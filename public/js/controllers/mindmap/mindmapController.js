@@ -484,7 +484,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         cSpan = [0, 0];
         cScale = 1;
         mapSaved = !1;
-        $("#ct-saveAction").addClass("disableButton")
+        $("#ct-saveAction").addClass("disableButton");
+        $("#ct-exportAction").addClass("disableButton");
+        document.getElementById("export-list").options[0].selected = true;
+        document.getElementById("export-list").disabled = true;
+        document.getElementById("export-list-create").options[0].selected = true;
+        document.getElementById("export-list-create").disabled = true;
         //Adding task to scenario
         taskAssign = {
             "endtoend": {
@@ -627,6 +632,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.loadMap = function(idx) {
         $("#ct-saveAction").removeClass("disableButton")
+        if ($scope.tab == 'tabCreate'){
+            $("#export-list-create").removeAttr("disabled", "disabled");
+            $("#export-list-create").change( function () {
+                $("#ct-exportAction").removeClass("disableButton");
+            });
+        }else if ($scope.tab == 'tabAssign'){
+            $("#export-list").removeAttr("disabled", "disabled");
+            $("#export-list").change( function () {
+                $("#ct-exportAction").removeClass("disableButton");
+            });
+        }
         $("#expCreate").attr('src','imgs/ic-collapse.png');
         $(".search-canvas").val('');
         $scope.functionTBE = 'loadMapPopupConfirmed';
@@ -3321,7 +3337,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var version_num = ($('.version-list').val() != undefined)? $('.version-list').val(): "0.0";
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
-        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "browserType": ["1"], "qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" }, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "" } } ] };
+        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "", "integrationType": "" }, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "","poolname":""} } ] };
         var moduleInfo = { "batchInfo": [] };
         blockUI('Loading UI');
         var moduleid = $('#createNewConfirmationPopup').attr('mapid');
@@ -3387,6 +3403,69 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
         );
     }
+
+
+
+    //Function to determine the method of export
+    $scope.exportMindmap1 = function() {
+        if ($scope.tab == 'tabAssign'){
+            var exportMode = $('#export-list').children("option").filter(":selected")[0].value;
+        }else if ($scope.tab == 'tabCreate'){
+            var exportMode = $('#export-list-create').children("option").filter(":selected")[0].value;
+        }
+        if (exportMode == 'json'){
+            $scope.exportMindmap(0);
+        } else if (exportMode == 'excel'){
+            $scope.exportToExcel();
+        } else if (exportMode == 'version'){
+            $scope.exportData();
+        }
+    }
+
+
+
+    /*
+    function : exportMindmap()
+    Purpose : Exporting Module in json file
+    param :
+    */
+
+   $scope.exportMindmap = function(versioning_status) {
+        if (versionFlag != 1) {
+            openDialogMindmap("Fail", "Please select a module to proceed");
+            return;
+        }
+        blockUI('Loading UI');
+        var mindmapId = $('#createNewConfirmationPopup').attr('mapid');
+        mindmapServices.exportMindmap(mindmapId).then(
+                function(response) {
+                if (response == "Invalid Session") {
+                    return $rootScope.redirectPage();
+                } else if (response == 'fail') {
+                    unblockUI();
+                    openDialogMindmap('Mindmap', "Data Export Failed");
+                    return;
+                }
+                if(response && response.name == loadedmodule && response._id != null) {
+                    mm = response;
+                    unblockUI();
+                    jsonDownload(loadedmodule+'.mm', JSON.stringify(mm, undefined, 2));
+                    openDialogMindmap('Mindmap', "Data Exported Successfully.");
+                } else {
+                    unblockUI();
+                    openDialogMindmap('Mindmap', "Module is not created");
+                    console.log('Not exported : ', loadedmodule);
+                }
+            },
+            function(err) {
+                console.log(err);
+                unblockUI();
+                openDialogMindmap('Mindmap', "Data Exported Failed");
+            }
+        );
+    }
+
+
 
     /*
     function : jsonDownload()
@@ -4917,6 +4996,140 @@ Purpose : displaying pop up for replication of project
             console.log(error);
         });        
     }
+
+
+    $scope.importMindmap = function($event) {
+		var counter1 = 0;
+        $scope.createdthrough="MM";
+        $("#importMindmapFile").attr("type", "file");
+        $("#importMindmapFile").trigger("click");
+        if($scope.projectList==undefined){
+            mindmapServices.populateProjects().then(function(res) {
+                if (res == "Invalid Session") {
+                    return $rootScope.redirectPage();
+                }
+                if (res.projectId.length > 0) {
+                    $scope.projectList = [];
+                    for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
+                        $scope.projectList.push({
+                            'apptype': res.appType[i],
+                            'name': res.projectName[i],
+                            'id': res.projectId[i],
+                            'releases':res.releases[i],
+                            'domains':res.domains[i]
+                        });
+                    }
+                }
+            }, function(error) {
+                console.log("Error:", error);
+                unblockUI();
+            });
+        }
+        importMindmapFile.addEventListener('change', function () {
+            if (counter1 == 0) {
+                blockUI("Loading...")
+				var file = importMindmapFile.files[0];
+				var textType = /json.*/;
+				var reader = new FileReader();
+				reader.onload = function (e) {
+					if (["mm","json"].indexOf((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase())>=0) {
+                        resultString = JSON.parse(reader.result);
+                        pro_list = []
+                        
+                        for(i=0;i<$scope.projectList.length;i++){
+                            pro_list.push($scope.projectList[i].id)
+                        }
+						if (!('testscenarios' in resultString)){
+                            openDialogMindmap("Import Error", "Incorrect JSON imported. Please check the contents!!");
+                            unblockUI();
+						} else if(resultString.testscenarios.length == 0){
+                            openDialogMindmap("No nodes found", "The file has no node structure to import, please check!!");
+                            unblockUI();
+						} else if(!(pro_list.includes(resultString.projectid))){
+                            openDialogMindmap("Import Error", "This project is not assigned to user, please check!!");
+                            unblockUI();
+						} else {
+                            mindmapServices.importMindmap({'content':resultString}).then(function(result) {
+                                if (result == "Invalid Session") {
+                                    return $rootScope.redirectPage();
+                                } else if (result == 'fail') {
+                                    openDialogMindmap('Error', 'error fetching data');
+                                } else {
+                                    var index=-1;
+                                    $scope.createMap('tabCreate');
+                                    $scope.tab = 'tabCreate';
+                                    $('.selectProject').addClass('selectProjectPosition');
+                                    $('.selectProject').show();
+                                    collapseSidebars();
+                                    $('#ct-moduleBox').attr('style','width:100%;left:0px;')
+                                    mindmapServices.populateProjects().then(function(res) {
+                                        if (res == "Invalid Session") {
+                                            return $rootScope.redirectPage();
+                                        }
+                                        if (res.projectId.length > 0) {
+                                            $scope.projectList = [];
+                                            for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
+                                                $scope.projectList.push({
+                                                    'apptype': res.appType[i],
+                                                    'name': res.projectName[i],
+                                                    'id': res.projectId[i],
+                                                    'releases':res.releases[i],
+                                                    'domains':res.domains[i]
+                                                });
+                                            }
+                                        }
+                                        $scope.projectListChange(resultString['projectid']);
+                                        var version_num = '';
+
+                                        if ($scope.param == 1) {
+                                            version_num = $('.version-list').val();
+                                        }
+                                        unloadMindmapData();
+                                        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectNameO || $scope.projectList[0].id, parseFloat(version_num), $('.cycle-list').val(),null,null)
+                                            .then(function(res) {
+                                                blockUI("Loading...");
+                                                if (res == "Invalid Session") {
+                                                    return $rootScope.redirectPage();
+                                                }
+                                                var nodeBox = d3.select('.ct-nodeBox');
+                                                $scope.allMMaps = res;
+                                                populateDynamicInputList();
+                                                for (i=0;i<$scope.allMMaps.length;i++){
+                                                    if($scope.allMMaps[i]._id==result._id){
+                                                        $scope.loadMap(i);
+                                                    }
+                                                    }
+                                                setModuleBoxHeight();
+                                                unassignTask=[];
+                                            }, function(error) {
+                                                console.log("Error:", error);
+                                                unblockUI();
+                                            })
+                                        
+                                        
+                                    });
+                                    // loadMindmapData1();
+                                    // $scope.loadMap(0);
+                                    //openDialogMindmap("Import Mindmap", "Success!");
+                                }
+                            }, function(error) {
+                                console.log(error);
+                                unblockUI();
+                            });
+						}
+					} else {
+                        openDialogMindmap("import Mindmap", "Please Check the file format you have uploaded!");
+                        unblockUI();
+					}
+				}
+				reader.readAsText(file);
+				counter1 = 1;
+                $("#importMindmapFile").val('');
+                unblockUI()
+            }
+        });
+    }
+
 
     $scope.showContent = function(sheetname) {
         if ($("#selectid option:selected").text()== "Please Select Sheet"){

@@ -105,6 +105,12 @@
 			   <li><a id='encrypt' href='#' class='userObject'><span><img src='imgs/ic-jq-editstep.png'></span>Create Object</a></li>
             </ul>
          </div>
+         <div ng-class="showContainer" id="left-bottom-section-app" style="display: none;">
+            <ul>
+               <li><a href='#' ng-click="importScreen($event)"  title="Import Screen"><span><img src='imgs/ic-import-script.png' alt='Import Screen' /></span>Import Screen</a><input style="visibility: hidden;display: none" type="file" id="importScreenFile" accept=".json"></li>
+               <li><a href='#' ng-click="exportScreen($event)"  title="Export Screen"><span><img src='imgs/ic-export-script.png' alt='Export Screen' /></span>Export Screen</a></li>
+            </ul>
+         </div>
       </div>
    </div>
    <!--Left Panel-->

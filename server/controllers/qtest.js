@@ -17,7 +17,9 @@ exports.loginToQTest_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
 		if (utils.isSessionActive(req)) {
-			var name = myserver.allSocketsICEUser[req.session.username];
+			var username = req.session.username;
+			var name = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("ICE Socket connecting IP: %s" , ip);
@@ -41,13 +43,13 @@ exports.loginToQTest_ICE = function (req, res) {
 						var username = req.body.qcUsername;
 						var password = req.body.qcPassword;
 						var url = req.body.qcURL;
-						var qcType = req.body.qcType;
+						var integrationType = req.body.integrationType;
 						var qcaction = req.body.qcaction;
 						var qcDetails = {
 							"qcUsername": username,
 							"qcPassword": password,
 							"qcURL": url,
-							"qcType" : qcType,
+							"integrationType" : integrationType,
 							"qcaction": qcaction
 						};
 						logger.info("Sending socket request for qclogin to redis");
@@ -55,7 +57,7 @@ exports.loginToQTest_ICE = function (req, res) {
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						function qclogin_listener(channel,message) {
 							var data = JSON.parse(message);
-							if(name == data.username){
+							if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
 								redisServer.redisSubServer.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occurred in loginQCServer_ICE: Socket Disconnected");
@@ -105,7 +107,9 @@ exports.qtestProjectDetails_ICE = function (req, res) {
 	var name;
 	try {
 		if (utils.isSessionActive(req)) {
-			var name = myserver.allSocketsICEUser[req.session.username];
+			var username = req.session.username;
+			var name = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
@@ -123,7 +127,7 @@ exports.qtestProjectDetails_ICE = function (req, res) {
 						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						function qclogin_listener(channel,message) {
 							var data = JSON.parse(message);
-							if(name == data.username){
+							if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
 								redisServer.redisSubServer.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occurred in qcProjectDetails_ICE: Socket Disconnected");
@@ -304,8 +308,9 @@ exports.qtestFolderDetails_ICE = function (req, res) {
 	try {
 		if (utils.isSessionActive(req)) {
 			var qcDetails = req.body;
-			// name = req.session.username;
-			var name = myserver.allSocketsICEUser[req.session.username];
+			var username = req.session.username;
+			var name = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
 			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
@@ -316,7 +321,7 @@ exports.qtestFolderDetails_ICE = function (req, res) {
 					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					function qclogin_listener(channel,message) {
 						var data = JSON.parse(message);
-						if(name == data.username){
+						if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
 							redisServer.redisSubServer.removeListener('message',qclogin_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occurred in qtestFolderDetails_ICE: Socket Disconnected");
@@ -430,8 +435,9 @@ exports.saveQtestDetails_ICE = function (req, res) {
 exports.viewQtestMappedList_ICE = function (req, res) {
 	logger.info("Inside UI service: viewQtestMappedList_ICE");
 	var userid = req.body.user_id;
-	// var name = req.session.username;
-	var name = myserver.allSocketsICEUser[req.session.username];
+	var username = req.session.username;
+	var name = undefined
+			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
 	getQcDetailsForUser(userid, function (responsedata) {
 		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 			if (redisres[1]>0) {
@@ -444,7 +450,7 @@ exports.viewQtestMappedList_ICE = function (req, res) {
 				redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 				function qclogin_listener(channel,message) {
 					var data = JSON.parse(message);
-					if(name == data.username){
+					if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
 						redisServer.redisSubServer.removeListener('message',qclogin_listener);
 						if (data.onAction == "unavailableLocalServer") {
 							logger.error("Error occurred in loginQCServer_ICE: Socket Disconnected");

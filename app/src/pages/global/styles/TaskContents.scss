@@ -151,6 +151,9 @@
 
     .disable-task{
         pointer-events: none;
+    }
+
+    .dark-bg, .disable-task{
         filter: brightness(0.5);
     }
     

@@ -12,10 +12,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.ldapConf = {};
 	$scope.samlConf = {};
 	$scope.oidcConf = {};
+	$scope.mailConf = {};
 	$scope.userConf = {};
 	$scope.domainConf = {};
 	$scope.moveItems = {};
 	$scope.assignProj = {};
+	$scope.createIcePool = {};
+	$scope.allocateIcePool = {};
 	$scope.preferences = {};
 	$scope.sessionConf = {};
 	$scope.tokens = {};
@@ -166,6 +169,432 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			}
 		});
 	});
+
+	const populatePool = () => new Promise ((res) => {
+		var data = {
+			poolid:"all",
+			projectids:[]
+		}
+		adminServices.getPools(data)
+		.then(function(data){
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Edit User", "Failed to fetch users.");
+			} else if(data == "empty") {
+				openModalPopup("Edit User", "There are no users created yet.");
+			} else {
+				var e = Object.entries(data)
+				e.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
+				res({data:e})
+			}
+			unblockUI();
+			res([]);
+		}, function (error) {
+			unblockUI();
+			console.error(error)
+			openModalPopup("Edit User", "Failed to fetch users.");
+			res([]);
+		});
+	})
+
+	const populateICEList = () => new Promise ((res) => {
+		var id = $scope.allocateIcePool.selectedIcePool._id
+		adminServices.getICEinPools({poolid:[id]})//temp
+		.then(function(data){
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Edit User", "Failed to fetch users.");
+			} else if(data == "empty") {
+				openModalPopup("Edit User", "There are no users created yet.");
+			} else {
+				var e = Object.entries(data)
+				e.sort((a,b) => a[1].icename.localeCompare(b[1].icename))
+				res({data:e,dict:data})
+			}
+			unblockUI();
+			res([]);
+		}, function (error) {
+			unblockUI();
+			console.error(error)
+			openModalPopup("Edit User", "Failed to fetch users.");
+			res([]);
+		});
+	})
+	
+	const createIcePoolReset = () =>{
+		$scope.tokens.name=undefined
+		$scope.createIcePool.poolName = ""
+		$('#assignedProjectAP option').appendTo($('#allProjectAP'))
+		$('select#allProjectAP').val([])
+		$('#tokenName').val('')
+		$('#tokenName').removeClass('error-border')
+	}
+
+	$scope.clearQueue = () =>{
+		if($scope.createIcePool.selectedIcePool && $scope.createIcePool.selectedIcePool.poolname){
+			openDeleteGlobalModal("Clear Queue", "clearQueue", `Are you sure you want to clear queue of the ICE pool : ${$scope.createIcePool.selectedIcePool.poolname} ? \nAll the jobs queued in this pool will be cancelled.`);
+		}else{
+			openDeleteGlobalModal("Clear Queue", "clearQueue", `Are you sure you want to clear all the queues ? \nAll the jobs queued in every pool will be cancelled.`);
+		}
+	}
+	$(document).on('click','#clearQueue', function(e) {
+		blockUI('Clearing Queue ...')
+		var poolids = []
+		var type = "any";
+		if($scope.createIcePool.selectedIcePool && $scope.createIcePool.selectedIcePool._id){
+			poolids.push($scope.createIcePool.selectedIcePool._id)
+		}else{
+			type = "all"	
+		}
+		var input = {"poolids":poolids,"type":type}
+		adminServices.clearQueue(input)
+		.then((data)=>{
+			if (data == "success") {
+				openModalPopup("Success", "Cleared queue successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			}else {
+				openModalPopup("ICE Pool", "Failed to clear queue");
+			}
+			unblockUI()
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to clear queue");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	})
+
+	$scope.EditIcePoolReset = () =>{
+		$('#update-icepool-rename').addClass("hide")
+		$('#assignedProjectAP option').remove()
+		$("#allProjectAP option").remove()
+		$('select#allProjectAP').val([])
+		$scope.createIcePool.allProjectList.forEach((e)=>{
+			$("#allProjectAP").append('<option value='+e._id+'>'+e.name+'</option>');
+		})
+		$scope.createIcePool.allIcePoolListFilter=''
+		$scope.createIcePool.selectedIcePool = undefined
+	}
+
+	// on click of create ice pool from action bar
+	$scope.createIcePool.click = () =>{
+		createIcePoolReset()
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#createIcePool").find("img").addClass("selectedIcon");
+		blockUI('Fetching Projects ...')
+		var requestedids = ["all"];
+		var idtype = ["all"];
+		adminServices.getDetails_ICE(idtype, requestedids)
+		.then((data)=>{
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Create ICE Pool", "Failed to fetch projects.");
+			} else if(data == "empty") {
+				openModalPopup("Create ICE Pool", "There are no projects created yet.");
+			} else {
+				var arr = Object.keys(data).map((id)=>{return data[id]})
+				arr.sort((a,b) => a.name.localeCompare(b.name));
+				$scope.createIcePool.allProjectList = arr
+			}
+			unblockUI()
+		},(error)=>{
+			openModalPopup("Create ICE Pool", "Failed to fetch projects.");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	}
+	
+	$scope.createIcePool.changeName = (val) =>{
+		if($('#tokenName').val()==''){
+			$('#tokenName').addClass('error-border')
+		}else{
+			$('#tokenName').removeClass('error-border')
+		}
+		$scope.createIcePool.poolName = val
+	} 
+
+	$scope.createIcePool.saveClick = () =>{
+		var projList = [];
+		$("#assignedProjectAP option").each(function () {
+			projList.push($(this).val())
+		});
+		var data = {
+			poolname: $scope.createIcePool.poolName,
+			projectids: projList
+		}
+		blockUI('Saving ICE Pool ...')
+		adminServices.createPool_ICE(data)
+		.then((data)=>{
+			if (data == "success") {
+				createIcePoolReset()
+				openModalPopup("Success", "ICE Pool created successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data  == 'Pool exists') {
+				$('#tokenName').addClass('error-border')
+				openModalPopup("Error", "Pool name already exist");
+			} else {
+				openModalPopup("Create ICE Pool", "There are no projects created yet.");
+			}
+			unblockUI()
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to create ICE Pool");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	}
+
+	$scope.createIcePool.selectIcePool = (pool) =>{
+		$scope.createIcePool.selectedIcePool=pool[1]
+		$("#update-icepool-rename").find('input').val(pool[1].poolname)
+		$("#update-icepool-rename").removeClass("hide");
+		var a=[]
+		if(pool[1].projectids){
+			$scope.createIcePool.allProjectList.forEach((e)=>{
+				if(pool[1].projectids.indexOf(e._id)!=-1){
+					a.push(e)
+					$("#allProjectAP option[value='"+e._id+"']").remove()
+				}
+			})
+		}
+		$scope.createIcePool.selectedIcePool=pool[1]
+		$scope.createIcePool.selectedIcePool.projectList = a;
+	}
+
+	// on click of edit ice pool button
+	$scope.editICEPool = async() => {
+		$scope.EditIcePoolReset()
+		$scope.tab = "tabIcePoolEdit";
+		blockUI("Fetching ICE Pools...");
+		var res = await populatePool()
+		$scope.createIcePool.allIcePoolList = res.data
+		unblockUI();
+	}
+
+	$scope.createIcePool.updateIcePool = () =>{
+		var pool = $scope.createIcePool.selectedIcePool
+		pool.projectids=[]
+		pool.ice_added=[]
+		pool.ice_deleted=[]
+		pool.poolname=$('#tokenName').val()
+		if(!pool.poolname || pool.poolname == ""){
+			$('#tokenName').addClass('error-border')
+			return;
+		}
+		$('#assignedProjectAP option').each((i,e)=>{pool.projectids.push(e.value)})
+		blockUI('Saving ICE Pool ...')
+		adminServices.updatePool(pool)
+		.then((data)=>{
+			if (data == "success") {
+				$scope.EditIcePoolReset()
+				populatePool().then((res)=>{
+				$scope.createIcePool.allIcePoolList = res.data
+				})
+				openModalPopup("Success", "ICE Pool updated successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data  == 'Pool exists') {
+				$('#tokenName').addClass('error-border')
+				openModalPopup("Error", "Pool name already exist");
+			} else {
+				openModalPopup("Create ICE Pool", "Failed to update ICE Pool.");
+			}
+			unblockUI()
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to update ICE Pool.");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	}
+
+	$scope.createIcePool.deleteIcePool = function () {
+		openDeleteGlobalModal("Delete ICE Pool", "delICEPool", `Are you sure you want to delete ICE Pool : ${$scope.createIcePool.selectedIcePool.poolname} ? \nAll the jobs queued on this pool will be canceled.`);
+	};
+
+	$(document).on('click','#delICEPool', function(e) {
+		hideDeleteGlobalModal();
+		blockUI('Deleting ICE Pool ...')
+		var id = $scope.createIcePool.selectedIcePool._id
+		adminServices.deletePools({'poolid':[id]})
+		.then((data)=>{
+			if (data == "success") {
+				$scope.EditIcePoolReset()
+				populatePool().then((res)=>{
+				$scope.createIcePool.allIcePoolList = res.data
+				})
+				openModalPopup("Success", "ICE Pool deleted successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else {
+				openModalPopup("ICE Pool", "Failed to delete ICE Pool");
+			}
+			unblockUI()
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to delete ICE Pool");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	})
+	
+	// on click of allocate ice pool button
+	$scope.allocateIcePool.click = async() =>{
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#allocateIcePool").find("img").addClass("selectedIcon");
+		//api to get total ice count and remaining ice count
+		$scope.iceAllocateType('quantity');
+		blockUI("Fetching ICE Pools...");
+		unblockUI()
+	}
+	
+	$scope.allocateIcePool.saveClick = () =>{
+		blockUI('Saving in Progress. Please Wait...');
+		var pool = $scope.allocateIcePool.selectedIcePool
+		var iceData = $scope.allocateIcePool.iceData
+		var type = $scope.allocateIcePool.type 
+		if(type == 'quantity'){
+			var iceList = Object.keys(pool.ice_list)
+			var val = $('#icepoolNumInp').val() - iceList.length
+			pool.ice_deleted = []
+			pool.ice_added = []
+			var availableIce = Object.keys(iceData.available_ice).length 
+			if(val > availableIce){
+				openModalPopup("Error", "Number of ICE assigned exceeds available ICE");
+				unblockUI()
+				return;
+			}
+			if(val<0){
+				pool.ice_deleted = Object.keys($scope.allocateIcePool.iceDict).slice(0,Math.abs(val))
+			}else{
+				pool.ice_added = Object.keys(iceData.available_ice).slice(0,val)
+			}
+		}
+		if(type == 'specific'){
+			var ice_List = []
+			var ice_added = []
+			var ice_deleted = []
+			$('#assignedProjectAP option').each((i,e)=>{
+				ice_List.push(e.value)
+				if(!(e in $scope.allocateIcePool.iceDict)){
+					ice_added.push(e.value)
+				}
+			})
+			$scope.allocateIcePool.iceList.forEach((e)=>{
+				if(ice_List.indexOf(e[0])==-1){
+					ice_deleted.push(e[0])
+				}
+			})
+			pool.ice_added= ice_added
+			pool.ice_deleted=ice_deleted
+		}
+		blockUI('Saving ICE Pool ...')
+		adminServices.updatePool(pool)
+		.then((data)=>{
+			if (data == "success") {
+				$scope.iceAllocateType(type)
+				openModalPopup("Success", "ICE Pool updated successfully.");
+			} else if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else {
+				openModalPopup("ICE Pool", "Failed to update ICE Pool");
+				unblockUI()
+			}
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to update ICE Pool");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	}
+
+	$scope.allocateIcePool.selectIcePool = (pool) =>{
+		$scope.allocateIcePool.selectedIcePool=pool
+		blockUI('Fetching ICE Pool...')
+		populateICEList().then(function(res){
+			$scope.allocateIcePool.iceList = res.data
+			$scope.allocateIcePool.iceDict = res.dict
+			if($scope.allocateIcePool.type==='quantity'){
+				$('#update-icepool-count').removeClass("hide")
+				$('#update-icepool-count').find('input').attr({
+					"max":$scope.allocateIcePool.iceCount+res.data.length,
+					"min":0,
+				})
+				$('#update-icepool-count').find('input').val(res.data.length)
+			}
+			if($scope.allocateIcePool.type==='specific'){
+				var selectBox = $("#assignedProjectAP");
+				res.data.forEach((e)=>{
+					selectBox.append('<option value='+e[0]+'>'+e[1].icename+'</option>');
+				})
+			}
+		})
+
+	}
+
+	$scope.allocationPoolReset = () => {
+		var type = $scope.allocateIcePool.type 
+		$scope.allocateIcePool.allIcePoolListFilter=''
+		$scope.allocateIcePool.selectedIcePool = undefined	
+		if(type == 'quantity'){
+			$('#update-icepool-count').addClass("hide")
+			$('#icepoolNumInp').val('')
+		}
+		if(type == 'specific'){
+			$('#allProjectAP option').remove()
+			if($scope.allocateIcePool.iceData){
+				var arr = {...$scope.allocateIcePool.iceData.available_ice}
+				Object.entries(arr).forEach((e)=>{
+					$('#allProjectAP').append('<option value='+e[0]+'>'+e[1].icename+'</option>')
+				})
+			}
+			$('#assignedProjectAP option').remove()
+			$('select#allProjectAP').val([])
+		}
+	}
+
+	$scope.iceAllocateType = async(type) => {
+		blockUI('Fetching ICE Pools...')
+		$scope.allocateIcePool.iceData = {}
+		$scope.allocateIcePool.type = type
+		$(".unactive-opt").removeClass("unactive-opt")
+		if(type==='quantity'){
+			$('#icepool-specific').addClass('unactive-opt')
+		}else{
+			$('#icepool-quantity').addClass('unactive-opt')
+		}
+		$scope.allocationPoolReset()
+		adminServices.getAvailable_ICE()
+		.then((data)=>{
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data  == 'fail') {
+				openModalPopup("Error", "Failed to fetch ICE");
+				unblockUI()
+			} else if(data.length == 0) {
+				openModalPopup("Error", "No active ICE available");
+				unblockUI()
+			} else {
+				if(type==='quantity'){
+					var available = Object.keys(data.available_ice).length
+					var total = available + Object.keys(data.unavailable_ice).length
+					$scope.allocateIcePool.iceCount = {total:total,available:available}
+					$scope.allocateIcePool.iceData = data
+				}if(type=='specific'){
+					$scope.allocateIcePool.iceData = data
+				}
+				populatePool().then((res)=>{
+					$scope.allocateIcePool.allIcePoolList = res.data
+					unblockUI()
+				})
+			}
+		},(error)=>{
+			openModalPopup("ICE Pool", "Failed to fetch ICE Pool");
+			console.log("Error:::::::::::::", error);
+			unblockUI()
+		})
+	}
+
 	// Assign Projects Tab Click
 	$scope.assignProj.click = function () {
 		resetAssignProjectForm();
@@ -1108,6 +1537,56 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 	};
 
+
+	//Export Project Action
+	$scope.export_project = function ($event) {
+		$("#selDomainEdit,#selProject").removeClass("selectErrorBorder");
+		if ($('#selDomainEdit option:selected').val() == "") {
+			$("#selDomainEdit").addClass("selectErrorBorder");
+		} else if ($('#selProject option:selected').val() == "") {
+			$("#selProject").addClass("selectErrorBorder");
+		} else if ($("#releaseList").children("li").length == 0) {
+			openModalPopup("Update Project", "Please add atleast one release");
+		}
+		else {
+			blockUI("Loading...");
+			flag = false;
+			var projectId = $('#selProject option:selected').val();
+			var projectName = $('#selProject option:selected').text();
+			adminServices.exportProject(projectId,projectName)
+				.then(function (data) {
+					if (data == "Invalid Session") {
+						$rootScope.redirectPage();
+					}else if (data == "fail") openModalPopup("Fail", "Error while exporting to zip");
+					else {
+						openWindow = 0;
+						if (openWindow == 0) {
+							var file = new Blob([data], { type: 'application/zip' });
+							if (isIE) {
+								navigator.msSaveOrOpenBlob(file);
+							}else{
+								var fileURL = URL.createObjectURL(file);
+								var a = document.createElement('a');
+								a.href = fileURL;
+								a.download = projectName+'.zip';
+								document.body.appendChild(a);
+								a.click();
+								document.body.removeChild(a);
+								URL.revokeObjectURL(fileURL);
+							}
+							openModalPopup("Success", "Successfully exported to zip");
+						}
+						openWindow++;
+					}
+					unblockUI();
+				}, function (error) {
+					console.log("Error:::::::::::::", error);
+				});
+		}
+	}
+
+
+
 	function resetForm() {
 		//$("#selDomain").prop('selectedIndex', 0);
 		// $("#selDomain").val("")
@@ -1954,6 +2433,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					}
 					$(document).on('change','#selDomainEdit', function() {
 						$("#releaseList, #cycleList").empty()
+						//$("#export_button").addClass("disableButton")
+						document.getElementById("export_button").disabled = true;
 						var domainName = $("#selDomainEdit option:selected").val();
 						console.log(domainName)
 						var requestedname = [];
@@ -2001,6 +2482,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 								$("#selProject").append(selectOptions[i]);
 							}
 							$("#selProject").prop('selectedIndex', 0);
+							document.getElementById("selProject").addEventListener('change', function (e) {
+								document.getElementById("export_button").disabled = false;
+								//$("#export_button").removeClass("disableButton")
+							});
 						}, function (error) {
 							console.log("Error:::::::::::::", error);
 						});
@@ -2758,7 +3243,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.cert = "";
 		this.certName = "No file choosen";
 		this.secure = "false";
-		this.fieldmap = {uname: "None", fname: "None", lname: "None", email: "None"};
+		this.fieldmap = {uname: "", fname: "", lname: "", email: ""};
 		this.fieldMapOpts = ["None"];
 		if (action == "edit") this.auth = "";
 		this.testStatus = "false";
@@ -3390,6 +3875,311 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}, function (error) {
 			unblockUI();
 			openModalPopup("Edit Configuration", failMsg);
+		});
+	};
+
+	// Email Server Configuration Click
+	$scope.mailConf.click = function () {
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#mailConfigTab").find("span.fa").addClass("selectedIcon");
+		this.providers = ["SMTP"];
+		this.channel = "email";
+		this.toggleStatus = "Disable";
+		this.loaded = "";
+		this.provider = "";
+		this.active = false;
+		this.name = "";
+		this.host = "";
+		this.port = "";
+		this.appurl = window.location.href.replace('/admin', '');
+		this.secure = "auto";
+		this.insecuretls = "false";
+		this.testMailID = "";
+		this.testMailMsg = "";
+		this.auth = {
+			type: "",
+			username: "",
+			password: ""
+		};
+		this.sender = {
+			name: "",
+			email: ""
+		};
+		this.pool = {
+			enable: false,
+			maxConnections: "",
+			maxMessages: ""
+		};
+		this.timeouts = {
+			connection: "",
+			greeting: "",
+			socket: ""
+		};
+		this.proxy = {
+			enable: false,
+			url: "",
+			auth: false,
+			user: "",
+			pass: ""
+		};
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail,#appURL,#proxyURL,#proxyUser,#proxyPass").removeClass("inputErrorBorder");
+		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
+	};
+
+	$scope.mailConf.getProviderInfo = function() {
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail").removeClass("inputErrorBorder");
+		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
+		blockUI("Loading Configurations...");
+		adminServices.getNotificationChannels("provider", this.channel, this.provider)
+		.then(function (data) {
+			unblockUI();
+			if (data == "Invalid Session") $rootScope.redirectPage();
+			else if (data == "fail") openModalPopup("Email Configuration", "Fail to fetch configured details for selected provider.");
+			else if (data != "empty") {
+				$scope.mailConf.loaded = $scope.mailConf.name = data.name;
+				$scope.mailConf.host = data.host;
+				$scope.mailConf.port = data.port;
+				$scope.mailConf.active = data.active;
+				$scope.mailConf.toggleStatus = (data.active)? "Disable":"Enable";
+				$scope.mailConf.secure = data.tls.security;
+				$scope.mailConf.insecuretls = data.tls.insecure.toString();
+				const authType = (data.auth && data.auth.type) || data.auth;
+				if (authType == "basic") $scope.mailConf.auth = data.auth;
+				else {
+					$scope.mailConf.auth = {
+						type: "none",
+						username: '',
+						password: ''
+					};
+				}
+				$scope.mailConf.sender = data.sender;
+				$scope.mailConf.appurl = data.appurl;
+				$scope.mailConf.timeouts = data.timeouts || {};
+				if (!data.pool) data.pool = {};
+				$scope.mailConf.pool.enable = data.pool.enable || false;
+				$scope.mailConf.pool.maxConnections = data.pool.maxconnections || "";
+				$scope.mailConf.pool.maxMessages = data.pool.maxmessages || "";
+				if (!data.proxy) data.proxy = {};
+				$scope.mailConf.proxy.enable = data.proxy.enable || false;
+				$scope.mailConf.proxy.url = data.proxy.url || "";
+				$scope.mailConf.proxy.auth = data.proxy.auth || false;
+				$scope.mailConf.proxy.user = data.proxy.user || "";
+				$scope.mailConf.proxy.pass = data.proxy.pass || "";
+			}
+		}, function (error) {
+			unblockUI();
+			console.error(error);
+			openModalPopup("Email Configuration", "Something Went Wrong");
+		});
+	};
+
+	$scope.mailConf.getConfObj = function() {
+		return {
+			channel: this.channel,
+			provider: this.provider,
+			name: this.name,
+			host: this.host,
+			port: this.port,
+			auth: this.auth,
+			sender: this.sender,
+			enabletls: this.secure,
+			insecuretls: this.insecuretls,
+			appurl: this.appurl,
+			pool: this.pool,
+			proxy: this.proxy,
+			timeouts: this.timeouts
+		};
+	};
+
+	$scope.mailConf.toggle = function() {
+		const conf = {
+			channel: this.channel,
+			provider: this.provider,
+			name: this.loaded
+		};
+		const action = this.toggleStatus;
+		let emsg = "Failed to "+action+" '"+conf.name+"' Configuration.";
+		blockUI(action.slice(0,-1) + "ing Configuration...")
+		adminServices.manageNotificationChannels(action.toLowerCase(), conf)
+		.then(function(data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == "fail") openModalPopup(action+" Configuration", emsg);
+			else if (data == "success") {
+				openModalPopup(action+" Configuration", "'"+conf.name+"' Configuration "+action+"d!");
+				$scope.mailConf.getProviderInfo();
+			} else if(/^1[0-4]{9}$/.test(data)) {
+				if (parseInt(data[1])) {
+					openModalPopup(action+" Configuration", emsg+" Invalid Request!");
+					return;
+				}
+				const errfields = [];
+				if (parseInt(data[2])) errfields.push("Server Name");
+				if (parseInt(data[3])) errfields.push("Channel");
+				openModalPopup(action+" Configuration", emsg+" Following values are invalid: "+errfields.join(", "));
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup(action+" Configuration", emsg);
+			console.error("Error in "+action+" Configuration:", error);
+		});
+	};
+
+	$scope.mailConf.validate = function() {
+		let flag = true;
+		let popped = false;
+		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail,#appURL,#proxyURL,#proxyUser,#proxyPass").removeClass("inputErrorBorder");
+		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
+		const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
+		const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+		const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (this.provider == "") {
+			$("#mailProvider").addClass("selectErrorBorder");
+			flag = false;
+		}
+		if (this.name == "") {
+			$("#mailName").addClass("inputErrorBorder");
+			flag = false;
+		} else if (!regExName.test(this.name)) {
+			$("#mailName").addClass("inputErrorBorder");
+			if (!popped) openModalPopup("Error", "Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen.");
+			flag = false;
+			popped = true;
+		}
+		if (this.host == "") {
+			$("#mailHost").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.port == "") {
+			$("#mailPort").addClass("inputErrorBorder");
+			flag = false;
+		} else if (!((+this.port >= 0) && (+this.port < 65536))) {
+			$("#mailPort").addClass("inputErrorBorder");
+			if (!popped) openModalPopup("Error", "Invalid Server Port provided! Value has to be a number between 0 and 65535.");
+			flag = false;
+			popped = true;
+		}
+		if (this.auth.type == "") {
+			$("#authenticationType").addClass("selectErrorBorder");
+			flag = false;
+		}
+		if (this.sender.name == "") {
+			$("#senderName").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.sender.email == "" || !emailRegEx.test(this.sender.email)) {
+			$("#senderEmail").addClass("inputErrorBorder");
+			flag = false;
+		}
+		if (this.appurl == "") {
+			$("#appURL").addClass("inputErrorBorder");
+			flag = false;
+		} else if (!regExURL.test(this.appurl)) {
+			$("#appURL").addClass("inputErrorBorder");
+			if (!popped) openModalPopup("Error", "Invalid Avo Assure Application URL provided!");
+			flag = false;
+			popped = true;
+		}
+		if (this.proxy.enable) {
+			if (this.proxy.url == "") {
+				$("#proxyURL").addClass("inputErrorBorder");
+				flag = false;
+			} else if (!regExURL.test(this.proxy.url)) {
+				$("#proxyURL").addClass("inputErrorBorder");
+				if (!popped) openModalPopup("Error", "Invalid Proxy Server URL provided!");
+				flag = false;
+				popped = true;
+			}
+			if (this.proxy.auth) {
+				if (this.proxy.user == "") {
+					$("#proxyUser").addClass("inputErrorBorder");
+					flag = false;
+				}
+				if (this.proxy.pass == "") {
+					$("#proxyPass").addClass("inputErrorBorder");
+					flag = false;
+				}
+			}
+		}
+		if (!flag && !popped) openModalPopup("Error", "Form contains errors!");
+		return flag;
+	};
+
+	$scope.mailConf.showTestMail = function() {
+		if (!this.validate()) return false;//openModalPopup("Test Configuration", "Certain fields have invalid values");
+		this.testMailID = '';
+		this.testMailMsg = '';
+		$("#testMailID").removeClass("inputErrorBorder");
+		$('#emailserverModal').modal("show");
+	};
+
+	$scope.mailConf.test = function() {
+		$("#testMailID").removeClass("inputErrorBorder");
+		const recipient = this.testMailID;
+		const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (recipient.length === 0 || !emailRegEx.test(recipient)) {
+			this.testMailMsg = "Recipient address is invalid!";
+			$("#testMailID").addClass("inputErrorBorder");
+			return false;
+		}
+		this.testMailMsg = 'Sending...';
+		const conf = this.getConfObj();
+		adminServices.testNotificationChannels(this.channel, this.provider, recipient, conf)
+		.then(function(data) {
+			let status = "Fail to send the test mail. Re-check the configuration.";
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == "invalidprovider") status = "Selected Provider is not supported yet!";
+			else if (data == "invalidrecipient") status = "Recipient address is invalid!";
+			else if (data == "success") status = "Test Email Sent!";
+			else status = "Fail to send the test mail. Re-check the configuration.";
+			$scope.mailConf.testMailMsg = status;
+		}, function (error) {
+			$scope.mailConf.testMailMsg = "Fail to send the test mail. Re-check the configuration.";
+			console.error("Error in Test Email:", error);
+		});
+		//$('#emailserverModal').modal("hide");
+	};
+
+	$scope.mailConf.manage = function() {
+		if (!this.validate()) return false;
+		const conf = this.getConfObj();
+		const action = (this.loaded)? "Update":"Create";
+		let emsg = "Failed to "+action+" '"+conf.name+"' Configuration.";
+		blockUI(action.slice(0,-1) + "ing Configuration...")
+		adminServices.manageNotificationChannels(action.toLowerCase(), conf)
+		.then(function(data) {
+			unblockUI();
+			if (data == "Invalid Session") return $rootScope.redirectPage();
+			else if (data == "fail") openModalPopup(action+" Configuration", emsg);
+			else if (data == "exists") openModalPopup(action+" Configuration", "'"+conf.name+"' configuration already exists");
+			else if (data == "success") {
+				openModalPopup(action+" Configuration", "'"+conf.name+"' Configuration "+action+"d!");
+				$scope.mailConf.getProviderInfo();
+			} else if(/^1[0-4]{12}$/.test(data)) {
+				if (+data[1]) {
+					openModalPopup(action+" Configuration", emsg+" Invalid Request!");
+					return;
+				}
+				const errfields = [];
+				if (+data[2]) errfields.push("Server Name");
+				if (+data[3]) errfields.push("Channel");
+				if (+data[4]) errfields.push("Provider");
+				if (+data[5]) errfields.push("Server Host");
+				if (+data[6]) errfields.push("Server Port");
+				if (+data[7]) errfields.push("Sender Email");
+				if (+data[8]) errfields.push("Secure Connection");
+				if (+data[9]) errfields.push("Authentication");
+				if (+data[10]) errfields.push("Avo Assure Application URL");
+				if (+data[11]) errfields.push("Proxy URL");
+				if (+data[12] == 1) errfields.push("Proxy Username");
+				else if (+data[12] == 2) errfields.push("Proxy Password");
+				else if (+data[12] == 3) errfields.push("Proxy Credentials");
+				openModalPopup(action+" Configuration", emsg+" Following values are invalid: "+errfields.join(", "));
+			}
+		}, function (error) {
+			unblockUI();
+			openModalPopup(action+" Configuration", emsg);
+			console.error("Error in "+action+" Configuration:", error);
 		});
 	};
 

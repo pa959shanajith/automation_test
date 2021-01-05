@@ -20,6 +20,16 @@ mySPA.factory('headerServices', ['$http','$q', function ($http,$q){
 			return $http.post('/keepSessionAlive')
 			.then(function(response) { return response.data},
 			function(response) {return $q.reject(response.data)})
+		},		
+		getUserICE : function(){	
+			return $http.post('/getUserICE')
+			.then(function(response) { return response.data},
+			function(response) {return $q.reject(response.data)})
+		},
+		setDefaultUserICE : function(defaultICE){	
+			return $http.post('/setDefaultUserICE',{defaultICE:defaultICE})
+			.then(function(response) { return response.data},
+			function(response) {return $q.reject(response.data)})
 		}
     }
 }]);

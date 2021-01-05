@@ -6,7 +6,8 @@ import LoginReducer from './pages/login/state/reducer';
 import adminReducer from './pages/admin/state/reducer.js';
 import pluginReducer from './pages/plugin/state/reducer.js';
 import mindmapReducer from './pages/mindmap/state/reducer.js';
-import scrapeReducer from './pages/scrapescreen/state/reducer.js';
+import scrapeReducer from './pages/scrape/state/reducer.js';
+import designReducer from './pages/design/state/reducer';
 
 const persistConfig = {
     key: 'login',
@@ -21,7 +22,8 @@ export const rootReducer = combineReducers({
     login : LoginReducer,
     admin : adminReducer,
     plugin : pluginReducer,
-    scrape : scrapeReducer
+    scrape : scrapeReducer,
+    design : designReducer,
 });
   
 const pReducer = persistReducer(persistConfig, rootReducer);

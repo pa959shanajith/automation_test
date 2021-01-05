@@ -43,13 +43,7 @@ exports.saveMindmap = function(req,res) {
 
 exports.saveMindmapE2E = function(req,res) {
 	logger.info("Inside UI service: saveMindmapE2E");
-	var createdthrough = 'Mindmaps Creation';
 	var RequestedJSON = req;
-	if (RequestedJSON.from_version != undefined && RequestedJSON.new_version !=undefined) {
-		versionnumber = RequestedJSON.from_version;
-		newversionnumber = RequestedJSON.new_version;
-	}
-
 	var inputs = {
 		"data": RequestedJSON 
 	};
@@ -59,7 +53,6 @@ exports.saveMindmapE2E = function(req,res) {
 			"Content-Type": "application/json"
 		}
 	};
-
 	client.post(epurl+"create_ice/saveMindmapE2E", args,
 		function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
