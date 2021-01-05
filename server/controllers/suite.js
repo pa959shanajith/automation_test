@@ -623,7 +623,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 					}
 					result["status"] = "Success";
 				}catch (e){
-					logger.error("Exception in the function executeScheduling from scheduleTestSuite: reshedule: %s", ex);
+					logger.error("Exception in the function ExecuteTestSuite_ICE: %s", ex);
 					result["Error"] = "Smart Execution Failed"
 				}
 			}
