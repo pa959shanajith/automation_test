@@ -23,18 +23,18 @@ process.env.nullpool = "5fc13ea772142998e29b5e64";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
-// if (cluster.isMaster) {
-// 	cluster.fork();
-// 	cluster.on('disconnect', function(worker) {
-// 		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
-// 	});
-// 	cluster.on('exit', function(worker) {
-// 		if (worker.exitedAfterDisconnect !== true) {
-// 			logger.error('Worker %d is killed!', worker.id);
-// 			cluster.fork();
-// 		}
-// 	});
-// } else
+if (cluster.isMaster) {
+	cluster.fork();
+	cluster.on('disconnect', function(worker) {
+		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
+	});
+	cluster.on('exit', function(worker) {
+		if (worker.exitedAfterDisconnect !== true) {
+			logger.error('Worker %d is killed!', worker.id);
+			cluster.fork();
+		}
+	});
+} else
 {
 	try {
 		var express = require('express');
@@ -143,53 +143,6 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
 			}
-			if (!req.session.username) {
-				// req.session.username = "admin";
-				// req.session.uniqueId = "vm-eH5lLa-76Ka-F2Y6aTZJsqW_KmHAo";
-				// req.session.usertype = "inhouse";
-				// req.session.logged = true;
-				// // req.session.userid = "FETCH FROM db.users";
-				// req.session.userid = "5db0022cf87fdec084ae49ad";
-				// //req.session.userid = "5de4e4aed9cdd57f4061bc99";
-				// req.session.ip = "0.0.0.0";
-				// req.session.loggedin = "2020-08-10T15:21:03.472Z";
-				// // req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
-				// // req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
-				// req.session.defaultRoleId = "5db0022cf87fdec084ae49a9"
-				// req.session.activeRoleId = "5db0022cf87fdec084ae49a9"
-				// // req.session.defaultRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
-				// // req.session.activeRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
-				// req.session.emailid = "batman@dc.com";
-				// req.session.additionalroles = [];
-				// req.session.firstname = "Bat";
-				// req.session.lastname = "Man";
-				// // req.session.activeRole = req.session.defaultRole = "Test Lead";
-				// req.session.activeRole = req.session.defaultRole = "Admin";
-
-
-
-				req.session.username = "anvesh.sharma";
-				req.session.uniqueId = "vm-eH5lLa-76Ka-F2Y6aTZJsqW_KmHAo";
-				req.session.usertype = "inhouse";
-				//req.session.logged = true;
-				// req.session.userid = "FETCH FROM db.users";
-				req.session.userid = "5f8971221ca309ef17db1fed";
-				//req.session.userid = "5de4e4aed9cdd57f4061bc99";
-				req.session.ip = "0.0.0.0";
-				req.session.loggedin = "2020-08-10T15:21:03.472Z";
-				// req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
-				// req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
-				req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
-				req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
-				// req.session.defaultRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
-				// req.session.activeRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
-				req.session.emailid = "batman@dc.com";
-				req.session.additionalroles = [];
-				req.session.firstname = "Bat";
-				req.session.lastname = "Man";
-				req.session.activeRole = req.session.defaultRole = "Test Lead";
-				// req.session.activeRole = req.session.defaultRole = "Admin";
-			}
 			return next();
 		});
 
@@ -234,22 +187,12 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 			}));
 			//CORS
 			app.all('*', function(req, res, next) {
-				const origin =  req.headers["origin"] || req.hostname;
-				console.log(origin);
-				res.setHeader('Access-Control-Allow-Origin', origin);
-				res.setHeader('Access-Control-Allow-Credentials', true);
-				res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Accept, Content-Type, Upgrade-Insecure-Requests');
+				res.setHeader('Access-Control-Allow-Origin', req.hostname);
+				res.header('Access-Control-Allow-Headers', 'X-Requested-With');
 				next();
 			});
 			// app.use(helmet.noCache());
 		}
-
-		// For Selecting Authentication Strategy and adding required routes
-		const utils = require("./server/lib/utils");
-		const authlib = require("./server/lib/auth");
-		const authconf = authlib();
-		const auth = authconf.auth;
-		app.use(authconf.router);
 
 		app.post('/restartService', function(req, res) {
 			logger.info("Inside UI Service: restartService");
@@ -359,7 +302,6 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
 		function sessionCheck(req, res, roles) {
 			logger.info("Inside sessioncheck for URL : %s", req.url);
-			return res.sendFile("app.html", { root: __dirname + "/public/" });
 			var sess = req.session;
 			logger.rewriters[0] = function(level, msg, meta) {
 				meta.username = (sess && sess.username) ? sess.username : null;
@@ -446,7 +388,6 @@ var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
-		app.post('/checkUserState', authlib.validateUserState);
 		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
