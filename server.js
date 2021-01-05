@@ -23,7 +23,7 @@ process.env.nullpool = "5fc13ea772142998e29b5e64";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
-if (cluster.isMaster) {
+if (cluster.isMaster && false) {
 	cluster.fork();
 	cluster.on('disconnect', function(worker) {
 		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
