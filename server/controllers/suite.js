@@ -623,7 +623,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 					}
 					result["status"] = "Success";
 				}catch (e){
-					logger.error("Exception in the function ExecuteTestSuite_ICE: %s", ex);
+					logger.error("Exception in the function ExecuteTestSuite_ICE: %s", e);
 					result["Error"] = "Smart Execution Failed"
 				}
 			}
