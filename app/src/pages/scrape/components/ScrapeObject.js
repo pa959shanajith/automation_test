@@ -31,14 +31,12 @@ const ScrapeObject = props => {
 
     return (
         <div className="ss__scrape_obj">
-
             <img className="ss_eye_icon" 
                 onClick={()=>props.setActiveEye(props.idx)} 
                 src={props.activeEye === props.idx ? 
                         "static/imgs/ic-highlight-element-active.png" : 
                         "static/imgs/ic-highlight-element-inactive.png"} 
                 alt="eyeIcon"/>
-            
             {
                 edit ? 
                 <ClickAwayListener className="ss_obj_name_e" onClickAway={handleOutsideClick}>

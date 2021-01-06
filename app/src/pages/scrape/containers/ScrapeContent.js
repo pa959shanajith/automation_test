@@ -103,7 +103,7 @@ const ScrapeContent = props => {
         let localScrapeItems = [...scrapeItems]
         let objId = "";
         for (let scrapeItem of localScrapeItems){
-            if (scrapeItem.val === value && scrapeItem.objId) {
+            if (scrapeItem.val === value) {
                 scrapeItem.title = newTitle;
                 objId = scrapeItem.objId;
             };
@@ -154,15 +154,16 @@ const ScrapeContent = props => {
     const onDelete = () => {
         let deletedArr = [];
         let scrapeItemsL = [...scrapeItems];
-        scrapeItemsL.forEach((item, idx) => {
+        let newScrapeList = []
+        newScrapeList = scrapeItemsL.filter((item, idx) => {
             if (item.checked){
-                deletedArr.push(item.objId);
-                delete scrapeItems[idx];
-            }
+                if (item.objId) deletedArr.push(item.objId);
+                return false;
+            } else return true;
         })
-        setScrapeItems(scrapeItemsL)
+        setScrapeItems(newScrapeList)
         setDeleted(deletedArr);
-        setDisableBtns({...disableBtns, delete: true})
+        setDisableBtns({...disableBtns, delete: true, save: false})
         console.log(deletedArr)
     }
 
@@ -244,7 +245,8 @@ const ScrapeContent = props => {
             for (let scrapeItem of scrapeItemsL) {
                 if (!scrapeItem.objId) {
                     // delete some properties then push
-                    added.push({...newScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title});
+                    if (scrapeItem.isCustom) added.push({custname: scrapeItem.title, xpath: scrapeItem.xpath, tag: scrapeItem.tag});
+                    else added.push({...newScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title});
                 } else {
                     scrapeData[scrapeItem.objId] = {...mainScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title}
                 }
@@ -253,6 +255,7 @@ const ScrapeContent = props => {
             setDisableBtns({...disableBtns, save: true});
             dispatch({type: actionTypes.SET_DISABLEACTION, payload: scrapeItemsL.length !== 0});
             dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: scrapeItemsL.length === 0});
+            setSaved(true);
             console.log("Added:", added);
             console.log("Old:", scrapeData);
             console.log("Modified: ", modified);
@@ -311,6 +314,7 @@ const ScrapeContent = props => {
                     <div className="min">
                     <div className="con">
                     <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                    <div className="scrape_object_container">
                     {
                         scrapeItems.map((object, index) => !object.hide && <ScrapeObject key={index} 
                                                                             idx={index}
@@ -321,6 +325,7 @@ const ScrapeContent = props => {
                                                                             renameScrapeItem={renameScrapeItem}
                                                                         />)
                     }
+                    </div>
                     </ScrollBar>
                     </div>
                     </div>
