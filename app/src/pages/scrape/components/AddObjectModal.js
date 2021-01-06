@@ -71,6 +71,7 @@ const AddObjectModal = props => {
         if (newObjects.length > 0 && !errorObj.index) {
             props.setScrapeItems([...props.scrapeItems, ...newObjects]);
             props.setShow(false);
+            props.setSaved(false);
         }
         setError(errorObj)
     }

@@ -354,7 +354,8 @@ const UpperContent = props => {
                                             objIdx: lastIdx,
                                             val: ++lastVal,
                                             hide: false,
-                                            title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
+                                            title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
+                                            custname: scrapeObject.custname
                                         }
                         
                         localScrapeList.push(scrapeItem)
@@ -495,28 +496,70 @@ const UpperContent = props => {
 
 const BottomContent = () => {
 
-    const { appType } = useSelector(state => state.plugin.CT);
+    const { appType, screenId, screenName, versionnumber, projectId, testCaseId} = useSelector(state => state.plugin.CT);
     const disableAction = useSelector(state => state.scrape.disableAction);
-    const { setShowObjModal, scrapeItems } = useContext(ScrapeContext);
+    const { setShowObjModal, scrapeItems, setShowPop } = useContext(ScrapeContext);
     const [customLen, setCustomLen] = useState(0);
     const [scrapeItemsLength, setScrapeLen] = useState(0);
+
+    const history = useHistory();
     
     useEffect(()=>{
         let customs = 0;
         for (let scrapeItem of scrapeItems){
-            if (scrapeItem.addCusOb) customs++;
+            if (scrapeItem.isCustom) customs++;
         }
         setScrapeLen(scrapeItems.length);
         setCustomLen(customs);
     }, [scrapeItems])
+
+    const exportScrapeObjects = () => {
+		scrapeApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
+        .then(data => {
+            if (data === "Invalid Session") return RedirectPage(history);
+            let temp, responseData;
+            let hasData = false;
+
+            if (typeof data === 'object' && data.view.length > 0) {
+                hasData = true;
+                temp = data;
+                temp['appType'] = appType;
+                temp['screenId'] = screenId;
+                temp['versionnumber'] = versionnumber;
+                responseData = JSON.stringify(temp, undefined, 2);
+            }
+
+            if (hasData){
+                let filename = "Screen_" + screenName + ".json";
+
+                let objectsBlob = new Blob([responseData], {
+                    type: "text/json;charset=utf-8"
+                });
+
+                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(objectsBlob, filename);
+                }
+                else {
+                    let a = document.createElement('a');
+                    a.download = filename;
+                    a.href = 'data:text/json;charset=utf-8,' + responseData;
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                  } 
+            } else setShowPop({title: "No Objects found", content: "The screen has no objects to export, please check!"});
+        })
+        .catch(error => console.error(error));
+	}
     
     const lowerList = [
         {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb"}, 
-        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>console.log("Pressed Map Object"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0},
+        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0},
         {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb"},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>console.log("Import TestCase"), show: true},
-        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>console.log("Export TestCase"), 'disable': customLen <= 0 && scrapeItemsLength-customLen <= 0, show: true}
+        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': customLen <= 0 && scrapeItemsLength-customLen <= 0, show: true}
     ]
 
     return (
