@@ -606,20 +606,26 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 			if (partitionResult["status"] == "fail") {
 				result['error'] = "Smart execution Failed";
 			}else{
-				var batchInfo = partitionResult["batchInfo"];
-				//Make batch request for each partition
-				for(let i in batchInfo){
-					let targetUser = batchInfo[i].targetUser;
-					let user = JSON.parse(JSON.stringify(userInfo));
-					user.icename = targetUser;
-					var executionData = JSON.parse(JSON.stringify(batchExecutionData));
-					executionData.batchInfo = [batchInfo[i]]
-					executionData.targetUser = targetUser;
-					//Get profile data and add to queue
-					var makeReq = await makeRequestAndAddToQueue(executionData, targetUser, user, poolid);
-					result["message"] = makeReq["message"] + "\n" + result["message"];
+				try{
+					var batchInfo = partitionResult["batchInfo"];
+					var userBatchMap = clubBatches(batchInfo);
+				
+					//Make batch request for each partition
+					for(let targetUser in userBatchMap){
+						let user = JSON.parse(JSON.stringify(userInfo));
+						user.icename = targetUser;
+						var executionData = JSON.parse(JSON.stringify(batchExecutionData));
+						executionData.batchInfo = userBatchMap[targetUser]
+						executionData.targetUser = targetUser;
+						//Get profile data and add to queue
+						var makeReq = await makeRequestAndAddToQueue(executionData, targetUser, user, poolid);
+						result["message"] = makeReq["message"] + "\n" + result["message"];
+					}
+					result["status"] = "Success";
+				}catch (e){
+					logger.error("Exception in the function ExecuteTestSuite_ICE: %s", e);
+					result["Error"] = "Smart Execution Failed"
 				}
-				result["status"] = "Success";		
 			}
 		}else{
 			result["error"] = "Please select available Target ICE";
@@ -651,6 +657,21 @@ async function makeRequestAndAddToQueue(batchExecutionData, targetUser, userInfo
 	delete userInfo;
 	delete profile;
 	return result;
+}
+
+function clubBatches(batchInfo){
+	userBatchMap = {};
+	for(let index in batchInfo){
+		let targetUser = batchInfo[index].targetUser;
+		if(targetUser && targetUser in userBatchMap){
+			userBatchMap[targetUser].push(batchInfo[index])
+		}else if(targetUser && !(targetUser in userBatchMap)){
+			userBatchMap[targetUser] = [batchInfo[index]]
+		}else{
+			throw "Target User not found";
+		}
+	}
+	return userBatchMap;
 }
 
 /** This service executes the testsuite(s) for request from API */
