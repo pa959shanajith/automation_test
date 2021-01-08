@@ -106,8 +106,8 @@ const TaskPanel = (props) => {
         }
         else if(dataobj.subtask === "TestSuite"){
             window.localStorage['navigateScreen'] = "TestSuite";
-            history.replace("/plugin")
-            // $window.location.assign("/execute");
+            history.replace("/execute")
+            // $window.location.assign("/execute"); 
         }
         else if(dataobj.subtask === "Scheduling"){
             window.localStorage['navigateScreen'] = "scheduling";

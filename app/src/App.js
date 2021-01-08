@@ -6,6 +6,7 @@ import {ProgressBar} from './pages/global'
 import Login, {Base} from './pages/login';
 import Admin from './pages/admin';
 import Plugin from './pages/plugin';
+import Execute from './pages/execute';
 import Mindmap from './pages/mindmap';
 import Scrape from './pages/scrape';
 import Design from './pages/design';
@@ -43,6 +44,7 @@ const App = () => {
           <Route path ="/design" component={Design}/>
           <Route path ="/utility" component={Utility}/>
           <Route path = "/integration" component={Integration}/>
+          <Route path ="/execute" component={Execute}/>
           <Route component={Base} />
         </Switch>
       </Router>

@@ -1,0 +1,25 @@
+.e__body{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgb(238, 238, 238);
+}
+
+.e__mid_section{
+    display: flex;
+    flex: auto;
+    width: 100%;
+    background-color: rgb(238, 238, 238);
+    margin: 0;
+    padding: 0;
+}
+
+.e__footer .main-footer{
+    position: static;
+}
+
+

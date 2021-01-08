@@ -1,10 +1,9 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
+import {ScreenOverlay, PopupMsg } from '../../global' 
 import {getUserDetails, getCIUsersDetails, fetchICE} from '../api';
 import ReactTooltip from 'react-tooltip';
 import Datetime from "react-datetime";
 import moment from "moment";
-import { useHistory } from 'react-router-dom';
 import '../styles/TokenMgmtForm.scss'
 
 
@@ -15,7 +14,6 @@ import '../styles/TokenMgmtForm.scss'
 
 const TokenMgmtForm = (props) => {
 
-    const history = useHistory();
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     const [allUsers,setAllUsers] = useState([['Select User',' ','','']])
@@ -23,6 +21,7 @@ const TokenMgmtForm = (props) => {
 	const [inputProps1Disable,setInputProps1Disable] = useState(true)
     const [copyToolTip,setCopyToolTip] = useState("Click To Copy")
     const [downloadToolTip,setDownloadToolTip] = useState("Download Token")
+    const [popup,setPopup] = useState({show:false})
 	let inputProps = {
 		placeholder: "Select Date",
 		readOnly:"readonly" ,
@@ -35,6 +34,16 @@ const TokenMgmtForm = (props) => {
 		disabled : inputProps1Disable,
         className:"fc-timePicker"
 	};
+
+	const displayError = (error) =>{
+        setLoading(false)
+        setPopup({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
+    }
 
     useEffect(()=>{
 		repopulateEntries('normal');
@@ -65,36 +74,22 @@ const TokenMgmtForm = (props) => {
 		props.setTimeVal("");
         setLoading("Loading...");
 		if (tokenOp === 'normal') {
-			try{
-                const data = await getUserDetails("user");
-                setLoading(false);
-				if (data === "Invalid Session") return RedirectPage(history);
-                else if (data === "fail") setPopupState({show:true,title:"Token Management",content:"Failed to fetch users."});
-                else if (data === "empty") setPopupState({show:true,title:"Token Management",content:"There are no users present."});
-				else {
-					data.sort((a,b)=>a[0].localeCompare(b[0]));
-					data.splice(0, 0, ['Select User',' ','','']);
-					setAllUsers(data.filter((e)=> (e[3] !== "Admin")));
-				}
-			}catch(error) {
-				console.log("Error:::::::::::::", error);
-			}
+			const data = await getUserDetails("user");
+			if(data.error){displayError(data.error);return;}
+			setLoading(false);
+			data.sort((a,b)=>a[0].localeCompare(b[0]));
+			data.splice(0, 0, ['Select User',' ','','']);
+			setAllUsers(data.filter((e)=> (e[3] !== "Admin")));
 		} else {
-			try{
-                const data = await fetchICE();
-				setLoading(false);
-				if (data === "Invalid Session") return RedirectPage(history);
-                else if (data === 'fail') setPopupState({show:true,title:"Token Management",content:"Failed to load ICE Provisions"});
-                else if(data === "empty") setPopupState({show:true,title:"Token Management",content:"There are no ICE provisioned"});
-                else {
-					data.sort((a,b)=>a.icename.localeCompare(b.icename));
-					data.splice(0, 0, {'_id':' ', 'icename':'Select ICE', 'icetype':'ci-cd'});
-                    const data1 = data.filter(e => (e.provisionedto !== "--Deleted--" && e.icetype==='ci-cd'));
-                    props.setAllICE(data1);
-				}
-			}catch(error) {
-				setLoading(false);
-				console.log("Error:::::::::::::", error);
+			const data = await fetchICE();
+			if(data.error){displayError(data.error);return;}
+			setLoading(false);
+			if(data === "empty") setPopupState({show:true,title:"Token Management",content:"There are no ICE provisioned"});
+			else {
+				data.sort((a,b)=>a.icename.localeCompare(b.icename));
+				data.splice(0, 0, {'_id':' ', 'icename':'Select ICE', 'icetype':'ci-cd'});
+				const data1 = data.filter(e => (e.provisionedto !== "--Deleted--" && e.icetype==='ci-cd'));
+				props.setAllICE(data1);
 			}
 		}
     }
@@ -107,30 +102,24 @@ const TokenMgmtForm = (props) => {
         const generatetoken = { 'userId': targetid };
 		if (generatetoken.userId === ' ') return false;
         setLoading("Fetching Token data. Please wait...")
-		try{
-            const data = await getCIUsersDetails(generatetoken);
-			setLoading(false);
-			if (data === "Invalid Session") RedirectPage(history);
-            else if (data === 'fail') setPopupState({show:true,title:"Token Management",content:"Failed to fetch token data"});
-            else if (data.length === 0) {
-				setPopupState({show:true,title:"Token Management",content:"No tokens have been issued"});
-				props.setAllTokens(data);
-			}else {
-				data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
-				data.forEach(e=>e.expiry=new Date(e.expiry).toString().slice(0,-22))
-                props.setAllTokens(data);
-				if (clearFields) {
-					props.setName("");
-					props.setToken("");
-					props.setdateVal("");
-					props.setTimeVal("");
-				}
+		const data = await getCIUsersDetails(generatetoken);
+		if(data.error){displayError(data.error);return;}
+		setLoading(false);
+		if (data.length === 0) {
+			setPopupState({show:true,title:"Token Management",content:"No tokens have been issued"});
+			props.setAllTokens(data);
+		}else {
+			data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
+			data.forEach(e=>e.expiry=new Date(e.expiry).toString().slice(0,-22))
+			props.setAllTokens(data);
+			if (clearFields) {
+				props.setName("");
+				props.setToken("");
+				props.setdateVal("");
+				props.setTimeVal("");
 			}
-			props.setShowList(true);
-		}catch(error) {
-			setLoading(false);
-			console.log("Error:::::::::::::", error);
 		}
+		props.setShowList(true);
     }
 
     const verifyName =(name) =>{
@@ -186,7 +175,8 @@ const TokenMgmtForm = (props) => {
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-            {loading?<ScreenOverlay content={loading}/>:null}
+			{loading?<ScreenOverlay content={loading}/>:null}
+			{(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
 
             <div className="col-xs-9" style={{width:"83%"}}>
                 <div className='adminControl-tkn-mgmt ice-type-tkn-mgmt'><div>
@@ -220,7 +210,7 @@ const TokenMgmtForm = (props) => {
                                 ))}
                             </select>
                         </div>
-                    :null}  
+                    :null}
 				</div>
                 <div className='adminControl-tkn-mgmt'><div>
 					<span className="leftControl-tkn-mgmt" title="Token Name">Token Name</span>

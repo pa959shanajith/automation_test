@@ -34,6 +34,7 @@
     "redux-persist": "^6.0.0",
     "simplebar-react": "^3.0.0-beta.5",
     "socket.io-client": "^3.0.3",
+    "sortablejs": "^1.12.0",
     "uuid": "^8.3.0"
   },
   "scripts": {

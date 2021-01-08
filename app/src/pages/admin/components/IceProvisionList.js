@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import {ScreenOverlay, PopupMsg, RedirectPage, ScrollBar} from '../../global' 
 import {fetchICE, provisions, manageSessionData} from '../api';
-import { useHistory } from 'react-router-dom';
 import '../styles/IceProvisionList.scss'
 
 
@@ -12,12 +11,12 @@ import '../styles/IceProvisionList.scss'
 
 const IceProvisionList = (props) => {
 
-    const history = useHistory();
     const [loading,setLoading] = useState(false)
 	const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 	const [searchTasks,setSearchTasks] = useState("")
 	const [icelistModify,setIcelistModify] = useState(props.icelist)
 	const [showList,setShowList] = useState(false)
+    const [popup,setPopup] = useState({show:false})
     
     useEffect(()=>{
 		refreshIceList();
@@ -27,27 +26,29 @@ const IceProvisionList = (props) => {
     const refreshIceList = async () => {
         setLoading("Loading...");
 		setSearchTasks("");
-		try{
-            const data = await fetchICE();
-			setLoading(false);
-			if (data === "Invalid Session") RedirectPage(history);
-            else if (data === 'fail') setPopupState({show:true,title:"ICE Provisions",content:"Failed to load ICE Provisions"});
-			else {
-				data.sort((a,b)=>a.icename.localeCompare(b.icename));
-				var data1 = data.filter(e => e.provisionedto !== "--Deleted--");
-				props.setIcelist(data1);
-				setIcelistModify(data1);
-				setShowList(true);
-			}
-		}catch(error) {
-			setLoading(false);
-			console.log("Error:::::::::::::", error);
-		}
+		const data = await fetchICE();
+		if(data.error){displayError(data.error);return;}
+		setLoading(false);
+		data.sort((a,b)=>a.icename.localeCompare(b.icename));
+		var data1 = data.filter(e => e.provisionedto !== "--Deleted--");
+		props.setIcelist(data1);
+		setIcelistModify(data1);
+		setShowList(true);
     }
 
     const closePopup = () =>{
         setPopupState({show:false,title:"",content:""});
 	}
+
+	const displayError = (error) =>{
+        setLoading(false)
+        setPopup({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
+    }
 	
 	const searchIceList = (val) =>{
 		const items = props.icelist.filter((e)=>e.icename.toUpperCase().indexOf(val.toUpperCase())!==-1)
@@ -65,27 +66,21 @@ const IceProvisionList = (props) => {
 			action: "reregister"
 		};
 		setLoading(event+"ing...");
-		try{
-            const data = await provisions(tokeninfo);
-			setLoading(false);
-			if (data === "Invalid Session") return RedirectPage(history);
-            else if (data === 'fail') setPopupState({show:true,title:"ICE Provisions",content:"ICE "+event+" Failed"});
-			else {
-				try{const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
-					if (data1 === "Invalid Session") return RedirectPage(history);
-				}catch (error) { }
-                props.setTokeninfoIcename(icename);
-                props.setIcename(icename);
-				props.setTokeninfoToken(data);
-				props.setToken(data);
-				props.setOp(provisionDetails.icetype);
-				props.setUserid(provisionDetails.provisionedto || ' ');
-				setPopupState({show:true,title:"ICE Provision Success",content:"ICE "+event+"ed Successfully: '"+icename+"'!!  Copy or Download the token"});
-                refreshIceList();
-			}
-		}catch(error) {
-			setLoading(false);
-			console.log("Error:::::::::::::", error);
+		const data = await provisions(tokeninfo);
+		if(data.error){displayError(data.error);return;}
+		setLoading(false);
+		if (data === 'fail') setPopupState({show:true,title:"ICE Provisions",content:"ICE "+event+" Failed"});
+		else {
+			const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
+			if(data1.error){displayError(data1.error);return;}
+			props.setTokeninfoIcename(icename);
+			props.setIcename(icename);
+			props.setTokeninfoToken(data);
+			props.setToken(data);
+			props.setOp(provisionDetails.icetype);
+			props.setUserid(provisionDetails.provisionedto || ' ');
+			setPopupState({show:true,title:"ICE Provision Success",content:"ICE "+event+"ed Successfully: '"+icename+"'!!  Copy or Download the token"});
+			refreshIceList();
 		}
     }
 	
@@ -99,29 +94,24 @@ const IceProvisionList = (props) => {
 			action: "deregister"
 		};
         setLoading("Deregistering...");
-		try{
-            const data = await provisions(tokeninfo);
-			setLoading(false);
-			if (data === "Invalid Session") return RedirectPage(history);
-            else if (data === 'fail') setPopupState({show:true,title:"ICE Provisions",content:"ICE Deregister Failed"});
-			else {
-				try{const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
-					if (data1 === "Invalid Session") return RedirectPage(history);
-				}catch(error) { }
-                setPopupState({show:true,title:"ICE Provisions",content:"ICE Deregistered Successfully"});
-				props.setSelectProvisionType(!props.selectProvisionType);
-			}
-		}catch(error) {
-			setLoading(false);
-			console.log("Error:::::::::::::", error);
+		const data = await provisions(tokeninfo);
+		if(data.error){displayError(data.error);return;}
+		setLoading(false);
+		if (data === 'fail') setPopupState({show:true,title:"ICE Provisions",content:"ICE Deregister Failed"});
+		else {
+			const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
+			if(data1.error){displayError(data1.error);return;}
+			setPopupState({show:true,title:"ICE Provisions",content:"ICE Deregistered Successfully"});
+			props.setSelectProvisionType(!props.selectProvisionType);
 		}
     }
 
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-            {loading?<ScreenOverlay content={loading}/>:null}
-
+			{loading?<ScreenOverlay content={loading}/>:null}
+			{(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+            
             <div className="col-xs-9 form-group-ip adminForm-ip" style={{paddingTop:"0",width:"83%"}}>
                 <div className="containerWrap">
                     <div className="sessionHeading-ip" data-toggle="collapse" data-target="#activeUsersToken-x">

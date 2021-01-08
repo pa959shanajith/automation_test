@@ -1,0 +1,89 @@
+.form-group-ldap{
+    margin-bottom:15px;
+    padding-top:0;
+}
+.adminForm-ldap {
+	padding-top: 2%;
+}
+.leftControl-ldap {
+	float: left;
+	width: 47%;
+}
+.title-ldap{
+    font-size: 18px;
+}
+.admin-ldap__secure{
+    margin-bottom:2%
+}
+.adminFormRadio-ldap input {
+    position: absolute;
+    width: auto!important;
+    margin-top: 7px;
+}
+.adminFormRadio-ldap span {
+    padding-left: 18px;
+    width: fit-content;
+}
+.ldapCert__lable{
+    cursor:pointer;
+}
+.ldapCert__lable-false{
+    cursor:not-allowed;
+}
+.certInput-ldap{
+    margin-top:5px;
+}
+.ldapcert-span{
+    width:auto !important;
+    font-weight:normal !important;
+}
+.ldapcert-upload{
+    width:auto !important;
+    margin-right:10px;
+}
+#binddn:disabled , #bindCredentials:disabled{
+    cursor: not-allowed;
+    background-color: #eee;
+    opacity: 1;
+}
+.certTextarea-ldap {
+    margin-top: 5px;
+    width: calc(100% - 130px);
+    height: 150px;
+    font-size: 12px;
+    resize: none;
+    float: right;
+    outline: 0;
+}
+@media screen and (min-width: 1801px) {
+    .certTextarea-ldap {
+        width: calc(100% - 200px);
+    }
+}
+.certTextarea-edit{
+    height:70px;
+}
+.inputErrorBorder{
+	border-bottom: 2px solid #d33c3c !important;
+}
+
+.selectErrorBorder{
+	border: 2px solid #d33c3c !important;
+}
+#ldapCertValue{
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: #929397;
+        border: 1px solid transparent;
+        border-left-color: #e6e7e9;
+        border-right-color: #e6e7e9;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px; 
+    }
+}
+.ldap-credentials{
+    padding-bottom: 30px;
+}

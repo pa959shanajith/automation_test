@@ -22,6 +22,7 @@ const IceProvisionForm = (props) => {
     const [icenameErrBorder,setIcenameErrBorder] = useState(false)
     const [selAssignUser2ErrBorder,setSelAssignUser2ErrBorder] = useState(false)
 	const [users,setUsers] = useState([['Select User',' ','','']])
+    const [popup,setPopup] = useState({show:false})
 
     useEffect(()=>{
 		setUsers([['Select User',' ','','']]);
@@ -58,21 +59,17 @@ const IceProvisionForm = (props) => {
 			action: "provision"
 		};
         setLoading("Provisioning Token...");
-		try{
-            const data = await provisions(tokeninfo);
-			setLoading(false);
-			if (data === "Invalid Session") return RedirectPage(history);
-            else if (data === 'fail') setPopupState({show:true,title:"ICE Provision Error",content:"ICE Provisioned Failed"});
-			else if (data==='DuplicateIceName') setPopupState({show:true,title:"ICE Provision Error",content:"ICE Provisioned Failed!!  ICE name or User already exists"});else {
-				props.setIcename(props.icename);
-				props.setTokeninfoToken(data);
-				props.setToken(data);
-				props.setRefreshIceList(!props.refreshIceList);
-				setPopupState({show:true,title:"ICE Provision Success",content:"Token generated Successfully for ICE '"+props.icename+"'!!  Copy or Download the token"});
-            }
-		}catch(error) {
-			setLoading(false);
-			console.log("Error:::::::::::::", error);
+		const data = await provisions(tokeninfo);
+		if(data.error){displayError(data.error);return;}
+		setLoading(false);
+		if (data === "Invalid Session") return RedirectPage(history);
+		else if (data === 'fail') setPopupState({show:true,title:"ICE Provision Error",content:"ICE Provisioned Failed"});
+		else if (data==='DuplicateIceName') setPopupState({show:true,title:"ICE Provision Error",content:"ICE Provisioned Failed!!  ICE name or User already exists"});else {
+			props.setIcename(props.icename);
+			props.setTokeninfoToken(data);
+			props.setToken(data);
+			props.setRefreshIceList(!props.refreshIceList);
+			setPopupState({show:true,title:"ICE Provision Success",content:"Token generated Successfully for ICE '"+props.icename+"'!!  Copy or Download the token"});
 		}
     }
 
@@ -83,19 +80,11 @@ const IceProvisionForm = (props) => {
 		props.setIcename("");
 		props.setUserid(" ");
 		if (props.op === "normal") {
-			try{
-                const data = await getUserDetails("user");
-				if (data === "Invalid Session") RedirectPage(history);
-                else if (data === "fail") setPopupState({show:true,title:"ICE Provisions",content:"Failed to fetch users."});
-                else if (data === "empty") setPopupState({show:true,title:"ICE Provisions",content:"There are no users present."});
-				else {
-					data.sort((a,b)=>a[0].localeCompare(b[0]));
-					data.splice(0, 0, ['Select User',' ','','']);
-					setUsers(data.filter((e)=> (e[3] !== "Admin")));
-				}
-			}catch(error) {
-				console.log("Error:::::::::::::", error);
-			}
+			const data = await getUserDetails("user");
+			if(data.error){displayError(data.error);return;}
+			data.sort((a,b)=>a[0].localeCompare(b[0]));
+			data.splice(0, 0, ['Select User',' ','','']);
+			setUsers(data.filter((e)=> (e[3] !== "Admin")));
 		}
     }
 
@@ -153,13 +142,24 @@ const IceProvisionForm = (props) => {
 		const icelist1 = props.icelist.map(e => e.icename);
 		if (icelist1.indexOf(name) > -1) setIcenameErrBorder(true);
 		else setIcenameErrBorder(false);
+	}
+	
+	const displayError = (error) =>{
+        setLoading(false)
+        setPopup({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
     }
 
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-            {loading?<ScreenOverlay content={loading}/>:null}
-
+			{loading?<ScreenOverlay content={loading}/>:null}
+			{(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+            
             <div className="col-xs-9" style={{width: "83%"}}>
 				<div className='adminControl-ip adminControl-ip-cust'><div>
                 <span className="leftControl-ip" title="ICE Type">ICE Type</span>

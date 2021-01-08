@@ -209,7 +209,7 @@ const Report = `<style>
         }
         .reportsDetails th
         {
-                text-align: left !important;
+                text-align: center !important;
                 padding: 8px;
                 width: 10%;
         }
@@ -241,7 +241,7 @@ const Report = `<style>
         <div class="maintabCont">
                 <table class='pdfReport' style="width: 100%;" >
                         <thead class="reportsDetails">
-                                <tr><th>S. No.</th>
+                                <tr><th>Sl. No.</th>
                                         <th>Object Name</th>
                                         <th>Keyword</th>
                                         <th>Input</th>

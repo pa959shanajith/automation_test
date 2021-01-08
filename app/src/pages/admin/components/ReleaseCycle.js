@@ -1,4 +1,5 @@
 import React ,  { Fragment} from 'react';
+import {ScrollBar} from '../../global' 
 import '../styles/ReleaseCycle.scss';
 
 /*Component ReleaseCycle
@@ -15,10 +16,10 @@ const ReleaseCycle = (props) => {
 				{/* <!-- Release Container --> */}
 				<div className="containerWrap-project releaseContainer rcContainer">
 					{/* <!-- Add Release --> */}
-					<div className="addContainer"><span onClick={()=>{props.clickAddRelease()}} id="addRelease" title="Add Release"><img src={"static/imgs/ic-add-sm.png"} alt="Add Release" />Add Release</span></div>
+					<div className="addContainer"><span onClick={()=>{props.clickAddRelease()}} id="addRelease" title="Add Release" className={props.disableAddRelease && props.taskName ==="Update Project" ?"disableAddRelease":""}><img src={"static/imgs/ic-add-sm.png"} alt="Add Release" />Add Release</span></div>
 					{/* <!-- Add Release --> */}
 
-					{/* <!-- Releases List --> */}
+                    {/* <!-- Releases List --> */}            
                     <ul id="releaseList" className="containerWrap-project ">
                     {props.releaseList.map((releaseName,index) => ( 
                         <li key={index} id={'releaseList_' + props.count} onClick={()=>{props.clickReleaseListName({id:'releaseList_' + props.count,releaseName:releaseName});props.setActiveRelease(releaseName);}} className={(releaseName===props.activeRelease)?"active-release":""} >

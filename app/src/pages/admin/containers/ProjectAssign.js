@@ -1,9 +1,7 @@
 import React ,  { Fragment, useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
-import {ScreenOverlay, PopupMsg, RedirectPage, ScrollBar} from '../../global' 
+import {ScreenOverlay, PopupMsg, ModalContainer} from '../../global' 
 import '../styles/ProjectAssign.scss';
-import AssignProjectmodal from '../components/AssignProjectModal'
-import { useHistory } from 'react-router-dom';
 
 /*Component ProjectAssign
   use: renders Project Assign Middle Screen
@@ -12,7 +10,6 @@ import { useHistory } from 'react-router-dom';
     
 const ProjectNew = (props) => {
     
-    const history = useHistory();
     const [userSelectErrorBorder,setUserSelectErrorBorder] = useState(false)
     const [domainSelectErrorBorder,setDomainSelectErrorBorder] = useState(false)
     const [selectBox,setSelectBox] = useState([])
@@ -27,6 +24,7 @@ const ProjectNew = (props) => {
     const [selectedUserId,setSelectedUserId] = useState("")
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
+    const [popup,setPopup] = useState({show:false})
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
     // eslint-disable-next-line
     const [showload,setShowload] = useState(false)
@@ -45,27 +43,26 @@ const ProjectNew = (props) => {
             // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.resetMiddleScreen["assignProjectTab"]])
 
+    const displayError = (error) =>{
+        setLoading(false)
+        setPopup({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
+    }
+
     const fetchUsers= async ()=>{
-        try{
-            const data = await getUserDetails("user");
-            if(data === "Invalid Session") {
-                RedirectPage(history);
-            } else if(data === "fail") {
-                setPopupState({show:true,title:"Assign Project",content:"Failed to fetch users."});
-            } else if(data === "empty") {
-                setPopupState({show:true,title:"Assign Project",content:"There are no users present."});
-            } else {
-                var userOptions = [];
-                for(var i=0; i<data.length; i++){
-                    if(data[i][3] !== "Admin"){
-                        userOptions.push(data[i]);
-                    }
-                }
-                setSelectBox(userOptions.sort());
+        const data = await getUserDetails("user");
+        if(data.error){displayError(data.error);return;}
+        var userOptions = [];
+        for(var i=0; i<data.length; i++){
+            if(data[i][3] !== "Admin"){
+                userOptions.push(data[i]);
             }
-        }catch(error){
-            console.log("Error:::::::::::::", error);
-        }    
+        }
+        setSelectBox(userOptions.sort());  
     }
 
     const resetAssignProjectForm = () =>{
@@ -92,14 +89,9 @@ const ProjectNew = (props) => {
         assignProj.assignedProjectAP = [];
         setAssignProj(assignProj);
 		setShowload(true);
-        try{
-            const data = await getDomains_ICE();
-            if (data === "Invalid Session") {
-                RedirectPage(history);
-            } else setSelDomainsOptions(data);
-        }catch(error){
-            console.log("Error:::::::::::::", error);
-        }    
+        const data = await getDomains_ICE();
+        if(data.error){displayError(data.error);return;}
+        setSelDomainsOptions(data);    
     }
 
     const ClickSelDomains = async(domainname) =>{
@@ -121,85 +113,67 @@ const ProjectNew = (props) => {
         var unAssignedProjects1 = {};
         try{
             const data1 = await getAssignedProjects_ICE(getAssignProj);
-			setGetAssignedProjectsLen(data1.length);
-			if (data1 === "Invalid Session") {
-				RedirectPage(history);
-            }
-			assignProj.assignedProjectAP = [];
+            if(data1.error){displayError(data1.error);return;}
+            setGetAssignedProjectsLen(data1.length);
+            assignProj.assignedProjectAP = [];
             setAssignProj(assignProj);
-			if (data1.length > 0) {
-				for (var i = 0; i < data1.length; i++) {
-					assignProj.assignedProjectAP.push({'projectid':data1[i]._id,'projectname':data1[i].name});
+            if (data1.length > 0) {
+                for (var i = 0; i < data1.length; i++) {
+                    assignProj.assignedProjectAP.push({'projectid':data1[i]._id,'projectname':data1[i].name});
                 }
                 setAssignProj(assignProj);
-				setAssignedProjectInitial(assignProj.assignedProjectAP);
-				for (var j = 0; j < data1.length; j++) {
-					assignedProjectsArr.push(data1[j]._id);
-					assignedProjectNames.push(data1[j].name);
-				}
+                setAssignedProjectInitial(assignProj.assignedProjectAP);
+                for (var j = 0; j < data1.length; j++) {
+                    assignedProjectsArr.push(data1[j]._id);
+                    assignedProjectNames.push(data1[j].name);
+                }
+                const detResponse = await getDetails_ICE(idtype, requestedids);
+                if(detResponse.error){displayError(detResponse.error);return;}
+                assignProj.allProjectAP = [];
+                setAssignProj(assignProj);
+                if (detResponse.projectIds.length > 0) {
+                    for (var k = 0; k < detResponse.projectIds.length; k++) {
+                        if (!eleContainsInArray(assignedProjectsArr, detResponse.projectIds[k])) {
+                            unassignedProjectIds.push(detResponse.projectIds[k]);
+                        }
+                    }
 
-                try{    
-                    const detResponse = await getDetails_ICE(idtype, requestedids);
-				
-					if (detResponse === "Invalid Session") {
-						RedirectPage(history);
-					}
-					assignProj.allProjectAP = [];
+                    for (var l = 0; l < detResponse.projectNames.length; l++) {
+                        if (!eleContainsInArray(assignedProjectNames, detResponse.projectNames[l])) {
+                            unassignedProjectNames.push(detResponse.projectNames[l]);
+                        }
+                    }
+
+                    unAssignedProjects1.projectIds = unassignedProjectIds;
+                    unAssignedProjects1.projectNames = unassignedProjectNames;
+                    for (var m = 0; m < unAssignedProjects1.projectIds.length; m++) {
+                        assignProj.allProjectAP.push({'projectname':unAssignedProjects1.projectNames[m],'projectid':unAssignedProjects1.projectIds[m]});
+                    }
                     setAssignProj(assignProj);
-                    if (detResponse.projectIds.length > 0) {
-						for (var k = 0; k < detResponse.projectIds.length; k++) {
-							if (!eleContainsInArray(assignedProjectsArr, detResponse.projectIds[k])) {
-								unassignedProjectIds.push(detResponse.projectIds[k]);
-							}
-						}
-
-						for (var l = 0; l < detResponse.projectNames.length; l++) {
-							if (!eleContainsInArray(assignedProjectNames, detResponse.projectNames[l])) {
-								unassignedProjectNames.push(detResponse.projectNames[l]);
-							}
-						}
-
-						unAssignedProjects1.projectIds = unassignedProjectIds;
-						unAssignedProjects1.projectNames = unassignedProjectNames;
-						for (var m = 0; m < unAssignedProjects1.projectIds.length; m++) {
-							assignProj.allProjectAP.push({'projectname':unAssignedProjects1.projectNames[m],'projectid':unAssignedProjects1.projectIds[m]});
-                        }
+                    if (selectedUserName === '') {
+                        assignProj.allProjectAP = [];
+                        assignProj.assignedProjectAP = [];
                         setAssignProj(assignProj);
-						if (selectedUserName === '') {
-							assignProj.allProjectAP = [];
-                            assignProj.assignedProjectAP = [];
-                            setAssignProj(assignProj);
-						}
-						setShowload(false);
-						// $("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", false);
-					}
-                }catch(error){
-                    console.log("Error:::::::::::::", error);
+                    }
+                    setShowload(false);
+                    // $("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", false);
                 }
-			} else {
-                try{    
-                    const res = await getDetails_ICE(idtype, requestedids);
-					if (res === "Invalid Session") {
-						RedirectPage(history);
-					}
-					if (res.projectIds.length > 0) {
-						assignProj.allProjectAP = [];
-						assignProj.assignedProjectAP = [];
-						for (var n = 0; n < res.projectIds.length; n++) {
-							assignProj.allProjectAP.push({'projectname':res.projectNames[n],'projectid':res.projectIds[n]});
-                        }
-                        setAssignProj(assignProj);
-					}
-					setShowload(false);
-					// $("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", false);
-                }catch(error){
-                    console.log("Error:::::::::::::", error);
+            } else {
+                const res = await getDetails_ICE(idtype, requestedids);
+                if(res.error){displayError(res.error);return;}
+                if (res.projectIds.length > 0) {
+                    assignProj.allProjectAP = [];
+                    assignProj.assignedProjectAP = [];
+                    for (var n = 0; n < res.projectIds.length; n++) {
+                        assignProj.allProjectAP.push({'projectname':res.projectNames[n],'projectid':res.projectIds[n]});
+                    }
+                    setAssignProj(assignProj);
                 }
-            }
+                setShowload(false);
+            }  
         }catch(error){
             console.log("Error:::::::::::::", error);
-        }   
-
+        } 
     }
 
     const eleContainsInArray = (arr, element)=> {
@@ -335,29 +309,22 @@ const ProjectNew = (props) => {
 		// labelArr.push(txnHistory.codesDict['AssignProjects']);
         // txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
         
-        try{
-            setLoading('Saving in Progress. Please Wait...');
-            const data = await assignProjects_ICE(assignProjectsObj)
-            setLoading(false);
-            if (data === "Invalid Session") {
-                RedirectPage(history);
+        setLoading('Saving in Progress. Please Wait...');
+        const data = await assignProjects_ICE(assignProjectsObj)
+        if(data.error){displayError(data.error);return;}
+        setLoading(false);
+        if (data === 'success') {
+            if (assignedProjects1.length !== 0){
+                setPopupState({show:true,title:"Assign Project",content:"Projects assigned to user successfully"});
             }
-            if (data === 'success') {
-                if (assignedProjects1.length !== 0){
-                    setPopupState({show:true,title:"Assign Project",content:"Projects assigned to user successfully"});
-                }
-                else{
-                    setPopupState({show:true,title:"Assign Project",content:"Projects unassigned successfully"});
-                } 
-                resetAssignProjectForm();
-            } else {
-                setPopupState({show:true,title:"Assign Project",content:"Failed to assign projects to user"});
-            }
-
-            fetchUsers();
-        }catch(error){
-            console.log("Error:::::::::::::", error);
+            else{
+                setPopupState({show:true,title:"Assign Project",content:"Projects unassigned successfully"});
+            } 
+            resetAssignProjectForm();
+        } else {
+            setPopupState({show:true,title:"Assign Project",content:"Failed to assign projects to user"});
         }
+        fetchUsers();
     }
 
     const getDifferentProjects= (assignedProjects1)=>{
@@ -384,6 +351,7 @@ const ProjectNew = (props) => {
     
     return (
         <Fragment>
+            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
@@ -458,12 +426,17 @@ const ProjectNew = (props) => {
 				</div>
             </div>    
 
-            {showAssignProjectModal?
-                <AssignProjectmodal setShowAssignProjectModal={setShowAssignProjectModal} clickAssignProjects1={clickAssignProjects1}  />
-                :null
-            }
-
+            {showAssignProjectModal? <ModalContainer title="Update Projects" footer={ModalButtons(clickAssignProjects1, setShowAssignProjectModal)} close={()=>{setShowAssignProjectModal(false)}} content="All the tasks that has been assigned to this user will be removed from this user's queue from the project(s) which are being unassigned (if any). Do you want to proceed?" modalClass=" modal-sm" /> :null}  
         </Fragment>
+    )
+}
+
+const ModalButtons = (clickAssignProjects1, setShowAssignProjectModal) =>{
+    return(
+        <div className="modal-footer-edit">
+            <button onClick={()=>{clickAssignProjects1()}} className=" btn-assign-popup">Yes</button>
+            <button  onClick={()=>{setShowAssignProjectModal(false)}} >No</button>
+        </div>
     )
 }
 
