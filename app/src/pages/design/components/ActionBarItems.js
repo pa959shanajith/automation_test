@@ -175,7 +175,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
         
 		DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber)
 		.then(response => {
-				if (response === "Invalid Session") RedirectPage(history);
+				if (response === "Invalid Session") return RedirectPage(history);
                 
                 let responseData;
                 if (typeof response === 'object') responseData = JSON.stringify(response.testcase, null, 2);

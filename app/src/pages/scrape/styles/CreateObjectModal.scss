@@ -1,6 +1,6 @@
 .ss__createObj{
     .modal__body{
-        height: 370px;
+        height: 350px;
         padding-right: 5px;
     }
     .modal__content{
@@ -31,21 +31,23 @@
 }
 
 .createObj_input{
-    flex: 0 0 50%;
+    flex: 0 0 55%;
     margin-right: 4%;
+    height: 34px;
     border: none;
     outline: none;
     box-shadow: none;
     padding: 6px 12px;
     font-size: 16px;
-    border-bottom: 1px solid #cacaca;
+    border-bottom: 1px solid #888;
 }
 
 .createObj_objType{
     flex: 0 0 30%;
     color: #fff;
-    background: #311d4e url('/static/imgs/ic-dropdown.png') 95% 10px no-repeat;
-    padding: 8px 10px !important;
+    height: 34px;
+    background: #311d4e url('/static/imgs/ic-dropdown.png') 95% 7px no-repeat;
+    padding: 6px 12px !important;
     border: 1px solid #311d4e !important;
     border-radius: 5px;
     box-shadow: none;
@@ -56,6 +58,10 @@
         background: #311d4e url('/static/imgs/ic-dropdown.png') 95% 10px no-repeat;
         cursor: not-allowed;
     }
+}
+
+.createObj_input::placeholder{
+    color: #999;
 }
 
 .createObj_option{
@@ -83,4 +89,8 @@
     border-radius: 20px;
     padding: 5px 20px;
     font-size: 16px;
+}
+
+.ss__error_border{
+    border-bottom: 2px solid#d33c3c !important;
 }

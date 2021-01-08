@@ -126,7 +126,7 @@ const RefBarItems = props => {
 				}
 				else if(tag === "userobj"){
 					scrapedItems.forEach(item => {
-						if (item.addCusOb) {
+						if (item.isCustom) {
 							item.hide = false
 						}
 					});
