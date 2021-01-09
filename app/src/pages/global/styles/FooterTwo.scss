@@ -9,7 +9,7 @@
     background-color: transparent;
     font-family: "LatoWeb";
     z-index: 0;
-    padding: 12px;
+    padding: 10px;
 }
 
 .main-footer-content{
@@ -21,7 +21,7 @@
 
 .footer-logo_two{
     margin-left:6px;
-    height: 16px; 
+    height: 18px; 
 }
 
 .left-text{
@@ -33,48 +33,8 @@
 }
 
 .right-text{
-    font-size: 1.8vh;
+    font-size: 12px;
     display: flex;
     align-items: center;
-    line-height: 1.42857143;
     flex-grow: 2;
-}
-
-
-
-@media screen and (max-width: 1025px){
-    .left-text{
-        font-size: 1.5vw;
-    }
-    
-    .right-text{
-        font-size: 1.4vw;
-    }
-    
-    .footer-logo_two{
-        margin-left: 3px;
-        height: 14px;
-    }
-    .footer-logo_two{
-        margin-left: .5vw;
-        height: 1.25vw;
-    }
-}
-
-
-@media screen and (min-width: 1400px) and (min-height: 770px){
-    .left-text{
-        font-size: 1.0vw;
-    }
-    .right-text{
-        font-size: 1.0vw;
-        flex-grow: 2;
-    }
-    .main-footer{
-        padding: 0.95vw;
-    }
-    .footer-logo_two{
-        margin-left: .5vw;
-        height: 1.25vw;
-    }
 }

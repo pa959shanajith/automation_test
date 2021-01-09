@@ -22,38 +22,10 @@
 }
 
 .lower-text{
-    font-size: 1.8vh;
-    line-height: 1.42857143;
+    font-size: 12px;
 }
 
 .footer-logo_one{
-    margin-left: .5vw;
-    height: 16px;
-}
-
-@media screen and (max-width: 800px){
-    .upper-text{
-        font-size: 10px;
-        line-height: 1.42857143;
-    }
-    
-    .lower-text{
-        font-size: 8px;
-        line-height: 1.42857143;
-    }
-    
-    .footer-logo_one{
-        margin-left: 3px;
-        height: 10px;
-    }
-}
-
-@media screen and (min-width: 1400px) and (min-height: 770px){
-    .upper-text{
-        font-size: 2vh;
-    }
-    .footer-logo_one{
-        margin-left: .5vw;
-        height: 1.25vw;
-    }    
+    margin-left: 7px;
+    height: 18px;
 }

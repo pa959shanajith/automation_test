@@ -62,26 +62,3 @@
         margin-top: .3vw;
     }
 }
-
-@media screen and (max-width: 1025px){
-    .plugin-blocks{
-        grid-gap: 2vw 2.4vw;
-    }
-    
-    .plugin-ic{
-        height: 16vw;
-        width: 16vw;
-    }
-    
-    
-    .avail-plugin-title{
-        font-size: 2.7vw;
-        padding-left: 1.8vw;
-        margin-bottom: 1.2vw;
-    }
-    
-    .plugin-text{
-        font-size: 2.3vw;
-        margin-top: .4vw;
-    }
-}
