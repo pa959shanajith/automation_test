@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { ScreenOverlay , PopupMsg } from '../../global';
 import * as api from '../api';
-import * as adminApi from "../../admin/api";
 import "../styles/LoginFields.scss";
 
 /*
@@ -113,7 +112,7 @@ const LoginFields = (props) => {
                     setRequested(false);
                     if (data === "restart") {
                         setOverlayText("Fetching active services...");
-                        adminApi.restartService("query")
+                        api.restartService("query")
                         .then(data=> {
                             if (data === "fail") {
                                 setLoginValidation("Failed to fetch services.");
@@ -153,7 +152,7 @@ const LoginFields = (props) => {
     const restartServer = (serverid, serverName) => {
         let errmsg = "Fail to restart " + serverName + " service!";
         setOverlayText("Please wait while " + serverName + " service is being restarted...");
-        adminApi.restartService(serverid)
+        api.restartService(serverid)
         .then(data => {
             if (data === "success") {
                 setOverlayText("");
