@@ -804,12 +804,13 @@ const DesignContent = (props) => {
                     <span className="remark_col d__rem_head" >Remarks</span>
                     <span className="details_col d__det_head" >Details</span>
                 </div>
-                <ClickAwayListener onClickAway={()=>{ runClickAway ? setFocusedRow(null) : runClickAway=true}} style={{height: "100%"}}>
+                <div style={{height: "100%"}}>
                 {testCaseData.length>0 && <div className="d__table_contents" >
                 <div className="ab">
                     <div className="min">
                         <div className="con">
                             <ScrollBar verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
+                            <ClickAwayListener onClickAway={()=>{ runClickAway ? setFocusedRow(null) : runClickAway=true}} style={{height: "100%"}}>
                             <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row">
                                 {
                                 testCaseData.map((testCase, i) => <TableRow 
@@ -821,12 +822,13 @@ const DesignContent = (props) => {
                                                         />)
                                 }
                             </ReactSortable>
+                            </ClickAwayListener>
                             </ScrollBar>
                         </div>
                     </div>
                 </div>
                 </div>}
-                </ClickAwayListener>
+                </div>
             </div>
         </div>
         </>
