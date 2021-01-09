@@ -24,7 +24,6 @@ const ProjectNew = (props) => {
     const [selectedUserId,setSelectedUserId] = useState("")
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
-    const [popup,setPopup] = useState({show:false})
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
     // eslint-disable-next-line
     const [showload,setShowload] = useState(false)
@@ -45,7 +44,7 @@ const ProjectNew = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -351,7 +350,6 @@ const ProjectNew = (props) => {
     
     return (
         <Fragment>
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">

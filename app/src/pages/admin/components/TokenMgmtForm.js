@@ -20,8 +20,8 @@ const TokenMgmtForm = (props) => {
 	const [firstStop,setFirstStop] = useState(false)
 	const [inputProps1Disable,setInputProps1Disable] = useState(true)
     const [copyToolTip,setCopyToolTip] = useState("Click To Copy")
-    const [downloadToolTip,setDownloadToolTip] = useState("Download Token")
-    const [popup,setPopup] = useState({show:false})
+	const [downloadToolTip,setDownloadToolTip] = useState("Download Token")
+	
 	let inputProps = {
 		placeholder: "Select Date",
 		readOnly:"readonly" ,
@@ -37,7 +37,7 @@ const TokenMgmtForm = (props) => {
 
 	const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -84,13 +84,10 @@ const TokenMgmtForm = (props) => {
 			const data = await fetchICE();
 			if(data.error){displayError(data.error);return;}
 			setLoading(false);
-			if(data === "empty") setPopupState({show:true,title:"Token Management",content:"There are no ICE provisioned"});
-			else {
-				data.sort((a,b)=>a.icename.localeCompare(b.icename));
-				data.splice(0, 0, {'_id':' ', 'icename':'Select ICE', 'icetype':'ci-cd'});
-				const data1 = data.filter(e => (e.provisionedto !== "--Deleted--" && e.icetype==='ci-cd'));
-				props.setAllICE(data1);
-			}
+			data.sort((a,b)=>a.icename.localeCompare(b.icename));
+			data.splice(0, 0, {'_id':' ', 'icename':'Select ICE', 'icetype':'ci-cd'});
+			const data1 = data.filter(e => (e.provisionedto !== "--Deleted--" && e.icetype==='ci-cd'));
+			props.setAllICE(data1);
 		}
     }
 
@@ -176,8 +173,7 @@ const TokenMgmtForm = (props) => {
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
 			{loading?<ScreenOverlay content={loading}/>:null}
-			{(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-
+			
             <div className="col-xs-9" style={{width:"83%"}}>
                 <div className='adminControl-tkn-mgmt ice-type-tkn-mgmt'><div>
                     <span className="leftControl-tkn-mgmt" title="ICE Type">ICE Type</span>

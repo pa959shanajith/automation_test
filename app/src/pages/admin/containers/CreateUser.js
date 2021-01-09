@@ -35,8 +35,7 @@ const CreateUser = (props) => {
     const [allUserFilList,setAllUserFilList] = useState(userConf.allUsersList)
     const [ldapUserList,setLdapUserList] = useState([])
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
-    const [popup,setPopup] = useState({show:false})
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     
     useEffect(()=>{
         
@@ -49,7 +48,7 @@ const CreateUser = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -268,20 +267,7 @@ const CreateUser = (props) => {
         setUserIdNameAddClass(false);
         setLdapDirectoryAddClass(false);
 
-        dispatch({type:actionTypes.UPDATE_USERID,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload:""})
-        dispatch({type:actionTypes.UPDATE_USERIDNAME,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_FIRSTNAME,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_LASTNAME,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_PASSWORD,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_CONFIRMPASSWORD,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:""})
-        dispatch({type:actionTypes.UPDATE_USERROLE,payload:""})
-        dispatch({type:actionTypes.UPDATE_ALLROLES,payload:[]})
-        dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-        dispatch({type:actionTypes.UPDATE_CONF_EXP,payload:false})
-        dispatch({type:actionTypes.UPDATE_LDAP_USER_FILTER,payload:""})
-        dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:""});
+        dispatch({type:actionTypes.RESET_VALUES,payload:""})
         updateUserRoles();
 
 		if (props!==undefined && props.query!==undefined && props.query !== "retaintype") {
@@ -410,12 +396,7 @@ const CreateUser = (props) => {
         if (data == "empty") {
             setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
         } else {
-            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-            dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload:data.username})
-            dispatch({type:actionTypes.UPDATE_INPUT_FIRSTNAME,payload:data.firstname})
-            dispatch({type:actionTypes.UPDATE_INPUT_LASTNAME,payload:data.lastname})
-            dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:data.email})  
-            dispatch({type:actionTypes.UPDATE_LDAP_USER,payload:data.ldapname})
+            dispatch({type:actionTypes.UPDATE_LDAP_DATA,payload:data})
         }
     }
 
@@ -446,19 +427,9 @@ const CreateUser = (props) => {
             else {
                 setLoading(false);
                 const uType = data.type;
-                dispatch({type:actionTypes.UPDATE_USERID,payload: data.userid});
-                dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload: data.username});
-                dispatch({type:actionTypes.UPDATE_USERIDNAME,payload: data.userid+";"+data.username});
-                dispatch({type:actionTypes.UPDATE_INPUT_PASSWORD,payload: data.password});
-                dispatch({type:actionTypes.UPDATE_INPUT_FIRSTNAME,payload: data.firstname});
-                dispatch({type:actionTypes.UPDATE_INPUT_LASTNAME,payload: data.lastname});
-                dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload: data.email});
-                dispatch({type:actionTypes.UPDATE_USERROLE,payload: data.role});
-                dispatch({type:actionTypes.UPDATE_ROLENAME,payload: data.rolename});
+                dispatch({type:actionTypes.UPDATE_DATA,payload: data});
                 dispatch({type:actionTypes.UPDATE_ADDROLES,payload: {}});
                 data.addrole.forEach((e) => dispatch({type:actionTypes.ADD_ADDROLE,payload: e}));
-                dispatch({type:actionTypes.UPDATE_TYPE,payload: uType});
-                dispatch({type:actionTypes.UPDATE_CONF_EXP,payload: false});
                 dispatch({type:actionTypes.UPDATE_FTYPE,payload:  (uType==="inhouse")? "Default":((uType==="oidc")? "OpenID":uType.toUpperCase())});
 
                 if (data.type !== "inhouse") {
@@ -539,7 +510,6 @@ const CreateUser = (props) => {
 
     return (
         <Fragment>
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName"><span>{(props.showEditUser===false)?"Create User":"Edit User"}</span></div>

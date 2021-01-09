@@ -30,7 +30,6 @@ const TokenManagement = (props) => {
     const [runLoadData,setRunLoadData] = useState(true)
 	const [refresh,setRefresh] = useState(false)
 	const [showList,setShowList] = useState(false)
-	const [popup,setPopup] = useState({show:false})
 
     useEffect(()=>{
 		setOp("normal");
@@ -40,7 +39,7 @@ const TokenManagement = (props) => {
 
 	const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -128,8 +127,8 @@ const TokenManagement = (props) => {
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
 			{loading?<ScreenOverlay content={loading}/>:null}
-			{(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-            <div id="page-taskName"><span>Token Management</span></div>
+			
+			<div id="page-taskName"><span>Token Management</span></div>
             <div className="adminActionBtn">
                 <button className="btn-md pull-right adminBtn-tkn-mgmt" onClick={()=>{generateCIusertokens();}}  title="Generate New Token">Generate</button>
                 <button className="btn-md pull-right adminBtn-tkn-mgmt btn-right-cust-tkn" onClick={()=>{setRefresh(!refresh);setOp("normal")}} title="Refresh">Refresh</button>            

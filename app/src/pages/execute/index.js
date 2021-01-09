@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import ExecuteHome from './containers/ExecuteHome'
 import { useHistory } from 'react-router-dom';
+import {RedirectPage} from '../global'
 export var history
 
 /*Component App
@@ -8,7 +9,14 @@ export var history
 */
 
 const Execute = () => {
-  history =  useHistory()
+  history = useHistory();
+
+  useEffect(()=>{
+      if(window.localStorage['navigateScreen'] !== "TestSuite"){
+          RedirectPage(history);
+      }
+  }, []);
+  
   return (
       <ExecuteHome/>
   );

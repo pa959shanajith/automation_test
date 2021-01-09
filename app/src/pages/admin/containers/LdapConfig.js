@@ -40,7 +40,6 @@ const LdapConfig = (props) => {
     const [ldapFMapEmailErrBor,setLdapFMapEmailErrBor] = useState(false)
     const [ldapCertErrBor,setLdapCertErrBor] = useState(false)
 	const [ldapServerNameErrBor,setLdapServerNameErrBor] = useState(false)
-	const [popup,setPopup] = useState({show:false})
 
     useEffect(()=>{
         setLdapEdit(false);
@@ -50,7 +49,7 @@ const LdapConfig = (props) => {
 	
 	const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -113,28 +112,14 @@ const LdapConfig = (props) => {
 		var fields = (typeof data=="string")? [] : (data.fields || []);
 		if (typeof data!=="string") data = data.flag;
 		setTestStatus(data);
-		if(data == "Invalid Session") {
-			RedirectPage(history);
-		} else if(data == "success") {
+		if(data == "success") {
 			setPopupState({show:true,title:"Test Connection",content: "Test Connection Successful!"});
 			fields = fields.concat("None");
 			for (let fmo of fieldMapOpts) {
 				if (!fields.includes(fmo)) fields.push(fmo);
 			}
 			setFieldMapOpts(fields.sort());
-		} else if(data == "invalid_addr") setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Either host is unavailable or port is incorrect."});
-		else if(data == "mismatch_secure") setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Secure connection must be enabled for 'ldaps' protocol."});
-		else if(data == "invalid_cert") setPopupState({show:true,title:"Test Connection",content:  "Test Connection Failed! 'ldaps://' protocol require TLS Certificate."});
-		else if(data == "invalid_cacert") setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! TLS Certificate should have full certificate chain including issuer CA certificate."});
-		else if(data == "invalid_cacert_host") setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Hostname/IP provided for connection is not in the TLS Certificate's list."});
-		else if(data == "invalid_url") setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Invalid URL. It must start with 'ldap://'"});
-		else if(data == "invalid_auth") setPopupState({show:true,title:"Test Connection",content: "Test Connection Success! Anonymous access is not allowed for this server."});
-		else if(data == "invalid_credentials") setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Credentials provided for Authentication are invalid."});
-		else if(data == "insufficient_access") setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Credentials provided does not have required privileges for setting up LDAP."});
-		else if(data == "invalid_basedn") setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Base Domain Name is incorrect."});
-		else if(data == "empty") setPopupState({show:true,title:"Test Connection",content: "Test Connection Successful but LDAP directory is empty!"});
-		else if(data == "fail") setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed!"});
-		else setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed due to unexpected error!"});
+		} else ldapTestMessage(data, setPopupState);
 	}
 
     const ldapManage = async (action) =>{
@@ -271,16 +256,33 @@ const LdapConfig = (props) => {
 
     return (
         <Fragment>
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
 
             {ldapEdit===false?
-                <LdapConfigCreate ldapManage={ldapManage} ldapTest={ldapTest} ldapServerNameErrBor={ldapServerNameErrBor} ldapCertErrBor={ldapCertErrBor} ldapFMapEmailErrBor={ldapFMapEmailErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapFnameErrBor={ldapFMapFnameErrBor} ldapFMapUnameErrBor={ldapFMapUnameErrBor} ldapBaseDNErrBor={ldapBaseDNErrBor} bindCredentialsErrBor={bindCredentialsErrBor} binddnErrBor={binddnErrBor} ldapServerURLErrBor={ldapServerURLErrBor} setFieldmap={setFieldmap} cert={cert} setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts} testStatus={testStatus} setCert={setCert} auth={auth} setAuth={setAuth} binddn={binddn} setBinddn={setBinddn} bindCredentials={bindCredentials} setBindCredentials={setBindCredentials} setCertName={setCertName} certName={certName} serverName={serverName} secure={secure} setSecure={setSecure} setServerName={setServerName} setBasedn={setBasedn} basedn={basedn} url={url} setUrl={setUrl} />
+                <LdapConfigCreate setPopupState={setPopupState} ldapManage={ldapManage} ldapTest={ldapTest} ldapServerNameErrBor={ldapServerNameErrBor} ldapCertErrBor={ldapCertErrBor} ldapFMapEmailErrBor={ldapFMapEmailErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapFnameErrBor={ldapFMapFnameErrBor} ldapFMapUnameErrBor={ldapFMapUnameErrBor} ldapBaseDNErrBor={ldapBaseDNErrBor} bindCredentialsErrBor={bindCredentialsErrBor} binddnErrBor={binddnErrBor} ldapServerURLErrBor={ldapServerURLErrBor} setFieldmap={setFieldmap} cert={cert} setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts} testStatus={testStatus} setCert={setCert} auth={auth} setAuth={setAuth} binddn={binddn} setBinddn={setBinddn} bindCredentials={bindCredentials} setBindCredentials={setBindCredentials} setCertName={setCertName} certName={certName} serverName={serverName} secure={secure} setSecure={setSecure} setServerName={setServerName} setBasedn={setBasedn} basedn={basedn} url={url} setUrl={setUrl} />
                 :<LdapConfigEdit setPopupState={setPopupState} popupState={popupState} manageEdit={manageEdit} ldapManage={ldapManage} ldapTest={ldapTest} ldapServerNameErrBor={ldapServerNameErrBor} ldapCertErrBor={ldapCertErrBor} ldapFMapEmailErrBor={ldapFMapEmailErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapFnameErrBor={ldapFMapFnameErrBor} ldapFMapUnameErrBor={ldapFMapUnameErrBor} ldapBaseDNErrBor={ldapBaseDNErrBor} bindCredentialsErrBor={bindCredentialsErrBor} binddnErrBor={binddnErrBor} ldapServerURLErrBor={ldapServerURLErrBor} setFieldmap={setFieldmap} setLdapCertErrBor={setLdapCertErrBor} setLdapFMapEmailErrBor={setLdapFMapEmailErrBor} setLdapFMapLnameErrBor={setLdapFMapLnameErrBor} setLdapFMapFnameErrBor={setLdapFMapFnameErrBor} setLdapBaseDNErrBor={setLdapBaseDNErrBor} setBindCredentialsErrBor={setBindCredentialsErrBor} setLdapFMapUnameErrBor={setLdapFMapUnameErrBor} setBinddnErrBor={setBinddnErrBor} setLdapServerURLErrBor={setLdapServerURLErrBor} setTestStatus={setTestStatus} setFieldMapOpts={setFieldMapOpts} setFieldmap={setFieldmap} setSecure={setSecure} setCertName={setCertName} setCert={setCert} setBasedn={setBasedn} setBindCredentials={setBindCredentials} setBinddn={setBinddn} setAuth={setAuth} setUrl={setUrl} setServerName={setServerName} cert={cert} ldapEdit={ldapEdit} setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts} testStatus={testStatus} setCert={setCert} auth={auth} setAuth={setAuth} binddn={binddn} setBinddn={setBinddn} bindCredentials={bindCredentials} setBindCredentials={setBindCredentials} setCertName={setCertName} certName={certName} serverName={serverName} secure={secure} setSecure={setSecure} setServerName={setServerName} setBasedn={setBasedn} basedn={basedn} url={url}/>
             }
         </Fragment>
   );
+}
+
+const ldapTestMessage = async (data, setPopupState) => {
+	switch(data) {
+		case "invalid_addr": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Either host is unavailable or port is incorrect."}); break;
+		case "mismatch_secure" :  setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Secure connection must be enabled for 'ldaps' protocol."}); break;
+		case "invalid_cert" : setPopupState({show:true,title:"Test Connection",content:  "Test Connection Failed! 'ldaps://' protocol require TLS Certificate."}); break;
+		case "invalid_cacert" : setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! TLS Certificate should have full certificate chain including issuer CA certificate."}); break;
+		case "invalid_cacert_host": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Hostname/IP provided for connection is not in the TLS Certificate's list."});break;
+		case "invalid_url": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Invalid URL. It must start with 'ldap://'"});break;
+		case "invalid_auth": setPopupState({show:true,title:"Test Connection",content: "Test Connection Success! Anonymous access is not allowed for this server."});break;
+		case "invalid_credentials": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Credentials provided for Authentication are invalid."});break;
+		case "insufficient_access": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Credentials provided does not have required privileges for setting up LDAP."});break;
+		case "invalid_basedn": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Base Domain Name is incorrect."});break;
+		case "empty": setPopupState({show:true,title:"Test Connection",content: "Test Connection Successful but LDAP directory is empty!"});break;
+		case "fail": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed!"});break;
+		default: setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed due to unexpected error!"});break;
+  	}
 }
 
 export default LdapConfig;

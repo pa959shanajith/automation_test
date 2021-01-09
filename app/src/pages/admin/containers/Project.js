@@ -54,7 +54,6 @@ const ProjectNew = (props) => {
     const [editProjectName,setEditProjectName] = useState(false)
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
-    const [popup,setPopup] = useState({show:false})
 
     useEffect(()=>{
         getDomains();
@@ -67,7 +66,7 @@ const ProjectNew = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',

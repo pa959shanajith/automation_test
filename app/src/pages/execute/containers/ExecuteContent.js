@@ -13,8 +13,7 @@ const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setS
     // const socket = socketIOClient(ENDPOINT);
     const history = useHistory();
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
-    const [popup,setPopup] = useState({show:false})
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const [eachData,setEachData] = useState([])
     const [eachDataFirst,setEachDataFirst] = useState([])
     const [updateAfterSave,setupdateAfterSave] = useState(false)
@@ -39,7 +38,7 @@ const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setS
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -311,7 +310,6 @@ const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setS
         <>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             
             <div className="e__content">
                 <div className="e__task_title"> <div className="e__task_name">{taskName || "Execute"}{batch_name}</div></div>

@@ -1,7 +1,6 @@
 import React ,  { Fragment, useState} from 'react';
 import { getNames_ICE, createProject_ICE, updateProject_ICE} from '../api';
-import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
-import { useHistory } from 'react-router-dom';
+import {ScreenOverlay, PopupMsg} from '../../global'
 import '../styles/ProjectButtons.scss';
 
 /*Component ProjectButtons
@@ -10,11 +9,10 @@ import '../styles/ProjectButtons.scss';
 */
     
 const ProjectButtons = (props) => {
-    const history = useHistory();
+    
     const [valid,setValid] = useState("")
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
-    const [popup,setPopup] = useState({show:false})
 
     // Create Project Action
     const create_project = async()=>{
@@ -211,7 +209,7 @@ const ProjectButtons = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -223,7 +221,7 @@ const ProjectButtons = (props) => {
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}   
+            
             <div className="adminActionBtn">
                 {props.taskName==="Create Project"?
                     <Fragment>

@@ -16,7 +16,6 @@ const TokenMgmtList = (props) => {
 	const [searchTasks,setSearchTasks] = useState("")
 	const [allTokensModify,setAllTokensModify] = useState(props.allTokens)
     const [firstStop,setFirstStop] = useState(false)
-    const [popup,setPopup] = useState({show:false})
 
     useEffect(()=>{
         if(firstStop) setFirstStop(!firstStop);
@@ -48,7 +47,7 @@ const TokenMgmtList = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -60,7 +59,6 @@ const TokenMgmtList = (props) => {
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             
             <div className="col-xs-9 adminForm-tkn-mgmt" style={{paddingTop:"0",width:"83%"}}>
                 <div className="tkn-mgmt-Wrap">

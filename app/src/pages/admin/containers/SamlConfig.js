@@ -25,7 +25,6 @@ const SamlConfig = (props) => {
     const [certNameErrBorder,setCertNameErrBorder] = useState(false)
     const [selBox,setSelBox] = useState([])
     const [showDeleteModal,setshowDeleteModal] = useState(false)
-    const [popup,setPopup] = useState({show:false})
 
     useEffect(()=>{
         setSamlEdit(false);
@@ -47,7 +46,7 @@ const SamlConfig = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -222,7 +221,6 @@ const SamlConfig = (props) => {
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             
             <div id="page-taskName"><span>{(samlEdit===false)?"Create SAML Configuration":"Edit SAML Configuration"}</span></div>
             

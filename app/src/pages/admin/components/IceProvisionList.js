@@ -16,7 +16,6 @@ const IceProvisionList = (props) => {
 	const [searchTasks,setSearchTasks] = useState("")
 	const [icelistModify,setIcelistModify] = useState(props.icelist)
 	const [showList,setShowList] = useState(false)
-    const [popup,setPopup] = useState({show:false})
     
     useEffect(()=>{
 		refreshIceList();
@@ -42,7 +41,7 @@ const IceProvisionList = (props) => {
 
 	const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -110,8 +109,7 @@ const IceProvisionList = (props) => {
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
 			{loading?<ScreenOverlay content={loading}/>:null}
-			{(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-            
+			
             <div className="col-xs-9 form-group-ip adminForm-ip" style={{paddingTop:"0",width:"83%"}}>
                 <div className="containerWrap">
                     <div className="sessionHeading-ip" data-toggle="collapse" data-target="#activeUsersToken-x">

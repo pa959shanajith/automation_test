@@ -16,7 +16,6 @@ const SessionManagement = (props) => {
     const [clients,setClients] = useState([])
     const [showSessions,setShowSessions] = useState(true)
     const [showClients,setShowClients] = useState(true)
-    const [popup,setPopup] = useState({show:false})
 
     useEffect(()=>{
         refreshSessMgmt();
@@ -25,7 +24,7 @@ const SessionManagement = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopup({
+        setPopupState({
             title:'ERROR',
             content:error,
             submitText:'Ok',
@@ -86,7 +85,6 @@ const SessionManagement = (props) => {
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             
             <div id="page-taskName"><span>Session Management</span></div>
             <div className="adminActionBtn-sess-mgmt">

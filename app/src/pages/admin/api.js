@@ -545,6 +545,9 @@ export const fetchICE = async(args) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
+        if( res.status === "empty"){
+            return {error:"There are no ICE provisioned"};
+        }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
