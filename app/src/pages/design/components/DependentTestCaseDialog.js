@@ -24,7 +24,6 @@ const DependentTestCaseDialog = props => {
 
     const history = useHistory();
     const [tcList, setTcList] = useState([]);
-    const [checkList , setCheckList] = useState([]);
     const [error, setError] = useState("");
 
     useEffect(()=>{
@@ -35,22 +34,20 @@ const DependentTestCaseDialog = props => {
             if (data === "Invalid Session") return RedirectPage(history);
             else{
                 for (let i = 0; i < data.length; i++) {
-                    dependentTestCases.push({'testCaseID': data[i].testcaseId, 'testCaseName': data[i].testcaseName})
+                    dependentTestCases.push({'testCaseID': data[i].testcaseId, 'testCaseName': data[i].testcaseName, 'checked': false, 'tempId': i})
                 }
                 
                 let testCases = [];
-                let newCheckedTc = [];
                 let disableAndBlock = true;
 
-                let reversedDtc = [...dependentTestCases].reverse();
-                
-                for (let testCase of reversedDtc) {
-                    let tc = testCase;
+                let dtcLength = dependentTestCases.length;
+                for (let i=dtcLength-1; i>=0; i--) {
+                    let tc = dependentTestCases[i];
                     tc.disableAndBlock = disableAndBlock;
-                    if (props.checkedTc.length <= 0 && !disableAndBlock) {
-                        newCheckedTc.push(tc.testCaseID)
+                    if (Object.keys(props.checkedTc).length <= 0 && !disableAndBlock) {
+                        tc.checked = true;
                     }
-                    if (props.checkedTc.includes(tc.testCaseID) && !disableAndBlock) newCheckedTc.push(tc.testCaseID);
+                    if ((i in props.checkedTc) && !disableAndBlock) tc.checked = true;
                     
                     if (tc.testCaseName === props.taskName) disableAndBlock = false;
         
@@ -58,9 +55,7 @@ const DependentTestCaseDialog = props => {
                 }
                 
                 testCases.reverse();
-                newCheckedTc.reverse();
                 setTcList(testCases);
-                setCheckList(newCheckedTc);
             }
         })
         .catch(error => console.error("ERROR::::", error));
@@ -68,20 +63,26 @@ const DependentTestCaseDialog = props => {
 
     const onSave = () => {
         
-        var checkedLength = checkList.length;
-        let checkedTestcases = [];
-        if (checkedLength === 0) {
+        let checkedTestcases = {};
+        tcList.forEach(testCase => {
+            if(testCase.checked) checkedTestcases[testCase.tempId] = testCase.testCaseID;
+        })
+        if (checkedTestcases.length === 0) {
             setError("Please Select Dependent Test Case");
         } else {
             setError("");
-            checkedTestcases = [...checkList];
-
-            checkedTestcases.push(props.taskId);
+            checkedTestcases['current'] = props.taskId;
             props.setShowDlg(false);
             props.setShowPop({'title': 'Dependent Test Cases', 'content': 'Dependent Test Cases saved successfully'});
             props.setDTcFlag(true);
             props.setCheckedTc(checkedTestcases);
         }
+    }
+
+    const updateChecklist = (index, state) => {
+        let updatedTCList = [...tcList];
+        updatedTCList[index].checked = state;
+        setTcList(updatedTCList);
     }
 
     return (
@@ -95,7 +96,7 @@ const DependentTestCaseDialog = props => {
                         <ScrollBar>
                             <div className="testCaseOverflow_div">
                                 {
-                                tcList.map(testCase=> <TestCaseItem testCase={testCase} setCheckList={setCheckList} checkList={checkList}/> )
+                                tcList.map((testCase, idx)=> <TestCaseItem key={idx} index={idx} testCase={testCase} updateChecklist={updateChecklist}/> )
                                 }
                             </div>
                         </ScrollBar>
@@ -112,28 +113,19 @@ const DependentTestCaseDialog = props => {
     );
 }
 
-const TestCaseItem = ({testCase, setCheckList, checkList}) => {
+const TestCaseItem = ({index, testCase, updateChecklist}) => {
 
     const history =  useHistory();
     const userInfo = useSelector(state=>state.login.userinfo);
     const [check, setCheck] = useState(false);
 
     useEffect(()=>{
-        setCheck(testCase.disableAndBlock ? false : checkList.includes(testCase.testCaseID));
-    }, [checkList]);
+        setCheck(testCase.disableAndBlock ? false : testCase.checked);
+    }, [testCase]);
 
     const handleCheck = event => {
-        let cl = [...checkList];
-        if (event.target.checked) {
-            setCheck(true);
-            cl.push(testCase.testCaseID);
-            setCheckList(cl);
-        }
-        else{
-            setCheck(false);
-            cl.splice(cl.indexOf(testCase.testCaseID), 1);
-            setCheckList(cl);
-        }
+        setCheck(event.target.checked);
+        updateChecklist(index, event.target.checked);
     }
 
     const onView = () => {
