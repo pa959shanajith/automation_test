@@ -96,23 +96,29 @@ export const userObjectElement_ICE = custObjProps => {
     });
 }
 
-// export const updateScreen_ICE = scrapeObject => {
-//     return new Promise((resolve, reject)=>{
-//         axios(url+"/updateScreen_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : { scrapeObject : scrapeObject },
-//             credentials : 'include',
-//         })
-//         .then(res=>{
-//             if (res.status === 200) resolve(res.data)
-//             else reject(res.status);
-//         })
-//         .catch(error=>reject(error));
-//     });
-// }
+export const updateScreen_ICE = (deleted, modified, added, scrapeData, screenId) => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/updateScreen_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                'deletedObj': deleted,
+                'modifiedObj': modified,
+                'addedObj': added,
+                'scrapedObjects': scrapeData,
+                'screenId': screenId
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
 
 // export const mapScrapeData_ICE = updateData => {
 //     try{

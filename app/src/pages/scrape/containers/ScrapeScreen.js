@@ -59,7 +59,7 @@ const ScrapeScreen = ()=>{
 
                     viewString = data;
 
-                    if(viewString.reuse){
+                    if(viewString.reuse && current_task.reuse !== viewString.reuse){
                         let task = { ...current_task }
                         task.reuse = "True";
                         dispatch({type: pluginActions.SET_CT, payload: task});
