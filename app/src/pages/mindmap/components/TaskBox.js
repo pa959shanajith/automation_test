@@ -7,6 +7,10 @@ import {populateUsers} from '../api';
 import { useSelector } from 'react-redux';
 import {ModalContainer} from '../../global';
 import Complexity, {getComplexityLevel} from './Complexity';
+import CalendarComp from './CalendarComp';
+import Datetime from "react-datetime";
+import moment from "moment";
+
 var unassignTask = []
 var reassignFlag = false
 const defaultVal = 'ct-default';
@@ -26,19 +30,20 @@ const TaskBox = (props) => {
     const [warning,setWarning]=useState(false)
     const [task,setTask] = useState({arr:[],initVal:undefined})
     const [batchName,setBatchName] = useState({show:false})
-    const [userAsgList,setUserAsgList] = useState({arr:[],value:undefined,disabled:true})
-    const [userRevList,setUserRevList] = useState({arr:[],value:undefined})
+    const [userAsgList,setUserAsgList] = useState({loading:true,arr:[],value:undefined,disabled:true})
+    const [userRevList,setUserRevList] = useState({loading:true,arr:[],value:undefined})
     const [startDate,setStartDate] = useState({show:false,value:undefined})
     const [endDate,setEndDate] = useState({show:false,value:undefined})
     const [propagate,setPropagate] = useState({show:false,val:false})
     const [complexity,setComplexity] = useState({show:false,clist:undefined,val:undefined})
     const [assignbtn,SetAssignbtn] = useState({disable:true,reassign:false})
     const [showcomplexity,setShowcomplexity] = useState(false)
-    const appType = projectList[selectedProj].apptype
+    const appType = projectList[selectedProj].apptypeName
     const cycleid = props.cycleid;
     const releaseid = props.releaseid;
     const setTaskBox = props.setTaskBox;
     const setPopup = props.setPopup;
+    const displayError = props.displayError
     var ctScale = props.ctScale;
     var dNodes = props.dNodes;
     var nodeDisplay = props.nodeDisplay
@@ -60,6 +65,21 @@ const TaskBox = (props) => {
         if(dNodes[pi].parent && dNodes[pi].parent.type === 'endtoend'){
             setTaskBox(false)
             setPopup({show:true,title:'MindMap',content:'Can not assign scenarios in end to end module. Please select respective modules to assign scenarios',submitText:'Ok'})
+            return;
+        }
+        if (t == 'screens' && (appType == "System" || appType == "Mainframe")) {
+            setTaskBox(false)
+            setPopup({show:true,title:'Error',content:'Task is disabled for '+appType +' screen',submitText:'Ok'})
+            return;
+        }
+        if (t != 'testcases' && (dNodes[pi]._children != null)) {
+            setTaskBox(false)
+            setPopup({show:true,title:'Error',content:'Expand the node',submitText:'Ok'})
+            return;
+        } 
+        if (t != 'testcases' && (dNodes[pi].children == null)) {
+            setTaskBox(false)
+            setPopup({show:true,title:'Error',content:'Incomplete Flow',submitText:'Ok'})
             return;
         }
         unassignTask = unassignList
@@ -88,37 +108,13 @@ const TaskBox = (props) => {
             tObj.t = taskAssign[t].task[0];
         }
         if (tObj.det === null || tObj.det.trim() == "") {
-            var type = dNodes[pi].type
+            var type = dNodes[pi].type.slice(0,-1) //remove plural
             // to avoid phrasing "Execute scenario scenarios" 
-            type = (type && type!=='scenarios')?type.charAt(0).toUpperCase()+type.slice(1):""
-            taskDetailsRef.current.value = tObj.t + " " + type + " " + dNodes[pi].name
+            type = (type)?" "+type.charAt(0).toUpperCase()+type.slice(1):""
+            if(tObj.t == 'Execute Scenario')type = ""
+            taskDetailsRef.current.value = tObj.t + type + " " + dNodes[pi].name
         } else {
             taskDetailsRef.current.value = tObj.det
-        }
-        var flag = true;
-        if (t == 'scenarios' && dNodes[pi].parent.type == 'endtoend') {
-            flag = false;
-        } else if (t == 'screens' && (appType == "258afbfd-088c-445f-b270-5014e61ba4e2" || appType == "7a6820f1-2817-4d57-adaf-53734dd2354b")) {
-            if (appType == "7a6820f1-2817-4d57-adaf-53734dd2354b"){
-                setTaskBox(false)
-                setPopup({show:true,title:'Error',content:'Task disabled for System screen',submitText:'Ok'})
-            }
-            else{
-                setTaskBox(false)
-                setPopup({show:true,title:'Error',content:'Task disabled for System screen',submitText:'Ok'})
-            }
-            return;
-        }
-        if (flag) {
-            if (t != 'testcases' && (dNodes[pi]._children != null)) {
-                setTaskBox(false)
-                setPopup({show:true,title:'Error',content:'Expand the node',submitText:'Ok'})
-                return;
-            } else if (t != 'testcases' && (dNodes[pi].children == null)) {
-                setTaskBox(false)
-                setPopup({show:true,title:'Error',content:'Incomplete Flow',submitText:'Ok'})
-                return;
-            }
         }
         // populate task 
         var val = dNodes[pi].task ? dNodes[pi].task.tasktype:dNodes[pi].task
@@ -132,18 +128,27 @@ const TaskBox = (props) => {
                 case 'at':{
                     (async()=>{
                         var res = await populateUsers(selectedProj)
-                        setUserAsgList({arr:res.rows,value:tObj.at,disabled:tObj.at?true:false})
-                        setUserRevList({arr:res.rows,value:tObj.rw})
+                        if(res.error){displayError(res.error);setTaskBox(false);return;}
+                        setUserAsgList({loading:false,arr:res.rows,value:tObj.at,disabled:tObj.at?true:false})
+                        setUserRevList({loading:false,arr:res.rows,value:tObj.rw})
                     })()
                     return;
                 }
                 case 'rw':
                     return;
                 case 'sd':
-                    setStartDate({show:true,value:"18/12/2020"})
+                    if (tObj.sd != '' && tObj.sd.indexOf('/')==-1) {
+                        var d=new Date(tObj.sd);
+                        tObj.sd=d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
+                    }
+                    setStartDate({show:true,value:tObj.sd})
                     return;
                 case 'ed':
-                    setEndDate({show:true,value:"19/12/2020"})
+                    if (tObj.ed != '' && tObj.ed.indexOf('/')==-1) {
+                        var d=new Date(tObj.ed);
+                        tObj.ed=d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
+                    }
+                    setEndDate({show:true,value:tObj.ed})
                     return;
                 case 'pg':
                     setPropagate({show:true,val:false})
@@ -170,8 +175,8 @@ const TaskBox = (props) => {
             reassignFlag=false
             setTask({arr:[],initVal:undefined})
             setBatchName({show:false})
-            setUserAsgList({arr:[],value:undefined,disabled:true})
-            setUserRevList({arr:[],value:undefined})
+            setUserAsgList({loading:true,arr:[],value:undefined,disabled:true})
+            setUserRevList({loading:true,arr:[],value:undefined})
             setStartDate({show:false,value:undefined})
             setEndDate({show:false,value:undefined})
             setPropagate({show:false,val:false})
@@ -192,12 +197,6 @@ const TaskBox = (props) => {
             setBatchName({show:true,disabled:true,val:""})
         }
     }
-    const ignoreClick = (e) => {
-        if(e.target.innerText === '×' || e.target.classList.contains('complx_btn') || e.target.className.baseVal === "ct-nodeIcon"){
-            return false
-        }
-        return true
-    }
     const unAssign = (flag) => {
         if(assignbtn.disable)return;
         reassignFlag = flag;
@@ -214,6 +213,10 @@ const TaskBox = (props) => {
     }
     const addTask = () => {
         if(!assignBoxValidator(propList))return;
+        if(assignbtn.reassign){
+            props.setTaskBox(false);
+            return;
+        }
         var tObj = initTaskObject(propList);
         Object.keys(tObj).forEach((k)=>{
             if (tObj[k] === undefined) tObj[k] = null;
@@ -229,7 +232,7 @@ const TaskBox = (props) => {
                 addTask_11(tSc.id, tObj, 1, cycleid, dNodes, nodeDisplay);
                 if (tSc.children != undefined) {
                     tSc.children.forEach(function(scr) {
-                        if (appType != "258afbfd-088c-445f-b270-5014e61ba4e2" && appType != "7a6820f1-2817-4d57-adaf-53734dd2354b") addTask_11(scr.id, tObj, 2, cycleid, dNodes, nodeDisplay);
+                        if (appType != "System" && appType != "Mainframe") addTask_11(scr.id, tObj, 2, cycleid, dNodes, nodeDisplay);
                         scr.children.forEach(function(tCa) {
                             addTask_11(tCa.id, tObj, 3, cycleid, dNodes, nodeDisplay);
                         });
@@ -244,7 +247,7 @@ const TaskBox = (props) => {
             if (tscid != 'null') {
                 addTask_11(dNodes[pi].id, tObj, 4, cycleid, dNodes, nodeDisplay);
                 if (dNodes[pi].children && propagate.val) dNodes[pi].children.forEach(function(scr) {
-                    if (appType != "258afbfd-088c-445f-b270-5014e61ba4e2" && appType != "7a6820f1-2817-4d57-adaf-53734dd2354b") addTask_11(scr.id, tObj, 5, cycleid, dNodes, nodeDisplay);
+                    if (appType != "System" && appType != "Mainframe") addTask_11(scr.id, tObj, 5, cycleid, dNodes, nodeDisplay);
                     scr.children.forEach(function(tCa) {
                         addTask_11(tCa.id, tObj, 6, cycleid, dNodes, nodeDisplay);
                     });
@@ -254,12 +257,19 @@ const TaskBox = (props) => {
             addTask_11(pi, tObj, 7, cycleid, dNodes, nodeDisplay);
             if (dNodes[pi].children && propagate.val) dNodes[pi].children.forEach(function(tCa) {
                 var cTask = (tObj.t == "Scrape" || tObj.t == "Append" || tObj.t == "Compare") ? "Design" : "Debug";
-                addTask_11(tCa.id, tObj, 8, cTask, cycleid, dNodes, nodeDisplay);
+                addTask_11(tCa.id, tObj, 8, cycleid, dNodes, nodeDisplay , cTask,);
             });
         } else if (t == "testcases") {
             addTask_11(pi, tObj, 9, cycleid, dNodes, nodeDisplay);
         }
         clickAddTask({dNodes,nodeDisplay})
+    }
+    const stopPropagate = (e) => {
+        if(e.target && e.target.id === 'task-ok')return;
+        e.stopPropagation()
+        if(e.nativeEvent){
+            e.nativeEvent.stopImmediatePropagation()
+        }
     }
     return(
         <Fragment>
@@ -270,8 +280,8 @@ const TaskBox = (props) => {
             content={<Content/>} 
             modalClass='modal-sm'
         />:null}
-        <ClickAwayListener onClickAway={(e)=>{if(ignoreClick(e))props.setTaskBox(false)}}>
-            <div id='ct-assignTable' className='task-box__container hide'>
+        <ClickAwayListener onClickAway={()=>{props.setTaskBox(false)}}>
+            <div onClick={stopPropagate} id='ct-assignTable' className='task-box__container hide'>
                 <ul>
                     {task.arr.length>0?
                         <li>
@@ -289,38 +299,39 @@ const TaskBox = (props) => {
                             <input id='ct-batchName' disabled={batchName.disabled || assignbtn.reassign} ref={batchNameRef} defaultValue={batchName.val}></input>
                         </li>
                     :null}
-                    {userAsgList.arr.length>0?
-                        <li>
-                            <label>Assigned to</label>
-                            <select id='ct-assignedTo' onChange={(e)=>setUserAsgList({...userAsgList,value:e.target.value})} disabled={userAsgList.disabled || assignbtn.reassign} defaultValue={userAsgList.value} >
-                                <option value={defaultVal}>Select User</option>
-                                {userAsgList.arr.map((e)=>
-                                    <option key={e._id} value={e._id}>{e.name}</option>
-                                )}
-                            </select>
-                        </li>
-                    :null}
-                    {userRevList.arr.length>0?
-                        <li>
-                            <label>Reviewer</label>
-                            <select id='ct-assignRevw' onChange={(e)=>setUserRevList({...userRevList,value:e.target.value})} disabled={assignbtn.reassign} defaultValue={userRevList.value}>
-                                <option value={defaultVal}>Select Reviewer</option>
-                                {userRevList.arr.map((e)=>
-                                    <option key={e._id} value={e._id}>{e.name}</option>
-                                )}
-                            </select>                        
-                        </li>
-                    :null}
+                    <li>
+                        <label>Assigned to</label>
+                        {userAsgList.loading?
+                        <select key='select_1' disabled={true} value={defaultVal}><option value={defaultVal}>Loading...</option></select>
+                        :<select key='select_2' id='ct-assignedTo' onChange={(e)=>setUserAsgList({...userAsgList,value:e.target.value})} disabled={userAsgList.disabled || assignbtn.reassign} defaultValue={userAsgList.value} >
+                            <option value={defaultVal}>Select User</option>
+                            {userAsgList.arr.map((e)=>
+                                <option key={e._id} value={e._id}>{e.name}</option>
+                            )}
+                        </select>}
+                    </li>
+                    <li>
+                        <label>Reviewer</label>
+                        {userRevList.loading?
+                        <select key='selectr_1' disabled={true} value={defaultVal}><option value={defaultVal}>Loading...</option></select>
+                        :<select  key='selectr_2'id='ct-assignRevw' onChange={(e)=>setUserRevList({...userRevList,value:e.target.value})} disabled={assignbtn.reassign} defaultValue={userRevList.value}>
+                            <option value={defaultVal}>Select Reviewer</option>
+                            {userRevList.arr.map((e)=>
+                                <option key={e._id} value={e._id}>{e.name}</option>
+                            )}
+                        </select>   
+                        }                     
+                    </li>
                     {startDate.show?
-                        <li>
+                        <li id='ct-startDate'>
                             <label>Start Date</label>
-                            <input id='ct-startDate' disabled={assignbtn.reassign} defaultValue={startDate.value}></input>
+                            <CalendarComp disabled={assignbtn.reassign} date={startDate.value} setDate={(val)=>setStartDate({show:true,value:val})}/>
                         </li>
                     :null}
                     {endDate.show?
-                        <li>
+                        <li id='ct-endDate'>
                             <label>End Date</label>
-                            <input id='ct-endDate' disabled={assignbtn.reassign} defaultValue={endDate.value}></input>
+                            <CalendarComp disabled={assignbtn.reassign} date={endDate.value} setDate={(val)=>setEndDate({show:true,value:val})}/>
                         </li>
                     :null}
                     {propagate.show?
@@ -348,7 +359,7 @@ const TaskBox = (props) => {
                     <span id='unassign-btn' onClick={()=>unAssign(true)} className={(assignbtn.disable)?'disableButton':''}>Reassign</span>:
                     <span id='unassign-btn' onClick={()=>unAssign(false)} className={(assignbtn.disable)?'disableButton':''}>Unassign</span>
                     }
-                    <span onClick={addTask}>Ok</span>
+                    <span id='task-ok' onClick={addTask}>Ok</span>
                 </div>
             </div>
         </ClickAwayListener>
@@ -478,7 +489,7 @@ function addTask_11(pi, tObj, qid, cycleid,dNodes,nodeDisplay,cTask) {
                     // d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:1').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
                 });
             }
-            dNodes[pi].task.copied = false;
+            dNodes[pi].task.copied = false; // why ???
         }
 
         replicateTask(pi);
@@ -601,11 +612,12 @@ const assignBoxValidator = ({userInfo,userAsgList,userRevList,batchNameRef,start
         d3.select('#ct-batchName').classed('errorBorder',true);
         pass = false;
     }
-    else if (startDate.value == "") {
-        d3.select('#ct-startDate').classed('errorBorder',true);
+    if (startDate.value == "") {
+        d3.select('#ct-startDate .fc-datePicker').classed('errorBorder',true);
         pass = false;
-    } else if (endDate.value == "") {
-        d3.select('#ct-endDate').classed('errorBorder',true);
+    }
+    if (endDate.value == "") {
+        d3.select('#ct-endDate .fc-datePicker').classed('errorBorder',true);
         pass = false;
     }
     var ed = endDate.value.split('/');
@@ -613,7 +625,7 @@ const assignBoxValidator = ({userInfo,userAsgList,userRevList,batchNameRef,start
     var start_date = new Date(sd[2] + '-' + sd[1] + '-' + sd[0]);
     var end_date = new Date(ed[2] + '-' + ed[1] + '-' + ed[0]);
     if (end_date < start_date) {
-        d3.select('#ct-endDate').classed('errorBorder',true);
+        d3.select('#ct-endDate .fc-datePicker').classed('errorBorder',true);
         pass = false;
     }
     return pass
@@ -645,11 +657,21 @@ const setCoordinate = (p,t,ctScale) => {
 }
 
 const removeTask = (pi,twf,userInfo,propagate,dNodes,nodeDisplay,cycleid,activeNode) => {
-    //var reuseDict = getReuseDetails(dNodes);
     //Fetching the config value for strictTaskWorkflow for the first time, hence the check
     if (twf !== false) twf= userInfo.taskwflow; 
     if((dNodes[pi].type=="screens" || dNodes[pi].type=="testcases") && dNodes[pi].task!=null && dNodes[pi].task.cycleid!=cycleid)return;
     task_unassignment(pi,twf,dNodes,nodeDisplay,cycleid,userInfo,propagate,activeNode);
+    var reuseDict = getReuseDetails(dNodes);
+    if (reuseDict[pi].length > 0) {
+        reuseDict[pi].forEach(function(e, i) {
+            if (dNodes[e]._id == null) return;
+            if(reassignFlag){
+                nodeDisplay[e].task = true;
+            }else{
+                nodeDisplay[e].task = false;
+            }
+        });
+    }
     // if (reuseDict[pi].length > 0) {
     //     reuseDict[pi].forEach(count1.add, count1)
     // }

@@ -66,6 +66,7 @@ const ToolbarMenuAssign = (props) => {
         setBlockui({show:true,content:'Loading...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:val})
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
+        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         setRelIndex(undefined)
         setCycle('')
         SearchInp.current.value = ""

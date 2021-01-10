@@ -7,7 +7,8 @@ import ModuleListDrop from '../components/ModuleListDrop';
 import Legends from '../components/Legends'
 import * as actionTypes from '../state/action';
 import CanvasNew from './CanvasNew';
-import {getApptypePD, getJsonPd, ClickFullScreen, ClickSwitchLayout} from './MindmapUtils';
+import ExportMapButton from '../components/ExportMapButton';
+import {getApptypePD, getJsonPd, ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils';
 import {ScreenOverlay, PopupMsg, ReferenceBar, ModalContainer} from '../../global';
 import '../styles/CreateNew.scss';
 
@@ -98,6 +99,7 @@ const CreateNew = () => {
                     {(Object.keys(moduleSelect).length>0)?
                     <CanvasNew displayError={displayError} setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>
                     :<Fragment>
+                        <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
                         <Legends/>
                     </Fragment>}
@@ -158,25 +160,6 @@ const Footer = (props) =>{
             </div>
         </Fragment>
     )
-}
-
-
-// function parseProjList:
-// parses input value to list of project props
-
-const parseProjList = (res) =>{
-    var proj = {};
-    res.projectId.forEach((e,i) => {
-    proj[res.projectId[i]]= {
-        'apptype': res.appType[i],
-        'apptypeName':res.appTypeName[i],
-        'name': res.projectName[i],
-        'id': res.projectId[i],
-        'releases':res.releases[i],
-        'domains':res.domains[i]
-        };
-    });
-    return proj
 }
 
 // importFromMm :

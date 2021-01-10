@@ -125,7 +125,7 @@ const CanvasAssign =(props)=>{
     return (
         <Fragment>
             <Legends/>
-            {taskbox?<TaskBox setPopup={setPopup} clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={releaseid} cycleid={cycleid} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask}/>:null}
+            {taskbox?<TaskBox setPopup={setPopup} clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={releaseid} cycleid={cycleid} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
             <SaveMapButton isAssign={true} dNodes={[...dNodes]} cycId={cycleid} setPopup={setPopup} setBlockui={setBlockui}/>
             <ExportMapButton isAssign={true} setBlockui={setBlockui} setPopup={setPopup} displayError={displayError} releaseRef={props.releaseRef} cycleRef={props.cycleRef}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
