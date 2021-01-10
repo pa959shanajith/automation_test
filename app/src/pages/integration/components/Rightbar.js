@@ -6,8 +6,7 @@ const Rightbar=()=>{
     return (
             <ReferenceBar 
                 hideTask={hideTask} 
-            />
-           
+            />     
     )
 }
 

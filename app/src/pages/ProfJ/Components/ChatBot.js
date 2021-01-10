@@ -54,7 +54,7 @@ const  ChatBot = (props) => {
     return (
         <Fragment>
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-        <div id="assistWrap" className="filter_pop" >
+        <div id="assistWrap" className="filter__pop" >
             <h4 className="pop_header">
                 <img className="assist-image" alt="message" src="static/imgs/ic-message.png"/>
                 <span className="pop_title">Prof J</span>

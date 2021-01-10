@@ -35,6 +35,7 @@ const [blockui,setBlockui] = useState({show:false});
 const [popup ,setPopup]= useState({show:false});
 const [disableSave , setDisableSave]=useState(true);
 const [saveSucess , setSaveSucess]=useState(false);
+const [logerror, setLogError]= useState(null);
     
     
 const user_id = useSelector(state=> state.login.userinfo.user_id); 
@@ -49,13 +50,18 @@ const displayError = (error) =>{
 
 const callLogin_ICE = async()=>{
     if(!(urlRef.current.value) ){
-        setFailMsg("Please Enter URL")
+        setFailMsg("Please Enter URL");
+        setLogError("URL")
     }
     else if(!(userNameRef.current.value)){
         setFailMsg("Please Enter Username ")
+        setLogError("UNAME")
+
     }
     else if(!(passwordRef.current.value)){
         setFailMsg("Please Enter Password ")
+        setLogError("PASS")
+
     }
     else {
         setBlockui({show:true,content:'Logging...'})
@@ -241,6 +247,9 @@ const callExit=()=>{
     setDisableSave(true);
     setProjectDropdn1("Select Project");
     setProjectDropdn2("Select Project");
+    setMappedDetails([]);
+    setSelectedScenario_ID(null);
+    setSelectedTestSuiteID(null);
 }
 const callUnSync=()=>{
     setSyncSuccess(false);
@@ -256,7 +265,15 @@ const content =()=>{
             passwordRef={passwordRef}
             failMSg={failMSg}
             callLogin_ICE={callLogin_ICE}
+            logerror={logerror}
          />
+    )
+}
+const footer=()=>{
+    return(
+        <span>
+            <button onClick={()=>callLogin_ICE() }>Submit</button>
+        </span>
     )
 }
 return (<Fragment>
@@ -303,6 +320,7 @@ return (<Fragment>
                         setSelectedScenarioName={setSelectedScenarioName}
                         filteredNames={filteredNames}
                         scenario_ID={scenario_ID}
+                        
                     />  
                      : null   
                     }
@@ -312,11 +330,13 @@ return (<Fragment>
                         <ModalContainer 
                             title="qTest Login"
                             close={()=>{props.setPopUpEnable(false);props.setFocus(null);props.setqTestClicked(false);setFailMsg(null)}}
-                            content={content()}/>
+                            content={content()}
+                            footer={footer()}/>
                         
                     </Fragment>
                     : null
                 }
+                {}
                 {
                     errorPopUp ? 
                         <PopupMsg
@@ -327,6 +347,10 @@ return (<Fragment>
                         close ={()=>setErrorPopUp(false)}/> 
                     : null
                 }
+                {/* {props.almClicked?
+                    <ALM/>
+                : null
+                } */}
             </div>
         </div>}
         </Fragment>

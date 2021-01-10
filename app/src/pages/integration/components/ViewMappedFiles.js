@@ -2,7 +2,7 @@ import React from 'react';
 
 const ViewMappedFiles=(props)=>{
     return(
-    <div  className="middleContent">
+    <div  className="integration_middleContent">
                 <div className="middle_holder">
                     <div className="page-taskName" >
                         <span className="taskname">

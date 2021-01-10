@@ -167,3 +167,33 @@ export const viewQtestMappedList_ICE = async(userID) => {
         return {error:'No Mapped Data Found'}
     }
 }
+
+export const loginQCServer_ICE = async(qcURL ,qcUsername ,qcPassword) => {
+    try{
+        const res = await axios(url+'/loginQCServer_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            action : 'loginQCServer_ICE',
+            qcURL: qcURL,
+            qcUsername: qcUsername,
+            qcPassword: qcPassword,
+            qcaction : "domain"
+        }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'No User Details Found ,Please Login Again'}
+    }catch(err){
+        console.error(err)
+        return {error:'No User Details Found ,Please Login Again'}
+    }
+}
