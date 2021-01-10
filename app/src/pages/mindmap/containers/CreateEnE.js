@@ -5,8 +5,11 @@ import { ScreenOverlay, PopupMsg, ReferenceBar} from '../../global';
 import { ClickFullScreen , parseProjList, ClickSwitchLayout} from './MindmapUtils';
 import  ToolbarMenuEnE from '../components/ToolbarMenuEnE';
 import CanvasEnE from './CanvasEnE';
+import SaveMapButton from '../components/SaveMapButton';
+import Legends from '../components/Legends';
 import * as actionTypes from '../state/action';
 import '../styles/CreateEnE.scss';
+
 
 /*Component CreateEnE
   use: renders create end to end Mindmap page
@@ -49,7 +52,11 @@ const CreateEnE = () =>{
         <div id='ene' className='mp__canvas_container'>
             <ToolbarMenuEnE setBlockui={setBlockui} setPopup={setPopup}/>
             <div id='mp__canvas' className='mp__canvas'>
-                {(Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>:null}
+                {(Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>
+                :<Fragment>
+                    <SaveMapButton disabled={true}/>
+                    <Legends isEnE={true}/>
+                </Fragment>}
             </div>
         </div>
         <ReferenceBar taskTop={true} collapsible={true} collapse={true}>

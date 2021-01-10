@@ -223,14 +223,19 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
         if(isAssign){
             if (d.task != null) {
                 if (d.task.cycleid == cycleID) {
-                        nodeDisplay[d.id].task = true;
-                        nodeDisplay[d.id].taskOpacity = 1;
+                    nodeDisplay[d.id].task = true;
+                    nodeDisplay[d.id].taskOpacity = 1;
                 }//do not fade for module????????
-                if(d.type=="screens" || d.type=="testcases")
-                        if (d.task.cycleid !=cycleID) {
-                                nodeDisplay[d.id].task = true;
-                                nodeDisplay[d.id].taskOpacity = 0.5;
-                        }
+                if(d.type=="screens" || d.type=="testcases"){
+                    if (d.task.cycleid !=cycleID) {
+                        nodeDisplay[d.id].task = true;
+                        nodeDisplay[d.id].taskOpacity = 0.5;
+                    }
+                }
+                if(d.parent && d.parent.type == 'endtoend'){
+                    nodeDisplay[d.id].task = true;
+                    nodeDisplay[d.id].taskOpacity = 1;
+                }
             }//showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
             else if (d.taskexists && d.type !="modules" && d.type !="scenarios") {
                 nodeDisplay[d.id].task = true;
@@ -771,6 +776,7 @@ export const parseProjList = (res) =>{
         proj[res.projectId[i]]= {
             'apptype': res.appType[i],
             'name': res.projectName[i],
+            'apptypeName':res.appTypeName[i],
             'id': res.projectId[i],
             'releases':res.releases[i],
             'domains':res.domains[i]

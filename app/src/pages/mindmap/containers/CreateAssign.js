@@ -6,6 +6,9 @@ import CanvasAssign from './CanvasAssign';
 import { ScreenOverlay ,PopupMsg,ReferenceBar,SetProgressBar} from '../../global'
 import {getProjectList} from '../api';
 import { ClickFullScreen , parseProjList, ClickSwitchLayout} from './MindmapUtils';
+import SaveMapButton from '../components/SaveMapButton';
+import Legends from '../components/Legends';
+import ExportMapButton from '../components/ExportMapButton';
 import * as actionTypes from '../state/action';
 
 /*Component CreateAssign
@@ -50,7 +53,12 @@ const CreateAssign = () => {
               <ModuleListDrop cycleRef={cycleRef} setPopup={setPopup} isAssign={true}/>
             </div>
             <div id='mp__canvas' className='mp__canvas'>
-                {(Object.keys(moduleSelect).length>0 && cycleRef.current)?<CanvasAssign setBlockui={setBlockui} releaseRef={releaseRef} cycleRef={cycleRef} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>:null}
+                {(Object.keys(moduleSelect).length>0 && cycleRef.current)?<CanvasAssign displayError={displayError} setBlockui={setBlockui} releaseRef={releaseRef} cycleRef={cycleRef} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>
+                :<Fragment>
+                    <SaveMapButton disabled={true}/>
+                    <ExportMapButton/>
+                    <Legends/>
+                </Fragment>}
             </div>
             </div>
             <ReferenceBar collapsible={true} collapse={true}>

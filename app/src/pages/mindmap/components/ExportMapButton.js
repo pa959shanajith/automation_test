@@ -22,11 +22,14 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
         setExportBox(true)
     }
     const clickExport = () => {
-        fnameRef.current.borderColor=""
+        if(!selectedModule._id)return;
+        fnameRef.current.style.borderColor = ''
+        ftypeRef.current.style.borderColor = ''
         var fname = fnameRef.current.value
         var ftype = ftypeRef.current.value
-        if(!fname){
-            fnameRef.current.borderColor = 'red'
+        if(!fname || ftype ==='def-option'){
+            if(!fname)fnameRef.current.style.borderColor = 'red';
+            if(ftype ==='def-option')ftypeRef.current.style.borderColor = 'red';
             return;
         }
         setExportBox(false)
@@ -34,7 +37,6 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
         if(ftype === 'json') toJSON(selectedModule,fname,displayError,setPopup,setBlockui);
         if(ftype === 'excel') toExcel(selectedProj,selectedModule,fname,displayError,setPopup,setBlockui);
         if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fname,displayError,setPopup,setBlockui);
-
     }
     return(
         <Fragment>
@@ -62,7 +64,8 @@ const Container = ({fnameRef,ftypeRef,modName,isAssign}) =>(
         </div>
         <div className='export-row'>
             <label>Export As: </label>
-            <select ref={ftypeRef} defaultValue={'excel'}>
+            <select ref={ftypeRef}>
+                <option value={'def-option'}>Select Export Format</option>
                 <option value={'excel'}>Excel Workbook (.xlsx)</option>
                 <option value={'json'}>MindMap (.mm)</option>
                 {isAssign && <option value={'custom'}>Custom (.json)</option>}
@@ -141,7 +144,7 @@ const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycle
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
         var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "browserType": ["1"], "qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" }, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "" } } ] };
         var moduleInfo = { "batchInfo": [] };
-        moduleData.appType = projectList[selectedProj].apptype;
+        moduleData.appType = projectList[selectedProj].apptypeName;
         moduleData.domainName = projectList[selectedProj].domains;
         moduleData.projectName = projectList[selectedProj].name;
         moduleData.projectId = projectList[selectedProj].id;
