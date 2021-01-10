@@ -4,6 +4,7 @@ import ScrapeObject from '../components/ScrapeObject';
 import { ScrollBar } from "../../global"
 import { ScrapeContext } from '../components/ScrapeContext';
 import * as actionTypes from '../state/action';
+import * as scrapeApi from '../api';
 import "../styles/ScrapeContent.scss"
 
 const ScrapeContent = props => {
@@ -17,7 +18,7 @@ const ScrapeContent = props => {
     const [searchVal, setSearchVal] = useState("");
     const [selAllCheck, setSelAllCheck] = useState(false);
     const [deleted, setDeleted] = useState([]);
-    const [modified, setModified] = useState([]);
+    const [modified, setModified] = useState({});
     const { saved, setSaved, newScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, hideSubmit, setScrapeItems } = useContext(ScrapeContext);
 
     useEffect(()=>{
@@ -55,11 +56,11 @@ const ScrapeContent = props => {
         if (!saved) setDisableBtns({...disableBtns, save: false});
     }, [saved])
 
-    const updateChecklist = (index, event) => {
+    const updateChecklist = (value, event) => {
 
         let localItems = [...scrapeItems];
         
-        if (index === "all") {
+        if (value === "all") {
             if (event.target.checked) {
                 localItems.forEach(item => { if (!item.hide) {
                     item.checked = true;
@@ -70,12 +71,9 @@ const ScrapeContent = props => {
             }})
         }
         else {
-            if (localItems[index].checked) {
-                localItems[index].checked = false;
-            }
-            else {
-                localItems[index].checked = true;
-            }
+            localItems.forEach(item => { 
+                if (!item.hide && item.val === value) item.checked = !item.checked;
+            })
         }
 
         // let selectedCounts = 0;
@@ -102,17 +100,20 @@ const ScrapeContent = props => {
     const renameScrapeItem = (value, newTitle) => {
         let localScrapeItems = [...scrapeItems]
         let objId = "";
+        let obj = null;
         for (let scrapeItem of localScrapeItems){
             if (scrapeItem.val === value) {
                 scrapeItem.title = newTitle;
                 objId = scrapeItem.objId;
+                if (objId) obj = {...mainScrapedData.view[scrapeItem.objIdx], custname: newTitle};
             };
         }
         
-        if (objId && !modified.includes(objId)) {
-            let modifiedArr = [...modified]
-            modifiedArr.push(objId);
-            setModified(modifiedArr);
+        if (obj && objId) {
+            let modifiedDict = {...modified}
+            // modifiedArr.push(obj);
+            modifiedDict[objId] = obj;
+            setModified(modifiedDict);
         }
         setSaved(false);
         setScrapeItems(localScrapeItems);
@@ -154,15 +155,21 @@ const ScrapeContent = props => {
     const onDelete = () => {
         let deletedArr = [];
         let scrapeItemsL = [...scrapeItems];
-        let newScrapeList = []
+        let modifiedDict = {...modified}
+        let newScrapeList = [];
         newScrapeList = scrapeItemsL.filter((item, idx) => {
             if (item.checked){
-                if (item.objId) deletedArr.push(item.objId);
+                if (item.objId) {
+                    deletedArr.push(item.objId);
+                    if (item.objId in modifiedDict)
+                        delete modifiedDict[item.objId]
+                }
                 return false;
             } else return true;
         })
         setScrapeItems(newScrapeList)
         setDeleted(deletedArr);
+        setModified(modifiedDict);
         setDisableBtns({...disableBtns, delete: true, save: false})
         console.log(deletedArr)
     }
@@ -259,6 +266,10 @@ const ScrapeContent = props => {
             console.log("Added:", added);
             console.log("Old:", scrapeData);
             console.log("Modified: ", modified);
+            console.log("Deleted:", deleted);
+            scrapeApi.updateScreen_ICE(deleted, modified, added, scrapeData, current_task.screenId)
+            .then(response => console.log(response))
+            .catch(error => console.error(error))
         }
     }
 

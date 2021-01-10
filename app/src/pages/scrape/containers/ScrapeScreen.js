@@ -5,6 +5,7 @@ import ScrapeContent from './ScrapeContent';
 import RefBarItems from '../components/RefBarItems.js';
 import AddObjectModal from '../components/AddObjectModal';
 import CompareObjectModal from '../components/CompareObjectModal';
+import MapObjectModal from '../components/MapObjectModal';
 import CreateObjectModal from '../components/CreateObjectModal';
 import ActionBarItems from '../components/ActionBarItems';
 import LaunchApplication from '../components/LaunchApplication';
@@ -58,7 +59,7 @@ const ScrapeScreen = ()=>{
 
                     viewString = data;
 
-                    if(viewString.reuse){
+                    if(viewString.reuse && current_task.reuse !== viewString.reuse){
                         let task = { ...current_task }
                         task.reuse = "True";
                         dispatch({type: pluginActions.SET_CT, payload: task});
@@ -86,7 +87,8 @@ const ScrapeScreen = ()=>{
                                                 val: i,
                                                 tag: scrapeObject.tag,
                                                 hide: false,
-                                                title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/[<>]/g, '').trim()
+                                                title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/[<>]/g, '').trim(),
+                                                custname: scrapeObject.custname
                                             }
                                             
                             if(scrapeObject.hasOwnProperty('editable')){
@@ -177,7 +179,8 @@ const ScrapeScreen = ()=>{
         { overlay && <ScreenOverlay content={overlay} />}
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
-        { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems}/> }
+        { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} /> }
+        { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved}/> }
         { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems}/> }
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} setShowPop={setShowPop}/>}
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}

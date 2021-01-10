@@ -11,10 +11,11 @@ const PluginSection = ({userInfo}) => {
             let tempList = [];
             let availablePlugins = userInfo.pluginsInfo;
             let pluginsLength = availablePlugins.length;
+            let nameMap = {"Integration": "Integrations", "Mindmap": "Mindmaps", "Reports": "Reports", "Utility": "Utilities"}
             for(let i=0 ; i < pluginsLength ; i++){
                 if(availablePlugins[i].pluginValue !== false){
                     let pluginName = availablePlugins[i].pluginName;
-                    tempList.push({'pluginName': pluginName});
+                    tempList.push({'pluginName': nameMap[pluginName] || pluginName, image: pluginName });
                 }
             }
             setPluginList(tempList);

@@ -4,6 +4,8 @@ import "../styles/LaunchApplication.scss"
 
 const LaunchApplication = props => {
 
+    const [error, setError] = useState({});
+
     // DESKTOP
 
     const [windowName, setWindowName] = useState("");
@@ -27,13 +29,17 @@ const LaunchApplication = props => {
             processID: processID,
             method: selectedMethod
         }
-        props.appPop.startScrape(scrapeObject);
+        if (!windowName || !processID) setError({windowName: !windowName, processID: !processID})
+        else {
+            setError(false);
+            props.appPop.startScrape(scrapeObject);
+        }
     }
 
     const desktopApp = {
         'content': <div className="ss__desktop_dlg">
-            <input className='ss__dsktp_wndw_name' placeholder='Enter window name' value={windowName} onChange={windowNameHandler}/>
-            <input className="ss__dsktp_prc_id" placeholder='Enter process ID' value={processID} onChange={processIDHandler}/>
+            <input className={'ss__dsktp_wndw_name'+(error.windowName ? " la_invalid": "")} placeholder='Enter window name' value={windowName} onChange={windowNameHandler}/>
+            <input className={"ss__dsktp_prc_id"+(error.processID ? " la_invalid" : "")} placeholder='Enter process ID' value={processID} onChange={processIDHandler}/>
         </div>,
         'footer': <div className="ss__sdkpt_footer">
             <span className="ss__dskp_footer_span">
@@ -61,11 +67,15 @@ const LaunchApplication = props => {
         let scrapeObject = {
             'appName' : appName
         }
-        props.appPop.startScrape(scrapeObject);
+        if (!appName) setError({appName: !appName})
+        else {
+            setError(false);
+            props.appPop.startScrape(scrapeObject);
+        }
     }
 
     const sapApp = {
-        'content': <input className='ss__sap_input' placeholder='Enter the .exe path;App Name' value={appName} onChange={appNameHandler}/>,
+        'content': <input className={'ss__sap_input'+(error.appName ? " la_invalid" : "")} placeholder='Enter the .exe path;App Name' value={appName} onChange={appNameHandler}/>,
         'footer': <button onClick={onSapLaunch} style={{width: "100px"}}>Launch</button>
     }
 
@@ -100,25 +110,32 @@ const LaunchApplication = props => {
             'deviceName': deviceName,
             'uuid': uuid
         }
-        props.appPop.startScrape(scrapeObject);
+        if ( os === "ios" && (!appPath2 || !verNum | !deviceName || !uuid))
+            setError({appPath2: !appPath2, verNum: !verNum, deviceName: !deviceName, uuid: !uuid})
+        else if (os === "android" && (!appPath || !sNum))
+            setError({appPath: !appPath, sNum: !sNum})
+        else {
+            setError(false);
+            props.appPop.startScrape(scrapeObject);
+        }
     }
 
     const mobileApp = {
         'content': <div className="ss__mblapp_inputs">
                 { !os && <div className="ss__mblapp_os_op">Choose OS</div>}
                 <div className="ss__mblapp_chooseApp">
-                    <button className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={()=>setOS("android")}>Android</button>
-                    <button className={"ss__mblapp_os_b"+(os==="ios" ? " ss__os_active":"")} onClick={()=>setOS("ios")}>iOS</button>
+                    <button className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={()=>{setOS("android"); setError(false);}}>Android</button>
+                    <button className={"ss__mblapp_os_b"+(os==="ios" ? " ss__os_active":"")} onClick={()=>{setOS("ios"); setError(false);}}>iOS</button>
                 </div>
                 { os === "ios" && <>
-                    <input class="ss__mblapp_input" placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler}/>
-                    <input className="ss__mblapp_input" placeholder='Enter Version Number' value={verNum} onChange={verNumHandler}/>
-                    <input className="ss__mblapp_input" placeholder='Enter Device Name'value={deviceName} onChange={deviceNameHandler}/>
-                    <input className="ss__mblapp_input" placeholder='Enter UDID' value={uuid} onChange={uuidHandler}/>
+                    <input className={"ss__mblapp_input"+(error.appPath2 ? " la_invalid": "")} placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler}/>
+                    <input className={"ss__mblapp_input"+(error.verNum ? " la_invalid": "")} placeholder='Enter Version Number' value={verNum} onChange={verNumHandler}/>
+                    <input className={"ss__mblapp_input"+(error.deviceName ? " la_invalid": "")} placeholder='Enter Device Name'value={deviceName} onChange={deviceNameHandler}/>
+                    <input className={"ss__mblapp_input"+(error.uuid ? " la_invalid": "")} placeholder='Enter UDID' value={uuid} onChange={uuidHandler}/>
                 </> }
                 { os === "android" && <>
-                    <input class="ss__mblapp_input" placeholder="Enter Application path" value={appPath} onChange={appPathHandler}/> 
-                    <input class="ss__mblapp_input" placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} />
+                    <input className={"ss__mblapp_input"+(error.appPath ? " la_invalid": "")} placeholder="Enter Application path" value={appPath} onChange={appPathHandler}/> 
+                    <input className={"ss__mblapp_input"+(error.sNum ? " la_invalid": "")} placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} />
                 </> }
         </div>,
 
@@ -134,11 +151,15 @@ const LaunchApplication = props => {
         let scrapeObject = {
             'winName' : winName
         }
-        props.appPop.startScrape(scrapeObject);
+        if (!winName) setError({winName: !winName})
+        else {
+            setError(false);
+            props.appPop.startScrape(scrapeObject);
+        }
     }
 
     const oebsApp = {
-        'content': <input className='ss__oebs_input' placeholder='Enter window name' value={winName} onChange={winNameHandler}/>,
+        'content': <input className={'ss__oebs_input'+(error.winName ? " la_invalid": "")} placeholder='Enter window name' value={winName} onChange={winNameHandler}/>,
         'footer': <button onClick={onWinLaunch} style={{width: "100px"}}>Launch</button>
     }
     
@@ -156,13 +177,17 @@ const LaunchApplication = props => {
             'slNum': slNum,
             'vernNum': vernNum
         }
-        props.appPop.startScrape(scrapeObject);
+        if (!slNum || !vernNum) setError({slNum: !slNum, vernNum: !vernNum});
+        else {
+            setError(false);
+            props.appPop.startScrape(scrapeObject);
+        }
     }
 
     const mobileWeb = {
         'content': <div className="ss__mblweb_inputs">    
-            <input class="ss__mblweb_input" placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler}/> 
-            <input class="ss__mblweb_input" placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} />
+            <input className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler}/> 
+            <input className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} />
         </div>,
 
         'footer': <button onClick={onMobileWebLaunch} style={{width: "100px"}}>Launch</button>
@@ -176,7 +201,10 @@ const LaunchApplication = props => {
                 title="Launch Application"
                 content={appDict[props.appPop.appType].content}
                 footer={appDict[props.appPop.appType].footer}
-                close={()=>props.setShow(false)}
+                close={()=>{
+                    props.setShow(false);
+                    setError(false);
+                }}
             />
         </div> 
     );

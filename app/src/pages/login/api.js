@@ -96,3 +96,50 @@ export const checkUser = async(user) => {
         return {error: 'Failed to check user'}
     }
 }
+
+export const restartService = async(i) => {
+    try{
+        const res = await axios(url+"/restartService", {
+            method : 'POST',
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {id: i},
+            credentials : 'include'
+        });
+        if (res.status === 200) {
+            return res.data;
+        }
+        else{
+            console.log(res.status);
+        }
+    }
+    catch(err){
+        console.log(err)
+    }
+} 
+
+export const storeUserDetails = async(userData) => {
+    try{
+        const res = await axios(url+"/storeUserDetails", {
+            method : 'POST',
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {
+                action: "storeUserDetails",
+                userDetails : userData
+            },
+            credentials : 'include'
+        });
+        if (res.status === 200) {
+            return res.data;
+        }
+        else{
+            console.log(res.status);
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+}

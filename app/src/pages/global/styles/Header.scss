@@ -134,42 +134,6 @@
     }
 }
 
-@media screen and (max-width: 800px){
-    .main-header {
-        padding: 2vw 0 2vw 2.5vw;
-    }
-    
-    .header-logo{
-        height: 3.3vw;
-    }
-    
-    .no-border{
-        padding: 0 2.8vw;
-        font-size: 2.3vw;
-    }
-    
-    .user-name-icon{
-        height: 2.8vw;
-        width: 2.8vw;
-        margin-left: 1.5vw;
-    }
-    
-    .user-name-btn{
-        padding-right: 2vw;
-        border-left: .1vw solid gray;
-    }
-    
-    .switch-role-icon{
-        height: 2.8vw;
-        width: 2.8vw;
-        margin-right: 1.8vw;
-    }
-    
-    .bell-ic{
-        font-size: 2.7vw;
-    }
-
-}
 
 @media screen and (min-width: 1400px) and (min-height: 770px){
     .main-header {
@@ -245,7 +209,6 @@
     
     .bell-ic{
         font-size: 1.6vw!important;
-        // margin-top: 0.2vw;
     }
     
 }

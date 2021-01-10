@@ -13,6 +13,7 @@ import Thumbnail from './components/Thumbnail';
 import TaskContents from './components/TaskContents';
 import ResetSession from './components/ResetSession';
 import Report from './components/Report'
+import BrowserFp from './components/BrowserFp';
 
 export { Header, 
         FooterOne, 
@@ -29,5 +30,6 @@ export { Header,
         Thumbnail, 
         TaskContents, 
         ResetSession, 
-        Report
+        Report,
+        BrowserFp
     };

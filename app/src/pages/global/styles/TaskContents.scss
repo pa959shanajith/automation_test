@@ -84,38 +84,12 @@
 
     .assign-task{
         font-size: 17px;
+        max-height: 100px;
+        word-break: break-all;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-
-    @media screen and (max-width: 1025px){
-        .task-description{
-            div{
-                font-size: 1.2vw;
-                padding: .1vw .9vw;
-            }
-        }
-        
-        .panel-content{
-            min-height: 5.5vw;
-            h4{
-                font-size: 1.6vw;
-                flex-basis: 2vw;
-            }
-        }
-        
-        .tasktype-btn{
-            font-size: 1.2vw;
-            border-radius: 1.8vw;
-            height: 2.2vw;
-            width: 7.2vw;
-        }
-        
-        
-        .assign-task{
-            font-size: 1.4vw;
-            padding: 0 3.6vw;
-        }
-    }
 
     @media screen and (min-width: 1400px) and (min-height: 770px){
         .task-description{

@@ -28,7 +28,7 @@ const DesignHome = () => {
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const [showDpndntTcDlg, setShowDpndntTcDlg] = useState(false);
     const [dTcFlag, setDTcFlag] = useState(false);
-    const [checkedTc, setCheckedTc] = useState([]);
+    const [checkedTc, setCheckedTc] = useState({});
     
     useEffect(()=>{
         setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
@@ -88,6 +88,7 @@ const DesignHome = () => {
                                                         setShowDlg={setShowDpndntTcDlg}
                                                         dTcFlag={dTcFlag} 
                                                         setDTcFlag={setDTcFlag} 
+                                                        setCheckedTc={setCheckedTc}
                                                         checkedTc={checkedTc} 
                                                         isMac={isMac}
                                                         disable={disableActionBar} 
