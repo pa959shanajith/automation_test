@@ -181,7 +181,56 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 userConf : {...state.userConf,addRole:state.userConf.addRole}
-            }                                
+            }
+        case actionTypes.RESET_VALUES:
+            return{
+                ...state,
+                userConf : {...state.userConf,
+                    userId:"",
+                    userName: "",
+                    userIdName: "",
+                    firstname: "",
+                    lastname: "",
+                    passWord: "",
+                    confirmPassword: "",
+                    email: "",
+                    role: "",
+                    allRoles: [],
+                    nocreate: false,
+                    confExpired: false,
+                    ldapUserFilter: "",
+                    ldapAllUserList: ""
+                }
+            } 
+            case actionTypes.UPDATE_DATA:
+                return{
+                    ...state,
+                    userConf : {...state.userConf,
+                        userId:action.payload.userid,
+                        userName: action.payload.username,
+                        userIdName: action.payload.userid+";"+action.payload.username,
+                        firstname: action.payload.firstname,
+                        lastname: action.payload.lastname,
+                        passWord: action.payload,
+                        rolename: action.payload.rolename,
+                        email: action.payload.email,
+                        role: action.payload.role,
+                        type: action.payload.type,
+                        confExpired: false,
+                    }
+                }  
+            case actionTypes.UPDATE_LDAP_DATA:
+                return{
+                    ...state,
+                    userConf : {...state.userConf,
+                        userName: action.payload.username,
+                        firstname: action.payload.firstname,
+                        lastname: action.payload.lastname,
+                        email: action.payload.email,
+                        ldap:{...state.userConf.ldap,user:action.payload.ldapname},
+                        nocreate: false,
+                    }
+                }                                             
         default: return state     
     }
 }

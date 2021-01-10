@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Redirect, Link } from 'react-router-dom';
+import { Redirect, Link, useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
-import { SetProgressBar } from '../../global';
+import { SetProgressBar, BrowserFp, RedirectPage } from '../../global';
 import StaticElements from '../components/StaticElements';
+import TermsAndConditions from '../components/TermsAndConditions';
 import * as api from '../api';
 import "../styles/BasePage.scss";
 
@@ -19,7 +20,10 @@ const BasePage = () => {
     const [loginValidation, setLoginValidation] = useState("Loading Profile...");
     const [loginAgain, setLoginAgain] = useState(true);
     const [redirectTo , setRedirectTo] = useState(null);
+    const [showTCPopup, setShowTCPopup] = useState(null);
+    const [userProfile, setUserProfile] = useState(null);
     const dispatch = useDispatch();
+    const history = useHistory();
 
     useEffect(()=>{
         (async()=>{
@@ -28,10 +32,11 @@ const BasePage = () => {
             window.sessionStorage.clear();
             if (checkLogout) {
                 if ((typeof(checkLogout) === "object") && (checkLogout.length === 2)) {
-                    setLoginValidation("Your session has been terminated by "+checkLogout[0]);
                     if (checkLogout[1] === "dereg") setLoginValidation("Reason: User is deleted from Avo Assure");
-                } 
-                else setLoginValidation("You Have Successfully Logged Out!");
+                    else setLoginValidation("Your session has been terminated by "+checkLogout[0]);
+                } else if ((typeof(checkLogout) == "object") && (checkLogout.length == 1)) {
+                    setLoginValidation(checkLogout[0]);
+                } else setLoginValidation("You Have Successfully Logged Out!");
                 SetProgressBar("stop");
             }
             else {
@@ -61,11 +66,11 @@ const BasePage = () => {
                                 setLoginValidation("Your session has expired!");
                                 setLoginAgain(true);
                             } else {
-                                window.localStorage.navigateScreen = userinfo.page;
-                                dispatch({type:actionTypes.SET_SR, payload: userinfo.rolename});
-                                dispatch({type:actionTypes.SET_USERINFO, payload: userinfo});
-                                SetProgressBar("start");
-                                setRedirectTo(`/${userinfo.page}`);
+                                if (userinfo.tandc) {
+                                    setUserProfile(userinfo);
+                                    setShowTCPopup(true);
+                                }
+                                else loadProfile(userinfo)
                             }
                         }
                         catch(err){
@@ -84,13 +89,64 @@ const BasePage = () => {
         })()
     }, []);
 
+    const loadProfile = userinfo => {
+        window.localStorage.navigateScreen = userinfo.page;
+        dispatch({type:actionTypes.SET_SR, payload: userinfo.rolename});
+        dispatch({type:actionTypes.SET_USERINFO, payload: userinfo});
+        SetProgressBar("start");
+        setRedirectTo(`/${userinfo.page}`);
+    }
+
+    const tcAction = action => {
+        let fullName = userProfile["firstname"] + " " + userProfile["lastname"];
+		let email = userProfile["email_id"];
+		let timeStamp = new Date().toLocaleString();
+		let bfp = BrowserFp()
+		let userData = {
+			'fullname': fullName,
+			'emailaddress': email,
+			'acceptance': action,
+			'timestamp': timeStamp,
+			'browserfp': bfp
+        };
+        api.storeUserDetails(userData)
+		.then(data => {
+			if(data === "Invalid Session") {
+                setShowTCPopup(false);
+                RedirectPage(history);
+			} else if (data !== "success") {
+                setLoginValidation("Failed to record user preference. Please Try again!");
+                setShowTCPopup(false);
+                RedirectPage(history);
+            }
+            else {
+				if (action === "Accept") loadProfile(userProfile);
+				else {
+                    setLoginValidation("Please accept our terms and conditions to continue to use Avo Assure!");
+                    setShowTCPopup(false);
+                    RedirectPage(history);
+                }
+			}
+        })
+        .catch(error => {
+			setLoginValidation("Failed to record user preference. Please Try again!");
+			setLoginAgain(false);
+            setShowTCPopup(false);
+			console.error("Error updating user tnc preference", error);
+        });
+        
+    }
+
     return (
         <>
         {redirectTo ? <Redirect to={redirectTo} /> :
+        <>
+        { showTCPopup && <TermsAndConditions tcAction={tcAction}/> }
         < StaticElements> 
             <div className="error-msg">{loginValidation}</div>
             {loginAgain && <span className="error-msg">Click <Link to="/login">here</Link> to login again.</span>}
         </ StaticElements>
+        </>
         }
         </>
     );

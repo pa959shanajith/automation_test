@@ -20,7 +20,7 @@
 .plugin-elements{
     display: flex;
     flex-direction: column;
-    min-height: 0;
+    overflow-y: auto;
     margin: 0;
     padding: 0;
     flex-grow: 1;
@@ -77,30 +77,6 @@
     
     .section-divider{
         height: 85%;
-        width: .2vw;
-    }
-}
-
-@media screen and (max-width: 1025px){
-    .plugin-bg-img{
-        width: 40%;
-    }
-    
-    .page-contents{
-        padding: 0 5% 0 10%;
-    }
-    
-    .plugin-elements{
-        justify-content: center;
-    }
-
-    .greeting-text{
-        font-size: 3vw;
-        margin-bottom: 5vw; 
-    }
-    
-    .section-divider{
-        height: 95%;
         width: .2vw;
     }
 }

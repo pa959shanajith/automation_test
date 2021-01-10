@@ -1,6 +1,11 @@
 import axios from 'axios';
-// const url = 'https://127.0.0.1:8443';
+import {RedirectPage} from '../global'
+import {history} from './index'
 const url = "https://"+window.location.hostname+":8443";
+
+/* Component
+  api returns [["Admin": ""],["Test Lead": ""],["": ""],["": ""]...]
+*/
 
 export const getUserRoles = async() => { 
     try{
@@ -11,15 +16,24 @@ export const getUserRoles = async() => {
             },
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to fetch user roles'}
     }catch(err){
         console.error(err)
+        return {error:'Failed to fetch user roles'}
     }
 }
+
+/* Component
+  api returns string "sucess" , "fail"
+*/
 
 export const manageUserDetails = async(action, userObj) => { 
     try{
@@ -31,16 +45,24 @@ export const manageUserDetails = async(action, userObj) => {
             data: {action: action,user: userObj},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to "+action+" user."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to "+action+" user."}
     }
 }
 
+/* Component
+  api returns [{name:"",_id:""},{name:"",_id:""},{name:"",_id:""},{name:"",_id:""},,,]
+*/
 
 export const getLDAPConfig = async(action, args, opts) => { 
     try{
@@ -52,15 +74,30 @@ export const getLDAPConfig = async(action, args, opts) => {
             data: {action: action,args: args,opts: opts},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        else if(res.status === "fail" ){
+            return {error:"Failed to fetch LDAP server configurations."}
+        }
+        else if(res.status === "insufficient_access" ){
+            return {error:"Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there is no such user"}
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch LDAP server configurations"}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch LDAP server configurations"}
     }
 }
+
+/* Component
+  api returns [{name:"",_id:""},{name:"",_id:""},{name:"",_id:""},{name:"",_id:""},,,]
+*/
 
 export const getSAMLConfig = async(name) => { 
     try{
@@ -72,15 +109,27 @@ export const getSAMLConfig = async(name) => {
             data: {name: name},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        else if(res.status === "fail" ){
+            return {error:"Failed to fetch SAML server configurations."}
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch SAML server configurations"}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch SAML server configurations"}
     }
 }
+
+/* Component
+  api returns string ex. "success" 
+*/
 
 export const manageSAMLConfig = async(action, confObj) => { 
     try{
@@ -92,15 +141,24 @@ export const manageSAMLConfig = async(action, confObj) => {
             data: {action: action,conf: confObj},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to manage SAML server configurations"}
     }catch(err){
         console.error(err)
+        return {error:"Failed to manage SAML server configurations"}
     }
 }
+
+/* Component
+  api returns [{name:"",_id:""},{name:"",_id:""},{name:"",_id:""},{name:"",_id:""},,,]
+*/
 
 export const getOIDCConfig = async(name) => { 
     try{
@@ -112,15 +170,27 @@ export const getOIDCConfig = async(name) => {
             data: {name: name},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        else if(res.status === "fail" ){
+            return {error:"Failed to fetch OpenID server configurations."}
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch OpenID server configurations"}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch OpenID server configurations"}
     }
 }
+
+/* Component
+  api returns data in array - [{"username","id","id","userRole"},{"username","id","id","userRole"},,,]
+*/
 
 export const getUserDetails = async(action, args) => { 
     try{
@@ -132,17 +202,26 @@ export const getUserDetails = async(action, args) => {
             data: {action: action,args: args},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        else if(res.status === "fail" ){
+            return {error:"Failed to fetch users."}
+        }
+        else if(res.status === "empty" ){
+            return {error:"There are no users created yet."}
+        }
+        else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch users."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch users."}
     }
 }
-
-
 
 export const restartService = async(i) => {
     try{
@@ -166,6 +245,10 @@ export const restartService = async(i) => {
     }
 } 
 
+/* Component
+  api returns array of available plugins - ["","","",..]
+*/
+
 export const getAvailablePlugins = async() => { 
     try{
         const res = await axios(url+'/getAvailablePlugins', {
@@ -175,15 +258,23 @@ export const getAvailablePlugins = async() => {
             },
             credentials: 'include'
         });
-        if(res.status===200){
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
-        }else{
-            console.error(res.status)
         }
+        console.error(res.data)
+        return {error:"Failed to fetch available plugins."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch available plugins."}
     }
 }
+
+/* Component
+  api returns [{name: "rolename", plugins: {…}},{},{},]
+*/
 
 export const getPreferences = async() => { 
     try{
@@ -194,15 +285,24 @@ export const getPreferences = async() => {
             },
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch Preferences."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch Preferences."}
     }
 }
+
+/* Component
+  api returns array containing domain names
+*/
 
 export const getDomains_ICE = async() => { 
     try{
@@ -213,16 +313,23 @@ export const getDomains_ICE = async() => {
             },
             credentials: 'include'
         });
-        if(res.status===200){
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
-        }else{
-            console.error(res.status)
         }
+        console.error(res.data)
+        return {error:"Failed to fetch domains."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch domains."}
     }
 }
 
+/* Component
+  api returns string ex. "success" or {projectIds:[],projectNames:[]}
+*/
 
 export const getNames_ICE = async(requestedids, idtype) => { 
     try{
@@ -234,15 +341,23 @@ export const getNames_ICE = async(requestedids, idtype) => {
             data: {requestedids: requestedids,idtype: idtype},
             credentials: 'include'
         });
-        if(res.status===200){
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
-        }else{
-            console.error(res.status)
         }
+        console.error(res.data)
+        return {error:"Failed to get names."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to get names."}
     }
 }
+
+/* Component
+  api returns string ex. "success"
+*/
 
 export const createProject_ICE = async(createprojectObj) => { 
     try{
@@ -254,15 +369,23 @@ export const createProject_ICE = async(createprojectObj) => {
             data: {createProjectObj: createprojectObj},
             credentials: 'include'
         });
-        if(res.status===200){
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
-        }else{
-            console.error(res.status)
         }
+        console.error(res.data)
+        return {error:"Failed to create project."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to create project."}
     }
 }
+
+/* Component
+  api returns {projectIds: [],projectNames:[]}
+*/
 
 export const getDetails_ICE = async(idtype, requestedids) => { 
     try{
@@ -274,17 +397,23 @@ export const getDetails_ICE = async(idtype, requestedids) => {
             data: {idtype: idtype,requestedids: requestedids},
             credentials: 'include'
         });
-        if(res.status===200){
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
-        }else{
-            console.error(res.status)
         }
+        console.error(res.data)
+        return {error:"Failed to fetch domains details."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch domains details."}
     }
 }
 
-
+/* Component
+  api returns string ex. "success"
+*/
 
 export const updateProject_ICE = async(updateProjectObj) => { 
     try{
@@ -296,15 +425,23 @@ export const updateProject_ICE = async(updateProjectObj) => {
             data: {updateProjectObj: updateProjectObj},
             credentials: 'include'
         });
-        if(res.status===200){
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
-        }else{
-            console.error(res.status)
         }
+        console.error(res.data)
+        return {error:"Failed to update project."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to update project."}
     }
 }
+
+/* Component
+  api returns [{name:"",_id:""},{name:"",_id:""},{name:"",_id:""},{name:"",_id:""},,,]
+*/
 
 export const getAssignedProjects_ICE = async(getAssignProj) => { 
     try{
@@ -316,15 +453,23 @@ export const getAssignedProjects_ICE = async(getAssignProj) => {
             data: {getAssignProj: getAssignProj},
             credentials: 'include'
         });
-        if(res.status===200){
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
-        }else{
-            console.error(res.status)
         }
+        console.error(res.data)
+        return {error:"Failed to fetch assigned projects."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch assigned projects."}
     }
 }
+
+/* Component
+  api returns string ex. "success"
+*/
 
 export const assignProjects_ICE = async(assignProjectsObj) => { 
     try{
@@ -336,15 +481,23 @@ export const assignProjects_ICE = async(assignProjectsObj) => {
             data: {assignProjectsObj: assignProjectsObj},
             credentials: 'include'
         });
-        if(res.status===200){
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
-        }else{
-            console.error(res.status)
         }
+        console.error(res.data)
+        return {error:"Failed to assign projects."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to assign projects."}
     }
 }
+
+/* Component
+  api returns an object containing clientData: [] sessionData: []
+*/
 
 export const manageSessionData = async(action, user, key, reason) => { 
     try{
@@ -359,15 +512,24 @@ export const manageSessionData = async(action, user, key, reason) => {
                     reason: reason},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        if(res.status===200){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to manage session Data."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to manage session Data."}
     }
 }
+
+/* Component
+  api returns [{icename: "",icetype: "",provisionedon: "",provisionedto: "",status: "",token: "",username: "",_id: ""},{...},]
+*/
 
 export const fetchICE = async(args) => { 
     try{
@@ -379,15 +541,27 @@ export const fetchICE = async(args) => {
             data: {user: args},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        if( res.status === "empty"){
+            return {error:"There are no ICE provisioned"};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch ICE Details"}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch ICE Details"}
     }
 }
+
+/* Component
+  api returns token or message(string)
+*/
 
 export const provisions = async(tokeninfo) => { 
     try{
@@ -399,16 +573,23 @@ export const provisions = async(tokeninfo) => {
             data: {tokeninfo:tokeninfo},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        if(res.status===200 ){            
+            return res.data;
+        }
+        console.error(res.data)
     }catch(err){
         console.error(err)
+        return {error:"ICE Provisioning Failed"}
     }
 }
 
+/* Component
+  api returns string ex. "success" 
+*/
 
 export const manageOIDCConfig = async(action, confObj) => { 
     try{
@@ -420,15 +601,24 @@ export const manageOIDCConfig = async(action, confObj) => {
             data: {action: action, conf: confObj},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to manage OIDC configuration."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to manage OIDC configuration."}
     }
 } 
+
+/* Component
+  api returns [{deactivated: "",expireson: "",generatedon: "",icetype: "",name: "",projects: [],type: "",userid: "",_id: ""},{...},]
+*/
 
 
 export const getCIUsersDetails = async(CIUser) => { 
@@ -441,15 +631,27 @@ export const getCIUsersDetails = async(CIUser) => {
             data: {CIUser: CIUser},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        else if(res.status === "fail" ){
+            return {error:"Failed to fetch user details."}
+        }
+        else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch user details."}
     }catch(err){
         console.error(err)
+        return {error:"Failed to fetch user details."}
     }
 } 
+
+/* Component
+  api returns token
+*/
 
 export const manageCIUsers = async(action,CIUser) => { 
     try{
@@ -461,12 +663,74 @@ export const manageCIUsers = async(action,CIUser) => {
             data: {action: action, CIUser: CIUser},
             credentials: 'include'
         });
-        if(res.status===200){
-            return res.data;
-        }else{
-            console.error(res.status)
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
         }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to manage user"}
     }catch(err){
         console.error(err)
+        return {error:"Failed to manage user"}
+    }
+}
+
+export const testLDAPConnection = async(auth, urlLDAP, baseDN, bindDN, bindCredentials, secure, cert) => { 
+    try{
+        const res = await axios(url+'/testLDAPConnection', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {ldapURL: urlLDAP,
+                    baseDN: baseDN,
+                    secure: secure,
+                    tlsCert: cert,
+                    authType: auth,
+                    username: bindDN,
+                    password: bindCredentials},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Test Connection Failed!"}
+    }catch(err){
+        console.error(err)
+        return {error:"Test Connection Failed!"}
+    }
+} 
+
+
+export const manageLDAPConfig = async(action, confObj) => { 
+    try{
+        const res = await axios(url+'/manageLDAPConfig', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action, conf: confObj},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Test Connection Failed!"}
+    }catch(err){
+        console.error(err)
+        return {error:"Test Connection Failed!"}
     }
 } 

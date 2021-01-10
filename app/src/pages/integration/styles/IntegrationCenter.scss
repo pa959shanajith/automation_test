@@ -76,6 +76,16 @@
     font-size: 16px
 }
 
+.qcActionBtn button,.qcActionBtn a{
+    color: #fff;
+    border: 0;
+    border-radius: 20px;
+    background: #643693;
+    font-family: 'LatoWebLight';
+    outline: 0;
+    text-decoration: none;
+    cursor: pointer;
+}
 .sepr_Div{
     float: right;
     margin-right: 30px;

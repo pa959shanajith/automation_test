@@ -6,6 +6,7 @@ const initialState = {
     screenData: {testCaseList:[],screenList:[]},
     selectedProj: undefined,
     searchModule: undefined,
+    initEnEProj: undefined,
     selectedModule: {},
     selectBoxState: false,
     selectNodes: {nodes:[],links:[]},
@@ -32,6 +33,11 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 selectedProj: action.payload
+            }  
+        case actionTypes.INIT_ENEPROJECT:
+            return{
+                ...state,
+                initEnEProj: action.payload
             }   
         case actionTypes.UPDATE_MODULELIST:
             return{

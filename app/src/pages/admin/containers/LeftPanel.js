@@ -33,8 +33,8 @@ const LeftPanel = (props) => {
 						<span><span className={'fa fa-briefcase'+ ((props.middleScreen==="projectTab") ? " selected-icon" : "")} ></span></span>Project</i></li>
 					<li className='userDivider'><i id='assignProjectTab' title="Assign Project" onClick={()=>{props.setMiddleScreen("assignProjectTab");resetScreen("assignProjectTab");}} className="selectBrowser">
 						<span><span className={'fa fa-link'+ ((props.middleScreen==="assignProjectTab") ? " selected-icon" : "")} ></span></span>Assign Projects</i></li>
-					{/* <li><i id='ldapConfigTab' title="Manage LDAP Configuration" onClick={()=>props.setMiddleScreen("ldapConfigTab")} className="selectBrowser" >
-						<span><span className='fa fa-address-book'></span></span>LDAP Configuration</i></li> */}
+					<li><i id='ldapConfigTab' title="Manage LDAP Configuration" onClick={()=>{props.setMiddleScreen("ldapConfigTab");resetScreen("ldapConfigTab")}} className="selectBrowser" >
+						<span><span className={'fa fa-address-book' + ((props.middleScreen==="ldapConfigTab") ? " selected-icon" : "")} ></span></span>LDAP Configuration</i></li>
 					<li><i id='samlConfigTab' title="Manage SAML Configuration" onClick={()=>{props.setMiddleScreen("samlConfigTab");resetScreen("samlConfigTab")}} className="selectBrowser" >
 						<span><span className={'fa fa-lock'+ ((props.middleScreen==="samlConfigTab") ? " selected-icon" : "")}  ></span></span>SAML Configuration</i></li>
 					<li><i id='oidcConfigTab' title="Manage OpenID Connect Configuration" onClick={()=>{props.setMiddleScreen("oidcConfigTab");resetScreen("oidcConfigTab")}} className="selectBrowser" >

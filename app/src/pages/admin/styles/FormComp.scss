@@ -1,0 +1,39 @@
+.input-label{
+    width: 75%;
+    font-size: small;
+    font-weight: 700;
+    margin-top: 25px;
+    .left-opt{
+        display: inline-block;
+        width: 75%;
+        margin-left: 10px;
+    }
+    input:read-only ,input:disabled{
+        background-color: #eee;
+        opacity: 1;
+        cursor: not-allowed;
+    }
+    
+    label{
+        width: 120px;
+    }
+    select{
+        text-transform: capitalize;
+    }
+    option:disabled{
+        background-color: #eee;
+    }
+    option{
+        text-transform: capitalize;
+    }
+    .conf-radio{
+        display: inline-block;
+        width: 75%;
+        margin-left: 10px;
+        input{
+            display: inline-block;
+            width: auto;
+            margin-right: 10px;
+        }
+    }
+}

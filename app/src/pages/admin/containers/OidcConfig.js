@@ -44,47 +44,45 @@ const OidcConfig = (props) => {
         setNameErrBorder(false);
     }
 
+    const displayError = (error) =>{
+        setLoading(false)
+        setPopupState({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
+    }
+
     const onClickEditButton = async () =>{
         oidcReset();
         setLoading("Fetching details...");
-        try{    
-            const data = await getOIDCConfig()
-            setLoading(false);
-			if(data === "Invalid Session") return RedirectPage(history);
-			else if(data === "fail") setPopupState({show:true,title:"Edit Configuration",content:"Failed to fetch configurations."});
-			else if(data === "empty") {
-                setPopupState({show:true,title:"Edit Configuration",content:"There are no configurations created yet."});
-                setSelBox([]);
-			} else {
-                data.sort();
-                var dataOptions = [];
-				for(var i = 0; i < data.length; i++) dataOptions.push(data[i].name);
-				setSelBox(dataOptions);
-			}
-		}catch(error) {
-			setLoading(false);
-            setPopupState({show:true,title:"Edit Configuration",content:"Failed to fetch configurations."});
-		};
+        const data = await getOIDCConfig()
+        if(data.error){displayError(data.error);return;}
+        setLoading(false);
+        if(data === "empty") {
+            setPopupState({show:true,title:"Edit Configuration",content:"There are no configurations created yet."});
+            setSelBox([]);
+        } else {
+            data.sort();
+            var dataOptions = [];
+            for(var i = 0; i < data.length; i++) dataOptions.push(data[i].name);
+            setSelBox(dataOptions);
+        }
     }
 
     const oidcGetServerData = async (name) =>{
 		const failMsg = "Failed to fetch details for '"+name+"' configuration.";
         setLoading("Fetching details...");
-		try{
-            const data = await getOIDCConfig(name);
-			setLoading(false);
-			if(data === "Invalid Session") return RedirectPage(history);
-            else if(data === "fail") setPopupState({show:true,title:"Edit Configuration",content:failMsg});
-            else if(data === "empty") setPopupState({show:true,title:"Edit Configuration",content:failMsg + "No such configuration exists"});
-			else {
-                setUrl(data.url);
-                setClientId(data.clientid);
-                setSecret(data.secret);
-			}
-		}catch(error) {
-			setLoading(false);
-			setPopupState({show:true,title:"Edit Configuration",content:failMsg});
-		}
+		const data = await getOIDCConfig(name);
+        if(data.error){displayError(data.error);return;}
+        setLoading(false);
+        if(data === "empty") setPopupState({show:true,title:"Edit Configuration",content:failMsg + "No such configuration exists"});
+        else {
+            setUrl(data.url);
+            setClientId(data.clientid);
+            setSecret(data.secret);
+        }
     }
 
     const oidcConfManage = async (action) =>{
@@ -107,39 +105,35 @@ const OidcConfig = (props) => {
 		// infoArr.push(action);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
             
-        try{
-            const data = await manageOIDCConfig(action, confObj);
-			setLoading(false);
-			if(data === "Invalid Session") {
-				RedirectPage(history);
-			} else if(data === "success") {
-				if (action === "create") oidcReset();
-                else onClickEditButton();
-                setPopupState({show:true,title:popupTitle,content: "Configuration '"+confObj.name+"' "+action+"d successfully!"});
-			} else if(data === "exists") {
-                setNameErrBorder(true);
-                setPopupState({show:true,title:popupTitle,content: "Configuration '"+confObj.name+"' already Exists!"});
-			} else if(data === "fail") {
-				if (action === "create") oidcReset();
-                else onClickEditButton();
-                setPopupState({show:true,title:popupTitle,content: "Failed to "+action+" '"+confObj.name+"' configuration."});
-			} else if(/^1[0-3]{4}$/.test(data)) {
-				if (JSON.parse(JSON.stringify(data)[1])) {
-                    setPopupState({show:true,title:popupTitle,content: failMsg+" Invalid Request!"});
-					return;
-				}
-				let errHints = "<br/>";
-				if (JSON.parse(JSON.stringify(data)[2])) setNameErrBorder(true);
-				if (JSON.parse(JSON.stringify(data)[3])) setUrl(true);
-				if (JSON.parse(JSON.stringify(data)[3]) === 2) errHints += "Issuer must start with http:// or https://<br/>";
-				if (JSON.parse(JSON.stringify(data)[4])) setClientIdErrBorder(true);
-				if (JSON.parse(JSON.stringify(data)[5])) setSecretErrBorder(true);
-                setPopupState({show:true,title:popupTitle,content: "Some values are Invalid!" + errHints});
-			}
-		}catch (error) {
-            setLoading(false);
-            setPopupState({show:true,title:popupTitle,content:failMsg});
-		};
+        const data = await manageOIDCConfig(action, confObj);
+        if(data.error){displayError(data.error);return;}
+        setLoading(false);
+        if(data === "Invalid Session") {
+            RedirectPage(history);
+        } else if(data === "success") {
+            if (action === "create") oidcReset();
+            else onClickEditButton();
+            setPopupState({show:true,title:popupTitle,content: "Configuration '"+confObj.name+"' "+action+"d successfully!"});
+        } else if(data === "exists") {
+            setNameErrBorder(true);
+            setPopupState({show:true,title:popupTitle,content: "Configuration '"+confObj.name+"' already Exists!"});
+        } else if(data === "fail") {
+            if (action === "create") oidcReset();
+            else onClickEditButton();
+            setPopupState({show:true,title:popupTitle,content: "Failed to "+action+" '"+confObj.name+"' configuration."});
+        } else if(/^1[0-3]{4}$/.test(data)) {
+            if (JSON.parse(JSON.stringify(data)[1])) {
+                setPopupState({show:true,title:popupTitle,content: failMsg+" Invalid Request!"});
+                return;
+            }
+            let errHints = "<br/>";
+            if (JSON.parse(JSON.stringify(data)[2])) setNameErrBorder(true);
+            if (JSON.parse(JSON.stringify(data)[3])) setUrl(true);
+            if (JSON.parse(JSON.stringify(data)[3]) === 2) errHints += "Issuer must start with http:// or https://<br/>";
+            if (JSON.parse(JSON.stringify(data)[4])) setClientIdErrBorder(true);
+            if (JSON.parse(JSON.stringify(data)[5])) setSecretErrBorder(true);
+            setPopupState({show:true,title:popupTitle,content: "Some values are Invalid!" + errHints});
+        }
     }
 
     const oidcConfValidate = (action) =>{
@@ -192,20 +186,11 @@ const OidcConfig = (props) => {
         setshowDeleteModal(false);
     }
 
-    const deleteModalButtons = () =>{
-        return(
-            <div>
-                <button id="deleteGlobalModalButton" onClick={()=>{oidcConfManage("delete");setshowDeleteModal(false);}} type="button" className="btn-default btnGlobalYes btn-margin">Yes</button>
-				<button type="button" onClick={()=>{setshowDeleteModal(false)}} className="btn-default">No</button>
-            </div>
-        )
-    }    
-
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
-
+            
             <div id="page-taskName"><span>{(oidcEdit===false)?"Create OpenID Connect Configuration":"Edit OpenID Connect Configuration"}</span></div>
             <div className="adminActionBtn-oidc">
                 {oidcEdit===false?
@@ -252,10 +237,19 @@ const OidcConfig = (props) => {
             </div>
 
             {showDeleteModal?
-                <ModalContainer title="Delete Configuration" footer={deleteModalButtons()} close={closeModal} content="Are you sure you want to delete ? Users depending on this configuration will not be able to login." />
+                <ModalContainer title="Delete Configuration" footer={deleteModalButtons(oidcConfManage, setshowDeleteModal)} close={closeModal} content="Are you sure you want to delete ? Users depending on this configuration will not be able to login." />
             :null} 
         </Fragment>
   );
 }
+
+const deleteModalButtons = (oidcConfManage, setshowDeleteModal) =>{
+    return(
+        <div>
+            <button id="deleteGlobalModalButton" onClick={()=>{oidcConfManage("delete");setshowDeleteModal(false);}} type="button" className="btn-default btnGlobalYes btn-margin">Yes</button>
+            <button type="button" onClick={()=>{setshowDeleteModal(false)}} className="btn-default">No</button>
+        </div>
+    )
+}    
 
 export default OidcConfig;

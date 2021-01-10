@@ -76,3 +76,20 @@
 button:focus{
     outline: none!important;
 }
+.modal-title {
+    margin: 0;
+    line-height: 1.42857143;
+    background: #311d4e;
+    color: #fff;
+    border-radius: 6px;
+    padding: 5px 40px;
+    text-align: center;
+    word-break: break-all;
+    font-size: 17px;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+}
+.modal-mmd{
+    min-width: 450px;
+}

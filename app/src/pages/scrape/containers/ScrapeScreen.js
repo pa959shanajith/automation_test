@@ -5,6 +5,7 @@ import ScrapeContent from './ScrapeContent';
 import RefBarItems from '../components/RefBarItems.js';
 import AddObjectModal from '../components/AddObjectModal';
 import CompareObjectModal from '../components/CompareObjectModal';
+import MapObjectModal from '../components/MapObjectModal';
 import CreateObjectModal from '../components/CreateObjectModal';
 import ActionBarItems from '../components/ActionBarItems';
 import LaunchApplication from '../components/LaunchApplication';
@@ -25,7 +26,6 @@ const ScrapeScreen = ()=>{
     const [showPop, setShowPop] = useState("");
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const [scrapeItems, setScrapeItems] = useState([]);
-    const [customLen, setCustomLen] = useState(0);
     const [mainScrapedData, setMainScrapedData] = useState({});
     const [saved, setSaved] = useState(true);
     const [showAppPop, setShowAppPop] = useState(false);
@@ -59,7 +59,7 @@ const ScrapeScreen = ()=>{
 
                     viewString = data;
 
-                    if(viewString.reuse){
+                    if(viewString.reuse && current_task.reuse !== viewString.reuse){
                         let task = { ...current_task }
                         task.reuse = "True";
                         dispatch({type: pluginActions.SET_CT, payload: task});
@@ -70,45 +70,34 @@ const ScrapeScreen = ()=>{
                     haveItems = viewString.view.length !== 0;
                     
                     if (haveItems) {
-                        let localScrapeList = []
-                        let custObjLength = 0;
+                        let localScrapeList = [];
 
                         for (let i = 0; i < viewString.view.length; i++) {
-                            let ob = viewString.view[i];
-                            let addcusOb = '';
-                            ob.tempId = i;
+                            let scrapeObject = viewString.view[i];
                             
-                            if (viewString.view[i].xpath === "") addcusOb = 'addCustObj';
-                            
-                            if (ob.cord) {
-                                addcusOb = "";
-                                ob.hiddentag = "No";
-                                ob.tag = `iris;${ob.objectType}`;
-                                ob.url = "";
-                                ob.xpath = `iris;${ob.custname};${ob.left};${ob.top};${(ob.width + ob.left)};${(ob.height + ob.top)};${ob.tag}`;
+                            if (scrapeObject.cord) {
+                                scrapeObject.hiddentag = "No";
+                                scrapeObject.tag = `iris;${scrapeObject.objectType}`;
+                                scrapeObject.url = "";
+                                scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${scrapeObject.tag}`;
                             }
 
-                            let scrapeItem = {  objId: ob._id, 
-                                                // xpath: ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' '),
-                                                // left: ob.left,
-                                                // top: ob.top,
-                                                // width: ob.width,
-                                                // height:  ob.height,
-                                                // url: ob.url,
-                                                // hiddentag: ob.hiddentag,
+                            let scrapeItem = {  objId: scrapeObject._id, 
                                                 objIdx: i,       
-                                                val: ob.tempId,
-                                                tag: ob.tag,
+                                                val: i,
+                                                tag: scrapeObject.tag,
                                                 hide: false,
-                                                title: ob.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/[<>]/g, '').trim()
+                                                title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/[<>]/g, '').trim(),
+                                                custname: scrapeObject.custname
                                             }
                                             
-                            if(ob.hasOwnProperty('editable')){
+                            if(scrapeObject.hasOwnProperty('editable')){
+                                // clearance needed
                                 scrapeItem.disabled = true;
                                 scrapeItem.decryptFlag = true;
                             } else {
-                                scrapeItem.addCusOb = addcusOb
-                                if (addcusOb) custObjLength++;
+                                let isCustom = scrapeObject.xpath === "";
+                                scrapeItem.isCustom = isCustom;
                             };
                             
                             localScrapeList.push(scrapeItem)
@@ -120,12 +109,7 @@ const ScrapeScreen = ()=>{
                         setSaved(true);
                         dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                         dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
-                        setCustomLen(custObjLength);
-                        console.log(custObjLength)
                         // screenshot
-                        // flip selectAll chkbox
-                        // if web -> flip gen and compare objects -> check custObjLength as well
-                        // flip save visibility save 
                         
                         setOverlay("");
                     }
@@ -133,14 +117,10 @@ const ScrapeScreen = ()=>{
                         setScrapeItems([]);
                         setMainScrapedData({});
                         setNewScrapedData([]);
-                        setCustomLen(0);
                         setSaved(true);
                         dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                         dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
                         // screenshot
-                        // flip selectAll chkbox
-                        // if web -> flip gen and compare objects
-                        // flip save visibility save 
 
                         setOverlay("");
                     }
@@ -149,10 +129,6 @@ const ScrapeScreen = ()=>{
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                     dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
                     // screenshot
-                    // flip selectAll chkbox
-                    // if web -> flip gen and compare objects
-                    // flip save visibility save 
-
                 }
             resolve("success");
             })
@@ -203,14 +179,15 @@ const ScrapeScreen = ()=>{
         { overlay && <ScreenOverlay content={overlay} />}
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
-        { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} /> }
-        { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal}/> }
-        { showObjModal === "createObject" && <CreateObjectModal setShow={setShowObjModal}/>}
+        { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} /> }
+        { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved}/> }
+        { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems}/> }
+        { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} setShowPop={setShowPop}/>}
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}
         <div  className="ss__body">
             <Header/>
             <div className="ss__mid_section">
-                <ScrapeContext.Provider value={{setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, customLen}}>
+                <ScrapeContext.Provider value={{setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems }}>
                     <ActionBarItems />
                     <ScrapeContent />
                     <RefBarItems />

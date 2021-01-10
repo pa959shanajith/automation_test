@@ -1,7 +1,6 @@
 import React ,  { Fragment, useState} from 'react';
 import { getNames_ICE, createProject_ICE, updateProject_ICE} from '../api';
-import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
-import { useHistory } from 'react-router-dom';
+import {ScreenOverlay, PopupMsg} from '../../global'
 import '../styles/ProjectButtons.scss';
 
 /*Component ProjectButtons
@@ -10,7 +9,7 @@ import '../styles/ProjectButtons.scss';
 */
     
 const ProjectButtons = (props) => {
-    const history = useHistory();
+    
     const [valid,setValid] = useState("")
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
@@ -18,7 +17,7 @@ const ProjectButtons = (props) => {
     // Create Project Action
     const create_project = async()=>{
         props.setProjectNameInputErrorBorder(false);
-        if (props.projectName === "") props.setProjectNameInputErrorBorder(true);
+        if (props.projectName.trim() === "") props.setProjectNameInputErrorBorder(true);
         else if (props.projectTypeSelected=== ""){
             setPopupState({show:true,title:"Create Project",content:"Please select Application Type"});
         } else if (props.releaseList.length === 0) {
@@ -47,49 +46,40 @@ const ProjectButtons = (props) => {
                     requestedids.push(props.selDomain);
                     idtype.push('domainsall');
                     var proceeed = false;
-                    try{
-                        const response = await getNames_ICE(requestedids, idtype)
-                        
-                        if (response === "Invalid Session")RedirectPage(history);
-                        if (response === "No Projects") {
-                            proceeed = true;
-                        } else if (response.projectNames.length > 0) {
-                            for ( i = 0; i < response.projectNames.length; i++) {
-                                if (props.projectName === response.projectNames[i]) {
-                                    setPopupState({show:true,title:"Create Project",content:"Project Name already Exists"});
-                                    return false;
-                                } else proceeed = true;
-                            }
+                    const response = await getNames_ICE(requestedids, idtype)
+                    if(response.error){displayError(response.error);return;}
+                    else if (response === "No Projects") {
+                        proceeed = true;
+                    } else if (response.projectNames.length > 0) {
+                        for ( i = 0; i < response.projectNames.length; i++) {
+                            if (props.projectName === response.projectNames[i]) {
+                                setPopupState({show:true,title:"Create Project",content:"Project Name already Exists"});
+                                return false;
+                            } else proceeed = true;
+                        }
+                    } else {
+                        setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
+                        return false;
+                    }
+                    if (proceeed === true) {
+                        setLoading("Loading...");
+                        const createprojectObj = {};
+                        createprojectObj.domain = props.selDomain;
+                        createprojectObj.projectName = props.projectName.trim();
+                        createprojectObj.appType = props.projectTypeSelected;
+                        createprojectObj.projectDetails = props.projectDetails;
+                        console.log("Controller: " + createprojectObj);
+                        const createProjectRes = await createProject_ICE(createprojectObj)
+                        if(createProjectRes.error){displayError(createProjectRes.error);return;}
+                        else if (createProjectRes === 'success') {
+                            setPopupState({show:true,title:"Create Project",content:"Project created successfully"});
+                            props.resetForm();
+                            props.setProjectDetails([]);
                         } else {
                             setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
-                            return false;
+                            props.resetForm();
                         }
-                        if (proceeed === true) {
-                            setLoading("Loading...");
-                            const createprojectObj = {};
-                            createprojectObj.domain = props.selDomain;
-                            createprojectObj.projectName = props.projectName.trim();
-                            createprojectObj.appType = props.projectTypeSelected;
-                            createprojectObj.projectDetails = props.projectDetails;
-                            console.log("Controller: " + createprojectObj);
-                            try{
-                                const createProjectRes = await createProject_ICE(createprojectObj)
-                                if (createProjectRes === "Invalid Session")RedirectPage(history);
-                                if (createProjectRes === 'success') {
-                                    setPopupState({show:true,title:"Create Project",content:"Project created successfully"});
-                                    props.resetForm();
-                                    props.setProjectDetails([]);
-                                } else {
-                                    setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
-                                    props.resetForm();
-                                }
-                                setLoading(false);
-                            }catch(error){
-                                console.log("Error:::::::::::::", error);
-                            }    
-                        }
-                    }catch(error){
-                        console.log("Error:::::::::::::", error);
+                        setLoading(false);
                     }
 				}
             }
@@ -196,23 +186,19 @@ const ProjectButtons = (props) => {
 					updateProjectObj.newProjectDetails = props.newProjectDetails;
 				else
 					updateProjectObj.newProjectDetails.push(props.newProjectDetails);
-                 
-                try{    
-                    const updateProjectRes = await updateProject_ICE(updateProjectObj);
-                    if (updateProjectRes === "Invalid Session") {
-                        RedirectPage(history);
-                    }
-                    props.clearUpdateProjectObjects();
-                    if (updateProjectRes === 'success') {
-                        setPopupState({show:true,title:"Update Project",content:"Project updated successfully"});
-                    } else {
-                        setPopupState({show:true,title:"Update Project",content:"Failed to update project"});
-                        props.resetForm();
-                    }
-                    setLoading(false);
-                }catch(error){
-                    console.log("Error:::::::::::::", error);
-                }    
+                if( updateProjectObj.projectName !== props.editProjectName && props.editProjectName !== "")
+                     updateProjectObj.newProjectName  = props.editProjectName.trim();
+                const updateProjectRes = await updateProject_ICE(updateProjectObj);
+                if(updateProjectRes.error){displayError(updateProjectRes.error);return;}
+                props.clearUpdateProjectObjects();
+                props.resetForm();
+                if (updateProjectRes === 'success') {
+                    setPopupState({show:true,title:"Update Project",content:"Project updated successfully"});
+                } else {
+                    setPopupState({show:true,title:"Update Project",content:"Failed to update project"});
+                    // props.resetForm();
+                }
+                setLoading(false);   
             }
         }    
     }
@@ -221,10 +207,21 @@ const ProjectButtons = (props) => {
         setPopupState({show:false,title:"",content:""});
     }
 
+    const displayError = (error) =>{
+        setLoading(false)
+        setPopupState({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
+    }
+
     return(
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
+            
             <div className="adminActionBtn">
                 {props.taskName==="Create Project"?
                     <Fragment>

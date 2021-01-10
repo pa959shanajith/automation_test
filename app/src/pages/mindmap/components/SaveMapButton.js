@@ -16,13 +16,14 @@ const SaveMapButton = (props) => {
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
     const unassignTask = useSelector(state=>state.mindmap.unassignTask)
     const projId = useSelector(state=>state.mindmap.selectedProj)
+    const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
     const projectList = useSelector(state=>state.mindmap.projectList)
     useEffect(()=>{
         if(props.createnew==='save')clickSave()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,props.setPopup,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,props.setPopup,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj)
     }
     return(
         <svg className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -35,7 +36,7 @@ const SaveMapButton = (props) => {
 }
 
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList)=>{
+const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj)=>{
     var tab = "tabCreate"
     var layout_vertical = false;
     var selectedProject;
@@ -117,6 +118,10 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
             displayError("Module belongs to project: " +projectList[selectedProject].name+". Please go back to the same project and Save");
             return;
         }
+        if(!selectedProject && initEnEProj !== projId){
+            displayError("Module belongs to project: " +projectList[initEnEProj].name+". Please go back to the same project and Save");
+            return;
+        }
     }
     if(isAssign){
         tab = "tabAssign"
@@ -132,8 +137,8 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
             tab : "tabAssign",
             cycId:cycId,
             write : 30,
-            unassignTask:unassignTask
-            //sendNotify: {} //{Execute Batch: "priyanka.r", Execute Scenario: "priyanka.r"}
+            unassignTask:unassignTask,
+            sendNotify: {} //{Execute Batch: "priyanka.r", Execute Scenario: "priyanka.r"}
         }
     }
     var modId = await saveMindmap(data)

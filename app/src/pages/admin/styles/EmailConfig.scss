@@ -1,0 +1,28 @@
+.conf_email{
+    height: calc(100% - 31px);
+    margin-top: 80px;
+    .input-label{
+        width: 75%;
+        font-size: small;
+        font-weight: 700;
+        margin-top: 25px;
+        label{
+            width: 120px;
+        }
+    }
+    .conf-title{
+        width: 100%;
+        background: #eeeeee;
+        display: block;
+        font-weight: 100;
+        font-size: 18px;
+        padding: 8px;
+    }
+    .checkbox-email{
+        label{
+            width: 200px;
+            margin-left: 10px;
+        }
+
+    }
+}

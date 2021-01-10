@@ -21,8 +21,8 @@ var zoom //global var to store zoom
 const types = {
     'modules': 112,
     'scenarios': 237,
-    'screens': 363,
-    'testcases': 488
+    'screens': 362,
+    'testcases': 487
 };
 var count;
 var temp = {

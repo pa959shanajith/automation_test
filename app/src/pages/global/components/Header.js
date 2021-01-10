@@ -242,7 +242,6 @@ const Header = () => {
                                 !adminDisable &&
                                 <>
                                 <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
-                                <div className="divider" />
                                 <div onClick={resetPass}><Link to="#">Change Password</Link></div>
                                 </>
                             }

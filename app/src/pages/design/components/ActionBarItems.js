@@ -28,7 +28,7 @@ import "../styles/ActionBarItems.scss"
         disable -> flag to check if action bar is required to disable
 */
 
-const UpperContent = ({setDTcFlag, isMac, setOverlay, disable, setShowPop, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
+const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, setShowPop, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
 
     const userInfo = useSelector(state=>state.login.userinfo);
     const current_task = useSelector(state=>state.plugin.CT);
@@ -44,6 +44,11 @@ const UpperContent = ({setDTcFlag, isMac, setOverlay, disable, setShowPop, setSh
     useEffect(()=>{
         if (!showDlg) setDependCheck(dTcFlag);
     }, [showDlg]);
+
+    useEffect(()=>{
+        setDependCheck(false);
+        setCheckedTc({});
+    }, [current_task])
 
     const WebList = [
         {'title': "Internet Explorer", 'img': "static/imgs/ic-ie.png", action: ()=>debugTestCases('3'), 'disable': disable}, 
@@ -73,6 +78,7 @@ const UpperContent = ({setDTcFlag, isMac, setOverlay, disable, setShowPop, setSh
         if (!event.target.checked) {
             setDependCheck(false);
             setDTcFlag(false);
+            setCheckedTc({});
         }
         else setShowDlg(true);
     }
@@ -93,9 +99,8 @@ const UpperContent = ({setDTcFlag, isMac, setOverlay, disable, setShowPop, setSh
         
         // globalSelectedBrowserType = selectedBrowserType;
 
-        if (dTcFlag) testcaseID = checkedTc;
+        if (dTcFlag) testcaseID = Object.values(checkedTc);
         else testcaseID.push(current_task.testCaseId);
-    
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
         DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, appType)
@@ -175,7 +180,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
         
 		DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber)
 		.then(response => {
-				if (response === "Invalid Session") RedirectPage(history);
+				if (response === "Invalid Session") return RedirectPage(history);
                 
                 let responseData;
                 if (typeof response === 'object') responseData = JSON.stringify(response.testcase, null, 2);

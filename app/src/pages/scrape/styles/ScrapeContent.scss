@@ -17,6 +17,10 @@
     height: 100%;
 }
 
+.scrape_object_container{
+    flex: 1 1;
+    overflow: auto;
+}
 
 .ss__task_title{
     margin-bottom: 15px;

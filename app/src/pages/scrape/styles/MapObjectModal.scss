@@ -1,0 +1,112 @@
+.ss__mapObj{
+    .modal__body{
+        height: 475px;
+        padding: 25px 40px;
+    }
+    .modal__content{
+        width: 140%;
+    }
+}
+
+.ss__mapObjBody, .ss__mo_scrapeObjectList, .ss__mo_customObjectList{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.ss__mo_scrapeObjectList, .ss__mo_customObjectList{
+    flex: 1 0 50%;
+    margin: 0 5px;
+}
+.ss__mo_customObjectList{
+    align-items: center;
+}
+
+.mo_scrapeListContainer{
+    display: flex;
+    position: relative;
+    height: 100%;
+}
+
+.mo_listCanvas{
+    display: flex;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+}
+
+.mo_listMinHeight{
+    min-height: 0;
+    width: 100%;
+}
+.mo_listContent{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    height: 100%;
+}
+
+.ss__mo_customOutContainer{
+    width: 100%;
+}
+.ss__mo_customInContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.mo_tagHead{
+    cursor: pointer;
+    background: #311d4e;
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 2px 10px;
+    color: white;
+    width: 60%;
+    border-radius: 5px;
+}
+
+.ss__mo_listItem{
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+    width: 85%;
+    font-size: 15px;
+}
+
+.ss__mo_lists{
+    display: flex;
+    padding: 0 20px;
+    height: 100%;
+}
+
+.ss__mo_lbl{
+    color: #311d4e;
+    font-family: 'LatoWebBold';
+    font-size: 15px;
+} 
+
+.headerMargin{
+    margin-bottom: 25px;
+}
+
+.lblMargin{
+    margin-bottom: 10px;
+}
+
+.mo_tagItems{
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    position: relative;
+    height: 28px;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+}
+
+.mo_tagItemList{
+    margin: 10px 0 15px;
+}

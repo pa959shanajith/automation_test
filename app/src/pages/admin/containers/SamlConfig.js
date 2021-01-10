@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, RedirectPage, ModalContainer, ScrollBar} from '../../global' 
+import {ScreenOverlay, PopupMsg, ModalContainer} from '../../global' 
 import {getSAMLConfig, manageSAMLConfig} from '../api';
-import { useHistory } from 'react-router-dom';
 import '../styles/SamlConfig.scss'
 
 
@@ -12,7 +11,6 @@ import '../styles/SamlConfig.scss'
 
 const SamlConfig = (props) => {
 
-    const history = useHistory();
     const [samlEdit,setSamlEdit] = useState(false)
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
@@ -44,6 +42,16 @@ const SamlConfig = (props) => {
         setIdpErrBorder(false);
         setCertNameErrBorder(false);
         setNameErrBorder(false);
+    }
+
+    const displayError = (error) =>{
+        setLoading(false)
+        setPopupState({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
     }
 
     const samlConfValidate = (action) =>{
@@ -107,63 +115,51 @@ const SamlConfig = (props) => {
 		// labelArr.push(txnHistory.codesDict['SamlConfmanage']);
 		// infoArr.push(action);
 		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-		try{
-            const data = await manageSAMLConfig(action, confObj);
-			setLoading(false);
-			if(data === "Invalid Session") {
-				RedirectPage(history);
-			} else if(data === "success") {
-				if (action === "create") samlReset();
-				else samlEditClick();
-                setPopupState({show:true,title:popupTitle,content:"Configuration '"+confObj.name+"' "+action+"d successfully!"});
-			} else if(data === "exists") {
-				setNameErrBorder(true);
-                setPopupState({show:true,title:popupTitle,content:"Configuration '"+confObj.name+"' already Exists!"});
-			} else if(data === "fail") {
-				if (action === "create") samlReset();
-				else samlEditClick();
-                setPopupState({show:true,title:popupTitle,content:failMsg});
-			} else if(/^1[0-2]{4}$/.test(data)) {
-				if (JSON.parse(JSON.stringify(data)[1])) {
-                    setPopupState({show:true,title:popupTitle,content: failMsg+" Invalid Request!"});
-					return;
-				}
-				let errHints = "<br/>";
-				if (JSON.parse(JSON.stringify(data)[2])) setNameErrBorder(true);
-				if (JSON.parse(JSON.stringify(data)[3]))setUrlErrBorder(false);
-				if (JSON.parse(JSON.stringify(data)[3]) === 2) errHints += "Single Sign-On URL must start with http:// or https://<br/>";
-				if (JSON.parse(JSON.stringify(data)[4])) setIdpErrBorder(true);
-				if (JSON.parse(JSON.stringify(data)[5])) setCertNameErrBorder(true);
-				if (JSON.parse(JSON.stringify(data)[5]) === 2) errHints += "File uploaded is not a valid certificate";
-                setPopupState({show:true,title:popupTitle,content: "Some values are Invalid!" + errHints});
-			}
-		}catch(error) {
-			setLoading(false);
-            setPopupState({show:true,title:popupTitle,content: failMsg});
-		}
+		const data = await manageSAMLConfig(action, confObj);
+        if(data.error){displayError(data.error);return;}
+        setLoading(false);
+        if(data === "success") {
+            if (action === "create") samlReset();
+            else samlEditClick();
+            setPopupState({show:true,title:popupTitle,content:"Configuration '"+confObj.name+"' "+action+"d successfully!"});
+        } else if(data === "exists") {
+            setNameErrBorder(true);
+            setPopupState({show:true,title:popupTitle,content:"Configuration '"+confObj.name+"' already Exists!"});
+        } else if(data === "fail") {
+            if (action === "create") samlReset();
+            else samlEditClick();
+            setPopupState({show:true,title:popupTitle,content:failMsg});
+        } else if(/^1[0-2]{4}$/.test(data)) {
+            if (JSON.parse(JSON.stringify(data)[1])) {
+                setPopupState({show:true,title:popupTitle,content: failMsg+" Invalid Request!"});
+                return;
+            }
+            let errHints = "<br/>";
+            if (JSON.parse(JSON.stringify(data)[2])) setNameErrBorder(true);
+            if (JSON.parse(JSON.stringify(data)[3]))setUrlErrBorder(false);
+            if (JSON.parse(JSON.stringify(data)[3]) === 2) errHints += "Single Sign-On URL must start with http:// or https://<br/>";
+            if (JSON.parse(JSON.stringify(data)[4])) setIdpErrBorder(true);
+            if (JSON.parse(JSON.stringify(data)[5])) setCertNameErrBorder(true);
+            if (JSON.parse(JSON.stringify(data)[5]) === 2) errHints += "File uploaded is not a valid certificate";
+            setPopupState({show:true,title:popupTitle,content: "Some values are Invalid!" + errHints});
+        }
     }
 
     const samlEditClick = async () =>{
 		samlReset();
         setLoading("Fetching details...");
-		const data = await getSAMLConfig();
-        try{    
-            setLoading(false);
-			if(data === "Invalid Session") return RedirectPage(history);
-			else if(data === "fail")  setPopupState({show:true,title:"Edit Configuration",content:"Failed to fetch configurations."});
-			else if(data === "empty") {
-                setPopupState({show:true,title:"Edit Configuration",content:"There are no configurations created yet."});
-				setSelBox([]);
-			} else {
-				data.sort();
-                var dataOptions = [];
-				for(var i = 0; i < data.length; i++) dataOptions.push(data[i].name);
-				setSelBox(dataOptions);
-			}
-		}catch(error) {
-            setLoading(false);
-			setPopupState({show:true,title:"Edit Configuration",content:"Failed to fetch configurations."});
-		}
+        const data = await getSAMLConfig();
+        if(data.error){displayError(data.error);return;}
+        setLoading(false);
+        if(data === "empty") {
+            setPopupState({show:true,title:"Edit Configuration",content:"There are no configurations created yet."});
+            setSelBox([]);
+        } else {
+            data.sort();
+            var dataOptions = [];
+            for(var i = 0; i < data.length; i++) dataOptions.push(data[i].name);
+            setSelBox(dataOptions);
+        }
     }
 
     const samlConfDelete = () =>{
@@ -173,22 +169,16 @@ const SamlConfig = (props) => {
     const samlGetServerData = async (name) =>{
 		const failMsg = "Failed to fetch details for '"+name+"' configuration.";
         setLoading("Fetching details...");
-        try{
-            const data = await getSAMLConfig(name)
-			setLoading(false);
-			if(data === "Invalid Session") return RedirectPage(history);
-			else if(data === "fail") setPopupState({show:true,title:"Edit Configuration",content: failMsg});
-			else if(data === "empty") setPopupState({show:true,title:"Edit Configuration",content: failMsg + "No such configuration exists"});
-			else {
-				setUrl(data.url);
-				setIdp(data.idp);
-				setCert(data.cert);
-				setCertName("No file choosen");
-			}
-		}catch(error) {
-			setLoading(false);
-			setPopupState({show:true,title:"Edit Configuration",content: failMsg});
-		}
+        const data = await getSAMLConfig(name)
+        if(data.error){displayError(data.error);return;}
+        setLoading(false);
+        if(data === "empty") setPopupState({show:true,title:"Edit Configuration",content: failMsg + "No such configuration exists"});
+        else {
+            setUrl(data.url);
+            setIdp(data.idp);
+            setCert(data.cert);
+            setCertName("No file choosen");
+        }
     }
 
     const updateCert = (targetFile) =>{
@@ -231,7 +221,7 @@ const SamlConfig = (props) => {
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
-
+            
             <div id="page-taskName"><span>{(samlEdit===false)?"Create SAML Configuration":"Edit SAML Configuration"}</span></div>
             
             <div className="adminActionBtn-saml">

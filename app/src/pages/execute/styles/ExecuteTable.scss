@@ -1,0 +1,310 @@
+.executionTableDnd{
+	float:left;
+	width:100%;
+	opacity:1;
+	height: calc(100% - 31px);
+}
+.executionTableDnd
+{
+    height: calc(100% - 65px) !important;
+}
+.e__batchSuites{
+    // display: flex;
+    // flex-direction: column;
+    // flex: 1 1 100%;
+    position: relative !important;
+    top: 22px;
+    display: block;
+    height: 56vh;
+    width: 100%;
+}
+[id^=page-taskName] {
+    float: left;
+    width: 100%;
+    margin-bottom: 10px;
+}
+input[type="checkbox"] {
+    cursor: default !important;
+    margin-top: 0;
+}
+.parentSuiteChk {
+    position: relative;
+    left: -5px;
+    vertical-align: middle;
+    height: 20px;
+    width: 16px;
+    top: -1px;
+}
+.testSuiteBatch {
+    float: left;
+    width: 97%;
+    padding-bottom: 12%;
+}
+.executionDataTable{
+	float:left;
+	width:100%;
+	position: relative;
+}
+.executionDataTable thead{
+    position: fixed;
+    width: calc(100% - 308px);
+    margin: -0.1em;
+    z-index: 1;
+    /*background: #5e636b;*/
+    background: #5e626b;
+    color: #fff;
+    font-size: 17px;
+    font-family: 'LatoWebLight';
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+}
+
+.executionDataTable thead
+{
+    position: relative !important;
+}
+.executionDataTable thead tr{
+	border-left: 4px solid transparent;
+    display: flex;
+    justify-content: space-between;
+    margin-right: 2px;
+}
+.executionDataTable tbody tr:nth-child(odd){
+	/*background:#e8e6ff;	*/
+    background: #e8e6fe;
+}
+.executionDataTable tbody, .designDataTable tbody {
+	position: absolute;
+    width: 100%;
+    margin-top: 28px;
+}
+.executionDataTable tbody
+{
+    /*max-height: 100px !important;*/
+    overflow: auto;
+    margin-top: 0px !important;
+}
+.executionDataTable tbody tr{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    border-left: 4px solid transparent;
+    align-items: center;
+    float: left !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}
+.executionDataTable th, .executionDataTable td{
+    font-weight: normal !important;
+	padding: 1px 0px;
+	display: inline-block;
+    text-align: center;
+    font-size: 14px;
+    font-family: 'LatoWeb';
+    flex: 0 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	/* float:left; */
+}
+.executionDataTable th{
+    font-size: 17px;
+    font-family: 'LatoWebLight';
+}
+
+.executionDataTable .form-control{
+	display: inline-block;
+	width: 90%;
+	height: 25px;
+	float: none;
+	border: 1px solid #5e636b;
+	padding: 0px 5px;
+}
+.executionDataTable select.form-control{
+	margin-bottom: 0;
+    width: 70%;
+    padding: 0px 10px;
+    appearance: none;
+    font-size: 14px;
+    font-family: 'LatoWeb';
+	/*border: 1px solid #5e636b !important;*/
+    border: 1px solid #7b7c7f !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+.executionDataTable select.form-control::-ms-expand {
+    display: none;
+}
+.executionDataTable .form-control:focus{
+	box-shadow:none;
+}
+.d-execute{
+	width:18px;
+	height:16px;
+	float:left;
+}
+.tabeleCellPadding{
+    padding: 5px 0px !important;
+    overflow: hidden;
+    white-space:nowrap !important; 
+    text-overflow: ellipsis;
+}
+@media only screen and (height:1080px){
+	.tabeleCellPadding{width: 4%;overflow: hidden;white-space:nowrap !important; text-overflow: ellipsis;}
+}
+.e__table_scenaio-name{
+    width: 16%; margin-right: 2%; cursor:pointer; word-break: break-all; text-align:left !important
+}
+.e__getParamPath{
+    display: inline-block;
+    width: 90%;
+    outline: none;
+    height: 25px;
+    float: none;
+    border: 1px solid #5e636b;
+    padding: 0px 5px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+.alertGreen{
+    background: #fff url("/static/imgs/ic-true.png") 90% center no-repeat !important
+}
+.alertRed{
+	background: #fff url("/static/imgs/ic-false.png") 90% center no-repeat !important
+}
+.projectName{
+    width:17%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important
+}
+.e__table_row_status{
+    border-left: 4px solid red !important;
+}
+
+.scenarioDetails{
+	float:left;
+	width:100%;
+    font-size: 15px;
+    max-height: 30vh;
+}
+
+.scenarioDetailsHeading{
+	background: #311d4e;
+    padding: 5px 10px;
+    color: #fff;
+    font-family: 'LatoWebMedium';
+    border-radius: 5px;
+    margin-bottom: 8px;
+}
+
+.sDInnerContentsWrap{
+	float:left;
+	width:100%;
+	padding: 5px 10px;
+}
+
+.sDInnerContentsWrap:nth-child(odd){
+	background: #e8e6fe;
+}
+
+.sDInnerContents{
+	float: left;
+    width: 33%;
+    text-align: center;
+    word-break: break-all;
+    word-wrap: break-word;
+    padding: 0px 10px;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+}
+.viewReadOnlyTC:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+.e__testScenarioScroll{
+    max-height: 100px !important;
+}
+.e__contextmenu{
+    width: 4%
+}
+.e__selectAll{
+    width: 3%;
+    padding: 5px 0px !important
+}
+.e__selectAll-exe{
+    font-size: 14px
+}
+.e-execute {
+    width: 18px;
+    height: 16px;
+    float: left;
+}
+.e__scenario{
+    width: 18%;
+    text-align:left !important;
+    border-right: 1px solid #fff
+}
+.e__param{
+    width: 27%;
+    border-right: 1px solid #fff
+}
+.e__condition{
+    width: 18%;
+    border-right: 1px solid #fff
+}
+.e__projectName{
+    width: 17%;
+    border-right: 1px solid rgb(255, 255, 255)
+}
+.e__apptype{
+    width: 12%;
+    text-align:center;
+    float: right
+}
+.exe-ExecuteStatus{
+    width: 3%;
+    padding-top: 7px !important;
+}
+.exe-dataParam{
+    width: 27%
+}
+.exe-conditionCheck{
+    width: 18%
+}
+.exe-apptype{
+    width: 12%;
+    float:right
+}
+
+.e__container-wrap{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1;
+}
+
+.e__abs-div{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.e__min-h{
+    // min-height: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex: 1 1;
+}

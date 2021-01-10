@@ -3,7 +3,7 @@ import {ScrollBar, TaskContents} from '../../global';
 import { useSelector } from 'react-redux';
 import "../styles/ReferenceBar.scss";
 import ClickAwayListener from 'react-click-away-listener';
-import ProfJ from '../../profJ';
+import ProfJ from '../../ProfJ';
 
     /* 
         Component : ReferenceBar (Right Bar)

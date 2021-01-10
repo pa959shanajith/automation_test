@@ -1,9 +1,9 @@
-import React ,  { Fragment , useRef } from 'react';
+import React ,  { Fragment , useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
 import '../styles/EditLanding.scss';
 import useOnClickOutside from './UseOnClickOutside'
-import {ScrollBar} from '../../global' 
+import {ScrollBar, ModalContainer} from '../../global' 
 
 /*Component EditLanding
   use: renders edit New User Landing page
@@ -13,6 +13,7 @@ import {ScrollBar} from '../../global'
 const EditLanding = (props) => {
     const dispatch = useDispatch()
     const userConf = useSelector(state=>state.admin.userConf)
+    const [showDeleteModal,setshowDeleteModal] = useState(false)
     const node = useRef();
 
     useOnClickOutside(node, () => props.setShowDropdownEdit(!props.showDropdownEdit));
@@ -21,7 +22,7 @@ const EditLanding = (props) => {
         <Fragment>
             <div className="adminActionBtn">
                 <button className=" btn-md-create pull-right adminBtn Create-User__btn_edit" onClick={()=>props.manage({action:'update'})} disabled={userConf.userIdName===''} title="Update User">Update</button>
-                <button className=" btn-md-create pull-right adminBtn Create-User__btn_edit" onClick={()=>{props.manage({action:"delete"});props.deleteUser();}} disabled={userConf.userIdName===''} style={{marginRight:"10px"}} title="Delete Configuration">Delete</button>           
+                <button className=" btn-md-create pull-right adminBtn Create-User__btn_edit" onClick={()=>{setshowDeleteModal(true)}} disabled={userConf.userIdName===''} style={{marginRight:"10px"}} title="Delete Configuration">Delete</button>           
             </div>
 
             <div className="col-xs-9 " style={{paddingTop:"5%"}}>
@@ -66,8 +67,20 @@ const EditLanding = (props) => {
                     <input type="text" autoComplete="Last-name" name="lastname" id="lastname" value={userConf.lastname} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_LASTNAME,payload:event.target.value})}} maxLength="100" className={props.lastnameAddClass?"middle__input__border-edit form-control__conv-edit form-control-custom-edit inputErrorBorder":"middle__input__border-edit form-control__conv-edit form-control-custom-edit   "} placeholder="Last Name"/>
                 </div>
             </div>
+            {showDeleteModal?
+                <ModalContainer title="Delete User" footer={submitModalButtons(props.manage, setshowDeleteModal)} close={()=>{setshowDeleteModal(false);}} content= "Are you sure you want to delete ? All task assignment information and ICE provisions will be deleted for this user." />
+            :null} 
         </Fragment>
     )
 }  
+
+const submitModalButtons = (manage, setshowDeleteModal) => {
+    return(
+        <div>
+            <button onClick={()=>{manage({action:"delete"});setshowDeleteModal(false);}} type="button" className="edit__modal_button" >Yes</button>
+            <button type="button" onClick={()=>{setshowDeleteModal(false);}} >No</button>
+        </div>
+    )
+}
 
 export default EditLanding;

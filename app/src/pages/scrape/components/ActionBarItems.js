@@ -20,11 +20,13 @@ const UpperContent = props => {
     const disableAppend = useSelector(state => state.scrape.disableAppend);
     const { appType } = useSelector(state => state.plugin.CT);
     const [isMac, setIsMac] = useState(false);
-    const {setShowAppPop, setSaved, setNewScrapedData, scrapeItems, setOverlay, setShowPop, updateScrapeItems} = useContext(ScrapeContext);
+    const [appendCheck, setAppendCheck] = useState(false);
+    const {setShowAppPop, saved, setSaved, setNewScrapedData, scrapeItems, setOverlay, setShowPop, updateScrapeItems, newScrapedData} = useContext(ScrapeContext);
 
     useEffect(() => {
         setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
-    }, [appType]);
+        if (saved) setAppendCheck(false);
+    }, [appType, saved]);
 
 
     const WebList = [
@@ -51,13 +53,15 @@ const UpperContent = props => {
 
     const onAppend = event => {
         dispatch({ type: actionTypes.SET_DISABLEACTION, payload: !event.target.checked });
+        if (event.target.checked) setAppendCheck(true);
+        else setAppendCheck(false);
     }
 
     let renderComp = [
-        <div key={1} className={'ss__scrapeOn' + (disableAppend ? " disable-thumbnail" : "")}>Scrape On</div>,
+        <div key={1} className={'ss__scrapeOn' + (disableAction ? " disable-thumbnail" : "")}>Scrape On</div>,
         <Thumbnail title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => initScraping("pdf")} disable={disableAction} />,
         <div key={3} className={"ss__thumbnail" + (disableAppend ? " disable-thumbnail" : "")}>
-            <input id="enable_append" type="checkbox" onChange={onAppend} />
+            <input id="enable_append" type="checkbox" onChange={onAppend} checked={appendCheck} />
             <span className="ss__thumbnail_title">Append</span>
         </div>
     ];
@@ -331,53 +335,40 @@ const UpperContent = props => {
                     if (viewString.view.length !== 0){
                     //Getting the Existing Scrape Data
                     let localScrapeList = [];
-                    let lastIdx = scrapeItems[scrapeItems.length-1].val;
+                    let lastObj = scrapeItems[scrapeItems.length-1]
+                    let lastVal = lastObj ? lastObj.val : 0;
+                    let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+
                     for (let i = 0; i < viewString.view.length; i++) {
                         
-                        let ob = viewString.view[i];
-                        let addcusOb = '';
-                        ob.tempId = lastIdx++;
+                        let scrapeObject = viewString.view[i];
                         
-                        if (viewString.view[i].xpath === "") addcusOb = 'addCustObj';
-                        
-                        if (ob.cord) {
-                            addcusOb = "";
-                            ob.hiddentag = "No";
-                            ob.tag = `iris;${ob.objectType}`;
-                            ob.url = "";
-                            ob.xpath = `iris;${ob.custname};${ob.left};${ob.top};${(ob.width + ob.left)};${(ob.height + ob.top)};${ob.tag}`;
+                        if (scrapeObject.cord) {
+                            scrapeObject.hiddentag = "No";
+                            scrapeObject.tag = `iris;${scrapeObject.objectType}`;
+                            scrapeObject.url = "";
+                            scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${scrapeObject.tag}`;
                         }
 
-                        let scrapeItem = {  objId: ob._id, 
-                                            // xpath: ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' '),
-                                            // left: ob.left,
-                                            // top: ob.top,
-                                            // width: ob.width,
-                                            // height:  ob.height,
-                                            // tag: ob.tag,
-                                            // url: ob.url,
-                                            // hiddentag: ob.hiddentag,
-                                            objIdx: i,
-                                            val: ob.tempId,
+                        let scrapeItem = {  objId: scrapeObject._id,
+                                            objIdx: lastIdx,
+                                            val: ++lastVal,
                                             hide: false,
-                                            title: ob.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
+                                            title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
+                                            custname: scrapeObject.custname
                                         }
-                                        
-                        if(ob.hasOwnProperty('editable')){
-                            scrapeItem.disabled = true;
-                            scrapeItem.decryptFlag = true;
-                        } else {
-                            scrapeItem.addCusOb = addcusOb
-                            // custObjLength++;
-                        };
                         
                         localScrapeList.push(scrapeItem)
                     }
-                    setNewScrapedData(viewString);
+
+                    let updatedNewScrapeData = {...newScrapedData};
+                    if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewString.view);
+                    else updatedNewScrapeData = viewString;
+                    // update other properties too
+                    setNewScrapedData(updatedNewScrapeData);
                     updateScrapeItems(localScrapeList)
                     
                     if (viewString.view.length > 0) setSaved(false);
-
                 }else{
                     //when viewsstring.view is empty after click and add
                     // save Objects
@@ -504,18 +495,71 @@ const UpperContent = props => {
 }
 
 const BottomContent = () => {
-    const { appType } = useSelector(state => state.plugin.CT);
-    const { setShowObjModal, scrapeItems, customLen} = useContext(ScrapeContext);
-    let scrapeItemsLength = scrapeItems.length;
+
+    const { appType, screenId, screenName, versionnumber, projectId, testCaseId} = useSelector(state => state.plugin.CT);
+    const disableAction = useSelector(state => state.scrape.disableAction);
+    const { setShowObjModal, scrapeItems, setShowPop } = useContext(ScrapeContext);
+    const [customLen, setCustomLen] = useState(0);
+    const [scrapeItemsLength, setScrapeLen] = useState(0);
+
+    const history = useHistory();
     
+    useEffect(()=>{
+        let customs = 0;
+        for (let scrapeItem of scrapeItems){
+            if (scrapeItem.isCustom) customs++;
+        }
+        setScrapeLen(scrapeItems.length);
+        setCustomLen(customs);
+    }, [scrapeItems])
+
+    const exportScrapeObjects = () => {
+		scrapeApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
+        .then(data => {
+            if (data === "Invalid Session") return RedirectPage(history);
+            let temp, responseData;
+            let hasData = false;
+
+            if (typeof data === 'object' && data.view.length > 0) {
+                hasData = true;
+                temp = data;
+                temp['appType'] = appType;
+                temp['screenId'] = screenId;
+                temp['versionnumber'] = versionnumber;
+                responseData = JSON.stringify(temp, undefined, 2);
+            }
+
+            if (hasData){
+                let filename = "Screen_" + screenName + ".json";
+
+                let objectsBlob = new Blob([responseData], {
+                    type: "text/json;charset=utf-8"
+                });
+
+                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(objectsBlob, filename);
+                }
+                else {
+                    let a = document.createElement('a');
+                    a.download = filename;
+                    a.href = 'data:text/json;charset=utf-8,' + responseData;
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                  } 
+            } else setShowPop({title: "No Objects found", content: "The screen has no objects to export, please check!"});
+        })
+        .catch(error => console.error(error));
+	}
     
     const lowerList = [
         {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb"}, 
-        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>console.log("Pressed Map Object"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0},
-        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0},
+        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0},
+        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb"},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>console.log("Import TestCase"), show: true},
-        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>console.log("Export TestCase"), 'disable': customLen <= 0 && scrapeItemsLength-customLen <= 0, show: true}
+        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': customLen <= 0 && scrapeItemsLength-customLen <= 0, show: true}
     ]
 
     return (
