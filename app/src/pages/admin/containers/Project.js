@@ -1,10 +1,8 @@
 import React ,  { Fragment, useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
-import EditGlobalModal from '../components/EditGlobalModal'
-import {ScreenOverlay,PopupMsg, RedirectPage} from '../../global' 
+import {ScreenOverlay,PopupMsg, RedirectPage, ModalContainer} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
-import { useHistory } from 'react-router-dom';
 import '../styles/Project.scss';
 
 /*Component ProjectNew
@@ -14,7 +12,6 @@ import '../styles/Project.scss';
     
 const ProjectNew = (props) => {
 
-    const history = useHistory();
     const [taskName,setTaskName] = useState("Create Project")
     const [selProject,setSelProject] = useState("")
     const [selProjectId,setSelProjectId] = useState("")
@@ -45,7 +42,7 @@ const ProjectNew = (props) => {
     const [projectNameErrorBorder,setProjectNameInputErrorBorder] = useState(false)
     const [releaseList,setReleaseList] = useState([])
     const [cycleList,setCycleList] = useState([])
-    // const [cycleListClass,setCycleListClass] = useState(true)
+    const [disableAddRelease,setDisableAddRelease] = useState(true)
     const [disableAddCycle,setDisableAddCycle] = useState(true)
     const [activeRelease,setActiveRelease] = useState(undefined)
     const [domainSelectErrorBorder,setDomainSelectErrorBorder] = useState(false)
@@ -53,13 +50,29 @@ const ProjectNew = (props) => {
     // const [editReleaseID,setEditReleaseId] = useState("")
     const [oldCyclename,setOldCyclename] = useState("")
     const [showEditNameModalCycle,setShowEditNameModalCycle] = useState("")
+    const [showProjectEditModal,setShowProjectEditModal] = useState(false)
+    const [editProjectName,setEditProjectName] = useState(false)
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
 
     useEffect(()=>{
         getDomains();
+        setDisableAddRelease(true);
+        setDisableAddCycle(true);
+        setSelProject("");
+        setModalInputErrorBorder(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.resetMiddleScreen["projectTab"]])
+
+    const displayError = (error) =>{
+        setLoading(false)
+        setPopupState({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
+    }
 
     const getDomains = () => {
         (async()=>{    
@@ -68,48 +81,38 @@ const ProjectNew = (props) => {
             setProjectDetails([]);
             setUpdateProjectDetails([]);
             var plugins = []; 
-            try{
-                setLoading("Loading...");
-                const plugins_list = await getAvailablePlugins();
-                for (var i = 0; i < plugins_list.length; i++) {
-                    plugins[i] = plugins_list[i];
-                }
-                try{
-                    const data = await getDomains_ICE()
-                    if (data === "Invalid Session") RedirectPage(history);
-                    else {
-                        if(data.length===0){
-                            // eslint-disable-next-line
-                            data=['Banking','Manufacturing','Finance'];
-                        }
-                        setSelDomainOptions(data);
-                        var details = {
-                            "web":{"data":"Web","title":"Web","img":"web"},
-                            "webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
-                            "desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
-                            "oebs":{"data":"OEBS","title":"Oracle Apps","img":"oracleApps"},
-                            "mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
-                            "mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
-                            "sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
-                            "system":{"data":"System","title":"System Apps","img":"desktop"},
-                            "mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"}
-                        };
-                        var listPlugin = [];
-                        for ( i = 0; i < plugins.length; i++) {
-                            listPlugin.push(details[plugins[i]]);
-                        }
-                        if(taskName==="Create Project") setSelDomain(data[0]);
-                        if(taskName==="Update Project") setSelDomain("");
-                        setApplicationType(listPlugin);
-                    }
-                }catch(error){
-                    console.log("Error:::::::::::::", error);
-                } 
-                setLoading(false);   
-            }catch(error){
-                setLoading(false);
-                console.log("Error:::::::::::::", error);
+            setLoading("Loading...");
+            const plugins_list = await getAvailablePlugins();
+            if(plugins_list.error){displayError(plugins_list.error);return;}
+            for (var i = 0; i < plugins_list.length; i++) {
+                plugins[i] = plugins_list[i];
             }
+            const data = await getDomains_ICE()
+            if(data.error){displayError(data.error);return;}
+            else if(data.length===0){
+                // eslint-disable-next-line
+                data=['Banking','Manufacturing','Finance'];
+            }
+            setSelDomainOptions(data);
+            var details = {
+                "web":{"data":"Web","title":"Web","img":"web"},
+                "webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
+                "desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
+                "oebs":{"data":"OEBS","title":"Oracle Apps","img":"oracleApps"},
+                "mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
+                "mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
+                "sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
+                "system":{"data":"System","title":"System Apps","img":"desktop"},
+                "mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"}
+            };
+            var listPlugin = [];
+            for ( i = 0; i < plugins.length; i++) {
+                listPlugin.push(details[plugins[i]]);
+            }
+            if(taskName==="Create Project") setSelDomain(data[0]);
+            if(taskName==="Update Project") setSelDomain("");
+            setApplicationType(listPlugin);
+            setLoading(false); 
         })()
     }
     const toggleCycleClick = (props)=>{
@@ -136,11 +139,15 @@ const ProjectNew = (props) => {
     const resetForm = ()=>{
         setProjectDetails([]);
         setProjectName("");
+        setEditProjectName("");
         setSelProjectId("");
         setprojectTypeSelected("");
         setReleaseList([]);
         setCycleList([]);
-		toggleCycleClick();
+        toggleCycleClick();
+        setSelDomain("");
+        if(document.getElementById("selProjectOption") !== null)
+            document.getElementById("selProjectOption").value="";
 	}
     
     const clearUpdateProjectObjects = ()=>{
@@ -583,7 +590,7 @@ const ProjectNew = (props) => {
                 setDelCount((delCount + 1) * 3);
                 cycleList.push(cycleName);
                 // var RelID = activeRelease;
-                var RelID = undefined;// please check why in orignal also undefined 
+                var RelID = activeRelease;// please check why in orignal also undefined 
                 //For update project json
                 if (newProjectDetails.length <= 0) {
                     createNewRelCyc.name = relName;
@@ -689,69 +696,80 @@ const ProjectNew = (props) => {
             requestedname.push(domainName);
             var idtype = ["domaindetails"];
 
-            try{
-                const getDetailsResponse = await getDetails_ICE(idtype, requestedname)
-                setSelProjectOptions([])
-                const projectOptions=[];
-                for (var i = 0; i < getDetailsResponse.projectNames.length; i++) {
-                    projectOptions.push({id:getDetailsResponse.projectIds[i],name:getDetailsResponse.projectNames[i]})
-                }    
-                setSelProjectOptions(projectOptions)
-                if (getDetailsResponse === "Invalid Session")RedirectPage(history);
-            }catch(error){
-                console.log("Error:::::::::::::", error);
-            }
+            const getDetailsResponse = await getDetails_ICE(idtype, requestedname)
+            if(getDetailsResponse.error){displayError(getDetailsResponse.error);return;}
+            setSelProjectOptions([])
+            const projectOptions=[];
+            for (var i = 0; i < getDetailsResponse.projectNames.length; i++) {
+                projectOptions.push({id:getDetailsResponse.projectIds[i],name:getDetailsResponse.projectNames[i]})
+            }    
+            
+            projectOptions.sort((a,b)=>a.name.localeCompare(b.name));
+            setSelProjectOptions(projectOptions)
             clearUpdateProjectObjects();
         }    
     }
    
     const selectProject = async (projectId) =>{
-
+        setModalInputErrorBorder(false);
         setSelProjectId(projectId);
         for (var i = 0; i < selProjectOptions.length; i++) {
             if(selProjectOptions[i].id === projectId){
                 setSelProject(selProjectOptions[i].name);
+                setEditProjectName(selProjectOptions[i].name)
                 break;
             }
         }
+        setDisableAddRelease(false);
         setUpdateProjectDetails([])
         var domaiprojectId = projectId;
         var projects = [];
         var requestedids = [domaiprojectId];
         var idtype = ["projectsdetails"];
         projects.push(domaiprojectId);
-        try{    
-            const selProjectRes = await getDetails_ICE(idtype, requestedids);
-            if (selProjectRes === "Invalid Session")RedirectPage(history);
-            setprojectTypeSelected(selProjectRes.appType);
-
-            setUpdateProjectDetails(selProjectRes.projectDetails);
-            setCycleList([]);
-
-            const RelaseNames = [];
-            selProjectRes.projectDetails.map((objctNames)=>(
-                RelaseNames.push(objctNames.name)
-            ))
-
-            const cycleNames = [];
-            selProjectRes.projectDetails[0].cycles.map((objctNames)=>(
-                cycleNames.push(objctNames.name)
-            ))
-
-
-            setReleaseList(RelaseNames);
-            setCycleList(cycleNames)
-            setActiveRelease(RelaseNames[0]);
-            }catch(error){
-            console.log("Error:::::::::::::", error);
-        }
+        const selProjectRes = await getDetails_ICE(idtype, requestedids);
+        if(selProjectRes.error){displayError(selProjectRes.error);return;}
+        setprojectTypeSelected(selProjectRes.appType);
+        setUpdateProjectDetails(selProjectRes.projectDetails);
+        setCycleList([]);
+        const RelaseNames = [];
+        selProjectRes.projectDetails.map((objctNames)=>(
+            RelaseNames.push(objctNames.name)
+        ))
+        const cycleNames = [];
+        selProjectRes.projectDetails[0].cycles.map((objctNames)=>(
+            cycleNames.push(objctNames.name)
+        ))
+        setReleaseList(RelaseNames);
+        setCycleList(cycleNames)
+        setActiveRelease(RelaseNames[0]);
         clearUpdateProjectObjects();
     }
 
     const closePopup = () =>{
         setPopupState({show:false,title:"",content:""});
     }
-    
+
+    const closeModal = () =>{
+        setShowProjectEditModal(false);
+    }
+
+    const editModalButtons = () =>{
+        return(
+            <div>
+                <button type="button" onClick={()=>{setShowProjectEditModal(false);}} className="btn-md adminBtn modal-btn">Save</button>
+            </div>
+        )
+    } 
+
+    const projectEditFunction = (newName) =>{
+        setEditProjectName(newName);
+        setModalInputErrorBorder(false);
+        if(newName.trim() === ""){
+            setModalInputErrorBorder(true);
+        } 
+    } 
+
     return (
     <Fragment>
         {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
@@ -763,12 +781,12 @@ const ProjectNew = (props) => {
                 }
 		</div>
         
-        <ProjectButtons setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
+        <ProjectButtons editProjectName={editProjectName} setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
 
         <div className="col-xs-9 form-group" style={{width: "83%"}}>
             <div className='userForm-project projectForm-project display-project' >
                 <div className='domainTxt'>Domain</div>
-                <select onChange={(event)=>{fetchProjectList(event.target.value);setSelDomain(event.target.value);}} className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project domain-custom':"adminSelect-project form-control__conv-project domain-custom"} id="selDomain" >
+                <select value={selDomain} onChange={(event)=>{fetchProjectList(event.target.value);setSelDomain(event.target.value);}} className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project domain-custom':"adminSelect-project form-control__conv-project domain-custom"} id="selDomain" >
                     {(taskName==="Update Project")?
                         <option value="" selected>Please Select Your Domain</option>
                     :null}
@@ -780,18 +798,26 @@ const ProjectNew = (props) => {
             {(taskName==="Update Project")?
             <div className='userForm-project projectForm-project display-project'  >
                 <div className='domainTxt'>Project</div>
-                <select onChange={(event)=>{selectProject(event.target.value);}}  className={projectSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project sel-domain-wid':"adminSelect-project form-control__conv-project sel-domain-wid"} id="selDomain" >
+                <select onChange={(event)=>{selectProject(event.target.value);}}  className={projectSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project sel-domain-wid':"adminSelect-project form-control__conv-project sel-domain-wid"} id="selProjectOption" >
                         <option value="" selected>Please Select Your Project</option>
                         {selProjectOptions.map((optionProject)=>(
                             <option key={optionProject.id} name={optionProject.name} value={optionProject.id}>{optionProject.name}</option>
                         ))}
                 </select>
+                <span  className="edit-project" >
+                    <img onClick={()=>{setShowProjectEditModal(true)}} title='Edit Project Name' src={"static/imgs/ic-edit-sm.png"} alt="Edit Project Name" className={'editProjectName'+(selProject===""?" disableEditProject":"")}/>
+                </span>
             </div>
+            
             :<div className='userForm-project adminControl-project display-project' >
                 <div className='domainTxt'>Name</div>
                 <input value={projectName} onChange={(event)=>{setProjectName(event.target.value)}} type="text" autoComplete="off" id="projectName" name="projectName" maxLength="50" className={projectNameErrorBorder?"inputErrorBorder middle__input__border form-control__conv-project form-control-custom def-margin":"middle__input__border form-control__conv-project form-control-custom def-margin"} placeholder="Project Name"/>
             </div>
             }
+            <div className='userForm-project adminControl-project display-project'>
+                {editProjectName!==selProject && editProjectName!=="" && showProjectEditModal===false? 
+                <div className='edit-project__label'>New Project Name : {editProjectName}. Please click on Update.</div>:null}
+            </div>
             
             <div className='domainTxt appTypeTxt'>Application Type</div>
 
@@ -802,22 +828,38 @@ const ProjectNew = (props) => {
             </div>
         </div>
 
-        <ReleaseCycle clickAddRelease={clickAddRelease} releaseList={releaseList} clickReleaseListName={clickReleaseListName} setActiveRelease={setActiveRelease} clickEditRelease={clickEditRelease} activeRelease={activeRelease} count={count} clickAddCycle={clickAddCycle} cycleList={cycleList} clickEditCycle={clickEditCycle} delCount={delCount} disableAddCycle={disableAddCycle} />
+        <ReleaseCycle clickAddRelease={clickAddRelease} releaseList={releaseList} clickReleaseListName={clickReleaseListName} setActiveRelease={setActiveRelease} clickEditRelease={clickEditRelease} activeRelease={activeRelease} count={count} clickAddCycle={clickAddCycle} cycleList={cycleList} clickEditCycle={clickEditCycle} delCount={delCount} disableAddRelease={disableAddRelease} taskName={taskName} disableAddCycle={disableAddCycle} />
        
-        {(showEditModalRelease)?
-            <EditGlobalModal modalInputErrorBorder={modalInputErrorBorder} saveAction={clickAddReleaseName} Txt={releaseTxt} setTxt={setReleaseTxt} setShowEditModal={setShowEditModalRelease} title ={ title} inputID={inputID} placeholder={ placeholder} buttonID={ buttonID}/>
-            :null}   
-        {showEditModalCycle?
-            <EditGlobalModal modalInputErrorBorder={modalInputErrorBorder} saveAction={clickAddCycleName} Txt={cycleTxt} setTxt={setCycleTxt} setShowEditModal={setShowEditModalCycle} title ={ title} inputID={inputID} placeholder={ placeholder} buttonID={ buttonID}/>
-        :null} 
-        {(showEditNameModalRelease)?
-            <EditGlobalModal modalInputErrorBorder={modalInputErrorBorder} saveAction={updateReleaseName} Txt={releaseTxt} setTxt={setReleaseTxt} setShowEditModal={setShowEditNameModalRelease} title ={ title} inputID={inputID} placeholder={ placeholder} buttonID={ buttonID}/>
-        :null} 
-        {(showEditNameModalCycle)?
-            <EditGlobalModal modalInputErrorBorder={modalInputErrorBorder} saveAction={updateCycleName} Txt={cycleTxt} setTxt={setCycleTxt} setShowEditModal={setShowEditNameModalCycle} title ={ title} inputID={inputID} placeholder={ placeholder} buttonID={ buttonID}/>
-        :null} 
+        {(showEditModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddReleaseName)} close={()=>{setShowEditModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder )} modalClass=" modal-sm" />:null}   
+        {(showEditModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddCycleName)} close={()=>{setShowEditModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder )} modalClass=" modal-sm" /> :null} 
+        {(showEditNameModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(updateReleaseName)} close={()=>{setShowEditNameModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder )} modalClass=" modal-sm" />:null} 
+        {(showEditNameModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(updateCycleName)} close={()=>{setShowEditNameModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder )} modalClass=" modal-sm" /> :null}
+        {showProjectEditModal? <ModalContainer title="Edit Project Name" footer={editModalButtons()} close={closeModal} content={editModalcontent(editProjectName, projectEditFunction, modalInputErrorBorder, projectNameErrorBorder)} modalClass=" modal-sm" /> :null}  
     </Fragment>
   );
 }
+
+const ModalContainerMiddleContent = (modalInputErrorBorder,Txt,setTxt, placeholder) => {
+    return(
+        <p><input autoComplete="off" value={Txt} onChange={(event)=>{setTxt(event.target.value)}} maxLength="50" type="text" className={(modalInputErrorBorder)?"middle__input__border form-control__conv form-control-custom validationKeydown preventSpecialChar inputErrorBorder":"middle__input__border form-control__conv form-control-custom validationKeydown preventSpecialChar"}  placeholder={placeholder}/></p>
+    )
+}
+
+const ModalButtonsFooter = (saveAction) =>{
+    return(
+        <div>
+            <button type="button" onClick={()=>{saveAction();}} className="btn-md adminBtn modal-btn">Save</button>
+        </div>
+    )
+} 
+
+const editModalcontent = (editProjectName, projectEditFunction, modalInputErrorBorder, projectNameErrorBorder) =>{
+    return(
+        <div>
+            <input value={editProjectName} onChange={(event)=>{projectEditFunction(event.target.value)}} type="text" autoComplete="off" id="editProjectName" name="editProjectName" maxLength="50" className={ (modalInputErrorBorder?"inputErrorBorder ":"") + (projectNameErrorBorder?"inputErrorBorder ":"") + "middle__input__border form-control__conv-project form-control-custom"} placeholder="Project Name"/>
+        </div>
+    )
+} 
+
 
 export default ProjectNew;

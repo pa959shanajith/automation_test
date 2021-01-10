@@ -94,6 +94,10 @@
     cursor: not-allowed !important;
     pointer-events: none;
 }
+.disableAddRelease{
+    cursor: not-allowed !important;
+    pointer-events: none;
+}
 .disableApplicationType{
     pointer-events: none;
 }
@@ -137,4 +141,18 @@
 }
 .active-release {
     background: #f1f1f1;
+}
+#releaseList, #cycleList{
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: #929397;
+        border: 1px solid transparent;
+        border-left-color: #e6e7e9;
+        border-right-color: #e6e7e9;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px; 
+    }
 }

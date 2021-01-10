@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, RedirectPage} from '../../global' 
+import {ScreenOverlay, PopupMsg} from '../../global' 
 import {getPreferences} from '../api';
-import { useHistory } from 'react-router-dom';
 import '../styles/Preferences.scss'
 
 
@@ -11,29 +10,35 @@ import '../styles/Preferences.scss'
 */
 
 const Preferences = (props) => {
-
-    const history = useHistory();
     const [loading,setLoading] = useState(false)
     const [resultList,setResultList] = useState([])
+    const [popup,setPopup] = useState({show:false})
     var rows = ["ALM","Mindmap","Reports","Utility"];
 
     useEffect(()=>{
         setLoading();
         (async()=>{
-            try{
-                const response = await getPreferences()
-				if (response === "Invalid Session") RedirectPage(history);
-				else  setResultList(response);
-			}catch (error) {
-				console.log("Error:::::::::::::", error);
-            }
+            const response = await getPreferences()
+            if(response.error){displayError(response.error);return;}
+            setResultList(response);
         })()
         setLoading(false);
         // eslint-disable-next-line
     },[props.resetMiddleScreen["Preferences"],props.MiddleScreen])
 
+    const displayError = (error) =>{
+        setLoading(false)
+        setPopup({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
+    }
+
     return (
         <Fragment>
+            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName"><span>Preferences</span></div>
             
@@ -84,7 +89,6 @@ const Preferences = (props) => {
                     </tbody>
 				</table>
 			</div>
-
         </Fragment>
   );
 }

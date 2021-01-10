@@ -1,13 +1,12 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
+import {ScreenOverlay, PopupMsg} from '../../global' 
 import {getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData} from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/CreateUser.scss'
 import CreateLanding from '../components/CreateLanding';
 import EditLanding from '../components/EditLanding';
 import useOnClickOutside from '../components/UseOnClickOutside'
-import { useHistory } from 'react-router-dom';
 
 /*Component CreateUser
   use: defines Admin middle Section for create user
@@ -20,7 +19,6 @@ const CreateUser = (props) => {
     const userConf = useSelector(state=>state.admin.userConf)
     
     const node = useRef();
-    const history = useHistory();
     const [toggleAddRoles,setToggleAddRoles] = useState(false)
     const [showDropdown,setShowDropdown] = useState(false)
     const [showDropdownEdit,setShowDropdownEdit] = useState(false)
@@ -37,7 +35,7 @@ const CreateUser = (props) => {
     const [allUserFilList,setAllUserFilList] = useState(userConf.allUsersList)
     const [ldapUserList,setLdapUserList] = useState([])
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     
     useEffect(()=>{
         
@@ -48,15 +46,26 @@ const CreateUser = (props) => {
 
     useOnClickOutside(node, () => setToggleAddRoles(false));
 
+    const displayError = (error) =>{
+        setLoading(false)
+        setPopupState({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
+    }
+
     //Fetch UserRoles
     const updateUserRoles = (props) =>{
         (async()=>{
             var res = await getUserRoles()
-            if(res!==undefined){
-            res.sort(function(a,b){ return a[0] >  b[0]; });
-            var allAddRoles = res.filter((e)=> (e[0].toLowerCase() !== "admin"))
-            dispatch({type:actionTypes.UPDATE_ALLROLES,payload:res})
-            dispatch({type:actionTypes.UPDATE_ALLADDROLES,payload:allAddRoles})
+            if(res.error){displayError(res.error);return;}
+            else if(res!==undefined){
+                res.sort(function(a,b){ return a[0] >  b[0]; });
+                var allAddRoles = res.filter((e)=> (e[0].toLowerCase() !== "admin"))
+                dispatch({type:actionTypes.UPDATE_ALLROLES,payload:res})
+                dispatch({type:actionTypes.UPDATE_ALLADDROLES,payload:allAddRoles})
             }
         })()
     }
@@ -92,22 +101,21 @@ const CreateUser = (props) => {
         (async()=>{
             try{
                 var data = await manageUserDetails(action, userObj);
+                if(data.error){displayError(data.error);return;}
                 setLoading(false);
-                if(data === "Invalid Session") {
-                    RedirectPage(history);
-                } else if(data === "success") {
+                if(data === "success") {
                     if (action === "create") click();
                     else edit();
                     setPopupState({show:true,title:bAction+" User",content:"User "+action+"d successfully!"});
                     if (action === "delete") {
                         const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
-                        if (data0 === "Invalid Session") return RedirectPage(history);
+                        if(data0.error){displayError(data0.error);return;}
                         var data1 = await fetchICE(userObj.userid)
-                        if (data1 === "Invalid Session") return RedirectPage(history);
-                        if (data1.length === 0) return false;
+                        if(data1.error){displayError(data1.error);return;}
+                        else if (data1.length === 0) return false;
                         const icename = data1[0].icename;
                         var data2 = await manageSessionData('disconnect', icename, '?', 'dereg')
-                        if (data2 === "Invalid Session") return RedirectPage(history);
+                        if(data2.error){displayError(data2.error);return;}
                     }
                 } else if(data === "exists") {
                     setPopupState({show:true,title:bAction+" User",content:"User already Exists!"});
@@ -133,9 +141,7 @@ const CreateUser = (props) => {
                 }
             }
             catch(error){
-                setLoading(false);
                 setPopupState({show:true,title:bAction+" User",content:"Failed to "+action+" user."});
-                console.log("Error:::", error);
             }
         })()
     }
@@ -261,20 +267,7 @@ const CreateUser = (props) => {
         setUserIdNameAddClass(false);
         setLdapDirectoryAddClass(false);
 
-        dispatch({type:actionTypes.UPDATE_USERID,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload:""})
-        dispatch({type:actionTypes.UPDATE_USERIDNAME,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_FIRSTNAME,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_LASTNAME,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_PASSWORD,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_CONFIRMPASSWORD,payload:""})
-        dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:""})
-        dispatch({type:actionTypes.UPDATE_USERROLE,payload:""})
-        dispatch({type:actionTypes.UPDATE_ALLROLES,payload:[]})
-        dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-        dispatch({type:actionTypes.UPDATE_CONF_EXP,payload:false})
-        dispatch({type:actionTypes.UPDATE_LDAP_USER_FILTER,payload:""})
-        dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:""});
+        dispatch({type:actionTypes.RESET_VALUES,payload:""})
         updateUserRoles();
 
 		if (props!==undefined && props.query!==undefined && props.query !== "retaintype") {
@@ -299,87 +292,51 @@ const CreateUser = (props) => {
 
     const  populateLDAPConf = async() =>{
        
-            try{
-                dispatch({type:actionTypes.UPDATE_LDAP,payload:{fetch: "map", user: ''}})
-                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                setLoading("Fetching LDAP Server configurations...");
-                var data = await getLDAPConfig("server");
-                setLoading(false);
-                if(data === "Invalid Session") RedirectPage(history);
-                else if(data === "fail"){
-                    setPopupState({show:true,title:"Create User",content:"Failed to fetch LDAP server configurations."});
-                }
-                else if(data === "empty"){
-                    setPopupState({show:true,title:"Create User",content:"There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
-                }
-                else {
-                    
-                    dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-                    data.sort((a,b)=>a.name.localeCompare(b.name));
-                    dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
-                }
-            } catch(error){
-                setLoading(false);
-                console.log("Error:::::::::::::", error);
-                setPopupState({show:true,title:"Create User",content:"Failed to fetch LDAP server configurations"});
-            }
-   
+        dispatch({type:actionTypes.UPDATE_LDAP,payload:{fetch: "map", user: ''}})
+        dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
+        setLoading("Fetching LDAP Server configurations...");
+        var data = await getLDAPConfig("server");
+        if(data.error){displayError(data.error);return;}
+        setLoading(false);
+        if (data == "empty") {
+            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+        } else {
+            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+            data.sort((a,b)=>a.name.localeCompare(b.name));
+            dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
+        }
     }
 
     const  populateSAMLConf = () =>{
         (async()=>{
-            try{
-                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                setLoading("Fetching SAML Server configurations...");
-                
-                var data = await getSAMLConfig();
-                setLoading(false);
-                if(data === "Invalid Session")RedirectPage(history);
-                else if(data === "fail"){
-                    setPopupState({show:true,title:"Create User",content:"Failed to fetch SAML server configurations."});
-                } 
-                else if(data === "empty"){
-                    setPopupState({show:true,title:"Create User",content:"There are no SAML server configured. To proceed create a server configuration in SAML configuration section."});
-                }
-                else {
-                    
-                    dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-                    // data.sort((a,b)=>a.name.localeCompare(b.name));
-                    data.sort();
-                    dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
-                }
-            }catch(error){
-                setLoading(false);
-				console.log("Error:::::::::::::", error);
-                setPopupState({show:true,title:"Create User",content:"Failed to fetch SAML server configurations"});
+            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
+            setLoading("Fetching SAML Server configurations...");
+            var data = await getSAMLConfig();
+            if(data.error){displayError(data.error);return;}
+            setLoading(false);
+            if (data == "empty") {
+                setPopupState({show:true,title:"Edit Configuration",content: "There are no SAML server configured. To proceed create a server configuration in SAML configuration section."});
+            } else {
+                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+                data.sort();
+                dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
             }
         })()
     }
 
     const  populateOIDCConf = () =>{
         (async()=>{
-            try{
-                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                setLoading("Fetching OpenID Server configurations...");
-                var data = await getOIDCConfig();
-                setLoading(false);
-                if(data === "Invalid Session")RedirectPage(history);
-                else if(data === "fail"){
-                    setPopupState({show:true,title:"Create User",content:"Failed to fetch OpenID server configurations."});
-                }
-                else if(data === "empty"){
-                    setPopupState({show:true,title:"Create User",content:"There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section."});
-                }
-                else {
-                    
-                    dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-                    data.sort((a,b)=>a.name.localeCompare(b.name));
-                    dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
-                }
-            }catch(error){
-                setLoading(false);
-                console.log("Error:::::::::::::", error);
-                setPopupState({show:true,title:"Create User",content:"Failed to fetch OpenID server configurations."});
+            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
+            setLoading("Fetching OpenID Server configurations...");
+            var data = await getOIDCConfig();
+            if(data.error){displayError(data.error);return;}
+            setLoading(false);
+            if(data === "empty" ){
+                setPopupState({show:true,title:"Edit Configuration",content: "There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section."});
+            } else {
+                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+                data.sort((a,b)=>a.name.localeCompare(b.name));
+                dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data})
             }
         })()
     }
@@ -394,32 +351,19 @@ const CreateUser = (props) => {
         dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
         dispatch({type:actionTypes.UPDATE_LDAP_ALLUSER_LIST,payload:[]})
         setLoading("Fetching LDAP users...");
-        try{
-            const data = await getLDAPConfig("user", ldapServer);
-            setLoading(false);
-			if(data === "Invalid Session")RedirectPage(history);
-			else if(data === "fail"){
-                setPopupState({show:true,title:"Create User",content:"Failed to LDAP fetch users"});
-            }
-            else if(data === "insufficient_access"){
-                setPopupState({show:true,title:"Create User",content:"Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there are no users available in this Server"});
-            }
-            else if(data === "empty"){
-                setPopupState({show:true,title:"Create User",content:"There are no users available in this Server."});
-            }
-            else if(data!==undefined) {
-                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-                // data.sort((a,b)=>a.localeCompare(b));
-                data.sort();
-                const ldapAllUserList = data.map(e=>({value:e[1],html:e[0]}));
-                dispatch({type:actionTypes.UPDATE_LDAP_ALLUSER_LIST,payload:ldapAllUserList})  
-                setLdapUserList(ldapAllUserList);  
-            }
-        }catch(error){
-            setLoading(false);
-            console.log("Error:::::::::::::", error);
-            setPopupState({show:true,title:"Create User",content:"Failed to fetch LDAP server configurations."});
-        } 
+        const data = await getLDAPConfig("user", ldapServer);
+        if(data.error){displayError(data.error);return;}
+        setLoading(false);
+        if (data == "empty") {
+            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+        }
+        else if(data!==undefined) {
+            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+            data.sort();
+            const ldapAllUserList = data.map(e=>({value:e[1],html:e[0]}));
+            dispatch({type:actionTypes.UPDATE_LDAP_ALLUSER_LIST,payload:ldapAllUserList})  
+            setLdapUserList(ldapAllUserList);  
+        }
     }
 
     const clearForm = ( retainExtra)=>{
@@ -446,37 +390,14 @@ const CreateUser = (props) => {
 		}
 		clearForm(true);
         setLoading("Fetching User details...");
-        try{    
-            const data = await getLDAPConfig("user", ldapServer, ldapUser);
-            setLoading(false);
-			if(data === "Invalid Session")RedirectPage(history);
-			else if(data === "fail"){
-                setPopupState({show:true,title:"Create User",content:"Failed to populate User details"});
-            }
-            else if(data === "insufficient_access"){
-                setPopupState({show:true,title:"Create User",content:"Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there is no such user"});
-            }
-            else if(data === "empty"){
-                setPopupState({show:true,title:"Create User",content:"User not found!"});
-            }				
-			else { 
-                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-                dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload:data.username})
-                dispatch({type:actionTypes.UPDATE_INPUT_FIRSTNAME,payload:data.firstname})
-                dispatch({type:actionTypes.UPDATE_INPUT_LASTNAME,payload:data.lastname})
-                dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:data.email})  
-                dispatch({type:actionTypes.UPDATE_LDAP_USER,payload:data.ldapname})
-            }
-        }catch(error){
-            setLoading(false);
-            console.log("Error:::::::::::::", error);
-            setPopupState({show:true,title:"Create User",content:"Failed to fetch LDAP server configurations"});
-       }     
-    }
-
-    const deleteUser = ()=>{
-        // openDeleteGlobalModal("Delete User", "delUserConf", "Are you sure you want to delete ? All task assignment information and ICE provisions will be deleted for this user.");
-	
+        const data = await getLDAPConfig("user", ldapServer, ldapUser);
+        if(data.error){displayError(data.error);return;}
+        setLoading(false);
+        if (data == "empty") {
+            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+        } else {
+            dispatch({type:actionTypes.UPDATE_LDAP_DATA,payload:data})
+        }
     }
 
     //load Users for Edit
@@ -485,24 +406,13 @@ const CreateUser = (props) => {
         dispatch({type:actionTypes.UPDATE_TYPE,payload: "inhouse"})
         dispatch({type:actionTypes.UPDATE_FTYPE,payload: "Default"})
         setLoading("Fetching users...");
-        try{
-            var data = await getUserDetails("user");
+        var data = await getUserDetails("user");
+        if(data.error){displayError(data.error);return;}
+        else {
             setLoading(false);
-            if(data === "Invalid Session")RedirectPage(history);
-            else if(data === "fail"){
-                setPopupState({show:true,title:"Edit User",content:"Failed to fetch users."});
-            } 
-            else if(data === "empty"){
-                setPopupState({show:true,title:"Edit User",content:"There are no users created yet."});
-            }
-            else {
-                data.sort();
-                dispatch({type:actionTypes.UPDATE_ALL_USERS_LIST,payload: data})
-                setAllUserFilList(data);
-            }
-        }catch(error){
-            setLoading(false);
-            setPopupState({show:true,title:"Edit User",content:"Failed to fetch users."});
+            data.sort();
+            dispatch({type:actionTypes.UPDATE_ALL_USERS_LIST,payload: data})
+            setAllUserFilList(data);
         }
     }
     
@@ -510,125 +420,77 @@ const CreateUser = (props) => {
         const userObj = props.user_idName.split(';');
         dispatch({type:actionTypes.UPDATE_USERID,payload: userObj[0]});
         dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload: userObj[1]});
-		var failMsg = "Failed to fetch user details.";
         setLoading("Fetching User details...");
-        try{    
+        try{
             const data = await getUserDetails("userid", userObj[0]);
-            setLoading(false);
-			if(data === "Invalid Session")RedirectPage(history);
-			else if(data === "fail"){
-                setPopupState({show:true,title:"Edit User",content:failMsg});
-            }
-			else {
-				const uType = data.type;
-                dispatch({type:actionTypes.UPDATE_USERID,payload: data.userid});
-                dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload: data.username});
-                dispatch({type:actionTypes.UPDATE_USERIDNAME,payload: data.userid+";"+data.username});
-                dispatch({type:actionTypes.UPDATE_INPUT_PASSWORD,payload: data.password});
-                dispatch({type:actionTypes.UPDATE_INPUT_FIRSTNAME,payload: data.firstname});
-                dispatch({type:actionTypes.UPDATE_INPUT_LASTNAME,payload: data.lastname});
-                dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload: data.email});
-                dispatch({type:actionTypes.UPDATE_USERROLE,payload: data.role});
-                dispatch({type:actionTypes.UPDATE_ROLENAME,payload: data.rolename});
+            if(data.error){displayError(data.error);return;}
+            else {
+                setLoading(false);
+                const uType = data.type;
+                dispatch({type:actionTypes.UPDATE_DATA,payload: data});
                 dispatch({type:actionTypes.UPDATE_ADDROLES,payload: {}});
                 data.addrole.forEach((e) => dispatch({type:actionTypes.ADD_ADDROLE,payload: e}));
-                dispatch({type:actionTypes.UPDATE_TYPE,payload: uType});
-                dispatch({type:actionTypes.UPDATE_CONF_EXP,payload: false});
                 dispatch({type:actionTypes.UPDATE_FTYPE,payload:  (uType==="inhouse")? "Default":((uType==="oidc")? "OpenID":uType.toUpperCase())});
 
-				if (data.type !== "inhouse") {
-					var confserver = data.server;
+                if (data.type !== "inhouse") {
+                    var confserver = data.server;
                     dispatch({type:actionTypes.UPDATE_SERVER,payload:""})
                     dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:[]})
                     if (data.type === "ldap") {
-                        try{
-                            dispatch({type:actionTypes.UPDATE_LDAP,payload:{fetch: "map", user: ''}})
-                            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                            setLoading("Fetching LDAP Server configurations...");
-                            var data1 = await getLDAPConfig("server");
-                            setLoading(false);
-                            if(data1 === "Invalid Session") RedirectPage(history);
-                            else if(data1 === "fail"){
-                                setPopupState({show:true,title:"Create User",content:"Failed to fetch LDAP server configurations."});
-                            }
-                            else if(data1 === "empty"){
-                                setPopupState({show:true,title:"Create User",content:"There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
-                            }
-                            else {
-                                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-                                data1.sort((a,b)=>a.name.localeCompare(b.name));
-                                dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
-                            }
-                        } catch(error){
-                            setLoading(false);
-                            console.log("Error:::::::::::::", error);
-                            setPopupState({show:true,title:"Create User",content:"Failed to fetch LDAP server configurations."});
+                        dispatch({type:actionTypes.UPDATE_LDAP,payload:{fetch: "map", user: ''}})
+                        dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
+                        setLoading("Fetching LDAP Server configurations...");
+                        var data1 = await getLDAPConfig("server");
+                        if(data1.error){displayError(data1.error);return;}
+                        setLoading(false);
+                        if (data1 == "empty") {
+                            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+                        } else {
+                            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+                            data1.sort((a,b)=>a.name.localeCompare(b.name));
+                            dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
                         }
-                    
                     }
                     else if (data.type === "saml"){
-                         try{
-                            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                            setLoading("Fetching SAML Server configurations...");
-                            data1 = await getSAMLConfig();
-                            setLoading(false);
-                            if(data1 === "Invalid Session")RedirectPage(history);
-                            else if(data1 === "fail"){
-                                setPopupState({show:true,title:"Create User",content:"Failed to fetch SAML server configurations."});
-                            }
-                            else if(data1 === "empty"){
-                                setPopupState({show:true,title:"Create User",content:"There are no SAML server configured. To proceed create a server configuration in SAML configuration section."});
-                            }
-                            else {
-                                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-                                data1.sort();
-                                dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
-                            }
-                        }catch(error){
-                            setLoading(false);
-                            console.log("Error:::::::::::::", error);
-                            setPopupState({show:true,title:"Create User",content:"Failed to fetch SAML server configurations."});
-                        }    
+                        dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
+                        setLoading("Fetching SAML Server configurations...");
+                        data1 = await getSAMLConfig();
+                        if(data1.error){displayError(data1.error);return;}
+                        setLoading(false);
+                        if (data == "empty") {
+                            setPopupState({show:true,title:"Edit Configuration",content: "There are no SAML server configured. To proceed create a server configuration in SAML configuration section."});
+                        } else {
+                            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+                            data1.sort();
+                            dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
+                        }
                     }
                     else if (data.type === "oidc"){ 
-                        try{
-                            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
-                            setLoading("Fetching OpenID Server configurations...");
-                            data1 = await getOIDCConfig();
-                            setLoading(false);
-                            if(data1 === "Invalid Session") RedirectPage(history);
-                            else if(data1 === "fail"){
-                                setPopupState({show:true,title:"Create User",content:"Failed to fetch OpenID server configurations."});
-                            }
-                            else if(data1 === "empty"){
-                                setPopupState({show:true,title:"Create User",content:"There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section."});
-                            
-                            }
-                            else {
-                                
-                                dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
-                                data1.sort((a,b)=>a.name.localeCompare(b.name));
-                                dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
-                            }
-                        }catch(error){
-                            setLoading(false);
-                            console.log("Error:::::::::::::", error);
-                            setPopupState({show:true,title:"Create User",content:"Failed to fetch OpenID server configurations"});
+                        dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:true})
+                        setLoading("Fetching OpenID Server configurations...");
+                        data1 = await getOIDCConfig();
+                        if(data1.error){displayError(data1.error);return;}
+                        setLoading(false);
+                        if(data1 === "empty" ){
+                            setPopupState({show:true,title:"Edit Configuration",content: "There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section."});
+                        } else {
+                            dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
+                            data1.sort((a,b)=>a.name.localeCompare(b.name));
+                            dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST,payload:data1})
                         }
-                    
                     }
                     if (!data1.some(function(e) { return e.name === confserver;})) {
                         dispatch({type:actionTypes.UPDATE_CONF_SERVER_LIST_PUSH,payload: {_id: '', name: confserver}});
                         dispatch({type:actionTypes.UPDATE_CONF_EXP,payload: confserver});
-					}
+                    }
                     dispatch({type:actionTypes.UPDATE_SERVER,payload: confserver});
                     dispatch({type:actionTypes.UPDATE_LDAP_USER,payload: data.ldapuser || ''});
-				}
-            }
+                }
+            }  
         }catch(error){
             setLoading(false);
-            setPopupState({show:true,title:"Edit User",content:failMsg});
-        }    
+            setPopupState({show:true,title:"Edit User",content:"Failed to fetch user details."});
+        }  
     }
 
     const searchFunctionUser = async(val)=>{
@@ -654,7 +516,7 @@ const CreateUser = (props) => {
             
             {(props.showEditUser===false)?
                 <CreateLanding firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown} ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap}  ldapDirectoryAddClass={ldapDirectoryAddClass} confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={props.setShowEditUser} ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} />
-                :<EditLanding firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} deleteUser={deleteUser} confServerAddClass={confServerAddClass} ldapGetUser={ldapGetUser} ldapDirectoryAddClass={ldapDirectoryAddClass} clearForm={clearForm} allUserFilList={allUserFilList} manage={manage} searchFunctionUser={searchFunctionUser} click={click} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} getUserData={getUserData} />
+                :<EditLanding firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} confServerAddClass={confServerAddClass} ldapGetUser={ldapGetUser} ldapDirectoryAddClass={ldapDirectoryAddClass} clearForm={clearForm} allUserFilList={allUserFilList} manage={manage} searchFunctionUser={searchFunctionUser} click={click} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} getUserData={getUserData} />
             }    
 
             <div className="col-xs-9 form-group__conv">

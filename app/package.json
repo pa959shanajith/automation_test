@@ -24,7 +24,7 @@
     "react-draggable": "^4.4.3",
     "react-perfect-scrollbar": "^1.5.8",
     "react-redux": "^7.2.1",
-    "react-rnd": "^10.2.2",
+    "react-rnd": "^10.2.3",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "react-sortablejs": "^6.0.0",
@@ -33,6 +33,7 @@
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
     "simplebar-react": "^3.0.0-beta.5",
+    "socket.io-client": "^3.0.3",
     "sortablejs": "^1.12.0",
     "uuid": "^8.3.0"
   },
