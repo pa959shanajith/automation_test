@@ -40,8 +40,9 @@ const QTest =(props)=>{
                 </select>
 
             </div>
+            
             <div className="qcTreeContainer">
-                <ScrollBar>
+            <ScrollBar>
                     { props.folderDetails ? 
                         <Fragment>    
                             <ul className="rootUl">
@@ -95,8 +96,9 @@ const QTest =(props)=>{
                             
                         </Fragment>
                             : null}
-                    </ScrollBar>
+                  </ScrollBar>  
             </div>
+            
         </div> 
         <div className="rightQcStructure">
             <div className="qcProContainer">

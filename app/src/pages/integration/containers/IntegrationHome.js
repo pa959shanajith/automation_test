@@ -4,6 +4,7 @@ import Footer from '../../global/components/FooterTwo';
 import Leftbar from '../components/Leftbar';
 import Rightbar from '../components/Rightbar';
 import IntegrationCenter from './IntegrationCenter'
+import '../styles/IntegrationHome.scss'
 
 //Integration Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 
@@ -35,7 +36,7 @@ const  Integrations=()=>{
                 />
                 <Rightbar />
             </div>    
-            <Footer/>
+            <div className="integration_Footer"><Footer/></div>
         </div>
     )
 }

@@ -106,7 +106,7 @@ const UtilityCenter=(props)=>{
         <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-        <div className="middleContent">
+        <div className="UtlmiddleContent">
             <div className="middle_holder">
             {(props.screenType ==="encryption")?
             <Encryption onDropChange={onDropChange}

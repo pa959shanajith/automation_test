@@ -1,13 +1,11 @@
-.middleContent{
-    width: calc(100% - 270px);
-    height:100%;
-    background: #fff;
+.integration_middleContent{
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 100%;
+    min-width: 0;
     padding: 20px;
-    box-sizing: border-box;
-    position: relative;
-    left: 6px;
-    float: left;
-    overflow-y: scroll;
+    margin: 0 5px;
+    background-color: #fff;
 }
 .middleContent::-webkit-scrollbar {
     display: none;
@@ -16,10 +14,6 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
-// .middleZ_index{
-//     z-index: -1;
-// }
-
 .launchPopupInput {
     width: 94%;
     border-radius: 0;
@@ -41,9 +35,19 @@
     width: 450px;
 }
 .leftAlign p input {
-    border: none ;
-    border-bottom: 1px solid grey;
-    border-radius: none;
+    width: 94%;
+    border-radius: 0;
+    border-right: 0;
+    border-left: 0;
+    border-top: 0;
+    border-bottom: 1px solid #9e9e9e;
+    box-shadow: none;
+    font-family: 'LatoWeb';
+    margin-right: 16px;
+    font-size: 15px;
+    padding: 0;
+    margin: 0 3%;
+
 }
 .leftAlign span button{
     float: right;
@@ -71,6 +75,7 @@
     float: left;
     font-size: 16px
 }
+
 .qcActionBtn button,.qcActionBtn a{
     color: #fff;
     border: 0;
@@ -154,7 +159,7 @@
 .qcTreeContainer ,.qcAvoAssureTreeContainer {
     float: left;
     width: 100%;
-    height: 80%;
+    height: 90%;
     margin-top: 20px;
     padding: 0 6px 0 6px;
 }
