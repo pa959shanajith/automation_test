@@ -535,8 +535,12 @@ if (cluster.isMaster) {
 		//Utility plugins
 		app.post('/Encrypt_ICE', utility.Encrypt_ICE);
 		// Wecoccular Plugin
-		app.post('/crawlResults', webocular.getCrawlResults);
-		app.post('/saveResults', webocular.saveResults);
+		app.post('/crawlResults', auth.protect, webocular.getCrawlResults);
+		app.post('/saveResults', auth.protect, webocular.saveResults);
+		app.post('/getWebocularModule_ICE', auth.protect, webocular.getWebocularModule_ICE);
+		app.post('/getWebocularData_ICE', auth.protect, webocular.getWebocularData_ICE);
+
+
 		//Chatbot Routes
 		app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
 		app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);

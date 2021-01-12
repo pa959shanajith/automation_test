@@ -152,6 +152,29 @@ mySPA.factory('reportService', ['$http', '$q', function($http, $q) {
                     function(response) {
                         return $q.reject(response.data)
                     })
+        },
+        getWebocularModule_ICE: function(){
+            return $http.post('/getWebocularModule_ICE', {
+                param: 'getWebocularModule_ICE'
+            })
+            .then(function(response) {
+                    return response.data
+                },
+                function(response) {
+                    return $q.reject(response.data)
+                })
+        },
+        getWebocularData_ICE: function(getWebocularInputData){
+            return $http.post('/getWebocularData_ICE', {
+                param: 'getWebocularData_ICE',
+                getWebocularInputData:getWebocularInputData
+            })
+            .then(function(response) {
+                    return response.data
+                },
+                function(response) {
+                    return $q.reject(response.data)
+                })
         }
     }
 }]);

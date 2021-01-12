@@ -6,6 +6,7 @@ var myserver = require('../lib/socket');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+const accessibility_testing = require("./webocular")
 const notifications = require('../notifications');
 var queue = require('../lib/executionQueue')
 var cache = require('../lib/cache')
@@ -237,7 +238,8 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 		allTestcaseSteps.push({
 			"template": "",
 			"testcase": allTestcaseObj[tc._id].steps,
-			"testcasename": allTestcaseObj[tc._id].name
+			"testcasename": allTestcaseObj[tc._id].name,
+			"screenid": tc.screenid
 		});
 	});
 
@@ -470,6 +472,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 			} else if (event == "result_executeTestSuite") {
 				if (!status) { // This block is for report data
 					const executionid = resultData.executionId;
+					const accessibility_reports = resultData.accessibility_reports
+					accessibility_testing.saveAccessibilityReports(accessibility_reports);
 					const scenarioid = resultData.scenarioId;
 					const testsuiteid = resultData.testsuiteId;
 					const testsuiteIndex = execReq.testsuiteIds.indexOf(testsuiteid);
