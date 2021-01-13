@@ -101,6 +101,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                           let dataIdx = data.projectId.indexOf(projectID);
                           
                           dataDict.project[projectID].domain = data.domains[dataIdx];
+                          dataDict.project[projectID].appType = { [data.appTypeName[dataIdx]]: data.appType[dataIdx] }
                           dataDict.projectDict[projectID] = data.projectName[dataIdx];
                           
                           for (const releaseID in dataDict.project[projectID].release){
