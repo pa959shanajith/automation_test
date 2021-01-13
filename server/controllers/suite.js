@@ -239,7 +239,8 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 			"template": "",
 			"testcase": allTestcaseObj[tc._id].steps,
 			"testcasename": allTestcaseObj[tc._id].name,
-			"screenid": tc.screenid
+			"screenid": tc.screenid,
+			"screenname":tc.screenname
 		});
 	});
 
