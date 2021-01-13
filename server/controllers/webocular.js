@@ -130,7 +130,8 @@ exports.getWebocularModule_ICE = async function (req, res) {
 	try {
 		const fnName = "getWebocularModule_ICE"
 		var inputs = {
-			"query": "moduledata"
+			"query": "screendata",
+			"cycleid": req.body.cycleid
 		};
 		const result = await utils.fetchData(inputs, "reports/getWebocularData_ICE", fnName);
 		if (result == "fail") res.status(500).send("fail");
@@ -145,7 +146,8 @@ exports.getWebocularData_ICE = async function(req, res) {
     try {
 		const fnName = "getWebocularData_ICE"
 		var inputs = {
-			"query": "reportdata"
+			"query": "reportdata",
+			"screenname": req.body.screenname
 		};
 		const result = await utils.fetchData(inputs, "reports/getWebocularData_ICE", fnName);
 		if (result == "fail") res.status(500).send("fail");

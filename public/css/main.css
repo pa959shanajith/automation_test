@@ -5511,6 +5511,16 @@ Webocular report css
 .webCrawler-report-span{
     font-size: 14px;
 }
+.webCrawler-toggle-btn{
+    height: 20px;
+    width: 70px;
+    background: #331d4e;
+    font-size: 12px;
+    padding: 0px 6px;
+    color: #f5f5f5;
+    border-radius: 20px;
+    font-family: inherit;
+}
 .webCrawler-report-label{
     padding: 2px 30px;
     font-size: 14px;

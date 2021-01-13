@@ -153,9 +153,10 @@ mySPA.factory('reportService', ['$http', '$q', function($http, $q) {
                         return $q.reject(response.data)
                     })
         },
-        getWebocularModule_ICE: function(){
+        getWebocularModule_ICE: function(inputData){
             return $http.post('/getWebocularModule_ICE', {
-                param: 'getWebocularModule_ICE'
+                param: 'getWebocularModule_ICE',
+                cycleid: inputData['cycleId']
             })
             .then(function(response) {
                     return response.data
@@ -167,7 +168,7 @@ mySPA.factory('reportService', ['$http', '$q', function($http, $q) {
         getWebocularData_ICE: function(getWebocularInputData){
             return $http.post('/getWebocularData_ICE', {
                 param: 'getWebocularData_ICE',
-                getWebocularInputData:getWebocularInputData
+                screenname:getWebocularInputData
             })
             .then(function(response) {
                     return response.data
