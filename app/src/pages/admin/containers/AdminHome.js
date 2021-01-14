@@ -1,17 +1,20 @@
 import React ,  { useState } from 'react';
-import LeftPanel from './LeftPanel'
-import CreateUser from './CreateUser'
-import Project from './Project'
-import ProjectAssign from './ProjectAssign'
+import LeftPanel from './LeftPanel';
+import CreateUser from './CreateUser';
+import Project from './Project';
+import ProjectAssign from './ProjectAssign';
 import OidcConfig from './OidcConfig'
-import {Header,FooterTwo,ReferenceBar, ScrollBar} from '../../global'
-import '../styles/AdminHome.scss'
 import SamlConfig from './SamlConfig';
 import Preferences from './Preferences';
 import SessionManagement from './SessionManagement';
+import CreateIcePool from './CreateIcePool';
 import IceProvision from './IceProvision';
 import TokenManagement from './TokenMangement';
 import LdapConfig from './LdapConfig';
+import EmailConfig from './EmailConfig';
+import AllocateIcePool from './AllocateIcePool';
+import {Header,FooterTwo,ReferenceBar} from '../../global';
+import '../styles/AdminHome.scss';
 
 /*Component AdminHome
   use: renders Admin landing page (footer,header,sidebars,middle saection)
@@ -37,9 +40,12 @@ const AdminHome = () => {
                                 {(middleScreen==="provisionTa")?<IceProvision resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen} />:null}
                                 {(middleScreen==="projectTab")?<Project resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
                                 {(middleScreen==="assignProjectTab")?<ProjectAssign resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
+                                {(middleScreen==="CreateIcePool")?<CreateIcePool resetMiddleScreen={resetMiddleScreen}/>:null}
+                                {(middleScreen==="AllocateIcePool")?<AllocateIcePool resetMiddleScreen={resetMiddleScreen}/>:null}
                                 {(middleScreen==="ldapConfigTab")?<LdapConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
                                 {(middleScreen==="samlConfigTab")?<SamlConfig resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
                                 {(middleScreen==="oidcConfigTab")?<OidcConfig resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
+                                {(middleScreen==="emailConfigTab")?<EmailConfig resetMiddleScreen={resetMiddleScreen}/>:null}
                                 {(middleScreen==="sessionTab")?<SessionManagement resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen}  />:null}
                                 {(middleScreen==="Preferences")?<Preferences resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
                             </div>

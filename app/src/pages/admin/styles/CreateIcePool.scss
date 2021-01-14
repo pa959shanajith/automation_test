@@ -24,26 +24,3 @@
 
     }
 }
-.edit_ice-pool{
-    input:focus{
-        outline: none;
-    }
-    .assignBox-container{
-        width: 100%;
-    }
-    .right-box{
-        position: relative;
-    }
-    .label-select{
-        position: absolute;
-        top: -15px;
-        width: 60%;
-        right: 0;
-        input{
-            width: 100%;
-        }
-        div{
-            width: 100%;  
-        }
-    }
-}
