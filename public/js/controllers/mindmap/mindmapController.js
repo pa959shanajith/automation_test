@@ -1048,6 +1048,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             t: $('#ct-assignTask').val(),
             bn: $('#ct-executeBatch').val(),
             at: $('#ct-assignedTo').val(),
+            ac: $('#ct-accessibilityTesting').val() ? $('#ct-accessibilityTesting').val() : '', 
             rw: /*(d3.select('#ct-assignRevw')[0][0])?*/ $('#ct-assignRevw').val() /*:null*/ ,
             sd: $('#startDate').val(),
             ed: $('#endDate').val(),
@@ -1079,6 +1080,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             task: tObj.t,
             assignedto: tObj.at,
             assignedToName: $('[value="' + tObj.at + '"]').attr('data-id'),
+            accessibilityTesting: tObj.ac,
             reviewer: tObj.rw,
             startdate: tObj.sd,
             enddate: tObj.ed,
@@ -1535,6 +1537,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
             det: (nt) ? nt.details : '',
             cx: (nt) ? nt.complexity : undefined,
+            ac: (nt) ? nt.accessibility_testing : '',
             _id:(nt)? nt._id:null
         };
 
@@ -1568,7 +1571,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#ct-executeBatch').val('');
             }
         })
-
+        if(p.attr('data-nodetype') == 'scenarios'){
+            v = u.append('li');
+            v.append('span').attr('class', 'ct-assignItem fl-left').html('Accessibility');
+            v.append('select').attr('id', 'ct-accessibilityTesting').style('width',"64%").style('float',"right");
+            $('#ct-accessibilityTesting').append("<option data-id='acc_enabled' value='Enable'>" + "Enable" + "</option>");
+            $('#ct-accessibilityTesting').append("<option data-id='acc_disabled' value='Disable'>" + "Disabled" + "</option>");
+    
+        }
+       
 
         var default_releaseid = '';
         taskAssign[t].attributes.forEach(function(tk) {

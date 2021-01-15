@@ -53,15 +53,28 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 							+ '<span style="display:none" class="ipContainer"><select id="mod' + i + '" onchange="openPopup(id)"" class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
 							+ '<span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span>'
 							+ '<span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" class="cursor:not-allowed" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
-							+ '<table class="scenarioSchdCon scenarioSch_' + i + '"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead>'
+							+ '<table class="scenarioSchdCon scenarioSch_' + i + '"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td style="width:12%;">Project Name</td><td>Accessibility Testing</tr></thead>'
 							+ '<tbody class="scenarioBody scenarioTbCon_' + i + '"></tbody></table>');
 						for (j = 0; j < eachData[i].scenarioids.length; j++) {
 							const flag = eachData[i].condition[j] == 0;
-							$(document).find(".scenarioTbCon_" + i + "").append('<tr><td><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
+							if(true){
+								$(document).find(".scenarioTbCon_" + i + "").append('<tr><td><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
 								+ '<td data-scenarioid="' + eachData[i].scenarioids[j] + '">' + eachData[i].scenarionames[j] + '</td>'
 								+ '<td style="padding: 2px 0 2px 0;"><input type="text" value="' + eachData[i].dataparam[j] + '" disabled/></td>'
 								+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
-								+ '<td>' + eachData[i].projectnames[j] + '</td></tr>');
+								+ '<td>' + eachData[i].projectnames[j] + '</td>'
+								+ '<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">Select Paradigm </span><ul style="margin: 0;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ng-style="{"font-weight":500}"><input value="A" checked type="checkbox"/><span id="methodA" }"></span>A</label></li><li><label title="method AA"  ng-style="{"font-weight":500}"><input value="AA" checked type="checkbox"/><span id="methodAA" }"></span>AA</label></li><li><label title="method 508"  ng-style="{"font-weight":500}"><input value="508" checked type="checkbox"/><span id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ng-style="{"font-weight":500}"><input value="Best Practice" checked type="checkbox"/><span id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>'
+								+ '</tr>');
+							}else{
+								$(document).find(".scenarioTbCon_" + i + "").append('<tr><td><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
+								+ '<td data-scenarioid="' + eachData[i].scenarioids[j] + '">' + eachData[i].scenarionames[j] + '</td>'
+								+ '<td style="padding: 2px 0 2px 0;"><input type="text" value="' + eachData[i].dataparam[j] + '" disabled/></td>'
+								+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
+								+ '<td>' + eachData[i].projectnames[j] + '</td>'
+								+ "<td class='projectName' title=" + "N/A" + " style='width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + "N/A" + "</td>"
+								+ '</tr>');
+							}
+							
 						}
 						$(".ipformating").empty();
 						// $(".ipformating").append("<option value=' ' selected disabled>Select User</option>")			
@@ -444,11 +457,16 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					if (doNotSchedule) return false;
 					$(this).find(".scenarioSchdCon tbody tr").each(function () {
 						if ($(this).find(".selectToSched").is(":checked")) {
+							let accessibilityParameters = []
+							$(this).children(".exe-accesibilityTesting").find("input:checked").each(function(){
+								accessibilityParameters.push($(this).val());
+							});
 							selectedScenarioData.push({
 								condition: parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
 								dataparam: [$(this).children("td:nth-child(3)").find("input").val().trim()],
 								scenarioId: $(this).children("td:nth-child(2)").data("scenarioid"),
 								scenarioName: $(this).children("td:nth-child(2)").text(),
+								accessibiltyParameters: accessibilityParameters
 							});
 						}
 					});

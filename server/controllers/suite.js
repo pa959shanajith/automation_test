@@ -58,7 +58,8 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"testsuitename": testsuite.name,
 			"moduleid": moduleId,
 			"testsuiteid": testsuite.testsuiteid,
-			"versionnumber": suite.versionnumber
+			"versionnumber": suite.versionnumber,
+			"accessibilityTestingMap": testscenarioDetails.accessibilitytestingmap
 		};
 		responsedata[moduleId] = finalSuite;
 	}
@@ -303,7 +304,8 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			"condition": [],
 			"dataparampath": [],
 			"scenarioNames": [],
-			"scenarioIds": []
+			"scenarioIds": [],
+			"accessibilityMap":{}
 		};
 		const suiteDetails = suite.suiteDetails;
 		for (const tsco of suiteDetails) {
@@ -320,6 +322,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
+			suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibiltyParameters;
 			suiteObj.condition.push(scenario.condition);
 			suiteObj.dataparampath.push(scenario.dataparam[0]);
 			suiteObj.scenarioNames.push(scenario.scenarioName);

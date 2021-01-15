@@ -95,7 +95,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$("#executionDataTable_" + m + " tbody tr").remove();
 					var rowData = eachData[m];
 					$("div.executionTableDnd").attr('id', 'batch_' + m);
-					$("#batch_" + m).append("<div class='suiteNameTxt' id='page-taskName_" + m + "'><span title=" + rowData.testsuitename + " class='taskname'><input id='parentSuite_" + m + "' class='parentSuiteChk' type='checkbox' name='' />" + rowData.testsuitename + "</span></div><div id='exeData_" + m + "' class='exeDataTable testSuiteBatch'><table id='executionDataTable_" + m + "' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_" + m + "' class='d-execute' type='checkbox' /></th>	<th style='width: 20%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 24%;'>Project Name</th></tr><input type='hidden' value='" + rowData.testsuiteid + "'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>"); //<th style='width: 8%; text-align: center;'>ALM</th>
+					$("#batch_" + m).append("<div class='suiteNameTxt' id='page-taskName_" + m + "'><span title=" + rowData.testsuitename + " class='taskname'><input id='parentSuite_" + m + "' class='parentSuiteChk' type='checkbox' name='' />" + rowData.testsuitename + "</span></div><div id='exeData_" + m + "' class='exeDataTable testSuiteBatch'><table id='executionDataTable_" + m + "' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_" + m + "' class='d-execute' type='checkbox' /></th>	<th style='width: 20%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 15%; border-right: 1px solid #fff' >Project Name</th><th style='width: 15%; '>Accessibility Testing</th></tr><input type='hidden' value='" + rowData.testsuiteid + "'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>"); //<th style='width: 8%; text-align: center;'>ALM</th>
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 					var row = $("#executionDataTable_" + m).find('tbody');
@@ -103,7 +103,12 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 					//Building object for each row after getting the data from server
 					for (var k = 0; k < rowData.scenarioids.length; k++) {
+						let accessibilityTesting = "Disable";
+						if(rowData.scenarioids[k] in rowData['accessibilityTestingMap'] && rowData['accessibilityTestingMap'][rowData.scenarioids[k]] == "Enable" ){
+							accessibilityTesting = "Enable"
+						}
 						if (current_task.scenarioFlag == 'True') {
+							
 							if (rowData.scenarioids[k] == assignedTestScenarioId) {
 								getEachScenario.push({
 									"condition": rowData.condition[k],
@@ -112,7 +117,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 									"scenarioIds": rowData.scenarioids[k],
 									"scenarionames": rowData.scenarionames[k],
 									"projectnames": rowData.projectnames[k],
-									"testSuiteId": rowData.testsuiteid[k]
+									"testSuiteId": rowData.testsuiteid[k],
+									"accessibilityTesting": accessibilityTesting
 								});
 							}
 						} else {
@@ -123,7 +129,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 								"scenarioIds": rowData.scenarioids[k],
 								"scenarionames": rowData.scenarionames[k],
 								"projectnames": rowData.projectnames[k],
-								"testSuiteId": rowData.testsuiteid[k]
+								"testSuiteId": rowData.testsuiteid[k],									
+								"accessibilityTesting": accessibilityTesting
 							});
 						}
 					}
@@ -146,11 +153,17 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							row.append($('<td style="width: 25%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value="' + getEachScenario[i].dataParam + '"/></td>'));
 						}
 						if (getEachScenario[i].condition == 0) {
-							row.append($('<td style="width:20%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertRed"><option value="1">True</option><option value="' + getEachScenario[i].condition + '" selected>False</option></select> </td>'));
+							row.append($('<td style="width:17%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertRed"><option value="1">True</option><option value="' + getEachScenario[i].condition + '" selected>False</option></select> </td>'));
 						} else {
-							row.append($('<td style="width:20%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="' + getEachScenario[i].condition + '" selected>True</option><option value="0">False</option></select> </td>'));
+							row.append($('<td style="width:17%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="' + getEachScenario[i].condition + '" selected>True</option><option value="0">False</option></select> </td>'));
 						}
-						row.append($("<td class='projectName' title=" + getEachScenario[i].projectnames + " style='width:20%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
+						row.append($("<td class='projectName' title=" + getEachScenario[i].projectnames + " style='width:16%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
+						if (getEachScenario[i].accessibilityTesting == "Enable"){
+							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">Select Paradigm </span><ul style="margin: 0;width: 14%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ng-style="{"font-weight":500}"><input value="A" checked type="checkbox"/><span id="methodA" }"></span>A</label></li><li><label title="method AA"  ng-style="{"font-weight":500}"><input value="AA" checked type="checkbox"/><span id="methodAA" }"></span>AA</label></li><li><label title="method 508"  ng-style="{"font-weight":500}"><input value="508" checked type="checkbox"/><span id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ng-style="{"font-weight":500}"><input value="Best Practice" checked type="checkbox"/><span id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
+						}
+						else{
+							row.append($("<td class='projectName' title=" + "N/A" + " style='width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + "N/A" + "</td>"));
+						}
 						// row.append($("<td class='variableMap' title='' style='width:10%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important;cursor:pointer;' class='tabeleCellPadding'><span class='descriptionContainer'><img alt='scenarioDescription' title='' id=scenarioDesc_"+count+" src='imgs/ic-details-inactive.png' data-scenarioid='"+getEachScenario[i].scenarioIds+"' class='scenarioDescIcon inactiveDesc'></span></td>"));
 						//row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
 						count++;
@@ -704,13 +717,20 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				var projectid = testsuiteDetails.projectidts;
 				if ($(this).is(":checked") == true) {
 					$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function () {
-						selectedRowData.push({
-							condition: parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
-							dataparam: [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
-							scenarioName: $(this).parent().siblings(".exe-scenarioIds")[0].innerText,
-							scenarioId: $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
-							scenariodescription: $scope.somevar[$(this).parent().siblings(".exe-scenarioIds").attr("sId")]
-						});
+						if(!$(this).parent().siblings().length == 0){
+							let accessibiltyParameters = []
+							$(this).parent().siblings(".exe-accesibilityTesting").find("input:checked").each(function(){
+								accessibiltyParameters.push($(this).val());
+							});
+							selectedRowData.push({
+								condition: parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
+								dataparam: [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
+								scenarioName: $(this).parent().siblings(".exe-scenarioIds")[0].innerText,
+								scenarioId: $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
+								scenariodescription: $scope.somevar[$(this).parent().siblings(".exe-scenarioIds").attr("sId")],
+								accessibiltyParameters: accessibiltyParameters
+							});
+						}
 					});
 
 					suiteInfo.testsuiteName = $(this).parents('span.taskname').text();
