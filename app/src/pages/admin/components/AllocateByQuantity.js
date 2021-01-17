@@ -96,13 +96,13 @@ const AllocateByQuantity = ({resetMiddleScreen,selectedPool,setSelectedPool,disp
             </div>
             <div style={{zIndex:1}} className='col-xs-9 form-group input-label'>
                 <label>Pool Name</label>
-                <span>
+                <span className='filter-pool'>
                     <FormInpDropDown clickInp={clickInp} inpRef={inpRef} data={poolList} setFilter={FilterPool}/>
                 </span>
             </div>
             <div className='col-xs-9 form-group input-label'>
                 <label>Enter number of ICE to assign</label>
-                <input ref={iceNum} disabled={selectedPool?false:true} type='number'></input>
+                <input className='ice-count' ref={iceNum} disabled={selectedPool?false:true} type='number'></input>
             </div>
         </div>
     )

@@ -2,7 +2,8 @@ import React, { Fragment, useState, useEffect , useRef } from 'react';
 import {ModalContainer} from '../../global' 
 import {FormInpDropDown, FormInput} from '../components/FormComp';
 import AssignOptionBox from '../components/AssignOptionBox'
-import {clearQueue,deleteICE_pools,updatePool} from '../api';
+import {clearQueue,deleteICE_pools,updatePool,getPools} from '../api';
+import '../styles/EditIcePool.scss';
 
 /*Component EditIcePool
   use: defines icepool middle Section for edit ice pool from create ice pool section
