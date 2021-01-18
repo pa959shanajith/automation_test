@@ -157,7 +157,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         reportsInputData.projectId = $.trim($('.project-list option:selected').val());
         reportsInputData.releaseName = $.trim($('.release-list option:selected').val());
         reportsInputData.cycleId = $.trim(cycleId);
-        reportsInputData.type = 'allmodules';
+        reportsInputData.type = 'screendata';
         blockUI("Loading modules.. please wait..");
         $("#accordion").hide();
         $('#nodeBox').empty();
@@ -212,7 +212,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 console.log("Error in service getReportsData_ICE while fetching modules-"+error);
             });
         }else{
-            reportService.getWebocularModule_ICE(reportsInputData).then(function (result_webocular_reportData) {
+            reportService.getAccessibilityData_ICE(reportsInputData).then(function (result_webocular_reportData) {
                 unblockUI()
                 if (result_webocular_reportData == "Fail") {
                     openModalPopup("Reports", "Failed to load Webocular Reports");
@@ -239,7 +239,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 }
             }, function (error) {
                 unblockUI();
-                console.log("Error in service getWebocularModule_ICE while fetching modules-" + error);
+                console.log("Error in service getAccessibilityData_ICE while fetching modules-" + error);
             });
         }
 
@@ -444,8 +444,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $('#reportsModuleTable tbody').empty();
         $('#accordionTblExecutions').hide()
         $scope.reportGenerated = true;
-        getWebocularInputData = e.target.id
-        reportService.getWebocularData_ICE(getWebocularInputData)
+        var inputdata = {};
+        inputdata['type'] = "reportdata";
+        inputdata['screendata'] = e.target.id;
+        reportService.getAccessibilityData_ICE(inputdata)
             .then(function (result_webocular_reportData) {
                 if (result_webocular_reportData == "Fail") {
                     openModalPopup("Reports", "Failed to load Webocular Reports");
@@ -469,7 +471,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 }
             }, function (error) {
                 unblockUI();
-                console.log("Error in service getWebocularData_ICE while fetching modules-" + error);
+                console.log("Error in service getAccessibilityData_ICE while fetching modules-" + error);
             });
 
     });

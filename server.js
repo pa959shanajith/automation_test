@@ -410,6 +410,7 @@ if (cluster.isMaster) {
 		var qtest = require('./server/controllers/qtest');
 		var zephyr = require('./server/controllers/zephyr');
 		var webocular = require('./server/controllers/webocular');
+		var accessibilityTesting = require('./server/controllers/accessibilityTesting');
 		var chatbot = require('./server/controllers/chatbot');
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
@@ -527,6 +528,7 @@ if (cluster.isMaster) {
 		app.post('/downloadVideo', auth.protect, report.downloadVideo);
 		app.post('/getReportsData_ICE', auth.protect, report.getReportsData_ICE);
 		app.post('/getReport_API', report.getReport_API);
+		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
 		app.use('/viewReport', report.viewReport);
 		//Plugin Routes
 		app.post('/getProjectIDs', plugin.getProjectIDs);
@@ -538,9 +540,8 @@ if (cluster.isMaster) {
 		app.post('/crawlResults', auth.protect, webocular.getCrawlResults);
 		app.post('/saveResults', auth.protect, webocular.saveResults);
 		app.post('/getWebocularModule_ICE', auth.protect, webocular.getWebocularModule_ICE);
-		app.post('/getWebocularData_ICE', auth.protect, webocular.getWebocularData_ICE);
-
-
+		//Accessibility Testing routes
+		app.post('/getAccessibilityData_ICE', auth.protect, accessibilityTesting.getAccessibilityTestingData_ICE);
 		//Chatbot Routes
 		app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
 		app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
