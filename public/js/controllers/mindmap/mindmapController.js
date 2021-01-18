@@ -3346,7 +3346,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             return;
         }
         var version_num = ($('.version-list').val() != undefined)? $('.version-list').val(): "0.0";
-        var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
+        var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": ""};
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
         var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"accountid":"","accesskey":"","secretkey":""}}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "","poolname":""} } ] };
         var moduleInfo = { "batchInfo": [] };
@@ -3389,6 +3389,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     moduleData.suiteDetails = [];
                     for (var j = 0; j < moduleObj.scenarioids.length; j++) {
                         var s_data = JSON.parse(JSON.stringify(suiteDetailsTemplate));
+                        if(moduleObj.accessibilityTestingMap[moduleObj.scenarioids[j]] == "Enable"){
+                            s_data.accessibilityParameters = []
+                        }
                         s_data.condition = moduleObj.condition[j];
                         s_data.dataparam = [moduleObj.dataparam[j]];
                         s_data.scenarioName = moduleObj.scenarionames[j];

@@ -159,7 +159,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						}
 						row.append($("<td class='projectName' title=" + getEachScenario[i].projectnames + " style='width:16%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
 						if (getEachScenario[i].accessibilityTesting == "Enable"){
-							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">Select Paradigm </span><ul style="margin: 0;width: 14%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ng-style="{"font-weight":500}"><input value="A" checked type="checkbox"/><span id="methodA" }"></span>A</label></li><li><label title="method AA"  ng-style="{"font-weight":500}"><input value="AA" checked type="checkbox"/><span id="methodAA" }"></span>AA</label></li><li><label title="method 508"  ng-style="{"font-weight":500}"><input value="508" checked type="checkbox"/><span id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ng-style="{"font-weight":500}"><input value="Best Practice" checked type="checkbox"/><span id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
+							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">Select Paradigm </span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ng-style="{"font-weight":500}"><input value="A" checked type="checkbox"/><span id="methodA" }"></span>A</label></li><li><label title="method AA"  ng-style="{"font-weight":500}"><input value="AA" checked type="checkbox"/><span id="methodAA" }"></span>AA</label></li><li><label title="method 508"  ng-style="{"font-weight":500}"><input value="508" checked type="checkbox"/><span id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ng-style="{"font-weight":500}"><input value="Best Practice" checked type="checkbox"/><span id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
 						}
 						else{
 							row.append($("<td class='projectName' title=" + "N/A" + " style='width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + "N/A" + "</td>"));
@@ -718,9 +718,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				if ($(this).is(":checked") == true) {
 					$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function () {
 						if(!$(this).parent().siblings().length == 0){
-							let accessibiltyParameters = []
+							let accessibilityParameters = []
 							$(this).parent().siblings(".exe-accesibilityTesting").find("input:checked").each(function(){
-								accessibiltyParameters.push($(this).val());
+								accessibilityParameters.push($(this).val());
 							});
 							selectedRowData.push({
 								condition: parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
@@ -728,7 +728,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 								scenarioName: $(this).parent().siblings(".exe-scenarioIds")[0].innerText,
 								scenarioId: $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
 								scenariodescription: $scope.somevar[$(this).parent().siblings(".exe-scenarioIds").attr("sId")],
-								accessibiltyParameters: accessibiltyParameters
+								accessibilityParameters: accessibilityParameters
 							});
 						}
 					});

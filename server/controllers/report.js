@@ -820,7 +820,8 @@ exports.getReport_API = async(req, res) => {
     try {
 		var executionId = req.body.execution_data.executionId || "";
 		var scenarioIds = req.body.execution_data.scenarioIds;
-		var finalReport = [];
+        var finalReport = [];
+        var concat_report = {};
 		var tempModDict = {};
 		const userInfo = await utils.tokenValidation(req.body.userInfo);
 		const execResponse = userInfo.inputs;
@@ -851,10 +852,11 @@ exports.getReport_API = async(req, res) => {
                             if(reportResult.errMsg != ""){
                                 execResponse.error_message=reportResult.errMsg;
                             }
+                            concat_report['accessibilityReport'] = reportResult.rows.accessibilityReports;
                             finalReport.push(execResponse);
-                            for(i=0; i<reportResult.rows.length; ++i) {
-                                var reportData = reportResult.rows[i].report;
-                                var reportInfo = reportResult.rows[i];
+                            for(i=0; i<reportResult.rows.functionalReports.length; ++i) {
+                                let reportInfo = reportResult.rows.functionalReports[i]
+                                var reportData = reportInfo.report;
                                 var pass = fail = terminated = total = 0;
                                 reportData.overallstatus[0].domainName=reportInfo.domainName;
                                 reportData.overallstatus[0].projectName=reportInfo.projectName;
@@ -917,7 +919,8 @@ exports.getReport_API = async(req, res) => {
                                 finalReport.push(tempModDict[k]);
                             } 
                             logger.info("Sending reports in the service getReport_API: final function");
-                            res.send(finalReport);
+                            concat_report['functionalTestingReports'] = finalReport;
+                            res.send(concat_report);
                         } catch (exception) {
                             logger.error("Exception in the service getReport_API - projectsUnderDomain: %s", exception);
                             res.send("fail");

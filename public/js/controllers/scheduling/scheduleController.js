@@ -57,7 +57,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 							+ '<tbody class="scenarioBody scenarioTbCon_' + i + '"></tbody></table>');
 						for (j = 0; j < eachData[i].scenarioids.length; j++) {
 							const flag = eachData[i].condition[j] == 0;
-							if(true){
+							if("accessibilityTestingMap" in eachData[i] && eachData[i].accessibilityTestingMap[eachData[i].scenarioids[j]] == "Enable"){
 								$(document).find(".scenarioTbCon_" + i + "").append('<tr><td><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
 								+ '<td data-scenarioid="' + eachData[i].scenarioids[j] + '">' + eachData[i].scenarionames[j] + '</td>'
 								+ '<td style="padding: 2px 0 2px 0;"><input type="text" value="' + eachData[i].dataparam[j] + '" disabled/></td>'
@@ -447,7 +447,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
 					suiteInfo.timestamp = timestamp.valueOf().toString();
 					const diff = (timestamp - new Date()) / 60000;
-					if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
+					if (diff < 0) {  // Check if schedule time is not ahead of 5 minutes from current time
 						if (diff < 0) $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").prop("style", "border: 2px solid red;");
 						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style", "border: 2px solid red;");
 						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
@@ -466,7 +466,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 								dataparam: [$(this).children("td:nth-child(3)").find("input").val().trim()],
 								scenarioId: $(this).children("td:nth-child(2)").data("scenarioid"),
 								scenarioName: $(this).children("td:nth-child(2)").text(),
-								accessibiltyParameters: accessibilityParameters
+								accessibilityParameters: accessibilityParameters
 							});
 						}
 					});
