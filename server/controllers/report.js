@@ -820,8 +820,7 @@ exports.getReport_API = async(req, res) => {
     try {
 		var executionId = req.body.execution_data.executionId || "";
 		var scenarioIds = req.body.execution_data.scenarioIds;
-        var finalReport = [];
-        var concat_report = {};
+		var finalReport = [];
 		var tempModDict = {};
 		const userInfo = await utils.tokenValidation(req.body.userInfo);
 		const execResponse = userInfo.inputs;
@@ -852,11 +851,10 @@ exports.getReport_API = async(req, res) => {
                             if(reportResult.errMsg != ""){
                                 execResponse.error_message=reportResult.errMsg;
                             }
-                            concat_report['accessibilityReport'] = reportResult.rows.accessibilityReports;
                             finalReport.push(execResponse);
-                            for(i=0; i<reportResult.rows.functionalReports.length; ++i) {
-                                let reportInfo = reportResult.rows.functionalReports[i]
-                                var reportData = reportInfo.report;
+                            for(i=0; i<reportResult.rows.length; ++i) {
+                                var reportData = reportResult.rows[i].report;
+                                var reportInfo = reportResult.rows[i];
                                 var pass = fail = terminated = total = 0;
                                 reportData.overallstatus[0].domainName=reportInfo.domainName;
                                 reportData.overallstatus[0].projectName=reportInfo.projectName;
@@ -919,8 +917,7 @@ exports.getReport_API = async(req, res) => {
                                 finalReport.push(tempModDict[k]);
                             } 
                             logger.info("Sending reports in the service getReport_API: final function");
-                            concat_report['functionalTestingReports'] = finalReport;
-                            res.send(concat_report);
+                            res.send(finalReport);
                         } catch (exception) {
                             logger.error("Exception in the service getReport_API - projectsUnderDomain: %s", exception);
                             res.send("fail");
@@ -936,6 +933,32 @@ exports.getReport_API = async(req, res) => {
         res.send("fail");
     }
 };
+
+exports.getAccessibilityReports_API = async(req, res)=>{
+    const executionId = req.body.execution_data.executionId;
+    var userInfo = req.body.userInfo;
+    var result = {"error":"Interanal Server Error", "userinfo":{"ice":userInfo.icename,"token":userInfo.tokenname}};
+    try{
+        const token = await utils.tokenValidation(userInfo);
+        if(token.inputs.tokenValidation.toLowerCase() == "passed"){
+            const inputs = {
+                "executionid": executionId,
+            };
+            reports = await utils.fetchData(inputs,"reports/getAccessibilityReports_API", "getAccessibilityReports_API");
+            if(reports == 'fail'){
+                result['error'] = "Invalid Execution ID"
+            }else{
+                result['reports'] = reports;
+                delete result['error'];
+            } 
+        }else{
+            result["error"] = "Invalid Token";
+        }
+    }catch(e){
+        logger.error("Exception occured in getAccessibilityReports_API service", exception);
+    }
+    res.send(result);
+}
 
 function validateData(content, type) {
     logger.info("Inside function: validateData");

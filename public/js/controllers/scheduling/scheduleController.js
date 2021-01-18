@@ -58,20 +58,20 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 						for (j = 0; j < eachData[i].scenarioids.length; j++) {
 							const flag = eachData[i].condition[j] == 0;
 							if("accessibilityTestingMap" in eachData[i] && eachData[i].accessibilityTestingMap[eachData[i].scenarioids[j]] == "Enable"){
-								$(document).find(".scenarioTbCon_" + i + "").append('<tr><td><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
+								$(document).find(".scenarioTbCon_" + i + "").append('<tr><td class = "tabeleCellPadding"><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
 								+ '<td data-scenarioid="' + eachData[i].scenarioids[j] + '">' + eachData[i].scenarionames[j] + '</td>'
 								+ '<td style="padding: 2px 0 2px 0;"><input type="text" value="' + eachData[i].dataparam[j] + '" disabled/></td>'
 								+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
 								+ '<td>' + eachData[i].projectnames[j] + '</td>'
-								+ '<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">Select Paradigm </span><ul style="margin: 0;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ng-style="{"font-weight":500}"><input value="A" checked type="checkbox"/><span id="methodA" }"></span>A</label></li><li><label title="method AA"  ng-style="{"font-weight":500}"><input value="AA" checked type="checkbox"/><span id="methodAA" }"></span>AA</label></li><li><label title="method 508"  ng-style="{"font-weight":500}"><input value="508" checked type="checkbox"/><span id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ng-style="{"font-weight":500}"><input value="Best Practice" checked type="checkbox"/><span id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>'
+								+ '<td class="exe-accesibilityTesting tabeleCellPadding" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">Select Paradigm </span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ><input style="height:12px;" value="A" checked type="checkbox"/><span style="margin-left: 5px;" id="methodA"></span>A</label></li><li><label title="method AA"  ><input style="height:12px;" value="AA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAA"></span>AA</label></li><li><label title="method 508"  ><input style="height:12px;" value="508" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ><input style="height:12px;" value="Best Practice" checked type="checkbox"/><span style="margin-left: 5px;" id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>'
 								+ '</tr>');
 							}else{
-								$(document).find(".scenarioTbCon_" + i + "").append('<tr><td><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
+								$(document).find(".scenarioTbCon_" + i + "").append('<tr><td class = "tabeleCellPadding"><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
 								+ '<td data-scenarioid="' + eachData[i].scenarioids[j] + '">' + eachData[i].scenarionames[j] + '</td>'
 								+ '<td style="padding: 2px 0 2px 0;"><input type="text" value="' + eachData[i].dataparam[j] + '" disabled/></td>'
 								+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
 								+ '<td>' + eachData[i].projectnames[j] + '</td>'
-								+ "<td class='projectName' title=" + "N/A" + " style='width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + "N/A" + "</td>"
+								+ "<td class='projectName' title=" + "N/A" + " style='width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important'  class='exe-accesibilityTesting tabeleCellPadding'>" + "N/A" + "</td>"
 								+ '</tr>');
 							}
 							
