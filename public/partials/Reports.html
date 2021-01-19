@@ -94,14 +94,14 @@
 									 </select>
 								  </div>
 							   </div>
+							   <div class="col">
+								<button class="webCrawler-toggle-btn" ng-click="toggle_accessibility($event)" style="background: blueviolet;"title="Save Report" id="accessibility_toggle">Accessibility Testing</button>
+						   		</div>
 							   <div class="col d-flex flex-row-reverse ">
 								  <input id='searchModule' class="reports-search" type="text" placeholder="Search Module" aria-label="Search">
 								  <img alt="Search Icon" class="searchReportsImg" src="imgs/ic-search-icon.png">
 							   </div>
 							</div>
-							<div>
-								<button class="webCrawler-toggle-btn" ng-click="toggle_webocular($event)" title="Save Report">Webocular</button>
-						   </div>
 							<div class="container-fluid moduleBox">
 							   <div id='nodeBox' class="row ct-nodeBox">
 								  <!-- Nodes -->
@@ -152,7 +152,7 @@
 									   <div class="panel-heading executionsHeader">
 										  <h4 class="panel-title" id='panelTitle'>
 											 <a id='executionNameHeader' data-toggle="" data-parent="#webocularTblExecution" href="#">
-												<!-- executionNameHeader Header -->
+												Accessibility Reports
 											 </a>
 										  </h4>
 									   </div>
@@ -162,7 +162,7 @@
 												<tr>
 												   <th>Execution No</th>
 												   <th>Title</th>
-												   <th>Time <span id='time'  class="glyphicon glyphicon-triangle-bottom dateDesc">
+												   <th>Time </th>
 												</tr>
 											 </thead>
 											 <tbody>

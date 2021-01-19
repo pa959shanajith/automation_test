@@ -4331,6 +4331,10 @@ select:focus{
 .scenariostatusreportselect{
 	background-color: #e3caff
 }
+.screen_report{cursor: pointer;}
+.screen_report{
+	background-color: #e3caff
+}
 .popupWrapRow{
 	display: block;
 	width:100%;
@@ -5512,8 +5516,8 @@ Webocular report css
     font-size: 14px;
 }
 .webCrawler-toggle-btn{
-    height: 20px;
-    width: 70px;
+    height: fit-content;
+    width: fit-content;
     background: #331d4e;
     font-size: 12px;
     padding: 0px 6px;

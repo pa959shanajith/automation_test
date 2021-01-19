@@ -157,7 +157,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         reportsInputData.projectId = $.trim($('.project-list option:selected').val());
         reportsInputData.releaseName = $.trim($('.release-list option:selected').val());
         reportsInputData.cycleId = $.trim(cycleId);
-        reportsInputData.type = 'screendata';
+        reportsInputData.type = 'allmodules';
         blockUI("Loading modules.. please wait..");
         $("#accordion").hide();
         $('#nodeBox').empty();
@@ -212,6 +212,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 console.log("Error in service getReportsData_ICE while fetching modules-"+error);
             });
         }else{
+            reportsInputData.type = 'screendata';
             reportService.getAccessibilityData_ICE(reportsInputData).then(function (result_webocular_reportData) {
                 unblockUI()
                 if (result_webocular_reportData == "Fail") {
@@ -322,6 +323,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //Module node click to fetch module start/end date & time execution entries
     $(document).on('click', '.ct-nodeIcon', function(e) {
         blockUI('Loading.. Please wait..')
+        $("#webocularTblExecution").hide();
         $("#report-canvas").empty();
         $("#report-canvas").hide();
         $("#report-header").empty();
@@ -428,11 +430,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $(document).on('click', '.ct-nodeIcon1', function (e) {
-        $("#report-canvas").show();
-        $("#report-header").show();
-        $("#report-header").empty();
+        blockUI("Loading Reports");
         $("#accordion").hide();
-        $("#report-canvas").empty();
         $("#report-canvas").empty();
         $("#report-canvas").hide();
         $("#report-header").empty();
@@ -449,6 +448,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         inputdata['screendata'] = e.target.id;
         reportService.getAccessibilityData_ICE(inputdata)
             .then(function (result_webocular_reportData) {
+                unblockUI();
                 if (result_webocular_reportData == "Fail") {
                     openModalPopup("Reports", "Failed to load Webocular Reports");
                 } if (result_webocular_reportData != "fail") {
@@ -487,7 +487,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
         $('#middle-content-section').attr('class', "webCrawler-report");
         proxy = "Disabled";
-        $("#report-header").append('<div width="100%"height="100%"class="webCrawler-header"><label style="position: relative;bottom: 1px;">Webocular Report</label></div><div style="display: flex;"><div style="width:50%;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">' + report.screenname + '</span></div><div><label class="webCrawler-report-label">URL</label><span class="webCrawler-report-span">' + report.url + '</span></div><div><label class="webCrawler-report-label">Agent</label><span class="webCrawler-report-span">' + report.agent + '</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">' + report.level + '</span></div></div><div style="width:50%;"><div><label class="webCrawler-report-label">Proxy</label><span class="webCrawler-report-span">' + proxy + '</span></div><div><label class="webCrawler-report-label">Proxy URL</label><span class="webCrawler-report-span">' + "None" + '</span></div><div><label class="webCrawler-report-label">Username</label><span class="webCrawler-report-span">' + "None" + '</span></div><div><label class="webCrawler-report-label">SearchData</label><span class="webCrawler-report-span">' + "None" + '</span></div></div></div>')
+        $("#report-header").append('<div width="100%" height="100%" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Webocular Report</label></div><div style="display: flex;"><div style="width:50%;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+ report.screenname + '</span></div><div><label class="webCrawler-report-label">' + report.agent + '</label><span class="webCrawler-report-span">chrome</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">0</span></div></div><div style="width:50%;"></div></div>')
         var body = document.getElementById('report-canvas');
         var reportDiv = document.createElement('div');
         //reportDiv.setAttribute('class', 'scrollbar-inner');
@@ -584,11 +584,18 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     });
 
 
-    $scope.toggle_webocular = function ($event) {
+    $scope.toggle_accessibility = function ($event) {
         if ($('.ct-nodeIcon1').parent().is(':hidden')) { $('.ct-nodeIcon1').parent().show() }
         else { $('.ct-nodeIcon1').parent().hide() }
-        if (access_only) access_only = false;
-        else access_only = true;
+        if (access_only){ 
+            access_only = false;
+            $("#accessibility_toggle")[0].style.background = "blueviolet";
+            $("#searchModule")[0].placeholder = "Search Module";
+        }else{
+            access_only = true;
+            $("#accessibility_toggle")[0].style.background = "purple";
+            $("#searchModule")[0].placeholder = "Search Screen";
+        }
     }
 
 
