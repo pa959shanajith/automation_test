@@ -864,6 +864,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
             'opacity': !( n._id == null || n._id == undefined) ? 1 : 0.5,
             'title': n.name,
+            'ac': n.accessibilityTesting || "None",
             'name': n.display_name,
             'img_src': img_src,
             '_id': n._id || null,
