@@ -1,6 +1,7 @@
 var screenshotObj, scrapedGlobJson, enableScreenShotHighlight, mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, globalSelectedBrowserType, selectedKeywordList, keywordListData, dependentTestCaseFlag = false;
 checkedTestcases = [];
 pasteSelecteStepNo = [];
+var image = new Image();
 var initScraping = {};
 var mirrorObj = {};
 var scrapeTypeObj = {};
@@ -1088,12 +1089,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								ob.hiddentag = "No",
 									tag = "iris;" + ob.objectType,
 									ob.url = "",
-									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectText
 							}
 							if(ob.hasOwnProperty('editable')){
-								var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
+								var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
 							}else{
-								var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+								var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 							}
 							// }									   
 							// }
@@ -2351,9 +2352,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 										ob.hiddentag = "No",
 										tag = "iris;" + ob.objectType,
 										ob.url = "",
-										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectText,
+										irisFlg = true
 									}
-									if (appType == "OEBS" || appType == "Desktop") {
+									if (irisFlg){
+										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+									}
+									else if (appType == "OEBS" || appType == "Desktop") {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									}
 									else {
@@ -2415,7 +2420,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								}
 								// }
 								// }
-								if (appType == "OEBS" || appType == "Desktop") {
+								irisFlg = false;
+								if (ob.cord && ob.cord != '') {  //in case of iris object
+									addcusOb = ""
+									console.log(ob.cord)
+									ob.hiddentag = "No",
+									tag = "iris;" + ob.objectType,
+									ob.url = "",
+									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectText,
+									irisFlg = true
+								}
+								if (irisFlg){
+									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+								}
+								else if (appType == "OEBS" || appType == "Desktop") {
 									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 								}
 								else {
@@ -2492,28 +2510,28 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 	}
 	
-	$(document).on("click", ".ellipsis", function(e) {
-		if(this.clicks === undefined) this.clicks=0;
-		this.clicks++;
-		setTimeout(function(){
-			var clicks = e.target.clicks;
-			e.target.clicks = 0;
-			if(clicks != 1) return false;
-			if(!e.target.parentNode.parentNode.attributes['data-tag'].value.startsWith('iris')) return false;
-			obj_xpath = e.target.parentNode.parentNode.attributes['data-xpath'].value;
-			objType = '';
-			for(var i=0;i<viewString.view.length;i++){
-				if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType != ''){
-					objType = viewString.view[i].objectType[0].toUpperCase() + viewString.view[i].objectType.slice(1,viewString.view[i].objectType.length);
-					break;
-				}  
-			}
-			$("#dialog-irisObject").modal("show");
-			$("#addIrisObjContainer").empty()
-			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option><option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
-		}, 500);
-	});
+	// $(document).on("click", ".ellipsis", function(e) {
+	// 	if(this.clicks === undefined) this.clicks=0;
+	// 	this.clicks++;
+	// 	setTimeout(function(){
+	// 		var clicks = e.target.clicks;
+	// 		e.target.clicks = 0;
+	// 		if(clicks != 1) return false;
+	// 		if(!e.target.parentNode.parentNode.attributes['data-tag'].value.startsWith('iris')) return false;
+	// 		obj_xpath = e.target.parentNode.parentNode.attributes['data-xpath'].value;
+	// 		objType = '';
+	// 		for(var i=0;i<viewString.view.length;i++){
+	// 			if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType != ''){
+	// 				objType = viewString.view[i].objectType[0].toUpperCase() + viewString.view[i].objectType.slice(1,viewString.view[i].objectType.length);
+	// 				break;
+	// 			}  
+	// 		}
+	// 		$("#dialog-irisObject").modal("show");
+	// 		$("#addIrisObjContainer").empty()
+	// 		if ($(".addObj-row").length > 1) $(".addObj-row").remove()
+	// 		$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option><option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
+	// 	}, 500);
+	// });
 	
 	$scope.submitIrisObjectType = function (e) {
 		var obj_cord = '';
@@ -2609,6 +2627,38 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$(document).on('click', '#editObjects', function () {
 		ele=$("input[type=checkbox].checkall:checked:visible").parents('li.item.select_all')
 		$('.errorMessage').val('');
+		if(ele[0].attributes["data-xpath"].value.startsWith('iris')){
+			obj_xpath = ele[0].attributes['data-xpath'].value;
+			obj_text = ele[0].attributes['data-text'].value;
+			if (obj_text=='') obj_text="Undefined";
+			obj_height = ele[0].attributes['data-height'].value;
+			obj_width = ele[0].attributes['data-width'].value;
+			objType = '';
+			for(var i=0;i<viewString.view.length;i++){
+				if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType != ''){
+					objType = viewString.view[i].objectType[0].toUpperCase() + viewString.view[i].objectType.slice(1,viewString.view[i].objectType.length);
+					break;
+				}  
+			}
+			img = ele[0].attributes["data-image"].value
+			image.src = 'data:image/png;base64,'+img;
+			// var canvas = document.createElement('canvas');
+			// var ctx = canvas.getContext('2d');
+			// canvas.width=300
+			// canvas.height =234
+			// ctx.drawImage(image,0,0,300,234)
+			$("#dialog-irisObject").modal("show");
+			$("#addIrisObjContainer").empty()
+			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
+			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><div class="irisimg" id="irisimg" style="float:right;margin-right:40px;width:210px"></div><br><br><div class="iristext" id="iristext"></div><br><div class="irispos" id="irispos"></div><br><div class="iriscoords" id="iriscoords"></div></div>');
+			$('#objectType').val(objType.toLowerCase())
+			$('#irisimg').append(image)
+			$('#irisimg').find('img').attr('style',"height: 120px;width: 200px;")
+			// $('#irisimg').append(canvas)
+			$('#iristext').append('<span><b>Object Text : '+obj_text+' </b></span>')
+			$('#irispos').append('<span><b>Object Height :'+obj_height+ ' px, Object Width :'+obj_width+'px</b></span>')
+			$('#iriscoords').append('<span><b>Object Coordinate-X :' + ele[0].attributes['data-left'].value + ', Object Coordinate-Y :'+ele[0].attributes['data-top'].value + ' </b></span>')
+		}else{
 			custObjProps=[]
 			custObjProps.push('decrypt')
 			custObjProps.push(ele.attr('data-xpath'))
@@ -2645,6 +2695,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}
 				// angular.element(document.getElementById("tableActionButtons")).scope().removeAddObjectSelection();
 			}, function (error) { });
+		}
 	});
 	//Show compared objects
 	$(document).on('click', '#comparedObjects', function () {
@@ -4677,6 +4728,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#deleteObjects").prop("disabled", true)
 		}
 		if (checkedLength == 1 && $('input.checkall.checked').offsetParent().parent().find('#decrypt').length==1) {
+			$("#editObjects").prop("disabled", false)
+		} else if (checkedLength == 1 && $('input.checkall.checked').offsetParent().parent().attr('data-xpath').startsWith('iris')) {
 			$("#editObjects").prop("disabled", false)
 		} else {
 			$("#editObjects").prop("disabled", true)
