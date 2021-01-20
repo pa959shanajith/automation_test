@@ -274,12 +274,12 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 					//check,uncheck parentSuite onload
 					$('#parentExecute_' + m).each(function () {
-						var checkedLen = $(this).parents('table').find('tbody tr input[type=checkbox]:checked').length;
+						var checkedLen = $(this).parents('table').find('tbody tr input.d-execute[type=checkbox]:checked').length;
 						if (parseInt(checkedLen) > 0)
 							$('#parentSuite_' + m).prop("checked", true);
 						else
 							$('#parentSuite_' + m).prop("checked", false);
-						var totalLen = $(this).parents('table').find('tbody tr input[type=checkbox]').length;
+						var totalLen = $(this).parents('table').find('tbody tr input.d-execute[type=checkbox]').length;
 						if (totalLen == checkedLen) {
 							$('#parentExecute_' + m).prop("checked", true);
 							//$('#parentSuite_'+m).prop("checked", true);
@@ -290,7 +290,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					});
 
 					//check parent checkbox by default if all child checkboxes are checked
-					if ($("#executionDataTable_" + m + " tbody tr").length == $("#executionDataTable_" + m + " tbody tr td.exe-ExecuteStatus input:checked").length) {
+					if ($("#executionDataTable_" + m + " tbody tr").length == $("#executionDataTable_" + m + " tbody tr td.exe-ExecuteStatus input.d-execute:checked").length) {
 						$("#parentExecute").prop("checked", true);
 					} else {
 						$("#parentExecute").prop("checked", false);
@@ -307,7 +307,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 				$('[id^=parentExecute_]').on('click', function (e) {
 					if ($(this).is(":checked") == true) {
-						$(this).parents('table').find('tbody tr input[type=checkbox]').prop('checked', true);
+						$(this).parents('table').find('tbody tr input.d-execute[type=checkbox]').prop('checked', true);
 						$(this).parents('table').parent().prev().children('span').children('input').prop('checked', true);
 					} else {
 						$(this).parents('table').find('tbody tr input[type=checkbox]').prop('checked', false);
@@ -322,7 +322,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					}
 				});
 
-				$('[id^=executionDataTable]').find('tbody tr td input').on('click', function (e) {
+				$('[id^=executionDataTable]').find('tbody tr td input.d-execute').on('click', function (e) {
 					var totalLen = $(this).parent().parent().parent().children().find('input[type=checkbox]').length;
 					var checkedLen = $(this).parent().parent().parent().children().find('input[type=checkbox]:checked').length;
 					if (totalLen == checkedLen) {
