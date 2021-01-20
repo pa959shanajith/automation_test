@@ -2658,8 +2658,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			}
 			// $('#irisimg').append(canvas)
 			$('#iristext').append('<span><b>Object Text : '+obj_text+' </b></span>')
-			$('#irispos').append('<span><b>Object Height :'+obj_height+ ' px, Object Width :'+obj_width+'px</b></span>')
-			$('#iriscoords').append('<span><b>Object Coordinate-X :' + ele[0].attributes['data-left'].value + ', Object Coordinate-Y :'+ele[0].attributes['data-top'].value + ' </b></span>')
+			$('#irispos').append('<span><b>Object Height :'+obj_height+ ' px, Object Width :'+obj_width+' px</b></span>')
+			$('#iriscoords').append('<span><b>Object Coordinate-X :' + ele[0].attributes['data-left'].value + ' px, Object Coordinate-Y :'+ele[0].attributes['data-top'].value + ' px </b></span>')
 		}else{
 			custObjProps=[]
 			custObjProps.push('decrypt')
