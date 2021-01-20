@@ -2650,10 +2650,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><div class="irisimg" id="irisimg" style="float:right;margin-right:40px;width:210px"></div><br><br><div class="iristext" id="iristext"></div><br><div class="irispos" id="irispos"></div><br><div class="iriscoords" id="iriscoords"></div></div>');
+			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><div class="irisimg" id="irisimg" style="float:right;margin-right:40px;width:210px;height:150px"></div><br><br><div class="iristext" id="iristext"></div><br><div class="irispos" id="irispos"></div><br><div class="iriscoords" id="iriscoords"></div></div>');
 			$('#objectType').val(objType.toLowerCase())
 			$('#irisimg').append(image)
-			$('#irisimg').find('img').attr('style',"height: 120px;width: 200px;")
+			if (obj_width > 200 || obj_height >150){ 
+				$('#irisimg').find('img').attr('style',"width: 200px;")
+			}
 			// $('#irisimg').append(canvas)
 			$('#iristext').append('<span><b>Object Text : '+obj_text+' </b></span>')
 			$('#irispos').append('<span><b>Object Height :'+obj_height+ ' px, Object Width :'+obj_width+'px</b></span>')
