@@ -1576,9 +1576,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             v = u.append('li');
             v.append('span').attr('class', 'ct-assignItem fl-left').html('Accessibility');
             v.append('select').attr('id', 'ct-accessibilityTesting').style('width',"64%").style('float',"right");
-            $('#ct-accessibilityTesting').append("<option data-id='acc_enabled' value='Enable'>" + "Enable" + "</option>");
-            $('#ct-accessibilityTesting').append("<option data-id='acc_disabled' value='Disable'>" + "Disabled" + "</option>");
-    
+            if(dNodes[pi] && 'accessibilityTesting' in dNodes[pi] && dNodes[pi]['accessibilityTesting'] == "Enable"){
+                $('#ct-accessibilityTesting').append("<option data-id='acc_enabled' value='Enable' selected>" + "Enabled" + "</option>");
+                $('#ct-accessibilityTesting').append("<option data-id='acc_disabled' value='Disable'>" + "Disabled" + "</option>");
+            }else{
+                $('#ct-accessibilityTesting').append("<option data-id='acc_enabled' value='Enable'>" + "Enabled" + "</option>");
+                $('#ct-accessibilityTesting').append("<option data-id='acc_disabled' value='Disable' selected>" + "Disabled" + "</option>");
+            }
         }
        
 
