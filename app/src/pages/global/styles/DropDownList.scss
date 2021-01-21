@@ -1,0 +1,33 @@
+.form-inp-dropdown{
+    font-size: 14px;
+    box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
+    display: block;
+    max-height: 100px;
+    background: #ffff;
+    margin-top: 2px;
+    z-index: 1;
+    width: 70%;
+    position: absolute;
+    ul{
+        padding-left: 2px;
+        margin: 4px;
+        width: calc(100% - 14px);
+    }
+    ul:hover{
+        background: #633691;
+        border-radius: 3px;
+        color: #fff;
+        cursor: pointer;
+    }
+}
+.dropdown-list-item{
+    font-weight: 500;
+    display: flex;
+    padding: 3px 12px;
+}
+.selectedCheckBox{
+    background: #633691;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+}

@@ -1,14 +1,15 @@
 import React, { useState} from 'react';
 import {ScreenOverlay, PopupMsg, RedirectPage, ModalContainer} from '../../global' 
-import {updateTestSuite_ICE, reviewTask, ExecuteTestSuite_ICE, loginQCServer_ICE, loginQTestServer_ICE} from '../api';
+import {updateTestSuite_ICE, reviewTask, ExecuteTestSuite_ICE, loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE} from '../api';
 import { useHistory } from 'react-router-dom';
 import "../styles/ExecuteContent.scss";
 import ExecuteTable from '../components/ExecuteTable';
+import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 // import socketIOClient from "socket.io-client";
 // const ENDPOINT = "https://"+window.location.hostname+":8443";
 
 
-const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setSyncScenario, setBrowserTypeExe, setExecutionActive, qccredentials, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
+const ExecuteContent = ({execEnv, taskName, status, setQccredentials, readTestSuite, setSyncScenario, setBrowserTypeExe, setExecutionActive, qccredentials, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
 
     // const socket = socketIOClient(ENDPOINT);
     const history = useHistory();
@@ -19,17 +20,20 @@ const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setS
     const [updateAfterSave,setupdateAfterSave] = useState(false)
     const [showDeleteModal,setshowDeleteModal] = useState(false)
     const [showALMModal,setshowALMModal] = useState(false)
+    const [showZephyrModal,setshowZephyrModal] = useState(false)
     const [showqTestModal,setshowqTestModal] = useState(false)
     const [modalDetails,setModalDetails] = useState({title:"",task:""})
     const [moduleInfo,setModuleInfo] = useState([])
     const [qccredentialsModal,setQccredentialsModal] = useState({almURL: "", almUserName: "", almPassword: ""});
     const [qTestModal,setqTestModal] = useState({qTestURL: "", qTestUserName: "", qTestPassword: ""});
+    const [zephyrModal,setZephyrModal] = useState({zephyrtURL: "", zephyrUserName: "", zephyrPassword: ""});
     const [qtestSteps,setqtestSteps] = useState(false)
     const [errorMsg,setErrorMsg] = useState("")
     const [almUrlErrBor,setAlmUrlErrBor] = useState(false)
     const [almUsernameErrBor,setAlmUsername] = useState(false)
     const [almPassErrBor,setAlmPassErrBor] = useState(false)
     const [selectAllBatch,setSelectAllBatch] = useState(0)
+    const [allocateICE,setAllocateICE] = useState(false)
     var batch_name= taskName ==="Batch Execution"?": "+current_task.taskName.slice(13):""
 
     const closePopup = () => {
@@ -184,72 +188,66 @@ const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setS
         //txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
     }
     
-    const ExecuteTestSuite = async () => {
+    const ExecuteTestSuitePopup = () => {
         const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction)
         // if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
-        if(check){
-            const modul_Info = parseLogicExecute(eachData, current_task, appType, projectdata, moduleInfo);
-			setLoading("Execution in progress. Please Wait...");
-			var executionData = {
-				source: "task",
-				exectionMode: execAction,
-				browserType: browserTypeExe,
-				qccredentials: qccredentials,
-				batchInfo: modul_Info
-			};
-			setExecutionActive(true);
-            // $rootScope.resetSession.start();
-            // ResetSession("start");
-			try{
-                setLoading(false);
-                return //remove this after syncing with new changes
-                const data = await ExecuteTestSuite_ICE(executionData);
-                if (data.error){displayError(data.error);return;}
-                if (data == "begin"){
-                    setLoading(false); //remove this when socket connection is done.
-                    return false;
+        if(check) setAllocateICE(true);
+    }    
+
+    const ExecuteTestSuite = async (executionData) => {
+       
+        setAllocateICE(false);
+        const modul_Info = parseLogicExecute(eachData, current_task, appType, projectdata, moduleInfo);
+        setLoading("Sending Execution Request");
+        executionData["source"]="task";
+        executionData["exectionMode"]=execAction;
+        executionData["executionEnv"]=execEnv;
+        executionData["browserType"]=browserTypeExe;
+        executionData["qccredentials"]=qccredentials;
+        executionData["batchInfo"]=modul_Info;
+        setExecutionActive(true);
+        // $rootScope.resetSession.start();
+        // ResetSession("start");
+        try{
+            // setLoading(false);
+            // return //remove this after syncing with new changes
+            const data = await ExecuteTestSuite_ICE(executionData);
+            if (data.errorapi){displayError(data.errorapi);return;}
+            if (data == "begin"){
+                setLoading(false); //remove this when socket connection is done.
+                return false;
+            }
+            setLoading(false);
+            // $rootScope.resetSession.end();
+            setExecutionActive(false);
+            if(data.status) {
+                if(data.status == "fail") {
+                    setPopupState({show:true,title:"Queue Test Suite",content:data["error"]});
+                } else {
+                    setPopupState({show:true,title:"Queue Test Suite",content:data["message"]});
                 }
-				setLoading(false);
-				// $rootScope.resetSession.end();
-				setExecutionActive(false);
-				if (data == "Invalid Session") return RedirectPage(history);
-                else if (data == "unavailableLocalServer")setPopupState({show:true,title:"Execute Test Suite",content:"No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
-                else if (data == "scheduleModeOn") setPopupState({show:true,title:"Execute Test Suite",content:"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."});
-                else if(data == "NotApproved")setPopupState({show:true,title:"Execute Test Suite",content:"All the dependent tasks (design, scrape) needs to be approved before execution"});
-                else if(data == "NoTask") setPopupState({show:true,title:"Execute Test Suite",content:"Task does not exist for child node"});
-                else if(data == "Modified") setPopupState({show:true,title:"Execute Test Suite",content:"Task has been modified, Please approve the task"});
-				else if (data == "unavailableLocalServer") setPopupState({show:true,title:"Execute Test Suite",content:"No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
-				else if (data == "Terminate") {
-					// $('#executionTerminated').modal('show');
-					// $('#executionTerminated').find('.btn-default').focus();
-				} else if (data == "success") {
-					// $('#executionCompleted').modal('show');
-					// setTimeout(function () {
-					// 	$("#executionCompleted").find('.btn-default').focus();
-					// }, 300);
-                } else setPopupState({show:true,title:"Execute Test Suite",content:"Failed to execute."});
-				setBrowserTypeExe([]);
-				setModuleInfo([]);
-				setupdateAfterSave(!updateAfterSave);
-				setSyncScenario(false);
-				//Transaction Activity for ExecuteTestSuite Button Action
-				// var labelArr = [];
-				// var infoArr = [];
-				// infoArr.push({"appType" : appType});
-				// infoArr.push({"status" : data});
-				// labelArr.push(txnHistory.codesDict['ExecuteTestSuite']);
-				// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
-			}catch(error) {
-				setLoading(false);
-				// $rootScope.resetSession.end();
-                setPopupState({show:true,title:"Execute Failed",content:"Failed to execute."});
-                setExecutionActive(false);
-				setBrowserTypeExe([]);
-				setModuleInfo([]);
-				setupdateAfterSave(!updateAfterSave);
-				setSyncScenario(false);
-			}
-		}
+            }
+            setBrowserTypeExe([]);
+            setModuleInfo([]);
+            setupdateAfterSave(!updateAfterSave);
+            setSyncScenario(false);
+            //Transaction Activity for ExecuteTestSuite Button Action
+            // var labelArr = [];
+            // var infoArr = [];
+            // infoArr.push({"appType" : appType});
+            // infoArr.push({"status" : data});
+            // labelArr.push(txnHistory.codesDict['ExecuteTestSuite']);
+            // txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+        }catch(error) {
+            setLoading(false);
+            // $rootScope.resetSession.end();
+            setPopupState({show:true,title:"Execute Failed",content:"Failed to execute."});
+            setExecutionActive(false);
+            setBrowserTypeExe([]);
+            setModuleInfo([]);
+            setupdateAfterSave(!updateAfterSave);
+            setSyncScenario(false);
+        }
     }
 
     const saveQTestCredentials = async () => {
@@ -285,6 +283,39 @@ const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setS
 		}
     }
 
+    const saveZephyrCredentials = async () => {
+        setAlmPassErrBor(false);setAlmUrlErrBor(false);setAlmUsername(false);
+		if (!zephyrModal.zephyrURL) {
+            setAlmUrlErrBor(true);
+            setErrorMsg("Please Enter URL.");
+		} else if (!zephyrModal.zephyrUserName) {
+            setAlmUsername(true);
+            setErrorMsg("Please Enter User Name.");
+		} else if (!zephyrModal.zephyrPassword) {
+            setAlmPassErrBor(true);
+            setErrorMsg("Please Enter Password.");
+		} else if (appType != "SAP" && browserTypeExe.length === 0) {
+            setshowZephyrModal(false);
+            setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
+        } 
+        // else if ($(".exe-ExecuteStatus input:checked").length === 0) {
+        //     setshowALMModal(false);
+        //     setPopupState({show:true,title:"Execute Test Suite",content:"Please select atleast one scenario(s) to execute"});
+        // } 
+        else {
+			setErrorMsg("");
+			const data = await loginZephyrServer_ICE(zephyrModal.zephyrURL, zephyrModal.zephyrUserName, zephyrModal.zephyrPassword,"Zephyr");
+            if(data.error){displayError(data.error);return;}
+            else if (data == "unavailableLocalServer") setErrorMsg("Unavailable LocalServer");
+            else if (data == "invalidcredentials") setErrorMsg("Invalid Credentials");
+            else if (data == "invalidurl") setErrorMsg("Invalid URL");
+            else {
+                setZephyrModal({qcurl: zephyrModal.zephyrURL, qcusername: zephyrModal.zephyrUserName, qcpassword: zephyrModal.zephyrPassword,  qctype: "Zephyr"})
+                setshowqTestModal(false);
+            }
+		}
+    }
+
     const syncScenarioChange = (value) => {
         setAlmPassErrBor(false);setAlmUrlErrBor(false);setAlmUsername(false);
         if (value == "1") {
@@ -296,6 +327,11 @@ const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setS
 		else if (value == "0") {
 			setqTestModal({qTestURL: "", qTestUserName: "", qTestPassword: ""});
 			setshowqTestModal(true);
+			setErrorMsg("");
+        }
+        else if (value == "2") {
+			setZephyrModal({zephyrURL: "", zephyrUserName: "", zephyrPassword: ""});
+			setshowZephyrModal(true);
 			setErrorMsg("");
 		}
     }
@@ -310,6 +346,17 @@ const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setS
         <>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
+            {allocateICE?
+            <AllocateICEPopup 
+                SubmitButton={ExecuteTestSuite} 
+                setAllocateICE={setAllocateICE}
+                modalButton={"Execute"} 
+                allocateICE={allocateICE} 
+                modalTitle={"Select ICE to Execute"} 
+                icePlaceholder={'Search ICE to execute'}
+                exeTypeLabel={"Select Execution type"}
+                exeIceLabel={"Execute on ICE"}
+            />:null}
             
             <div className="e__content">
                 <div className="e__task_title"> <div className="e__task_name">{taskName || "Execute"}{batch_name}</div></div>
@@ -321,10 +368,11 @@ const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setS
                         <option value="" selected disabled>Select Integration</option>
                         <option value="1">ALM</option>
                         <option value="0">qTest</option>
+                        <option value="2">Zephyr</option>
                     </select>
                     <button className="e__btn-md submitTaskBtn" onClick={()=>{setModalDetails({title:(status!=='underReview'?'Submit Task':'Approve Task'),task:(status!=='underReview'?"submit":"approve")});setshowDeleteModal(true)}} title="Submit Task">{status!=='underReview'?"Submit":"Approve"}</button>
                     <button className={"e__btn-md reassignTaskBtn"+ ((status==='underReview') ? "" : " e__btn_display-hide")} onClick={()=>{setModalDetails({title:'Reassign Task',task:"reassign"});setshowDeleteModal(true)}} title="Reassign Task">Reassign</button>
-                    <button className="e__btn-md executeBtn" onClick={()=>{ExecuteTestSuite()}} title="Execute">Execute</button>
+                    <button className="e__btn-md executeBtn" onClick={()=>{ExecuteTestSuitePopup()}} title="Execute">Execute</button>
                 </div>
 
                 <ExecuteTable current_task={current_task} selectAllBatch={selectAllBatch} setLoading={setLoading} setPopupState={setPopupState} selectAllBatch={selectAllBatch} filter_data={projectdata} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} eachDataFirst={eachDataFirst} setEachDataFirst={setEachDataFirst} />
@@ -332,6 +380,7 @@ const ExecuteContent = ({taskName, status, setQccredentials, readTestSuite, setS
                         
             {showDeleteModal?<ModalContainer title={modalDetails.title} footer={submitModalButtons(setshowDeleteModal, submit_task)} close={closeModal} content={"Are you sure you want to "+ modalDetails.task+" the task ?"} modalClass=" modal-sm" />:null} 
             {showALMModal?<ModalContainer title="ALM" footer={submitQModalButtons(errorMsg, saveQcCredentials)} close={closeALMModal} content={AlmMiddleContent(qccredentialsModal, setQccredentialsModal, almUrlErrBor, almUsernameErrBor, almPassErrBor)} modalClass=" e__alm-modal"/>:null}
+            {showZephyrModal?<ModalContainer title="Zephyr" footer={submitQModalButtons(errorMsg, saveZephyrCredentials)} close={()=>{setshowZephyrModal(false)}} content={ZephyrMiddleContent(zephyrModal, setZephyrModal, almUrlErrBor, almUsernameErrBor, almPassErrBor)} modalClass=" e__alm-modal"/>:null}
             {showqTestModal?<ModalContainer title="qTest" footer={submitQModalButtons(errorMsg, saveQTestCredentials)} close={closeqTestModal} content={qTestMiddleContent(qTestModal, setqTestModal, setqtestSteps, almPassErrBor, almUrlErrBor, almUsernameErrBor, qtestSteps)} modalClass=" e__alm-modal"/>:null} 
         </>
     );
@@ -369,6 +418,18 @@ const AlmMiddleContent = (qccredentialsModal, setQccredentialsModal, almUrlErrBo
                 <p><input value={qccredentialsModal.almURL} onChange={(event)=>{setQccredentialsModal({almURL: event.target.value, almUserName: qccredentialsModal.almUserName, almPassword: qccredentialsModal.almPassword})}} type="text" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input "+ (almUrlErrBor ? " inputErrBor" : "")} placeholder="Enter ALM Url"  id="almURL" /></p>
                 <p className="halfWrap halfWrap-margin" ><input value={qccredentialsModal.almUserName} onChange={(event)=>{setQccredentialsModal({almURL: qccredentialsModal.almURL, almUserName: event.target.value, almPassword: qccredentialsModal.almPassword})}} type="text" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input"+ (almUsernameErrBor ? " inputErrBor" : "")} placeholder="Enter User Name" id="almUserName" /></p>
                 <p className="halfWrap"><input value={qccredentialsModal.almPassword} onChange={(event)=>{setQccredentialsModal({almURL: qccredentialsModal.almURL, almUserName: qccredentialsModal.almUserName, almPassword: event.target.value})}} type="password" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input"+ (almPassErrBor ? " inputErrBor" : "")} placeholder="Enter Password" id="almPassword" /></p>
+            </div>
+        </div>
+    )
+}
+
+const ZephyrMiddleContent = (qccredentialsModal, setQccredentialsModal, almUrlErrBor, almUsernameErrBor, almPassErrBor) => {
+    return(
+        <div className="popupWrapRow">
+            <div className="textFieldsContainer">
+                <p><input value={qccredentialsModal.zephyrURL} onChange={(event)=>{setQccredentialsModal({zephyrURL: event.target.value, zephyrUserName: qccredentialsModal.zephyrUserName, zephyrPassword: qccredentialsModal.zephyrPassword})}} type="text" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input "+ (almUrlErrBor ? " inputErrBor" : "")} placeholder="Enter Zephyr Account ID"  id="almURL" /></p>
+                <p className="halfWrap halfWrap-margin" ><input value={qccredentialsModal.almUserName} onChange={(event)=>{setQccredentialsModal({zephyrURL: qccredentialsModal.zephyrURL, zephyrUserName: event.target.value, zephyrPassword: qccredentialsModal.azephyrPassword})}} type="text" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input"+ (almUsernameErrBor ? " inputErrBor" : "")} placeholder="Enter Access Key" id="almUserName" /></p>
+                <p className="halfWrap"><input value={qccredentialsModal.almPassword} onChange={(event)=>{setQccredentialsModal({zephyrURL: qccredentialsModal.zephyrURL, zephyrUserName: qccredentialsModal.zephyrUserName, zephyrPassword: event.target.value})}} type="password" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input"+ (almPassErrBor ? " inputErrBor" : "")} placeholder="Enter Secret Key" id="almPassword" /></p>
             </div>
         </div>
     )

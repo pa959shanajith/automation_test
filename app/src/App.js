@@ -7,6 +7,7 @@ import Login, {Base} from './pages/login';
 import Admin from './pages/admin';
 import Plugin from './pages/plugin';
 import Execute from './pages/execute';
+import Schedule from './pages/schedule';
 import Mindmap from './pages/mindmap';
 import Scrape from './pages/scrape';
 import Design from './pages/design';
@@ -45,6 +46,7 @@ const App = () => {
           <Route path ="/utility" component={Utility}/>
           <Route path = "/integration" component={Integration}/>
           <Route path ="/execute" component={Execute}/>
+          <Route path ="/scheduling" component={Schedule}/>
           <Route component={Base} />
         </Switch>
       </Router>

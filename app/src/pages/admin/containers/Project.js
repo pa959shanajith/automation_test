@@ -145,7 +145,7 @@ const ProjectNew = (props) => {
         setReleaseList([]);
         setCycleList([]);
         toggleCycleClick();
-        setSelDomain("");
+        if (taskName==="Update Project") setSelDomain("");
         if(document.getElementById("selProjectOption") !== null)
             document.getElementById("selProjectOption").value="";
 	}
@@ -788,7 +788,7 @@ const ProjectNew = (props) => {
                 <div className='domainTxt'>Domain</div>
                 <select value={selDomain} onChange={(event)=>{fetchProjectList(event.target.value);setSelDomain(event.target.value);}} className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project domain-custom':"adminSelect-project form-control__conv-project domain-custom"} id="selDomain" >
                     {(taskName==="Update Project")?
-                        <option value="" selected>Please Select Your Domain</option>
+                        <option disabled={true} value="" selected>Please Select Your Domain</option>
                     :null}
                     {selDomainOptions.map((e,i)=>(
                         <option key={i}  value={selDomainOptions[i]} onClick={()=>{fetchProjectList();setSelDomain(selDomainOptions[i]);}}>{selDomainOptions[i]}</option>
@@ -799,12 +799,12 @@ const ProjectNew = (props) => {
             <div className='userForm-project projectForm-project display-project'  >
                 <div className='domainTxt'>Project</div>
                 <select onChange={(event)=>{selectProject(event.target.value);}}  className={projectSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project sel-domain-wid':"adminSelect-project form-control__conv-project sel-domain-wid"} id="selProjectOption" >
-                        <option value="" selected>Please Select Your Project</option>
+                        <option disabled={true} value="" selected>Please Select Your Project</option>
                         {selProjectOptions.map((optionProject)=>(
                             <option key={optionProject.id} name={optionProject.name} value={optionProject.id}>{optionProject.name}</option>
                         ))}
                 </select>
-                <span  className="edit-project" >
+                <span  className={"edit-project "+(selProject===""?" disableEditProject-span":"")} >
                     <img onClick={()=>{setShowProjectEditModal(true)}} title='Edit Project Name' src={"static/imgs/ic-edit-sm.png"} alt="Edit Project Name" className={'editProjectName'+(selProject===""?" disableEditProject":"")}/>
                 </span>
             </div>
@@ -831,7 +831,7 @@ const ProjectNew = (props) => {
         <ReleaseCycle clickAddRelease={clickAddRelease} releaseList={releaseList} clickReleaseListName={clickReleaseListName} setActiveRelease={setActiveRelease} clickEditRelease={clickEditRelease} activeRelease={activeRelease} count={count} clickAddCycle={clickAddCycle} cycleList={cycleList} clickEditCycle={clickEditCycle} delCount={delCount} disableAddRelease={disableAddRelease} taskName={taskName} disableAddCycle={disableAddCycle} />
        
         {(showEditModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddReleaseName)} close={()=>{setShowEditModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder )} modalClass=" modal-sm" />:null}   
-        {(showEditModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddCycleName)} close={()=>{setShowEditModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder )} modalClass=" modal-sm" /> :null} 
+        {(showEditModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddCycleName)} close={()=>{setShowEditModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder )} modalClass=" modal-sm" /> :null} 
         {(showEditNameModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(updateReleaseName)} close={()=>{setShowEditNameModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder )} modalClass=" modal-sm" />:null} 
         {(showEditNameModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(updateCycleName)} close={()=>{setShowEditNameModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder )} modalClass=" modal-sm" /> :null}
         {showProjectEditModal? <ModalContainer title="Edit Project Name" footer={editModalButtons()} close={closeModal} content={editModalcontent(editProjectName, projectEditFunction, modalInputErrorBorder, projectNameErrorBorder)} modalClass=" modal-sm" /> :null}  

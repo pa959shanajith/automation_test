@@ -11,7 +11,8 @@ const ExecuteHome = () => {
     const filter_data = useSelector(state=>state.plugin.FD)
 	const [browserTypeExe,setBrowserTypeExe] = useState([]); // Contains selected browser id for execution
 	const [executionActive,setExecutionActive] = useState(false); 
-	const [execAction,setExecAction] = useState("serial");
+	const [execAction,setExecAction] = useState("serial"); 
+	const [execEnv,setExecEnv] = useState("default");
     const [qccredentials,setQccredentials] = useState({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
     const [taskName, setTaskName] = useState(null);
     const [status, setStatus] = useState(null);
@@ -53,12 +54,19 @@ const ExecuteHome = () => {
 		else setExecAction("serial");
     }
 
+    const updateExecEnv = () => {
+        if (execEnv ==="default") setExecEnv("Saucelabs");
+		else setExecEnv("default");
+    }
+
     return (
         <div className="e__body">
             <Header />
                 <div className="e__mid_section">
-                    <ActionBar upperContent={<UpperContent appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />} bottomContent={<BottomContent appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
-                    <ExecuteContent setQccredentials={setQccredentials} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} setSyncScenario={setSyncScenario} setExecutionActive={setExecutionActive} qccredentials={qccredentials} projectdata={filter_data} execAction={execAction} appType={appType} browserTypeExe={browserTypeExe} syncScenario={syncScenario} taskName={taskName} status={status} readTestSuite={readTestSuite} current_task={current_task} />
+                    <ActionBar 
+                        upperContent={<UpperContent appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />}
+                        bottomContent={<BottomContent execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
+                    <ExecuteContent execEnv={execEnv} setQccredentials={setQccredentials} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} setSyncScenario={setSyncScenario} setExecutionActive={setExecutionActive} qccredentials={qccredentials} projectdata={filter_data} execAction={execAction} appType={appType} browserTypeExe={browserTypeExe} syncScenario={syncScenario} taskName={taskName} status={status} readTestSuite={readTestSuite} current_task={current_task} />
                     <ReferenceBar /> 
                 </div>
             <div className='e__footer'><Footer/></div>
