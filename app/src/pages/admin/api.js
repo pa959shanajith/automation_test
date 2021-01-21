@@ -733,4 +733,267 @@ export const manageLDAPConfig = async(action, confObj) => {
         console.error(err)
         return {error:"Test Connection Failed!"}
     }
+}
+
+export const updatePool = async(data) => { 
+    try{
+        const res = await axios(url+'/updatePool', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){ 
+            if(res.data === 'success')return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to Update ICE pool!"}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to Update ICE pool!"}
+    }
 } 
+
+export const deleteICE_pools = async(data) => { 
+    try{
+        const res = await axios(url+'/deleteICE_pools', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){ 
+            if(res.data === 'success')return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to Delete ICE pool!"}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to Delete ICE pool!"}
+    }
+}
+
+export const createPool_ICE = async(data) => { 
+    try{
+        const res = await axios(url+'/createPool_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){ 
+            if(res.data === 'Pool exists') return {error:"Pool name already exist!"};
+            if(res.data === 'success')return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to create ICE pool!"}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to create ICE pool!"}
+    }
+}
+
+
+export const getICEinPools = async(data) => { 
+    try{
+        const res = await axios(url+'/getICEinPools', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){ 
+            if(res.data === "empty") return{error:"No ICE available!"}
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch ICE!"}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to fetch ICE!"}
+    }
+}
+
+export const getAvailable_ICE = async(data) => { 
+    try{
+        const res = await axios(url+'/getAvailable_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){ 
+            if(res.data.length<1) return{error:"No active ICE available!"}
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch available ICE!"}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to fetch available ICE!"}
+    }
+}
+
+export const clearQueue = async(data) => { 
+    try{
+        const res = await axios(url+'/clearQueue', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){ 
+            if(res.data === 'empty') return {error:"Queue is already empty."} 
+            if(res.data === 'success') return res.data
+        }
+        console.error(res.data)
+        return {error:"Failed Clear Queue!"}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed Clear Queue!"}
+    }
+} 
+
+export const getPools = async(data) => { 
+    try{
+        const res = await axios(url+'/getPools', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){ 
+            if(res.data === 'empty' || Object.keys(res.data).length<1) return {error:"There are no users created yet."}           
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch pools!"}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to fetch pools!"}
+    }
+} 
+
+//{"action":"provider","channel":"email","args":"smtp"}
+export const getNotificationChannels = async(data) => { 
+    try{
+        const res = await axios(url+'/getNotificationChannels', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){  
+            // if(res.data === 'empty')return {error : "Fail to fetch configured details for selected provider."}          
+            // return {"_id":"5fab88ae911ebf83599cc1bc","active":true,"appurl":"https://srv01nineteen68","auth":false,"channel":"email","host":"10.41.31.131","name":"smtpconf","pool":{"enable":true,"maxconnections":10,"maxmessages":120},"port":587,"provider":"smtp","proxy":{"auth":false,"enable":false,"pass":"","url":"","user":""},"sender":{"email":"avoassure-alerts@avoautomation.com","name":"Avo Assure Alerts"},"timeouts":{"connection":240000,"greeting":60000,"socket":1200000},"tls":{"insecure":"true","security":"auto"}}
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Fail to fetch configured details for selected provider."}
+    }catch(err){
+        console.error(err)
+        return {error:"Fail to fetch configured details for selected provider."}
+    }
+}
+
+export const manageNotificationChannels = async(data) => { 
+    try{
+        const res = await axios(url+'/manageNotificationChannels', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){  
+            if(res.data === 'empty')return {error : "Fail to update configuration for selected provider."}          
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Fail to update configuration for selected provider."}
+    }catch(err){
+        console.error(err)
+        return {error:"Fail to update configuration for selected provider."}
+    }
+}
+
+export const testNotificationChannels = async(data) => { 
+    try{
+        const res = await axios(url+'/testNotificationChannels', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){  
+            if(res.data === 'empty') return "Fail to fetch configured details for selected provider.";
+            else if (res.data === "invalidprovider")  return "Selected Provider is not supported yet!";
+            else if (res.data === "invalidrecipient") return "Recipient address is invalid!";
+            else if (res.data === "success") return "Test Email Sent!";
+        }
+        console.error(res.data)
+        return {error:"Failed! Re-check the configuration."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed! Re-check the configuration."}
+    }
+}

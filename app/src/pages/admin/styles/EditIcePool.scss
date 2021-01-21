@@ -1,0 +1,33 @@
+.edit_ice-pool{
+    input:focus{
+        outline: none;
+    }
+    .assignBox-container{
+        width: 100%;
+    }
+    .right-box{
+        position: relative;
+    }
+    .label-select{
+        position: absolute;
+        top: -15px;
+        width: 60%;
+        right: 0;
+        input{
+            width: 100%;
+        }
+        div{
+            width: 100%;  
+        }
+    }
+    @media screen and (max-width:1225px){
+        .right-title{
+            display: inline-block;
+            padding-top: 20px;
+        }
+        .left-title{
+            padding-top: 20px;
+        }
+    }
+}
+

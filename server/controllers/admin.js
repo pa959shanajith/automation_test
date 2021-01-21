@@ -1752,7 +1752,7 @@ exports.createPool_ICE = async(req,res) => {
 	const fnName = "createPools_ICE";
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.data;
+		const poolinfo = req.body;
 		const inputs = {
 			poolname: poolinfo.poolname,
 			createdby: req.session.userid,
@@ -1773,7 +1773,7 @@ exports.updatePool = async(req,res) => {
 	const fnName = "updatePool"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.data;
+		const poolinfo = req.body;
 		const inputs = {
 			poolname: poolinfo.poolname,
 			poolid: poolinfo._id,
@@ -1797,10 +1797,9 @@ exports.getPools = async(req,res) => {
 	logger.info("Inside UI service: " + fnName)
 	var inputCheck = false;
 	try{
-		const poolinfo = req.body.data;
 		const inputs = {
-			poolid: poolinfo.poolid,
-			projectids: poolinfo.projectids,
+			poolid: req.body.poolid,
+			projectids: req.body.projectids,
 		};
 		inputCheck = true;
 		const result = await utils.fetchData(inputs, "admin/getPools", fnName);
@@ -1816,7 +1815,7 @@ exports.getICEinPools = async(req,res) => {
 	const fnName = "getICEinPools"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.data;
+		const poolinfo = req.body;
 		const inputs = {
 			poolids: poolinfo.poolid,
 		};
@@ -1832,7 +1831,7 @@ exports.deletePools = async(req,res) => {
 	const fnName = "deletePools"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.data;
+		const poolinfo = req.body;
 		const inputs = {
 			poolids: poolinfo.poolid,
 		};
@@ -1861,7 +1860,7 @@ exports.getAvailable_ICE = async(req,res) => {
 
 exports.clearQueue = async(req,res) => {
 	try{
-		const poolinfo = req.body.data;
+		const poolinfo = req.body;
 		const result = await queue.Execution_Queue.updatePools("clear_queue",poolinfo);
 		res.send(result)
 	}catch(e){
