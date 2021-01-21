@@ -29,5 +29,12 @@
     padding: 20px;
     margin: 0 5px;
     background-color: #fff;
+    .modal-content{
+        width: 600px
+    }
+    .modal-body{
+        height: 250px;
+        padding: 40px 15px;
+    }
 }
 

@@ -1,12 +1,13 @@
-.form-inp-dropdown{
+.form-inp-dropdown-popup{
     font-size: 14px;
+    width: 335px;
+    left: 171px;
+    max-height: 123px;
     box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
     display: block;
-    max-height: 100px;
     background: #ffff;
     margin-top: 2px;
     z-index: 1;
-    width: 70%;
     position: absolute;
     ul{
         padding-left: 2px;
