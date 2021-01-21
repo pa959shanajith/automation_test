@@ -10,11 +10,12 @@ import '../styles/ChangeDefaultIce.scss';
 
 */
 
-const ChangeDefaultIce = ({setShowModal}) => {
+const ChangeDefaultIce = ({}) => {
 
     const [chooseDefICE, setChooseDefICE] = useState([])
     const [defICE, setDefICE] = useState("")
     const [loading,setLoading] = useState(false)
+    const [showPopup,setShowPopup] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
 
     useEffect( async ()=>{
@@ -32,6 +33,7 @@ const ChangeDefaultIce = ({setShowModal}) => {
                     } else {
                         setChooseDefICE(data.ice_list);
                         setDefICE(data.ice_list[0]);
+                        setShowPopup(true);
                     }
                 }
             }catch(error){
@@ -40,8 +42,6 @@ const ChangeDefaultIce = ({setShowModal}) => {
                 setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
             }
     }, []);
-
-    const handleClose = () => setShowModal();
    
     const Content = () => (
         <div className="defIce_inputs_container">
@@ -62,8 +62,7 @@ const ChangeDefaultIce = ({setShowModal}) => {
 
     const changeDefICEClick = async () =>{
 		setLoading("Setting Default ICE ...")
-        // $("#selectDefIce").modal("hide")
-        // setShowModal();
+        setShowPopup(false);
 		var ice = defICE;
 		try{
             const data = await setDefaultUserICE(ice);
@@ -72,9 +71,9 @@ const ChangeDefaultIce = ({setShowModal}) => {
                 setPopupState({show:true,title:"Change Default ICE",content:"Changed default ICE successfully"});
 			}else{
                 setPopupState({show:true,title:"Change Default ICE",content:"Failed to change default ICE"});
-			}
+            }
 		}catch(error){
-			setLoading(false)
+            setLoading(false)
 			console.error(error)
 			setPopupState({show:true,title:"Change Default ICE",content:"Failed to change default ICE"});
 		}
@@ -82,13 +81,15 @@ const ChangeDefaultIce = ({setShowModal}) => {
 
     return (
         <>
-            <ModalContainer
-                close={handleClose}
-                title={"Change Default ICE"}
-                content={Content()}
-                footer={Footer()}
-                modalClass={" modal-md"}
-            />
+            {showPopup?
+                <ModalContainer
+                    close={()=>{setShowPopup(false);}}
+                    title={"Change Default ICE"}
+                    content={Content()}
+                    footer={Footer()}
+                    modalClass={" modal-md"}
+                />
+            :null}
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>{setPopupState({show:false})}} close={()=>{setPopupState({show:false})}} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
         </>   

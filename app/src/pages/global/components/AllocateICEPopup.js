@@ -122,13 +122,15 @@ const AllocateICEPopup = ( {exeTypeLabel, exeIceLabel, SubmitButton, setAllocate
             {(popupState.show)?<PopupMsg submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} title={popupState.title} content={popupState.content} submitText={popupState.submitText}/>:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             {allocateICE?
-                <ModalContainer 
-                    title={modalTitle} 
-                    footer={submitModalButton(SubmitButton, selectedPool, smartMode, selectedICE, modalButton)} 
-                    close={()=>{setAllocateICE(false)}}
-                    content={MiddleContent(exeTypeLabel, exeIceLabel, icePlaceholder, chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode,selectedICE, setSelectedICE)}
-                    // modalClass=" modal-md"
-                />
+                <div className="allocate-ice-Modal">
+                    <ModalContainer 
+                        title={modalTitle} 
+                        footer={submitModalButton(SubmitButton, selectedPool, smartMode, selectedICE, modalButton)} 
+                        close={()=>{setAllocateICE(false)}}
+                        content={MiddleContent(exeTypeLabel, exeIceLabel, icePlaceholder, chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode,selectedICE, setSelectedICE)}
+                        // modalClass=" modal-md"
+                    />
+                </div>
             :null} 
             
         </>
