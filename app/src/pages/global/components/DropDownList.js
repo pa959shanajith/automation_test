@@ -50,7 +50,7 @@ const DropDownList = ({data,smartMode,selectedICE, setSelectedICE, placeholder})
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
             <div>
                 <input type={'hidden'} autoComplete={"off"} ref={inputRef} className="btn-users dropdown-toggle-edit edit-user-dropdown-edit" onChange={inputFilter} onClick = {resetField} type="text"  id="userIdName" placeholder={placeholder}/>
-                <div className="form-inp-dropdown" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
+                <div className="form-inp-dropdown-popup" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list.map((ice,index) => (  
                         <ul key={index} role="presentation" style={{ display: (!(smartMode==='normal') && JSON.parse(ice.statusCode !== "Online") ) ? 'none' : 'block' }} className="dropdown-ul" >
