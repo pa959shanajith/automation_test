@@ -767,7 +767,7 @@ const DesignContent = (props) => {
 
                 <div className="d__taskBtns">
                     <button className="d__taskBtn d__btn" onClick={saveTestCases} disabled={!changed}>Save</button>
-                    <button className="d__taskBtn d__btn" onClick={deleteTestcase}>Delete</button>
+                    <button className="d__taskBtn d__btn" onClick={deleteTestcase} disabled={!checkedRows.length}>Delete</button>
                 </div>
 
                 <div className="d__submit">
