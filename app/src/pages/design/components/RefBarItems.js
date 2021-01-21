@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
 import { ReferenceBar } from '../../global';
-import "../styles/RefBarItems.scss";
 
 /*
     Component: ReferenceBar Content

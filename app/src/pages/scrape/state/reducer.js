@@ -4,6 +4,9 @@ const initialState = {
     ScrapeData : [],
     disableAction: false,
     disableAppend: false,
+    compareFlag: false,
+    compareData: {},
+    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []}
 }
 
 const reducer = (state=initialState, action) => {
@@ -19,6 +22,18 @@ const reducer = (state=initialState, action) => {
         case actionTypes.SET_DISABLEAPPEND:
                 return {
                     ...state, disableAppend: action.payload
+                }
+        case actionTypes.SET_COMPAREFLAG:
+                return {
+                    ...state, compareFlag: action.payload
+                }
+        case actionTypes.SET_COMPAREDATA:
+                return {
+                    ...state, compareData: action.payload
+                }
+        case actionTypes.SET_COMPAREOBJ:
+                return {
+                    ...state, compareObj: action.payload
                 }
         default:
             return state

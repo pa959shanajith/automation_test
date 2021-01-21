@@ -80,3 +80,14 @@
         width: .2vw;
     }
 }
+
+@media screen and (max-height: 650px){
+    .plugin-bg-img{
+        width: 30%;
+    }
+
+    .greeting-text{
+        font-size: 35px;
+        margin-bottom: 30px; 
+    }
+}

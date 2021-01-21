@@ -1,16 +1,22 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import ScrapeObject from '../components/ScrapeObject';
-import { ScrollBar } from "../../global"
+import { ScrollBar, RedirectPage } from "../../global"
 import { ScrapeContext } from '../components/ScrapeContext';
 import * as actionTypes from '../state/action';
 import * as scrapeApi from '../api';
+import { reviewTask } from '../../global/api';
 import "../styles/ScrapeContent.scss"
+import CompareObjects from './CompareObjects';
 
 const ScrapeContent = props => {
 
     const dispatch = useDispatch();
     const current_task = useSelector(state=>state.plugin.CT);
+    const { user_id, role } = useSelector(state=>state.login.userinfo);
+    const compareFlag = useSelector(state=>state.scrape.compareFlag);
+    const history = useHistory();
 
     const [activeEye, setActiveEye] = useState(null);
     const [disableBtns, setDisableBtns] = useState({save: true, delete: true, edit: true, search: false, selAll: false});
@@ -19,7 +25,8 @@ const ScrapeContent = props => {
     const [selAllCheck, setSelAllCheck] = useState(false);
     const [deleted, setDeleted] = useState([]);
     const [modified, setModified] = useState({});
-    const { saved, setSaved, newScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, hideSubmit, setScrapeItems } = useContext(ScrapeContext);
+    const [editableObj, setEditableObj] = useState({});
+    const { setShowObjModal, isUnderReview, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, hideSubmit, setScrapeItems } = useContext(ScrapeContext);
 
     useEffect(()=>{
         let disable = {};
@@ -30,10 +37,14 @@ const ScrapeContent = props => {
         let selected = 0;
         let total = 0;
         let visible = 0;
+        let selectedObj = null;
         scrapeItems.forEach(item=>{
             if (item.hide) hidden++;
             else visible++;
-            if (!item.hide && item.checked) selected++;
+            if (!item.hide && item.checked) {
+                selected++;
+                selectedObj = item;
+            }
             total++;
         })
 
@@ -48,13 +59,35 @@ const ScrapeContent = props => {
         if (!disableDelete) disable = {...disable, delete: false};
         else disable = {...disable, delete: true};
 
+        if (selected === 1 && selectedObj.editable) {
+            disable = { ...disable, edit: false};
+            setEditableObj(selectedObj);
+        } else {
+            disable = { ...disable, edit: true};
+            setEditableObj({});
+        }
+
         setDisableBtns({...disableBtns, ...disable})
         setSelAllCheck(checkAll);
     }, [scrapeItems])
 
     useEffect(()=>{
         if (!saved) setDisableBtns({...disableBtns, save: false});
+        else {
+            setDeleted([]);
+            setModified({});
+            setActiveEye(null);
+            setShowSearch(false);
+            setSearchVal("");
+            setSelAllCheck(false);
+            setEditableObj({});
+        }
     }, [saved])
+
+    const redirectToPlugin = () => {
+        window.localStorage['navigateScreen'] = "plugin";
+        history.replace('/plugin');
+    }
 
     const updateChecklist = (value, event) => {
 
@@ -76,48 +109,39 @@ const ScrapeContent = props => {
             })
         }
 
-        // let selectedCounts = 0;
-        // let totalVisible = 0;
-
-        // localItems.map(object => {
-        //     if (!object.hide) {
-        //         if (object.checked) selectedCounts++;
-        //         totalVisible++;
-        //     }
-        // })
-
-        // let disables = {}
-        // if (totalVisible === selectedCounts && totalVisible > 0) selAll = true;
-        // if (totalVisible === 0) disables = {...disables, selAll: true}
-        // if (selectedCounts > 0) disables = {...disables, delete: false}
-        // else disables = {...disables, delete: true}
-
-        // setDisableBtns({...disableBtns, ...disables})
-        // setSelAllCheck(selAll);
         setScrapeItems(localItems)
     }
     
-    const renameScrapeItem = (value, newTitle) => {
-        let localScrapeItems = [...scrapeItems]
+    const modifyScrapeItem = (value, newProperties, customFlag) => {
+        let localScrapeItems = [...scrapeItems];
+        let updNewScrapedData = [...newScrapedData];
         let objId = "";
         let obj = null;
         for (let scrapeItem of localScrapeItems){
             if (scrapeItem.val === value) {
-                scrapeItem.title = newTitle;
+                scrapeItem.title = newProperties.custname;
+                if (customFlag) {
+                    scrapeItem.tag = newProperties.tag;
+                    scrapeItem.url = newProperties.url;
+                    scrapeItem.xpath = newProperties.xpath;
+                    scrapeItem.editable = true;
+                }
                 objId = scrapeItem.objId;
-                if (objId) obj = {...mainScrapedData.view[scrapeItem.objIdx], custname: newTitle};
+                if (objId) obj = {...mainScrapedData.view[scrapeItem.objIdx], ...newProperties};
+                else updNewScrapedData.view[scrapeItem.objIdx] = {...newScrapedData.view[scrapeItem.objIdx], ...newProperties}
+                // else only if customFlag is true
             };
         }
         
-        if (obj && objId) {
+        if (objId) {
             let modifiedDict = {...modified}
-            // modifiedArr.push(obj);
             modifiedDict[objId] = obj;
             setModified(modifiedDict);
         }
+        else setNewScrapedData(updNewScrapedData);
         setSaved(false);
         setScrapeItems(localScrapeItems);
-        setDisableBtns({...disableBtns, save: false})
+        // setDisableBtns({...disableBtns, save: false})
     }
 
     const toggleSearch = () => {
@@ -128,6 +152,14 @@ const ScrapeContent = props => {
             setScrapeItems(scrapeItemsL)
         }
         setSearchVal("");
+    }
+
+    const onEdit = () => {
+        setShowObjModal({
+            operation: "editObject",
+            modifyScrapeItem: (value, newProperties, customFlag) => modifyScrapeItem(value, newProperties, customFlag),
+            object: editableObj
+        })
     }
 
     const onSearch = event => {
@@ -247,93 +279,149 @@ const ScrapeContent = props => {
 
         if (continueSave) {
             let scrapeItemsL = [...scrapeItems]
-            let added = []
-            let scrapeData = {}
+            let added = Object.keys(newScrapedData).length ? { ...newScrapedData } : { ...mainScrapedData };
+            let views = []
             for (let scrapeItem of scrapeItemsL) {
                 if (!scrapeItem.objId) {
-                    // delete some properties then push
-                    if (scrapeItem.isCustom) added.push({custname: scrapeItem.title, xpath: scrapeItem.xpath, tag: scrapeItem.tag});
-                    else added.push({...newScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title});
-                } else {
-                    scrapeData[scrapeItem.objId] = {...mainScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title}
+                    if (scrapeItem.isCustom) views.push({custname: scrapeItem.title, xpath: scrapeItem.xpath, tag: scrapeItem.tag});
+                    else views.push({...newScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title});
                 }
             }
+            
+            let arg = {
+                'deletedObj': deleted,
+                'modifiedObj': Object.values(modified),
+                'addedObj': {...added, view: views},
+                'screenId': current_task.screenId,
+                'userId': user_id,
+                'roleId': role,
+                'param': 'saveScrapeData'
+            }
 
-            setDisableBtns({...disableBtns, save: true});
-            dispatch({type: actionTypes.SET_DISABLEACTION, payload: scrapeItemsL.length !== 0});
-            dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: scrapeItemsL.length === 0});
-            setSaved(true);
-            console.log("Added:", added);
-            console.log("Old:", scrapeData);
-            console.log("Modified: ", modified);
-            console.log("Deleted:", deleted);
-            scrapeApi.updateScreen_ICE(deleted, modified, added, scrapeData, current_task.screenId)
-            .then(response => console.log(response))
+            scrapeApi.updateScreen_ICE(arg)
+            .then(response => {
+                if (response === "Invalid Session") return RedirectPage(history);
+                else fetchScrapeData().then(resp=>{
+                    if (resp === 'success'){
+                        setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: false});
+                        dispatch({type: actionTypes.SET_DISABLEACTION, payload: scrapeItemsL.length !== 0});
+                        dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: scrapeItemsL.length === 0});
+                        setSaved(true);
+                    } else console.error(resp);
+                })
+                .catch(error => console.error(error));
+            })
             .catch(error => console.error(error))
         }
     }
 
+    const onAction = operation => {
+        switch(operation){
+            case "submit": setShowConfirmPop({'title':'Submit Task', 'content': 'Are you sure you want to submit the task ?', 'onClick': ()=>submitTask(operation)});
+                           break;
+            case "reassign": setShowConfirmPop({'title':'Reassign Task', 'content': 'Are you sure you want to reassign the task ?', 'onClick': ()=>submitTask(operation)});
+                             break;
+            case "approve": setShowConfirmPop({'title':'Approve Task', 'content': 'Are you sure you want to approve the task ?', 'onClick': ()=>submitTask(operation)});
+                            break;
+            default: break;
+        }                       
+    }
+
+    const submitTask = submitOperation => {
+		let taskid = current_task.subTaskId;
+		let taskstatus = current_task.status;
+		let version = current_task.versionnumber;
+		let batchTaskIDs = current_task.batchTaskIDs;
+        let projectId = current_task.projectId;
+        
+		if (submitOperation === 'reassign') {
+			taskstatus = 'reassign';
+        }
+
+        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
+        .then(result => {
+            if (result === "fail") setShowPop({'title': 'Task Submission Error', 'content': 'Reviewer is not assigned !'});
+            else if (taskstatus === 'reassign') setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});
+            else if (taskstatus === 'underReview') setShowPop({'title': "Task Completion Success", 'content': "Task Approved successfully!", onClick: ()=>redirectToPlugin()});
+            else setShowPop({'title': "Task Submission Success", 'content': "Task Submitted successfully!", onClick: ()=>redirectToPlugin()});
+        })
+        .catch(error => {
+			console.error(error);
+        })
+        
+        setShowConfirmPop(false);
+    }
+
     return (
         <div className="ss__content">
-            <div className="ss__content_wrap">
-            { /* Task Name */ }
-            <div className="ss__task_title">
-                <div className="ss__task_name">{current_task.taskName}</div>
-            </div>
-
-            { /* Button Group */ }
-            <div className="ss__btngroup">
-                <div className="ss__left-btns">
-                    <label className="ss__select-all">
-                        <input className="ss__select-all-chkbox" type="checkbox" checked={selAllCheck} disabled={disableBtns.selAll} onChange={(e)=>updateChecklist("all", e)}/>
-                        <span className="ss__select-all-lbl">
-                            Select all
-                        </span>
-                    </label>
-                    <button className="ss__taskBtn ss__btn" disabled={disableBtns.save} onClick={onSave}>Save</button>
-                    <button className="ss__taskBtn ss__btn" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
-                    <button className="ss__taskBtn ss__btn" disabled={disableBtns.edit}>Edit</button>
-                    <button className="ss__search-btn" onClick={toggleSearch}>
-                        <img className="ss__search-icon" src="static/imgs/ic-search-icon.png"/>
-                    </button>
-                    { showSearch && <input className="ss__search_field" value={searchVal} onChange={onSearch}/>}
+            <div className="ss__content_wrap" style={ compareFlag ? {height: "100%"} : {}}>
+                { /* Task Name */ }
+                <div className="ss__task_title">
+                    <div className="ss__task_name">{current_task.taskName}</div>
                 </div>
 
-                <div className="ss__right-btns">
-                    {/* { isUnderReview && 
-                        <>
-                        <button className="ss__reassignBtn ss__btn">
-                            Reassign
+                {
+                    compareFlag ? 
+                    <CompareObjects viewString={ Object.keys(newScrapedData).length ? {...newScrapedData, view: [...mainScrapedData.view, ...newScrapedData.view]} : { ...mainScrapedData }}
+                                    setShowPop={setShowPop}
+                                    fetchScrapeData={fetchScrapeData}
+                    /> : <>
+                { /* Button Group */ }
+                <div className="ss__btngroup">
+                    <div className="ss__left-btns">
+                        <label className="ss__select-all">
+                            <input className="ss__select-all-chkbox" type="checkbox" checked={selAllCheck} disabled={disableBtns.selAll} onChange={(e)=>updateChecklist("all", e)}/>
+                            <span className="ss__select-all-lbl">
+                                Select all
+                            </span>
+                        </label>
+                        <button className="ss__taskBtn ss__btn" disabled={disableBtns.save} onClick={onSave}>Save</button>
+                        <button className="ss__taskBtn ss__btn" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
+                        <button className="ss__taskBtn ss__btn" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
+                        <button className="ss__search-btn" onClick={toggleSearch}>
+                            <img className="ss__search-icon" src="static/imgs/ic-search-icon.png"/>
                         </button>
-                        <button className="ss__approveBtn ss__btn">
-                            Approve
-                        </button>
-                        </>
-                    } */}
-                    { !hideSubmit && //!isUnderReview &&
-                        <button className="ss__submitBtn ss__btn">
-                            Submit
-                        </button>
-                    }
-                </div>
+                        { showSearch && <input className="ss__search_field" value={searchVal} onChange={onSearch}/>}
+                    </div>
 
-            </div>
+                    <div className="ss__right-btns">
+                        { isUnderReview && 
+                            <>
+                            <button className="ss__reassignBtn ss__btn" onClick={()=>onAction("reassign")}>
+                                Reassign
+                            </button>
+                            <button className="ss__approveBtn ss__btn" onClick={()=>onAction("approve")}>
+                                Approve
+                            </button>
+                            </>
+                        }
+                        { !hideSubmit && !isUnderReview &&
+                            <button className="ss__submitBtn ss__btn" onClick={()=>onAction("submit")}>
+                                Submit
+                            </button>
+                        }
+                    </div>
+
+                </div></>
+                }
             </div>
             
-            <div className="scraped_obj_list">
+            {
+                !compareFlag &&
+                <div className="scraped_obj_list">
                 <div className="ab">
                     <div className="min">
-                    <div className="con">
-                    <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                    <div className="con" id="scrapeObjCon">
+                    <ScrollBar scrollId="scrapeObjCon" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
                     <div className="scrape_object_container">
                     {
-                        scrapeItems.map((object, index) => !object.hide && <ScrapeObject key={index} 
+                        scrapeItems.map((object, index) => !object.hide && <ScrapeObject key={object.val} 
                                                                             idx={index}
                                                                             object={object} 
                                                                             activeEye={activeEye}
                                                                             setActiveEye={setActiveEye}
                                                                             updateChecklist={updateChecklist}
-                                                                            renameScrapeItem={renameScrapeItem}
+                                                                            modifyScrapeItem={modifyScrapeItem}
                                                                         />)
                     }
                     </div>
@@ -341,7 +429,8 @@ const ScrapeContent = props => {
                     </div>
                     </div>
                 </div>
-            </div>
+                </div>
+            }
         </div>
     )
 }

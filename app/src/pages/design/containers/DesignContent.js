@@ -11,6 +11,7 @@ import RemarkDialog from '../components/RemarkDialog';
 import PasteStepDialog from '../components/PasteStepDialog';
 import SelectMultipleDialog from '../components/SelectMultipleDialog';
 import * as DesignApi from "../api";
+import { reviewTask } from '../../global/api';
 import * as pluginActions from "../../plugin/state/action";
 import * as designActions from '../state/action';
 import "../styles/DesignContent.scss";
@@ -463,7 +464,7 @@ const DesignContent = (props) => {
 			taskstatus = 'reassign';
         }
 
-        DesignApi.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
+        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
         .then(result => {
             if (result === "fail") props.setShowPop({'title': 'Task Submission Error', 'content': 'Reviewer is not assigned !'});
             else if (taskstatus === 'reassign') props.setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});

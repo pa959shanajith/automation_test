@@ -48,3 +48,29 @@ export const nonMobileFilters = [
     { label: "User Created", tag: "userobj"},
     { label: "Duplicate Custnames", tag: "duplicateCustnames"}
 ]
+
+export const objectTypes = [
+    {value: "a", typeOfElement: "lnk", name: "Link"}, 
+    {value: "input", typeOfElement: "txtbox", name: "Textbox/Textarea"}, 
+    {value: "table", typeOfElement: "tbl", name: "Table"}, 
+    {value: "list", typeOfElement: "lst", name: "List"},
+    {value: "select", typeOfElement: "select", name: "Dropdown"},
+    {value: "img", typeOfElement: "img", name: "Image"},
+    {value: "button", typeOfElement: "btn", name: "Button"},
+    {value: "radiobutton", typeOfElement: "radiobtn", name: "Radiobutton"},
+    {value: "checkbox", typeOfElement: "chkbox", name: "Checkbox"}, 
+    {value: "Element", typeOfElement: "elmnt", name: "Element"}
+];
+
+export const mappingList = {
+    'lnk': { value: 'a', name: 'Link'},
+    'txtbox': { value: 'input', name: 'Textbox/Textarea'},
+    'tbl': { value: 'table', name: 'Table'},
+    'lst': { value: 'list', name: 'List'},
+    'select': { value: 'select', name: 'Dropdown'},
+    'img': { value: 'img', name: 'Image'},
+    'btn': { value: 'button', name: 'Button'},
+    'radiobtn': { value: 'radiobutton', name: 'Radiobutton'},
+    'chkbox': { value: 'checkbox', name: 'Checkbox'},
+    'elmnt': { value: 'Element', name: 'Element'}
+}
