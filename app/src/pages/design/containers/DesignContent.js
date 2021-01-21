@@ -588,7 +588,7 @@ const DesignContent = (props) => {
         setFocusedRow(null);
 
         if (!copiedContent.testCaseId){
-            // console.log("No TestCase to Paste");
+            props.setShowPop({'title': 'Paste Test Step', 'content': 'No Testcases to Paste! Please Copy Testcase(s) before Pasting.'});
             return;
         }
 
