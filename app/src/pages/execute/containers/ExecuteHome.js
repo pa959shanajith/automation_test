@@ -13,7 +13,6 @@ const ExecuteHome = () => {
 	const [executionActive,setExecutionActive] = useState(false); 
 	const [execAction,setExecAction] = useState("serial"); 
 	const [execEnv,setExecEnv] = useState("default");
-    const [qccredentials,setQccredentials] = useState({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
     const [taskName, setTaskName] = useState(null);
     const [status, setStatus] = useState(null);
     const [appType, setAppType] = useState(null);
@@ -66,7 +65,7 @@ const ExecuteHome = () => {
                     <ActionBar 
                         upperContent={<UpperContent appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />}
                         bottomContent={<BottomContent execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
-                    <ExecuteContent execEnv={execEnv} setQccredentials={setQccredentials} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} setSyncScenario={setSyncScenario} setExecutionActive={setExecutionActive} qccredentials={qccredentials} projectdata={filter_data} execAction={execAction} appType={appType} browserTypeExe={browserTypeExe} syncScenario={syncScenario} taskName={taskName} status={status} readTestSuite={readTestSuite} current_task={current_task} />
+                    <ExecuteContent execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} setSyncScenario={setSyncScenario} setExecutionActive={setExecutionActive} projectdata={filter_data} execAction={execAction} appType={appType} browserTypeExe={browserTypeExe} syncScenario={syncScenario} taskName={taskName} status={status} readTestSuite={readTestSuite} current_task={current_task} />
                     <ReferenceBar /> 
                 </div>
             <div className='e__footer'><Footer/></div>

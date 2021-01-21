@@ -1,5 +1,5 @@
 import React, {useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
+import {ScreenOverlay, PopupMsg, ScrollBar, IntegrationDropDown} from '../../global' 
 import { useSelector } from 'react-redux';
 import {getScheduledDetails_ICE, testSuitesScheduler_ICE} from '../api';
 import "../styles/ScheduleContent.scss";
@@ -7,7 +7,7 @@ import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import Pagination from '../components/Pagination';
 
-const ScheduleContent = ({execEnv, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
+const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
 
     const filter_data = useSelector(state=>state.plugin.FD)
     const [loading,setLoading] = useState(false)
@@ -19,6 +19,8 @@ const ScheduleContent = ({execEnv, setBrowserTypeExe,setExecAction,appType,brows
     const current_task = useSelector(state=>state.plugin.CT)
     const [scheduleTableData,setScheduleTableData] = useState([])
     const [moduleInfo,setModuleInfo] = useState([])
+    const [qccredentials,setQccredentials] = useState({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
+    const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [moduleSceduledate,setModuleSceduledate] = useState([])
 
     useEffect(()=>{
@@ -127,7 +129,7 @@ const ScheduleContent = ({execEnv, setBrowserTypeExe,setExecAction,appType,brows
         executionData["exectionMode"]=execAction;
         executionData["executionEnv"]=execEnv;
         executionData["browserType"]=browserTypeExe;
-        executionData["qccredentials"]={ "qcurl": "", "qcusername": "", "qcpassword": "" };
+        executionData["qccredentials"]=qccredentials;
         executionData["batchInfo"]=modul_Info;
         
         setLoading("Scheduling...");
@@ -163,6 +165,19 @@ const ScheduleContent = ({execEnv, setBrowserTypeExe,setExecAction,appType,brows
         // $(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;");
     }
 
+    const syncScenarioChange = (value) => {
+        setQccredentials({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
+        if (value == "1") {
+            setShowIntegrationModal("ALM")
+		}
+		else if (value == "0") {
+            setShowIntegrationModal("qTest")
+		}
+        else if (value == "2") {
+            setShowIntegrationModal("Zephyr")
+		}
+    }
+
     return (
         <>
             {loading?<ScreenOverlay content={loading}/>:null}
@@ -178,10 +193,30 @@ const ScheduleContent = ({execEnv, setBrowserTypeExe,setExecAction,appType,brows
                     exeIceLabel={"Allocate ICE"}
                 />
             :null}
+            { showIntegrationModal ? 
+                <IntegrationDropDown
+                    setshowModal={setShowIntegrationModal} 
+                    type={showIntegrationModal} 
+                    showIntegrationModal={showIntegrationModal} 
+                    appType={appType} 
+                    setPopupState={setPopupState} 
+                    setCredentialsExecution={setQccredentials}
+                    displayError={displayError}
+                    browserTypeExe={browserTypeExe}
+                />
+            :null} 
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             
             <div id="wrapper-sc">
-            <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
+                <div className="s__task_container">
+                    <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
+                    <select id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className="e__taskBtn e__btn">
+                        <option value="" selected disabled>Select Integration</option>
+                        <option value="1">ALM</option>
+                        <option value="0">qTest</option>
+                        <option value="2">Zephyr</option>
+                    </select>
+                </div>
             <div id="pageContent">
                 <div id="scheduleSuitesTopSection">
                     <div id="tableActionButtons">

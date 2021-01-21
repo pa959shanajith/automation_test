@@ -1,6 +1,6 @@
 import React, { useState} from 'react';
-import {ScreenOverlay, PopupMsg, RedirectPage, ModalContainer} from '../../global' 
-import {updateTestSuite_ICE, reviewTask, ExecuteTestSuite_ICE, loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE} from '../api';
+import {ScreenOverlay, PopupMsg, ModalContainer , IntegrationDropDown} from '../../global' 
+import {updateTestSuite_ICE, reviewTask, ExecuteTestSuite_ICE} from '../api';
 import { useHistory } from 'react-router-dom';
 import "../styles/ExecuteContent.scss";
 import ExecuteTable from '../components/ExecuteTable';
@@ -9,7 +9,7 @@ import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 // const ENDPOINT = "https://"+window.location.hostname+":8443";
 
 
-const ExecuteContent = ({execEnv, taskName, status, setQccredentials, readTestSuite, setSyncScenario, setBrowserTypeExe, setExecutionActive, qccredentials, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
+const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, setExecutionActive, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
 
     // const socket = socketIOClient(ENDPOINT);
     const history = useHistory();
@@ -19,19 +19,10 @@ const ExecuteContent = ({execEnv, taskName, status, setQccredentials, readTestSu
     const [eachDataFirst,setEachDataFirst] = useState([])
     const [updateAfterSave,setupdateAfterSave] = useState(false)
     const [showDeleteModal,setshowDeleteModal] = useState(false)
-    const [showALMModal,setshowALMModal] = useState(false)
-    const [showZephyrModal,setshowZephyrModal] = useState(false)
-    const [showqTestModal,setshowqTestModal] = useState(false)
+    const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [modalDetails,setModalDetails] = useState({title:"",task:""})
     const [moduleInfo,setModuleInfo] = useState([])
-    const [qccredentialsModal,setQccredentialsModal] = useState({almURL: "", almUserName: "", almPassword: ""});
-    const [qTestModal,setqTestModal] = useState({qTestURL: "", qTestUserName: "", qTestPassword: ""});
-    const [zephyrModal,setZephyrModal] = useState({zephyrtURL: "", zephyrUserName: "", zephyrPassword: ""});
-    const [qtestSteps,setqtestSteps] = useState(false)
-    const [errorMsg,setErrorMsg] = useState("")
-    const [almUrlErrBor,setAlmUrlErrBor] = useState(false)
-    const [almUsernameErrBor,setAlmUsername] = useState(false)
-    const [almPassErrBor,setAlmPassErrBor] = useState(false)
+    const [qccredentials,setQccredentials] = useState({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
     const [selectAllBatch,setSelectAllBatch] = useState(0)
     const [allocateICE,setAllocateICE] = useState(false)
     var batch_name= taskName ==="Batch Execution"?": "+current_task.taskName.slice(13):""
@@ -96,57 +87,6 @@ const ExecuteContent = ({execEnv, taskName, status, setQccredentials, readTestSu
         setshowDeleteModal(false);
     }
     
-    const closeALMModal = () => {
-        setshowALMModal(false);
-    }
-
-    const closeqTestModal = () => {
-        setshowqTestModal(false);
-    }
-
-    const saveQcCredentials = async () => {
-        setAlmPassErrBor(false);setAlmUrlErrBor(false);setAlmUsername(false);
-		if (!qccredentialsModal.almURL) {
-            setAlmUrlErrBor(true);
-            setErrorMsg("Please Enter URL.");
-		} else if (!qccredentialsModal.almUserName) {
-            setAlmUsername(true);
-            setErrorMsg("Please Enter User Name.");
-		} else if (!qccredentialsModal.almPassword) {
-            setAlmPassErrBor(true);
-            setErrorMsg("Please Enter Password.");
-		} else if (appType != "SAP" && browserTypeExe.length === 0) {
-            setshowALMModal(false);
-            setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
-        } 
-        // else if ($(".exe-ExecuteStatus input:checked").length === 0) {
-        //     setshowALMModal(false);
-        //     setPopupState({show:true,title:"Execute Test Suite",content:"Please select atleast one scenario(s) to execute"});
-        // } 
-        else {
-            setErrorMsg("");
-			const data = await loginQCServer_ICE(qccredentialsModal.almURL, qccredentialsModal.almUserName, qccredentialsModal.almPassword);
-            if(data.error){displayError(data.error);return;}
-            else if (data == "unavailableLocalServer") {
-                setErrorMsg("Unavailable LocalServer");
-            } else if (data == "Invalid Session") {
-                setErrorMsg("Invalid Session");
-            } else if (data == "invalidcredentials") {
-                setErrorMsg("Invalid Credentials");
-            } else if (data == "invalidurl") {
-                setErrorMsg("Invalid URL");
-            } else {
-                setQccredentials({qcurl: qccredentialsModal.almURL, qcusername: qccredentialsModal.almUserName, qcpassword: qccredentialsModal.almPassword, qctype: ""})
-                //Transaction Activity for SaveQcCredentialsExecution Button Action
-                // var labelArr = [];
-                // var infoArr = [];
-                // labelArr.push(txnHistory.codesDict['SaveQcCredentialsExecution']);
-                // txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-                setshowALMModal(false);
-            }
-		}
-    }
-    
     const submit_task = async () => {
         let action = "reassign";
         if(status!=='underReview') action = "approve";
@@ -158,9 +98,6 @@ const ExecuteContent = ({execEnv, taskName, status, setQccredentials, readTestSu
 		if (action != undefined && action == 'reassign') {
 			taskstatus = action;
 		}
-		//Transaction Activity for Task Submit/Approve/Reassign Button Action
-		// var labelArr = [];
-		// var infoArr = [];
 
 		const result = await reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs);
         if(result.error){displayError(result.error);return;}
@@ -173,19 +110,15 @@ const ExecuteContent = ({execEnv, taskName, status, setQccredentials, readTestSu
             setPopupState({show:true,title:"Task Reassignment Success",content:"Task Reassigned successfully!"});
             window.localStorage['navigateScreen'] = "plugin";
             history.replace('/plugin');
-            //labelArr.push(txnHistory.codesDict['TaskReassign']);
         } else if (taskstatus == 'underReview') {
             setPopupState({show:true,title:"Task Completion Success",content:"Task Approved successfully!"});
             window.localStorage['navigateScreen'] = "plugin";
             history.replace('/plugin');
-            //labelArr.push(txnHistory.codesDict['TaskApprove']);
         } else {
             setPopupState({show:true,title:"Task Submission Success",content:"Task Submitted successfully!"});
             window.localStorage['navigateScreen'] = "plugin";
             history.replace('/plugin');
-            //labelArr.push(txnHistory.codesDict['TaskSubmit']);
         }
-        //txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
     }
     
     const ExecuteTestSuitePopup = () => {
@@ -231,13 +164,6 @@ const ExecuteContent = ({execEnv, taskName, status, setQccredentials, readTestSu
             setModuleInfo([]);
             setupdateAfterSave(!updateAfterSave);
             setSyncScenario(false);
-            //Transaction Activity for ExecuteTestSuite Button Action
-            // var labelArr = [];
-            // var infoArr = [];
-            // infoArr.push({"appType" : appType});
-            // infoArr.push({"status" : data});
-            // labelArr.push(txnHistory.codesDict['ExecuteTestSuite']);
-            // txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
         }catch(error) {
             setLoading(false);
             // $rootScope.resetSession.end();
@@ -250,89 +176,16 @@ const ExecuteContent = ({execEnv, taskName, status, setQccredentials, readTestSu
         }
     }
 
-    const saveQTestCredentials = async () => {
-        setAlmPassErrBor(false);setAlmUrlErrBor(false);setAlmUsername(false);
-		if (!qTestModal.qTestURL) {
-            setAlmUrlErrBor(true);
-            setErrorMsg("Please Enter URL.");
-		} else if (!qTestModal.qTestUserName) {
-            setAlmUsername(true);
-            setErrorMsg("Please Enter User Name.");
-		} else if (!qTestModal.qTestPassword) {
-            setAlmPassErrBor(true);
-            setErrorMsg("Please Enter Password.");
-		} else if (appType != "SAP" && browserTypeExe.length === 0) {
-            setshowALMModal(false);
-            setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
-        } 
-        // else if ($(".exe-ExecuteStatus input:checked").length === 0) {
-        //     setshowALMModal(false);
-        //     setPopupState({show:true,title:"Execute Test Suite",content:"Please select atleast one scenario(s) to execute"});
-        // } 
-        else {
-			setErrorMsg("");
-			const data = await loginQTestServer_ICE(qTestModal.qTestURL, qTestModal.qTestUserName, qTestModal.qTestPassword,"qTest");
-            if(data.error){displayError(data.error);return;}
-            else if (data == "unavailableLocalServer") setErrorMsg("Unavailable LocalServer");
-            else if (data == "invalidcredentials") setErrorMsg("Invalid Credentials");
-            else if (data == "invalidurl") setErrorMsg("Invalid URL");
-            else {
-                setQccredentials({qcurl: qTestModal.qTestURL, qcusername: qTestModal.qTestUserName, qcpassword: qTestModal.qTestPassword, qteststeps: qtestSteps, qctype: "qTest"})
-                setshowqTestModal(false);
-            }
-		}
-    }
-
-    const saveZephyrCredentials = async () => {
-        setAlmPassErrBor(false);setAlmUrlErrBor(false);setAlmUsername(false);
-		if (!zephyrModal.zephyrURL) {
-            setAlmUrlErrBor(true);
-            setErrorMsg("Please Enter URL.");
-		} else if (!zephyrModal.zephyrUserName) {
-            setAlmUsername(true);
-            setErrorMsg("Please Enter User Name.");
-		} else if (!zephyrModal.zephyrPassword) {
-            setAlmPassErrBor(true);
-            setErrorMsg("Please Enter Password.");
-		} else if (appType != "SAP" && browserTypeExe.length === 0) {
-            setshowZephyrModal(false);
-            setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
-        } 
-        // else if ($(".exe-ExecuteStatus input:checked").length === 0) {
-        //     setshowALMModal(false);
-        //     setPopupState({show:true,title:"Execute Test Suite",content:"Please select atleast one scenario(s) to execute"});
-        // } 
-        else {
-			setErrorMsg("");
-			const data = await loginZephyrServer_ICE(zephyrModal.zephyrURL, zephyrModal.zephyrUserName, zephyrModal.zephyrPassword,"Zephyr");
-            if(data.error){displayError(data.error);return;}
-            else if (data == "unavailableLocalServer") setErrorMsg("Unavailable LocalServer");
-            else if (data == "invalidcredentials") setErrorMsg("Invalid Credentials");
-            else if (data == "invalidurl") setErrorMsg("Invalid URL");
-            else {
-                setZephyrModal({qcurl: zephyrModal.zephyrURL, qcusername: zephyrModal.zephyrUserName, qcpassword: zephyrModal.zephyrPassword,  qctype: "Zephyr"})
-                setshowqTestModal(false);
-            }
-		}
-    }
-
     const syncScenarioChange = (value) => {
-        setAlmPassErrBor(false);setAlmUrlErrBor(false);setAlmUsername(false);
+        setQccredentials({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
         if (value == "1") {
-			setQccredentialsModal({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
-			setQccredentials({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
-            setshowALMModal(true);
-			setErrorMsg("");
+            setShowIntegrationModal("ALM")
 		}
 		else if (value == "0") {
-			setqTestModal({qTestURL: "", qTestUserName: "", qTestPassword: ""});
-			setshowqTestModal(true);
-			setErrorMsg("");
-        }
+            setShowIntegrationModal("qTest")
+		}
         else if (value == "2") {
-			setZephyrModal({zephyrURL: "", zephyrUserName: "", zephyrPassword: ""});
-			setshowZephyrModal(true);
-			setErrorMsg("");
+            setShowIntegrationModal("Zephyr")
 		}
     }
 
@@ -379,9 +232,18 @@ const ExecuteContent = ({execEnv, taskName, status, setQccredentials, readTestSu
                 </div>
                         
             {showDeleteModal?<ModalContainer title={modalDetails.title} footer={submitModalButtons(setshowDeleteModal, submit_task)} close={closeModal} content={"Are you sure you want to "+ modalDetails.task+" the task ?"} modalClass=" modal-sm" />:null} 
-            {showALMModal?<ModalContainer title="ALM" footer={submitQModalButtons(errorMsg, saveQcCredentials)} close={closeALMModal} content={AlmMiddleContent(qccredentialsModal, setQccredentialsModal, almUrlErrBor, almUsernameErrBor, almPassErrBor)} modalClass=" e__alm-modal"/>:null}
-            {showZephyrModal?<ModalContainer title="Zephyr" footer={submitQModalButtons(errorMsg, saveZephyrCredentials)} close={()=>{setshowZephyrModal(false)}} content={ZephyrMiddleContent(zephyrModal, setZephyrModal, almUrlErrBor, almUsernameErrBor, almPassErrBor)} modalClass=" e__alm-modal"/>:null}
-            {showqTestModal?<ModalContainer title="qTest" footer={submitQModalButtons(errorMsg, saveQTestCredentials)} close={closeqTestModal} content={qTestMiddleContent(qTestModal, setqTestModal, setqtestSteps, almPassErrBor, almUrlErrBor, almUsernameErrBor, qtestSteps)} modalClass=" e__alm-modal"/>:null} 
+            { showIntegrationModal ? 
+                <IntegrationDropDown
+                    setshowModal={setShowIntegrationModal} 
+                    type={showIntegrationModal} 
+                    showIntegrationModal={showIntegrationModal} 
+                    appType={appType} 
+                    setPopupState={setPopupState} 
+                    setCredentialsExecution={setQccredentials}
+                    displayError={displayError}
+                    browserTypeExe={browserTypeExe}
+                />
+            :null}   
         </>
     );
 }
@@ -406,57 +268,6 @@ const submitModalButtons = (setshowDeleteModal, submit_task) => {
         <div>
             <button onClick={()=>{setshowDeleteModal(false);submit_task()}} type="button" className="e__modal_button" >Yes</button>
             <button type="button" onClick={()=>{setshowDeleteModal(false);}} >No</button>
-        </div>
-    )
-}
-
-
-const AlmMiddleContent = (qccredentialsModal, setQccredentialsModal, almUrlErrBor, almUsernameErrBor, almPassErrBor) => {
-    return(
-        <div className="popupWrapRow">
-            <div className="textFieldsContainer">
-                <p><input value={qccredentialsModal.almURL} onChange={(event)=>{setQccredentialsModal({almURL: event.target.value, almUserName: qccredentialsModal.almUserName, almPassword: qccredentialsModal.almPassword})}} type="text" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input "+ (almUrlErrBor ? " inputErrBor" : "")} placeholder="Enter ALM Url"  id="almURL" /></p>
-                <p className="halfWrap halfWrap-margin" ><input value={qccredentialsModal.almUserName} onChange={(event)=>{setQccredentialsModal({almURL: qccredentialsModal.almURL, almUserName: event.target.value, almPassword: qccredentialsModal.almPassword})}} type="text" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input"+ (almUsernameErrBor ? " inputErrBor" : "")} placeholder="Enter User Name" id="almUserName" /></p>
-                <p className="halfWrap"><input value={qccredentialsModal.almPassword} onChange={(event)=>{setQccredentialsModal({almURL: qccredentialsModal.almURL, almUserName: qccredentialsModal.almUserName, almPassword: event.target.value})}} type="password" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input"+ (almPassErrBor ? " inputErrBor" : "")} placeholder="Enter Password" id="almPassword" /></p>
-            </div>
-        </div>
-    )
-}
-
-const ZephyrMiddleContent = (qccredentialsModal, setQccredentialsModal, almUrlErrBor, almUsernameErrBor, almPassErrBor) => {
-    return(
-        <div className="popupWrapRow">
-            <div className="textFieldsContainer">
-                <p><input value={qccredentialsModal.zephyrURL} onChange={(event)=>{setQccredentialsModal({zephyrURL: event.target.value, zephyrUserName: qccredentialsModal.zephyrUserName, zephyrPassword: qccredentialsModal.zephyrPassword})}} type="text" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input "+ (almUrlErrBor ? " inputErrBor" : "")} placeholder="Enter Zephyr Account ID"  id="almURL" /></p>
-                <p className="halfWrap halfWrap-margin" ><input value={qccredentialsModal.almUserName} onChange={(event)=>{setQccredentialsModal({zephyrURL: qccredentialsModal.zephyrURL, zephyrUserName: event.target.value, zephyrPassword: qccredentialsModal.azephyrPassword})}} type="text" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input"+ (almUsernameErrBor ? " inputErrBor" : "")} placeholder="Enter Access Key" id="almUserName" /></p>
-                <p className="halfWrap"><input value={qccredentialsModal.almPassword} onChange={(event)=>{setQccredentialsModal({zephyrURL: qccredentialsModal.zephyrURL, zephyrUserName: qccredentialsModal.zephyrUserName, zephyrPassword: event.target.value})}} type="password" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input"+ (almPassErrBor ? " inputErrBor" : "")} placeholder="Enter Secret Key" id="almPassword" /></p>
-            </div>
-        </div>
-    )
-}
-
-const submitQModalButtons = (errorMsg, saveCredentials) => {
-    return(
-        <div className="popupWrapRow">
-            <div className="textFieldsContainer">
-            <p align="right" className="textFieldsContainer-cust">
-                <span className="error-msg-exeQc">{errorMsg}</span>
-                <button type="button" className="e__btn-md " onClick={()=>{saveCredentials()}} >Save</button>
-            </p>
-            </div>
-        </div>
-    )
-}
-
-const qTestMiddleContent = (qTestModal, setqTestModal, setqtestSteps, almPassErrBor, almUrlErrBor, almUsernameErrBor, qtestSteps) => {
-    return(
-        <div className="popupWrapRow">
-            <div className="textFieldsContainer">
-                <p><input value={qTestModal.qTestURL} onChange={(event)=>{setqTestModal({qTestURL: event.target.value, qTestUserName: qTestModal.qTestUserName, qTestPassword: qTestModal.qTestPassword})}} type="text" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input "+ (almUrlErrBor ? " inputErrBor" : "")} placeholder="Enter ALM Url"  id="almURL" /></p>
-                <p className="halfWrap halfWrap-margin" ><input value={qTestModal.qTestUserName} onChange={(event)=>{setqTestModal({qTestURL: qTestModal.qTestURL, qTestUserName: event.target.value, qTestPassword: qTestModal.qTestPassword})}} type="text" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input"+ (almUsernameErrBor ? " inputErrBor" : "")} placeholder="Enter User Name" id="almUserName" /></p>
-                <p className="halfWrap"><input value={qTestModal.qTestPassword} onChange={(event)=>{setqTestModal({qTestURL: qTestModal.qTestURL, qTestUserName: qTestModal.qTestUserName, qTestPassword:  event.target.value})}} type="password" className={"form-control-ldap form-control-custom-ldap e__modal-alm-input"+ (almPassErrBor ? " inputErrBor" : "")} placeholder="Enter Password" id="almPassword" /></p>
-                <p className="qtestSteps" ><input value={qtestSteps} onChange={()=>{setqtestSteps(!qtestSteps)}} type="checkbox" title="Update steps status" id="qtestSteps"/><span>  Update step status</span></p>
-            </div>
         </div>
     )
 }

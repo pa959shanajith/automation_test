@@ -3,11 +3,22 @@
 	width:100%;
 	height: 95%;
 }
+#syncScenario-schedule{
+    height: 20px;
+    background: white;
+    color: black;
+    border: 1px solid #7b7c7f !important;
+    border-radius: 3px !important;
+    margin-left: 5%;
+}
 #wrapper-sc{
 	float: left;
     width: 100%;
     position: relative;
     height: 100%;
+}
+.s__task_container{
+    display: flex
 }
 .s__btn-md.focus,
 .s__btn-md,

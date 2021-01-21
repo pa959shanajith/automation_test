@@ -1,5 +1,11 @@
 
-.e__btn-md.focus,
+#syncScenario{
+    height: 20px;
+    background: white;
+    color: black;
+    border: 1px solid #7b7c7f !important;
+    border-radius: 3px !important;
+}.e__btn-md.focus,
 .e__btn-md,
 .e__btn-md:active:focus,
 .e__btn-md:focus,
@@ -142,13 +148,6 @@
 	margin-bottom: 25px;
 	position: relative;
 }
-.error-msg-exeQc{
-    font-size: 14px;
-    font-family: 'LatoWeb';
-    float: left;
-    padding: 16px 0 0 12px;
-    color: red;
-}
 .e__modal-alm-input{
     border-radius: 0 !important;
 }
@@ -180,7 +179,4 @@
 }
 #scheduledSuitesFilterData:focus{
 	box-shadow:none;
-}
-.e__alm-modal .modal__content{
-    width: 700px !important; 
 }

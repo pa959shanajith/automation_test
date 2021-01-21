@@ -14,6 +14,7 @@ import TaskContents from './components/TaskContents';
 import ResetSession from './components/ResetSession';
 import Report from './components/Report'
 import BrowserFp from './components/BrowserFp';
+import IntegrationDropDown from './components/IntegrationDropDown';
 
 export { Header, 
         FooterOne, 
@@ -31,5 +32,6 @@ export { Header,
         TaskContents, 
         ResetSession, 
         Report,
-        BrowserFp
+        BrowserFp,
+        IntegrationDropDown
     };
