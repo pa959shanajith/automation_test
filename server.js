@@ -497,7 +497,7 @@ if (cluster.isMaster) {
 		app.post('/highlightScrapElement_ICE', designscreen.highlightScrapElement_ICE);
 		app.post('/getScrapeDataScreenLevel_ICE', designscreen.getScrapeDataScreenLevel_ICE);
 		app.post('/updateScreen_ICE', designscreen.updateScreen_ICE);
-		app.post('/updateIrisDataset', designscreen.updateIrisDataset);
+		app.post('/updateIrisDataset', auth.protect, designscreen.updateIrisDataset);
 		app.post('/userObjectElement_ICE', designscreen.userObjectElement_ICE);
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', design.readTestCase_ICE);

@@ -2552,20 +2552,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			DesignServices.updateIrisDataset(data)
 				.then(function (val) {
 					$("#dialog-irisObject").find("button.close").click();
-					if(val=='unavailableLocalServer')  openDialog("Iris Object Type", $rootScope.unavailableLocalServer_msg);
-					else if(val=='unsavedObject') openDialog("Iris Object Type","Please save the object first.");
-					else{
-						if(val){
-							openDialog("Iris Object Type","Submitted Successfully.");
-							for(var i=0;i<viewString.view.length;i++){
-								if(viewString.view[i].xpath == obj_xpath){
-									viewString.view[i].objectType = user_obj_type;
-									break;
-								}
+					if(val === 'success'){
+						openDialog("Iris Object Type","Submitted Successfully.");
+						for(var i=0;i<viewString.view.length;i++){
+							if(viewString.view[i].xpath == obj_xpath){
+								viewString.view[i].objectType = user_obj_type;
+								break;
 							}
 						}
-						else
-							openDialog("Iris Object Type","Failed.");
+					}
+					else if(val=='unsavedObject') openDialog("Iris Object Type","Please save the object first.");
+					else{
+						openDialog("Iris Object Type","Failed to updated Iris Object Type.");
 					}
 				}, function (error) {
 					
