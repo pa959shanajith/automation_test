@@ -21,21 +21,27 @@ const UpperContent = ({appType, isMac, UpdateBrowserTypeExe, browserTypeExe}) =>
     return renderComp;
 };
 
-const BottomContent = ({appType, updateExecAction, execAction}) => {
+const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, execEnv}) => {
     const history = useHistory();
     const scheduleRedirect = () => {
-        // uncomment to redirect to schedule screen
-        // window.localStorage['navigateScreen'] = "scheduling";
-        // history.replace('/scheduling');
+        window.localStorage['navigateScreen'] = "scheduling";
+        history.replace('/scheduling');
     }
     
     return (
         <>
             {appType === "Web"?
+                <>
                 <div className="e__parallel_icon" onClick={()=>{updateExecAction()}}>
                     <img className={"e__parallel_icon__img"+ (execAction==="parallel" ? " e__selectedBrowser" : "" )}   src='static/imgs/ic-parallel.png' alt="Parallel Execution"/>
                     <span className="thumbnail__title">Parallel Execution</span>
-                </div>:null}
+                </div>
+                <div className="e__parallel_icon" onClick={()=>{updateExecEnv()}}>
+                    <img className={"e__parallel_icon__img"+ (execEnv!=="default" ? " e__selectedBrowser" : "" )}   src='static/imgs/saucelabs.png' alt="Parallel Execution"/>
+                    <span className="thumbnail__title">SauceLabs Execution</span>
+                </div>
+                </>
+            :null}
             <div className="e__parallel_icon" onClick={()=>{scheduleRedirect()}}>
                 <img className="e__parallel_icon__img"   src='static/imgs/ic-scheduling.png' alt="Schedule"/>
                 <span className="thumbnail__title">Schedule</span>

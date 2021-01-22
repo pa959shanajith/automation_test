@@ -18,6 +18,7 @@ import ProfJ from '../../profJ';
             taskName : to let the reference bar know which task to highlight as disabled.
             popups : to render pop up menus like filter, screenshot 
             closeAllpopups : method to close all passed popups
+            scrapeScreenURL : populating the URL field for scrape screen
     */
 
 const ReferenceBar = (props) => {
@@ -108,13 +109,13 @@ const ReferenceBar = (props) => {
                 'Screen' : current_task.screenName,
                 'Release' : current_task.releaseid,
                 'Cycle' : dataDict.cycleDict[current_task.cycleid],
-                'URL': ''
+                'URL': props.scrapeScreenURL || ''
             }
             setSearchValue("");
             setShowTask(false);
             setTaskInfo(info);
         }
-    }, [current_task, current_task.screenName]);
+    }, [current_task, current_task.screenName, props.scrapeScreenURL]);
 
     const onSearchHandler = event => {
         searchTask(event.target.value)

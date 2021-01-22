@@ -96,7 +96,7 @@ export const userObjectElement_ICE = custObjProps => {
     });
 }
 
-export const updateScreen_ICE = (deleted, modified, added, scrapeData, screenId) => {
+export const updateScreen_ICE = arg => {
     return new Promise((resolve, reject)=>{
         axios(url+"/updateScreen_ICE", {
             method: 'POST',
@@ -104,11 +104,7 @@ export const updateScreen_ICE = (deleted, modified, added, scrapeData, screenId)
                 'Content-type' : 'application/json'
             },
             data : { 
-                'deletedObj': deleted,
-                'modifiedObj': modified,
-                'addedObj': added,
-                'scrapedObjects': scrapeData,
-                'screenId': screenId
+                data: arg
             },
             credentials : 'include',
         })
@@ -119,117 +115,6 @@ export const updateScreen_ICE = (deleted, modified, added, scrapeData, screenId)
         .catch(error=>reject(error));
     });
 }
-
-// export const mapScrapeData_ICE = updateData => {
-//     try{
-//         const res = await axios(url+"/updateScreen_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : { scrapeObject : updateData },
-//             credentials : 'include',
-//         });
-//         if (res.status === 200){
-//             return res.data;
-//         }
-//         else{
-//             console.log(res.status)
-//         }
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
-
-// export const readTestCase_ICE = (userInfo, testCaseId, testCaseName, versionnumber, screenName) => {
-//     return new Promise((resolve, reject)=> {
-//         axios(url+"/readTestCase_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'readTestCase_ICE',
-//                 userInfo: userInfo,
-//                 testcaseid: testCaseId,
-//                 testcasename: testCaseName,
-//                 versionnumber: versionnumber,
-//                 screenName : screenName
-//             },
-//             credentials : 'include',
-//         })
-//         .then(res=>{
-//             if (res.status === 200){
-//                 resolve(res.data);
-//             }
-//             else{
-//                 reject({error: res.status});
-//             }
-//         })
-//         .catch(err=>reject({error: err}));
-//     });
-// }
-
-// export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userInfo, versionnumber, import_status) => {
-//     return new Promise((resolve, reject)=>{
-//         axios(url+"/updateTestCase_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'updateTestCase_ICE',
-//                 testcaseid: testCaseId,
-//                 testcasename: testCaseName,
-//                 testcasesteps: JSON.stringify(testCaseData),
-//                 userinfo: userInfo,
-//                 skucodetestcase : "skucodetestcase",
-//                 tags: "tags",
-//                 versionnumber: versionnumber,
-//                 import_status: import_status
-//             },
-//             credentials : 'include',
-//         })
-//         .then(res=>{
-//             if (res.status === 200){
-//                 resolve(res.data);
-//             }
-//             else{
-//                 reject(res.status);
-//             }
-//         })
-//         .catch(error=>reject(error));
-//     });
-// }
-
-// export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType) => {
-//     return new Promise((resolve, reject)=>{
-//         axios(url+"/debugTestCase_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'debugTestCase_ICE',
-//                 userInfo: userInfo,
-//                 browsertypes: browserType,
-//                 testcaseids: testcaseID,
-//                 apptype: appType
-//             },
-//             credentials : 'include',
-//         })
-//         .then(res=>{
-//             if (res.status === 200){
-//                 resolve(res.data);
-//             }
-//             else{
-//                 reject(res.status);
-//             }
-//         })
-//         .catch(error=>reject(error));
-//     });
-// }
 
 // export const initScrapeWS_ICE = async(initWSJson) => {
 //     try{
@@ -254,31 +139,6 @@ export const updateScreen_ICE = (deleted, modified, added, scrapeData, screenId)
 //     catch(err){
 //         console.log(err);
 //     }
-// }
-
-// export const getKeywordDetails_ICE = (appType) => {
-//     return new Promise((resolve, reject)=>{
-//         axios(url+"/getKeywordDetails_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'getKeywordDetails_ICE',
-//                 projecttypename : appType
-//             },
-//             credentials : 'include',
-//         })
-//         .then(res=>{
-//             if (res.status === 200){
-//                 resolve(res.data);
-//             }
-//             else{
-//                 reject(res.status);
-//             }
-//         })
-//         .catch(error=>reject(error))
-//     })
 // }
 
 // export const launchWSDLGo = async(wsdlUrl) => {
@@ -331,31 +191,6 @@ export const updateScreen_ICE = (deleted, modified, added, scrapeData, screenId)
 //     catch(err){
 //         console.log(err);
 //     }
-// }
-
-// export const getTestcasesByScenarioId_ICE = (testScenarioId) => {
-//     return new Promise((resolve, reject)=>{
-//         axios(url+"/getTestcasesByScenarioId_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'getTestcasesByScenarioId_ICE',
-//                 testScenarioId : testScenarioId
-//             },
-//             credentials : 'include',
-//         })
-//         .then(res=>{   
-//             if (res.status === 200){
-//                 resolve(res.data);
-//             }
-//             else{
-//                 reject(res.status)
-//             }
-//         })
-//         .catch(error=>reject(error))
-//     })
 // }
 
 // export const updateIrisDataset = async(data) => {

@@ -31,14 +31,20 @@ const LeftPanel = (props) => {
 						<span><span className={'fa fa-cogs'+ ((props.middleScreen==="provisionTa") ? " selected-icon" : "")} ></span></span>ICE Provision</i></li>
 					<li><i id='projectTab' title="Create/Update Project" onClick={()=>{props.setMiddleScreen("projectTab");resetScreen("projectTab")}} className="selectBrowser">
 						<span><span className={'fa fa-briefcase'+ ((props.middleScreen==="projectTab") ? " selected-icon" : "")} ></span></span>Project</i></li>
-					<li className='userDivider'><i id='assignProjectTab' title="Assign Project" onClick={()=>{props.setMiddleScreen("assignProjectTab");resetScreen("assignProjectTab");}} className="selectBrowser">
+					<li><i id='assignProjectTab' title="Assign Project" onClick={()=>{props.setMiddleScreen("assignProjectTab");resetScreen("assignProjectTab");}} className="selectBrowser">
 						<span><span className={'fa fa-link'+ ((props.middleScreen==="assignProjectTab") ? " selected-icon" : "")} ></span></span>Assign Projects</i></li>
+					<li><i id='CreateIcePool' title="ICE Pool" onClick={()=>{props.setMiddleScreen("CreateIcePool");resetScreen("CreateIcePool");}} className="selectBrowser">
+						<span><img style={{height:'60px'}} src={"static/imgs/CreateICEPool.png"} alt={"Create ICE Pool"} className={((props.middleScreen==="CreateIcePool") ? " selected-icon" : "")} ></img></span><span>ICE Pool</span></i></li>
+					<li className='userDivider'><i id='AllocateIcePool' alt={"Allocate ICE Pool"} onClick={()=>{props.setMiddleScreen("AllocateIcePool");resetScreen("AllocateIcePool");}} className="selectBrowser">
+						<span><img style={{height:'60px'}} src={"static/imgs/AllocateICEPool.png"}  className={((props.middleScreen==="AllocateIcePool") ? " selected-icon" : "")} ></img></span><span>Allocate ICE Pool</span></i></li>
 					<li><i id='ldapConfigTab' title="Manage LDAP Configuration" onClick={()=>{props.setMiddleScreen("ldapConfigTab");resetScreen("ldapConfigTab")}} className="selectBrowser" >
 						<span><span className={'fa fa-address-book' + ((props.middleScreen==="ldapConfigTab") ? " selected-icon" : "")} ></span></span>LDAP Configuration</i></li>
 					<li><i id='samlConfigTab' title="Manage SAML Configuration" onClick={()=>{props.setMiddleScreen("samlConfigTab");resetScreen("samlConfigTab")}} className="selectBrowser" >
 						<span><span className={'fa fa-lock'+ ((props.middleScreen==="samlConfigTab") ? " selected-icon" : "")}  ></span></span>SAML Configuration</i></li>
 					<li><i id='oidcConfigTab' title="Manage OpenID Connect Configuration" onClick={()=>{props.setMiddleScreen("oidcConfigTab");resetScreen("oidcConfigTab")}} className="selectBrowser" >
 						<span><span className={'fa fa-openid'+ ((props.middleScreen==="oidcConfigTab") ? " selected-icon" : "")}></span></span>OpenID Connect Configuration</i></li>
+					<li><i id='emailConfigTab' title="Manage Email Server Configuration" onClick={()=>{props.setMiddleScreen("emailConfigTab");resetScreen("emailConfigTab")}} className="selectBrowser" >
+						<span><span className={'fa fa-envelope'+ ((props.middleScreen==="emailConfigTab") ? " selected-icon" : "")}  ></span></span>Email Server Configuration</i></li>
 					<li><i id='sessionTab' title="Session Management" onClick={()=>{props.setMiddleScreen("sessionTab");resetScreen("sessionTab");}} className="selectBrowser" >
 						<span><span className={'fa fa-users'+ ((props.middleScreen==="sessionTab") ? " selected-icon" : "")} ></span></span>Session Management</i></li>
 					<li className='left-top-section__preferencesTab'><i id='Preferences' title="Preferences" onClick={()=>{props.setMiddleScreen("Preferences");resetScreen("Preferences")}} className="selectBrowser" >

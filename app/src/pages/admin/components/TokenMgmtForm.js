@@ -192,7 +192,7 @@ const TokenMgmtForm = (props) => {
                             <span className="leftControl-tkn-mgmt" title="User">Username</span>
                             <select  value={props.targetid} id="selAssignUser1" onChange={(event)=>{loadData(event.target.value,true);props.setTargetid(event.target.value);props.setSelAssignUser2ErrBorder(false)}} className={props.selAssignUser2ErrBorder?'selectErrorBorder adminSelect-tkn-mgmt form-control-tkn-mgmt':'adminSelect-tkn-mgmt form-control-tkn-mgmt'}>
                                 {allUsers.map((entry,index) => (
-                                    <option key={index} value={entry[1]}>{entry[0]}</option>
+									<option key={index} value={entry[1]} disabled={entry[0]==='Select User'?true:false}>{entry[0]}</option>
                                 ))}
                             </select>
                         </div>
