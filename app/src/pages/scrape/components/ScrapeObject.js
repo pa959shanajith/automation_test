@@ -25,7 +25,7 @@ const ScrapeObject = props => {
     const checkKeyPress = event => {
         if (event.keyCode === 13) {
             setEdit(false);
-            props.renameScrapeItem(props.object.val, objName)
+            props.modifyScrapeItem(props.object.val, {custname: objName})
         }
     }
 
@@ -44,8 +44,8 @@ const ScrapeObject = props => {
                 </ClickAwayListener>
                 : 
                 <div className="ss_obj_label">
-                    <input className="ss_obj_chkbx" type="checkbox" onChange={handleCheckbox} checked={checked} />
-                    <div className={"ss_obj_name" + (props.object.duplicate ? " ss__red" : "")} onDoubleClick={()=>setEdit(true)}>{objName}</div> 
+                    {!props.hideCheckbox && <input className="ss_obj_chkbx" type="checkbox" onChange={handleCheckbox} checked={checked} />}
+                    <div className={"ss_obj_name" + (props.object.duplicate ? " ss__red" : "") + (props.object.isCustom ? " ss__customObject": "")} onDoubleClick={!props.notEditable ? ()=>setEdit(true) : null}>{objName}</div> 
                 </div>
             }
         </div>
