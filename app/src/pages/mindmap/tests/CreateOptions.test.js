@@ -1,11 +1,19 @@
 import React from 'react';
-import { shallow } from 'enzyme';
+import {mount} from 'enzyme';
 import CreateOptions from '../components/CreateOptions';
 import {findByTestAtrr} from '../../../setupTests';
-
+import { Provider } from 'react-redux';
+import reducer from '../state/reducer';
+import {createStore} from 'redux';
 
 const setUp = (props={setOptions:()=>{}}) => {
-    const component = shallow(<CreateOptions {...props} />);
+    const mockStore = createStore(reducer, {count: 0});
+    const component =
+    mount(
+        <Provider store={mockStore}>
+          <CreateOptions {...props} />
+        </Provider>
+      );
     return component;
 };
 
