@@ -3395,7 +3395,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     for (var j = 0; j < moduleObj.scenarioids.length; j++) {
                         var s_data = JSON.parse(JSON.stringify(suiteDetailsTemplate));
                         if(moduleObj.accessibilityTestingMap[moduleObj.scenarioids[j]] == "Enable"){
-                            s_data.accessibilityParameters = []
+                            s_data.accessibilityParameters = ["AA","A","508","Best Practice"]
                         }
                         s_data.condition = moduleObj.condition[j];
                         s_data.dataparam = [moduleObj.dataparam[j]];
