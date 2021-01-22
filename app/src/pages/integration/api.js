@@ -168,7 +168,7 @@ export const viewQtestMappedList_ICE = async(userID) => {
     }
 }
 
-export const loginQCServer_ICE = async(qcURL ,qcUsername ,qcPassword) => {
+export const loginQCServer_ICE = async(qcPassword , qcURL , qcUsername ) => {
     try{
         const res = await axios(url+'/loginQCServer_ICE', {
             method: 'POST',
@@ -176,10 +176,10 @@ export const loginQCServer_ICE = async(qcURL ,qcUsername ,qcPassword) => {
             'Content-type': 'application/json',
             },
            data: {
-            action : 'loginQCServer_ICE',
-            qcURL: qcURL,
-            qcUsername: qcUsername,
             qcPassword: qcPassword,
+            qcURL: qcURL,
+            qcUsername: qcUsername,   
+            action : 'loginQCServer_ICE',
             qcaction : "domain"
         }
         });
@@ -195,5 +195,128 @@ export const loginQCServer_ICE = async(qcURL ,qcUsername ,qcPassword) => {
     }catch(err){
         console.error(err)
         return {error:'No User Details Found ,Please Login Again'}
+    }
+}
+
+export const qcProjectDetails_ICE = async(domain ,user_id ) => {
+    try{
+        const res = await axios(url+'/qcProjectDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            action : 'qcProjectDetails_ICE',
+            domain: domain,
+            user_id: user_id,
+            qcaction : "project"
+        }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'No Projects Found ,Please add Projects'}
+    }catch(err){
+        console.error(err)
+        return {error:'No Projects Found ,Please add Projects'}
+    }
+}
+
+export const qcFolderDetails_ICE = async(domain ,foldername ,project,qcaction,testset) => {
+    try{
+        const res = await axios(url+'/qcFolderDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            action : 'qcFolderDetails_ICE',
+            domain: domain,
+            foldername: foldername,
+            project : project,
+            qcaction : qcaction,
+            testset : testset
+        }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'No Projects Found ,Please add Projects'}
+    }catch(err){
+        console.error(err)
+        return {error:'No Projects Found ,Please add Projects'}
+    }
+}
+
+/*Component saveQtestDetails_ICE
+  use: Saves the Synced TestCzses and Scenario pair
+  api returns: sucess/ Fail 
+*/
+export const saveQcDetails_ICE = async(mappedDetails) => {
+    try{
+        const res = await axios(url+'/saveQcDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            mappedDetails : mappedDetails,
+            action : 'saveQcDetails_ICE'
+            
+           }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Map Test Cases Before save'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to Save Mapped TestCases'}
+    }
+}
+/*Component viewQtestMappedList_ICE
+  use: Gets the Values of the mapped files 
+  api returns: [] 
+*/
+export const viewQcMappedList_ICE = async(userID) => {
+    try{
+        const res = await axios(url+'/viewQcMappedList_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            user_id : userID,
+            action : 'viewQcMappedList_ICE'
+            
+           }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'No Mapped Dataa Found'}
+    }catch(err){
+        console.error(err)
+        return {error:'No Mapped Data Found'}
     }
 }
