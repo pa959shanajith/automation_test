@@ -1,6 +1,6 @@
 import React ,  { Fragment, useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
-import {ScreenOverlay,PopupMsg, RedirectPage, ModalContainer} from '../../global' 
+import {ScreenOverlay,PopupMsg, ModalContainer} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
 import '../styles/Project.scss';
@@ -87,7 +87,7 @@ const ProjectNew = (props) => {
             for (var i = 0; i < plugins_list.length; i++) {
                 plugins[i] = plugins_list[i];
             }
-            const data = await getDomains_ICE()
+            let data = await getDomains_ICE() 
             if(data.error){displayError(data.error);return;}
             else if(data.length===0){
                 data=['Banking','Manufacturing','Finance'];
