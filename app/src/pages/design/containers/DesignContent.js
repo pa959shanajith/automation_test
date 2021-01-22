@@ -11,6 +11,7 @@ import RemarkDialog from '../components/RemarkDialog';
 import PasteStepDialog from '../components/PasteStepDialog';
 import SelectMultipleDialog from '../components/SelectMultipleDialog';
 import * as DesignApi from "../api";
+import { reviewTask } from '../../global/api';
 import * as pluginActions from "../../plugin/state/action";
 import * as designActions from '../state/action';
 import "../styles/DesignContent.scss";
@@ -463,7 +464,7 @@ const DesignContent = (props) => {
 			taskstatus = 'reassign';
         }
 
-        DesignApi.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
+        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
         .then(result => {
             if (result === "fail") props.setShowPop({'title': 'Task Submission Error', 'content': 'Reviewer is not assigned !'});
             else if (taskstatus === 'reassign') props.setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});
@@ -588,7 +589,7 @@ const DesignContent = (props) => {
         setFocusedRow(null);
 
         if (!copiedContent.testCaseId){
-            // console.log("No TestCase to Paste");
+            props.setShowPop({'title': 'Paste Test Step', 'content': 'No Testcases to Paste! Please Copy Testcase(s) before Pasting.'});
             return;
         }
 
@@ -767,7 +768,7 @@ const DesignContent = (props) => {
 
                 <div className="d__taskBtns">
                     <button className="d__taskBtn d__btn" onClick={saveTestCases} disabled={!changed}>Save</button>
-                    <button className="d__taskBtn d__btn" onClick={deleteTestcase}>Delete</button>
+                    <button className="d__taskBtn d__btn" onClick={deleteTestcase} disabled={!checkedRows.length}>Delete</button>
                 </div>
 
                 <div className="d__submit">

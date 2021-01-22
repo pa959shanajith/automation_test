@@ -9,13 +9,14 @@ import "../styles/RefBarItems.scss";
 const RefBarItems = props => {
 
 	const { appType } = useSelector(state=>state.plugin.CT);
+	const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const [toFilter, setToFilter] = useState([]);
 	const [tagList, setTagList] = useState([]);
 	const [showFilterPop, setShowFilterPop] = useState(false);
 	const [filterY, setFilterY] = useState(null);
 	const [showScreenPop, setShowScreenPop] = useState(false);
 	const [screenshotY, setScreenshotY] = useState(null);
-	const { scrapeItems, setScrapeItems } = useContext(ScrapeContext);
+	const { scrapeItems, setScrapeItems, scrapedURL } = useContext(ScrapeContext);
 
 	useEffect(()=>{
 		if (appType === "MobileApp") navigator.appVersion.indexOf("Mac") !== -1 ? setTagList(list.mobileMacFilters) : setTagList(list.mobileFilters);
@@ -188,10 +189,10 @@ const RefBarItems = props => {
     
     return (
     
-        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} >
+        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} scrapeScreenURL={scrapedURL} >
 
 			{ appType!=="Webservice" && appType!=="Mainframe" && <div className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
-            <span onClick={toggleFilterPop} className="ic_box "  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>
+            <span onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>
         </ReferenceBar>
         
     

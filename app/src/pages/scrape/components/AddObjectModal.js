@@ -76,13 +76,21 @@ const AddObjectModal = props => {
         setError(errorObj)
     }
 
+    const resetFields = () => {
+        let emptyFields = [...objects];
+        for (let i=0; i<emptyFields.length; i++) {
+            emptyFields[i] = {objName: "", objType: ""};
+        }
+        setObjects(emptyFields);
+    }
+
     return (
         <div className="ss__objModal">
             <ModalContainer 
                 title="Add Object"
                 content={
-                    <div className="ss__objModal_content">
-                        <ScrollBar hideXbar={true} thumbColor="#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                    <div className="ss__objModal_content" id="ss__objModalListId">
+                        <ScrollBar scrollId="ss__objModalListId" hideXbar={true} thumbColor="#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
                                 { objects.map((object, index) => <div className="ss__objModal_item" key={index}>
                                         <input className={"addObj_name"+(error.type==="input" && error.index === index ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
                                         <select className={"addObj_objType"+(error.type==="type" && error.index === index ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
@@ -102,7 +110,7 @@ const AddObjectModal = props => {
                 }
                 close={()=>props.setShow(false)}
                 footer={<>
-                    <button>Reset</button>
+                    <button onClick={resetFields}>Reset</button>
                     <button onClick={onSubmit}>Submit</button>
                 </>}
             />

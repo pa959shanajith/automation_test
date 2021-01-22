@@ -129,3 +129,34 @@ export const getRoleNameByRoleId = async(roleasarray) => {
         })
     })
 }
+
+/*Component DesignContent
+  api returns fail/inprogress
+*/ 
+export const reviewTask = (projectId, taskid, taskstatus, version, batchTaskIDs) => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/reviewTask", {
+            method : 'POST',
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: { action: 'reviewTask', 
+                    prjId: projectId,
+                    taskId: taskid,
+                    status: taskstatus,
+                    versionnumber: version,
+                    batchIds: batchTaskIDs
+                },
+            credentials : 'include'
+        })
+        .then(res=>{
+            if (res.status === 200 && res.data!=="fail") {
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => reject(err));
+    })
+}
