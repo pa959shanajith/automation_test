@@ -160,7 +160,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
         // $("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
         // $("#scheduledSuitesFilterData").prop('selectedIndex', 0);
         // $(".selectScheduleSuite, .selectToSched").prop("checked", false);
-        setExecAction("parallel");
+        setExecAction("serial");
         setBrowserTypeExe([]);
         // $(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;");
     }
@@ -176,6 +176,11 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
         else if (value == "2") {
             setShowIntegrationModal("Zephyr")
 		}
+    }
+
+    const sortDateTime = () => {
+        const data = scheduledData.sort((a, b) => b.scheduledatetime - a.scheduledatetime);
+        setScheduledData(data);
     }
 
     return (
@@ -245,7 +250,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
 
                     <div className="scheduleDataTable">
 						<div className="scheduleDataHeader">
-							<span className="s__Table_date s__table_Textoverflow s__cursor s__Table_border" title="Click to sort" ng-click="reverse=!reverse;predicate='scheduledatetime'">Date & Time</span>
+							<span className="s__Table_date s__table_Textoverflow s__cursor s__Table_border" onClick={()=>{sortDateTime()}} title="Click to sort" ng-click="reverse=!reverse;predicate='scheduledatetime'">Date & Time</span>
 							<span className="s__Table_host s__table_Textoverflow s__Table_border" >Host</span>
 							<span className="s__Table_scenario s__table_Textoverflow s__Table_border" >Scenario Name</span>
 							<span className="s__Table_suite s__table_Textoverflow s__Table_border" >Test Suite</span>
