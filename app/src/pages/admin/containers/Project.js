@@ -90,7 +90,6 @@ const ProjectNew = (props) => {
             const data = await getDomains_ICE()
             if(data.error){displayError(data.error);return;}
             else if(data.length===0){
-                // eslint-disable-next-line
                 data=['Banking','Manufacturing','Finance'];
             }
             setSelDomainOptions(data);
