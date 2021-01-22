@@ -1,0 +1,244 @@
+#pageContent{
+	float:left;
+	width:100%;
+	height: 95%;
+}
+#syncScenario-schedule{
+    height: 20px;
+    background: white;
+    color: black;
+    border: 1px solid #7b7c7f !important;
+    border-radius: 3px !important;
+    margin-left: 5%;
+}
+#wrapper-sc{
+	float: left;
+    width: 100%;
+    position: relative;
+    height: 100%;
+}
+.s__task_container{
+    display: flex
+}
+.s__btn-md.focus,
+.s__btn-md,
+.s__btn-md:active:focus,
+.s__btn-md:focus,
+.s__btn-md:hover {
+    color: #fff !important;
+    border: 0 !important;
+    border-radius: 20px !important;
+    padding: 2px 15px !important;
+    font-size: 17px !important;
+    background: #643693 ;
+	font-family: 'LatoWebLight' !important;
+    outline: 0 !important;
+}
+@media screen and (min-width:1800px){
+    .s__btn-md{
+        font-size: 1.2vw !important;
+    }
+}
+.s__btn-md-cust{
+    margin-bottom: 25px !important;
+}
+.btnAddToSchedule:hover, 
+.btnAddToSchedule.focus,
+.btnAddToSchedule,
+.btnAddToSchedule:active:focus,
+.btnAddToSchedule:focus {
+    padding: 2px 30px !important;
+    margin-right:10px;
+    float: right!important;
+}
+.s__task_title{
+    margin-bottom: 10px;
+   max-width: 80%;
+}
+
+.s__task_name{
+    background-color: #331d4e;
+    color: #fff;
+    padding: 1px 14px 0;
+    font-family: "LatoWebLight";
+    font-size: 18px;
+    width: fit-content;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-radius: 5px;
+}
+.s__taskBtn {
+    padding: 0px 12px;
+    margin-right: 7px;
+    background-color: #633693;
+    margin-top: 7px;
+}
+.s__btn {
+    border: none;
+    outline: none;
+    color: #fff;
+    border-radius: 20px;
+    font-size: 13px;
+    line-height: 19.5px;
+    font-family: 'LatoWebLight';
+}
+#scheduleSuitesTopSection{
+	position: relative;
+    // height: 45%;
+    height: 35vh;
+	float:left;
+	width:100%;
+	// padding-bottom: 25px;
+}
+
+#scheduleSuitesBottomSection{
+	float: left;
+    width: calc(100% + 40px);
+    position: relative;
+    border-top: 20px solid #EEEEEE;
+    margin-left: -20px;
+    padding: 20px;
+    // height: 57%;
+    height: 35vh;
+}
+.form-control-schedule{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+#scheduledSuitesFilterData{
+    margin-bottom: 0;
+    border: 1px solid #5e636b !important;
+    display: inline-block;
+    float: none;
+    width: 15%;
+    height: 30px;
+    font-size: 14px;
+    font-family: 'LatoWeb';
+    margin-left: 15px;
+    outline: 0;
+}
+#scheduledSuitesFilterData:focus{
+    box-shadow:none;
+    outline: 0;
+}
+.scheduleDataTable{
+    opacity: 1;
+	float:left;
+	width:100%;
+	height: calc(100% - 31px);
+}
+.scheduleDataHeader{
+    position: relative;
+    width: 100%;
+    margin: -0.1em;
+    z-index: 1;
+    /*background: #5e636b;*/
+    background: #5e626b;
+    color: #fff;
+    font-size: 17px;
+    font-family: 'LatoWebLight';
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+}
+.s__Table_date{
+    width: 18%;
+    cursor: pointer;
+}
+.s__Table_host{
+    width: 12%; 
+}
+.s__Table_scenario{
+    width: 20%;
+}
+.s__Table_suite{
+    width: 20%;
+}
+.s__Table_appType{
+    width: 15%; 
+}
+.s__Table_status{
+    width: 9%
+}
+.s__Table_border{
+    border-right: 1px solid #fff
+}
+.s__table_Textoverflow{
+    flex: 0 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#scheduledDataBody{
+	float:left;
+	width:100% !important;
+	// margin-top: 28px;
+	overflow: auto;
+	-ms-overflow-style: none;
+    -webkit-overflow-style: none;
+    // max-height: 23vh;
+    max-height: 17vh;
+}
+.scheduleDataBodyRowChild{
+	width: 100%;
+    /*display: block !important;*/
+    float: left !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    display: flex;
+    justify-content: space-between;
+}
+.scheduleDataBodyRowChild div:nth-child(2),.scheduleDataBodyRowChild div:nth-child(3),.scheduleDataBodyRowChild div:nth-child(4){
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    vertical-align: middle;
+}
+.scheduleDataHeader span, .scheduleDataBodyRow>div div{
+	font-weight: normal !important;
+	padding: 1px 0px;
+	display: inline-block;
+    text-align: center;
+    font-family: 'LatoWeb';
+	/* float:left; */
+}
+.scheduleDataBodyRow>div div{
+    font-size: 14px;
+}
+.scheduleDataHeader span{
+	font-size: 17px !important;
+}
+.s__cursor{
+    cursor: pointer;
+}
+.scheduleDataBodyRowChild:nth-child(odd){
+	background: rgb(232, 230, 254);
+}
+.s__Table_apptypy_img{
+    margin-right: 5px;
+}
+#tableActionButtons{
+	float:left;
+	width:100%;
+	margin-bottom: 15px;
+	// opacity:0
+}
+.s__Table_date-time{
+    cursor: default;
+}

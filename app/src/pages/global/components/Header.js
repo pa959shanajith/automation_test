@@ -8,6 +8,7 @@ import { getRoleNameByRoleId } from '../api';
 import * as actionTypes from '../../login/state/action';
 import ClickAwayListener from 'react-click-away-listener';
 import ChangePassword from './ChangePassword';
+import ChangeDefaultIce from './ChangeDefaultIce';
 import { persistor } from '../../../reducer'
 
 
@@ -27,6 +28,7 @@ const Header = () => {
     const [username, setUsername] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [showChangePass, setShowChangePass] = useState(false);
+    const [showChangeDefaultIce, setShowChangeDefaultIce] = useState(false);
     const [showSuccessPass, setSuccessPass] = useState(false);
     const [showUD, setShowUD] = useState(false);
     const [showSR, setShowSR] = useState(false);
@@ -118,6 +120,11 @@ const Header = () => {
         setShowChangePass(!showChangePass);
     };
 
+    const chngDftIce = () => {
+        setShowUD(false);
+        setShowChangeDefaultIce(true);
+    };
+
     const resetSuccess = () => {
         setSuccessPass(false);
 		window.sessionStorage.clear();
@@ -203,6 +210,7 @@ const Header = () => {
         <> 
             { redirectTo && <Redirect to={redirectTo} /> }
             { showChangePass && <ChangePassword setShow={toggleChangePass} setSuccessPass={setSuccessPass} /> }
+            { showChangeDefaultIce && <ChangeDefaultIce /> }
             { showSuccessPass && <PasswordSuccessPopup /> }
             { showConfSR && <ConfSwitchRole />  }
             { showSR_Pop && <SRPopup /> }
@@ -242,6 +250,7 @@ const Header = () => {
                                 !adminDisable &&
                                 <>
                                 <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
+                                <div onClick={chngDftIce} ><Link to="#">Change Default ICE</Link></div>
                                 <div onClick={resetPass}><Link to="#">Change Password</Link></div>
                                 </>
                             }

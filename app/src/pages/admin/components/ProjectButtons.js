@@ -10,7 +10,6 @@ import '../styles/ProjectButtons.scss';
     
 const ProjectButtons = (props) => {
     
-    const [valid,setValid] = useState("")
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 
@@ -37,15 +36,12 @@ const ProjectButtons = (props) => {
             else if (proceedToCreate === true) {
 				var requestedids = [];
 				var idtype = [];
-				checkCycle(props.flag);
-
-				if (valid === "false") {
-					return false;
-            	} 
-            else if (props.selDomain !== "") {
+				if ( checkCycle(props.flag)) return false;
+                else if (props.selDomain !== "") {
                     requestedids.push(props.selDomain);
                     idtype.push('domainsall');
                     var proceeed = false;
+                    //loading hatao and saving karo
                     const response = await getNames_ICE(requestedids, idtype)
                     if(response.error){displayError(response.error);return;}
                     else if (response === "No Projects") {
@@ -62,7 +58,7 @@ const ProjectButtons = (props) => {
                         return false;
                     }
                     if (proceeed === true) {
-                        setLoading("Loading...");
+                        setLoading("Saving...");
                         const createprojectObj = {};
                         createprojectObj.domain = props.selDomain;
                         createprojectObj.projectName = props.projectName.trim();
@@ -96,12 +92,12 @@ const ProjectButtons = (props) => {
 				if (props.releaseList[j] === props.projectDetails[i].name) {
 					if (props.projectDetails[i].cycles.length === 0) {
                         setPopupState({show:true,title:"Create Project",content:"Please add atleast one cycle for a release"});
-                        setValid(false);
-						return flag;
+                        return true;
 					}
 				}
 			}
         };
+        return false;
     }
     
     //Update Project Action
@@ -186,8 +182,29 @@ const ProjectButtons = (props) => {
 					updateProjectObj.newProjectDetails = props.newProjectDetails;
 				else
 					updateProjectObj.newProjectDetails.push(props.newProjectDetails);
-                if( updateProjectObj.projectName !== props.editProjectName && props.editProjectName !== "")
-                     updateProjectObj.newProjectName  = props.editProjectName.trim();
+                if( updateProjectObj.projectName !== props.editProjectName && props.editProjectName !== ""){
+                    var requestedids = [];
+                    var idtype = [];
+                    requestedids.push(props.selDomain);
+                    idtype.push('domainsall');
+                    var proceeed = false;
+                    const response = await getNames_ICE(requestedids, idtype)
+                    if(response.error){displayError(response.error);return;}
+                    else if (response === "No Projects") {
+                        proceeed = true;
+                    } else if (response.projectNames.length > 0) {
+                        for ( i = 0; i < response.projectNames.length; i++) {
+                            if (props.editProjectName.trim() === response.projectNames[i]) {
+                                setPopupState({show:true,title:"Create Project",content:"Project Name already Exists"});
+                                proceeed = false;
+                                setLoading(false);
+                                return;
+                            } else proceeed = true;
+                        }
+                    } 
+                    if (proceeed === true) updateProjectObj.newProjectName  = props.editProjectName.trim();
+                }
+                 
                 const updateProjectRes = await updateProject_ICE(updateProjectObj);
                 if(updateProjectRes.error){displayError(updateProjectRes.error);return;}
                 props.clearUpdateProjectObjects();

@@ -116,7 +116,33 @@ export const getRoleNameByRoleId = async(roleasarray) => {
             data: {'action': "getRoleNameByRoleId", 'role': roleasarray},
             credentials : 'include'
         })
-        .then(res=>{
+        .then(res => {
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+/*Component ChangeDefaultIce
+  api returns ice_list: [""] or string mssg ex. "fail"
+*/
+export const getUserICE = async() => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/getUserICE", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            credentials : 'include'
+        })
+        .then(res => {
             if (res.status === 200){
                 resolve(res.data);
             }
@@ -149,14 +175,43 @@ export const reviewTask = (projectId, taskid, taskstatus, version, batchTaskIDs)
                 },
             credentials : 'include'
         })
-        .then(res=>{
-            if (res.status === 200 && res.data!=="fail") {
+        .then(res => {
+            if (res.status === 200){
                 resolve(res.data);
             }
             else{
                 reject(res.status);
             }
         })
-        .catch(err => reject(err));
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+/*Component ChangeDefaultIce
+  api returns string mssg ex. "success"
+*/
+export const setDefaultUserICE = async(defaultICE) => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/setDefaultUserICE", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: { defaultICE : defaultICE},
+            credentials : 'include'
+        })
+        .then(res => {
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
     })
 }

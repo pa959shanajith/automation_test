@@ -12,7 +12,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
 
     const userInfo = useSelector(state=>state.login.userinfo);
     const [scenarioDetails,setScenarioDetails] = useState({})
-    const [showDeleteModal,setshowDeleteModal] = useState(false)
+    const [showModal,setshowModal] = useState(false)
     const [projectAppType,setProjectApptype] = useState({})
     const [initialTableList,setInitialTableList] = useState([])
     const [popup,setPopup] = useState({show:false})
@@ -142,7 +142,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
     }
 
     const closeModal = () => {
-        setshowDeleteModal(false);
+        setshowModal(false);
     }
 
     const loadLocationDetailsScenario = async (scenarioName, scenarioId) => {
@@ -195,7 +195,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                                                                 <td  className='tabeleCellPadding exe-ExecuteStatus'>
                                                                     <input id={"executestatus_"+m+"_"+count} checked={rowData.executestatus[count]!== undefined && rowData.executestatus[count]!== 0 ? true:false} onChange={()=>{changeExecutestatus(m,count,eachData,batchStatusCheckbox,setEachData)}} type='checkbox' title='Select to execute this scenario' className='doNotExecuteScenario e-execute'/>
                                                                 </td>
-                                                                <td title={rowData.scenarionames[count]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(rowData.scenarionames[count],rowData.scenarioids[count]);setshowDeleteModal(true);}} sId={rowData.scenarioids[count]} >{rowData.scenarionames[count]}</td>
+                                                                <td title={rowData.scenarionames[count]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(rowData.scenarionames[count],rowData.scenarioids[count]);setshowModal(true);}} sId={rowData.scenarioids[count]} >{rowData.scenarionames[count]}</td>
                                                                 <td className="tabeleCellPadding exe-dataParam"><input className="e__getParamPath" type="text" onChange={(event)=>{changeParamPath(m,count,event.target.value)}} value={ rowData.dataparam[count]}/></td>
                                                                 <td className="tabeleCellPadding exe-conditionCheck"><select onChange={(event)=>{conditionUpdate(m,count,event.target.value)}} value={JSON.parse(rowData.condition[count])} className={"conditionCheck form-control"+(((rowData.condition[count]===0 || rowData.condition[count]=== "0"))?" alertRed":" alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </td>
                                                                 <td title={rowData.projectnames[count]}  className='tabeleCellPadding projectName'>{rowData.projectnames[count]}</td>
@@ -217,17 +217,17 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                     </div>
                 </div> 
             </div>
-            {showDeleteModal?
-                <ModalContainer title={scenarioDetails.modalHeader} footer={submitModalButtons(setshowDeleteModal)} close={closeModal} content={scenarioDetailsContent(scenarioDetails, userInfo, displayError)} modalClass=" modal-sm" />
+            {showModal?
+                <ModalContainer title={scenarioDetails.modalHeader} footer={submitModalButtons(setshowModal)} close={closeModal} content={scenarioDetailsContent(scenarioDetails, userInfo, displayError)} />
             :null} 
         </>
     );
 }
 
 
-const submitModalButtons = (setshowDeleteModal) => {
+const submitModalButtons = (setshowModal) => {
     return(
-        <button type="button" onClick={()=>{setshowDeleteModal(false);}} >Ok</button>
+        <button type="button" onClick={()=>{setshowModal(false);}} >Ok</button>
     )
 }
 

@@ -178,7 +178,7 @@ const IceProvisionForm = (props) => {
 					<span className="leftControl-ip" title="User">User</span>
                     <select value={props.userid} onChange={(event)=>props.setUserid(event.target.value)} disabled={props.op!=='normal'}  id="selAssignUser2" className={selAssignUser2ErrBorder?'selectErrorBorder adminSelect-ip form-control-ip':'adminSelect-ip form-control-ip'}>
                         {users.map((entry,index) => (
-                            <option key={index} value={entry[1]}>{entry[0]}</option>
+                            <option disabled={entry[0]==='Select User'?true:false} key={index} value={entry[1]}>{entry[0]}</option>
                         ))}
                     </select>
                 </div></div>
