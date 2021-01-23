@@ -6,6 +6,7 @@
     padding: 20px;
     margin: 0 5px;
     background-color: #fff;
+    overflow-x: hidden;
 }
 
 .d__task_title{
@@ -38,6 +39,12 @@
     max-width: 100%;
     margin-bottom: 15px;
     font-family: 'LatoWebLight';
+}
+
+@media screen and (max-width: 850px){
+    .d__btngroup{
+        flex-direction: column;
+    }
 }
 
 .d__table_ac_btn_grp{
@@ -157,6 +164,8 @@
     height: 100%;
     padding: 0 5px;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .keyword_col{
