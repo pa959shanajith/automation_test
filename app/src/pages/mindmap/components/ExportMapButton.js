@@ -64,8 +64,8 @@ const Container = ({fnameRef,ftypeRef,modName,isAssign}) =>(
         </div>
         <div className='export-row'>
             <label>Export As: </label>
-            <select ref={ftypeRef}>
-                <option value={'def-option'}>Select Export Format</option>
+            <select defaultValue={'def-option'} ref={ftypeRef}>
+                <option value={'def-option'} disabled>Select Export Format</option>
                 <option value={'excel'}>Excel Workbook (.xlsx)</option>
                 <option value={'json'}>MindMap (.mm)</option>
                 {isAssign && <option value={'custom'}>Custom (.json)</option>}

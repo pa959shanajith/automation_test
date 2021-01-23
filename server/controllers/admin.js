@@ -65,12 +65,12 @@ exports.manageUserDetails = async (req, res) => {
 			inputs.userid = (reqData.userid || "").trim();
 		}
 		if (action != "delete") {
-			if (internalUser) {
-				if (validator.isEmpty(inputs.auth.password) && !(validator.isLength(inputs.auth.password,1,12))) {
-					logger.error("Error occurred in admin/"+fnName+": Invalid Password.");
-					flag[5]='1';
-				}
-			}
+			// if (internalUser) {
+			// 	if (validator.isEmpty(inputs.auth.password) && !(validator.isLength(inputs.auth.password,1,12))) {
+			// 		logger.error("Error occurred in admin/"+fnName+": Invalid Password.");
+			// 		flag[5]='1';
+			// 	}
+			// }
 			if (inputs.auth.password != '') {
 				const salt = bcrypt.genSaltSync(10);
 				inputs.auth.password = bcrypt.hashSync(inputs.auth.password, salt);

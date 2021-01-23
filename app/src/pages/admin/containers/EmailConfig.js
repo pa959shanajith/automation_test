@@ -215,7 +215,7 @@ const selectProvider = async({inputRef,showPool,showAuth,showProxCred,showProxUr
         setLoading('Loading ...');
         var data = await getNotificationChannels(arg);
         if(data.error){displayError(data.error);return;}
-        if(data === 'empty'){setLoading(false);return;}
+        if(data === 'empty'){inputRef.toggleUppdate.disabled=false;setLoading(false);return;}
         inputRef.toggleUppdate.current.innerText = 'Update'
         inputRef.servername.current.value = data.name
         if(data.name)inputRef.servername.current.readOnly = true

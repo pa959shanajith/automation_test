@@ -359,7 +359,7 @@ const TaskBox = (props) => {
                     <span id='unassign-btn' onClick={()=>unAssign(true)} className={(assignbtn.disable)?'disableButton':''}>Reassign</span>:
                     <span id='unassign-btn' onClick={()=>unAssign(false)} className={(assignbtn.disable)?'disableButton':''}>Unassign</span>
                     }
-                    <span id='task-ok' onClick={addTask}>Ok</span>
+                    <span id='task-ok' tabIndex={'0'} onClick={addTask} onKeyPress={addTask}>Ok</span>
                 </div>
             </div>
         </ClickAwayListener>
@@ -464,7 +464,12 @@ function addTask_11(pi, tObj, qid, cycleid,dNodes,nodeDisplay,cTask) {
             dNodes[pi].task.details = '';
         }
         if(!origTask && taskUndef){
-            dNodes[pi].task.details =  dNodes[pi].task.task + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name;
+            var type = dNodes[pi].type.slice(0,-1) //remove plural
+            // to avoid phrasing "Execute scenario scenarios" 
+            type = (type)?" "+type.charAt(0).toUpperCase()+type.slice(1):""
+            if(dNodes[pi].task.task == 'Execute Scenario')type = ""
+            dNodes[pi].task.details = dNodes[pi].task.task + type + " " + dNodes[pi].name
+            // dNodes[pi].task.details =  dNodes[pi].task.task + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name;
         }                
         if(!taskUndef && !origTask){
             dNodes[pi].task.reviewer = tObj.rw;

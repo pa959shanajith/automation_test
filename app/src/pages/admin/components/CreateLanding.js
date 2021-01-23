@@ -39,7 +39,7 @@ const CreateLanding = (props) => {
                 {(userConf.type !== "inhouse")?
                         <div className="adminControl-create" >
                             <select onChange={(event)=>{props.clearForm();dispatch({type:actionTypes.UPDATE_SERVER,payload:event.target.value});}} className={props.confServerAddClass?'adminSelect-create  form-control__conv-create selectErrorBorder confServer-cust':'adminSelect-create  form-control__conv-create confServer-cust'} id="confServer">
-                                <option defaultValue="" selected>Select Server</option>                                
+                                <option disabled={true} defaultValue="" selected={true}>Select Server</option>                                
                                 {userConf.confServerList.map((srv,index) => (      
                                     <option key={index} value={srv.name} disabled={userConf.confExpired===srv.name}>{srv.name}</option>
                                 ))}
