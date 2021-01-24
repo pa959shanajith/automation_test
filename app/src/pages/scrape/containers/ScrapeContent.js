@@ -114,7 +114,7 @@ const ScrapeContent = props => {
     
     const modifyScrapeItem = (value, newProperties, customFlag) => {
         let localScrapeItems = [...scrapeItems];
-        let updNewScrapedData = [...newScrapedData];
+        let updNewScrapedData = {...newScrapedData};
         let objId = "";
         let obj = null;
         for (let scrapeItem of localScrapeItems){
