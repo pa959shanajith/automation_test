@@ -17,6 +17,7 @@ const UpperContent = props => {
     const dispatch = useDispatch();
     const disableAction = useSelector(state => state.scrape.disableAction);
     const disableAppend = useSelector(state => state.scrape.disableAppend);
+    const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const { appType } = useSelector(state => state.plugin.CT);
     const [isMac, setIsMac] = useState(false);
     const [appendCheck, setAppendCheck] = useState(false);
@@ -29,12 +30,12 @@ const UpperContent = props => {
 
 
     const WebList = [
-        { 'title': "Internet Explorer", 'img': "static/imgs/ic-ie.png", action: () => startScrape('ie'), 'disable': disableAction },
-        { 'title': "Google Chrome", 'img': "static/imgs/ic-chrome.png", action: () => startScrape('chrome'), 'disable': disableAction },
-        { 'title': "Safari", 'img': "static/imgs/ic-safari.png", action: () => startScrape('safari'), 'disable': disableAction },
-        { 'title': "Mozilla Firefox", 'img': "static/imgs/ic-mozilla.png", action: () => startScrape('mozilla'), 'disable': disableAction },
-        { 'title': "Microsoft Edge", 'svg': "static/imgs/ic-edge.svg", action: () => startScrape('edge'), 'disable': disableAction },
-        { 'title': "Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg", action: () => startScrape('chromium'), 'disable': disableAction }
+        { 'title': "Internet Explorer", 'img': "static/imgs/ic-ie.png", action: () => startScrape('ie'), 'disable': disableAction || compareFlag },
+        { 'title': "Google Chrome", 'img': "static/imgs/ic-chrome.png", action: () => startScrape('chrome'), 'disable': disableAction || compareFlag },
+        { 'title': "Safari", 'img': "static/imgs/ic-safari.png", action: () => startScrape('safari'), 'disable': disableAction || compareFlag },
+        { 'title': "Mozilla Firefox", 'img': "static/imgs/ic-mozilla.png", action: () => startScrape('mozilla'), 'disable': disableAction || compareFlag },
+        { 'title': "Microsoft Edge", 'svg': "static/imgs/ic-edge.svg", action: () => startScrape('edge'), 'disable': disableAction || compareFlag },
+        { 'title': "Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg", action: () => startScrape('chromium'), 'disable': disableAction || compareFlag }
     ]
 
     const oebsList = [{ 'title': "OEBS Apps", 'img': 'static/imgs/ic-desktop.png', action: ()=> setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction }]
@@ -47,7 +48,7 @@ const UpperContent = props => {
 
     const mobileAppList = [{ 'title': "Mobile Apps", 'img': 'static/imgs/ic-mobility.png', action: () => setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction }]
 
-    const mobileWebList = [{ 'title': "Mobile Web", 'img': 'static/imgs/ic-mobility.png', action: () => setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction }]
+    const mobileWebList = [{ 'title': "Mobile Web", 'img': 'static/imgs/ic-mobility.png', action: () => setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction || compareFlag }]
 
 
     const onAppend = event => {
@@ -57,9 +58,9 @@ const UpperContent = props => {
     }
 
     let renderComp = [
-        <div key={1} className={'ss__scrapeOn' + (disableAction ? " disable-thumbnail" : "")}>Scrape On</div>,
+        <div key={1} className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Scrape On</div>,
         <Thumbnail title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />,
-        <div key={3} className={"ss__thumbnail" + (disableAppend ? " disable-thumbnail" : "")}>
+        <div key={3} className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
             <input id="enable_append" type="checkbox" onChange={onAppend} checked={appendCheck} />
             <span className="ss__thumbnail_title">Append</span>
         </div>
@@ -90,6 +91,7 @@ const BottomContent = () => {
 
     const { appType, screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
     const disableAction = useSelector(state => state.scrape.disableAction);
+    const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
 
     const { setShowObjModal, scrapeItems, setShowPop, fetchScrapeData } = useContext(ScrapeContext);
@@ -210,10 +212,10 @@ const BottomContent = () => {
     }
     
     const lowerList = [
-        {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb"}, 
-        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0},
-        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction },
-        {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb"},
+        {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable:  compareFlag}, 
+        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
+        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag },
+        {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(true), show: true},
         {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': customLen <= 0 && scrapeItemsLength-customLen <= 0, show: true}
     ]
