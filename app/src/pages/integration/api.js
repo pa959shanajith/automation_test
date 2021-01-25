@@ -314,7 +314,7 @@ export const viewQcMappedList_ICE = async(userID) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'No Mapped Dataa Found'}
+        return {error:'No Mapped Data Found'}
     }catch(err){
         console.error(err)
         return {error:'No Mapped Data Found'}

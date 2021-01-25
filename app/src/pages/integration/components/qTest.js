@@ -24,7 +24,7 @@ const QTest =(props)=>{
                 <select value={props.projectDropdn1} ref={props.selProjectRef} onChange={(e)=>props.callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
                     <option value="Select Project"selected disabled >Select Project</option>
 
-                    {   props.domainDetails ? 
+                    {   props.domainDetails.length ? 
                         props.domainDetails.map((e,i)=>(
                             <option id={e.id} value={e.name}>{e.name}</option>
                         )) : null
