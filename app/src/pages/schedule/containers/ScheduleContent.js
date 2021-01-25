@@ -19,7 +19,6 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
     const current_task = useSelector(state=>state.plugin.CT)
     const [scheduleTableData,setScheduleTableData] = useState([])
     const [moduleInfo,setModuleInfo] = useState([])
-    const [qccredentials,setQccredentials] = useState({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
     const [integration,setIntegration] = useState({alm: {url:"",username:"",password:""}, 
                                                     qtest: {url:"",username:"",password:"",qteststeps:""}, 
                                                     zephyr: {accountid:"",accesskey:"",secretkey:""}});
@@ -33,7 +32,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
 
     const getScheduledDetails = async () => {
         try{
-            setLoading(true);
+            setLoading("Loading...");
             const result = await getScheduledDetails_ICE();
             if (result && result.length > 0 && result != "fail") {
                 for (var k = 0; k < result.length; k++) {
