@@ -954,10 +954,10 @@ exports.getAccessibilityReports_API = async(req, res)=>{
         }else{
             result["error"] = "Invalid Token";
         }
+        res.send(result);
     }catch(e){
         logger.error("Exception occured in getAccessibilityReports_API service", exception);
     }
-    res.send(result);
 }
 
 function validateData(content, type) {

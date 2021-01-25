@@ -540,7 +540,6 @@ if (cluster.isMaster) {
 		// Wecoccular Plugin
 		app.post('/crawlResults', auth.protect, webocular.getCrawlResults);
 		app.post('/saveResults', auth.protect, webocular.saveResults);
-		app.post('/getWebocularModule_ICE', auth.protect, webocular.getWebocularModule_ICE);
 		//Accessibility Testing routes
 		app.post('/getAccessibilityData_ICE', auth.protect, accessibilityTesting.getAccessibilityTestingData_ICE);
 		//Chatbot Routes
