@@ -25,6 +25,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                                                     zephyr: {accountid:"",accesskey:"",secretkey:""}});
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [moduleSceduledate,setModuleSceduledate] = useState([])
+    const [sort,setSort] = useState(true)
 
     useEffect(()=>{
         getScheduledDetails()
@@ -185,7 +186,28 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
     }
 
     const sortDateTime = () => {
-        const data = scheduledData.sort((a, b) => b.scheduledatetime - a.scheduledatetime);
+        function compareOpp( a, b ) {
+            if ( a.scheduledatetime < b.scheduledatetime ){
+              return -1;
+            }
+            if ( a.scheduledatetime > b.scheduledatetime ){
+              return 1;
+            }
+            return 0;
+        }
+        function compare( a, b ) {
+            if ( a.scheduledatetime > b.scheduledatetime ){
+              return -1;
+            }
+            if ( a.scheduledatetime < b.scheduledatetime ){
+              return 1;
+            }
+            return 0;
+        }
+        
+        var data = [...scheduledData];
+        if( sort === true) {data.sort( compare );setSort(false);}
+        else {data.sort( compareOpp );setSort(true);}
         setScheduledData(data);
     }
 
