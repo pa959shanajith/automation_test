@@ -353,8 +353,6 @@ const ScrapeScreen = ()=>{
                     }
                 } else {
                     let viewString = data;
-                    
-                    // update Mirror
 
                     if (viewString.view.length !== 0){
                     let localScrapeList = [];
@@ -395,6 +393,7 @@ const ScrapeScreen = ()=>{
                     setNewScrapedData(updatedNewScrapeData);
                     updateScrapeItems(localScrapeList);
                     setScrapedURL(updatedNewScrapeData.scrapedurl);
+                    setMirror(viewString.mirror);
                     
                     if (viewString.view.length > 0) setSaved(false);
                 }                        
