@@ -1291,6 +1291,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				];
 				step = 3;
 			}
+			else if (item["@label"]=="Start" && screendata[0].apptype=="OEBS"){
+				firstScript = true;
+				testCaseSteps = [getTestcaseStep(1,null,'@Oebs','FindWindowAndAttach',screendata[0].url,null,null,"OEBS")],step = 2;
+			}
 		});	
 	}
 
@@ -1409,6 +1413,42 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					break;
 				default:
 					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
+					break;
+			}
+			if(testcaseObj){
+				testCaseSteps.push(testcaseObj);
+				step++;
+			}
+		}
+		//maping OEBS objects
+		else if(eachScrapedAction.apptype=="OEBS"){
+			text = eachScrapedAction.text;
+			input = text.split("  ");
+			switch(eachScrapedAction.tag){
+				case "combo box":
+				case "list":
+					if (eachScrapedAction.custname == '') eachScrapedAction.custname=eachScrapedAction.tag.concat("_elmnt");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectValueByText',[input[0]],null,null,"OEBS");
+					break;
+				case "push button":
+				case "page tab":
+					if (eachScrapedAction.custname == '') eachScrapedAction.custname=eachScrapedAction.tag.concat("_elmnt");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,null,"OEBS");
+					break;
+				case "radio button":
+					if (eachScrapedAction.custname == '') eachScrapedAction.custname=eachScrapedAction.tag.concat("_elmnt");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"OEBS");
+					break;
+				case "check box":
+					if (eachScrapedAction.custname == '') eachScrapedAction.custname=eachScrapedAction.tag.concat("_elmnt");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"OEBS");
+					break;
+				case "text":
+					if (eachScrapedAction.custname == '') eachScrapedAction.custname=eachScrapedAction.tag.concat("_elmnt");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"OEBS");
+					break;
+				default:
+					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for OEBS apptype.");
 					break;
 			}
 			if(testcaseObj){

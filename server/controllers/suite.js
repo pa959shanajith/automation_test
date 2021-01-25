@@ -617,7 +617,6 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 				try{
 					var batchInfo = partitionResult["batchInfo"];
 					var userBatchMap = clubBatches(batchInfo);
-				
 					//Make batch request for each partition
 					for(let targetUser in userBatchMap){
 						let user = JSON.parse(JSON.stringify(userInfo));
@@ -684,6 +683,8 @@ function clubBatches(batchInfo){
 
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
+	// Several client apps do not send TCP Keep-Alive. Hence this is handled in applicaton side.
+	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +process.env.KEEP_ALIVE);
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
 	await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
 };
