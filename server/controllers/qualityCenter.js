@@ -440,7 +440,6 @@ exports.viewQcMappedList_ICE = function (req, res) {
 	logger.info("Inside UI service: viewQcMappedList_ICE");
 	var userid = req.body.user_id;
 	getQcDetailsForUser(userid, function (responsedata) {
-		//console.log(responsedata);
 		res.send(responsedata);
 	});
 };
@@ -479,7 +478,7 @@ function getQcDetailsForUser(userid, cb) {
 			});
 		},
 		scenarioDetails: function (callback1) {
-				logger.info("Inside function scenarioDetails");
+			logger.info("Inside function scenarioDetails");
 			async.forEachSeries(projectidlist, function (itr, callback2) {
 				qcscenariodetails(itr, function (err, projectDetails) {
 					for (i = 0; i < projectDetails.length; i++) {

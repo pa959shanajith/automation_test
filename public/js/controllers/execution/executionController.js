@@ -528,7 +528,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	};
 	//Save TestSuite Functionality
 
-	$scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: "", integrationType: ""};
+	// $scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: "", integrationType: ""};
+	$scope.integration = {alm: {url:"",username:"",password:""}, 
+	qtest: {url:"",username:"",password:"",qteststeps:""}, 
+	zephyr: {accountid:"",accesskey:"",secretkey:""}};
 
 	//Save QC Details
 	$scope.saveQcCredentials = function (e) {
@@ -566,11 +569,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				} else if (data == "invalidurl") {
 					$(".error-msg-exeQc").text("Invalid URL");
 				} else {
-					$scope.qccredentials = {
-						qcurl: $("#almURL").val(),
-						qcusername: $("#almUserName").val(),
-						qcpassword: $("#almPassword").val(),
-						integrationType: "ALM"
+					$scope.integration.alm = {
+						url: $("#almURL").val(),
+						username: $("#almUserName").val(),
+						password: $("#almPassword").val()
 					}
 					$("#ALMSyncWindow").find("button.close").trigger("click");
 				}
@@ -615,12 +617,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				} else if (data == "invalidurl") {
 					$(".error-msg-exeQc").text("Invalid URL");
 				} else {
-					$scope.qccredentials = {
-						qcurl: $("#qTestURL").val(),
-						qcusername: $("#qTestUserName").val(),
-						qcpassword: $("#qTestPassword").val(),
-						qteststeps: checkedVal,
-						integrationType: "qTest"
+					$scope.integration.qtest = {
+						url:$("#qTestURL").val(),
+						username:$("#qTestUserName").val(),
+						password: $("#qTestPassword").val(),
+						qteststeps:checkedVal
 					}
 					$("#QTestSyncWindow").find("button.close").trigger("click");
 				}
@@ -632,15 +633,15 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	//Save Zephyr Details
 	$scope.saveZephyrCredentials = function (e) {
-		$("#ZephyrURL, #ZephyrUserName, #ZephyrPassword").removeClass('inputErrorBorder');
-		if (!$scope.ZephyrURL) {
-			$("#ZephyrURL").addClass('inputErrorBorder');
+		$("#ZephyrAccId, #ZephyrAccKey, #ZephyrSecKey").removeClass('inputErrorBorder');
+		if (!$scope.ZephyrAccId) {
+			$("#ZephyrAccId").addClass('inputErrorBorder');
 			$(".error-msg-exeQc").text("Please Enter Zephyr Account ID.");
-		} else if (!$scope.ZephyrUserName) {
-			$("#ZephyrUserName").addClass('inputErrorBorder');
+		} else if (!$scope.ZephyrAccKey) {
+			$("#ZephyrAccKey").addClass('inputErrorBorder');
 			$(".error-msg-exeQc").text("Please Enter Access Key.");
-		} else if (!$scope.ZephyrPassword) {
-			$("#ZephyrPassword").addClass('inputErrorBorder');
+		} else if (!$scope.ZephyrSecKey) {
+			$("#ZephyrSecKey").addClass('inputErrorBorder');
 			$(".error-msg-exeQc").text("Please Enter Secret Key.");
 		} else if (appType != "SAP" && browserTypeExe.length === 0) {
 			$("#ZephyrSyncWindow").find("button.close").trigger("click");
@@ -649,11 +650,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$("#ZephyrSyncWindow").find("button.close").trigger("click");
 			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
 		} else {
-			$("#ZephyrURL,#ZephyrUserName,#ZephyrPassword").css({
+			$("#ZephyrAccId,#ZephyrAccKey,#ZephyrSecKey").css({
 				"background": "none"
 			});
 			$(".error-msg-exeQc").text("");
-			ExecutionService.loginZephyrServer_ICE($scope.ZephyrURL, $scope.ZephyrUserName, $scope.ZephyrPassword,"Zephyr")
+			ExecutionService.loginZephyrServer_ICE($scope.ZephyrAccId, $scope.ZephyrAccKey, $scope.ZephyrSecKey,"Zephyr")
 			.then(function (data) {
 				if (data == "unavailableLocalServer") {
 					$(".error-msg-exeQc").text("Unavailable LocalServer");
@@ -664,11 +665,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				} else if (data == "invalidurl") {
 					$(".error-msg-exeQc").text("Invalid URL");
 				} else {
-					$scope.qccredentials = {
-						qcurl: $("#ZephyrURL").val(),
-						qcusername: $("#ZephyrUserName").val(),
-						qcpassword: $("#ZephyrPassword").val(),
-						integrationType: "Zephyr"
+					$scope.integration.zephyr = {
+						accountid: $("#ZephyrAccId").val(),
+						accesskey: $("#ZephyrAccKey").val(),
+						secretkey: $("#ZephyrSecKey").val()
 					}
 					$("#ZephyrSyncWindow").find("button.close").trigger("click");
 				}
@@ -732,7 +732,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				exectionMode: execAction,
 				executionEnv: execEnv,
 				browserType: browserTypeExe,
-				qccredentials: $scope.qccredentials,
+				// qccredentials: $scope.qccredentials,
+				integration: $scope.integration,
 				batchInfo: $scope.moduleInfo
 			};
 			allocateICEPopup()
@@ -962,12 +963,12 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$(".error-msg-exeQc").text('');
 		}
 		else if ($(this).val() == "2") {
-			$("#ZephyrURL").val('');
-			$("#ZephyrUserName").val('');
-			$("#ZephyrPassword").val('');
-			$scope.ZephyrURL = '';
-			$scope.ZephyrUserName = '';
-			$scope.ZephyrPassword = '';
+			$("#ZephyrAccId").val('');
+			$("#ZephyrAccKey").val('');
+			$("#ZephyrSecKey").val('');
+			$scope.ZephyrAccId = '';
+			$scope.ZephyrAccKey = '';
+			$scope.ZephyrSecKey = '';
 			$("#ZephyrSyncWindow").modal("show");
 			$(".error-msg-exeQc").text('');
 		}

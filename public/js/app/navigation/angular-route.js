@@ -11,6 +11,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/directives/headerDirective.js',				
+						'js/directives/tandcDirective.js',				
 						'js/controllers/login/baseController.js',
 						'js/controllers/login/loginService.js'
                     ]);
