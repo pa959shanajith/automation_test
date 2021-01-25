@@ -244,24 +244,25 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 	scenario.testcase = JSON.stringify(allTestcaseSteps);
 
 	// Step 3: Get qcdetails
-	inputs = {
-		"testscenarioid": scenarioid
-	};
-	if (integrationType == 'qTest') inputs.query = "qtestdetails";
-	else if (integrationType == 'ALM') inputs.query = "qcdetails";
-	else if (integrationType == 'Zephyr') inputs.query = "zephyrdetails";
-	if (!inputs.query) scenario.qcdetails = {};
-	else {
-		const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
-		if(integrationType == 'ALM' && Array.isArray(qcdetails)) {
-			for(var i=0;i<qcdetails.length;++i) {
-				if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
+	scenario.qcdetails = [];
+	for(var k =0; k<integrationType.length; ++k) {
+		inputs = {
+			"testscenarioid": scenarioid
+		};
+		const integ = integrationType[k];
+		if (integ == 'qTest') inputs.query = "qtestdetails";
+		else if (integ == 'ALM') inputs.query = "qcdetails";
+		else if (integ == 'Zephyr') inputs.query = "zephyrdetails";
+		if (inputs.query) {
+			const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
+			if(integ == 'ALM' && Array.isArray(qcdetails)) {
+				for (let i=0; i < qcdetails.length; ++i) {
+					if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
+				}
+				if (qcDetailsList.length > 0) scenario.qcdetails.push(qcDetailsList);
+			} else {
+				if (qcdetails != "fail" && qcdetails.length > 0) scenario.qcdetails.push(JSON.parse(JSON.stringify(qcdetails[0])));
 			}
-			if (qcDetailsList.length > 0) scenario.qcdetails = qcDetailsList;
-			else scenario.qcdetails = {};
-		} else {
-			if (qcdetails != "fail" && qcdetails.length > 0) scenario.qcdetails = JSON.parse(JSON.stringify(qcdetails[0]));
-			else scenario.qcdetails = {};
 		}
 	}
 	return scenario;
@@ -276,7 +277,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		"exec_mode": batchData.exectionMode,
 		"exec_env" : batchData.executionEnv,
 		"apptype": batchData.batchInfo[0].appType,
-		"qccredentials": batchData.qccredentials,
+		"integration": batchData.integration,
 		"batchId": "",
 		"executionIds": [],
 		"testsuiteIds": [],
@@ -303,7 +304,17 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		};
 		const suiteDetails = suite.suiteDetails;
 		for (const tsco of suiteDetails) {
-			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, batchData.qccredentials.integrationType);
+			var integrationType = [];
+			if(batchData.integration.alm.url) {
+				integrationType.push("ALM");
+			} 
+			if (batchData.integration.qtest.url){
+				integrationType.push("qTest");
+			} 
+			if (batchData.integration.zephyr.accountid) {
+				integrationType.push("Zephyr");
+			}
+			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
 			suiteObj.condition.push(scenario.condition);
@@ -595,20 +606,25 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 			if (partitionResult["status"] == "fail") {
 				result['error'] = "Smart execution Failed";
 			}else{
-				var batchInfo = partitionResult["batchInfo"];
-				//Make batch request for each partition
-				for(let i in batchInfo){
-					let targetUser = batchInfo[i].targetUser;
-					let user = JSON.parse(JSON.stringify(userInfo));
-					user.icename = targetUser;
-					var executionData = JSON.parse(JSON.stringify(batchExecutionData));
-					executionData.batchInfo = [batchInfo[i]]
-					executionData.targetUser = targetUser;
-					//Get profile data and add to queue
-					var makeReq = await makeRequestAndAddToQueue(executionData, targetUser, user, poolid);
-					result["message"] = makeReq["message"] + "\n" + result["message"];
+				try{
+					var batchInfo = partitionResult["batchInfo"];
+					var userBatchMap = clubBatches(batchInfo);
+					//Make batch request for each partition
+					for(let targetUser in userBatchMap){
+						let user = JSON.parse(JSON.stringify(userInfo));
+						user.icename = targetUser;
+						var executionData = JSON.parse(JSON.stringify(batchExecutionData));
+						executionData.batchInfo = userBatchMap[targetUser]
+						executionData.targetUser = targetUser;
+						//Get profile data and add to queue
+						var makeReq = await makeRequestAndAddToQueue(executionData, targetUser, user, poolid);
+						result["message"] = makeReq["message"] + "\n" + result["message"];
+					}
+					result["status"] = "Success";
+				}catch (e){
+					logger.error("Exception in the function ExecuteTestSuite_ICE: %s", e);
+					result["Error"] = "Smart Execution Failed"
 				}
-				result["status"] = "Success";		
 			}
 		}else{
 			result["error"] = "Please select available Target ICE";
@@ -642,8 +658,25 @@ async function makeRequestAndAddToQueue(batchExecutionData, targetUser, userInfo
 	return result;
 }
 
+function clubBatches(batchInfo){
+	userBatchMap = {};
+	for(let index in batchInfo){
+		let targetUser = batchInfo[index].targetUser;
+		if(targetUser && targetUser in userBatchMap){
+			userBatchMap[targetUser].push(batchInfo[index])
+		}else if(targetUser && !(targetUser in userBatchMap)){
+			userBatchMap[targetUser] = [batchInfo[index]]
+		}else{
+			throw "Target User not found";
+		}
+	}
+	return userBatchMap;
+}
+
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
+	// Several client apps do not send TCP Keep-Alive. Hence this is handled in applicaton side.
+	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +process.env.KEEP_ALIVE);
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
 	await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
 };

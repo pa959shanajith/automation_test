@@ -439,13 +439,13 @@
 				<!-- Top -->
 				<div class="textFieldsContainer">
 					<p>
-						<input type="text" class="form-control form-control-custom" placeholder="Enter Zephyr Account ID" ng-model="ZephyrURL" id="ZephyrURL" />
+						<input type="text" class="form-control form-control-custom" placeholder="Enter Zephyr Account ID" ng-model="ZephyrAccId" id="ZephyrAccId" />
 					</p>
 					<p class="halfWrap" style="margin-right: 3%">
-						<input type="text" class="form-control form-control-custom" placeholder="Enter Access Key" ng-model="ZephyrUserName" id="ZephyrUserName" />
+						<input type="text" class="form-control form-control-custom" placeholder="Enter Access Key" ng-model="ZephyrAccKey" id="ZephyrAccKey" />
 					</p>
 					<p class="halfWrap">
-						<input type="password" class="form-control form-control-custom" placeholder="Enter Secret Key" ng-model="ZephyrPassword" id="ZephyrPassword" />
+						<input type="password" class="form-control form-control-custom" placeholder="Enter Secret Key" ng-model="ZephyrSecKey" id="ZephyrSecKey" />
 					</p>
 					<p align="right">
 						<span class="error-msg-exeQc"></span>
@@ -528,8 +528,8 @@
 					<div>
 						<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click='availableICEFilter.icename="";selectedICE=false' ng-model="availableICEFilter.icename" placeholder="{{'Search ICE to execute'}}">
 						<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
-							<li role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=!smartMode?ice.icename:'';iceCheckboxClick($event,ice.icename)" >
-								<label ng-hide='smartMode && {{ice.statusCode != "Online"}}' title='{{ice.statusCode}}'  ng-style="{'font-weight':500}">
+							<li ng-hide='smartMode && {{ice.statusCode != "Online"}}' role="presentation" ng-repeat='ice in availableICE | filter:availableICEFilter' ng-click="availableICEFilter.icename=!smartMode?ice.icename:'';iceCheckboxClick($event,ice.icename)" >
+								<label title='{{ice.statusCode}}'  ng-style="{'font-weight':500}">
 									<input ng-hide='!smartMode' value='{{ice.icename}}' checked type="checkbox"/>
 									<span id='status' ng-style="{'background-color':'{{ice.color}}'}"></span>
 									{{ice.icename}}
