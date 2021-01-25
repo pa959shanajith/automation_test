@@ -22,7 +22,9 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [modalDetails,setModalDetails] = useState({title:"",task:""})
     const [moduleInfo,setModuleInfo] = useState([])
-    const [qccredentials,setQccredentials] = useState({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
+    const [integration,setIntegration] = useState({alm: {url:"",username:"",password:""}, 
+                                                    qtest: {url:"",username:"",password:"",qteststeps:""}, 
+                                                    zephyr: {accountid:"",accesskey:"",secretkey:""}});
     const [selectAllBatch,setSelectAllBatch] = useState(0)
     const [allocateICE,setAllocateICE] = useState(false)
     var batch_name= taskName ==="Batch Execution"?": "+current_task.taskName.slice(13):""
@@ -136,7 +138,7 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
         executionData["exectionMode"]=execAction;
         executionData["executionEnv"]=execEnv;
         executionData["browserType"]=browserTypeExe;
-        executionData["qccredentials"]=qccredentials;
+        executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
         setExecutionActive(true);
         // $rootScope.resetSession.start();
@@ -177,7 +179,9 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
     }
 
     const syncScenarioChange = (value) => {
-        setQccredentials({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
+        setIntegration({alm: {url:"",username:"",password:""}, 
+        qtest: {url:"",username:"",password:"",qteststeps:""}, 
+        zephyr: {accountid:"",accesskey:"",secretkey:""}})
         if (value == "1") {
             setShowIntegrationModal("ALM")
 		}
@@ -239,7 +243,7 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
                     showIntegrationModal={showIntegrationModal} 
                     appType={appType} 
                     setPopupState={setPopupState} 
-                    setCredentialsExecution={setQccredentials}
+                    setCredentialsExecution={setIntegration}
                     displayError={displayError}
                     browserTypeExe={browserTypeExe}
                 />
