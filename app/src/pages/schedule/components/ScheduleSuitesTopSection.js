@@ -146,7 +146,7 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
         <>
         {loading?<ScreenOverlay content={loading}/>:null}
         <div className="scheduleSuiteTable">
-            <ScrollBar thumbColor="rgb(51,51,51)" trackColor="rgb(211, 211, 211)">
+            <ScrollBar thumbColor="#929397" trackColor="rgb(211, 211, 211)">
             {scheduleTableData.map((rowData,i)=>(
                 <div className="batchSuite">
                     <div className="scheduleSuite" >
@@ -154,10 +154,10 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
                         <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span>
                         <span className="timePicContainer">
                             <Datetime 
-                                onChange={(event)=>{updateDateTime("time",event.format("H:m" ),rowData.testsuiteid)}} 
+                                onChange={(event)=>{updateDateTime("time",event.format("HH:mm" ),rowData.testsuiteid)}} 
                                 inputProps={inputProps1} 
                                 dateFormat={false} 
-                                timeFormat="H:m" 
+                                timeFormat="HH:mm" 
                             /> 
                             <img className="timepickerIcon" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
 						</span>

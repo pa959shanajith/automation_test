@@ -186,7 +186,7 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
 								</label>
 								<label title='unavailable' className="legends">
 									<span id='status' className="status-unavailable" ></span>
-									 Unavilable
+                                    Unavailable
 								</label>
 								<label title='do not disturb' className="legends">
 									<span id='status' className="status-dnd"></span>

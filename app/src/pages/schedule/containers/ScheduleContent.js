@@ -1,7 +1,7 @@
 import React, {useState, useEffect } from 'react';
 import {ScreenOverlay, PopupMsg, ScrollBar, IntegrationDropDown} from '../../global' 
 import { useSelector } from 'react-redux';
-import {getScheduledDetails_ICE, testSuitesScheduler_ICE} from '../api';
+import {getScheduledDetails_ICE, testSuitesScheduler_ICE, cancelScheduledJob_ICE} from '../api';
 import "../styles/ScheduleContent.scss";
 import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
@@ -19,9 +19,12 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
     const current_task = useSelector(state=>state.plugin.CT)
     const [scheduleTableData,setScheduleTableData] = useState([])
     const [moduleInfo,setModuleInfo] = useState([])
-    const [qccredentials,setQccredentials] = useState({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
+    const [integration,setIntegration] = useState({alm: {url:"",username:"",password:""}, 
+                                                    qtest: {url:"",username:"",password:"",qteststeps:""}, 
+                                                    zephyr: {accountid:"",accesskey:"",secretkey:""}});
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [moduleSceduledate,setModuleSceduledate] = useState([])
+    const [sort,setSort] = useState(true)
 
     useEffect(()=>{
         getScheduledDetails()
@@ -29,7 +32,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
 
     const getScheduledDetails = async () => {
         try{
-            setLoading(true);
+            setLoading("Loading...");
             const result = await getScheduledDetails_ICE();
             if (result && result.length > 0 && result != "fail") {
                 for (var k = 0; k < result.length; k++) {
@@ -45,6 +48,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                     for(var j =0 ; j < eachScenarioDetails.length ; j++ ) {
                         let newScheduledScenario = {};
                         newScheduledScenario["target"] = result[i].target;
+                        newScheduledScenario["cycleid"] = eachScenarioDetails[j].cycleid;
                         newScheduledScenario["scheduledby"] = result[i].scheduledby;
                         newScheduledScenario["scheduledatetime"] = result[i].scheduledatetime;
                         newScheduledScenario["testsuitenames"] = result[i].testsuitenames;
@@ -129,7 +133,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
         executionData["exectionMode"]=execAction;
         executionData["executionEnv"]=execEnv;
         executionData["browserType"]=browserTypeExe;
-        executionData["qccredentials"]=qccredentials;
+        executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
         
         setLoading("Scheduling...");
@@ -166,7 +170,9 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
     }
 
     const syncScenarioChange = (value) => {
-        setQccredentials({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
+        setIntegration({alm: {url:"",username:"",password:""}, 
+        qtest: {url:"",username:"",password:"",qteststeps:""}, 
+        zephyr: {accountid:"",accesskey:"",secretkey:""}})
         if (value == "1") {
             setShowIntegrationModal("ALM")
 		}
@@ -179,7 +185,28 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
     }
 
     const sortDateTime = () => {
-        const data = scheduledData.sort((a, b) => b.scheduledatetime - a.scheduledatetime);
+        function compareOpp( a, b ) {
+            if ( a.scheduledatetime < b.scheduledatetime ){
+              return -1;
+            }
+            if ( a.scheduledatetime > b.scheduledatetime ){
+              return 1;
+            }
+            return 0;
+        }
+        function compare( a, b ) {
+            if ( a.scheduledatetime > b.scheduledatetime ){
+              return -1;
+            }
+            if ( a.scheduledatetime < b.scheduledatetime ){
+              return 1;
+            }
+            return 0;
+        }
+        
+        var data = [...scheduledData];
+        if( sort === true) {data.sort( compare );setSort(false);}
+        else {data.sort( compareOpp );setSort(true);}
         setScheduledData(data);
     }
 
@@ -205,7 +232,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                     showIntegrationModal={showIntegrationModal} 
                     appType={appType} 
                     setPopupState={setPopupState} 
-                    setCredentialsExecution={setQccredentials}
+                    setCredentialsExecution={setIntegration}
                     displayError={displayError}
                     browserTypeExe={browserTypeExe}
                 />
@@ -263,7 +290,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                                         {pageOfItems.map((data)=>(
                                             <div className="scheduleDataBodyRowChild">
                                                 <div className="s__Table_date s__Table_date-time ">{data.scheduledatetime}</div>
-                                                <div className="s__Table_host" data-scheduledby={data.scheduledby}>{data.target}</div>
+                                                <div className="s__Table_host" >{data.target}</div>
                                                 <div className="s__Table_scenario" title={data.scenarioname||data.scenarioName}>{data.scenarioname||data.scenarioName}</div>
                                                 <div className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
                                                 <div className="s__Table_appType">
@@ -271,8 +298,11 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                                                         <img src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
                                                     ))}
                                                 </div>
-                                                <div className="s__Table_status" data-cycleid={data.cycleid} data-scheduleid={data._id} data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>{data.status}
-                                                    <span className="glyphicon glyphicon-remove cancelJob" ng-if="data.status == 'scheduled'" ng-click='cancelThisJob($event,"cancelled")' title='Cancel Job'></span>
+                                                <div className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
+                                                    {data.status}
+                                                    {(data.status === 'scheduled')?
+                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,setPopupState)}} ng-click='cancelThisJob($event,"cancelled")' title='Cancel Job'/>
+                                                    :null}
                                                 </div> 
                                             </div>
                                         ))}
@@ -286,6 +316,25 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
             </div>
         </>
     );
+}
+
+const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,status,getScheduledDetails,setPopupState) => {
+    if(cycleid===undefined) cycleid=""
+    const schDetails = {
+        cycleid:cycleid,
+        scheduledatetime:scheduledatetime,
+        scheduleid:_id 
+    };
+    const host = target;
+    const schedUserid = scheduledby;
+    const data = await cancelScheduledJob_ICE(schDetails, host, JSON.stringify(schedUserid));
+    if (data === "success") {
+        setPopupState({show:true,title:"Scheduled Test Suite",content:"Job is " + status + "."});
+        // target.innerText = status;
+        getScheduledDetails();
+    } else if (data == "inprogress") setPopupState({show:true,title:"Scheduled Test Suite",content:"Job is in progress.. cannot be cancelled."});
+    else if (data == "not authorised") setPopupState({show:true,title:"Scheduled Test Suite",content:"You are not authorized to cancel this job."});
+    else setPopupState({show:true,title:"Scheduled Test Suite",content:"Failed to cancel Job"});
 }
 
 const SelectBrowserCheck = (appType,browserTypeExe,setPopupState,execAction)=>{

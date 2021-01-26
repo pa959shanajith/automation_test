@@ -46,13 +46,32 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, setPo
             } else if (data == "invalidurl") {
                 setErrorMsg("Invalid URL");
             } else {
-                setCredentialsExecution({
-                    qcurl: credentials.url,
-                    qcusername: credentials.userName,
-                    qcpassword: credentials.password,
-                    qteststeps: qtestSteps,
-                    integrationType: type
-                })
+                var integration = {alm: {url:"",username:"",password:""}, 
+                qtest: {url:"",username:"",password:"",qteststeps:""}, 
+                zephyr: {accountid:"",accesskey:"",secretkey:""}};
+                if(type === "ALM"){
+                    integration.alm = {
+						url:credentials.url,
+						username: credentials.userName,
+						password: credentials.password
+					}
+                }
+                else if(type === "qTest"){
+                    integration.qtest = {
+						url:credentials.url,
+						username: credentials.userName,
+                        password: credentials.password,
+                        qteststeps:qtestSteps
+					}
+                }
+                else if(type === "Zephyr"){
+                    integration.zephyr = {
+						accountid: credentials.url,
+						accesskey: credentials.userName,
+						secretkey: credentials.password,
+					}
+                }
+                setCredentialsExecution(integration)
                 setshowModal(false);
             }
 		}

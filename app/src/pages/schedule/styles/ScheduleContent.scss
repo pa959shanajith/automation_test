@@ -171,10 +171,10 @@
     width: 20%;
 }
 .s__Table_appType{
-    width: 15%; 
+    width: 10%; 
 }
 .s__Table_status{
-    width: 9%
+    width: 14%
 }
 .s__Table_border{
     border-right: 1px solid #fff
@@ -225,7 +225,7 @@
 	font-size: 17px !important;
 }
 .s__cursor{
-    cursor: pointer;
+    cursor: pointer !important;
 }
 .scheduleDataBodyRowChild:nth-child(odd){
 	background: rgb(232, 230, 254);
@@ -241,4 +241,8 @@
 }
 .s__Table_date-time{
     cursor: default;
+}
+.s__cancel{
+    margin-left: 5%;
+    cursor: pointer
 }
