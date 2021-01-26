@@ -32,9 +32,10 @@ const CreateOptions = (props) => {
     })
   }
   const submitSheet = async() =>{
-    props.setOptions('newmindmap')
     var resdata = await excelToMindmap({'content':data,'flag':'data',sheetname: sheet})
+    setSheetList(false);
     if(resdata.error){displayError(resdata.error);return;}
+    props.setOptions('newmindmap')
     dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:'excel',data:resdata}})
   }
   const fileImport = (file,impType) => {
@@ -72,8 +73,8 @@ const CreateOptions = (props) => {
 const Container = (props) => {
   return(
     <div className = 'mp__sheet-popup'>
-      <select id='mp__import-sheet' onChange={(e)=>props.setSheet(e.target.value)}>
-        <option value="" disabled selected>Please Select Sheet</option>
+      <select defaultValue={"def-opt"} id='mp__import-sheet' onChange={(e)=>props.setSheet(e.target.value)}>
+        <option value="def-opt" disabled>Please Select Sheet</option>
         {props.sheetList.map((e,i)=><option value={e} key={i}>{e}</option>)}
       </select>
     </div>
@@ -85,7 +86,7 @@ const Footer = (props) =>{
   const [errMsg,setErrMsg] = useState('')
   const submit = () => {
     var projid = document.getElementById('mp__import-sheet').value
-    if(projid !== ""){
+    if(projid !== "def-opt"){
       props.submitSheet()
     }else{
       setErrMsg("Sheet not selected")
