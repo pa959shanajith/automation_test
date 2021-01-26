@@ -92,3 +92,36 @@ export const testSuitesScheduler_ICE = async(executionData) => {
         return {error:"Failed to schedule Testsuite."}
     }
 }
+
+
+/*Component  
+  api returns 
+*/
+
+export const cancelScheduledJob_ICE = async(schDetails, host, schedUserid) => { 
+    try{
+        const res = await axios(url+'/cancelScheduledJob_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {param: 'cancelScheduledJob_ICE',
+            schDetails: schDetails,
+            host: host,
+            schedUserid: schedUserid},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to cancel scheduled job."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to cancel scheduled job."}
+    }
+}
