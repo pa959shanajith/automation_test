@@ -12,7 +12,7 @@ const urlRef = useRef();
 const userNameRef = useRef();
 const passwordRef = useRef();
 const selProjectRef = useRef();
-const [domainDetails , setDomainDetails] = useState(null);
+const [domainDetails , setDomainDetails] = useState([]);
 const [projectDetails , setProjectDetails] = useState(null);
 const [folderDetails , setFolderDetails ] = useState(null);
 const [domainID , setDomainID]= useState(null);
@@ -72,6 +72,9 @@ const callLogin_ICE = async()=>{
         if(domainDetails.error){displayError(domainDetails.error);return;}
         if(domainDetails === "unavailableLocalServer"){
             setFailMsg("ICE Engine is not available, Please run the batch file and connect to the Server.")
+        }
+        else if (domainDetails === "invalidcredentials"){
+            setFailMsg("Invalid Credentials , Retry Login")
         }
         else{
         setDomainDetails(domainDetails);

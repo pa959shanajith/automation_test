@@ -62,3 +62,26 @@
         margin-top: .3vw;
     }
 }
+
+@media screen and (max-height: 650px){
+    .plugin-blocks{
+        grid-gap: 7px 38px;
+    }
+    
+    .plugin-ic{
+        height: 145px;
+        width: 145px;
+    }
+    
+    
+    .avail-plugin-title{
+        font-size: 26px;
+        padding-left: 13px;
+        margin-bottom: 23px;
+    }
+    
+    .plugin-text{
+        font-size: 16px;
+        margin-top: 8px;
+    }
+}

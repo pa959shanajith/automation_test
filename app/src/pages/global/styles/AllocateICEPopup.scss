@@ -1,0 +1,65 @@
+#executionType, #chooseICEPool{
+    max-width: 200px;
+    height: 35px;
+}
+.e__IceStatus{
+    padding-top: 7px;
+    width: 100%;
+    left: 171px;
+    max-height: 123px;
+    background: white;
+}
+.status-available{
+    background-color:#95c353
+}
+.status-unavailable{
+    background-color:#fdc010
+}
+.status-dnd{
+    background-color:red
+}
+.popup-content{
+    padding: 0px 40px !important;
+}
+.popup-wrap{
+    height: 250px;
+    padding: 40px 15px;
+}
+.popup-li{
+    margin: 0px;
+    padding: 0px;
+    list-style-type: none;
+}
+#status {
+    height: 7px;
+    width: 7px;
+    margin: 2px 5px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.popup-content .leftControl{
+    font-size: inherit
+}
+.popup-btn-users {
+    background: none;
+    border: 1px solid !important;
+    height: 30px;
+}
+.dropdown-menu-execute{
+    width: 335px;
+    left: 171px;
+    max-height: 123px;
+    background: white;
+}
+.allocate-ice-Modal{
+    .modal-content{
+        width: 600px
+    }
+    .modal-body{
+        height: 250px;
+        padding: 40px 15px;
+    }
+}
+.popup-content-status{
+    margin-bottom: 0 !important
+}

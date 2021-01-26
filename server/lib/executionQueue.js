@@ -183,7 +183,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     const sockmode = await utils.channelStatus(targetICE);
                     if((!sockmode.normal && !sockmode.schedule)){
                         response["status"] = "pass";
-                        response["message"] = "Can't establish connection with ICE Re-Connect to server!";
+                        response["message"] = "Can't establish connection with ICE: " + targetICE + " Re-Connect to server!";
                         return response;
                     }
                     if ((this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser) || !this.ice_list[targetICE]["mode"]) {

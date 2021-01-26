@@ -11,24 +11,25 @@ import RemarkDialog from '../components/RemarkDialog';
 import PasteStepDialog from '../components/PasteStepDialog';
 import SelectMultipleDialog from '../components/SelectMultipleDialog';
 import * as DesignApi from "../api";
+import { reviewTask } from '../../global/api';
 import * as pluginActions from "../../plugin/state/action";
 import * as designActions from '../state/action';
 import "../styles/DesignContent.scss";
 
 /*
-    Container: Design Content
-    Uses: Renders middle screen contents of design screen 
+    Container: DesignContent
+    Uses: Renders middle contents of DesignScreen 
     Props: 
         current_task -> current task state from redux
         imported -> imported flag / changes everytime a testcase is imported
-        setImported -> setState for imported flag
-        setMirror -> setState for mirror value
-        setShowPop -> showPopup state
-        setShowConfirmPop -> confirmation dialog popup
-        setDisableActionBar -> flag to set if action bar is required to disable
+        setImported -> Changes "imported" state
+        setMirror -> Changes "mirror" state
+        setShowPop -> Show/Hide MsgPopup,  arguments used - {title:'',content:''}/false
+        setShowConfirmPop -> Show/Hide Confirmation Popup,  arguments used - {title:'',content:'',footer:''}/false
+        setDisableActionBar -> Manages Disabling/Enabling of ActionBar
 */
 
-const DesignContent = (props) => {
+const DesignContent = props => {
     
     const userInfo = useSelector(state=>state.login.userinfo);
     const copiedContent = useSelector(state=>state.design.copiedTestCases);
@@ -57,7 +58,6 @@ const DesignContent = (props) => {
     const [isUnderReview, setIsUnderReview] = useState(props.current_task.status === "underReview");
     const [rowChange, setRowChange] = useState(false);
     const [headerCheck, setHeaderCheck] = useState(false);
-    const [clickedAway, setClickAway] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
     let runClickAway = true;
     const emptyRowData = {
@@ -68,15 +68,13 @@ const DesignContent = (props) => {
         "outputVal": "",
         "stepNo": "",
         "url": "",
-        "appType": "Generic",
+        "appType": "",
         "remarksStatus": "",
         "remarks": "",
         "_id_": "",
         "addTestCaseDetails": "",
         "addTestCaseDetailsInfo": ""
     };
-    // let checkArray = [];
-    
 
     const tableActionBtnGroup = [
         {'title': 'Add Test Step', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add Steps', onClick: ()=>addRow()},
@@ -94,7 +92,6 @@ const DesignContent = (props) => {
 
     useEffect(()=>{
         setChanged(true);
-        console.log(`shipped ${saveEnable}`);
     }, [saveEnable]);
 
     useEffect(()=>{
@@ -104,12 +101,12 @@ const DesignContent = (props) => {
                 data !== "success" && props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
                 props.setImported(false)
             })
-            .catch(error=>console.error("Error: Fetch TestCase Failed"));
+            .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
         }
     }, [props.imported]);
 
     useEffect(()=>{
-        if (Object.keys(userInfo).length!==0 && Object.keys(props.current_task).length!==0) {
+        if (Object.keys(userInfo).length && Object.keys(props.current_task).length) {
             fetchTestCases()
             .then(data=>{
                 data !== "success" &&
@@ -122,24 +119,21 @@ const DesignContent = (props) => {
                 setHeaderCheck(false);
                 setIsUnderReview(props.current_task.status === "underReview")
             })
-            .catch(error=>console.error("Error: Fetch TestCase Failed"));
+            .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
         }
     }, [userInfo, props.current_task]);
 
     const fetchTestCases = () => {
 		return new Promise((resolve, reject)=>{
-            let taskInfo = props.current_task;
-            let testCaseId = taskInfo.testCaseId;
-            let testCaseName = taskInfo.testCaseName;
-            let versionnumber = taskInfo.versionnumber;
+            let { testCaseName, versionnumber, screenName, screenId, projectId, testCaseId, appType } = props.current_task;
             let deleteObjectFlag = false;
             
             setOverlay("Loading...");
             
             // service call # 1 - getTestScriptData service call
-            DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber, taskInfo.screenName)
+            DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber, screenName)
             .then(data => {
-                if (data === "Invalid Session") RedirectPage(history);
+                if (data === "Invalid Session") return RedirectPage(history);
                 
                 let changeFlag = false
                 let taskObj = props.current_task
@@ -154,30 +148,18 @@ const DesignContent = (props) => {
                 if (changeFlag) dispatch({type: pluginActions.SET_CT, payload: taskObj});
 
                 if(data.del_flag){
-                    //pop up for presence of deleted objects
-                    deleteObjectFlag = true;
-                    //disable left-top-section
-                    props.setDisableActionBar(true);
+                    deleteObjectFlag = true; // Flag for DeletedObjects Popup
+                    props.setDisableActionBar(true); //disable left-top-section
                 }
-                else{
-                    //enable left-top-section
-                    props.setDisableActionBar(false);
-                }
-                let appType = taskInfo.appType;
-                // $('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
-                // removing the down arrow from grid header columns - disabling the grid menu pop-up
-                // $('.ui-grid-icon-angle-down').removeClass('ui-grid-icon-angle-down');
-                // $("#jqGrid").jqGrid('clearGridData');
+                else props.setDisableActionBar(false); //enable left-top-section
                 
                 setHideSubmit(data.testcase.length === 0);
                 
-                
-                // $('#jqGrid').show();
                 // service call # 2 - objectType service call 
 
-                DesignApi.getScrapeDataScreenLevel_ICE(appType, taskInfo.screenId, taskInfo.projectId, taskInfo.testCaseId)
+                DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
                     .then(scriptData => {
-                        if (scriptData === "Invalid Session") RedirectPage(history);
+                        if (scriptData === "Invalid Session") return RedirectPage(history);
                         if (appType === "Webservice"){
                             if (scriptData.view.length > 0) {
                                 if (scriptData.view[0].header) setDataFormat(scriptData.view[0].header[0].split("##").join("\n"));
@@ -191,23 +173,13 @@ const DesignContent = (props) => {
                         // service call # 3 -objectType service call
                         DesignApi.getKeywordDetails_ICE(appType)
                             .then(keywordData => {
-                                if (keywordData === "Invalid Session") RedirectPage(history);
+                                if (keywordData === "Invalid Session") return RedirectPage(history);
                                 
                                 setKeywordList(keywordData);
                                 let testcaseArray = [];
                                 if (data === "" || data === null || data === "{}" || data === "[]" || data.testcase.toString() === "" || data.testcase === "[]") {
                                     testcaseArray.push(emptyRowData);
                                     props.setDisableActionBar(true);
-                                    // $("#jqGrid").jqGrid('GridUnload');
-                                    // $("#jqGrid").trigger("reloadGrid");
-                                    // contentTable(scriptData.view);
-                                    // $('.cbox').prop('disabled', false);
-                                    // $('.cbox').parent().removeClass('disable_a_href');
-                                    // updateColumnStyle();
-                                    // $("#jqGrid").focusout(()=>{
-                                    // 	updateColumnStyle();
-                                    // })
-                                    
                                     setOverlay("");
                                 } else {
                                     let testcase = data.testcase;
@@ -227,16 +199,6 @@ const DesignContent = (props) => {
                                             // props.setDisableActionBar(false);
                                         }
                                     }
-                                    // $("#jqGrid_addNewTestScript").jqGrid('clearGridData');
-                                    // $("#jqGrid").jqGrid('GridUnload');
-                                    // $("#jqGrid").trigger("reloadGrid");
-                                    // contentTable(scriptData.view);
-                                    // $('.cbox').prop('disabled', false);
-                                    // $('.cbox').parent().removeClass('disable_a_href');
-                                    // updateColumnStyle();
-                                    // $("#jqGrid").focusout(()=>{
-                                    // 	updateColumnStyle();	
-                                    // });				
                                     setOverlay("");
                                 }
                                 setTestCaseData(testcaseArray);
@@ -252,8 +214,7 @@ const DesignContent = (props) => {
                                 setObjNameList(null);
                                 console.error("Error getObjectType method! \r\n " + (error.data));
                                 reject("fail");
-                            }); //	getObjectType end
-                        
+                            });
                     })
                     .catch(error => {
                         setOverlay("");
@@ -263,7 +224,7 @@ const DesignContent = (props) => {
                         setObjNameList(null);
                         console.error("Error getObjectType method! \r\n " + (error));
                         reject("fail");
-                    }); //	getScrapeData end
+                    });
             })
             .catch(error => {
                 setOverlay("");
@@ -279,10 +240,7 @@ const DesignContent = (props) => {
     
     const saveTestCases = () => {
         if (userInfo.role !== "Viewer") {
-            let screenId = props.current_task.screenId;
-            let testCaseId = props.current_task.testCaseId;
-            let testCaseName = props.current_task.testCaseName;
-            let versionnumber = props.current_task.versionnumber;
+            let { screenId, testCaseId, testCaseName, versionnumber } = props.current_task;
             let import_status = false;
 
             if (String(screenId) !== "undefined" && String(testCaseId) !== "undefined") {
@@ -294,9 +252,9 @@ const DesignContent = (props) => {
                     testCases[i].stepNo = step;
 
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
-                        let col = "Object Name"
-                        if (!testCases[i].keywordVal) col = "keyword"
-                        props.setShowPop({'title': 'Save Testcase', 'content': `Please select ${col} Name at Step No. ${step}`})
+                        let col = "Object Name";
+                        if (!testCases[i].keywordVal) col = "keyword";
+                        props.setShowPop({'title': 'Save Testcase', 'content': `Please select ${col} Name at Step No. ${step}`});
                         errorFlag = true;
                         break;
                     } else {
@@ -315,16 +273,16 @@ const DesignContent = (props) => {
                             else testCases[i].inputVal[0] = testCases[i].inputVal[0].replace(/[\n\r]/g, '##');
                         }
                     }
-                    if (testCases[i].url == undefined) testCases[i].url = "";
+                    if (!testCases[i].url) testCases[i].url = "";
                     
-                    if (testCases[i].cord === null) testCases[i].cord = "";
+                    if (!testCases[i].cord) testCases[i].cord = "";
 
                 }
 
                 if (!errorFlag) {
                     let scrape_data = null;
-                    let taskInfo = props.current_task;
-                    DesignApi.getScrapeDataScreenLevel_ICE(taskInfo.appType, taskInfo.screenId, taskInfo.projectId, taskInfo.testCaseId)
+                    let { appType, screenId, projectId, testCaseId} = props.current_task;
+                    DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
                         .then(res => {
                             let getScrapeData=res
                             scrape_data = JSON.parse(JSON.stringify(getScrapeData));
@@ -338,6 +296,7 @@ const DesignContent = (props) => {
                         if (data === "success") {
                             
                             if(props.current_task.appType.toLowerCase()==="web" && Object.keys(modified).length !== 0){
+                                // THIS SECTION NEEDS TO BE RECHECKED
                                 let screenId = props.current_task.screenId;
                                 let screenName = props.current_task.screenName;
                                 let projectId = props.current_task.projectId;
@@ -368,55 +327,52 @@ const DesignContent = (props) => {
                                         fetchTestCases()
                                         .then(msg=>{
                                             setChanged(false);
-                                            msg === "success" ? props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'})
+                                            msg === "success"
+                                            ? props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'})
                                             : props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."})
                                         })
-                                        .catch(error=>console.error("Error: Fetch TestCase Failed"));
-                                    } else {
-                                        props.setShowPop({'title': 'Save Testcase', 'content': 'Failed to save Testcase'});
-                                    }
+                                        .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
+                                    } else props.setShowPop({'title': 'Save Testcase', 'content': 'Failed to save Testcase'});
                                 })
                                 .catch(error => {
-                                    console.error("Error")
+                                    console.error("Error::::", error)
                                 })
                             }
                             else{
                                 fetchTestCases()
                                 .then(data=>{
                                     setChanged(false);
-                                    data === "success" ? props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'}) 
+                                    data === "success" 
+                                    ? props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'}) 
                                     : props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
                                 })
-                                .catch(error=>console.error("Error: Fetch TestCase Failed"));
+                                .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
                             }
-                        } else {
-                            props.setShowPop({'title':'Save Testcase', 'content':'Failed to save Testcase'})
-                        };
+                        } else props.setShowPop({'title':'Save Testcase', 'content':'Failed to save Testcase'});
                     })
                     .catch(error => { 
                         console.error("Error::::", error);
                     });
                     errorFlag = false;
                 }
-            } else {
-                props.setShowPop({'title':'Save Testcase', 'content':'ScreenID or TestscriptID is undefined'});
-            }
+            } else props.setShowPop({'title':'Save Testcase', 'content':'ScreenID or TestscriptID is undefined'});
         }
         setFocusedRow(null);
         setCheckedRows([]);
         setHeaderCheck(false);
     }
 
-    const setRowData = (data) => {
+    const setRowData = data => {
         let testCases = [...testCaseData];
         let { rowIdx, operation } = data;
         let changed = false;
         if (operation === "row") {
-            const { objName, keyword, inputVal, outputVal } = data;
+            const { objName, keyword, inputVal, outputVal, appType } = data;
             if (testCases[rowIdx].custname !== objName || testCases[rowIdx].keywordVal !== keyword || testCases[rowIdx].inputVal[0] !== inputVal || testCases[rowIdx].outputVal !== outputVal || commentFlag){
                 testCases[rowIdx].custname = objName;
                 testCases[rowIdx].keywordVal = keyword;
                 testCases[rowIdx].inputVal = [inputVal];
+                testCases[rowIdx].appType = appType;
 
                 let outputVal2 = outputVal
                 if (commentFlag) {
@@ -452,27 +408,19 @@ const DesignContent = (props) => {
         history.replace('/plugin');
     }
 
-    const submitTask = (submitOperation) => {
-		let taskid = props.current_task.subTaskId;
-		let taskstatus = props.current_task.status;
-		let version = props.current_task.versionnumber;
-		let batchTaskIDs = props.current_task.batchTaskIDs;
-        let projectId = props.current_task.projectId;
+    const submitTask = submitOperation => {
+        let { subTaskId: taskid, status: taskstatus, versionnumber: version, batchTaskIDs, projectId } = props.current_task;
         
-		if (submitOperation === 'reassign') {
-			taskstatus = 'reassign';
-        }
+		if (submitOperation === 'reassign') taskstatus = 'reassign';
 
-        DesignApi.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
+        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
         .then(result => {
             if (result === "fail") props.setShowPop({'title': 'Task Submission Error', 'content': 'Reviewer is not assigned !'});
             else if (taskstatus === 'reassign') props.setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});
             else if (taskstatus === 'underReview') props.setShowPop({'title': "Task Completion Success", 'content': "Task Approved successfully!", onClick: ()=>redirectToPlugin()});
             else props.setShowPop({'title': "Task Submission Success", 'content': "Task Submitted successfully!", onClick: ()=>redirectToPlugin()});
         })
-        .catch(error => {
-			console.error(error);
-        })
+        .catch(error => console.error(error))
         
         props.setShowConfirmPop(false);
     }
@@ -588,7 +536,7 @@ const DesignContent = (props) => {
         setFocusedRow(null);
 
         if (!copiedContent.testCaseId){
-            // console.log("No TestCase to Paste");
+            props.setShowPop({'title': 'Paste Test Step', 'content': 'No Testcases to Paste! Please Copy Testcase(s) before Pasting.'});
             return;
         }
 
@@ -659,7 +607,7 @@ const DesignContent = (props) => {
         else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) props.setShowPop({'title': 'Comment step', 'content': 'Empty step can not be commented.'});
         else{
             for(let idx of selectedIndexes){
-                if (focusedRow === idx) continue;
+                if (focusedRow === idx && edit) continue;
                 let testCase = { ...testCases[idx] }
                 let isComment = testCase.outputVal.slice(-2) === "##";
                 if (isComment) testCase.outputVal = testCase.outputVal.replace(/(;*##)$/g, "")
@@ -736,7 +684,7 @@ const DesignContent = (props) => {
         setCheckedRows(checkList);
     }
 
-    const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task, testScriptData), [keywordList, props.current_task, testScriptData]);
+    const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
 
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
     let key = 0;
@@ -767,7 +715,7 @@ const DesignContent = (props) => {
 
                 <div className="d__taskBtns">
                     <button className="d__taskBtn d__btn" onClick={saveTestCases} disabled={!changed}>Save</button>
-                    <button className="d__taskBtn d__btn" onClick={deleteTestcase}>Delete</button>
+                    <button className="d__taskBtn d__btn" onClick={deleteTestcase} disabled={!checkedRows.length}>Delete</button>
                 </div>
 
                 <div className="d__submit">
@@ -808,8 +756,8 @@ const DesignContent = (props) => {
                 {testCaseData.length>0 && <div className="d__table_contents" >
                 <div className="ab">
                     <div className="min">
-                        <div className="con">
-                            <ScrollBar verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
+                        <div className="con" id="d__tcListId">
+                            <ScrollBar scrollId="d__tcListId" verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setFocusedRow(null) : runClickAway=true}} style={{height: "100%"}}>
                             <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row">
                                 {

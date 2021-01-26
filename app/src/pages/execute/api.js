@@ -175,16 +175,16 @@ export const ExecuteTestSuite_ICE = async(executionData) => {
         });
         if(res.status === 401 || res.status === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {errorapi:'invalid session'};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to execute test suite.'}
+        return {errorapi:'Failed to execute test suite.'}
     }catch(err){
         console.error(err)
-        return {error:'Failed to execute test suite.'}
+        return {errorapi:'Failed to execute test suite.'}
     }
 }
 
@@ -252,5 +252,96 @@ export const loginQTestServer_ICE = async(qcURL,qcUserName,qcPassword, qcType) =
     }catch(err){
         console.error(err)
         return {error:'Failed to login qtest server.'}
+    }
+}
+
+export const getPools = async(data) => { 
+    try{
+        const res = await axios(url+'/getPools', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){ 
+            if(res.data === 'empty' || Object.keys(res.data).length<1) return {error:"There are no users created yet."}           
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch pools!"}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to fetch pools!"}
+    }
+} 
+
+/*Component  
+  api returns object=> 
+*/
+
+export const getICE_list = async(data) => { 
+    try{
+        const res = await axios(url+'/getICE_list', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch ICE."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to fetch ICE."}
+    }
+}
+
+/*Component  
+  api returns object=> 
+*/
+
+export const loginZephyrServer_ICE = async(zephyrAccNo,zephyrAcKey,zephyrSecKey, integrationType) => { 
+    try{
+        const res = await axios(url+'/loginToZephyr_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: { action: "loginToZephyr_ICE",
+				zephyrAccNo: zephyrAccNo,
+				zephyrAcKey: zephyrAcKey,
+				zephyrSecKey : zephyrSecKey,
+				integrationType : integrationType,
+				execFlag: "1",
+                zephyraction: "domain"
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to login Zephyr server."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to login Zephyr server."}
     }
 }

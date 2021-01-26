@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useSelector } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
-import { ReferenceBar } from '../../global';
+import { ReferenceBar, ScrollBar } from '../../global';
 import * as list from './ListVariables';
 import { ScrapeContext } from './ScrapeContext';
 import "../styles/RefBarItems.scss";
@@ -9,13 +9,14 @@ import "../styles/RefBarItems.scss";
 const RefBarItems = props => {
 
 	const { appType } = useSelector(state=>state.plugin.CT);
+	const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const [toFilter, setToFilter] = useState([]);
 	const [tagList, setTagList] = useState([]);
 	const [showFilterPop, setShowFilterPop] = useState(false);
 	const [filterY, setFilterY] = useState(null);
 	const [showScreenPop, setShowScreenPop] = useState(false);
 	const [screenshotY, setScreenshotY] = useState(null);
-	const { scrapeItems, setScrapeItems } = useContext(ScrapeContext);
+	const { scrapeItems, setScrapeItems, scrapedURL } = useContext(ScrapeContext);
 
 	useEffect(()=>{
 		if (appType === "MobileApp") navigator.appVersion.indexOf("Mac") !== -1 ? setTagList(list.mobileMacFilters) : setTagList(list.mobileFilters);
@@ -162,9 +163,11 @@ const RefBarItems = props => {
             <ClickAwayListener onClickAway={closeAllPopups}>
             <div className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`}}>
                 <h4 className="pop__header" onClick={()=>setShowScreenPop(false)}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
-                <div className="screenshot_pop__content">
+				<div className="screenshot_pop__content" id="ss_ssId">
+				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
                     { props.mirror ? <img className="screenshot_img" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
-                </div>
+				</ScrollBar>
+				</div>
             </div>
             </ClickAwayListener>
 		}
@@ -188,10 +191,10 @@ const RefBarItems = props => {
     
     return (
     
-        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} >
+        <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} scrapeScreenURL={scrapedURL} >
 
 			{ appType!=="Webservice" && appType!=="Mainframe" && <div className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
-            <span onClick={toggleFilterPop} className="ic_box "  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>
+            <span onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>
         </ReferenceBar>
         
     

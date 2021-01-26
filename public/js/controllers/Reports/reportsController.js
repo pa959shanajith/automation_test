@@ -457,8 +457,14 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             else if (data[i].browser.toLowerCase() == "firefox") browserIcon = "ic-reports-firefox.png";
                             else if (data[i].browser.toLowerCase() == "internet explorer") browserIcon = "ic-reports-ie.png";
                             else if (data[i].browser.toLowerCase() == "safari") browserIcon = "ic-reports-safari.png";
-                            if (browserIcon) brow = "imgs/" + browserIcon;
-                            else brow = "imgs/no_img1.png"
+                            if (browserIcon) {
+                                brow = "imgs/" + browserIcon;
+                                alt = data[i].browser.toLowerCase();
+                            }
+                            else {
+                                brow = "imgs/no_img1.png"
+                                alt = "-";
+                            }
                             if (data[i].status.toLowerCase() == "pass") {
                                 pass++;
                                 status="Pass"
@@ -476,12 +482,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 status="Incomplete"
                                 styleColor = "style='color: #343a40 !important; text-decoration-line: none;'";
                             }
-							else if (data[i].status.toLowerCase() == "skipped") {
+                            else if (data[i].status.toLowerCase() == "skipped") {
                                 skipped++;
                                 status="Skipped"
                                 styleColor = "style='color: #343a40 !important; text-decoration-line: none;'";
                             }
-                            scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><span>" + data[i].executedtime.trim() + "</span></td></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");
+                            scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><img  alt='"+alt+"' style='width: 21px;height: 22px;' src='"+brow+"' title='"+alt+"'></td><td><span>" + data[i].executedtime.trim() + "</span></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");
                         }
                         if ($('.scenarioTblReport').length > 0) {
                             $("tr.scenarioTblReport:even").removeClass('even').addClass('even');
@@ -507,20 +513,24 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                     },
                                     "deferRender": true,
                                     "columns": [{
-                                            "width": "25%",
+                                            "width": "20%",
                                             "targets": 0
                                         },
                                         {
-                                            "width": "25%",
+                                            "width": "20%",
                                             "targets": 1
                                         },
                                         {
-                                            "width": "25%",
+                                            "width": "20%",
                                             "targets": 2
                                         },
                                         {
-                                            "width": "25%",
+                                            "width": "20%",
                                             "targets": 3
+                                        },
+                                        {
+                                            "width": "20%",
+                                            "targets": 4
                                         },
                                     ],
                                     "fnInitComplete": function(oSettings, json) {

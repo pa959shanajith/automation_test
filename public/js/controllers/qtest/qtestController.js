@@ -58,6 +58,8 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 		$(".mappedFiles, .mappedFilesLabel").hide();
 		$("#page-taskName span").text("qTest Integration");
 		$(".qcActionBtn, .leftQcStructure, .rightQcStructure").show();
+		$("#zephyrTab").show();
+		$("#almTab").show();
 	};
 
 	//login to QC
@@ -477,6 +479,8 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 				$(".mappedFiles").empty().show();
 				$('.mappedFiles').removeClass('scroll-wrapper');
 				$(".mappedFilesLabel").show();
+				$("#zephyrTab").hide();
+				$("#almTab").hide();
 				for(var i=0;i<data.length;i++){
 					//there is no testscenarioname 
 					$(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qtestproject+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qtestsuite+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>');  //testscenarioname ??

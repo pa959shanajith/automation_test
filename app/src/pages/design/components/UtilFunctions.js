@@ -29,11 +29,11 @@ export const getObjNameList = (appType, data) => {
 	return obnames;
 }
 
-export const getKeywordList = (objectName, keywordList, current_task, scriptData) => {
-    let appType = current_task.appType;
+export const getKeywordList = (objectName, keywordList, appType, scriptData) => {
     let cord = null;
     let objName = " ";
     let url = " ";
+    let tcAppType = appType;
     let keywords = null;
     let selectedKeywordList = null;
 
@@ -47,15 +47,18 @@ export const getKeywordList = (objectName, keywordList, current_task, scriptData
             if (appType === "MobileApp") {
                 keywords = Object.keys(keywordList.defaultListMobility);
                 selectedKeywordList = "defaultListMobility";
+                tcAppType = "Generic";
             }
             else {
                 keywords = Object.keys(keywordList.defaultList);
                 selectedKeywordList = "defaultList";
+                tcAppType = "Generic";
             }
             break;
         case "@System":
             keywords = Object.keys(keywordList.system);
             selectedKeywordList = "getOsInfo";
+            tcAppType = "System";
             break;
         case "@Browser":
             keywords = Object.keys(keywordList.browser);
@@ -163,10 +166,12 @@ export const getKeywordList = (objectName, keywordList, current_task, scriptData
         case "@Excel":
             keywords = Object.keys(keywordList.excelList);
             selectedKeywordList = "excelList";
+            tcAppType = "Generic";
             break;
         case "@Word":
             keywords = Object.keys(keywordList.word);
             selectedKeywordList = "word";
+            tcAppType = "Generic";
             break;
         default: 
             let scrappedDataCustnames = [];
@@ -199,6 +204,7 @@ export const getKeywordList = (objectName, keywordList, current_task, scriptData
                     } else if (ob.tag.startsWith("@PDF")) {
                         keywords = Object.keys(keywordList.pdfList);
                         selectedKeywordList = "pdfList";
+                        tcAppType = "pdf";
                         break;
                     } else if (obType === 'elementWS') {
                         keywords = Object.keys(keywordList.elementWS);
@@ -516,7 +522,7 @@ export const getKeywordList = (objectName, keywordList, current_task, scriptData
             }
             break;
     }
-    const data = { objectName: objName, keywords: keywords, url: url, cord: cord, obType: selectedKeywordList }
+    const data = { objectName: objName, keywords: keywords, url: url, cord: cord, obType: selectedKeywordList, appType: tcAppType }
     return data;
 }
 

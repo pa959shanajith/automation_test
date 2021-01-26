@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
+import { objectTypes } from './ListVariables';
 import { userObjectElement_ICE } from '../api';
 import "../styles/CreateObjectModal.scss";
 
@@ -15,18 +16,40 @@ const CreateObjectModal = props => {
     const [error, setError] = useState({type: '', tempId: ''});
     const [showFields, setShowFields] = useState([tempIdCounter]);
 
-    const objectTypes = [
-        {value: "a", typeOfElement: "lnk", name: "Link"}, 
-        {value: "input", typeOfElement: "txtbox", name: "Textbox/Textarea"}, 
-        {value: "table", typeOfElement: "tbl", name: "Table"}, 
-        {value: "list", typeOfElement: "lst", name: "List"},
-        {value: "select", typeOfElement: "select", name: "Dropdown"},
-        {value: "img", typeOfElement: "img", name: "Image"},
-        {value: "button", typeOfElement: "btn", name: "Button"},
-        {value: "radiobutton", typeOfElement: "radiobtn", name: "Radiobutton"},
-        {value: "checkbox", typeOfElement: "chkbox", name: "Checkbox"}, 
-        {value: "Element", typeOfElement: "elmnt", name: "Element"}
-    ];
+    useEffect(()=>{
+        if (props.editFlag) {
+            console.log(props.utils)
+            let customFields = ['decrypt', props.utils.object.xpath, props.utils.object.url, props.utils.object.tag];
+            
+            userObjectElement_ICE(customFields)
+            .then(data => {
+                console.log(data);
+                if (data === "unavailableLocalServer") 
+                    props.setShowPop({title: "Fail", content: "Failed to create object ICE not available"});
+                else if (data === "invalid session") return RedirectPage(history);
+                else if (data === "fail") 
+                    props.setShowPop({title: "Fail", content: "Failed to create object"});
+                else{
+                    let custname = props.utils.object.title;
+                    let newObj = { 
+                        objName:  custname.slice(0, custname.lastIndexOf("_")), 
+                        objType: `${data.tag}-${custname.slice(custname.lastIndexOf("_")+1)}`, 
+                        url: data.url, 
+                        name: data.name, 
+                        relXpath: data.rpath, 
+                        absXpath: data.apath, 
+                        className: data.classname, 
+                        id: data.id, 
+                        qSelect: data.selector
+                    }
+                    let obj = [...objects];
+                    obj[0] = {...obj[0], ...newObj};
+                    setObjects(obj);
+                    console.log(obj);
+                }})
+                .catch(error => console.log(error));
+        }
+    }, [])
 
     const newField = () => {
         let updatedObjects = [...objects];
@@ -91,11 +114,11 @@ const CreateObjectModal = props => {
             userObjectElement_ICE(customFields)
 			.then(data => {
 				if (data === "unavailableLocalServer")
-					props.setShowPop({title: "Fail", content: "Failed to create object ICE not available"});
+					props.setShowPop({title: "Fail", content: `Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`});
 				else if (data === "Invalid Session")
 					return RedirectPage(history);
 				else if (data === "fail")
-					props.setShowPop({title: "Fail", content: "Failed to create object"});
+					props.setShowPop({title: "Fail", content: `Failed to ${props.editFlag ? "edit" : "create"} object`});
 				else{
                     let customObject = { custname: `${object.objName}_${elementType}`,
                                         tag: tag,
@@ -118,36 +141,47 @@ const CreateObjectModal = props => {
     }
 
     const onSubmit = () => {
-        let localScrapeList = [];
-        let viewArray = [];
-        let lastObj = props.scrapeItems[props.scrapeItems.length-1]
-        let lastVal = lastObj ? lastObj.val : 0;
-        let lastIdx = props.newScrapedData.view ? props.newScrapedData.view.length : 0;
-        for (let tempId of Object.keys(customObjList)){
-            localScrapeList.push({
-                objId: undefined,
-                objIdx: lastIdx++,
-                val: ++lastVal,
-                hide: false,
-                title: customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
-            });
-            viewArray.push({
-                custname: customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
-                tag: customObjList[tempId].tag,
-                url: customObjList[tempId].url,
-                xpath: customObjList[tempId].xpath,
-                editable: customObjList[tempId].editable
-            });  
+        if (props.editFlag) {
+            props.utils.modifyScrapeItem(props.utils.object.val, {
+                custname: customObjList[1].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
+                tag: customObjList[1].tag,
+                url: customObjList[1].url,
+                xpath: customObjList[1].xpath,
+                editable: true
+            }, true);
+            props.setShow(false);
         }
-        let updatedNewScrapeData = {...props.newScrapedData};
-        if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewArray);
-        else updatedNewScrapeData = { view: [...viewArray] };
-        // update other properties too
-        props.setNewScrapedData(updatedNewScrapeData);
-        props.updateScrapeItems(localScrapeList)
-        props.setSaved(false);
-        props.setShow(false);
-        props.setShowPop({title: "Add Object", content: "Objects has been added successfully."})
+        else {
+            let localScrapeList = [];
+            let viewArray = [];
+            let lastObj = props.scrapeItems[props.scrapeItems.length-1]
+            let lastVal = lastObj ? lastObj.val : 0;
+            let lastIdx = props.newScrapedData.view ? props.newScrapedData.view.length : 0;
+            for (let tempId of Object.keys(customObjList)){
+                localScrapeList.push({
+                    objId: undefined,
+                    objIdx: lastIdx++,
+                    val: ++lastVal,
+                    hide: false,
+                    title: customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
+                });
+                viewArray.push({
+                    custname: customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
+                    tag: customObjList[tempId].tag,
+                    url: customObjList[tempId].url,
+                    xpath: customObjList[tempId].xpath,
+                    editable: true
+                });  
+            }
+            let updatedNewScrapeData = {...props.newScrapedData};
+            if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewArray);
+            else updatedNewScrapeData = { view: [...viewArray] };
+            props.setNewScrapedData(updatedNewScrapeData);
+            props.updateScrapeItems(localScrapeList)
+            props.setSaved(false);
+            props.setShow(false);
+            props.setShowPop({title: "Add Object", content: "Objects has been added successfully."})
+        }
     }
 
     const handleType = (event, index) => {
@@ -156,25 +190,37 @@ const CreateObjectModal = props => {
         setObjects(updatedObjects);
     }
 
+    const resetFields = () => {
+        let emptyFields = [...objects];
+        let showAll = [...showFields];
+        for (let i=0; i<emptyFields.length; i++) {
+            emptyFields[i] = { ...emptyFields[i], ...customObj};
+            if (!showAll.includes(emptyFields[i].tempId)) 
+                showAll.push(emptyFields[i].tempId)
+        }
+        setObjects(emptyFields);
+        setShowFields(showAll);
+    }
+
     return (
         <div className="ss__createObj">
             <ModalContainer 
-                title="Create Object"
+                title={props.editFlag ? "Edit Object" : "Create Object"}
                 content={
-                    <div className="ss__createObj_content">
-                        <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                    <div className="ss__createObj_content" id="createObjListId">
+                        <ScrollBar scrollId="createObjListId" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
                                 { objects.map((object, index) => <div className="ss__createObj_item" key={object.tempId}>
                                         <div className="createObj_row">
-                                            <input className={"createObj_input"+(error[object.tempId] === "objName" ? " ss__error_border" : "")} name="objName" onChange={(e)=>handleInputs(e, index)} value={object.objName} placeholder="Enter Object Name" />
-                                            <select className={"createObj_objType"+(error[object.tempId] === "objType" ? " ss__error_border" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
+                                            <input className={"createObj_input"+(error[object.tempId] === "objName" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} name="objName" onChange={(e)=>handleInputs(e, index)} value={object.objName} placeholder="Enter Object Name" />
+                                            <select className={"createObj_objType"+(error[object.tempId] === "objType" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} value={object.objType} onChange={(e)=>handleType(e, index)}>
                                                 <option className="createObj_option" disabled selected value="">Select Object Type</option>
                                                 { objectTypes.map( objectType =>
                                                     <option className="createObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>{objectType.name}</option>
                                                 ) }
                                             </select>
-                                            <button className="createObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img src="static/imgs/ic-delete.png" /></button>
-                                            <button className="createObj_btn" onClick={()=>onEdit(object.tempId)}><img src="static/imgs/ic-jq-editstep.png" /></button>
-                                            { objects.length-1 === index && <button className="createObj_btn" onClick={newField}><img src="static/imgs/ic-add.png" /></button>}
+                                            {!props.editFlag && <button className="createObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img src="static/imgs/ic-delete.png" /></button>}
+                                            <button className="createObj_btn" onClick={()=>onEdit(object.tempId)} style={props.editFlag ? {flex: "1 0"} : null}><img src="static/imgs/ic-jq-editstep.png" /></button>
+                                            {!props.editFlag && objects.length-1 === index && <button className="createObj_btn" onClick={newField}><img src="static/imgs/ic-add.png" /></button>}
                                         </div>
                                         {
                                             showFields.includes(object.tempId) && 
@@ -198,7 +244,7 @@ const CreateObjectModal = props => {
                 }
                 close={()=>props.setShow(false)}
                 footer={<>
-                    <button>Reset</button>
+                    <button onClick={resetFields}>Reset</button>
                     <button disabled={showFields.length} onClick={onSubmit}>Submit</button>
                 </>}
             />
@@ -206,4 +252,9 @@ const CreateObjectModal = props => {
     );
 }
 
-export default CreateObjectModal;
+const EditObjectModal = props => {
+    return (
+        <CreateObjectModal {...props} editFlag={true} />
+    );
+}
+export { CreateObjectModal, EditObjectModal };

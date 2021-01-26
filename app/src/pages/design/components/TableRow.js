@@ -39,6 +39,7 @@ const TableRow = (props) => {
     const [remarks, setRemarks] = useState([]);
     const [TCDetails, setTCDetails] = useState("");
     const [escapeFlag, setEscapeFlag] = useState(true);
+    const [tcAppType, setTcAppType] = useState("");
     let objList = props.objList;
     
     
@@ -52,6 +53,7 @@ const TableRow = (props) => {
             setInputPlaceholder(null);
             setOutputPlaceholder(null);
             setKeywordList(null);
+            setTcAppType(props.testCase.appType);
             objList = props.objList;
             setRemarks(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
             setCommented(props.testCase.outputVal.slice(-2) === "##");
@@ -82,6 +84,7 @@ const TableRow = (props) => {
                 setObjType(caseData.obType);
                 setOutputPlaceholder(placeholders.outputval);
                 setInputPlaceholder(placeholders.inputval);
+                setTcAppType(caseData.appType);
             }
             else{
                 setFocused(false);
@@ -98,7 +101,8 @@ const TableRow = (props) => {
                         objName: objName === "OBJECT_DELETED" || !objName ? objList[0] : objName,
                         keyword: objName === "OBJECT_DELETED" || !keyword ? keywordList[0] : keyword,
                         inputVal: input,
-                        outputVal: output
+                        outputVal: output,
+                        appType: tcAppType
                     });
                     setEscapeFlag(true);
                 }
@@ -139,6 +143,7 @@ const TableRow = (props) => {
         setInputPlaceholder(placeholders.inputval);
         setObjName(event.target.value)
         setKeyword(caseData.keywords[0]);
+        setTcAppType(caseData.appType);
     };
 
     const onKeySelect = event => {
@@ -152,7 +157,7 @@ const TableRow = (props) => {
 
     const submitChanges = event => {
         if (event.keyCode === 13){
-            props.setRowData({rowIdx: props.idx, operation: "row", objName: objName, keyword: keyword, inputVal: input, outputVal: output});
+            props.setRowData({rowIdx: props.idx, operation: "row", objName: objName, keyword: keyword, inputVal: input, outputVal: output, appType: tcAppType});
             props.setFocusedRow(null);
         }
         else if (event.keyCode === 27) {
