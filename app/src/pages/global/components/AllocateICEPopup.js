@@ -174,7 +174,7 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
 				</div>
 			</div>
 
-            <div className='adminControl popup-content'>
+            <div className='adminControl popup-content popup-content-status'>
 				<div>
 					<span className="leftControl" title="Token Name">ICE Status:</span>
 					<div>
