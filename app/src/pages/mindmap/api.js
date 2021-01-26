@@ -306,10 +306,10 @@ export const excelToMindmap = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'error fetching sheet names'}
+        return {error:'Error fetching excel data!'}
     }catch(err){
         console.error(err)
-        return {error:'error fetching sheet names'}
+        return {error:'Error fetching excel data!'}
     }
 }
 
