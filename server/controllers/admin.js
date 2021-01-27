@@ -12,7 +12,7 @@ const logger = require('../../logger');
 const utils = require('../lib/utils');
 const notifications = require('../notifications');
 const queue = require("../lib/executionQueue")
-const regEx= /[~*+=?^<>()|\\|\/]/;
+const regEx= /[~*+=?^%<>()|\\|\/]/;
 
 //GetUserRoles
 exports.getUserRoles = async (req, res) => {
@@ -46,7 +46,7 @@ exports.manageUserDetails = async (req, res) => {
 		const action = req.body.action;
 		const internalUser = reqData.type == "inhouse";
 		const regEx_email=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-		if(action in ["create","update"]){
+		if(action=="create" || action=="update"){
 			if(regEx.test(reqData.firstname) || regEx.test(reqData.lastname) || regEx.test(reqData.username)){
 				validate_name=true
 				reg_error="Error: Special characters found in firstname/lastname/username";
