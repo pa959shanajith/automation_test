@@ -1572,7 +1572,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#ct-executeBatch').val('');
             }
         })
-        if(p.attr('data-nodetype') == 'scenarios'){
+        if(p.attr('data-nodetype') == 'scenarios' && apptype === "5db0022cf87fdec084ae49b6"){
             v = u.append('li');
             v.append('span').attr('class', 'ct-assignItem fl-left').html('Accessibility');
             v.append('select').attr('id', 'ct-accessibilityTesting').style('width',"64%").style('float',"right");
