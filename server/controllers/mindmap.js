@@ -562,7 +562,7 @@ exports.saveData = function (req, res) {
 				});
 			}
 		} else {
-			err1='Malicious code has been detected in the request!!'
+			err1='Error: Special characters found!!'
 			logger.error(err1);
 			res.status(500).send(err1)
 		}
