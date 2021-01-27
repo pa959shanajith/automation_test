@@ -2659,7 +2659,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$('#irisimg').append(image)
 			if (obj_width > 200 || obj_height >150){ 
 				$('#irisimg').find('img').attr('style',"width: 200px;")
-			}
+			}else{
+                var wd = obj_width + "px;"
+                $('#irisimg').find('img').attr('style',"width:"+wd)
+            }
 			// $('#irisimg').append(canvas)
 			$('#iristext').append('<span><b>Object Text : '+obj_text+' </b></span>')
 			$('#irispos').append('<span><b>Object Height :'+obj_height+ ' px, Object Width :'+obj_width+' px</b></span>')
