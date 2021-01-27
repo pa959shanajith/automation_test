@@ -71,7 +71,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	$timeout(function () {
 		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 	}, 1000);
-
+	$(document).on("change",".acc-chk",function(){
+		let parent = this.parentNode.parentElement.parentElement.parentElement
+		let selected_length = parent.querySelectorAll("input:checked").length;
+		if (selected_length != 0) parent.querySelector("span").textContent = selected_length.toString() + " Standards Selected"
+		else parent.querySelector("span").textContent = "Select Standards"
+	})
+	$(document).on('click',".dropdown-menu",function(e){e.stopPropagation()})
 	$scope.readTestSuite_ICE = function () {
 		$('.checkStylebox').attr("disabled", true);
 		$('#excSaveBtn').attr("disabled", true);
@@ -159,7 +165,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						}
 						row.append($("<td class='projectName' title=" + getEachScenario[i].projectnames + " style='width:16%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
 						if (getEachScenario[i].accessibilityTesting == "Enable"){
-							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">Select Paradigm </span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ><input value="A" checked type="checkbox"/><span style="margin-left: 5px;" id="methodA"></span>A</label></li><li><label title="method AA"  ><input value="AA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAA"></span>AA</label></li><li><label title="method 508"  ><input value="508" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ><input value="Best Practice" checked type="checkbox"/><span style="margin-left: 5px;" id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
+							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">4 Standards Selected</span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ><input value="A" checked class = "acc-chk" type="checkbox"/><span style="margin-left: 5px;" id="methodA"></span>A</label></li><li><label title="method AA"  ><input class = "acc-chk" value="AA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAA"></span>AA</label></li><li><label title="method 508"  ><input class = "acc-chk" value="508" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ><input class = "acc-chk" value="Best Practice" checked type="checkbox"/><span style="margin-left: 5px;" id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
 						}
 						else{
 							row.append($("<td class='projectName' title=" + "N/A" + " style='width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + "N/A" + "</td>"));
@@ -957,7 +963,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		populateICElist(arr,unallocated)
 		$scope.$apply();
 	})
-	
+
 	//Execute TestSuite Functionality
 
 	//Integration Functionality
