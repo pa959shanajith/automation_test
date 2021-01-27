@@ -141,7 +141,6 @@ const ScrapeContent = props => {
         else setNewScrapedData(updNewScrapedData);
         setSaved(false);
         setScrapeItems(localScrapeItems);
-        // setDisableBtns({...disableBtns, save: false})
     }
 
     const toggleSearch = () => {
@@ -165,51 +164,45 @@ const ScrapeContent = props => {
     const onSearch = event => {
         let scrapeItemsL = [...scrapeItems]
         let value = event.target.value;
-        // let totalCount = 0;
-        // let selectedCount = 0;
-        // let selAll = false;
         scrapeItemsL.forEach(item => {
                         if (item.title.toLowerCase().indexOf(value.toLowerCase()) < 0){
                             item.hide = true;
                         } else {
                             item.hide = false
-                            // if (item.checked) selectedCount++;
-                            // totalCount++;
                         };
                     });
-        // if (totalCount === selectedCount && totalCount > 0) selAll = true;
-        // if (totalCount === 0) setDisableBtns({ ...disableBtns, 'selAll': true})
-        // setSelAllCheck(selAll);
         setSearchVal(value);
         setScrapeItems(scrapeItemsL)
     }
 
     const onDelete = () => {
-        let deletedArr = [];
-        let scrapeItemsL = [...scrapeItems];
-        let modifiedDict = {...modified}
-        let newScrapeList = [];
-        newScrapeList = scrapeItemsL.filter((item, idx) => {
-            if (item.checked){
-                if (item.objId) {
-                    deletedArr.push(item.objId);
-                    if (item.objId in modifiedDict)
-                        delete modifiedDict[item.objId]
-                }
-                return false;
-            } else return true;
-        })
-        setScrapeItems(newScrapeList)
-        setDeleted(deletedArr);
-        setModified(modifiedDict);
-        setDisableBtns({...disableBtns, delete: true, save: false})
-        console.log(deletedArr)
+        setShowConfirmPop({
+            title: "Delete Scraped Data",
+            content: current_task.reuse === 'True' ? "Screen is been reused. Are you sure you want to delete objects?" : "Are you sure you want to delete objects?",
+            onClick: ()=>{
+                let deletedArr = [];
+                let scrapeItemsL = [...scrapeItems];
+                let modifiedDict = {...modified}
+                let newScrapeList = [];
+                newScrapeList = scrapeItemsL.filter( item => {
+                    if (item.checked){
+                        if (item.objId) {
+                            deletedArr.push(item.objId);
+                            if (item.objId in modifiedDict)
+                                delete modifiedDict[item.objId]
+                        }
+                        return false;
+                    } else return true;
+                });
+                onSave(null, {deletedArr: deletedArr, newScrapeList: newScrapeList, modifiedDict: modifiedDict}); // task reuse check false
+            }
+        });
     }
 
-    const onSave = () => {
+    const onSave = (e, arg) => {
         let continueSave = true;
-
-        if (current_task.reuse === 'True') {
+        
+        if (current_task.reuse === 'True' && !arg) {
             setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen is been reused. Are you sure you want to save objects?', 'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();}})
             continueSave = false;
         }
@@ -220,7 +213,7 @@ const ScrapeContent = props => {
         let uniqueXPaths = [];
         let dCusts = [];
         let dCusts2 = [];
-        let scrapeItemsL = [...scrapeItems];
+        let scrapeItemsL = arg ? arg.newScrapeList : [...scrapeItems];
 
         if (scrapeItemsL.length > 0) {
             for (let scrapeItem of scrapeItemsL) {
@@ -252,7 +245,7 @@ const ScrapeContent = props => {
             if (dCustname) {
                 continueSave = false;
                 setShowPop({
-                    'title': 'Save Scrape data',
+                    'title': `${arg ? 'Delete' : 'Save'} Scrape data`,
                     'content': <div className="ss__dup_labels">
                         Please rename/delete duplicate scraped objects
                         <br/><br/>
@@ -263,25 +256,25 @@ const ScrapeContent = props => {
             } else if (dXpath) {
                 continueSave = false;
                 setShowConfirmPop({
-                    'title': 'Save Scrape data',
+                    'title': `${arg ? 'Delete' : 'Save'} Scrape data`,
                     'content': <div className="ss__dup_labels">
                         Object characteristics are same for the below list of objects:
                         { dCusts.map(custname => <span className="ss__dup_li">{custname}</span>) }
                         <br/>
                         Do you still want to continue?
                     </div>,
-                    'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();},
+                    'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects(arg);},
                     'continueText': "Continue",
                     'rejectText': "Cancel"
                 })
             }
         }
 
-        if (continueSave) saveScrapedObjects();
+        if (continueSave) saveScrapedObjects(arg);
     }
 
-    const saveScrapedObjects = () => {
-        let scrapeItemsL = [...scrapeItems]
+    const saveScrapedObjects = arg => {
+        let scrapeItemsL = arg ? arg.newScrapeList : [...scrapeItems]
         let added = Object.keys(newScrapedData).length ? { ...newScrapedData } : { ...mainScrapedData };
         let views = []
         for (let scrapeItem of scrapeItemsL) {
@@ -291,9 +284,9 @@ const ScrapeContent = props => {
             }
         }
         
-        let arg = {
-            'deletedObj': deleted,
-            'modifiedObj': Object.values(modified),
+        let params = {
+            'deletedObj': arg ? arg.deletedArr : [],
+            'modifiedObj': arg ? Object.values(arg.modifiedDict) : Object.values(modified),
             'addedObj': {...added, view: views},
             'screenId': current_task.screenId,
             'userId': user_id,
@@ -301,11 +294,22 @@ const ScrapeContent = props => {
             'param': 'saveScrapeData'
         }
 
-        scrapeApi.updateScreen_ICE(arg)
+        scrapeApi.updateScreen_ICE(params)
         .then(response => {
             if (response === "Invalid Session") return RedirectPage(history);
             else fetchScrapeData().then(resp=>{
-                if (resp === 'success'){
+                if (resp === 'success' || typeof(resp) === "object"){
+                    setShowPop({
+                        'title': `${arg ? 'Delete' : 'Save'} Scrape data`,
+                        'content': typeof(resp)==="object" && resp.length>0 ? <div className="ss__dup_labels">
+                            Scraped data saved successfully.
+                            <br/><br/>
+                            <strong>Warning: Please scrape an IRIS reference object.</strong>
+                            <br/><br/>
+                            Matching objects found for:
+                            { resp.map(custname => <span className="ss__dup_li">{custname}</span>) }
+                        </div> : `Scraped data ${arg ? 'deleted' : 'saved'} successfully.`
+                    })
                     setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: false});
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: scrapeItemsL.length !== 0});
                     dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: scrapeItemsL.length === 0});
@@ -411,10 +415,10 @@ const ScrapeContent = props => {
             {
                 !compareFlag &&
                 <div className="scraped_obj_list">
-                <div className="ab">
-                    <div className="min">
-                    <div className="con" id="scrapeObjCon">
-                    <ScrollBar scrollId="scrapeObjCon" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                <div className="sc__ab">
+                    <div className="sc__min">
+                    <div className="sc__con" id="scrapeObjCon">
+                    <ScrollBar scrollId="scrapeObjCon" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                     <div className="scrape_object_container">
                     {
                         scrapeItems.map((object, index) => !object.hide && <ScrapeObject key={object.val} 

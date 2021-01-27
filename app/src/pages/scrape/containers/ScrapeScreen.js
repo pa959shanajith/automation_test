@@ -248,7 +248,6 @@ const ScrapeScreen = ()=>{
         ResetSession.start();
         scrapeApi.initScraping_ICE(screenViewObject)
             .then(data=> {
-                console.log(data)
                 let err = null;
                 setOverlay("");
                 ResetSession.end();
@@ -372,7 +371,7 @@ const ScrapeScreen = ()=>{
                         }
 
                         let scrapeItem = {  objId: scrapeObject._id,
-                                            objIdx: lastIdx,
+                                            objIdx: lastIdx++,
                                             val: ++lastVal,
                                             hide: false,
                                             title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),

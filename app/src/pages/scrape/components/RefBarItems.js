@@ -10,18 +10,31 @@ const RefBarItems = props => {
 
 	const { appType } = useSelector(state=>state.plugin.CT);
 	const compareFlag = useSelector(state=>state.scrape.compareFlag);
+	const objValue = useSelector(state=>state.scrape.objValue);
     const [toFilter, setToFilter] = useState([]);
 	const [tagList, setTagList] = useState([]);
 	const [showFilterPop, setShowFilterPop] = useState(false);
 	const [filterY, setFilterY] = useState(null);
 	const [showScreenPop, setShowScreenPop] = useState(false);
 	const [screenshotY, setScreenshotY] = useState(null);
-	const { scrapeItems, setScrapeItems, scrapedURL } = useContext(ScrapeContext);
+	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData } = useContext(ScrapeContext);
 
 	useEffect(()=>{
 		if (appType === "MobileApp") navigator.appVersion.indexOf("Mac") !== -1 ? setTagList(list.mobileMacFilters) : setTagList(list.mobileFilters);
 		else setTagList(list.nonMobileFilters);
 	}, [appType]);
+
+	useEffect(()=>{
+		if (objValue){
+			let objIndex = scrapeItems[objValue].objIdx;
+			let ScrapedObject = null;
+			
+			if (scrapeItems[objValue].objId) ScrapedObject = mainScrapedData.view[objIndex];
+			else ScrapedObject = newScrapedData.view[objIndex];
+
+			console.log(ScrapedObject);
+		}
+	}, [objValue])
 
     const closeAllPopups = () => {
 		setShowScreenPop(false);
@@ -149,10 +162,6 @@ const RefBarItems = props => {
 		} else {
 			scrapedItems.forEach(item => item.hide = false)
 		}
-		// $("html").css({
-		// 	'cursor': 'auto'
-		// });
-		// cfpLoadingBar.complete()
         setScrapeItems(scrapedItems)
 	}
 
@@ -160,16 +169,16 @@ const RefBarItems = props => {
         <>
         {
             showScreenPop && 
-            <ClickAwayListener onClickAway={closeAllPopups}>
+            // <ClickAwayListener onClickAway={closeAllPopups}>
             <div className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`}}>
                 <h4 className="pop__header" onClick={()=>setShowScreenPop(false)}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
 				<div className="screenshot_pop__content" id="ss_ssId">
-				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
-                    { props.mirror ? <img className="screenshot_img" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
+				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
+					{ props.mirror ? <img className="screenshot_img" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
 				</ScrollBar>
 				</div>
             </div>
-            </ClickAwayListener>
+            // </ClickAwayListener>
 		}
 		{
             showFilterPop && 

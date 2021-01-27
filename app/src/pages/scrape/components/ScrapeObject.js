@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
+import * as actions from '../state/action';
 import "../styles/ScrapeObject.scss";
 
 const ScrapeObject = props => {
+
+    const dispatch = useDispatch();
 
     const [objName, setObjName] = useState(props.object.title);
     const [checked, setChecked] = useState(props.object.checked);
@@ -29,11 +33,18 @@ const ScrapeObject = props => {
         }
     }
 
+    const onHighlight = () => {
+        if (props.activeEye !== props.object.val){
+            props.setActiveEye(props.object.val);
+            dispatch({type: actions.SET_OBJVAL, payload: props.object.val});
+        }
+    }
+
     return (
         <div className="ss__scrape_obj">
             <img className="ss_eye_icon" 
-                onClick={()=>props.setActiveEye(props.idx)} 
-                src={props.activeEye === props.idx ? 
+                onClick={onHighlight} 
+                src={props.activeEye === props.object.val ? 
                         "static/imgs/ic-highlight-element-active.png" : 
                         "static/imgs/ic-highlight-element-inactive.png"} 
                 alt="eyeIcon"/>

@@ -18,12 +18,10 @@ const CreateObjectModal = props => {
 
     useEffect(()=>{
         if (props.editFlag) {
-            console.log(props.utils)
             let customFields = ['decrypt', props.utils.object.xpath, props.utils.object.url, props.utils.object.tag];
             
             userObjectElement_ICE(customFields)
             .then(data => {
-                console.log(data);
                 if (data === "unavailableLocalServer") 
                     props.setShowPop({title: "Fail", content: "Failed to create object ICE not available"});
                 else if (data === "invalid session") return RedirectPage(history);
@@ -208,7 +206,7 @@ const CreateObjectModal = props => {
                 title={props.editFlag ? "Edit Object" : "Create Object"}
                 content={
                     <div className="ss__createObj_content" id="createObjListId">
-                        <ScrollBar scrollId="createObjListId" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                        <ScrollBar scrollId="createObjListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                 { objects.map((object, index) => <div className="ss__createObj_item" key={object.tempId}>
                                         <div className="createObj_row">
                                             <input className={"createObj_input"+(error[object.tempId] === "objName" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} name="objName" onChange={(e)=>handleInputs(e, index)} value={object.objName} placeholder="Enter Object Name" />

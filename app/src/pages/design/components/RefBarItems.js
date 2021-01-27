@@ -26,7 +26,7 @@ const ReferenceContent = ({mirror}) => {
             <div className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`}}>
                 <h4 className="pop__header" onClick={()=>setShowScreenPop(false)}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                 <div className="screenshot_pop__content" id="ss_ssId">
-                <ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                <ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                     { mirror ? <img className="screenshot_img" src={`data:image/PNG;base64,${mirror}`} /> : "No Screenshot Available"}
                 </ScrollBar>
 				</div>

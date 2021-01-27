@@ -25,7 +25,7 @@ const UpperContent = props => {
 
     useEffect(() => {
         setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
-        if (saved) setAppendCheck(false);
+        if (saved || disableAction) setAppendCheck(false);
     }, [appType, saved]);
 
 

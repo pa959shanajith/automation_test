@@ -132,7 +132,7 @@ const MapObjectModal = props => {
                                     <div className="mo_listCanvas">
                                         <div className="mo_listMinHeight">
                                             <div className="mo_listContent" id="moListId">
-                                            <ScrollBar scrollId="moListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                                            <ScrollBar scrollId="moListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                             <>
                                             { (()=> selectedTag ? scrapedList[selectedTag] : nonCustomList)()
                                             .map(object => {
