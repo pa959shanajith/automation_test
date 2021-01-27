@@ -2353,6 +2353,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									// if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
 									//	 var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									// } else {
+									irisFlg = false;
 									if (ob.cord && ob.cord != '') {  //in case of iris object
 										addcusOb = ""
 										ob.hiddentag = "No",
@@ -2628,7 +2629,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			});
 	}
 	//Edit Objects
-	$(document).on('click', '#editObjects', function () {
+	$(document).on('click', '#editObjects', function (e) {
 		ele=$("input[type=checkbox].checkall:checked:visible").parents('li.item.select_all')
 		$('.errorMessage').val('');
 		if(ele[0].attributes["data-xpath"].value.startsWith('iris')){
