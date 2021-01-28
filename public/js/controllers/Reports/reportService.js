@@ -152,6 +152,17 @@ mySPA.factory('reportService', ['$http', '$q', function($http, $q) {
                     function(response) {
                         return $q.reject(response.data)
                     })
+        },
+        getAccessibilityData_ICE: function(inputData){
+            return $http.post('/getAccessibilityData_ICE', {
+                input: inputData
+            })
+            .then(function(response) {
+                    return response.data
+                },
+                function(response) {
+                    return $q.reject(response.data)
+                })
         }
     }
 }]);

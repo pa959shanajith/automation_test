@@ -35,7 +35,13 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 
 	//update scheduled table every 60 seconds
 	$interval(getScheduledDetailsInterval, 60000);
-
+	$(document).on("change",".acc-chk",function(){
+		let parent = this.parentNode.parentElement.parentElement.parentElement
+		let selected_length = parent.querySelectorAll("input:checked").length;
+		if (selected_length != 0) parent.querySelector("span").textContent = selected_length.toString() + " Standards Selected"
+		else parent.querySelector("span").textContent = "Select Standards"
+	})
+	$(document).on('click',".dropdown-menu",function(e){e.stopPropagation()})
 	$scope.readTestSuite_ICE = function () {
 		ScheduleService.readTestSuite_ICE(readTestSuite, "schedule")
 			.then(function (result) {
@@ -53,15 +59,28 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 							+ '<span style="display:none" class="ipContainer"><select id="mod' + i + '" onchange="openPopup(id)"" class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
 							+ '<span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span>'
 							+ '<span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" class="cursor:not-allowed" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
-							+ '<table class="scenarioSchdCon scenarioSch_' + i + '"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead>'
+							+ '<table class="scenarioSchdCon scenarioSch_' + i + '"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td style="width:12%;">Project Name</td><td>Accessibility Testing</tr></thead>'
 							+ '<tbody class="scenarioBody scenarioTbCon_' + i + '"></tbody></table>');
 						for (j = 0; j < eachData[i].scenarioids.length; j++) {
 							const flag = eachData[i].condition[j] == 0;
-							$(document).find(".scenarioTbCon_" + i + "").append('<tr><td><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
+							if("accessibilityTestingMap" in eachData[i] && eachData[i].accessibilityTestingMap[eachData[i].scenarioids[j]] == "Enable"){
+								$(document).find(".scenarioTbCon_" + i + "").append('<tr><td class = "tabeleCellPadding"><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
 								+ '<td data-scenarioid="' + eachData[i].scenarioids[j] + '">' + eachData[i].scenarionames[j] + '</td>'
 								+ '<td style="padding: 2px 0 2px 0;"><input type="text" value="' + eachData[i].dataparam[j] + '" disabled/></td>'
 								+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
-								+ '<td>' + eachData[i].projectnames[j] + '</td></tr>');
+								+ '<td>' + eachData[i].projectnames[j] + '</td>'
+								+ '<td class="exe-accesibilityTesting tabeleCellPadding" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">4 Standards Selected</span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ><input style="height:12px;" class = "acc-chk" value="A" checked type="checkbox"/><span style="margin-left: 5px;" id="methodA"></span>A</label></li><li><label title="method AA"  ><input class = "acc-chk" style="height:12px;" value="AA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAA"></span>AA</label></li><li><label title="method 508"  ><input class = "acc-chk" style="height:12px;" value="508" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ><input class = "acc-chk" style="height:12px;" value="Best Practice" checked type="checkbox"/><span style="margin-left: 5px;" id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>'
+								+ '</tr>');
+							}else{
+								$(document).find(".scenarioTbCon_" + i + "").append('<tr><td class = "tabeleCellPadding"><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
+								+ '<td data-scenarioid="' + eachData[i].scenarioids[j] + '">' + eachData[i].scenarionames[j] + '</td>'
+								+ '<td style="padding: 2px 0 2px 0;"><input type="text" value="' + eachData[i].dataparam[j] + '" disabled/></td>'
+								+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
+								+ '<td>' + eachData[i].projectnames[j] + '</td>'
+								+ "<td class='projectName' title=" + "N/A" + " style='width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important'  class='exe-accesibilityTesting tabeleCellPadding'>" + "N/A" + "</td>"
+								+ '</tr>');
+							}
+							
 						}
 						$(".ipformating").empty();
 						// $(".ipformating").append("<option value=' ' selected disabled>Select User</option>")			
@@ -434,7 +453,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
 					suiteInfo.timestamp = timestamp.valueOf().toString();
 					const diff = (timestamp - new Date()) / 60000;
-					if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
+					if (diff < 0) {  // Check if schedule time is not ahead of 5 minutes from current time
 						if (diff < 0) $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").prop("style", "border: 2px solid red;");
 						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style", "border: 2px solid red;");
 						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
@@ -444,11 +463,16 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					if (doNotSchedule) return false;
 					$(this).find(".scenarioSchdCon tbody tr").each(function () {
 						if ($(this).find(".selectToSched").is(":checked")) {
+							let accessibilityParameters = []
+							$(this).children(".exe-accesibilityTesting").find("input:checked").each(function(){
+								accessibilityParameters.push($(this).val());
+							});
 							selectedScenarioData.push({
 								condition: parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
 								dataparam: [$(this).children("td:nth-child(3)").find("input").val().trim()],
 								scenarioId: $(this).children("td:nth-child(2)").data("scenarioid"),
 								scenarioName: $(this).children("td:nth-child(2)").text(),
+								accessibilityParameters: accessibilityParameters
 							});
 						}
 					});

@@ -934,6 +934,32 @@ exports.getReport_API = async(req, res) => {
     }
 };
 
+exports.getAccessibilityReports_API = async(req, res)=>{
+    const executionId = req.body.execution_data.executionId;
+    var userInfo = req.body.userInfo;
+    var result = {"error":"Interanal Server Error", "userinfo":{"ice":userInfo.icename,"token":userInfo.tokenname}};
+    try{
+        const token = await utils.tokenValidation(userInfo);
+        if(token.inputs.tokenValidation.toLowerCase() == "passed"){
+            const inputs = {
+                "executionid": executionId,
+            };
+            reports = await utils.fetchData(inputs,"reports/getAccessibilityReports_API", "getAccessibilityReports_API");
+            if(reports == 'fail'){
+                result['error'] = "Invalid Execution ID"
+            }else{
+                result['reports'] = reports;
+                delete result['error'];
+            } 
+        }else{
+            result["error"] = "Invalid Token";
+        }
+        res.send(result);
+    }catch(e){
+        logger.error("Exception occured in getAccessibilityReports_API service", exception);
+    }
+}
+
 function validateData(content, type) {
     logger.info("Inside function: validateData");
     switch (type) {

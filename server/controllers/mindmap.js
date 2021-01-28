@@ -228,74 +228,60 @@ exports.saveData = async function (req, res) {
 		var createdthrough = inputs.createdthrough || "Web";
 		//Assigned Tasks Notification
 		var assignedObj = {};
-        var scenarioObj = {}
-        var regg = /^[a-zA-Z0-9_]*$/;
-		var flag_validate=0
-		test_json=JSON.stringify(inputs)
-		for(var key in inputs){
-			if(key=='map'){
-				for(var i=0;i<inputs[key].length;i++){
-					if(!regg.test(inputs[key][i]['name'])){
-						flag_validate=1
-						break
+		var scenarioObj = {}
+		for (var k = 0; k < data.length; k++) {
+			var task = data[k].task;
+			if (task != null) {
+				if('accessibilityTesting' in task){
+					scenarioObj[data[k]["_id"]] = task["accessibilityTesting"];
+				}
+				if ('assignedToName' in task) {
+					var assignedTo = task.assignedToName;
+					if (assignedTo != null && assignedTo != undefined) {
+						if ('status' in task) {
+							assignedObj[task.details] = assignedTo;
+						}
 					}
 				}
 			}
-        }
-        if(flag_validate==0){
-            for (var k = 0; k < data.length; k++) {
-                var task = data[k].task;
-                if (task != null) {
-                    if('accessibilityTesting' in task){
-                        scenarioObj[data[k]["_id"]] = task["accessibilityTesting"];
-                    }
-                    if ('assignedToName' in task) {
-                        var assignedTo = task.assignedToName;
-                        if (assignedTo != null && assignedTo != undefined) {
-                            if ('status' in task) {
-                                assignedObj[task.details] = assignedTo;
-                            }
-                        }
-                    }
-                }
-            }
-            if(Object.keys(scenarioObj).length > 0){
-                let scenario_result = await updateScenario(scenarioObj);
-                if (scenario_result == 'fail'){
-                    logger.error("Update Scenario Failed task can not be saved.");
-                    return res.send("fail");
-                }
-            }
-            var notify = assignedObj;
-            if (Object.keys(notify).length > 0 && Object.keys(notify).length != undefined) {
-                var assignedToValues = Object.keys(notify).map(function (key) { return notify[key] });
-                for (var i = 0; i < assignedToValues.length; i++) {
-                    if (Object.keys(myserver.socketMapNotify).indexOf(assignedToValues[i]) > -1) {
-                        var keys = Object.keys(notify);
-                        for (var j = 0; j < keys.length; j++) {
-                            if (i == j) {
-                                var tName = keys[j];
-                                var taskAssignment = 'assigned';
-                                var taskName = tName;
-                                var soc = myserver.socketMapNotify[assignedToValues[i]];
-                                var count = 0;
-                                var assignedTasksNotification = {};
-                                assignedTasksNotification.to = '/plugin';
-                                if (removeTask.length > 0) {
-                                    for (var p = 0; p < removeTask.length; p++) {
-                                        for (var q = 0; q < data.length; q++) {
-                                            if (removeTask[p] == data[q].oid) {
-                                                taskAssignment = "unassigned";
-                                            }
-                                            if (taskAssignment == "unassigned") {
-                                                assignedTasksNotification.notifyMsg = "Task '" + taskName + "' has been unassigned by " + user + "";
-                                            }
-                                            assignedTasksNotification.isRead = false;
-                                            assignedTasksNotification.count = count;
-                                            soc.emit("notify", assignedTasksNotification);
-                                        }
-                                    }
-                                }
+		}
+		if(Object.keys(scenarioObj).length > 0){
+			let scenario_result = await updateScenario(scenarioObj);
+			if (scenario_result == 'fail'){
+				logger.error("Update Scenario Failed task can not be saved.");
+				return res.send("fail");
+			}
+		}
+		var notify = assignedObj;
+		if (Object.keys(notify).length > 0 && Object.keys(notify).length != undefined) {
+			var assignedToValues = Object.keys(notify).map(function (key) { return notify[key] });
+			for (var i = 0; i < assignedToValues.length; i++) {
+				if (Object.keys(myserver.socketMapNotify).indexOf(assignedToValues[i]) > -1) {
+					var keys = Object.keys(notify);
+					for (var j = 0; j < keys.length; j++) {
+						if (i == j) {
+							var tName = keys[j];
+							var taskAssignment = 'assigned';
+							var taskName = tName;
+							var soc = myserver.socketMapNotify[assignedToValues[i]];
+							var count = 0;
+							var assignedTasksNotification = {};
+							assignedTasksNotification.to = '/plugin';
+							if (removeTask.length > 0) {
+								for (var p = 0; p < removeTask.length; p++) {
+									for (var q = 0; q < data.length; q++) {
+										if (removeTask[p] == data[q].oid) {
+											taskAssignment = "unassigned";
+										}
+										if (taskAssignment == "unassigned") {
+											assignedTasksNotification.notifyMsg = "Task '" + taskName + "' has been unassigned by " + user + "";
+										}
+										assignedTasksNotification.isRead = false;
+										assignedTasksNotification.count = count;
+										soc.emit("notify", assignedTasksNotification);
+									}
+								}
+							}
 
                                 if (taskAssignment == "assigned") {
                                     assignedTasksNotification.notifyMsg = "New task '" + taskName + "' has been assigned by " + user + "";
@@ -572,10 +558,6 @@ exports.saveData = async function (req, res) {
                         }
                 });
             }
-        } else {
-			logger.error('Error: Special characters found!!');
-			res.status(500).send('Error: Special characters found!!')
-        }
 	} else {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
