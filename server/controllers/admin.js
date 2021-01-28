@@ -13,6 +13,10 @@ const utils = require('../lib/utils');
 const notifications = require('../notifications');
 const queue = require("../lib/executionQueue")
 const regEx= /[~*+=?^%<>()|\\|\/]/;
+const ldap_url=/^ldap:\/\/[A-Za-z0-9._-].*$/i;
+const char_check=/[<'>"]/;
+const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+const regEx_email=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 //GetUserRoles
 exports.getUserRoles = async (req, res) => {
@@ -45,7 +49,6 @@ exports.manageUserDetails = async (req, res) => {
 		const reqData = req.body.user;
 		const action = req.body.action;
 		const internalUser = reqData.type == "inhouse";
-		const regEx_email=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		if(action=="create" || action=="update"){
 			if(regEx.test(reqData.firstname) || regEx.test(reqData.lastname) || regEx.test(reqData.username)){
 				validate_name=true
@@ -521,93 +524,102 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 
 exports.testLDAPConnection = (req, res) => {
 	logger.info("Inside UI Service: testLDAPConnection");
+	const test_flg=false;
 	try{
 		const reqData = req.body;
 		const ldapURL = (reqData.ldapURL || "").trim();
 		const secure = (reqData.secure || "false").trim();
 		const tlsCert = (reqData.tlsCert || "").trim() || false;
-		if (ldapURL.slice(0,8) == "ldaps://") {
-			if (secure === "false") {
-				logger.error("Error occurred in admin/testLDAPConnection: Secure connection must be enabled for 'ldaps' protocol");
-				return res.send("mismatch_secure");
-			} else if (!tlsCert) {
-				logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol require TLS Certificate.");
-				return res.send("invalid_cert");
+		if(!ldap_url.test(ldapURL) || char_check.test(reqData.baseDN) || regEx.test(reqData.username)){
+			test_flg=true;
+		}
+		if(!test_flg){
+			if (ldapURL.slice(0,8) == "ldaps://") {
+				if (secure === "false") {
+					logger.error("Error occurred in admin/testLDAPConnection: Secure connection must be enabled for 'ldaps' protocol");
+					return res.send("mismatch_secure");
+				} else if (!tlsCert) {
+					logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol require TLS Certificate.");
+					return res.send("invalid_cert");
+				}
+			} else if (ldapURL.slice(0,8) != "ldaps://" && ldapURL.slice(0,7) != "ldap://") {
+				logger.error("Error occurred in admin/testLDAPConnection: Invalid URL provided for connection test.");
+				return res.send("invalid_url");
 			}
-		} else if (ldapURL.slice(0,8) != "ldaps://" && ldapURL.slice(0,7) != "ldap://") {
-			logger.error("Error occurred in admin/testLDAPConnection: Invalid URL provided for connection test.");
-			return res.send("invalid_url");
-		}
-		const baseDN = (reqData.baseDN || "").trim();
-		const authUser = (reqData.username || "").trim();
-		const authKey = (reqData.password || "").trim();
-		const authType = reqData.authType;
-		const adConfig = {
-			url: ldapURL,
-			baseDN: baseDN
-		};
-		if (secure !== "false") adConfig.tlsOptions = { 
-			ca: tlsCert,
-			rejectUnauthorized: secure === "secure"
-		};
-		if (authType == "simple") {
-			adConfig.bindDN = authUser;
-			adConfig.bindCredentials = authKey;
-		}
-		const ad = new activeDirectory(adConfig);
-		var resSent = false;
-		ad.find("cn=*", function (err, result) {
-			if (resSent) return;
-			resSent = !resSent;
-			var flag = "success";
-			var data = {fields:{}};
-			if (err) {
-				const errm = err.lde_message;
-				if (["EADDRNOTAVAIL", "ECONNREFUSED", "ETIMEDOUT"].includes(err.errno)) flag = "invalid_addr";
-				else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
-					if (authType == "simple") flag = "insufficient_access";
-					else flag = "success";
-				} else if (errm) {
-					if (errm.indexOf("DSID-0C0906E8") > -1) {
+			const baseDN = (reqData.baseDN || "").trim();
+			const authUser = (reqData.username || "").trim();
+			const authKey = (reqData.password || "").trim();
+			const authType = reqData.authType;
+			const adConfig = {
+				url: ldapURL,
+				baseDN: baseDN
+			};
+			if (secure !== "false") adConfig.tlsOptions = { 
+				ca: tlsCert,
+				rejectUnauthorized: secure === "secure"
+			};
+			if (authType == "simple") {
+				adConfig.bindDN = authUser;
+				adConfig.bindCredentials = authKey;
+			}
+			const ad = new activeDirectory(adConfig);
+			var resSent = false;
+			ad.find("cn=*", function (err, result) {
+				if (resSent) return;
+				resSent = !resSent;
+				var flag = "success";
+				var data = {fields:{}};
+				if (err) {
+					const errm = err.lde_message;
+					if (["EADDRNOTAVAIL", "ECONNREFUSED", "ETIMEDOUT"].includes(err.errno)) flag = "invalid_addr";
+					else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
 						if (authType == "simple") flag = "insufficient_access";
-						else flag = "invalid_auth";
-					} else if (errm.indexOf("DSID-031522C9") > -1) {
-						flag = "insufficient_access";
-						logger.error("User Does not have sufficient Access!");
-					} else if (authType == "simple") {
-						if ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) || (errm.indexOf("DSID-0C090442") > -1))
-							flag = "invalid_credentials";
+						else flag = "success";
+					} else if (errm) {
+						if (errm.indexOf("DSID-0C0906E8") > -1) {
+							if (authType == "simple") flag = "insufficient_access";
+							else flag = "invalid_auth";
+						} else if (errm.indexOf("DSID-031522C9") > -1) {
+							flag = "insufficient_access";
+							logger.error("User Does not have sufficient Access!");
+						} else if (authType == "simple") {
+							if ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) || (errm.indexOf("DSID-0C090442") > -1))
+								flag = "invalid_credentials";
+						}
+						else if (errm.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
+					} else if (err.code == "UNABLE_TO_VERIFY_LEAF_SIGNATURE") flag = "invalid_cacert";
+					else if (err.code == "ERR_TLS_CERT_ALTNAME_INVALID") flag = "invalid_cacert_host";
+					else flag = "fail";
+					var errStack = "";
+					try {
+						errStack = JSON.stringify(err);
+					} catch(_){
+						errStack = JSON.stringify({"message": err.lde_message || err.message, "code": err.errno || err.code});
 					}
-					else if (errm.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
-				} else if (err.code == "UNABLE_TO_VERIFY_LEAF_SIGNATURE") flag = "invalid_cacert";
-				else if (err.code == "ERR_TLS_CERT_ALTNAME_INVALID") flag = "invalid_cacert_host";
-				else flag = "fail";
-				var errStack = "";
-				try {
-					errStack = JSON.stringify(err);
-				} catch(_){
-					errStack = JSON.stringify({"message": err.lde_message || err.message, "code": err.errno || err.code});
+					logger.debug("Error occurred in admin/testLDAPConnection: " + errStack);
 				}
-				logger.debug("Error occurred in admin/testLDAPConnection: " + errStack);
-			}
-			if (flag == "success") {
-				logger.info('LDAP Connection test passed!');
-				if (result && result.users && result.users.length > 0) {
-					const fieldSet = new Set();
-					for (let idx of [0, parseInt(result.users.length/2), result.users.length]) {
-						for (let uo in result.users[idx]) fieldSet.add(uo);
+				if (flag == "success") {
+					logger.info('LDAP Connection test passed!');
+					if (result && result.users && result.users.length > 0) {
+						const fieldSet = new Set();
+						for (let idx of [0, parseInt(result.users.length/2), result.users.length]) {
+							for (let uo in result.users[idx]) fieldSet.add(uo);
+						}
+						data.fields = [...fieldSet.values()];
+					} else {
+						flag= "empty";
+						logger.warn('LDAP Connection test passed but directory is empty');
 					}
-					data.fields = [...fieldSet.values()];
 				} else {
-					flag= "empty";
-					logger.warn('LDAP Connection test passed but directory is empty');
+					logger.error('LDAP Connection test failed!');
 				}
-			} else {
-				logger.error('LDAP Connection test failed!');
-			}
-			data.flag = flag;
-			return res.send(data);
-		});
+				data.flag = flag;
+				return res.send(data);
+			});
+		} else{
+			logger.error("Error: Special characters found!!");
+			res.status(500).send("fail");
+		}
 	} catch (exception){
 		if (exception.name == "InvalidDistinguishedNameError") {
 			res.send("invalid_basedn");
@@ -734,6 +746,7 @@ exports.getLDAPConfig = async (req, res) => {
 
 exports.manageLDAPConfig = async (req, res) => {
 	const fnName = "manageLDAPConfig";
+	const ldap_flag=false;
 	logger.info("Inside UI Service: " + fnName);
 	try {
 		let flag = ['1','0','0','0','0','0','0','0','0'];
@@ -742,75 +755,86 @@ exports.manageLDAPConfig = async (req, res) => {
 		let inputs = {};
 		inputs.action = action;
 		inputs.name = (reqData.name || "").trim();
-		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
-			logger.error("Error occurred in admin/manageLDAPConfig: Invalid action.");
-			flag[1] = '1';
+		if(regEx.test(inputs.name) || !ldap_url.test(reqData.url) || char_check.test(reqData.binddn) || char_check.test(reqData.basedn) || char_check.test(reqData.fieldmap.fname) || char_check.test(reqData.fieldmap.lname) || char_check.test(reqData.fieldmap.uname)){
+			ldap_flag=true;
 		}
-		if (validator.isEmpty(inputs.name)) {
-			logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server Name cannot be empty.");
-			flag[2] = '1';
+		if(!regEx_email.test(reqData.fieldmap.email)){
+			ldap_flag=true;
 		}
-		if  (action != "delete") {
-			inputs.url = (reqData.url || "").trim();
-			inputs.basedn = (reqData.basedn || "").trim();
-			inputs.secure = reqData.secure;
-			inputs.auth = reqData.auth;
-			inputs.fieldmap = reqData.fieldmap || {};
-			const secure = (reqData.secure !== "false");
-			const protocol = (inputs.url.slice(0,7) + ((inputs.url.slice(7,8)=='/')?'/':'')).slice(0,-3);
-			if (validator.isEmpty(inputs.url)) {
-				logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
-				flag[3] = '1';
-			} else if (secure && protocol == "ldap") {
-				logger.error("Error occurred in admin/manageLDAPConfig: Secure Connection needs 'ldaps' protocol.");
-				flag[3] = '2';
-			} else if (secure && protocol == "ldaps") {
-				if ((reqData.cert || "").trim().length !== 0) inputs.cert = reqData.cert;
-				else {
-					logger.error("Error occurred in admin/manageLDAPConfig: Secure Connection needs a TLS Certificate.");
-					flag[3] = '3';
+		if(!ldap_flag){
+			if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+				logger.error("Error occurred in admin/manageLDAPConfig: Invalid action.");
+				flag[1] = '1';
+			}
+			if (validator.isEmpty(inputs.name)) {
+				logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server Name cannot be empty.");
+				flag[2] = '1';
+			}
+			if  (action != "delete") {
+				inputs.url = (reqData.url || "").trim();
+				inputs.basedn = (reqData.basedn || "").trim();
+				inputs.secure = reqData.secure;
+				inputs.auth = reqData.auth;
+				inputs.fieldmap = reqData.fieldmap || {};
+				const secure = (reqData.secure !== "false");
+				const protocol = (inputs.url.slice(0,7) + ((inputs.url.slice(7,8)=='/')?'/':'')).slice(0,-3);
+				if (validator.isEmpty(inputs.url)) {
+					logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
+					flag[3] = '1';
+				} else if (secure && protocol == "ldap") {
+					logger.error("Error occurred in admin/manageLDAPConfig: Secure Connection needs 'ldaps' protocol.");
+					flag[3] = '2';
+				} else if (secure && protocol == "ldaps") {
+					if ((reqData.cert || "").trim().length !== 0) inputs.cert = reqData.cert;
+					else {
+						logger.error("Error occurred in admin/manageLDAPConfig: Secure Connection needs a TLS Certificate.");
+						flag[3] = '3';
+					}
+				} else if (!secure && protocol == "ldaps") {
+					logger.error("Error occurred in admin/manageLDAPConfig: 'ldaps' protocol needs secure connection enabled.");
+					flag[3] = '4';
+				} else if (!["ldap", "ldaps"].includes(protocol)) {
+					logger.error("Error occurred in admin/manageLDAPConfig: Invalid URL provided. URL should start with ldap or ldaps");
+					flag[3] = '5';
 				}
-			} else if (!secure && protocol == "ldaps") {
-				logger.error("Error occurred in admin/manageLDAPConfig: 'ldaps' protocol needs secure connection enabled.");
-				flag[3] = '4';
-			} else if (!["ldap", "ldaps"].includes(protocol)) {
-				logger.error("Error occurred in admin/manageLDAPConfig: Invalid URL provided. URL should start with ldap or ldaps");
-				flag[3] = '5';
-			}
-			if (validator.isEmpty(inputs.basedn)) {
-				logger.error("Error occurred in admin/manageLDAPConfig: Invalid Base Domain Name.");
-				flag[4] = '1';
-			}
-			if (validator.isEmpty(inputs.auth)) {
-				logger.error("Error occurred in admin/manageLDAPConfig: Invalid Authentication Protocol.");
-				flag[5] = '1';
-			}
-			if (inputs.auth == "simple") {
-				inputs.binddn = (reqData.binddn || "").trim();
-				inputs.bindcredentials = (reqData.bindcredentials || "").trim();
-				if (validator.isEmpty(inputs.binddn)) {
-					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Domain Name.");
-					flag[6] = '1';
+				if (validator.isEmpty(inputs.basedn)) {
+					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Base Domain Name.");
+					flag[4] = '1';
 				}
-				if (validator.isEmpty(inputs.bindcredentials)) {
-					if (action == "create") {
-						logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Credentials.");
-						flag[7] = '1';
-					} else {
-						delete inputs.bindcredentials;
+				if (validator.isEmpty(inputs.auth)) {
+					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Authentication Protocol.");
+					flag[5] = '1';
+				}
+				if (inputs.auth == "simple") {
+					inputs.binddn = (reqData.binddn || "").trim();
+					inputs.bindcredentials = (reqData.bindcredentials || "").trim();
+					if (validator.isEmpty(inputs.binddn)) {
+						logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Domain Name.");
+						flag[6] = '1';
+					}
+					if (validator.isEmpty(inputs.bindcredentials)) {
+						if (action == "create") {
+							logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Credentials.");
+							flag[7] = '1';
+						} else {
+							delete inputs.bindcredentials;
+						}
 					}
 				}
+				if (!inputs.fieldmap.uname || !inputs.fieldmap.fname || !inputs.fieldmap.lname || !inputs.fieldmap.email) {
+					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Field Map.");
+					flag[8] = '1';
+				} else inputs.fieldmap = JSON.stringify(inputs.fieldmap);
 			}
-			if (!inputs.fieldmap.uname || !inputs.fieldmap.fname || !inputs.fieldmap.lname || !inputs.fieldmap.email) {
-				logger.error("Error occurred in admin/manageLDAPConfig: Invalid Field Map.");
-				flag[8] = '1';
-			} else inputs.fieldmap = JSON.stringify(inputs.fieldmap);
+			flag = flag.join('');
+			if (flag != "100000000") return res.send(flag);
+			const data = await utils.fetchData(inputs, "admin/manageLDAPConfig", fnName);
+			if (data == "fail") res.status(500).send(data);
+			else return res.send(data);
+		} else {
+			logger.error("Error: Special characters found!!");
+			res.status(500).send("fail");
 		}
-		flag = flag.join('');
-		if (flag != "100000000") return res.send(flag);
-		const data = await utils.fetchData(inputs, "admin/manageLDAPConfig", fnName);
-		if (data == "fail") res.status(500).send(data);
-		else return res.send(data);
 	} catch (exception){
 		logger.error("Error occurred in admin/manageLDAPConfig", exception);
 		res.status(500).send("fail");
@@ -837,6 +861,7 @@ exports.getSAMLConfig = async (req, res) => {
 exports.manageSAMLConfig = async (req, res) => {
 	const fnName = "manageSAMLConfig";
 	const errPretext = "Error occurred in admin/" + fnName;
+	const saml_flg=false;
 	logger.info("Inside UI Service: " + fnName);
 	try{
 		let flag = ['1','0','0','0','0'];
@@ -845,42 +870,50 @@ exports.manageSAMLConfig = async (req, res) => {
 		const inputs = {};
 		inputs.action = action;
 		inputs.name = (reqData.name || "").trim();
-		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
-			logger.error(errPretext + ": Invalid action.");
-			flag[1] = '1';
+		if(char_check.test(reqData.idp) || regEx.test(reqData.name) || !regExURL.test(reqData.url) ){
+			saml_flg=true;
 		}
-		if (validator.isEmpty(inputs.name)) {
-			logger.error(errPretext + ": SAML Server Name cannot be empty.");
-			flag[2] = '1';
+		if(!saml_flg){
+			if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+				logger.error(errPretext + ": Invalid action.");
+				flag[1] = '1';
+			}
+			if (validator.isEmpty(inputs.name)) {
+				logger.error(errPretext + ": SAML Server Name cannot be empty.");
+				flag[2] = '1';
+			}
+			if  (action != "delete") {
+				inputs.url = (reqData.url || "").trim();
+				inputs.idp = (reqData.idp || "").trim();
+				inputs.cert = (reqData.cert || "").trim();
+				if (validator.isEmpty(inputs.url)) {
+					logger.error(errPretext + ": Single Sign-On URL cannot be empty.");
+					flag[3] = '1';
+				} else if (!inputs.url.startsWith("https://") && !inputs.url.startsWith("http://")) {
+					logger.error(errPretext + ": Single Sign-On URL must start with http:// or https://");
+					flag[3] = '2';
+				}
+				if (validator.isEmpty(inputs.idp)) {
+					logger.error(errPretext + ": Issuer cannot be empty.");
+					flag[4] = '1';
+				}
+				if (validator.isEmpty(inputs.cert)) {
+					logger.error(errPretext + ": Certificate cannot be empty.");
+					flag[5] = '1';
+				} else if (inputs.cert.indexOf("BEGIN CERTIFICATE") == -1 || inputs.cert.indexOf("END CERTIFICATE") == -1) {
+					logger.error(errPretext + ": Invalid certificate provided.");
+					flag[5] = '2';
+				}
+			}
+			flag = flag.join('');
+			if (flag != "10000") return res.send(flag);
+			const data = await utils.fetchData(inputs, "admin/manageSAMLConfig", fnName);
+			if (data == "fail") res.status(500).send(data);
+			else return res.send(data);
+		} else {
+			logger.error("Error: Special characters found!!");
+			res.status(500).send("fail");
 		}
-		if  (action != "delete") {
-			inputs.url = (reqData.url || "").trim();
-			inputs.idp = (reqData.idp || "").trim();
-			inputs.cert = (reqData.cert || "").trim();
-			if (validator.isEmpty(inputs.url)) {
-				logger.error(errPretext + ": Single Sign-On URL cannot be empty.");
-				flag[3] = '1';
-			} else if (!inputs.url.startsWith("https://") && !inputs.url.startsWith("http://")) {
-				logger.error(errPretext + ": Single Sign-On URL must start with http:// or https://");
-				flag[3] = '2';
-			}
-			if (validator.isEmpty(inputs.idp)) {
-				logger.error(errPretext + ": Issuer cannot be empty.");
-				flag[4] = '1';
-			}
-			if (validator.isEmpty(inputs.cert)) {
-				logger.error(errPretext + ": Certificate cannot be empty.");
-				flag[5] = '1';
-			} else if (inputs.cert.indexOf("BEGIN CERTIFICATE") == -1 || inputs.cert.indexOf("END CERTIFICATE") == -1) {
-				logger.error(errPretext + ": Invalid certificate provided.");
-				flag[5] = '2';
-			}
-		}
-		flag = flag.join('');
-		if (flag != "10000") return res.send(flag);
-		const data = await utils.fetchData(inputs, "admin/manageSAMLConfig", fnName);
-		if (data == "fail") res.status(500).send(data);
-		else return res.send(data);
 	} catch (exception){
 		logger.error(errPretext, exception);
 		res.status(500).send("fail");
@@ -907,6 +940,7 @@ exports.getOIDCConfig = async (req, res) => {
 exports.manageOIDCConfig = async (req, res) => {
 	const fnName = "manageOIDCConfig";
 	const errPretext = "Error occurred in admin/" + fnName;
+	const oidc_flg=false;
 	logger.info("Inside UI Service: " + fnName);
 	try{
 		let flag = ['1','0','0','0','0'];
@@ -915,39 +949,47 @@ exports.manageOIDCConfig = async (req, res) => {
 		const inputs = {};
 		inputs.action = action;
 		inputs.name = (reqData.name || "").trim();
-		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
-			logger.error(errPretext + ": Invalid action.");
-			flag[1] = '1';
+		if(regEx.test(reqData.name) || char_check.test(reqData.clientid) || !regExURL.test(reqData.url) || char_check.test(reqData.secret)){
+			oidc_flg=true;
 		}
-		if (validator.isEmpty(inputs.name)) {
-			logger.error(errPretext + ": OIDC Server Name cannot be empty.");
-			flag[2] = '1';
+		if(!oidc_flg){
+			if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+				logger.error(errPretext + ": Invalid action.");
+				flag[1] = '1';
+			}
+			if (validator.isEmpty(inputs.name)) {
+				logger.error(errPretext + ": OIDC Server Name cannot be empty.");
+				flag[2] = '1';
+			}
+			if  (action != "delete") {
+				inputs.url = (reqData.url || "").trim();
+				inputs.clientid = (reqData.clientid || "").trim();
+				inputs.secret = (reqData.secret || "").trim();
+				if (validator.isEmpty(inputs.url)) {
+					logger.error(errPretext + ": Issuer URL cannot be empty.");
+					flag[3] = '1';
+				} else if (!inputs.url.startsWith("https://") && !inputs.url.startsWith("http://")) {
+					logger.error(errPretext + ": Issuer URL must start with http:// or https://");
+					flag[3] = '2';
+				}
+				if (validator.isEmpty(inputs.clientid)) {
+					logger.error(errPretext + ": Client ID cannot be empty.");
+					flag[4] = '1';
+				}
+				if (validator.isEmpty(inputs.secret)) {
+					logger.error(errPretext + ": Client Secret cannot be empty.");
+					flag[5] = '1';
+				}
+			}
+			flag = flag.join('');
+			if (flag != "10000") return res.send(flag);
+			const data = await utils.fetchData(inputs, "admin/manageOIDCConfig", fnName);
+			if (data == "fail") res.status(500).send(data);
+			else return res.send(data);
+		} else {
+			logger.error("Error: Special characters found!!");
+			res.status(500).send("fail");
 		}
-		if  (action != "delete") {
-			inputs.url = (reqData.url || "").trim();
-			inputs.clientid = (reqData.clientid || "").trim();
-			inputs.secret = (reqData.secret || "").trim();
-			if (validator.isEmpty(inputs.url)) {
-				logger.error(errPretext + ": Issuer URL cannot be empty.");
-				flag[3] = '1';
-			} else if (!inputs.url.startsWith("https://") && !inputs.url.startsWith("http://")) {
-				logger.error(errPretext + ": Issuer URL must start with http:// or https://");
-				flag[3] = '2';
-			}
-			if (validator.isEmpty(inputs.clientid)) {
-				logger.error(errPretext + ": Client ID cannot be empty.");
-				flag[4] = '1';
-			}
-			if (validator.isEmpty(inputs.secret)) {
-				logger.error(errPretext + ": Client Secret cannot be empty.");
-				flag[5] = '1';
-			}
-		}
-		flag = flag.join('');
-		if (flag != "10000") return res.send(flag);
-		const data = await utils.fetchData(inputs, "admin/manageOIDCConfig", fnName);
-		if (data == "fail") res.status(500).send(data);
-		else return res.send(data);
 	} catch (exception){
 		logger.error(errPretext, exception);
 		res.status(500).send("fail");
@@ -2020,7 +2062,6 @@ const removeDir = function(path) {
 
 const getEmailConf = async (conf, fnName, inputs, flag) => {
 	if (!flag) flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];
-	const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 	inputs.host = (conf.host || "").trim();
 	inputs.port = conf.port || "";
 	if (!inputs.host && !validator.isIP(inputs.host) && !validator.isFQDN(inputs.host)) { // Allow Anything as of now
