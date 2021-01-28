@@ -199,7 +199,8 @@ const reducer = (state = initialState , action) => {
                     nocreate: false,
                     confExpired: false,
                     ldapUserFilter: "",
-                    ldapAllUserList: ""
+                    ldapAllUserList: "",
+                    allUserFilter: ""
                 }
             } 
             case actionTypes.UPDATE_DATA:
@@ -211,7 +212,8 @@ const reducer = (state = initialState , action) => {
                         userIdName: action.payload.userid+";"+action.payload.username,
                         firstname: action.payload.firstname,
                         lastname: action.payload.lastname,
-                        passWord: action.payload,
+                        passWord: "",
+                        confirmPassword: "",
                         rolename: action.payload.rolename,
                         email: action.payload.email,
                         role: action.payload.role,
