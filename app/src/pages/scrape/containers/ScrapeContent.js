@@ -114,7 +114,7 @@ const ScrapeContent = props => {
     
     const modifyScrapeItem = (value, newProperties, customFlag) => {
         let localScrapeItems = [...scrapeItems];
-        let updNewScrapedData = [...newScrapedData];
+        let updNewScrapedData = {...newScrapedData};
         let objId = "";
         let obj = null;
         for (let scrapeItem of localScrapeItems){
@@ -210,7 +210,7 @@ const ScrapeContent = props => {
         let continueSave = true;
 
         if (current_task.reuse === 'True') {
-            setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen is been reused. Are you sure you want to save objects?', 'onClick': ()=>console.log("proceed to save")})
+            setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen is been reused. Are you sure you want to save objects?', 'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();}})
             continueSave = false;
         }
 
@@ -270,49 +270,51 @@ const ScrapeContent = props => {
                         <br/>
                         Do you still want to continue?
                     </div>,
-                    'onClick': ()=>console.log("Save"),
+                    'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();},
                     'continueText': "Continue",
                     'rejectText': "Cancel"
                 })
             }
         }
 
-        if (continueSave) {
-            let scrapeItemsL = [...scrapeItems]
-            let added = Object.keys(newScrapedData).length ? { ...newScrapedData } : { ...mainScrapedData };
-            let views = []
-            for (let scrapeItem of scrapeItemsL) {
-                if (!scrapeItem.objId) {
-                    if (scrapeItem.isCustom) views.push({custname: scrapeItem.title, xpath: scrapeItem.xpath, tag: scrapeItem.tag});
-                    else views.push({...newScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title});
-                }
-            }
-            
-            let arg = {
-                'deletedObj': deleted,
-                'modifiedObj': Object.values(modified),
-                'addedObj': {...added, view: views},
-                'screenId': current_task.screenId,
-                'userId': user_id,
-                'roleId': role,
-                'param': 'saveScrapeData'
-            }
+        if (continueSave) saveScrapedObjects();
+    }
 
-            scrapeApi.updateScreen_ICE(arg)
-            .then(response => {
-                if (response === "Invalid Session") return RedirectPage(history);
-                else fetchScrapeData().then(resp=>{
-                    if (resp === 'success'){
-                        setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: false});
-                        dispatch({type: actionTypes.SET_DISABLEACTION, payload: scrapeItemsL.length !== 0});
-                        dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: scrapeItemsL.length === 0});
-                        setSaved(true);
-                    } else console.error(resp);
-                })
-                .catch(error => console.error(error));
-            })
-            .catch(error => console.error(error))
+    const saveScrapedObjects = () => {
+        let scrapeItemsL = [...scrapeItems]
+        let added = Object.keys(newScrapedData).length ? { ...newScrapedData } : { ...mainScrapedData };
+        let views = []
+        for (let scrapeItem of scrapeItemsL) {
+            if (!scrapeItem.objId) {
+                if (scrapeItem.isCustom) views.push({custname: scrapeItem.title, xpath: scrapeItem.xpath, tag: scrapeItem.tag});
+                else views.push({...newScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title});
+            }
         }
+        
+        let arg = {
+            'deletedObj': deleted,
+            'modifiedObj': Object.values(modified),
+            'addedObj': {...added, view: views},
+            'screenId': current_task.screenId,
+            'userId': user_id,
+            'roleId': role,
+            'param': 'saveScrapeData'
+        }
+
+        scrapeApi.updateScreen_ICE(arg)
+        .then(response => {
+            if (response === "Invalid Session") return RedirectPage(history);
+            else fetchScrapeData().then(resp=>{
+                if (resp === 'success'){
+                    setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: false});
+                    dispatch({type: actionTypes.SET_DISABLEACTION, payload: scrapeItemsL.length !== 0});
+                    dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: scrapeItemsL.length === 0});
+                    setSaved(true);
+                } else console.error(resp);
+            })
+            .catch(error => console.error(error));
+        })
+        .catch(error => console.error(error))
     }
 
     const onAction = operation => {

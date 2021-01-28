@@ -1,9 +1,11 @@
 .edit_ice-pool{
+    height: calc(100% - 70px);
     input:focus{
         outline: none;
     }
     .assignBox-container{
         width: 100%;
+        height: 75%;
     }
     .right-box{
         position: relative;
