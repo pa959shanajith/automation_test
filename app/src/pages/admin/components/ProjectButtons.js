@@ -182,7 +182,7 @@ const ProjectButtons = (props) => {
 					updateProjectObj.newProjectDetails = props.newProjectDetails;
 				else
 					updateProjectObj.newProjectDetails.push(props.newProjectDetails);
-                if( updateProjectObj.projectName !== props.editProjectName && props.editProjectName !== ""){
+                if( updateProjectObj.projectName !== props.editProjectName && props.editProjectName !== "" && props.editProjectName!==false){
                     var requestedids = [];
                     var idtype = [];
                     requestedids.push(props.selDomain);

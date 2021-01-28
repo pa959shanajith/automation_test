@@ -138,7 +138,7 @@ const ProjectNew = (props) => {
     const resetForm = ()=>{
         setProjectDetails([]);
         setProjectName("");
-        setEditProjectName("");
+        setEditProjectName(false);
         setSelProjectId("");
         setprojectTypeSelected("");
         setReleaseList([]);
@@ -705,7 +705,9 @@ const ProjectNew = (props) => {
             }    
             
             projectOptions.sort((a,b)=>a.name.localeCompare(b.name));
-            setSelProjectOptions(projectOptions)
+            setSelProjectOptions(projectOptions);
+            document.getElementById("selProjectOption").selectedIndex = "0";  
+            setEditProjectName(false);
             setSelProject("")
             clearUpdateProjectObjects();
         }    
@@ -816,7 +818,7 @@ const ProjectNew = (props) => {
             </div>
             }
             <div className='userForm-project adminControl-project display-project'>
-                {editProjectName!==selProject && editProjectName!=="" && showProjectEditModal===false? 
+                {editProjectName!==selProject && editProjectName!=="" && editProjectName!==false && showProjectEditModal===false? 
                 <div className='edit-project__label'>New Project Name : {editProjectName}. Please click on Update.</div>:null}
             </div>
             
