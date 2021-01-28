@@ -94,6 +94,9 @@
 									 </select>
 								  </div>
 							   </div>
+							   <div class="col">
+								<button class="webCrawler-toggle-btn" ng-click="toggle_accessibility($event)" style="background: blueviolet;"title="Save Report" id="accessibility_toggle">Accessibility Testing</button>
+						   		</div>
 							   <div class="col d-flex flex-row-reverse ">
 								  <input id='searchModule' class="reports-search" type="text" placeholder="Search Module" aria-label="Search">
 								  <img alt="Search Icon" class="searchReportsImg" src="imgs/ic-search-icon.png">
@@ -144,6 +147,30 @@
 										</div>
 									 </div>
 								  </div>
+								  <div class="panel-group" id="accessibilityTblExecution">
+									<div class="panel panel-default">
+									   <div class="panel-heading executionsHeader">
+										  <h4 class="panel-title" id='panelTitle'>
+											 <a id='executionNameHeader' data-toggle="" data-parent="#accessibilityTblExecution" href="#">
+												Accessibility Reports
+											 </a>
+										  </h4>
+									   </div>
+									   <div class='container-fluid dataTableReports modTbl'>
+										  <table id="reportsModuleTable" class='display' style='width:100%'>
+											 <thead>
+												<tr>
+												   <th>Execution No</th>
+												   <th>Title</th>
+												   <th>Time </th>
+												</tr>
+											 </thead>
+											 <tbody>
+											 </tbody>
+										  </table>
+									   </div>
+									</div>
+								 </div>
 							   </div>
 							   <div class="col colReportsWidth">
 								  <div class="panel-group scenarioStatus" id="accordionTbloverallStatus">

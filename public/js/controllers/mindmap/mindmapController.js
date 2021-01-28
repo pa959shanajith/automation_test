@@ -864,6 +864,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
             'opacity': !( n._id == null || n._id == undefined) ? 1 : 0.5,
             'title': n.name,
+            'ac': n.accessibilityTesting || "None",
             'name': n.display_name,
             'img_src': img_src,
             '_id': n._id || null,
@@ -1048,6 +1049,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             t: $('#ct-assignTask').val(),
             bn: $('#ct-executeBatch').val(),
             at: $('#ct-assignedTo').val(),
+            ac: $('#ct-accessibilityTesting').val() ? $('#ct-accessibilityTesting').val() : '', 
             rw: /*(d3.select('#ct-assignRevw')[0][0])?*/ $('#ct-assignRevw').val() /*:null*/ ,
             sd: $('#startDate').val(),
             ed: $('#endDate').val(),
@@ -1079,6 +1081,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             task: tObj.t,
             assignedto: tObj.at,
             assignedToName: $('[value="' + tObj.at + '"]').attr('data-id'),
+            accessibilityTesting: tObj.ac,
             reviewer: tObj.rw,
             startdate: tObj.sd,
             enddate: tObj.ed,
@@ -1535,6 +1538,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
             det: (nt) ? nt.details : '',
             cx: (nt) ? nt.complexity : undefined,
+            ac: (nt) ? nt.accessibility_testing : '',
             _id:(nt)? nt._id:null
         };
 
@@ -1568,7 +1572,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#ct-executeBatch').val('');
             }
         })
-
+        if(p.attr('data-nodetype') == 'scenarios' && apptype === "5db0022cf87fdec084ae49b6"){
+            v = u.append('li');
+            v.append('span').attr('class', 'ct-assignItem fl-left').html('Accessibility');
+            v.append('select').attr('id', 'ct-accessibilityTesting').style('width',"64%").style('float',"right");
+            if(dNodes[pi] && 'accessibilityTesting' in dNodes[pi] && dNodes[pi]['accessibilityTesting'] == "Enable"){
+                $('#ct-accessibilityTesting').append("<option data-id='acc_enabled' value='Enable' selected>" + "Enabled" + "</option>");
+                $('#ct-accessibilityTesting').append("<option data-id='acc_disabled' value='Disable'>" + "Disabled" + "</option>");
+            }else{
+                $('#ct-accessibilityTesting').append("<option data-id='acc_enabled' value='Enable'>" + "Enabled" + "</option>");
+                $('#ct-accessibilityTesting').append("<option data-id='acc_disabled' value='Disable' selected>" + "Disabled" + "</option>");
+            }
+        }
+       
 
         var default_releaseid = '';
         taskAssign[t].attributes.forEach(function(tk) {
@@ -3335,7 +3351,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             return;
         }
         var version_num = ($('.version-list').val() != undefined)? $('.version-list').val(): "0.0";
-        var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
+        var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": ""};
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
         var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"accountid":"","accesskey":"","secretkey":""}}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "","poolname":""} } ] };
         var moduleInfo = { "batchInfo": [] };
@@ -3378,6 +3394,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     moduleData.suiteDetails = [];
                     for (var j = 0; j < moduleObj.scenarioids.length; j++) {
                         var s_data = JSON.parse(JSON.stringify(suiteDetailsTemplate));
+                        if(moduleObj.accessibilityTestingMap[moduleObj.scenarioids[j]] == "Enable"){
+                            s_data.accessibilityParameters = ["AA","A","508","Best Practice"]
+                        }
                         s_data.condition = moduleObj.condition[j];
                         s_data.dataparam = [moduleObj.dataparam[j]];
                         s_data.scenarioName = moduleObj.scenarionames[j];

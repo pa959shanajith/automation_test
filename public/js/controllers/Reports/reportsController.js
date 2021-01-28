@@ -1,4 +1,4 @@
-mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$location', '$timeout', '$window', 'reportService', 'mindmapServices', 'cfpLoadingBar', '$sce', function($scope, $rootScope, $http, $location, $timeout, $window, reportService, mindmapServices, cfpLoadingBar, $sce) {
+mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$location', '$timeout', '$window', 'reportService', 'mindmapServices', 'cfpLoadingBar', '$sce', function ($scope, $rootScope, $http, $location, $timeout, $window, reportService, mindmapServices, cfpLoadingBar, $sce) {
     $("head").append('<link rel="stylesheet" href="css/css_reports/bootstrap/bootstrap.min.css"> <link rel="stylesheet" type="text/css" href="css/css_reports/datatables/dataTables.css"><link rel="stylesheet" type="text/css" href="css/css_reports/header.css"><link rel="stylesheet" type="text/css" href="css/css_reports/footer.css"><link rel="stylesheet" type="text/css" href="css/css_reports/leftSideBar.css"><link rel="stylesheet" type="text/css" href="css/css_reports/rightSideBar.css"><link rel="stylesheet" type="text/css" href="css/css_reports/reports.css"><script src="js/plugins/reports/bootstrap/popper.js"></script><script src="js/plugins/reports/bootstrap/bootstrap.min.js"></script><script src="js/plugins/reports/datatables/datatables.min.js"></script>');
     var getUserInfo = JSON.parse(window.localStorage['_UI']);
     var userID = getUserInfo.user_id;
@@ -7,6 +7,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     var openWindow = 0;
     var executionId, testsuiteId;
     var robj, redirected = false;
+    var access_only = false;
     var pauseloadinginterval = false;
     var clearIntervalList = [];
     var slideOpen = false;
@@ -42,8 +43,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             .then(function(data) {
                 if (data == "Invalid Session") {
                     return $rootScope.redirectPage();
-                }  
-                window.localStorage['project']=JSON.stringify(data)           
+                }
+                window.localStorage['project']=JSON.stringify(data)
                 if (type == "projects" ) {
                     if(data != "fail"){
                         $(".project-list").empty();
@@ -60,7 +61,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 unblockUI();
                                 $('#selectProjects').val(robj.testSuiteDetails[0].projectidts);
                                 $('#selectProjects').trigger('change');
-                              
+
                             }, 500);
 
                         }
@@ -90,10 +91,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $('#searchModule').val('');
         $('#searchModule').attr('disabled', 'disabled');
         data = JSON.parse(window.localStorage['project'])
-        try{ 
+        try{
             for (i=0; i< data.length; i++){
                 if(projectId == data[i]._id){
-                    unblockUI();           
+                    unblockUI();
                     $('.release-list').empty();
                     $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                     $('.cycle-list').empty();
@@ -109,60 +110,61 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         }, 500);
                     }
                 }
-        }
-     } catch(exception){
+            }
+        } catch(exception){
             unblockUI();
             console.log("Error in service populateReleases while fetching projects -" + error);
         }
     });
 
-         //Bind cycles on releases Filter Change
-         $('.release-list').change(function() {
-            var releaseName= $('.release-list option:selected').val();
-            blockUI("Loading cycles.. please wait..");
-            $(".moduleBox,.mid-report-section,#accordion").hide();
-            $("#expAssign").attr('src', 'imgs/ic-collapse.png');
-            $('#searchModule').val('');
-            $('#searchModule').attr('disabled', 'disabled');
-            result = $scope.releases;
-            try{ 
-                for (i=0;i< result.length;i++){
-                    if(releaseName == result[i].name){
-                        unblockUI();
-                        $('.cycle-list').empty();
-                        $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                        for (j = 0; j < result[i].cycles.length; j++) {
-                            $('.cycle-list').append("<option data-id='" +result[i].cycles[j]._id+ "' value='" + result[i].cycles[j]._id + "'>" + result[i].cycles[j].name + "</option>");
-                        }
-                        if (redirected) {
-                            $timeout(function() {
-                                $('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
-                                unblockUI();
-                                $('#selectCycles').trigger('change');
-                            }, 500);
-                        }
+    //Bind cycles on releases Filter Change
+    $('.release-list').change(function() {
+        var releaseName= $('.release-list option:selected').val();
+        blockUI("Loading cycles.. please wait..");
+        $(".moduleBox,.mid-report-section,#accordion").hide();
+        $("#expAssign").attr('src', 'imgs/ic-collapse.png');
+        $('#searchModule').val('');
+        $('#searchModule').attr('disabled', 'disabled');
+        result = $scope.releases;
+        try{
+            for (i=0;i< result.length;i++){
+                if (releaseName == result[i].name) {
+                    unblockUI();
+                    $('.cycle-list').empty();
+                    $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                    for (j = 0; j < result[i].cycles.length; j++) {
+                        $('.cycle-list').append("<option data-id='" + result[i].cycles[j]._id + "' value='" + result[i].cycles[j]._id + "'>" + result[i].cycles[j].name + "</option>");
+                    }
+                    if (redirected) {
+                        $timeout(function () {
+                            $('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
+                            unblockUI();
+                            $('#selectCycles').trigger('change');
+                        }, 500);
                     }
                 }
-            } catch(exception){
-                unblockUI();
-                console.log("Error in service populateReleases while fetching projects -" + error);
             }
-        });
+        } catch (exception) {
+            unblockUI();
+            console.log("Error in service populateReleases while fetching projects -" + error);
+        }
+    });
 
-        //Load modules on cycles filter change
-        $('.cycle-list').change(function() {
-            var cycleId = $('.cycle-list option:selected').val();
-            var reportsInputData = {};
-            reportsInputData.projectId = $.trim($('.project-list option:selected').val());
-            reportsInputData.releaseName = $.trim($('.release-list option:selected').val());
-            reportsInputData.cycleId = $.trim(cycleId);
-            reportsInputData.type = 'allmodules';
-            blockUI("Loading modules.. please wait..");
-            $("#accordion").hide();
-            $('#nodeBox').empty();
-            $('#searchModule').val('');
-            //$("#expAssign").attr('src', 'imgs/ic-collapse.png');
-            //Fetching Modules under cycle
+    //Load modules on cycles filter change
+    $('.cycle-list').change(function() {
+        var cycleId = $('.cycle-list option:selected').val();
+        var reportsInputData = {};
+        reportsInputData.projectId = $.trim($('.project-list option:selected').val());
+        reportsInputData.releaseName = $.trim($('.release-list option:selected').val());
+        reportsInputData.cycleId = $.trim(cycleId);
+        reportsInputData.type = 'allmodules';
+        blockUI("Loading modules.. please wait..");
+        $("#accordion").hide();
+        $('#nodeBox').empty();
+        $('#searchModule').val('');
+        //$("#expAssign").attr('src', 'imgs/ic-collapse.png');
+        //Fetching Modules under cycle
+        if (!access_only) {
             reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
                 unblockUI();
                 if (result_res_reportData == "Fail") {
@@ -175,7 +177,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         $(".mid-report-section").hide();
                         $('#searchModule').attr('disabled', 'disabled');
                         if($('.slideOpen').is(":visible") == true)
-                        {
+                        { 
                             $('div.moduleBox').removeClass('slideOpen');
                             $('#expAssign').trigger('click');
                         }
@@ -209,7 +211,40 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 unblockUI();
                 console.log("Error in service getReportsData_ICE while fetching modules-"+error);
             });
-        });
+        }else{
+            reportsInputData.type = 'screendata';
+            reportService.getAccessibilityData_ICE(reportsInputData).then(function (accessibility_data) {
+                unblockUI()
+                if (accessibility_data == "Fail") {
+                    openModalPopup("Reports", "Failed to load Accessibility Reports");
+                } else {
+                    $(".mid-report-section").hide();
+                    if (accessibility_data.length == 0) {
+                        //No Modules Found
+                        openModalPopup("Modules", "No Accessibility Modules Found");
+                        $(".mid-report-section").hide();
+                        $('#searchModule').attr('disabled', 'disabled');
+                    } else {
+                        angular.forEach(accessibility_data, function (value, index) {
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope"  data-screenname=' + value + '  title=' + value + ' style="width: 139px;"><img id=' + value + ' class="ct-nodeIcon1" src="imgs/node-screens.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value + '</span></div>')
+                            $('.reports-search').removeAttr('disabled', 'disabled');
+                        });
+                        $('#searchModule').removeAttr('disabled', 'disabled');
+                        if ($('.moduleBox').is(':visible') == true) {
+                        } else {
+                            $('div.moduleBox').removeClass('slideOpen');
+                            $('#expAssign').trigger('click');
+                        }
+                    }
+                    $('#ctExpandAssign').css('pointer-events', 'auto')
+                }
+            }, function (error) {
+                unblockUI();
+                console.log("Error in service getAccessibilityData_ICE while fetching modules-" + error);
+            });
+        }
+
+    });
 
 
     //Responsive Header Menu
@@ -222,7 +257,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             x.className = "topnav";
         }
     };
-  
+
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
         if($(".ct-nodeIcon").length == 0 && $(".ct-nodeIcon1").length == 0)
@@ -288,6 +323,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //Module node click to fetch module start/end date & time execution entries
     $(document).on('click', '.ct-nodeIcon', function(e) {
         blockUI('Loading.. Please wait..')
+        $("#accessibilityTblExecution").hide();
         $("#report-canvas").empty();
         $("#report-canvas").hide();
         $("#report-header").empty();
@@ -392,6 +428,177 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     console.log("Error in service getSuiteDetailsInExecution_ICE" + error);
                 })
     });
+
+    $(document).on('click', '.ct-nodeIcon1', function (e) {
+        blockUI("Loading Reports");
+        $("#accordion").hide();
+        $("#report-canvas").empty();
+        $("#report-canvas").hide();
+        $("#report-header").empty();
+        $("#report-header").hide();
+        $('.mid-report-section').removeClass('hide');
+        $('img.highlight-module').removeClass('highlight-module');
+        $('span.highlight-moduleName').removeClass('highlight-moduleName');
+        $(this).addClass('highlight-module').next('span').addClass('highlight-moduleName');
+        $('#reportsModuleTable tbody').empty();
+        $('#accordionTblExecutions').hide()
+        $scope.reportGenerated = true;
+        var inputdata = {};
+        inputdata['type'] = "reportdata";
+        inputdata['screendata'] = e.target.id;
+        reportService.getAccessibilityData_ICE(inputdata)
+            .then(function (accessibility_data) {
+                unblockUI();
+                if (accessibility_data == "Fail") {
+                    openModalPopup("Reports", "Failed to load Accessibility Reports");
+                } if (accessibility_data != "fail") {
+                    $(".mid-report-section").show();
+                    $('#overallStatus,#accordion,.scenarioStatus').hide();
+                    var tableContainer = $('.mid-report-section tbody');
+                    if (accessibility_data.length > 0) {
+                        tableContainer.empty();
+                        var screen_acc_reportdata = {}
+                        var time = "new time"
+                        for (i = 0; i < accessibility_data.length; i++) {
+                            let time = accessibility_data[i]["executedtime"]
+                            tableContainer.append("<tr class='screen_report'   data-executionid='" + accessibility_data[i]["_id"] + "'><td class='executionNo'>" + (i + 1) + "</td><td>" + accessibility_data[i]["title"] + "</td><td>" + time + "</td>");
+                            screen_acc_reportdata[accessibility_data[i]["_id"]] = accessibility_data[i]
+                        }
+                        $scope['acc_report_data'] = screen_acc_reportdata;
+                        $('.modTbl,#accessibilityTblExecution').show();
+
+                    }
+                }
+            }, function (error) {
+                unblockUI();
+                console.log("Error in service getAccessibilityData_ICE while fetching modules-" + error);
+            });
+
+    });
+
+    $(document).on('click', '.screen_report', function (e) {
+        const id = $(this).attr('data-executionid');
+        const report = $scope['acc_report_data'][id]
+        $("#report-canvas").show();
+        $("#report-header").show();
+        $("#report-header").empty();
+        $("#accordion").hide();
+        $(".mid-report-section").hide();
+
+        $('#middle-content-section').attr('class', "webCrawler-report");
+        proxy = "Disabled";
+        $("#report-header").append('<div width="100%" height="100%" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Accessibility Report</label></div><div style="display: flex;"><div style="width:50%;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+ report.screenname + '</span></div><div><label class="webCrawler-report-label">' + "Agent" + '</label><span class="webCrawler-report-span" style="text-transform: capitalize;">'+ report.agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">0</span></div></div><div style="width:50%;"></div></div>')
+        var body = document.getElementById('report-canvas');
+        var reportDiv = document.createElement('div');
+        //reportDiv.setAttribute('class', 'scrollbar-inner');
+
+        var tbl = document.createElement('table');
+        tbl.setAttribute('width', '100%');
+        tbl.setAttribute('height', '100%');
+        tbl.setAttribute('class', 'webCrawler-report-table');
+        // $('.scrollbar-inner').scrollbar();
+        var tbdy = document.createElement('tbody');
+        var headrow = document.createElement('tr');
+        var headData = { 0: 'S.No.', 1: 'Level', 2: 'URL', 3: 'Status', 4: 'A', 5: 'AA', 6: 'Section508', 7: 'Best-Practice' };
+        jsonStruct = { 0: 'level', 1: 'url', 2: 'status' };
+        for (var i = 0; i < 8; i++) {
+            var th = document.createElement('th');
+            th.appendChild(document.createTextNode(headData[i]));
+            headrow.appendChild(th);
+        }
+
+        tbdy.appendChild(headrow);
+        headrow.childNodes[0].setAttribute('style', 'width : 55px');
+        headrow.childNodes[1].setAttribute('style', 'width : 55px');
+        headrow.childNodes[3].setAttribute('style', 'width : 55px');
+        headrow.childNodes[4].setAttribute('style', 'width : 85px');
+        headrow.childNodes[5].setAttribute('style', 'width : 85px');
+        headrow.childNodes[6].setAttribute('style', 'width : 85px');
+        headrow.childNodes[7].setAttribute('style', 'width : 85px');
+
+        // Iterating through links for Body Element
+    
+        var newRow = document.createElement('tr');
+        var sNo = document.createElement('td');
+        sNo.setAttribute('style', 'width: 55px');
+        sNo.appendChild(document.createTextNode(1));
+        newRow.appendChild(sNo);
+        for (j = 0; j < 3; j++) {
+            var data = document.createElement('td');
+            text = report[jsonStruct[j]];
+            if (text == undefined)
+                text = "-";
+            data.appendChild(document.createTextNode(text));
+            newRow.appendChild(data);
+        }
+
+        // Adding if the Accessibly test passed or failed.
+        for (k = 0; k < 4; k++) {
+            var node = document.createElement('td');
+            if (report.data["access-rules"][k]["selected"]) {
+                if (report.data["access-rules"][k]["pass"]) {
+                    node.innerHTML = '<div class="foo green"></div>';
+                } else {
+                    node.innerHTML = '<div class="foo red"></div>';
+                }
+            } else {
+                node.innerHTML = 'NA';
+            }
+            newRow.appendChild(node);
+        }
+        tbdy.appendChild(newRow);
+            
+        
+        tbl.appendChild(tbdy);
+        reportDiv.appendChild(tbl);
+        body.appendChild(reportDiv);
+        var accessDiv = document.createElement('table');
+        accessDiv.setAttribute('width', '100%');
+        accessDiv.setAttribute('class', 'webCrawler-report-table');
+
+        var tr1 = document.createElement('tr');
+        headers = ["SNo", "Description", "Help", "Impact"];
+        datas = ["description", "help", "impact"];
+        for (i = 0; i < headers.length; i++) {
+            var th1 = document.createElement('th');
+            th1.appendChild(document.createTextNode(headers[i]));
+            tr1.appendChild(th1);
+        }
+
+        accessDiv.appendChild(tr1);
+
+        for (i = 0; i < report.data["accessibility"]["violations"].length; i++) {
+            var tr1 = document.createElement('tr');
+            var td1 = document.createElement('td');
+            td1.appendChild(document.createTextNode(i + 1));
+            tr1.append(td1);
+            for (j = 0; j < datas.length; j++) {
+                var td1 = document.createElement('td');
+                td1.appendChild(document.createTextNode(report.data["accessibility"]["violations"][i][datas[j]]));
+                tr1.appendChild(td1);
+            }
+            accessDiv.appendChild(tr1);
+        }
+        body.appendChild(accessDiv);
+
+    });
+
+
+    $scope.toggle_accessibility = function ($event) {
+        if ($('.ct-nodeIcon1').parent().is(':hidden')) { $('.ct-nodeIcon1').parent().show() }
+        else { $('.ct-nodeIcon1').parent().hide() }
+        if (access_only){ 
+            access_only = false;
+            $("#accessibility_toggle")[0].style.background = "blueviolet";
+            $("#searchModule")[0].placeholder = "Search Module";
+        }else{
+            access_only = true;
+            $("#accessibility_toggle")[0].style.background = "purple";
+            $("#searchModule")[0].placeholder = "Search Screen";
+        }
+    }
+
+
     //Set status color for report status
     function setStatusColor() {
         $(".status").each(function() {
