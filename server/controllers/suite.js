@@ -6,6 +6,7 @@ var myserver = require('../lib/socket');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+const accessibility_testing = require("./accessibilityTesting")
 const notifications = require('../notifications');
 var queue = require('../lib/executionQueue')
 var cache = require('../lib/cache')
@@ -57,7 +58,8 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"testsuitename": testsuite.name,
 			"moduleid": moduleId,
 			"testsuiteid": testsuite.testsuiteid,
-			"versionnumber": suite.versionnumber
+			"versionnumber": suite.versionnumber,
+			"accessibilityTestingMap": testscenarioDetails.accessibilitytestingmap
 		};
 		responsedata[moduleId] = finalSuite;
 	}
@@ -237,7 +239,9 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 		allTestcaseSteps.push({
 			"template": "",
 			"testcase": allTestcaseObj[tc._id].steps,
-			"testcasename": allTestcaseObj[tc._id].name
+			"testcasename": allTestcaseObj[tc._id].name,
+			"screenid": tc.screenid,
+			"screenname":tc.screenname
 		});
 	});
 
@@ -300,7 +304,8 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			"condition": [],
 			"dataparampath": [],
 			"scenarioNames": [],
-			"scenarioIds": []
+			"scenarioIds": [],
+			"accessibilityMap":{}
 		};
 		const suiteDetails = suite.suiteDetails;
 		for (const tsco of suiteDetails) {
@@ -317,6 +322,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
+			suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibilityParameters;
 			suiteObj.condition.push(scenario.condition);
 			suiteObj.dataparampath.push(scenario.dataparam[0]);
 			suiteObj.scenarioNames.push(scenario.scenarioName);
@@ -470,6 +476,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 			} else if (event == "result_executeTestSuite") {
 				if (!status) { // This block is for report data
 					const executionid = resultData.executionId;
+					const accessibility_reports = resultData.accessibility_reports
+					accessibility_testing.saveAccessibilityReports(accessibility_reports);
 					const scenarioid = resultData.scenarioId;
 					const testsuiteid = resultData.testsuiteId;
 					const testsuiteIndex = execReq.testsuiteIds.indexOf(testsuiteid);

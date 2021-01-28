@@ -1136,7 +1136,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 			if (result_webocular_reportData == "fail") {
 				console.log("Reports", "Failed to load Webocular Reports");
 			} else {
-				if (result_webocular_reportData.rows.length == 0) {
+				if (result_webocular_reportData.length == 0) {
 					console.log("Modules", "No Webocular Modules Found");
 					webocularServices.saveResults($scope.url, $scope.level, $scope.selectedAgent, $scope.proxy, crawledLinks_var, $scope.searchData, $scope.modulename)
 						.then(function (data) {
@@ -1148,7 +1148,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
 							}
 						});
 				} else {
-					angular.forEach(result_webocular_reportData.rows, function(value, index) {
+					angular.forEach(result_webocular_reportData, function(value, index) {
 						if(value.modulename==$scope.modulename){
 							duplicateModuleName=true;
 						}

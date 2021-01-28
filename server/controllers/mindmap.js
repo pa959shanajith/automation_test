@@ -199,7 +199,7 @@ exports.reviewTask = function (req, res) {
 	}
 };
 
-exports.saveData = function (req, res) {
+exports.saveData = async function (req, res) {
 	logger.info("Inside UI service: saveData");
 	if (utils.isSessionActive(req)) {
 		var tasks = [];
@@ -228,9 +228,13 @@ exports.saveData = function (req, res) {
 		var createdthrough = inputs.createdthrough || "Web";
 		//Assigned Tasks Notification
 		var assignedObj = {};
+		var scenarioObj = {}
 		for (var k = 0; k < data.length; k++) {
 			var task = data[k].task;
 			if (task != null) {
+				if('accessibilityTesting' in task){
+					scenarioObj[data[k]["_id"]] = task["accessibilityTesting"];
+				}
 				if ('assignedToName' in task) {
 					var assignedTo = task.assignedToName;
 					if (assignedTo != null && assignedTo != undefined) {
@@ -239,6 +243,13 @@ exports.saveData = function (req, res) {
 						}
 					}
 				}
+			}
+		}
+		if(Object.keys(scenarioObj).length > 0){
+			let scenario_result = await updateScenario(scenarioObj);
+			if (scenario_result == 'fail'){
+				logger.error("Update Scenario Failed task can not be saved.");
+				return res.send("fail");
 			}
 		}
 		var notify = assignedObj;
@@ -551,6 +562,19 @@ exports.saveData = function (req, res) {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
+}
+async function updateScenario(scenarioObj){
+	let inputs = {
+		scenarios: scenarioObj
+	}
+	const fnName = "updateScenario";
+	try{
+		let result = await utils.fetchData(inputs,"mindmap/updateScenario",fnName)
+		return result;
+	}catch(e){
+		logger.error("Error occured in updateScenarion: %s",e);
+	}
+	return "fail";
 }
 
 exports.saveEndtoEndData = function (req, res) {
