@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
-import { mappingList } from  './ListVariables';
+import { tagList } from  './ListVariables';
 import { updateScreen_ICE } from '../api';
 import "../styles/MapObjectModal.scss";
 
@@ -21,8 +21,8 @@ const MapObjectModal = props => {
         let tempNonCustom = [];
         if (props.scrapeItems.length) {
             props.scrapeItems.forEach(object => {
-                let elementType = object.title.split('_').pop();
-                elementType = mappingList[elementType] === undefined ? 'elmnt' : elementType;
+                let elementType = object.tag;
+                elementType = tagList.includes(elementType) ? elementType : 'Element';
                 if (!object.objId) {}
                 else if (object.isCustom) {
                     if (tempCustomList[elementType]) tempCustomList[elementType] = [...tempCustomList[elementType], object];
@@ -174,7 +174,7 @@ const MapObjectModal = props => {
                                 <div className="ss__mo_customInContainer">
                                 { Object.keys(customList).map(elementType => (
                                     <>
-                                    <div className="mo_tagHead" onClick={()=>setSelectedTag(elementType === selectedTag ? "" : elementType )}>{mappingList[elementType].value}</div>
+                                    <div className="mo_tagHead" onClick={()=>setSelectedTag(elementType === selectedTag ? "" : elementType )}>{elementType}</div>
                                     { selectedTag === elementType && <div className="mo_tagItemList"> 
                                         {customList[selectedTag].map(object => <div className={"mo_tagItems"+(selectedItems.includes(object.val) ? " mo_selectedTag" : "")} onDragOver={onDragOver} onDrop={(e)=>onDrop(e, object)}>
                                             { object.val in map ?
