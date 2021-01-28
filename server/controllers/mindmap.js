@@ -199,7 +199,7 @@ exports.reviewTask = function (req, res) {
 	}
 };
 
-exports.saveData = function (req, res) {
+exports.saveData = async function (req, res) {
 	logger.info("Inside UI service: saveData");
 	if (utils.isSessionActive(req)) {
 		var tasks = [];
@@ -228,7 +228,8 @@ exports.saveData = function (req, res) {
 		var createdthrough = inputs.createdthrough || "Web";
 		//Assigned Tasks Notification
 		var assignedObj = {};
-		var regg = /^[a-zA-Z0-9_]*$/;
+        var scenarioObj = {}
+        var regg = /^[a-zA-Z0-9_]*$/;
 		var flag_validate=0
 		test_json=JSON.stringify(inputs)
 		for(var key in inputs){
@@ -240,336 +241,358 @@ exports.saveData = function (req, res) {
 					}
 				}
 			}
-		}
-		if(flag_validate==0){
-			for (var k = 0; k < data.length; k++) {
-				var task = data[k].task;
-				if (task != null) {
-					if ('assignedToName' in task) {
-						var assignedTo = task.assignedToName;
-						if (assignedTo != null && assignedTo != undefined) {
-							if ('status' in task) {
-								assignedObj[task.details] = assignedTo;
-							}
-						}
-					}
-				}
-			}
-			var notify = assignedObj;
-			if (Object.keys(notify).length > 0 && Object.keys(notify).length != undefined) {
-				var assignedToValues = Object.keys(notify).map(function (key) { return notify[key] });
-				for (var i = 0; i < assignedToValues.length; i++) {
-					if (Object.keys(myserver.socketMapNotify).indexOf(assignedToValues[i]) > -1) {
-						var keys = Object.keys(notify);
-						for (var j = 0; j < keys.length; j++) {
-							if (i == j) {
-								var tName = keys[j];
-								var taskAssignment = 'assigned';
-								var taskName = tName;
-								var soc = myserver.socketMapNotify[assignedToValues[i]];
-								var count = 0;
-								var assignedTasksNotification = {};
-								assignedTasksNotification.to = '/plugin';
-								if (removeTask.length > 0) {
-									for (var p = 0; p < removeTask.length; p++) {
-										for (var q = 0; q < data.length; q++) {
-											if (removeTask[p] == data[q].oid) {
-												taskAssignment = "unassigned";
-											}
-											if (taskAssignment == "unassigned") {
-												assignedTasksNotification.notifyMsg = "Task '" + taskName + "' has been unassigned by " + user + "";
-											}
-											assignedTasksNotification.isRead = false;
-											assignedTasksNotification.count = count;
-											soc.emit("notify", assignedTasksNotification);
-										}
-									}
-								}
+        }
+        if(flag_validate==0){
+            for (var k = 0; k < data.length; k++) {
+                var task = data[k].task;
+                if (task != null) {
+                    if('accessibilityTesting' in task){
+                        scenarioObj[data[k]["_id"]] = task["accessibilityTesting"];
+                    }
+                    if ('assignedToName' in task) {
+                        var assignedTo = task.assignedToName;
+                        if (assignedTo != null && assignedTo != undefined) {
+                            if ('status' in task) {
+                                assignedObj[task.details] = assignedTo;
+                            }
+                        }
+                    }
+                }
+            }
+            if(Object.keys(scenarioObj).length > 0){
+                let scenario_result = await updateScenario(scenarioObj);
+                if (scenario_result == 'fail'){
+                    logger.error("Update Scenario Failed task can not be saved.");
+                    return res.send("fail");
+                }
+            }
+            var notify = assignedObj;
+            if (Object.keys(notify).length > 0 && Object.keys(notify).length != undefined) {
+                var assignedToValues = Object.keys(notify).map(function (key) { return notify[key] });
+                for (var i = 0; i < assignedToValues.length; i++) {
+                    if (Object.keys(myserver.socketMapNotify).indexOf(assignedToValues[i]) > -1) {
+                        var keys = Object.keys(notify);
+                        for (var j = 0; j < keys.length; j++) {
+                            if (i == j) {
+                                var tName = keys[j];
+                                var taskAssignment = 'assigned';
+                                var taskName = tName;
+                                var soc = myserver.socketMapNotify[assignedToValues[i]];
+                                var count = 0;
+                                var assignedTasksNotification = {};
+                                assignedTasksNotification.to = '/plugin';
+                                if (removeTask.length > 0) {
+                                    for (var p = 0; p < removeTask.length; p++) {
+                                        for (var q = 0; q < data.length; q++) {
+                                            if (removeTask[p] == data[q].oid) {
+                                                taskAssignment = "unassigned";
+                                            }
+                                            if (taskAssignment == "unassigned") {
+                                                assignedTasksNotification.notifyMsg = "Task '" + taskName + "' has been unassigned by " + user + "";
+                                            }
+                                            assignedTasksNotification.isRead = false;
+                                            assignedTasksNotification.count = count;
+                                            soc.emit("notify", assignedTasksNotification);
+                                        }
+                                    }
+                                }
 
-								if (taskAssignment == "assigned") {
-									assignedTasksNotification.notifyMsg = "New task '" + taskName + "' has been assigned by " + user + "";
-									assignedTasksNotification.isRead = false;
-									assignedTasksNotification.count = count;
-									soc.emit("notify", assignedTasksNotification);
-								}
-							}
-						}
-					}
-				}
-			}
-			// This flag is for Save. Save and Create will now be merged.
-			if (flag == 10) 
-			{
-				qpush=[]
-				var uidx = 0, rIndex;
-				// var idn_v_idc = {};
-				var cycId=inputs.cycId;
+                                if (taskAssignment == "assigned") {
+                                    assignedTasksNotification.notifyMsg = "New task '" + taskName + "' has been assigned by " + user + "";
+                                    assignedTasksNotification.isRead = false;
+                                    assignedTasksNotification.count = count;
+                                    soc.emit("notify", assignedTasksNotification);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // This flag is for Save. Save and Create will now be merged.
+            if (flag == 10) 
+            {
+                qpush=[]
+                var uidx = 0, rIndex;
+                // var idn_v_idc = {};
+                var cycId=inputs.cycId;
 
-				// Creating the data for running the Create Structure Query
-				var qObj = { "projectid": prjId, "cycleId": cycId, "appType": "Web", "testsuiteDetails": [], "versionnumber": parseFloat(vn_from), "newversionnumber":  parseFloat(vn_to) ,"username": user, "userrole": userrole,"userid":userid,"userroleid":userroleid,"createdthrough":createdthrough ,"deletednodes":deletednodes };
-				var nObj = [], tsList = [];
-				data.forEach(function (e, i) {
-					if (e.type == "modules") rIndex = uidx;
-					if (e.task != null) delete e.task.oid;
-					// idn_v_idc[e.id_n] = e.id_c;
-					nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex });
-					if (e.type == "testcases") nObj[nObj.length - 1]['pid_c'] = e._id||null;
-					if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
-					idDict[e.id] = uidx++;
-				});
-				nObj[rIndex].children.forEach(function (ts, i) {
-					var sList = [];
-					ts.children.forEach(function (s, i) {
-						var tcList = [];
-						s.children.forEach(function (tc, i) {
-							tcList.push({ "screenid": s._id||null, "testcaseid": tc._id||null, "testcaseName": tc.name, "task": tc.task,"state":tc.state ,"childIndex":parseInt(tc.childIndex)});
-							
-						});
-						tcList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
-						sList.push({ "screenid": s._id||null, "screenName": s.name, "task": s.task, "testcaseDetails": tcList,"state":s.state,"childIndex":parseInt(s.childIndex) });
-						
-					});
-					sList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
-					tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
-					
-				});
-				tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
-				qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
-				create_ice.saveMindmap(qObj, function (err, data) {
-					if (err) {
-						res.status(500).send(err);
-					} else {
-						res.status(200).send(data);
-					}
-				});
-			}
-			else if (flag == 30) { 
-				//Assign
-				var tasks_insert=[];
-				var tasks_update=[];
-				var tasks_remove=removeTask;
-				var scenarioids=new Set();
-				var screenids= new Set();
-				var testcaseids = new Set();
-				data.forEach(function (e, i) {
-					idDict[e._id] = (e._id) || null;
-					e._id = idDict[e._id];
-					t = e.task;
-					var tsk={}
-					if (e.type == 'endtoend') {
-						if (t != null && e._id != null) {
-							if (t._id!=null && (removeTask.includes(t._id))) return;
-							tsk.tasktype=t.task
-							tsk.nodetype="testsuites"
-							tsk.name=e.name
-							tsk.nodeid=e._id
-							tsk.cycleid=t.cycleid
-							tsk.parent=""
-							tsk.createdon=""
-							tsk.assignedtime=""
-							tsk.startdate=t.startdate
-							tsk.enddate=t.enddate
-							tsk.assignedto=t.assignedto
-							tsk.reviewer=t.reviewer
-							tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
-							tsk.batchname=t.batchName
-							tsk.status=t.status
-							tsk.details=t.details
-							tsk.reestimation=t.reestimation
-							tsk.complexity=""
-							tsk.history=[]
-							tsk.projectid=prjId
-							if (t._id!=null){
-								tsk._id=t._id
-								tasks_update.push(tsk)
-							}
-							else{
-								tasks_insert.push(tsk)
-							}
-						}
-					}
-					else if (e.type == 'modules') {
-						if (t != null && e._id != null) {
-							if (t._id!=null && (removeTask.includes(t._id))) return;
-							tsk.tasktype=t.task
-							tsk.nodetype="testsuites"
-							tsk.name=e.name
-							tsk.nodeid=e._id
-							tsk.cycleid=t.cycleid
-							tsk.parent=""
-							tsk.createdon=""
-							tsk.assignedtime=""
-							tsk.startdate=t.startdate
-							tsk.enddate=t.enddate
-							tsk.assignedto=t.assignedto
-							tsk.reviewer=t.reviewer
-							tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
-							tsk.batchname=t.batchName
-							tsk.status=t.status
-							tsk.details=t.details
-							tsk.reestimation=t.reestimation
-							tsk.complexity=""
-							tsk.history=[]
-							tsk.projectid=prjId
-							
-							
-							if (t._id!=null){
-								tsk._id=t._id
-								tasks_update.push(tsk)
-							}
-							else{
-								tasks_insert.push(tsk)
-							}
-						}
-						tasks.push(tsk)
-					}
-					else if (e.type == 'scenarios') {
-						
-						if (t != null && e._id != null) {
-							if (t._id!=null && (removeTask.includes(t._id))) return;
-							tsk.tasktype=t.task
-							tsk.nodetype="testscenarios"
-							tsk.name=e.name
-							tsk.nodeid=e._id
-							tsk.cycleid=t.cycleid
-							tsk.parent=t.parent
-							tsk.createdon=""
-							tsk.assignedtime=""
-							tsk.startdate=t.startdate
-							tsk.enddate=t.enddate
-							tsk.assignedto=t.assignedto
-							tsk.reviewer=t.reviewer
-							tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
-							tsk.status=t.status
-							tsk.details=t.details
-							tsk.reestimation=t.reestimation
-							tsk.complexity=t.complexity || ""
-							tsk.history=[]
-							tsk.projectid=prjId
-							
-							if (t._id!=null){
-								tsk._id=t._id
-								tasks_update.push(tsk)
-							}
-							else{
-								if(!scenarioids.has(tsk.nodeid))
-									tasks_insert.push(tsk)
-							}
+                // Creating the data for running the Create Structure Query
+                var qObj = { "projectid": prjId, "cycleId": cycId, "appType": "Web", "testsuiteDetails": [], "versionnumber": parseFloat(vn_from), "newversionnumber":  parseFloat(vn_to) ,"username": user, "userrole": userrole,"userid":userid,"userroleid":userroleid,"createdthrough":createdthrough ,"deletednodes":deletednodes };
+                var nObj = [], tsList = [];
+                data.forEach(function (e, i) {
+                    if (e.type == "modules") rIndex = uidx;
+                    if (e.task != null) delete e.task.oid;
+                    // idn_v_idc[e.id_n] = e.id_c;
+                    nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex });
+                    if (e.type == "testcases") nObj[nObj.length - 1]['pid_c'] = e._id||null;
+                    if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
+                    idDict[e.id] = uidx++;
+                });
+                nObj[rIndex].children.forEach(function (ts, i) {
+                    var sList = [];
+                    ts.children.forEach(function (s, i) {
+                        var tcList = [];
+                        s.children.forEach(function (tc, i) {
+                            tcList.push({ "screenid": s._id||null, "testcaseid": tc._id||null, "testcaseName": tc.name, "task": tc.task,"state":tc.state ,"childIndex":parseInt(tc.childIndex)});
+                            
+                        });
+                        tcList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
+                        sList.push({ "screenid": s._id||null, "screenName": s.name, "task": s.task, "testcaseDetails": tcList,"state":s.state,"childIndex":parseInt(s.childIndex) });
+                        
+                    });
+                    sList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
+                    tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
+                    
+                });
+                tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
+                qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
+                create_ice.saveMindmap(qObj, function (err, data) {
+                    if (err) {
+                        res.status(500).send(err);
+                    } else {
+                        res.status(200).send(data);
+                    }
+                });
+            }
+            else if (flag == 30) { 
+                //Assign
+                var tasks_insert=[];
+                var tasks_update=[];
+                var tasks_remove=removeTask;
+                var scenarioids=new Set();
+                var screenids= new Set();
+                var testcaseids = new Set();
+                data.forEach(function (e, i) {
+                    idDict[e._id] = (e._id) || null;
+                    e._id = idDict[e._id];
+                    t = e.task;
+                    var tsk={}
+                    if (e.type == 'endtoend') {
+                        if (t != null && e._id != null) {
+                            if (t._id!=null && (removeTask.includes(t._id))) return;
+                            tsk.tasktype=t.task
+                            tsk.nodetype="testsuites"
+                            tsk.name=e.name
+                            tsk.nodeid=e._id
+                            tsk.cycleid=t.cycleid
+                            tsk.parent=""
+                            tsk.createdon=""
+                            tsk.assignedtime=""
+                            tsk.startdate=t.startdate
+                            tsk.enddate=t.enddate
+                            tsk.assignedto=t.assignedto
+                            tsk.reviewer=t.reviewer
+                            tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
+                            tsk.batchname=t.batchName
+                            tsk.status=t.status
+                            tsk.details=t.details
+                            tsk.reestimation=t.reestimation
+                            tsk.complexity=""
+                            tsk.history=[]
+                            tsk.projectid=prjId
+                            if (t._id!=null){
+                                tsk._id=t._id
+                                tasks_update.push(tsk)
+                            }
+                            else{
+                                tasks_insert.push(tsk)
+                            }
+                        }
+                    }
+                    else if (e.type == 'modules') {
+                        if (t != null && e._id != null) {
+                            if (t._id!=null && (removeTask.includes(t._id))) return;
+                            tsk.tasktype=t.task
+                            tsk.nodetype="testsuites"
+                            tsk.name=e.name
+                            tsk.nodeid=e._id
+                            tsk.cycleid=t.cycleid
+                            tsk.parent=""
+                            tsk.createdon=""
+                            tsk.assignedtime=""
+                            tsk.startdate=t.startdate
+                            tsk.enddate=t.enddate
+                            tsk.assignedto=t.assignedto
+                            tsk.reviewer=t.reviewer
+                            tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
+                            tsk.batchname=t.batchName
+                            tsk.status=t.status
+                            tsk.details=t.details
+                            tsk.reestimation=t.reestimation
+                            tsk.complexity=""
+                            tsk.history=[]
+                            tsk.projectid=prjId
+                            
+                            
+                            if (t._id!=null){
+                                tsk._id=t._id
+                                tasks_update.push(tsk)
+                            }
+                            else{
+                                tasks_insert.push(tsk)
+                            }
+                        }
+                        tasks.push(tsk)
+                    }
+                    else if (e.type == 'scenarios') {
+                        
+                        if (t != null && e._id != null) {
+                            if (t._id!=null && (removeTask.includes(t._id))) return;
+                            tsk.tasktype=t.task
+                            tsk.nodetype="testscenarios"
+                            tsk.name=e.name
+                            tsk.nodeid=e._id
+                            tsk.cycleid=t.cycleid
+                            tsk.parent=t.parent
+                            tsk.createdon=""
+                            tsk.assignedtime=""
+                            tsk.startdate=t.startdate
+                            tsk.enddate=t.enddate
+                            tsk.assignedto=t.assignedto
+                            tsk.reviewer=t.reviewer
+                            tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
+                            tsk.status=t.status
+                            tsk.details=t.details
+                            tsk.reestimation=t.reestimation
+                            tsk.complexity=t.complexity || ""
+                            tsk.history=[]
+                            tsk.projectid=prjId
+                            
+                            if (t._id!=null){
+                                tsk._id=t._id
+                                tasks_update.push(tsk)
+                            }
+                            else{
+                                if(!scenarioids.has(tsk.nodeid))
+                                    tasks_insert.push(tsk)
+                            }
 
-							scenarioids.add(tsk.nodeid);
-						}
-						
-					}
-					else if (e.type == 'screens') {
-						uidx++; lts = idDict[e.pid];
+                            scenarioids.add(tsk.nodeid);
+                        }
+                        
+                    }
+                    else if (e.type == 'screens') {
+                        uidx++; lts = idDict[e.pid];
 
-						if (t != null && e._id != null) {
-							if (t._id!=null && (removeTask.includes(t._id))) return;
-							tsk.tasktype=t.task
-							tsk.nodetype=e.type
-							tsk.name=e.name
-							tsk.nodeid=e._id
-							tsk.cycleid=t.cycleid
-							tsk.parent=prjId
-							tsk.createdon=""
-							tsk.assignedtime=""
-							tsk.startdate=t.startdate
-							tsk.enddate=t.enddate
-							tsk.assignedto=t.assignedto
-							tsk.reviewer=t.reviewer
-							tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
-							tsk.status=t.status
-							tsk.details=t.details
-							tsk.reestimation=t.reestimation
-							tsk.complexity=t.complexity || ""
-							tsk.history=[]
-							tsk.projectid=prjId
-							if (t._id != null) {
-								if (cycId == t.cycleid) {
-									tsk.projectid=prjId
-									tsk._id=t._id
-									tasks_update.push(tsk)
-									
-								}
+                        if (t != null && e._id != null) {
+                            if (t._id!=null && (removeTask.includes(t._id))) return;
+                            tsk.tasktype=t.task
+                            tsk.nodetype=e.type
+                            tsk.name=e.name
+                            tsk.nodeid=e._id
+                            tsk.cycleid=t.cycleid
+                            tsk.parent=prjId
+                            tsk.createdon=""
+                            tsk.assignedtime=""
+                            tsk.startdate=t.startdate
+                            tsk.enddate=t.enddate
+                            tsk.assignedto=t.assignedto
+                            tsk.reviewer=t.reviewer
+                            tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
+                            tsk.status=t.status
+                            tsk.details=t.details
+                            tsk.reestimation=t.reestimation
+                            tsk.complexity=t.complexity || ""
+                            tsk.history=[]
+                            tsk.projectid=prjId
+                            if (t._id != null) {
+                                if (cycId == t.cycleid) {
+                                    tsk.projectid=prjId
+                                    tsk._id=t._id
+                                    tasks_update.push(tsk)
+                                    
+                                }
 
-							}else{
-								if(!screenids.has(tsk.nodeid))
-									tasks_insert.push(tsk)
-							}
-							screenids.add(tsk.nodeid)
-						}
-					}
-					else if (e.type == 'testcases') {
-						if (t != null && e.id != null) {
-							if (t._id!=null && (removeTask.includes(t._id))) return;
-							tsk.tasktype=t.task
-							tsk.nodetype=e.type
-							tsk.name=e.name
-							tsk.nodeid=e._id
-							tsk.cycleid=t.cycleid
-							tsk.parent=t.parent
-							tsk.createdon=""
-							tsk.assignedtime=""
-							tsk.startdate=t.startdate
-							tsk.enddate=t.enddate
-							tsk.assignedto=t.assignedto
-							tsk.reviewer=t.reviewer
-							tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
-							tsk.status=t.status
-							tsk.details=t.details
-							tsk.reestimation=t.reestimation
-							tsk.complexity=t.complexity || ""
-							tsk.history=[]
-							tsk.projectid=prjId
-							if (t._id != null) {
-								if (cycId == t.cycleid) {
-									tsk._id=t._id
-									tasks_update.push(tsk)
-								}
-							}else{
-								if(!testcaseids.has(tsk.nodeid))
-									tasks_insert.push(tsk)
-							}
-							testcaseids.add(tsk.nodeid);
-						}
-					}
-				});
-				var inputs={
-					"update": tasks_update,
-					"insert": tasks_insert,
-					"delete": tasks_remove,
-					"action": "modify"
-				}
-				var args={
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				}
-				logger.info("Calling DAS Service from saveData : admin/createProject_ICE");
-				client.post(epurl+"mindmap/manageTask", args,
-					function (data_var, response) {
-						if (response.statusCode != 200 || data_var.rows == "fail") {
-							logger.error("Error occurred in mindmap/manageTask from saveData Error Code : ERRDAS");
-							res.send("fail");
-						} else {
-							var modid='fail'
-							if (data_var.rows == "success"){
-								modid=data[0]._id
-							}
-							res.send(modid);
-						}
-				});
-			}
-		} else {
-			err1='Error: Special characters found!!'
-			logger.error(err1);
-			res.status(500).send(err1)
-		}
+                            }else{
+                                if(!screenids.has(tsk.nodeid))
+                                    tasks_insert.push(tsk)
+                            }
+                            screenids.add(tsk.nodeid)
+                        }
+                    }
+                    else if (e.type == 'testcases') {
+                        if (t != null && e.id != null) {
+                            if (t._id!=null && (removeTask.includes(t._id))) return;
+                            tsk.tasktype=t.task
+                            tsk.nodetype=e.type
+                            tsk.name=e.name
+                            tsk.nodeid=e._id
+                            tsk.cycleid=t.cycleid
+                            tsk.parent=t.parent
+                            tsk.createdon=""
+                            tsk.assignedtime=""
+                            tsk.startdate=t.startdate
+                            tsk.enddate=t.enddate
+                            tsk.assignedto=t.assignedto
+                            tsk.reviewer=t.reviewer
+                            tsk.owner=(tsk.owner!=null) ? tsk.owner : t.assignedto
+                            tsk.status=t.status
+                            tsk.details=t.details
+                            tsk.reestimation=t.reestimation
+                            tsk.complexity=t.complexity || ""
+                            tsk.history=[]
+                            tsk.projectid=prjId
+                            if (t._id != null) {
+                                if (cycId == t.cycleid) {
+                                    tsk._id=t._id
+                                    tasks_update.push(tsk)
+                                }
+                            }else{
+                                if(!testcaseids.has(tsk.nodeid))
+                                    tasks_insert.push(tsk)
+                            }
+                            testcaseids.add(tsk.nodeid);
+                        }
+                    }
+                });
+                var inputs={
+                    "update": tasks_update,
+                    "insert": tasks_insert,
+                    "delete": tasks_remove,
+                    "action": "modify"
+                }
+                var args={
+                    data: inputs,
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+                logger.info("Calling DAS Service from saveData : admin/createProject_ICE");
+                client.post(epurl+"mindmap/manageTask", args,
+                    function (data_var, response) {
+                        if (response.statusCode != 200 || data_var.rows == "fail") {
+                            logger.error("Error occurred in mindmap/manageTask from saveData Error Code : ERRDAS");
+                            res.send("fail");
+                        } else {
+                            var modid='fail'
+                            if (data_var.rows == "success"){
+                                modid=data[0]._id
+                            }
+                            res.send(modid);
+                        }
+                });
+            }
+        } else {
+			logger.error('Error: Special characters found!!');
+			res.status(500).send('Error: Special characters found!!')
+        }
 	} else {
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
+}
+async function updateScenario(scenarioObj){
+	let inputs = {
+		scenarios: scenarioObj
+	}
+	const fnName = "updateScenario";
+	try{
+		let result = await utils.fetchData(inputs,"mindmap/updateScenario",fnName)
+		return result;
+	}catch(e){
+		logger.error("Error occured in updateScenarion: %s",e);
+	}
+	return "fail";
 }
 
 exports.saveEndtoEndData = function (req, res) {
