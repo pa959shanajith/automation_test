@@ -217,20 +217,20 @@ const ScrapeContent = props => {
 
         if (scrapeItemsL.length > 0) {
             for (let scrapeItem of scrapeItemsL) {
-                if (!dXpath) {
-                    if (uniqueCusts.includes(scrapeItem.title)) {
-                        dCustname = true;
-                        scrapeItem.duplicate = true;
-                        dCusts.push(scrapeItem.title);
-                    }
-                    else uniqueCusts.push(scrapeItem.title);
+                if (uniqueCusts.includes(scrapeItem.title)) {
+                    dCustname = true;
+                    scrapeItem.duplicate = true;
+                    dCusts.push(scrapeItem.title);
                 }
-                if (!dCustname) {
+                else uniqueCusts.push(scrapeItem.title);
+            }
+            if (!dCustname) {
+                for (let scrapeItem of scrapeItemsL) {
                     if (scrapeItem.xpath === "" || scrapeItem.xpath === undefined) continue;
                     let xpath = scrapeItem.xpath;
-
+    
                     if (current_task.appType === 'MobileWeb') xpath = xpath.split(";")[2];
-
+    
                     if (uniqueXPaths.includes(xpath)) {
                         dXpath = true;
                         scrapeItem.duplicate = true;
@@ -239,8 +239,6 @@ const ScrapeContent = props => {
                     else uniqueXPaths.push(xpath);
                 }
             }
-            
-            dCusts = dCusts2;
 
             if (dCustname) {
                 continueSave = false;
@@ -259,7 +257,7 @@ const ScrapeContent = props => {
                     'title': `${arg ? 'Delete' : 'Save'} Scrape data`,
                     'content': <div className="ss__dup_labels">
                         Object characteristics are same for the below list of objects:
-                        { dCusts.map(custname => <span className="ss__dup_li">{custname}</span>) }
+                        { dCusts2.map(custname => <span className="ss__dup_li">{custname}</span>) }
                         <br/>
                         Do you still want to continue?
                     </div>,

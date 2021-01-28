@@ -43,7 +43,6 @@ const CreateObjectModal = props => {
                     let obj = [...objects];
                     obj[0] = {...obj[0], ...newObj};
                     setObjects(obj);
-                    console.log(obj);
                 }})
                 .catch(error => console.log(error));
         }
@@ -140,14 +139,30 @@ const CreateObjectModal = props => {
 
     const onSubmit = () => {
         if (props.editFlag) {
-            props.utils.modifyScrapeItem(props.utils.object.val, {
-                custname: customObjList[1].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
-                tag: customObjList[1].tag,
-                url: customObjList[1].url,
-                xpath: customObjList[1].xpath,
-                editable: true
-            }, true);
-            props.setShow(false);
+            let errorFlag = null;
+            let errorObj = {};
+            let custname = customObjList[1].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim();
+            for(let object of props.scrapeItems) {
+                if (object.title === custname) {
+                    errorObj = { [customObjList[1].tempId]: "objName", dTitle: custname };
+                    errorFlag = 'present';
+                    break;
+                }
+            }
+            if (errorFlag) {
+                setError(errorObj);
+                props.setShowPop({title: 'Edit Object', content: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`});
+            }
+            else {
+                props.utils.modifyScrapeItem(props.utils.object.val, {
+                    custname: custname,
+                    tag: customObjList[1].tag,
+                    url: customObjList[1].url,
+                    xpath: customObjList[1].xpath,
+                    editable: true
+                }, true);
+                props.setShow(false);
+            }
         }
         else {
             let localScrapeList = [];
@@ -159,10 +174,22 @@ const CreateObjectModal = props => {
             let duplicateDict = {};
             let tempIdArr = [];
             let duplicateFlag = false;
+            let errorFlag = null;
+            let errorObj = {};
 
             for (let tempId of Object.keys(customObjList)){
 
                 let custname = customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim();
+
+                for(let object of props.scrapeItems) {
+                    if (object.title === custname) {
+                        errorObj = { [tempId]: "objName", dTitle: custname };
+                        errorFlag = 'present';
+                        break;
+                    }
+                }
+
+                if (errorFlag==='present') break;
 
                 if (custname in duplicateDict){
                     duplicateDict[custname].push(tempId);
@@ -175,7 +202,11 @@ const CreateObjectModal = props => {
                     objIdx: lastIdx++,
                     val: ++lastVal,
                     hide: false,
-                    title: custname
+                    title: custname,
+                    url: customObjList[tempId].url,
+                    tag: customObjList[tempId].tag,
+                    xpath: customObjList[tempId].xpath,
+                    editable: true
                 });
                 viewArray.push({
                     custname: custname,
@@ -186,8 +217,11 @@ const CreateObjectModal = props => {
                 });  
             }
             
-            if (duplicateFlag) {
-                let errorObj = {};
+            if (errorFlag) {
+                setError(errorObj);
+                props.setShowPop({title: 'Create Object', content: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`});
+            } 
+            else if (duplicateFlag) {
                 tempIdArr.forEach(tempId => errorObj[tempId] = "objName");
                 setError(errorObj);
                 props.setShowPop({title: 'Create Object', content: 'Duplicate Object Names Found!'});
@@ -199,7 +233,7 @@ const CreateObjectModal = props => {
                 props.updateScrapeItems(localScrapeList)
                 props.setSaved(false);
                 props.setShow(false);
-                props.setShowPop({title: "Add Object", content: "Objects has been added successfully."});
+                props.setShowPop({title: "Add Object", content: "Objects has been created successfully."});
             }
         }
     }

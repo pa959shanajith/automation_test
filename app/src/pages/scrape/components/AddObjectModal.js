@@ -46,7 +46,7 @@ const AddObjectModal = props => {
 
     const onSubmit = () => {
         let errorObj = {};
-        let errorFlag = false;
+        let errorFlag = null;
         let lastObj = props.scrapeItems[props.scrapeItems.length-1]
         let lastVal = lastObj ? lastObj.val : 0;
 
@@ -60,9 +60,18 @@ const AddObjectModal = props => {
             let [tag, value] = type.split("-");
             let custname = `${name}_${value}`;
 
+            for(let object of props.scrapeItems) {
+                if (object.title === custname) {
+                    errorObj = { type: "input", index: [i], dTitle: custname };
+                    errorFlag = 'present';
+                    break;
+                }
+            }
+            if (errorFlag==='present') break;
+
             if (!name || !type) {
                 errorObj = { type: !name ? "input" : "type", index: [i] };
-                errorFlag = true;
+                errorFlag = 'empty';
                 break;
             }
 
@@ -83,17 +92,20 @@ const AddObjectModal = props => {
             });
         }
 
-        if (errorFlag === 'duplicate') {
-            errorObj = {type: 'input', index: indexArr};
-            props.setShowPop({title: 'Add Objects', content: 'Duplicate Object Names Found!'})
+        if (errorFlag) {
+            if (errorFlag==='duplicate') {
+                errorObj = {type: 'input', index: indexArr};
+                props.setShowPop({title: 'Add Objects', content: 'Duplicate Object Names Found!'})
+            } 
+            else if (errorFlag==='present') props.setShowPop({title: 'Add Objects', content: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`})
+            setError(errorObj);
         };
-
-        if (errorFlag) setError(errorObj);
         
         if (!errorFlag && newObjects.length > 0) {
             props.setScrapeItems([...props.scrapeItems, ...newObjects]);
             props.setShow(false);
             props.setSaved(false);
+            props.setShowPop({title: "Add Object", content: "Objects has been added successfully."});
         }
     }
 
