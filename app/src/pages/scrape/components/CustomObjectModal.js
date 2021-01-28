@@ -198,6 +198,7 @@ const CreateObjectModal = props => {
         }
         setObjects(emptyFields);
         setShowFields(showAll);
+        setError({type: '', tempId: ''});
     }
 
     return (

@@ -92,6 +92,7 @@ const ScrapeScreen = ()=>{
                                                 title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/[<>]/g, '').trim(),
                                                 custname: scrapeObject.custname,
                                                 hiddentag: scrapeObject.hiddentag,
+                                                checked: false,
                                                 url: scrapeObject.url,
                                                 xpath: scrapeObject.xpath,
                                             }
@@ -373,9 +374,14 @@ const ScrapeScreen = ()=>{
                         let scrapeItem = {  objId: scrapeObject._id,
                                             objIdx: lastIdx++,
                                             val: ++lastVal,
+                                            tag: scrapeObject.tag,
                                             hide: false,
                                             title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
-                                            custname: scrapeObject.custname
+                                            custname: scrapeObject.custname,
+                                            hiddentag: scrapeObject.hiddentag,
+                                            checked: false,
+                                            url: scrapeObject.url,
+                                            xpath: scrapeObject.xpath,
                                         }
                         
                         localScrapeList.push(scrapeItem);
@@ -446,7 +452,7 @@ const ScrapeScreen = ()=>{
         { overlay && <ScreenOverlay content={overlay} />}
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
-        { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} current_task={current_task} user_id={user_id} role={role} fetchScrapeData={fetchScrapeData} history={history} /> }
+        { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} user_id={user_id} role={role} fetchScrapeData={fetchScrapeData} history={history} /> }
         { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved}/> }
         { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} startScrape={startScrape} /> }
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} />}

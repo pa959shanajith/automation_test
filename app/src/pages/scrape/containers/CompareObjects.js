@@ -71,7 +71,7 @@ const CompareObjects = props => {
     return (
         <div className="ss__compareContents">
             <div className="ss__comparebtngroup">
-                <button className="ss__compareAction" onClick={updateObjects}>Update</button>
+                { changedObj && changedObj.length && <button className="ss__compareAction" onClick={updateObjects}>Update</button>}
                 <button className="ss__compareAction" onClick={closeCompare}>Cancel</button>
             </div>
             <div className="ss__compareboxes">

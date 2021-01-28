@@ -75,6 +75,11 @@ const MapObjectModal = props => {
 
     const submitMap = () => {
 
+        if (!Object.keys(map).length) {
+            setErrorMsg("Please select atleast one object to Map");
+            return;
+        }
+
         let { screenId, screenName, projectId, appType, versionnumber } = props.current_task;
         
         let arg = {
@@ -100,11 +105,21 @@ const MapObjectModal = props => {
             if (response === "Invalid Session") return RedirectPage(props.history);
             else props.fetchScrapeData()
                     .then(resp => {
-                        if (resp === "success") props.setShow(false);
+                        if (resp === "success") {
+                            props.setShow(false);
+                            props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Successfully!'})
+                        }
+                        else props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
                     })
-                    .catch(err => console.err(err));
+                    .catch(err => {
+                        props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+                        console.err(err);
+                    });
         })
-        .catch(error => console.error(error))
+        .catch(error => {
+            props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+            console.err(error);
+        })
     }
 
     const onCustomClick = (showName, id) => {
@@ -187,7 +202,7 @@ const MapObjectModal = props => {
                 }
                 close={()=>props.setShow(false)}
                 footer={<>
-                    { errorMsg && <span>{errorMsg}</span>}
+                    { errorMsg && <span className="mo_errorMsg">{errorMsg}</span>}
                     <button onClick={onShowAllObjects}>Show All Objects</button>
                     <button onClick={onUnlink} disabled={!selectedItems.length}>Un-Link</button>
                     <button onClick={submitMap}>Submit</button>

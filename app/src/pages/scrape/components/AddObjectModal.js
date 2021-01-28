@@ -82,6 +82,7 @@ const AddObjectModal = props => {
             emptyFields[i] = {objName: "", objType: ""};
         }
         setObjects(emptyFields);
+        setError({});
     }
 
     return (
@@ -101,7 +102,7 @@ const AddObjectModal = props => {
                                                 </option>
                                             ) }
                                         </select>
-                                        <button className="addObj_btn" onClick={()=>deleteField(index)}><img src="static/imgs/ic-delete.png" /></button>
+                                        <button className="addObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img src="static/imgs/ic-delete.png" /></button>
                                         { objects.length-1 === index && <button className="addObj_btn" onClick={newField}><img src="static/imgs/ic-add.png" /></button>}
                                     </div>
                                 ) }
