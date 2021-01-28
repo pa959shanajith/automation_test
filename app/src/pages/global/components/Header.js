@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, Link, Redirect } from 'react-router-dom';
-import { RedirectPage, PopupMsg, ModalContainer, ScreenOverlay } from '../../global';
+import { RedirectPage, PopupMsg, ModalContainer, ScreenOverlay ,Encrypt } from '../../global';
 import "../styles/Header.scss";
 import { loadUserInfo } from '../../login/api';
 import { getRoleNameByRoleId } from '../api';
@@ -9,8 +9,7 @@ import * as actionTypes from '../../login/state/action';
 import ClickAwayListener from 'react-click-away-listener';
 import ChangePassword from './ChangePassword';
 import ChangeDefaultIce from './ChangeDefaultIce';
-import { persistor } from '../../../reducer'
-
+import { persistor } from '../../../reducer';
 
 /*
     Component: Header Bar
@@ -23,7 +22,6 @@ const Header = () => {
 
     const history = useHistory();
     const dispatch = useDispatch();
-
     const [userDetails, setUserDetails] = useState(null);
     const [username, setUsername] = useState(null);
     const [userRole, setUserRole] = useState(null);
@@ -42,7 +40,17 @@ const Header = () => {
 
     const userInfo = useSelector(state=>state.login.userinfo);
     const selectedRole = useSelector(state=>state.login.SR);
-
+    const socket = useSelector(state=>state.login.socket);
+    useEffect(()=>{
+        if(socket){
+            // socket.on('ICEnotAvailable',(e)=> {
+            //     console.log(e)
+            // });
+            socket.on('notify',(a)=> {
+                console.log(a)
+            });
+        }
+    },[socket])
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0){
             setUserDetails(userInfo);

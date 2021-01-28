@@ -2,7 +2,8 @@ import * as actionTypes from './action';
 
 const initialState = {
     userinfo:{},
-    SR:{}
+    SR:{},
+    socket:undefined
 }
 
 const reducer = (state=initialState, action) => {
@@ -14,6 +15,10 @@ const reducer = (state=initialState, action) => {
         case actionTypes.SET_SR:
             return {
                 ...state, SR: action.payload
+            }
+        case actionTypes.SET_SOCKET:
+            return {
+                ...state, socket: action.payload
             }
         default:
             return state
