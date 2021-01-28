@@ -143,6 +143,7 @@ const ProjectNew = (props) => {
         setprojectTypeSelected("");
         setReleaseList([]);
         setCycleList([]);
+        setSelProjectOptions([]);
         toggleCycleClick();
         if (taskName==="Update Project") setSelDomain("");
         if(document.getElementById("selProjectOption") !== null)
@@ -705,6 +706,7 @@ const ProjectNew = (props) => {
             
             projectOptions.sort((a,b)=>a.name.localeCompare(b.name));
             setSelProjectOptions(projectOptions)
+            setSelProject("")
             clearUpdateProjectObjects();
         }    
     }
