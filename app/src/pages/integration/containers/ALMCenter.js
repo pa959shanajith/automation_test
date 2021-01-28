@@ -12,7 +12,7 @@ const passwordRef = useRef();
 const [blockui,setBlockui] = useState({show:false});
 const [popup ,setPopup]= useState({show:false});
 const [failMSg , setFailMsg] = useState(null);
-const [domainDetails , setDomainDetails] = useState(null);
+const [domainDetails , setDomainDetails] = useState([]);
 const [loginSucess , setLoginSucess]=useState(false)
 
 const displayError = (error) =>{

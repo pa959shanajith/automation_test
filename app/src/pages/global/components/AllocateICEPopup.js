@@ -174,7 +174,7 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
 				</div>
 			</div>
 
-            <div className='adminControl popup-content'>
+            <div className='adminControl popup-content popup-content-status'>
 				<div>
 					<span className="leftControl" title="Token Name">ICE Status:</span>
 					<div>
@@ -186,7 +186,7 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
 								</label>
 								<label title='unavailable' className="legends">
 									<span id='status' className="status-unavailable" ></span>
-									 Unavilable
+                                    Unavailable
 								</label>
 								<label title='do not disturb' className="legends">
 									<span id='status' className="status-dnd"></span>
