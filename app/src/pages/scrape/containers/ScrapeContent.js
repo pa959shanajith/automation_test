@@ -194,7 +194,7 @@ const ScrapeContent = props => {
                         return false;
                     } else return true;
                 });
-                onSave(null, {deletedArr: deletedArr, newScrapeList: newScrapeList, modifiedDict: modifiedDict}); // task reuse check false
+                onSave(null, {deletedArr: deletedArr, newScrapeList: newScrapeList, modifiedDict: modifiedDict});
             }
         });
     }

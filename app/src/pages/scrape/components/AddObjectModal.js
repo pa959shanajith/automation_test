@@ -45,35 +45,56 @@ const AddObjectModal = props => {
     }
 
     const onSubmit = () => {
-        let newObjects = []
         let errorObj = {};
+        let errorFlag = false;
         let lastObj = props.scrapeItems[props.scrapeItems.length-1]
         let lastVal = lastObj ? lastObj.val : 0;
+
+        let duplicateDict = {};
+        let indexArr = [];
+        let newObjects = [];
+        
         for (let i=0; i<objects.length; i++){
             let name = objects[i].objName;
             let type = objects[i].objType;
+            let [tag, value] = type.split("-");
+            let custname = `${name}_${value}`;
 
             if (!name || !type) {
-                errorObj = { type: !name ? "input" : "type", index: i };
+                errorObj = { type: !name ? "input" : "type", index: [i] };
+                errorFlag = true;
                 break;
-            } else {
-                let [tag, value] = type.split("-");
-                newObjects.push({
-                    objIdx: i,
-                    title: `${name}_${value}`, 
-                    tag: tag, 
-                    xpath: "", 
-                    val: ++lastVal,
-                    isCustom: true
-                });
             }
+
+            if (custname in duplicateDict){
+                duplicateDict[custname].push(i);
+                indexArr.push(...duplicateDict[custname]);
+                errorFlag = 'duplicate';
+            }
+            else duplicateDict[custname] = [i];
+
+            newObjects.push({
+                objIdx: i,
+                title: `${name}_${value}`, 
+                tag: tag, 
+                xpath: "", 
+                val: ++lastVal,
+                isCustom: true
+            });
         }
-        if (newObjects.length > 0 && !errorObj.index) {
+
+        if (errorFlag === 'duplicate') {
+            errorObj = {type: 'input', index: indexArr};
+            props.setShowPop({title: 'Add Objects', content: 'Duplicate Object Names Found!'})
+        };
+
+        if (errorFlag) setError(errorObj);
+        
+        if (!errorFlag && newObjects.length > 0) {
             props.setScrapeItems([...props.scrapeItems, ...newObjects]);
             props.setShow(false);
             props.setSaved(false);
         }
-        setError(errorObj)
     }
 
     const resetFields = () => {
@@ -93,8 +114,8 @@ const AddObjectModal = props => {
                     <div className="ss__objModal_content" id="ss__objModalListId">
                         <ScrollBar scrollId="ss__objModalListId" thumbColor="#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                 { objects.map((object, index) => <div className="ss__objModal_item" key={index}>
-                                        <input className={"addObj_name"+(error.type==="input" && error.index === index ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
-                                        <select className={"addObj_objType"+(error.type==="type" && error.index === index ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
+                                        <input className={"addObj_name"+(error.type==="input" && error.index.includes(index) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
+                                        <select className={"addObj_objType"+(error.type==="type" && error.index.includes(index) ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
                                             <option className="addObj_option" disabled selected value="">Select Object Type</option>
                                             { objectTypes.map( objectType =>
                                                 <option className="addObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>

@@ -155,30 +155,52 @@ const CreateObjectModal = props => {
             let lastObj = props.scrapeItems[props.scrapeItems.length-1]
             let lastVal = lastObj ? lastObj.val : 0;
             let lastIdx = props.newScrapedData.view ? props.newScrapedData.view.length : 0;
+
+            let duplicateDict = {};
+            let tempIdArr = [];
+            let duplicateFlag = false;
+
             for (let tempId of Object.keys(customObjList)){
+
+                let custname = customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim();
+
+                if (custname in duplicateDict){
+                    duplicateDict[custname].push(tempId);
+                    tempIdArr.push(...duplicateDict[custname]);
+                    duplicateFlag = true;
+                } else duplicateDict[custname] = [tempId]
+
                 localScrapeList.push({
                     objId: undefined,
                     objIdx: lastIdx++,
                     val: ++lastVal,
                     hide: false,
-                    title: customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
+                    title: custname
                 });
                 viewArray.push({
-                    custname: customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
+                    custname: custname,
                     tag: customObjList[tempId].tag,
                     url: customObjList[tempId].url,
                     xpath: customObjList[tempId].xpath,
                     editable: true
                 });  
             }
-            let updatedNewScrapeData = {...props.newScrapedData};
-            if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewArray);
-            else updatedNewScrapeData = { view: [...viewArray] };
-            props.setNewScrapedData(updatedNewScrapeData);
-            props.updateScrapeItems(localScrapeList)
-            props.setSaved(false);
-            props.setShow(false);
-            props.setShowPop({title: "Add Object", content: "Objects has been added successfully."})
+            
+            if (duplicateFlag) {
+                let errorObj = {};
+                tempIdArr.forEach(tempId => errorObj[tempId] = "objName");
+                setError(errorObj);
+                props.setShowPop({title: 'Create Object', content: 'Duplicate Object Names Found!'});
+            } else {
+                let updatedNewScrapeData = {...props.newScrapedData};
+                if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewArray);
+                else updatedNewScrapeData = { view: [...viewArray] };
+                props.setNewScrapedData(updatedNewScrapeData);
+                props.updateScrapeItems(localScrapeList)
+                props.setSaved(false);
+                props.setShow(false);
+                props.setShowPop({title: "Add Object", content: "Objects has been added successfully."});
+            }
         }
     }
 
