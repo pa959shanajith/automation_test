@@ -65,10 +65,7 @@ const ProjectNew = (props) => {
     }
 
     const resetAssignProjectForm = () =>{
-		// $("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
-		assignProj.allProjectAP = [];
-        assignProj.assignedProjectAP = []; 
-        setAssignProj(assignProj);   
+        setAssignProj({allProjectAP:[],assignedProjectAP:[]});   
         setSelDomainsOptions([]);
         setSelectBox([]);
     }
@@ -84,20 +81,17 @@ const ProjectNew = (props) => {
         }
         setSelectedUserName(userName);
         setAssignedProjectInitial([]);
-		assignProj.allProjectAP = [];
-        assignProj.assignedProjectAP = [];
-        setAssignProj(assignProj);
+		setAssignProj({allProjectAP:[],assignedProjectAP:[]});
 		setShowload(true);
         const data = await getDomains_ICE();
         if(data.error){displayError(data.error);return;}
-        setSelDomainsOptions(data);    
+        setSelDomainsOptions(data);  
+        document.getElementById("selDomains").selectedIndex = "0";  
     }
 
     const ClickSelDomains = async(domainname) =>{
         setSelectedProject(domainname);
-		assignProj.allProjectAP = [];
-        assignProj.assignedProjectAP = [];
-        setAssignProj(assignProj);
+		setAssignProj({allProjectAP:[],assignedProjectAP:[]});
 		var requestedids = [];
 		requestedids.push(domainname);
 		var idtype = ["domaindetails"];
@@ -150,9 +144,7 @@ const ProjectNew = (props) => {
                     }
                     setAssignProj(assignProj);
                     if (selectedUserName === '') {
-                        assignProj.allProjectAP = [];
-                        assignProj.assignedProjectAP = [];
-                        setAssignProj(assignProj);
+                        setAssignProj({allProjectAP:[],assignedProjectAP:[]});
                     }
                     setShowload(false);
                     // $("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", false);
