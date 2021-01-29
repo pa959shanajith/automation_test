@@ -664,6 +664,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             else if (data[i].browser.toLowerCase() == "firefox") browserIcon = "ic-reports-firefox.png";
                             else if (data[i].browser.toLowerCase() == "internet explorer") browserIcon = "ic-reports-ie.png";
                             else if (data[i].browser.toLowerCase() == "safari") browserIcon = "ic-reports-safari.png";
+                            else if (data[i].browser.toLowerCase() == "edge legacy") browserIcon = "ic-legacy-schedule.png";
+                            else if (data[i].browser.toLowerCase() == "edge chromium") browserIcon = "ic-chromium-schedule.png";
                             if (browserIcon) {
                                 brow = "imgs/" + browserIcon;
                                 alt = data[i].browser.toLowerCase();
