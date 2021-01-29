@@ -476,8 +476,10 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 			} else if (event == "result_executeTestSuite") {
 				if (!status) { // This block is for report data
 					const executionid = resultData.executionId;
-					const accessibility_reports = resultData.accessibility_reports
-					accessibility_testing.saveAccessibilityReports(accessibility_reports);
+					if("accessibility_reports" in resultData){	
+						const accessibility_reports = resultData.accessibility_reports
+						accessibility_testing.saveAccessibilityReports(accessibility_reports);
+					}
 					const scenarioid = resultData.scenarioId;
 					const testsuiteid = resultData.testsuiteId;
 					const testsuiteIndex = execReq.testsuiteIds.indexOf(testsuiteid);

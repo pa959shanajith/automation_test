@@ -499,9 +499,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         // $('.scrollbar-inner').scrollbar();
         var tbdy = document.createElement('tbody');
         var headrow = document.createElement('tr');
-        var headData = { 0: 'S.No.', 1: 'Level', 2: 'URL', 3: 'Status', 4: 'A', 5: 'AA', 6: 'Section508', 7: 'Best-Practice' };
-        jsonStruct = { 0: 'level', 1: 'url', 2: 'status' };
-        for (var i = 0; i < 8; i++) {
+        var headData = { 0: 'S.No.', 1: 'Level', 2: 'URL', 3: 'A', 4: 'AA', 5: 'Section508', 6: 'Best-Practice' };
+        jsonStruct = { 0: 'level', 1: 'url'};
+        for (var i = 0; i < 7; i++) {
             var th = document.createElement('th');
             th.appendChild(document.createTextNode(headData[i]));
             headrow.appendChild(th);
@@ -514,7 +514,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         headrow.childNodes[4].setAttribute('style', 'width : 85px');
         headrow.childNodes[5].setAttribute('style', 'width : 85px');
         headrow.childNodes[6].setAttribute('style', 'width : 85px');
-        headrow.childNodes[7].setAttribute('style', 'width : 85px');
 
         // Iterating through links for Body Element
     
@@ -523,7 +522,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         sNo.setAttribute('style', 'width: 55px');
         sNo.appendChild(document.createTextNode(1));
         newRow.appendChild(sNo);
-        for (j = 0; j < 3; j++) {
+        for (j = 0; j < 2; j++) {
             var data = document.createElement('td');
             text = report[jsonStruct[j]];
             if (text == undefined)
