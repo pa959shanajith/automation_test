@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
 import { ReferenceBar, ScrollBar } from '../../global';
@@ -15,6 +15,22 @@ const ReferenceContent = ({mirror}) => {
     const { appType } = useSelector(state=>state.plugin.CT);
     const [showScreenPop, setShowScreenPop] = useState(false);
     const [screenshotY, setScreenshotY] = useState(null);
+	const [mirrorHeight, setMirrorHeight] = useState("0px");
+
+    useEffect(()=>{
+		let mirrorImg = new Image();
+
+		mirrorImg.onload = function(){
+			let aspect_ratio = mirrorImg.height / mirrorImg.width;
+			let ds_width = 500;
+			let ds_height = ds_width * aspect_ratio;
+			if (ds_height > 300) ds_height = 300;
+			ds_height += 45; // popup header size included
+			setMirrorHeight(ds_height);
+		}
+
+		mirrorImg.src = `data:image/PNG;base64,${mirror}`;
+	}, [mirror])
 
     const closeAllPopups = () => setShowScreenPop(false);
 
@@ -23,12 +39,16 @@ const ReferenceContent = ({mirror}) => {
         {
             showScreenPop && 
             <ClickAwayListener onClickAway={closeAllPopups}>
-            <div className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`}}>
+            <div className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`, height: `${mirrorHeight}px`}}>
                 <h4 className="pop__header" onClick={()=>setShowScreenPop(false)}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
-                <div className="screenshot_pop__content" id="ss_ssId">
-                <ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                    { mirror ? <img className="screenshot_img" src={`data:image/PNG;base64,${mirror}`} /> : "No Screenshot Available"}
-                </ScrollBar>
+                <div className="screenshot_pop__content" >
+				<div className="scrsht_outerContainer" id="ss_ssId">
+				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' hideXbar={true}>
+					<div className="ss_scrsht_insideScroll">
+					{ mirror ? <img id="ss_screenshot" className="screenshot_img" src={`data:image/PNG;base64,${mirror}`} /> : "No Screenshot Available"}
+					</div>
+				</ScrollBar>
+				</div>
 				</div>
             </div>
             </ClickAwayListener>

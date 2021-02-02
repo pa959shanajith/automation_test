@@ -51,17 +51,3 @@
 .active-filter{
     background-color: #9d6ae0;
 }
-
-.scrsht_outerContainer{
-    display: flex;
-    flex-direction: column;
-    flex: 1 1;
-    height: 100%;
-    padding: 5px;
-}
-
-.ss_scrsht_insideScroll{
-    flex: 1 1;
-    overflow: auto;
-    // margin-right: 10px;
-}

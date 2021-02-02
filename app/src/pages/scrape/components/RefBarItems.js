@@ -42,7 +42,6 @@ const RefBarItems = props => {
 		let mirrorImg = new Image();
 
 		mirrorImg.onload = function(){
-			console.log(mirrorImg.height, mirrorImg.width);
 			let aspect_ratio = mirrorImg.height / mirrorImg.width;
 			let ds_width = 500;
 			let ds_height = ds_width * aspect_ratio;
