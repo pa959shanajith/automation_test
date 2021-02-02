@@ -145,7 +145,10 @@ const ProjectNew = (props) => {
         setCycleList([]);
         setSelProjectOptions([]);
         toggleCycleClick();
-        if (taskName==="Update Project") setSelDomain("");
+        if (taskName==="Update Project"){
+            setSelProject("");
+            setSelDomain("");
+        } 
         if(document.getElementById("selProjectOption") !== null)
             document.getElementById("selProjectOption").value="";
 	}
