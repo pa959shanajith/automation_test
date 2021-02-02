@@ -13,7 +13,7 @@ const utils = require('../lib/utils');
 const notifications = require('../notifications');
 const queue = require("../lib/executionQueue")
 const regEx= /[~*+=?^%<>()|\\|\/]/;
-const ldap_url=/^ldap:\/\/[A-Za-z0-9._-].*$/i;
+const ldap_url=/^ldap:\/\/[A-Za-z0-9._-]/;
 const char_check=/[<'>"]/;
 const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 const regEx_email=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -228,56 +228,67 @@ exports.manageCIUsers = function (req, res) {
 	logger.info("Inside UI service: manageCIUsers");
 	var token_flag=false;
 	try {
+		var expdata = req.body.CIUser.expiry;
+		var now = new Date(expdata)
+		var today= new Date();
+		var td =today;
+		td.setHours(today.getHours()+8);
 		if (utils.isSessionActive(req)) {
-			if(req.body.action=="create" && !regEx.test(req.body.CIUser.tokenname))
-			{
-				var requestDetails = req.body.CIUser;
-				const tokgen2 = new TokenGenerator(256, TokenGenerator.BASE62);
-				var token=tokgen2.generate()
-				var salt = bcrypt.genSaltSync(10);
-				var inputs = {
-					userid: requestDetails.userId,
-					expireson: requestDetails.expiry,
-					name: requestDetails.tokenname,
-					icetype:requestDetails.icetype,
-					hash: bcrypt.hashSync(token, salt),
-					action: req.body.action,
-					type: "TOKENS",
-					deactivated: "active"
-				};
-			}
-			else if(req.body.action=="deactivate" && !regEx.test(req.body.CIUser.tokenName)) {
-				var requestDetails = req.body.CIUser;
-				var inputs = {
-					userid: requestDetails.userId,
-					name: requestDetails.tokenName,
-					action: req.body.action,
-				};
-			}
-			else token_flag=true
+			if(now > today || (now <= today && now > td)){
+				if(req.body.action=="create" && !regEx.test(req.body.CIUser.tokenname))
+				{
+					var requestDetails = req.body.CIUser;
+					const tokgen2 = new TokenGenerator(256, TokenGenerator.BASE62);
+					var token=tokgen2.generate()
+					var salt = bcrypt.genSaltSync(10);
 
-			if(!token_flag){
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling DAS Service : admin/manageCIUsers");
-				client.post(epurl + "admin/manageCIUsers",args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						res.send("fail");
-					} else if (response.statusCode != 200 || result.rows == "duplicate"){
-						res.send("duplicate")
-					} else {
-						result.rows.token = token;
-						res.send(result.rows);
-					}
-				});
+					var inputs = {
+						userid: requestDetails.userId,
+						expireson: requestDetails.expiry,
+						name: requestDetails.tokenname,
+						icetype:requestDetails.icetype,
+						hash: bcrypt.hashSync(token, salt),
+						action: req.body.action,
+						type: "TOKENS",
+						deactivated: "active"
+					};
+				}
+				else if(req.body.action=="deactivate" && !regEx.test(req.body.CIUser.tokenName)) {
+					var requestDetails = req.body.CIUser;
+					var inputs = {
+						userid: requestDetails.userId,
+						name: requestDetails.tokenName,
+						action: req.body.action,
+					};
+				}
+				else token_flag=true
+
+				if(!token_flag){
+					var args = {
+						data: inputs,
+						headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					logger.info("Calling DAS Service : admin/manageCIUsers");
+					client.post(epurl + "admin/manageCIUsers",args,
+						function (result, response) {
+						if (response.statusCode != 200 || result.rows == "fail") {
+							res.send("fail");
+						} else if (response.statusCode != 200 || result.rows == "duplicate"){
+							res.send("duplicate")
+						} else {
+							result.rows.token = token;
+							res.send(result.rows);
+						}
+					});
+				} else {
+					logger.error("Error: Special characters found in token name");
+					res.status(500).send("Error: Special characters found in token name");
+				}
 			} else {
-				logger.error("Error: Special characters found in token name");
-				res.status(500).send("Error: Special characters found in token name");
+				logger.error("Expiry time should be 8 hours more than current time");
+				res.status(500).send("Expiry time should be 8 hours more than current time");
 			}
 		} else {
 			res.send("Invalid Session");
@@ -1273,7 +1284,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 				var check_project = validator.isEmpty(updateProjectDetails.projectName);
 				var check_projectId = validator.isMongoId(updateProjectDetails.projectId);
 				var check_projectLen = validator.isLength(updateProjectDetails.projectName, 1, 50);
-				if (check_project == false && check_projectLen == true && check_projectId == true) {
+				if (check_project == false && check_projectLen == true && check_projectId == true && !regEx.test(updateProjectDetails.projectName)) {
 					valid_projectName = true;
 				}
 				var check_appType = validator.isEmpty(updateProjectDetails.appType);
@@ -1303,7 +1314,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 								}
 							}
 						}
-						if(!edit_prj){
+						if(!new_prj){
 							async.forEachSeries(projectDetails, function (eachprojectDetail, eachprojectDetailcallback) {
 								try {
 									var releaseCreateStatus = eachprojectDetail.newStatus;
@@ -1409,6 +1420,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 							}, newProjectDetailsCallback);
 						} else {
 							logger.error("Error: Special characters found");
+							res.send("Error: Special characters are found");
 						}
 					},
 					deletedProjectDetails: function (deletedProjectDetailsCallback) {
@@ -1718,6 +1730,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 								}, editedProjectDetailsCallback);
 							} else {
 								logger.error("Error: Special characters are found");
+								res.send("Error: Special characters are found");
 							}
 						} catch (exception) {
 							logger.error(exception.message);
@@ -1823,7 +1836,7 @@ exports.provisionICE = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const tokeninfo = req.body.tokeninfo;
-		if(!regEx.test(tokeninfo.icetype)){
+		if(!regEx.test(tokeninfo.icename)){
 			const inputs = {
 				provisionedto: tokeninfo.userid,
 				icename: tokeninfo.icename.toLowerCase(),

@@ -229,19 +229,20 @@ exports.saveData = async function (req, res) {
 		//Assigned Tasks Notification
 		var assignedObj = {};
         var scenarioObj = {}
-        var regg = /^[a-zA-Z0-9_]*$/;
+        var regg= /[~*+=?^%<>()|\\|\/]/;
 		var flag_validate=0
 		test_json=JSON.stringify(inputs)
 		for(var key in inputs){
 			if(key=='map'){
 				for(var i=0;i<inputs[key].length;i++){
-					if(!regg.test(inputs[key][i]['name'])){
+					var map_task=inputs[key][i]['task']
+					if(regg.test(inputs[key][i]['name']) || regg.test(map_task['batchName']) || regg.test(map_task['details']) || regg.test(map_task['task'])){
 						flag_validate=1
 						break
 					}
 				}
 			}
-        }
+		}
         if(flag_validate==0){
             for (var k = 0; k < data.length; k++) {
                 var task = data[k].task;
@@ -574,6 +575,7 @@ exports.saveData = async function (req, res) {
             }
         } else {
 			logger.error('Error: Special characters found!!');
+							 
 			res.status(500).send('Error: Special characters found!!')
         }
 	} else {

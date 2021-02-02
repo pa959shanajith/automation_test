@@ -247,8 +247,8 @@ exports.updateScreen_ICE = function (req, res) {
 			newData = updateData.newData;
 			type = updateData.type;
 			var regex_flag=0;
-			var regEx = /<|_->/g;
-			var scrape_err="Scraped object names cannot contain special characters other than ._- and space";
+			var regEx = /[<>]/;
+			var scrape_err="Error: Special characters <> not allowed!!";
 			if (param == "updateScrapeData_ICE") {
 				try {
 					scrapedObjects = updateData.getScrapeData;
