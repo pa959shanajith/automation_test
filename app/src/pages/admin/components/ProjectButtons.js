@@ -175,6 +175,7 @@ const ProjectButtons = (props) => {
             }
             if (proceedFlag === false) {
                 setPopupState({show:true,title:"Update Project",content:"Please add atleast one cycle for release: " + relName});
+                setLoading(false);
                 return false;
             }
             if (proceedFlag === true) {

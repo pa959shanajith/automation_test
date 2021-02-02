@@ -602,7 +602,9 @@ const ProjectNew = (props) => {
                 } else {
                     var chk = true;
                     for (var j = 0; j < newProjectDetails.length; j++) {
-                        if (newProjectDetails[j].name === relName && newProjectDetails[j].releaseId === RelID) {
+                        // if (newProjectDetails[j].name === relName && newProjectDetails[j].releaseId === RelID) {
+                        //check when cycle is added to new created release RelID is undefined (check not needed)
+                        if (newProjectDetails[j].name === relName ) {
                             createCyc.name = cycleName;
                             newProjectDetails[j].cycles.push(createCyc);
                             setNewProjectDetails(newProjectDetails);
@@ -746,6 +748,7 @@ const ProjectNew = (props) => {
         setReleaseList(RelaseNames);
         setCycleList(cycleNames)
         setActiveRelease(RelaseNames[0]);
+        setDisableAddCycle(false);
         clearUpdateProjectObjects();
     }
 
@@ -760,7 +763,7 @@ const ProjectNew = (props) => {
     const editModalButtons = () =>{
         return(
             <div>
-                <button type="button" onClick={()=>{setShowProjectEditModal(false);}} className="btn-md adminBtn modal-btn">Save</button>
+                <button type="button" onClick={()=>{setShowProjectEditModal(false);}} >Save</button>
             </div>
         )
     } 
@@ -851,7 +854,7 @@ const ModalContainerMiddleContent = (modalInputErrorBorder,Txt,setTxt, placehold
 const ModalButtonsFooter = (saveAction) =>{
     return(
         <div>
-            <button type="button" onClick={()=>{saveAction();}} className="btn-md adminBtn modal-btn">Save</button>
+            <button type="button" onClick={()=>{saveAction();}} >Save</button>
         </div>
     )
 } 
