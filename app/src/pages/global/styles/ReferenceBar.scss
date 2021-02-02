@@ -13,13 +13,13 @@
 }
 
 .screenshot_pop{
-    width: 490px!important;
-    height: 302px!important;
+    width: 500px!important;
 }
 
 .screenshot_pop__content{
-    padding: 5px;
-    height: 95%;
+    // position: relative;
+    // height: 95%;
+    overflow: auto;
 }
 
 .screenshot_img{

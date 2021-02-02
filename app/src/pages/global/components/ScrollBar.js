@@ -54,7 +54,7 @@ const ScrollBar = (props) => {
                 }
                 `}
             </style> 
-            <PerfectScrollbar style={{maxHeight:'inherit',height:'inherit'}}>
+            <PerfectScrollbar options={{suppressScrollX:props.hideXbar, useBothWheelAxes:false}} style={{maxHeight:'inherit',height:'inherit'}}>
                 {props.children}
             </PerfectScrollbar>
         </Fragment>
