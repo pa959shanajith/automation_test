@@ -25,10 +25,19 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [moduleSceduledate,setModuleSceduledate] = useState({})
     const [sort,setSort] = useState(true)
+    const [scheDetails,setScheDetails] = useState(true)
 
     useEffect(()=>{
         getScheduledDetails()
     }, []);
+
+    useEffect(()=>{
+        setTimeout(() => {
+            console.log('Hello, World!');
+            getScheduledDetails();
+            setScheDetails(!scheDetails)
+        }, 100000);
+    }, [scheDetails]);
 
     const getScheduledDetails = async () => {
         try{
@@ -114,9 +123,9 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
     }
 
     const ScheduleTestSuitePopup = () => {
-        const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction)
-        // if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
-        if(check) setAllocateICE(true);
+        const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction);
+        const valid = checkSelectedModules(scheduleTableData, setPopupState);
+        if(check && valid) setAllocateICE(true);
     } 
 
     const ScheduleTestSuite = async (schedulePoolDetails) => {
@@ -144,15 +153,11 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
         else if (data == "success" || data.includes("success")) {
             if (data.includes("Set"))  setPopupState({show:true,title:"Schedule Test Suite",content: data.replace('success', '')}); 
             else setPopupState({show:true,title:"Schedule Test Suite",content:"Successfully scheduled."});
-            // $(".ipformating").val(" ");
-            // $(".fc-datePicker").datepicker('clearDates');
-            // $(".fc-timePicker").prop('disabled', true).css('cursor', 'not-allowed').timepicker('clear');
+            updateDateTimeValues(scheduleTableData, setModuleSceduledate);
             getScheduledDetails();
         } else if (data == "few") {
             setPopupState({show:true,title:"Schedule Test Suite",content:"Failed to schedule few testsuites"});
-            // $(".ipformating").val(" ");
-            // $(".fc-datePicker").datepicker('clearDates');
-            // $(".fc-timePicker").prop('disabled', true).css('cursor', 'not-allowed').timepicker('clear');
+            updateDateTimeValues(scheduleTableData, setModuleSceduledate);
         } else if (data == "fail") {
             setPopupState({show:true,title:"Schedule Test Suite",content:"Failed to schedule few testsuites"});
         } else {
@@ -163,7 +168,6 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
         // $(".selectScheduleSuite, .selectToSched").prop("checked", false);
         setExecAction("serial");
         setBrowserTypeExe([]);
-        // $(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;");
     }
 
     const syncScenarioChange = (value) => {
@@ -314,6 +318,29 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
         </>
     );
 }
+const updateDateTimeValues = (scheduleTableData, setModuleSceduledate) => {
+    //setting module date and time props
+    let moduleSceduledateTime = {};
+    scheduleTableData.map((rowData)=>{
+        if(moduleSceduledateTime[rowData.testsuiteid] === undefined) {
+            moduleSceduledateTime[rowData.testsuiteid] = {
+                date:"",
+                time:"",
+                inputPropstime: {readOnly:"readonly" ,
+                    disabled : true,
+                    className:"fc-timePicker",
+                    placeholder: "Select Time"
+                },
+                inputPropsdate : {
+                    placeholder: "Select Date",
+                    readOnly:"readonly" ,
+                    className:"fc-datePicker"
+                }
+            };
+        }
+    })
+    setModuleSceduledate(moduleSceduledateTime);
+}
 
 const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,status,getScheduledDetails,setPopupState) => {
     if(cycleid===undefined) cycleid=""
@@ -367,6 +394,19 @@ const browImg = (brow, appType) => {
     else if (appType == "MobileWeb") return '/imgs/MobileWeb.png';
 }
 
+const checkSelectedModules = (scheduleTableData, setPopupState) => {
+    let pass = false;
+    scheduleTableData.map((rowData,m)=>{
+        const indeterminate = document.getElementById('selectScheduleSuite_' + m).indeterminate;
+        const checked = document.getElementById('selectScheduleSuite_' + m).checked;
+        if(indeterminate || checked){
+            pass = true;
+            return
+        } 
+    })
+    if (pass===false) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select atleast one scenario(s) to execute"});
+    return pass
+} 
 
 const parseLogicExecute = (schedulePoolDetails, setModuleSceduledate, moduleSceduledate, eachData, current_task, appType, projectdata, moduleInfo, setPopupState) => {
     for(var i =0 ;i<eachData.length;i++){
