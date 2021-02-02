@@ -49,38 +49,24 @@ exports.populateProjects = function (req, res) {
 	}
 };
 
-exports.populateScenarios = function (req, res) {
-	logger.info("Inside UI service: populateScenarios");
-	if (utils.isSessionActive(req)) {
-		var moduleId = req.body.moduleId;
-		var inputs= {
+exports.populateScenarios = async (req, res) => {
+	const fnName = "populateScenarios";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const moduleId = req.body.moduleId;
+		const inputs= {
 			"moduleid":moduleId,
 			"name":"populateScenarios"
 		}
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-
-		client.post(epurl+"mindmap/getScenarios", args,
-		function (result, response) {
-			try {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmap/getScenarios: getScenarios, Error Code : ERRDAS");
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-			} catch (ex) {
-				logger.error("Exception in the service getScenarios: %s", ex);
-			}
-		});
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+		const result = await utils.fetchData(inputs, "mindmap/getScenarios", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch (exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
@@ -103,11 +89,12 @@ exports.getProjectTypeMM = function (req, res) {
 	}
 };
 
-exports.populateUsers = function (req, res) {
-	logger.info("Inside UI service: populateUsers");
-	if (utils.isSessionActive(req)) {
+exports.populateUsers = async (req, res) => {
+	const fnName = "populateUsers";
+	logger.info("Inside UI service: " + fnName);
+	try {
 		var d = req.body;
-		admin.getUsers({ prjId: d.projectId }, function (err, data) {
+		admin.getUsers({ prjId: d.projectId }, (err, data) => {
 			res.setHeader('Content-Type', 'application/json');
 			if (err)
 				res.status(500).send('Fail');
@@ -115,12 +102,10 @@ exports.populateUsers = function (req, res) {
 				res.status(200).send(data);
 			}
 		});
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
-
 };
 
 exports.getModules = async (req, res) => {
@@ -138,70 +123,51 @@ exports.getModules = async (req, res) => {
 	res.send(data);
 };
 
-exports.reviewTask = function (req, res) {
-	logger.info("Inside UI service: reviewTask");
-	if (utils.isSessionActive(req)) {
+exports.reviewTask = async (req, res) => {
+	const fnName = "reviewTask";
+	logger.info("Inside UI service: " + fnName);
+	try {
 		var inputs = req.body;
-		taskID = inputs.taskId;
+		var taskID = inputs.taskId;
 		var batchIds = inputs.batchIds;
 		var userId = req.session.userid;
 		var username = req.session.username;
 		var date = new Date();
 		var status = inputs.status;
-		var versionnumber = inputs.versionnumber;
-		if (batchIds.indexOf(',')>-1){
-			var batch_tasks=batchIds.split(',');
-			taskID=JSON.stringify(batch_tasks);
-		}else{
+		if (batchIds.indexOf(',') > -1) {
+			taskID=JSON.stringify(batchIds.split(','));
+		} else {
 			taskID=batchIds[0];
 		}
 		var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' +date.toLocaleTimeString();
 		var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
-		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
-			var inputs= {
-				"id" : taskID,
-				"action" : "updatetaskstatus",
-				"status" : status,
-				"history" : taskHistory,
-				"assignedto" : userId
-			}
-			// query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
-		} else if (status == 'underReview') {
-			var inputs= {
-				"id" : taskID,
-				"action" : "updatetaskstatus",
-				"status" : status,
-				"history" : taskHistory,
-				"reviewer" : userId
-			}
-			// query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
-		}
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
+		var inputs= {
+			"id" : taskID,
+			"action" : "updatetaskstatus",
+			"status" : status,
+			"history" : taskHistory
 		};
-		client.post(epurl+"mindmap/manageTask", args,
-		function (result, response) {
-			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRDAS");
-				res.send("fail");
-			} else {
-				res.send('inprogress');
-			}
-
-		})
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
+			inputs.assignedto = userId;
+		} else if (status == 'underReview') {
+			inputs.reviewer = userId;
+		}
+		const result = await utils.fetchData(inputs, "mindmap/manageTask", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send('inprogress');
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
-exports.saveData = async function (req, res) {
-	logger.info("Inside UI service: saveData");
-	if (utils.isSessionActive(req)) {
+exports.saveData = async (req, res) => {
+	const fnName = "saveData";
+	logger.info("Inside UI service: " + fnName);
+	try {
 		var tasks = [];
 		var nameDict = {};
 		var nData = [], qList = [], idDict = {};
@@ -558,11 +524,12 @@ exports.saveData = async function (req, res) {
 					}
 			});
 		}
-	} else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
-}
+};
+
 async function updateScenario(scenarioObj){
 	let inputs = {
 		scenarios: scenarioObj
@@ -578,8 +545,9 @@ async function updateScenario(scenarioObj){
 }
 
 exports.saveEndtoEndData = function (req, res) {
-	logger.info("Inside UI service: saveEndtoEndData");
-	if (utils.isSessionActive(req)) {
+	const fnName = "saveEndtoEndData";
+	logger.info("Inside UI service: " + fnName);
+	try {
 		var nData = [], qList = [], idDict = {};
 		var urlData = req.get('host').split(':');
 		var inputs = req.body;
@@ -630,130 +598,105 @@ exports.saveEndtoEndData = function (req, res) {
 				}
 			});
 		}
-	} else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
 exports.excelToMindmap = function (req, res) {
-	logger.info("Inside UI service: excelToMindmap");
+	const fnName = "excelToMindmap";
+	logger.info("Inside UI service: " + fnName);
 	try {
-		if (utils.isSessionActive(req)) {
-			var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
-			if (req.body.data.flag == 'sheetname') {
-				return res.status(200).send(wb1.SheetNames);
+		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
+		if (req.body.data.flag == 'sheetname') {
+			return res.status(200).send(wb1.SheetNames);
+		}
+		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+		var numSheets = myCSV.length / 2;
+		var qObj = [];
+		var err;
+		for (var k = 0; k < numSheets; k++) {
+			var cSheet = myCSV[k * 2 + 1];
+			var cSheetRow = cSheet.split('\n');
+			var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
+			var uniqueIndex = 0;
+			cSheetRow[0].split(',').forEach(function (e, i) {
+				if(i== 0 && e.toLowerCase()=="module") modIdx = i;
+				if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
+				if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
+				if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
+			});
+			if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
+				err = true;
+				break;
 			}
-			var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
-			var numSheets = myCSV.length / 2;
-			var qObj = [];
-			var err;
-			for (var k = 0; k < numSheets; k++) {
-				var cSheet = myCSV[k * 2 + 1];
-				var cSheetRow = cSheet.split('\n');
-				var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
-				var uniqueIndex = 0;
-				cSheetRow[0].split(',').forEach(function (e, i) {
-					if(i== 0 && e.toLowerCase()=="module") modIdx = i;
-					if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
-					if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
-					if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
-				});
-				if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
-					err = true;
-					break;
+			var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
+			for (var i = 1; i < cSheetRow.length; i++) {
+				var row = cSheetRow[i].split(',');
+				if (row.length < 3) continue;
+				if (row[modIdx] !== '') {
+					e = { id: uuidV4(), name: row[modIdx], type: 0 };
+					qObj.push(e);
 				}
-				var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
-				for (var i = 1; i < cSheetRow.length; i++) {
-					var row = cSheetRow[i].split(',');
-					if (row.length < 3) continue;
-					if (row[modIdx] !== '') {
-						e = { id: uuidV4(), name: row[modIdx], type: 0 };
-						qObj.push(e);
-					}
-					if (row[scoIdx] !== '') {
-						lastSco = uniqueIndex; lastScr = -1; scrDict = {};
-						e = { id: uuidV4(), name: row[scoIdx], type: 1 };
-						qObj.push(e);
-						nodeDict[e.id] = uniqueIndex;
-						uniqueIndex++;
-					}
-					if (row[scrIdx] !== '' && lastSco != -1) {
-						var tName = row[scrIdx];
-						var lScr = qObj[lastScr];
-						if (lScr === undefined || (lScr)) {
-							if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
-							lastScr = uniqueIndex;
-							e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
-							qObj.push(e);
-							nodeDict[e.id] = uniqueIndex;
-							uniqueIndex++;
-						}
-					}
-					if (row[sctIdx] !== '' && lastScr != -1) {
-						e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
+				if (row[scoIdx] !== '') {
+					lastSco = uniqueIndex; lastScr = -1; scrDict = {};
+					e = { id: uuidV4(), name: row[scoIdx], type: 1 };
+					qObj.push(e);
+					nodeDict[e.id] = uniqueIndex;
+					uniqueIndex++;
+				}
+				if (row[scrIdx] !== '' && lastSco != -1) {
+					var tName = row[scrIdx];
+					var lScr = qObj[lastScr];
+					if (lScr === undefined || (lScr)) {
+						if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
+						lastScr = uniqueIndex;
+						e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
 						qObj.push(e);
 						nodeDict[e.id] = uniqueIndex;
 						uniqueIndex++;
 					}
 				}
+				if (row[sctIdx] !== '' && lastScr != -1) {
+					e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
+					qObj.push(e);
+					nodeDict[e.id] = uniqueIndex;
+					uniqueIndex++;
+				}
 			}
-			if (err) res.status(200).send('fail');
-			else res.status(200).send(qObj);
 		}
-		else {
-			logger.error("Invalid Session");
-			res.send("Invalid Session");
-		}
-	}
-	catch (exc) {
-		logger.error(exc.message);
-		return res.send('fail')
+		if (err) res.status(200).send('fail');
+		else res.status(200).send(qObj);
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
-exports.getScreens = function (req, res) {
-	logger.info("Inside UI service: populateScenarios");
-	if (utils.isSessionActive(req)) {
-		var d = req.body;
-		var projectid = d.projectId;
-		var screenList = [];
-		var testCasesList = [];
-
-		var inputs= {
-			"projectid":projectid
+exports.getScreens = async (req, res) => {
+	const fnName = "getScreens";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const projectid = req.body.projectId;
+		const inputs= { projectid }
+		const result = await utils.fetchData(inputs, "mindmap/getScreens", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
 		}
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-
-		client.post(epurl+"mindmap/getScreens", args,
-		function (result, response) {
-			try {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmap/getScenarios: getScenarios, Error Code : ERRDAS");
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-			} catch (ex) {
-				logger.error("Exception in the service getScenarios: %s", ex);
-			}
-		});
-		
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
 exports.exportToExcel = function (req, res) {
-	logger.info("Writing Module structure to Excel");
-	if (utils.isSessionActive(req)) {
+	const fnName = "exportToExcel";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		logger.info("Writing Module structure to Excel");
 		var d = req.body;
 		var excelMap = d.excelMap;
 		var dir = './../../excel';
@@ -824,34 +767,30 @@ exports.exportToExcel = function (req, res) {
 		var min_scen_idx = 1;
 		var min_scr_idx = 1;
 		ws.cell(2,1).string(curr.name);
-		try {
-			var tc_count=0;
-			for (i = 0; i < curr.children.length; i++) {
-				for (j = 0; j < curr.children[i].children.length; j++) {
-					for (k = 0; k < curr.children[i].children[j].children.length; k++) {
-						tc_count++;
-						ws.cell(1 + tc_count,4).string(curr.children[i].children[j].children[k].name);
-					}
-					
-					ws.cell(1 + min_scr_idx,3).string(curr.children[i].children[j].name);
-					min_scr_idx= tc_count+1;
+		var tc_count=0;
+		for (i = 0; i < curr.children.length; i++) {
+			for (j = 0; j < curr.children[i].children.length; j++) {
+				for (k = 0; k < curr.children[i].children[j].children.length; k++) {
+					tc_count++;
+					ws.cell(1 + tc_count,4).string(curr.children[i].children[j].children[k].name);
 				}
-				ws.cell( 1 + min_scen_idx,2).string(curr.children[i].name);
-				min_scen_idx=tc_count+1;
+				
+				ws.cell(1 + min_scr_idx,3).string(curr.children[i].children[j].name);
+				min_scr_idx= tc_count+1;
 			}
-			//save it
-			wb.write('./excel/samp234.xlsx',function (err) {
-				if (err) return res.send('fail');
-				res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-				var rstream = fs.createReadStream(filePath);
-				rstream.pipe(res);
-			});
-		} catch (ex) {
-			logger.error("Exception in mindmapService: exportToExcel: ", ex);
+			ws.cell( 1 + min_scen_idx,2).string(curr.children[i].name);
+			min_scen_idx=tc_count+1;
 		}
-	} else {
-		logger.error("Invalid session");
-		res.send("Invalid Session");
+		//save it
+		wb.write('./excel/samp234.xlsx',function (err) {
+			if (err) return res.send('fail');
+			res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+			var rstream = fs.createReadStream(filePath);
+			rstream.pipe(res);
+		});
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
@@ -1247,8 +1186,8 @@ exports.pdProcess = function (req, res) {
 			//final callback
 			res.send({"success":true,"data":orderMatrix,"history":activityJSON['mxGraphModel']['@history']});
 		});
-	} catch(err) {
-		logger.error("Exception occurred in pdProcess", err)
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/pdProcess:", exception);
 		res.status(500).send("fail");
 	}
 };
@@ -1528,78 +1467,44 @@ var encrypt = (data) => {
 	return 	encryptedData.toUpperCase();
 }
 
-
-exports.exportMindmap = function (req, res) {
-	logger.info("Inside UI service: exportMindmap");
-	if (utils.isSessionActive(req)) {
-		var d = req.body;
-		var mindmapId = d.mindmapId;
-		var inputs= {
-			"mindmapId":mindmapId,
+exports.exportMindmap = async (req, res) => {
+	const fnName = "exportMindmap";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const mindmapId = req.body.mindmapId;
+		const inputs= {
+			"mindmapId": mindmapId,
 			"query":"exportMindmap"
 		}
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-
-		client.post(epurl+"mindmap/exportMindmap", args,
-		function (result, response) {
-			try {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmap/exportMindmap: exportMindmap, Error Code : ERRDAS");
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-			} catch (ex) {
-				logger.error("Exception in the service exportMindmap: %s", ex);
-			}
-		});
-		
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+		const result = await utils.fetchData(inputs, "mindmap/exportMindmap", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
-
-exports.importMindmap = function (req, res) {
-	logger.info("Inside UI service: importMindmap");
-	if (utils.isSessionActive(req)) {
-		var d = req.body;
-		var content = d.content;
-		var inputs= {
-			"mindmap":content,
+exports.importMindmap = async (req, res) => {
+	const fnName = "importMindmap";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const content = req.body.content;
+		const inputs= {
+			"mindmap": content,
 			"query":"importMindmap"
 		}
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-
-		client.post(epurl+"mindmap/importMindmap", args,
-		function (result, response) {
-			try {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmap/importMindmap: importMindmap, Error Code : ERRDAS");
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-			} catch (ex) {
-				logger.error("Exception in the service importMindmap: %s", ex);
-			}
-		});
-		
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+		const result = await utils.fetchData(inputs, "mindmap/importMindmap", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
