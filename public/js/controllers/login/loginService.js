@@ -13,6 +13,40 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data)
 			})
 		},
+		unlock: function (username, password) {
+			return $http.post('/unlock', {
+				username: username,
+				password: password
+			})
+			.then(function (response) {
+				return response.data
+			},
+				function (response) {
+				return $q.reject(response.data)
+			})
+		},
+		forgotPasswordEmail: function (username) {
+			return $http.post('/forgotPasswordEmail', {
+				username: username
+			})
+			.then(function (response) {
+				return response.data
+			},
+				function (response) {
+				return $q.reject(response.data)
+			})
+		},
+		unlockAccountEmail: function (username) {
+			return $http.post('/unlockAccountEmail', {
+				username: username
+			})
+			.then(function (response) {
+				return response.data
+			},
+				function (response) {
+				return $q.reject(response.data)
+			})
+		},
 		loadUserInfo: function (selRole) {
 			var param = "loadUserInfo";
 			return $http.post('/loadUserInfo', {
@@ -30,6 +64,19 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 			return $http.post('/resetPassword', {
 				newpassword: newpassword,
 				currpassword: currpassword
+			})
+			.then(function (response) {
+				return response.data
+			},
+				function (response) {
+				return $q.reject(response.data)
+			})
+		},
+		changePassword: function (username,currpassword,newpassword) {
+			return $http.post('/changePassword', {
+				username: username,
+				currpassword: currpassword,
+				newpassword: newpassword
 			})
 			.then(function (response) {
 				return response.data

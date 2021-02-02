@@ -10,6 +10,7 @@ const Negotiator = require('negotiator');
 const uidsafe = require('uid-safe');
 const logger = require("../../logger");
 const utils = require('./utils');
+const notifications = require('../notifications');
 const strategies = []; // Store all registered strategies
 const options = {
 	route: {
@@ -28,10 +29,30 @@ const strategyUtil = {
 			let flag = 'inValidCredential';
 			let userInfo = null;
 			let validAuth = false;
+			let forgotPass = false;
 			let inputs = { username };
 			const user = await utils.fetchData(inputs, "login/loadUser", fnName);
 			if (user == "fail") flag = "fail";
 			else if (!user || !user.auth) flag = "invalid_username_password";
+			else if (user.invalidCredCount == 5) flag = "userLocked";
+			else if (user.defaultpassword != "") {
+				forgotPass = true;
+				var defPassword = bcrypt.compareSync(password, user.defaultpassword);
+				if (defPassword) {
+					inputs = {
+						"username": username,
+						"action": "forgotPass"
+					}
+					const user = await utils.fetchData(inputs, "login/passtimeout", fnName);
+					if (user == "fail") flag = "fail";
+					else if(user == "timeout") flag = "timeout";
+					else flag = "changePwd";
+				} else {
+					inputs = {"username": username, "action": "increment"}
+					const invalidCredCounter = await utils.fetchData(inputs, "login/invalidCredCounter", fnName);
+					if (invalidCredCounter == "fail") flag = "fail";
+				}
+			}
 			else {
 				const type = user.auth.type;
 				if (type != "ldap") {
@@ -83,8 +104,17 @@ const strategyUtil = {
 					}
 				}
 				if (validAuth) {
-					flag = "validCredential";
-					userInfo = { username, type };
+					inputs = {"username": username, "action": "clear"}
+					const invalidCredCounter = await utils.fetchData(inputs, "login/invalidCredCounter", fnName);
+					if (invalidCredCounter == "fail") flag = "fail";
+					else {
+						flag = "validCredential";
+						userInfo = { username, type };
+					}
+				} else if(flag == "inValidCredential"){
+					inputs = {"username": username, "action": "increment"}
+					const invalidCredCounter = await utils.fetchData(inputs, "login/invalidCredCounter", fnName);
+					if (invalidCredCounter == "fail") flag = "fail";
 				}
 			}
 			return done(null, userInfo, flag);
@@ -149,11 +179,13 @@ const strategyUtil = {
 const routeUtil = {
 	"inhouse": async opts => {
 		authRouter.get(opts.route.login, async (req, res) => {
+			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			if (req.session.uniqueId) await utils.cloneSession(req);
 			return res.sendFile("index.html", { root: __dirname + "/../../public/" });
 		});
 		authRouter.post(opts.route.login, (req, res, next) => {
 			logger.info("Inside UI service: login");
+			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			// Credentials for service user that can restart services
 			if (req.body.username == "restartservice" && req.body.password == "r3Start@3") return res.send("restart");
 			return passport.authenticate("inhouse", {
@@ -262,6 +294,108 @@ module.exports.checkUser = async (req, res) => {
 					if (status == "fail") result = "fail";
 					else if (status == "invalid") result = "invalidServerConf";
 				}
+			}
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+// send email when forgot password
+module.exports.forgotPasswordEmail = async (req, res) => {
+	const fnName = "forgotPasswordEmail";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const inputs = 	{ "username": req.body.username };
+		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
+		let result = { "proceed": true };
+		if (userInfo == "fail") return result = "fail";
+		else if (!userInfo || !userInfo.auth) result = "invalid_username_password";
+		else if (userInfo.invalidCredCount == 5) result = "userLocked";
+		else if (userInfo && userInfo.auth) {
+			//create a temporary password here
+			const default_password = utils.generateDefPassword();
+			const password = bcrypt.hashSync(default_password, bcrypt.genSaltSync(10));
+			//password created
+			const inputsFor = {
+				"username": req.body.username,
+				"defaultpassword": password
+			};
+			const userUpd = await utils.fetchData(inputsFor, "login/forgotPasswordEmail", fnName);
+			if (userUpd == "fail") return result = "fail";
+			else {
+				userInfo.defaultpassword = default_password
+				notifications.notify("forgotPassword", {field: "password", user: userInfo});
+				result = "success";
+			}
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+//unlock user account
+module.exports.unlock = async (req, res) => {
+	const fnName = "unlock";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const inputs = 	{ "username": req.body.username };
+		const username = req.body.username;
+		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
+		let result = { "proceed": true };
+		if (userInfo == "fail") return result = "fail";
+		else if (!userInfo || !userInfo.auth) result = "invalid_username_password";
+		else if (userInfo.invalidCredCount != 5) result = "userUnlocked";
+		else if (userInfo.verificationpassword != "") {
+			var defPassword = bcrypt.compareSync(req.body.password, userInfo.verificationpassword);
+			if (defPassword) {
+				//unlock the account
+				const inputsunlock = {"username":username, "action":"unlock"}
+				const user = await utils.fetchData(inputsunlock, "login/passtimeout", "unlock");
+				if (user == "fail") result = "fail";
+				else if(user == "timeout") result = "timeout";
+				else result = "success";
+			} else {
+				result = "invalid_username_password";
+			}
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+//send email for unlock account
+module.exports.unlockAccountEmail = async (req, res) => {
+	const fnName = "unlockAccountEmail";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const inputs = 	{ "username": req.body.username };
+		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
+		let result = { "proceed": true };
+		if (userInfo == "fail") return result = "fail";
+		else if (!userInfo || !userInfo.auth) result = "invalid_username_password";
+		else if (userInfo.invalidCredCount != 5) result = "userUnlocked";
+		else if (userInfo && userInfo.auth) {
+			//create a verification password here
+			const default_password = utils.generateDefPassword();
+			const password = bcrypt.hashSync(default_password, bcrypt.genSaltSync(10));
+			//password created
+			const inputsFor = {
+				"username": req.body.username,
+				"verificationpassword": password
+			};
+			const userUpd = await utils.fetchData(inputsFor, "login/unlockAccountEmail", fnName);
+			if (userUpd == "fail") return result = "fail";
+			else {
+				userInfo.verificationpassword = default_password
+				notifications.notify("unlockAccount", {field: "password", user: userInfo});
+				result = "success";
 			}
 		}
 		return res.send(result);

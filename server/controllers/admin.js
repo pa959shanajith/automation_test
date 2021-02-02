@@ -38,7 +38,8 @@ exports.manageUserDetails = async (req, res) => {
 	const fnName = "manageUserDetails";
 	logger.info("Inside UI Service: " + fnName);
 	try {
-		let flag = ['2','0','0','0','0','0','0','0','0'];
+		let flag = ['2','0','0','0','0','0','0','0','0','0','0'];
+		let regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
 		const reqData = req.body.user;
 		const action = req.body.action;
 		const internalUser = reqData.type == "inhouse";
@@ -51,6 +52,10 @@ exports.manageUserDetails = async (req, res) => {
 				type: reqData.type,
 				password: reqData.password || ""
 			},
+		};
+		const username = inputs.name; 
+		let input_pass = {
+			username
 		};
 
 		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
@@ -66,13 +71,36 @@ exports.manageUserDetails = async (req, res) => {
 		}
 		if (action != "delete") {
 			if (internalUser) {
-				if (validator.isEmpty(inputs.auth.password) && !(validator.isLength(inputs.auth.password,1,12))) {
+				if (!validator.isEmpty(inputs.auth.password) && !(validator.isLength(inputs.auth.password,1,12))) {
 					logger.error("Error occurred in admin/"+fnName+": Invalid Password.");
 					flag[5]='1';
 				}
 			}
 			if (inputs.auth.password != '') {
 				const salt = bcrypt.genSaltSync(10);
+				if (!regexPassword.test(inputs.auth.password)) {
+					logger.error("Error occurred in admin/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
+					flag[9]='1'
+				}
+				if (action == "update"){
+					const userDet = await utils.fetchData(input_pass, "login/loadUser", fnName);
+					if (userDet == "fail") flag[9]='1' //here if anything happens what error to show
+					else {
+						var passHistory = userDet.passwordhistory;
+						var oldPass = userDet.auth.password;
+						if (bcrypt.compareSync(inputs.auth.password, oldPass)) flag[10]='1'
+						else {
+							for(var i=0;i<passHistory.length;++i) {
+								if(bcrypt.compareSync(inputs.auth.password, passHistory[i])) {
+									flag[10]='1'
+									break
+								}
+							}
+						}
+						//Add previous password to history
+						inputs.oldPassword = bcrypt.hashSync(oldPass, salt);
+					}
+				}
 				inputs.auth.password = bcrypt.hashSync(inputs.auth.password, salt);
 			} else delete inputs.auth.password;
 			inputs.firstname = (reqData.firstname || "").trim();
@@ -111,7 +139,7 @@ exports.manageUserDetails = async (req, res) => {
 			}
 		}
 		flag = flag.join('');
-		if (flag != "200000000") {
+		if (flag != "20000000000") {
 			return res.send(flag);
 		}
 		const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
@@ -160,6 +188,32 @@ exports.getUserDetails = async (req, res) => {
 		}
 	} catch (exception){
 		logger.error("Error occurred in admin/getUserDetails", exception);
+		res.status(500).send("fail");
+	}
+};
+
+// Fetch Locked Users
+exports.fetchLockedUsers = async (req, res) => {
+	logger.info("Inside UI Service: fetchLockedUsers");
+	try {
+		const action = req.body.action;
+		const userid = req.body.args;
+		let inputs = {};
+		if (action != "user") inputs.userid = userid;
+		const result = await utils.fetchData(inputs, "admin/fetchLockedUsers", "fetchLockedUsers");
+		if (result == "fail") res.status(500).send("fail");
+		else {
+			data = {lockedUsers: []};
+			result.forEach(function(e) {
+					data.lockedUsers.push({
+						username: e.name,
+						role: e.defaultrole
+					});
+			});
+			return res.send(data);
+		}
+	} catch (exception){
+		logger.error("Error occurred in admin/fetchLockedUsers", exception);
 		res.status(500).send("fail");
 	}
 };
@@ -363,6 +417,22 @@ exports.manageSessionData = async (req, res) => {
 		logger.error("Error occurred in admin/manageSessionData:", exception);
 		res.status(500).send("fail");
 	}
+};
+
+//Unlock user by admin
+exports.unlockUser = async (req, res) => {
+	logger.info("Inside UI service: unlockUser");
+	try {
+		const username = req.body.user;
+		inputs = {username}
+		const status = await utils.fetchData(inputs, "admin/unlockUser", "unlockUser");
+		if(status=="fail") res.status(500).send("fail");
+		else res.send("success");
+	} catch (exception) {
+		logger.error("Error occurred in admin/unlockUser:", exception);
+		res.status(500).send("fail");
+	}
+	
 };
 
 exports.getNames_ICE = function (req, res) {

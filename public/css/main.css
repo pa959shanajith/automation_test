@@ -478,7 +478,7 @@ input[type="radio"]{
     -ms-border-radius: 22px;
     font-size: 32px;
     float: left;
-    margin-top: 35px;
+    margin-top: 50px;
     padding: 0 12px;
     background: #9f62e1;
 }
@@ -487,7 +487,7 @@ input[type="radio"]{
     position: absolute;
     width: 100%;
     text-align: center;
-    top: 60%;
+    top: 75%;
     transform: translateY(-25%);
     left: 0
 }
@@ -497,6 +497,16 @@ input[type="radio"]{
     font-family: LatoWebMedium
 }
 
+.helplinks {
+    position: relative;
+    width: 100%;
+    margin-top: 5px;
+}
+
+.helplinks a {
+    color: #9f62e1;
+    text-decoration: underline;
+}
 
 /*****************Login CSS*****************/
 
@@ -3966,11 +3976,10 @@ select[multiple]:-internal-list-box option:checked {
 }
 
 .sessionItemWrap {
-	position: absolute;
 	height: 45%;
 }
 
-#activeUsersToken,#activeUsers,#clientUsers {
+#activeUsersToken,#activeUsers,#clientUsers,#lockedUsers {
     overflow-y: auto;
     height: calc(100% - 40px);
 }

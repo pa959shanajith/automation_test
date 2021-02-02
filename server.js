@@ -43,6 +43,7 @@ if (cluster.isMaster) {
 		var bodyParser = require('body-parser');
 		var sessions = require('express-session');
 		var cookieParser = require('cookie-parser');
+		var csrf = require('csurf')
 		var helmet = require('helmet');
 		var hpkp = require('hpkp');
 		var lusca = require('lusca');
@@ -153,6 +154,7 @@ if (cluster.isMaster) {
 				res.clearCookie('maintain.sid');
 				req.session.destroy();
 			};
+			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			next();
 		});
 
@@ -194,6 +196,22 @@ if (cluster.isMaster) {
 			});
 			// app.use(helmet.noCache());
 		}
+
+		var suite = require('./server/controllers/suite');
+		var report = require('./server/controllers/report');
+
+		// No CSRF token
+		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
+		app.post('/getReport_API', report.getReport_API);
+
+		app.use(csrf({
+			cookie: true
+		}));
+
+		app.all('*', function(req, res, next) {
+			res.cookie('XSRF-TOKEN', req.csrfToken(), {httpOnly: false, expires: ""})
+			next();
+		});
 
 		app.post('/restartService', function(req, res) {
 			logger.info("Inside UI Service: restartService");
@@ -403,8 +421,6 @@ if (cluster.isMaster) {
 		var admin = require('./server/controllers/admin');
 		var design = require('./server/controllers/design');
 		var designscreen = require('./server/controllers/designscreen');
-		var suite = require('./server/controllers/suite');
-		var report = require('./server/controllers/report');
 		var plugin = require('./server/controllers/plugin');
 		var utility = require('./server/controllers/utility');
 		var qc = require('./server/controllers/qualityCenter');
@@ -452,10 +468,14 @@ if (cluster.isMaster) {
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
+		app.post('/forgotPasswordEmail', authlib.forgotPasswordEmail);
+		app.post('/unlockAccountEmail', authlib.unlockAccountEmail);
+		app.post('/unlock', authlib.unlock);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);
 		app.post('/resetPassword', auth.protect, login.resetPassword);
+		app.post('/changePassword', login.changePassword);
 		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
 		//Admin Routes
 		app.post('/getUserRoles', admin.getUserRoles);
@@ -468,8 +488,10 @@ if (cluster.isMaster) {
 		app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
 		app.post('/getAvailablePlugins', auth.protect, admin.getAvailablePlugins);
 		app.post('/manageSessionData', auth.protect, admin.manageSessionData);
+		app.post('/unlockUser', auth.protect, admin.unlockUser);
 		app.post('/manageUserDetails', auth.protect, admin.manageUserDetails);
 		app.post('/getUserDetails', auth.protect, admin.getUserDetails);
+		app.post('/fetchLockedUsers', auth.protect, admin.fetchLockedUsers);
 		app.post('/testLDAPConnection', auth.protect, admin.testLDAPConnection);
 		app.post('/getLDAPConfig', auth.protect, admin.getLDAPConfig);
 		app.post('/manageLDAPConfig', auth.protect, admin.manageLDAPConfig);
@@ -512,7 +534,6 @@ if (cluster.isMaster) {
 		app.post('/updateTestSuite_ICE', auth.protect, suite.updateTestSuite_ICE);
 		app.post('/getTestcaseDetailsForScenario_ICE', auth.protect, suite.getTestcaseDetailsForScenario_ICE);
 		app.post('/ExecuteTestSuite_ICE', auth.protect, suite.ExecuteTestSuite_ICE);
-		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
 		app.post('/getICE_list', auth.protect, suite.getICE_list);
 		//Scheduling Screen Routes
 		app.post('/testSuitesScheduler_ICE', auth.protect, suite.testSuitesScheduler_ICE);
@@ -528,7 +549,6 @@ if (cluster.isMaster) {
 		app.post('/connectJira_ICE', report.connectJira_ICE);
 		app.post('/downloadVideo', auth.protect, report.downloadVideo);
 		app.post('/getReportsData_ICE', auth.protect, report.getReportsData_ICE);
-		app.post('/getReport_API', report.getReport_API);
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
 		app.use('/viewReport', report.viewReport);
 		//Plugin Routes

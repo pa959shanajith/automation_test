@@ -103,25 +103,99 @@ exports.resetPassword = async (req, res) => {
 	const fnName = "resetPassword";
 	logger.info("Inside UI Service: " + fnName);
 	try {
+		let regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
 		if (req.session.usertype != "inhouse") return res.send("fail");
 		const username = req.session.username;
 		const currpassword = req.body.currpassword;
 		const newpassword = req.body.newpassword;
+		if (!regexPassword.test(currpassword)) {
+			logger.error("Error occurred in login/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
+			return rers.send("fail");
+		}
+		if (!regexPassword.test(newpassword)) {
+			logger.error("Error occurred in login/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
+			return rers.send("fail");
+		}
 		let inputs = { username };
 		const result = await utils.fetchData(inputs, "login/loadUser", fnName);
 		if (result == "fail") return res.send("fail");
-		const dbpassword = result.auth.password;
-		const validUser = bcrypt.compareSync(currpassword, dbpassword);
-		if (!validUser) return res.send("incorrect");
-		if (currpassword == newpassword) return res.send("same");
+		else {
+			var passHistory = result.passwordhistory;
+			const dbpassword = result.auth.password;
+			const validUser = bcrypt.compareSync(currpassword, dbpassword);
+			if (!validUser) return res.send("incorrect");
+			if (currpassword == newpassword) return res.send("same");
+			if (bcrypt.compareSync(newpassword, dbpassword)) return res.send("reusedPass")
+			else {
+				for(var i=0;i<passHistory.length;++i) {
+					if(bcrypt.compareSync(newpassword, passHistory[i])) {
+						return res.send("reusedPass")
+					}
+				}
+			}
+		}
 		const password = bcrypt.hashSync(newpassword, bcrypt.genSaltSync(10));
+		const oldPassword = bcrypt.hashSync(currpassword, bcrypt.genSaltSync(10));
+		
 		inputs = {
 			action: "resetpassword",
 			userid: req.session.userid,
 			name: req.session.username,
 			modifiedby: req.session.userid,
 			modifiedbyrole: req.session.activeRoleId,
-			password: password
+			password: password,
+			oldPassword: oldPassword
+		};
+		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else {
+			notifications.notify("userUpdate", {field: "password", user: result});
+			res.send(status);
+		}
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+// Reset Current password on Forgot Password
+exports.changePassword = async (req, res) => {
+	const fnName = "changePassword";
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		let regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
+		const username = req.body.username;
+		const currpassword = req.body.currpassword;
+		const newpassword = req.body.newpassword;
+		if (!regexPassword.test(newpassword)) {
+			logger.error("Error occurred in login/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
+			return res.send("fail");
+		}
+		let inputs = { username };
+		const result = await utils.fetchData(inputs, "login/loadUser", fnName);
+		if (result == "fail") return res.send("fail");
+		else {
+			var passHistory = result.passwordhistory;
+			const dbpassword = result.auth.password;
+			const validUser = bcrypt.compareSync(currpassword, result.defaultpassword);
+			if (!validUser) return res.send("incorrect");
+			if (bcrypt.compareSync(newpassword, dbpassword)) return res.send("reusedPass")
+			else {
+				for(var i=0;i<passHistory.length;++i) {
+					if(bcrypt.compareSync(newpassword, passHistory[i])) {
+						return res.send("reusedPass")
+					}
+				}
+			}
+		}
+		const password = bcrypt.hashSync(newpassword, bcrypt.genSaltSync(10));
+		const oldPassword = bcrypt.hashSync(result.auth.password, bcrypt.genSaltSync(10));
+		
+		inputs = {
+			action: "changepassword",
+			name: req.body.username,
+			password: password,
+			oldPassword: oldPassword
 		};
 		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");
@@ -140,6 +214,7 @@ exports.logoutUser = async (req, res) => {
 	logger.info("%s logged out successfully", req.session.username);
 	req.logOut();
 	req.clearSession();
+	//res.clearCookie('XSRF-TOKEN');
 	res.send('Session Expired');
 };
 

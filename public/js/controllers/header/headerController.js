@@ -358,6 +358,10 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				} else if(data == "incorrect") {
 					$(".ic-currpassword").parent().addClass("input-border-error");
 					$scope.passwordValidation = "Current Password is incorrect";
+				} else if(data == "reusedPass"){
+					$(".ic-newpassword").parent().addClass("input-border-error");
+					$(".ic-confpassword").parent().addClass("input-border-error");
+					$scope.passwordValidation = "Sorry! You can't use last 5 passwords";
 				} else if(data == "fail") {
 					$scope.passwordValidation = "Failed to Change Password";
 				} else if(/^2[0-4]{10}$/.test(data)) {
