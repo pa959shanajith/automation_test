@@ -56,7 +56,7 @@ const ScrapeObject = props => {
                 : 
                 <div className="ss_obj_label">
                     {!props.hideCheckbox && <input className="ss_obj_chkbx" type="checkbox" onChange={handleCheckbox} checked={checked} />}
-                    <div className={"ss_obj_name" + (props.object.duplicate ? " ss__red" : "") + (props.object.isCustom ? " ss__customObject": "")} onDoubleClick={!props.notEditable ? ()=>setEdit(true) : null}>{objName}</div> 
+                    <div className={"ss_obj_name" + (props.object.duplicate ? " ss__red" : "" + (!props.object.objId ? " ss__newObj" : "" )) + (props.object.isCustom ? " ss__customObject": "")} onDoubleClick={!props.notEditable ? ()=>setEdit(true) : null}>{objName}</div> 
                 </div>
             }
         </div>

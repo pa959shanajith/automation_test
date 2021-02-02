@@ -28,6 +28,16 @@ const ScrapeContent = props => {
     const [editableObj, setEditableObj] = useState({});
     const { setShowObjModal, isUnderReview, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, hideSubmit, setScrapeItems } = useContext(ScrapeContext);
 
+    useEffect(()=> {
+        setActiveEye(null);
+        setShowSearch(false);
+        setSearchVal("");
+        setSelAllCheck(false);
+        setDeleted([]);
+        setModified({});
+        setEditableObj({});
+    }, [current_task])
+
     useEffect(()=>{
         let disable = {};
         let disableSelect = false;
@@ -176,10 +186,10 @@ const ScrapeContent = props => {
     }
 
     const onDelete = () => {
-        setShowConfirmPop({
-            title: "Delete Scraped Data",
-            content: current_task.reuse === 'True' ? "Screen is been reused. Are you sure you want to delete objects?" : "Are you sure you want to delete objects?",
-            onClick: ()=>{
+        // setShowConfirmPop({
+            // title: "Delete Scraped Data",
+            // content: current_task.reuse === 'True' ? "Screen is been reused. Are you sure you want to delete objects?" : "Are you sure you want to delete objects?",
+            // onClick: ()=>{
                 let deletedArr = [];
                 let scrapeItemsL = [...scrapeItems];
                 let modifiedDict = {...modified}
@@ -194,15 +204,19 @@ const ScrapeContent = props => {
                         return false;
                     } else return true;
                 });
-                onSave(null, {deletedArr: deletedArr, newScrapeList: newScrapeList, modifiedDict: modifiedDict});
-            }
-        });
+                setScrapeItems(newScrapeList)
+                setDeleted(deletedArr);
+                setModified(modifiedDict);
+                setDisableBtns({...disableBtns, delete: true, save: false})
+        //         onSave(null, {deletedArr: deletedArr, newScrapeList: newScrapeList, modifiedDict: modifiedDict});
+        //     }
+        // });
     }
 
-    const onSave = (e, arg) => {
+    const onSave = () => {
         let continueSave = true;
         
-        if (current_task.reuse === 'True' && !arg) {
+        if (current_task.reuse === 'True') {
             setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen is been reused. Are you sure you want to save objects?', 'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();}})
             continueSave = false;
         }
@@ -213,7 +227,7 @@ const ScrapeContent = props => {
         let uniqueXPaths = [];
         let dCusts = [];
         let dCusts2 = [];
-        let scrapeItemsL = arg ? arg.newScrapeList : [...scrapeItems];
+        let scrapeItemsL = [...scrapeItems];
 
         if (scrapeItemsL.length > 0) {
             for (let scrapeItem of scrapeItemsL) {
@@ -243,7 +257,7 @@ const ScrapeContent = props => {
             if (dCustname) {
                 continueSave = false;
                 setShowPop({
-                    'title': `${arg ? 'Delete' : 'Save'} Scrape data`,
+                    'title': 'Save Scrape data',
                     'content': <div className="ss__dup_labels">
                         Please rename/delete duplicate scraped objects
                         <br/><br/>
@@ -254,25 +268,25 @@ const ScrapeContent = props => {
             } else if (dXpath) {
                 continueSave = false;
                 setShowConfirmPop({
-                    'title': `${arg ? 'Delete' : 'Save'} Scrape data`,
+                    'title': 'Save Scrape data',
                     'content': <div className="ss__dup_labels">
                         Object characteristics are same for the below list of objects:
                         { dCusts2.map(custname => <span className="ss__dup_li">{custname}</span>) }
                         <br/>
                         Do you still want to continue?
                     </div>,
-                    'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects(arg);},
+                    'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();},
                     'continueText': "Continue",
                     'rejectText': "Cancel"
                 })
             }
         }
 
-        if (continueSave) saveScrapedObjects(arg);
+        if (continueSave) saveScrapedObjects();
     }
 
-    const saveScrapedObjects = arg => {
-        let scrapeItemsL = arg ? arg.newScrapeList : [...scrapeItems]
+    const saveScrapedObjects = () => {
+        let scrapeItemsL = [...scrapeItems];
         let added = Object.keys(newScrapedData).length ? { ...newScrapedData } : { ...mainScrapedData };
         let views = []
         for (let scrapeItem of scrapeItemsL) {
@@ -283,8 +297,8 @@ const ScrapeContent = props => {
         }
         
         let params = {
-            'deletedObj': arg ? arg.deletedArr : [],
-            'modifiedObj': arg ? Object.values(arg.modifiedDict) : Object.values(modified),
+            'deletedObj': deleted,
+            'modifiedObj': Object.values(modified),
             'addedObj': {...added, view: views},
             'screenId': current_task.screenId,
             'userId': user_id,
@@ -298,7 +312,7 @@ const ScrapeContent = props => {
             else fetchScrapeData().then(resp=>{
                 if (resp === 'success' || typeof(resp) === "object"){
                     setShowPop({
-                        'title': `${arg ? 'Delete' : 'Save'} Scrape data`,
+                        'title': 'Save Scrape data',
                         'content': typeof(resp)==="object" && resp.length>0 ? <div className="ss__dup_labels">
                             Scraped data saved successfully.
                             <br/><br/>
@@ -306,7 +320,7 @@ const ScrapeContent = props => {
                             <br/><br/>
                             Matching objects found for:
                             { resp.map(custname => <span className="ss__dup_li">{custname}</span>) }
-                        </div> : `Scraped data ${arg ? 'deleted' : 'saved'} successfully.`
+                        </div> : 'Scraped data saved successfully.'
                     })
                     setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: false});
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: scrapeItemsL.length !== 0});
