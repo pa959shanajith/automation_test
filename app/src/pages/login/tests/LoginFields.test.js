@@ -3,7 +3,6 @@ import { shallow,mount, } from 'enzyme';
 import {findByTestAtrr,checkProps} from '../../../setupTests';
 import LoginFields,{handleShowPass}  from '../components/LoginFields';
 import { SetProgressBar as SPB} from '../../global';
-import apiMock from '../apiMock'
 import * as api from '../api'
 
 
