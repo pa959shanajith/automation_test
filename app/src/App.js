@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import socketIOClient from "socket.io-client";
-import {Encrypt} from './pages/global';
 import {useDispatch, useSelector} from 'react-redux';
 import {v4 as uuid} from 'uuid';
 import * as actionTypes from './pages/login/state/action';
@@ -50,9 +49,8 @@ const RouteApp = () => {
   const EndPoint = "https://"+window.location.hostname+":8443";
   const dispatch = useDispatch()
   useEffect(()=>{
-    var userName = Encrypt.encode((userInfo)?userInfo.username:uuid());
+    var userName = Buffer.from((userInfo)?userInfo.username:uuid()).toString('base64')
     var socket = socketIOClient(EndPoint, { forceNew: true, reconnect: true, query: {check: 'notify', key: userName}});
-    socket.emit("key",userName);
     dispatch({type:actionTypes.SET_SOCKET,payload:socket})
   },[userInfo])
   return(
