@@ -176,6 +176,7 @@
          <div class="wsdlRow wsdlActions">
             <div id="wsdlActionsButton">
                <button ng-click="showWsdlRequest()" id="showWsdlRequest" class="btn btn-xs btn-xs-custom pull-left"  title="Request">Request</button>
+               <button ng-click="showParams()" id="showParams" class="btn btn-xs btn-xs-custom pull-left"  title="Params">Params</button>
                <button ng-click="showWsdlResponse()" id="showWsdlResponse" class="btn btn-xs btn-xs-custom pull-left"  title="Response">Response</button>
                <button ng-click="saveWS()" class="btn btn-xs btn-xs-custom pull-left saveWS"  title="Save">Save</button>
                <input ng-model="endPointURL" id="endPointURL" type="text" class="endPointURL form-control pull-left" placeholder="End Point URL"/>
@@ -201,6 +202,12 @@
                <textarea id="wsdlRequestBody" class="wsdlTextAreaBody" placeholder="Request Body"></textarea>
             </div>
             <!-- requestWrap -->
+             <!-- ParamWrap -->
+             <div id="wsdlParam" class="wsdlRqstRspnsWrap wsdlParamWrap">
+               <textarea id="wsdlRequestParam" class="wsdlTextAreaHeader" placeholder="Request Param"></textarea>
+               <!-- <textarea id="wsdlParamBody" class="wsdlTextAreaBody" placeholder="Request Body"></textarea> -->
+            </div>
+            <!-- ParamWrap -->
             <!-- responseWrap -->
             <div id="wsdlResponse" class="wsdlRqstRspnsWrap wsdlRspnsWrap">
                <textarea id="wsdlResponseHeader" class="wsdlTextAreaHeader" placeholder="Response Header"></textarea>

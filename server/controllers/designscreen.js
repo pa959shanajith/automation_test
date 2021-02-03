@@ -230,18 +230,18 @@ exports.updateScreen_ICE = function (req, res) {
 			var screenID = updateData.screenId;
 			var screenName = updateData.screenName;
 			var param = updateData.param;
-			var delete_list = updateData.delete_list;
+			// var delete_list = updateData.delete_list;
 			var update_list = updateData.update_list;
-			var insert_list = updateData.insert_list;
+			// var insert_list = updateData.insert_list;
 			var appType = updateData.appType;
 			var requestedversionnumber = updateData.versionnumber;
 			//xpaths required to be mapped(used only when param is mapScrapeData_ICE)
-			var requiredXpathList = [];
+			// var requiredXpathList = [];
 			//URLs required to be mapped(used only when param is mapScrapeData_ICE)
-			var requiredURLList = [];
+			// var requiredURLList = [];
 			var scrapedObjects = {};
 			var inputs = {};
-			var inputstestcase = {};
+			// var inputstestcase = {};
 			var statusFlag = "";
 			dataObj=[]
 			newData = updateData.newData;
@@ -256,7 +256,7 @@ exports.updateScreen_ICE = function (req, res) {
 						}
 					}
 					if (appType.toUpperCase() === 'WEBSERVICE') {
-						if ('body' in parsedScrapedObj) {
+						if (parsedScrapedObj.method == 'POST' && 'body' in parsedScrapedObj ) {
 							parsedScrapedObj.body[0] = parsedScrapedObj.body[0].replace(/'+/g, "\"");
 						}
 					}
@@ -288,10 +288,12 @@ exports.updateScreen_ICE = function (req, res) {
 							if ('method' in scrapedObjects &&
 								'header' in scrapedObjects &&
 								'body' in scrapedObjects) {
-								if (scrapedObjects.method == 'POST') {
+								var method = scrapedObjects.method;
+								var requestedparam = scrapedObjects.param;
+								if (method == 'POST') {
 									var requestedBody = scrapedObjects.body;
 									var requestedHeader = scrapedObjects.header;
-									if (requestedBody != null &&
+									if (method == 'POST' && requestedBody != null &&
 										requestedBody != ''){
 										if(requestedHeader.indexOf('json') === -1){
 											if (requestedBody.indexOf('Envelope') !== -1) {
@@ -301,9 +303,15 @@ exports.updateScreen_ICE = function (req, res) {
 													var baseRequestBody = obj.root;
 													allXpaths = [];
 													allCustnames = [];
+													//Parsing Request Parameters
+													if (requestedparam.trim() != ""){
+														var reqparams=parseRequestParam(requestedparam);
+														if (reqparams.length>0) viewArray.concat(reqparams);
+													}
 													try {
 														logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
 														parseRequest(baseRequestBody);
+
 													} catch (exception) {
 														logger.error(exception.message);
 													}
@@ -314,16 +322,7 @@ exports.updateScreen_ICE = function (req, res) {
 														scrapedObjectsWS.tag = "elementWS";
 														viewArray.push(scrapedObjectsWS);
 													}
-													var baseData = {};
-													baseData.endPointURL = scrapedObjects.endPointURL;
-													baseData.method = scrapedObjects.method;
-													baseData.header = scrapedObjects.header;
-													baseData.operations = scrapedObjects.operations;
-													baseData.body = scrapedObjects.body;
-													baseData.responseHeader = scrapedObjects.responseHeader;
-													baseData.responseBody = scrapedObjects.responseBody;
-													baseData.view = viewArray;
-													scrapedObjects = baseData;
+													scrapedObjects.view = viewArray;
 													scrapedObjects = JSON.stringify(scrapedObjects);
 													scrapedObjects = scrapedObjects.replace(/'+/g, "''")
 												}
@@ -334,6 +333,12 @@ exports.updateScreen_ICE = function (req, res) {
 										}
 										else if(requestedHeader.indexOf('json') !== -1){
 											try{
+												//Parsing Request Parameters
+												if (requestedparam.trim() != ""){
+													var reqparams=parseRequestParam(requestedparam);
+													if (reqparams.length>0) viewArray.concat(reqparams);
+												}
+												//Parsing Request Body
 												requestedBody=JSON.parse(requestedBody)
 												var xpaths=parseJsonRequest(requestedBody,"","");
 												for (var object of xpaths) {
@@ -343,7 +348,7 @@ exports.updateScreen_ICE = function (req, res) {
 													scrapedObjectsWS.tag = "elementWS";
 													viewArray.push(scrapedObjectsWS);
 												}
-												if (viewArray.length>0) scrapedObjects.view=viewArray
+												if (viewArray.length>0) scrapedObjects.view=viewArray;
 
 											}
 											catch(Exception){
@@ -355,8 +360,23 @@ exports.updateScreen_ICE = function (req, res) {
 											scrapedObjects="Fail";
 										}						
 									}
+								}else if (method=='GET' && requestedparam.trim() !='') {
+									try{
+										//Parsing Request Parameters
+										if (requestedparam.trim() != ""){
+											var reqparams=parseRequestParam(requestedparam);
+											if (reqparams.length>0){
+												scrapedObjects.view=reqparams;
+											}
+										}	
+									}catch(Exception){
+										logger.error("Invalid Request Header for GET API")
+										scrapedObjects="Fail";
+									}
 								}
-							}if (temp_flag == false){
+							}
+							
+							if (temp_flag == false){
 								inputs = {
 									"query": "updatescreen",
 									"scrapedata": scrapedObjects,
@@ -776,6 +796,26 @@ function buildObject(scrapedObjects, modifiedBy, modifiedByrole, screenID, proje
 		logger.error("Exception in the function buildObject: %s", exception);
 	}
 }
+
+function parseRequestParam(paramerters){
+	logger.info("Inside the function parseRequest ");
+	var paramsArray=[];
+	try{
+		var params=paramerters.split('##');
+		for (var object of params) {
+			object=object.split(":");
+			var scrapedObjectsWS = {};
+			scrapedObjectsWS.xpath = object[0].trim();
+			scrapedObjectsWS.custname = object[0].trim();
+			scrapedObjectsWS.tag = "elementWS";
+			paramsArray.push(scrapedObjectsWS);
+		}
+	}catch (Exception){
+		logger.info("Exception in the function parseRequest : %s",exception);
+	}	
+	return paramsArray										
+}
+
 
 function parseRequest(readChild) {
 	try {
