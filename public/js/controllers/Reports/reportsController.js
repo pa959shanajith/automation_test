@@ -486,7 +486,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $(".mid-report-section").hide();
 
         $('#middle-content-section').attr('class', "webCrawler-report");
-        proxy = "Disabled";
+        var proxy = "Disabled";
         $("#report-header").append('<div width="100%" height="100%" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Accessibility Report</label></div><div style="display: flex;"><div style="width:50%;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+ report.screenname + '</span></div><div><label class="webCrawler-report-label">' + "Agent" + '</label><span class="webCrawler-report-span" style="text-transform: capitalize;">'+ report.agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">0</span></div></div><div style="width:50%;"></div></div>')
         var body = document.getElementById('report-canvas');
         var reportDiv = document.createElement('div');
@@ -499,9 +499,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         // $('.scrollbar-inner').scrollbar();
         var tbdy = document.createElement('tbody');
         var headrow = document.createElement('tr');
-        var headData = { 0: 'S.No.', 1: 'Level', 2: 'URL', 3: 'Status', 4: 'A', 5: 'AA', 6: 'Section508', 7: 'Best-Practice' };
-        jsonStruct = { 0: 'level', 1: 'url', 2: 'status' };
-        for (var i = 0; i < 8; i++) {
+        var headData = { 0: 'S.No.', 1: 'Level', 2: 'URL', 3: 'A', 4: 'AA', 5: 'Section508', 6: 'Best-Practice' };
+        jsonStruct = { 0: 'level', 1: 'url'};
+        for (var i = 0; i < 7; i++) {
             var th = document.createElement('th');
             th.appendChild(document.createTextNode(headData[i]));
             headrow.appendChild(th);
@@ -514,7 +514,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         headrow.childNodes[4].setAttribute('style', 'width : 85px');
         headrow.childNodes[5].setAttribute('style', 'width : 85px');
         headrow.childNodes[6].setAttribute('style', 'width : 85px');
-        headrow.childNodes[7].setAttribute('style', 'width : 85px');
 
         // Iterating through links for Body Element
     
@@ -523,7 +522,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         sNo.setAttribute('style', 'width: 55px');
         sNo.appendChild(document.createTextNode(1));
         newRow.appendChild(sNo);
-        for (j = 0; j < 3; j++) {
+        for (j = 0; j < 2; j++) {
             var data = document.createElement('td');
             text = report[jsonStruct[j]];
             if (text == undefined)
@@ -664,6 +663,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             else if (data[i].browser.toLowerCase() == "firefox") browserIcon = "ic-reports-firefox.png";
                             else if (data[i].browser.toLowerCase() == "internet explorer") browserIcon = "ic-reports-ie.png";
                             else if (data[i].browser.toLowerCase() == "safari") browserIcon = "ic-reports-safari.png";
+                            else if (data[i].browser.toLowerCase() == "edge legacy") browserIcon = "ic-legacy-schedule.png";
+                            else if (data[i].browser.toLowerCase() == "edge chromium") browserIcon = "ic-chromium-schedule.png";
                             if (browserIcon) {
                                 brow = "imgs/" + browserIcon;
                                 alt = data[i].browser.toLowerCase();

@@ -764,76 +764,15 @@ exports.highlightScrapElement_ICE = function (req, res) {
 	}
 };
 
-exports.updateIrisDataset = function updateIrisDataset(req, res) {
+exports.updateIrisDataset = async(req, res) => {
 	try{
 		logger.info("Inside UI service: updateIrisDataset");
-		if (utils.isSessionActive(req)) {
-			var username=req.session.username
-			var icename = undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-			image_data = req.body.data;
-			redisServer.redisSubServer.subscribe('ICE2_' + icename);
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , icename);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
-				if (redisres[1]>0) {
-					logger.info("Sending socket request for updateIrisDataset to cachedb");
-					dataToIce = {"emitAction" : "irisOperations","username" : icename, "image_data":image_data, "param":"updateDataset"};
-					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
-					function updateIrisDataset_listener(channel,message) {
-						var data = JSON.parse(message);
-						if(icename == data.username && ["unavailableLocalServer", "iris_operations_result"].includes(data.onAction)){
-							redisServer.redisSubServer.removeListener('message',updateIrisDataset_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in updateIrisDataset: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[username];
-									soc.emit("ICEnotAvailable");
-								}
-							} else if (data.onAction == "iris_operations_result") {
-								if(data.value==true){
-									var args = {
-										data: image_data,
-										headers: {
-											"Content-Type": "application/json"
-										}
-									};
-									logger.info("Calling DAS Service from updateIrisDataset: design/updateIrisObjectType");
-									client.post(epurl + "design/updateIrisObjectType", args,
-										function (result, response) {
-										try {
-											if (response.statusCode != 200 || result.rows == "fail") res.send(false);
-											else if (result.rows == "unsavedObject") res.send("unsavedObject");
-											else res.send(true);
-										} catch (exception) {
-											logger.error("Exception in the service updateIrisObjectType: %s", exception);
-											res.send(false);
-										}
-									});
-								}
-								else  res.send(data.value);
-							}
-						}
-					}
-					redisServer.redisSubServer.on("message",updateIrisDataset_listener);
-				} else {
-					utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
-						var flag="";
-						if (found) flag = "scheduleModeOn";
-						else {
-							flag = "unavailableLocalServer";
-							logger.info("ICE Socket not Available");
-						}
-						res.send(flag);
-					});
-				}
-			});
-		} else {
-			logger.error("Error occurred in the service updateIrisDataset: Invalid Session");
-			res.send("Invalid Session");
-		}
+		var image_data = req.body.data;
+		const result = await utils.fetchData(image_data, "design/updateIrisObjectType", 'updateIrisDataset');
+		res.send(result)
 	} catch(exception){
 		logger.error("Exception in the service updateIrisDataset: %s", exception);
+		res.send("fail");
 	}
 }
 

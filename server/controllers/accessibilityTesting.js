@@ -30,6 +30,7 @@ exports.getAccessibilityTestingData_ICE = async function(req, res) {
 
 exports.saveAccessibilityReports = async function (reports){
 	try {
+		if (!reports) return false;
 		const fnName = "getAccessibilityTestingData_ICE"
 		var inputs = {
 			"query": "insertdata",

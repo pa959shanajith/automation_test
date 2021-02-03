@@ -1274,6 +1274,10 @@ var getTestcaseStep = function(sno, ob, cn, keyVal, inp, out, url, app) {
 var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	var testCaseSteps = [],testcaseObj,step = 1;
 	var firstScript = false,windowId;
+	var temp_screendata=screendata;
+	var menu_input='';
+	var menu_count=0;
+	var mflag=0;
 	if(adjacentItems){
 		// in case is first script
 		// make orderlist global
@@ -1289,6 +1293,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					getTestcaseStep(1,null,'@Sap','LaunchApplication',null,null,null,"SAP"),
 					getTestcaseStep(2,null,'@Sap','ServerConnect',null,null,null,"SAP")
 				];
+				mflag=1;
 				step = 3;
 			}
 			else if (item["@label"]=="Start" && screendata[0].apptype=="OEBS"){
@@ -1365,59 +1370,100 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 		else if(eachScrapedAction.apptype=="SAP"){
 			text = eachScrapedAction.text;
 			input = text.split("  ");
-			switch(eachScrapedAction.tag){
-				case "input":
-				case "GuiOkCodeField":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
-					break;
-				case "button":
-				case "shell":
-				case "table":
-				case "toolbar":
-				case "calendar":
-				case "gridview":
-				case "GuiLabel":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
-					var custname_split = eachScrapedAction.custname.split('_');
-					if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
-					break;
-				case "GuiStatusbar":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
-					break;
-				case "GuiTab":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
-					break;
-				case "select":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
-					break;
-				case "GuiMenubar":
-					testcaseObj = getTestcaseStep(step,null,'@Sap','SelectMenu',null,null,null,"SAP");
-					break;
-				case "GuiSimpleContainer":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
-					break;
-				case "radiobutton":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
-					break;
-				case "checkbox":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
-					break;
-				case "tree":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
-					break;
-				case "picture":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
-					break;
-				case "text":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
-					break;
-				default:
-					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
-					break;
+			var menu_flg=0;
+			if(eachScrapedAction.tag=="GuiMenu"){
+				if(mflag==1) temp_mdata=temp_screendata[menu_count-2];
+				else temp_mdata=temp_screendata[menu_count]
+				if(temp_mdata.tag=="GuiMenu"){
+					menu_flg=1;
+					menu_input=menu_input.concat(input+';');
+				} else{
+					menu_flg=0;
+					menu_input=menu_input.concat(input);
+				}
 			}
-			if(testcaseObj){
-				testCaseSteps.push(testcaseObj);
-				step++;
+				
+			if(menu_flg==0){
+				switch(eachScrapedAction.tag){
+					case "input":
+					case "GuiOkCodeField":
+						if(input[0]=='') input=eachScrapedAction.command[0][2].split(' ')
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
+						break;
+					case "button":
+					case "shell":
+					case "table":
+					case "toolbar":
+					case "calendar":
+					case "gridview":
+					case "GuiLabel":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+						var custname_split = eachScrapedAction.custname.split('_');
+						if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						break;
+					case "GuiStatusbar":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
+						break;
+					case "GuiTab":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
+						break;
+					case "select":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
+						break;
+					case "GuiMenubar":
+					case "GuiMenu":
+						testcaseObj = getTestcaseStep(step,null,'@Sap','SelectMenu',[menu_input],null,null,"SAP");
+						break;
+					case "GuiSimpleContainer":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
+						break;
+					case "radiobutton":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
+						break;
+					case "checkbox":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
+						break;
+					case "tree":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
+						break;
+					case "picture":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
+						break;
+					case "text":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
+						break;
+					case "GuiModalWindow":
+					case "GuiDialogShell":
+						if(eachScrapedAction.command[0][1]=='close'){
+							testcaseObj = getTestcaseStep(step,null,'@Sap','closedialogwindow',null,null,null,"SAP");
+						}
+						break;
+					default:
+						if(eachScrapedAction.command[0][1]=='sendVKey'){
+							key=eachScrapedAction.command[0][2]
+							keycode_map = {
+								'1': 'F1', '2': 'F2', '3': 'F3', '4': 'F4', '5': 'F5', '6': 'F6', '7': 'F7', '8': 'F8', '9': 'F9', '10': 'F10', '11': 'ctrl+s', '12': 'f12', '13': 'shift+f1',
+								'14': 'shift+f2', '15': 'shift+f3', '16': 'shift+f4', '17': 'shift+f5', '18': 'shift+f6', '19': 'shift+f7', '20': 'shift+f8', '21': 'shift+f9',
+								'22': 'shift+ctrl+0', '23': 'shift+f11', '24': 'shift+f12', '25': 'ctrl+f1', '26': 'ctrl+f2', '27': 'ctrl+f3', '28': 'ctrl+f4', '29': 'ctrl+f5',
+								'30': 'ctrl+f6', '31': 'ctrl+f7', '32': 'ctrl+f8', '33': 'ctrl+f9', '34': 'ctrl+f10', '35': 'ctrl+f11', '36': 'ctrl+f12', '37': 'ctrl+shift+f1',
+								'38': 'ctrl+shift+f2', '39': 'ctrl+shift+f3', '40': 'ctrl+shift+f4', '41': 'ctrl+shift+f5', '42': 'ctrl+shift+f6', '43': 'ctrl+shift+f7', '44': 'ctrl+shift+f8',
+								'45': 'ctrl+shift+f9', '46': 'ctrl+shift+f10', '47': 'ctrl+shift+f11', '48': 'ctrl+shift+f12', '70': 'ctrl+e', '71': 'ctrl+f', '72': 'ctrl+/', '73': 'ctrl+\ ',
+								'74': 'ctrl+n', '75': 'ctrl+o', '76': 'ctrl+x', '77': 'ctrl+c', '78': 'ctrl+v', '79': 'ctrl+z', '80': 'ctrl+pageup', '81': 'pageup', '82': 'pagedown', '83': 'ctrl+pagedown',
+								'84': 'ctrl+g', '85': 'ctrl+r', '86': 'ctrl+p'
+							}
+							testcaseObj = getTestcaseStep(step,null,'@Generic','sendFunctionKeys',keycode_map[key],null,null,"SAP");
+						} else {
+							logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
+						}
+						break;
+				}
+				if(testcaseObj){
+					testCaseSteps.push(testcaseObj);
+					step++;
+					menu_count=step;
+				}
+			} else{
+				menu_count++;
 			}
 		}
 		//maping OEBS objects
