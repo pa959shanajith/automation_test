@@ -1089,11 +1089,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								ob.hiddentag = "No",
 									tag = "iris;" + ob.objectType,
 									ob.url = "",
-									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectText
+									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
                                 if(ob.hasOwnProperty('editable')){
-                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
+                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
                                 }else{
-                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     }
 							}else{
                                 if(ob.hasOwnProperty('editable')){
@@ -2363,7 +2363,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 										irisFlg = true
 									}
 									if (irisFlg){
-										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									}
 									else if (appType == "OEBS" || appType == "Desktop") {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -2417,28 +2417,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								} else imgTag = tag;
 								// if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
 								//	 var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-								// } else {
-								if (ob.cord && ob.cord != '') {  //in case of iris object
-									addcusOb = ""
-									ob.hiddentag = "No",
-										tag = "iris;" + ob.objectType,
-										ob.url = "",
-										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
-								}
-								// }
-								// }
+								// } 
 								irisFlg = false;
 								if (ob.cord && ob.cord != '') {  //in case of iris object
 									addcusOb = ""
-									console.log(ob.cord)
 									ob.hiddentag = "No",
 									tag = "iris;" + ob.objectType,
 									ob.url = "",
-									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectText,
+									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag,
 									irisFlg = true
 								}
 								if (irisFlg){
-									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 								}
 								else if (appType == "OEBS" || appType == "Desktop") {
 									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -2560,7 +2550,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				.then(function (val) {
 					$("#dialog-irisObject").find("button.close").click();
 					if(val === 'success'){
-						openDialog("Iris Object Type","Submitted Successfully.");
+						openDialog("Iris Object Details","Submitted Successfully.");
 						for(var i=0;i<viewString.view.length;i++){
 							if(viewString.view[i].xpath == obj_xpath){
 								viewString.view[i].objectType = user_obj_type;
@@ -2568,9 +2558,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							}
 						}
 					}
-					else if(val=='unsavedObject') openDialog("Iris Object Type","Please save the object first.");
+					else if(val=='unsavedObject') openDialog("Iris Object Details","Please save the object first.");
 					else{
-						openDialog("Iris Object Type","Failed to updated Iris Object Type.");
+						openDialog("Iris Object Details","Failed to updated Iris Object Details.");
 					}
 				}, function (error) {
 					
@@ -2578,7 +2568,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 		else{
 			$("#dialog-irisObject").find("button.close").click();
-			openDialog("Iris Object Type","Submitted Successfully.");
+			openDialog("Iris Object Details","Submitted Successfully.");
 		}
 	}
 	
@@ -2634,6 +2624,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		$('.errorMessage').val('');
 		if(ele[0].attributes["data-xpath"].value.startsWith('iris')){
 			obj_xpath = ele[0].attributes['data-xpath'].value;
+			obj_tag = obj_xpath.split(";").pop();
 			obj_text = ele[0].attributes['data-text'].value;
 			if (obj_text=='') obj_text="Undefined";
 			obj_height = ele[0].attributes['data-height'].value;
@@ -2647,15 +2638,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			}
 			img = ele[0].attributes["data-image"].value
 			image.src = 'data:image/png;base64,'+img;
-			// var canvas = document.createElement('canvas');
-			// var ctx = canvas.getContext('2d');
-			// canvas.width=300
-			// canvas.height =234
-			// ctx.drawImage(image,0,0,300,234)
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><div class="irisimg" id="irisimg" style="float:right;margin-right:40px;width:210px;height:150px"></div><br><br><div class="iristext" id="iristext"></div><br><div class="irispos" id="irispos"></div><br><div class="iriscoords" id="iriscoords"></div></div>');
+			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><div class="irisimg" id="irisimg" style="float:right;margin-right:40px;width:210px;height:150px"></div><br><br><div class="iristext" id="iristext"></div><br><div class="iristag" id="iristag"></div></div>');
 			$('#objectType').val(objType.toLowerCase())
 			$('#irisimg').append(image)
 			if (obj_width > 200 || obj_height >150){ 
@@ -2665,9 +2651,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 $('#irisimg').find('img').attr('style',"width:"+wd)
             }
 			// $('#irisimg').append(canvas)
-			$('#iristext').append('<span><b>Object Text : '+obj_text+' </b></span>')
-			$('#irispos').append('<span><b>Object Height :'+obj_height+ ' px, Object Width :'+obj_width+' px</b></span>')
-			$('#iriscoords').append('<span><b>Object Coordinate-X :' + ele[0].attributes['data-left'].value + ' px, Object Coordinate-Y :'+ele[0].attributes['data-top'].value + ' px </b></span>')
+			$('#iristext').append('<span><b>Object Text : '+obj_text.replace(/%27/g, "'") +' </b></span>')
+			$('#iristag').append('<span><b style="text-transform: capitalize;">Object Tag : ' + obj_tag + '</b></span>')
 		}else{
 			custObjProps=[]
 			custObjProps.push('decrypt')
