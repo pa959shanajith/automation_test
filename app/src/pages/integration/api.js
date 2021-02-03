@@ -283,10 +283,10 @@ export const saveQcDetails_ICE = async(mappedDetails) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'Map Test Cases Before save'}
+        return {error:'Map Testcases Before save'}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Save Mapped TestCases'}
+        return {error:'Failed to Save Mapped Testcases'}
     }
 }
 /*Component viewQtestMappedList_ICE

@@ -10,7 +10,6 @@ import '../styles/IntegrationHome.scss'
 //Integration Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 
 const  Integrations=()=>{
-    // const [screenType , setScreenType] = useState("encryption");
     const [qTestClicked , setqTestClicked] = useState(false);
     const [almClicked , setAlmClicked] = useState(false);
     const [popUpEnable , setPopUpEnable] = useState(false);
@@ -32,12 +31,16 @@ const  Integrations=()=>{
                     qTestClicked={qTestClicked}
                     almClicked={almClicked}
                 />
-                {almClicked ?
-                    <ALMCenter
+                {almClicked?
+                <ALMCenter
                     setloginAlm={setloginAlm}
-                    loginAlm={loginAlm}/>
-                    :
-                    <IntegrationCenter
+                    loginAlm={loginAlm}
+                    viewmappedFiles={viewmappedFiles}
+                    setViewMappedFiles={setViewMappedFiles}
+                    almClicked={almClicked}
+                    setAlmClicked={setAlmClicked}
+                /> :
+                <IntegrationCenter
                     qTestClicked={qTestClicked}
                     setqTestClicked={setqTestClicked}
                     popUpEnable={popUpEnable}
@@ -47,8 +50,7 @@ const  Integrations=()=>{
                     setViewMappedFiles={setViewMappedFiles}
                     setAlmClicked={setAlmClicked}
                     almClicked={almClicked}
-                    />
-                }
+                />}
                 <Rightbar />
             </div>    
             <div className="integration_Footer"><Footer/></div>
