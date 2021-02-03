@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const logger = require('../../logger');
 const myserver = require('../../server');
-const cache = require('./cache');
+const cache = require('./cache').getClient();
 const redisServer = require('./redisSocketHandler');
 const taskflow = require('../config/options').strictTaskWorkflow;
 const epurl = process.env.DAS_URL;
@@ -105,6 +105,9 @@ module.exports.cloneSession = async (req) => {
 };
 
 module.exports.isSessionActive = function (req){
+	/* Session validation is now handled by passport middleware. 
+	   This function is retained until all serives are updated. */
+	return true;
 	var sessionToken = (req.session)? req.session.uniqueId:undefined;
 	var sessionCheck = (sessionToken!==undefined) && (req.sessionID==sessionToken);
 	var cookies = req.signedCookies;

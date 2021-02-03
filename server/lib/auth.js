@@ -193,10 +193,16 @@ module.exports = () => {
 		if (sessFlag && cookieFlag) return true;
 		return false;
 	};
-	passport.protect = (req, res, next) => {
-		if (passport.verifySession(req)) return next();
+	passport.protect = async (req, res, next) => {
+		if (passport.verifySession(req)) {
+			const allow = await userAccess(req);
+			if (allow) return next();
+			else return res.send("Invalid Session");
+			// else return res.status(403).send("Invalid Session");
+		}
 		if (new Negotiator(req).mediaType() === 'text/html') return res.redirect(options.route.login);
 		else return res.send("Invalid Session");
+		// else return res.status(401).send("Invalid Session");
 	};
 	authRouter.use(passport.initialize({ userProperty: "user" }));
 	authRouter.use(passport.session());
@@ -209,6 +215,30 @@ module.exports = () => {
 		router: authRouter
 	};
 };
+
+const userAccess = async req => {
+	const roleid = req.session.activeRoleId || "blank";
+	// if (!roleid) return true;
+	const servicename = req.url.replace("/", "");
+	const updateinp = { roleid, servicename };
+	try {
+		const allowed = await utils.fetchData(updateinp, "utility/userAccess", "userAccess");
+		if (allowed == "off") {
+			res.status(500).send("fail");
+			// httpsServer.close();
+			logger.error("License Expired!!");
+			logger.error("Please run the Service API and Restart the Server");
+		} else if (allowed == "fail") return false;
+		else if (allowed === true) return true;
+		else {
+			req.clearSession();
+			return false;
+		}
+	} catch (e) {
+		logger.error("Error occured in userAccess");
+		return false;
+	}
+}
 
 const registerAuthStrategy = async (opts) => {
 	const fnName = "registerAuthStrategy";

@@ -110,11 +110,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					//Building object for each row after getting the data from server
 					for (var k = 0; k < rowData.scenarioids.length; k++) {
 						let accessibilityTesting = "Disable";
-						if(rowData.scenarioids[k] in rowData['accessibilityTestingMap'] && rowData['accessibilityTestingMap'][rowData.scenarioids[k]] == "Enable" ){
+						if (rowData.accessibilityTestingMap && (rowData.scenarioids[k] in rowData.accessibilityTestingMap) && (rowData.accessibilityTestingMap[rowData.scenarioids[k]] == "Enable")){
 							accessibilityTesting = "Enable"
 						}
 						if (current_task.scenarioFlag == 'True') {
-							
 							if (rowData.scenarioids[k] == assignedTestScenarioId) {
 								getEachScenario.push({
 									"condition": rowData.condition[k],
