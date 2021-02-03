@@ -277,7 +277,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 		$scope.newpassword = "";
 		$scope.confpassword = "";
 		$scope.passwordValidation = "";
-		$(".fpusername, .fpnewpass, .fpconfpass").parent().removeClass("input-border-error");
+		$(".fpcurrpass, .fpnewpass, .fpconfpass").parent().removeClass("input-border-error");
 	};
 
 	$scope.changePwd = function(){
@@ -290,9 +290,6 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 		if (!currpassword) {
 			$(".fpcurrpass").parent().addClass("input-border-error");
 			$scope.passwordValidation = "Current Password field is empty.";
-		} else if (!regexPassword.test(currpassword)) {
-			$(".fpcurrpass").parent().addClass("input-border-error");
-			$scope.passwordValidation = "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..";
 		} else if (!newpassword) {
 			$(".fpnewpass").parent().addClass("input-border-error");
 			$scope.passwordValidation = "New Password field is empty.";
@@ -302,10 +299,13 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 		} else if (!confpassword) {
 			$(".fpconfpass").parent().addClass("input-border-error");
 			$scope.passwordValidation = "Confirm Password field is empty.";
-		} else if (newpassword != confpassword) {
-			$(".fpconfpass").parent().addClass("input-border-error");
+		} else if (currpassword == newpassword) {
+			$(".fpcurrpass, .fpnewpass, .fpconfpass").parent().addClass("input-border-error");
+			$scope.passwordValidation = "Current Password and New Password should not be same";
+		}  else if (newpassword != confpassword) {
+			$(".fpnewpass, .fpconfpass").parent().addClass("input-border-error");
 			$scope.passwordValidation = "New Password and Confirm Password do not match";
-		} else {
+		}  else {
 			LoginService.changePassword($scope.ud.userName,currpassword,newpassword)
 			.then(function (data) {
 				if(data == "Invalid Session"){

@@ -2798,11 +2798,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (parseInt(data[2])) errfields.push("User Name");
 				if (parseInt(data[3])) errfields.push("First Name");
 				if (parseInt(data[4])) errfields.push("Last Name");
-				if (parseInt(data[5])) errfields.push("Password");
 				if (parseInt(data[6])) errfields.push("Email");
 				if (parseInt(data[7])) errfields.push("Authentication Server");
 				if (parseInt(data[8])) errfields.push("User Domain Name");
 				openModalPopup(bAction+" User", "Following values are invalid: "+errfields.join(", "));
+				if (parseInt(data[5])) {
+					openModalPopup(bAction+" User", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
+				}
 				if (parseInt(data[9])) {
 					openModalPopup(bAction+" User", "Failed to "+action+" user");
 				}

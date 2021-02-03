@@ -114,7 +114,7 @@ module.exports.isSessionActive = function (req){
 };
 
 module.exports.generateDefPassword = function () {
-	let passwordtemp = new randexp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,10}$/).gen();
+	let passwordtemp = new randexp(/^([A-Z][a-z][0-9][!#$%&,:;<>@_~])(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!*#$%&@_^])[A-Za-z\d!*#$%&@_^]{4,6}$/).gen();
 	return passwordtemp;
 }
 
