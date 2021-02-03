@@ -4,7 +4,7 @@ import {findByTestAtrr,checkProps} from '../../../setupTests';
 import LoginFields,{handleShowPass}  from '../components/LoginFields';
 import { SetProgressBar as SPB} from '../../global';
 import * as api from '../api'
-import { deleteNode } from '../../mindmap/containers/MindmapUtils';
+
 
 
 const setUp=()=>{
