@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
-import { mappingList } from  './ListVariables';
+import { tagList } from  './ListVariables';
 import { updateScreen_ICE } from '../api';
 import "../styles/MapObjectModal.scss";
 
@@ -21,8 +21,8 @@ const MapObjectModal = props => {
         let tempNonCustom = [];
         if (props.scrapeItems.length) {
             props.scrapeItems.forEach(object => {
-                let elementType = object.title.split('_').pop();
-                elementType = mappingList[elementType] === undefined ? 'elmnt' : elementType;
+                let elementType = object.tag;
+                elementType = tagList.includes(elementType) ? elementType : 'Element';
                 if (!object.objId) {}
                 else if (object.isCustom) {
                     if (tempCustomList[elementType]) tempCustomList[elementType] = [...tempCustomList[elementType], object];
@@ -75,6 +75,11 @@ const MapObjectModal = props => {
 
     const submitMap = () => {
 
+        if (!Object.keys(map).length) {
+            setErrorMsg("Please select atleast one object to Map");
+            return;
+        }
+
         let { screenId, screenName, projectId, appType, versionnumber } = props.current_task;
         
         let arg = {
@@ -100,11 +105,21 @@ const MapObjectModal = props => {
             if (response === "Invalid Session") return RedirectPage(props.history);
             else props.fetchScrapeData()
                     .then(resp => {
-                        if (resp === "success") props.setShow(false);
+                        if (resp === "success") {
+                            props.setShow(false);
+                            props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Successfully!'})
+                        }
+                        else props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
                     })
-                    .catch(err => console.err(err));
+                    .catch(err => {
+                        props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+                        console.err(err);
+                    });
         })
-        .catch(error => console.error(error))
+        .catch(error => {
+            props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+            console.err(error);
+        })
     }
 
     const onCustomClick = (showName, id) => {
@@ -132,7 +147,7 @@ const MapObjectModal = props => {
                                     <div className="mo_listCanvas">
                                         <div className="mo_listMinHeight">
                                             <div className="mo_listContent" id="moListId">
-                                            <ScrollBar scrollId="moListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                                            <ScrollBar scrollId="moListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                             <>
                                             { (()=> selectedTag ? scrapedList[selectedTag] : nonCustomList)()
                                             .map(object => {
@@ -159,7 +174,7 @@ const MapObjectModal = props => {
                                 <div className="ss__mo_customInContainer">
                                 { Object.keys(customList).map(elementType => (
                                     <>
-                                    <div className="mo_tagHead" onClick={()=>setSelectedTag(elementType === selectedTag ? "" : elementType )}>{mappingList[elementType].value}</div>
+                                    <div className="mo_tagHead" onClick={()=>setSelectedTag(elementType === selectedTag ? "" : elementType )}>{elementType}</div>
                                     { selectedTag === elementType && <div className="mo_tagItemList"> 
                                         {customList[selectedTag].map(object => <div className={"mo_tagItems"+(selectedItems.includes(object.val) ? " mo_selectedTag" : "")} onDragOver={onDragOver} onDrop={(e)=>onDrop(e, object)}>
                                             { object.val in map ?
@@ -187,7 +202,7 @@ const MapObjectModal = props => {
                 }
                 close={()=>props.setShow(false)}
                 footer={<>
-                    { errorMsg && <span>{errorMsg}</span>}
+                    { errorMsg && <span className="mo_errorMsg">{errorMsg}</span>}
                     <button onClick={onShowAllObjects}>Show All Objects</button>
                     <button onClick={onUnlink} disabled={!selectedItems.length}>Un-Link</button>
                     <button onClick={submitMap}>Submit</button>

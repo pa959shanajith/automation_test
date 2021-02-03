@@ -32,7 +32,6 @@ const ScrollBar = (props) => {
                     opacity: 1!important;
                     left: 0;
                     right: 0;
-                    ${props.minThumbSize ? `min-height: ${props.minThumbSize};` : ''}
                     width: ${props.verticalbarWidth?props.verticalbarWidth:'6px'}!important;
                     background:${props.thumbColor?props.thumbColor:'#000'}!important;
                 }
@@ -55,7 +54,7 @@ const ScrollBar = (props) => {
                 }
                 `}
             </style> 
-            <PerfectScrollbar style={{maxHeight:'inherit',height:'inherit'}}>
+            <PerfectScrollbar options={{suppressScrollX:props.hideXbar, useBothWheelAxes:false}} style={{maxHeight:'inherit',height:'inherit'}}>
                 {props.children}
             </PerfectScrollbar>
         </Fragment>
