@@ -16,7 +16,7 @@ var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = [];
 window.localStorage['selectRowStepNo'] = '';
 window.localStorage['_modified'] = "";
-var getWSTemplateData = {} //Contains Webservice saved data
+// var getWSTemplateData = {} //Contains Webservice saved data
 var appType, projectId, projectDetails, screenName, testCaseName, subTaskType, subTask, draggedEle, getDraggedEle, allTasks;
 var updatedViewString = {};
 var allScreenNames = [];
@@ -1221,15 +1221,28 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$scope.showWsdlRequest = function () {
 		$(".wsdlRqstWrap").show();
 		$(".wsdlRspnsWrap").hide();
+		$(".wsdlParamWrap").hide();
 		$("#showWsdlRequest").addClass("wsButtonActive")
+		$("#showWsdlResponse").removeClass("wsButtonActive")
+		$("#showParams").removeClass("wsButtonActive")
+	}
+
+	$scope.showParams = function () {
+		$(".wsdlParamWrap").show();
+		$(".wsdlRspnsWrap").hide();
+		$(".wsdlRqstWrap").hide();
+		$("#showParams").addClass("wsButtonActive")
+		$("#showWsdlRequest").removeClass("wsButtonActive")
 		$("#showWsdlResponse").removeClass("wsButtonActive")
 	}
 
 	$scope.showWsdlResponse = function () {
 		$(".wsdlRspnsWrap").show();
 		$(".wsdlRqstWrap").hide();
+		$(".wsdlParamWrap").hide();
 		$("#showWsdlResponse").addClass("wsButtonActive")
 		$("#showWsdlRequest").removeClass("wsButtonActive")
+		$("#showParams").removeClass("wsButtonActive")
 	}
 
 	$scope.getWSData = function () {
@@ -1264,6 +1277,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("#wsdlOperation").val(data.operations)
 						//Printing Request Data
 						$("#wsdlRequestHeader").val(data.header.split("##").join("\n"));
+						$("#wsdlRequestParam").val(data.param.split("##").join("\n"));
 						if (data.body.indexOf("{") == 0 || data.body.indexOf("[") == 0) {
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
@@ -1299,7 +1313,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$(".saveWS").prop("disabled", true);
 						$("#enbledWS").prop("disabled", false)
 						$(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")
-						$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").prop("disabled", true)
+						$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestParam, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").prop("disabled", true)
 					} else {
 						$(".saveWS").prop("disabled", false);
 						$("#enbledWS").prop("disabled", true)
@@ -1336,6 +1350,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var wsdlMethods = $("#wsdlMethods option:selected").val();
 		var wsdlOperation = $("#wsdlOperation").val();
 		var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+		var wsdlRequestParam = $("#wsdlRequestParam").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"');
 		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		var wsdlResponseHeader = $("#wsdlResponseHeader").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"');
 		var wsdlResponseBody = $("#wsdlResponseBody").val().replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
@@ -1350,17 +1365,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				"responseBody": wsdlResponseBody,
 				"method": wsdlMethods,
 				"endPointURL": endPointURL,
-				"header": wsdlRequestHeader
+				"header": wsdlRequestHeader,
+				"param": wsdlRequestParam
 			};
 			var appType = $scope.getScreenView;
-			getWSTemplateData = JSON.stringify(getWSData)
 			var projectId = tasks.projectId;
 			var screenId = tasks.screenId;
 			var screenName = tasks.screenName;
 			var userinfo = JSON.parse(window.localStorage['_UI']);
 			scrapeObject = {};
 			scrapeObject.param = 'updateScrapeData_ICE';
-			scrapeObject.getScrapeData = getWSTemplateData;
+			scrapeObject.getScrapeData = JSON.stringify(getWSData);
 			scrapeObject.projectId = projectId;
 			scrapeObject.appType = appType;
 			scrapeObject.screenId = screenId;
@@ -1394,7 +1409,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$(document).on("click", "#enbledWS", function () {
 		if ($(this).is(":checked") == true) {
 			$(".saveWS").prop("disabled", false)
-			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
+			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestParam, #wsdlRequestBody").prop("disabled", false)
 			//Additional to enable the web service icon
 			$.each($(this).parents("ul").children("li"), function () {
 				if ($(this).find("a").hasClass("disableActionsWS") == true) {
@@ -1404,13 +1419,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			//Additional to enable the web service icon
 		} else {
 			$(".saveWS").prop("disabled", true)
-			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", true)
+			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestParam, #wsdlRequestBody").prop("disabled", true)
 		}
 	})
 
 	//Init Webservice
 	$scope.initScrapeWS = function (e) {
-		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader, #wsdlOperation, #wsdlRequestBody").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
+		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader, #wsdlRequestParam, #wsdlOperation, #wsdlRequestBody").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
 		var initWSJson = {}
 		var testCaseWS = []
 		var proceed = false;
@@ -1422,6 +1437,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		wsdlInputs.push($("#wsdlMethods").val());
 		wsdlInputs.push($("#wsdlOperation").val());
 		wsdlInputs.push($("#wsdlRequestHeader").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
+		wsdlInputs.push($("#wsdlRequestParam").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
 		wsdlInputs.push($("#wsdlRequestBody").val().replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"'));
 		var cert_data =$("#importCertificate").val();
 		if (cert_data.length!=0){
@@ -1439,7 +1455,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		if (e.currentTarget.className == "disableActionsWS") return false
 		else if (!wsdlInputs[0]) $("#endPointURL").addClass("inputErrorBorderFull")
 		else if (!$scope.wsdlMethods && !wsdlInputs[1]) $("#wsdlMethods").addClass("selectErrorBorder")
-		else if (wsdlInputs[5]){
+		else if (wsdlInputs[6]){
 			auth_cert = true;
 			proceed = true;
 		}
@@ -1448,10 +1464,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				if (wsdlInputs[3]) {
 					if (!wsdlInputs[2]) $("#wsdlOperation").addClass("inputErrorBorderFull")
 					else proceed = true;
-				} else proceed = true;
-			} else if (wsdlInputs[1] == "POST") {
+				}else proceed = true;
+			} 
+			else if (wsdlInputs[1] == "POST") {
 				if (!wsdlInputs[3]) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
-				else if (!wsdlInputs[4]) $("#wsdlRequestBody").addClass("inputErrorBorderFull")
+				else if (!wsdlInputs[5]) $("#wsdlRequestBody").addClass("inputErrorBorderFull")
 				else proceed = true;
 			}
 		}
@@ -1460,6 +1477,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody","addClientCertificate","setBasicAuth"]
 			}else{
 				keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"]
+			}
+			if (wsdlInputs[4]){
+				keywordVal.splice(4,0,'setParam');
 			}
 			var blockMsg = "Fetching Response Header & Body..."
 			blockUI(blockMsg);
@@ -1586,7 +1606,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$scope.wsdlAdd = function () {
 		var resutFile='';
 		if (Object.keys(certObj).length!==0) resutFile=certObj;
-		$("#endPointURL, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").val("");
+		$("#endPointURL, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestParam, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").val("");
 		$("#wsdlMethods").prop('selectedIndex', 0);
 		$("#wsldInput").removeClass("inputErrorBorderFull");
 		$("#wsldSelect").removeClass("selectErrorBorder");
@@ -1620,6 +1640,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("#wsdlOperation").val(data.operations)
 						//Printing Request Data
 						$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
+						$("#wsdlRequestParam").val(data.param[0].split("##").join("\n"));
 						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
