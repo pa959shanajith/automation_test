@@ -2359,7 +2359,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 										ob.hiddentag = "No",
 										tag = "iris;" + ob.objectType,
 										ob.url = "",
-										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag + ";" + ob.objectText,
+										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag,
 										irisFlg = true
 									}
 									if (irisFlg){
@@ -2641,7 +2641,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><div class="irisimg" id="irisimg" style="float:right;margin-right:40px;width:210px;height:150px"></div><br><br><div class="iristext" id="iristext"></div><br><div class="iristag" id="iristag"></div></div>');
+			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><div class="irisimg" id="irisimg" style="float:right;margin-right:40px;width:210px;height:150px"></div><br><br><br><div class="iristext" id="iristext"></div><br><div class="iristag" id="iristag"></div></div>');
 			$('#objectType').val(objType.toLowerCase())
 			$('#irisimg').append(image)
 			if (obj_width > 200 || obj_height >150){ 
