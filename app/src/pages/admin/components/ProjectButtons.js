@@ -175,6 +175,7 @@ const ProjectButtons = (props) => {
             }
             if (proceedFlag === false) {
                 setPopupState({show:true,title:"Update Project",content:"Please add atleast one cycle for release: " + relName});
+                setLoading(false);
                 return false;
             }
             if (proceedFlag === true) {
@@ -182,7 +183,7 @@ const ProjectButtons = (props) => {
 					updateProjectObj.newProjectDetails = props.newProjectDetails;
 				else
 					updateProjectObj.newProjectDetails.push(props.newProjectDetails);
-                if( updateProjectObj.projectName !== props.editProjectName && props.editProjectName !== ""){
+                if( updateProjectObj.projectName !== props.editProjectName && props.editProjectName !== "" && props.editProjectName!==false){
                     var requestedids = [];
                     var idtype = [];
                     requestedids.push(props.selDomain);

@@ -1,7 +1,8 @@
-import React, { useState} from 'react';
-import {ScreenOverlay, PopupMsg, ModalContainer , IntegrationDropDown} from '../../global' 
+import React, { useState, useEffect} from 'react';
+import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown} from '../../global' 
 import {updateTestSuite_ICE, reviewTask, ExecuteTestSuite_ICE} from '../api';
 import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import "../styles/ExecuteContent.scss";
 import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
@@ -125,8 +126,8 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
     
     const ExecuteTestSuitePopup = () => {
         const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction)
-        // if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
-        if(check) setAllocateICE(true);
+        const valid = checkSelectedModules(eachData, setPopupState);
+        if(check && valid) setAllocateICE(true);
     }    
 
     const ExecuteTestSuite = async (executionData) => {
@@ -141,19 +142,15 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
         setExecutionActive(true);
-        // $rootScope.resetSession.start();
-        // ResetSession("start");
+        ResetSession.start();
         try{
-            // setLoading(false);
-            // return //remove this after syncing with new changes
+            setLoading(false);
             const data = await ExecuteTestSuite_ICE(executionData);
             if (data.errorapi){displayError(data.errorapi);return;}
             if (data == "begin"){
-                setLoading(false); //remove this when socket connection is done.
                 return false;
             }
-            setLoading(false);
-            // $rootScope.resetSession.end();
+            ResetSession.end();
             setExecutionActive(false);
             if(data.status) {
                 if(data.status == "fail") {
@@ -168,7 +165,7 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
             setSyncScenario(false);
         }catch(error) {
             setLoading(false);
-            // $rootScope.resetSession.end();
+            ResetSession.end();
             setPopupState({show:true,title:"Execute Failed",content:"Failed to execute."});
             setExecutionActive(false);
             setBrowserTypeExe([]);
@@ -251,6 +248,20 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
         </>
     );
 }
+
+const checkSelectedModules = (data, setPopupState) => {
+    let pass = false;
+    data.map((rowData,m)=>{
+        const indeterminate = document.getElementById('parentExecute_"' + m).indeterminate;
+        const checked = document.getElementById('parentExecute_"' + m).checked;
+        if(indeterminate || checked){
+            pass = true;
+            return
+        } 
+    })
+    if (pass===false) setPopupState({show:true,title:"Execute Test Suite",content:"Please select atleast one scenario(s) to execute"});
+    return pass
+} 
 
 const SelectBrowserCheck = (appType,browserTypeExe,setPopupState,execAction)=>{
     if ((appType == "Web") && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});

@@ -138,13 +138,17 @@ const ProjectNew = (props) => {
     const resetForm = ()=>{
         setProjectDetails([]);
         setProjectName("");
-        setEditProjectName("");
+        setEditProjectName(false);
         setSelProjectId("");
         setprojectTypeSelected("");
         setReleaseList([]);
         setCycleList([]);
+        setSelProjectOptions([]);
         toggleCycleClick();
-        if (taskName==="Update Project") setSelDomain("");
+        if (taskName==="Update Project"){
+            setSelProject("");
+            setSelDomain("");
+        } 
         if(document.getElementById("selProjectOption") !== null)
             document.getElementById("selProjectOption").value="";
 	}
@@ -601,7 +605,9 @@ const ProjectNew = (props) => {
                 } else {
                     var chk = true;
                     for (var j = 0; j < newProjectDetails.length; j++) {
-                        if (newProjectDetails[j].name === relName && newProjectDetails[j].releaseId === RelID) {
+                        // if (newProjectDetails[j].name === relName && newProjectDetails[j].releaseId === RelID) {
+                        //check when cycle is added to new created release RelID is undefined (check not needed)
+                        if (newProjectDetails[j].name === relName ) {
                             createCyc.name = cycleName;
                             newProjectDetails[j].cycles.push(createCyc);
                             setNewProjectDetails(newProjectDetails);
@@ -704,7 +710,10 @@ const ProjectNew = (props) => {
             }    
             
             projectOptions.sort((a,b)=>a.name.localeCompare(b.name));
-            setSelProjectOptions(projectOptions)
+            setSelProjectOptions(projectOptions);
+            document.getElementById("selProjectOption").selectedIndex = "0";  
+            setEditProjectName(false);
+            setSelProject("")
             clearUpdateProjectObjects();
         }    
     }
@@ -742,6 +751,7 @@ const ProjectNew = (props) => {
         setReleaseList(RelaseNames);
         setCycleList(cycleNames)
         setActiveRelease(RelaseNames[0]);
+        setDisableAddCycle(false);
         clearUpdateProjectObjects();
     }
 
@@ -756,7 +766,7 @@ const ProjectNew = (props) => {
     const editModalButtons = () =>{
         return(
             <div>
-                <button type="button" onClick={()=>{setShowProjectEditModal(false);}} className="btn-md adminBtn modal-btn">Save</button>
+                <button type="button" onClick={()=>{setShowProjectEditModal(false);}} >Save</button>
             </div>
         )
     } 
@@ -814,7 +824,7 @@ const ProjectNew = (props) => {
             </div>
             }
             <div className='userForm-project adminControl-project display-project'>
-                {editProjectName!==selProject && editProjectName!=="" && showProjectEditModal===false? 
+                {editProjectName!==selProject && editProjectName!=="" && editProjectName!==false && showProjectEditModal===false? 
                 <div className='edit-project__label'>New Project Name : {editProjectName}. Please click on Update.</div>:null}
             </div>
             
@@ -847,7 +857,7 @@ const ModalContainerMiddleContent = (modalInputErrorBorder,Txt,setTxt, placehold
 const ModalButtonsFooter = (saveAction) =>{
     return(
         <div>
-            <button type="button" onClick={()=>{saveAction();}} className="btn-md adminBtn modal-btn">Save</button>
+            <button type="button" onClick={()=>{saveAction();}} >Save</button>
         </div>
     )
 } 

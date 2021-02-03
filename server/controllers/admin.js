@@ -74,7 +74,8 @@ exports.manageUserDetails = async (req, res) => {
 			if (inputs.auth.password != '') {
 				const salt = bcrypt.genSaltSync(10);
 				inputs.auth.password = bcrypt.hashSync(inputs.auth.password, salt);
-			} else delete inputs.auth.password;
+			}
+			// else delete inputs.auth.password;
 			inputs.firstname = (reqData.firstname || "").trim();
 			inputs.lastname = (reqData.lastname || "").trim();
 			inputs.email = (reqData.email || "").trim();
