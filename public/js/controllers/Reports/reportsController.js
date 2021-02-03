@@ -486,7 +486,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $(".mid-report-section").hide();
 
         $('#middle-content-section').attr('class', "webCrawler-report");
-        proxy = "Disabled";
+        var proxy = "Disabled";
         $("#report-header").append('<div width="100%" height="100%" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Accessibility Report</label></div><div style="display: flex;"><div style="width:50%;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+ report.screenname + '</span></div><div><label class="webCrawler-report-label">' + "Agent" + '</label><span class="webCrawler-report-span" style="text-transform: capitalize;">'+ report.agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">0</span></div></div><div style="width:50%;"></div></div>')
         var body = document.getElementById('report-canvas');
         var reportDiv = document.createElement('div');
