@@ -522,7 +522,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 msg = "Scenario execution failed due to an error encountered during execution";
             }
             const tsuIds = batchExecutionData.batchInfo.map(u => u.testsuiteId);
-            const currExecIds = await generateExecutionIds(execIds, tsuIds, userInfo.userid);
+            const currExecIds = await suite.generateExecutionIds(execIds, tsuIds, userInfo.userid);
             if (currExecIds != "fail") {
                 const batchObj = {
                     "executionIds": tsuIds.map(i => currExecIds.execids[i]),
