@@ -1277,13 +1277,13 @@ input[disabled]{
 }
 
 .endPointURL {
-    width: 35%;
+    width: 32%;
     margin-top: 6px;
     margin-left: 8px;
 }
 
 .wsdlMethods {
-	width: 13%;
+	width: 120px;
     margin: 0 10px;
     margin-top: 6px;
 }
@@ -1690,7 +1690,7 @@ input[disabled]{
 	height:100%;
 }
 
-.wsdlRqstWrap, .wsdlRspnsWrap{
+.wsdlRqstWrap, .wsdlRspnsWrap, .wsdlParamWrap{
     display: none;
 }
 
@@ -4331,10 +4331,6 @@ select:focus{
 .scenariostatusreportselect{
 	background-color: #e3caff
 }
-.screen_report{cursor: pointer;}
-.screen_report{
-	background-color: #e3caff
-}
 .popupWrapRow{
 	display: block;
 	width:100%;
@@ -4780,9 +4776,6 @@ select:-webkit-autofill:focus {
 	}
 	.ApptypeScreenView{
 		min-height: 50% !important;
-	}
-	.endPointURL{
-		width: 37%
 	}
 	.wsdlTextAreaBody{
 		height: 56%;
@@ -5514,16 +5507,6 @@ Webocular report css
   }
 .webCrawler-report-span{
     font-size: 14px;
-}
-.webCrawler-toggle-btn{
-    height: fit-content;
-    width: fit-content;
-    background: #331d4e;
-    font-size: 12px;
-    padding: 0px 6px;
-    color: #f5f5f5;
-    border-radius: 20px;
-    font-family: inherit;
 }
 .webCrawler-report-label{
     padding: 2px 30px;
