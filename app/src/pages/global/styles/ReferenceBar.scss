@@ -13,13 +13,27 @@
 }
 
 .screenshot_pop{
-    width: 490px!important;
-    height: 302px!important;
+    width: 500px!important;
+}
+
+.scrsht_outerContainer{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    height: 100%;
+    padding: 5px;
+}
+
+.ss_scrsht_insideScroll{
+    flex: 1 1;
+    overflow: auto;
+    // margin-right: 10px;
 }
 
 .screenshot_pop__content{
-    padding: 5px;
-    height: 95%;
+    // position: relative;
+    // height: 95%;
+    overflow: auto;
 }
 
 .screenshot_img{

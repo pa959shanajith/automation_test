@@ -1,4 +1,4 @@
-.ab{
+.sc__ab{
     position: absolute;
     top: 0;
     bottom: 0;
@@ -7,10 +7,10 @@
     display: flex;
     flex-direction: column;
 }
-.min{
+.sc__min{
     min-height: 0;
 }
-.con{
+.sc__con{
     display: flex;
     flex-direction: column;
     flex: 1 1;

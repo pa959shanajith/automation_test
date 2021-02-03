@@ -6,7 +6,8 @@ const initialState = {
     disableAppend: false,
     compareFlag: false,
     compareData: {},
-    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []}
+    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
+    objValue: null,
 }
 
 const reducer = (state=initialState, action) => {
@@ -35,6 +36,10 @@ const reducer = (state=initialState, action) => {
                 return {
                     ...state, compareObj: action.payload
                 }
+        case actionTypes.SET_OBJVAL:
+            return {
+                ...state, objValue: action.payload
+            }
         default:
             return state
     }

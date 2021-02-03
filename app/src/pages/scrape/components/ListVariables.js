@@ -62,15 +62,4 @@ export const objectTypes = [
     {value: "Element", typeOfElement: "elmnt", name: "Element"}
 ];
 
-export const mappingList = {
-    'lnk': { value: 'a', name: 'Link'},
-    'txtbox': { value: 'input', name: 'Textbox/Textarea'},
-    'tbl': { value: 'table', name: 'Table'},
-    'lst': { value: 'list', name: 'List'},
-    'select': { value: 'select', name: 'Dropdown'},
-    'img': { value: 'img', name: 'Image'},
-    'btn': { value: 'button', name: 'Button'},
-    'radiobtn': { value: 'radiobutton', name: 'Radiobutton'},
-    'chkbox': { value: 'checkbox', name: 'Checkbox'},
-    'elmnt': { value: 'Element', name: 'Element'}
-}
+export const tagList = ['a', 'input', 'table', 'list', 'select', 'img', 'button', 'radiobutton', 'checkbox', 'Element']

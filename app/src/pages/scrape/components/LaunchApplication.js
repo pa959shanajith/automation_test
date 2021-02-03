@@ -29,7 +29,7 @@ const LaunchApplication = props => {
             processID: processID,
             method: selectedMethod
         }
-        if (!windowName || !processID) setError({windowName: !windowName, processID: !processID})
+        if (!windowName && !processID) setError({windowName: !windowName, processID: !processID})
         else {
             setError(false);
             props.appPop.startScrape(scrapeObject);

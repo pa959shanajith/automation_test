@@ -262,7 +262,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 <span className={"task-nav-item " + (activeTab==="review" && "active-tab")} onClick={onSelectReview}>To Review</span>
             </div>
             { notManager && <div className="task-overflow">
-                <ScrollBar thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" >
+                <ScrollBar thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                     <div className="task-content" id="plugin_page__list">
                         <TaskContents items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} cycleDict={dataDictState.cycleDict} taskJson={taskJson} />
                     </div>

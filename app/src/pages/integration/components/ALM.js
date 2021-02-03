@@ -2,7 +2,7 @@ import React,{Fragment, useState,useRef} from 'react';
 import {ScrollBar} from '../../global';
 import {loginQCServer_ICE,qcProjectDetails_ICE,qcFolderDetails_ICE,saveQcDetails_ICE,viewQcMappedList_ICE} from '../api.js';
 import { useSelector } from 'react-redux';
-import ViewMappedALM from '../components/ViewMappedALM.js';
+
 
 const ALM=(props)=>{
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
@@ -29,8 +29,7 @@ const ALM=(props)=>{
     const [filteredNames , setFilteredName]= useState(null);
     const [testSets , setTestSets]= useState([]);
     const [saveSucess , setSaveSucess]=useState(false);
-    const [mappedfilesRes , setMappedFilesRes] = useState([])
-    const [viewMappedFiles , setViewmappedFiles]= useState(false);
+    const [screenexit , setScreenExit]= useState(false);
     
 
     const callProjectDetails_ICE=async(e)=>{
@@ -99,32 +98,21 @@ const ALM=(props)=>{
     const callSaveButton =async()=>{ 
         props.setBlockui({show:true,content:'Saving...'})
         const response = await saveQcDetails_ICE(mappedDetails);
-        if(response.error){props.displayError(response.error);props.setBlockui({show:false});return;}
+        if(response.error){props.displayError("Save Mapped Testcase",response.error);props.setBlockui({show:false});return;}
         if ( response == "success"){
             props.setBlockui({show:false})
             setErrorPopUp(true);
-            props.displayError("Saved SuccesFully")
+            props.displayError("Save Mapped Testcase","Saved Succesfully");
             setSaveSucess(true);
             setSyncSuccess(false);
         }
         props.setBlockui({show:false})
     }
-    const callViewMappedFiles = async()=>{
-        props.setBlockui({show:true,content:'Saving...'})
-        setViewmappedFiles(true)
-        const userid = user_id;
-        const response = await viewQcMappedList_ICE(userid);
-        if(response.error){props.displayError(response.error);props.setBlockui({show:false});return;}
-        setMappedFilesRes(response);
-        props.setBlockui({show:false})
-    }
     const callExit=()=>{
-        props.setqTestClicked(false);
-        props.setFocus(null);
+        setScreenExit(true);
         setFolderDetails(null);
         setScenarioArr(null);
         //setLoginSucess(false);
-        props.setPopUpEnable(false);
         //setFailMsg(null);
         setReleaseDropdn("Select Release");
         //setDisableSave(true);
@@ -202,9 +190,8 @@ const ALM=(props)=>{
         //setDisableSave(true);
     
     }
-    console.log(mappedfilesRes);
     return(
-        viewMappedFiles ? <ViewMappedALM mappedfilesRes={mappedfilesRes}/> : 
+         !screenexit?
         <Fragment>
         <div className="page-taskName" >
             <span className="taskname">
@@ -213,8 +200,8 @@ const ALM=(props)=>{
         </div>
         <div className="sepr_Div">
             <button className="saveQcbtn" style={{marginLeft:"470px"}} onClick={()=>callSaveButton()}>Save</button> 
-            <button className="viewMapbtn" onClick={()=>callViewMappedFiles()}>View Mapped Files</button> 
-            <button className="saveQcbtn" onClick={()=>callExit()}>Exit</button>
+            <button className="viewMapbtn" onClick={()=>props.callViewMappedFiles()}>View Mapped Files</button> 
+            <button className="saveQcbtn" onClick={()=>{callExit();props.callExitcenter()}}>Exit</button>
         </div><br/>
         <div className="qcActionBtn">
         <label>ALM Tests</label>
@@ -357,7 +344,8 @@ const ALM=(props)=>{
             </div>
             
         </div>
-    </Fragment>)
+    </Fragment>
+    :null)
 }
     
 export default ALM;

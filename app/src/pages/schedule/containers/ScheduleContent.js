@@ -23,12 +23,21 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                                                     qtest: {url:"",username:"",password:"",qteststeps:""}, 
                                                     zephyr: {accountid:"",accesskey:"",secretkey:""}});
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
-    const [moduleSceduledate,setModuleSceduledate] = useState([])
+    const [moduleSceduledate,setModuleSceduledate] = useState({})
     const [sort,setSort] = useState(true)
+    const [scheDetails,setScheDetails] = useState(true)
 
     useEffect(()=>{
         getScheduledDetails()
     }, []);
+
+    useEffect(()=>{
+        setTimeout(() => {
+            console.log('Hello, World!');
+            getScheduledDetails();
+            setScheDetails(!scheDetails)
+        }, 100000);
+    }, [scheDetails]);
 
     const getScheduledDetails = async () => {
         try{
@@ -114,18 +123,15 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
     }
 
     const ScheduleTestSuitePopup = () => {
-        const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction)
-        // if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
-        if(check) setAllocateICE(true);
+        const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction);
+        const valid = checkSelectedModules(scheduleTableData, setPopupState);
+        if(check && valid) setAllocateICE(true);
     } 
 
     const ScheduleTestSuite = async (schedulePoolDetails) => {
         setAllocateICE(false);
-        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleSceduledate, scheduleTableData, current_task, appType, filter_data, moduleInfo);
-        
-        //add red error border instead of popup mssg
-        if(modul_Info.error !== undefined){
-            setPopupState({show:true,title:"Schedule Test Suite",content: modul_Info.message});
+        const modul_Info = parseLogicExecute(schedulePoolDetails, setModuleSceduledate, moduleSceduledate, scheduleTableData, current_task, appType, filter_data, moduleInfo, setPopupState);
+        if(!modul_Info){
             return
         }
         var executionData = {}
@@ -147,15 +153,11 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
         else if (data == "success" || data.includes("success")) {
             if (data.includes("Set"))  setPopupState({show:true,title:"Schedule Test Suite",content: data.replace('success', '')}); 
             else setPopupState({show:true,title:"Schedule Test Suite",content:"Successfully scheduled."});
-            // $(".ipformating").val(" ");
-            // $(".fc-datePicker").datepicker('clearDates');
-            // $(".fc-timePicker").prop('disabled', true).css('cursor', 'not-allowed').timepicker('clear');
+            updateDateTimeValues(scheduleTableData, setModuleSceduledate);
             getScheduledDetails();
         } else if (data == "few") {
             setPopupState({show:true,title:"Schedule Test Suite",content:"Failed to schedule few testsuites"});
-            // $(".ipformating").val(" ");
-            // $(".fc-datePicker").datepicker('clearDates');
-            // $(".fc-timePicker").prop('disabled', true).css('cursor', 'not-allowed').timepicker('clear');
+            updateDateTimeValues(scheduleTableData, setModuleSceduledate);
         } else if (data == "fail") {
             setPopupState({show:true,title:"Schedule Test Suite",content:"Failed to schedule few testsuites"});
         } else {
@@ -166,7 +168,6 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
         // $(".selectScheduleSuite, .selectToSched").prop("checked", false);
         setExecAction("serial");
         setBrowserTypeExe([]);
-        // $(".ipformating, .fc-datePicker, .fc-timePicker").prop("style", "border: none;");
     }
 
     const syncScenarioChange = (value) => {
@@ -317,6 +318,29 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
         </>
     );
 }
+const updateDateTimeValues = (scheduleTableData, setModuleSceduledate) => {
+    //setting module date and time props
+    let moduleSceduledateTime = {};
+    scheduleTableData.map((rowData)=>{
+        if(moduleSceduledateTime[rowData.testsuiteid] === undefined) {
+            moduleSceduledateTime[rowData.testsuiteid] = {
+                date:"",
+                time:"",
+                inputPropstime: {readOnly:"readonly" ,
+                    disabled : true,
+                    className:"fc-timePicker",
+                    placeholder: "Select Time"
+                },
+                inputPropsdate : {
+                    placeholder: "Select Date",
+                    readOnly:"readonly" ,
+                    className:"fc-datePicker"
+                }
+            };
+        }
+    })
+    setModuleSceduledate(moduleSceduledateTime);
+}
 
 const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,status,getScheduledDetails,setPopupState) => {
     if(cycleid===undefined) cycleid=""
@@ -370,8 +394,21 @@ const browImg = (brow, appType) => {
     else if (appType == "MobileWeb") return '/imgs/MobileWeb.png';
 }
 
+const checkSelectedModules = (scheduleTableData, setPopupState) => {
+    let pass = false;
+    scheduleTableData.map((rowData,m)=>{
+        const indeterminate = document.getElementById('selectScheduleSuite_' + m).indeterminate;
+        const checked = document.getElementById('selectScheduleSuite_' + m).checked;
+        if(indeterminate || checked){
+            pass = true;
+            return
+        } 
+    })
+    if (pass===false) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select atleast one scenario(s) to execute"});
+    return pass
+} 
 
-const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, current_task, appType, projectdata, moduleInfo) => {
+const parseLogicExecute = (schedulePoolDetails, setModuleSceduledate, moduleSceduledate, eachData, current_task, appType, projectdata, moduleInfo, setPopupState) => {
     for(var i =0 ;i<eachData.length;i++){
         var testsuiteDetails = current_task.testSuiteDetails[i];
         var suiteInfo = {};
@@ -410,33 +447,35 @@ const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, cur
         suiteInfo.iceList = iceList;
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
-                
-                if (moduleSceduledate[eachData[i].testsuiteid] !== undefined) {
-                    suiteInfo.date = moduleSceduledate[eachData[i].testsuiteid][0];
-                    suiteInfo.time = moduleSceduledate[eachData[i].testsuiteid][1];
-                    if (suiteInfo.date === "") {  // Check if schedule date is not empty
-                        // $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").prop("style", "border: 2px solid red;");
-                        return {error:"date empty", message:"Date not selected for "+eachData[i].testsuitename};
-                    }
-                    if (suiteInfo.time === "") {  // Check if schedule time is not empty
-                        // $(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style", "border: 2px solid red;");
-                        return {error:"time empty", message:"Time not selected for "+eachData[i].testsuitename};
-                    }
+                let doNotSchedule = false
+                let moduleSceduledatetime = {...moduleSceduledate};
+                moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-timePicker";
+                moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker";
+
+                suiteInfo.date = moduleSceduledate[eachData[i].testsuiteid]["date"];
+                suiteInfo.time = moduleSceduledate[eachData[i].testsuiteid]["time"];
+                if (suiteInfo.date === "") {  // Check if schedule date is not empty
+                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
+                    doNotSchedule = true;
                 }
-                else return {error:"time empty", message:"Time and Date not selected for "+eachData[i].testsuitename};
-                
+                else if (suiteInfo.time === "") {  // Check if schedule time is not empty
+                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
+                    doNotSchedule = true;
+                }
+                setModuleSceduledate(moduleSceduledatetime);
+                if(doNotSchedule) return false
+    
                 const sldate_2 = suiteInfo.date.split("-");
                 const sltime_2 = suiteInfo.time.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 suiteInfo.timestamp = timestamp.valueOf().toString();
                 const diff = (timestamp - new Date()) / 60000;
                 if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
-                    // if (diff < 0) $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").prop("style", "border: 2px solid red;");
-                    // $(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style", "border: 2px solid red;");
-                    // openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
-                    // doNotSchedule = true;
-                    // return false;
-                    return {error:"time empty", message:"Schedule time must be 5 mins more than current time for "+eachData[i].testsuitename};
+                    if (diff < 0) moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
+                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
+                    setPopupState({show:true,title:"Schedule Test Suite",content:"Schedule time must be 5 mins more than current time."});
+                    setModuleSceduledate(moduleSceduledatetime);
+                    return false
                 }
             } 
         }

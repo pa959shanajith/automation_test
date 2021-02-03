@@ -29,27 +29,27 @@ export const initScraping_ICE = screenViewObject => {
     });
 }
 
-// export const highlightScrapElement_ICE = (xpath, url, appType) => {
-//     return new Promise((resolve, reject)=> {
-//         axios(url+"/highlightScrapElement_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {"action": "highlightScrapElement_ICE",
-//                     "elementXpath": xpath, 
-//                     "elementUrl": url,
-//                     "appType": appType
-//                 },
-//             credentials : 'include',
-//         })
-//         .then(res=>{
-//             if (res.status === 200) resolve(res.data);
-//             else reject(res.status);
-//         })
-//         .catch(err => reject(err));
-//     });
-// }
+export const highlightScrapElement_ICE = (xpath, objurl, appType) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/highlightScrapElement_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {"action": "highlightScrapElement_ICE",
+                    "elementXpath": xpath, 
+                    "elementUrl": objurl,
+                    "appType": appType
+                },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data);
+            else reject(res.status);
+        })
+        .catch(err => reject(err));
+    });
+}
 
 /*Component ScrapeScreen
   api returns {"mirror":"","name":"","reuse":bool,"scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
