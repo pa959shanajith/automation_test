@@ -585,7 +585,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									openDialog("Import Screen", "Screen Json imported successfully.");
 									// unblockUI()
 									//add popoup for error and saved 
-								}, function (error) {unblockUI() })
+								}, function (error) {
+									unblockUI();
+									openDialog("Import Screen", "Failed to import Json");
+								})
 							
 							var currentElements = $(".ellipsis:visible").length;
 							if (currentElements > 0) {
@@ -4699,7 +4702,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					//enableScreenShotHighlight = false;
 					openDialog("Save Scraped data", "Failed to save");
 				}
-			}, function (error) { })
+			}, function (error) {
+				unblockUI();
+				openDialog("Save Scraped data", "Failed to save");
+			})
 
 		if ($("#window-filter").is(":visible")) {
 			var filters = $(".popupContent-filter .filterObjects");

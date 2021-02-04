@@ -246,10 +246,18 @@ exports.updateScreen_ICE = function (req, res) {
 			dataObj=[]
 			newData = updateData.newData;
 			type = updateData.type;
+			var regEx = /[<>]/;
+			var scrape_err="Error: Special characters <> not allowed!!";
 			if (param == "updateScrapeData_ICE") {
 				try {
 					scrapedObjects = updateData.getScrapeData;
 					var parsedScrapedObj = JSON.parse(scrapedObjects);
+					for(var i=0;i<parsedScrapedObj.view.length;i++){
+						if(regEx.test(parsedScrapedObj.view[i].custname)){
+							logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE. "+scrape_err);
+							return finalFunction("Fail");
+						}
+					}
 					if (newData != undefined){
 						if ("scrapedurl" in newData){
 							parsedScrapedObj.scrapedurl = newData.scrapedurl
@@ -266,9 +274,8 @@ exports.updateScreen_ICE = function (req, res) {
 							{
 								dataObj.push(parsedScrapedObj.view[i])
 							}
-						}		
+						}
 						parsedScrapedObj.view = dataObj
-
 					}
 					//why 2 stringyfy
 					scrapedObjects = JSON.stringify(parsedScrapedObj);
@@ -358,7 +365,7 @@ exports.updateScreen_ICE = function (req, res) {
 										}else{
 											logger.error("Invalid Request header or Request body")
 											scrapedObjects="Fail";
-										}						
+										}
 									}
 								}else if (method=='GET' && requestedparam.trim() !='') {
 									try{
@@ -425,6 +432,12 @@ exports.updateScreen_ICE = function (req, res) {
 				}
 			}else if (param == "importScreen") {
 				try {
+					for(var i=0;i<newData.view.length;i++){
+						if(regEx.test(newData.view[i].custname)){
+							logger.info("Calling final function from the service updateScreen_ICE: importScreen. "+scrape_err);
+							return finalFunction("Fail");
+						}
+					}
 					scrapedObjects.view = newData.view;
 					scrapedObjects.mirror = newData.mirror;
 					scrapedObjects.scrapedurl = newData.scrapedurl;
@@ -504,6 +517,12 @@ exports.updateScreen_ICE = function (req, res) {
 				try {
 					scrapedObjects = updateData.getScrapeData;
 					var parsedScrapedObj = JSON.parse(scrapedObjects);
+					for(var i=0;i<parsedScrapedObj.length;i++){
+						if(regEx.test(parsedScrapedObj[i][1])){
+							logger.info("Calling final function from the service updateScreen_ICE: importScreen. "+scrape_err);
+							return finalFunction("Fail");
+						}
+					}
 					inputs = {
 						"scrapedata": scrapedObjects,
 						"modifiedby": modifiedByID,

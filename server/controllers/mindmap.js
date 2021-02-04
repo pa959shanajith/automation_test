@@ -194,7 +194,19 @@ exports.saveData = async (req, res) => {
 		var createdthrough = inputs.createdthrough || "Web";
 		//Assigned Tasks Notification
 		var assignedObj = {};
-		var scenarioObj = {}
+        var scenarioObj = {}
+        var regg= /[~*+=?^%<>()|\\|\/]/;
+		for(var key in inputs){
+			if(key=='map'){
+				for(var i=0;i<inputs[key].length;i++){
+					var map_task=inputs[key][i]['task']
+					if(regg.test(inputs[key][i]['name']) || regg.test(map_task['batchName']) || regg.test(map_task['details']) || regg.test(map_task['task'])){
+						logger.error("Error occurred in mindmap/"+fnName+": Special characters found!!");
+						return res.send('fail');
+					}
+				}
+			}
+		}
 		for (var k = 0; k < data.length; k++) {
 			var task = data[k].task;
 			if (task != null) {
@@ -454,7 +466,6 @@ exports.saveData = async (req, res) => {
 								tasks_update.push(tsk)
 								
 							}
-
 						}else{
 							if(!screenids.has(tsk.nodeid))
 								tasks_insert.push(tsk)
