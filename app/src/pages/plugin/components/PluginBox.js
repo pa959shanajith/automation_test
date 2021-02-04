@@ -14,10 +14,10 @@ const PluginBox = ({plugin}) => {
 
     return (
 		<>
-			{ redirectTo && <Redirect to={redirectTo} />}
-            <div className="plugin-block" onClick={pluginRedirect}>
-                <img className="plugin-ic" alt="plugin-ic" src={`static/imgs/${plugin.image}.png`} />
-                <span className="plugin-text">{plugin.pluginName}</span>
+			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
+            <div data-test="plugin-blocks" className="plugin-block" onClick={pluginRedirect}>
+                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${plugin.image}.png`} />
+                <span data-test="plugin-name" className="plugin-text">{plugin.pluginName}</span>
         	</div>
 		</>
     );

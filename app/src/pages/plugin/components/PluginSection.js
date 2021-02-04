@@ -23,9 +23,9 @@ const PluginSection = ({userInfo}) => {
     }, [userInfo]);
 
     return(
-        <div className="plugin-section">
-            <div className="avail-plugin-title">Available Plugins</div>
-            <div className="plugin-blocks">
+        <div data-test="plugins-section" className="plugin-section">
+            <div data-test="available-plugins-title" className="avail-plugin-title">Available Plugins</div>
+            <div data-test="plugins-blocks" className="plugin-blocks">
                 {
                     pluginList.length !==0 && pluginList.map((plugin, i)=>
                         <PluginBox key={i} plugin={plugin}/>
