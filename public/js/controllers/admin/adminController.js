@@ -336,6 +336,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if(data  == 'Pool exists') {
 				$('#tokenName').addClass('error-border')
 				openModalPopup("Error", "Pool name already exist");
+			} else if (data == 'invalid_splname') {
+				openModalPopup("Create ICE Pool", "Special characters found in poolname.");
 			} else {
 				openModalPopup("Create ICE Pool", "There are no projects created yet.");
 			}
@@ -399,6 +401,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if(data  == 'Pool exists') {
 				$('#tokenName').addClass('error-border')
 				openModalPopup("Error", "Pool name already exist");
+			} else if (data == 'invalid_splname') {
+				openModalPopup("Create ICE Pool", "Failed to update ICE Pool. Special characters found in poolname.");
 			} else {
 				openModalPopup("Create ICE Pool", "Failed to update ICE Pool.");
 			}
@@ -497,6 +501,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				openModalPopup("Success", "ICE Pool updated successfully.");
 			} else if(data == "Invalid Session") {
 				$rootScope.redirectPage();
+			} else if (data == 'invalid_splname') {
+				openModalPopup("Create ICE Pool", "Failed to update ICE Pool. Special characters found in poolname.");
 			} else {
 				openModalPopup("ICE Pool", "Failed to update ICE Pool");
 				unblockUI()
@@ -746,7 +752,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		if (flag) return false;
 
-		var tokeninfo = {
+		const tokeninfo = {
 			userid: userid,
 			icename: icename,
 			icetype: icetype,
@@ -757,7 +763,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			unblockUI();
 			if (data == "Invalid Session") return $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("ICE Provision Error", "ICE Provisioned Failed");
-			else if (data=='DuplicateIceName') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>ICE name or User already exists");
+			else if (data == 'DuplicateIceName') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>ICE name or User already exists");
+			else if (data == 'invalid_splname') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>Special characters found in icename");
 			else {
 				$scope.tokeninfo.icename = icename;
 				$scope.tokeninfo.token = data;
@@ -830,6 +837,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			unblockUI();
 			if (data == "Invalid Session") return $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("ICE Provisions", "ICE Deregister Failed");
+			else if (data == 'invalid_splname') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>Special characters found in icename");
 			else {
 				adminServices.manageSessionData('disconnect', icename, "?", "dereg").then(function (data) {
 					if (data == "Invalid Session") return $rootScope.redirectPage();
@@ -859,6 +867,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			unblockUI();
 			if (data == "Invalid Session") return $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("ICE Provisions", "ICE "+event+" Failed");
+			else if (data == 'invalid_splname') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>Special characters found in icename");
 			else {
 				adminServices.manageSessionData('disconnect', icename, "?", "dereg").then(function (data) {
 					if (data == "Invalid Session") return $rootScope.redirectPage();
@@ -1092,6 +1101,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			if (data == "Invalid Session") $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("Token Management", "Failed to generate token");
 			else if (data == 'duplicate') openModalPopup("Token Management", "Failed to generate token, Token Name already exists");
+			else if (data == 'invalid_name_special') openModalPopup("Token Management", "Failed to generate token, Special characters found in token name");
+			else if (data == 'invalid_past_time') openModalPopup("Token Management", "Expiry time should be 8 hours more than current time");
 			else {
 				$scope.tokens.token = data.token;
 				$scope.tokens.loadData($event);
@@ -1112,6 +1123,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			unblockUI();
 			if (data == "Invalid Session") $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("Token Management", "Failed to deactivate token");
+			else if (data == 'invalid_name_special') openModalPopup("Token Management", "Failed to generate token, Special characters found in token name");
 			else {
 				openModalPopup("Token Management", "Token '"+CIUser.tokenName+"' has been Deactivated");
 				data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
@@ -1374,12 +1386,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 									}
 									if (createProjectRes == 'success') {
 										openModalPopup("Create Project", "Project created successfully");
-										resetForm();
 										projectDetails = [];
 									} else {
-										openModalPopup("Create Project", "Failed to create project");
-										resetForm();
+										if (createProjectRes == 'invalid_name_spl') openModalPopup("Create Project", "Failed to create project. Special characters found in project/release/cycle name");
+										else openModalPopup("Create Project", "Failed to create project");
 									}
+									resetForm();
 									unblockUI();
 								}, function (error) {
 									console.log("Error:::::::::::::", error);
@@ -3506,6 +3518,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "insufficient_access") openModalPopup("Test Connection", "Test Connection Failed! Credentials provided does not have required privileges for setting up LDAP.");
 			else if(data == "invalid_basedn") openModalPopup("Test Connection", "Test Connection Failed! Base Domain Name is incorrect.");
 			else if(data == "empty") openModalPopup("Test Connection", "Test Connection Successful but LDAP directory is empty!");
+			else if(data == "spl_chars") openModalPopup("Test Connection", "Test Connection Failed! Special characters found in LDAP configuration values.");
 			else if(data == "fail") openModalPopup("Test Connection", "Test Connection Failed!");
 			else openModalPopup("Test Connection", "Test Connection Failed due to unexpected error!");
 		}, function (error) {

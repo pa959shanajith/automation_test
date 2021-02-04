@@ -331,13 +331,13 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		var taskObj = {};
 		if(dataobj_json.status=='assigned'){
 			dataobj_json.status='inprogress';
-			PluginService.updateTaskStatus(dataobj_json.subtaskid)
-					.then(function(data) {
-						dataobj_json.status=data;
-						},
-						function(error) {
-							console.log("Error updating task status " + (error.data));
-						});
+			PluginService.updateTaskStatus(dataobj_json.subtaskid).then(
+			function(data) {
+				dataobj_json.status=data;
+			},
+			function(error) {
+				console.log("Error updating task status " + (error.data));
+			});
 		}
 		taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
 		taskObj.scenarioFlag = dataobj_json.scenarioflag;

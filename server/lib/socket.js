@@ -25,7 +25,7 @@ var logger = require('../../logger');
 var redisServer = require('./redisSocketHandler');
 var utils = require('./utils');
 var notificationMsg = require('./../notifications').broadcast;
-const cache = require("./cache")
+const cache = require("./cache").getClient(2);
 
 io.on('connection', async socket => {
 	logger.info("Inside Socket connection");
