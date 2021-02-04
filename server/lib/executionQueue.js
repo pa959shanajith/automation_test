@@ -1,7 +1,7 @@
-const utils = require('../lib/utils');
+const utils = require('./utils');
 const suite = require('../controllers/suite')
 const redisServer = require('./redisSocketHandler');
-const cache = require("./cache")
+const cache = require("./cache").getClient(2);
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var logger = require('../../logger');
@@ -15,6 +15,7 @@ const SOCK_SCHD_MSG = "ICE is connected in Scheduling mode";
 const SOCK_NA_MSG = "ICE is not Available";
 const DO_NOT_PROCESS = "do_not_process_response";
 const EMPTYUSER = process.env.nulluser;
+
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools

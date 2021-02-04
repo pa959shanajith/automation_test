@@ -957,6 +957,7 @@ exports.getAccessibilityReports_API = async(req, res)=>{
         res.send(result);
     }catch(e){
         logger.error("Exception occured in getAccessibilityReports_API service", exception);
+        return res.status(500).send("fail");
     }
 }
 

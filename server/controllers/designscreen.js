@@ -230,23 +230,22 @@ exports.updateScreen_ICE = function (req, res) {
 			var screenID = updateData.screenId;
 			var screenName = updateData.screenName;
 			var param = updateData.param;
-			var delete_list = updateData.delete_list;
+			// var delete_list = updateData.delete_list;
 			var update_list = updateData.update_list;
-			var insert_list = updateData.insert_list;
+			// var insert_list = updateData.insert_list;
 			var appType = updateData.appType;
 			var requestedversionnumber = updateData.versionnumber;
 			//xpaths required to be mapped(used only when param is mapScrapeData_ICE)
-			var requiredXpathList = [];
+			// var requiredXpathList = [];
 			//URLs required to be mapped(used only when param is mapScrapeData_ICE)
-			var requiredURLList = [];
+			// var requiredURLList = [];
 			var scrapedObjects = {};
 			var inputs = {};
-			var inputstestcase = {};
+			// var inputstestcase = {};
 			var statusFlag = "";
 			dataObj=[]
 			newData = updateData.newData;
 			type = updateData.type;
-			var regex_flag=0;
 			var regEx = /[<>]/;
 			var scrape_err="Error: Special characters <> not allowed!!";
 			if (param == "updateScrapeData_ICE") {
@@ -255,164 +254,178 @@ exports.updateScreen_ICE = function (req, res) {
 					var parsedScrapedObj = JSON.parse(scrapedObjects);
 					for(var i=0;i<parsedScrapedObj.view.length;i++){
 						if(regEx.test(parsedScrapedObj.view[i].custname)){
-							regex_flag=1
-							break;
+							logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE. "+scrape_err);
+							return finalFunction("Fail");
 						}
 					}
-					if(regex_flag==0){
-						if (newData != undefined){
-							if ("scrapedurl" in newData){
-								parsedScrapedObj.scrapedurl = newData.scrapedurl
+					if (newData != undefined){
+						if ("scrapedurl" in newData){
+							parsedScrapedObj.scrapedurl = newData.scrapedurl
+						}
+					}
+					if (appType.toUpperCase() === 'WEBSERVICE') {
+						if (parsedScrapedObj.method == 'POST' && 'body' in parsedScrapedObj ) {
+							parsedScrapedObj.body[0] = parsedScrapedObj.body[0].replace(/'+/g, "\"");
+						}
+					}
+					else{
+						for(var i=0;i<parsedScrapedObj.view.length;i++){
+							if(!('_id'  in parsedScrapedObj.view[i]))
+							{
+								dataObj.push(parsedScrapedObj.view[i])
 							}
 						}
-						if (appType.toUpperCase() === 'WEBSERVICE') {
-							if ('body' in parsedScrapedObj) {
-								parsedScrapedObj.body[0] = parsedScrapedObj.body[0].replace(/'+/g, "\"");
-							}
-						}
-						else{
-							for(var i=0;i<parsedScrapedObj.view.length;i++){
-								if(!('_id'  in parsedScrapedObj.view[i]))
-								{
-									dataObj.push(parsedScrapedObj.view[i])
-								}
-							}		
-							parsedScrapedObj.view = dataObj
-
-						}
-						//why 2 stringyfy
-						scrapedObjects = JSON.stringify(parsedScrapedObj);
-						//scrapedObjects = JSON.stringify(scrapedObjects);
-						scrapedObjects = scrapedObjects.replace(/'+/g, "''");
-						var newParse;
-						if (scrapedObjects != null && scrapedObjects.trim() != '' && scrapedObjects != undefined) {
-							newParse = JSON.parse(scrapedObjects);
-						} else {
-							newParse = JSON.parse("{}");
-						}
-						scrapedObjects = newParse;
-						if (appType.toUpperCase() === 'WEBSERVICE') {
-							var temp_flag=true;
-							try {
-								var viewArray = [];
-								if ('method' in scrapedObjects &&
-									'header' in scrapedObjects &&
-									'body' in scrapedObjects) {
-									if (scrapedObjects.method == 'POST') {
-										var requestedBody = scrapedObjects.body;
-										var requestedHeader = scrapedObjects.header;
-										if (requestedBody != null &&
-											requestedBody != ''){
-											if(requestedHeader.indexOf('json') === -1){
-												if (requestedBody.indexOf('Envelope') !== -1) {
-													var obj = parse(requestedBody);
-													if ('root' in obj) {
-														temp_flag = false
-														var baseRequestBody = obj.root;
-														allXpaths = [];
-														allCustnames = [];
-														try {
-															logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
-															parseRequest(baseRequestBody);
-														} catch (exception) {
-															logger.error(exception.message);
-														}
-														for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
-															var scrapedObjectsWS = {};
-															scrapedObjectsWS.xpath = allXpaths[populationindex];
-															scrapedObjectsWS.custname = allCustnames[populationindex];
-															scrapedObjectsWS.tag = "elementWS";
-															viewArray.push(scrapedObjectsWS);
-														}
-														var baseData = {};
-														baseData.endPointURL = scrapedObjects.endPointURL;
-														baseData.method = scrapedObjects.method;
-														baseData.header = scrapedObjects.header;
-														baseData.operations = scrapedObjects.operations;
-														baseData.body = scrapedObjects.body;
-														baseData.responseHeader = scrapedObjects.responseHeader;
-														baseData.responseBody = scrapedObjects.responseBody;
-														baseData.view = viewArray;
-														scrapedObjects = baseData;
-														scrapedObjects = JSON.stringify(scrapedObjects);
-														scrapedObjects = scrapedObjects.replace(/'+/g, "''")
+						parsedScrapedObj.view = dataObj
+					}
+					//why 2 stringyfy
+					scrapedObjects = JSON.stringify(parsedScrapedObj);
+					//scrapedObjects = JSON.stringify(scrapedObjects);
+					scrapedObjects = scrapedObjects.replace(/'+/g, "''");
+					var newParse;
+					if (scrapedObjects != null && scrapedObjects.trim() != '' && scrapedObjects != undefined) {
+						newParse = JSON.parse(scrapedObjects);
+					} else {
+						newParse = JSON.parse("{}");
+					}
+					scrapedObjects = newParse;
+					if (appType.toUpperCase() === 'WEBSERVICE') {
+						var temp_flag=true;
+						try {
+							var viewArray = [];
+							if ('method' in scrapedObjects &&
+								'header' in scrapedObjects &&
+								'body' in scrapedObjects) {
+								var method = scrapedObjects.method;
+								var requestedparam = scrapedObjects.param;
+								if (method == 'POST') {
+									var requestedBody = scrapedObjects.body;
+									var requestedHeader = scrapedObjects.header;
+									if (method == 'POST' && requestedBody != null &&
+										requestedBody != ''){
+										if(requestedHeader.indexOf('json') === -1){
+											if (requestedBody.indexOf('Envelope') !== -1) {
+												var obj = parse(requestedBody);
+												if ('root' in obj) {
+													temp_flag = false
+													var baseRequestBody = obj.root;
+													allXpaths = [];
+													allCustnames = [];
+													//Parsing Request Parameters
+													if (requestedparam.trim() != ""){
+														var reqparams=parseRequestParam(requestedparam);
+														if (reqparams.length>0) viewArray.concat(reqparams);
 													}
-												}else{
-													logger.error("Invalid Request header or Request body for XML")
-													scrapedObjects="Fail";
-												}
-											}
-											else if(requestedHeader.indexOf('json') !== -1){
-												try{
-													requestedBody=JSON.parse(requestedBody)
-													var xpaths=parseJsonRequest(requestedBody,"","");
-													for (var object of xpaths) {
+													try {
+														logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
+														parseRequest(baseRequestBody);
+
+													} catch (exception) {
+														logger.error(exception.message);
+													}
+													for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
 														var scrapedObjectsWS = {};
-														scrapedObjectsWS.xpath = object;
-														scrapedObjectsWS.custname = object;
+														scrapedObjectsWS.xpath = allXpaths[populationindex];
+														scrapedObjectsWS.custname = allCustnames[populationindex];
 														scrapedObjectsWS.tag = "elementWS";
 														viewArray.push(scrapedObjectsWS);
 													}
-													if (viewArray.length>0) scrapedObjects.view=viewArray
-
-												}
-												catch(Exception){
-													logger.error("Invalid Request body for RestAPI")
-													scrapedObjects="Fail";
+													scrapedObjects.view = viewArray;
+													scrapedObjects = JSON.stringify(scrapedObjects);
+													scrapedObjects = scrapedObjects.replace(/'+/g, "''")
 												}
 											}else{
-												logger.error("Invalid Request header or Request body")
+												logger.error("Invalid Request header or Request body for XML")
 												scrapedObjects="Fail";
-											}						
+											}
+										}
+										else if(requestedHeader.indexOf('json') !== -1){
+											try{
+												//Parsing Request Parameters
+												if (requestedparam.trim() != ""){
+													var reqparams=parseRequestParam(requestedparam);
+													if (reqparams.length>0) viewArray.concat(reqparams);
+												}
+												//Parsing Request Body
+												requestedBody=JSON.parse(requestedBody)
+												var xpaths=parseJsonRequest(requestedBody,"","");
+												for (var object of xpaths) {
+													var scrapedObjectsWS = {};
+													scrapedObjectsWS.xpath = object;
+													scrapedObjectsWS.custname = object;
+													scrapedObjectsWS.tag = "elementWS";
+													viewArray.push(scrapedObjectsWS);
+												}
+												if (viewArray.length>0) scrapedObjects.view=viewArray;
+
+											}
+											catch(Exception){
+												logger.error("Invalid Request body for RestAPI")
+												scrapedObjects="Fail";
+											}
+										}else{
+											logger.error("Invalid Request header or Request body")
+											scrapedObjects="Fail";
 										}
 									}
-								}if (temp_flag == false){
-									inputs = {
-										"query": "updatescreen",
-										"scrapedata": scrapedObjects,
-										"modifiedby": modifiedByID,
-										"modifiedByrole":modifiedByrole,
-										"screenid": screenID,
-										"projectid": projectID,
-										"screenname": screenName,
-										"versionnumber": requestedversionnumber,
-										"type": "WS_obj"
+								}else if (method=='GET' && requestedparam.trim() !='') {
+									try{
+										//Parsing Request Parameters
+										if (requestedparam.trim() != ""){
+											var reqparams=parseRequestParam(requestedparam);
+											if (reqparams.length>0){
+												scrapedObjects.view=reqparams;
+											}
+										}	
+									}catch(Exception){
+										logger.error("Invalid Request Header for GET API")
+										scrapedObjects="Fail";
 									}
 								}
-								else{
-									inputs = buildObject(scrapedObjects, modifiedByID, modifiedByrole, screenID, projectID, screenName, requestedversionnumber);
-								}
-								logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
-								finalFunction(scrapedObjects);
-							} catch (exception) {
-								logger.error("Exception from the service updateScreen_ICE: updateScrapeData_ICE - WEBSERVICE: %s",exception);
 							}
-						} else {
-							if(type == 'delete') deleteList=updateData.delete_list
-							else deleteList=[]
-							if(updateData.update_list != '') updateList=updateData.update_list
-							else updateList=[]
-							inputs = {
-								"scrapedata": scrapedObjects,
-								"modifiedby": modifiedByID,
-								"screenid": screenID,
-								"modifiedByrole":modifiedByrole, 
-								"projectid": projectID,
-								"screenname": screenName,
-								"versionnumber": requestedversionnumber,
-								"type": "insert_obj",
-								"delete_list": deleteList,
-								"update_list": updateList
-							};
-							if (updateData.propedit != undefined){
-								inputs.propedit = updateData.propedit
+							
+							if (temp_flag == false){
+								inputs = {
+									"query": "updatescreen",
+									"scrapedata": scrapedObjects,
+									"modifiedby": modifiedByID,
+									"modifiedByrole":modifiedByrole,
+									"screenid": screenID,
+									"projectid": projectID,
+									"screenname": screenName,
+									"versionnumber": requestedversionnumber,
+									"type": "WS_obj"
+								}
+							}
+							else{
+								inputs = buildObject(scrapedObjects, modifiedByID, modifiedByrole, screenID, projectID, screenName, requestedversionnumber);
 							}
 							logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
 							finalFunction(scrapedObjects);
+						} catch (exception) {
+							logger.error("Exception from the service updateScreen_ICE: updateScrapeData_ICE - WEBSERVICE: %s",exception);
 						}
-					}else{
-						logger.error(scrape_err);
-						res.status(500).send(scrape_err)
+					} else {
+						if(type == 'delete') deleteList=updateData.delete_list
+						else deleteList=[]
+						if(updateData.update_list != '') updateList=updateData.update_list
+						else updateList=[]
+						inputs = {
+							"scrapedata": scrapedObjects,
+							"modifiedby": modifiedByID,
+							"screenid": screenID,
+							"modifiedByrole":modifiedByrole, 
+							"projectid": projectID,
+							"screenname": screenName,
+							"versionnumber": requestedversionnumber,
+							"type": "insert_obj",
+							"delete_list": deleteList,
+							"update_list": updateList
+						};
+						if (updateData.propedit != undefined){
+							inputs.propedit = updateData.propedit
+						}
+						logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
+						finalFunction(scrapedObjects);
 					}
 				} catch (exception) {
 					logger.error("Exception from the service updateScreen_ICE: updateScrapeData_ICE: %s",exception);
@@ -421,42 +434,37 @@ exports.updateScreen_ICE = function (req, res) {
 				try {
 					for(var i=0;i<newData.view.length;i++){
 						if(regEx.test(newData.view[i].custname)){
-							regex_flag=1
-							break;
+							logger.info("Calling final function from the service updateScreen_ICE: importScreen. "+scrape_err);
+							return finalFunction("Fail");
 						}
 					}
-					if(regex_flag==0){
-						scrapedObjects.view = newData.view;
-						scrapedObjects.mirror = newData.mirror;
-						scrapedObjects.scrapedurl = newData.scrapedurl;
-						scrapeinfo = { 
-							"body" : newData.body,
-							"endPointURL" : newData.endPointURL,
-							"header" : newData.header,
-							"method" : newData.method,
-							"operations" : newData.operations,
-							"responseBody" : newData.responseBody,
-							"responseHeader" : newData.responseHeader
-						};
-						scrapedObjects.scrapeinfo =scrapeinfo
-						scrapedObjects = JSON.stringify(scrapedObjects);
-						scrapedObjects = scrapedObjects.replace(/'+/g, "''");
-						inputs = {
-							"scrapedata": scrapedObjects,
-							"modifiedby": modifiedByID,
-							"modifiedByrole":modifiedByrole,
-							"screenid": screenID,
-							"projectid": projectID,
-							"screenname": screenName,
-							"versionnumber": requestedversionnumber,
-							"type": "importScreen"
-						};
-						logger.info("Calling final function from the service updateScreen_ICE: importScreen");
-						finalFunction(newData);
-					} else{
-						logger.error(scrape_err);
-						res.status(500).send(scrape_err)
-					}
+					scrapedObjects.view = newData.view;
+					scrapedObjects.mirror = newData.mirror;
+					scrapedObjects.scrapedurl = newData.scrapedurl;
+					scrapeinfo = { 
+						"body" : newData.body,
+						"endPointURL" : newData.endPointURL,
+						"header" : newData.header,
+						"method" : newData.method,
+						"operations" : newData.operations,
+						"responseBody" : newData.responseBody,
+						"responseHeader" : newData.responseHeader
+					};
+					scrapedObjects.scrapeinfo =scrapeinfo
+					scrapedObjects = JSON.stringify(scrapedObjects);
+					scrapedObjects = scrapedObjects.replace(/'+/g, "''");
+					inputs = {
+						"scrapedata": scrapedObjects,
+						"modifiedby": modifiedByID,
+						"modifiedByrole":modifiedByrole,
+						"screenid": screenID,
+						"projectid": projectID,
+						"screenname": screenName,
+						"versionnumber": requestedversionnumber,
+						"type": "importScreen"
+					};
+					logger.info("Calling final function from the service updateScreen_ICE: importScreen");
+					finalFunction(newData);
 				} catch (exception) {
 					logger.error("Exception from the service updateScreen_ICE: importScreen: %s",exception);
 				}
@@ -511,28 +519,23 @@ exports.updateScreen_ICE = function (req, res) {
 					var parsedScrapedObj = JSON.parse(scrapedObjects);
 					for(var i=0;i<parsedScrapedObj.length;i++){
 						if(regEx.test(parsedScrapedObj[i][1])){
-							regex_flag=1
-							break;
+							logger.info("Calling final function from the service updateScreen_ICE: importScreen. "+scrape_err);
+							return finalFunction("Fail");
 						}
 					}
-					if(regex_flag==0){
-						inputs = {
-							"scrapedata": scrapedObjects,
-							"modifiedby": modifiedByID,
-							"modifiedByrole":modifiedByrole,
-							"screenid": screenID,
-							"projectid": projectID,
-							"screenname": screenName,
-							"versionnumber": requestedversionnumber,
-							"type": "update_obj",
-							"insert_list": insertList
-						};
-						logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
-						finalFunction(scrapedObjects);
-					} else{
-						logger.error(scrape_err);
-						res.status(500).send(scrape_err)
-					}
+					inputs = {
+						"scrapedata": scrapedObjects,
+						"modifiedby": modifiedByID,
+						"modifiedByrole":modifiedByrole,
+						"screenid": screenID,
+						"projectid": projectID,
+						"screenname": screenName,
+						"versionnumber": requestedversionnumber,
+						"type": "update_obj",
+						"insert_list": insertList
+					};
+					logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE");
+					finalFunction(scrapedObjects);
 				}
 				catch (exception) {
 					logger.error("Exception in the edit_updateScrapeData_ICE: %s", exception);
@@ -780,76 +783,15 @@ exports.highlightScrapElement_ICE = function (req, res) {
 	}
 };
 
-exports.updateIrisDataset = function updateIrisDataset(req, res) {
+exports.updateIrisDataset = async(req, res) => {
 	try{
 		logger.info("Inside UI service: updateIrisDataset");
-		if (utils.isSessionActive(req)) {
-			var username=req.session.username
-			var icename = undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-			image_data = req.body.data;
-			redisServer.redisSubServer.subscribe('ICE2_' + icename);
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , icename);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
-				if (redisres[1]>0) {
-					logger.info("Sending socket request for updateIrisDataset to cachedb");
-					dataToIce = {"emitAction" : "irisOperations","username" : icename, "image_data":image_data, "param":"updateDataset"};
-					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
-					function updateIrisDataset_listener(channel,message) {
-						var data = JSON.parse(message);
-						if(icename == data.username && ["unavailableLocalServer", "iris_operations_result"].includes(data.onAction)){
-							redisServer.redisSubServer.removeListener('message',updateIrisDataset_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in updateIrisDataset: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[username];
-									soc.emit("ICEnotAvailable");
-								}
-							} else if (data.onAction == "iris_operations_result") {
-								if(data.value==true){
-									var args = {
-										data: image_data,
-										headers: {
-											"Content-Type": "application/json"
-										}
-									};
-									logger.info("Calling DAS Service from updateIrisDataset: design/updateIrisObjectType");
-									client.post(epurl + "design/updateIrisObjectType", args,
-										function (result, response) {
-										try {
-											if (response.statusCode != 200 || result.rows == "fail") res.send(false);
-											else if (result.rows == "unsavedObject") res.send("unsavedObject");
-											else res.send(true);
-										} catch (exception) {
-											logger.error("Exception in the service updateIrisObjectType: %s", exception);
-											res.send(false);
-										}
-									});
-								}
-								else  res.send(data.value);
-							}
-						}
-					}
-					redisServer.redisSubServer.on("message",updateIrisDataset_listener);
-				} else {
-					utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
-						var flag="";
-						if (found) flag = "scheduleModeOn";
-						else {
-							flag = "unavailableLocalServer";
-							logger.info("ICE Socket not Available");
-						}
-						res.send(flag);
-					});
-				}
-			});
-		} else {
-			logger.error("Error occurred in the service updateIrisDataset: Invalid Session");
-			res.send("Invalid Session");
-		}
+		var image_data = req.body.data;
+		const result = await utils.fetchData(image_data, "design/updateIrisObjectType", 'updateIrisDataset');
+		res.send(result)
 	} catch(exception){
 		logger.error("Exception in the service updateIrisDataset: %s", exception);
+		res.send("fail");
 	}
 }
 
@@ -873,6 +815,26 @@ function buildObject(scrapedObjects, modifiedBy, modifiedByrole, screenID, proje
 		logger.error("Exception in the function buildObject: %s", exception);
 	}
 }
+
+function parseRequestParam(paramerters){
+	logger.info("Inside the function parseRequest ");
+	var paramsArray=[];
+	try{
+		var params=paramerters.split('##');
+		for (var object of params) {
+			object=object.split(":");
+			var scrapedObjectsWS = {};
+			scrapedObjectsWS.xpath = object[0].trim();
+			scrapedObjectsWS.custname = object[0].trim();
+			scrapedObjectsWS.tag = "elementWS";
+			paramsArray.push(scrapedObjectsWS);
+		}
+	}catch (Exception){
+		logger.info("Exception in the function parseRequest : %s",exception);
+	}	
+	return paramsArray										
+}
+
 
 function parseRequest(readChild) {
 	try {

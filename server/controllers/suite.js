@@ -9,7 +9,7 @@ var utils = require('../lib/utils');
 const accessibility_testing = require("./accessibilityTesting")
 const notifications = require('../notifications');
 var queue = require('../lib/executionQueue')
-var cache = require('../lib/cache')
+var cache = require('../lib/cache').getClient(2);
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const scheduleJobMap = {};
 const SOCK_NORM = "normalModeOn";
@@ -94,13 +94,12 @@ async function getICEList (projectids,userid){
 	var result = {ice_ids:{}}
 	result["ice_list"] = []
 	result["unallocatedICE"] = {}
-	try{
+	try {
 		const pool_req =  {
 			"projectids":[projectids],
 			"poolid": ""
 		}
-		
-		pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
+		let pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
 		unallocatedICE = await utils.fetchData({}, "admin/getAvailable_ICE");
 		ice_status = await cache.get("ICE_status");
 		unallocatedICE = unallocatedICE["available_ice"];
@@ -227,6 +226,7 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 				"testcaseid": tc._id,
 				"screenid": tc.screenid,
 				"versionnumber": tc.versionnumber,
+				"userid": userid,
 				"query": "readtestcase"
 			};
 			const testcasedata = await utils.fetchData(inputs, "design/readTestCase_ICE", fnName);
@@ -476,8 +476,10 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 			} else if (event == "result_executeTestSuite") {
 				if (!status) { // This block is for report data
 					const executionid = resultData.executionId;
-					const accessibility_reports = resultData.accessibility_reports
-					accessibility_testing.saveAccessibilityReports(accessibility_reports);
+					if("accessibility_reports" in resultData){	
+						const accessibility_reports = resultData.accessibility_reports
+						accessibility_testing.saveAccessibilityReports(accessibility_reports);
+					}
 					const scenarioid = resultData.scenarioId;
 					const testsuiteid = resultData.testsuiteId;
 					const testsuiteIndex = execReq.testsuiteIds.indexOf(testsuiteid);
@@ -684,7 +686,7 @@ function clubBatches(batchInfo){
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	// Several client apps do not send TCP Keep-Alive. Hence this is handled in applicaton side.
-	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +process.env.KEEP_ALIVE);
+	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +(process.env.KEEP_ALIVE || "30000"));
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
 	await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
 };
