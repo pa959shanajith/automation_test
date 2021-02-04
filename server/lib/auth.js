@@ -34,19 +34,25 @@ const strategyUtil = {
 			const user = await utils.fetchData(inputs, "login/loadUser", fnName);
 			if (user == "fail") flag = "fail";
 			else if (!user || !user.auth) flag = "invalid_username_password";
-			else if (user.invalidCredCount == 5) flag = "userLocked";
-			else if (user.defaultpassword && user.defaultpassword != "") {
+			else if (user.invalidCredCount == 5) {
+				flag = "userLocked";
+				userInfo = { username, type: user.auth.type };
+			}
+			else if (user.auth.defaultpassword && user.auth.defaultpassword != "") {
 				forgotPass = true;
-				var defPassword = bcrypt.compareSync(password, user.defaultpassword);
+				var defPassword = bcrypt.compareSync(password, user.auth.defaultpassword);
 				if (defPassword) {
 					inputs = {
 						"username": username,
 						"action": "forgotPass"
 					}
-					const user = await utils.fetchData(inputs, "login/passtimeout", fnName);
-					if (user == "fail") flag = "fail";
-					else if(user == "timeout") flag = "timeout";
-					else flag = "changePwd";
+					const usertime = await utils.fetchData(inputs, "login/passtimeout", fnName);
+					if (usertime == "fail") flag = "fail";
+					else if(usertime == "timeout") flag = "timeout";
+					else {
+						flag = "changePwd";
+						userInfo = { username, type: user.auth.type };
+					}
 				} else {
 					inputs = {"username": username, "action": "increment"}
 					const invalidCredCounter = await utils.fetchData(inputs, "login/invalidCredCounter", fnName);
@@ -373,15 +379,15 @@ module.exports.unlock = async (req, res) => {
 	const fnName = "unlock";
 	try {
 		logger.info("Inside UI Service: " + fnName);
-		const inputs = 	{ "username": req.body.username };
-		const username = req.body.username;
+		const username = req.user.username;
+		const inputs = 	{ "username": username };
 		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
 		let result = { "proceed": true };
 		if (userInfo == "fail") return result = "fail";
 		else if (!userInfo || !userInfo.auth) result = "invalid_username_password";
 		else if (userInfo.invalidCredCount != 5) result = "userUnlocked";
-		else if (userInfo.verificationpassword != "") {
-			var defPassword = bcrypt.compareSync(req.body.password, userInfo.verificationpassword);
+		else if (userInfo.auth.verificationpassword != "") {
+			var defPassword = bcrypt.compareSync(req.body.password, userInfo.auth.verificationpassword);
 			if (defPassword) {
 				//unlock the account
 				const inputsunlock = {"username":username, "action":"unlock"}
@@ -405,7 +411,7 @@ module.exports.unlockAccountEmail = async (req, res) => {
 	const fnName = "unlockAccountEmail";
 	try {
 		logger.info("Inside UI Service: " + fnName);
-		const inputs = 	{ "username": req.body.username };
+		const inputs = 	{ "username": req.user.username };
 		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
 		let result = { "proceed": true };
 		if (userInfo == "fail") return result = "fail";
@@ -417,7 +423,7 @@ module.exports.unlockAccountEmail = async (req, res) => {
 			const password = bcrypt.hashSync(default_password, bcrypt.genSaltSync(10));
 			//password created
 			const inputsFor = {
-				"username": req.body.username,
+				"username": req.user.username,
 				"verificationpassword": password
 			};
 			const userUpd = await utils.fetchData(inputsFor, "login/unlockAccountEmail", fnName);

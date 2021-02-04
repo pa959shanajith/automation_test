@@ -1,5 +1,6 @@
 const logger = require('../../logger');
 const utils = require('../lib/utils');
+const login = require('./login');
 const configpath= require('../config/options');
 const notifications = require('../notifications');
 const bcrypt = require('bcryptjs');
@@ -107,7 +108,7 @@ exports.verifyPasswordHistory = async (uData) => {
 	if (userDet == "fail") return "fail";
 	uData.user = userDet;
 	oldpass = uData.oldpass = userDet.auth.password;
-	const passHistory = userDet.passwordhistory;
+	const passHistory = userDet.auth.passwordhistory;
 	if (uData.currpass && !bcrypt.compareSync(uData.currpass, oldpass)) return "invalid"
 	if (bcrypt.compareSync(newpass, oldpass)) return "same";
 	for (let pass of passHistory) {
@@ -173,7 +174,7 @@ exports.changePassword = async (req, res) => {
 	const fnName = "changePassword";
 	logger.info("Inside UI Service: " + fnName);
 	try {
-		const username = req.body.username;
+		const username = req.user.username;
 		const currpassword = req.body.currpassword;
 		const newpassword = req.body.newpassword;
 		if (!regexPassword.test(newpassword)) {
@@ -186,7 +187,9 @@ exports.changePassword = async (req, res) => {
 			logger.error("Error occurred in login/"+fnName+": Unable to retrive user profile");
 			return res.status(500).send("fail");
 		} else {
-			const validUser = bcrypt.compareSync(currpassword, fresh.user.defaultpassword);
+			const userDet = await utils.fetchData({ username }, "login/loadUser", fnName);
+			if (userDet == "fail") res.status(500).send("fail");
+			const validUser = bcrypt.compareSync(currpassword, userDet.auth.defaultpassword);
 			if (!validUser) {
 				logger.error("Error occurred in login/"+fnName+": Current Password provided is incorrect.");
 				return res.send("incorrect");
@@ -203,7 +206,7 @@ exports.changePassword = async (req, res) => {
 		const password = bcrypt.hashSync(newpassword, bcrypt.genSaltSync(10));
 		const inputs = {
 			action: "changepassword",
-			name: req.body.username,
+			name: username,
 			password: password,
 			oldPassword: userData.oldpass
 		};
