@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const randexp = require('randexp');
 const logger = require('../../logger');
 const myserver = require('../../server');
 const cache = require('./cache').getClient();
@@ -114,6 +115,11 @@ module.exports.isSessionActive = function (req){
 	var cookieCheck = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
 	return sessionCheck && cookieCheck;
 };
+
+module.exports.generateDefPassword = function () {
+	let passwordtemp = new randexp(/^([A-Z][a-z][0-9][!#$%&,:;<>@_~])(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!*#$%&@_^])[A-Za-z\d!*#$%&@_^]{4,6}$/).gen();
+	return passwordtemp;
+}
 
 module.exports.approvalStatusCheck = async executionData => {
 	var data = {res: "pass", status: null};

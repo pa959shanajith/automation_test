@@ -30,13 +30,19 @@
 							<input ng-model="ud.userName" ng-change="hideLogin()" type="text" id="userName" class="form-control" name="username" placeholder="Username">
 							<span ng-if="!showLogin" class="input-group-addon fa fa-arrow-circle-right" ng-click="checkUser()" style="color:#a0a0a0;font-size:25px"> </span>
 						</div>
-						<div class="input-group" ng-if="showLogin">
+						<div class="input-group" style="margin-bottom: 10px;" ng-if="showLogin">
 							<span class="input-group-addon ic-password"><img src="imgs/ic-password.png" /></span>
 							<input ng-model="ud.password" ng-trim="false" id="passWord" type="{{inputType}}" class="form-control" name="password" placeholder="Password" autocomplete="off">
 							<span class="input-group-addon ic-password fa {{showHideClass}}" style="color:#a0a0a0;font-size:20px" ng-click="showPassword()"> </span>
 						</div>
-						<span ng-show="loginValidation" class="absoluteError errorMessages">{{loginValidation}}</span>
-						<button ng-if="showLogin" ng-click="check_credentials('/plugin', $event)" type="submit" class="btn btn-block" ng-disabled="requested==true">Login</button>
+						<span ng-show="loginValidation" class="absoluteError errorMessages" style="transform:translateY(-100%)">{{loginValidation}}
+							<span ng-show="lockedOut" class="errorMessages">Click <a style="color:inherit;cursor:pointer;text-decoration: underline;" ng-click="unlockAccountEmail()"><b>here</b></a> to unlock.</span>
+						</span>
+						<div ng-if="showLogin" class="helplinks">
+							<a id="forgotPassword" style="float:right;cursor:pointer" ng-click="forgotPasswordEmail()">Forgot Password?</a>
+						</div>
+						<button id="loginButton" ng-if="showLogin" ng-click="check_credentials('/plugin', $event)" type="submit" class="btn btn-block" ng-disabled="requested==true">Login</button>
+						<button id="unlockButton" style="margin-top:55px" ng-if="unlockCond" ng-click="unlock('/plugin', $event)" type="submit" class="btn btn-block">Unlock</button>
 					</form>
 				</div>
 				<div class="wrap login-wrap" ng-if="restartForm">
@@ -78,3 +84,106 @@
 	</div>
 </div>
 <!--Modal Box-->
+
+<div class="modal fade" id="changePassPopup" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm resetModal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Change Password</h4>
+			</div>
+			<div class="modal-body">
+			  <div class="login-wrap">
+				<div class="input-group resetModalchild">
+					<input ng-model="currpassword" type="password" maxlength="16" class="fpcurrpass reset-control spaceRegex passwordRegex" name="currpassword" placeholder="Current Password" autocomplete="off">
+				</div>
+				<div class="input-group resetModalchild">
+					<input ng-model="newpassword" type="password" maxlength="16" class="fpnewpass reset-control spaceRegex passwordRegex" name="newpassword" placeholder="New Password" autocomplete="off">
+				</div>
+				<div class="input-group resetModalchild">
+					<input ng-model="confpassword" type="password" maxlength="16" class="fpconfpass reset-control spaceRegex passwordRegex" name="confpassword" placeholder="Confirm Password" autocomplete="off">
+				</div>
+				<span ng-show="passwordValidation" class="errorMessages">{{passwordValidation}}</span>
+			  </div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" ng-click="resetAllFields($event)">Clear</button>
+				<button type="button" class="btn btn-default" ng-click="changePwd($event)">Submit</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Popup for Reset password -->
+
+
+    <!-- Popup for successful reset of password -->
+    <div class="modal fade" id="changeSuccessPopup" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Change Password</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Password change successful! Please login with new password</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="resetSuccess($event)">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+	<!-- Popup for successful reset of password -->
+	
+	<!-- Popup for successful email sent -->
+    <div class="modal fade" id="forgotPassEmailSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Forgot Password</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Successfully sent an email to reset your password! Please login with the temporary password sent in the email</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="resetSuccess($event)">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+	<!-- Popup for successful email sent -->
+
+	<!-- Popup for successful email sent -->
+    <div class="modal fade" id="unlockAccEmailSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Unlock Account</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Successfully sent an email! Please unlock the account using verification password sent in the email</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="closeSuccess($event)">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Popup for successful email sent -->
+	
+	<!-- Popup for successful unlock account -->
+    <div class="modal fade" id="unlockAccSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Unlock Account</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Successfully unlocked the user account! Please login again</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="resetSuccess($event)">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Popup for successful unlock account -->

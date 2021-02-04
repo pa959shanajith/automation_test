@@ -21,6 +21,11 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
+		fetchLockedUsers: function () {
+			return $http.post('/fetchLockedUsers', {})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
 		getDomains_ICE: function () {
 			return $http.post('/getDomains_ICE')
 			.then(function(response) { return response.data },
@@ -98,6 +103,13 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 				user: user,
 				key: key,
 				reason: reason
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) });
+		},
+		unlockUser: function (user) {
+			return $http.post('/unlockUser', {
+				user: user
 			})
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });

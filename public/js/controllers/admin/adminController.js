@@ -2807,6 +2807,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					return;
 				}
 				var errfields = [];
+				let hints = 'Hint:';
 				if (parseInt(data[2])) errfields.push("User Name");
 				if (parseInt(data[3])) errfields.push("First Name");
 				if (parseInt(data[4])) errfields.push("Last Name");
@@ -2814,7 +2815,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (parseInt(data[6])) errfields.push("Email");
 				if (parseInt(data[7])) errfields.push("Authentication Server");
 				if (parseInt(data[8])) errfields.push("User Domain Name");
-				openModalPopup(bAction+" User", "Following values are invalid: "+errfields.join(", "));
+				if (parseInt(data[5]) == '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+				if (parseInt(data[5]) == '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
+				openModalPopup(bAction+" User", "Following values are invalid: "+errfields.join(", ")+" "+hints);
 			}
 		}, function (error) {
 			unblockUI();
@@ -4210,12 +4213,31 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				data.clientData.sort(function(a,b) { return a.username > b.username; });
 				$scope.sessionConf.sessions = data.sessionData;
 				$scope.sessionConf.clients = data.clientData;
+				$scope.sessionConf.fetchLockedUsers();
 			}
 			unblockUI();
 		}, function (error) {
 			console.error("Fail to load session data", error);
 		});
 	};
+
+	$scope.sessionConf.fetchLockedUsers = function () {
+		// blockUI("Fetching locked users...");
+		adminServices.fetchLockedUsers()
+		.then(function(data){
+			// unblockUI();
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Session Management", "Unable to fetch locked users accounts.");
+			} else {
+				$scope.sessionConf.lockedusers = data;
+			}
+		}, function (error) {
+			// unblockUI();
+			openModalPopup("Session Management", "Unable to fetch locked users accounts.");
+		});
+	}
 
 	// Session Management: Logoff/Disconnect User
 	$scope.sessionConf.kill = function ($event) {
@@ -4243,6 +4265,31 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if (data == "fail") {
 				openModalPopup("Session Management", msg+"failed!")
 			} else {
+				openModalPopup("Session Management", msg+"successful!")
+				rootObj.splice(id,1);
+			}
+			unblockUI();
+		}, function (error) {
+			console.error("Fail to load session data", error);
+		});
+	};
+
+	$scope.sessionConf.unlock = function ($event) {
+		var id = parseInt($event.target.dataset.id);
+		var msg, rootObj, obj;
+		msg = "Unlocking User Account ";
+		rootObj = $scope.sessionConf.lockedusers;
+		obj = rootObj[id];
+		var user = obj.username;
+		blockUI(msg+user+"...");
+		adminServices.unlockUser(user)
+		.then(function (data) {
+			if (data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if (data == "fail") {
+				openModalPopup("Session Management", msg+"failed!")
+			} else {
+				openModalPopup("Session Management", msg+"successful!")
 				rootObj.splice(id,1);
 			}
 			unblockUI();

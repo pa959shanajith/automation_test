@@ -9,6 +9,7 @@ const client = new Client();
 const epurl = process.env.DAS_URL;
 const validator =  require('validator');
 const logger = require('../../logger');
+const login = require('./login');
 const utils = require('../lib/utils');
 const notifications = require('../notifications');
 const queue = require("../lib/executionQueue")
@@ -44,6 +45,7 @@ exports.manageUserDetails = async (req, res) => {
 	logger.info("Inside UI Service: " + fnName);
 	try {
 		let flag = ['2','0','0','0','0','0','0','0','0'];
+		let regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
 		const reqData = req.body.user;
 		const action = req.body.action;
 		const internalUser = reqData.type == "inhouse";
@@ -56,6 +58,10 @@ exports.manageUserDetails = async (req, res) => {
 				type: reqData.type,
 				password: reqData.password || ""
 			},
+		};
+		const username = inputs.name; 
+		let input_pass = {
+			username
 		};
 
 		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
@@ -71,9 +77,22 @@ exports.manageUserDetails = async (req, res) => {
 		}
 		if (action != "delete") {
 			if (internalUser) {
-				if (validator.isEmpty(inputs.auth.password) && !(validator.isLength(inputs.auth.password,1,12))) {
-					logger.error("Error occurred in admin/"+fnName+": Invalid Password.");
+				if (validator.isEmpty(inputs.auth.password) || validator.isLength(inputs.auth.password,1,12) || !regexPassword.test(inputs.auth.password)) {
+					logger.error("Error occurred in admin/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.");
 					flag[5]='1';
+				} else if (action == "update") {
+					const userData = {username, newpass: inputs.auth.password, oldpass: ''};
+					const fresh = await login.verifyPasswordHistory(userData);
+					if (fresh == "fail") {
+						logger.error("Error occurred in admin/"+fnName+": Unable to retrive user profile");
+						return res.status(500).send("fail");
+					} else if (fresh != "valid") {
+						logger.error("Error occurred in admin/"+fnName+": Password provided does not meet length, complexity or history requirements of application.");
+						flag[5]='2'
+					} else {
+						//Add previous password to history
+						inputs.oldPassword = userData.oldpass;
+					}
 				}
 			}
 			if (inputs.auth.password != '') {
@@ -165,6 +184,29 @@ exports.getUserDetails = async (req, res) => {
 		}
 	} catch (exception){
 		logger.error("Error occurred in admin/getUserDetails", exception);
+		res.status(500).send("fail");
+	}
+};
+
+// Fetch Locked Users
+exports.fetchLockedUsers = async (req, res) => {
+	const fnName = "fetchLockedUsers";
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		const result = await utils.fetchData({}, "admin/fetchLockedUsers", fnName);
+		if (result == "fail") res.status(500).send("fail");
+		else {
+			const lockedUsers = [];
+			result.forEach(function(e) {
+				lockedUsers.push({
+					username: e.name,
+					role: e.defaultrole
+				});
+			});
+			return res.send(lockedUsers);
+		}
+	} catch (exception){
+		logger.error("Error occurred in admin/"+fnName+":", exception);
 		res.status(500).send("fail");
 	}
 };
@@ -325,6 +367,23 @@ exports.manageSessionData = async (req, res) => {
 		logger.error("Error occurred in admin/manageSessionData:", exception);
 		res.status(500).send("fail");
 	}
+};
+
+//Unlock user by admin
+exports.unlockUser = async (req, res) => {
+	const fnName = "unlockUser";
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		const username = req.body.user;
+		inputs = { username };
+		const status = await utils.fetchData(inputs, "admin/unlockUser", fnName);
+		if(status=="fail") res.status(500).send("fail");
+		else res.send("success");
+	} catch (exception) {
+		logger.error("Error occurred in admin/"+fnName+":", exception);
+		res.status(500).send("fail");
+	}
+	
 };
 
 exports.getNames_ICE = async (req, res) => {
@@ -2070,5 +2129,62 @@ exports.getNotificationChannels = async (req, res) => {
 	} catch (exception){
 		logger.error("Error occurred in admin/"+fnName, exception);
 		res.status(500).send("fail");
+	}
+};
+
+exports.restartService = async (req, res) => {
+	logger.info("Inside UI Service: restartService");
+	var childProcess = require("child_process");
+	var serverList = ["License Server", "DAS Server", "Web Server"];
+	var svcNA = "service does not exist";
+	var svcRun = "RUNNING";
+	var svcRunPending = "START_PENDING";
+	var svcStop = "STOPPED";
+	var svcStopPending = "STOP_PENDING";
+	var svc = req.body.id;
+	var batFile = require.resolve("./assets/svc.bat");
+	var execCmd = batFile + " ";
+	try {
+		if (svc == "query") {
+			var svcStatus = [];
+			childProcess.exec(execCmd + "0 QUERY", function(error, stdout, stderr) {
+				if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+				else svcStatus.push(false);
+				childProcess.exec(execCmd + "1 QUERY", function(error, stdout, stderr) {
+					if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+					else svcStatus.push(false);
+					childProcess.exec(execCmd + "2 QUERY", function(error, stdout, stderr) {
+						if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+						else svcStatus.push(false);
+						return res.send(svcStatus);
+					});
+				});
+			});
+		} else {
+			execCmd = execCmd + svc.toString() + " ";
+			childProcess.exec(execCmd + "QUERY", function(error, stdout, stderr) {
+				if (stdout) {
+					if (stdout.indexOf(svcNA) > 0) {
+						logger.error("Error occured in restartService:", serverList[svc], "Service is not installed");
+						return res.send("na");
+					} else {
+						if (stdout.indexOf(svcRun) > 0 || stdout.indexOf(svcRunPending) > 0) execCmd += "RESTART";
+						else execCmd += "START";
+						logger.error(serverList[svc], "Service restarted successfully");
+						res.send("success");
+						childProcess.exec("START " + execCmd, function(error, stdout, stderr) {
+							return;
+						});
+						return true;
+					}
+				} else {
+					logger.error("Error occured in restartService: Fail to restart", serverList[svc], "Service");
+					return res.status(500).send("fail");
+				}
+			});
+		}
+	} catch (exception) {
+		logger.error(exception.message);
+		return res.status(500).send("fail");
 	}
 };
