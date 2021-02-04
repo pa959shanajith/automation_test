@@ -2801,28 +2801,23 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (action == "create") $scope.userConf.click();
 				else $scope.userConf.edit();
 				openModalPopup(bAction+" User", "Failed to "+action+" user.");
-			} else if(/^2[0-4]{10}$/.test(data)) {
+			} else if(/^2[0-4]{8}$/.test(data)) {
 				if (parseInt(data[1])) {
 					openModalPopup(bAction+" User", "Failed to "+action+" user. Invalid Request!");
 					return;
 				}
 				var errfields = [];
+				let hints = 'Hint:';
 				if (parseInt(data[2])) errfields.push("User Name");
 				if (parseInt(data[3])) errfields.push("First Name");
 				if (parseInt(data[4])) errfields.push("Last Name");
+				if (parseInt(data[5])) errfields.push("Password");
 				if (parseInt(data[6])) errfields.push("Email");
 				if (parseInt(data[7])) errfields.push("Authentication Server");
 				if (parseInt(data[8])) errfields.push("User Domain Name");
-				openModalPopup(bAction+" User", "Following values are invalid: "+errfields.join(", "));
-				if (parseInt(data[5])) {
-					openModalPopup(bAction+" User", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
-				}
-				if (parseInt(data[9])) {
-					openModalPopup(bAction+" User", "Failed to "+action+" user");
-				}
-				if (parseInt(data[10])) {
-					openModalPopup(bAction+" User", "Please do not use last 5 passwords");
-				}
+				if (parseInt(data[5]) == '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+				if (parseInt(data[5]) == '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
+				openModalPopup(bAction+" User", "Following values are invalid: "+errfields.join(", ")+" "+hints);
 			}
 		}, function (error) {
 			unblockUI();
@@ -4227,25 +4222,20 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.sessionConf.fetchLockedUsers = function () {
-		// this.click();
-		// $scope.tab = "editUser";
-		// $scope.userConf.fType = "Default";
 		// blockUI("Fetching locked users...");
-		adminServices.fetchLockedUsers("user")
+		adminServices.fetchLockedUsers()
 		.then(function(data){
 			// unblockUI();
 			if(data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else if(data == "fail") {
-				openModalPopup("Edit User", "Failed to fetch users.");
-			} else if(data == "empty") {
-				openModalPopup("Edit User", "There are no users created yet.");
+				openModalPopup("Session Management", "Unable to fetch locked users accounts.");
 			} else {
-				$scope.sessionConf.lockedusers = data.lockedUsers;
+				$scope.sessionConf.lockedusers = data;
 			}
 		}, function (error) {
 			// unblockUI();
-			openModalPopup("Edit User", "Failed to fetch users.");
+			openModalPopup("Session Management", "Unable to fetch locked users accounts.");
 		});
 	}
 
@@ -4275,6 +4265,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if (data == "fail") {
 				openModalPopup("Session Management", msg+"failed!")
 			} else {
+				openModalPopup("Session Management", msg+"successful!")
 				rootObj.splice(id,1);
 			}
 			unblockUI();
@@ -4285,21 +4276,20 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.sessionConf.unlock = function ($event) {
 		var id = parseInt($event.target.dataset.id);
-		var msg, rootObj, key, obj;
-		msg = "Unlocking User ";
+		var msg, rootObj, obj;
+		msg = "Unlocking User Account ";
 		rootObj = $scope.sessionConf.lockedusers;
 		obj = rootObj[id];
-		key = obj.id;
 		var user = obj.username;
-
 		blockUI(msg+user+"...");
-		adminServices.unlockUser(user,key)
+		adminServices.unlockUser(user)
 		.then(function (data) {
 			if (data == "Invalid Session") {
 				$rootScope.redirectPage();
 			} else if (data == "fail") {
 				openModalPopup("Session Management", msg+"failed!")
 			} else {
+				openModalPopup("Session Management", msg+"successful!")
 				rootObj.splice(id,1);
 			}
 			unblockUI();

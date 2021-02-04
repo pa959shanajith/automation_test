@@ -121,10 +121,11 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 					$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
 					$(".ic-password").parent().addClass("input-border-error");
 					$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
-				} else if(data == "changePwd") {
+				} else if (data == "changePwd") {
 					$scope.changePwdPopup();
-				} else if(data == "timeout") $scope.loginValidation = "Password expired."; 
-				else if (data == "userLocked") {
+				} else if(data == "timeout") {
+					$scope.loginValidation = "User Password has expired. Please reset forgot password or contact admin";
+				} else if (data == "userLocked") {
 					$scope.loginValidation = "User account is locked!";
 					$scope.lockedOut = true;
 					$('#forgotPassword').hide();
@@ -313,17 +314,15 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 				} else if(data == "success") {
 					$("#changePassPopup").modal("hide");
 					openHeaderModalPopup("changeSuccessPopup");
-				} else if(data == "same"){
-					$(".ic-newpassword").parent().addClass("input-border-error");
-					$(".ic-confpassword").parent().addClass("input-border-error");
-					$scope.passwordValidation = "Sorry! You can't use the existing password again";
 				} else if(data == "incorrect") {
 					$(".ic-currpassword").parent().addClass("input-border-error");
 					$scope.passwordValidation = "Current Password is incorrect";
-				} else if(data == "reusedPass"){
+				} else if(data == "reusedPass" || data == "insuff" || data == "same") {
 					$(".ic-newpassword").parent().addClass("input-border-error");
 					$(".ic-confpassword").parent().addClass("input-border-error");
-					$scope.passwordValidation = "Sorry! You can't use last 5 passwords";
+					if (data == "same") $scope.passwordValidation = "New Password provided is same as old password";
+					else if (data == "insuff") $scope.passwordValidation = "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+					else $scope.passwordValidation = "Password provided does not meet length, complexity or history requirements of application.";
 				} else if(data == "fail") {
 					$scope.passwordValidation = "Failed to Change Password";
 				} else if(/^2[0-4]{10}$/.test(data)) {

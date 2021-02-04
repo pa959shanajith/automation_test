@@ -35,7 +35,7 @@ const strategyUtil = {
 			if (user == "fail") flag = "fail";
 			else if (!user || !user.auth) flag = "invalid_username_password";
 			else if (user.invalidCredCount == 5) flag = "userLocked";
-			else if (user.defaultpassword != "") {
+			else if (user.defaultpassword && user.defaultpassword != "") {
 				forgotPass = true;
 				var defPassword = bcrypt.compareSync(password, user.defaultpassword);
 				if (defPassword) {

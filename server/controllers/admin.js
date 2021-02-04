@@ -9,6 +9,7 @@ const client = new Client();
 const epurl = process.env.DAS_URL;
 const validator =  require('validator');
 const logger = require('../../logger');
+const login = require('./login');
 const utils = require('../lib/utils');
 const notifications = require('../notifications');
 const queue = require("../lib/executionQueue")
@@ -43,7 +44,7 @@ exports.manageUserDetails = async (req, res) => {
 	const fnName = "manageUserDetails";
 	logger.info("Inside UI Service: " + fnName);
 	try {
-		let flag = ['2','0','0','0','0','0','0','0','0','0','0'];
+		let flag = ['2','0','0','0','0','0','0','0','0'];
 		let regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
 		const reqData = req.body.user;
 		const action = req.body.action;
@@ -76,36 +77,26 @@ exports.manageUserDetails = async (req, res) => {
 		}
 		if (action != "delete") {
 			if (internalUser) {
-				if (!validator.isEmpty(inputs.auth.password) && !(validator.isLength(inputs.auth.password,1,12))) {
-					logger.error("Error occurred in admin/"+fnName+": Invalid Password.");
+				if (validator.isEmpty(inputs.auth.password) || validator.isLength(inputs.auth.password,1,12) || !regexPassword.test(inputs.auth.password)) {
+					logger.error("Error occurred in admin/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.");
 					flag[5]='1';
+				} else if (action == "update") {
+					const userData = {username, newpass: inputs.auth.password, oldpass: ''};
+					const fresh = await login.verifyPasswordHistory(userData);
+					if (fresh == "fail") {
+						logger.error("Error occurred in admin/"+fnName+": Unable to retrive user profile");
+						return res.status(500).send("fail");
+					} else if (fresh != "valid") {
+						logger.error("Error occurred in admin/"+fnName+": Password provided does not meet length, complexity or history requirements of application.");
+						flag[5]='2'
+					} else {
+						//Add previous password to history
+						inputs.oldPassword = userData.oldpass;
+					}
 				}
 			}
 			if (inputs.auth.password != '') {
 				const salt = bcrypt.genSaltSync(10);
-				if (!regexPassword.test(inputs.auth.password)) {
-					logger.error("Error occurred in admin/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters..");
-					flag[9]='1'
-				}
-				if (action == "update"){
-					const userDet = await utils.fetchData(input_pass, "login/loadUser", fnName);
-					if (userDet == "fail") flag[9]='1' //here if anything happens what error to show
-					else {
-						var passHistory = userDet.passwordhistory;
-						var oldPass = userDet.auth.password;
-						if (bcrypt.compareSync(inputs.auth.password, oldPass)) flag[10]='1'
-						else {
-							for(var i=0;i<passHistory.length;++i) {
-								if(bcrypt.compareSync(inputs.auth.password, passHistory[i])) {
-									flag[10]='1'
-									break
-								}
-							}
-						}
-						//Add previous password to history
-						inputs.oldPassword = bcrypt.hashSync(oldPass, salt);
-					}
-				}
 				inputs.auth.password = bcrypt.hashSync(inputs.auth.password, salt);
 			} else delete inputs.auth.password;
 			inputs.firstname = (reqData.firstname || "").trim();
@@ -144,7 +135,7 @@ exports.manageUserDetails = async (req, res) => {
 			}
 		}
 		flag = flag.join('');
-		if (flag != "20000000000") {
+		if (flag != "200000000") {
 			return res.send(flag);
 		}
 		const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
@@ -202,21 +193,17 @@ exports.fetchLockedUsers = async (req, res) => {
 	const fnName = "fetchLockedUsers";
 	logger.info("Inside UI Service: " + fnName);
 	try {
-		const action = req.body.action;
-		const userid = req.body.args;
-		let inputs = {};
-		if (action != "user") inputs.userid = userid;
-		const result = await utils.fetchData(inputs, "admin/fetchLockedUsers", fnName);
+		const result = await utils.fetchData({}, "admin/fetchLockedUsers", fnName);
 		if (result == "fail") res.status(500).send("fail");
 		else {
-			data = {lockedUsers: []};
+			const lockedUsers = [];
 			result.forEach(function(e) {
-				data.lockedUsers.push({
+				lockedUsers.push({
 					username: e.name,
 					role: e.defaultrole
 				});
 			});
-			return res.send(data);
+			return res.send(lockedUsers);
 		}
 	} catch (exception){
 		logger.error("Error occurred in admin/"+fnName+":", exception);
