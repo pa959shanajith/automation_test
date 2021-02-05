@@ -85,6 +85,13 @@ if (cluster.isMaster) {
 			ciphers: ["ECDHE-RSA-AES256-SHA384", "DHE-RSA-AES256-SHA384", "ECDHE-RSA-AES256-SHA256", "DHE-RSA-AES256-SHA256", "ECDHE-RSA-AES128-SHA256", "DHE-RSA-AES128-SHA256", "HIGH", "!aNULL", "!eNULL", "!EXPORT", "!DES", "!RC4", "!MD5", "!PSK", "!SRP", "!CAMELLIA"].join(':'),
 			honorCipherOrder: true
 		};
+		// CORS and security headers
+		app.all('*', function(req, res, next) {
+			res.setHeader('Access-Control-Allow-Origin', req.hostname);
+			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
+			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+			next();
+		});
 		var httpsServer = require('https').createServer(credentials, app);
 		var serverPort = process.env.SERVER_PORT || 8443;
 		module.exports = app;
@@ -189,14 +196,6 @@ if (cluster.isMaster) {
 			}));
 			// app.use(helmet.noCache());
 		}
-
-		// CORS and security headers
-		app.all('*', function(req, res, next) {
-			res.setHeader('Access-Control-Allow-Origin', req.hostname);
-			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
-			res.setHeader('X-Frame-Options', 'SAMEORIGIN');				
-			next();
-		});
 
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
