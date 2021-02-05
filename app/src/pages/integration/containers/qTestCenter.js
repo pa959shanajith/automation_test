@@ -1,12 +1,12 @@
 import React ,{useState , Fragment , useRef} from 'react';
 import {ModalContainer , ScrollBar , PopupMsg ,ScreenOverlay} from '../../global';
-import '../styles/IntegrationCenter.scss';
+import '../styles/qTestCenter.scss';
 import { useSelector } from 'react-redux';
 import { loginToQTest_ICE ,qtestProjectDetails_ICE , qtestFolderDetails_ICE , saveQtestDetails_ICE,viewQtestMappedList_ICE} from '../api.js';
 import Content from "../components/Content.js"
 import ViewMappedFiles from "../components/ViewMappedFiles.js"
 import QTest from '../components/qTest.js'
-const  IntegrationCenter = (props)=> {
+const  QTestCenter = (props)=> {
 const [loginSucess , setLoginSucess] = useState(false);
 const urlRef = useRef();
 const userNameRef = useRef();
@@ -361,5 +361,6 @@ return (<Fragment>
     )
 }
 
-export default IntegrationCenter
+export default QTestCenter;
+
 

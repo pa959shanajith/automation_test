@@ -3,8 +3,9 @@ import Header from '../../global/components/Header';
 import Footer from '../../global/components/FooterTwo';
 import Leftbar from '../components/Leftbar';
 import Rightbar from '../components/Rightbar';
-import IntegrationCenter from './IntegrationCenter';
-import ALMCenter from './ALMCenter.js'
+import QTestCenter from './qTestCenter';
+import ALMCenter from './ALMCenter.js';
+import ZephyrCenter from './ZephyrCenter.js';
 import '../styles/IntegrationHome.scss'
 
 //Integration Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
@@ -12,8 +13,10 @@ import '../styles/IntegrationHome.scss'
 const  Integrations=()=>{
     const [qTestClicked , setqTestClicked] = useState(false);
     const [almClicked , setAlmClicked] = useState(false);
+    const [zephyrClicked , setZephyrClicked]= useState(false);
     const [popUpEnable , setPopUpEnable] = useState(false);
     const [loginAlm , setloginAlm]= useState(false);
+    const [loginZephyr , setloginZephyr] = useState(false);
     const [focus,setFocus] = useState(null);
     const [viewmappedFiles , setViewMappedFiles] = useState(false)
     return(
@@ -30,6 +33,9 @@ const  Integrations=()=>{
                     setloginAlm={setloginAlm}
                     qTestClicked={qTestClicked}
                     almClicked={almClicked}
+                    zephyrClicked={zephyrClicked}
+                    setZephyrClicked={setZephyrClicked}
+                    setloginZephyr={setloginZephyr}
                 />
                 {almClicked?
                 <ALMCenter
@@ -39,8 +45,21 @@ const  Integrations=()=>{
                     setViewMappedFiles={setViewMappedFiles}
                     almClicked={almClicked}
                     setAlmClicked={setAlmClicked}
-                /> :
-                <IntegrationCenter
+                    
+                /> 
+                :
+                zephyrClicked?
+                <ZephyrCenter
+                    zephyrClicked={zephyrClicked}
+                    viewmappedFiles={viewmappedFiles}
+                    setViewMappedFiles={setViewMappedFiles}
+                    setZephyrClicked={setZephyrClicked}
+                    loginZephyr={loginZephyr}
+                    setloginZephyr={setloginZephyr}
+                    setFocus={setFocus}
+                />
+                :
+                <QTestCenter
                     qTestClicked={qTestClicked}
                     setqTestClicked={setqTestClicked}
                     popUpEnable={popUpEnable}

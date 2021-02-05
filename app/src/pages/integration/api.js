@@ -320,3 +320,36 @@ export const viewQcMappedList_ICE = async(userID) => {
         return {error:'No Mapped Data Found'}
     }
 }
+export const loginToZephyr_ICE = async(zephyrAcKey , zephyrAccNo , zephyrJiraAccToken,zephyrJiraUrl,zephyrSecKey,zephyrJiraUserName ) => {
+    try{
+        const res = await axios(url+'/loginToZephyr_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            execFlag : '0',
+            zephyrAcKey: zephyrAcKey,
+            zephyrAccNo: zephyrAccNo,
+            zephyrJiraAccToken: zephyrJiraAccToken,
+            zephyrJiraUrl:zephyrJiraUrl,
+            zephyrSecKey:zephyrSecKey,
+            zephyrJiraUserName:zephyrJiraUserName,   
+            action : 'loginToZephyr_ICE',
+            zephyraction : "domain"
+        }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'No User Details Found ,Please Login Again'}
+    }catch(err){
+        console.error(err)
+        return {error:'No User Details Found ,Please Login Again'}
+    }
+}
