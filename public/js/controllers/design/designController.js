@@ -1092,11 +1092,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								ob.hiddentag = "No",
 									tag = "iris;" + ob.objectType,
 									ob.url = "",
-									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag,
+									irisText = ob.objectText || ""
                                 if(ob.hasOwnProperty('editable')){
-                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
+                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + irisText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
                                 }else{
-                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + irisText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     }
 							}else{
                                 if(ob.hasOwnProperty('editable')){
@@ -2384,10 +2385,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 										tag = "iris;" + ob.objectType,
 										ob.url = "",
 										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag,
-										irisFlg = true
+										irisFlg = true,
+										irisText = ob.objectText || ""
 									}
 									if (irisFlg){
-										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + irisText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									}
 									else if (appType == "OEBS" || appType == "Desktop") {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -2449,10 +2451,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									tag = "iris;" + ob.objectType,
 									ob.url = "",
 									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag,
-									irisFlg = true
+									irisFlg = true,
+									irisText = ob.objectText || ""
 								}
 								if (irisFlg){
-									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + ob.objectText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-text='" + irisText.replace(/'/g, "%27") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 								}
 								else if (appType == "OEBS" || appType == "Desktop") {
 									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -2658,7 +2661,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType != ''){
 					objType = viewString.view[i].objectType[0].toUpperCase() + viewString.view[i].objectType.slice(1,viewString.view[i].objectType.length);
 					break;
-				}  
+				}else if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType == ''){
+					objType = "unrecognizableobject";
+					break;
+				}
 			}
 			img = ele[0].attributes["data-image"].value
 			image.src = 'data:image/png;base64,'+img;
@@ -2674,7 +2680,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 var wd = obj_width + "px;"
                 $('#irisimg').find('img').attr('style',"width:"+wd)
             }
-			// $('#irisimg').append(canvas)
 			$('#iristext').append('<span><b>Object Text : '+obj_text.replace(/%27/g, "'") +' </b></span>')
 			$('#iristag').append('<span><b style="text-transform: capitalize;">Object Tag : ' + obj_tag + '</b></span>')
 		}else{
