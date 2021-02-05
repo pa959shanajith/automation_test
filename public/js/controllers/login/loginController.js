@@ -307,7 +307,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			$(".fpnewpass, .fpconfpass").parent().addClass("input-border-error");
 			$scope.passwordValidation = "New Password and Confirm Password do not match";
 		}  else {
-			LoginService.changePassword($scope.ud.userName,currpassword,newpassword)
+			LoginService.resetPassword(newpassword,currpassword)
 			.then(function (data) {
 				if(data == "Invalid Session"){
 					$scope.passwordValidation = "Invalid Session";

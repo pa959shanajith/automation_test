@@ -367,7 +367,8 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				}
 			}, function (error) {
 				$(".ic-currpassword").parent().addClass("input-border-error");
-				$scope.passwordValidation = "Failed to Authenticate user with Current Password.";
+				if(error == "Invalid Session") $scope.passwordValidation = "Invalid Session";
+				else $scope.passwordValidation = "Failed to Authenticate user with Current Password.";
 			});
 		}
 	};
