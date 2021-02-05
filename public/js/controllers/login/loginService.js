@@ -72,19 +72,6 @@ mySPA.factory('LoginService', ['$http', '$q', function ($http, $q) {
 				return $q.reject(response.data)
 			})
 		},
-		changePassword: function (username,currpassword,newpassword) {
-			return $http.post('/changePassword', {
-				username: username,
-				currpassword: currpassword,
-				newpassword: newpassword
-			})
-			.then(function (response) {
-				return response.data
-			},
-				function (response) {
-				return $q.reject(response.data)
-			})
-		},
 		getRoleNameByRoleId: function (roleasarray) {
 			var param = "getRoleNameByRoleId";
 			return $http.post('/getRoleNameByRoleId', {
