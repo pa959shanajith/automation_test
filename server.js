@@ -94,9 +94,7 @@ if (cluster.isMaster) {
 
 		//Caching static files for thirtyDays 
 		var thirtyDays = 2592000; // in milliseconds
-		app.use(express.static(__dirname + "/public/", {
-			maxage: thirtyDays
-		}));
+		app.use(express.static(__dirname + "/public/", { maxage: thirtyDays, index: false }));
 
 		//serve all asset files from necessary directories
 		app.use('/partials', express.static(__dirname + "/public/partials"));
@@ -132,7 +130,8 @@ if (cluster.isMaster) {
 				path: '/',
 				httpOnly: true,
 				secure: true,
-				maxAge: parseInt(process.env.SESSION_AGE)
+				maxAge: parseInt(process.env.SESSION_AGE),
+				sameSite: true
 			},
 			resave: false,
 			rolling: true,
@@ -211,7 +210,7 @@ if (cluster.isMaster) {
 		}));
 
 		app.all('*', function(req, res, next) {
-			res.cookie('XSRF-TOKEN', req.csrfToken(), {httpOnly: false, expires: ""})
+			res.cookie('XSRF-TOKEN', req.csrfToken(), {httpOnly: false, sameSite:true, secure: true})
 			next();
 		});
 
