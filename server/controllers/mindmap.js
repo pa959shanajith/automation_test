@@ -204,6 +204,7 @@ exports.saveData = async (req, res) => {
 						return res.send('fail');
 					}
 					if(inputs[key][i]['task']!=null){
+						var map_task=inputs[key][i]['task']
 						if(regg.test(map_task['batchName']) || regg.test(map_task['details']) || regg.test(map_task['task'])){
 							logger.error("Error occurred in mindmap/"+fnName+": Special characters found!!");
 							return res.send('fail');
