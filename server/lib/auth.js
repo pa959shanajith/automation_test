@@ -524,7 +524,7 @@ module.exports.validateUserState = async (req, res) => {
 						emsg = "noProjectsAssigned";
 					} else {
 						emsg = "ok";
-						res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
+						res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
 						req.session.userid = userid;
 						req.session.ip = ip;
 						req.session.loggedin = (new Date()).toISOString();
