@@ -357,7 +357,7 @@ exports.getAllSuites_ICE = function(req, res) {
         var requestedaction = req.body.readme;
         if (requestedaction == 'projects' || requestedaction == 'reports') {
             try {
-                var userid = req.body.userId;
+                var userid = req.body.userId ? req.body.userId : req.session.userid;
                 logger.info("Calling function getprojectdetails from getAllSuites_ICE: Projects");
                 getprojectdetails(userid, function(getprojectdetailserror, getprojectdetailsresponse) {
                     try {
