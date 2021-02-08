@@ -16,7 +16,7 @@ import Mindmap from './pages/mindmap';
 import Scrape from './pages/scrape';
 import Design from './pages/design';
 import Utility from './pages/utility';
-// import Report from './pages/report';
+import Report from './pages/report';
 import Integration from './pages/integration';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
@@ -65,7 +65,7 @@ const RouteApp = () => {
       <Route path ="/design" component={Design}/>
       <Route path ="/utility" component={Utility}/>
       <Route path = "/integration" component={Integration}/>
-      {/* <Route path = "/reports" component={Report}/> */}
+      <Route path = "/reports" component={Report}/>
       <Route path ="/execute" component={Execute}/>
       <Route path ="/scheduling" component={Schedule}/>
       <Route component={Base} />

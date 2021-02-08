@@ -98,11 +98,6 @@ if (cluster.isMaster) {
 		}));
 
 		//serve all asset files from necessary directories
-		app.use('/partials', express.static(__dirname + "/public/partials"));
-		app.use("/js", express.static(__dirname + "/public/js"));
-		app.use("/imgs", express.static(__dirname + "/public/imgs"));
-		app.use("/css", express.static(__dirname + "/public/css"));
-		app.use("/fonts", express.static(__dirname + "/public/fonts"));
 		app.use("/neuronGraphs", express.static(__dirname + "/public/neurongraphs"));
 
 		app.use(bodyParser.json({
@@ -290,7 +285,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(specificreports|mindmap|p_Utility|p_Reports|plugin)$/, function(req, res) {
+		app.get(/^\/(mindmap|p_Utility|reports|plugin)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});

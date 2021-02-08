@@ -91,7 +91,8 @@ const reducer = (state = initialState , action) => {
                 deletedNodes: [],
                 moduleList: action.payload.moduledata,
                 selectedModule: {},
-                scenarioList:[]
+                scenarioList:[],
+                unassignTask:[]
             }
         case actionTypes.UPDATE_UNASSIGNTASK:
             return{
