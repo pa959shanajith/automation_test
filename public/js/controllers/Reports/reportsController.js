@@ -618,11 +618,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $(".mid-report-section tbody").empty();
         if($(ele).is(":visible") == true)
         {
-            var j=dateArray.length;
+            var j=dateArray.length/2;
             for (var i =0; i < dateArray.length; i++) {
                 dateArray[i].firstChild.innerHTML = "E<sub>" + parseInt(j) + "</sub>";
                 $(".mid-report-section tbody").append(dateArray[i]);
                 j--;
+                i++;
             }
         }
         else{
