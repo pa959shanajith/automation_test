@@ -100,15 +100,16 @@ exports.getRoleNameByRoleId = async (req, res) => {
 };
 
 // Return if new password provided is acceptable based on password history or not
-exports.verifyPasswordHistory = async (uData) => {
+const verifyPasswordHistory = async (uData) => {
 	const fnName = "verifyPasswordHistory";
 	let {username, newpass, oldpass} = uData;
 	const userDet = await utils.fetchData({ username }, "login/loadUser", fnName);
 	if (userDet == "fail") return "fail";
 	uData.user = userDet;
 	oldpass = uData.oldpass = userDet.auth.password;
-	const passHistory = userDet.passwordhistory;
-	if (uData.currpass && !bcrypt.compareSync(uData.currpass, oldpass)) return "invalid"
+	const passHistory = userDet.auth.passwordhistory;
+	if (uData.currpass && !bcrypt.compareSync(uData.currpass, oldpass)) return "invalid";
+	if (uData.currdefpass && !bcrypt.compareSync(uData.currdefpass, userDet.auth.defaultpassword)) return "invalid";
 	if (bcrypt.compareSync(newpass, oldpass)) return "same";
 	for (let pass of passHistory) {
 		if (bcrypt.compareSync(newpass, pass)) return "reuse";
@@ -116,13 +117,24 @@ exports.verifyPasswordHistory = async (uData) => {
 	return "valid";
 };
 
+exports.verifyPasswordHistory = verifyPasswordHistory;
+
 // Reset Current password
 exports.resetPassword = async (req, res) => {
 	const fnName = "resetPassword";
 	logger.info("Inside UI Service: " + fnName);
 	try {
-		if (req.session.usertype != "inhouse") return res.send("fail");
-		const username = req.session.username;
+		let {username, usertype} = req.session;
+		let resetFlag = false;
+		const loggedUser = req._passport.instance.verifySession(req);
+		if (!loggedUser && req.user) {
+			username = req.user.username;
+			usertype = req.user.type;
+			resetFlag = true;
+		} else if (!loggedUser) {
+			return res.status(401).send("Invalid Session");
+		}
+		if (usertype != "inhouse") return res.send("fail");
 		const currpassword = req.body.currpassword;
 		const newpassword = req.body.newpassword;
 		if (!regexPassword.test(newpassword)) {
@@ -130,8 +142,10 @@ exports.resetPassword = async (req, res) => {
 			return res.send("insuff");
 		}
 
-		const userData = {username, currpass: currpassword, newpass: newpassword, oldpass: ''};
-		const fresh = await login.verifyPasswordHistory(userData);
+		const userData = {username, newpass: newpassword, oldpass: ''};
+		if (resetFlag) userData.currdefpass = currpassword;
+		else userData.currpass = currpassword;
+		const fresh = await verifyPasswordHistory(userData);
 		if (fresh == "fail") {
 			logger.error("Error occurred in login/"+fnName+": Unable to retrive user profile");
 			return res.status(500).send("fail");
@@ -149,68 +163,17 @@ exports.resetPassword = async (req, res) => {
 		const password = bcrypt.hashSync(newpassword, bcrypt.genSaltSync(10));
 		const inputs = {
 			action: "resetpassword",
-			userid: req.session.userid,
-			name: req.session.username,
-			modifiedby: req.session.userid,
-			modifiedbyrole: req.session.activeRoleId,
+			name: username,
+			userid: userData.user._id,
+			modifiedby: userData.user._id,
+			modifiedbyrole: userData.user.defaultrole,
 			password: password,
 			oldPassword: userData.oldpass
 		};
 		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");
 		else {
-			notifications.notify("userUpdate", {field: "password", user: result});
-			res.send(status);
-		}
-	} catch (exception) {
-		logger.error(exception.message);
-		res.send("fail");
-	}
-};
-
-// Reset Current password on Forgot Password
-exports.changePassword = async (req, res) => {
-	const fnName = "changePassword";
-	logger.info("Inside UI Service: " + fnName);
-	try {
-		const username = req.body.username;
-		const currpassword = req.body.currpassword;
-		const newpassword = req.body.newpassword;
-		if (!regexPassword.test(newpassword)) {
-			logger.error("Error occurred in login/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.");
-			return res.send("insuff");
-		}
-		const userData = {username, newpass: newpassword, oldpass: ''};
-		const fresh = await login.verifyPasswordHistory(userData);
-		if (fresh == "fail") {
-			logger.error("Error occurred in login/"+fnName+": Unable to retrive user profile");
-			return res.status(500).send("fail");
-		} else {
-			const validUser = bcrypt.compareSync(currpassword, fresh.user.defaultpassword);
-			if (!validUser) {
-				logger.error("Error occurred in login/"+fnName+": Current Password provided is incorrect.");
-				return res.send("incorrect");
-			}
-			if (fresh == "reuse") {
-				logger.error("Error occurred in login/"+fnName+": Password provided does not meet length, complexity or history requirements of application.");
-				return res.send("reusedPass");
-			} else if (fresh == "same") {
-				logger.error("Error occurred in login/"+fnName+": New Password provided is same as old password.");
-				return res.send("same");
-			}
-		}
-
-		const password = bcrypt.hashSync(newpassword, bcrypt.genSaltSync(10));
-		const inputs = {
-			action: "changepassword",
-			name: req.body.username,
-			password: password,
-			oldPassword: userData.oldpass
-		};
-		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
-		if (status == "fail" || status == "forbidden") return res.send("fail");
-		else {
-			notifications.notify("userUpdate", {field: "password", user: result});
+			notifications.notify("userUpdate", {field: "password", user: userData.user});
 			res.send(status);
 		}
 	} catch (exception) {
