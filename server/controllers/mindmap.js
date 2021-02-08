@@ -1307,7 +1307,11 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
 								'setText',[eachScrapedAction.action.actionData],null,eachScrapedAction.url,"Web")
 						}
-						break;		
+						break;
+                    case "inputReadOnly":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+								'setText',[eachScrapedAction.action.actionData],null,eachScrapedAction.url,"Web")
+						break;						
 					default:
 						break;
 				}
