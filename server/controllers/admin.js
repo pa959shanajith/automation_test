@@ -439,15 +439,17 @@ exports.createProject_ICE = async (req, res) => {
 				}
 			}
 		}
+		const userid = req.session.userid;
+		const roleId = req.session.activeRoleId;
 		const inputs = {
 			name: createProjectObj.projectName,
 			domain: createProjectObj.domain,
 			type: createProjectObj.appType,
 			releases: createProjectObj.projectDetails,
-			createdby: res.session.userid,
-			createdbyrole: res.session.activeRoleId,
-			modifiedby: res.session.userid,
-			modifiedbyrole: res.session.activeRoleId
+			createdby: userid,
+			createdbyrole: roleId,
+			modifiedby: userid,
+			modifiedbyrole: roleId
 		};
 		const result = await utils.fetchData(inputs, "admin/createProject_ICE", fnName);
 		if (result == "fail") {

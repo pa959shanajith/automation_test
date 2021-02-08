@@ -138,9 +138,9 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 	$(document).off('change').on('change', ".qcSelectDomain", function(){
 		$(document.body).css({'cursor' : 'wait'});
 		$(".qcSelectDomain, .qcSelectProject").prop("disabled", true);
-		var getDomain = $(this).children("option:selected").val();
+		var projectId = $(this).children("option:selected").data("projectid");
 		blockUI('Loading....');
-		qcServices.qtestProjectDetails_ICE(getDomain)
+		qcServices.qtestProjectDetails_ICE(projectId)
 			.then(function(data){
 				avoassure_projects_details = data.avoassure_projects;
 				if(data == "unavailableLocalServer"){
@@ -157,7 +157,7 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 					$(".qcSelectProject").empty();
 					$(".qcSelectProject").append("<option value='' selected disabled>Select Release</option>");
 					for(var i=0;i<data.qc_projects.length;i++){
-						$(".qcSelectProject").append("<option value='"+data.qc_projects[i]+"'>"+data.qc_projects[i]+"</option>");
+						$(".qcSelectProject").append("<option value='"+data.qc_projects[i].id+"'>"+data.qc_projects[i].name+"</option>");
 					}
 					$(".qtestAvoAssureSelectProject").empty();					
 					$(".qtestAvoAssureSelectProject").append("<option value='' selected disabled>Select Project</option>");

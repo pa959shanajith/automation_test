@@ -85,6 +85,13 @@ if (cluster.isMaster) {
 			ciphers: ["ECDHE-RSA-AES256-SHA384", "DHE-RSA-AES256-SHA384", "ECDHE-RSA-AES256-SHA256", "DHE-RSA-AES256-SHA256", "ECDHE-RSA-AES128-SHA256", "DHE-RSA-AES128-SHA256", "HIGH", "!aNULL", "!eNULL", "!EXPORT", "!DES", "!RC4", "!MD5", "!PSK", "!SRP", "!CAMELLIA"].join(':'),
 			honorCipherOrder: true
 		};
+		// CORS and security headers
+		app.all('*', function(req, res, next) {
+			res.setHeader('Access-Control-Allow-Origin', req.hostname);
+			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
+			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+			next();
+		});
 		var httpsServer = require('https').createServer(credentials, app);
 		var serverPort = process.env.SERVER_PORT || 8443;
 		module.exports = app;
@@ -103,6 +110,7 @@ if (cluster.isMaster) {
 		app.use("/css", express.static(__dirname + "/public/css"));
 		app.use("/fonts", express.static(__dirname + "/public/fonts"));
 		app.use("/neuronGraphs", express.static(__dirname + "/public/neurongraphs"));
+		app.post('/designTestCase', (req, res) => res.sendFile("index.html", { root: __dirname + "/public/" }));
 
 		app.use(bodyParser.json({
 			limit: '50mb'
@@ -189,14 +197,6 @@ if (cluster.isMaster) {
 			// app.use(helmet.noCache());
 		}
 
-		// CORS and security headers
-		app.all('*', function(req, res, next) {
-			res.setHeader('Access-Control-Allow-Origin', req.hostname);
-			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
-			res.setHeader('X-Frame-Options', 'SAMEORIGIN');				
-			next();
-		});
-
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
 
@@ -204,6 +204,7 @@ if (cluster.isMaster) {
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
 		app.post('/getReport_API', report.getReport_API);
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
+		app.post('/ICE_provisioning_register', io.registerICE);
 
 		app.use(csrf({
 			cookie: true
@@ -284,10 +285,6 @@ if (cluster.isMaster) {
 				return res.redirect("/error?e=" + ((sessChk) ? "403" : "401"));
 			}
 		}
-
-		app.post('/designTestCase', function(req, res) {
-			return res.sendFile("index.html", { root: __dirname + "/public/" });
-		});
 
 		app.get('/AvoAssure_ICE.zip', async (req, res) => {
 			const iceFile = "AvoAssure_ICE.zip";
@@ -481,8 +478,6 @@ if (cluster.isMaster) {
 		app.post('/APG_OpenFileInEditor', auth.protect, flowGraph.APG_OpenFileInEditor);
 		app.post('/APG_createAPGProject', auth.protect, flowGraph.APG_createAPGProject);
 		app.post('/APG_runDeadcodeIdentifier', auth.protect, flowGraph.APG_runDeadcodeIdentifier);
-		// ICE Provisioning
-		app.post('/ICE_provisioning_register', io.registerICE);
 		app.post('/getUserICE', auth.protect, io.getUserICE)
 		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE)
 		//-------------Route Mapping-------------//
@@ -506,6 +501,7 @@ if (cluster.isMaster) {
 
 		// To catch all errors
 		app.use(function(err, req, res, next) {
+			if (err.code == "EBADCSRFTOKEN") return res.status(400).send("Bad Request!");
 			var ecode = "601";
 			var emsg = err.message;
 			if (err.message == "cachedbnotavailable") {
