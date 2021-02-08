@@ -2,6 +2,7 @@ import React, { Fragment, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import ReportHome from './container/ReportHome.js';
+import { SetProgressBar, RedirectPage } from '../global';
 export var history
 
 /*Component Report
