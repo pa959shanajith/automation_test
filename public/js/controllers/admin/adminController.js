@@ -274,7 +274,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$scope.createIcePool.allProjectList.forEach((e)=>{
 			$("#allProjectAP").append('<option value='+e._id+'>'+e.name+'</option>');
 		})
-		$scope.createIcePool.allIcePoolListFilter=''
+		$scope.createIcePool.allIcePoolListFilter={}
 		$scope.createIcePool.selectedIcePool = undefined
 	}
 
@@ -540,7 +540,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.allocationPoolReset = () => {
 		var type = $scope.allocateIcePool.type 
-		$scope.allocateIcePool.allIcePoolListFilter=''
+		$scope.allocateIcePool.allIcePoolListFilter={}
 		$scope.allocateIcePool.selectedIcePool = undefined	
 		if(type == 'quantity'){
 			$('#update-icepool-count').addClass("hide")
@@ -3256,6 +3256,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.bindCredentials = "";
 		this.basedn = "";
 		this.cert = "";
+		this.servers = [];
 		this.certName = "No file choosen";
 		this.secure = "false";
 		this.fieldmap = {uname: "", fname: "", lname: "", email: ""};
@@ -3416,19 +3417,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				openModalPopup("Edit Configuration", "Failed to fetch configurations.");
 			} else if(data == "empty") {
 				openModalPopup("Edit Configuration", "There are no configurations created yet.");
-				var selBox = $("#ldapServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				selBox.prop("selectedIndex", 0);
+				$scope.ldapConf.servers = [];
 			} else {
 				data.sort(function(a,b){ return a > b; });
-				var selBox = $("#ldapServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				for(var i = 0; i < data.length; i++){
-					selBox.append("<option value=\""+data[i].name+"\">"+data[i].name+"</option>");
-				}
-				selBox.prop("selectedIndex", 0);
+				$scope.ldapConf.servers = data.map(e=> e.name);
 			}
 		}, function (error) {
 			unblockUI();
@@ -3447,6 +3439,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.ldapConf.getServerData = function () {
 		var name = this.serverName;
+		if (name == null) return;
 		ldapConf = $scope.ldapConf;
 		var failMsg = "Failed to fetch details for '"+name+"' configuration.";
 		blockUI("Fetching details...");
@@ -3549,6 +3542,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.url = "";
 		this.idp = "";
 		this.cert = "";
+		this.servers = [];
 		this.certName = "No file choosen";
 		this.urlToolTip = "Single Sign-On URL (SAML assertion URL)"
 		this.idpToolTip = "Identity Issuer (Can be text or URL)"
@@ -3662,19 +3656,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "fail") openModalPopup("Edit Configuration", "Failed to fetch configurations.");
 			else if(data == "empty") {
 				openModalPopup("Edit Configuration", "There are no configurations created yet.");
-				const selBox = $("#samlServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				selBox.prop("selectedIndex", 0);
+				$scope.samlConf.servers = [];
 			} else {
 				data.sort(function(a,b){ return a > b; });
-				const selBox = $("#samlServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				for(var i = 0; i < data.length; i++){
-					selBox.append("<option value='"+data[i].name+"'>"+data[i].name+"</option>");
-				}
-				selBox.prop("selectedIndex", 0);
+				$scope.samlConf.servers = data.map(e=> e.name);
 			}
 		}, function (error) {
 			unblockUI();
@@ -3708,6 +3693,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.samlConf.getServerData = function () {
 		const name = $scope.samlConf.name;
+		if (name == null) return;
 		const failMsg = "Failed to fetch details for '"+name+"' configuration.";
 		blockUI("Fetching details...");
 		adminServices.getSAMLConfig(name)
@@ -3735,6 +3721,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.url = "";
 		this.clientId = "";
 		this.secret = "";
+		this.servers = [];
 		this.idToolTip = "Public identifier for the client"
 		this.secretToolTip = "Secret used by the client to exchange an authorization code for a token"
 		$("#oidcUrl,#oidcClientId,#oidcClientSecret").removeClass("inputErrorBorder");
@@ -3844,19 +3831,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "fail") openModalPopup("Edit Configuration", "Failed to fetch configurations.");
 			else if(data == "empty") {
 				openModalPopup("Edit Configuration", "There are no configurations created yet.");
-				const selBox = $("#oidcServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				selBox.prop("selectedIndex", 0);
+				$scope.oidcConf.servers = [];
 			} else {
 				data.sort(function(a,b){ return a > b; });
-				const selBox = $("#oidcServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				for(var i = 0; i < data.length; i++){
-					selBox.append("<option value='"+data[i].name+"'>"+data[i].name+"</option>");
-				}
-				selBox.prop("selectedIndex", 0);
+				$scope.oidcConf.servers = data.map(e=> e.name);
 			}
 		}, function (error) {
 			unblockUI();
@@ -3875,6 +3853,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.oidcConf.getServerData = function () {
 		const name = $scope.oidcConf.name;
+		if (name == null) return;
 		const failMsg = "Failed to fetch details for '"+name+"' configuration.";
 		blockUI("Fetching details...");
 		adminServices.getOIDCConfig(name)
@@ -3943,6 +3922,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.mailConf.getProviderInfo = function() {
+		if (this.provider == null) return;
 		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail").removeClass("inputErrorBorder");
 		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
 		blockUI("Loading Configurations...");
