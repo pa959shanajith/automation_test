@@ -199,10 +199,16 @@ exports.saveData = async (req, res) => {
 		for(var key in inputs){
 			if(key=='map'){
 				for(var i=0;i<inputs[key].length;i++){
-					var map_task=inputs[key][i]['task']
-					if(regg.test(inputs[key][i]['name']) || regg.test(map_task['batchName']) || regg.test(map_task['details']) || regg.test(map_task['task'])){
+					if(regg.test(inputs[key][i]['name'])){
 						logger.error("Error occurred in mindmap/"+fnName+": Special characters found!!");
 						return res.send('fail');
+					}
+					if(inputs[key][i]['task']!=null){
+						var map_task=inputs[key][i]['task']
+						if(regg.test(map_task['batchName']) || regg.test(map_task['details']) || regg.test(map_task['task'])){
+							logger.error("Error occurred in mindmap/"+fnName+": Special characters found!!");
+							return res.send('fail');
+						}
 					}
 				}
 			}
