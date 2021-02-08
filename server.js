@@ -501,6 +501,7 @@ if (cluster.isMaster) {
 
 		// To catch all errors
 		app.use(function(err, req, res, next) {
+			if (err.code == "EBADCSRFTOKEN") return res.status(400).send("Bad Request!");
 			var ecode = "601";
 			var emsg = err.message;
 			if (err.message == "cachedbnotavailable") {

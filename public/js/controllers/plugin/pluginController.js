@@ -176,50 +176,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						}
 					}
 					window.localStorage['_FD'] = angular.toJson($scope.filterDat);
-					// PluginService.getNames_ICE($scope.filterDat.projectids,Array($scope.filterDat.projectids.length).fill('projects'))
-					// .then(function (response) {
-					// 	if(response== "fail"){ unblockUI(); }
-					// 	else if(response == "Invalid Session"){
-					// 		return $rootScope.redirectPage();
-					// 	} else {
-					// 		response.respnames.forEach(function(name,i){
-					// 			$scope.filterDat.idnamemapprj[response.requestedids[i]] = name;
-					// 		});
-					// 		PluginService.getNames_ICE($scope.filterDat.releaseids,Array($scope.filterDat.releaseids.length).fill('releases'))
-					// 		.then(function (response) {
-					// 			if(response == "Invalid Session"){
-					// 				return $rootScope.redirectPage();
-					// 			} else{
-					// 				response.respnames.forEach(function(name,i){
-					// 					$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
-					// 				});
-					// 				PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
-					// 				.then(function (response) {
-					// 					if(response == "Invalid Session"){
-					// 						return $rootScope.redirectPage();
-					// 					} else{
-					// 						unblockUI();
-					// 						response.respnames.forEach(function(name,i){
-					// 							$scope.filterDat.idnamemapcyc[response.requestedids[i]] = name;
-					// 							window.localStorage['_FD'] = angular.toJson($scope.filterDat);
-					// 						});
-					// 					}
-					// 				}, function (error) {
-					// 					unblockUI();
-					// 					console.log("Error:::::::::::::", error);
-					// 				});
-					// 			}
-					// 		}, function (error) {
-					// 			unblockUI();
-					// 			console.log("Error:::::::::::::", error);
-					// 		});
-					// 	}
-					// }, function (error) {
-					// 	unblockUI();
-					// 	console.log("Error:::::::::::::", error);
-					// }); // end of getnames call//
-
-					
+					$scope.clearFilter();
 					//$("#plugin-container").removeClass("inactiveLink");
 				}, function (error) {
 					unblockUI();
