@@ -5,7 +5,9 @@
     text-transform: capitalize;
 
     .rp__detail-table{
-        max-height: 370px;
+        #pr_detail-scroll-box{
+            max-height: 370px;
+        }
         .rp__col{
             display: inline-block;
             width: calc((100% - 450px)/2);

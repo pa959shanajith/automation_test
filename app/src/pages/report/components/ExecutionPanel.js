@@ -13,10 +13,10 @@ const ExecutionPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails
     const suDetails = useSelector(state=>state.report.suiteDetails)
     const suiteSelected = useSelector(state=>state.report.suiteSelected)
     const [suiteDetails,setSuiteDetails] =  useState([])
-    const [sortUp,setSortUp] = useState(true)
+    const [sortUp,setSortUp] = useState(false)
     useEffect(()=>{
         if(suDetails.length>0){
-            var arr = dateASC([...suDetails])
+            var arr = dateASC([...suDetails]).reverse()
             setSuiteDetails(arr)           
         }
     },[suDetails])

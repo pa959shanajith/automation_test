@@ -23,15 +23,14 @@ const ModuleList = ({displayError,setBlockui,setModDrop}) =>{
         if(res.error){displayError(res.error);return;}
         dispatch({type:actionTypes.UPDATE_SUITEDETAILS,payload:{suiteDetails:res,suiteID:{_id:suiteID,name:suiteName}}})
         setBlockui({show:false})
-        setModDrop(true)
     }
     return(
         <div id='rp_module-list' className='rp_moduleList'>
             <ScrollBar scrollId='rp_module-list' trackColor={'transperent'} thumbColor={'grey'}>
                 {moduleList.map((e,i)=>{
                     return(
-                        <div value={e._id} key={i} className={'toolbar__module-box'+((suiteSelected._id===e._id)?" selected":"")}>
-                            <img onClick={moduleClick} name={e.name} value={e._id}  src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
+                        <div  name={e.name} onClick={moduleClick} value={e._id} key={i} className={'toolbar__module-box'}>
+                            <img style={{opacity:suiteSelected._id===e._id?0.5:1}} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
                             <span value={e._id} >{e.name}</span>
                         </div>
                     )

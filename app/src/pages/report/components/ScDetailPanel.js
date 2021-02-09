@@ -39,26 +39,28 @@ const ScDetailPanel = ({scDetails,setBlockui,displayError,selectedScDetails}) =>
                         <div className='rp__col status'>Status</div>
                         <div className='rp__col export'>View Report</div>
                     </div>
-                <ScrollBar scrollId='rp__detail-panel'>
-                        {arr.map((e,i)=>   
-                        <div key={e.reportid} className='rp__row cont-body'>
-                            <div className='rp__col'>{e.testscenarioname}</div>
-                            <div className='rp__col browser'>
-                                {e.browser.toLowerCase() in imgs?
-                                <img src={"static/imgs/"+imgs[e.browser.toLowerCase()]} alt={e.browser}/>:
-                                "-"
-                                }
+                <div id='pr_detail-scroll-box'>
+                    <ScrollBar scrollId='pr_detail-scroll-box'>
+                            {arr.map((e,i)=>   
+                            <div key={e.reportid} className='rp__row cont-body'>
+                                <div className='rp__col'>{e.testscenarioname}</div>
+                                <div className='rp__col browser'>
+                                    {e.browser.toLowerCase() in imgs?
+                                    <img src={"static/imgs/"+imgs[e.browser.toLowerCase()]} alt={e.browser}/>:
+                                    "-"
+                                    }
+                                </div>
+                                <div className='rp__col'>{e.executedtime}</div>
+                                <div className={'rp__col status '+e.status.toLowerCase()}>{e.status}</div>
+                                <div className='rp__col export' scname={e.testscenarioname}>
+                                    <img type={'pdf'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-pdf.png"} alt={e.browser}/>
+                                    <img type={'html'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-web.png"} alt={e.browser}/>
+                                    <img type={'json'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-export-to-json.png"} alt={e.browser}/>
+                                </div>
                             </div>
-                            <div className='rp__col'>{e.executedtime}</div>
-                            <div className={'rp__col status '+e.status.toLowerCase()}>{e.status}</div>
-                            <div className='rp__col export' scname={e.testscenarioname}>
-                                <img type={'pdf'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-pdf.png"} alt={e.browser}/>
-                                <img type={'html'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-web.png"} alt={e.browser}/>
-                                <img type={'json'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-export-to-json.png"} alt={e.browser}/>
-                            </div>
-                        </div>
-                        )}
-                </ScrollBar>
+                            )}
+                    </ScrollBar>
+                </div>
             </div>
         </div>
     )
