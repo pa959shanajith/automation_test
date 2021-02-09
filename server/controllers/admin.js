@@ -77,7 +77,8 @@ exports.manageUserDetails = async (req, res) => {
 		}
 		if (action != "delete") {
 			if (internalUser) {
-				if (validator.isEmpty(inputs.auth.password) || !validator.isLength(inputs.auth.password,1,12) || !regexPassword.test(inputs.auth.password)) {
+				//check if password is valid iff it is not empty
+				if (!validator.isEmpty(inputs.auth.password) && (!validator.isLength(inputs.auth.password,1,12) || !regexPassword.test(inputs.auth.password))) {
 					logger.error("Error occurred in admin/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.");
 					flag[5]='1';
 				} else if (action == "update") {

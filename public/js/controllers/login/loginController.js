@@ -274,7 +274,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	};
 
 	$scope.resetAllFields = function(){
-		$scope.username = "";
+		$scope.currpassword = "";
 		$scope.newpassword = "";
 		$scope.confpassword = "";
 		$scope.passwordValidation = "";

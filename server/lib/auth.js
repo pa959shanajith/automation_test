@@ -38,27 +38,6 @@ const strategyUtil = {
 				flag = "userLocked";
 				userInfo = { username, type: user.auth.type };
 			}
-			else if (user.auth.defaultpassword && user.auth.defaultpassword != "") {
-				forgotPass = true;
-				var defPassword = bcrypt.compareSync(password, user.auth.defaultpassword);
-				if (defPassword) {
-					inputs = {
-						"username": username,
-						"action": "forgotPass"
-					}
-					const usertime = await utils.fetchData(inputs, "login/passtimeout", fnName);
-					if (usertime == "fail") flag = "fail";
-					else if(usertime == "timeout") flag = "timeout";
-					else {
-						flag = "changePwd";
-						userInfo = { username, type: user.auth.type };
-					}
-				} else {
-					inputs = {"username": username, "action": "increment"}
-					const invalidCredCounter = await utils.fetchData(inputs, "login/invalidCredCounter", fnName);
-					if (invalidCredCounter == "fail") flag = "fail";
-				}
-			}
 			else {
 				const type = user.auth.type;
 				if (type != "ldap") {
@@ -68,6 +47,23 @@ const strategyUtil = {
 					} catch (exception) {
 						logger.error("Error occurred in user authentication: " + exception.message.toString());
 						flag = "fail";
+					}
+					if (!validAuth && user.auth.defaultpassword && user.auth.defaultpassword != "") {
+						forgotPass = true;
+						var defPassword = bcrypt.compareSync(password, user.auth.defaultpassword);
+						if (defPassword) {
+							inputs = {
+								"username": username,
+								"action": "forgotPass"
+							}
+							const usertime = await utils.fetchData(inputs, "login/passtimeout", fnName);
+							if (usertime == "fail") flag = "fail";
+							else if(usertime == "timeout") flag = "timeout";
+							else {
+								flag = "changePwd";
+								userInfo = { username, type: user.auth.type };
+							}
+						}
 					}
 				}
 				// LDAP auth starts
