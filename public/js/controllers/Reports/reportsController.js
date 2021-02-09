@@ -62,8 +62,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         $scope.prc.cycles = [];
                         $scope.prc.cycleId = '';
                         if (redirected) {
-                            $scope.prc.projectId = robj.testSuiteDetails[0].projectidts;
-                            $scope.prc.selProjectsFilter();
+                            $timeout(function() {
+                                $scope.prc.projectId = robj.testSuiteDetails[0].projectidts;
+                                $scope.prc.selProjectsFilter();
+                            }, 300);
                         }
                     } else console.log("Unable to load test suites.");
                     $('.searchScrapEle').css('display', 'none');
@@ -93,7 +95,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $('#searchModule').attr('disabled', 'disabled');
         var data = JSON.parse(window.localStorage['project'])
         try{
-            for (i=0; i< data.length; i++){
+            for (var i=0; i< data.length; i++){
                 if(projectId == data[i]._id){
                     unblockUI();
                     $scope.prc.releaseId = '';
@@ -104,6 +106,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         $scope.prc.releaseId = robj.testSuiteDetails[0].releaseid;
                         $scope.prc.selReleasesFilter();
                     }
+                    break;
                 }
             }
         } catch(exception){
@@ -123,7 +126,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $('#searchModule').attr('disabled', 'disabled');
         var result = $scope.prc.releases;
         try{
-            for (i=0;i< result.length;i++){
+            for (var i=0;i< result.length;i++){
                 if (releaseName == result[i].name) {
                     unblockUI();
                     $scope.prc.cycles = [];
@@ -133,6 +136,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         $scope.prc.cycleId = robj.testSuiteDetails[0].cycleid;
                         $scope.prc.selCyclesFilter();
                     }
+                    break;
                 }
             }
         } catch (exception) {
@@ -168,8 +172,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         openModalPopup("Modules", "No Modules Found");
                         $(".mid-report-section").hide();
                         $('#searchModule').attr('disabled', 'disabled');
-                        if($('.slideOpen').is(":visible") == true)
-                        { 
+                        if($('.slideOpen').is(":visible") == true) {
                             $('div.moduleBox').removeClass('slideOpen');
                             $('#expAssign').trigger('click');
                         }
@@ -224,8 +227,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             $('.reports-search').removeAttr('disabled', 'disabled');
                         });
                         $('#searchModule').removeAttr('disabled', 'disabled');
-                        if ($('.moduleBox').is(':visible') == true) {
-                        } else {
+                        if ($('.moduleBox').is(':visible') != true) {
                             $('div.moduleBox').removeClass('slideOpen');
                             $('#expAssign').trigger('click');
                         }
@@ -578,13 +580,15 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     $scope.toggle_accessibility = function ($event) {
         if ($('.ct-nodeIcon1').parent().is(':hidden')) { $('.ct-nodeIcon1').parent().show() }
         else { $('.ct-nodeIcon1').parent().hide() }
-        if (access_only){ 
+        if (access_only){
             access_only = false;
             $("#accessibility_toggle")[0].style.background = "blueviolet";
+            $("#accessibility_toggle")[0].title = "Enable Accessibility Testing Reports";
             $("#searchModule")[0].placeholder = "Search Module";
         }else{
             access_only = true;
             $("#accessibility_toggle")[0].style.background = "purple";
+            $("#accessibility_toggle")[0].title = "Disable Accessibility Testing Reports";
             $("#searchModule")[0].placeholder = "Search Screen";
         }
     }

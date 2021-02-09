@@ -409,7 +409,9 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 		ice.sort((a,b) => a.icename.localeCompare(b.icename))
 		$scope.availableICE = ice
 	}
-
+	$scope.integration = {alm: {url:"",username:"",password:""}, 
+	qtest: {url:"",username:"",password:"",qteststeps:""}, 
+	zephyr: {accountid:"",accesskey:"",secretkey:""}};
 	//Add to list and schedule
 	$scope.initSchedule = function ($event) {
 		if (smartBatch) {
@@ -509,6 +511,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				exectionMode: execAction,
 				browserType: browserTypeExe,
 				qccredentials: { "qcurl": "", "qcusername": "", "qcpassword": "" },
+				integration: $scope.integration,
 				batchInfo: moduleInfo
 			};
 			$('#userIdName').val("")
