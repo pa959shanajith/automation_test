@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import socketIOClient from "socket.io-client";
 import {useDispatch, useSelector} from 'react-redux';
@@ -18,6 +18,7 @@ import Design from './pages/design';
 import Utility from './pages/utility';
 import Report from './pages/report';
 import Integration from './pages/integration';
+import {ScreenOverlay} from './pages/global';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-datetime/css/react-datetime.css';
@@ -25,19 +26,15 @@ import 'react-datetime/css/react-datetime.css';
 /*Component App
   use: defines components for each url
 */
-// window.history.pushState(null, null, document.URL);
-// if (!window.localStorage.hiss) window.localStorage.hiss = "";
-// window.localStorage.hiss+=";"+document.URL;
-// window.addEventListener('popstate', function () {
-// 	var currentURL = document.URL.split("/")[0]+'/'+window.localStorage.navigateScreen;
-// 	if (!window.localStorage.hiss) window.localStorage.hiss = "";
-// 	window.localStorage.hiss+=";"+currentURL;
-// 	window.history.pushState(null, null, currentURL);
-// });
 
 const App = () => {
+  const [blockui,setBlockui] = useState({show:false})
+  useEffect(()=>{
+    TabCheck(setBlockui);
+  },[])
   return (
     <Provider store={store}>
+      {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
       <ProgressBar />
       <RouteApp/>
     </Provider>
@@ -72,6 +69,34 @@ const RouteApp = () => {
     </Switch>
   </Router>
   )
+}
+
+//disable duplicate tabs
+const TabCheck = (setBlockui) => {
+  const storage_Handler = (e) => {
+    if (window.location.pathname.includes('/viewreport/')) return false;
+      // if tabGUID does not match then more than one tab and GUID
+      if (e.key == 'tabUUID' && e.oldValue != '') {
+          if (e.oldValue != e.newValue) {
+            window.localStorage.clear();
+            localStorage["tabValidity"] = "invalid";
+            setBlockui({show:true,content:'Duplicate Tabs not allowed, Please Close this Tab and refresh.'})
+            window.sessionStorage.clear();
+          }
+      }else if(e.key == "tabValidity"){
+        window.sessionStorage.clear();
+      // history.pushState(null, null, document.URL);
+      setBlockui({show:true,content:"Duplicate Tabs not allowed, Please Close this Tab and refresh."})
+    }
+  } 
+  // detect local storage available
+  if (typeof (Storage) === "undefined") return;
+  // get (set if not) tab uuid and store in tab session
+  if (window.name == "") window.name = uuid();
+  // add eventlistener to session storage
+  window.addEventListener("storage", storage_Handler, false);
+  // set tab UUID in session storage
+  localStorage["tabUUID"] = window.name;
 }
 
 export default App;

@@ -40,7 +40,7 @@ const NotifyDropDown = ({show}) =>{
                         ))}
                     </Fragment>:
                     <div key={'notify'} className='message' style={{textAlign:'center'}}>
-                        <span>No new notification</span>
+                        <span>No new notifications</span>
                     </div>
                 }
             </ScrollBar>
