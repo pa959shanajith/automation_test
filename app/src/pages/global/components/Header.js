@@ -45,6 +45,12 @@ const Header = () => {
     const notifyCnt = useSelector(state=>state.login.notify.unread)
 
     useEffect(()=>{
+        //on Click back button on browser
+        window.addEventListener('popstate',(e)=>{
+            logout(e);
+        })
+    },[])
+    useEffect(()=>{
         if(socket){
             socket.on('notify',(value)=> {
                 if (value.count == 0 && 'notifyMsg' in value) {
