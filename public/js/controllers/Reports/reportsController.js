@@ -615,7 +615,6 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 dateArray[i].firstChild.innerHTML = "E<sub>" + parseInt(j) + "</sub>";
                 tblBody.append(dateArray[i]);
                 j--;
-                i++;
             }
         } else {
             for (var k =0; k < dateArray.length; k++) {
