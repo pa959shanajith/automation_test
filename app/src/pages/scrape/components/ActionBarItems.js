@@ -59,10 +59,10 @@ const UpperContent = props => {
 
     let renderComp = [
         <div key={1} className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Scrape On</div>,
-        <Thumbnail title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />,
+        (appType!=="Webservice" && <Thumbnail title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
         <div key={3} className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
             <input id="enable_append" type="checkbox" onChange={onAppend} checked={appendCheck} />
-            <span className="ss__thumbnail_title">Append</span>
+            <span className="ss__thumbnail_title">{appType==="Webservice" ? "Edit" : "Append"}</span>
         </div>
     ];
 

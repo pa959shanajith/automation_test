@@ -1,0 +1,191 @@
+.ws__row{
+    display: flex;
+    width: 100%;
+}
+
+.ws__url_method{
+    flex: 1 0;
+    margin-top: -5px;
+
+    label{
+        font-family: 'LatoWebLight';
+        font-size: 16px;
+        margin-bottom: 0;
+        margin-right: 20px;
+        color: #643693;
+        font-weight: 700;
+    }
+
+    .ws__input{
+        width: 360px;
+        border-radius: 4px 0 0 4px!important;
+    }
+
+    .ws__select{
+        width: 225px;
+    }
+
+    .ws__addBtn{
+        margin-left: 40px;
+    }
+    
+    .ws__goBtn{
+        color: #fff;
+        font-size: 15px;
+        border: 1px solid #643693;
+        background: #643693;
+        font-family: "LatoWebLight";
+        margin-left: -2px;
+        margin-right: 50px;
+        border-radius: 0 4px 4px 0;
+        padding: 1px 10px 0px 14px;
+        outline: 0;
+    }
+}
+
+.ws__action_wrapper{
+
+    display: flex;
+    align-items: center;
+    margin-top: 25px;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #888;
+
+    .ws__input{
+        width: 370px;
+        margin: 0 10px 0 5px;
+    }
+
+    .ws__select{
+        width: 140px;
+        margin: 0 10px 0 0;
+    }
+    
+    .ws__op_input{
+        width: 140px!important;
+        margin: 0 10px 0 0;
+    }
+}
+
+.ws__cert_btn{
+    border: none;
+    outline: none;
+    color: #fff;
+    padding: 0;
+    margin: -1px 15px 0 0;
+
+    img{
+        height: 24px;
+        width: 24px;
+    }
+}
+
+.ws__bigBtn{
+    font-size: 17px!important;
+    padding: 2px 24px!important;
+    height: max-content!important;
+}
+
+.ws__select{
+    height: 25px;
+    border: 1px solid #909090;
+    font-size: 14px;
+    font-family: "LatoWeb";
+    color: #555;
+    outline: none;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    &:disabled{
+        cursor: not-allowed;
+        background-color: #eee;
+    }
+}
+
+.ws__input{
+    font-size: 14px;
+    border-radius: 4px;
+    font-family: "LatoWeb";
+    outline: none;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    color: #555;
+    background-color: #fff;
+    padding: 5px;
+    height: 24px;
+    border: 1px solid #909090;
+    &:disabled{
+        cursor: not-allowed;
+        background-color: #eee;
+    }
+}
+
+.caret__ws{
+    position: absolute;
+    display: flex!important;
+    align-items: center;
+    color: #311d4e;
+    height: 5px;
+    left: calc(50% - 3.5px);
+    z-index: 1;
+}
+
+.ws__url_m_wrapper{
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    border-radius: 4px;
+    padding: 10px 80px 10px 15px;
+    background-color: #e6e7e9;
+}
+
+.ws__mainContainer{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.ws__rqst_resp_header, .ws__rqst_resp_body{
+    width: 100%;
+    resize: none;
+    padding: 10px;
+    background: #e6e7e9;
+    border: none;
+    font-family: "LatoWeb";
+    font-size: 14px;
+    overflow: auto;
+    &:disabled{
+        color: #000;
+    }
+}
+
+.ws__rqst_resp_header{
+    height: 28%;
+    margin-bottom: 2%;
+}
+
+.ws__rqst_resp_body{
+    height: 38%;
+}
+
+.ws__action_btn{
+    position: relative;
+    padding: 1px 13px;
+    margin-right: 7px;
+    height: 21px;
+    font-size: 13px;
+    font-family: "LatoWebLight";
+    background-color: #633693;
+    border: none;
+    outline: none;
+    color: #fff;
+    border-radius: 20px;
+    &:disabled{
+        background-color: #997cb8;
+        cursor: not-allowed;
+    }
+}
+
+.ws__active{
+    background-color:#311d4e !important
+}

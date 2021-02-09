@@ -5,3 +5,4 @@ export const SET_COMPAREFLAG = "SS_SET_COMPAREFLAG";
 export const SET_COMPAREDATA = "SS_SET_COMPAREDATA";
 export const SET_COMPAREOBJ = "SS_SET_COMPAREOBJ";
 export const SET_OBJVAL = "SS_SET_OBJVAL";
+export const SET_CERT = "WS_SET_CERT";

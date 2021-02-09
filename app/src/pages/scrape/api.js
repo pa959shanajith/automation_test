@@ -141,57 +141,49 @@ export const updateScreen_ICE = arg => {
 //     }
 // }
 
-// export const launchWSDLGo = async(wsdlUrl) => {
-//     try{
-//         const res = await axios(url+"/debugTestCase_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'wsdlListGenerator_ICE',
-//                 wsdlurl: wsdlUrl
-//             },
-//             credentials : 'include',
-//         });
-//         if (res.status === 200){
-//             return res.data;
-//         }
-//         else{
-//             console.log(res.status)
-//         }
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
+export const launchWSDLGo = wsdlUrl => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'wsdlListGenerator_ICE',
+                wsdlurl: wsdlUrl
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
 
-// export const wsdlAdd = async(wsdlUrl, wsdlSelectedMethod, resultFile) => {
-//     try{
-//         const res = await axios(url+"/debugTestCase_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'wsdlServiceGenerator_ICE',
-//                 wsdlurl: wsdlUrl,
-//                 method : wsdlSelectedMethod,
-//                 resultFile:resultFile
-//             },
-//             credentials : 'include',
-//         });
-//         if (res.status === 200){
-//             return res.data;
-//         }
-//         else{
-//             console.log(res.status)
-//         }
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
+export const wsdlAdd = (wsdlUrl, wsdlSelectedMethod, resultFile) => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'wsdlServiceGenerator_ICE',
+                wsdlurl: wsdlUrl,
+                method : wsdlSelectedMethod,
+                resultFile:resultFile
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
 
 // export const updateIrisDataset = async(data) => {
 //     try{
