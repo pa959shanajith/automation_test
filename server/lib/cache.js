@@ -9,7 +9,7 @@ try {
 	var fileData = fs.readFileSync(credsPath, 'UTF-8');
 	var decipher = crypto.createDecipheriv('aes-256-cbc', 'AvoAssureCredentials@CacheDbAuth', '0000000000000000');
 	var parsed = JSON.parse(decipher.update(fileData, 'hex', 'utf8') + decipher.final('utf8'));
-	cachedb = parsed['cachedb'];
+	cachedb = parsed['cachedb']['password'];
 } catch (ex) {
 	console.error("Error occurred while loading cache db auth");
 	console.error(ex);

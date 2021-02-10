@@ -13,7 +13,11 @@ if(!process.argv[2] || !process.argv[3]) {
 		if(var_name != "cachedb") {
 			console.error("Invalid key error");
 		} else {
-			var cred = {"cachedb": var_val};
+			var cred = {
+				"cachedb": {
+					"password": var_val
+				}
+			};
 			const cipher = crypto.createCipheriv('aes-256-cbc', 'AvoAssureCredentials@CacheDbAuth', "0000000000000000");
 			const encryptedData = cipher.update(JSON.stringify(cred), 'utf8', 'hex') + cipher.final('hex');
 			fs.writeFileSync(credsPath, encryptedData, function(err) {});
