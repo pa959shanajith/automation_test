@@ -145,6 +145,8 @@ const ProjectNew = (props) => {
         setCycleList([]);
         setSelProjectOptions([]);
         toggleCycleClick();
+        setDisableAddRelease(true);
+        setDisableAddCycle(true);
         if (taskName==="Update Project"){
             setSelProject("");
             setSelDomain("");

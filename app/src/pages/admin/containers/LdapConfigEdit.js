@@ -170,8 +170,8 @@ const LdapConfigEdit = (props) => {
 const deleteModalButtons = (ldapManage, setshowDeleteModal) => {
     return(
         <div>
-            <button id="deleteGlobalModalButton-ldap" onClick={()=>{ldapManage("delete");setshowDeleteModal(false);}} type="button" className="btn-md-ldap adminBtn-ldap btn-margin-ldap" >Yes</button>
-            <button type="button" onClick={()=>{setshowDeleteModal(false);}} className="btn-md-ldap adminBtn-ldap">No</button>
+            <button id="deleteGlobalModalButton-ldap" onClick={()=>{ldapManage("delete");setshowDeleteModal(false);}} type="button" className=" btn-margin-ldap" >Yes</button>
+            <button type="button" onClick={()=>{setshowDeleteModal(false);}} >No</button>
         </div>
     )
 }
