@@ -1,0 +1,11 @@
+.rp_moduleList{
+    height: calc(100% - 35px);
+    width: 100%;
+    .scrollbar-container{
+        width: 100%;
+    }
+    .toolbar__module-box:hover {
+        background-color: white;
+        cursor: pointer;
+    }
+}
