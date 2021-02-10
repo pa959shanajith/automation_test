@@ -38,7 +38,7 @@
         margin-left: -2px;
         margin-right: 50px;
         border-radius: 0 4px 4px 0;
-        padding: 1px 10px 0px 14px;
+        padding: 0 14px 0 10px;
         outline: 0;
     }
 }
@@ -102,6 +102,10 @@
     }
 }
 
+.ss__right-btns{
+    margin-top: 5px;
+}
+
 .ws__input{
     font-size: 14px;
     border-radius: 4px;
@@ -134,7 +138,7 @@
     width: fit-content;
     align-items: center;
     border-radius: 4px;
-    padding: 10px 80px 10px 15px;
+    padding: 10px 40px 10px 15px;
     background-color: #e6e7e9;
 }
 
@@ -188,4 +192,8 @@
 
 .ws__active{
     background-color:#311d4e !important
+}
+
+.ws_eb{
+    border: 2px solid #d33c3c !important;
 }

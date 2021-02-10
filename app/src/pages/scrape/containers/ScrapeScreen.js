@@ -1,4 +1,4 @@
-import React ,{ useState, useEffect } from 'react';
+import React ,{ useState, useEffect, useRef } from 'react';
 import {useSelector, useDispatch} from "react-redux"
 import { useHistory } from 'react-router-dom';
 import ScrapeObjectList from './ScrapeObjectList';
@@ -23,9 +23,11 @@ const ScrapeScreen = ()=>{
     const dispatch = useDispatch();
     const history = useHistory();
     const current_task = useSelector(state=>state.plugin.CT);
+    const certificateInfo = useSelector(state=>state.scrape.cert);
     const  { user_id, role } = useSelector(state=>state.login.userinfo);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
-    
+    const {endPointURL, method, opInput, reqHeader, reqBody, respHeader, respBody, paramHeader} = useSelector(state=>state.scrape.WsData);
+
     const [overlay, setOverlay] = useState(null);
     const [showPop, setShowPop] = useState("");
     const [showConfirmPop, setShowConfirmPop] = useState(false);
@@ -104,18 +106,72 @@ const ScrapeScreen = ()=>{
                     }
                 }
                 else if (typeof data === "object" && current_task.appType==="Webservice"){
-                    console.log(data);
-                    setScrapeItems([]);
-                    setMainScrapedData({});
-                    setNewScrapedData([]);
-                    setMirror(null);
-                    setSaved(true);
-                    setHideSubmit(true);
-                    setOverlay("");
+                    if (data.endPointURL && data.method) {
+                        dispatch({type: actionTypes.SET_WSDATA, payload: {endPointURL: data.endPointURL}});
+                        dispatch({type: actionTypes.SET_WSDATA, payload: {method : data.method}});
+                        dispatch({type: actionTypes.SET_WSDATA, payload: {opInput : data.operations || ""}});
+                        
+                        dispatch({type: actionTypes.SET_WSDATA, payload: {reqHeader : data.header ? data.header.split("##").join("\n"): ""}});
+
+                        if (data.body){
+                            let localReqBody;
+                            if (!data.body.indexOf("{") || !data.body.indexOf("[")) {
+                                let jsonObj = JSON.parse(data.body);
+                                let jsonPretty = JSON.stringify(jsonObj, null, '\t');
+                                localReqBody = jsonPretty;
+                            } else {
+                                localReqBody = formatXml(data.body.replace(/>\s+</g, '><'));
+                                if(localReqBody==='\r\n') localReqBody = '';
+                            }
+                            dispatch({type: actionTypes.SET_WSDATA, payload: {reqBody : localReqBody}});
+                        } else dispatch({type: actionTypes.SET_WSDATA, payload: {reqBody : ""}});
+
+                        dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader : data.responseHeader ? data.responseHeader.split("##").join("\n") : ""}});
+                        
+                        if (data.responseBody) {
+                            let localRespBody;
+                            if (!data.responseBody.indexOf("{") || !data.responseBody.indexOf("[")) {
+                                let jsonObj = JSON.parse(data.responseBody);
+                                let jsonPretty = JSON.stringify(jsonObj, null, '\t');
+                                localRespBody = jsonPretty;
+                            } else {
+                                localRespBody = formatXml(data.responseBody.replace(/>\s+</g, '><'));
+                                if(localRespBody==='\r\n') localRespBody = '';
+                            }
+                            dispatch({type: actionTypes.SET_WSDATA, payload: {respBody : localRespBody}});
+                        } else dispatch({type: actionTypes.SET_WSDATA, payload: {respBody : ""}});
+
+                        dispatch({type: actionTypes.SET_ACTIONERROR, payload: []});
+                        dispatch({type: actionTypes.SET_WSDLERROR, payload: []});
+                        setOverlay("");
+                        setSaved(true);
+                        setHideSubmit(false);
+						dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: false});
+						dispatch({type: actionTypes.SET_DISABLEACTION, payload: true});
+					} else {
+                        setSaved(false);
+                        setHideSubmit(true);
+                        setOverlay("");
+                        dispatch({type: actionTypes.SET_ACTIONERROR, payload: []});
+                        dispatch({type: actionTypes.SET_WSDLERROR, payload: []});
+                        dispatch({type: actionTypes.SET_WSDATA, payload: {
+                            endPointURL: "",
+                            method: "0",
+                            opInput: "",
+                            reqHeader: "",
+                            reqBody: "",
+                            respHeader: "",
+                            respBody: "",
+                            paramHeader: "",
+                        }});
+						dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: true});
+						dispatch({type: actionTypes.SET_DISABLEACTION, payload: false});
+					}
                 }
                 else{
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                     dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
+                    setOverlay("");
                     // screenshot
                 }
             resolve("success");
@@ -132,19 +188,132 @@ const ScrapeScreen = ()=>{
 
     const startScrape = (browserType, compareFlag) => {
         let appType = current_task.appType;
-        let screenViewObject = {};
-        let blockMsg = 'Scraping in progress. Please Wait...';
-        if (compareFlag) {
-            blockMsg = 'Comparing objects in progress...';
-            setShowObjModal(false);
-        };
+        if (appType === "Webservice") {
 
-        screenViewObject = getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData, newScrapedData);
-        setShowAppPop(false);
-        setOverlay(blockMsg);
+            let proceed = false;
+            let authCert = false;
+            let arg = {}
+            let testCaseWS = []
+            let keywordVal;
+            let wsdlInputs = [ endPointURL, method, opInput ];
+            wsdlInputs.push(reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
+            wsdlInputs.push(reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"'));
+            if (Object.keys(certificateInfo).length!==0){
+                wsdlInputs.push(certificateInfo.certsDetails+";");
+                wsdlInputs.push(certificateInfo.authDetails);
+            }
+            let certURL = endPointURL.indexOf('https')
+            if (certURL===0) arg.res = certificateInfo;
 
-        ResetSession.start();
-        scrapeApi.initScraping_ICE(screenViewObject)
+            if (!wsdlInputs[0]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["endPointURL"]}); // error
+            else if (method==="0") dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["method"]}); // error
+            else if (wsdlInputs[5]){
+                authCert = true;
+                proceed = true;
+            }
+            else {
+                if (["GET", "HEAD", "PUT", "DELETE"].includes(wsdlInputs[1])) {
+                    if (wsdlInputs[3] && !wsdlInputs[2]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["opInput"]}); // error
+                    else proceed = true;
+                } else if (wsdlInputs[1] === "POST") {
+                    if (!wsdlInputs[3]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqHeader"]}); // error
+                    else if (!wsdlInputs[4]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqBody"]}); // error
+                    else proceed = true;
+                }
+            }
+            if (proceed) {
+                dispatch({type: actionTypes.SET_ACTIONERROR, payload: []});
+                if (authCert){
+                    keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody","addClientCertificate","setBasicAuth"]
+                }else{
+                    keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"]
+                }
+                setOverlay("Fetching Response Header & Body...");
+                ResetSession.start();
+                for (let i = 0; i < wsdlInputs.length; i++) {
+                    if (wsdlInputs[i] !== "") {
+                        testCaseWS.push({
+                            "stepNo": i + 1,
+                            "appType": appType,
+                            "objectName": "",
+                            "inputVal": [wsdlInputs[i]],
+                            "keywordVal": keywordVal[i],
+                            "outputVal": "",
+                            "url": "",
+                            "custname": "",
+                            "remarks": [""],
+                            "addTestCaseDetails": "",
+                            "addTestCaseDetailsInfo": ""
+                        })
+                    }
+                }
+                testCaseWS.push({
+                    "stepNo": testCaseWS.length + 1,
+                    "appType": appType,
+                    "objectName": "",
+                    "inputVal": [""],
+                    "keywordVal": "executeRequest",
+                    "outputVal": "",
+                    "url": "",
+                    "custname": "",
+                    "remarks": [""],
+                    "addTestCaseDetails": "",
+                    "addTestCaseDetailsInfo": ""
+                });
+                arg.testcasename = "";
+                arg.apptype = "Webservice";
+                arg.testcase = testCaseWS;
+                scrapeApi.initScrapeWS_ICE(arg)
+                .then(data => {
+                    setOverlay("");
+                    ResetSession.end();
+                    if (data === "Invalid Session") {
+                        return RedirectPage(history);
+                    } else if (data === "unavailableLocalServer") {
+                        setShowPop({title: "Web Service Screen", content: "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
+                    } else if (data === "scheduleModeOn") {
+                        setShowPop({title: "Web Service Screen", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."});
+                    } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
+                        setShowPop({title: "Web Service Screen", content: "Execution Only Allowed"});
+                    } else if (typeof data === "object") {
+                        setShowPop({title: "Data Retrieve", content: "Web Service response received successfully"});
+                        dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader: data.responseHeader[0].split("##").join("\n")}});
+                        let localRespBody;
+                        if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+                            var jsonObj = JSON.parse(data.responseBody);
+                            var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+                            localRespBody = jsonPretty.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
+                        } else {
+                            localRespBody = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+                            localRespBody = localRespBody.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
+                        }
+                        dispatch({type: actionTypes.SET_WSDATA, payload: {respBody: localRespBody}});
+
+                    } else {
+                        setShowPop({title: "Debug Web Service", content: "Debug Terminated."});
+                    }
+                })
+                .catch(error => {
+                    setOverlay("");
+                    ResetSession.end();
+                    setShowPop({title: "Web Service Screen", content: "Error while performing operation."});
+                    console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
+                });
+            }
+        } else {
+            let screenViewObject = {};
+            let blockMsg = 'Scraping in progress. Please Wait...';
+            if (compareFlag) {
+                blockMsg = 'Comparing objects in progress...';
+                setShowObjModal(false);
+            };
+
+            screenViewObject = getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData, newScrapedData);
+            setShowAppPop(false);
+            setOverlay(blockMsg);
+
+            ResetSession.start();
+            scrapeApi.initScraping_ICE(screenViewObject)
             .then(data=> {
                 let err = null;
                 setOverlay("");
@@ -228,6 +397,7 @@ const ScrapeScreen = ()=>{
                 setShowPop({'title': "Scrape Screen",'content': "Error while performing Scrape."});
                 console.error("Fail to Load design_ICE. Cause:", error);
             });
+        }
     }
 
     const PopupDialog = () => (
@@ -461,4 +631,33 @@ function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
     }
 
     return localScrapeList;
+}
+
+
+function formatXml(xml) {
+	let formatted = '';
+	let reg = /(>)(<)(\/*)/g;
+	xml = xml.replace(reg, '$1\r\n$2$3');
+	let pad = 0;
+	xml.split('\r\n').forEach(function (node, index) {
+		let indent = 0;
+		if (node.match(/.+<\/\w[^>]*>$/)) {
+			indent = 0;
+		} else if (node.match(/^<\/\w/)) {
+			if (pad != 0) {
+				pad -= 1;
+			}
+		} else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+			indent = 1;
+		} else {
+			indent = 0;
+		}
+		let padding = '';
+		for (let i = 0; i < pad; i++) {
+			padding += '  ';
+		}
+		formatted += padding + node + '\r\n';
+		pad += indent;
+	});
+	return formatted;
 }

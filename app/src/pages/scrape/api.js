@@ -116,30 +116,26 @@ export const updateScreen_ICE = arg => {
     });
 }
 
-// export const initScrapeWS_ICE = async(initWSJson) => {
-//     try{
-//         const res = await axios(url+"/debugTestCase_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'debugTestCaseWS_ICE',
-//                 testCaseWS: initWSJson
-//             },
-//             credentials : 'include',
-//         });
-//         if (res.status === 200){
-//             return res.data;
-//         }
-//         else{
-//             console.log(res.status)
-//         }
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
+export const initScrapeWS_ICE = arg => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'debugTestCaseWS_ICE',
+                testCaseWS: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
 
 export const launchWSDLGo = wsdlUrl => {
     return new Promise((resolve, reject) => {

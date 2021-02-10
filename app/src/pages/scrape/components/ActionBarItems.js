@@ -18,15 +18,15 @@ const UpperContent = props => {
     const disableAction = useSelector(state => state.scrape.disableAction);
     const disableAppend = useSelector(state => state.scrape.disableAppend);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
-    const { appType } = useSelector(state => state.plugin.CT);
+    const { appType, ...restCT } = useSelector(state => state.plugin.CT);
     const [isMac, setIsMac] = useState(false);
     const [appendCheck, setAppendCheck] = useState(false);
-    const { setShowAppPop, saved, startScrape } = useContext(ScrapeContext);
+    const { setShowAppPop, saved, startScrape, setSaved } = useContext(ScrapeContext);
 
     useEffect(() => {
         setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
         if (saved || disableAction) setAppendCheck(false);
-    }, [appType, saved]);
+    }, [appType, saved, restCT]);
 
 
     const WebList = [
@@ -44,7 +44,7 @@ const UpperContent = props => {
 
     const sapList = [{ 'title': "SAP Apps", 'img': 'static/imgs/ic-desktop.png', action: () => setShowAppPop({'appType': 'SAP', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction }]
 
-    const webserviceList = [{ 'title': "Web Services", 'img': 'static/imgs/ic-webservice.png', action: () => console.log(""), 'disable': disableAction }]
+    const webserviceList = [{ 'title': "Web Services", 'img': 'static/imgs/ic-webservice.png', action: () => startScrape(), 'disable': disableAction }]
 
     const mobileAppList = [{ 'title': "Mobile Apps", 'img': 'static/imgs/ic-mobility.png', action: () => setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction }]
 
@@ -53,7 +53,10 @@ const UpperContent = props => {
 
     const onAppend = event => {
         dispatch({ type: actionTypes.SET_DISABLEACTION, payload: !event.target.checked });
-        if (event.target.checked) setAppendCheck(true);
+        if (event.target.checked) {
+            setAppendCheck(true);
+            if (appType==="Webservice") setSaved(false);
+        }
         else setAppendCheck(false);
     }
 
@@ -216,8 +219,8 @@ const BottomContent = () => {
         {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
         {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},
-        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(true), show: true, disable: compareFlag},
-        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': (customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag, show: true}
+        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(true), show: true, disable: compareFlag || appType==="Webservice"},
+        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) || appType==="Webservice", show: true}
     ]
 
     return (

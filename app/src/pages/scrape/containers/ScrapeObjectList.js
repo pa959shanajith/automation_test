@@ -34,6 +34,7 @@ const ScrapeObjectList = () => {
         setDeleted([]);
         setModified({});
         setEditableObj({});
+        setSaved(true);
     }, [current_task])
 
     useEffect(()=>{
@@ -82,6 +83,7 @@ const ScrapeObjectList = () => {
     useEffect(()=>{
         if (!saved) setDisableBtns({...disableBtns, save: false});
         else {
+            setDisableBtns({...disableBtns, save: true});
             setDeleted([]);
             setModified({});
             setActiveEye(null);
