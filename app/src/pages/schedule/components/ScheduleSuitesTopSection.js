@@ -145,7 +145,11 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
         if(date_time==="date"){
             moduleSceduledatetime[testsuiteid]["date"] = value;
             if(moduleSceduledatetime[testsuiteid]["time"] === "") {
-                moduleSceduledatetime[testsuiteid]["time"] = new Date().getHours() + ':' + (parseInt(new Date().getMinutes()));
+                var hr = new Date().getHours();
+                var min = parseInt(new Date().getMinutes());
+                if(new Date().getHours().toString().length == 1) hr = "0"+hr;
+                if(parseInt(new Date().getMinutes()).toString().length == 1) min = "0"+min;
+                moduleSceduledatetime[testsuiteid]["time"] = hr  + ':' + min;
             }
             moduleSceduledatetime[testsuiteid]["inputPropstime"]["disabled"]=false;
         }
