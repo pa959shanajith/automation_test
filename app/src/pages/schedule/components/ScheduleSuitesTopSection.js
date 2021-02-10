@@ -36,6 +36,27 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
             var eachData2 = [];
             keys.map(itm => eachData2.push({...data[itm]}));
 
+            //setting module date and time props
+            let moduleSceduledateTime = {};
+            eachData2.map((rowData)=>{
+                if(moduleSceduledateTime[rowData.testsuiteid] === undefined) {
+                    moduleSceduledateTime[rowData.testsuiteid] = {
+                        date:"",time:"",
+                        inputPropstime: {readOnly:"readonly" ,
+                            disabled : true,
+                            className:"fc-timePicker",
+                            placeholder: "Select Time"
+                        },
+                        inputPropsdate : {
+                            placeholder: "Select Date",
+                            readOnly:"readonly" ,
+                            className:"fc-datePicker"
+                        }
+                    };
+                }
+            })
+            setModuleSceduledate(moduleSceduledateTime);
+
             //finding distinct projects : helpful for apptype column
             var flags = [], output = [];
             for(var j=0; j<eachData2.length; j++) {
@@ -60,19 +81,6 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
             updateScenarioStatus(eachData2);
         }
     }
-
-    let inputProps = {
-		placeholder: "Select Date",
-		readOnly:"readonly" ,
-		className:"fc-datePicker"
-    };
-
-    let inputProps1 = {
-		placeholder: "Select Time",
-		readOnly:"readonly" ,
-		// disabled : inputProps1Disable,
-        className:"fc-timePicker"
-    };
     
     const changeSelectALL = (m,id) => {
         let data = [...scheduleTableData];
@@ -130,16 +138,21 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
     }
 
     const updateDateTime = (date_time, value , testsuiteid) => {
-        if(moduleSceduledate[testsuiteid] === undefined) {
-            moduleSceduledate[testsuiteid] = ["",""];
+        let moduleSceduledatetime = {...moduleSceduledate}
+        if(moduleSceduledatetime[testsuiteid] === undefined) {
+            moduleSceduledatetime[testsuiteid] = {date:"",time:""};
         }
         if(date_time==="date"){
-            moduleSceduledate[testsuiteid][0] = value;
+            moduleSceduledatetime[testsuiteid]["date"] = value;
+            if(moduleSceduledatetime[testsuiteid]["time"] === "") {
+                moduleSceduledatetime[testsuiteid]["time"] = new Date().getHours() + ':' + (parseInt(new Date().getMinutes()));
+            }
+            moduleSceduledatetime[testsuiteid]["inputPropstime"]["disabled"]=false;
         }
-        if(date_time==="time"){
-            moduleSceduledate[testsuiteid][1] = value;
+        else if(date_time==="time"){
+            moduleSceduledatetime[testsuiteid]["time"] = value;
         }
-        setModuleSceduledate(moduleSceduledate);
+        setModuleSceduledate(moduleSceduledatetime);
     }
 
     return (
@@ -155,9 +168,10 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
                         <span className="timePicContainer">
                             <Datetime 
                                 onChange={(event)=>{updateDateTime("time",event.format("HH:mm" ),rowData.testsuiteid)}} 
-                                inputProps={inputProps1} 
+                                inputProps={moduleSceduledate[rowData.testsuiteid]["inputPropstime"]} 
                                 dateFormat={false} 
-                                timeFormat="HH:mm" 
+                                timeFormat="HH:mm"
+                                value={moduleSceduledate[rowData.testsuiteid]["time"]}
                             /> 
                             <img className="timepickerIcon" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
 						</span>
@@ -166,10 +180,10 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
                                 onChange={(event)=>{updateDateTime("date",event.format("DD-MM-YYYY"),rowData.testsuiteid)}} 
                                 dateFormat="DD-MM-YYYY" 
                                 closeOnSelect={true} 
-                                inputProps={inputProps} 
-                                timeFormat={false} 
-                                id="data-token"
+                                inputProps={moduleSceduledate[rowData.testsuiteid]["inputPropsdate"]} 
+                                timeFormat={false}
                                 isValidDate={valid}
+                                value={moduleSceduledate[rowData.testsuiteid]["date"]}
                             /> 
                             <img className="datepickerIcon" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
 						</span>

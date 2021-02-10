@@ -306,10 +306,10 @@ export const excelToMindmap = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'Error fetching excel data!'}
+        return {error:'Invalid data in excel, please check!'}
     }catch(err){
         console.error(err)
-        return {error:'Error fetching excel data!'}
+        return {error:'Invalid data in excel, please check!'}
     }
 }
 

@@ -1,4 +1,4 @@
-import React ,  { Fragment,  useRef} from 'react';
+import React ,  { Fragment,  useRef, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {ScrollBar} from '../../global' 
 import * as actionTypes from '../state/action';
@@ -15,6 +15,11 @@ const CreateLanding = (props) => {
     const userConf = useSelector(state=>state.admin.userConf)
     const node = useRef();
 
+    useEffect(()=>{
+        if(document.getElementById("confServer") !== null)
+            document.getElementById("confServer").selectedIndex = "0";  
+    },[userConf.confServerList])
+
     useOnClickOutside(node, () => {props.setShowDropdown(!props.showDropdown);props.click({query:'retaintype'});});
 
     return (
@@ -28,7 +33,7 @@ const CreateLanding = (props) => {
             <div className="Create-outer form-group__conv-create" >
                 <div className="selectRole-create adminControl-create">
 					<label className="leftControl-create primaryRole-create">User Type</label>
-					<select value={userConf.type} onChange={(event)=>{props.click(); props.selectUserType({type:event.target.value});dispatch({type:actionTypes.UPDATE_TYPE,payload:event.target.value});props.selectUserType({type:event.target.value});}} className='adminSelect-create form-control__conv-create ' id="userTypes-create"   >
+					<select value={userConf.type} onChange={(event)=>{props.click(); props.selectUserType({type:event.target.value});dispatch({type:actionTypes.UPDATE_TYPE,payload:event.target.value});}} className='adminSelect-create form-control__conv-create ' id="userTypes-create"   >
 						<option value="inhouse" >Default</option>
 						<option value="ldap">LDAP</option>
 						<option value="saml">SAML</option>
@@ -39,7 +44,7 @@ const CreateLanding = (props) => {
                 {(userConf.type !== "inhouse")?
                         <div className="adminControl-create" >
                             <select onChange={(event)=>{props.clearForm();dispatch({type:actionTypes.UPDATE_SERVER,payload:event.target.value});}} className={props.confServerAddClass?'adminSelect-create  form-control__conv-create selectErrorBorder confServer-cust':'adminSelect-create  form-control__conv-create confServer-cust'} id="confServer">
-                                <option disabled={true} defaultValue="" selected={true}>Select Server</option>                                
+                                <option key="0" disabled={true} value="" selected={true}>Select Server</option>                                
                                 {userConf.confServerList.map((srv,index) => (      
                                     <option key={index} value={srv.name} disabled={userConf.confExpired===srv.name}>{srv.name}</option>
                                 ))}

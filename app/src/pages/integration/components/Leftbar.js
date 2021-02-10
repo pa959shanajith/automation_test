@@ -14,11 +14,9 @@ const Leftbar=(props)=>{
         props.setAlmClicked(false);
     }
     else if (iconType == "ALM"){
-        //props.setFocus(iconType);
         props.setAlmClicked(true);
         props.setloginAlm(true)
-        //props.setPopUpEnable(true);
-        //props.setViewMappedFiles(false);
+        props.setViewMappedFiles(false);
     }
     }
     
@@ -28,11 +26,13 @@ const Leftbar=(props)=>{
                 {props.almClicked ? 
                 <Fragment>
                     <h4>ALM Integration</h4>
-                    <span>
+                    <span onClick={()=>callIconClick("ALM")}>
                         <img id="selectedIcon" src='static/imgs/testplan.png'/>
                         <div>Test Lab</div>
                     </span>
-                    <span style={{opacity:"0.5"}}>
+                    <span   onClick={()=>callIconClick("ALM")}
+                            style={{opacity:"0.5"}}
+                    >
                         <img src='static/imgs/testlab.png'/> 
                         <div>Test Plan</div>    
                     </span>

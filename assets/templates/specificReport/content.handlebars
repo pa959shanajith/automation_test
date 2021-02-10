@@ -4,14 +4,14 @@
    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <title>Avo Assure - Execution Report</title>
-   <link rel="icon" href="../imgs/favicon.ico">
-   <link rel="stylesheet" type="text/css" href="../fonts/latofonts.css" />
-   <link rel="stylesheet" type="text/css" href="../fonts/font-awesome_mindmap/css/font-awesome.css" />
-   <link rel="stylesheet" type="text/css" href="../css/css_reports/datatables/dataTables.css">
-   <script type="text/javascript" src="../js/plugins/jquery.min.js"></script>
-   <script type="text/javascript" src="../js/plugins/jquery-ui.min.js"></script>
-   <script type="text/javascript" src="../js/plugins/jquery.blockUI.js"></script>
-   <script type="text/javascript" src="../js/plugins/reports/datatables/datatables.min.js"></script>
+   <link rel="icon" href="../favicon.ico">
+   <link rel="stylesheet" type="text/css" href="../static/fonts/latofonts.css" />
+   <link rel="stylesheet" type="text/css" href="../static/reports/font-awesome.css" />
+   <link rel="stylesheet" type="text/css" href="../static/reports/dataTables.css">
+   <script type="text/javascript" src="../static/reports/jquery.min.js"></script>
+   <script type="text/javascript" src="../static/reports/jquery-ui.min.js"></script>
+   <script type="text/javascript" src="../static/reports/jquery.blockUI.js"></script>
+   <script type="text/javascript" src="../static/reports/datatables.min.js"></script>
 
    <style>
       .no-disp {
@@ -1000,10 +1000,10 @@
          <div class="h2Header" style="left:78%;user-select:none">
             <label for="scrShotChk" title="Include Screenshots in PDF" style="font-size:13px">With Screenshots</label>
             <input id="scrShotChk" type="checkbox" title="Include Screenshots in PDF" style="height:12px;margin:0" checked="true">
-            <img alt="Save PDF" class="export-icons" data-rep="pdf" src="../imgs/ic-pdf.png" title="Save PDF Report">
-            <img alt="Export JSON" class="export-icons" data-rep="json" style="" src="../imgs/ic-export-to-json.png" title="Export to JSON">
+            <img alt="Save PDF" class="export-icons" data-rep="pdf" src="../static/imgs/ic-pdf.png" title="Save PDF Report">
+            <img alt="Export JSON" class="export-icons" data-rep="json" style="" src="../static/imgs/ic-export-to-json.png" title="Export to JSON">
             {{#ifnotEquals video '-'}}
-               <img alt="Download video" class="export-icons" data-rep="mp4" data-path={{video}} style="" src="../imgs/screenrecord.png" title="Download Execution Video">
+               <img alt="Download video" class="export-icons" data-rep="mp4" data-path={{video}} style="" src="../static/imgs/screenrecord.png" title="Download Execution Video">
             {{/ifnotEquals}}
          </div>
       </div>
@@ -1230,7 +1230,7 @@
          <button type="button" class="closeWindow">Ok</button>
       </p>
    </div>
-   <script type="text/javascript" src="../js/plugins/reports/specificReport.js"></script>
+   <script type="text/javascript" src="../static/reports/specificReport.js"></script>
 </body>
 
 </html>
