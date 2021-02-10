@@ -194,7 +194,7 @@ const importFromMm = async(importData,importProj,prjList,dispatch,displayError,s
 const importFromPd = async(importData,importProj,prjList,dispatch,displayError,setBlockui,setImportProj) => {
     var appType = getApptypePD(importData.data)
     if(appType !== prjList[importProj].apptypeName.toLowerCase()){
-        displayError("App Type Error", "AppType doesn't match, please check!!")
+        displayError("AppType doesn't match, Please check!!")
         return;
     }else{
         var res =  await pdProcess({'projectid':importProj,'file':importData.data})
