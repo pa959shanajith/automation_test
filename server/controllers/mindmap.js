@@ -1347,7 +1347,6 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				switch(eachScrapedAction.tag){
 					case "input":
 					case "GuiOkCodeField":
-						if(input[0]=='') input=eachScrapedAction.command[0][2].split(' ')
 						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
 						break;
 					case "button":
