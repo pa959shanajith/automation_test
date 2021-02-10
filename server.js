@@ -1,7 +1,9 @@
 //load environment variables
 var env = require('node-env-file');
 var fs = require('fs');
+var crypto = require('crypto');
 var envFilePath = __dirname + '/.env';
+var credsPath = __dirname + '/.tokens';
 try {
 	if (fs.existsSync(envFilePath)) {
 		env(envFilePath);
@@ -10,6 +12,31 @@ try {
 	}
 } catch (ex) {
 	console.error("Error occurred in loading ENVIRONMENT VARIABLES");
+	console.error(ex);
+}
+
+var cachedb = null;
+
+//default cache auth if not initialised
+try {
+	if(!fs.existsSync(credsPath)) {
+		encryptedData = "3d868b1feaa6184c8800f56e95114fc751d7c1e0adeb1ef2d6945621ae1f693263b1bfa41756665432"+
+		"e3456fb266b61100bd5e8f2141e283520037ad09e05065b47348e9eff14d68d7eb42c980b49e4a";
+		fs.writeFileSync(credsPath, encryptedData, function(err) {});
+	}
+} catch (ex) {
+	console.error("Error occurred while writing to file");
+	console.error(ex);
+}
+
+//load cache auth
+try {
+	var fileData = fs.readFileSync(credsPath, 'UTF-8');
+	var decipher = crypto.createDecipheriv('aes-256-cbc', 'AvoAssureCredentials@CacheDbAuth', '0000000000000000');
+	var parsed = JSON.parse(decipher.update(fileData, 'hex', 'utf8') + decipher.final('utf8'));
+	cachedb = parsed['cachedb'];
+} catch (ex) {
+	console.error("Error occurred while loading cache db auth");
 	console.error(ex);
 }
 
@@ -56,7 +83,7 @@ if (cluster.isMaster) {
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
-			"password": process.env.CACHEDB_AUTH
+			"password": cachedb
 		};
 		var redisSessionClient = redis.createClient(redisConfig);
 		redisSessionClient.on("error", function(err) {

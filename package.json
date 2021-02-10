@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --max_old_space_size=4096 --optimize_for_size server.js",
     "filestart": "node --max_old_space_size=4096 --optimize_for_size .\\server\\controllers\\fileserver.js",
-    "service": "node server_winservice.js"
+    "service": "node server_winservice.js",
+    "storedbauth": "node .\\server\\controllers\\saveauth.js"
   },
   "author": "Avo Automation",
   "license": "Copyright (c) Avo Automation",
