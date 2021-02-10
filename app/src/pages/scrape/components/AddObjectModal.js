@@ -4,7 +4,8 @@ import "../styles/AddObjectModal.scss";
 
 const AddObjectModal = props => {
 
-    const [objects, setObjects] = useState([{objName: "", objType: ""}]);
+    const [tempIdCounter, setTempIdCounter] = useState(1);
+    const [objects, setObjects] = useState([{objName: "", objType: "", tempId: tempIdCounter}]);
     const [error, setError] = useState({});
 
     const objectTypes = [
@@ -22,8 +23,10 @@ const AddObjectModal = props => {
 
     const newField = () => {
         let updatedObjects = [...objects];
-        updatedObjects.push({ objName: "", objType: ""});
+        let newTempId = tempIdCounter + 1;
+        updatedObjects.push({ objName: "", objType: "", tempId: newTempId});
         setObjects(updatedObjects);
+        setTempIdCounter(newTempId);
     }
 
     const deleteField = index => {
@@ -51,18 +54,19 @@ const AddObjectModal = props => {
         let lastVal = lastObj ? lastObj.val : 0;
 
         let duplicateDict = {};
-        let indexArr = [];
+        let idArr = [];
         let newObjects = [];
         
         for (let i=0; i<objects.length; i++){
             let name = objects[i].objName;
             let type = objects[i].objType;
+            let tempId = objects[i].tempId;
             let [tag, value] = type.split("-");
             let custname = `${name}_${value}`;
 
             for(let object of props.scrapeItems) {
                 if (object.title === custname) {
-                    errorObj = { type: "input", index: [i], dTitle: custname };
+                    errorObj = { type: "input", tempId: [tempId], dTitle: custname };
                     errorFlag = 'present';
                     break;
                 }
@@ -70,17 +74,17 @@ const AddObjectModal = props => {
             if (errorFlag==='present') break;
 
             if (!name || !type) {
-                errorObj = { type: !name ? "input" : "type", index: [i] };
+                errorObj = { type: !name ? "input" : "type", tempId: [tempId] };
                 errorFlag = 'empty';
                 break;
             }
 
             if (custname in duplicateDict){
-                duplicateDict[custname].push(i);
-                indexArr.push(...duplicateDict[custname]);
+                duplicateDict[custname].push(tempId);
+                idArr.push(...duplicateDict[custname]);
                 errorFlag = 'duplicate';
             }
-            else duplicateDict[custname] = [i];
+            else duplicateDict[custname] = [tempId];
 
             newObjects.push({
                 objIdx: i,
@@ -94,7 +98,7 @@ const AddObjectModal = props => {
 
         if (errorFlag) {
             if (errorFlag==='duplicate') {
-                errorObj = {type: 'input', index: indexArr};
+                errorObj = {type: 'input', tempId: idArr};
                 props.setShowPop({title: 'Add Objects', content: 'Duplicate Object Names Found!'})
             } 
             else if (errorFlag==='present') props.setShowPop({title: 'Add Objects', content: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`})
@@ -126,8 +130,8 @@ const AddObjectModal = props => {
                     <div className="ss__objModal_content" id="ss__objModalListId">
                         <ScrollBar scrollId="ss__objModalListId" thumbColor="#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                 { objects.map((object, index) => <div className="ss__objModal_item" key={index}>
-                                        <input className={"addObj_name"+(error.type==="input" && error.index.includes(index) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
-                                        <select className={"addObj_objType"+(error.type==="type" && error.index.includes(index) ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
+                                        <input className={"addObj_name"+(error.type==="input" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
+                                        <select className={"addObj_objType"+(error.type==="type" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
                                             <option className="addObj_option" disabled selected value="">Select Object Type</option>
                                             { objectTypes.map( objectType =>
                                                 <option className="addObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>

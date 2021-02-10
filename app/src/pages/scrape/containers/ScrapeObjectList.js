@@ -6,16 +6,14 @@ import { ScrollBar, RedirectPage } from "../../global"
 import { ScrapeContext } from '../components/ScrapeContext';
 import * as actionTypes from '../state/action';
 import * as scrapeApi from '../api';
-import { reviewTask } from '../../global/api';
-import "../styles/ScrapeContent.scss"
-import CompareObjects from './CompareObjects';
+import "../styles/ScrapeObjectList.scss";
+import ScreenWrapper from './ScreenWrapper';
+import SubmitTask from '../components/SubmitTask';
 
-const ScrapeContent = props => {
-
+const ScrapeObjectList = () => {
     const dispatch = useDispatch();
     const current_task = useSelector(state=>state.plugin.CT);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
-    const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const history = useHistory();
 
     const [activeEye, setActiveEye] = useState(null);
@@ -26,7 +24,7 @@ const ScrapeContent = props => {
     const [deleted, setDeleted] = useState([]);
     const [modified, setModified] = useState({});
     const [editableObj, setEditableObj] = useState({});
-    const { setShowObjModal, isUnderReview, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, hideSubmit, setScrapeItems } = useContext(ScrapeContext);
+    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems } = useContext(ScrapeContext);
 
     useEffect(()=> {
         setActiveEye(null);
@@ -36,6 +34,7 @@ const ScrapeContent = props => {
         setDeleted([]);
         setModified({});
         setEditableObj({});
+        setSaved(true);
     }, [current_task])
 
     useEffect(()=>{
@@ -84,6 +83,7 @@ const ScrapeContent = props => {
     useEffect(()=>{
         if (!saved) setDisableBtns({...disableBtns, save: false});
         else {
+            setDisableBtns({...disableBtns, save: true});
             setDeleted([]);
             setModified({});
             setActiveEye(null);
@@ -93,11 +93,6 @@ const ScrapeContent = props => {
             setEditableObj({});
         }
     }, [saved])
-
-    const redirectToPlugin = () => {
-        window.localStorage['navigateScreen'] = "plugin";
-        history.replace('/plugin');
-    }
 
     const updateChecklist = (value, event) => {
 
@@ -333,58 +328,9 @@ const ScrapeContent = props => {
         .catch(error => console.error(error))
     }
 
-    const onAction = operation => {
-        switch(operation){
-            case "submit": setShowConfirmPop({'title':'Submit Task', 'content': 'Are you sure you want to submit the task ?', 'onClick': ()=>submitTask(operation)});
-                           break;
-            case "reassign": setShowConfirmPop({'title':'Reassign Task', 'content': 'Are you sure you want to reassign the task ?', 'onClick': ()=>submitTask(operation)});
-                             break;
-            case "approve": setShowConfirmPop({'title':'Approve Task', 'content': 'Are you sure you want to approve the task ?', 'onClick': ()=>submitTask(operation)});
-                            break;
-            default: break;
-        }                       
-    }
-
-    const submitTask = submitOperation => {
-		let taskid = current_task.subTaskId;
-		let taskstatus = current_task.status;
-		let version = current_task.versionnumber;
-		let batchTaskIDs = current_task.batchTaskIDs;
-        let projectId = current_task.projectId;
-        
-		if (submitOperation === 'reassign') {
-			taskstatus = 'reassign';
-        }
-
-        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
-        .then(result => {
-            if (result === "fail") setShowPop({'title': 'Task Submission Error', 'content': 'Reviewer is not assigned !'});
-            else if (taskstatus === 'reassign') setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});
-            else if (taskstatus === 'underReview') setShowPop({'title': "Task Completion Success", 'content': "Task Approved successfully!", onClick: ()=>redirectToPlugin()});
-            else setShowPop({'title': "Task Submission Success", 'content': "Task Submitted successfully!", onClick: ()=>redirectToPlugin()});
-        })
-        .catch(error => {
-			console.error(error);
-        })
-        
-        setShowConfirmPop(false);
-    }
-
     return (
-        <div className="ss__content">
-            <div className="ss__content_wrap" style={ compareFlag ? {height: "100%"} : {}}>
-                { /* Task Name */ }
-                <div className="ss__task_title">
-                    <div className="ss__task_name">{current_task.taskName}</div>
-                </div>
-
-                {
-                    compareFlag ? 
-                    <CompareObjects viewString={ Object.keys(newScrapedData).length ? {...newScrapedData, view: [...mainScrapedData.view, ...newScrapedData.view]} : { ...mainScrapedData }}
-                                    setShowPop={setShowPop}
-                                    fetchScrapeData={fetchScrapeData}
-                    /> : <>
-                { /* Button Group */ }
+        <ScreenWrapper 
+            buttonGroup={
                 <div className="ss__btngroup">
                     <div className="ss__left-btns">
                         <label className="ss__select-all">
@@ -402,30 +348,11 @@ const ScrapeContent = props => {
                         { showSearch && <input className="ss__search_field" value={searchVal} onChange={onSearch}/>}
                     </div>
 
-                    <div className="ss__right-btns">
-                        { isUnderReview && 
-                            <>
-                            <button className="ss__reassignBtn ss__btn" onClick={()=>onAction("reassign")}>
-                                Reassign
-                            </button>
-                            <button className="ss__approveBtn ss__btn" onClick={()=>onAction("approve")}>
-                                Approve
-                            </button>
-                            </>
-                        }
-                        { !hideSubmit && !isUnderReview &&
-                            <button className="ss__submitBtn ss__btn" onClick={()=>onAction("submit")}>
-                                Submit
-                            </button>
-                        }
-                    </div>
+                    <SubmitTask />
 
-                </div></>
-                }
-            </div>
-            
-            {
-                !compareFlag &&
+                </div>
+            }
+            scrapeObjectList={
                 <div className="scraped_obj_list">
                 <div className="sc__ab">
                     <div className="sc__min">
@@ -449,8 +376,8 @@ const ScrapeContent = props => {
                 </div>
                 </div>
             }
-        </div>
-    )
+        />
+    );
 }
 
-export default ScrapeContent;
+export default ScrapeObjectList;

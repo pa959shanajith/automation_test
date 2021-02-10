@@ -39,20 +39,22 @@ const RefBarItems = props => {
 	}, [appType]);
 
 	useEffect(()=>{
-		let mirrorImg = new Image();
+		if (props.mirror){
+			let mirrorImg = new Image();
 
-		mirrorImg.onload = function(){
-			let aspect_ratio = mirrorImg.height / mirrorImg.width;
-			let ds_width = 500;
-			let ds_height = ds_width * aspect_ratio;
-			let ds_ratio = 490 / mirrorImg.width;
-			if (ds_height > 300) ds_height = 300;
-			ds_height += 45; // popup header size included
-			setMirrorHeight(ds_height);
-			setDsRatio(ds_ratio);
+			mirrorImg.onload = function(){
+				let aspect_ratio = mirrorImg.height / mirrorImg.width;
+				let ds_width = 500;
+				let ds_height = ds_width * aspect_ratio;
+				let ds_ratio = 490 / mirrorImg.width;
+				if (ds_height > 300) ds_height = 300;
+				ds_height += 45; // popup header size included
+				setMirrorHeight(ds_height);
+				setDsRatio(ds_ratio);
+			}
+
+			mirrorImg.src = `data:image/PNG;base64,${props.mirror}`;
 		}
-
-		mirrorImg.src = `data:image/PNG;base64,${props.mirror}`;
 	}, [props.mirror])
 
 	useEffect(()=>{
@@ -275,9 +277,8 @@ const RefBarItems = props => {
     return (
     
         <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} scrapeScreenURL={scrapedURL} >
-
 			{ appType!=="Webservice" && appType!=="Mainframe" && <div className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
-            <span onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>
+            { appType!=="Webservice" && <span onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>}
         </ReferenceBar>
         
     
