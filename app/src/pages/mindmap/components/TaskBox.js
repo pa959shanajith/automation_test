@@ -108,10 +108,14 @@ const TaskBox = (props) => {
             tObj.t = taskAssign[t].task[0];
         }
         if (tObj.det === null || tObj.det.trim() == "") {
-            var type = dNodes[pi].type.slice(0,-1) //remove plural
-            // to avoid phrasing "Execute scenario scenarios" 
-            type = (type)?" "+type.charAt(0).toUpperCase()+type.slice(1):""
-            if(tObj.t == 'Execute Scenario')type = ""
+            if(dNodes[pi].type === 'endtoend') {
+                type = ' End to End'
+            }else{
+                var type = dNodes[pi].type.slice(0,-1) //remove plural
+                // to avoid phrasing "Execute scenario scenarios"
+                type = (type)?" "+type.charAt(0).toUpperCase()+type.slice(1):""
+                if(tObj.t == 'Execute Scenario')type = ""
+            }
             taskDetailsRef.current.value = tObj.t + type + " " + dNodes[pi].name
         } else {
             taskDetailsRef.current.value = tObj.det
