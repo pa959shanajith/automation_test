@@ -110,3 +110,20 @@
     flex: 1 1;
     overflow: auto;
 }
+
+.ss__dup_scroll{
+    display: flex;
+    flex-direction: column;
+}
+.ss__dup_labels{
+    display: flex;
+    flex-direction: column;
+    font-family: "LatoWeb";
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+    max-height: 250px;
+}
+.ss__dup_li{
+    font-weight: normal;
+}
