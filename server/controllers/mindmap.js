@@ -382,8 +382,7 @@ exports.saveData = async (req, res) => {
 					}
 					tasks.push(tsk)
 				}
-				else if (e.type == 'scenarios') {
-					
+				else if (e.type == 'scenarios') {					
 					if (t != null && e._id != null) {
 						if (t._id!=null && (removeTask.includes(t._id))) return;
 						tsk.tasktype=t.task
@@ -689,7 +688,7 @@ exports.getScreens = async (req, res) => {
 	res.send(data)
 };
 
-exports.exportToExcel = function (req, res) {
+exports.exportToExcel = async (req, res) =>{
 	const fnName = "exportToExcel";
 	logger.info("Inside UI service: " + fnName);
 	try {
