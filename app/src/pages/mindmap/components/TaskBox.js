@@ -133,8 +133,9 @@ const TaskBox = (props) => {
                     (async()=>{
                         var res = await populateUsers(selectedProj)
                         if(res.error){displayError(res.error);setTaskBox(false);return;}
-                        setUserAsgList({loading:false,arr:res.rows,value:tObj.at,disabled:tObj.at?true:false})
-                        setUserRevList({loading:false,arr:res.rows,value:tObj.rw})
+                        var arr = [...res.rows].sort((a,b)=>a.name.localeCompare(b.name))
+                        setUserAsgList({loading:false,arr:arr,value:tObj.at,disabled:tObj.at?true:false})
+                        setUserRevList({loading:false,arr:arr,value:tObj.rw})
                     })()
                     return;
                 }
@@ -360,8 +361,8 @@ const TaskBox = (props) => {
                 </div>
                 <div id='ct-submitTask'>
                     {(assignbtn.reassign)?
-                    <span id='unassign-btn' onClick={()=>unAssign(true)} className={(assignbtn.disable)?'disableButton':''}>Reassign</span>:
-                    <span id='unassign-btn' onClick={()=>unAssign(false)} className={(assignbtn.disable)?'disableButton':''}>Unassign</span>
+                    <span id='unassign-btn' tabIndex={'0'} onClick={()=>unAssign(true)} className={(assignbtn.disable)?'disableButton':''}>Reassign</span>:
+                    <span id='unassign-btn' tabIndex={'0'} onClick={()=>unAssign(false)} className={(assignbtn.disable)?'disableButton':''}>Unassign</span>
                     }
                     <span id='task-ok' tabIndex={'0'} onClick={addTask} onKeyPress={addTask}>Ok</span>
                 </div>
