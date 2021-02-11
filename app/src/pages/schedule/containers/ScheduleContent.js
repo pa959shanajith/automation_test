@@ -36,7 +36,9 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
             console.log('Hello, World!');
             getScheduledDetails();
             setScheDetails(!scheDetails)
-        }, 100000);
+            document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
+            
+        }, 30000);
     }, [scheDetails]);
 
     const getScheduledDetails = async () => {
@@ -66,6 +68,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                         newScheduledScenario["status"] = result[i].status;
                         newScheduledScenario["scenarioname"] = eachScenarioDetails[j]["scenarioname"];
                         newScheduledScenario["appType"] = eachScenarioDetails[j]["appType"];
+                        newScheduledScenario["poolname"] =  eachScenarioDetails[j]["poolname"];
                         scheduledDataParsed.push(newScheduledScenario);
                     }
                 } 
@@ -80,6 +83,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                 //     triggeredSeconds = Math.round(new Date() / 1000);
                 // }, 100)
             }
+            document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
             setLoading(false);
         }catch (error) {
             setLoading(false);
@@ -125,12 +129,13 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
     const ScheduleTestSuitePopup = () => {
         const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction);
         const valid = checkSelectedModules(scheduleTableData, setPopupState);
-        if(check && valid) setAllocateICE(true);
+        const checkDateTime = checkDateTimeValues(scheduleTableData, moduleSceduledate, setModuleSceduledate, setPopupState);
+        if(check && valid && checkDateTime) setAllocateICE(true);
     } 
 
     const ScheduleTestSuite = async (schedulePoolDetails) => {
         setAllocateICE(false);
-        const modul_Info = parseLogicExecute(schedulePoolDetails, setModuleSceduledate, moduleSceduledate, scheduleTableData, current_task, appType, filter_data, moduleInfo, setPopupState);
+        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleSceduledate, scheduleTableData, current_task, appType, filter_data);
         if(!modul_Info){
             return
         }
@@ -263,7 +268,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                     <div id="page-taskName">
 						<span>Scheduled</span>
                         <select onChange={(event)=>{selectStatus(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
-                            <option selected disable={true}>Select Status</option>
+                            <option selected disabled={true}>Select Status</option>
                             <option>Completed</option>
                             <option>In Progress</option>
                             <option>Scheduled</option>
@@ -291,8 +296,8 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                                         {pageOfItems.map((data)=>(
                                             <div className="scheduleDataBodyRowChild">
                                                 <div className="s__Table_date s__Table_date-time ">{data.scheduledatetime}</div>
-                                                <div className="s__Table_host" >{data.target}</div>
-                                                <div className="s__Table_scenario" title={data.scenarioname||data.scenarioName}>{data.scenarioname||data.scenarioName}</div>
+                                                <div className="s__Table_host" >{data.target == "nulluser"?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                <div className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                 <div className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
                                                 <div className="s__Table_appType">
                                                     {data.browserlist.map((brow)=>(
@@ -408,7 +413,47 @@ const checkSelectedModules = (scheduleTableData, setPopupState) => {
     return pass
 } 
 
-const parseLogicExecute = (schedulePoolDetails, setModuleSceduledate, moduleSceduledate, eachData, current_task, appType, projectdata, moduleInfo, setPopupState) => {
+const checkDateTimeValues = (eachData, moduleSceduledate, setModuleSceduledate, setPopupState) => {
+    for(var i =0 ;i<eachData.length;i++){
+        for(var j =0 ; j<eachData[i].executestatus.length; j++){
+            if(eachData[i].executestatus[j]===1){
+                let doNotSchedule = false
+                let moduleSceduledatetime = {...moduleSceduledate};
+                moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-timePicker";
+                moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker";
+
+                var dateValue = moduleSceduledate[eachData[i].testsuiteid]["date"];
+                var timeValue = moduleSceduledate[eachData[i].testsuiteid]["time"];
+                if (dateValue === "") {  // Check if schedule date is not empty
+                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
+                    doNotSchedule = true;
+                }
+                else if (timeValue === "") {  // Check if schedule time is not empty
+                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
+                    doNotSchedule = true;
+                }
+                setModuleSceduledate(moduleSceduledatetime);
+                if(doNotSchedule) return false
+
+                const sldate_2 = dateValue.split("-");
+                const sltime_2 = timeValue.split(":");
+                const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
+                const diff = (timestamp - new Date()) / 60000;
+                if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
+                    if (diff < 0) moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
+                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
+                    setPopupState({show:true,title:"Schedule Test Suite",content:"Schedule time must be 5 mins more than current time."});
+                    setModuleSceduledate(moduleSceduledatetime);
+                    return false
+                }
+            } 
+        }
+    }  
+    return true  
+} 
+
+const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, current_task, appType, projectdata ) => {
+    let moduleInfo = [];
     for(var i =0 ;i<eachData.length;i++){
         var testsuiteDetails = current_task.testSuiteDetails[i];
         var suiteInfo = {};
@@ -422,7 +467,7 @@ const parseLogicExecute = (schedulePoolDetails, setModuleSceduledate, moduleSced
                 selectedRowData.push({
                     condition: eachData[i].condition[j],
                     dataparam: [eachData[i].dataparam[j].trim()],
-                    scenarioName: eachData[i].scenarionames[j],
+                    scenarioname: eachData[i].scenarionames[j],
                     scenarioId: eachData[i].scenarioids[j],
                     scenariodescription: undefined
                 });
@@ -447,36 +492,12 @@ const parseLogicExecute = (schedulePoolDetails, setModuleSceduledate, moduleSced
         suiteInfo.iceList = iceList;
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
-                let doNotSchedule = false
-                let moduleSceduledatetime = {...moduleSceduledate};
-                moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-timePicker";
-                moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker";
-
                 suiteInfo.date = moduleSceduledate[eachData[i].testsuiteid]["date"];
                 suiteInfo.time = moduleSceduledate[eachData[i].testsuiteid]["time"];
-                if (suiteInfo.date === "") {  // Check if schedule date is not empty
-                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
-                    doNotSchedule = true;
-                }
-                else if (suiteInfo.time === "") {  // Check if schedule time is not empty
-                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
-                    doNotSchedule = true;
-                }
-                setModuleSceduledate(moduleSceduledatetime);
-                if(doNotSchedule) return false
-    
                 const sldate_2 = suiteInfo.date.split("-");
                 const sltime_2 = suiteInfo.time.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 suiteInfo.timestamp = timestamp.valueOf().toString();
-                const diff = (timestamp - new Date()) / 60000;
-                if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
-                    if (diff < 0) moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
-                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
-                    setPopupState({show:true,title:"Schedule Test Suite",content:"Schedule time must be 5 mins more than current time."});
-                    setModuleSceduledate(moduleSceduledatetime);
-                    return false
-                }
             } 
         }
         if(selectedRowData.length !== 0) moduleInfo.push(suiteInfo);
