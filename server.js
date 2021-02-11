@@ -1,9 +1,9 @@
 //load environment variables
 var env = require('node-env-file');
 var fs = require('fs');
-var crypto = require('crypto');
+var dbAuthStore = require('./server/lib/dbAuthStore')
 var envFilePath = __dirname + '/.env';
-var credsPath = __dirname + '/.tokens';
+var credsPath = __dirname + '/server/config/.tokens';
 try {
 	if (fs.existsSync(envFilePath)) {
 		env(envFilePath);
@@ -15,31 +15,18 @@ try {
 	console.error(ex);
 }
 
+//default cache auth if not initialised and load cachedbauth
 var cachedb = null;
-
-//default cache auth if not initialised
 try {
 	if(!fs.existsSync(credsPath)) {
-		encryptedData = "1721aecfa7d84efa8d01035bc64e80ee0ee45d162a50fa1f50377b2eab1aeba272a85a33d6b1"+
-		"f9699e78f702a470a187c213f474166bcc4d557b858535910e1f322d9e7a9660150d0c3165c7d2d1a18494a48fe2"+
-		"fe35761057025d87e4a3d2be";
-		fs.writeFileSync(credsPath, encryptedData, function(err) {});
+		dbAuthStore.loadDefaultCacheAuth();
 	}
-} catch (ex) {
-	console.error("Error occurred while writing to file");
-	console.error(ex);
-}
-
-//load cache auth
-try {
-	var fileData = fs.readFileSync(credsPath, 'UTF-8');
-	var decipher = crypto.createDecipheriv('aes-256-cbc', 'AvoAssureCredentials@CacheDbAuth', '0000000000000000');
-	var parsed = JSON.parse(decipher.update(fileData, 'hex', 'utf8') + decipher.final('utf8'));
+	var parsed = dbAuthStore.decryptCacheAuth();
 	cachedb = parsed['cachedb']['password'];
 } catch (ex) {
-	console.error("Error occurred while loading cache db auth");
+	console.error("Error occurred while initialising/writing to tokens file");
 	console.error(ex);
-}
+};
 
 // Module Dependencies
 var cluster = require('cluster');

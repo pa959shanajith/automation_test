@@ -1,15 +1,10 @@
 const redis = require("redis");
 const validator =  require('validator');
 const logger = require("../../logger");
-var fs = require('fs');
-var path = require('path');
-var crypto = require('crypto');
-var credsPath = path.join(path.dirname(fs.realpathSync(__filename)), '../../.tokens');
+const dbAuthStore = require('./dbAuthStore');
 var cachedb = null;
 try {
-	var fileData = fs.readFileSync(credsPath, 'UTF-8');
-	var decipher = crypto.createDecipheriv('aes-256-cbc', 'AvoAssureCredentials@CacheDbAuth', '0000000000000000');
-	var parsed = JSON.parse(decipher.update(fileData, 'hex', 'utf8') + decipher.final('utf8'));
+	var parsed = dbAuthStore.decryptCacheAuth();
 	cachedb = parsed['cachedb']['password'];
 } catch (ex) {
 	console.error("Error occurred while loading cache db auth");
