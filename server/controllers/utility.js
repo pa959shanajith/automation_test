@@ -17,6 +17,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 			var encrytData = req.body.encryptionValue;
 			var encryptedValue,check_encryptionType;
 			var validate_encryptionType,validate_check_encryptData;
+			var regEx=/[<">']/;
 			validateEncryption();
 			function validateEncryption()
 			{
@@ -27,7 +28,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 					validate_encryptionType = true;
 				}
 				check_encryptData = validator.isEmpty(encrytData);
-				if(check_encryptData == false)
+				if(check_encryptData == false || !regEx.test(encrytData))
 				{
 					validate_check_encryptData = true;
 				}

@@ -10,6 +10,7 @@ const Negotiator = require('negotiator');
 const uidsafe = require('uid-safe');
 const logger = require("../../logger");
 const utils = require('./utils');
+const notifications = require('../notifications');
 const strategies = []; // Store all registered strategies
 const options = {
 	route: {
@@ -28,10 +29,15 @@ const strategyUtil = {
 			let flag = 'inValidCredential';
 			let userInfo = null;
 			let validAuth = false;
+			let forgotPass = false;
 			let inputs = { username };
 			const user = await utils.fetchData(inputs, "login/loadUser", fnName);
 			if (user == "fail") flag = "fail";
 			else if (!user || !user.auth) flag = "invalid_username_password";
+			else if (user.invalidCredCount == 5) {
+				flag = "userLocked";
+				userInfo = { username, type: user.auth.type };
+			}
 			else {
 				const type = user.auth.type;
 				if (type != "ldap") {
@@ -41,6 +47,23 @@ const strategyUtil = {
 					} catch (exception) {
 						logger.error("Error occurred in user authentication: " + exception.message.toString());
 						flag = "fail";
+					}
+					if (!validAuth && user.auth.defaultpassword && user.auth.defaultpassword != "") {
+						forgotPass = true;
+						var defPassword = bcrypt.compareSync(password, user.auth.defaultpassword);
+						if (defPassword) {
+							inputs = {
+								"username": username,
+								"action": "forgotPass"
+							}
+							const usertime = await utils.fetchData(inputs, "login/passtimeout", fnName);
+							if (usertime == "fail") flag = "fail";
+							else if(usertime == "timeout") flag = "timeout";
+							else {
+								flag = "changePwd";
+								userInfo = { username, type: user.auth.type };
+							}
+						}
 					}
 				}
 				// LDAP auth starts
@@ -83,8 +106,17 @@ const strategyUtil = {
 					}
 				}
 				if (validAuth) {
-					flag = "validCredential";
-					userInfo = { username, type };
+					inputs = {"username": username, "action": "clear"}
+					const invalidCredCounter = await utils.fetchData(inputs, "login/invalidCredCounter", fnName);
+					if (invalidCredCounter == "fail") flag = "fail";
+					else {
+						flag = "validCredential";
+						userInfo = { username, type };
+					}
+				} else if(flag == "inValidCredential"){
+					inputs = {"username": username, "action": "increment"}
+					const invalidCredCounter = await utils.fetchData(inputs, "login/invalidCredCounter", fnName);
+					if (invalidCredCounter == "fail") flag = "fail";
 				}
 			}
 			return done(null, userInfo, flag);
@@ -149,11 +181,13 @@ const strategyUtil = {
 const routeUtil = {
 	"inhouse": async opts => {
 		authRouter.get(opts.route.login, async (req, res) => {
+			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			if (req.session.uniqueId) await utils.cloneSession(req);
 			return res.sendFile("index.html", { root: __dirname + "/../../public/" });
 		});
 		authRouter.post(opts.route.login, (req, res, next) => {
 			logger.info("Inside UI service: login");
+			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			// Credentials for service user that can restart services
 			if (req.body.username == "restartservice" && req.body.password == "r3Start@3") return res.send("restart");
 			return passport.authenticate("inhouse", {
@@ -193,10 +227,16 @@ module.exports = () => {
 		if (sessFlag && cookieFlag) return true;
 		return false;
 	};
-	passport.protect = (req, res, next) => {
-		if (passport.verifySession(req)) return next();
+	passport.protect = async (req, res, next) => {
+		if (passport.verifySession(req)) {
+			const allow = await userAccess(req);
+			if (allow) return next();
+			else return res.send("Invalid Session");
+			// else return res.status(403).send("Invalid Session");
+		}
 		if (new Negotiator(req).mediaType() === 'text/html') return res.redirect(options.route.login);
 		else return res.send("Invalid Session");
+		// else return res.status(401).send("Invalid Session");
 	};
 	authRouter.use(passport.initialize({ userProperty: "user" }));
 	authRouter.use(passport.session());
@@ -209,6 +249,30 @@ module.exports = () => {
 		router: authRouter
 	};
 };
+
+const userAccess = async req => {
+	const roleid = req.session.activeRoleId || "blank";
+	// if (!roleid) return true;
+	const servicename = req.url.replace("/", "");
+	const updateinp = { roleid, servicename };
+	try {
+		const allowed = await utils.fetchData(updateinp, "utility/userAccess", "userAccess");
+		if (allowed == "off") {
+			res.status(500).send("fail");
+			// httpsServer.close();
+			logger.error("License Expired!!");
+			logger.error("Please run the Service API and Restart the Server");
+		} else if (allowed == "fail") return false;
+		else if (allowed === true) return true;
+		else {
+			req.clearSession();
+			return false;
+		}
+	} catch (e) {
+		logger.error("Error occured in userAccess");
+		return false;
+	}
+}
 
 const registerAuthStrategy = async (opts) => {
 	const fnName = "registerAuthStrategy";
@@ -262,6 +326,108 @@ module.exports.checkUser = async (req, res) => {
 					if (status == "fail") result = "fail";
 					else if (status == "invalid") result = "invalidServerConf";
 				}
+			}
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+// send email when forgot password
+module.exports.forgotPasswordEmail = async (req, res) => {
+	const fnName = "forgotPasswordEmail";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const inputs = 	{ "username": req.body.username };
+		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
+		let result = { "proceed": true };
+		if (userInfo == "fail") return result = "fail";
+		else if (!userInfo || !userInfo.auth) result = "invalid_username_password";
+		else if (userInfo.invalidCredCount == 5) result = "userLocked";
+		else if (userInfo && userInfo.auth) {
+			//create a temporary password here
+			const default_password = utils.generateDefPassword();
+			const password = bcrypt.hashSync(default_password, bcrypt.genSaltSync(10));
+			//password created
+			const inputsFor = {
+				"username": req.body.username,
+				"defaultpassword": password
+			};
+			const userUpd = await utils.fetchData(inputsFor, "login/forgotPasswordEmail", fnName);
+			if (userUpd == "fail") return result = "fail";
+			else {
+				userInfo.defaultpassword = default_password
+				notifications.notify("forgotPassword", {field: "password", user: userInfo});
+				result = "success";
+			}
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+//unlock user account
+module.exports.unlock = async (req, res) => {
+	const fnName = "unlock";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const username = req.user.username;
+		const inputs = 	{ "username": username };
+		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
+		let result = { "proceed": true };
+		if (userInfo == "fail") return result = "fail";
+		else if (!userInfo || !userInfo.auth) result = "invalid_username_password";
+		else if (userInfo.invalidCredCount != 5) result = "userUnlocked";
+		else if (userInfo.auth.verificationpassword != "") {
+			var defPassword = bcrypt.compareSync(req.body.password, userInfo.auth.verificationpassword);
+			if (defPassword) {
+				//unlock the account
+				const inputsunlock = {"username":username, "action":"unlock"}
+				const user = await utils.fetchData(inputsunlock, "login/passtimeout", "unlock");
+				if (user == "fail") result = "fail";
+				else if(user == "timeout") result = "timeout";
+				else result = "success";
+			} else {
+				result = "invalid_username_password";
+			}
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+//send email for unlock account
+module.exports.unlockAccountEmail = async (req, res) => {
+	const fnName = "unlockAccountEmail";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const inputs = 	{ "username": req.user.username };
+		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
+		let result = { "proceed": true };
+		if (userInfo == "fail") return result = "fail";
+		else if (!userInfo || !userInfo.auth) result = "invalid_username_password";
+		else if (userInfo.invalidCredCount != 5) result = "userUnlocked";
+		else if (userInfo && userInfo.auth) {
+			//create a verification password here
+			const default_password = utils.generateDefPassword();
+			const password = bcrypt.hashSync(default_password, bcrypt.genSaltSync(10));
+			//password created
+			const inputsFor = {
+				"username": req.user.username,
+				"verificationpassword": password
+			};
+			const userUpd = await utils.fetchData(inputsFor, "login/unlockAccountEmail", fnName);
+			if (userUpd == "fail") return result = "fail";
+			else {
+				userInfo.verificationpassword = default_password
+				notifications.notify("unlockAccount", {field: "password", user: userInfo});
+				result = "success";
 			}
 		}
 		return res.send(result);
@@ -354,7 +520,7 @@ module.exports.validateUserState = async (req, res) => {
 						emsg = "noProjectsAssigned";
 					} else {
 						emsg = "ok";
-						res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed:true});
+						res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
 						req.session.userid = userid;
 						req.session.ip = ip;
 						req.session.loggedin = (new Date()).toISOString();

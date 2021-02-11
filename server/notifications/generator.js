@@ -137,6 +137,66 @@ generateEmailPayload.iceAssign = async data => {};
 generateEmailPayload.projectAssign = async data => {};
 
 
+generateEmailPayload.forgotPassword = async data => {
+	const user = data.user;
+	const recv = user.email;
+	if (!validator.isEmail(recv)) return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
+	const msg = {
+		'subject': '',
+		'template': 'forgot-password',
+		'context': {
+			'companyLogo': data.url + companyLogo,
+			'productLogo': data.url + productLogo,
+			'username': user.name,
+			'name': user.firstname + ' ' + user.lastname,
+			"defaultpassword": user.defaultpassword,
+			'datetime': new Date().toLocaleString(),
+			'customFooter': "Please contact your Avo Assure administrator for any trouble logging in, or to disable further notifications."
+		}
+	};
+
+	if (data.field === 'password') {
+		msg.subject = 'Your Avo Assure Change Password Notification';
+		msg.context.password = true;
+	}
+
+	return {
+		error: null,
+		msg,
+		receivers: [recv]
+	};
+};
+
+generateEmailPayload.unlockAccount = async data => {
+	const user = data.user;
+	const recv = user.email;
+	if (!validator.isEmail(recv)) return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
+	const msg = {
+		'subject': '',
+		'template': 'unlock-account',
+		'context': {
+			'companyLogo': data.url + companyLogo,
+			'productLogo': data.url + productLogo,
+			'username': user.name,
+			'name': user.firstname + ' ' + user.lastname,
+			"verificationpassword": user.verificationpassword,
+			'datetime': new Date().toLocaleString(),
+			'customFooter': "Please contact your Avo Assure administrator for any trouble logging in, or to disable further notifications."
+		}
+	};
+
+	if (data.field === 'password') {
+		msg.subject = 'Your Avo Assure Unlock Account Notification';
+		msg.context.password = true;
+	}
+
+	return {
+		error: null,
+		msg,
+		receivers: [recv]
+	};
+};
+
 function userUpdate(data) {
 	return when.promise((resolve, reject) => {
 		storageModule.getUser(data.userId).then((user) => {

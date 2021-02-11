@@ -38,38 +38,24 @@ exports.populateProjects =  async(req, res) => {
 	res.send(data);
 };
 
-exports.populateScenarios = function (req, res) {
-	logger.info("Inside UI service: populateScenarios");
-	if (utils.isSessionActive(req)) {
-		var moduleId = req.body.moduleId;
-		var inputs= {
+exports.populateScenarios = async (req, res) => {
+	const fnName = "populateScenarios";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const moduleId = req.body.moduleId;
+		const inputs= {
 			"moduleid":moduleId,
 			"name":"populateScenarios"
 		}
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-
-		client.post(epurl+"mindmap/getScenarios", args,
-		function (result, response) {
-			try {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmap/getScenarios: getScenarios, Error Code : ERRDAS");
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-			} catch (ex) {
-				logger.error("Exception in the service getScenarios: %s", ex);
-			}
-		});
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+		const result = await utils.fetchData(inputs, "mindmap/getScenarios", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch (exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
@@ -86,11 +72,12 @@ exports.getProjectTypeMM = (req, res) =>{
 	});
 };
 
-exports.populateUsers = function (req, res) {
-	logger.info("Inside UI service: populateUsers");
-	if (utils.isSessionActive(req)) {
+exports.populateUsers = async (req, res) => {
+	const fnName = "populateUsers";
+	logger.info("Inside UI service: " + fnName);
+	try {
 		var d = req.body;
-		admin.getUsers({ prjId: d.projectId }, function (err, data) {
+		admin.getUsers({ prjId: d.projectId }, (err, data) => {
 			res.setHeader('Content-Type', 'application/json');
 			if (err)
 				res.status(500).send('Fail');
@@ -98,12 +85,10 @@ exports.populateUsers = function (req, res) {
 				res.status(200).send(data);
 			}
 		});
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
-	}
-
 };
 
 const getModule = async (d) => {
@@ -124,70 +109,51 @@ exports.getModules = async (req, res) => {
 	res.send(data);
 };
 
-exports.reviewTask = function (req, res) {
-	logger.info("Inside UI service: reviewTask");
-	if (utils.isSessionActive(req)) {
+exports.reviewTask = async (req, res) => {
+	const fnName = "reviewTask";
+	logger.info("Inside UI service: " + fnName);
+	try {
 		var inputs = req.body;
-		taskID = inputs.taskId;
+		var taskID = inputs.taskId;
 		var batchIds = inputs.batchIds;
 		var userId = req.session.userid;
 		var username = req.session.username;
 		var date = new Date();
 		var status = inputs.status;
-		var versionnumber = inputs.versionnumber;
-		if (batchIds.indexOf(',')>-1){
-			var batch_tasks=batchIds.split(',');
-			taskID=JSON.stringify(batch_tasks);
-		}else{
+		if (batchIds.indexOf(',') > -1) {
+			taskID=JSON.stringify(batchIds.split(','));
+		} else {
 			taskID=batchIds[0];
 		}
 		var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' +date.toLocaleTimeString();
 		var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
-		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
-			var inputs= {
-				"id" : taskID,
-				"action" : "updatetaskstatus",
-				"status" : status,
-				"history" : taskHistory,
-				"assignedto" : userId
-			}
-			// query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.assignedTo='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
-		} else if (status == 'underReview') {
-			var inputs= {
-				"id" : taskID,
-				"action" : "updatetaskstatus",
-				"status" : status,
-				"history" : taskHistory,
-				"reviewer" : userId
-			}
-			// query = { 'statement': "MATCH (n:TASKS) WHERE n.taskID in " + taskID + " and n.reviewer='" + userId + "' with n as n Match path=(n)<-[r]-(a) RETURN path", "resultDataContents": ["graph"] };
-		}
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
+		var inputs= {
+			"id" : taskID,
+			"action" : "updatetaskstatus",
+			"status" : status,
+			"history" : taskHistory
 		};
-		client.post(epurl+"mindmap/manageTask", args,
-		function (result, response) {
-			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRDAS");
-				res.send("fail");
-			} else {
-				res.send('inprogress');
-			}
-
-		})
-	}
-	else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
+			inputs.assignedto = userId;
+		} else if (status == 'underReview') {
+			inputs.reviewer = userId;
+		}
+		const result = await utils.fetchData(inputs, "mindmap/manageTask", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send('inprogress');
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
-exports.saveData =  async(req, res)=> {
-	logger.info("Inside UI service: saveData");
-	if (utils.isSessionActive(req)) {
+exports.saveData = async (req, res) => {
+	const fnName = "saveData";
+	logger.info("Inside UI service: " + fnName);
+	try {
 		var tasks = [];
 		var idDict = {};
 		var inputs = req.body;
@@ -205,9 +171,31 @@ exports.saveData =  async(req, res)=> {
 		var cycId = inputs.cycId;
 		var createdthrough = inputs.createdthrough || "Web";
 		var assignedObj = {};
+        var scenarioObj = {}
+        var regg= /[~*+=?^%<>()|\\|\/]/;
+		for(var key in inputs){
+			if(key=='map'){
+				for(var i=0;i<inputs[key].length;i++){
+					if(regg.test(inputs[key][i]['name'])){
+						logger.error("Error occurred in mindmap/"+fnName+": Special characters found!!");
+						return res.send('fail');
+					}
+					if(inputs[key][i]['task']!=null){
+						var map_task=inputs[key][i]['task']
+						if(regg.test(map_task['batchName']) || regg.test(map_task['details']) || regg.test(map_task['task'])){
+							logger.error("Error occurred in mindmap/"+fnName+": Special characters found!!");
+							return res.send('fail');
+						}
+					}
+				}
+			}
+		}
 		for (var k = 0; k < data.length; k++) {
 			var task = data[k].task;
 			if (task != null) {
+				if('accessibilityTesting' in task){
+					scenarioObj[data[k]["_id"]] = task["accessibilityTesting"];
+				}
 				if ('assignedToName' in task) {
 					var assignedTo = task.assignedToName;
 					if (assignedTo != null && assignedTo != undefined) {
@@ -216,6 +204,13 @@ exports.saveData =  async(req, res)=> {
 						}
 					}
 				}
+			}
+		}
+		if(Object.keys(scenarioObj).length > 0){
+			let scenario_result = await updateScenario(scenarioObj);
+			if (scenario_result == 'fail'){
+				logger.error("Update Scenario Failed task can not be saved.");
+				return res.send("fail");
 			}
 		}
 		var notify = assignedObj;
@@ -455,7 +450,6 @@ exports.saveData =  async(req, res)=> {
 								tasks_update.push(tsk)
 								
 							}
-
 						}else{
 							if(!screenids.has(tsk.nodeid))
 								tasks_insert.push(tsk)
@@ -525,57 +519,89 @@ exports.saveData =  async(req, res)=> {
 					}
 			});
 		}
-	} else {
-		logger.error("Invalid Session");
-		res.send("Invalid Session");
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
+};
+
+async function updateScenario(scenarioObj){
+	let inputs = {
+		scenarios: scenarioObj
+	}
+	const fnName = "updateScenario";
+	try{
+		let result = await utils.fetchData(inputs,"mindmap/updateScenario",fnName)
+		return result;
+	}catch(e){
+		logger.error("Error occured in updateScenarion: %s",e);
+	}
+	return "fail";
 }
 
 exports.saveEndtoEndData = function (req, res) {
-	logger.info("Inside UI service: saveEndtoEndData");
-	var idDict = {};
-	var inputs = req.body;
-	var data = inputs.map;
-	var prjId = inputs.prjId;
-	var deletednodes = inputs.deletednode;
-	var user = req.session.username;
-	var userrole = req.session.activeRole;
-	var userid = req.session.userid;
-	var userroleid = req.session.activeRoleId;
-	var flag = inputs.write;
-	var createdthrough=inputs.createdthrough || "Web";
-	if (flag == 10) {
-		var uidx = 0, rIndex;
-		var vn_from = inputs.vn_from;
-		var vn_to = inputs.vn_from;
-		var qObj = { "projectid": prjId, "testsuiteDetails": [], "username": user, "userrole": userrole, "versionnumber": parseFloat(vn_from)|| 0, "newversionnumber": parseFloat(vn_to) || 0 , "userid":userid,"userroleid":userroleid ,"createdthrough":createdthrough,"deletednodes":deletednodes};
-		var nObj = [], tsList = [];
-		data.forEach(function (e, i) {
-			if (e.type == "endtoend") rIndex = uidx; // check for normal modules
-			if (e.task != null) delete e.task.oid;
-			nObj.push({ projectID: e.projectID, _id: e._id || null, name: e.name, task: e.task, children: [] ,state: e.state, childIndex:e.childIndex});
-			if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
-			idDict[e.id] = uidx++;
-		});
-		nObj[rIndex].children.forEach(function (ts, i) {
-			tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"state":ts.state,"childIndex":parseInt(ts.childIndex)});
-		});
-		tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1)
-		qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
-		
-		create_ice.saveMindmapE2E(qObj, function (err, data) {
-			if (err) {
-				res.status(500).send(err);
-			} else {
-				// if res.rows
-				res.status(200).send(data);
-			}
-		});
+	const fnName = "saveEndtoEndData";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var nData = [], qList = [], idDict = {};
+		var urlData = req.get('host').split(':');
+		var inputs = req.body;
+		var data = inputs.map;
+		var prjId = inputs.prjId;
+		var deletednodes = inputs.deletednode;
+		var user = req.session.username;
+		var userrole = req.session.activeRole;
+		var userid = req.session.userid;
+		var userroleid = req.session.activeRoleId;
+		var flag = inputs.write;
+		// var relId = inputs.relId;
+		var cycId = inputs.cycId;
+		var createdthrough=inputs.createdthrough || "Web";
+
+		//TO support task deletion
+		var removeTask = inputs.unassignTask;
+		if (flag == 10) {
+			var uidx = 0, rIndex;
+			var vn_from = inputs.vn_from;
+			var vn_to = inputs.vn_from;
+			// var idn_v_idc = {};
+
+			var qObj = { "projectid": prjId, "testsuiteDetails": [], "username": user, "userrole": userrole, "versionnumber": parseFloat(vn_from)|| 0, "newversionnumber": parseFloat(vn_to) || 0 , "userid":userid,"userroleid":userroleid ,"createdthrough":createdthrough,"deletednodes":deletednodes};
+			var nObj = [], tsList = [];
+			data.forEach(function (e, i) {
+				if (e.type == "endtoend") rIndex = uidx; // check for normal modules
+				if (e.task != null) delete e.task.oid;
+				nObj.push({ projectID: e.projectID, _id: e._id || null, name: e.name, task: e.task, children: [] ,state: e.state, childIndex:e.childIndex});
+				if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
+				idDict[e.id] = uidx++;
+			});
+
+			nObj[rIndex].children.forEach(function (ts, i) {
+				var sList = [];
+				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"state":ts.state,"childIndex":parseInt(ts.childIndex)});
+				
+			});
+			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1)
+			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
+			
+			create_ice.saveMindmapE2E(qObj, function (err, data) {
+				if (err) {
+					res.status(500).send(err);
+				} else {
+					// if res.rows
+					res.status(200).send(data);
+				}
+			});
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
 exports.excelToMindmap = function (req, res) {
-	logger.info("Inside UI service: excelToMindmap");
+	const fnName = "excelToMindmap";
+	logger.info("Inside UI service: " + fnName);
 	try {
 		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
 		if (req.body.data.flag == 'sheetname') {
@@ -637,52 +663,43 @@ exports.excelToMindmap = function (req, res) {
 		}
 		if (err) res.status(200).send('fail');
 		else res.status(200).send(qObj);
-	}
-	catch (exc) {
-		logger.error(exc.message);
-		return res.send('fail')
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 };
 
-exports.getScreens = async(req, res) =>{
-	logger.info("Inside UI service: populateScenarios");
-	var d = req.body;
-	var inputs= {
-		"projectid":d.projectId
-	}
-	var data = await utils.fetchData(inputs, "mindmap/getScreens", "getScreens");
-	res.send(data);
-};
-
-exports.importMindmap = async(req, res) =>{
-	logger.info("Inside UI service: importMindmap");
-	var d = req.body;
-	var inputs= {
-		"mindmap":d,
-		"query":"importMindmap"
-	}
-	var data = await utils.fetchData(inputs, "mindmap/importMindmap", "importMindmap");
-	res.send(data)
-};
-
-exports.exportMindmap= async (req, res) =>{
-	logger.info("Inside UI service: exportMindmap");
-	var d = req.body;
-	var inputs= {
-		"mindmapId":d.mindmapId,
-		"query":"exportMindmap"
+exports.getScreens = async (req, res) => {
+	const fnName = "getScreens";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const projectid = req.body.projectId;
+		const inputs= { projectid }
+		const result = await utils.fetchData(inputs, "mindmap/getScreens", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 	var data = await utils.fetchData(inputs, "mindmap/exportMindmap","exportMindmap");
 	res.send(data)
 };
 
-exports.exportToExcel = async (req, res) =>{
-	logger.info("Writing Module structure to Excel");
-	var d = req.body;
-	var excelMap = await getModule({modName:null,cycId:null,"tab":"tabCreate","projectid":d.projectid,"moduleid":d.moduleid})
-	var dir = './../../excel';
-	var excelDirPath = path.join(__dirname, dir);
-	var filePath = path.join(excelDirPath, 'samp234.xlsx');
+exports.exportToExcel = function (req, res) {
+	const fnName = "exportToExcel";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		logger.info("Fetching Module details");
+		var d = req.body;
+		var excelMap = await getModule({modName:null,cycId:null,"tab":"tabCreate","projectid":d.projectid,"moduleid":d.moduleid})
+		logger.info("Writing Module structure to Excel");
+		var dir = './../../excel';
+		var excelDirPath = path.join(__dirname, dir);
+		var filePath = path.join(excelDirPath, 'samp234.xlsx');
 
 	try {
 		if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
@@ -733,22 +750,9 @@ exports.exportToExcel = async (req, res) =>{
 			.string('Module')
 			.style(style);
 
-	ws.cell(1, 2)
-			.string('Scenario')
-			.style(style);
-
-	ws.cell(1, 3)
-			.string('Screen')
-			.style(style);
-
-	ws.cell(1, 4)
-			.string('Script')
-			.style(style);
-
-	var min_scen_idx = 1;
-	var min_scr_idx = 1;
-	ws.cell(2,1).string(curr.name);
-	try {
+		var min_scen_idx = 1;
+		var min_scr_idx = 1;
+		ws.cell(2,1).string(curr.name);
 		var tc_count=0;
 		for (i = 0; i < curr.children.length; i++) {
 			for (j = 0; j < curr.children[i].children.length; j++) {
@@ -770,8 +774,9 @@ exports.exportToExcel = async (req, res) =>{
 			var rstream = fs.createReadStream(filePath);
 			rstream.pipe(res);
 		});
-	} catch (ex) {
-		logger.error("Exception in mindmapService: exportToExcel: ", ex);
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
 	}
 
 };
@@ -1169,8 +1174,8 @@ exports.pdProcess = function (req, res) {
 			//final callback
 			res.send({"success":true,"data":orderMatrix,"history":activityJSON['mxGraphModel']['@history']});
 		});
-	} catch(err) {
-		logger.error("Exception occurred in pdProcess", err)
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/pdProcess:", exception);
 		res.status(500).send("fail");
 	}
 };
@@ -1196,6 +1201,10 @@ var getTestcaseStep = function(sno, ob, cn, keyVal, inp, out, url, app) {
 var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	var testCaseSteps = [],testcaseObj,step = 1;
 	var firstScript = false,windowId;
+	var temp_screendata=screendata;
+	var menu_input='';
+	var menu_count=0;
+	var mflag=0;
 	if(adjacentItems){
 		// in case is first script
 		// make orderlist global
@@ -1211,6 +1220,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					getTestcaseStep(1,null,'@Sap','LaunchApplication',null,null,null,"SAP"),
 					getTestcaseStep(2,null,'@Sap','ServerConnect',null,null,null,"SAP")
 				];
+				mflag=1;
 				step = 3;
 			}
 			else if (item["@label"]=="Start" && screendata[0].apptype=="OEBS"){
@@ -1268,7 +1278,11 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
 								'setText',[eachScrapedAction.action.actionData],null,eachScrapedAction.url,"Web")
 						}
-						break;		
+						break;
+                    case "inputReadOnly":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+								'setText',[eachScrapedAction.action.actionData],null,eachScrapedAction.url,"Web")
+						break;						
 					default:
 						break;
 				}
@@ -1287,59 +1301,100 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 		else if(eachScrapedAction.apptype=="SAP"){
 			text = eachScrapedAction.text;
 			input = text.split("  ");
-			switch(eachScrapedAction.tag){
-				case "input":
-				case "GuiOkCodeField":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
-					break;
-				case "button":
-				case "shell":
-				case "table":
-				case "toolbar":
-				case "calendar":
-				case "gridview":
-				case "GuiLabel":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
-					var custname_split = eachScrapedAction.custname.split('_');
-					if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
-					break;
-				case "GuiStatusbar":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
-					break;
-				case "GuiTab":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
-					break;
-				case "select":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
-					break;
-				case "GuiMenubar":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'SelectMenu',[input[0]],null,null,"SAP");
-					break;
-				case "GuiSimpleContainer":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
-					break;
-				case "radiobutton":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
-					break;
-				case "checkbox":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
-					break;
-				case "tree":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
-					break;
-				case "picture":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
-					break;
-				case "text":
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
-					break;
-				default:
-					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
-					break;
+			var menu_flg=0;
+			if(eachScrapedAction.tag=="GuiMenu"){
+				if(mflag==1) temp_mdata=temp_screendata[menu_count-2];
+				else temp_mdata=temp_screendata[menu_count]
+				if(temp_mdata.tag=="GuiMenu"){
+					menu_flg=1;
+					menu_input=menu_input.concat(input+';');
+				} else{
+					menu_flg=0;
+					menu_input=menu_input.concat(input);
+				}
 			}
-			if(testcaseObj){
-				testCaseSteps.push(testcaseObj);
-				step++;
+				
+			if(menu_flg==0){
+				switch(eachScrapedAction.tag){
+					case "input":
+					case "GuiOkCodeField":
+						if(input[0]=='') input=eachScrapedAction.command[0][2].split(' ')
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
+						break;
+					case "button":
+					case "shell":
+					case "table":
+					case "toolbar":
+					case "calendar":
+					case "gridview":
+					case "GuiLabel":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+						var custname_split = eachScrapedAction.custname.split('_');
+						if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+						break;
+					case "GuiStatusbar":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
+						break;
+					case "GuiTab":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
+						break;
+					case "select":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
+						break;
+					case "GuiMenubar":
+					case "GuiMenu":
+						testcaseObj = getTestcaseStep(step,null,'@Sap','SelectMenu',[menu_input],null,null,"SAP");
+						break;
+					case "GuiSimpleContainer":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
+						break;
+					case "radiobutton":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
+						break;
+					case "checkbox":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
+						break;
+					case "tree":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
+						break;
+					case "picture":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
+						break;
+					case "text":
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
+						break;
+					case "GuiModalWindow":
+					case "GuiDialogShell":
+						if(eachScrapedAction.command[0][1]=='close'){
+							testcaseObj = getTestcaseStep(step,null,'@Sap','closedialogwindow',null,null,null,"SAP");
+						}
+						break;
+					default:
+						if(eachScrapedAction.command[0][1]=='sendVKey'){
+							key=eachScrapedAction.command[0][2]
+							keycode_map = {
+								'1': 'F1', '2': 'F2', '3': 'F3', '4': 'F4', '5': 'F5', '6': 'F6', '7': 'F7', '8': 'F8', '9': 'F9', '10': 'F10', '11': 'ctrl+s', '12': 'f12', '13': 'shift+f1',
+								'14': 'shift+f2', '15': 'shift+f3', '16': 'shift+f4', '17': 'shift+f5', '18': 'shift+f6', '19': 'shift+f7', '20': 'shift+f8', '21': 'shift+f9',
+								'22': 'shift+ctrl+0', '23': 'shift+f11', '24': 'shift+f12', '25': 'ctrl+f1', '26': 'ctrl+f2', '27': 'ctrl+f3', '28': 'ctrl+f4', '29': 'ctrl+f5',
+								'30': 'ctrl+f6', '31': 'ctrl+f7', '32': 'ctrl+f8', '33': 'ctrl+f9', '34': 'ctrl+f10', '35': 'ctrl+f11', '36': 'ctrl+f12', '37': 'ctrl+shift+f1',
+								'38': 'ctrl+shift+f2', '39': 'ctrl+shift+f3', '40': 'ctrl+shift+f4', '41': 'ctrl+shift+f5', '42': 'ctrl+shift+f6', '43': 'ctrl+shift+f7', '44': 'ctrl+shift+f8',
+								'45': 'ctrl+shift+f9', '46': 'ctrl+shift+f10', '47': 'ctrl+shift+f11', '48': 'ctrl+shift+f12', '70': 'ctrl+e', '71': 'ctrl+f', '72': 'ctrl+/', '73': 'ctrl+\ ',
+								'74': 'ctrl+n', '75': 'ctrl+o', '76': 'ctrl+x', '77': 'ctrl+c', '78': 'ctrl+v', '79': 'ctrl+z', '80': 'ctrl+pageup', '81': 'pageup', '82': 'pagedown', '83': 'ctrl+pagedown',
+								'84': 'ctrl+g', '85': 'ctrl+r', '86': 'ctrl+p'
+							}
+							testcaseObj = getTestcaseStep(step,null,'@Generic','sendFunctionKeys',keycode_map[key],null,null,"SAP");
+						} else {
+							logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
+						}
+						break;
+				}
+				if(testcaseObj){
+					testCaseSteps.push(testcaseObj);
+					step++;
+					menu_count=step;
+				}
+			} else{
+				menu_count++;
 			}
 		}
 		//maping OEBS objects
@@ -1449,3 +1504,45 @@ var encrypt = (data) => {
 	const encryptedData = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
 	return 	encryptedData.toUpperCase();
 }
+
+exports.exportMindmap = async (req, res) => {
+	const fnName = "exportMindmap";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const mindmapId = req.body.mindmapId;
+		const inputs= {
+			"mindmapId": mindmapId,
+			"query":"exportMindmap"
+		}
+		const result = await utils.fetchData(inputs, "mindmap/exportMindmap", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+exports.importMindmap = async (req, res) => {
+	const fnName = "importMindmap";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const content = req.body;
+		const inputs= {
+			"mindmap": content,
+			"query":"importMindmap"
+		}
+		const result = await utils.fetchData(inputs, "mindmap/importMindmap", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};

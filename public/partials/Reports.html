@@ -73,27 +73,33 @@
 							   <div class="col">
 								  <div class="form-group inline-form-control">
 									 <label>Project:</label>
-									 <select id="selectProjects" class="project-list ng-pristine ng-valid ng-touched" ng-model='projectNames' ng-change='selProjectsFilter()'>
-										<option class="" selected="selected">Web</option>
-									 </select>
+									 <select id="selectProjects" class="project-list ng-pristine ng-valid ng-touched" ng-model='prc.projectId' ng-change='prc.selProjectsFilter()'>
+										<option value="" selected="selected" disabled="disabled">Select Project</option>
+										<option ng-repeat="prj in prc.projects" value="{{prj._id}}">{{prj.name}}</option>
+									</select>
 								  </div>
 							   </div>
 							   <div class="col">
 								  <div class="form-group inline-form-control">
 									 <label>Release:</label>
-									 <select id="selectReleases" class="release-list ng-pristine ng-valid ng-touched" ng-model="releaseNames" ng-change='selReleasesFilter()'>
-										<option class="ng-binding ng-scope" selected="selected">Release</option>
+									 <select id="selectReleases" class="release-list ng-pristine ng-valid ng-touched" ng-model="prc.releaseId" ng-change='prc.selReleasesFilter()'>
+										<option value='' class="ng-binding ng-scope" selected="selected" disabled="disabled">Select Release</option>
+										<option ng-repeat="rel in prc.releases" value="{{rel.name}}">{{rel.name}}</option>
 									 </select>
 								  </div>
 							   </div>
 							   <div class="col">
 								  <div class="form-group inline-form-control">
 									 <label>Cycle:</label>
-									 <select id="selectCycles" class="cycle-list ng-pristine ng-valid ng-touched" ng-model="cycleNames" ng-change='selCyclesFilter()'>
-										<option class="ng-binding ng-scope" selected="selected">Cycle</option>
+									 <select id="selectCycles" class="cycle-list ng-pristine ng-valid ng-touched" ng-model="prc.cycleId" ng-change='prc.selCyclesFilter()'>
+										<option value="" class="ng-binding ng-scope" selected="selected" disabled="disabled">Select Cycle</option>
+										<option ng-repeat="cyc in prc.cycles" data-id="{{cyc._id}}" value="{{cyc._id}}">{{cyc.name}}</option>
 									 </select>
 								  </div>
 							   </div>
+							   <div class="col">
+								  <button class="webCrawler-toggle-btn" ng-click="toggle_accessibility($event)" style="background: blueviolet;color:white;"title="Enable Accessibility Testing Reports" id="accessibility_toggle">Accessibility Testing</button>
+						   		</div>
 							   <div class="col d-flex flex-row-reverse ">
 								  <input id='searchModule' class="reports-search" type="text" placeholder="Search Module" aria-label="Search">
 								  <img alt="Search Icon" class="searchReportsImg" src="imgs/ic-search-icon.png">
@@ -144,6 +150,30 @@
 										</div>
 									 </div>
 								  </div>
+								  <div class="panel-group" id="accessibilityTblExecution">
+									<div class="panel panel-default">
+									   <div class="panel-heading executionsHeader">
+										  <h4 class="panel-title" id='panelTitle'>
+											 <a id='executionNameHeader' data-toggle="" data-parent="#accessibilityTblExecution" href="#">
+												Accessibility Reports
+											 </a>
+										  </h4>
+									   </div>
+									   <div class='container-fluid dataTableReports modTbl'>
+										  <table id="reportsAccTable" class='display' style='width:100%'>
+											 <thead>
+												<tr>
+												   <th>Execution No</th>
+												   <th>Title</th>
+												   <th>Time </th>
+												</tr>
+											 </thead>
+											 <tbody>
+											 </tbody>
+										  </table>
+									   </div>
+									</div>
+								 </div>
 							   </div>
 							   <div class="col colReportsWidth">
 								  <div class="panel-group scenarioStatus" id="accordionTbloverallStatus">
@@ -345,7 +375,7 @@
  <!-- Reports Modal Box -->
  <!-- Footer  -->
  <footer class="footer">
-	<div class="card-header text-white d-flex card-footer"> <a href="#" class="text-white leftFooterTxt">&copy; <span id="currentYear">2020</span> Avo Automation. All Rights Reserved</a>
+	<div class="card-header text-white d-flex card-footer"> <a href="#" class="text-white leftFooterTxt">&copy; <span id="currentYear">2021</span> Avo Automation. All Rights Reserved</a>
 	   <a href="#" class="text-white ml-auto rightFooterTxt" style='top: 0px;'>Powered By <img class="f-logo" src="imgs/ftr-avo-logo.png" /></a>
 	</div>
  </footer>
