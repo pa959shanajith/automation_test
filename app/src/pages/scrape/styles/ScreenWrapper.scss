@@ -1,0 +1,27 @@
+.ss__content{
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 100%;
+    min-width: 0;
+    padding: 20px;
+    margin: 0 5px;
+    background-color: #fff;
+}
+
+.ss__task_title{
+    margin-bottom: 15px;
+    max-width: 80%;
+}
+
+.ss__task_name{
+    cursor: pointer;
+    background-color: #331d4e;
+    color: #fff;
+    padding: 1px 14px 0;
+    font-family: "LatoWebLight";
+    font-size: 18px;
+    width: fit-content;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-radius: 5px;
+}

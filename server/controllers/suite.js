@@ -6,9 +6,10 @@ var myserver = require('../lib/socket');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+const accessibility_testing = require("./accessibilityTesting")
 const notifications = require('../notifications');
 var queue = require('../lib/executionQueue')
-var cache = require('../lib/cache')
+var cache = require('../lib/cache').getClient(2);
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const scheduleJobMap = {};
 const SOCK_NORM = "normalModeOn";
@@ -57,7 +58,8 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"testsuitename": testsuite.name,
 			"moduleid": moduleId,
 			"testsuiteid": testsuite.testsuiteid,
-			"versionnumber": suite.versionnumber
+			"versionnumber": suite.versionnumber,
+			"accessibilityTestingMap": testscenarioDetails.accessibilitytestingmap
 		};
 		responsedata[moduleId] = finalSuite;
 	}
@@ -92,13 +94,12 @@ async function getICEList (projectids,userid){
 	var result = {ice_ids:{}}
 	result["ice_list"] = []
 	result["unallocatedICE"] = {}
-	try{
+	try {
 		const pool_req =  {
 			"projectids":[projectids],
 			"poolid": ""
 		}
-		
-		pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
+		let pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
 		unallocatedICE = await utils.fetchData({}, "admin/getAvailable_ICE");
 		ice_status = await cache.get("ICE_status");
 		unallocatedICE = unallocatedICE["available_ice"];
@@ -225,6 +226,7 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 				"testcaseid": tc._id,
 				"screenid": tc.screenid,
 				"versionnumber": tc.versionnumber,
+				"userid": userid,
 				"query": "readtestcase"
 			};
 			const testcasedata = await utils.fetchData(inputs, "design/readTestCase_ICE", fnName);
@@ -237,7 +239,9 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 		allTestcaseSteps.push({
 			"template": "",
 			"testcase": allTestcaseObj[tc._id].steps,
-			"testcasename": allTestcaseObj[tc._id].name
+			"testcasename": allTestcaseObj[tc._id].name,
+			"screenid": tc.screenid,
+			"screenname":tc.screenname
 		});
 	});
 
@@ -300,7 +304,8 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			"condition": [],
 			"dataparampath": [],
 			"scenarioNames": [],
-			"scenarioIds": []
+			"scenarioIds": [],
+			"accessibilityMap":{}
 		};
 		const suiteDetails = suite.suiteDetails;
 		for (const tsco of suiteDetails) {
@@ -317,6 +322,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
+			suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibilityParameters;
 			suiteObj.condition.push(scenario.condition);
 			suiteObj.dataparampath.push(scenario.dataparam[0]);
 			suiteObj.scenarioNames.push(scenario.scenarioName);
@@ -470,6 +476,10 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 			} else if (event == "result_executeTestSuite") {
 				if (!status) { // This block is for report data
 					const executionid = resultData.executionId;
+					if("accessibility_reports" in resultData){	
+						const accessibility_reports = resultData.accessibility_reports
+						accessibility_testing.saveAccessibilityReports(accessibility_reports);
+					}
 					const scenarioid = resultData.scenarioId;
 					const testsuiteid = resultData.testsuiteId;
 					const testsuiteIndex = execReq.testsuiteIds.indexOf(testsuiteid);
@@ -676,7 +686,7 @@ function clubBatches(batchInfo){
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	// Several client apps do not send TCP Keep-Alive. Hence this is handled in applicaton side.
-	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +process.env.KEEP_ALIVE);
+	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +(process.env.KEEP_ALIVE || "30000"));
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
 	await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
 };

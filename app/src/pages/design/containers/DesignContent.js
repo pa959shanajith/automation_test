@@ -447,6 +447,7 @@ const DesignContent = props => {
     const addRow = () => {
         let testCases = [...testCaseData]
         let insertedRowIdx = [];
+        runClickAway = false;
         if (checkedRows.length === 1) {
             const rowIdx = checkedRows[0];
             testCases.splice(rowIdx+1, 0, emptyRowData);

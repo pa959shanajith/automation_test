@@ -18,15 +18,15 @@ const UpperContent = props => {
     const disableAction = useSelector(state => state.scrape.disableAction);
     const disableAppend = useSelector(state => state.scrape.disableAppend);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
-    const { appType } = useSelector(state => state.plugin.CT);
+    const { appType, subTaskId } = useSelector(state => state.plugin.CT);
     const [isMac, setIsMac] = useState(false);
     const [appendCheck, setAppendCheck] = useState(false);
-    const { setShowAppPop, saved, startScrape } = useContext(ScrapeContext);
+    const { setShowAppPop, saved, startScrape, setSaved } = useContext(ScrapeContext);
 
     useEffect(() => {
         setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
         if (saved || disableAction) setAppendCheck(false);
-    }, [appType, saved]);
+    }, [appType, saved, subTaskId]);
 
 
     const WebList = [
@@ -44,7 +44,7 @@ const UpperContent = props => {
 
     const sapList = [{ 'title': "SAP Apps", 'img': 'static/imgs/ic-desktop.png', action: () => setShowAppPop({'appType': 'SAP', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction }]
 
-    const webserviceList = [{ 'title': "Web Services", 'img': 'static/imgs/ic-webservice.png', action: () => console.log(""), 'disable': disableAction }]
+    const webserviceList = [{ 'title': "Web Services", 'img': 'static/imgs/ic-webservice.png', action: () => startScrape(), 'disable': disableAction }]
 
     const mobileAppList = [{ 'title': "Mobile Apps", 'img': 'static/imgs/ic-mobility.png', action: () => setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction }]
 
@@ -53,16 +53,19 @@ const UpperContent = props => {
 
     const onAppend = event => {
         dispatch({ type: actionTypes.SET_DISABLEACTION, payload: !event.target.checked });
-        if (event.target.checked) setAppendCheck(true);
+        if (event.target.checked) {
+            setAppendCheck(true);
+            if (appType==="Webservice") setSaved(false);
+        }
         else setAppendCheck(false);
     }
 
     let renderComp = [
         <div key={1} className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Scrape On</div>,
-        <Thumbnail title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />,
+        (appType!=="Webservice" && <Thumbnail title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
         <div key={3} className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
             <input id="enable_append" type="checkbox" onChange={onAppend} checked={appendCheck} />
-            <span className="ss__thumbnail_title">Append</span>
+            <span className="ss__thumbnail_title">{appType==="Webservice" ? "Edit" : "Append"}</span>
         </div>
     ];
 
@@ -113,12 +116,19 @@ const BottomContent = () => {
 		scrapeApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
         .then(data => {
             if (data === "Invalid Session") return RedirectPage(history);
-            let temp, responseData;
+            let temp = {}
+            let responseData;
             let hasData = false;
 
-            if (typeof data === 'object' && data.view.length > 0) {
+            if (typeof data === 'object' && data.view.length > 0) { 
                 hasData = true;
-                temp = data;
+                if (appType === "Webservice"){
+                    let {view, reuse, ...info } = data; 
+                    temp['scrapeinfo'] = info;
+                    temp['reuse'] = reuse;
+                    temp['view'] = view;
+                } else temp = data;
+
                 temp['appType'] = appType;
                 temp['screenId'] = screenId;
                 temp['versionnumber'] = versionnumber;
@@ -216,8 +226,8 @@ const BottomContent = () => {
         {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
         {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},
-        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(true), show: true, disable: compareFlag},
-        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': (customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag, show: true}
+        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(true), show: true, disable: compareFlag && appType!=="Webservice"},
+        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType!=="Webservice", show: true}
     ]
 
     return (
