@@ -257,7 +257,11 @@ const ScrapeObjectList = () => {
                         Please rename/delete duplicate scraped objects
                         <br/><br/>
                         Object characterstics are same for:
-                        { dCusts.map(custname => <span className="ss__dup_li">{custname}</span>) }
+                        <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
+                            <div className="ss__dup_scroll">
+                            { dCusts.map(custname => <span className="ss__dup_li">{custname}</span>) }
+                            </div>
+                        </ScrollBar>
                     </div>
                 })
             } else if (dXpath) {
@@ -266,7 +270,11 @@ const ScrapeObjectList = () => {
                     'title': 'Save Scrape data',
                     'content': <div className="ss__dup_labels">
                         Object characteristics are same for the below list of objects:
-                        { dCusts2.map(custname => <span className="ss__dup_li">{custname}</span>) }
+                        <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
+                            <div className="ss__dup_scroll">
+                            { dCusts2.map(custname => <span className="ss__dup_li">{custname}</span>) }
+                            </div>
+                        </ScrollBar>
                         <br/>
                         Do you still want to continue?
                     </div>,

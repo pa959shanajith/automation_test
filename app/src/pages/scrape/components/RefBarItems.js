@@ -31,7 +31,8 @@ const RefBarItems = props => {
 	useEffect(()=>{
 		dispatch({type: actions.SET_OBJVAL, payload: null});
 		setHighlight(false);
-	}, [subTaskId])
+		setToFilter([]);
+	}, [subTaskId, newScrapedData])
 
 	useEffect(()=>{
 		if (appType === "MobileApp") navigator.appVersion.indexOf("Mac") !== -1 ? setTagList(list.mobileMacFilters) : setTagList(list.mobileFilters);
@@ -55,6 +56,10 @@ const RefBarItems = props => {
 
 			mirrorImg.src = `data:image/PNG;base64,${props.mirror}`;
 		}
+		dispatch({type: actions.SET_OBJVAL, payload: null});
+		setHighlight(false);
+		filter([]);
+		setToFilter([]);
 	}, [props.mirror])
 
 	useEffect(()=>{
