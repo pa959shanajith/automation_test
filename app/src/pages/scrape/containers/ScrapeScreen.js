@@ -280,7 +280,7 @@ const ScrapeScreen = ()=>{
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader: data.responseHeader[0].split("##").join("\n")}});
                         let localRespBody;
                         if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
-                            var jsonObj = JSON.parse(data.responseBody);
+                            var jsonObj = JSON.parse(data.responseBody[0]);
                             var jsonPretty = JSON.stringify(jsonObj, null, '\t');
                             localRespBody = jsonPretty.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
                         } else {

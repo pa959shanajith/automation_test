@@ -34,10 +34,9 @@ const ScrapeObject = props => {
     }
 
     const onHighlight = () => {
-        if (props.activeEye !== props.object.val){
-            props.setActiveEye(props.object.val);
-            dispatch({type: actions.SET_OBJVAL, payload: props.object.val});
-        }
+        props.setActiveEye(props.object.val);
+        let objVal = { val:  props.object.val };
+        dispatch({type: actions.SET_OBJVAL, payload: objVal});
     }
 
     return (
