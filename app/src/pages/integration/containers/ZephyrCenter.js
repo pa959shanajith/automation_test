@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import Zephyr from '../components/Zephyr.js';
 import ViewMappedZephyr from '../components/ViewMappedZephyr.js';
 import ContentZephyr from '../components/ContentZephyr.js';
-import {loginToZephyr_ICE} from '../api.js';
+import {loginToZephyr_ICE,viewZephyrMappedList_ICE} from '../api.js';
 const ZephyrCenter =(props)=>{
 const user_id = useSelector(state=> state.login.userinfo.user_id); 
 const accountidRef = useRef();
@@ -76,6 +76,15 @@ const callLogin_zephyr = async()=>{
     setBlockui({show:false})
     }
 }
+const callViewMappedFiles=async()=>{
+    setBlockui({show:true,content:'Loading...'})
+    props.setViewMappedFiles(true)
+    const userid = user_id;
+    const response = await viewZephyrMappedList_ICE(userid);
+    if(response.error){props.displayError(response.error);props.setBlockui({show:false});return;}
+    setMappedFilesRes(response);
+    setBlockui({show:false})
+}
   const content =()=>{
     return(
         <ContentZephyr
@@ -110,7 +119,7 @@ const footer=()=>{
                     setBlockui={setBlockui}
                     displayError={displayError}
                     setPopup={setPopup}
-                    //callViewMappedFiles={callViewMappedFiles}
+                    callViewMappedFiles={callViewMappedFiles}
                     
 
                 /> :null}

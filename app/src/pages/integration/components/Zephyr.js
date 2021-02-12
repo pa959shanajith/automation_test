@@ -1,6 +1,6 @@
 import React,{Fragment, useState,useRef} from 'react';
 import {ScrollBar} from '../../global';
-import {loginQCServer_ICE,qcProjectDetails_ICE,qcFolderDetails_ICE,saveQcDetails_ICE,viewQcMappedList_ICE} from '../api.js';
+import {zephyrProjectDetails_ICE,saveZephyrDetails_ICE} from '../api.js';
 import { useSelector } from 'react-redux';
 
 
@@ -8,15 +8,14 @@ const Zephyr=(props)=>{
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
     const selProjectRef = useRef();
     const [projectDetails , setProjectDetails]=useState(null);
-    const [testSuiteSelected_name , setTestSuiteSelected_name] = useState(null);
-    const [folderDetails , setFolderDetails ] = useState([]);
-    const [testSuiteDetails , setTestSuiteDetails]= useState([]);
+    const [avoProjects , setAvoprojects]= useState(null);
+    const [selectedIssueId , setSelectedIssueID] = useState(null);
     const [selectedDomain, setSelectedDomain] = useState(null);
     const [selectedScenario_ID , setSelectedScenario_ID]= useState(null);
     const [selectedScenarioName , setSelectedScenarioName]=useState(null);
-    const [selectedtestSetName , setSelectectedTestSetName]= useState(null);
+    const [selectedtestName , setSelectectedTestName]= useState(null);
     const [selectedTestSuiteID , setSelectedTestSuiteID] = useState(null);
-    const [selectedProject , setSelectedProject]=useState(null);
+    const [selectedProjectID , setSelectedProjectId]=useState(null);
     const [scenarioArr , setScenarioArr] = useState(false);
     const [scenario_ID , setScenario_ID] = useState(null) ;
     const [projectDropdn1 , setProjectDropdn1]= useState(null);
@@ -30,6 +29,8 @@ const Zephyr=(props)=>{
     const [testSets , setTestSets]= useState([]);
     const [saveSucess , setSaveSucess]=useState(false);
     const [screenexit , setScreenExit]= useState(false);
+    const[selectedCycleId , setSelectedCycleId]=useState(null);
+    const[selectedVersionId , setSelectedVersionId] =useState(null)
     
 
     const callProjectDetails_ICE=async(e)=>{
@@ -37,40 +38,15 @@ const Zephyr=(props)=>{
         const domain = e.target.value;
         const userid = user_id;
         setSelectedDomain(domain)
-        const projectDetails = await qcProjectDetails_ICE(domain , userid )
+        const projectDetails = await zephyrProjectDetails_ICE(domain , userid )
         if(projectDetails.error){props.displayError(projectDetails.error);return;}
-        setProjectDetails(projectDetails)
-        setFolderDetails([]);
+        setProjectDetails(projectDetails.project_dets);
+        setAvoprojects(projectDetails.avoassure_projects);
         props.setBlockui({show:false});
         setReleaseDropdn("Select Release")
         setProjectDropdn1(domain);
     }
-    const callFolderDetails_ICE = async(e)=>{
-        props.setBlockui({show:true,content:'Loading TestCases...'})
-        const domain = selectedDomain;
-        const project_Name = e.target.value;
-        setSelectedProject(project_Name);
-        const folderDetails = await qcFolderDetails_ICE(domain,"root",project_Name,"folder",null)
-        if(folderDetails.error){props.displayError(folderDetails.error);return;}
-        setFolderDetails(folderDetails);
-        props.setBlockui({show:false})
-        setReleaseDropdn(project_Name);
-    }
-    const callTestSets = async(e,name,folderpath)=>{
-        props.setBlockui({show:true,content:'Loading TestCases...'})
-        const domain= selectedDomain;
-        const testsetID= e;
-        const project = selectedProject;
-        const TestName = name;
-        const foldername= folderpath;
-        const testDetails = [...testSets]
-        const folderDetails = await qcFolderDetails_ICE(domain,foldername,project,"testcase",TestName);
-        if(folderDetails.error){props.displayError(folderDetails.error);return;}
-        testDetails.push({content: folderDetails , testsetid : testsetID})
-        setTestSets(testDetails);
-        props.setBlockui({show:false})
-        
-    }
+
     const callScenarios =(e)=>{
         const scenarioID = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id");
         const project_Name= e.target.value
@@ -82,22 +58,16 @@ const Zephyr=(props)=>{
         setSelectedScenario_ID(null);
         setSelectedScenarioName(null);
     }
-    const calltestSuites=async(e,i)=>{
-        props.setBlockui({show:true,content:'Loading TestCases...'})
-        const domain= selectedDomain;
-        const foldername= e;
-        const project = selectedProject;
-        const testDetails = [...testSuiteDetails]
-        const folderDetails = await qcFolderDetails_ICE(domain,foldername,project,"folder",null);
-        if(folderDetails.error){props.displayError(folderDetails.error);return;}
-        testDetails.splice(0,0,folderDetails)
-        setTestSuiteDetails(testDetails);
-        props.setBlockui({show:false})
-
+    const calltestSuites=(e)=>{
+        const arr =[...projectDetails];
+        arr.map((element,i)=>(
+            element.cycleId == e ? (element['cycleOpen'] == true)? element['cycleOpen'] = false : element['cycleOpen'] = true : null
+        ))
+        setProjectDetails(arr);
     }
     const callSaveButton =async()=>{ 
         props.setBlockui({show:true,content:'Saving...'})
-        const response = await saveQcDetails_ICE(mappedDetails);
+        const response = await saveZephyrDetails_ICE(mappedDetails);
         if(response.error){props.displayError("Save Mapped Testcase",response.error);props.setBlockui({show:false});return;}
         if ( response == "success"){
             props.setBlockui({show:false})
@@ -110,7 +80,6 @@ const Zephyr=(props)=>{
     }
     const callExit=()=>{
         setScreenExit(true);
-        setFolderDetails(null);
         setScenarioArr(null);
         //setLoginSucess(false);
         //setFailMsg(null);
@@ -122,24 +91,29 @@ const Zephyr=(props)=>{
         setSelectedScenario_ID(null);
         setSelectedTestSuiteID(null);
     }
-    const callTestSuiteSelection=(event ,idx , name , testSet)=>{
-        setSelectedTestSuiteID(idx)
-        setTestSuiteSelected_name(name);
-        setSelectectedTestSetName(testSet);
+    const callTestSuiteSelection=(id , issueid , name, versionId,cycleId,projectId )=>{
+        setSelectedTestSuiteID(id)
+        setSelectectedTestName(name)
+        setSelectedCycleId(cycleId)
+        setSelectedIssueID(issueid)
+        setSelectedVersionId(versionId)
+        setSelectedProjectId(projectId)
+        // setTestSuiteSelected_name(name);
+        // setSelectectedTestSetName(testSet);
         
-        if(event.target.childNodes.length){
-            if(mappedDetails.length){
-                if(mappedDetails[0].testsuiteid == idx){
-                   setSyncSuccess(true);
-                }
-                else{
-                    setSyncSuccess(false);
-                }
-               }
-               else{
-                setSyncSuccess(false)
-               }
-        }
+        // if(event.target.childNodes.length){
+        //     if(mappedDetails.length){
+        //         if(mappedDetails[0].testsuiteid == idx){
+        //            setSyncSuccess(true);
+        //         }
+        //         else{
+        //             setSyncSuccess(false);
+        //         }
+        //        }
+        //        else{
+        //         setSyncSuccess(false)
+        //        }
+        // }
     }
     const callSyncronise =(folderpath)=>{
         if(!selectedScenario_ID){
@@ -153,12 +127,13 @@ const Zephyr=(props)=>{
             else{
         const mapped_Details=[
             {
-                domain: selectedDomain,
-                folderpath: folderpath,
-                project: selectedProject,
+                cycleid: selectedCycleId,
+                issueid: selectedIssueId,
+                projectid: selectedProjectID,
                 scenarioId: selectedScenario_ID,
-                testcase: testSuiteSelected_name,
-                testset:  selectedtestSetName
+                testid: selectedTestSuiteID,
+                testname:  selectedtestName,
+                versionid : selectedVersionId
             }
          ]
         // setViewMappedFiles(false);
@@ -173,7 +148,7 @@ const Zephyr=(props)=>{
         var filter = []
         var ScenarioName=[] 
         if(scenarioArr){
-            projectDetails.avoassure_projects.map((e,i)=>(
+            avoProjects.map((e,i)=>(
                 (i == scenario_ID) ? 
                     e.scenario_details ? 
                     e.scenario_details.map((e,i)=>(
@@ -190,6 +165,7 @@ const Zephyr=(props)=>{
         //setDisableSave(true);
     
     }
+    console.log(projectDetails);
     return(
          !screenexit?
         <Fragment>
@@ -222,7 +198,7 @@ const Zephyr=(props)=>{
             </div>
             <div className="qcTreeContainer">
                 <ScrollBar>
-                    {folderDetails.length ? 
+                    {projectDetails? 
                         <Fragment>    
                             <ul className="rootUl">
                                 <li>
@@ -230,60 +206,29 @@ const Zephyr=(props)=>{
                                     <label>Root</label>
                                 </li>
                                 <ul>
-                                {folderDetails[0].testfolder.map((e,i)=>(
+                                {projectDetails.map((e,i)=>(
                                     <li >
-                                        <img  className="blueminusImage" id={i} onClick={()=>calltestSuites(e.folderpath,i)} style={{height:"16px" , cursor: "pointer"}} src= "static/imgs/ic-qcExpand.png"/>
-                                        <label>{e.foldername}</label>
-                                        {testSuiteDetails.length?
-                                        testSuiteDetails.map((ele,i)=>(
-                                            ele.map((element,i)=>(
-                                            element.testfolder.length ?
-                                            element.testfolder.map((test,i)=>( 
-                                                    test.folderpath == e.folderpath.concat('\\',test.foldername) ?
-                                                <li style={{paddingLeft:"40px"}}>
-                                                    <img style={{height:"16px",cursor: "pointer"}} src="static/imgs/ic-qcExpand.png"/>
-                                                    <label>{test.foldername}</label>
-                                                </li>
-                                                :null
-                                                )) :
-                                                element.TestSet.length ?
-                                                element.TestSet.map((testCase,i)=>( 
-                                                    testCase.testsetpath == e.folderpath?
-                                                    <li style={{paddingLeft:"40px"}}>
-                                                        <img style={{height:"16px",cursor: "pointer"}} onClick={()=>callTestSets(testCase.testsetid,testCase.testset,testCase.testsetpath)} src="static/imgs/ic-taskType-blue-plus.png"/>
-                                                        <label>{testCase.testset}</label>
-                                                        {testSets.length ? 
-                                                        testSets.map((suite,idx)=>(suite.testsetid == testCase.testsetid?
-                                                            suite.content[0].testcase.map((cases , index)=>(
-                                                                <li id={cases.substring(cases.indexOf("/")+1)} onClick={(event)=>callTestSuiteSelection(event,cases.substring(cases.indexOf("/")+1),cases.slice(0,cases.indexOf("/")),testCase.testset)}>
-                                                                <label style={{marginLeft:"34px"}} title={cases}>
-                                                                    <span id="qcTestcaseId">{cases.substring(cases.indexOf("/")+1)}</span>
-                                                                    <span>{cases.slice(0,cases.indexOf("/"))}</span>
-                                                                </label>
-                                                                { selectedTestSuiteID == cases.substring(cases.indexOf("/")+1)  ? <>
+                                        <img  className="blueminusImage" id={e.cycleId} onClick={()=>calltestSuites(e.cycleId)} style={{height:"16px" , cursor: "pointer"}} src={e.cycleOpen? "static/imgs/ic-qcCollapse.png" : "static/imgs/ic-qcExpand.png"}/>
+                                        <label>{e.cycle}</label>
+                                        {e.cycleOpen? 
+                                            e.tests.map((ele ,i)=>(
+                                                <ul style={{cursor:"pointer"}} onClick={()=>callTestSuiteSelection(ele.id,ele.issueId,ele.name,e.versionId,e.cycleId,e.projectId)}>
+                                                    <li style={selectedTestSuiteID == ele.id? {backgroundColor:"rgb(225,202,255"} : null}>
+                                                        <label>{ele.name}</label>
+                                                        { selectedTestSuiteID == ele.id ? <>
                                                             {syncSuccess ?<img onClick={()=>callUnSync()} style={{cursor: "pointer",paddingRight:"10px"}} src="static/imgs/ic-qcUndoSyncronise.png"/>:null}
-                                                            {!syncSuccess ?<img onClick={()=>callSyncronise(testCase.testsetpath)} style={{cursor: "pointer",paddingRight:"10px"}} src="static/imgs/ic-qcSyncronise.png"/>:null}
+                                                            {!syncSuccess ?<img onClick={()=>callSyncronise()} style={{cursor: "pointer",paddingRight:"10px"}} src="static/imgs/ic-qcSyncronise.png"/>:null}
                                                             </>
                                                             : null}
-                                                                </li>
-                                                                
-                                                            ))
-                                                            :null
-                                                            ))
-                                                        : null
-                                                        }
                                                     </li>
-                                                    :null
-                                                    ))
-                                                :null       
-                                            )) ))
-                                         : null  
-                                        }
+                                                </ul>
+                                                
+                                            )): null}
+
                                     </li>
                                 ))}                                  
                             </ul>
-                            </ul>
-                            
+                            </ul>   
                         </Fragment>
                             : null}
                     </ScrollBar>
@@ -294,8 +239,8 @@ const Zephyr=(props)=>{
                 <select value={projectDropdn2} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
                     <option value="Select Project"selected disabled >Select Project</option>
                 {
-                    projectDetails ? 
-                    projectDetails.avoassure_projects.map((e,i)=>(
+                    avoProjects? 
+                    avoProjects.map((e,i)=>(
                         <option id={i} value={e.project_name} >{e.project_name}</option>))
                         : null 
                 }
@@ -315,7 +260,7 @@ const Zephyr=(props)=>{
             <ScrollBar>
                 {
                     scenarioArr ? 
-                    projectDetails.avoassure_projects.map((e,i)=>(
+                    avoProjects.map((e,i)=>(
                         (i == scenario_ID)? 
                         (e.scenario_details)? 
                         e.scenario_details.map((e,i)=>(

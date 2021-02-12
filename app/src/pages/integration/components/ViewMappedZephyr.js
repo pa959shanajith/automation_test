@@ -10,18 +10,17 @@ const ViewMappedZephyr=(props)=>{
                         </span>
                     </div>
                     <div className="qcActionBtn">
-                        <label>Avo Assure Scenarios</label>
-                        <label id="scenarioLabel">ALM Testcases</label>
+                        <label>Zephyr Tests</label>
+                        <label id="scenarioLabel">Avo Assure Scenarios</label>
                     </div>
                     { props.mappedfilesRes.length?
                     <Fragment>
                         <div className="leftQcStructure" style={{border:"none"}}>
-                            {props.mappedfilesRes.map((e,i)=>(
-                            e.testscenarioname.map((element,idx)=>(<li className="mappedLis">{element}</li>))))}
+                            {props.mappedfilesRes.map((e,i)=>(<li>{e.testname}</li>))}
                         </div>
                         <div className="rightQcStructure" style={{border:"none"}}>{props.mappedfilesRes.map((e,i)=>(<li className="mappedLis">{
                             
-                                e.qctestcase
+                                e.testscenarioname
                             
                         }</li>))}</div>
                         </Fragment>: null }

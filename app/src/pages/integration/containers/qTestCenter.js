@@ -36,7 +36,7 @@ const [popup ,setPopup]= useState({show:false});
 const [disableSave , setDisableSave]=useState(true);
 const [saveSucess , setSaveSucess]=useState(false);
 const [logerror, setLogError]= useState(null);
-    
+const [mappedFilesICERes , setMappedFIlesICERes]= useState([]);
     
 const user_id = useSelector(state=> state.login.userinfo.user_id); 
 const displayError = (error) =>{
@@ -90,7 +90,7 @@ const callProjectDetails_ICE=async(e)=>{
     const domainid = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id")
     setDomainID(domainid);
     const userid = user_id;
-    const projectDetails = await qtestProjectDetails_ICE(domain , userid )
+    const projectDetails = await qtestProjectDetails_ICE(domainid , userid )
     if(projectDetails.error){displayError(projectDetails.error);return;}
     setProjectDetails(projectDetails)
     setFolderDetails(null);
@@ -101,9 +101,10 @@ const callProjectDetails_ICE=async(e)=>{
 const callFolderDetails_ICE = async(e)=>{
     setBlockui({show:true,content:'Loading TestCases...'})
     const projectName = e.target.value;
+    const project_ID = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id")
     const domain_ID = domainID
-    const folderDetails = await qtestFolderDetails_ICE(projectName,"root",domain_ID,"folder",)
-    if(folderDetails.error){displayError(folderDetails.error);return;}
+    const folderDetails = await qtestFolderDetails_ICE(project_ID,"root",domain_ID,"folder",)
+    if(folderDetails.error){displayError(folderDetails.error);return;} 
     setFolderDetails(folderDetails);
     setBlockui({show:false})
     setReleaseDropdn(projectName);
@@ -216,27 +217,26 @@ const onSearch=(e)=>{
     filter = [...ScenarioName].filter((e)=>e.toUpperCase().indexOf(val.toUpperCase())!==-1)
     setFilteredName(filter)
 }
-const callViewMappedFiles=()=>{
-    if(mappedDetails.length == 0){
+const callViewMappedFiles=async()=>{
+    setBlockui({show:true,content:'Loading...'})
+    const userid = user_id;
+    const mappedResponse = await viewQtestMappedList_ICE(user_id)
+    if(mappedResponse.length == 0){
         setPopup({
             title:'Mapped Testcase',
             content:"No mapped details",
             submitText:'Ok',
             show:true
           })
+          setBlockui({show:false})
     }
-    else if (saveSucess){
+    else{
         props.setViewMappedFiles(true);
-        props.setqTestClicked(false)
-    }
-    else(
-        setPopup({
-            title:'Mapped Testcase',
-            content:"No mapped details",
-            submitText:'Ok',
-            show:true
-          }) 
-    )
+        props.setqTestClicked(false);
+        setMappedFIlesICERes(mappedResponse);
+        setBlockui({show:false})
+
+}
 }
 const callExit=()=>{
     props.setqTestClicked(false);
@@ -284,9 +284,8 @@ return (<Fragment>
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
         {props.viewmappedFiles ? 
             <ViewMappedFiles 
-                mappedDetails={mappedDetails}
-                selectedScenarioName={selectedScenarioName}
-                /> : 
+                mappedFilesICERes={mappedFilesICERes}
+            /> : 
         <div className="integration_middleContent">
         <div className="middle_holder">
                 {

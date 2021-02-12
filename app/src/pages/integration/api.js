@@ -353,3 +353,87 @@ export const loginToZephyr_ICE = async(zephyrAcKey , zephyrAccNo , zephyrJiraAcc
         return {error:'No User Details Found ,Please Login Again'}
     }
 }
+
+export const zephyrProjectDetails_ICE = async(domain ,user_id ) => {
+    try{
+        const res = await axios(url+'/zephyrProjectDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            action : 'zephyrProjectDetails_ICE',
+            domain: domain,
+            user_id: user_id,
+            zephyraction : "project"
+        }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'No Projects Found ,Please add Projects'}
+    }catch(err){
+        console.error(err)
+        return {error:'No Projects Found ,Please add Projects'}
+    }
+}
+export const viewZephyrMappedList_ICE = async(userID) => {
+    try{
+        const res = await axios(url+'/viewZephyrMappedList_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            user_id : userID,
+            action : 'viewZephyrMappedList_ICE'
+            
+           }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'No Mapped Data Found'}
+    }catch(err){
+        console.error(err)
+        return {error:'No Mapped Data Found'}
+    }
+}
+
+export const saveZephyrDetails_ICE = async(mappedDetails) => {
+    try{
+        const res = await axios(url+'/saveZephyrDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            mappedDetails : mappedDetails,
+            action : 'saveZephyrDetails_ICE'
+            
+           }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Map Testcases Before save'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to Save Mapped Testcases'}
+    }
+}
