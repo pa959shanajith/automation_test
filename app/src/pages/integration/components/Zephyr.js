@@ -81,10 +81,7 @@ const Zephyr=(props)=>{
     const callExit=()=>{
         setScreenExit(true);
         setScenarioArr(null);
-        //setLoginSucess(false);
-        //setFailMsg(null);
         setReleaseDropdn("Select Release");
-        //setDisableSave(true);
         setProjectDropdn1("Select Project");
         setProjectDropdn2("Select Project");
         setMappedDetails([]);
