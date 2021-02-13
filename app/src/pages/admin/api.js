@@ -373,6 +373,7 @@ export const createProject_ICE = async(createprojectObj) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
+            if(res.data === 'invalid_name_spl') return {error:"Failed to create project. Special characters found in project/release/cycle name"};
             return res.data;
         }
         console.error(res.data)
@@ -577,7 +578,9 @@ export const provisions = async(tokeninfo) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200 ){            
+        if(res.status===200 ){    
+            if(res.data === 'DuplicateIceName') return {error:"ICE Provisioned Failed!<br/>ICE name or User already exists"};
+            if(res.data === 'invalid_splname') return {error:"ICE Provisioned Failed!<br/>Special characters found in icename"};
             return res.data;
         }
         console.error(res.data)
@@ -668,6 +671,8 @@ export const manageCIUsers = async(action,CIUser) => {
             return {error:'invalid session'};
         }
         if(res.status===200 && res.data !== "fail"){            
+            if(res.data === 'invalid_name_special') return {error:"Failed to generate token, Special characters found in token name"};
+            if(res.data === 'invalid_past_time') return {error:"Expiry time should be 8 hours more than current time"};
             return res.data;
         }
         console.error(res.data)
@@ -750,6 +755,7 @@ export const updatePool = async(data) => {
             return {error:'invalid session'};
         }
         if(res.status===200 && res.data !== "fail"){ 
+            if(res.data === 'invalid_splname') return {error:"Failed to update ICE Pool. Special characters found in poolname."};
             if(res.data === 'success')return res.data;
         }
         console.error(res.data)
@@ -801,6 +807,7 @@ export const createPool_ICE = async(data) => {
         }
         if(res.status===200 && res.data !== "fail"){ 
             if(res.data === 'Pool exists') return {error:"Pool name already exist!"};
+            if(res.data === 'invalid_splname') return {error:"Special characters found in poolname."};
             if(res.data === 'success')return res.data;
         }
         console.error(res.data)

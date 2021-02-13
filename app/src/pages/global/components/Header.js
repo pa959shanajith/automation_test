@@ -39,6 +39,8 @@ const Header = () => {
     const [showOverlay, setShowOverlay] = useState("");
     const [redirectTo, setRedirectTo] = useState("");
     const [clickNotify,setClickNotify] = useState(false)
+    const [showAfterExecution,setShowAfterExecution] = useState(false)
+    const [showExecution_Pop,setShowExecution_Pop] = useState(false);
     const userInfo = useSelector(state=>state.login.userinfo);
     const selectedRole = useSelector(state=>state.login.SR);
     const socket = useSelector(state=>state.login.socket);
@@ -67,6 +69,31 @@ const Header = () => {
 				// 		}
 				// 	}).show();
                 // }
+            });
+            socket.on("result_ExecutionDataInfo",(result)=> {
+                var data = result.status
+                var testSuiteIds = result.testSuiteDetails;
+                var msg = "";
+                testSuiteIds[0]["projectidts"] = testSuiteIds[0]["projectid"];
+                // window.localStorage["report"] = JSON.stringify(result);
+                msg = testSuiteIds[0]["testsuitename"]
+                
+                if (data == "Terminate") {
+                    setShowAfterExecution({title:msg,content:"Execution terminated - By Program." })
+                } 
+                else if (data == "UserTerminate") {
+                    setShowAfterExecution({title:msg,content:"Execution terminated - By Program." })
+                } 
+                else if (data == "unavailableLocalServer") {
+                    setShowExecution_Pop({'title': 'Execute Test Suite', 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
+                } 
+                else if (data == "success") {
+                    setShowAfterExecution({title:msg,content:"Execution completed successfully." })
+                   
+                } else if(data == "Completed"){
+                    setShowExecution_Pop({'title': 'Scheduled Execution Complete', 'content':msg});
+                }
+                else setShowExecution_Pop({'title': "Execute Test Suite", 'content':"Failed to execute."});
             });
         }
     },[socket])
@@ -212,6 +239,16 @@ const Header = () => {
             submit={()=>setShowSR_Pop("")}
         />
     );
+    
+    const Execution_Pop = () => (
+        <PopupMsg 
+            title={showExecution_Pop.title}
+            content={showExecution_Pop.content}
+            submitText="OK"
+            close={()=>setShowExecution_Pop(false)}
+            submit={()=>setShowExecution_Pop(false)}
+        />
+    );
 
     const showConfPop = (rid, data) =>{
         setShowSR(false);
@@ -220,7 +257,7 @@ const Header = () => {
     }
 
     const ConfSwitchRole = () => (
-       <ModalContainer 
+        <ModalContainer
             title="Switch Role"
             content={`Are you sure you want to switch role to: ${clickedRole.data}`}
             close={()=>setShowConfSR(false)}
@@ -233,6 +270,21 @@ const Header = () => {
         />
     );
 
+    const PostExecution = () => (
+        <div className="afterExecution-modal">
+            <ModalContainer 
+                title={"Execute Test Suite"}
+                content={
+                    <p >{showAfterExecution.content} <br /> Go to Reports</p>
+                }
+                close={()=>setShowAfterExecution(false)}
+                footer={
+                    <button onClick={()=>setShowAfterExecution(false)}>Ok</button>
+                }
+            />
+        </div>
+    );
+
     return(
         <> 
             { redirectTo && <Redirect to={redirectTo} /> }
@@ -241,7 +293,9 @@ const Header = () => {
             { showSuccessPass && <PasswordSuccessPopup /> }
             { showConfSR && <ConfSwitchRole />  }
             { showSR_Pop && <SRPopup /> }
+            { showExecution_Pop && <Execution_Pop /> }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
+            { showAfterExecution && <PostExecution/> } 
 
             <div className = "main-header">
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
