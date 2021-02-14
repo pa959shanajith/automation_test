@@ -95,7 +95,7 @@ const ALM=(props)=>{
     const callSaveButton =async()=>{ 
         props.setBlockui({show:true,content:'Saving...'})
         const response = await saveQcDetails_ICE(mappedDetails);
-        if(response.error){props.displayError("Save Mapped Testcase",response.error);props.setBlockui({show:false});return;}
+        if(response.error){props.displayError("Error",response.error);props.setBlockui({show:false});return;}
         if ( response == "success"){
             props.setBlockui({show:false})
             setErrorPopUp(true);
@@ -184,20 +184,20 @@ const ALM=(props)=>{
         }
         else{
             const mapped_Details=[
-            {
-                domain: selectedDomain,
-                folderpath: [folderpath],
-                project: selectedProject,
-                scenarioId: selectedScenario_ID,
-                testcase: testSuiteSelected_name,
-                testset:  selectedtestSetName
-            }
-         ]
-        // setViewMappedFiles(false);
-        setMappedDetails(mapped_Details);
-        //setDisableSave(false)
-        setSyncSuccess(true);
-    }
+                {
+                    domain: selectedDomain,
+                    folderpath: [folderpath],
+                    project: selectedProject,
+                    scenarioId: selectedScenario_ID,
+                    testcase: testSuiteSelected_name,
+                    testset:  selectedtestSetName
+                }
+            ]
+            // setViewMappedFiles(false);
+            setMappedDetails(mapped_Details);
+            //setDisableSave(false)
+            setSyncSuccess(true);
+        }
     }
     
     const onSearch=(e)=>{

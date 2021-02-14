@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 
 const ViewMappedFiles=(props)=>{
     return(
@@ -13,9 +13,14 @@ const ViewMappedFiles=(props)=>{
                         <label>qTest Tests</label>
                         <label id="scenarioLabel">Avo Assure Scenarios</label>
                     </div>
-                    <div className="leftQcStructure" style={{border:"none"}}><li className="mappedLis">{ props.mappedDetails.length? props.mappedDetails[0].testsuite: null}</li></div>
+                    {props.mappedFilesICERes.length?
+                    props.mappedFilesICERes.map((e,i)=>(
+                    <Fragment><div className="leftQcStructure" style={{border:"none"}}><li className="mappedLis">{e.qtestsuite}</li></div>
+                    <div className="rightQcStructure" style={{border:"none"}}><li className="mappedLis">{e.testscenarioname}</li></div></Fragment>
+                    )) : null}
+                    
                     {/* <div className="hrBetween"></div> */}
-                    <div className="rightQcStructure" style={{border:"none"}}><li className="mappedLis">{props.selectedScenarioName}</li></div>
+                    
 
                 </div>   
             </div>)
