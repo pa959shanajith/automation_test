@@ -310,13 +310,13 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		const suiteDetails = suite.suiteDetails;
 		for (const tsco of suiteDetails) {
 			var integrationType = [];
-			if(batchData.integration.alm.url) {
+			if(batchData.integration && batchData.integration.alm.url) {
 				integrationType.push("ALM");
 			} 
-			if (batchData.integration.qtest.url){
+			if (batchData.integration && batchData.integration.qtest.url){
 				integrationType.push("qTest");
 			} 
-			if (batchData.integration.zephyr.accountid) {
+			if (batchData.integration && batchData.integration.zephyr.accountid) {
 				integrationType.push("Zephyr");
 			}
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);

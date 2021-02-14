@@ -187,6 +187,11 @@ module.exports.Execution_Queue = class Execution_Queue {
                         response["message"] = "Can't establish connection with ICE: " + targetICE + " Re-Connect to server!";
                         return response;
                     }
+                    if(this.ice_list[targetICE]['status']){
+                        response["status"] = "pass";
+                        response["message"] = "Execution or Termination already in progress on ICE: " + targetICE;
+                        return response;
+                    }
                     if ((this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser) || !this.ice_list[targetICE]["mode"]) {
                         if (type == "ACTIVE") {
                             this.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
@@ -637,8 +642,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             return
         }        
         if (!reqFromADO){
-            res.send(finalResult);
-            return;
+            return res.send(finalResult);
         } 
         // This code only executes when request comes from Azure DevOps
         let adoStatus = finalResult.executionStatus.every(e => e.status == "success");
