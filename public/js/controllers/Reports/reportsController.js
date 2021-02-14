@@ -210,7 +210,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             reportsInputData.type = 'screendata';
             reportService.getAccessibilityData_ICE(reportsInputData).then(function (accessibility_data) {
                 unblockUI()
-                if (data == "Invalid Session") {
+                if (accessibility_data == "Invalid Session") {
                     $rootScope.redirectPage();
                 } else if (accessibility_data == "Fail") {
                     openModalPopup("Reports", "Failed to load Accessibility Reports");
@@ -441,7 +441,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         reportService.getAccessibilityData_ICE(inputdata)
             .then(function (accessibility_data) {
                 unblockUI();
-                if (data == "Invalid Session") {
+                if (accessibility_data == "Invalid Session") {
                     $rootScope.redirectPage();
                 } else if (accessibility_data == "Fail") {
                     openModalPopup("Reports", "Failed to load Accessibility Reports");
