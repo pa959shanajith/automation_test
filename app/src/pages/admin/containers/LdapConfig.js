@@ -280,6 +280,7 @@ const ldapTestMessage = async (data, setPopupState) => {
 		case "insufficient_access": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Credentials provided does not have required privileges for setting up LDAP."});break;
 		case "invalid_basedn": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Base Domain Name is incorrect."});break;
 		case "empty": setPopupState({show:true,title:"Test Connection",content: "Test Connection Successful but LDAP directory is empty!"});break;
+		case "spl_chars": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed! Special characters found in LDAP configuration values."});break;
 		case "fail": setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed!"});break;
 		default: setPopupState({show:true,title:"Test Connection",content: "Test Connection Failed due to unexpected error!"});break;
   	}

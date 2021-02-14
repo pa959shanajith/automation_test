@@ -7,7 +7,7 @@ import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import Pagination from '../components/Pagination';
 
-const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
+const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
 
     const filter_data = useSelector(state=>state.plugin.FD)
     const [loading,setLoading] = useState(false)
@@ -33,11 +33,11 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
 
     useEffect(()=>{
         setTimeout(() => {
-            console.log('Hello, World!');
             getScheduledDetails();
             setScheDetails(!scheDetails)
-            document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
-            
+            var schFilterData = document.getElementById("scheduledSuitesFilterData");
+            if(schFilterData !== null && schFilterData!==undefined)
+                schFilterData.selectedIndex = "0"; 
         }, 30000);
     }, [scheDetails]);
 
@@ -229,6 +229,7 @@ const ScheduleContent = ({execEnv, syncScenario, setBrowserTypeExe,setExecAction
                     icePlaceholder={'Search ICE to allocate'}
                     exeTypeLabel={"Select Schedule type"}
                     exeIceLabel={"Allocate ICE"}
+                    scheSmartMode={smartMode}
                 />
             :null}
             { showIntegrationModal ? 

@@ -63,3 +63,23 @@
 .popup-content-status{
     margin-bottom: 0 !important
 }
+.adminControl-ice {
+    margin-bottom: 3%;
+    padding: 0px 0px;
+    position: relative;
+    float: left;
+    width: 100%;
+}
+.adminControl-ice div span {
+    display: inline-block;
+    font-size: small;
+    width: 28%;
+    font-weight: 700;
+    margin-top: 5px;
+}
+.adminControl-ice div select {
+    width: calc(100% - 130px);
+}
+.adminControl-ice div input {
+    width: 70%;
+}
