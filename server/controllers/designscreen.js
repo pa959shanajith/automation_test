@@ -252,10 +252,12 @@ exports.updateScreen_ICE = function (req, res) {
 				try {
 					scrapedObjects = updateData.getScrapeData;
 					var parsedScrapedObj = JSON.parse(scrapedObjects);
-					for(var i=0;i<parsedScrapedObj.view.length;i++){
-						if(regEx.test(parsedScrapedObj.view[i].custname)){
-							logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE. "+scrape_err);
-							return finalFunction("Fail");
+					if (parsedScrapedObj.view) {
+						for (var i=0;i<parsedScrapedObj.view.length;i++) {
+							if (regEx.test(parsedScrapedObj.view[i].custname)) {
+								logger.info("Calling final function from the service updateScreen_ICE: updateScrapeData_ICE. "+scrape_err);
+								return finalFunction("Fail");
+							}
 						}
 					}
 					if (newData != undefined){

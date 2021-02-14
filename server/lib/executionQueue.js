@@ -241,11 +241,10 @@ module.exports.Execution_Queue = class Execution_Queue {
             }
             // Check if request came from Azure DevOps. If yes, then send the acknowledgement
             if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
-                res.send("Request Recieved");
+                return res.send("Request Recieved");
             }
             if (!multiBatchExecutionData || multiBatchExecutionData.constructor !== Array || multiBatchExecutionData.length === 0) {
-                res.send({"error":"Empty or Invalid Batch Data"});
-                return;
+                return res.send({"error":"Empty or Invalid Batch Data"});
             }
             let suiteRequest = {"executionData":testSuiteRequest.body.executionData,"headers":testSuiteRequest.headers}
             let userInfo = testSuiteRequest.body.executionData[0].userInfo;
@@ -270,17 +269,17 @@ module.exports.Execution_Queue = class Execution_Queue {
                 testSuite['res'] = res; 
             } else if(this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]){
                     const sockmode = await utils.channelStatus(targetICE);
-                    if((!sockmode.normal && !sockmode.schedule)) res.send({"error":"Can't establish connection with ICE Re-Connect to server!"})
+                    if((!sockmode.normal && !sockmode.schedule)) return res.send({"error":"Can't establish connection with ICE Re-Connect to server!"})
                     testSuite['res'] = res;
                     this.executeAPI(testSuite);
             } else if(targetICE === EMPTYUSER && (!poolid || poolid === "")){
-                res.send({"error":"ICE name and Pool Id not provided."})
+                return res.send({"error":"ICE name and Pool Id not provided."})
             } else{
-                res.send({"error":targetICE + " not connected to server!"})
+                return res.send({"error":targetICE + " not connected to server!"})
             }
         } catch (e) {
-            res.send({"error":"Error while adding test suite to queue"});
             logger.error("Error in addAPITestSuiteToQueue. Error: %s", e);
+            return res.send({"error":"Error while adding test suite to queue"});
         }
         return;
     }
@@ -639,11 +638,10 @@ module.exports.Execution_Queue = class Execution_Queue {
         const res = testSuite['res'];
         if(!res){
             logger.error("Error while sending response in executeAPI, response object undefined");
-            return
-        }        
-        if (!reqFromADO){
+            return;
+        } else if (!reqFromADO){
             return res.send(finalResult);
-        } 
+        }
         // This code only executes when request comes from Azure DevOps
         let adoStatus = finalResult.executionStatus.every(e => e.status == "success");
         const args = {
@@ -673,7 +671,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         }));
         try { return await promiseData; }
         catch (e) { logger.error(e); }
-
     }
     /** 
     * @param {string} ice_name

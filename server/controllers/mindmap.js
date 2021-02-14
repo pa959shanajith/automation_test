@@ -1334,7 +1334,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			if(eachScrapedAction.tag=="GuiMenu"){
 				if(mflag==1) temp_mdata=temp_screendata[menu_count-2];
 				else temp_mdata=temp_screendata[menu_count]
-				if(temp_mdata.tag=="GuiMenu"){
+				if(temp_mdata && temp_mdata.tag=="GuiMenu"){
 					menu_flg=1;
 					menu_input=menu_input.concat(input+';');
 				} else{
