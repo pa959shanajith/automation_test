@@ -1,9 +1,7 @@
 //load environment variables
 var env = require('node-env-file');
 var fs = require('fs');
-var dbAuthStore = require('./server/lib/dbAuthStore')
 var envFilePath = __dirname + '/.env';
-var credsPath = __dirname + '/server/config/.tokens';
 try {
 	if (fs.existsSync(envFilePath)) {
 		env(envFilePath);
@@ -15,22 +13,11 @@ try {
 	console.error(ex);
 }
 
-//default cache auth if not initialised and load cachedbauth
-var cachedb = null;
-try {
-	if(!fs.existsSync(credsPath)) {
-		dbAuthStore.loadDefaultCacheAuth();
-	}
-	var parsed = dbAuthStore.decryptCacheAuth();
-	cachedb = parsed['cachedb']['password'];
-} catch (ex) {
-	console.error("Error occurred while initialising/writing to tokens file");
-	console.error(ex);
-};
 
 // Module Dependencies
 var cluster = require('cluster');
 var expressWinston = require('express-winston');
+var dbAuthStore = require('./server/lib/dbAuthStore');
 var epurl = "http://" + (process.env.DAS_IP || "127.0.0.1") + ":" + (process.env.DAS_PORT || "1990") + "/";
 process.env.DAS_URL = epurl;
 process.env.KEEP_ALIVE = 30000;  // Default TCP Keep-Alive Interval 30s
@@ -71,12 +58,16 @@ if (cluster.isMaster) {
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
-			"password": cachedb
+			"password": dbAuthStore.getCachedbAuth()
 		};
 		var redisSessionClient = redis.createClient(redisConfig);
-		redisSessionClient.on("error", function(err) {
-			logger.error("Please run the Cache DB");
-			//cluster.worker.disconnect().kill();
+		redisSessionClient.on("error", err => {
+			if (err.code == "NOAUTH" || err.message == "ERR invalid password") {
+				logger.error("Invalid Cache Database credentials");
+				cluster.worker.disconnect().kill();
+			}
+			else logger.error("Please run the Cache DB");
+			// throw "Invalid Cache Database credentials";
 		});
 		redisSessionClient.on("connect", function(err) {
 			logger.debug("Cache DB connected");
@@ -336,22 +327,7 @@ if (cluster.isMaster) {
 
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
-		try {
-			throw "Disable Versioning";
-			var version = require('./server/controllers/project_versioning');
-			app.post('/getVersions', version.getVersions);
-			app.post('/getModulesVersioning', version.getModulesVersioning);
-			app.post('/saveDataVersioning', version.saveDataVersioning);
-			app.post('/createVersion', version.createVersion);
-			app.post('/getProjectsNeo', version.getProjectsNeo);
-		} catch (Ex) {
-			process.env.projectVersioning = "disabled";
-			logger.warn('Versioning is disabled');
-			app.post('/getProjectsNeo', function(req, res) {
-				res.send("false");
-			});
-		}
-
+		app.post('/getProjectsNeo', auth.protect, (req, res) => (res.send("false")));
 		app.post('/populateProjects', auth.protect, mindmap.populateProjects);
 		app.post('/populateUsers', auth.protect, mindmap.populateUsers);
 		app.post('/getProjectTypeMM', auth.protect, mindmap.getProjectTypeMM);

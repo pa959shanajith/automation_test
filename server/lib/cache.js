@@ -1,15 +1,7 @@
 const redis = require("redis");
 const logger = require('../../logger');
 const dbAuthStore = require('./dbAuthStore');
-var cachedb = null;
-try {
-	var parsed = dbAuthStore.decryptCacheAuth();
-	cachedb = parsed['cachedb']['password'];
-} catch (ex) {
-	console.error("Error occurred while loading cache db auth");
-	console.error(ex);
-}
-const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.env.CACHEDB_PORT),"password" : cachedb};
+const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.env.CACHEDB_PORT), "password": dbAuthStore.getCachedbAuth()};
 
 const clients = {};
 
