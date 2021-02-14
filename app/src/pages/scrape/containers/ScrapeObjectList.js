@@ -164,6 +164,7 @@ const ScrapeObjectList = () => {
             modalObject = {
                 operation: "editIrisObject",
                 object: editableObj,
+                modifyScrapeItem: (value, newProperties, customFlag) => modifyScrapeItem(value, newProperties, customFlag),
                 cord: (editableObj.objId ? mainScrapedData.view : newScrapedData.view)[editableObj.objIdx].cord
             };
         } else {

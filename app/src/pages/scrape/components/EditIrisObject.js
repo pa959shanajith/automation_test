@@ -41,12 +41,13 @@ const EditIrisObject = props => {
                     props.setShow(false);
                     if(val === 'success'){
                         props.setShowPop({title: "Iris Object Details", content: "Submitted Successfully."});
-                        // for(var i=0;i<viewString.view.length;i++){
-                        //     if(viewString.view[i].xpath == obj_xpath){
-                        //         viewString.view[i].objectType = user_obj_type;
-                        //         break;
-                        //     }
-                        // }
+                        props.utils.modifyScrapeItem(props.utils.object.val, {
+                            custname: props.utils.object.custname,
+                            tag: `iris;${selectedType}`,
+                            url: props.utils.object.url,
+                            xpath: props.utils.object.xpath,
+                            editable: true
+                        }, true);
                     }
                     else props.setShowPop({title: "Iris Object Details", content: "Failed to updated Iris Object Details."});
                 })
