@@ -9,6 +9,7 @@ import AddObjectModal from '../components/AddObjectModal';
 import CompareObjectModal from '../components/CompareObjectModal';
 import MapObjectModal from '../components/MapObjectModal';
 import CertificateModal from '../components/CertificateModal';
+import EditIrisObject from '../components/EditIrisObject';
 import { CreateObjectModal, EditObjectModal } from '../components/CustomObjectModal';
 import ActionBarItems from '../components/ActionBarItems';
 import LaunchApplication from '../components/LaunchApplication';
@@ -443,6 +444,7 @@ const ScrapeScreen = ()=>{
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} />}
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
+        { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: current_task.projectId, screenid: current_task.screenId, screenname: current_task.screenName,versionnumber: current_task.versionnumber}} />}
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}
         <div  className="ss__body">
             <Header/>
@@ -618,14 +620,15 @@ function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
                             xpath: scrapeObject.xpath,
                         }
 
-        if (fetchDataFlag){
-            if(scrapeObject.hasOwnProperty('editable')){
+        // if (fetchDataFlag){
+            if(scrapeObject.hasOwnProperty('editable') || scrapeObject.cord){
                 scrapeItem.editable = true;
+                if (scrapeObject.cord) scrapeItem.irisText = scrapeObject.objectText || "";
             } else {
                 let isCustom = scrapeObject.xpath === "";
                 scrapeItem.isCustom = isCustom;
             };
-        }
+        // }
         
         localScrapeList.push(scrapeItem);
     }

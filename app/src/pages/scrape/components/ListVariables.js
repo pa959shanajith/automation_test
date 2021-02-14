@@ -63,3 +63,18 @@ export const objectTypes = [
 ];
 
 export const tagList = ['a', 'input', 'table', 'list', 'select', 'img', 'button', 'radiobutton', 'checkbox', 'Element']
+
+export const irisObjectTypes = [ 
+    {val: "button", name: "Button"}, 
+    {val: "checkbox", name: "Checkbox"}, 
+    {val: "radiobutton", name: "Radiobutton" }, 
+    {val: "textbox", name: "Textbox"}, 
+    {val: "label", name: "Label"}, 
+    {val: "tree", name: "Tree"}, 
+    {val: "table", name: "Table"}, 
+    {val: "dropdown", name: "Dropdown"}, 
+    {val: "image", name: "Image"}, 
+    {val: "vscroll", name: "Vertical-scroll"}, 
+    {val: "hscroll", name: "Horizontal-scroll"}, 
+    {val: "unrecognizableobject", name: "Others"}
+];
