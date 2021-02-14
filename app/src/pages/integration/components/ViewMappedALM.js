@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import '../styles/ViewMappedALM.scss';
 
 const ViewMappedALM=(props)=>{
     return(
@@ -15,15 +16,18 @@ const ViewMappedALM=(props)=>{
                     </div>
                     { props.mappedfilesRes.length?
                     <Fragment>
-                        <div className="leftQcStructure" style={{border:"none"}}>
-                            {props.mappedfilesRes.map((e,i)=>(
-                            e.testscenarioname.map((element,idx)=>(<li className="mappedLis">{element}</li>))))}
+                        <div className="alm-linkedTestset-box">
+                            <div className="leftQcStructure" style={{border:"none"}}>
+                                {props.mappedfilesRes.map((e,i)=>(
+                                e.testscenarioname.map((element,idx)=>(
+                                    <li className="mappedLis">{element}</li>))))}
+                            </div>
+                            <div className="rightQcStructure" style={{border:"none"}}>
+                                {props.mappedfilesRes.map((e,i)=>(
+                                    <li className="mappedLis">{e.qctestcase}</li>
+                                ))}
+                            </div>
                         </div>
-                        <div className="rightQcStructure" style={{border:"none"}}>{props.mappedfilesRes.map((e,i)=>(<li className="mappedLis">{
-                            
-                                e.qctestcase
-                            
-                        }</li>))}</div>
                         </Fragment>: null }
                 </div>   
             </div>)
