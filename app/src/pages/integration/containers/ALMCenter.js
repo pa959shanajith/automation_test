@@ -75,7 +75,7 @@ const callViewMappedFiles = async()=>{
 const callExitcenter=()=>{
     props.setAlmClicked(false);
 }
-const content =(props)=>{
+const content = () =>{
         return(
             <ContentAlm
                 urlRef={urlRef}
@@ -88,20 +88,21 @@ const content =(props)=>{
              />
         )
     }
-    const footer=()=>{
-        return(<span>
-                <button onClick={()=>callLogin_ALM() }>Submit</button>
-        </span>)
-    }
     return(
         
-        <Fragment>
+        <>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
         {props.viewmappedFiles ? <ViewMappedALM mappedfilesRes={mappedfilesRes}/> :
         <div className="integration_middleContent">
-            <div className="middle_holder">
-            {props.almClicked?
+            { props.loginAlm && !loginSucess &&
+                    <> <ModalContainer 
+                            title="ALM Login"
+                            close={()=>{props.setloginAlm(false);props.setAlmClicked(false)}}
+                            content={content()}
+                            footer ={<button onClick={()=>callLogin_ALM() }>Submit</button>} /> 
+                    </> }
+            { props.almClicked &&
                 <ALM 
                     domainDetails={domainDetails}
                     setBlockui={setBlockui}
@@ -110,21 +111,9 @@ const content =(props)=>{
                     callViewMappedFiles={callViewMappedFiles}
                     callExitcenter={callExitcenter}
 
-                /> :null}
-                {
-                    props.loginAlm && !loginSucess? 
-                    <Fragment>
-                        <ModalContainer 
-                            title="ALM Login"
-                            close={()=>{props.setloginAlm(false);props.setAlmClicked(false)}}
-                            content={content()}
-                            footer ={footer()} />
-                    </Fragment>
-                    : null
-                }
-            </div>
+                /> }
         </div>}
-        </Fragment> 
+        </> 
     )
 }
 

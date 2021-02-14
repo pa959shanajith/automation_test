@@ -245,14 +245,14 @@ const WebserviceScrape = () => {
                 else if (data === "unavailableLocalServer") setShowPop({title: "WSDL-Scrape Screen", content: "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
                 else if (data === "scheduleModeOn") setShowPop({ title: "WSDL-Scrape Screen", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."})
                 else if (typeof data === "object") {
-                    dispatch({type: actions.SET_WSDATA, payload: {endPointURL : data.endPointURL}});
+                    dispatch({type: actions.SET_WSDATA, payload: {endPointURL : data.endPointURL[0]}});
                     dispatch({type: actions.SET_WSDATA, payload: {method : data.method[0]}});
-                    dispatch({type: actions.SET_WSDATA, payload: {opInput : data.operations}});
+                    dispatch({type: actions.SET_WSDATA, payload: {opInput : data.operations[0]}});
                     dispatch({type: actions.SET_WSDATA, payload: {reqHeader : data.header[0].split("##").join("\n")}})
 
                     let localReqBody;
                     if (!data.body[0].indexOf("{") || !data.body[0].indexOf("[")) {
-                        let jsonObj = JSON.parse(data.body);
+                        let jsonObj = JSON.parse(data.body[0]);
                         let jsonPretty = JSON.stringify(jsonObj, null, '\t');
                         localReqBody = jsonPretty;
                     } else {
