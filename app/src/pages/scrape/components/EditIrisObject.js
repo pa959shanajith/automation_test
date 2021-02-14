@@ -7,13 +7,19 @@ import "../styles/EditIrisObject.scss";
 const EditIrisObject = props => {
 
     const [selectedType, setSelectedType] = useState("");
+    const [selectedStatus, setSelectedStatus] = useState("");
 
     useEffect(()=>{
-        setSelectedType(props.utils.object.tag.split(";").pop() || "unrecognizableobject")
+        setSelectedType(props.utils.object.tag.split(";").pop() || "unrecognizableobject");
+        setSelectedStatus(-1);
     }, [])
 
     const onSelectType = event => {
         setSelectedType(event.target.value);
+    }
+
+    const onSelectStatus = event => {
+        setSelectedStatus(event.target.value);
     }
 
     const submitData = () => {
@@ -24,6 +30,7 @@ const EditIrisObject = props => {
                 "cord": props.utils.cord,
                 "type": selectedType, 
                 "xpath": props.utils.object.xpath,
+                "status": selectedStatus < 0 ? 0 : selectedStatus,
                 ...props.taskDetails
             };
 
@@ -61,11 +68,23 @@ const EditIrisObject = props => {
                         <div className="ss__ei_info_panel">
                             <span>Object Type:</span>
                             <span><select className="ss__ei_objType" value={selectedType} onChange={onSelectType}>
-                                <option className="ss__ei_options" disabled selected value={0}>Select Object Type</option>
-                                { irisObjectTypes.map(option => <option className="ss__ei_options" value={option.val}>
-                                        {option.name}
+                                <option className="ss__ei_options" disabled value={0}>Select Object Type</option>
+                                { Object.keys(irisObjectTypes).map(key => <option className="ss__ei_options" value={key}>
+                                        {irisObjectTypes[key].name}
                                     </option>) }
                             </select></span>
+                            { irisObjectTypes[selectedType] && irisObjectTypes[selectedType].states.length > 1 ?
+                                <> 
+                                <span>Object Status:</span>
+                                <span>
+                                    <select className="ss__ei_objType" value={selectedStatus} onChange={onSelectStatus}>
+                                        <option className="ss__ei_options" disabled value={-1}>Select Object Status</option>
+                                        <option className="ss__ei_options" value={0}>Unchecked</option>
+                                        <option className="ss__ei_options" value={1}>Checked</option>
+                                    </select>
+                                </span>
+                                </>
+                                : null }
                             <span>Object Text:</span>
                             <span>{props.utils.object.irisText || "Undefined"}</span>
                             <span>Object Tag:</span>
@@ -77,7 +96,7 @@ const EditIrisObject = props => {
                     </div>
                 }
                 footer={
-                    <button onSubmit={submitData}>Submit</button>
+                    <button onClick={submitData}>Submit</button>
                 }
                 close={()=>props.setShow(false)}
             />

@@ -64,17 +64,17 @@ export const objectTypes = [
 
 export const tagList = ['a', 'input', 'table', 'list', 'select', 'img', 'button', 'radiobutton', 'checkbox', 'Element']
 
-export const irisObjectTypes = [ 
-    {val: "button", name: "Button"}, 
-    {val: "checkbox", name: "Checkbox"}, 
-    {val: "radiobutton", name: "Radiobutton" }, 
-    {val: "textbox", name: "Textbox"}, 
-    {val: "label", name: "Label"}, 
-    {val: "tree", name: "Tree"}, 
-    {val: "table", name: "Table"}, 
-    {val: "dropdown", name: "Dropdown"}, 
-    {val: "image", name: "Image"}, 
-    {val: "vscroll", name: "Vertical-scroll"}, 
-    {val: "hscroll", name: "Horizontal-scroll"}, 
-    {val: "unrecognizableobject", name: "Others"}
-];
+export const irisObjectTypes = {
+    "button": { name: "Button", states: [0] }, 
+    "checkbox": { name: "Checkbox", states: [0, 1] }, 
+    "radiobutton": { name: "Radiobutton", states: [0, 1] }, 
+    "textbox": { name: "Textbox", states: [0] }, 
+    "label": { name: "Label", states: [0] }, 
+    "tree": { name: "Tree", states: [0] }, 
+    "table": { name: "Table", states: [0]}, 
+    "dropdown": { name: "Dropdown", states: [0]}, 
+    "image": { name: "Image", states: [0]}, 
+    "vscroll": { name: "Vertical-scroll", states: [0]}, 
+    "hscroll": { name: "Horizontal-scroll", states: [0]}, 
+    "unrecognizableobject": { name: "Others", states: [0]}
+};
