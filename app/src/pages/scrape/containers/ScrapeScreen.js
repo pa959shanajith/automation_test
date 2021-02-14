@@ -453,16 +453,16 @@ const ScrapeScreen = ()=>{
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} />}
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} setShow={setShowObjModal} setShowPop={setShowPop}/>}
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}
-        <div  className="ss__body">
+        <div data-test="ssBody" className="ss__body">
             <Header/>
-            <div className="ss__mid_section">
+            <div data-test="ssMidSection" className="ss__mid_section">
                 <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems }}>
                     <ActionBarItems />
                     <ScrapeContent />
                     <RefBarItems mirror={mirror}/>
                 </ScrapeContext.Provider>
             </div>
-            <div className='ss__footer'><Footer/></div>
+            <div data-test="ssFooter"className='ss__footer'><Footer/></div>
         </div>
         </>
     );
