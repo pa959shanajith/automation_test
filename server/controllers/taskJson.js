@@ -295,26 +295,17 @@ function next_function(resultobj,projectid)
 						testSuiteDetails_obj.projectidts = t.projectid;
 						testSuiteDetails_obj.assignedTestScenarioIds = '';
 						
-						
-						
-						//Check if versioning exists
-						function versioningCheck() {
-							versioningEnabled = ' ';
-							if (process.env.projectVersioning != "disabled")
-								versioningEnabled += 'version_'+ task_json.versionnumber+ ' : ';
-							return versioningEnabled;
-						}
 
 						if (t.tasktype == 'Design' || t.tasktype == 'Update') {
-							// taskDetails.taskName = t.tasktype + versioningCheck() + m.testCaseName;
+							// taskDetails.taskName = t.tasktype + ' ' + m.testCaseName;
 							taskDetails.reuse=reuseflag;
 							// task_json.testCaseName = m.testCaseName;
 						} else if (t.tasktype == 'Execute') {
-							// taskDetails.taskName = t.tasktype + versioningCheck()  + m.moduleName;
+							// taskDetails.taskName = t.tasktype + ' '  + m.moduleName;
 							// testSuiteDetails_obj.testsuitename = m.moduleName;
 						} else if (t.tasktype == 'Execute Batch') {
 							task_json.projectId = "";
-							taskDetails.taskName = t.tasktype + versioningCheck() + t.batchname;
+							taskDetails.taskName = t.tasktype + ' ' + t.batchname;
 							// testSuiteDetails_obj.testsuitename = m.moduleName;
 							testSuiteDetails_obj.assignedTime = t.assignedTime;
 							if (batch_dict[t.batchname+'_'+t.cycleid] == undefined) {
@@ -331,11 +322,11 @@ function next_function(resultobj,projectid)
 						} else if (t.tasktype == 'Execute Scenario') {
 							task_json.scenarioFlag = 'True';
 							task_json.assignedTestScenarioIds = [task_json.scenarioId];
-							// taskDetails.taskName = t.tasktype + versioningCheck() + m.testScenarioName;
+							// taskDetails.taskName = t.tasktype + ' ' + m.testScenarioName;
 							// task_json.scenarioName = m.testScenarioName;
 							//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
 						} else {
-							// taskDetails.taskName = t.tasktype + versioningCheck() + m.screenName;
+							// taskDetails.taskName = t.tasktype + ' ' + m.screenName;
 							// task_json.screenName = m.screenName;
 							taskDetails.reuse=reuseflag;
 						}

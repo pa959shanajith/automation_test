@@ -5,3 +5,4 @@ node.exe
 npm.cmd
 assets/wkhtmltox
 *.bat
+server/config/.tokens
