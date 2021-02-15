@@ -416,14 +416,15 @@ export const getDetails_ICE = async(idtype, requestedids) => {
   api returns string ex. "success"
 */
 
-export const updateProject_ICE = async(updateProjectObj) => { 
+export const updateProject_ICE = async(updateProjectObj, userDetails) => { 
     try{
         const res = await axios(url+'/updateProject_ICE', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {updateProjectObj: updateProjectObj},
+            data: {updateProjectObj: updateProjectObj,
+                userDetails: userDetails},
             credentials: 'include'
         });
         if(res.status === 401 || res.status === "Invalid Session" ){
