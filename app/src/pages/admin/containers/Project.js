@@ -56,7 +56,7 @@ const ProjectNew = (props) => {
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
 
     useEffect(()=>{
-        getDomains();
+        getDomains("Create Project");
         setDisableAddRelease(true);
         setDisableAddCycle(true);
         setSelProject("");
@@ -74,10 +74,10 @@ const ProjectNew = (props) => {
         })
     }
 
-    const getDomains = () => {
+    const getDomains = (screen) => {
         (async()=>{    
             setTaskName("Create Project")
-            resetForm();
+            resetForm(screen);
             setProjectDetails([]);
             setUpdateProjectDetails([]);
             var plugins = []; 
@@ -108,8 +108,9 @@ const ProjectNew = (props) => {
             for ( i = 0; i < plugins.length; i++) {
                 listPlugin.push(details[plugins[i]]);
             }
-            if(taskName==="Create Project") setSelDomain(data[0]);
-            if(taskName==="Update Project") setSelDomain("");
+            if(screen !== undefined) setSelDomain(data[0]);
+            else if(taskName==="Create Project") setSelDomain(data[0]);
+            else if(taskName==="Update Project") setSelDomain("");
             setApplicationType(listPlugin);
             setLoading(false); 
         })()
@@ -135,7 +136,7 @@ const ProjectNew = (props) => {
         setCycleList([])
     }
 
-    const resetForm = ()=>{
+    const resetForm = (screen)=>{
         setProjectDetails([]);
         setProjectName("");
         setEditProjectName(false);
@@ -147,7 +148,7 @@ const ProjectNew = (props) => {
         toggleCycleClick();
         setDisableAddRelease(true);
         setDisableAddCycle(true);
-        if (taskName==="Update Project"){
+        if (screen===undefined && taskName==="Update Project"){
             setSelProject("");
             setSelDomain("");
         } 
