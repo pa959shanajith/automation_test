@@ -1,5 +1,6 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import ThumbnailSchedule from './ThumbnailSchedule';
+import {PopupMsg, ModalContainer} from '../../global';
 import "../styles/ActionBarItems.scss"
 
 // todo: after pull add bottomcontent two icons smart scheduling 
@@ -22,9 +23,56 @@ const UpperContent = ({appType, isMac, UpdateBrowserTypeExe, browserTypeExe}) =>
     return renderComp;
 };
 
-const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, execEnv}) => {
+const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, execEnv,smartMode,setSmartMode}) => {
+  
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""});
+    const [smartScenario,setSmartScenario] = useState(false);
+
+    const updateSmartMode = (mode) => {
+        if(mode==="smartModule"){
+            if(smartMode==="smartModule") setSmartMode("normal");
+            else {
+                setPopupState({
+                    title:'Smart SchedulingR',
+                    content:"All the modules will be executed as batch.\nAll available ICE should be in similar configurations for optimal results.",
+                    show:true
+                })
+            }
+        } else if(mode==="smartScenario"){
+            if(smartMode==="smartScenario") setSmartMode("normal");
+            else {
+                setSmartMode("normal");
+                setSmartScenario(true);
+            }
+        }
+    }
+    
     return (
         <>
+            {popupState.show?
+                <PopupMsg 
+                    content={popupState.content} 
+                    title={popupState.title} 
+                    submit={()=>{setPopupState({show:false}); setSmartMode("smartModule");}} 
+                    close={()=>setPopupState({show:false})} 
+                    submitText={"Ok"} 
+                />
+            :null}
+            {smartScenario?
+                <div className="smartScenario-popup" >
+                    <ModalContainer
+                        title="Smart Scheduling"
+                        content={"Smart scheduling requires independent scenarios. Are you sure you want to enable smart scheduling the task ?\n All available ICE should be in similar configurations for optimal results."}
+                        close={()=>setSmartScenario(false)}
+                        footer={
+                            <>
+                                <button onClick={()=>{setSmartScenario(false); setSmartMode("smartScenario");}}>Yes</button>
+                                <button onClick={()=>{setSmartScenario(false);}}>No</button>
+                            </>
+                        }
+                    />
+                </div>
+            :null}
             {appType === "Web"?
                 <>
                     <div className="s__parallel_icon" onClick={()=>{updateExecAction()}}>
@@ -32,8 +80,16 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
                         <span className="thumbnail__title">Parallel Execution</span>
                     </div>
                     <div className="s__parallel_icon" onClick={()=>{updateExecEnv()}}>
-                        <img className={"s__parallel_icon__img"+ (execEnv!=="default" ? " s__selectedBrowser" : "" )}   src='static/imgs/saucelabs.png' alt="Parallel Execution"/>
+                        <img className={"s__parallel_icon__img"+ (execEnv!=="default" ? " s__selectedBrowser" : "" )}   src='static/imgs/saucelabs.png' alt="SauceLabs Execution"/>
                         <span className="thumbnail__title">SauceLabs Execution</span>
+                    </div>
+                    <div className="s__parallel_icon" onClick={()=>{updateSmartMode("smartModule")}}>
+                        <img className={"s__parallel_icon__img"+ (smartMode==="smartModule" ? " s__selectedBrowser" : "" )}   src='static/imgs/ic-module-smart.png' alt="Module Smart Scheduling"/>
+                        <span className="thumbnail__title">Module Smart Scheduling</span>
+                    </div>
+                    <div className="s__parallel_icon" onClick={()=>{updateSmartMode("smartScenario")}}>
+                        <img className={"s__parallel_icon__img"+ (smartMode==="smartScenario" ? " s__selectedBrowser" : "" )}   src='static/imgs/ic-scenario-smart.png' alt="Scenario Smart Scheduling"/>
+                        <span className="thumbnail__title">Scenario Smart Scheduling</span>
                     </div>
                 </>
             :null}

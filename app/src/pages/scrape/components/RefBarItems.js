@@ -29,7 +29,7 @@ const RefBarItems = props => {
 	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, setShowPop } = useContext(ScrapeContext);
 
 	useEffect(()=>{
-		dispatch({type: actions.SET_OBJVAL, payload: null});
+		dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
 		setHighlight(false);
 		setToFilter([]);
 	}, [subTaskId, newScrapedData])
@@ -56,7 +56,7 @@ const RefBarItems = props => {
 
 			mirrorImg.src = `data:image/PNG;base64,${props.mirror}`;
 		}
-		dispatch({type: actions.SET_OBJVAL, payload: null});
+		dispatch({type: actions.SET_OBJVAL, payload: {val: null }});
 		setHighlight(false);
 		filter([]);
 		setToFilter([]);
@@ -64,11 +64,11 @@ const RefBarItems = props => {
 
 	useEffect(()=>{
 		// !== null because objValue can be 0
-		if (objValue !== null){
-			let objIndex = scrapeItems[objValue].objIdx;
+		if (objValue.val !== null){
+			let objIndex = scrapeItems[objValue.val].objIdx;
 			let ScrapedObject = null;
 			
-			if (scrapeItems[objValue].objId) ScrapedObject = mainScrapedData.view[objIndex];
+			if (scrapeItems[objValue.val].objId) ScrapedObject = mainScrapedData.view[objIndex];
 			else ScrapedObject = newScrapedData.view[objIndex];
 
 			let top=0; let left=0; let height=0; let width=0;

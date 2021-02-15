@@ -7,7 +7,7 @@ const initialState = {
     compareFlag: false,
     compareData: {},
     compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
-    objValue: null,
+    objValue: { val: null },
     cert: {},
     WsData: {
         endPointURL: "",

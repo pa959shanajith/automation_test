@@ -181,27 +181,23 @@ export const wsdlAdd = (wsdlUrl, wsdlSelectedMethod, resultFile) => {
     });
 }
 
-// export const updateIrisDataset = async(data) => {
-//     try{
-//         const res = await axios(url+"/updateIrisDataset", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 data : data
-//             },
-//             credentials : 'include',
-//         });
-//         if (res.status === 200){
-//             return res.data;
-//         }
-//         else{
-//             console.log(res.status)
-//         }
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
+export const updateIrisDataset = data => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/updateIrisDataset", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                data : data
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
 

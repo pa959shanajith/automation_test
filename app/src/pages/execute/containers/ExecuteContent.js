@@ -6,13 +6,9 @@ import { useSelector } from 'react-redux';
 import "../styles/ExecuteContent.scss";
 import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
-// import socketIOClient from "socket.io-client";
-// const ENDPOINT = "https://"+window.location.hostname+":8443";
 
 
-const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, setExecutionActive, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
-
-    // const socket = socketIOClient(ENDPOINT);
+const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, setExecutionActive, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
     const history = useHistory();
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
@@ -76,12 +72,6 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
         setLoading(false);
         if (data !== "fail") {
             setPopupState({show:true,title:"Save Test Suite",content:"Test suite saved successfully."});
-            //$("#saveSuitesModal").modal("show")
-            //Transaction Activity for Save Test Suite Button Action
-            // var labelArr = [];
-            // var infoArr = [];
-            // labelArr.push(txnHistory.codesDict['SaveTestSuite']);
-            // txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
         }
         setupdateAfterSave(!updateAfterSave);
     }
@@ -161,6 +151,7 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
             }
             setBrowserTypeExe([]);
             setModuleInfo([]);
+            setExecAction("serial");
             setupdateAfterSave(!updateAfterSave);
             setSyncScenario(false);
         }catch(error) {
@@ -170,6 +161,7 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
             setExecutionActive(false);
             setBrowserTypeExe([]);
             setModuleInfo([]);
+            setExecAction("serial");
             setupdateAfterSave(!updateAfterSave);
             setSyncScenario(false);
         }
@@ -210,6 +202,7 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
                 icePlaceholder={'Search ICE to execute'}
                 exeTypeLabel={"Select Execution type"}
                 exeIceLabel={"Execute on ICE"}
+                ExeScreen={true}
             />:null}
             
             <div className="e__content">
@@ -303,7 +296,8 @@ const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleI
                     dataparam: [eachData[i].dataparam[j].trim()],
                     scenarioName: eachData[i].scenarionames[j],
                     scenarioId: eachData[i].scenarioids[j],
-                    scenariodescription: undefined
+                    scenariodescription: undefined,
+                    accessibilityParameters: "Disable"
                 });
             }
         }

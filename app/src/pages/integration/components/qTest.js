@@ -34,7 +34,7 @@ const QTest =(props)=>{
                     <option value="Select Release" selected disabled >Select Release</option>
                     {props.projectDetails ? 
                         props.projectDetails.qc_projects.map((e,i)=>(
-                            <option value={e}>{e}</option>))
+                            <option id={e.id} value={e.name}>{e.name}</option>))
                             : null
                     }
                 </select>

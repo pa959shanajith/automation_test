@@ -12,11 +12,18 @@ const Leftbar=(props)=>{
         props.setPopUpEnable(true);
         props.setViewMappedFiles(false);
         props.setAlmClicked(false);
+        props.setZephyrClicked(false);
     }
     else if (iconType == "ALM"){
         props.setAlmClicked(true);
-        props.setloginAlm(true)
+        props.setloginAlm(true);
         props.setViewMappedFiles(false);
+    }
+    else if(iconType == "Zephyr"){
+        props.setZephyrClicked(true);
+        props.setViewMappedFiles(false);
+        props.setFocus(iconType);
+        props.setloginZephyr(true);
     }
     }
     
@@ -46,6 +53,10 @@ const Leftbar=(props)=>{
                     <span onClick={()=>callIconClick("ALM")}>
                         <img src='static/imgs/ALM.png'/>
                         <div>ALM</div>
+                    </span>
+                    <span onClick={()=>callIconClick("Zephyr")}>
+                        <img  id={(props.focus === "Zephyr")? "selectedIcon" : null} src='static/imgs/Zephyr.png'/>
+                        <div>Zephyr</div>
                     </span>
                 </Fragment>}
             </div>

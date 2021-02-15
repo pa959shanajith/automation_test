@@ -159,11 +159,22 @@ const ScrapeObjectList = () => {
     }
 
     const onEdit = () => {
-        setShowObjModal({
-            operation: "editObject",
-            modifyScrapeItem: (value, newProperties, customFlag) => modifyScrapeItem(value, newProperties, customFlag),
-            object: editableObj
-        })
+        let modalObject = {};
+        if (editableObj.hasOwnProperty('irisText')) {
+            modalObject = {
+                operation: "editIrisObject",
+                object: editableObj,
+                modifyScrapeItem: (value, newProperties, customFlag) => modifyScrapeItem(value, newProperties, customFlag),
+                cord: (editableObj.objId ? mainScrapedData.view : newScrapedData.view)[editableObj.objIdx].cord
+            };
+        } else {
+            modalObject = {
+                operation: "editObject",
+                modifyScrapeItem: (value, newProperties, customFlag) => modifyScrapeItem(value, newProperties, customFlag),
+                object: editableObj
+            }
+        }
+        setShowObjModal(modalObject);
     }
 
     const onSearch = event => {
