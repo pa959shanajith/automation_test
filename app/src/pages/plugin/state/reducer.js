@@ -3,7 +3,14 @@ import * as actionTypes from './action.js';
 const initialState = {
     tasksJson: {},
     FD: {},
-    CT: {}
+    CT: {},
+    RD: {
+        'cycleid': undefined,
+        'releaseid': undefined,
+        'testsuiteid': undefined,
+        'projectid': undefined,
+        'testsuitename': undefined
+    }
 }
 
 const reducer = (state=initialState, action) => {
@@ -19,6 +26,23 @@ const reducer = (state=initialState, action) => {
         case actionTypes.SET_CT:
             return {
                 ...state, CT: action.payload
+            }
+        case actionTypes.UPDATE_REPORTDATA:
+            var data = action.payload.testSuiteDetails[0]
+            return{
+                ...state, 
+                RD: {
+                    'cycleid': data.cycleid,
+                    'releaseid': data.releaseid,
+                    'testsuiteid': data.testsuiteid,
+                    'projectid': data.projectid,
+                    'testsuitename': data.testsuitename
+                }
+            }
+        case actionTypes.CLEAR_REPORTDATA:
+            return{
+                ...state,
+                RD: initialState.RD
             }
         default:
             return state

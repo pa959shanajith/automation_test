@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector} from 'react-redux';
 import { ScrollBar } from '../../global';
 import { getSuiteDetailsInExecution_ICE} from '../api';
 import * as actionTypes from '../state/action';
+import { CLEAR_REPORTDATA } from '../../plugin/state/action';
 import '../styles/ModuleList.scss'
 
 /*Component ModuleList
@@ -14,6 +15,7 @@ const ModuleList = ({displayError,setBlockui,setModDrop}) =>{
     const dispatch = useDispatch()
     const moduleList = useSelector(state=>state.report.moduleList)
     const suiteSelected = useSelector(state=>state.report.suiteSelected)
+    const reportData = useSelector(state=>state.plugin.RD);
     const moduleClick = async(e)=> {
         var suiteID = e.currentTarget.getAttribute('value')
         var suiteName = e.currentTarget.getAttribute('name')
@@ -24,6 +26,21 @@ const ModuleList = ({displayError,setBlockui,setModDrop}) =>{
         dispatch({type:actionTypes.UPDATE_SUITEDETAILS,payload:{suiteDetails:res,suiteID:{_id:suiteID,name:suiteName}}})
         setBlockui({show:false})
     }
+    useEffect(()=>{
+        if(reportData.projectid && moduleList.length >0){
+            (async()=>{
+                var suiteID = reportData.testsuiteid
+                var suiteName = reportData.testsuitename
+                setBlockui({show:true,content:'Loading...'})
+                var arg = {"param":"getSuiteDetailsInExecution_ICE","testsuiteid":suiteID}
+                var res = await getSuiteDetailsInExecution_ICE(arg)
+                if(res.error){displayError(res.error);return;}
+                dispatch({type:actionTypes.UPDATE_SUITEDETAILS,payload:{suiteDetails:res,suiteID:{_id:suiteID,name:suiteName}}})
+                setBlockui({show:false})
+                dispatch({type:CLEAR_REPORTDATA,payload:{}})
+            })()
+        }
+    },[reportData,moduleList])
     return(
         <div id='rp_module-list' className='rp_moduleList'>
             <ScrollBar scrollId='rp_module-list' trackColor={'transperent'} thumbColor={'grey'}>

@@ -4,6 +4,7 @@ import { useHistory, Link, Redirect } from 'react-router-dom';
 import { loadUserInfo } from '../../login/api';
 import { getRoleNameByRoleId } from '../api';
 import * as actionTypes from '../../login/state/action';
+import { UPDATE_REPORTDATA } from '../../plugin/state/action';
 import ClickAwayListener from 'react-click-away-listener';
 import ChangePassword from './ChangePassword';
 import ChangeDefaultIce from './ChangeDefaultIce';
@@ -48,8 +49,8 @@ const Header = () => {
 
     useEffect(()=>{
         //on Click back button on browser
-        window.addEventListener('popstate',(e)=>{
-            logout(e);
+        window.addEventListener('popstate', (e)=> {
+            logout(e)
         })
     },[])
     useEffect(()=>{
@@ -75,7 +76,7 @@ const Header = () => {
                 var testSuiteIds = result.testSuiteDetails;
                 var msg = "";
                 testSuiteIds[0]["projectidts"] = testSuiteIds[0]["projectid"];
-                // window.localStorage["report"] = JSON.stringify(result);
+                dispatch({type: UPDATE_REPORTDATA, payload: result});
                 msg = testSuiteIds[0]["testsuitename"]
                 
                 if (data == "Terminate") {
