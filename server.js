@@ -327,7 +327,7 @@ if (cluster.isMaster) {
 
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
-		app.post('/getProjectsNeo', auth.protect, (req, res) => (res.send("false")));
+		app.post('/getProjectsNeo', (req, res) => (res.send("false")));
 		app.post('/populateProjects', auth.protect, mindmap.populateProjects);
 		app.post('/populateUsers', auth.protect, mindmap.populateUsers);
 		app.post('/getProjectTypeMM', auth.protect, mindmap.getProjectTypeMM);
