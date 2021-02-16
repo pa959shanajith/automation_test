@@ -143,3 +143,76 @@ export const storeUserDetails = async(userData) => {
         console.log(err);
     }
 }
+
+export const forgotPasswordEmail = async(username) => {
+    try{
+        const res = await axios(url+"/forgotPasswordEmail", {
+            method : 'POST',
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {
+                username: username
+            },
+            credentials : 'include'
+        });
+        if (res.status === 200) {
+            return res.data;
+        }
+        else{
+            console.log(res.status);
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+}
+
+export const unlockAccountEmail = async(username) => {
+    try{
+        const res = await axios(url+"/unlockAccountEmail", {
+            method : 'POST',
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {
+                username: username
+            },
+            credentials : 'include'
+        });
+        if (res.status === 200) {
+            return res.data;
+        }
+        else{
+            console.log(res.status);
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+}
+
+export const unlock = async(username, password) => {
+    try{
+        const res = await axios(url+"/unlock", {
+            method : 'POST',
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {
+                username: username,
+				password: password
+            },
+            credentials : 'include'
+        });
+        if (res.status === 200) {
+            return res.data;
+        }
+        else{
+            console.log(res.status);
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+}

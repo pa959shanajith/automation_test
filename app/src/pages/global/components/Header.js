@@ -71,7 +71,7 @@ const Header = () => {
 				// 	}).show();
                 // }
             });
-            socket.on("result_ExecutionDataInfo",(result)=> {
+            const executionDATA =(result) => {
                 var data = result.status
                 var testSuiteIds = result.testSuiteDetails;
                 var msg = "";
@@ -80,10 +80,10 @@ const Header = () => {
                 msg = testSuiteIds[0]["testsuitename"]
                 
                 if (data == "Terminate") {
-                    setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By Program." })
+                    setShowAfterExecution({show:true, title:msg,content: "Execution terminated - By Program." })
                 } 
                 else if (data == "UserTerminate") {
-                    setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By Program." })
+                    setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By User." })
                 } 
                 else if (data == "unavailableLocalServer") {
                     setShowExecution_Pop({'title': 'Execute Test Suite', 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
@@ -95,6 +95,9 @@ const Header = () => {
                     setShowExecution_Pop({'title': 'Scheduled Execution Complete', 'content':msg});
                 }
                 else setShowExecution_Pop({'title': "Execute Test Suite", 'content':"Failed to execute."});
+            }
+            socket.on("result_ExecutionDataInfo",(result)=> {
+                executionDATA(result);
             });
         }
     },[socket])
@@ -271,12 +274,17 @@ const Header = () => {
         />
     );
 
+    const redirectToReports = () =>{
+        window.localStorage['navigateScreen'] = "reports";
+        setRedirectTo('/reports');
+    }
+
     const PostExecution = () => (
         <div className="afterExecution-modal">
             <ModalContainer 
                 title={"Execute Test Suite"}
                 content={
-                    <p >{showAfterExecution.content} <br /> Go to Reports</p>
+                    <p >{showAfterExecution.content} <br /><p onClick={()=>{redirectToReports()}}> Go to Reports</p></p>
                 }
                 close={()=>setShowAfterExecution({show:false})}
                 footer={
