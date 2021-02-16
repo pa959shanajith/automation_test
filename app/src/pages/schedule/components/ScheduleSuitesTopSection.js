@@ -188,6 +188,9 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
                                 timeFormat={false}
                                 isValidDate={valid}
                                 value={moduleSceduledate[rowData.testsuiteid]["date"]}
+                                renderInput={(props) => {
+                                    return <input {...props} value={(moduleSceduledate[rowData.testsuiteid]["date"]) ? props.value : ''} />
+                                }}
                             /> 
                             <img className="datepickerIcon" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
 						</span>
