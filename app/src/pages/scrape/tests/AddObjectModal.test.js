@@ -123,6 +123,8 @@ describe('<AddObjectModel/> Positive Sceanrios',()=>{
         expect(findByTestAtrr(modalContainer,'addObjectInput').length).toBe(1);
         expect(findByTestAtrr(modalContainer,'addObjectTypeSelect').length).toBe(1);
         expect(findByTestAtrr(modalContainer,'addObjectButton').length).toBe(1);
+		expect(findByTestAtrr(modalContainer,'reset').length).toBe(1);
+        expect(findByTestAtrr(modalContainer,'submit').length).toBe(1);
     });
     
     it('Should clear the inputs when reset is clicked',()=>{
