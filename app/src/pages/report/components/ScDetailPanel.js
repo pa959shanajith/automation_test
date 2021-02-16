@@ -79,6 +79,7 @@ const Report = async(e,setBlockui,displayError)=>{
     var scName = e.currentTarget.parentElement.getAttribute('scname')
     if(reportType==='html'){
         const reportURL = window.location.origin + "/viewReport/" + reportID;
+        setBlockui({show:false})
         return window.open(reportURL, '_blank');
     }
     var data =  await viewReport(reportID, reportType)
