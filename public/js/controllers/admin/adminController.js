@@ -3396,7 +3396,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (parseInt(data[6])) errfields.push("Authentication Principal");
 				if (parseInt(data[7])) errfields.push("Authentication Credentials");
 				if (parseInt(data[8])) errfields.push("Data Mapping Settings");
-				openModalPopup(bAction+" Configuration", "Following values are invalid: "+errfields.join(", ")+ (errHints.length!=0)? (". Note: "+errHints):'.');
+				openModalPopup(bAction+" Configuration", "Following values are invalid: "+errfields.join(", ")+ ((errHints.length!=0)? (". Note: "+errHints):'.'));
 			}
 		}, function (error) {
 			unblockUI();
