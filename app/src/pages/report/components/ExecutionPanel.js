@@ -64,13 +64,17 @@ const ExecutionPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails
                     </div>
                     <div id='rp__row_content'>
                         <ScrollBar scrollId='rp__row_content' trackColor='transparent'>
-                        {suiteDetails.map((e,i)=>
-                        <div key={e.execution_id} onClick={onClickRow} name={(sortUp)?i+1:suiteDetails.length-i} value={e.execution_id} className={'rp__row'+(selectedScDetails._id===e.execution_id?" selected-row":"")}>
-                            <div className='rp__col'>E<sub>{(sortUp)?i+1:suiteDetails.length-i}</sub></div>
-                            <div className='rp__col'>{e.start_time}</div>
-                            <div className='rp__col'>{e.end_time}</div>
-                        </div>
-                        )}
+                        {(suiteDetails.length>0)?
+                            suiteDetails.map((e,i)=>
+                            <div key={e.execution_id} onClick={onClickRow} name={(sortUp)?i+1:suiteDetails.length-i} value={e.execution_id} className={'rp__row'+(selectedScDetails._id===e.execution_id?" selected-row":"")}>
+                                <div className='rp__col'>E<sub>{(sortUp)?i+1:suiteDetails.length-i}</sub></div>
+                                <div className='rp__col'>{e.start_time}</div>
+                                <div className='rp__col'>{e.end_time}</div>
+                            </div>):
+                            <div style={{textAlign:'center',padding:'30px',height:'100%'}} className='rp__row'>
+                                No record(s) found
+                            </div>
+                        }
                         </ScrollBar>
                     </div>
                 </div>
