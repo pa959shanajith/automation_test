@@ -24,6 +24,7 @@ const ModuleList = ({displayError,setBlockui,setModDrop}) =>{
         var res = await getSuiteDetailsInExecution_ICE(arg)
         if(res.error){displayError(res.error);return;}
         dispatch({type:actionTypes.UPDATE_SUITEDETAILS,payload:{suiteDetails:res,suiteID:{_id:suiteID,name:suiteName}}})
+        setModDrop(true)
         setBlockui({show:false})
     }
     useEffect(()=>{
@@ -38,6 +39,7 @@ const ModuleList = ({displayError,setBlockui,setModDrop}) =>{
                 dispatch({type:actionTypes.UPDATE_SUITEDETAILS,payload:{suiteDetails:res,suiteID:{_id:suiteID,name:suiteName}}})
                 setBlockui({show:false})
                 dispatch({type:CLEAR_REPORTDATA,payload:{}})
+                setModDrop(true)
             })()
         }
     },[reportData,moduleList])
