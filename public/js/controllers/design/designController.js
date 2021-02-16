@@ -2653,10 +2653,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			obj_width = ele[0].attributes['data-width'].value;
 			objType = '';
 			for(var i=0;i<viewString.view.length;i++){
-				if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType != ''){
+				if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType ){
 					objType = viewString.view[i].objectType[0].toUpperCase() + viewString.view[i].objectType.slice(1,viewString.view[i].objectType.length);
 					break;
-				}else if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType == ''){
+				}else if(obj_xpath == viewString.view[i].xpath && !viewString.view[i].objectType ){
 					objType = "unrecognizableobject";
 					break;
 				}
@@ -2666,9 +2666,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><span style="float:right;margin-right: 100px;"><strong>Object Image</strong></span><div class="irisimg" id="irisimg" style="float:right;margin-right:20px;width:210px;height:130px;justify-content: center;align-items: center;display: flex;margin-top: 10px;"></div><br><br><br><div class="iristag" id="iristag"></div></div>');
+			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><span style="float:right;margin-right: 100px;"><strong>Object Image</strong></span><div class="irisimg" id="irisimg" style="float:right;margin-right:20px;width:210px;height:120px;justify-content: center;align-items: center;display: flex;margin-top: 20px;"></div><br><br><br><div class="iristag" id="iristag"></div></div>');
 			$('#objectType').val(objType.toLowerCase())
 			$('#irisimg').append(image)
+			if (obj_width < 0) obj_width= obj_width *-1
+			if (obj_height < 0) obj_height = obj_height *-1
 			if (obj_width > 200 || obj_height > 130){ 
 				$('#irisimg').find('img').attr('style',"width: 200px;")
 			}else{
