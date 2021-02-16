@@ -2574,7 +2574,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				.then(function (val) {
 					$("#dialog-irisObject").find("button.close").click();
 					if(val === 'success'){
-						openDialog("Iris Object Details","Submitted Successfully.");
+						openDialog("IRIS Object Details","Submitted Successfully.");
 						for(var i=0;i<viewString.view.length;i++){
 							if(viewString.view[i].xpath == obj_xpath){
 								viewString.view[i].objectType = user_obj_type;
@@ -2582,9 +2582,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							}
 						}
 					}
-					else if(val=='unsavedObject') openDialog("Iris Object Details","Please save the object first.");
+					else if(val=='unsavedObject') openDialog("IRIS Object Details","Please save the object first.");
 					else{
-						openDialog("Iris Object Details","Failed to updated Iris Object Details.");
+						openDialog("IRIS Object Details","Failed to updated IRIS Object Details.");
 					}
 				}, function (error) {
 					
@@ -2592,7 +2592,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 		else{
 			$("#dialog-irisObject").find("button.close").click();
-			openDialog("Iris Object Details","Submitted Successfully.");
+			openDialog("IRIS Object Details","Submitted Successfully.");
 		}
 	}
 	
@@ -2666,10 +2666,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#dialog-irisObject").modal("show");
 			$("#addIrisObjContainer").empty()
 			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><div class="irisimg" id="irisimg" style="float:right;margin-right:40px;width:210px;height:150px"></div><br><br><br><div class="iristag" id="iristag"></div></div>');
+			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><span style="float:right;margin-right: 100px;"><strong>Object Image</strong></span><div class="irisimg" id="irisimg" style="float:right;margin-right:20px;width:210px;height:130px;justify-content: center;align-items: center;display: flex;margin-top: 10px;"></div><br><br><br><div class="iristag" id="iristag"></div></div>');
 			$('#objectType').val(objType.toLowerCase())
 			$('#irisimg').append(image)
-			if (obj_width > 200 || obj_height >150){ 
+			if (obj_width > 200 || obj_height > 130){ 
 				$('#irisimg').find('img').attr('style',"width: 200px;")
 			}else{
                 var wd = obj_width + "px;"
