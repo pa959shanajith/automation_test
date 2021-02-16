@@ -36,7 +36,12 @@ function loadReports() {
         var calcDataTableHeight = function() {
             return scrollBodyHeight - 100;
         };
-        
+        var cdict = {};
+        document.cookie.split(';').map(i=> {
+            let p=i.trim().split('=');
+            cdict[p[0]] = decodeURIComponent(p[1])
+        })
+        var secCook = cdict['XSRF-TOKEN'];
         var overallStatus = $('.overallStatusVal').text();
         if(overallStatus.indexOf('Incomplete') != '-1') {
             $('.toggleIncompleteStatus').hide();
@@ -119,6 +124,7 @@ function loadReports() {
                     type: 'POST',
                     url: 'https://' + hostName + '/openScreenShot',
                     responseType: 'arraybuffer',
+					headers: { "x-xsrf-token": secCook},
                     data: {
                         "absPath": [path]
                     },
@@ -250,6 +256,7 @@ function loadReports() {
                     type: 'POST',
                     url: posturl,
                     responseType: 'arraybuffer',
+					headers: { "x-xsrf-token": secCook},
                     data: {
                         "url": url,
                         "username": userName,
@@ -414,6 +421,7 @@ function loadReports() {
                     type: 'POST',
                     url: posturl,
                     responseType: 'arraybuffer',
+					headers: { "x-xsrf-token": secCook},
                     data: issue_dict,
                     success: function(data) {
                         if (data == "Fail") {
@@ -583,6 +591,7 @@ function loadReports() {
                     type: 'POST',
                     url: posturl,
                     data: {'videoPath':videoPath},
+					headers: { "x-xsrf-token": secCook},
                     xhr: function() { return xhrOverride },
                     success: function(data1) {
                         if (data1.byteLength){
