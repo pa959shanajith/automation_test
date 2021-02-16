@@ -18,6 +18,8 @@ const ExecutionPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails
         if(suDetails.length>0){
             var arr = dateASC([...suDetails]).reverse()
             setSuiteDetails(arr)           
+        }else{
+            setSuiteDetails([])
         }
     },[suDetails])
     useEffect(()=>{
