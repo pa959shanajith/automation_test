@@ -17,7 +17,6 @@ const regEx= /[~*+=?^%<>()|\\|\/]/;
 const ldap_url=/^ldap:\/\/[A-Za-z0-9._-]/;
 const char_check=/[<'>"]/;
 const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
-const serverNameCheck = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
 const regEx_email=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 //GetUserRoles
@@ -1916,7 +1915,7 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 	if (!flag) flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];
 	inputs.host = (conf.host || "").trim();
 	inputs.port = conf.port || "";
-	if (!inputs.host && !validator.isIP(inputs.host) && !validator.isFQDN(inputs.host) || !serverNameCheck.test(inputs.host)) { // Allow Anything as of now
+	if (!inputs.host && !validator.isIP(inputs.host) && !validator.isFQDN(inputs.host)) { // Allow Anything as of now
 		logger.error("Error occurred in admin/"+fnName+": Invalid Hostname or IP.");
 		flag[5]='1';
 	}
@@ -1929,13 +1928,13 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 		name: (conf.sender.name || "Avo Assure Alerts").trim(),
 		email: (conf.sender.email || "avoassure-alerts@avoautomation.com").trim()
 	}
-	if(char_check.test(inputs.sender.name)) {
-		logger.error("Error occurred in admin/"+fnName+": Restricted Characters found.");
-		return res.send("Restricted characters found")
-	}
 	if (!validator.isEmail(inputs.sender.email) || !regEx_email.test(inputs.sender.email)) {
 		logger.error("Error occurred in admin/"+fnName+": Invalid sender email address.");
 		flag[7]='1';
+	}
+	if(char_check.test(inputs.sender.name)) {
+		logger.error("Error occurred in admin/"+fnName+": Invalid sender name. Restricted Characters found.");
+		flag[7]='2';
 	}
 	inputs.tls = {
 		security: conf.enabletls || "auto",
@@ -1960,14 +1959,15 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 			username: (auth.username || "").trim(),
 			password: (auth.password || "").trim(),
 		};
-		if(char_check.test(inputs.auth.username)){
-			logger.error("Error occurred in admin/"+fnName+": Restricted Characters found.");
-			return res.send("Restricted characters found")
-		}
 		if (inputs.auth.type == "none") inputs.auth = false;
 		else if (!["basic"].includes(inputs.auth.type)) {
 			logger.error("Error occurred in admin/"+fnName+": Invalid auth type.");
 			flag[9]='1';
+		} else {
+			if (char_check.test(inputs.auth.username)) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid auth username. Restricted Characters found.");
+				flag[9]='2';
+			}
 		}
 	}
 	const timeouts = conf.timeouts || "";
@@ -2026,7 +2026,7 @@ exports.testNotificationChannels = async (req, res) => {
 		let flag = "fail";
 		if (channel == "email") {
 			if (provider != "smtp") flag = "invalidprovider";
-			else if (!validator.isEmail(recipient) || !regEx_email.test(recipient)) flag = "invalidrecipient";
+			else if (!validator.isEmail(recipient)) flag = "invalidrecipient";
 			else {
 				const conf = { channel, provider, name: rawConf.name };
 				await getEmailConf(rawConf, fnName, conf);
