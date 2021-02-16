@@ -599,10 +599,11 @@ function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
     for (let i = 0; i < viewString.view.length; i++) {
                             
         let scrapeObject = viewString.view[i];
+        let newTag = scrapeObject.tag;
         
         if (scrapeObject.cord) {
             scrapeObject.hiddentag = "No";
-            scrapeObject.tag = `iris;${scrapeObject.objectType}`;
+            newTag = `iris;${scrapeObject.objectType}`;
             scrapeObject.url = "";
             scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${scrapeObject.tag}`;
         }
@@ -610,7 +611,7 @@ function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
         let scrapeItem = {  objId: scrapeObject._id,
                             objIdx: lastIdx++,
                             val: ++lastVal,
-                            tag: scrapeObject.tag,
+                            tag: newTag,
                             hide: false,
                             title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
                             custname: scrapeObject.custname,

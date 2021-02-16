@@ -119,14 +119,12 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
                     let rows={}
                     mainTestCases.forEach((testCase, index) => {
                         if(index+1 in data){
-                            // $('#jqGrid').jqGrid('setCell', $(this)[0].id, 'objectName', data[$(this)[0].id].xpath);
-                            rows[testCase.custname]=data[index+1].xpath
+                            rows[testCase.custname]=data[index+1].xpath;
                         }
                     });
                     dispatch({type: DesignActions.SET_MODIFIED, payload: rows});
                     dispatch({type: DesignActions.SET_SAVEENABLE, payload: !saveEnable})
-                    console.log(`dispatching ${!saveEnable}`)
-                    setShowPop({'title': "Debug Testcase", 'content': "Debug completed successfully."})
+                    setShowPop({'title': "Debug Testcase", 'content': "Debug completed successfully."});
                 } else {
                     console.log(data);
                 }										
