@@ -65,7 +65,7 @@ const callLogin_ALM = async()=>{
 }
 const callViewMappedFiles = async()=>{
     setBlockui({show:true,content:'Fetching...'})
-    props.setViewMappedFiles("ALM")
+    props.setViewMappedFiles(true)
     const userid = user_id;
     const response = await viewQcMappedList_ICE(userid);
     if(response.error){props.displayError(response.error);props.setBlockui({show:false});return;}

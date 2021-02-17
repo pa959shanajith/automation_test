@@ -18,7 +18,7 @@ const  Integrations=()=>{
     const [loginAlm , setloginAlm]= useState(false);
     const [loginZephyr , setloginZephyr] = useState(false);
     const [focus,setFocus] = useState(null);
-    const [viewmappedFiles , setViewMappedFiles] = useState(null)
+    const [viewmappedFiles , setViewMappedFiles] = useState(false)
     return(
         <div className="parent">
             <Header/>
