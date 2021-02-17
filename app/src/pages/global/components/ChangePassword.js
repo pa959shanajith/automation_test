@@ -8,10 +8,11 @@ import '../styles/ChangePassword.scss';
     Uses: Renders the modal Popup for changing password
     Props: setShow -> setState for displaying and hiding modal
             setSuccessPass -> successPass setState to flip the flag once change pass is success
-
+            loginPopup -> when user opening changepassword from login not from header
+            loginCurrPassword -> email temporary password (forgot password)
 */
 
-const ChangePassword = ({setShow, setSuccessPass}) => {
+const ChangePassword = ({setShow, setSuccessPass,loginPopup,loginCurrPassword}) => {
 
     const [currpassword, setCurrPassword] = useState("");
     const [newpassword, setNewPassword] = useState("");
@@ -63,7 +64,7 @@ const ChangePassword = ({setShow, setSuccessPass}) => {
         resetErrorFlags();
         
         let regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
-		if (!currpassword) {
+		if (loginCurrPassword===undefined && !currpassword) {
 			setCurrPassError(true);
 			setPasswordValid("Current Password field is empty.");
 		} else if (!newpassword) {
@@ -79,7 +80,8 @@ const ChangePassword = ({setShow, setSuccessPass}) => {
 			setConfPassError(true);
 			setPasswordValid("New Password and Confirm Password do not match");
 		} else {
-			resetPassword(newpassword, currpassword)
+            const currentPass = loginCurrPassword!==undefined?loginCurrPassword:currpassword;
+			resetPassword(newpassword, currentPass)
 			.then(data => {
                 if(data === "Invalid Session") setPasswordValid("Invalid Session")
                 else if(data === "success") {
@@ -110,7 +112,7 @@ const ChangePassword = ({setShow, setSuccessPass}) => {
 
     const Content = () => (
         <div className="pass_inputs_container">
-            <input className={"reset_pass_inputs " + (currPassError ? "error_reset_field" : "")} placeholder="Current Password" type="password" onChange={currPassHandler} value={currpassword} />
+            {loginPopup===undefined?<input className={"reset_pass_inputs " + (currPassError ? "error_reset_field" : "")} placeholder="Current Password" type="password" onChange={currPassHandler} value={currpassword} />:null}
             <input className={"reset_pass_inputs " + (newPassError ? "error_reset_field" : "")} placeholder="New Password" type="password" onChange={newPassHandler} value={newpassword} />
             <input className={"reset_pass_inputs " + (confPassError ? "error_reset_field" : "")} placeholder="Confirm Password" type="password" onChange={confPasshandler} value={confpassword}/>
             <span className={"pass_valid_err " + (passwordValidation ? "" : "hide_pass_valid")}>{passwordValidation ? passwordValidation : "none"}</span>
