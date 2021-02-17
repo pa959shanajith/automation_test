@@ -1192,7 +1192,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 			}
 			else{
 				for(var j=0;j<projectDetails[i].cycles.length;j++){
-					if(regEx.test(projectDetails[i].cycles[j].cycleName)){
+					if(regEx.test(projectDetails[i].cycles[j].cyclename)){
 						return res.send("Error: Special characters are found");
 					}
 				}
