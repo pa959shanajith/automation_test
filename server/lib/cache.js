@@ -1,6 +1,7 @@
 const redis = require("redis");
 const logger = require('../../logger');
-const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.env.CACHEDB_PORT),"password" : process.env.CACHEDB_AUTH};
+const dbAuthStore = require('./dbAuthStore');
+const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.env.CACHEDB_PORT), "password": dbAuthStore.getCachedbAuth()};
 
 const clients = {};
 

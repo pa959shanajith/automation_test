@@ -1,12 +1,12 @@
 const redis = require("redis");
 const validator =  require('validator');
 const logger = require("../../logger");
-const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.env.CACHEDB_PORT),"password" : process.env.CACHEDB_AUTH};
+const dbAuthStore = require('./dbAuthStore');
+const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.env.CACHEDB_PORT), "password": dbAuthStore.getCachedbAuth()};
 const default_sub = redis.createClient(redisConfig);
 const default_pub = redis.createClient(redisConfig);
 const server_sub = redis.createClient(redisConfig);
 var cache = require('./cache').getClient(2);
-var fs = require('fs');
 var options = require('../config/options');
 var pulse_ICE = {}
 const server_pub = default_pub;
