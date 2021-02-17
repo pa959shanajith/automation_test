@@ -203,37 +203,37 @@ const CreateObjectModal = props => {
     }
 
     return (
-        <div className="ss__createObj">
+        <div data-test="createObject" className="ss__createObj">
             <ModalContainer 
                 title={props.editFlag ? "Edit Object" : "Create Object"}
                 content={
-                    <div className="ss__createObj_content" id="createObjListId">
+                    <div  data-test="createObjectModalContent" className="ss__createObj_content" id="createObjListId">
                         <ScrollBar scrollId="createObjListId" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
-                                { objects.map((object, index) => <div className="ss__createObj_item" key={object.tempId}>
-                                        <div className="createObj_row">
-                                            <input className={"createObj_input"+(error[object.tempId] === "objName" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} name="objName" onChange={(e)=>handleInputs(e, index)} value={object.objName} placeholder="Enter Object Name" />
-                                            <select className={"createObj_objType"+(error[object.tempId] === "objType" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} value={object.objType} onChange={(e)=>handleType(e, index)}>
+                                { objects.map((object, index) => <div data-test="ssCreateObjectItem" className="ss__createObj_item" key={object.tempId}>
+                                        <div data-test="createObjectRow" className="createObj_row">
+                                            <input  data-test="createObjectInput" className={"createObj_input"+(error[object.tempId] === "objName" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} name="objName" onChange={(e)=>handleInputs(e, index)} value={object.objName} placeholder="Enter Object Name" />
+                                            <select   data-test="createObjectType" className={"createObj_objType"+(error[object.tempId] === "objType" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} value={object.objType} onChange={(e)=>handleType(e, index)}>
                                                 <option className="createObj_option" disabled selected value="">Select Object Type</option>
                                                 { objectTypes.map( objectType =>
                                                     <option className="createObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>{objectType.name}</option>
                                                 ) }
                                             </select>
-                                            {!props.editFlag && <button className="createObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img src="static/imgs/ic-delete.png" /></button>}
-                                            <button className="createObj_btn" onClick={()=>onEdit(object.tempId)} style={props.editFlag ? {flex: "1 0"} : null}><img src="static/imgs/ic-jq-editstep.png" /></button>
-                                            {!props.editFlag && objects.length-1 === index && <button className="createObj_btn" onClick={newField}><img src="static/imgs/ic-add.png" /></button>}
+                                            {!props.editFlag && <button data-test="objectDeleteButton" className="createObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img src="static/imgs/ic-delete.png" /></button>}
+                                            <button data-test="objectEditButton" className="createObj_btn" onClick={()=>onEdit(object.tempId)} style={props.editFlag ? {flex: "1 0"} : null}><img src="static/imgs/ic-jq-editstep.png" /></button>
+                                            {!props.editFlag && objects.length-1 === index && <button data-test="objectAddButton" className="createObj_btn" onClick={newField}><img src="static/imgs/ic-add.png" /></button>}
                                         </div>
                                         {
                                             showFields.includes(object.tempId) && 
                                             <>
-                                            <div className="createObj_row"><input className={"createObj_input"+(error[object.tempId] === "url" ? " ss__error_border" : "")} name="url" onChange={(e)=>handleInputs(e, index)} value={object.url} placeholder="Enter URL" /></div>
-                                            <div className="createObj_row"><input className="createObj_input" name="name" onChange={(e)=>handleInputs(e, index)} value={object.name} placeholder="Enter name" /></div>
-                                            <div className="createObj_row"><input className="createObj_input" name="relXpath" onChange={(e)=>handleInputs(e, index)} value={object.relXpath} placeholder="Enter Relative xpath" /></div>
-                                            <div className="createObj_row"><input className="createObj_input" name="absXpath" onChange={(e)=>handleInputs(e, index)} value={object.absXpath} placeholder="Enter Absolute xpath" /></div>
-                                            <div className="createObj_row"><input className="createObj_input" name="className" onChange={(e)=>handleInputs(e, index)} value={object.className} placeholder="Enter class name" /></div>
-                                            <div className="createObj_row"><input className="createObj_input" name="id" onChange={(e)=>handleInputs(e, index)} value={object.id} placeholder="Enter ID" /></div>
-                                            <div className="createObj_row">
+                                            <div data-test="enterURL" className="createObj_row"><input  data-test="enterURLInput" className={"createObj_input"+(error[object.tempId] === "url" ? " ss__error_border" : "")} name="url" onChange={(e)=>handleInputs(e, index)} value={object.url} placeholder="Enter URL" /></div>
+                                            <div data-test="enterName" className="createObj_row"><input data-test="enterNameInput"className="createObj_input" name="name" onChange={(e)=>handleInputs(e, index)} value={object.name} placeholder="Enter name" /></div>
+                                            <div data-test="enterrelXpath" className="createObj_row"><input className="createObj_input" name="relXpath" onChange={(e)=>handleInputs(e, index)} value={object.relXpath} placeholder="Enter Relative xpath" /></div>
+                                            <div data-test="enterabsXpath"className="createObj_row"><input className="createObj_input" name="absXpath" onChange={(e)=>handleInputs(e, index)} value={object.absXpath} placeholder="Enter Absolute xpath" /></div>
+                                            <div data-test="enterclassName" className="createObj_row"><input className="createObj_input" name="className" onChange={(e)=>handleInputs(e, index)} value={object.className} placeholder="Enter class name" /></div>
+                                            <div data-test="enterID" className="createObj_row"><input className="createObj_input" name="id" onChange={(e)=>handleInputs(e, index)} value={object.id} placeholder="Enter ID" /></div>
+                                            <div data-test="enterQuery" className="createObj_row">
                                                 <input className="createObj_input" name="qSelect" onChange={(e)=>handleInputs(e, index)} value={object.qSelect} placeholder="Enter Query Selector" />
-                                                <button className="createObj_save" onClick={()=>onSave(index)}>Save</button>
+                                                <button   data-test="saveButton"  className="createObj_save" onClick={()=>onSave(index)}>Save</button>
                                             </div>
                                             </>
                                         }
@@ -244,8 +244,8 @@ const CreateObjectModal = props => {
                 }
                 close={()=>props.setShow(false)}
                 footer={<>
-                    <button onClick={resetFields}>Reset</button>
-                    <button disabled={showFields.length} onClick={onSubmit}>Submit</button>
+                    <button data-test="reset" onClick={resetFields}>Reset</button>
+                    <button data-test="submit" disabled={showFields.length} onClick={onSubmit}>Submit</button>
                 </>}
             />
         </div>
