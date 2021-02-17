@@ -1470,16 +1470,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			proceed = true;
 		}
 		else {
-			if (wsdlInputs[1] == "GET" || wsdlInputs[1] == "HEAD" || wsdlInputs[1] == "PUT" || wsdlInputs[1] == "DELETE") {
-				if (wsdlInputs[3]) {
-					if (!wsdlInputs[2]) $("#wsdlOperation").addClass("inputErrorBorderFull")
-					else proceed = true;
-				}else proceed = true;
-			} 
-			else if (wsdlInputs[1] == "POST") {
+			if (wsdlInputs[1] == "POST") {
 				if (!wsdlInputs[3]) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
 				else if (!wsdlInputs[5]) $("#wsdlRequestBody").addClass("inputErrorBorderFull")
 				else proceed = true;
+			}else{
+				proceed = true;
 			}
 		}
 		if (proceed) {
@@ -1489,7 +1485,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"]
 			}
 			if (wsdlInputs[4]){
-				keywordVal.splice(4,0,'setParam');
+				keywordVal.splice(4,0,'setParamValue');
 			}
 			var blockMsg = "Fetching Response Header & Body..."
 			blockUI(blockMsg);
