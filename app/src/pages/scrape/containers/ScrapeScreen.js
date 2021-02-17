@@ -113,7 +113,8 @@ const ScrapeScreen = ()=>{
                         dispatch({type: actionTypes.SET_WSDATA, payload: {opInput : data.operations || ""}});
                         
                         dispatch({type: actionTypes.SET_WSDATA, payload: {reqHeader : data.header ? data.header.split("##").join("\n"): ""}});
-
+                        dispatch({type: actionTypes.SET_WSDATA, payload: {paramHeader : data.param ? data.param.split("##").join("\n"): ""}});
+                        
                         if (data.body){
                             let localReqBody;
                             if (!data.body.indexOf("{") || !data.body.indexOf("[")) {
@@ -198,6 +199,7 @@ const ScrapeScreen = ()=>{
             let keywordVal;
             let wsdlInputs = [ endPointURL, method, opInput ];
             wsdlInputs.push(reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
+            wsdlInputs.push(paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
             wsdlInputs.push(reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"'));
             if (Object.keys(certificateInfo).length!==0){
                 wsdlInputs.push(certificateInfo.certsDetails+";");
@@ -208,7 +210,7 @@ const ScrapeScreen = ()=>{
 
             if (!wsdlInputs[0]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["endPointURL"]}); // error
             else if (method==="0") dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["method"]}); // error
-            else if (wsdlInputs[5]){
+            else if (wsdlInputs[6]){
                 authCert = true;
                 proceed = true;
             }
@@ -218,7 +220,7 @@ const ScrapeScreen = ()=>{
                     else proceed = true;
                 } else if (wsdlInputs[1] === "POST") {
                     if (!wsdlInputs[3]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqHeader"]}); // error
-                    else if (!wsdlInputs[4]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqBody"]}); // error
+                    else if (!wsdlInputs[5]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqBody"]}); // error
                     else proceed = true;
                 }
             }
@@ -228,6 +230,9 @@ const ScrapeScreen = ()=>{
                     keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody","addClientCertificate","setBasicAuth"]
                 }else{
                     keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"]
+                }
+                if (wsdlInputs[4]){
+                    keywordVal.splice(4,0,'setParam');
                 }
                 setOverlay("Fetching Response Header & Body...");
                 ResetSession.start();
@@ -624,7 +629,6 @@ function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
         // if (fetchDataFlag){
             if(scrapeObject.hasOwnProperty('editable') || scrapeObject.cord){
                 scrapeItem.editable = true;
-                if (scrapeObject.cord) scrapeItem.irisText = scrapeObject.objectText || "";
             } else {
                 let isCustom = scrapeObject.xpath === "";
                 scrapeItem.isCustom = isCustom;
