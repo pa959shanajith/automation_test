@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import {ScreenOverlay, PopupMsg, ModalContainer} from '../../global' 
 import {getSAMLConfig, manageSAMLConfig} from '../api';
+import ValidationExpression from '../../global/components/ValidationExpression';
 import '../styles/SamlConfig.scss'
 
 
@@ -215,7 +216,12 @@ const SamlConfig = (props) => {
 				<button type="button" onClick={()=>{setshowDeleteModal(false);samlReset();}} className="btn-default">No</button>
             </div>
         )
-    }  
+    }
+    
+    const updateSamlServerName = (value) => {
+        value = ValidationExpression(value,"samlServerName")
+        setName(value);
+    }
 
     return (
         <Fragment>
@@ -242,7 +248,7 @@ const SamlConfig = (props) => {
                     {(samlEdit===false)?
                     <Fragment>
                         <span className="leftControl-saml" title="Server Name">Server Name</span>
-                        <input type="text" autoComplete="off" id="samlServerName" name="samlServerName" value={name} onChange={(event)=>{setName(event.target.value)}} maxLength="50" className={nameErrBorder?"inputErrorBorder middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create":" middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create"} placeholder="Server Name"/>
+                        <input type="text" autoComplete="off" id="samlServerName" name="samlServerName" value={name} onChange={(event)=>{updateSamlServerName(event.target.value)}} maxLength="50" className={nameErrBorder?"inputErrorBorder middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create":" middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create"} placeholder="Server Name"/>
                     </Fragment>
                     :<Fragment>
                         <span className="leftControl-saml" title="Server Name">Server Name</span>

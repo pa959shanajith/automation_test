@@ -4,6 +4,7 @@ import {ScrollBar} from '../../global'
 import * as actionTypes from '../state/action';
 import '../styles/CreateLanding.scss';
 import useOnClickOutside from './UseOnClickOutside'
+import ValidationExpression from '../../global/components/ValidationExpression';
 
 /*Component CreateLanding
   use: renders create New User Landing page
@@ -21,6 +22,11 @@ const CreateLanding = (props) => {
     },[userConf.confServerList])
 
     useOnClickOutside(node, () => {props.setShowDropdown(!props.showDropdown);props.click({query:'retaintype'});});
+
+    const userNameChange = (value) => {
+        value = ValidationExpression(value.toLowerCase(),"userName")
+        dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload:value})
+    }
 
     return (
         <Fragment>
@@ -93,7 +99,7 @@ const CreateLanding = (props) => {
                 }
 
                 <div className='userForm-create adminControl-create'>
-                    <input type="text" autoComplete="User-name" id="userName" value={userConf.userName} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_USERNAME,payload:event.target.value})}} name="userName" maxLength="100" className={props.userNameAddClass?((props.userNameAddClass==="selectErrorBorder")?"middle__input__border-create form-control-custom-create form-control__conv-create  selectErrorBorder username-cust":"middle__input__border-create form-control-custom-create form-control__conv-create username-cust inputErrorBorder"):"username-cust middle__input__border-create form-control-custom-create form-control__conv-create   "} placeholder="User Name"/>
+                    <input type="text" autoComplete="User-name" id="userName" value={userConf.userName} onChange={(event)=>{userNameChange(event.target.value)}} name="userName" maxLength="100" className={props.userNameAddClass?((props.userNameAddClass==="selectErrorBorder")?"middle__input__border-create form-control-custom-create form-control__conv-create  selectErrorBorder username-cust":"middle__input__border-create form-control-custom-create form-control__conv-create username-cust inputErrorBorder"):"username-cust middle__input__border-create form-control-custom-create form-control__conv-create   "} placeholder="User Name"/>
                 </div>
 
                 <div className='leftControl-create adminControl-create'>
