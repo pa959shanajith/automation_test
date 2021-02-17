@@ -761,11 +761,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				integration: $scope.integration,
 				batchInfo: $scope.moduleInfo
 			};
-			allocateICEPopup()
+			$scope.allocateICEPopup()
 		}
 	};
 
-	const allocateICEPopup = () =>{
+	$scope.allocateICEPopup = () =>{
 		$scope.smartMode = false;
 		$scope.selectedICE = "";
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
@@ -829,6 +829,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	const populateICElist =(arr,unallocated)=>{
 		var ice=[]
+		$scope.iceNameIdMap = {}
 		var iceStatus = $scope.iceStatus.ice_ids
 		const statusUpdate = (ice) => {
 			var color = '#fdc010' ;
@@ -857,6 +858,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					Object.entries(e[1].ice_list).forEach((k)=>{
 						if(k[0] in iceStatus){
 							var res = statusUpdate(iceStatus[k[0]])
+							$scope.iceNameIdMap[k[1].icename] = {}
+							$scope.iceNameIdMap[k[1].icename].id = k[0];
+							$scope.iceNameIdMap[k[1].icename].status = iceStatus[k[0]].status;
 							k[1].color = res.color;
 							k[1].statusCode = res.status;
 							ice.push(k[1])
@@ -869,13 +873,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$scope.availableICE = ice
 	}
 
-	$scope.ExecuteOnclick = () =>{
-		$scope.selectedPool = $('#chooseICEPool').val()
-		if($('#chooseICEPool').val() == 'unallocated')$scope.selectedPool = "";
-		var iceList=[]
-		var smartModeType = ''
+	$scope.CheckStatusAndExecute = () =>{
+		let iceList = []
 		if($scope.smartMode){
-			smartModeType = $('#executionType').val() //change value of dropdown in execution.html if needed
 			$('#ice-dropdown input:checked').each(function(){
                 if($(this).parent().attr('title')=='Online'){
                     iceList.push($(this).val())
@@ -883,6 +883,33 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
             })
 			$scope.selectedICE = iceList
 		}
+		if(Array.isArray($scope.selectedICE)){
+			for(let icename in $scope.selectedICE){
+				let ice_id = $scope.iceNameIdMap[$scope.selectedICE[icename]];
+				if(ice_id && ice_id.status){
+					$("#selectIcePoolIce").modal("hide");
+					$("#proceedExecution").modal("show");
+					$('#proceedExecution').find('.btn-default-yes').focus();
+					return;
+				} 
+			}
+		}else{
+			let ice_id = $scope.iceNameIdMap[$scope.selectedICE];
+			if(ice_id && ice_id.status){
+				$("#selectIcePoolIce").modal("hide");
+				$("#proceedExecution").modal("show");
+				$('#proceedExecution').find('.btn-default-yes').focus();
+				return
+			} 
+		}
+		$scope.ExecuteOnclick();
+	}
+
+	$scope.ExecuteOnclick = () =>{
+		$scope.selectedPool = $('#chooseICEPool').val()
+		if($('#chooseICEPool').val() == 'unallocated')$scope.selectedPool = "";
+		var smartModeType = ''
+		if($scope.smartMode) smartModeType = $('#executionType').val() //change value of dropdown in execution.html if needed
 		else if(!$scope.selectedICE){
 			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0){
 				$scope.selectedICE = ""
