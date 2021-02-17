@@ -28,7 +28,7 @@ const ModuleList = ({displayError,setBlockui,setModDrop}) =>{
         setBlockui({show:false})
     }
     useEffect(()=>{
-        if(reportData.projectid && moduleList.length >0){
+        if(reportData && reportData.projectid && moduleList.length >0){
             (async()=>{
                 var suiteID = reportData.testsuiteid
                 var suiteName = reportData.testsuitename
