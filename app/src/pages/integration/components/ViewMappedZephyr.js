@@ -15,14 +15,20 @@ const ViewMappedZephyr=(props)=>{
                     </div>
                     { props.mappedfilesRes.length?
                     <Fragment>
-                        <div className="leftQcStructure" style={{border:"none"}}>
-                            {props.mappedfilesRes.map((e,i)=>(<li>{e.testname}</li>))}
+                        <div className="linkedTestset-box">
+                        <div className="leftQcStructuremap" style={{border:"none"}}>
+                            {props.mappedfilesRes.map((e,i)=>(
+                            <li className="mappedLis">
+                                {e.testname}
+                            </li>))}
                         </div>
-                        <div className="rightQcStructure" style={{border:"none"}}>{props.mappedfilesRes.map((e,i)=>(<li className="mappedLis">{
+                        <div className="rightQcStructuremap" style={{border:"none"}}>{props.mappedfilesRes.map((e,i)=>(
+                        <li className="mappedLis">{
                             
                                 e.testscenarioname
                             
                         }</li>))}</div>
+                        </div>
                         </Fragment>: null }
                 </div>   
             </div>)

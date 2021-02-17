@@ -18,7 +18,7 @@ const  Integrations=()=>{
     const [loginAlm , setloginAlm]= useState(false);
     const [loginZephyr , setloginZephyr] = useState(false);
     const [focus,setFocus] = useState(null);
-    const [viewmappedFiles , setViewMappedFiles] = useState(false)
+    const [viewmappedFiles , setViewMappedFiles] = useState(null)
     return(
         <div className="parent">
             <Header/>
@@ -29,6 +29,7 @@ const  Integrations=()=>{
                     setqTestClicked={setqTestClicked} 
                     setPopUpEnable={setPopUpEnable}
                     setViewMappedFiles={setViewMappedFiles}
+                    viewmappedFiles={viewmappedFiles}
                     setAlmClicked={setAlmClicked}
                     setloginAlm={setloginAlm}
                     qTestClicked={qTestClicked}
