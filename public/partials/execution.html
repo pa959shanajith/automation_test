@@ -255,6 +255,26 @@
 </div>
 <!-- Submitting Task -->
 
+<!-- Submitting Task -->
+<div class="modal fade" id="proceedExecution" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">ICE Busy</h4>
+			</div>
+			<div class="modal-body">
+				<p>Selected ICE is already executing a Test Suite. Press Proceed to queue this execution on selected ICE, press No to select any other ICE.</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-default-yes" ng-click="ExecuteOnclick()"  data-dismiss="modal">Proceed</button>
+				<button type="button" class="btn btn-default" ng-click="allocateICEPopup()"  data-dismiss="modal">No</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Submitting Task -->
+
 <!-- Submitting Task Success -->
 <div class="modal fade" id="globalTaskSubmit" role="dialog" data-keyboard="false" data-backdrop="static">
 	<div class="modal-dialog modal-sm">
@@ -564,7 +584,7 @@
 			</div>
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-default btn-default-modal" ng-click="ExecuteOnclick($event)">Execute</button>
+			<button type="button" class="btn btn-default btn-default-modal" ng-click="CheckStatusAndExecute($event)">Execute</button>
 		  </div>
 	   </div>
 	</div>
