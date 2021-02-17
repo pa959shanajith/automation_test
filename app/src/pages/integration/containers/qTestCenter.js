@@ -287,7 +287,7 @@ return (<Fragment>
                 mappedFilesICERes={mappedFilesICERes}
             /> : 
         <div className="integration_middleContent">
-        <div className="middle_holder">
+        {/* <div className="middle_holder"> */}
                 {
                     props.qTestClicked ?
                     <QTest
@@ -354,7 +354,8 @@ return (<Fragment>
                 : null
                 } */}
             </div>
-        </div>}
+        // </div>
+        }
         </Fragment>
     
     )
