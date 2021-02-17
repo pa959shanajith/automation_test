@@ -144,7 +144,7 @@ const ScrapeObjectList = () => {
             setModified(modifiedDict);
         }
         else setNewScrapedData(updNewScrapedData);
-        setSaved(false);
+        if(!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved(false);
         setScrapeItems(localScrapeItems);
     }
 

@@ -11,7 +11,7 @@ const EditIrisObject = props => {
 
     useEffect(()=>{
         setSelectedType(props.utils.object.tag.split(";").pop() || "unrecognizableobject");
-        setSelectedStatus(-1);
+        setSelectedStatus(0);
     }, [])
 
     const onSelectType = event => {
@@ -30,7 +30,7 @@ const EditIrisObject = props => {
                 "cord": props.utils.cord,
                 "type": selectedType, 
                 "xpath": props.utils.object.xpath,
-                "status": selectedStatus < 0 ? 0 : selectedStatus,
+                "status": selectedStatus,
                 ...props.taskDetails
             };
 
@@ -79,7 +79,6 @@ const EditIrisObject = props => {
                                 <span>Object Status:</span>
                                 <span>
                                     <select className="ss__ei_objType" value={selectedStatus} onChange={onSelectStatus}>
-                                        <option className="ss__ei_options" disabled value={-1}>Select Object Status</option>
                                         <option className="ss__ei_options" value={0}>Unchecked</option>
                                         <option className="ss__ei_options" value={1}>Checked</option>
                                     </select>
