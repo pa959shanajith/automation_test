@@ -176,7 +176,7 @@ const LdapConfig = (props) => {
 				if (JSON.parse(JSON.stringify(data)[6])) errfields.push("Authentication Principal");
 				if (JSON.parse(JSON.stringify(data)[7])) errfields.push("Authentication Credentials");
                 if (JSON.parse(JSON.stringify(data)[8])) errfields.push("Data Mapping Settings");
-                setPopupState({show:true,title:bAction+" Configuration",content: "Following values are invalid: "+errfields.join(", ")+ (errHints.length!=0)? (". Note: "+errHints):'.'});
+                setPopupState({show:true,title:bAction+" Configuration",content: "Following values are invalid: "+errfields.join(", ")+ ((errHints.length!=0)? (". Note: "+errHints):'.')});
 			}
 		}catch(error) {
             setLoading(false);
