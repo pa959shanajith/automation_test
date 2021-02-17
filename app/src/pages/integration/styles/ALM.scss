@@ -4,26 +4,16 @@
 
 .alm__tree_containers{
     display: flex;
+    flex-grow: 1;
+    margin-bottom: 10px;
+    justify-content: space-between;
 }
 
 .alm__action_row{
     display: flex;
-
-    #alm_left_info{
-        flex-basis: 50%;
-    }
-    #alm_right_info{
-        label { 
-            margin-right: 80px;
-        }
-    }
-
-    label {
-        font-family: "LatoWeb";
-        font-size: 14px;
-        font-weight: 700;
-        margin: 0;
-    }
+    justify-content: flex-end;
+    margin-bottom: 10px;
+    
     button{
         font-family: "LatoWebLight";
         border: none;
@@ -42,6 +32,25 @@
     }
 }
 
+.alm__title_row{
+    display: flex;
+    font-family: "LatoWeb";
+    font-size: 14px;
+    font-weight: 700;
+    justify-content: center;
+
+    label {
+        margin: 0;
+        white-space: nowrap;
+    }
+}
+
+.alm__tree_container{
+    display: flex;
+    flex-direction: column;
+    flex-basis: 48%;
+}
+
 .alm__left_tree, .alm__right_tree{
     font-family: "LatoWeb";
     font-size: 14px;
@@ -49,7 +58,7 @@
     float: left;
     width: 100%;
     height: 90%;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .alm_tree_toggle{
@@ -153,18 +162,10 @@
     }
 }
 
-.alm__left_tree_container{
-    margin-right: 35px;   
-}
-
 .alm__left_tree_container, .alm__right_tree_container {
     border: 1px solid #000;
     position: relative;
     top: 14px;
-    height: 400px;
-    padding: 5px;
-    width: 47%;
-    float: left;
-    padding-top: 15px;
-    padding-left: 15px;
+    height: 100%;
+    padding: 15px 5px 5px 15px;
 }

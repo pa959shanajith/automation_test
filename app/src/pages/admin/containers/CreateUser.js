@@ -130,6 +130,7 @@ const CreateUser = (props) => {
                         return;
                     }
                     var errfields = [];
+                    let hints = 'Hint:';
                     if (JSON.parse(JSON.stringify(data)[2])) errfields.push("User Name");
                     if (JSON.parse(JSON.stringify(data)[3])) errfields.push("First Name");
                     if (JSON.parse(JSON.stringify(data)[4])) errfields.push("Last Name");
@@ -137,7 +138,9 @@ const CreateUser = (props) => {
                     if (JSON.parse(JSON.stringify(data)[6])) errfields.push("Email");
                     if (JSON.parse(JSON.stringify(data)[7])) errfields.push("Authentication Server");
                     if (JSON.parse(JSON.stringify(data)[8])) errfields.push("User Domain Name");
-                    setPopupState({show:true,title:bAction+" User",content:"Following values are invalid: "+errfields.join(", ")});
+                    if (JSON.stringify(data)[5] == '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+				    if (JSON.stringify(data)[5] == '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
+				    setPopupState({show:true,title:bAction+" User",content:"Following values are invalid: "+errfields.join(", ")+" "+hints});
                 }
             }
             catch(error){

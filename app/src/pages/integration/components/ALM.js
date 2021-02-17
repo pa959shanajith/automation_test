@@ -247,124 +247,125 @@ const ALM=(props)=>{
             </span>
         </div>
         <div className="alm__action_row">
-            <span id="alm_left_info"><label>ALM Tests</label></span>
-            <span id="alm_right_info">
-                <label>Avo Assure Scenarios</label>
-                <button onClick={()=>callSaveButton()}>Save</button> 
-                <button onClick={()=>props.callViewMappedFiles()}>View Mapped Files</button> 
-                <button onClick={()=>{callExit();props.callExitcenter()}}>Exit</button>
-            </span>
+            <button onClick={()=>callSaveButton()}>Save</button> 
+            <button onClick={()=>props.callViewMappedFiles()}>View Mapped Files</button> 
+            <button onClick={()=>{callExit();props.callExitcenter()}}>Exit</button>
         </div>
         <div className="alm__tree_containers">
-            <div className="alm__left_tree_container">
-                <div className="alm_tree_selection_box">
-                    <select value={projectDropdn1} ref={selProjectRef} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
-                        <option value="Select Project"selected disabled >Select Domain</option>
+            <div className="alm__tree_container">
+                <span className="alm__title_row"><label>ALM Tests</label></span>
+                <div className="alm__left_tree_container">
+                    <div className="alm_tree_selection_box">
+                        <select value={projectDropdn1} ref={selProjectRef} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
+                            <option value="Select Project"selected disabled >Select Domain</option>
 
-                        { props.domainDetails && 
-                            props.domainDetails.domain.map(e => (
-                                <option id={e.id} value={e.name}>{e}</option>
-                            )) }
-                    </select>
-                    <select value={releaseDropdn} className="qcSelectProject" onChange={(e)=>callFolderDetails_ICE(e)}>
-                        <option value="Select Release" selected disabled >Select Release</option>
-                        { projectDetails &&
-                            projectDetails.qc_projects.map( e => (
-                                <option value={e}>{e}</option>)) }
-                    </select>
+                            { props.domainDetails && 
+                                props.domainDetails.domain.map(e => (
+                                    <option id={e.id} value={e.name}>{e}</option>
+                                )) }
+                        </select>
+                        <select value={releaseDropdn} className="qcSelectProject" onChange={(e)=>callFolderDetails_ICE(e)}>
+                            <option value="Select Release" selected disabled >Select Release</option>
+                            { projectDetails &&
+                                projectDetails.qc_projects.map( e => (
+                                    <option value={e}>{e}</option>)) }
+                        </select>
 
-                </div>
-                <div className="alm__left_tree" id="alm_left_tree">
-                    <ScrollBar scrollId="alm_left_tree" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                        {folderDetails.length ?
-                            <>    
-                            <div className="alm__rootDiv">
-                                <img className="alm_tree_toggle" src="static/imgs/ic-qcCollapse.png"/>
-                                <label>Root</label>
-                            <div className="alm_tree_branches">
-                                { folderDetails[0].testfolder.map((e,i)=>(
-                                    <div>
-                                        <img className="alm_tree_toggle" id={i} onClick={()=>calltestSuites(e.folderpath,i)} src= "static/imgs/ic-qcExpand.png"/>
-                                        <label>{e.foldername}</label>
-                                        { testSuiteDetails.length ?
-                                        testSuiteDetails.map(ele=>(
-                                            ele.map(element => (
-                                            element.testfolder.length ?
-                                                element.testfolder.map( test => ( 
-                                                        (test.folderpath === e.folderpath.concat('\\', test.foldername)) &&
-                                                    <div className="alm_tree_branches">
-                                                        <img className="alm_tree_toggle" src="static/imgs/ic-qcExpand.png"/>
-                                                        <label>{test.foldername}</label>
-                                                    </div> )) 
-                                                :
-                                                element.TestSet.length &&
-                                                element.TestSet.map(testCase => ( 
-                                                    (testCase.testsetpath === e.folderpath) ?
-                                                    <div className="alm_tree_branches">
-                                                        <img className="alm_tree_toggle" onClick={()=>callTestSets(testCase.testsetid,testCase.testset,testCase.testsetpath)} src="static/imgs/ic-taskType-blue-plus.png"/>
-                                                        <label>{testCase.testset}</label>
-                                                        { testSets.length ?
-                                                        testSets.map(suite => ((suite.testsetid === testCase.testsetid) ?
-                                                            suite.content[0].testcase.map(cases => (
-                                                                <div className={"alm_tree_leaves"+(testSuiteSelected_name.indexOf(cases.slice(0,cases.indexOf("/")))!==-1?" selectedCase-backColor":"")} id={cases.substring(cases.indexOf("/")+1)} onClick={(event)=>callTestSuiteSelection(event,cases.substring(cases.indexOf("/")+1),cases.slice(0,cases.indexOf("/")),testCase.testset)}>
-                                                                    <label title={cases}>
-                                                                        <span className="leafId">{cases.substring(cases.indexOf("/")+1)}</span>
-                                                                        <span>{cases.slice(0,cases.indexOf("/"))}</span>
-                                                                    </label>
-                                                                    { (testSuiteSelected_name.indexOf(cases.slice(0,cases.indexOf("/")))!==-1) &&
-                                                                        <> { syncSuccess 
-                                                                            ? <img onClick={()=>callUnSync()} style={{cursor: "pointer", paddingRight:"10px"}} src="static/imgs/ic-qcUndoSyncronise.png"/>
-                                                                            : <img onClick={()=>callSyncronise(testCase.testsetpath)} style={{cursor: "pointer", paddingRight:"10px"}} src="static/imgs/ic-qcSyncronise.png"/> }
-                                                                        </> }
-                                                                </div>
-                                                            )) : null )) : null }
-                                                    </div> : null 
+                    </div>
+                    <div className="alm__left_tree" id="alm_left_tree">
+                        <ScrollBar scrollId="alm_left_tree" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
+                            {folderDetails.length ?
+                                <>    
+                                <div className="alm__rootDiv">
+                                    <img className="alm_tree_toggle" src="static/imgs/ic-qcCollapse.png"/>
+                                    <label>Root</label>
+                                <div className="alm_tree_branches">
+                                    { folderDetails[0].testfolder.map((e,i)=>(
+                                        <div>
+                                            <img className="alm_tree_toggle" id={i} onClick={()=>calltestSuites(e.folderpath,i)} src= "static/imgs/ic-qcExpand.png"/>
+                                            <label>{e.foldername}</label>
+                                            { testSuiteDetails.length ?
+                                            testSuiteDetails.map(ele=>(
+                                                ele.map(element => (
+                                                element.testfolder.length ?
+                                                    element.testfolder.map( test => ( 
+                                                            (test.folderpath === e.folderpath.concat('\\', test.foldername)) &&
+                                                        <div className="alm_tree_branches">
+                                                            <img className="alm_tree_toggle" src="static/imgs/ic-qcExpand.png"/>
+                                                            <label>{test.foldername}</label>
+                                                        </div> )) 
+                                                    :
+                                                    element.TestSet.length &&
+                                                    element.TestSet.map(testCase => ( 
+                                                        (testCase.testsetpath === e.folderpath) ?
+                                                        <div className="alm_tree_branches">
+                                                            <img className="alm_tree_toggle" onClick={()=>callTestSets(testCase.testsetid,testCase.testset,testCase.testsetpath)} src="static/imgs/ic-taskType-blue-plus.png"/>
+                                                            <label>{testCase.testset}</label>
+                                                            { testSets.length ?
+                                                            testSets.map(suite => ((suite.testsetid === testCase.testsetid) ?
+                                                                suite.content[0].testcase.map(cases => (
+                                                                    <div className={"alm_tree_leaves"+(testSuiteSelected_name.indexOf(cases.slice(0,cases.indexOf("/")))!==-1?" selectedCase-backColor":"")} id={cases.substring(cases.indexOf("/")+1)} onClick={(event)=>callTestSuiteSelection(event,cases.substring(cases.indexOf("/")+1),cases.slice(0,cases.indexOf("/")),testCase.testset)}>
+                                                                        <label title={cases}>
+                                                                            <span className="leafId">{cases.substring(cases.indexOf("/")+1)}</span>
+                                                                            <span>{cases.slice(0,cases.indexOf("/"))}</span>
+                                                                        </label>
+                                                                        { (testSuiteSelected_name.indexOf(cases.slice(0,cases.indexOf("/")))!==-1) &&
+                                                                            <> { syncSuccess 
+                                                                                ? <img onClick={()=>callUnSync()} style={{cursor: "pointer", paddingRight:"10px"}} src="static/imgs/ic-qcUndoSyncronise.png"/>
+                                                                                : <img onClick={()=>callSyncronise(testCase.testsetpath)} style={{cursor: "pointer", paddingRight:"10px"}} src="static/imgs/ic-qcSyncronise.png"/> }
+                                                                            </> }
+                                                                    </div>
+                                                                )) : null )) : null }
+                                                        </div> : null 
+                                                    )) 
                                                 )) 
-                                            )) 
-                                        )) : null }
-                                    </div>
-                                )) }                                  
-                            </div>
-                            </div>
-                            </> : null}
-                    </ScrollBar>
+                                            )) : null }
+                                        </div>
+                                    )) }                                  
+                                </div>
+                                </div>
+                                </> : null}
+                        </ScrollBar>
+                    </div>
                 </div>
             </div> 
-            <div className="alm__right_tree_container">
-                <div className="alm_tree_selection_box">
-                    <select value={projectDropdn2} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
-                        <option value="Select Project"selected disabled >Select Project</option>
-                    { projectDetails && 
-                        projectDetails.avoassure_projects.map((e,i)=>(
-                            <option id={i} value={e.project_name} >{e.project_name}</option>
-                        )) }
-                    </select>
-                    { scenarioArr &&
-                    <> { SearchIconClicked && <input onChange={(e)=>onSearch(e)} type="text" placeholder="Scenario Name"/> }
-                        <span className="alm__searchIcon" style={{display:"inline" , float:"right"}}> 
-                            <img onClick={()=>{setSearchIconClicked(!SearchIconClicked);setFilteredName(null)}} style={{cursor: "pointer" , display:"inline",float:"right"}} src="static/imgs/ic-searchIcon-black.png" />
-                        </span>
-                    </> }
+            <div className="alm__tree_container">
+                <span className="alm__title_row"><label>Avo Assure Scenarios</label></span>
+                <div className="alm__right_tree_container">
+                    <div className="alm_tree_selection_box">
+                        <select value={projectDropdn2} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
+                            <option value="Select Project"selected disabled >Select Project</option>
+                        { projectDetails && 
+                            projectDetails.avoassure_projects.map((e,i)=>(
+                                <option id={i} value={e.project_name} >{e.project_name}</option>
+                            )) }
+                        </select>
+                        { scenarioArr &&
+                        <> { SearchIconClicked && <input onChange={(e)=>onSearch(e)} type="text" placeholder="Scenario Name"/> }
+                            <span className="alm__searchIcon" style={{display:"inline" , float:"right"}}> 
+                                <img onClick={()=>{setSearchIconClicked(!SearchIconClicked);setFilteredName(null)}} style={{cursor: "pointer" , display:"inline",float:"right"}} src="static/imgs/ic-searchIcon-black.png" />
+                            </span>
+                        </> }
+                    </div>
+                
+                    <div  className="alm__right_tree" id="alm_right_tree">
+                    <ScrollBar scrollId="alm_right_tree" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
+                        { scenarioArr && 
+                            projectDetails.avoassure_projects.map((e,i)=>(
+                                (i == scenario_ID) && (e.scenario_details) &&
+                                e.scenario_details.map(e => (
+                                    <div 
+                                        className={"alm_tree_leaves "+(selectedScenario_ID.indexOf(e._id)!==-1 ? "slectedTestDiv" : null)} 
+                                        onClick={(event)=>{selectScenarioMultiple(event, e._id);}}
+                                        style={{cursor: "pointer"}}
+                                    >
+                                    { filteredNames ? filteredNames.map((element)=>(element == e.name && element)):  e.name }
+                                    </div>
+                                )))) }
+                    </ScrollBar>
+                    </div>
                 </div>
-            
-                <div  className="alm__right_tree" id="alm_right_tree">
-                <ScrollBar scrollId="alm_right_tree" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                    { scenarioArr && 
-                        projectDetails.avoassure_projects.map((e,i)=>(
-                            (i == scenario_ID) && (e.scenario_details) &&
-                            e.scenario_details.map(e => (
-                                <div 
-                                    className={"alm_tree_leaves "+(selectedScenario_ID.indexOf(e._id)!==-1 ? "slectedTestDiv" : null)} 
-                                    onClick={(event)=>{selectScenarioMultiple(event, e._id);}}
-                                    style={{cursor: "pointer"}}
-                                >
-                                { filteredNames ? filteredNames.map((element)=>(element == e.name && element)):  e.name }
-                                </div>
-                            )))) }
-                </ScrollBar>
-                </div>
-            
-        </div>
+            </div>
         </div>
     </>
     :null)

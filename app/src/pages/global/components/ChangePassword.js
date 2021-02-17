@@ -92,8 +92,13 @@ const ChangePassword = ({setShow, setSuccessPass}) => {
 				} else if(data === "incorrect") {
 					setCurrPassError(true);
 					setPasswordValid("Current Password is incorrect");
-                } 
-                else if(data === "fail") setPasswordValid("Failed to Change Password")
+                } else if(data == "reusedPass" || data == "insuff" || data == "same") {
+					setNewPassError(true);
+					setConfPassError(true);
+					if (data == "same") setPasswordValid("New Password provided is same as old password");
+					else if (data == "insuff") setPasswordValid("Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.");
+					else setPasswordValid("Password provided does not meet length, complexity or history requirements of application.");
+				} else if(data === "fail") setPasswordValid("Failed to Change Password")
 				else if(/^2[0-4]{10}$/.test(data)) setPasswordValid("Invalid Request")
             })
             .catch(error => {
