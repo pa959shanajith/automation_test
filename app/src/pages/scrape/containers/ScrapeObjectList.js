@@ -160,7 +160,7 @@ const ScrapeObjectList = () => {
 
     const onEdit = () => {
         let modalObject = {};
-        if (editableObj.hasOwnProperty('irisText')) {
+        if (editableObj.tag.substring(0, 4) === "iris") {
             modalObject = {
                 operation: "editIrisObject",
                 object: editableObj,

@@ -624,7 +624,6 @@ function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
         // if (fetchDataFlag){
             if(scrapeObject.hasOwnProperty('editable') || scrapeObject.cord){
                 scrapeItem.editable = true;
-                if (scrapeObject.cord) scrapeItem.irisText = scrapeObject.objectText || "";
             } else {
                 let isCustom = scrapeObject.xpath === "";
                 scrapeItem.isCustom = isCustom;

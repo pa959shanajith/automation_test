@@ -34,13 +34,13 @@ const EditIrisObject = props => {
                 ...props.taskDetails
             };
 
-            if (!props.utils.object.objId) props.setShowPop({title: "Iris Object Details", content: "Please save the object first."});
+            if (!props.utils.object.objId) props.setShowPop({title: "IRIS Object Details", content: "Please save the object first."});
             else {
                 updateIrisDataset(data)
                 .then(val => {
                     props.setShow(false);
                     if(val === 'success'){
-                        props.setShowPop({title: "Iris Object Details", content: "Submitted Successfully."});
+                        props.setShowPop({title: "IRIS Object Details", content: "Submitted Successfully."});
                         props.utils.modifyScrapeItem(props.utils.object.val, {
                             custname: props.utils.object.custname,
                             tag: `iris;${selectedType}`,
@@ -49,21 +49,21 @@ const EditIrisObject = props => {
                             editable: true
                         }, true);
                     }
-                    else props.setShowPop({title: "Iris Object Details", content: "Failed to updated Iris Object Details."});
+                    else props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
                 })
                 .catch(error => console.error(error));
             }
 		}
 		else{
 			props.setShow(false);
-			props.setShowPop({title: "Iris Object Details", content: "Submitted Successfully."});
+			props.setShowPop({title: "IRIS Object Details", content: "Submitted Successfully."});
 		}
     }
 
     return (
         <div className="ss__ei_container">
             <ModalContainer 
-                title="Iris Object Details"
+                title="IRIS Object Details"
                 content={
                     <div className="ss__ei_body">
                         <div className="ss__ei_info_panel">
@@ -86,13 +86,14 @@ const EditIrisObject = props => {
                                 </span>
                                 </>
                                 : null }
-                            <span>Object Text:</span>
-                            <span>{props.utils.object.irisText || "Undefined"}</span>
                             <span>Object Tag:</span>
                             <span>{props.utils.object.xpath.split(";").pop()}</span>
                         </div>
                         <div className="ss__ei_img_panel">
-                            <img className="ss__ei_img" src={`data:image/PNG;base64,${props.utils.cord.substring(2, props.utils.cord.length - 2)}`}/>
+                            <span>Object Image</span>
+                            <div className="ss__ei_img_box">
+                                <img className="ss__ei_img" src={`data:image/PNG;base64,${props.utils.cord.substring(2, props.utils.cord.length - 2)}`}/>
+                            </div>
                         </div>
                     </div>
                 }
