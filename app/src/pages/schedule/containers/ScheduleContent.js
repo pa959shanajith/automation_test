@@ -9,6 +9,7 @@ import Pagination from '../components/Pagination';
 
 const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
 
+    const nulluser = "5fc137cc72142998e29b5e63";
     const filter_data = useSelector(state=>state.plugin.FD)
     const [loading,setLoading] = useState(false)
     const [pageOfItems,setPageOfItems] = useState([])
@@ -297,7 +298,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                                         {pageOfItems.map((data)=>(
                                             <div className="scheduleDataBodyRowChild">
                                                 <div className="s__Table_date s__Table_date-time ">{data.scheduledatetime}</div>
-                                                <div className="s__Table_host" >{data.target == "nulluser"?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                <div className="s__Table_host" >{data.target == nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
                                                 <div className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                 <div className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
                                                 <div className="s__Table_appType">
