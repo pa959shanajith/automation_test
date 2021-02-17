@@ -174,7 +174,7 @@ const Zephyr=(props)=>{
         <div className="sepr_Div">
             <button className="saveQcbtn" style={{marginLeft:"470px"}} onClick={()=>callSaveButton()}>Save</button> 
             <button className="viewMapbtn" onClick={()=>props.callViewMappedFiles()}>View Mapped Files</button> 
-            <button className="saveQcbtn" onClick={()=>{callExit();props.callExitcenter()}}>Exit</button>
+            <button className="saveQcbtn" onClick={()=>callExit()}>Exit</button>
         </div><br/>
         <div className="qcActionBtn">
         <label>Zephyr Tests</label>

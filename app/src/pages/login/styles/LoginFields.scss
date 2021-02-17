@@ -93,6 +93,12 @@
     }
 }
 
+.error-msg-hyperlink{
+    color:inherit;
+    cursor:pointer;
+    text-decoration: underline;
+}
+
 @media screen and (max-width: 800px){
     .login-btn{
         margin-top: 0;
@@ -145,4 +151,14 @@
         height: 1.5vw;
     }
     
+}
+
+.forget-password,
+.forget-password:hover {
+    float: right;
+    color: #9f62e1;
+    font-size: 14px;
+    font-family: 'LatoWeb';
+    text-decoration: underline;
+    cursor: pointer;
 }

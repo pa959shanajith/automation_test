@@ -4,6 +4,7 @@ import { useHistory, Link, Redirect } from 'react-router-dom';
 import { loadUserInfo } from '../../login/api';
 import { getRoleNameByRoleId } from '../api';
 import * as actionTypes from '../../login/state/action';
+import { UPDATE_REPORTDATA } from '../../plugin/state/action';
 import ClickAwayListener from 'react-click-away-listener';
 import ChangePassword from './ChangePassword';
 import ChangeDefaultIce from './ChangeDefaultIce';
@@ -39,7 +40,7 @@ const Header = () => {
     const [showOverlay, setShowOverlay] = useState("");
     const [redirectTo, setRedirectTo] = useState("");
     const [clickNotify,setClickNotify] = useState(false)
-    const [showAfterExecution,setShowAfterExecution] = useState(false)
+    const [showAfterExecution,setShowAfterExecution] = useState({show:false})
     const [showExecution_Pop,setShowExecution_Pop] = useState(false);
     const userInfo = useSelector(state=>state.login.userinfo);
     const selectedRole = useSelector(state=>state.login.SR);
@@ -48,8 +49,8 @@ const Header = () => {
 
     useEffect(()=>{
         //on Click back button on browser
-        window.addEventListener('popstate',(e)=>{
-            logout(e);
+        window.addEventListener('popstate', (e)=> {
+            logout(e)
         })
     },[])
     useEffect(()=>{
@@ -70,30 +71,33 @@ const Header = () => {
 				// 	}).show();
                 // }
             });
-            socket.on("result_ExecutionDataInfo",(result)=> {
+            const executionDATA =(result) => {
                 var data = result.status
                 var testSuiteIds = result.testSuiteDetails;
                 var msg = "";
                 testSuiteIds[0]["projectidts"] = testSuiteIds[0]["projectid"];
-                // window.localStorage["report"] = JSON.stringify(result);
+                dispatch({type: UPDATE_REPORTDATA, payload: result});
                 msg = testSuiteIds[0]["testsuitename"]
                 
                 if (data == "Terminate") {
-                    setShowAfterExecution({title:msg,content:"Execution terminated - By Program." })
+                    setShowAfterExecution({show:true, title:msg,content: "Execution terminated - By Program." })
                 } 
                 else if (data == "UserTerminate") {
-                    setShowAfterExecution({title:msg,content:"Execution terminated - By Program." })
+                    setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By User." })
                 } 
                 else if (data == "unavailableLocalServer") {
                     setShowExecution_Pop({'title': 'Execute Test Suite', 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
                 } 
                 else if (data == "success") {
-                    setShowAfterExecution({title:msg,content:"Execution completed successfully." })
+                    setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
                    
                 } else if(data == "Completed"){
                     setShowExecution_Pop({'title': 'Scheduled Execution Complete', 'content':msg});
                 }
                 else setShowExecution_Pop({'title': "Execute Test Suite", 'content':"Failed to execute."});
+            }
+            socket.on("result_ExecutionDataInfo",(result)=> {
+                executionDATA(result);
             });
         }
     },[socket])
@@ -270,16 +274,21 @@ const Header = () => {
         />
     );
 
+    const redirectToReports = () =>{
+        window.localStorage['navigateScreen'] = "reports";
+        setRedirectTo('/reports');
+    }
+
     const PostExecution = () => (
         <div className="afterExecution-modal">
             <ModalContainer 
                 title={"Execute Test Suite"}
                 content={
-                    <p >{showAfterExecution.content} <br /> Go to Reports</p>
+                    <p >{showAfterExecution.content} <br /><p onClick={()=>{redirectToReports()}}> Go to Reports</p></p>
                 }
-                close={()=>setShowAfterExecution(false)}
+                close={()=>setShowAfterExecution({show:false})}
                 footer={
-                    <button onClick={()=>setShowAfterExecution(false)}>Ok</button>
+                    <button onClick={()=>setShowAfterExecution({show:false})}>Ok</button>
                 }
             />
         </div>
@@ -295,7 +304,7 @@ const Header = () => {
             { showSR_Pop && <SRPopup /> }
             { showExecution_Pop && <Execution_Pop /> }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
-            { showAfterExecution && <PostExecution/> } 
+            { showAfterExecution.show ? <PostExecution /> :null } 
 
             <div className = "main-header">
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>

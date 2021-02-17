@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {getAllSuites_ICE , getReportsData_ICE} from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/ToolbarMenu.scss';
@@ -11,10 +11,12 @@ import '../styles/ToolbarMenu.scss';
 
 const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
     const dispatch = useDispatch()
+    const [autoReport,setAutoReport] = useState(false)
     const [modlist,setModList] = useState([])
     const [projData,setProjData] = useState([])
     const [relList,setRelList] = useState([])
     const [cycList,setCycList] = useState([])
+    const reportData = useSelector(state=>state.plugin.RD);
     const cycRef = useRef()
     const relRef = useRef()
     const projRef = useRef()
@@ -29,6 +31,39 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
             setBlockui({show:false})
         })()
     },[])
+    useEffect(()=>{
+        if(reportData.projectid && projData.length >0){
+            try{
+                var data = {}
+                var cyclData = {}
+                projData.some((e)=>{if(e._id===reportData.projectid){
+                    data = e
+                    return true
+                }})
+                data.releases.some((e)=>{if(e.name===reportData.releaseid){
+                    cyclData = e
+                    return true
+                }})
+                setRelList(data.releases)
+                setCycList(cyclData.cycles)
+                setAutoReport(true)            
+            }catch(err){
+                displayError('Failed to load Reports!')
+                console.error(err)
+            }
+        }
+    },[reportData,projData])
+    useEffect(()=>{
+        if(autoReport){
+            projRef.current.value = reportData.projectid;
+            relRef.current.disabled = false;
+            relRef.current.value = reportData.releaseid
+            cycRef.current.disabled = false;
+            cycRef.current.value = reportData.cycleid
+            CycChange()
+            setAutoReport(false)
+        }
+    },[autoReport])
     const projChange = (e) =>{
         relRef.current.value = 'def-val'
         setRelList(projData[e.target.selectedIndex].releases)

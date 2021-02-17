@@ -1,6 +1,7 @@
 import React ,  { Fragment, useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
-import {ScreenOverlay, PopupMsg, ModalContainer} from '../../global' 
+import {ScreenOverlay, PopupMsg, ModalContainer} from '../../global'
+import { useSelector} from 'react-redux'; 
 import '../styles/ProjectAssign.scss';
 
 /*Component ProjectAssign
@@ -10,6 +11,7 @@ import '../styles/ProjectAssign.scss';
     
 const ProjectNew = (props) => {
     
+    const userInfo = useSelector(state=>state.login.userinfo);
     const [userSelectErrorBorder,setUserSelectErrorBorder] = useState(false)
     const [domainSelectErrorBorder,setDomainSelectErrorBorder] = useState(false)
     const [selectBox,setSelectBox] = useState([])
@@ -61,7 +63,12 @@ const ProjectNew = (props) => {
                 userOptions.push(data[i]);
             }
         }
-        setSelectBox(userOptions.sort());  
+        setSelectBox(userOptions.sort());
+        if(document.getElementById("selAssignUser") !== null)
+            document.getElementById("selAssignUser").selectedIndex = "0"; 
+        if(document.getElementById("selDomains") !== null)
+        document.getElementById("selDomains").selectedIndex = "0";       
+
     }
 
     const resetAssignProjectForm = () =>{
@@ -284,7 +291,8 @@ const ProjectNew = (props) => {
 		// assignProjectsObj.userInfo = userDetails;
 		assignProjectsObj.userId = userId;
 		assignProjectsObj.assignedProjects = assignedProjects1;
-		assignProjectsObj.getAssignedProjectsLen = getAssignedProjectsLen;
+        assignProjectsObj.getAssignedProjectsLen = getAssignedProjectsLen;
+        assignProjectsObj.userInfo = userInfo
 
 		/* Logic to get unassigned project list */
         setDiffprj([]);
@@ -378,7 +386,7 @@ const ProjectNew = (props) => {
             <div className="col-xs-9 form-group" style={{width: "100%"}}>
 				<div className="project-left2">
 					{/* <!--Left Select Box--> */}
-					<div className="wrap left-select">
+					<div className="wrap assign-select">
 						{/* <!--Labels--> */}
 						<label className="labelStyle1">All Projects</label>
 						<div className="seprator" >
@@ -401,7 +409,7 @@ const ProjectNew = (props) => {
 					{/* <!--Center Input--> */}
 
 					{/* <!--Right Select Box--> */}
-					<div className="wrap right-select">
+					<div className="wrap assign-select">
 						{/* <!--Labels--> */}
 						<label className="labelStyle1">Assigned Projects</label>
                         <div className="seprator seprator-custom" >

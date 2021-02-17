@@ -416,14 +416,15 @@ export const getDetails_ICE = async(idtype, requestedids) => {
   api returns string ex. "success"
 */
 
-export const updateProject_ICE = async(updateProjectObj) => { 
+export const updateProject_ICE = async(updateProjectObj, userDetails) => { 
     try{
         const res = await axios(url+'/updateProject_ICE', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {updateProjectObj: updateProjectObj},
+            data: {updateProjectObj: updateProjectObj,
+                userDetails: userDetails},
             credentials: 'include'
         });
         if(res.status === 401 || res.status === "Invalid Session" ){
@@ -1002,5 +1003,62 @@ export const testNotificationChannels = async(data) => {
     }catch(err){
         console.error(err)
         return {error:"Failed! Re-check the configuration."}
+    }
+}
+
+
+/* Component Session Management
+  api returns
+*/
+
+export const fetchLockedUsers = async() => { 
+    try{
+        const res = await axios(url+'/fetchLockedUsers', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch locked users."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to fetch locked users"}
+    }
+}
+
+/* Component Session Management
+  api returns
+*/
+
+export const unlockUser = async(user) => { 
+    try{
+        const res = await axios(url+'/unlockUser', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {user: user},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to unlocked users."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to unlocked users"}
     }
 }

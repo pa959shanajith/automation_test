@@ -1,6 +1,7 @@
 import React ,  { Fragment, useState} from 'react';
 import { getNames_ICE, createProject_ICE, updateProject_ICE} from '../api';
 import {ScreenOverlay, PopupMsg} from '../../global'
+import { useSelector} from 'react-redux'; 
 import '../styles/ProjectButtons.scss';
 
 /*Component ProjectButtons
@@ -9,7 +10,7 @@ import '../styles/ProjectButtons.scss';
 */
     
 const ProjectButtons = (props) => {
-    
+    const userInfo = useSelector(state=>state.login.userinfo);
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 
@@ -206,7 +207,7 @@ const ProjectButtons = (props) => {
                     if (proceeed === true) updateProjectObj.newProjectName  = props.editProjectName.trim();
                 }
                  
-                const updateProjectRes = await updateProject_ICE(updateProjectObj);
+                const updateProjectRes = await updateProject_ICE(updateProjectObj, userInfo);
                 if(updateProjectRes.error){displayError(updateProjectRes.error);return;}
                 props.clearUpdateProjectObjects();
                 props.resetForm();
