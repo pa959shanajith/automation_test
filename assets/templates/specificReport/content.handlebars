@@ -975,6 +975,9 @@
          height: 22px;
          margin-left: 10px;
       }
+      .capitalize{
+         text-transform: capitalize;
+      }
    </style>
 </head>
 
@@ -1024,7 +1027,7 @@
             <label>Domain</label>
             <span>: {{domainName}}</span>
             <label>Browser Type</label>
-            <span>: {{browserType}}</span>
+            <span class="capitalize">: {{browserType}}</span>
             <label>Browser Version</label>
             <span>: {{browserVersion}}</span>
             <span style='visibility:hidden' class="reportId">{{reportId}}</span>
