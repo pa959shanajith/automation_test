@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import {ScreenOverlay, PopupMsg, RedirectPage, ModalContainer} from '../../global' 
 import {getOIDCConfig, manageOIDCConfig} from '../api';
+import ValidationExpression from '../../global/components/ValidationExpression';
 import { useHistory } from 'react-router-dom';
 import '../styles/OidcConfig.scss'
 
@@ -186,6 +187,11 @@ const OidcConfig = (props) => {
         setshowDeleteModal(false);
     }
 
+    const updateOidcServerName = (value) => {
+		value = ValidationExpression(value,"oidcServerName");
+        setName(value);
+	};
+;
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
@@ -209,11 +215,11 @@ const OidcConfig = (props) => {
                     {(oidcEdit===false)?
                     <Fragment>
                         <span className="leftControl-oidc" title="Server Name">Server Name</span>
-                        <input type="text" autoComplete="off" id="oidcServerName" name="oidcServerName" value={name} onChange={(event)=>{setName(event.target.value)}} maxLength="50" className={nameErrBorder?"inputErrorBorder middle__input__border-oidc form-control-oidc form-control-custom-oidc validationKeydown preventSpecialChar create":" middle__input__border-oidc form-control-oidc form-control-custom-oidc validationKeydown preventSpecialChar create"} placeholder="Server Name"/>
+                        <input type="text" autoComplete="off" id="oidcServerName" name="oidcServerName" value={name} onChange={(event)=>{updateOidcServerName(event.target.value)}} maxLength="50" className={nameErrBorder?"inputErrorBorder middle__input__border-oidc form-control-oidc form-control-custom-oidc validationKeydown preventSpecialChar create":" middle__input__border-oidc form-control-oidc form-control-custom-oidc validationKeydown preventSpecialChar create"} placeholder="Server Name"/>
                     </Fragment>
                     :<Fragment>
                         <span className="leftControl-oidc" title="Server Name">Server Name</span>
-                        <select value={name} onChange = {(event)=>{setName(event.target.value); oidcGetServerData(event.target.value);}} className={nameErrBorder?'selectErrorBorder adminSelect-oidc form-control-oidc':'adminSelect-oidc form-control-oidc'} id="oidcServerName" >
+                        <select value={name} onChange = {(event)=>{setName(event.target.value);oidcGetServerData(event.target.value);}} className={nameErrBorder?'selectErrorBorder adminSelect-oidc form-control-oidc':'adminSelect-oidc form-control-oidc'} id="oidcServerName" >
                             <option value="" disabled selected>Select Server</option>
                             {selBox.map((data,index)=>(
                                 <option key={index}  value={data}>{data}</option>

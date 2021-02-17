@@ -77,19 +77,19 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
                 <>
                     <div className="s__parallel_icon" onClick={()=>{updateExecAction()}}>
                         <img className={"s__parallel_icon__img"+ (execAction==="parallel" ? " s__selectedBrowser" : "" )}   src='static/imgs/ic-parallel.png' alt="Parallel Execution"/>
-                        <span className="thumbnail__title">Parallel Execution</span>
+                        <span className="s__thumbnail__title">Parallel Execution</span>
                     </div>
                     <div className="s__parallel_icon" onClick={()=>{updateExecEnv()}}>
                         <img className={"s__parallel_icon__img"+ (execEnv!=="default" ? " s__selectedBrowser" : "" )}   src='static/imgs/saucelabs.png' alt="SauceLabs Execution"/>
-                        <span className="thumbnail__title">SauceLabs Execution</span>
+                        <span className="s__thumbnail__title">SauceLabs Execution</span>
                     </div>
                     <div className="s__parallel_icon" onClick={()=>{updateSmartMode("smartModule")}}>
                         <img className={"s__parallel_icon__img"+ (smartMode==="smartModule" ? " s__selectedBrowser" : "" )}   src='static/imgs/ic-module-smart.png' alt="Module Smart Scheduling"/>
-                        <span className="thumbnail__title">Module Smart Scheduling</span>
+                        <span className="s__thumbnail__title">Module Smart Scheduling</span>
                     </div>
                     <div className="s__parallel_icon" onClick={()=>{updateSmartMode("smartScenario")}}>
                         <img className={"s__parallel_icon__img"+ (smartMode==="smartScenario" ? " s__selectedBrowser" : "" )}   src='static/imgs/ic-scenario-smart.png' alt="Scenario Smart Scheduling"/>
-                        <span className="thumbnail__title">Scenario Smart Scheduling</span>
+                        <span className="s__thumbnail__title">Scenario Smart Scheduling</span>
                     </div>
                 </>
             :null}

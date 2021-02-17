@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
 import {getUserDetails, provisions} from '../api';
+import ValidationExpression from '../../global/components/ValidationExpression';
 import ReactTooltip from 'react-tooltip';
 import { useHistory } from 'react-router-dom';
 import '../styles/IceProvisionForm.scss'
@@ -91,6 +92,11 @@ const IceProvisionForm = (props) => {
         setPopupState({show:false,title:"",content:""});
 	}
 
+	const updateIceName = (value) => {
+		value = ValidationExpression(value,"iceName")
+		props.setIcename(value);
+		verifyName(value)
+	}
 	
 	const copyTokenFunc = () =>{
 		const data = props.tokeninfoToken;
@@ -172,7 +178,7 @@ const IceProvisionForm = (props) => {
 				</div></div>
                 <div className='adminControl-ip'><div>
 					<span className="leftControl-ip" title="ICE Name">ICE Name</span>
-					<input type="text" autoComplete="off" id="icename" name="icename" value={props.icename} onChange={(event)=>{props.setIcename(event.target.value);verifyName(event.target.value)}} maxLength="100" className={icenameErrBorder?"inputErrorBorder border_input-ip form-control-ip form-control-custom-ip":"border_input-ip form-control-ip form-control-custom-ip"} placeholder="ICE Name"/>
+					<input type="text" autoComplete="off" id="icename" name="icename" value={props.icename} onChange={(event)=>{updateIceName(event.target.value)}} maxLength="100" className={icenameErrBorder?"inputErrorBorder border_input-ip form-control-ip form-control-custom-ip":"border_input-ip form-control-ip form-control-custom-ip"} placeholder="ICE Name"/>
 				</div></div>
                 <div className='userForm adminControl-ip'><div>
 					<span className="leftControl-ip" title="User">User</span>
