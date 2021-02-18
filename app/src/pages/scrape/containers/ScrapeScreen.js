@@ -53,6 +53,9 @@ const ScrapeScreen = ()=>{
 
     const fetchScrapeData = () => {
 		return new Promise((resolve, reject) => {
+            dispatch({type: actionTypes.SET_COMPAREDATA, payload: {}});
+            dispatch({type: actionTypes.SET_COMPAREOBJ, payload: {changedObj: [], notChangedObj: [], notFoundObj: []}});
+            dispatch({type: actionTypes.SET_COMPAREFLAG, payload: false});
             setOverlay("Loading...");
             
             let viewString = scrapeItems;
@@ -87,9 +90,6 @@ const ScrapeScreen = ()=>{
                         setOverlay("");
                         dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                         dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
-                        dispatch({type: actionTypes.SET_COMPAREDATA, payload: {}});
-                        dispatch({type: actionTypes.SET_COMPAREOBJ, payload: {changedObj: [], notChangedObj: [], notFoundObj: []}});
-                        dispatch({type: actionTypes.SET_COMPAREFLAG, payload: false});
                     }
                     else {
                         setScrapeItems([]);

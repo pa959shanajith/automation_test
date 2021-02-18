@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import LoginFields from "../components/LoginFields.js";
 import { SetProgressBar} from '../../global';
+import { persistor } from '../../../reducer';
 import StaticElements from '../components/StaticElements';
 
 /*
@@ -14,6 +15,7 @@ import StaticElements from '../components/StaticElements';
 const LoginPage = () => {
      
     useEffect(()=>{
+        persistor.purge();
         SetProgressBar('complete');
     }, []);
 

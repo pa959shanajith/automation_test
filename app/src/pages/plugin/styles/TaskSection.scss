@@ -108,59 +108,72 @@
     }
 }
 
-
 @media screen and (min-width: 1400px) and (min-height: 770px){
-    .active-tab{
-        border-top: .1vw solid #ddd;
-        border-left: .1vw solid #ddd;
-        border-right: .1vw solid #ddd;
-        border-bottom: .1vw solid #fff;
-        border-radius: .2vw .2vw 0 0;
-    }
-
-    .task-header{
-        margin: 0;
-        padding: .1vw .1vw .1vw 1.3vw;
-        border-radius: .6vw;
-    }
-    
-    .filter-ic, .search-ic{
-        height: 1.5vw;
-    }
-    
-    .task-ic-container{
-        border-radius: .6vw;
-        padding: .4vw;
-        margin: .3vw;
-        height: 1.5vw;
-        width: 1.5vw;
-    }
-    
-    .my-task{
-        flex-grow: 2;
-        font-size: 1.5vw;
-        margin-right: 1.6vw;
-    }
-    
-    .task-search-bar{
-        height: 2vw;
-        font-size: 1.6vw;
-        border-radius: .3vw;
-        padding-left: .3vw;
-    }
-    
-    .task-nav-bar{
-        margin-top: .8vw;
-        border-bottom: .1vw solid #ddd;
-    }
-    
-    .task-nav-item{
-        font-size: 1.45vw;
-        padding: .7vw .9vw;
-        margin-right: .6vw;
-        margin-bottom: -.1vw;
-        &:hover{
-            border-radius: .3vw .3vw 0 0;
-        }
+    .task-section{
+        width: 30%;
+        min-width: 100px;
     }
 }
+
+
+@media screen and (max-width: 1000px){
+    .task-section{
+        min-width: 30%;
+    }
+}
+
+// @media screen and (min-width: 1400px) and (min-height: 770px){
+//     .active-tab{
+//         border-top: .1vw solid #ddd;
+//         border-left: .1vw solid #ddd;
+//         border-right: .1vw solid #ddd;
+//         border-bottom: .1vw solid #fff;
+//         border-radius: .2vw .2vw 0 0;
+//     }
+
+//     .task-header{
+//         margin: 0;
+//         padding: .1vw .1vw .1vw 1.3vw;
+//         border-radius: .6vw;
+//     }
+    
+//     .filter-ic, .search-ic{
+//         height: 1.5vw;
+//     }
+    
+//     .task-ic-container{
+//         border-radius: .6vw;
+//         padding: .4vw;
+//         margin: .3vw;
+//         height: 1.5vw;
+//         width: 1.5vw;
+//     }
+    
+//     .my-task{
+//         flex-grow: 2;
+//         font-size: 1.5vw;
+//         margin-right: 1.6vw;
+//     }
+    
+//     .task-search-bar{
+//         height: 2vw;
+//         font-size: 1.6vw;
+//         border-radius: .3vw;
+//         padding-left: .3vw;
+//     }
+    
+//     .task-nav-bar{
+//         margin-top: .8vw;
+//         border-bottom: .1vw solid #ddd;
+//     }
+    
+//     .task-nav-item{
+//         font-size: 1.45vw;
+//         padding: .7vw .9vw;
+//         margin-right: .6vw;
+//         margin-bottom: -.1vw;
+//         &:hover{
+//             border-radius: .3vw .3vw 0 0;
+//         }
+//     }
+// }
