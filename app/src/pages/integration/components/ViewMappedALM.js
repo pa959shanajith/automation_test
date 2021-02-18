@@ -17,12 +17,12 @@ const ViewMappedALM=(props)=>{
                     { props.mappedfilesRes.length?
                     <Fragment>
                         <div className="alm-linkedTestset-box">
-                            <div className="leftQcStructure" style={{border:"none"}}>
+                            <div className="leftQcStructuremap" style={{border:"none"}}>
                                 {props.mappedfilesRes.map((e,i)=>(
                                 e.testscenarioname.map((element,idx)=>(
                                     <li className="mappedLis">{element}</li>))))}
                             </div>
-                            <div className="rightQcStructure" style={{border:"none"}}>
+                            <div className="rightQcStructuremap" style={{border:"none"}}>
                                 {props.mappedfilesRes.map((e,i)=>(
                                     <li className="mappedLis">{e.qctestcase}</li>
                                 ))}

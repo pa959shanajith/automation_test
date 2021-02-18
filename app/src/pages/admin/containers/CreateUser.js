@@ -7,6 +7,7 @@ import '../styles/CreateUser.scss'
 import CreateLanding from '../components/CreateLanding';
 import EditLanding from '../components/EditLanding';
 import useOnClickOutside from '../components/UseOnClickOutside'
+import ValidationExpression from '../../global/components/ValidationExpression';
 
 /*Component CreateUser
   use: defines Admin middle Section for create user
@@ -511,6 +512,22 @@ const CreateUser = (props) => {
         setPopupState({show:false,title:"",content:""});
     }
 
+    const passwordChange = (value) => {
+        value = ValidationExpression(value,"password")
+        dispatch({type:actionTypes.UPDATE_INPUT_PASSWORD,payload:value})
+    }
+
+    
+    const confirmPasswordChange = (value) => {
+        value = ValidationExpression(value,"password")
+        dispatch({type:actionTypes.UPDATE_INPUT_CONFIRMPASSWORD,payload:value})
+    }
+
+    const emailChange = (value) => {
+        value = ValidationExpression(value,"email")
+        dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:value})
+    }
+
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
@@ -527,10 +544,10 @@ const CreateUser = (props) => {
                 {(userConf.type === "inhouse")?
                     <Fragment>
                         <div className='leftControl adminControl'>
-                            <input value={userConf.passWord} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_PASSWORD,payload:event.target.value})}} type="password" autoComplete="new-password" name="passWord" id="password" maxLength="16" className={passwordAddClass?"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex inputErrorBorder" :"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex"} placeholder="Password" />
+                            <input value={userConf.passWord} onChange={(event)=>{passwordChange(event.target.value)}} type="password" autoComplete="new-password" name="passWord" id="password" maxLength="16" className={passwordAddClass?"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex inputErrorBorder" :"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex"} placeholder="Password" />
                         </div>
                         <div className='rightControl adminControl'>
-                            <input value={userConf.confirmPassword} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_CONFIRMPASSWORD,payload:event.target.value})}} type="password" autoComplete="new-password" name='confirmPassword' id='confirmPassword' maxLength="16" className={confirmPasswordAddClass?"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex inputErrorBorder" :"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex"}  placeholder="Confirm Password"/>
+                            <input value={userConf.confirmPassword} onChange={(event)=>{confirmPasswordChange(event.target.value)}} type="password" autoComplete="new-password" name='confirmPassword' id='confirmPassword' maxLength="16" className={confirmPasswordAddClass?"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex inputErrorBorder" :"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex"}  placeholder="Confirm Password"/>
                         </div>
                     </Fragment>
                     :null
@@ -538,7 +555,7 @@ const CreateUser = (props) => {
                 
                 {/* PRESENT FOR EACH USERTYPE */}
                 <div className='adminControl'>
-					<input value={userConf.email} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:event.target.value})}} type="email" autoComplete="off" name="email" id="email" maxLength="100" className={emailAddClass?"middle__input__border form-control__conv form-control-custom create inputErrorBorder":"middle__input__border form-control__conv form-control-custom create"} placeholder="Email Id"/>
+					<input value={userConf.email} onChange={(event)=>{emailChange(event.target.value)}} autoComplete="off" name="email" id="email" maxLength="100" className={emailAddClass?"middle__input__border form-control__conv form-control-custom create inputErrorBorder":"middle__input__border form-control__conv form-control-custom create"} placeholder="Email Id"/>
 				</div>
 				<div className="selectRole  adminControl role-padding" >
 					<label className="leftControl primaryRole">Primary Role</label>

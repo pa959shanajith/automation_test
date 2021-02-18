@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import {ScreenOverlay, PopupMsg } from '../../global' 
 import {getUserDetails, getCIUsersDetails, fetchICE} from '../api';
+import ValidationExpression from '../../global/components/ValidationExpression';
 import ReactTooltip from 'react-tooltip';
 import Datetime from "react-datetime";
 import moment from "moment";
@@ -123,7 +124,13 @@ const TokenMgmtForm = (props) => {
 		const tknlist = props.allTokens.map(e => e.name);
 		if (tknlist.indexOf(name) > -1)props.setNameErrBorder(true);
 		else props.setNameErrBorder(false);
-    }
+	}
+	
+	const updateTokenName = (value) => {
+		value = ValidationExpression(value,"tokenName")
+		props.setName(value);
+		verifyName(value)
+	}
 
     const copyTokenFunc = () =>{
 		const data = props.token;
@@ -210,7 +217,7 @@ const TokenMgmtForm = (props) => {
 				</div>
                 <div className='adminControl-tkn-mgmt'><div>
 					<span className="leftControl-tkn-mgmt" title="Token Name">Token Name</span>
-					<input type="text" autoComplete="off" id="tokenName" name="tokenName" onChange={(event)=>{props.setName(event.target.value);verifyName(event.target.value)}} value={props.name} maxLength="100" className={props.nameErrBorder?"inputErrorBorder border_input-tkn-mgmt form-control-tkn-mgmt form-control-custom-tkn-mgmt":"border_input-tkn-mgmt form-control-tkn-mgmt form-control-custom-tkn-mgmt"} placeholder="Token Name"/>
+					<input type="text" autoComplete="off" id="tokenName" name="tokenName" onChange={(event)=>{updateTokenName(event.target.value)}} value={props.name} maxLength="100" className={props.nameErrBorder?"inputErrorBorder border_input-tkn-mgmt form-control-tkn-mgmt form-control-custom-tkn-mgmt":"border_input-tkn-mgmt form-control-tkn-mgmt form-control-custom-tkn-mgmt"} placeholder="Token Name"/>
 				</div></div>
                 <div className='adminControl-tkn-mgmt1'><div>
 					<span className="adminControl-tkn-mgmt1__title leftControl-tkn-mgmt" title="Token Expiry">Token Expiry</span>

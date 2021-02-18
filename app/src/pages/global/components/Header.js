@@ -71,31 +71,6 @@ const Header = () => {
 				// 	}).show();
                 // }
             });
-            const executionDATA =(result) => {
-                var data = result.status
-                var testSuiteIds = result.testSuiteDetails;
-                var msg = "";
-                testSuiteIds[0]["projectidts"] = testSuiteIds[0]["projectid"];
-                dispatch({type: UPDATE_REPORTDATA, payload: result});
-                msg = testSuiteIds[0]["testsuitename"]
-                
-                if (data == "Terminate") {
-                    setShowAfterExecution({show:true, title:msg,content: "Execution terminated - By Program." })
-                } 
-                else if (data == "UserTerminate") {
-                    setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By User." })
-                } 
-                else if (data == "unavailableLocalServer") {
-                    setShowExecution_Pop({'title': 'Execute Test Suite', 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
-                } 
-                else if (data == "success") {
-                    setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
-                   
-                } else if(data == "Completed"){
-                    setShowExecution_Pop({'title': 'Scheduled Execution Complete', 'content':msg});
-                }
-                else setShowExecution_Pop({'title': "Execute Test Suite", 'content':"Failed to execute."});
-            }
             socket.on("result_ExecutionDataInfo",(result)=> {
                 executionDATA(result);
             });
@@ -115,6 +90,32 @@ const Header = () => {
             }
         }
     }, [userInfo, selectedRole]);
+
+    const executionDATA = (result) => {
+        var data = result.status
+        var testSuiteIds = result.testSuiteDetails;
+        var msg = "";
+        testSuiteIds[0]["projectidts"] = testSuiteIds[0]["projectid"];
+        dispatch({type: UPDATE_REPORTDATA, payload: result});
+        msg = testSuiteIds[0]["testsuitename"]
+        
+        if (data == "Terminate") {
+            setShowAfterExecution({show:true, title:msg,content: "Execution terminated - By Program." })
+        } 
+        else if (data == "UserTerminate") {
+            setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By User." })
+        } 
+        else if (data == "unavailableLocalServer") {
+            setShowExecution_Pop({'title': 'Execute Test Suite', 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
+        } 
+        else if (data == "success") {
+            setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
+           
+        } else if(data == "Completed"){
+            setShowExecution_Pop({'title': 'Scheduled Execution Complete', 'content':msg});
+        }
+        else setShowExecution_Pop({'title': "Execute Test Suite", 'content':"Failed to execute."});
+    }
 
     const naviPg = () => {
         

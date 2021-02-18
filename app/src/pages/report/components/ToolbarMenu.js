@@ -32,7 +32,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
         })()
     },[])
     useEffect(()=>{
-        if(reportData.projectid && projData.length >0){
+        if(reportData && reportData.projectid && projData.length >0){
             try{
                 var data = {}
                 var cyclData = {}

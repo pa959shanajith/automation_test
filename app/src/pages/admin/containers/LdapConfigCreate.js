@@ -1,9 +1,9 @@
-import React, { Fragment, useState} from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global'
-import { useHistory } from 'react-router-dom';
+import React, { Fragment} from 'react';
+import {ScrollBar} from '../../global'
 import '../styles/LdapConfigCreate.scss'
 import LdapConfigurationForm from '../components/LdapConfigurationForm';
 import LdapDataMapping from '../components/LdapDataMapping';
+import ValidationExpression from '../../global/components/ValidationExpression';
 
 /*Component LdapConfigCreate
   use: defines Admin middle Section for create Ldap Configuration
@@ -11,6 +11,11 @@ import LdapDataMapping from '../components/LdapDataMapping';
 */
 
 const LdapConfigCreate = (props) => {
+
+    const updateLdapServerName = (value) => {
+        value = ValidationExpression(value,"ldapServerName")
+        props.setServerName(value)
+    }
 
     return (
         <Fragment>
@@ -26,7 +31,7 @@ const LdapConfigCreate = (props) => {
                         <h4 className='title-ldap' >LDAP Server Details</h4>
                         <div className='adminControl-ldap'><div>
                             <span className="leftControl-ldap" title="Server Name">Server Name</span>
-                            <input type="text" autocomplete="off" id="ldapServerName" name="ldapServerName" value={props.serverName} onChange={(event)=>{props.setServerName(event.target.value)}} maxlength="50" className={"form-control-ldap form-control-custom-ldap input_border-ldap"+ (props.ldapServerNameErrBor ? " inputErrorBorder" : "")}  placeholder="Server Name"/>
+                            <input type="text" autocomplete="off" id="ldapServerName" name="ldapServerName" value={props.serverName} onChange={(event)=>{updateLdapServerName(event.target.value)}} maxlength="50" className={"form-control-ldap form-control-custom-ldap input_border-ldap"+ (props.ldapServerNameErrBor ? " inputErrorBorder" : "")}  placeholder="Server Name"/>
                         </div></div>
                     
                         <LdapConfigurationForm {...props}  />
