@@ -72,7 +72,7 @@ const TaskPanel = (props) => {
                         console.log("Error updating task status " + (error.data));
                     });
         }
-        taskObj.testSuiteDetails = taskSuiteDetails;
+        taskObj.testSuiteDetails = taskSuiteDetails; 
         taskObj.scenarioFlag = dataobj.scenarioflag;
         taskObj.assignedTestScenarioIds = dataobj.assignedtestscenarioids;
         taskObj.screenId = dataobj.screenid;
