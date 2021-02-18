@@ -16,11 +16,16 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
     const [projectAppType,setProjectApptype] = useState({})
     const [initialTableList,setInitialTableList] = useState([])
     const [popup,setPopup] = useState({show:false})
+    const [arr,setArr] = useState([])
     
     useEffect(()=>{
         if(readTestSuite !== "")  readTestSuiteFunct();
     }, [readTestSuite, updateAfterSave]);
     
+    useEffect(()=>{
+        setArr(eachData)
+    },[eachData])
+
     useEffect(()=>{
         updateSelectAllBatch();
     }, [selectAllBatch]);
@@ -106,26 +111,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                         initialTableList[m].executestatus = exeStatus;
                     }
                 }
-                //finding distinct projects : helpful for apptype column
-                var flags = [], output = [];
-                for(var j=0; j<eachData1.length; j++) {
-                    for(var i=0; i<eachData1[j].projectnames.length; i++) {
-                        if( flags[eachData1[j].projectnames[i]]) continue;
-                        flags[eachData1[j].projectnames[i]] = true;
-                        output.push(eachData1[j].projectnames[i]);
-                    }
-                }
-                var projectApptype = {};
-                keys.map(itm => {
-                    for(var i =0 ; i<output.length; i++){
-                        for( const [key,value] of Object.entries(filter_data.projectDict)){
-                            if(output[i] === value){
-                                projectApptype[output[i]]= Object.keys(filter_data.project[key].appType)[0];
-                            } 
-                        }
-                    }
-                });
-                setProjectApptype(projectApptype);
+                distinctProjectType(eachData1, keys);
                 setEachData(eachData1);
                 setEachDataFirst(eachData2);
                 updateScenarioStatus(eachData1);
@@ -133,6 +119,29 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
         }catch(error){
             console.log(error);
         }
+    }
+
+    const distinctProjectType = (Data, keys) => {
+        //finding distinct projects : helpful for apptype column
+        var allProjects = [];
+        for(var j=0; j<Data.length; j++) {
+            for(var i=0; i<Data[j].projectnames.length; i++) {
+                allProjects.push(Data[j].projectnames[i]);
+            }
+        }
+        var distinctProjects = [...new Set(allProjects)];
+        var distinctAppType = {};
+        keys.map(itm => {
+            for(var i =0 ; i<distinctProjects.length; i++){
+                for( const [key,value] of Object.entries(filter_data.projectDict)){
+                    if(distinctProjects[i] === value){
+                        distinctAppType[distinctProjects[i]]= Object.keys(filter_data.project[key].appType)[0];
+                    } 
+                }
+            }
+        });
+        setArr([])
+        setProjectApptype(distinctAppType);
     }
 
     const changeParamPath = (m,count,value) => {
@@ -169,11 +178,11 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                             <ScrollBar thumbColor="#321e4f">
                                 <div className="e__batchSuites">
                                 <ScrollBar  thumbColor="rgb(51,51,51)" trackColor="rgb(211, 211, 211)" >
-                                    {eachData.map((rowData,m)=>(
-                                        <div className="executionTableDnd" id={"batch_'"+m} >
+                                    {arr.map((rowData,m)=>(
+                                        <div key={m} className="executionTableDnd" id={"batch_'"+m} >
                                             <div className='suiteNameTxt' id={"page-taskName_'" + m}><span title={rowData.testsuitename}  className='taskname'> {rowData.testsuitename} </span></div>
                                             <div id={'exeData_"' + m} className='exeDataTable testSuiteBatch'>
-                                                <table id={'executionDataTable_"' + m} className='executionDataTable' cellspacing='0' cellpadding='0'>
+                                                <table id={'executionDataTable_"' + m} className='executionDataTable' cellSpacing='0' cellPadding='0'>
                                                     <thead>
                                                         <tr>
                                                             <th className='e__contextmenu' id='contextmenu'></th>
@@ -185,17 +194,16 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                                                             <th className='e__projectName'>Project Name</th>
                                                             <th className='e__apptype' >App Type</th>
                                                         </tr>
-                                                        <input type='hidden' value={rowData.testsuiteid }/>
                                                     </thead>
                                                     <tbody className={eachData.length>1?'e__testScenarioScroll':""}>
                                                         <ScrollBar thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                         {rowData.scenarioids.map((sid,count)=>(
-                                                            <tr id={count} className={(initialTableList[m]!==undefined && initialTableList[m].executestatus[count]=== 0) ? "e__table_row_status" : ""}>
+                                                            <tr id={count} key={count} className={(initialTableList[m]!==undefined && initialTableList[m].executestatus[count]=== 0) ? "e__table_row_status" : ""}>
                                                                 <td title={count} className='tabeleCellPadding e__contextmenu' id={count}>{count+1}</td>
                                                                 <td  className='tabeleCellPadding exe-ExecuteStatus'>
                                                                     <input id={"executestatus_"+m+"_"+count} checked={rowData.executestatus[count]!== undefined && rowData.executestatus[count]!== 0 ? true:false} onChange={()=>{changeExecutestatus(m,count,eachData,batchStatusCheckbox,setEachData)}} type='checkbox' title='Select to execute this scenario' className='doNotExecuteScenario e-execute'/>
                                                                 </td>
-                                                                <td title={rowData.scenarionames[count]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(rowData.scenarionames[count],rowData.scenarioids[count]);setshowModal(true);}} sId={rowData.scenarioids[count]} >{rowData.scenarionames[count]}</td>
+                                                                <td title={rowData.scenarionames[count]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(rowData.scenarionames[count],rowData.scenarioids[count]);setshowModal(true);}}>{rowData.scenarionames[count]}</td>
                                                                 <td className="tabeleCellPadding exe-dataParam"><input className="e__getParamPath" type="text" onChange={(event)=>{changeParamPath(m,count,event.target.value)}} value={rowData.dataparam[count].trim()}/></td>
                                                                 <td className="tabeleCellPadding exe-conditionCheck"><select onChange={(event)=>{conditionUpdate(m,count,event.target.value)}} value={JSON.parse(rowData.condition[count])} className={"conditionCheck form-control"+(((rowData.condition[count]===0 || rowData.condition[count]=== "0"))?" alertRed":" alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </td>
                                                                 <td title={rowData.projectnames[count]}  className='tabeleCellPadding projectName'>{rowData.projectnames[count]}</td>
