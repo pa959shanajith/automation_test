@@ -2651,6 +2651,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			for(var i=0;i<viewString.view.length;i++){
 				if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType ){
 					objType = viewString.view[i].objectType[0].toUpperCase() + viewString.view[i].objectType.slice(1,viewString.view[i].objectType.length);
+					if (objType == "Unable to recognize object type") objType = "unrecognizableobject";
 					break;
 				}else if(obj_xpath == viewString.view[i].xpath && !viewString.view[i].objectType ){
 					objType = "unrecognizableobject";
