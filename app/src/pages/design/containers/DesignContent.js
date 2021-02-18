@@ -287,7 +287,7 @@ const DesignContent = props => {
                             
                             if(props.current_task.appType.toLowerCase()==="web" && Object.keys(modified).length !== 0){
                                 let scrape_data = {};
-                                let { appType, screenId, projectId, testCaseId } = props.current_task;
+                                let { appType, projectId, testCaseId, versionnumber } = props.current_task;
                                 
                                 DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
                                 .then(res => {
@@ -304,17 +304,18 @@ const DesignContent = props => {
                                         'deletedObj': [],
                                         'modifiedObj': modifiedObjects,
                                         'addedObj': {...scrape_data, view: []},
-                                        'screenId': screenId,
+                                        'testCaseId': testCaseId,
                                         'userId': userInfo.user_id,
                                         'roleId': userInfo.role,
-                                        'param': 'saveScrapeData'
+                                        'versionnumber': versionnumber,
+                                        'param': 'DebugModeScrapeData'
                                     }
                                     
                                     DesignApi.updateScreen_ICE(params)
                                     .then(data1 => {
                                         if (data1 === "Invalid Session") return RedirectPage(history);
                                         
-                                        if (data1 === "success") {            
+                                        if (data1 === "Success") {            
                                             fetchTestCases()
                                             .then(msg=>{
                                                 setChanged(false);

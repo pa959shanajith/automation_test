@@ -361,8 +361,8 @@ const TaskBox = (props) => {
                 </div>
                 <div id='ct-submitTask'>
                     {(assignbtn.reassign)?
-                    <span id='unassign-btn' tabIndex={'0'} onClick={()=>unAssign(true)} className={(assignbtn.disable)?'disableButton':''}>Reassign</span>:
-                    <span id='unassign-btn' tabIndex={'0'} onClick={()=>unAssign(false)} className={(assignbtn.disable)?'disableButton':''}>Unassign</span>
+                    <span id='unassign-btn' tabIndex={'0'}  onKeyPress={()=>unAssign(true)} onClick={()=>unAssign(true)} className={(assignbtn.disable)?'disableButton':''}>Reassign</span>:
+                    <span id='unassign-btn' tabIndex={'0'}  onKeyPress={()=>unAssign(false)} onClick={()=>unAssign(false)} className={(assignbtn.disable)?'disableButton':''}>Unassign</span>
                     }
                     <span id='task-ok' tabIndex={'0'} onClick={addTask} onKeyPress={addTask}>Ok</span>
                 </div>

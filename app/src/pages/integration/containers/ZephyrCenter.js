@@ -85,6 +85,7 @@ const callViewMappedFiles=async()=>{
     setMappedFilesRes(response);
     setBlockui({show:false})
 }
+
   const content =()=>{
     return(
         <ContentZephyr
@@ -112,7 +113,7 @@ const footer=()=>{
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
         {props.viewmappedFiles ? <ViewMappedZephyr mappedfilesRes={mappedfilesRes}/> :
         <div className="integration_middleContent">
-            <div className="middle_holder">
+            {/* <div className="middle_holder"> */}
             {props.zephyrClicked?
                 <Zephyr 
                     domainDetails={domainDetails}
@@ -136,7 +137,8 @@ const footer=()=>{
                     : null
                 }
             </div>
-        </div>}
+        // </div>
+        }
         </Fragment> 
     )
 }

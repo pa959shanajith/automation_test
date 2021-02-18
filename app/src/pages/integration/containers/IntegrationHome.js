@@ -29,6 +29,7 @@ const  Integrations=()=>{
                     setqTestClicked={setqTestClicked} 
                     setPopUpEnable={setPopUpEnable}
                     setViewMappedFiles={setViewMappedFiles}
+                    viewmappedFiles={viewmappedFiles}
                     setAlmClicked={setAlmClicked}
                     setloginAlm={setloginAlm}
                     qTestClicked={qTestClicked}

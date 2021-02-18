@@ -15,8 +15,8 @@ const ViewMappedFiles=(props)=>{
                     </div>
                     {props.mappedFilesICERes.length?
                     props.mappedFilesICERes.map((e,i)=>(
-                    <Fragment><div className="leftQcStructure" style={{border:"none"}}><li className="mappedLis">{e.qtestsuite}</li></div>
-                    <div className="rightQcStructure" style={{border:"none"}}><li className="mappedLis">{e.testscenarioname}</li></div></Fragment>
+                    <Fragment><div className="leftQcStructuremap" style={{border:"none"}}><li className="mappedLis">{e.qtestsuite}</li></div>
+                    <div className="rightQcStructuremap" style={{border:"none"}}><li className="mappedLis">{e.testscenarioname}</li></div></Fragment>
                     )) : null}
                     
                     {/* <div className="hrBetween"></div> */}
