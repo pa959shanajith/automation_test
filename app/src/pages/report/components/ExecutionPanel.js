@@ -100,6 +100,24 @@ const dateASC = (dateArray)=> {
         if (new Date(gDate + " " + timeA) >= new Date(mDate + " " + timeB)) return 1;
         if (new Date(gDate + " " + timeA) <= new Date(mDate + " " + timeB)) return -1;
     })
+    var a = [...dateArray]
+    a.map((e,i)=>{
+        var startDat = (e.start_time.split(' ')[0]).split("-")
+        var startTym = (e.start_time.split(' ')[1]).split(":")
+        var sD = ("0" + startDat[0]).slice(-2) + "-" + ("0" + startDat[1]).slice(-2) + "-" + startDat[2];
+        var sT = ("0" + startTym[0]).slice(-2) + ":" + ("0" + startTym[1]).slice(-2);
+        if (e.end_time == '-') {
+            var eD = '-';
+            var eT = '';
+        } else {
+            var endDat = (e.end_time.split(' ')[0]).split("-")
+            var endTym = (e.end_time.split(' ')[1]).split(":")
+            var eD = ("0" + endDat[0]).slice(-2) + "-" + ("0" + endDat[1]).slice(-2) + "-" + endDat[2];
+            var eT = ("0" + endTym[0]).slice(-2) + ":" + ("0" + endTym[1]).slice(-2);
+        }
+        dateArray[i].start_time =  sD + " " + sT 
+        dateArray[i].end_time =  eD + " " + eT 
+    })
     return dateArray
 }
 
