@@ -51,6 +51,7 @@ const EmailConfig = ({resetMiddleScreen}) => {
             inputRef.toggleUppdate.current.disabled = true
             inputRef.toggleStatus.current.disabled = true
             inputRef.toggleTest.current.disabled = true
+            fn.showAll();
         }
     },[inputRef])
     const onSelectProvider = () => {
@@ -209,13 +210,17 @@ const clickToggle = async(servername,action,setLoading,displayError,onSelectProv
     }
 }
 
-const selectProvider = async({inputRef,showPool,showAuth,showProxCred,showProxUrl,displayError,setLoading}) =>{
+const selectProvider = async({inputRef,showPool,showAuth,showAll,showProxCred,showProxUrl,displayError,setLoading}) =>{
     var arg = {"action":"provider","channel":"email","args":"smtp"}
     try{
         setLoading('Loading ...');
         var data = await getNotificationChannels(arg);
         if(data.error){displayError(data.error);return;}
-        if(data === 'empty'){inputRef.toggleUppdate.disabled=false;setLoading(false);return;}
+        if(data === 'empty'){
+            inputRef.toggleUppdate.current.disabled=false;
+            setLoading(false);
+            return;
+        }
         inputRef.toggleUppdate.current.innerText = 'Update'
         inputRef.servername.current.value = data.name
         if(data.name)inputRef.servername.current.readOnly = true
@@ -272,8 +277,8 @@ const selectProvider = async({inputRef,showPool,showAuth,showProxCred,showProxUr
 
 const factoryFn = (inputRef) =>{
     const showAuth = () => {
-        inputRef.authname.current.disabled = inputRef.selectauth.current.value === 'none'
-        inputRef.authpassword.current.disabled = inputRef.selectauth.current.value === 'none'
+        inputRef.authname.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt")
+        inputRef.authpassword.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt")
     }
     const showProxCred = () =>{
         inputRef.proxyuser.current.disabled = !inputRef.checkproxycred.current.checked
@@ -286,7 +291,13 @@ const factoryFn = (inputRef) =>{
         inputRef.maxconnection.current.disabled =!inputRef.checkboxpool.current.checked 
         inputRef.maxmessages.current.disabled = !inputRef.checkboxpool.current.checked 
     }
-    return {showPool,showAuth,showProxCred,showProxUrl}
+    const showAll = () => {
+        showAuth();
+        showPool();
+        showProxUrl();
+        showProxCred();
+    }
+    return {showPool,showAuth,showProxCred,showProxUrl,showAll}
 }
 
 const getConfObj = (inputRef) => {
