@@ -913,7 +913,7 @@ export const getPools = async(data) => {
             return {error:'invalid session'};
         }
         if(res.status===200 && res.data !== "fail"){ 
-            if(res.data === 'empty' || Object.keys(res.data).length<1) return {error:"There are no users created yet."}           
+            if(res.data === 'empty' || Object.keys(res.data).length<1) return {error:"There are no ICE pools created yet."}           
             return res.data;
         }
         console.error(res.data)
