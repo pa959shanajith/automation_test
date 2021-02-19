@@ -91,7 +91,7 @@ const EditIrisObject = props => {
                         <div className="ss__ei_img_panel">
                             <span>Object Image</span>
                             <div className="ss__ei_img_box">
-                                <img className="ss__ei_img" src={`data:image/PNG;base64,${props.utils.cord.substring(2, props.utils.cord.length - 2)}`}/>
+                                <img className="ss__ei_img" src={`data:image/PNG;base64,${props.utils.cord.substring(2, props.utils.cord.length - 1)}`}/>
                             </div>
                         </div>
                     </div>
