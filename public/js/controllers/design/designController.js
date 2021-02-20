@@ -2556,6 +2556,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var task = JSON.parse(window.localStorage['_CT']);
 		var identified_obj_type = objType.toLowerCase();
 		var user_obj_type = $('#objectType').val();
+
+		var app_type = task.appType;
+		app_type = 'saveirisimage_'+app_type;
+		
 		if(user_obj_type!=null && user_obj_type != identified_obj_type){
 			for(var i=0;i<viewString.view.length;i++){
 				if(viewString.view[i].xpath == obj_xpath){
@@ -2570,13 +2574,29 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				.then(function (val) {
 					$("#dialog-irisObject").find("button.close").click();
 					if(val === 'success'){
-						openDialog("IRIS Object Details","Submitted Successfully.");
 						for(var i=0;i<viewString.view.length;i++){
 							if(viewString.view[i].xpath == obj_xpath){
 								viewString.view[i].objectType = user_obj_type;
 								break;
 							}
 						}
+						custObjProps=[]
+						custObjProps.push(app_type)
+						custObjProps.push(obj_cord)
+						custObjProps.push(user_obj_type)
+						DesignServices.userObjectElement_ICE(custObjProps)
+							.then(function (datairis) {
+								if (datairis == "unavailableLocalServer") {
+									openDialog("IRIS Object Details", "Submitted successfully but failed to save IRIS image, ICE not available.")
+								} else if (datairis == "Invalid Session") {
+									return $rootScope.redirectPage();
+								} else if (datairis == "fail") {
+									openDialog("IRIS Object Details", "Submitted successfully but failed to save IRIS image.")
+								} else{
+									openDialog("IRIS Object Details","Submitted Successfully. IRIS image saved.");
+									console.log("success!::::" + datairis);
+								}
+						}, function (error) { });
 					}
 					else if(val=='unsavedObject') openDialog("IRIS Object Details","Please save the object first.");
 					else{
@@ -2588,7 +2608,32 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 		else{
 			$("#dialog-irisObject").find("button.close").click();
-			openDialog("IRIS Object Details","Submitted Successfully.");
+			success_flag = true;
+			for(var i=0;i<viewString.view.length;i++){
+				if(viewString.view[i].xpath == obj_xpath){
+					obj_cord = viewString.view[i].cord;
+					if("_id" in viewString.view[i]){obj_id = viewString.view[i]._id;}
+					break;
+				}
+			}
+			custObjProps=[]
+			custObjProps.push(app_type)
+			custObjProps.push(obj_cord)
+			custObjProps.push(user_obj_type)
+			DesignServices.userObjectElement_ICE(custObjProps)
+				.then(function (datairis) {
+					if (datairis == "unavailableLocalServer") {
+						openDialog("IRIS Object Details", "Submitted successfully but failed to save IRIS image, ICE not available.")
+					} else if (datairis == "Invalid Session") {
+						return $rootScope.redirectPage();
+					} else if (datairis == "fail") {
+						openDialog("IRIS Object Details", "Submitted successfully but failed to save IRIS image.")
+					} else{
+						openDialog("IRIS Object Details","Submitted Successfully. IRIS image saved.");
+						console.log("success!::::" + datairis);
+						obj=JSON.stringify(datairis)
+					}
+			}, function (error) { });
 		}
 	}
 	
