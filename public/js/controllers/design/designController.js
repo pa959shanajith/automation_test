@@ -2556,10 +2556,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var task = JSON.parse(window.localStorage['_CT']);
 		var identified_obj_type = objType.toLowerCase();
 		var user_obj_type = $('#objectType').val();
-
-		var app_type = task.appType;
-		app_type = 'saveirisimage_'+app_type;
-		
+		var app_type = 'saveirisimage_'+task.appType;
 		if(user_obj_type!=null && user_obj_type != identified_obj_type){
 			for(var i=0;i<viewString.view.length;i++){
 				if(viewString.view[i].xpath == obj_xpath){
@@ -2580,10 +2577,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								break;
 							}
 						}
-						custObjProps=[]
-						custObjProps.push(app_type)
-						custObjProps.push(obj_cord)
-						custObjProps.push(user_obj_type)
+						var custObjProps=[app_type, obj_cord, user_obj_type];
 						DesignServices.userObjectElement_ICE(custObjProps)
 							.then(function (datairis) {
 								if (datairis == "unavailableLocalServer") {
@@ -2616,10 +2610,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					break;
 				}
 			}
-			custObjProps=[]
-			custObjProps.push(app_type)
-			custObjProps.push(obj_cord)
-			custObjProps.push(user_obj_type)
+			var custObjProps=[app_type, obj_cord, user_obj_type];
 			DesignServices.userObjectElement_ICE(custObjProps)
 				.then(function (datairis) {
 					if (datairis == "unavailableLocalServer") {
@@ -2721,11 +2712,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			}
 			$('#iristag').append('<span><b style="text-transform: capitalize;">Object Tag : ' + obj_tag + '</b></span>')
 		}else{
-			custObjProps=[]
-			custObjProps.push('decrypt')
-			custObjProps.push(ele.attr('data-xpath'))
-			custObjProps.push(ele.attr('data-url'))
-			custObjProps.push(ele.attr('data-tag'))
+			var custObjProps=['decrypt', ele.attr('data-xpath'), ele.attr('data-url'), ele.attr('data-tag')];
 			DesignServices.userObjectElement_ICE(custObjProps)
 			.then(function (data) {
 				if (data == "unavailableLocalServer") {
@@ -3714,11 +3701,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}else if(param=='decrypt'){
 			//$scope.errorMessage = "";
 			$('.errorMessage').val('');
-			custObjProps=[]
-			custObjProps.push('decrypt')
-			custObjProps.push($(e.target.parentElement.parentElement).attr('data-xpath'))
-			custObjProps.push($(e.target.parentElement.parentElement).attr('data-url'))
-			custObjProps.push($(e.target.parentElement.parentElement).attr('data-tag'))
+			var ele = $(e.target.parentElement.parentElement);
+			var custObjProps=['decrypt', ele.attr('data-xpath'), ele.attr('data-url'), ele.attr('data-tag')];
 			DesignServices.userObjectElement_ICE(custObjProps)
 			.then(function (data) {
 				if (data == "unavailableLocalServer") {
@@ -3759,7 +3743,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	
 	//Save User Object
 	$(document).on("click", ".btn-defaultsave", function () {
-			custObjProps=[];
+			var custObjProps=[];
 			custObjNames=[];
 			var flag="false";
 			custObjProps.push('encrypt');
