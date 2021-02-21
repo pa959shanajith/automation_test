@@ -63,6 +63,18 @@ default_sub.on("message", (channel, message) => {
 	case "webscrape":
 		mySocket.emit("webscrape", data.data);
 		break;
+	
+	case "LAUNCH_DESKTOP_iris":
+		mySocket.emit("LAUNCH_DESKTOP", data.data);
+		break;
+	
+	case "LAUNCH_OEBS_iris":
+		mySocket.emit("LAUNCH_OEBS", data.data);
+		break;
+		
+	case "LAUNCH_SAP_iris":
+		mySocket.emit("LAUNCH_SAP", data.data);
+		break;
 
 	case "focus":
 		mySocket.emit("focus", data.focusParam, data.elementURL, data.appType);
