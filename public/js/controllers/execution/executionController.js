@@ -111,7 +111,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					for (var k = 0; k < rowData.scenarioids.length; k++) {
 						let accessibilityTesting = "Disable";
 						if (rowData.accessibilityTestingMap && (rowData.scenarioids[k] in rowData.accessibilityTestingMap) && (rowData.accessibilityTestingMap[rowData.scenarioids[k]] == "Enable")){
-							accessibilityTesting = "Enable"
+							accessibilityTesting = "Enable";
+						} else if (rowData.accessibilityTestingMap && (rowData.scenarioids[k] in rowData.accessibilityTestingMap) && (rowData.accessibilityTestingMap[rowData.scenarioids[k]] == "Exclusive")){
+							accessibilityTesting = "Exclusive"
 						}
 						if (current_task.scenarioFlag == 'True') {
 							if (rowData.scenarioids[k] == assignedTestScenarioId) {
@@ -163,7 +165,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							row.append($('<td style="width:17%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="' + getEachScenario[i].condition + '" selected>True</option><option value="0">False</option></select> </td>'));
 						}
 						row.append($("<td class='projectName' title=" + getEachScenario[i].projectnames + " style='width:16%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
-						if (getEachScenario[i].accessibilityTesting == "Enable"){
+						if (getEachScenario[i].accessibilityTesting != "Disable"){
 							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">4 Standards Selected</span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ><input value="A" checked class = "acc-chk" type="checkbox"/><span style="margin-left: 5px;" id="methodA"></span>A</label></li><li><label title="method AA"  ><input class = "acc-chk" value="AA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAA"></span>AA</label></li><li><label title="method 508"  ><input class = "acc-chk" value="508" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ><input class = "acc-chk" value="Best Practice" checked type="checkbox"/><span style="margin-left: 5px;" id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
 						}
 						else{

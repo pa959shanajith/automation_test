@@ -159,7 +159,10 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			}, 300);
 		} else if(data == "Completed"){
 			openHeaderModalPopup("executeGlobalModal","Scheduled Execution Complete", msg);
-		}else openHeaderModalPopup("executeGlobalModal","Execute Test Suite", "Failed to execute.");
+		} else if(data == 'accessibilityTestingSuccess') {
+			openHeaderModalPopup("executeGlobalModal","Accessibility Testing ", msg + ": Accessibility Testing completed Successfully.");
+		}
+		else openHeaderModalPopup("executeGlobalModal","Execute Test Suite", "Failed to execute.");
 	});
 
 	

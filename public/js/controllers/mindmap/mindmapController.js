@@ -501,7 +501,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 "attributes": ["bn", "at", "rw", "sd", "ed", "reestimation", "pg"]
             },
             "scenarios": {
-                "task": ["Execute Scenario"],
+                "task": ["Execute Scenario","Execute Scenario with Accessibility", "Execute Scenario Accessibility Only"],
                 "attributes": ["at", "rw", "sd", "ed", "reestimation", "pg", "cx"]
             },
             "screens": {
@@ -864,7 +864,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
             'opacity': !( n._id == null || n._id == undefined) ? 1 : 0.5,
             'title': n.name,
-            'ac': n.accessibilityTesting || "None",
+            'ac': n.accessibilityTesting || "Disable",
             'name': n.display_name,
             'img_src': img_src,
             '_id': n._id || null,
@@ -1044,12 +1044,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         if ($('.version-list') !== undefined)
             tvn = $('.version-list').val();
+        let accessibilityToggle = "Disable"
+        if  ($('#ct-assignTask').val() == "Execute Scenario with Accessibility") accessibilityToggle = "Enable"
+        else if ($('#ct-assignTask').val() == "Execute Scenario Accessibility Only") accessibilityToggle = "Exclusive"
         var tObj = {
             tvn: tvn,
             t: $('#ct-assignTask').val(),
             bn: $('#ct-executeBatch').val(),
             at: $('#ct-assignedTo').val(),
-            ac: $('#ct-accessibilityTesting').val() ? $('#ct-accessibilityTesting').val() : '', 
+            ac: accessibilityToggle, 
             rw: /*(d3.select('#ct-assignRevw')[0][0])?*/ $('#ct-assignRevw').val() /*:null*/ ,
             sd: $('#startDate').val(),
             ed: $('#endDate').val(),
@@ -1538,7 +1541,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
             det: (nt) ? nt.details : '',
             cx: (nt) ? nt.complexity : undefined,
-            ac: (nt) ? nt.accessibility_testing : '',
+            ac: (nt) ? nt.accessibility_testing : 'Disable',
             _id:(nt)? nt._id:null
         };
 
@@ -1557,13 +1560,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
 
         $("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected');
-
-        if (tObj.det === null || tObj.det.trim() == "") {
-            d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name);
-        } else {
-            d3.select('#ct-assignDetails').property('value', tObj.det);
+        if(p.attr('data-nodetype') == 'scenarios' && apptype === "5db0022cf87fdec084ae49b6"){
+            if(dNodes[pi] && 'accessibilityTesting' in dNodes[pi] && dNodes[pi]['accessibilityTesting'] == "Enable"){
+                $('#ct-assignTask')[0].options[1].selected = true;
+            }else if(dNodes[pi] && 'accessibilityTesting' in dNodes[pi] && dNodes[pi]['accessibilityTesting'] == "Exclusive"){
+                $('#ct-assignTask')[0].options[2].selected = true;
+            }
         }
-
+        tObj.t = $('#ct-assignTask')[0].value
+        d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name);
         $("#ct-assignTask").change(function() {
             if ($("#ct-assignTask").val() == 'Execute Batch') {
                 $('#ct-executeBatch').removeAttr("disabled");
@@ -1572,20 +1577,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#ct-executeBatch').val('');
             }
         })
-        if(p.attr('data-nodetype') == 'scenarios' && apptype === "5db0022cf87fdec084ae49b6"){
-            v = u.append('li');
-            v.append('span').attr('class', 'ct-assignItem fl-left').html('Accessibility');
-            v.append('select').attr('id', 'ct-accessibilityTesting').style('width',"64%").style('float',"right");
-            if(dNodes[pi] && 'accessibilityTesting' in dNodes[pi] && dNodes[pi]['accessibilityTesting'] == "Enable"){
-                $('#ct-accessibilityTesting').append("<option data-id='acc_enabled' value='Enable' selected>" + "Enabled" + "</option>");
-                $('#ct-accessibilityTesting').append("<option data-id='acc_disabled' value='Disable'>" + "Disabled" + "</option>");
-            }else{
-                $('#ct-accessibilityTesting').append("<option data-id='acc_enabled' value='Enable'>" + "Enabled" + "</option>");
-                $('#ct-accessibilityTesting').append("<option data-id='acc_disabled' value='Disable' selected>" + "Disabled" + "</option>");
-            }
-        }
-       
-
         var default_releaseid = '';
         taskAssign[t].attributes.forEach(function(tk) {
             v = tk != 'reestimation' ? u.append('li') : v;
@@ -3394,7 +3385,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     moduleData.suiteDetails = [];
                     for (var j = 0; j < moduleObj.scenarioids.length; j++) {
                         var s_data = JSON.parse(JSON.stringify(suiteDetailsTemplate));
-                        if(moduleObj.accessibilityTestingMap[moduleObj.scenarioids[j]] == "Enable"){
+                        if(moduleObj.accessibilityTestingMap[moduleObj.scenarioids[j]] == "Enable" || moduleObj.accessibilityTestingMap[moduleObj.scenarioids[j]] == "Exclusive"){
                             s_data.accessibilityParameters = ["AA","A","508","Best Practice"]
                         }
                         s_data.condition = moduleObj.condition[j];
@@ -3609,7 +3600,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 "attributes": ["at", "rw", "sd", "ed"]
             },
             "scenarios": {
-                "task": ["Execute Scenario"],
+                "task": ["Execute Scenario","Execute Scenario with Accessibility", "Execute Scenario Accessibility Only"],
                 "attributes": ["at", "rw", "sd", "ed", "cx"]
             },
             "screens": {

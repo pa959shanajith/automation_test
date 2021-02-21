@@ -63,7 +63,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 							+ '<tbody class="scenarioBody scenarioTbCon_' + i + '"></tbody></table>');
 						for (j = 0; j < eachData[i].scenarioids.length; j++) {
 							const flag = eachData[i].condition[j] == 0;
-							if("accessibilityTestingMap" in eachData[i] && eachData[i].accessibilityTestingMap[eachData[i].scenarioids[j]] == "Enable"){
+							if("accessibilityTestingMap" in eachData[i] && eachData[i].accessibilityTestingMap[eachData[i].scenarioids[j]] != "Disable"){
 								$(document).find(".scenarioTbCon_" + i + "").append('<tr><td class = "tabeleCellPadding"><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
 								+ '<td data-scenarioid="' + eachData[i].scenarioids[j] + '">' + eachData[i].scenarionames[j] + '</td>'
 								+ '<td style="padding: 2px 0 2px 0;"><input type="text" value="' + eachData[i].dataparam[j] + '" disabled/></td>'
@@ -524,7 +524,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 		$scope.selectedPool = $('#chooseICEPool').val() 
 		if($('#chooseICEPool').val() == 'unallocated')$scope.selectedPool = "";
 		if(!smartBatch && !$scope.selectedICE){
-			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0){
+			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0 && $scope.selectedPool != ""){
 				$scope.selectedICE = ""
 			}else{
 				$('#userIdName').addClass('error-border')

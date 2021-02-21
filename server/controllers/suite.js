@@ -216,8 +216,10 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 		"id": scenarioid,
 		"userid": userid
 	};
-	var testcases = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
-	if (testcases == "fail") return "fail";
+	var result = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
+	if (result == "fail") return "fail";
+	var testcases = result['testcases']
+	var accessibilityTestingType = result['accessibilitytestingtype']
 
 	// Step 2: Get Testcasesteps
 	for (const tc of testcases) {
@@ -246,7 +248,7 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 	});
 
 	scenario.testcase = JSON.stringify(allTestcaseSteps);
-
+	scenario.accessibilityTestingType = accessibilityTestingType;
 	// Step 3: Get qcdetails
 	scenario.qcdetails = [];
 	for(var k =0; k<integrationType.length; ++k) {
@@ -308,6 +310,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			"accessibilityMap":{}
 		};
 		const suiteDetails = suite.suiteDetails;
+		var reportType = "accessiblityTestingOnly";
 		for (const tsco of suiteDetails) {
 			var integrationType = [];
 			if(batchData.integration && batchData.integration.alm.url) {
@@ -322,6 +325,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
+			if (!scenario.accessibilityTestingType || scenario.accessibilityTestingType != "Exclusive") reportType = "functionalTesting";
 			suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibilityParameters;
 			suiteObj.condition.push(scenario.condition);
 			suiteObj.dataparampath.push(scenario.dataparam[0]);
@@ -333,6 +337,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			scenarioList.push(scenarioObj);
 		}
 		suiteObj[testsuiteid] = scenarioList;
+		execReq.reportType = reportType;
 		execReq.testsuiteIds.push(testsuiteid);
 		execReq.suitedetails.push(suiteObj);
 	}
@@ -430,7 +435,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 	const channel = "normal";
 	var completedSceCount = 0;
 	var statusPass = 0;
-
+	var reportType = "accessiblityTestingOnly";
 	logger.info("Sending request to ICE for executeTestSuite");
 	const dataToIce = {"emitAction" : "executeTestSuite","username" : icename, "executionRequest": execReq};
 	redisServer.redisPubICE.publish('ICE1_' + channel + '_' + icename, JSON.stringify(dataToIce));
@@ -480,6 +485,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						const accessibility_reports = resultData.accessibility_reports
 						accessibility_testing.saveAccessibilityReports(accessibility_reports);
 					}
+					if (resultData.report_type != "accessiblityTestingOnly") reportType = "functionalTesting";
 					const scenarioid = resultData.scenarioId;
 					const testsuiteid = resultData.testsuiteId;
 					const testsuiteIndex = execReq.testsuiteIds.indexOf(testsuiteid);
@@ -543,6 +549,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						let result = status;
 						let report_result = {};
 						report_result["status"] = status
+						if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess'
 						report_result["testSuiteDetails"] = execReq["suitedetails"]
 						if (resultData.userTerminated) result = "UserTerminate";
 						if (execType == "API") result = [d2R, status];
@@ -706,7 +713,7 @@ exports.getTestcaseDetailsForScenario_ICE = async (req, res) => {
 		"id": req.body.testScenarioId
 	};
 	data = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
-	if (data != "fail") for (const e of data) {
+	if (data != "fail") for (const e of data['testcases']) {
 		testcasenamelist.push(e["name"]);
 		testcaseidlist.push(e["_id"]);
 		screenidlist.push(e["screenid"]);
