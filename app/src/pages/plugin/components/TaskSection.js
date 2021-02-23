@@ -253,8 +253,8 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         <div className="task-section">
             <div className="task-header">
                 <span className="my-task">My Task(s)</span>
-                <input className={"task-search-bar " + (!showSearch && "no-search-bar")} onChange={onSearchHandler} value={searchValue} />
-                <span className="task-ic-container" onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
+                { showSearch && <input className="task-search-bar " autoFocus onChange={onSearchHandler} value={searchValue} />}
+                <span className={"task-ic-container"+(showSearch?" plugin__showSearch":"")} onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
                 <span className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span>
             </div>
             <div className="task-nav-bar">

@@ -11,9 +11,9 @@ const QTest =(props)=>{
             </span>
         </div>
         <div className="sepr_Div">
-            <button disabled={props.disableSave} onClick={()=>props.callSaveButton()} className="saveQcbtn" style={{marginLeft:"470px"}}>Save</button> 
-            <button onClick={()=>props.callViewMappedFiles()} className="viewMapbtn">View Mapped Files</button> 
-            <button onClick={()=>props.callExit()} className="saveQcbtn">Exit</button>
+            <button disabled={props.disableSave} onClick={()=>props.callSaveButton()} style={{marginLeft:"470px"}}>Save</button> 
+            <button onClick={()=>props.callViewMappedFiles()}>View Mapped Files</button> 
+            <button onClick={()=>props.callExit()} >Exit</button>
         </div>
         <div className="trees_wrappers">
         <div className="leftQcStructure">
@@ -27,7 +27,7 @@ const QTest =(props)=>{
 
                     {   props.domainDetails.length ? 
                         props.domainDetails.map((e,i)=>(
-                            <option id={e.id} value={e.name}>{e.name}</option>
+                            <option id={e.id} value={e.id}>{e.name}</option>
                         )) : null
                     }
                 </select>
@@ -61,7 +61,8 @@ const QTest =(props)=>{
                                             <Fragment> 
                                             <li  style={{paddingLeft:"40px"}}>
                                                 <img  onClick={()=>props.callTestSuiteExpand({i})} style={{height:"16px",cursor: "pointer"}} src={e.TestsuiteOpen?"static/imgs/ic-taskType-blue-minus.png" :"static/imgs/ic-taskType-blue-plus.png"}/>
-                                                {e.testsuites.map((e,i)=>(
+                                                {e.testsuites&&
+                                                    e.testsuites.map((e,i)=>(
                                                     <label>{e.name}</label>
                                                 
                                                 ))
@@ -69,7 +70,8 @@ const QTest =(props)=>{
                                             {
                                                 e.TestsuiteOpen ?
                                                 <li id="testSuitediv">
-                                                {e.testsuites.map((e,i)=>(
+                                                {e.testsuites &&
+                                                e.testsuites.map((e,i)=>(
                                                     e.testruns.map((e,i)=>(
                                                         <Fragment>
                                                         <div style={{cursor: "pointer"}} onClick={(event)=>props.callTestSuiteSelection(event,e.id ,e.name)} id={e.id} className={props.selectedTestSuiteID == e.id? "slectedTestDiv": null} >

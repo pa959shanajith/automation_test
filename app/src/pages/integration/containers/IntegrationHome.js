@@ -1,4 +1,5 @@
 import React ,{useState} from 'react';
+import { useDispatch ,useSelector } from 'react-redux';
 import Header from '../../global/components/Header';
 import Footer from '../../global/components/FooterTwo';
 import Leftbar from '../components/Leftbar';
@@ -11,14 +12,8 @@ import '../styles/IntegrationHome.scss'
 //Integration Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 
 const  Integrations=()=>{
-    const [qTestClicked , setqTestClicked] = useState(false);
-    const [almClicked , setAlmClicked] = useState(false);
-    const [zephyrClicked , setZephyrClicked]= useState(false);
-    const [popUpEnable , setPopUpEnable] = useState(false);
-    const [loginAlm , setloginAlm]= useState(false);
-    const [loginZephyr , setloginZephyr] = useState(false);
+    const screenType = useSelector(state=>state.integration.loginPopupType);
     const [focus,setFocus] = useState(null);
-    const [viewmappedFiles , setViewMappedFiles] = useState(false)
     return(
         <div className="parent">
             <Header/>
@@ -26,51 +21,20 @@ const  Integrations=()=>{
                 <Leftbar 
                     focus={focus} 
                     setFocus={setFocus} 
-                    setqTestClicked={setqTestClicked} 
-                    setPopUpEnable={setPopUpEnable}
-                    setViewMappedFiles={setViewMappedFiles}
-                    viewmappedFiles={viewmappedFiles}
-                    setAlmClicked={setAlmClicked}
-                    setloginAlm={setloginAlm}
-                    qTestClicked={qTestClicked}
-                    almClicked={almClicked}
-                    zephyrClicked={zephyrClicked}
-                    setZephyrClicked={setZephyrClicked}
-                    setloginZephyr={setloginZephyr}
                 />
-                {almClicked?
-                <ALMCenter
-                    setloginAlm={setloginAlm}
-                    loginAlm={loginAlm}
-                    viewmappedFiles={viewmappedFiles}
-                    setViewMappedFiles={setViewMappedFiles}
-                    almClicked={almClicked}
-                    setAlmClicked={setAlmClicked}
-                    
-                /> 
+                {screenType== 'ALM'?
+                <ALMCenter/> 
                 :
-                zephyrClicked?
+                screenType=="Zephyr"?
                 <ZephyrCenter
-                    zephyrClicked={zephyrClicked}
-                    viewmappedFiles={viewmappedFiles}
-                    setViewMappedFiles={setViewMappedFiles}
-                    setZephyrClicked={setZephyrClicked}
-                    loginZephyr={loginZephyr}
-                    setloginZephyr={setloginZephyr}
                     setFocus={setFocus}
                 />
                 :
+                screenType=="qTest"?
                 <QTestCenter
-                    qTestClicked={qTestClicked}
-                    setqTestClicked={setqTestClicked}
-                    popUpEnable={popUpEnable}
-                    setPopUpEnable={setPopUpEnable}
-                    setFocus={setFocus}
-                    viewmappedFiles={viewmappedFiles}
-                    setViewMappedFiles={setViewMappedFiles}
-                    setAlmClicked={setAlmClicked}
-                    almClicked={almClicked}
-                />}
+                    setFocus={setFocus}    
+                />:
+                <div className="integration_middleContent"></div>}
                 <Rightbar />
             </div>    
             <div className="integration_Footer"><Footer/></div>

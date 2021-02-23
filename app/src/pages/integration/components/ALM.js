@@ -237,7 +237,7 @@ const ALM=(props)=>{
 		}
 		e.stopPropagation();	
     }
-    
+    console.log(testSuiteDetails);
     return(
          !screenexit?
         <>
@@ -291,8 +291,50 @@ const ALM=(props)=>{
                                                     element.testfolder.map( test => ( 
                                                             (test.folderpath === e.folderpath.concat('\\', test.foldername)) &&
                                                         <div className="alm_tree_branches">
-                                                            <img className="alm_tree_toggle" src="static/imgs/ic-qcExpand.png"/>
+                                                            <img className="alm_tree_toggle" onClick={()=>calltestSuites(test.folderpath)}src="static/imgs/ic-qcExpand.png"/>
                                                             <label>{test.foldername}</label>
+                                                            {testSuiteDetails.map(elem=>(
+                                                                elem.map(elements=>(
+                                                                    elements.testfolder.length?
+                                                                    elements.testfolder.map(nTest=>(
+                                                                       (nTest.folderpath == test.folderpath.concat('\\',nTest.foldername))&&
+                                                                       <div className="alm_tree_branches">
+                                                                            <img className="alm_tree_toggle" onClick={()=>calltestSuites(nTest.folderpath)}src="static/imgs/ic-qcExpand.png"/>
+                                                                            <label>{nTest.foldername}</label>
+                                                                            {
+                                                                                testSuiteDetails.map(ele1=>(
+                                                                                    ele1.map(ele2=>(
+                                                                                      ele2.TestSet.length && 
+                                                                                      ele2.TestSet.map(ele3=>(
+                                                                                          (ele3.testsetpath == nTest.folderpath) ?
+                                                                                          <div className="alm_tree_branches">
+                                                                                            <img className="alm_tree_toggle" onClick={()=>callTestSets(ele3.testsetid,ele3.testset,ele3.testsetpath)} src="static/imgs/ic-taskType-blue-plus.png"/>
+                                                                                            <label>{ele3.testset}</label>
+                                                                                            { testSets.length ?
+                                                                                            testSets.map(suite => ((suite.testsetid === ele3.testsetid) ?
+                                                                                                suite.content[0].testcase.map(cases => (
+                                                                                                    <div className={"alm_tree_leaves"+(testSuiteSelected_name.indexOf(cases.slice(0,cases.indexOf("/")))!==-1?" selectedCase-backColor":"")} id={cases.substring(cases.indexOf("/")+1)} onClick={(event)=>callTestSuiteSelection(event,cases.substring(cases.indexOf("/")+1),cases.slice(0,cases.indexOf("/")),ele3.testset)}>
+                                                                                                        <label title={cases}>
+                                                                                                            <span className="leafId">{cases.substring(cases.indexOf("/")+1)}</span>
+                                                                                                            <span>{cases.slice(0,cases.indexOf("/"))}</span>
+                                                                                                        </label>
+                                                                                                        { (testSuiteSelected_name.indexOf(cases.slice(0,cases.indexOf("/")))!==-1) &&
+                                                                                                            <> { syncSuccess 
+                                                                                                                ? <img onClick={()=>callUnSync()} style={{cursor: "pointer", paddingRight:"10px"}} src="static/imgs/ic-qcUndoSyncronise.png"/>
+                                                                                                                : <img onClick={()=>callSyncronise(ele3.testsetpath)} style={{cursor: "pointer", paddingRight:"10px"}} src="static/imgs/ic-qcSyncronise.png"/> }
+                                                                                                            </> }
+                                                                                                    </div>
+                                                                                                )) : null )) : null }
+                                                                                        </div> : null
+                                                                                      ))  
+                                                                                    ))
+                                                                                ))
+                                                                            }
+                                                                        </div>    
+
+                                                                    )) : null
+                                                                ))
+                                                            ))}
                                                         </div> )) 
                                                     :
                                                     element.TestSet.length &&

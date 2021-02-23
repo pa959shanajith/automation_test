@@ -268,7 +268,7 @@ const RefBarItems = props => {
                 <h4 className="pop__header" onClick={()=>setShowFilterPop(false)}><span className="pop__title">Filter</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                 <div className="filter_pop__content">
 					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length}/><span>Select All</span></div>
-					{ tagList.map((tag, index)=>(<div className="d__filter-btnbox">
+					{ tagList.map((tag, index)=>(<div key={index} className="d__filter-btnbox">
 						<button className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
 					</div>))}
                 </div>
