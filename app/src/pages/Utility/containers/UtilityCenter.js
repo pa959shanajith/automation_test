@@ -65,6 +65,7 @@ const UtilityCenter=(props)=>{
         else{
             const items = await Encrypt_ICE(encryptionType ,encryptionValue);
             if(items.error){displayError(items.error);return;}
+            setEmptyCall(false);
             setEncryptedData(items);
             setBlockui({show:false});
         }

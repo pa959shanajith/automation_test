@@ -86,7 +86,7 @@
     margin-bottom: 25px;
 }
 .encryptionData-body{
-    height: 176px;
+    height: 30vh;
     float: left;
     width: 100%;
     resize: none;
@@ -106,6 +106,7 @@
     height: 100%;
     outline: none;
     resize: none;
+    font-size: x-large;
 }
 #encryptedData{
     border: none;
@@ -113,6 +114,7 @@
     height: 100%;
     outline: none;
     resize: none;
+    font-size: x-large;
 }
 #optimization-fn{
     border-radius: 1em;
