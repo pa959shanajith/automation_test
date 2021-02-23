@@ -70,7 +70,7 @@ const EditIrisObject = props => {
                             <span>Object Type:</span>
                             <span><select className="ss__ei_objType" value={selectedType} onChange={onSelectType}>
                                 <option className="ss__ei_options" disabled value={0}>Select Object Type</option>
-                                { Object.keys(irisObjectTypes).map(key => <option className="ss__ei_options" value={key}>
+                                { Object.keys(irisObjectTypes).map((key, i) => <option key={i} className="ss__ei_options" value={key}>
                                         {irisObjectTypes[key].name}
                                     </option>) }
                             </select></span>

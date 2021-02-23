@@ -9,11 +9,6 @@
     border-radius: 8px;
 }
 
-.no-search-bar{
-    visibility: hidden;
-    width: 0%!important;
-}
-
 .task-section{
     width: 45%;
 }
@@ -63,14 +58,16 @@
     outline: none;
     border: none;
     width: 50%;
-    height: 29px;
+    height: 32px;
     font-size: 20px;
     font-family: "LatoWebLight";
-    border-radius: 7px;
+    border-radius: 7px 0 0 7px;
+    border-right: 1px solid #ccc;
+    margin-right: -2px;
     padding-left: 10px;
     &:focus{
         outline: none;
-        border: none;
+        border-right: 1px solid #ccc;
     }
 }
 
@@ -94,7 +91,9 @@
         cursor: pointer;
     }
 }
-
+.plugin__showSearch{
+    border-radius: 0 7px 7px 0!important; 
+}
 .active-tab{
     border-top: 1px solid #ddd;
     border-left: 1px solid #ddd;

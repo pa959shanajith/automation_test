@@ -284,7 +284,7 @@ const WebserviceScrape = () => {
                             <button className="ws__goBtn" onClick={onGo}>Go</button>
                             <select className={"ws__select"+(wsdlError.includes("opDropdown")?" ws_eb":"")} value={opDropdown} onChange={opDropdownHandler}>
                                 <option disabled={true} value="0">Select Operation</option>
-                                { opList.map(op => <option value={op}>{op}</option>)}
+                                { opList.map((op, i) => <option key={i} value={op}>{op}</option>)}
                             </select>
                             <button className="ws__action_btn ws__bigBtn ws__addBtn" onClick={onAdd}>Add</button>
                         </div>
