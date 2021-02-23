@@ -48,7 +48,7 @@ const ReferenceBar = (props) => {
             let lenght_tasksJson = tasksJson.length;
             let task_list = [];
             for(let i=0; i < lenght_tasksJson; i++) {
-                let testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
+                let testSuiteDetails =tasksJson[i].testSuiteDetails;
                 let tasktype = tasksJson[i].taskDetails[0].taskType;
                 let taskname = tasksJson[i].taskDetails[0].taskName;
                 let dataobj = {
