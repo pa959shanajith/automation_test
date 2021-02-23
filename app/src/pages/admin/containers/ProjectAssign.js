@@ -383,7 +383,7 @@ const ProjectNew = (props) => {
             </div>
 
 
-            <div className="col-xs-9 form-group" style={{width: "100%"}}>
+            <div className="col-xs-9 form-group assign-container" style={{width: "100%"}}>
 				<div className="project-left2">
 					{/* <!--Left Select Box--> */}
 					<div className="wrap assign-select">

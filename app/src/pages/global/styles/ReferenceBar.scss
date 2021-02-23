@@ -175,6 +175,8 @@
 
 .task_info__title{
     flex-grow: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .task_info__content{
@@ -319,7 +321,7 @@
         padding: 4% 9%;
         font-size: 1.95vh;
         margin-bottom: 0.6vh;
-        grid-template-columns: 30% auto;
+        grid-template-columns: 40% auto;
         grid-gap: 0.6vh 0;
     }
     

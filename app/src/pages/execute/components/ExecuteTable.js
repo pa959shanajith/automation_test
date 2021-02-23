@@ -78,7 +78,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                             if (eachData2[m].scenarioids[k] == current_task.assignedTestScenarioIds) {
                                 eachData1.push({
                                     "condition": [rowData.condition[k]],
-                                    "dataparam": [rowData.dataparam[k]],
+                                    "dataparam": [(rowData.dataparam[k]).trim()],
                                     "executestatus": [rowData.executestatus[k]],
                                     "scenarioids": [rowData.scenarioids[k]],
                                     "scenarionames": [rowData.scenarionames[k]],
@@ -88,7 +88,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                                 });
                                 initialTableList.push({
                                     "condition": [rowData.condition[k]],
-                                    "dataparam": [rowData.dataparam[k]],
+                                    "dataparam": [(rowData.dataparam[k]).trim()],
                                     "executestatus": [rowData.executestatus[k]],
                                     "scenarioids": [rowData.scenarioids[k]],
                                     "scenarionames": [rowData.scenarionames[k]],

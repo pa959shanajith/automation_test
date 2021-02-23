@@ -108,7 +108,7 @@ const EditIcePool = ({projList,displayError,setLoading}) => {
                         disable={!selectedPool?true:false} leftBox={allProj} rightBox={assignProj} setLeftBox={setAllProj} setRightBox={setAssignProj}
                     />
                 </div>
-                <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'}/>
+                <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'} validExp={"poolName"}/>
             </div>
         </Fragment>
     )

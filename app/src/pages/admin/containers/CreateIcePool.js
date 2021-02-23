@@ -66,7 +66,7 @@ const CreateIcePool = (props) => {
                     <button className=" btn-md adminBtn" onClick={ClickCreate}  title="Save">Create</button>
                 </div>
                 <div className='crt_ice-pool'>
-                    <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'}/>
+                    <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'} validExp={"poolName"}/>
                     <div className="col-xs-9 form-group assignBox-container">
                         <AssignOptionBox leftBox={allProj} rightBox={assignProj} setLeftBox={setAllProj} setRightBox={setAssignProj}/>
                     </div>

@@ -171,7 +171,7 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
             </div>
             <div class='adminControl-ice popup-content'>
 				<div>
-					<span class="leftControl" title="Token Name">{exeIceLabel}</span>
+					<span className="leftControl" title="Token Name">{exeIceLabel}</span>
                     <DropDownList placeholder={icePlaceholder} data={availableICE} smartMode={(ExeScreen===true?smartMode:scheSmartMode)} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
 				</div>
 			</div>

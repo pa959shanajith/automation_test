@@ -303,7 +303,7 @@ const CreateUser = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data == "empty") {
-            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+            setPopupState({show:true,title:"Edit Configuration",content: "User not found"});
         } else {
             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
             data.sort((a,b)=>a.name.localeCompare(b.name));

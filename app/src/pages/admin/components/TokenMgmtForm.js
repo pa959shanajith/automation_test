@@ -227,7 +227,7 @@ const TokenMgmtForm = (props) => {
                             <img className="datepickerIconToken" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
 						</span>
 						<span className="timePicContainer">
-							<Datetime value={props.timeVal} onChange={(event)=>{props.setTimeVal(event.format("H:m"))}} inputProps={inputProps1} dateFormat={false} timeFormat="H:m" /> 
+							<Datetime value={props.timeVal} onChange={(event)=>{props.setTimeVal(event.format("HH:mm"))}} inputProps={inputProps1} dateFormat={false} timeFormat="HH:mm" /> 
                             <img className="timepickerIconToken" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
 						</span>
 					</div>
