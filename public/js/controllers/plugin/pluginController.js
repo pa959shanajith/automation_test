@@ -107,6 +107,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 								}
 								var dataobj={
 									'scenarioflag':tasksJson[i].scenarioFlag,
+									'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
 									'apptype':tasksJson[i].appType,
 									'projectid':tasksJson[i].projectId,
 									'screenid':tasksJson[i].screenId,
@@ -298,6 +299,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		}
 		taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
 		taskObj.scenarioFlag = dataobj_json.scenarioflag;
+		taskObj.scenarioTaskType = dataobj_json.scenarioTaskType
 		taskObj.assignedTestScenarioIds = dataobj_json.assignedtestscenarioids;
 		taskObj.screenId = dataobj_json.screenid;
 		taskObj.screenName = dataobj_json.screenname;

@@ -43,7 +43,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	var getTaskName = current_task.taskName;
 	var versionnumber = current_task.versionnumber;
 	var appType = current_task.appType;
-
+	var scenarioTaskType = current_task.scenarioTaskType;
 	//Task Name Commented
 	//$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 	$(".projectInfoWrap").empty();
@@ -109,12 +109,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 					//Building object for each row after getting the data from server
 					for (var k = 0; k < rowData.scenarioids.length; k++) {
-						let accessibilityTesting = "Disable";
-						if (rowData.accessibilityTestingMap && (rowData.scenarioids[k] in rowData.accessibilityTestingMap) && (rowData.accessibilityTestingMap[rowData.scenarioids[k]] == "Enable")){
-							accessibilityTesting = "Enable";
-						} else if (rowData.accessibilityTestingMap && (rowData.scenarioids[k] in rowData.accessibilityTestingMap) && (rowData.accessibilityTestingMap[rowData.scenarioids[k]] == "Exclusive")){
-							accessibilityTesting = "Exclusive"
-						}
 						if (current_task.scenarioFlag == 'True') {
 							if (rowData.scenarioids[k] == assignedTestScenarioId) {
 								getEachScenario.push({
@@ -124,8 +118,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 									"scenarioIds": rowData.scenarioids[k],
 									"scenarionames": rowData.scenarionames[k],
 									"projectnames": rowData.projectnames[k],
-									"testSuiteId": rowData.testsuiteid[k],
-									"accessibilityTesting": accessibilityTesting
+									"testSuiteId": rowData.testsuiteid[k]
 								});
 							}
 						} else {
@@ -136,12 +129,23 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 								"scenarioIds": rowData.scenarioids[k],
 								"scenarionames": rowData.scenarionames[k],
 								"projectnames": rowData.projectnames[k],
-								"testSuiteId": rowData.testsuiteid[k],									
-								"accessibilityTesting": accessibilityTesting
+								"testSuiteId": rowData.testsuiteid[k]
 							});
 						}
 					}
-
+					let projectNameWidth = "16";
+					let conditionCheckWidth = "17";
+					if(scenarioTaskType && scenarioTaskType == "disable"){
+						$(".executionDataTable").toArray().forEach(element => {
+							if(element.children[0].children[0].children[6])
+								element.children[0].children[0].children[6].remove();
+							element.children[0].children[0].children[5].style.width = "20%";
+							element.children[0].children[0].children[4].style.width = "28%";
+							element.children[0].children[0].children[5].style.borderRight = ""
+						});
+						projectNameWidth = "19";
+						conditionCheckWidth = "28.4"
+					}
 					//Building object for each row after getting the data from server
 					//Creating Table Rows for each of the Scenarios
 					for (var i = 0; i < getEachScenario.length; i++) {
@@ -160,16 +164,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							row.append($('<td style="width: 25%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value="' + getEachScenario[i].dataParam + '"/></td>'));
 						}
 						if (getEachScenario[i].condition == 0) {
-							row.append($('<td style="width:17%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertRed"><option value="1">True</option><option value="' + getEachScenario[i].condition + '" selected>False</option></select> </td>'));
+							row.append($('<td style="width:'+ conditionCheckWidth +'%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertRed"><option value="1">True</option><option value="' + getEachScenario[i].condition + '" selected>False</option></select> </td>'));
 						} else {
-							row.append($('<td style="width:17%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="' + getEachScenario[i].condition + '" selected>True</option><option value="0">False</option></select> </td>'));
+							row.append($('<td style="width:'+ conditionCheckWidth +'%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="' + getEachScenario[i].condition + '" selected>True</option><option value="0">False</option></select> </td>'));
 						}
-						row.append($("<td class='projectName' title=" + getEachScenario[i].projectnames + " style='width:16%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
-						if (getEachScenario[i].accessibilityTesting != "Disable"){
+						row.append($("<td class='projectName' title=" + getEachScenario[i].projectnames + " style='width:" + projectNameWidth + "%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
+						if (scenarioTaskType && scenarioTaskType != "disable"){
 							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">4 Standards Selected</span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ><input value="A" checked class = "acc-chk" type="checkbox"/><span style="margin-left: 5px;" id="methodA"></span>A</label></li><li><label title="method AA"  ><input class = "acc-chk" value="AA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAA"></span>AA</label></li><li><label title="method 508"  ><input class = "acc-chk" value="508" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ><input class = "acc-chk" value="Best Practice" checked type="checkbox"/><span style="margin-left: 5px;" id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
-						}
-						else{
-							row.append($("<td class='projectName' title=" + "N/A" + " style='width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + "N/A" + "</td>"));
 						}
 						// row.append($("<td class='variableMap' title='' style='width:10%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important;cursor:pointer;' class='tabeleCellPadding'><span class='descriptionContainer'><img alt='scenarioDescription' title='' id=scenarioDesc_"+count+" src='imgs/ic-details-inactive.png' data-scenarioid='"+getEachScenario[i].scenarioIds+"' class='scenarioDescIcon inactiveDesc'></span></td>"));
 						//row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));

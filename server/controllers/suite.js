@@ -58,8 +58,7 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"testsuitename": testsuite.name,
 			"moduleid": moduleId,
 			"testsuiteid": testsuite.testsuiteid,
-			"versionnumber": suite.versionnumber,
-			"accessibilityTestingMap": testscenarioDetails.accessibilitytestingmap
+			"versionnumber": suite.versionnumber
 		};
 		responsedata[moduleId] = finalSuite;
 	}
@@ -216,10 +215,8 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 		"id": scenarioid,
 		"userid": userid
 	};
-	var result = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
-	if (result == "fail") return "fail";
-	var testcases = result['testcases']
-	var accessibilityTestingType = result['accessibilitytestingtype']
+	var testcases = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
+	if (testcases == "fail") return "fail";
 
 	// Step 2: Get Testcasesteps
 	for (const tc of testcases) {
@@ -713,7 +710,7 @@ exports.getTestcaseDetailsForScenario_ICE = async (req, res) => {
 		"id": req.body.testScenarioId
 	};
 	data = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
-	if (data != "fail") for (const e of data['testcases']) {
+	if (data != "fail") for (const e of data) {
 		testcasenamelist.push(e["name"]);
 		testcaseidlist.push(e["_id"]);
 		screenidlist.push(e["screenid"]);

@@ -318,11 +318,14 @@ function next_function(resultobj,projectid){
 					}
 					break;
 				case 'Execute Scenario':
+					task_json.scenarioTaskType = 'enable'
+					break;
 				case 'Execute Scenario with Accessibility':
+					task_json.scenarioTaskType = 'disable'
+					break;
 				case 'Execute Scenario Accessibility Only':
-					task_json.scenarioFlag = 'True';
-					task_json.assignedTestScenarioIds = [task_json.scenarioId];
-					t.taskType = 'Execute Scenario';
+					task_json.scenarioTaskType = "exclusive"
+					break;
 					// taskDetails.taskName = t.tasktype + ' ' + m.testScenarioName;
 					// task_json.scenarioName = m.testScenarioName;
 					//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
@@ -332,6 +335,11 @@ function next_function(resultobj,projectid){
 				// taskDetails.taskName = t.tasktype + ' ' + m.screenName;
 				// task_json.screenName = m.screenName
 
+			}
+			if (t.tasktype.includes("Scenario")){
+					task_json.scenarioFlag = 'True';
+					task_json.assignedTestScenarioIds = [task_json.scenarioId];
+					t.taskType = 'Execute Scenario';
 			}
 			//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 			if (!batch_flag) {

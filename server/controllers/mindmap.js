@@ -194,7 +194,6 @@ exports.saveData = async (req, res) => {
 		var createdthrough = inputs.createdthrough || "Web";
 		//Assigned Tasks Notification
 		var assignedObj = {};
-        var scenarioObj = {}
         var regg= /[~*+=?^%<>()|\\|\/]/;
 		for(var key in inputs){
 			if(key=='map'){
@@ -216,9 +215,6 @@ exports.saveData = async (req, res) => {
 		for (var k = 0; k < data.length; k++) {
 			var task = data[k].task;
 			if (task != null) {
-				if('accessibilityTesting' in task){
-					scenarioObj[data[k]["_id"]] = task["accessibilityTesting"];
-				}
 				if ('assignedToName' in task) {
 					var assignedTo = task.assignedToName;
 					if (assignedTo != null && assignedTo != undefined) {
@@ -227,13 +223,6 @@ exports.saveData = async (req, res) => {
 						}
 					}
 				}
-			}
-		}
-		if(Object.keys(scenarioObj).length > 0){
-			let scenario_result = await updateScenario(scenarioObj);
-			if (scenario_result == 'fail'){
-				logger.error("Update Scenario Failed task can not be saved.");
-				return res.send("fail");
 			}
 		}
 		var notify = assignedObj;
@@ -547,19 +536,6 @@ exports.saveData = async (req, res) => {
 	}
 };
 
-async function updateScenario(scenarioObj){
-	let inputs = {
-		scenarios: scenarioObj
-	}
-	const fnName = "updateScenario";
-	try{
-		let result = await utils.fetchData(inputs,"mindmap/updateScenario",fnName)
-		return result;
-	}catch(e){
-		logger.error("Error occured in updateScenarion: %s",e);
-	}
-	return "fail";
-}
 
 exports.saveEndtoEndData = function (req, res) {
 	const fnName = "saveEndtoEndData";
