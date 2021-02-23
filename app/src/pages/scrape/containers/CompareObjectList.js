@@ -88,9 +88,9 @@ const CompareObjectList = () => {
                         <button className="ss__compareAction" onClick={closeCompare}>Cancel</button>
                     </div>
                     <div className="ss__compareboxes">
-                    <div className="ss__cmprBoxAbsolute">
-                    <div className="ss__cmprBoxMin">
-                    <div className="ss__cmprBoxCon" id="cmprObjListId">
+                    <div className="ss__cmprListAbsolute">
+                    <div className="ss__cmprListMin">
+                    <div className="ss__cmprListCon" id="cmprObjListId">
                         <ScrollBar scrollId="cmprObjListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                             { changedObj && changedObj.length && <CompareBox checkedList={checkedList} setCheckedList={setCheckedList} header="Changed Objects" objList={changedObj} /> }
                             { notChangedObj && notChangedObj.length && <CompareBox header="Unchanged Objects" objList={notChangedObj} hideCheckbox={true}/> }

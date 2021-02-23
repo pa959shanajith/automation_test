@@ -133,8 +133,8 @@ const AddObjectModal = props => {
                                         <input className={"addObj_name"+(error.type==="input" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
                                         <select className={"addObj_objType"+(error.type==="type" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
                                             <option className="addObj_option" disabled selected value="">Select Object Type</option>
-                                            { objectTypes.map( objectType =>
-                                                <option className="addObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>
+                                            { objectTypes.map((objectType, i) =>
+                                                <option key={i} className="addObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>
                                                     {objectType.name}
                                                 </option>
                                             ) }

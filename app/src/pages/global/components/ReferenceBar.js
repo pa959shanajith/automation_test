@@ -194,7 +194,7 @@ const ReferenceBar = (props) => {
                     {
                         showInfo && 
                         <ClickAwayListener onClickAway={closePopups}>
-                        <div className="ref_pop info_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
+                        <div className={"ref_pop" + (taskInfo?" info_pop":"")} style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
                             <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                             <div className="info_pop__contents">
                             {

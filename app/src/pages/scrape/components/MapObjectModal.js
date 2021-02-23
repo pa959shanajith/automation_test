@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
 import { tagList } from  './ListVariables';
 import { updateScreen_ICE } from '../api';
@@ -150,9 +150,9 @@ const MapObjectModal = props => {
                                             <ScrollBar scrollId="moListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                             <>
                                             { (()=> selectedTag ? scrapedList[selectedTag] : nonCustomList)()
-                                            .map(object => {
+                                            .map((object, i) => {
                                                 let mapped = object.val in map;
-                                                return (<div className={"ss__mo_listItem"+(mapped ? " mo_mapped" : "")} draggable={ mapped ? "false" : "true"} onDragStart={(e)=>onDragStart(e, object)}>
+                                                return (<div key={i} className={"ss__mo_listItem"+(mapped ? " mo_mapped" : "")} draggable={ mapped ? "false" : "true"} onDragStart={(e)=>onDragStart(e, object)}>
                                                     {object.title}
                                                 </div>)
                                             }) }
@@ -172,11 +172,11 @@ const MapObjectModal = props => {
                                 <div className="mo_listContent" id="moListId">
                                 <ScrollBar scrollId="moListId">
                                 <div className="ss__mo_customInContainer">
-                                { Object.keys(customList).map(elementType => (
-                                    <>
+                                { Object.keys(customList).map((elementType, i) => (
+                                    <Fragment key={i}>
                                     <div className="mo_tagHead" onClick={()=>setSelectedTag(elementType === selectedTag ? "" : elementType )}>{elementType}</div>
                                     { selectedTag === elementType && <div className="mo_tagItemList"> 
-                                        {customList[selectedTag].map(object => <div className={"mo_tagItems"+(selectedItems.includes(object.val) ? " mo_selectedTag" : "")} onDragOver={onDragOver} onDrop={(e)=>onDrop(e, object)}>
+                                        {customList[selectedTag].map((object, j) => <div key={j} className={"mo_tagItems"+(selectedItems.includes(object.val) ? " mo_selectedTag" : "")} onDragOver={onDragOver} onDrop={(e)=>onDrop(e, object)}>
                                             { object.val in map ?
                                             <>
                                             <span className="mo_mappedName" onClick={()=>onCustomClick("", object.val)}>
@@ -188,7 +188,7 @@ const MapObjectModal = props => {
                                             
                                         </div>)} 
                                     </div> }
-                                    </>
+                                    </Fragment>
                                 ))}
                                 </div>
                                 </ScrollBar>

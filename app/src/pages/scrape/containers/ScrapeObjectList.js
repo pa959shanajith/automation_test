@@ -270,7 +270,7 @@ const ScrapeObjectList = () => {
                         Object characterstics are same for:
                         <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
                             <div className="ss__dup_scroll">
-                            { dCusts.map(custname => <span className="ss__dup_li">{custname}</span>) }
+                            { dCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
                             </div>
                         </ScrollBar>
                     </div>
@@ -283,7 +283,7 @@ const ScrapeObjectList = () => {
                         Object characteristics are same for the below list of objects:
                         <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
                             <div className="ss__dup_scroll">
-                            { dCusts2.map(custname => <span className="ss__dup_li">{custname}</span>) }
+                            { dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
                             </div>
                         </ScrollBar>
                         <br/>
@@ -333,7 +333,7 @@ const ScrapeObjectList = () => {
                             <strong>Warning: Please scrape an IRIS reference object.</strong>
                             <br/><br/>
                             Matching objects found for:
-                            { resp.map(custname => <span className="ss__dup_li">{custname}</span>) }
+                            { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
                         </div> : 'Scraped data saved successfully.'
                     })
                     setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: false});
