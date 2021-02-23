@@ -1090,7 +1090,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							if (ob.cord && ob.cord != '') {  //in case of iris object
 								addcusOb = ""
 								ob.hiddentag = "No",
-									tag = "iris;" + ob.objectType,
+									tag = "iris;" + (ob.objectType || "").toLowerCase(),
 									ob.url = "",
 									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + (ob.objectType || "") + ";" + (ob.objectStatus || "0") + ";"  + ob.tag
                                 //if(ob.hasOwnProperty('editable')){
@@ -2285,9 +2285,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								if (ob.cord && ob.cord != '') {  //in case of iris object
 									addcusOb = ""
 									ob.hiddentag = "No",
-										tag = "iris;" + ob.objectType,
+										tag = "iris;" + (ob.objectType || "").toLowerCase(),
 										ob.url = "",
-										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ((ob.objectType || "").toLowerCase() || "") + ";" + (ob.objectStatus || "0") + ";"  + ob.tag
 								}
 
 								// if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
@@ -2377,9 +2377,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									if (ob.cord && ob.cord != '') {  //in case of iris object
 										addcusOb = ""
 										ob.hiddentag = "No",
-										tag = "iris;" + ob.objectType,
+										tag = "iris;" + (ob.objectType || "").toLowerCase(),
 										ob.url = "",
-										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag,
+										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ((ob.objectType || "").toLowerCase() || "") + ";" + (ob.objectStatus || "0") + ";"  + ob.tag,
 										irisFlg = true
 									}
 									if (irisFlg){
@@ -2442,9 +2442,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								if (ob.cord && ob.cord != '') {  //in case of iris object
 									addcusOb = ""
 									ob.hiddentag = "No",
-									tag = "iris;" + ob.objectType,
+									tag = "iris;" + (ob.objectType || "").toLowerCase(),
 									ob.url = "",
-									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag,
+									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ((ob.objectType || "").toLowerCase() || "") + ";" + (ob.objectStatus || "0") + ";"  + ob.tag,
 									irisFlg = true
 								}
 								if (irisFlg){
