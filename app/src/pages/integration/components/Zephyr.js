@@ -95,22 +95,6 @@ const Zephyr=(props)=>{
         setSelectedIssueID(issueid)
         setSelectedVersionId(versionId)
         setSelectedProjectId(projectId)
-        // setTestSuiteSelected_name(name);
-        // setSelectectedTestSetName(testSet);
-        
-        // if(event.target.childNodes.length){
-        //     if(mappedDetails.length){
-        //         if(mappedDetails[0].testsuiteid == idx){
-        //            setSyncSuccess(true);
-        //         }
-        //         else{
-        //             setSyncSuccess(false);
-        //         }
-        //        }
-        //        else{
-        //         setSyncSuccess(false)
-        //        }
-        // }
     }
     const callSyncronise =(folderpath)=>{
         if(!selectedScenario_ID){
@@ -133,9 +117,7 @@ const Zephyr=(props)=>{
                 versionid : selectedVersionId
             }
          ]
-        // setViewMappedFiles(false);
         setMappedDetails(mapped_Details);
-        //setDisableSave(false)
         setSyncSuccess(true);
     }
     }
@@ -159,7 +141,6 @@ const Zephyr=(props)=>{
     const callUnSync=()=>{
         setSyncSuccess(false);
         setMappedDetails([]);
-        //setDisableSave(true);
     
     }
     console.log(projectDetails);

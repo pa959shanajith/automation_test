@@ -1,14 +1,19 @@
-import React , {useRef , Fragment ,useState} from 'react';
+import React , {useRef , Fragment ,useState ,getState} from 'react';
 import {ModalContainer , ScrollBar , PopupMsg ,ScreenOverlay} from '../../global';
+import * as actionTypes from '../state/action.js';
 import ALM from '../components/ALM.js';
 import ContentAlm from'../components/ContentAlm.js';
 import {viewQcMappedList_ICE,loginQCServer_ICE} from '../api.js';
 import ViewMappedALM from '../components/ViewMappedALM.js';
-import { useSelector } from 'react-redux';
+import { useSelector ,useDispatch} from 'react-redux';
 
 
 const ALMCenter =(props)=>{
 const user_id = useSelector(state=> state.login.userinfo.user_id); 
+const screenType = useSelector(state=>state.integration.loginPopupType);
+const viewMappedFlies = useSelector(state=>state.integration.mapped_scren_type);
+//const loginALM = reducer.getState().ALM_LOGIN;
+const dispatch = useDispatch();
 const urlRef = useRef();
 const userNameRef = useRef();
 const passwordRef = useRef();
@@ -65,7 +70,8 @@ const callLogin_ALM = async()=>{
 }
 const callViewMappedFiles = async()=>{
     setBlockui({show:true,content:'Fetching...'})
-    props.setViewMappedFiles(true)
+    //props.setViewMappedFiles(true)
+    dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "ALM" });
     const userid = user_id;
     const response = await viewQcMappedList_ICE(userid);
     if(response.error){props.displayError(response.error);props.setBlockui({show:false});return;}
@@ -73,7 +79,8 @@ const callViewMappedFiles = async()=>{
     setBlockui({show:false})
 }
 const callExitcenter=()=>{
-    props.setAlmClicked(false);
+    //dispatch({ type: actionTypes.ALM_LOGIN, payload: false });;
+    props.setAlmClicked(false)
 }
 const content = () =>{
         return(
@@ -93,16 +100,16 @@ const content = () =>{
         <>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-        {props.viewmappedFiles ? <ViewMappedALM mappedfilesRes={mappedfilesRes}/> :
+        {viewMappedFlies =="ALM" ? <ViewMappedALM mappedfilesRes={mappedfilesRes}/> :
         <div className="integration_middleContent">
-            { props.loginAlm && !loginSucess &&
+            {!loginSucess &&
                     <> <ModalContainer 
                             title="ALM Login"
-                            close={()=>{props.setloginAlm(false);props.setAlmClicked(false)}}
+                            close={()=>{dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });}}
                             content={content()}
                             footer ={<button onClick={()=>callLogin_ALM() }>Submit</button>} /> 
                     </> }
-            { props.almClicked &&
+            { screenType=="ALM" &&
                 <ALM 
                     domainDetails={domainDetails}
                     setBlockui={setBlockui}

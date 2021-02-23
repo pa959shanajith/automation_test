@@ -5,6 +5,8 @@ import {getTopMatches_ProfJ } from '../api';
 
 const  ChatBot = (props) => {
     const queryref = useRef(); //ref for query input tag to acess the current value of usermessage onClick.
+    const uMsgRef = useRef();
+    const bMsgRef = useRef();
     const [chatBox , setChatBox] = useState(false); //State for chat aree open close 
     const [chat , setChat] = useState([])//State stores all the list of chat objects.
     const [linkMsgArr , setLinkMsgArr]= useState([])//stores all the links clicked on the Bot Message
@@ -42,7 +44,8 @@ const  ChatBot = (props) => {
         if(chatReturn.error){displayError(chatReturn.error);return;}
         chatArr.push({message: chatReturn , from: "Bot"})
         setChat(chatArr) 
-        
+        uMsgRef.current && uMsgRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+        bMsgRef.current && bMsgRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
     }
 
     const callLinkClick=(idx)=>{ //if any of the links are clicked on te BOT message
@@ -73,11 +76,11 @@ const  ChatBot = (props) => {
                             {
                             chat.map((e,i)=>(
                                 (e.from === "user")? 
-                                    <span className="userQuerymessage" key={i} >
+                                    <span ref={uMsgRef} className="userQuerymessage" key={i} >
                                         {e.message}
                                     </span>
                                 : 
-                                    <div className="defautMssg">
+                                    <div ref={bMsgRef} className="defautMssg">
                                         {e.message.map((mes , i ) => ((mes[0] ==-1)?  mes[1] :
                                         i ===0 ?
                                             <>Did you mean to ask about one of these? 

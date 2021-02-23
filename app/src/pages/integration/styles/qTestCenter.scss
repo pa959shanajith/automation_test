@@ -151,6 +151,9 @@
         min-height: 1.2em;
         padding: 0px 2px 1px;
     }
+    option::selection{
+        background: red;
+    }
 }
 .qcProContainer input{
     height: 24px;
@@ -289,4 +292,14 @@
         margin: 0;
         white-space: nowrap;
     }
+}
+.submit_row{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+}
+.submit_row span:first-child{
+    color: red;
 }

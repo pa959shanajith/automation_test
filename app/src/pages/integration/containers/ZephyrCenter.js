@@ -1,12 +1,16 @@
 import React , {useRef , Fragment ,useState} from 'react';
 import {ModalContainer , ScrollBar , PopupMsg ,ScreenOverlay} from '../../global';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Zephyr from '../components/Zephyr.js';
 import ViewMappedZephyr from '../components/ViewMappedZephyr.js';
 import ContentZephyr from '../components/ContentZephyr.js';
 import {loginToZephyr_ICE,viewZephyrMappedList_ICE} from '../api.js';
+import * as actionTypes from '../state/action.js';
 const ZephyrCenter =(props)=>{
-const user_id = useSelector(state=> state.login.userinfo.user_id); 
+const dispatch= useDispatch();
+const user_id = useSelector(state=> state.login.userinfo.user_id);
+const screenType = useSelector(state=>state.integration.loginPopupType); 
+const viewMappedFlies = useSelector(state=>state.integration.mapped_scren_type);
 const accountidRef = useRef();
 const accessKeyRef = useRef();
 const secretKeyRef = useRef();
@@ -78,7 +82,7 @@ const callLogin_zephyr = async()=>{
 }
 const callViewMappedFiles=async()=>{
     setBlockui({show:true,content:'Loading...'})
-    props.setViewMappedFiles(true)
+    dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "Zephyr" });
     const userid = user_id;
     const response = await viewZephyrMappedList_ICE(userid);
     if(response.error){props.displayError(response.error);props.setBlockui({show:false});return;}
@@ -111,10 +115,10 @@ const footer=()=>{
         <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-        {props.viewmappedFiles ? <ViewMappedZephyr mappedfilesRes={mappedfilesRes}/> :
+        {viewMappedFlies =="Zephyr" ? <ViewMappedZephyr mappedfilesRes={mappedfilesRes}/> :
         <div className="integration_middleContent">
             {/* <div className="middle_holder"> */}
-            {props.zephyrClicked?
+            {screenType=="Zephyr"?
                 <Zephyr 
                     domainDetails={domainDetails}
                     setBlockui={setBlockui}
@@ -125,11 +129,11 @@ const footer=()=>{
 
                 /> :null}
                 {
-                    props.loginZephyr && !loginSucess? 
+                 !loginSucess? 
                     <Fragment>
                         <ModalContainer 
                             title="Zephyr Login"
-                            close={()=>{props.setZephyrClicked(false);props.setloginZephyr(false);props.setFocus(null)}}
+                            close={()=>{dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });;props.setFocus(null)}}
                             content={content()}
                             footer ={footer()} 
                         />
