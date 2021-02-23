@@ -320,7 +320,7 @@ const scenarioDetailsContent = (scenarioDetails, userInfo, displayError) => {
                 {scenarioDetails.screennames!==undefined?
                 <>
                     {scenarioDetails.screennames.map((data,i)=>(
-                        <div className="sDInnerContentsWrap">
+                        <div key={i} className="sDInnerContentsWrap">
                             <div className="sDInnerContents viewReadOnlyTC" onClick={()=>{testCaseDetails(scenarioDetails.testcasenames[i], scenarioDetails.testcaseids[i], userInfo, displayError)}} >{scenarioDetails.testcasenames[i]}</div>
                             <div className="sDInnerContents">{scenarioDetails.screennames[i]}</div>
                             <div className="sDInnerContents">{scenarioDetails.projectnames[i]}</div>

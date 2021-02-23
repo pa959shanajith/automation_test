@@ -306,8 +306,8 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                                                                 <div className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                                 <div className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
                                                                 <div className="s__Table_appType">
-                                                                    {data.browserlist.map((brow)=>(
-                                                                        <img src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
+                                                                    {data.browserlist.map((brow,index)=>(
+                                                                        <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
                                                                     ))}
                                                                 </div>
                                                                 <div className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
