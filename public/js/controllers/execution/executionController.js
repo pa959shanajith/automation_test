@@ -770,6 +770,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	$scope.allocateICEPopup = () =>{
 		$scope.smartMode = false;
 		$scope.selectedICE = "";
+		$('#userIdName')[0].value = ""
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
 		var data = {poolid:"",projectids: [projId]}
 		$("#chooseICEPool option").slice(1).remove()
