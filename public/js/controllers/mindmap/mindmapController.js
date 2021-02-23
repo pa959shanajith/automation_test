@@ -858,13 +858,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         var img_src = 'imgs/node-' + n.type + '.png';
         if (n.reuse && (n.type == 'testcases' || n.type == 'screens')) img_src = 'imgs/' + n.type + '-reuse.png';
+        let accessibility = 'Disable'
+        if(n.task && n.task.tasktype == 'Execute Scenario Accessibility Only') accessibility = 'Exclusive'
+        else if(n.task && n.task.tasktype == 'Execute Scenario with Accessibility') accessibility = 'Enable'
+        
 
         $scope.nodeDisplay[n.id] = {
             'type': n.type,
             'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
             'opacity': !( n._id == null || n._id == undefined) ? 1 : 0.5,
             'title': n.name,
-            'ac': n.accessibilityTesting || "Disable",
+            'ac': accessibility,
             'name': n.display_name,
             'img_src': img_src,
             '_id': n._id || null,
