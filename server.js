@@ -254,13 +254,13 @@ if (cluster.isMaster) {
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|p_Utility|reports|plugin)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|reports|plugin)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(p_Webocular|neuronGraphs\/|p_ALM|p_APG|p_Integration|p_qTest|p_Zephyr)$/, function(req, res) {
+		app.get(/^\/(p_Webocular|neuronGraphs\/|p_ALM|p_APG|integration|p_qTest|p_Zephyr)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});

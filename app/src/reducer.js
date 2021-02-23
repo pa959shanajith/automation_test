@@ -9,6 +9,8 @@ import mindmapReducer from './pages/mindmap/state/reducer.js';
 import scrapeReducer from './pages/scrape/state/reducer.js';
 import designReducer from './pages/design/state/reducer.js';
 import reportReducer from './pages/report/state/reducer.js';
+import integrationReducer from './pages/integration/state/reducer.js';
+
 
 export const JSOGTransform = createTransform(
   (inboundState, key) => {
@@ -21,7 +23,7 @@ export const JSOGTransform = createTransform(
 const persistConfig = {
     key: 'login',
     storage: storage,
-    whitelist: ['login', 'plugin'], //reducer that needs to be saved for refresh
+    whitelist: ['login', 'plugin','integration'], //reducer that needs to be saved for refresh
     transforms: [JSOGTransform]
   };
 
@@ -34,7 +36,8 @@ export const rootReducer = combineReducers({
     plugin : pluginReducer,
     scrape : scrapeReducer,
     design : designReducer,
-    report: reportReducer
+    report: reportReducer,
+    integration: integrationReducer
 });
   
 const pReducer = persistReducer(persistConfig, rootReducer);
