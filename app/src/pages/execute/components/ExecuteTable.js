@@ -78,7 +78,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                             if (eachData2[m].scenarioids[k] == current_task.assignedTestScenarioIds) {
                                 eachData1.push({
                                     "condition": [rowData.condition[k]],
-                                    "dataparam": [rowData.dataparam[k]],
+                                    "dataparam": [(rowData.dataparam[k]).trim()],
                                     "executestatus": [rowData.executestatus[k]],
                                     "scenarioids": [rowData.scenarioids[k]],
                                     "scenarionames": [rowData.scenarionames[k]],
@@ -88,7 +88,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                                 });
                                 initialTableList.push({
                                     "condition": [rowData.condition[k]],
-                                    "dataparam": [rowData.dataparam[k]],
+                                    "dataparam": [(rowData.dataparam[k]).trim()],
                                     "executestatus": [rowData.executestatus[k]],
                                     "scenarioids": [rowData.scenarioids[k]],
                                     "scenarionames": [rowData.scenarionames[k]],
@@ -320,7 +320,7 @@ const scenarioDetailsContent = (scenarioDetails, userInfo, displayError) => {
                 {scenarioDetails.screennames!==undefined?
                 <>
                     {scenarioDetails.screennames.map((data,i)=>(
-                        <div className="sDInnerContentsWrap">
+                        <div key={i} className="sDInnerContentsWrap">
                             <div className="sDInnerContents viewReadOnlyTC" onClick={()=>{testCaseDetails(scenarioDetails.testcasenames[i], scenarioDetails.testcaseids[i], userInfo, displayError)}} >{scenarioDetails.testcasenames[i]}</div>
                             <div className="sDInnerContents">{scenarioDetails.screennames[i]}</div>
                             <div className="sDInnerContents">{scenarioDetails.projectnames[i]}</div>

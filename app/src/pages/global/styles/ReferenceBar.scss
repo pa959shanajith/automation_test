@@ -175,6 +175,8 @@
 
 .task_info__title{
     flex-grow: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .task_info__content{

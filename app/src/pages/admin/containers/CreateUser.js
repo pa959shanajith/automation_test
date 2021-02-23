@@ -303,7 +303,7 @@ const CreateUser = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data == "empty") {
-            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+            setPopupState({show:true,title:"Edit Configuration",content: "User not found"});
         } else {
             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
             data.sort((a,b)=>a.name.localeCompare(b.name));
@@ -504,7 +504,8 @@ const CreateUser = (props) => {
     }
 
     const searchFunctionLdap = async(val)=>{
-        const items = userConf.ldapAllUserList.filter((e)=>e.html.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        let items = [];
+        if(userConf.ldapAllUserList!=="") items = userConf.ldapAllUserList.filter((e)=>e.html.toUpperCase().indexOf(val.toUpperCase())!==-1)
         setLdapUserList(items);
     }
     

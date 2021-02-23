@@ -84,8 +84,8 @@
 }
 #scheduleSuitesTopSection{
 	position: relative;
-    // height: 45%;
-    height: 35vh;
+    height: 45%;
+    // height: 35vh;
 	float:left;
 	width:100%;
 	// padding-bottom: 25px;
@@ -99,7 +99,7 @@
     margin-left: -20px;
     padding: 20px;
     // height: 57%;
-    height: 35vh;
+    height: 45%;
 }
 .form-control-schedule{
     display: block;
@@ -185,14 +185,12 @@
     text-overflow: ellipsis;
 }
 #scheduledDataBody{
-	float:left;
-	width:100% !important;
-	// margin-top: 28px;
-	overflow: auto;
-	-ms-overflow-style: none;
+	float: left;
+    width: 100% !important;
+    overflow: auto;
+    -ms-overflow-style: none;
     -webkit-overflow-style: none;
-    // max-height: 23vh;
-    max-height: 17vh;
+    max-height: 100%;
 }
 .scheduleDataBodyRowChild{
 	width: 100%;
@@ -245,4 +243,31 @@
 .s__cancel{
     margin-left: 5%;
     cursor: pointer
+}
+.s__table_contents{
+    margin-top: 5px;
+    position: relative;
+    height: 100%;
+}
+.s__ab{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+}
+.s__min{
+    min-height: 0;
+    height: 100%;
+}
+.s__con{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    height: 100%;
+}
+.s__table_container{
+    height: 98%;
 }

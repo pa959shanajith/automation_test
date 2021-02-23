@@ -202,10 +202,10 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
                         </thead>
                         <tbody className="scenarioBody scenarioTbCon_' + i + '">
                         {rowData.scenarioids.map((sid,j)=>(
-                            <tr>
+                            <tr key={j}>
                                 <td><span>{j+1}</span><input type="checkbox" checked={rowData.executestatus[j]?true:false}  onChange={()=>{changeExecutestatus(i,j)}} id={"executestatus_"+i+"_"+j} className="selectToSched"/></td>
 								<td data-scenarioid={sid}>{rowData.scenarionames[j]}</td>
-								<td style={{padding: "2px 0 2px 0"}}><input type="text" value={rowData.dataparam[j]} disabled/></td>
+								<td style={{padding: "2px 0 2px 0"}}><input type="text" value={(rowData.dataparam[j]).trim()} disabled/></td>
 								<td><select disabled><option value="1" selected={(rowData.condition[j] == 0) ? '' : 'selected'} >True</option><option value="0" selected={(rowData.condition[j] == 0) ? 'selected' : '' }>False</option></select></td>
 								<td>{rowData.projectnames[j]}</td> 
                                 <td title={rowData.projectnames[j]}>

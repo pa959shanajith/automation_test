@@ -1,5 +1,5 @@
 import React ,  { Fragment, useState} from 'react';
-import { getNames_ICE, createProject_ICE, updateProject_ICE} from '../api';
+import { getNames_ICE, createProject_ICE, updateProject_ICE, getDomains_ICE} from '../api';
 import {ScreenOverlay, PopupMsg} from '../../global'
 import { useSelector} from 'react-redux'; 
 import '../styles/ProjectButtons.scss';
@@ -16,6 +16,7 @@ const ProjectButtons = (props) => {
 
     // Create Project Action
     const create_project = async()=>{
+        document.getElementById("create_button").disabled = true;
         props.setProjectNameInputErrorBorder(false);
         if (props.projectName.trim() === "") props.setProjectNameInputErrorBorder(true);
         else if (props.projectTypeSelected=== ""){
@@ -37,25 +38,29 @@ const ProjectButtons = (props) => {
             else if (proceedToCreate === true) {
 				var requestedids = [];
 				var idtype = [];
-				if ( checkCycle(props.flag)) return false;
+				if ( checkCycle(props.flag)){
+                    document.getElementById("create_button").disabled = false;
+                    return false;
+                } 
                 else if (props.selDomain !== "") {
                     requestedids.push(props.selDomain);
                     idtype.push('domainsall');
                     var proceeed = false;
-                    //loading hatao and saving karo
                     const response = await getNames_ICE(requestedids, idtype)
-                    if(response.error){displayError(response.error);return;}
+                    if(response.error){displayError(response.error);document.getElementById("create_button").disabled = false;return;}
                     else if (response === "No Projects") {
                         proceeed = true;
                     } else if (response.projectNames.length > 0) {
                         for ( i = 0; i < response.projectNames.length; i++) {
                             if (props.projectName === response.projectNames[i]) {
                                 setPopupState({show:true,title:"Create Project",content:"Project Name already Exists"});
+                                document.getElementById("create_button").disabled = false;
                                 return false;
                             } else proceeed = true;
                         }
                     } else {
                         setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
+                        document.getElementById("create_button").disabled = false;
                         return false;
                     }
                     if (proceeed === true) {
@@ -67,11 +72,12 @@ const ProjectButtons = (props) => {
                         createprojectObj.projectDetails = props.projectDetails;
                         console.log("Controller: " + createprojectObj);
                         const createProjectRes = await createProject_ICE(createprojectObj)
-                        if(createProjectRes.error){displayError(createProjectRes.error);return;}
+                        if(createProjectRes.error){displayError(createProjectRes.error);document.getElementById("create_button").disabled = false;return;}
                         else if (createProjectRes === 'success') {
                             setPopupState({show:true,title:"Create Project",content:"Project created successfully"});
                             props.resetForm();
                             props.setProjectDetails([]);
+                            refreshDomainList();
                         } else {
                             setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
                             props.resetForm();
@@ -84,7 +90,17 @@ const ProjectButtons = (props) => {
 				setLoading(false);
                 setPopupState({show:true,title:"Create Project",content:"Please add atleast one cycle for a release"});
 			}
-		}
+        }
+        document.getElementById("create_button").disabled = false;
+    }
+
+    const refreshDomainList = async () => {
+        let data = await getDomains_ICE() 
+        if(data.error){displayError(data.error);return;}
+        else if(data.length===0){
+            data=['Banking','Manufacturing','Finance'];
+        }
+        props.setSelDomainOptions(data);
     }
 
     const checkCycle = (flag)=>{
@@ -245,7 +261,7 @@ const ProjectButtons = (props) => {
                 {props.taskName==="Create Project"?
                     <Fragment>
                         <button className="btn-md pull-right adminBtn" onClick={()=>props.editProjectTab()}  title="Edit Project">Edit</button>
-                        <button className="btn-md pull-right adminBtn btn-project-cust" onClick={()=>{create_project()}} title="Create Project">Create</button>            
+                        <button id="create_button" onClick={()=>{create_project()}} title="Create Project"  className="btn-md pull-right adminBtn btn-project-cust">Create</button>            
                     </Fragment>
                 :<button className="btn-md pull-right adminBtn" onClick={()=>{updateProject()}}  title="Update Project">Update</button>
                 }

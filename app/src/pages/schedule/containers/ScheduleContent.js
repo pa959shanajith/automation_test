@@ -247,9 +247,8 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
             :null} 
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             
-            <div id="wrapper-sc">
-                <div className="s__task_container">
-                    <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
+            <div className="s__task_container">
+                <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
                     <select id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className="e__taskBtn e__btn">
                         <option value="" selected disabled>Select Integration</option>
                         <option value="1">ALM</option>
@@ -257,13 +256,13 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                         <option value="2">Zephyr</option>
                     </select>
                 </div>
-            <div id="pageContent">
-                <div id="scheduleSuitesTopSection">
-                    <div id="tableActionButtons">
-                        <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}} title="Add">Schedule</button>
+                <div id="pageContent">
+                    <div id="scheduleSuitesTopSection">
+                        <div id="tableActionButtons">
+                            <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}} title="Add">Schedule</button>
+                        </div>
+                        <ScheduleSuitesTopSection moduleSceduledate={moduleSceduledate} setModuleSceduledate={setModuleSceduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} />
                     </div>
-                    <ScheduleSuitesTopSection moduleSceduledate={moduleSceduledate} setModuleSceduledate={setModuleSceduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} />
-                </div>
 
                 {/* //lower scheduled table Section */}
                 <div id="scheduleSuitesBottomSection">
@@ -292,35 +291,44 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
 							<span className="s__Table_appType s__table_Textoverflow s__Table_border" >App Type</span>
 							<span className="s__Table_status s__table_Textoverflow s__Table_border" >Status</span>
 						</div>
-                        <div id="scheduledDataBody" className="scheduledDataBody">
-                            <ScrollBar thumbColor="rgb(211, 211, 211)" trackColor="rgb(211, 211, 211)" >
-                                <div className='scheduleDataBodyRow'>
-                                        {pageOfItems.map((data)=>(
-                                            <div className="scheduleDataBodyRowChild">
-                                                <div className="s__Table_date s__Table_date-time ">{data.scheduledatetime}</div>
-                                                <div className="s__Table_host" >{data.target == nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
-                                                <div className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
-                                                <div className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
-                                                <div className="s__Table_appType">
-                                                    {data.browserlist.map((brow)=>(
-                                                        <img src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
-                                                    ))}
-                                                </div>
-                                                <div className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                    {data.status}
-                                                    {(data.status === 'scheduled')?
-                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,setPopupState)}} ng-click='cancelThisJob($event,"cancelled")' title='Cancel Job'/>
-                                                    :null}
-                                                </div> 
+                        <div className="s__table_container" >
+                            <div className="s__table_contents" >
+                                <div className="s__ab">
+                                    <div className="s__min">
+                                        <div className="s__con">
+                                            <div id="scheduledDataBody" className="scheduledDataBody">
+                                                <ScrollBar thumbColor="rgb(211, 211, 211)" trackColor="rgb(211, 211, 211)" >
+                                                    <div className='scheduleDataBodyRow'>
+                                                        {pageOfItems.map((data)=>(
+                                                            <div className="scheduleDataBodyRowChild">
+                                                                <div className="s__Table_date s__Table_date-time ">{data.scheduledatetime}</div>
+                                                                <div className="s__Table_host" >{data.target == nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                                <div className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
+                                                                <div className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
+                                                                <div className="s__Table_appType">
+                                                                    {data.browserlist.map((brow,index)=>(
+                                                                        <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
+                                                                    ))}
+                                                                </div>
+                                                                <div className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
+                                                                    {data.status}
+                                                                    {(data.status === 'scheduled')?
+                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,setPopupState)}} ng-click='cancelThisJob($event,"cancelled")' title='Cancel Job'/>
+                                                                    :null}
+                                                                </div> 
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </ScrollBar>
                                             </div>
-                                        ))}
+                                        </div>
+                                        <Pagination items={scheduledData} onChangePage={onChangePage} />
                                     </div>
-                            </ScrollBar>
+                                </div>
+                            </div>
                         </div>
 					</div>
-                    <Pagination items={scheduledData} onChangePage={onChangePage} />
                 </div>
-            </div>
             </div>
         </>
     );
