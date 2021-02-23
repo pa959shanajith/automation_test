@@ -24,16 +24,16 @@ const CompareObjectModal = props => {
         <div className="ss__compareObj">
             <ModalContainer 
                 title="Compare Object"
-                content={<div className="ss__compareObj_content">
+                content={<div data-test="ssCompareObjectContent" className="ss__compareObj_content">
                     <span>Select one of the browsers below to compare objects</span>
-                    <div className="compareObj_btns">
-                        { webIcons.map(icon => !icon.hide && <button className="compareObj_btn" title={icon.title} onClick={icon.action}>
-                                <img className="ss__web_icons" src={icon.src} alt={icon.title}/>
+                    <div data-test="compareObjectButtons" className="compareObj_btns">
+                        { webIcons.map(icon => !icon.hide && <button data-test="compareObjectButton" className="compareObj_btn" title={icon.title} onClick={icon.action}>
+                                <img  data-test="webIcons" className="ss__web_icons" src={icon.src} alt={icon.title}/>
                             </button>
                         ) }
                     </div>
                 </div>}
-                footer={<button onClick={()=>props.setShow(false)}>Cancel</button>}
+                footer={<button  data-test="cancelButton" onClick={()=>props.setShow(false)}>Cancel</button>}
                 close={()=>props.setShow(false)}
             />
         </div>
