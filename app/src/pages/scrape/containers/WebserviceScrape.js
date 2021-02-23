@@ -48,6 +48,29 @@ const WebserviceScrape = () => {
         else dispatch({type: actions.SET_WSDATA, payload: {respBody : event.target.value}})//setRespBody(event.target.value);
     }
 
+    const clearFields = () => {
+        setwsdlURL("");
+        setOpDropdown("0");
+        setOpList([]);
+        dispatch({
+            type: actions.SET_WSDATA, 
+            payload:  {
+                endPointURL: "",
+                method: "0",
+                opInput: "",
+                reqHeader: "",
+                reqBody: "",
+                respHeader: "",
+                respBody: "",
+                paramHeader: "",
+            }
+        });
+        dispatch({type: actions.SET_DISABLEACTION, payload: false});
+        dispatch({type: actions.SET_DISABLEAPPEND, payload: true});
+        dispatch({type: actions.SET_ACTIONERROR, payload: []});
+        dispatch({type: actions.SET_WSDLERROR, payload: []});
+    }
+
     const onSave = () => {
         let arg = {};
         let callApi = true;
@@ -280,7 +303,7 @@ const WebserviceScrape = () => {
                     <div className="ws__url_method">
                         <div className="ws__url_m_wrapper">
                             <label>WSDL</label>
-                            <input className={"ws__input"+(wsdlError.includes("wsdlURL")?" ws_eb":"")} type='text' placeholder='Enter WSDL Url' onChange={wsdlURLHandler} value={wsdlURL} />
+                            <input className={"ws__input"+(wsdlError.includes("wsdlURL")?" ws_eb":"")} type='text' placeholder='Enter WSDL URL' onChange={wsdlURLHandler} value={wsdlURL} />
                             <button className="ws__goBtn" onClick={onGo}>Go</button>
                             <select className={"ws__select"+(wsdlError.includes("opDropdown")?" ws_eb":"")} value={opDropdown} onChange={opDropdownHandler}>
                                 <option disabled={true} value="0">Select Operation</option>
@@ -307,7 +330,7 @@ const WebserviceScrape = () => {
                     </button>
                     <input className={"ws__input"+(actionError.includes("endPointURL")?" ws_eb":"")} type='text' placeholder='End Point URL' onChange={endpointURLHandler} value={endPointURL} disabled={disableAction}/>
                     <select className={"ws__select"+(actionError.includes("method")?" ws_eb":"")} onChange={methodHandler} value={method} disabled={disableAction} >
-                        <option value="0">Select Method</option>
+                        <option disabled value="0">Select Method</option>
                         <option value="GET">GET</option>
                         <option value="POST">POST</option>
                         <option value="HEAD">HEAD</option>
@@ -319,6 +342,9 @@ const WebserviceScrape = () => {
                         <img src="static/imgs/certificate_ws.png"/>
                     </button>
                     <button className="ws__action_btn ws__bigBtn" disabled={saved && disableAction } onClick={onSave}>Save</button>
+                    <button className="ws__action_btn ws__bigBtn" disabled={
+                        !wsdlURL && opDropdown === "0" && !endPointURL && method === "0" && !opInput && !reqHeader && !reqBody && !respHeader && !respBody && !paramHeader
+                    } onClick={clearFields}>Clear</button>
                 </div>
                 
                 <textarea 

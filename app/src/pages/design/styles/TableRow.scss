@@ -1,7 +1,29 @@
 
-.d__table_row_edit{
-    &:active{
-        background-color: #e3caff;
+// .d__table_row_edit{
+//     &:active{
+//         background-color: #e3caff;
+//     }
+// }
+
+.design__tc_row{
+    display: flex;
+    flex: 0 0 84%;
+    align-items: center;
+
+    .step_col{
+        flex: 0 0 4.9%;
+    }
+    
+    .objname_col{
+        flex: 0 0 22%;
+    }
+    
+    .keyword_col{
+        flex: 0 0 21%;
+    }
+    
+    .input_col, .output_col{
+        flex: 0 0 23%;
     }
 }
 
