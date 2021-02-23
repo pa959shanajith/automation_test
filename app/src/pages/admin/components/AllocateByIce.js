@@ -11,7 +11,7 @@ const  AllocateByIce = ({displayError,setLoading,selectedPool,setSelectedPool,sa
     const inpRef = useRef()
     const [poolIceData,setPoolIceData] = useState([])
     const [iceData,setIceData] = useState([])
-    const [initAssign,setInitAssign] = useState({})
+    const [initAssign,setInitAssign] = useState([])
     const [poolList,setPoolList] =  useState([])
     const [poolDict,setPoolDict] = useState({})
     //on selection of option in formInpDropdown
