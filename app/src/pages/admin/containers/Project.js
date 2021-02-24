@@ -61,6 +61,9 @@ const ProjectNew = (props) => {
         setDisableAddCycle(true);
         setSelProject("");
         setModalInputErrorBorder(false);
+        setDomainSelectErrorBorder(false);
+        setProjectSelectErrorBorder(false);
+        setProjectNameInputErrorBorder(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.resetMiddleScreen["projectTab"]])
 
@@ -134,6 +137,10 @@ const ProjectNew = (props) => {
         setSelDomain("");
         setReleaseList([])
         setCycleList([])
+        setModalInputErrorBorder(false);
+        setDomainSelectErrorBorder(false);
+        setProjectSelectErrorBorder(false);
+        setProjectNameInputErrorBorder(false);
     }
 
     const resetForm = (screen)=>{
@@ -699,6 +706,7 @@ const ProjectNew = (props) => {
 
     const fetchProjectList = async (domain) =>{
         if(taskName==="Update Project"){
+            setLoading("Loading Projects...")
             var domainName =domain;
 			var requestedname = [];
             requestedname.push(domainName);
@@ -717,6 +725,7 @@ const ProjectNew = (props) => {
             document.getElementById("selProjectOption").selectedIndex = "0";  
             setEditProjectName(false);
             setSelProject("")
+            setLoading(false);
             clearUpdateProjectObjects();
         }    
     }
@@ -793,7 +802,7 @@ const ProjectNew = (props) => {
                 }
 		</div>
         
-        <ProjectButtons editProjectName={editProjectName} setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
+        <ProjectButtons setSelDomainOptions={setSelDomainOptions} editProjectName={editProjectName} setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
 
         <div className="col-xs-9 form-group" style={{width: "83%"}}>
             <div className='userForm-project projectForm-project display-project' >

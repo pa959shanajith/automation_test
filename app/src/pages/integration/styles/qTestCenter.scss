@@ -71,7 +71,7 @@
 #scenarioLabel{
     margin-bottom: 0;
     position: relative;
-    left: 457px ;
+    left: 41.5% ;
     float: left;
     font-size: 16px
 }
@@ -87,55 +87,60 @@
     cursor: pointer;
 }
 .sepr_Div{
-    float: right;
-    margin-right: 30px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
 }
 .sepr_Div button{
+    font-family: "LatoWebLight";
+    border: none;
+    outline: none;
     color: #fff;
-    border: 0;
     border-radius: 20px;
-    background: #643693;
-    font-family: 'LatoWebLight';
-    outline: 0;
-    text-decoration: none;
-    cursor: pointer;
-    
+    padding: 0 19px;
+    height: 21px;
+    margin-right: 6px;
+    font-size: 15px;
+    background-color: #633693;
 }
+    
 .sepr_Div button:disabled,
     button[disabled]{
     cursor: not-allowed;
     opacity: .8;
 }
-.saveQcbtn {
-    float: left !important;
-    padding: 0px 19px !important;
-    font-size: 16px;
+.trees_wrappers{
+    display: flex;
+    flex-grow: 1;
+    margin-bottom: 10px;
+    justify-content: space-between;
 }
-
-.viewMapbtn {
-    padding: 0px 15px !important;
-    font-size: 15px;
-    float: left !important;
-    margin-left: 6px;
-    margin-right: 6px;
-}
-.leftQcStructure, .rightQcStructure {
+.left_tree_container ,.right_tree_container{
     border: 1px solid #000;
     position: relative;
     top: 14px;
-    height: 400px;
-    padding: 5px;
-    width: 47%;
-    float: left;
-    padding-top: 15px;
-    padding-left: 15px;
+    height: 100%;
+    padding: 15px 5px 5px 15px;
+}
+.leftQcStructure, .rightQcStructure {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 48%;
 }
 .leftQcStructure{
     margin-right: 35px;
     
 }
+.qcDomProContainer ,.qcProContainer{
+    display: flex;
+    font-family: "LatoWeb";
+    font-size: 14px;
+    width: 97%;
+    justify-content: space-between;
+}
 .qcDomProContainer select, .qcProContainer select {
-    width: 48%;
+    outline: none;
+    flex-basis: 49.5%;
     height: 24px;
     border-radius: 5px;
     border: 1px solid #000;
@@ -145,6 +150,9 @@
         white-space: pre;
         min-height: 1.2em;
         padding: 0px 2px 1px;
+    }
+    option::selection{
+        background: red;
     }
 }
 .qcProContainer input{
@@ -157,11 +165,13 @@
 
 }
 .qcTreeContainer ,.qcAvoAssureTreeContainer {
+    font-family: "LatoWeb";
+    font-size: 14px;
+    font-weight: 700;
     float: left;
     width: 100%;
     height: 90%;
-    margin-top: 20px;
-    padding: 0 6px 0 6px;
+    margin-top: 10px;
 }
 .qcTreeContainer ul{
     list-style-type: none;
@@ -252,4 +262,44 @@
     /* width: 14px; */
     display: inline;
     padding: 2px;
+}
+.linkedTestset-box{
+    width: 100%;
+    float: left;
+    margin-bottom: 26px;
+}
+.leftQcStructuremap, .rightQcStructuremap {
+    border: 1px solid #000;
+    position: relative;
+    top: 14px;
+    height: 400px;
+    padding: 5px;
+    width: 47%;
+    float: left;
+    padding-top: 15px;
+    padding-left: 15px;
+}
+.leftQcStructuremap{
+    margin-right: 35px;
+    
+}
+.title_rows{
+    display: flex;
+    font-family: "LatoWeb";
+    font-size: 14px;
+    font-weight: 700;
+    label {
+        margin: 0;
+        white-space: nowrap;
+    }
+}
+.submit_row{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+}
+.submit_row span:first-child{
+    color: red;
 }

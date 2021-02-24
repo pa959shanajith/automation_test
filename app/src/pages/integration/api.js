@@ -130,7 +130,7 @@ export const saveQtestDetails_ICE = async(mappedDetails) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'Map Test Cases Before save'}
+        return {error:'Map Testcases Before Save'}
     }catch(err){
         console.error(err)
         return {error:'Failed to Save Mapped TestCases'}
@@ -283,7 +283,7 @@ export const saveQcDetails_ICE = async(mappedDetails) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'Map Testcases Before save'}
+        return {error:'Map Testcases Before Save'}
     }catch(err){
         console.error(err)
         return {error:'Failed to Save Mapped Testcases'}
@@ -431,7 +431,7 @@ export const saveZephyrDetails_ICE = async(mappedDetails) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'Map Testcases Before save'}
+        return {error:'Map Testcases Before Save'}
     }catch(err){
         console.error(err)
         return {error:'Failed to Save Mapped Testcases'}

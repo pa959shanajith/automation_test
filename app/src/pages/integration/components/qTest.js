@@ -11,22 +11,23 @@ const QTest =(props)=>{
             </span>
         </div>
         <div className="sepr_Div">
-            <button disabled={props.disableSave} onClick={()=>props.callSaveButton()} className="saveQcbtn" style={{marginLeft:"470px"}}>Save</button> 
-            <button onClick={()=>props.callViewMappedFiles()} className="viewMapbtn">View Mapped Files</button> 
-            <button onClick={()=>props.callExit()} className="saveQcbtn">Exit</button>
-        </div><br/>
-        <div className="qcActionBtn">
-        <label>qTest Tests</label>
-        <label id="scenarioLabel">Avo Assure Scenarios</label>
+            <button disabled={props.disableSave} onClick={()=>props.callSaveButton()} style={{marginLeft:"470px"}}>Save</button> 
+            <button onClick={()=>props.callViewMappedFiles()}>View Mapped Files</button> 
+            <button onClick={()=>props.callExit()} >Exit</button>
         </div>
+        <div className="trees_wrappers">
         <div className="leftQcStructure">
+        <span className="title_rows">
+             <label>qTest Tests</label>
+            </span>
+            <div className="left_tree_container">
             <div className="qcDomProContainer">
                 <select value={props.projectDropdn1} ref={props.selProjectRef} onChange={(e)=>props.callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
                     <option value="Select Project"selected disabled >Select Project</option>
 
                     {   props.domainDetails.length ? 
                         props.domainDetails.map((e,i)=>(
-                            <option id={e.id} value={e.name}>{e.name}</option>
+                            <option id={e.id} value={e.id}>{e.name}</option>
                         )) : null
                     }
                 </select>
@@ -41,8 +42,8 @@ const QTest =(props)=>{
 
             </div>
             
-            <div className="qcTreeContainer">
-            <ScrollBar>
+            <div className="qcTreeContainer" id="left_tree">
+            <ScrollBar scrollId="left_tree" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                     { props.folderDetails ? 
                         <Fragment>    
                             <ul className="rootUl">
@@ -60,7 +61,8 @@ const QTest =(props)=>{
                                             <Fragment> 
                                             <li  style={{paddingLeft:"40px"}}>
                                                 <img  onClick={()=>props.callTestSuiteExpand({i})} style={{height:"16px",cursor: "pointer"}} src={e.TestsuiteOpen?"static/imgs/ic-taskType-blue-minus.png" :"static/imgs/ic-taskType-blue-plus.png"}/>
-                                                {e.testsuites.map((e,i)=>(
+                                                {e.testsuites&&
+                                                    e.testsuites.map((e,i)=>(
                                                     <label>{e.name}</label>
                                                 
                                                 ))
@@ -68,7 +70,8 @@ const QTest =(props)=>{
                                             {
                                                 e.TestsuiteOpen ?
                                                 <li id="testSuitediv">
-                                                {e.testsuites.map((e,i)=>(
+                                                {e.testsuites &&
+                                                e.testsuites.map((e,i)=>(
                                                     e.testruns.map((e,i)=>(
                                                         <Fragment>
                                                         <div style={{cursor: "pointer"}} onClick={(event)=>props.callTestSuiteSelection(event,e.id ,e.name)} id={e.id} className={props.selectedTestSuiteID == e.id? "slectedTestDiv": null} >
@@ -98,9 +101,11 @@ const QTest =(props)=>{
                             : null}
                   </ScrollBar>  
             </div>
-            
+            </div>
         </div> 
         <div className="rightQcStructure">
+        <span className="title_rows"><label>Avo Assure Scenarios</label></span>
+            <div className="right_tree_container">
             <div className="qcProContainer">
                 <select value={props.projectDropdn2} onChange={(e)=>props.callScenarios(e)} className="qtestAvoAssureSelectProject">
                     <option value="Select Project"selected disabled >Select Project</option>
@@ -122,8 +127,8 @@ const QTest =(props)=>{
                 }
             </div>
             
-            <div  className="qcAvoAssureTreeContainer">
-            <ScrollBar>
+            <div  className="qcAvoAssureTreeContainer" id="right_tree">
+            <ScrollBar scrollId="right_tree" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                 {
                     props.scenarioArr ? 
                     props.projectDetails.avoassure_projects.map((e,i)=>(
@@ -145,7 +150,8 @@ const QTest =(props)=>{
                 }
             </ScrollBar>
             </div>
-            
+            </div>
+            </div>
         </div>
     </Fragment>)
 }

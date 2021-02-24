@@ -68,11 +68,11 @@ const Zephyr=(props)=>{
     const callSaveButton =async()=>{ 
         props.setBlockui({show:true,content:'Saving...'})
         const response = await saveZephyrDetails_ICE(mappedDetails);
-        if(response.error){props.displayError("Save Mapped Testcase",response.error);props.setBlockui({show:false});return;}
+        if(response.error){props.displayError("Error",response.error);props.setBlockui({show:false});return;}
         if ( response == "success"){
             props.setBlockui({show:false})
             setErrorPopUp(true);
-            props.displayError("Save Mapped Testcase","Saved Succesfully");
+            props.displayError("Error","Saved Succesfully");
             setSaveSucess(true);
             setSyncSuccess(false);
         }
@@ -95,22 +95,6 @@ const Zephyr=(props)=>{
         setSelectedIssueID(issueid)
         setSelectedVersionId(versionId)
         setSelectedProjectId(projectId)
-        // setTestSuiteSelected_name(name);
-        // setSelectectedTestSetName(testSet);
-        
-        // if(event.target.childNodes.length){
-        //     if(mappedDetails.length){
-        //         if(mappedDetails[0].testsuiteid == idx){
-        //            setSyncSuccess(true);
-        //         }
-        //         else{
-        //             setSyncSuccess(false);
-        //         }
-        //        }
-        //        else{
-        //         setSyncSuccess(false)
-        //        }
-        // }
     }
     const callSyncronise =(folderpath)=>{
         if(!selectedScenario_ID){
@@ -133,9 +117,7 @@ const Zephyr=(props)=>{
                 versionid : selectedVersionId
             }
          ]
-        // setViewMappedFiles(false);
         setMappedDetails(mapped_Details);
-        //setDisableSave(false)
         setSyncSuccess(true);
     }
     }
@@ -159,7 +141,6 @@ const Zephyr=(props)=>{
     const callUnSync=()=>{
         setSyncSuccess(false);
         setMappedDetails([]);
-        //setDisableSave(true);
     
     }
     console.log(projectDetails);
@@ -175,12 +156,13 @@ const Zephyr=(props)=>{
             <button className="saveQcbtn" style={{marginLeft:"470px"}} onClick={()=>callSaveButton()}>Save</button> 
             <button className="viewMapbtn" onClick={()=>props.callViewMappedFiles()}>View Mapped Files</button> 
             <button className="saveQcbtn" onClick={()=>callExit()}>Exit</button>
-        </div><br/>
-        <div className="qcActionBtn">
-        <label>Zephyr Tests</label>
-        <label id="scenarioLabel">Avo Assure Scenarios</label>
         </div>
-        <div className="leftQcStructure">
+        <div className="trees_wrappers">
+            <div className="leftQcStructure">
+             <span className="title_rows">
+             <label>Zephyr Tests</label>
+            </span>
+            <div className="left_tree_container">
             <div className="qcDomProContainer">
                 <select value={projectDropdn1} ref={selProjectRef} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
                     <option value="Select Project"selected disabled >Select Project</option>
@@ -193,8 +175,8 @@ const Zephyr=(props)=>{
                 </select>
 
             </div>
-            <div className="qcTreeContainer">
-                <ScrollBar>
+            <div className="qcTreeContainer" id="left_tree">
+                <ScrollBar scrollId="left_tree" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                     {projectDetails? 
                         <Fragment>    
                             <ul className="rootUl">
@@ -213,8 +195,8 @@ const Zephyr=(props)=>{
                                                     <li style={selectedTestSuiteID == ele.id? {backgroundColor:"rgb(225,202,255"} : null}>
                                                         <label>{ele.name}</label>
                                                         { selectedTestSuiteID == ele.id ? <>
-                                                            {syncSuccess ?<img onClick={()=>callUnSync()} style={{cursor: "pointer",paddingRight:"10px"}} src="static/imgs/ic-qcUndoSyncronise.png"/>:null}
-                                                            {!syncSuccess ?<img onClick={()=>callSyncronise()} style={{cursor: "pointer",paddingRight:"10px"}} src="static/imgs/ic-qcSyncronise.png"/>:null}
+                                                            {syncSuccess ?<img onClick={()=>callUnSync()} style={{cursor: "pointer",float:"right",paddingRight:"10px"}} src="static/imgs/ic-qcUndoSyncronise.png"/>:null}
+                                                            {!syncSuccess ?<img onClick={()=>callSyncronise()} style={{cursor: "pointer",float:"right",paddingRight:"10px"}} src="static/imgs/ic-qcSyncronise.png"/>:null}
                                                             </>
                                                             : null}
                                                     </li>
@@ -231,7 +213,10 @@ const Zephyr=(props)=>{
                     </ScrollBar>
             </div>
         </div> 
+        </div>
         <div className="rightQcStructure">
+            <span className="title_rows"><label>Avo Assure Scenarios</label></span>
+            <div className="right_tree_container">
             <div className="qcProContainer">
                 <select value={projectDropdn2} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
                     <option value="Select Project"selected disabled >Select Project</option>
@@ -253,8 +238,8 @@ const Zephyr=(props)=>{
                 }
             </div>
             
-            <div  className="qcAvoAssureTreeContainer">
-            <ScrollBar>
+            <div  className="qcAvoAssureTreeContainer" id="right_tree">
+            <ScrollBar scrollId="right_tree" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                 {
                     scenarioArr ? 
                     avoProjects.map((e,i)=>(
@@ -276,7 +261,8 @@ const Zephyr=(props)=>{
                 }
             </ScrollBar>
             </div>
-            
+            </div>
+        </div>
         </div>
     </Fragment>
     :null)

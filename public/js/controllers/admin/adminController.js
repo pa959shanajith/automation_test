@@ -3396,7 +3396,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (parseInt(data[6])) errfields.push("Authentication Principal");
 				if (parseInt(data[7])) errfields.push("Authentication Credentials");
 				if (parseInt(data[8])) errfields.push("Data Mapping Settings");
-				openModalPopup(bAction+" Configuration", "Following values are invalid: "+errfields.join(", ")+ (errHints.length!=0)? (". Note: "+errHints):'.');
+				openModalPopup(bAction+" Configuration", "Following values are invalid: "+errfields.join(", ")+ ((errHints.length!=0)? (". Note: "+errHints):'.'));
 			}
 		}, function (error) {
 			unblockUI();
@@ -4162,9 +4162,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (+data[4]) errfields.push("Provider");
 				if (+data[5]) errfields.push("Server Host");
 				if (+data[6]) errfields.push("Server Port");
-				if (+data[7]) errfields.push("Sender Email");
+				if (+data[7]==1) errfields.push("Sender Email");
+				if (+data[7]==2) errfields.push("Sender Name");
 				if (+data[8]) errfields.push("Secure Connection");
-				if (+data[9]) errfields.push("Authentication");
+				if (+data[9]==1) errfields.push("Authentication");
+				if (+data[9]==2) errfields.push("Authentication Username");
 				if (+data[10]) errfields.push("Avo Assure Application URL");
 				if (+data[11]) errfields.push("Proxy URL");
 				if (+data[12] == 1) errfields.push("Proxy Username");

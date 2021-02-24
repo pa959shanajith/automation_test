@@ -48,7 +48,7 @@ const ReferenceBar = (props) => {
             let lenght_tasksJson = tasksJson.length;
             let task_list = [];
             for(let i=0; i < lenght_tasksJson; i++) {
-                let testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
+                let testSuiteDetails =tasksJson[i].testSuiteDetails;
                 let tasktype = tasksJson[i].taskDetails[0].taskType;
                 let taskname = tasksJson[i].taskDetails[0].taskName;
                 let dataobj = {
@@ -194,7 +194,7 @@ const ReferenceBar = (props) => {
                     {
                         showInfo && 
                         <ClickAwayListener onClickAway={closePopups}>
-                        <div className="ref_pop info_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
+                        <div className={"ref_pop" + (taskInfo?" info_pop":"")} style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
                             <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                             <div className="info_pop__contents">
                             {

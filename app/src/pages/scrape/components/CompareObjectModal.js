@@ -27,7 +27,7 @@ const CompareObjectModal = props => {
                 content={<div className="ss__compareObj_content">
                     <span>Select one of the browsers below to compare objects</span>
                     <div className="compareObj_btns">
-                        { webIcons.map(icon => !icon.hide && <button className="compareObj_btn" title={icon.title} onClick={icon.action}>
+                        { webIcons.map((icon, i) => !icon.hide && <button key={i} className="compareObj_btn" title={icon.title} onClick={icon.action}>
                                 <img className="ss__web_icons" src={icon.src} alt={icon.title}/>
                             </button>
                         ) }

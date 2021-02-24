@@ -1,13 +1,17 @@
 import React ,{useState , Fragment , useRef} from 'react';
 import {ModalContainer , ScrollBar , PopupMsg ,ScreenOverlay} from '../../global';
 import '../styles/qTestCenter.scss';
-import { useSelector } from 'react-redux';
+import { useSelector ,useDispatch } from 'react-redux';
 import { loginToQTest_ICE ,qtestProjectDetails_ICE , qtestFolderDetails_ICE , saveQtestDetails_ICE,viewQtestMappedList_ICE} from '../api.js';
 import Content from "../components/Content.js"
 import ViewMappedFiles from "../components/ViewMappedFiles.js"
 import QTest from '../components/qTest.js'
+import * as actionTypes from '../state/action.js';
 const  QTestCenter = (props)=> {
+const dispatch =useDispatch()
 const [loginSucess , setLoginSucess] = useState(false);
+const screenType = useSelector(state=>state.integration.loginPopupType);
+const viewMappedFlies = useSelector(state=>state.integration.mapped_scren_type);
 const urlRef = useRef();
 const userNameRef = useRef();
 const passwordRef = useRef();
@@ -79,7 +83,6 @@ const callLogin_ICE = async()=>{
         else{
         setDomainDetails(domainDetails);
         setLoginSucess(true);
-        props.setPopUpEnable(false);
     }
     setBlockui({show:false})
     }
@@ -96,7 +99,7 @@ const callProjectDetails_ICE=async(e)=>{
     setFolderDetails(null);
     setBlockui({show:false});
     setReleaseDropdn("Select Release")
-    setProjectDropdn1(domain);
+    setProjectDropdn1(domainid);
 }
 const callFolderDetails_ICE = async(e)=>{
     setBlockui({show:true,content:'Loading TestCases...'})
@@ -182,7 +185,7 @@ const callSyncronise =()=>{
             testsuiteid: selectedTestSuiteID  
         }
     ]
-    props.setViewMappedFiles(false);
+    //props.setViewMappedFiles(false);
     setMappedDetails(mapped_Details);
     setDisableSave(false)
     setSyncSuccess(true);
@@ -231,20 +234,21 @@ const callViewMappedFiles=async()=>{
           setBlockui({show:false})
     }
     else{
-        props.setViewMappedFiles(true);
-        props.setqTestClicked(false);
+        //props.setViewMappedFiles(true);
+        dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "qTest" });
+        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
         setMappedFIlesICERes(mappedResponse);
         setBlockui({show:false})
 
 }
 }
 const callExit=()=>{
-    props.setqTestClicked(false);
     props.setFocus(null);
     setFolderDetails(null);
     setScenarioArr(null);
     setLoginSucess(false);
-    props.setPopUpEnable(false);
+    //props.setPopUpEnable(false);
+    dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
     setFailMsg(null);
     setReleaseDropdn("Select Release");
     setDisableSave(true);
@@ -274,22 +278,27 @@ const content =()=>{
 }
 const footer=()=>{
     return(
+        <div className="submit_row">
+        <span>
+                {failMSg}
+        </span>
         <span>
             <button onClick={()=>callLogin_ICE() }>Submit</button>
         </span>
+        </div>
     )
 }
 return (<Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-        {props.viewmappedFiles ? 
+        {viewMappedFlies =="qTest" ? 
             <ViewMappedFiles 
                 mappedFilesICERes={mappedFilesICERes}
             /> : 
         <div className="integration_middleContent">
-        <div className="middle_holder">
+        {/* <div className="middle_holder"> */}
                 {
-                    props.qTestClicked ?
+                    screenType =="qTest" ?
                     <QTest
                         disableSave={disableSave}
                         callSaveButton={callSaveButton}
@@ -327,11 +336,11 @@ return (<Fragment>
                      : null   
                     }
                     {
-                    props.popUpEnable  & (!loginSucess)? 
+                    (!loginSucess)? 
                     <Fragment>
                         <ModalContainer 
                             title="qTest Login"
-                            close={()=>{props.setPopUpEnable(false);props.setFocus(null);props.setqTestClicked(false);setFailMsg(null)}}
+                            close={()=>{dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });;props.setFocus(null);setFailMsg(null);setLogError(null)}}
                             content={content()}
                             footer={footer()}/>
                         
@@ -354,7 +363,8 @@ return (<Fragment>
                 : null
                 } */}
             </div>
-        </div>}
+        // </div>
+        }
         </Fragment>
     
     )

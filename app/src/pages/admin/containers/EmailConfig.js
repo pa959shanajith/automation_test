@@ -91,7 +91,7 @@ const EmailConfig = ({resetMiddleScreen}) => {
             <div id='conf_email' className='conf_email'>
             <ScrollBar scrollId='conf_email' trackColor={'transperent'} thumbColor={'grey'}> 
                 <FormSelect inpRef={inputRef['selectprovider']} onChangeFn={onSelectProvider} defValue={"Select Provider"} label={"Provider"} option={['SMTP']}/>
-                <FormInput inpRef={inputRef['servername']} label={'Server Name'} placeholder={'Server Name'}/>
+                <FormInput inpRef={inputRef['servername']} label={'Server Name'} placeholder={'Server Name'} validExp={"emailServerName"}/>
                 <div className='col-xs-9 form-group input-label'>
                     <label>Status</label>
                     <span ref={inputRef['serverstatus']} style={{marginLeft:'20px'}} className={'left-opt'}>-</span>

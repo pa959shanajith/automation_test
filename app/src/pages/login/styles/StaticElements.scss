@@ -42,7 +42,7 @@
     margin-right: 10%;
     width: 290px;
     background: #FFF;
-    padding: 7% 4%;
+    padding: 5% 4%;
     border-radius: 50px;
     box-sizing: content-box;
 }
@@ -51,7 +51,7 @@
     height: 65px;
 }
 .logo-wrap{
-    margin-bottom: 65px;
+    margin-bottom: 50px;
     display: flex;
     justify-content: center;
 }
@@ -82,7 +82,7 @@
 
 @media screen and (max-width: 800px){
     .login-block{
-        padding: 7% 4%;
+        padding: 6% 4%;
         margin-top: 20px;
         margin-right: 0;
     }

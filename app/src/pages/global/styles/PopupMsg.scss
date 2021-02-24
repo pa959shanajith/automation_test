@@ -67,3 +67,8 @@
 button:focus{
     outline: none!important;
 }
+.popup__body-content{
+    white-space: pre-line;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

@@ -20,7 +20,7 @@ const PopupMsg = (props) => {
                     <h4 className='modal-title'>{props.title}</h4>
                 </div>
                 <div className='modal-body popup__body'>
-                    <p>{props.content}</p>
+                    <p className='popup__body-content'>{props.content}</p>
                 </div>
                 <div className='modal-footer popup__footer'>
                     <button onClick={(e)=>props.submit(e)} >{props.submitText}</button>

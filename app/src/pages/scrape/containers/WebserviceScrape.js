@@ -48,12 +48,35 @@ const WebserviceScrape = () => {
         else dispatch({type: actions.SET_WSDATA, payload: {respBody : event.target.value}})//setRespBody(event.target.value);
     }
 
+    const clearFields = () => {
+        setwsdlURL("");
+        setOpDropdown("0");
+        setOpList([]);
+        dispatch({
+            type: actions.SET_WSDATA, 
+            payload:  {
+                endPointURL: "",
+                method: "0",
+                opInput: "",
+                reqHeader: "",
+                reqBody: "",
+                respHeader: "",
+                respBody: "",
+                paramHeader: "",
+            }
+        });
+        dispatch({type: actions.SET_DISABLEACTION, payload: false});
+        dispatch({type: actions.SET_DISABLEAPPEND, payload: true});
+        dispatch({type: actions.SET_ACTIONERROR, payload: []});
+        dispatch({type: actions.SET_WSDLERROR, payload: []});
+    }
+
     const onSave = () => {
         let arg = {};
         let callApi = true;
 		let rReqHeader = reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
 		let rParamHeader = paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
-        let rReqBody = reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
+        let rReqBody = reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"').replace(/'+/g, "\"");
 		let rRespHeader = respHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
 		let rRespBody = respBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		if (!endPointURL) dispatch({type: actions.SET_ACTIONERROR, payload: ["endPointURL"]}); // error
@@ -73,6 +96,8 @@ const WebserviceScrape = () => {
                                         parsedReqBody = parsedReqBody.body;
                                     } 
                                     temp_flag = false;
+                                    allXpaths = [];
+                                    allCustnames = [];
                                     
                                     // NOT IMPLEMENTING PARAM YET
                                     // if (requestedparam.trim() != ""){
@@ -102,12 +127,12 @@ const WebserviceScrape = () => {
                                 }
                             } else if(rReqHeader.indexOf('json') !== -1){
                                 try{
-                                    // NOT IMPLEMENTING PARAM YET
-                                    // //Parsing Request Parameters
-                                    // if (requestedparam.trim() != ""){
-                                    //     var reqparams=parseRequestParam(requestedparam);
-                                    //     if (reqparams.length>0) viewArray.concat(reqparams);
-                                    // }
+                                    
+                                    //Parsing Request Parameters
+                                    if (rParamHeader.trim() != ""){
+                                        let reqparams = parseRequestParam(rParamHeader);
+                                        if (reqparams.length > 0) viewArray.concat(reqparams);
+                                    }
                                     //Parsing Request Body
                                     let xpaths = parseJsonRequest(rReqBody,"","");
                                     for (let object of xpaths) {
@@ -126,19 +151,16 @@ const WebserviceScrape = () => {
                             }
                         }
                     } else if (method === 'GET' && rParamHeader) {
-                        // IMPLEMENTATION FOR PARAMS
-                        // try{
-                        //     //Parsing Request Parameters
-                        //     if (requestedparam.trim() != ""){
-                        //         var reqparams=parseRequestParam(requestedparam);
-                        //         if (reqparams.length>0){
-                        //             scrapedObjects.view=reqparams;
-                        //         }
-                        //     }	
-                        // }catch(Exception){
-                        //     logger.error("Invalid Request Header for GET API")
-                        //     scrapedObjects="Fail";
-                        // }
+                        try{
+                            //Parsing Request Parameters
+                            if (rParamHeader.trim() != ""){
+                                var reqparams=parseRequestParam(rParamHeader);
+                                if (reqparams.length>0) viewArray=reqparams;
+                            }	
+                        } catch(Exception){
+                            console.error("Invalid Request Header for GET API");
+                            callApi = false;
+                        }
                     }
                 }
                 
@@ -150,6 +172,7 @@ const WebserviceScrape = () => {
                     "method": method,
                     "endPointURL": endPointURL,
                     "header": rReqHeader,
+                    "param": rParamHeader
                 };
 
                 if (viewArray.length > 0) scrapeData.view = viewArray;
@@ -162,7 +185,7 @@ const WebserviceScrape = () => {
                     "projectid": current_task.projectId,
                     "screenname": current_task.screenName,
                     "versionnumber": current_task.versionnumber,
-                    "param": "WS_obj"
+                    "param": "WebserviceScrapeData"
                 }
 
                 if (!temp_flag) arg["query"] = "updatescreen";
@@ -280,11 +303,11 @@ const WebserviceScrape = () => {
                     <div className="ws__url_method">
                         <div className="ws__url_m_wrapper">
                             <label>WSDL</label>
-                            <input className={"ws__input"+(wsdlError.includes("wsdlURL")?" ws_eb":"")} type='text' placeholder='Enter WSDL Url' onChange={wsdlURLHandler} value={wsdlURL} />
+                            <input className={"ws__input"+(wsdlError.includes("wsdlURL")?" ws_eb":"")} type='text' placeholder='Enter WSDL URL' onChange={wsdlURLHandler} value={wsdlURL} />
                             <button className="ws__goBtn" onClick={onGo}>Go</button>
                             <select className={"ws__select"+(wsdlError.includes("opDropdown")?" ws_eb":"")} value={opDropdown} onChange={opDropdownHandler}>
                                 <option disabled={true} value="0">Select Operation</option>
-                                { opList.map(op => <option value={op}>{op}</option>)}
+                                { opList.map((op, i) => <option key={i} value={op}>{op}</option>)}
                             </select>
                             <button className="ws__action_btn ws__bigBtn ws__addBtn" onClick={onAdd}>Add</button>
                         </div>
@@ -307,7 +330,7 @@ const WebserviceScrape = () => {
                     </button>
                     <input className={"ws__input"+(actionError.includes("endPointURL")?" ws_eb":"")} type='text' placeholder='End Point URL' onChange={endpointURLHandler} value={endPointURL} disabled={disableAction}/>
                     <select className={"ws__select"+(actionError.includes("method")?" ws_eb":"")} onChange={methodHandler} value={method} disabled={disableAction} >
-                        <option value="0">Select Method</option>
+                        <option disabled value="0">Select Method</option>
                         <option value="GET">GET</option>
                         <option value="POST">POST</option>
                         <option value="HEAD">HEAD</option>
@@ -319,6 +342,9 @@ const WebserviceScrape = () => {
                         <img src="static/imgs/certificate_ws.png"/>
                     </button>
                     <button className="ws__action_btn ws__bigBtn" disabled={saved && disableAction } onClick={onSave}>Save</button>
+                    <button className="ws__action_btn ws__bigBtn" disabled={
+                        !wsdlURL && opDropdown === "0" && !endPointURL && method === "0" && !opInput && !reqHeader && !reqBody && !respHeader && !respBody && !paramHeader
+                    } onClick={clearFields}>Clear</button>
                 </div>
                 
                 <textarea 
@@ -449,4 +475,22 @@ function parseJsonRequest(requestedBody, base_key, cur_key) {
 		console.error("Exception in the function parseRequest: ERROR::::", exception);
 	}
 	return xpaths
+}
+
+function parseRequestParam(parameters){
+	let paramsArray=[];
+    try{
+		var params=parameters.split('##');
+		for (let object of params) {
+			object=object.split(":");
+			let scrapedObjectsWS = {};
+			scrapedObjectsWS.xpath = object[0].trim();
+			scrapedObjectsWS.custname = object[0].trim();
+			scrapedObjectsWS.tag = "elementWS";
+			paramsArray.push(scrapedObjectsWS);
+		}
+	}catch (Exception){
+		console.error(Exception);
+	}	
+	return paramsArray										
 }
