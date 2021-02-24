@@ -318,13 +318,16 @@ function next_function(resultobj,projectid){
 					}
 					break;
 				case 'Execute Scenario':
-					task_json.scenarioTaskType = 'enable'
+					task_json.scenarioTaskType = 'disable';
+					taskDetails.taskName = "Execute Scenario " + t.name;
 					break;
 				case 'Execute Scenario with Accessibility':
-					task_json.scenarioTaskType = 'disable'
+					task_json.scenarioTaskType = 'enable';
+					taskDetails.taskName = "Execute Scenario "+ t.name + " with Accessibility Testing";
 					break;
 				case 'Execute Scenario Accessibility Only':
-					task_json.scenarioTaskType = "exclusive"
+					task_json.scenarioTaskType = "exclusive";
+					taskDetails.taskName = "Execute Accessibility Testing for Scenario " + t.name;
 					break;
 					// taskDetails.taskName = t.tasktype + ' ' + m.testScenarioName;
 					// task_json.scenarioName = m.testScenarioName;

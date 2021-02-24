@@ -1048,7 +1048,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         if ($('.version-list') !== undefined)
             tvn = $('.version-list').val();
-        let accessibilityToggle = "Disable"
+        let accessibilityToggle = 'Disable';
         if  ($('#ct-assignTask').val() == "Execute Scenario with Accessibility") accessibilityToggle = "Enable"
         else if ($('#ct-assignTask').val() == "Execute Scenario Accessibility Only") accessibilityToggle = "Exclusive"
         var tObj = {
@@ -1565,14 +1565,25 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         $("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected');
         if(p.attr('data-nodetype') == 'scenarios' && apptype === "5db0022cf87fdec084ae49b6"){
-            if(dNodes[pi] && 'accessibilityTesting' in dNodes[pi] && dNodes[pi]['accessibilityTesting'] == "Enable"){
-                $('#ct-assignTask')[0].options[1].selected = true;
-            }else if(dNodes[pi] && 'accessibilityTesting' in dNodes[pi] && dNodes[pi]['accessibilityTesting'] == "Exclusive"){
-                $('#ct-assignTask')[0].options[2].selected = true;
+            switch(tObj.t){
+                case "Execute Scenario":
+                    $('#ct-assignTask')[0].options[0].selected = true;
+                    tObj.ac = "Disable";
+                    d3.select('#ct-assignDetails').property('value', "Execute Scenario "  + dNodes[pi].name);
+                    break;
+                case "Execute Scenario with Accessibility":
+                    $('#ct-assignTask')[0].options[1].selected = true;
+                    d3.select('#ct-assignDetails').property('value', "Execute Scenario "  + dNodes[pi].name + " with Accessibility Testing");
+                    tObj.ac = "Enable"
+                    break;
+                default:
+                    $('#ct-assignTask')[0].options[2].selected = true;
+                    d3.select('#ct-assignDetails').property('value', "Execute Accessibility Testing for Scenario "  + dNodes[pi].name);
+                    tObj.ac = "Exclusive"
             }
         }
         tObj.t = $('#ct-assignTask')[0].value
-        d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name);
+        if (p.attr('data-nodetype') != 'scenarios') d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name);
         $("#ct-assignTask").change(function() {
             if ($("#ct-assignTask").val() == 'Execute Batch') {
                 $('#ct-executeBatch').removeAttr("disabled");
@@ -1617,6 +1628,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('#ct-assignedTo').attr('disabled', 'disabled');
                             $('#ct-assignedTo').css('background', '#ebebe4');
                         }
+                        if (p.attr('data-nodetype') == 'scenarios' && $('#ct-assignedTo')[0].disabled) $('#ct-assignTask')[0].disabled = true;
                     }, function(error) {
                         console.log("Error:::::::::::::", error);
                         unblockUI();
@@ -3389,9 +3401,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     moduleData.suiteDetails = [];
                     for (var j = 0; j < moduleObj.scenarioids.length; j++) {
                         var s_data = JSON.parse(JSON.stringify(suiteDetailsTemplate));
-                        if(moduleObj.accessibilityTestingMap[moduleObj.scenarioids[j]] == "Enable" || moduleObj.accessibilityTestingMap[moduleObj.scenarioids[j]] == "Exclusive"){
-                            s_data.accessibilityParameters = ["AA","A","508","Best Practice"]
-                        }
                         s_data.condition = moduleObj.condition[j];
                         s_data.dataparam = [moduleObj.dataparam[j]];
                         s_data.scenarioName = moduleObj.scenarionames[j];
