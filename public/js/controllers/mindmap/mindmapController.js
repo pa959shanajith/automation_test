@@ -1568,7 +1568,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
         }
         tObj.t = $('#ct-assignTask')[0].value
-        d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name);
+        d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length) + " " + dNodes[pi].name);
         $("#ct-assignTask").change(function() {
             if ($("#ct-assignTask").val() == 'Execute Batch') {
                 $('#ct-executeBatch').removeAttr("disabled");
