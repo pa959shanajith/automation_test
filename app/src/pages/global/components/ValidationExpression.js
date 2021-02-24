@@ -11,6 +11,8 @@ const ValidationExpression = (value,id) =>{
         regex = /\s/g;
     else if (id == "email")
         regex = /[^a-zA-Z0-9@._-]/g;
+    else if (['projectName', 'releaseTxt', 'cycleTxt', 'releaseName', 'cycleName'].includes(id))
+        regex = /[~`%*()+=|:;"'?/><,]/g;
     else
         return value;
     var replacedValue = value.replace(regex, "");
