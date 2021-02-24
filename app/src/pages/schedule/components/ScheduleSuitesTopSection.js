@@ -165,7 +165,7 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
         <div className="scheduleSuiteTable">
             <ScrollBar thumbColor="#929397" trackColor="rgb(211, 211, 211)">
             {scheduleTableData.map((rowData,i)=>(
-                <div className="batchSuite">
+                <div key={i} className="batchSuite">
                     <div className="scheduleSuite" >
                         <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" />
                         <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span>

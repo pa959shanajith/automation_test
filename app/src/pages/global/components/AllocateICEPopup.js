@@ -205,9 +205,10 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
 
 const submitModalButton = (SubmitButton,  selectedPool, smartMode, selectedICE, modalButton, scheSmartMode, ExeScreen) => {
     const executionData = {};
-    executionData.targetUser = selectedICE
     executionData.type = (ExeScreen===true?smartMode:scheSmartMode)
     executionData.poolid =  selectedPool
+    if((ExeScreen===true?smartMode:scheSmartMode) !== "normal") executionData.targetUser = Object.keys(selectedICE);
+    else executionData.targetUser = selectedICE
 
     return(
         <div>
