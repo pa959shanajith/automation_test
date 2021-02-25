@@ -436,7 +436,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $('#accordionTblExecutions').hide()
         $scope.reportGenerated = true;
         var inputdata = {};
-        inputdata['type'] = "reportdata";
+        inputdata['type'] = "reportdata_names_only";
         inputdata['screendata'] = e.target.id;
         reportService.getAccessibilityData_ICE(inputdata)
             .then(function (accessibility_data) {
@@ -471,108 +471,124 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $(document).on('click', '.screen_report', function (e) {
+        blockUI("Fetching Accessibility Reports");
         const id = $(this).attr('data-executionid');
-        const report = $scope['acc_report_data'][id]
-        $("#report-canvas").show();
-        $("#report-header").show();
-        $("#report-header").empty();
-        $("#accordion").hide();
-        $(".mid-report-section").hide();
+        var inputdata = {type:"reportdata", executionid: id}
+        reportService.getAccessibilityData_ICE(inputdata).then((report) => {
+            var report = report[0];
+            $("#report-canvas").show();
+            $("#report-header").show();
+            $("#report-header").empty();
+            $("#accordion").hide();
+            $(".mid-report-section").hide();
 
-        $('#middle-content-section').attr('class', "webCrawler-report");
-        var proxy = "Disabled";
-        $("#report-header").append('<div width="100%" height="100%" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Accessibility Report</label></div><div style="display: flex;"><div style="width:50%;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+ report.screenname + '</span></div><div><label class="webCrawler-report-label">' + "Agent" + '</label><span class="webCrawler-report-span" style="text-transform: capitalize;">'+ report.agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">0</span></div></div><div style="width:50%;"></div></div>')
-        var body = document.getElementById('report-canvas');
-        var reportDiv = document.createElement('div');
-        //reportDiv.setAttribute('class', 'scrollbar-inner');
+            $('#middle-content-section').attr('class', "webCrawler-report");
+            var proxy = "Disabled";
+            $("#report-header").append('<div width="100%" height="100%" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Accessibility Report</label></div><div style="display: flex;"><div style="width:50%;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+ report.screenname + '</span></div><div><label class="webCrawler-report-label">' + "Agent" + '</label><span class="webCrawler-report-span" style="text-transform: capitalize;">'+ report.agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">0</span></div></div><div style="width:50%;"></div></div>')
+            var body = document.getElementById('report-canvas');
+            var reportDiv = document.createElement('div');
+            //reportDiv.setAttribute('class', 'scrollbar-inner');
 
-        var tbl = document.createElement('table');
-        tbl.setAttribute('width', '100%');
-        tbl.setAttribute('height', '100%');
-        tbl.setAttribute('class', 'webCrawler-report-table');
-        // $('.scrollbar-inner').scrollbar();
-        var tbdy = document.createElement('tbody');
-        var headrow = document.createElement('tr');
-        var headData = { 0: 'S.No.', 1: 'Level', 2: 'URL', 3: 'A', 4: 'AA', 5: 'Section508', 6: 'Best-Practice' };
-        jsonStruct = { 0: 'level', 1: 'url'};
-        for (var i = 0; i < 7; i++) {
-            var th = document.createElement('th');
-            th.appendChild(document.createTextNode(headData[i]));
-            headrow.appendChild(th);
-        }
-
-        tbdy.appendChild(headrow);
-        headrow.childNodes[0].setAttribute('style', 'width : 55px');
-        headrow.childNodes[1].setAttribute('style', 'width : 55px');
-        headrow.childNodes[3].setAttribute('style', 'width : 55px');
-        headrow.childNodes[4].setAttribute('style', 'width : 85px');
-        headrow.childNodes[5].setAttribute('style', 'width : 85px');
-        headrow.childNodes[6].setAttribute('style', 'width : 85px');
-
-        // Iterating through links for Body Element
-    
-        var newRow = document.createElement('tr');
-        var sNo = document.createElement('td');
-        sNo.setAttribute('style', 'width: 55px');
-        sNo.appendChild(document.createTextNode(1));
-        newRow.appendChild(sNo);
-        for (j = 0; j < 2; j++) {
-            var data = document.createElement('td');
-            text = report[jsonStruct[j]];
-            if (text == undefined)
-                text = "-";
-            data.appendChild(document.createTextNode(text));
-            newRow.appendChild(data);
-        }
-
-        // Adding if the Accessibly test passed or failed.
-        for (k = 0; k < 4; k++) {
-            var node = document.createElement('td');
-            if (report.data["access-rules"][k]["selected"]) {
-                if (report.data["access-rules"][k]["pass"]) {
-                    node.innerHTML = '<div class="foo green"></div>';
-                } else {
-                    node.innerHTML = '<div class="foo red"></div>';
-                }
-            } else {
-                node.innerHTML = 'NA';
+            var tbl = document.createElement('table');
+            tbl.setAttribute('width', '100%');
+            tbl.setAttribute('height', '100%');
+            tbl.setAttribute('class', 'webCrawler-report-table');
+            // $('.scrollbar-inner').scrollbar();
+            var tbdy = document.createElement('tbody');
+            var headrow = document.createElement('tr');
+            var headData = { 0: 'S.No.', 1: 'Level', 2: 'URL', 3: 'Standard'};
+            jsonStruct = { 0: 'level', 1: 'url'};
+            for (var i = 0; i < 4; i++) {
+                var th = document.createElement('th');
+                th.appendChild(document.createTextNode(headData[i]));
+                headrow.appendChild(th);
             }
-            newRow.appendChild(node);
-        }
-        tbdy.appendChild(newRow);
-            
+
+            tbdy.appendChild(headrow);
+            headrow.childNodes[0].setAttribute('style', 'width : 55px');
+            headrow.childNodes[1].setAttribute('style', 'width : 55px');
+            headrow.childNodes[3].setAttribute('style', 'width : 10%');
+
+            // Iterating through links for Body Element
         
-        tbl.appendChild(tbdy);
-        reportDiv.appendChild(tbl);
-        body.appendChild(reportDiv);
-        var accessDiv = document.createElement('table');
-        accessDiv.setAttribute('width', '100%');
-        accessDiv.setAttribute('class', 'webCrawler-report-table');
-
-        var tr1 = document.createElement('tr');
-        headers = ["SNo", "Description", "Help", "Impact"];
-        datas = ["description", "help", "impact"];
-        for (i = 0; i < headers.length; i++) {
-            var th1 = document.createElement('th');
-            th1.appendChild(document.createTextNode(headers[i]));
-            tr1.appendChild(th1);
-        }
-
-        accessDiv.appendChild(tr1);
-
-        for (i = 0; i < report.data["accessibility"]["violations"].length; i++) {
-            var tr1 = document.createElement('tr');
-            var td1 = document.createElement('td');
-            td1.appendChild(document.createTextNode(i + 1));
-            tr1.append(td1);
-            for (j = 0; j < datas.length; j++) {
-                var td1 = document.createElement('td');
-                td1.appendChild(document.createTextNode(report.data["accessibility"]["violations"][i][datas[j]]));
-                tr1.appendChild(td1);
+            var newRow = document.createElement('tr');
+            var sNo = document.createElement('td');
+            sNo.setAttribute('style', 'width: 55px');
+            sNo.appendChild(document.createTextNode(1));
+            newRow.appendChild(sNo);
+            for (j = 0; j < 2; j++) {
+                var data = document.createElement('td');
+                text = report[jsonStruct[j]];
+                if (text == undefined)
+                    text = "-";
+                data.appendChild(document.createTextNode(text));
+                newRow.appendChild(data);
             }
+
+            // Adding if the Accessibly test passed or failed.
+            var node = document.createElement('td');
+            var innerHtml = ""
+            for (k = 0; k < 4; k++) {
+                if (report.data["access-rules"][k]["selected"]) {
+                    if (report.data["access-rules"][k]["pass"]) {
+                        innerHtml = '<div><div class="foo green"></div><label style="margin-left: 3px;">' + report.data["access-rules"][k]["name"] + '</label></div>' + innerHtml;
+                    } else {
+                        innerHtml = '<div><div class="foo red"></div><label style="margin-left: 3px;">' + report.data["access-rules"][k]["name"] + '</label></div>' + innerHtml;
+                    }
+                }
+            }
+            node.innerHTML = innerHtml;
+            newRow.appendChild(node);
+            tbdy.appendChild(newRow);
+                
+            
+            tbl.appendChild(tbdy);
+            reportDiv.appendChild(tbl);
+            body.appendChild(reportDiv);
+            var accessDiv = document.createElement('table');
+            accessDiv.setAttribute('width', '100%');
+            accessDiv.setAttribute('class', 'webCrawler-report-table');
+
+            var tr1 = document.createElement('tr');
+            headers = ["SNo","Status", "Description", "Help", "Impact"];
+            header_widths = ["5%","10%","40%","35%","10%"]
+            datas = ["description", "help", "impact"];
+            for (i = 0; i < headers.length; i++) {
+                var th1 = document.createElement('th');
+                th1.appendChild(document.createTextNode(headers[i]));
+                th1.style.width = header_widths[i];
+                tr1.appendChild(th1);
+            }
+
             accessDiv.appendChild(tr1);
-        }
-        body.appendChild(accessDiv);
+            let reportNo = 1;
+            for (let accReport in report.data["accessibility"]) {
+                if (accReport === "url" || accReport === "timestamp") continue
+                for(var i = 0; i < report.data["accessibility"][accReport].length; i++){
+                    var tr1 = document.createElement('tr');
+                    var td1 = document.createElement('td');
+                    var td2 = document.createElement('td');
+                    td1.appendChild(document.createTextNode(reportNo++));
+                    tr1.append(td1);
+                    td2.appendChild(document.createTextNode(accReport));
+                    tr1.append(td2)
+                    for (j = 0; j < datas.length; j++) {
+                        var td1 = document.createElement('td');
+                        td1.appendChild(document.createTextNode(report.data["accessibility"][accReport][i][datas[j]]));
+                        tr1.appendChild(td1);
+                    }
+                    accessDiv.appendChild(tr1);
+                }
+                
+            }
+            body.appendChild(accessDiv);
+            unblockUI();
+
+        }).catch((error)=>{
+            unblockUI();
+            console.log("Error in getAccessibilityData_ICE while fetching accessibility reports-" + error);
+        })
+        
 
     });
 

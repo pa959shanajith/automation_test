@@ -14,7 +14,11 @@ exports.getAccessibilityTestingData_ICE = async function(req, res) {
 				result = await utils.fetchData(inputs, "reports/getAccessibilityTestingData_ICE", fnName);
 				break;
 			case "reportdata":
-				inputs ={query: "reportdata", "screenname": query.screendata}; 
+				inputs ={query: "reportdata", "executionid": query.executionid}; 
+				result = await utils.fetchData(inputs, "reports/getAccessibilityTestingData_ICE", fnName);
+				break;
+			case "reportdata_names_only":
+				inputs ={query: "reportdata_names_only", "screenname": query.screendata}; 
 				result = await utils.fetchData(inputs, "reports/getAccessibilityTestingData_ICE", fnName);
 				break;
 			default:

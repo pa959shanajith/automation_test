@@ -741,7 +741,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							});
 						}
 					});
-
+					suiteInfo.scenarioTaskType = scenarioTaskType;
 					suiteInfo.testsuiteName = $(this).parents('span.taskname').text();
 					suiteInfo.testsuiteId = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
 					suiteInfo.versionNumber = testsuiteDetails.versionnumber;

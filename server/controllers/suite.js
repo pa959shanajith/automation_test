@@ -245,7 +245,6 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 	});
 
 	scenario.testcase = JSON.stringify(allTestcaseSteps);
-	scenario.accessibilityTestingType = accessibilityTestingType;
 	// Step 3: Get qcdetails
 	scenario.qcdetails = [];
 	for(var k =0; k<integrationType.length; ++k) {
@@ -284,7 +283,8 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		"batchId": "",
 		"executionIds": [],
 		"testsuiteIds": [],
-		"suitedetails": []
+		"suitedetails": [],
+		"reportType": "functionalTesting"
 	};
 	const batchInfo = batchData.batchInfo;
 	for (const suite of batchInfo) {
@@ -307,7 +307,6 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			"accessibilityMap":{}
 		};
 		const suiteDetails = suite.suiteDetails;
-		var reportType = "accessiblityTestingOnly";
 		for (const tsco of suiteDetails) {
 			var integrationType = [];
 			if(batchData.integration && batchData.integration.alm.url) {
@@ -322,7 +321,6 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
-			if (!scenario.accessibilityTestingType || scenario.accessibilityTestingType != "Exclusive") reportType = "functionalTesting";
 			suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibilityParameters;
 			suiteObj.condition.push(scenario.condition);
 			suiteObj.dataparampath.push(scenario.dataparam[0]);
@@ -333,8 +331,8 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			scenarioObj.qcdetails = scenario.qcdetails;
 			scenarioList.push(scenarioObj);
 		}
+		if (suite.scenarioTaskType == "exclusive") execReq.reportType = "accessiblityTestingOnly";
 		suiteObj[testsuiteid] = scenarioList;
-		execReq.reportType = reportType;
 		execReq.testsuiteIds.push(testsuiteid);
 		execReq.suitedetails.push(suiteObj);
 	}
