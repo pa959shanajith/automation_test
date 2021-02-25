@@ -476,6 +476,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         var inputdata = {type:"reportdata", executionid: id}
         reportService.getAccessibilityData_ICE(inputdata).then((report) => {
             var report = report[0];
+            $scope.access_report = report;
             $("#report-canvas").show();
             $("#report-header").show();
             $("#report-header").empty();
@@ -496,7 +497,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             // $('.scrollbar-inner').scrollbar();
             var tbdy = document.createElement('tbody');
             var headrow = document.createElement('tr');
-            var headData = { 0: 'S.No.', 1: 'Level', 2: 'URL', 3: 'Standard'};
+            var headData = { 0: 'S.No.', 1: 'Level', 2: 'URL', 3: 'View Standard Report'};
             jsonStruct = { 0: 'level', 1: 'url'};
             for (var i = 0; i < 4; i++) {
                 var th = document.createElement('th');
@@ -529,11 +530,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var node = document.createElement('td');
             var innerHtml = ""
             for (k = 0; k < 4; k++) {
-                if (report.data["access-rules"][k]["selected"]) {
-                    if (report.data["access-rules"][k]["pass"]) {
-                        innerHtml = '<div><div class="foo green"></div><label style="margin-left: 3px;">' + report.data["access-rules"][k]["name"] + '</label></div>' + innerHtml;
+                if (report["access-rules"][k]["selected"]) {
+                    if (report["access-rules"][k]["pass"]) {
+                        innerHtml = '<div value="' +  report["access-rules"][k]["tag"] + '" class="accessRules"><div class="foo green"></div><label style="margin-left: 3px;">' + report["access-rules"][k]["name"] + '</label></div>' + innerHtml;
                     } else {
-                        innerHtml = '<div><div class="foo red"></div><label style="margin-left: 3px;">' + report.data["access-rules"][k]["name"] + '</label></div>' + innerHtml;
+                        innerHtml = '<div value="' +  report["access-rules"][k]["tag"] + '" class="accessRules"><div class="foo red"></div><label style="margin-left: 3px;">' + report["access-rules"][k]["name"] + '</label></div>' + innerHtml;
                     }
                 }
             }
@@ -545,7 +546,36 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             tbl.appendChild(tbdy);
             reportDiv.appendChild(tbl);
             body.appendChild(reportDiv);
+            
+            unblockUI();
+
+        }).catch((error)=>{
+            $scope.access_report = false;
+            unblockUI();
+            console.log("Error in getAccessibilityData_ICE while fetching accessibility reports-" + error);
+        })
+        
+
+    });
+
+    $(document).on('click',".accessRules",function(e){
+        const report = $scope.access_report;
+        const standard = e.currentTarget.attributes.value.value;
+        if(report && standard){
+            var reportList = report.rulemap[standard];
+            var body = document.getElementById('report-canvas');
+            if(document.getElementById("tableHeading")) document.getElementById("tableHeading").remove();
+            if(document.getElementById("accessibilityTable")) document.getElementById("accessibilityTable").remove();
+            var tableHeader = document.createElement("div");
+            tableHeader.setAttribute("id","tableHeading")
+            var tableStandard = document.createElement("label");
+            tableStandard.textContent = "Slected Standard: " + e.currentTarget.children[1].textContent;
+            tableHeader.style.fontSize = "20px"
+            tableHeader.appendChild(tableStandard);
+            body.appendChild(tableHeader);
+            tableHeader.appendChild(document.createElement("label"))
             var accessDiv = document.createElement('table');
+            accessDiv.setAttribute('id', 'accessibilityTable')
             accessDiv.setAttribute('width', '100%');
             accessDiv.setAttribute('class', 'webCrawler-report-table');
 
@@ -562,19 +592,18 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
             accessDiv.appendChild(tr1);
             let reportNo = 1;
-            for (let accReport in report.data["accessibility"]) {
-                if (accReport === "url" || accReport === "timestamp") continue
-                for(var i = 0; i < report.data["accessibility"][accReport].length; i++){
+            for (let reportType in reportList) {
+                for(var i = 0; i < reportList[reportType].length; i++){
                     var tr1 = document.createElement('tr');
                     var td1 = document.createElement('td');
                     var td2 = document.createElement('td');
                     td1.appendChild(document.createTextNode(reportNo++));
                     tr1.append(td1);
-                    td2.appendChild(document.createTextNode(accReport));
+                    td2.appendChild(document.createTextNode(reportType));
                     tr1.append(td2)
                     for (j = 0; j < datas.length; j++) {
                         var td1 = document.createElement('td');
-                        td1.appendChild(document.createTextNode(report.data["accessibility"][accReport][i][datas[j]]));
+                        td1.appendChild(document.createTextNode(reportList[reportType][i][datas[j]]));
                         tr1.appendChild(td1);
                     }
                     accessDiv.appendChild(tr1);
@@ -582,17 +611,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 
             }
             body.appendChild(accessDiv);
-            unblockUI();
-
-        }).catch((error)=>{
-            unblockUI();
-            console.log("Error in getAccessibilityData_ICE while fetching accessibility reports-" + error);
-        })
-        
-
+        }
     });
-
-
+     
+    
     $scope.toggle_accessibility = function ($event) {
         if ($('.ct-nodeIcon1').parent().is(':hidden')) { $('.ct-nodeIcon1').parent().show() }
         else { $('.ct-nodeIcon1').parent().hide() }
