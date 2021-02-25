@@ -529,7 +529,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             // Adding if the Accessibly test passed or failed.
             var node = document.createElement('td');
             var innerHtml = ""
-            for (k = 0; k < 4; k++) {
+            for (k = 0; k < 6; k++) {
                 if (report["access-rules"][k]["selected"]) {
                     if (report["access-rules"][k]["pass"]) {
                         innerHtml = '<div value="' +  report["access-rules"][k]["tag"] + '" class="accessRules"><div class="foo green"></div><label style="margin-left: 3px;">' + report["access-rules"][k]["name"] + '</label></div>' + innerHtml;
@@ -560,8 +560,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
     $(document).on('click',".accessRules",function(e){
         const report = $scope.access_report;
-        const standard = e.currentTarget.attributes.value.value;
+        var standard = e.currentTarget.attributes.value.value;
         if(report && standard){
+            standard = standard.replace(".","_");
             var reportList = report.rulemap[standard];
             var body = document.getElementById('report-canvas');
             if(document.getElementById("tableHeading")) document.getElementById("tableHeading").remove();
@@ -603,7 +604,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     tr1.append(td2)
                     for (j = 0; j < datas.length; j++) {
                         var td1 = document.createElement('td');
-                        td1.appendChild(document.createTextNode(reportList[reportType][i][datas[j]]));
+                        var value = reportList[reportType][i][datas[j]] || "N/A";
+                        td1.appendChild(document.createTextNode(value));
                         tr1.appendChild(td1);
                     }
                     accessDiv.appendChild(tr1);
