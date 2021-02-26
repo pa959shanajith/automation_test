@@ -827,6 +827,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		}else{
 			$scope.selectedICE = ice
 			$('#userIdName').removeClass('error-border')
+			$('#iceDrop').click()
 		}
 	}
 
