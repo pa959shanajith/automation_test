@@ -7,23 +7,23 @@
 
 .design__tc_row{
     display: flex;
-    flex: 0 0 84%;
+    flex: 0 0 76.5%;
     align-items: center;
 
-    .step_col{
-        flex: 0 0 4.7%;
-    }
-    
     .objname_col{
-        flex: 0 0 22%;
+        flex: 0 0 23.5%;
     }
     
     .keyword_col{
-        flex: 0 0 21%;
+        flex: 0 0 24%;
     }
     
-    .input_col, .output_col{
-        flex: 0 0 24%;
+    .input_col{
+        flex: 0 0 26%;
+    }
+    
+    .output_col{
+        flex: 0 0 27%;
     }
 }
 
@@ -92,6 +92,11 @@
     min-height: 25px;
     max-height: 25px;
     resize: none;
+}
+
+.d__disabled_step{
+    pointer-events: none;
+    cursor: default;
 }
 
 
