@@ -485,62 +485,68 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
             $('#middle-content-section').attr('class', "webCrawler-report");
             var proxy = "Disabled";
-            $("#report-header").append('<div width="100%" height="100%" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Accessibility Report</label></div><div style="display: flex;"><div style="width:50%;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+ report.screenname + '</span></div><div><label class="webCrawler-report-label">' + "Agent" + '</label><span class="webCrawler-report-span" style="text-transform: capitalize;">'+ report.agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">0</span></div></div><div style="width:50%;"></div></div>')
+            $("#report-header").append('<div width="100%" height="100%" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Report Data</label></div><div style="display: flex;"><div style="width:100%;position:relative;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+ report.screenname + '</span></div><div><label class="webCrawler-report-label">' + "Agent" + '</label><span class="webCrawler-report-span" style="text-transform: capitalize;">'+ report.agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">0</span></div><div><label class="webCrawler-report-label">URL</label><span class="webCrawler-report-span">'+ report.url + '</span></div></div></div>')
             var body = document.getElementById('report-canvas');
+            var headerDiv = document.createElement('div')
+            headerDiv.innerHTML = '<div width="100%" style="margin-top:5%;" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Accessibility Reports by Standards</label></div>';
+            body.appendChild(headerDiv)
             var reportDiv = document.createElement('div');
             //reportDiv.setAttribute('class', 'scrollbar-inner');
 
             var tbl = document.createElement('table');
             tbl.setAttribute('width', '100%');
             tbl.setAttribute('height', '100%');
-            tbl.setAttribute('class', 'webCrawler-report-table');
+            tbl.setAttribute('class', 'dataTable');
             // $('.scrollbar-inner').scrollbar();
             var tbdy = document.createElement('tbody');
             var headrow = document.createElement('tr');
-            var headData = { 0: 'S.No.', 1: 'Level', 2: 'URL', 3: 'View Standard Report'};
-            jsonStruct = { 0: 'level', 1: 'url'};
+            headrow.style.background = "gray"; 
+            headrow.style.color = "white"; 
+            headrow.style.fontSize = "12px"; 
+
+            var headData = { 0: 'S.No.', 1: 'Standard', 2: 'Status', 3: 'View Standard Report'};
+            jsonStruct = { 0: 'Standard', 1: 'Status',2:"Report"};
             for (var i = 0; i < 4; i++) {
                 var th = document.createElement('th');
+                th.style.textAlign = "center";
+                th.style.width = "20%"
                 th.appendChild(document.createTextNode(headData[i]));
                 headrow.appendChild(th);
             }
+            headrow.childNodes[0].style.width = "4%";
 
             tbdy.appendChild(headrow);
-            headrow.childNodes[0].setAttribute('style', 'width : 55px');
-            headrow.childNodes[1].setAttribute('style', 'width : 55px');
-            headrow.childNodes[3].setAttribute('style', 'width : 10%');
-
-            // Iterating through links for Body Element
-        
-            var newRow = document.createElement('tr');
-            var sNo = document.createElement('td');
-            sNo.setAttribute('style', 'width: 55px');
-            sNo.appendChild(document.createTextNode(1));
-            newRow.appendChild(sNo);
-            for (j = 0; j < 2; j++) {
-                var data = document.createElement('td');
-                text = report[jsonStruct[j]];
-                if (text == undefined)
-                    text = "-";
-                data.appendChild(document.createTextNode(text));
-                newRow.appendChild(data);
-            }
 
             // Adding if the Accessibly test passed or failed.
-            var node = document.createElement('td');
-            var innerHtml = ""
+            var reportNo = 1;
             for (k = 0; k < 6; k++) {
                 if (report["access-rules"][k]["selected"]) {
+                    var newRow = document.createElement('tr');
+                    newRow.style.textAlign = "center"
+                    newRow.style.fontSize = "12px";
+                    var sNo = document.createElement('td');
+                    sNo.setAttribute('style', 'width: 55px');
+                    sNo.appendChild(document.createTextNode(reportNo++));
+                    newRow.appendChild(sNo);
+                    var statusNode = document.createElement('td');
+                    var node = document.createElement('td');
                     if (report["access-rules"][k]["pass"]) {
-                        innerHtml = '<div value="' +  report["access-rules"][k]["tag"] + '" class="accessRules"><div class="foo green"></div><label style="margin-left: 3px;">' + report["access-rules"][k]["name"] + '</label></div>' + innerHtml;
+                        node.innerHTML = '<label style="margin-left: 3px;">' + report["access-rules"][k]["name"] + '</label>';
+                        statusNode.innerHTML = '<label style="color:green;">' + "Pass" + '</label>';
                     } else {
-                        innerHtml = '<div value="' +  report["access-rules"][k]["tag"] + '" class="accessRules"><div class="foo red"></div><label style="margin-left: 3px;">' + report["access-rules"][k]["name"] + '</label></div>' + innerHtml;
+                        node.innerHTML = '<label style="margin-left: 3px;">' + report["access-rules"][k]["name"] + '</label>';
+                        statusNode.innerHTML = '<label style="color:red;">' + "Fail" + '</label>';;
                     }
+                    newRow.append(node);
+                    newRow.append(statusNode);
+                    var reportLink = document.createElement('td');;
+                    reportLink.innerHTML = '<div value="' +  report["access-rules"][k]["tag"] + '" data="' + report["access-rules"][k]["name"] + '" class="accessRules"> <label>Report</label></div>'
+                    newRow.append(reportLink);
+                    tbdy.appendChild(newRow);
                 }
             }
-            node.innerHTML = innerHtml;
-            newRow.appendChild(node);
-            tbdy.appendChild(newRow);
+            
+            
                 
             
             tbl.appendChild(tbdy);
@@ -570,7 +576,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var tableHeader = document.createElement("div");
             tableHeader.setAttribute("id","tableHeading")
             var tableStandard = document.createElement("label");
-            tableStandard.textContent = "Slected Standard: " + e.currentTarget.children[1].textContent;
+            tableStandard.textContent = "Slected Standard: " + e.currentTarget.attributes.data.value;
             tableHeader.style.fontSize = "20px"
             tableHeader.appendChild(tableStandard);
             body.appendChild(tableHeader);
@@ -617,20 +623,51 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     });
      
     
-    $scope.toggle_accessibility = function ($event) {
+    $scope.toggle_accessibility = function (flag) {
+        $(" .mid-report-section")[0].style.display = "none"
+        $("#accordion")[0].style.display = "none"
+        $("#report-header")[0].style.display = "none"
+        $("#report-canvas")[0].style.display = "none"
+        $('#nodeBox')[0].innerHTML = "";
+        $("#ctExpandAssign")[0].style.pointerEvents = "none"
+        $("#ctExpandAssign")[0].children[0].alt = "Collapse Icon"
+        $("#ctExpandAssign")[0].children[0].src = "imgs/ic-collapse.png"
+        $('.container-fluid .moduleBox')[0].style.display = "none"
+        var data = JSON.parse(window.localStorage['project'])
+        $scope.prc.projects = data;
+        $scope.prc.releaseId = '';
+        $scope.prc.cycleId = '';
+        $scope.prc.projectId = '';
         if ($('.ct-nodeIcon1').parent().is(':hidden')) { $('.ct-nodeIcon1').parent().show() }
         else { $('.ct-nodeIcon1').parent().hide() }
-        if (access_only){
-            access_only = false;
-            $("#accessibility_toggle")[0].style.background = "blueviolet";
-            $("#accessibility_toggle")[0].title = "Enable Accessibility Testing Reports";
+        if (flag){
+            access_only = true;
+            let web_projects = [];
+            for(var projectIndex in data){
+                if(data[projectIndex].type == "5db0022cf87fdec084ae49b6"){
+                    web_projects.push(data[projectIndex]);
+                }
+            }
+            $scope.prc.projects = web_projects;
+            $("#reports-taskName")[0].style.background = "";
+            $("#accessibility-taskName")[0].style.background = "purple";
+            $("#accessibility-taskName")[0].style.color = "white"
+            $("#reports-taskName")[0].style.color = "black"
+
             $("#searchModule")[0].placeholder = "Search Module";
         }else{
-            access_only = true;
-            $("#accessibility_toggle")[0].style.background = "purple";
-            $("#accessibility_toggle")[0].title = "Disable Accessibility Testing Reports";
+            access_only = false;
+            $("#reports-taskName")[0].style.background = "purple";
+            $("#accessibility-taskName")[0].style.background = "";
+            $("#accessibility-taskName")[0].style.color = "black"
+            $("#reports-taskName")[0].style.color = "white"
+           
             $("#searchModule")[0].placeholder = "Search Screen";
         }
+        
+        $("#selectProjects")[0].options[0].selected = true
+        $("#selectReleases")[0].options[0].selected = true
+        $("#selectCycles")[0].options[0].selected = true
     }
 
 

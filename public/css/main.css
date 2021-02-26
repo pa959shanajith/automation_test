@@ -5515,11 +5515,15 @@ Webocular report css
   }
 .webCrawler-report-span{
     font-size: 14px;
+    width: 80%;
+    position: absolute;
+    word-break: break-word;
 }
 .webCrawler-report-label{
     padding: 2px 30px;
     font-size: 14px;
-    width: 20%;
+    width: 150px;
+    display: inline-block;
 }
 .webCrawler-report-table {
   margin: 1em 0;
