@@ -4,6 +4,7 @@ import { useHistory, Link, Redirect } from 'react-router-dom';
 import { loadUserInfo } from '../../login/api';
 import { getRoleNameByRoleId } from '../api';
 import * as actionTypes from '../../login/state/action';
+import { SET_POST_EXECUTION_POPUP } from '../state/action';
 import { UPDATE_REPORTDATA } from '../../plugin/state/action';
 import ClickAwayListener from 'react-click-away-listener';
 import ChangePassword from './ChangePassword';
@@ -46,6 +47,12 @@ const Header = () => {
     const selectedRole = useSelector(state=>state.login.SR);
     const socket = useSelector(state=>state.login.socket);
     const notifyCnt = useSelector(state=>state.login.notify.unread)
+    const postExecutionPopup = useSelector(state=>state.progressbar.postExecutionPopup);
+
+    useEffect(()=>{
+        if(postExecutionPopup!==false)
+            executionDATA(postExecutionPopup)
+    },[postExecutionPopup])
 
     useEffect(()=>{
         //on Click back button on browser
@@ -72,7 +79,7 @@ const Header = () => {
                 // }
             });
             socket.on("result_ExecutionDataInfo",(result)=> {
-                executionDATA(result);
+                dispatch({type: SET_POST_EXECUTION_POPUP, payload: result});
             });
         }
     },[socket])
@@ -115,6 +122,7 @@ const Header = () => {
             setShowExecution_Pop({'title': 'Scheduled Execution Complete', 'content':msg});
         }
         else setShowExecution_Pop({'title': "Execute Test Suite", 'content':"Failed to execute."});
+        dispatch({type: SET_POST_EXECUTION_POPUP, payload: false});
     }
 
     const naviPg = () => {
