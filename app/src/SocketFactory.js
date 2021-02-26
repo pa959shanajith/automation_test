@@ -1,5 +1,4 @@
 import React, { useEffect, useState, Fragment} from 'react';
-import {  } from 'react';
 import socketIOClient from "socket.io-client";
 import {useDispatch, useSelector} from 'react-redux';
 import { ModalContainer, PopupMsg } from './pages/global';
@@ -8,6 +7,11 @@ import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
 import * as actionTypes from './pages/login/state/action';
 import { Redirect } from 'react-router-dom';
 
+/*Component SocketFactory
+  use: creates/updates socket connection
+  1 : notify -> used in mindmap screen assign notification updates header header notify
+  2 : result_ExecutionDataInfo -> execution completion popups
+*/
 
 const SocketFactory = () => {
     const [redirectTo,setRedirectTo] = useState("")
