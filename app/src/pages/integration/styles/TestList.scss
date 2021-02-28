@@ -1,0 +1,63 @@
+
+.test_tree_toggle{
+    height: 16px;
+}
+
+.test_tree_branches{
+    padding-left: 17px;
+
+    .test_tree_leaves{
+        margin-left: 40px;
+        display: flex;
+        align-items: center;
+        width: 88%;
+    }
+
+    .test_tree_toggle {
+        cursor: pointer;
+    }
+}
+
+.test_tree_leaves{
+    label{ 
+        margin: 3px 0 3px 10px!important;
+        flex-grow: 1;
+    }
+    &:hover{
+        background-color: rgb(225, 223, 255); 
+        border-radius: 5px;
+    }
+}
+
+
+.leafId{
+    background: #331d4c;
+    color: #fff;
+    border-radius: 3px;
+    display: inline;
+    padding: 2px;
+    margin-right: 2px;
+}
+
+.test__searchIcon{
+    margin-left: 2px;
+    border-radius: 5px;
+    border: 1px solid #000;
+    position: relative;
+    cursor: pointer;
+    display: none;
+    
+    img{
+        width: 24px;
+    }
+}
+
+.test__rootDiv{
+    margin-bottom: 0px;
+    margin-right: 0px;
+    max-height: 310.391px;
+    padding: 0px;
+    label {
+        margin: 0 0 10px 10px;
+    }
+}

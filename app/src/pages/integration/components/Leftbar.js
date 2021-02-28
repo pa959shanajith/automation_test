@@ -1,40 +1,34 @@
-import React ,{useState, Fragment} from 'react';
+import React, { Fragment} from 'react';
 import { ActionBar } from '../../global';
 import  "../styles/Leftbar.scss";
 import { useDispatch ,useSelector } from 'react-redux';
 import * as actionTypes from '../state/action.js';
 
-const Leftbar=(props)=>{
-    //const [focus,setFocus] = useState(null);
+const Leftbar = () => {
     const dispatch = useDispatch();
-    const viewMappedFlies = useSelector(state=>state.integration.mapped_scren_type);
-    const screenType = useSelector(state=>state.integration.ALM_LOGIN);
+    const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
+    const screenType = useSelector(state=>state.integration.screenType);
 
-    const callIconClick = (iconType)=>{
-        if(iconType == "qTest" ){
-        props.setFocus(iconType);
-        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: "qTest" });
-        dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null });
-        
-    }
-    else if (iconType == "ALM"){
-        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: "ALM" });
-        dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null });
-    }
-    else if(iconType == "Zephyr"){
-        props.setFocus(iconType);
-        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: "Zephyr" });
+    const callIconClick = iconType => {
+        let clickedScreen = null;
+
+        if(iconType === "qTest" ) clickedScreen = "qTest";
+        else if (iconType === "ALM") clickedScreen = "ALM";
+        else if(iconType === "Zephyr") clickedScreen = "Zephyr";
+
+        window.localStorage['integrationScreenType'] = clickedScreen;
+        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: clickedScreen });
         dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null });
     }
-    }
+
     const barRender=()=>{
-        switch (viewMappedFlies){
+        switch(viewMappedFiles){
             case "qTest": 
             return(
                 <Fragment>
                     <h4>Integration</h4>
                 <span onClick={()=>callIconClick("qTest") }>
-                    <img  id={(props.focus === "qTest")? "selectedIcon" : null}  src='static/imgs/qTest.png'/> 
+                    <img  id={(screenType === "qTest")? "selectedIcon" : null}  src='static/imgs/qTest.png'/> 
                     <div>qTest</div>
                 </span>
                 </Fragment>
@@ -53,7 +47,7 @@ const Leftbar=(props)=>{
                 <Fragment>
                     <h4>Integration</h4>
                    <span onClick={()=>callIconClick("Zephyr")}>
-                        <img  id={(props.focus === "Zephyr")? "selectedIcon" : null} src='static/imgs/Zephyr.png'/>
+                        <img  id={(screenType === "Zephyr")? "selectedIcon" : null} src='static/imgs/Zephyr.png'/>
                         <div>Zephyr</div>
                     </span> 
                 </Fragment> ) 
@@ -62,7 +56,7 @@ const Leftbar=(props)=>{
             <Fragment>
                 <h4>Integration</h4>
                     <span onClick={()=>callIconClick("qTest") }>
-                        <img  id={(props.focus === "qTest")? "selectedIcon" : null}  src='static/imgs/qTest.png'/> 
+                        <img  id={(screenType === "qTest")? "selectedIcon" : null}  src='static/imgs/qTest.png'/> 
                         <div>qTest</div>
                     </span>
                     <span onClick={()=>callIconClick("ALM")}>
@@ -70,7 +64,7 @@ const Leftbar=(props)=>{
                         <div>ALM</div>
                     </span>
                     <span onClick={()=>callIconClick("Zephyr")}>
-                        <img  id={(props.focus === "Zephyr")? "selectedIcon" : null} src='static/imgs/Zephyr.png'/>
+                        <img  id={(screenType === "Zephyr")? "selectedIcon" : null} src='static/imgs/Zephyr.png'/>
                         <div>Zephyr</div>
                     </span>
             </Fragment>    )
@@ -98,15 +92,8 @@ const Leftbar=(props)=>{
             </div>
         )
     }
-    const bottomContent=()=>{
-        return null;
-    }
-    return (
-            <ActionBar 
-            upperContent={upperContent()} 
-            bottomContent={bottomContent()}
-            />
-    )
+
+    return <ActionBar upperContent={upperContent()} />;
 }
 
 export default Leftbar

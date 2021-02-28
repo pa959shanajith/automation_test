@@ -4,7 +4,7 @@ import {zephyrProjectDetails_ICE,saveZephyrDetails_ICE} from '../api.js';
 import { useSelector } from 'react-redux';
 
 
-const Zephyr=(props)=>{
+const ZephyrContent = props => {
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
     const selProjectRef = useRef();
     const [projectDetails , setProjectDetails]=useState(null);
@@ -231,7 +231,7 @@ const Zephyr=(props)=>{
                 <>
                     {SearchIconClicked ?
                         <input onChange={(e)=>onSearch(e)} type="text" placeholder="Scenario Name"/> : null}
-                    <span className="searchScenarioAvoAssure" style={{display:"inline" , float:"right"}}> 
+                    <span className="mapping__searchIcon" style={{display:"inline" , float:"right"}}> 
                         <img onClick={()=>{setSearchIconClicked(!SearchIconClicked);setFilteredName(null)}} style={{cursor: "pointer" , display:"inline",float:"right"}} src="static/imgs/ic-searchIcon-black.png"></img>
                     </span>
                 </> : null    
@@ -268,4 +268,4 @@ const Zephyr=(props)=>{
     :null)
 }
     
-export default Zephyr;
+export default ZephyrContent;
