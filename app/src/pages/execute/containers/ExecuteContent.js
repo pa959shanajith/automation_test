@@ -1,8 +1,7 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown} from '../../global' 
 import {updateTestSuite_ICE, reviewTask, ExecuteTestSuite_ICE} from '../api';
-import { useHistory } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import "../styles/ExecuteContent.scss";
 import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
@@ -19,9 +18,11 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [modalDetails,setModalDetails] = useState({title:"",task:""})
     const [moduleInfo,setModuleInfo] = useState([])
-    const [integration,setIntegration] = useState({alm: {url:"",username:"",password:""}, 
-                                                    qtest: {url:"",username:"",password:"",qteststeps:""}, 
-                                                    zephyr: {accountid:"",accesskey:"",secretkey:""}});
+    const [integration,setIntegration] = useState({
+        alm: {url:"",username:"",password:""}, 
+        qtest: {url:"",username:"",password:"",qteststeps:""}, 
+        zephyr: {accountid:"",accesskey:"",secretkey:""}
+    });
     const [selectAllBatch,setSelectAllBatch] = useState(0)
     const [allocateICE,setAllocateICE] = useState(false)
     var batch_name= taskName ==="Batch Execution"?": "+current_task.taskName.slice(13):""

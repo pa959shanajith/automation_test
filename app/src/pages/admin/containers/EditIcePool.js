@@ -163,8 +163,8 @@ const updateIcePool = async(prop) =>{
     })
     var data = await updatePool(pool)
     if(data.error){prop.displayError(data.error);return;}
-    await resetData(prop)
-    prop.displayError("ICE Pool saved successfully.","Success")
+    var err = await resetData(prop)
+    if(!err)prop.displayError("ICE Pool saved successfully.","Success")
 }
 
 const deleteIcePool = async(prop) =>{
@@ -172,8 +172,8 @@ const deleteIcePool = async(prop) =>{
     var id = prop.selectedPool._id
     var data = await deleteICE_pools({'poolid':[id]})
     if(data.error){prop.displayError(data.error);return;}
-    await resetData(prop)
-    prop.displayError("ICE Pool deleted successfully.","Success")
+    var err = await resetData(prop)
+    if(!err)prop.displayError("ICE Pool deleted successfully.","Success")
 }
 
 const clearIceQueue = async({selectedPool,setLoading,displayError}) =>{
@@ -199,7 +199,15 @@ const resetData = async({filterRef,setSelectedPool,poolName,projList,setAllProj,
     poolName.current.disabled = true
     poolName.current.value = ""
     var data = await getPools(data)
-    if(data.error){displayError(data.error);return;}
+    if(data.error){
+        if(data.val === 'empty'){
+            displayError(data.error);
+            data = {};
+        }else{
+            displayError(data.error);
+            return true;
+        }
+    }
     var e = Object.entries(data)
     e.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
     setPoolDict(data)
