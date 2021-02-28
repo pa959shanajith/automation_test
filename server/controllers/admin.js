@@ -464,27 +464,80 @@ exports.createProject_ICE = async (req, res) => {
 	}
 };
 
+const parseLDAPErrors = (err, authType, fnName) => {
+	var flag = "fail"
+	const errm = err.lde_message;
+	if (["EADDRNOTAVAIL", "ECONNREFUSED", "ETIMEDOUT"].includes(err.errno)) {
+		flag = "invalid_addr";
+		logger.error("Error occurred in admin/"+fnName+": Invalid LDAP Server address");
+	} else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
+		if (authType == "simple") {
+			flag = "insufficient_access";
+			logger.error("Error occurred in admin/"+fnName+": Insufficient Access");
+		} else flag = "success";
+	} else if (errm) {
+		if (errm.indexOf("DSID-0C0906E8") > -1) {
+			if (authType == "simple") {
+				flag = "insufficient_access";
+				logger.error("Error occurred in admin/"+fnName+": Insufficient Access");
+			} else {
+				flag = "invalid_auth";
+				logger.error("Error occurred in admin/"+fnName+": Invalid Credentials");
+			}
+		} else if (errm.indexOf("DSID-031522C9") > -1) {
+			flag = "insufficient_access";
+			logger.error("Error occurred in admin/"+fnName+": Insufficient Access");
+		} else if (authType == "simple") {
+			if ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) ||
+				(errm.indexOf("DSID-0C090442") > -1) || (errm.indexOf("DSID-0C090453") > -1)) {
+				flag = "invalid_credentials";
+				logger.error("Error occurred in admin/"+fnName+": Invalid Credentials");
+			}
+		} else if (errm.indexOf("DSID-031007DB") > -1) {
+			flag = "invalid_basedn";
+			logger.error("Error occurred in admin/"+fnName+": Invalid Base DN");
+		} else {
+			flag = "server_error";
+			logger.error("Error occurred in admin/"+fnName+":", err.lde_message || err.message);
+		}
+	} else if (err.code == "UNABLE_TO_VERIFY_LEAF_SIGNATURE") {
+		flag = "invalid_cacert";
+		logger.error("Error occurred in admin/"+fnName+": Invalid TLS certificate");
+	} else if (err.code == "ERR_TLS_CERT_ALTNAME_INVALID") {
+		flag = "invalid_cacert_host";
+		logger.error("Error occurred in admin/"+fnName+": Invalid TLS Certificate - Hostname verification failed!");
+	}
+	var errStack = "";
+	try {
+		errStack = JSON.stringify(err);
+	} catch(_){
+		errStack = JSON.stringify({"message": err.lde_message || err.message, "code": err.errno || err.code});
+	}
+	return [flag, errStack];
+};
+
 exports.testLDAPConnection = (req, res) => {
-	logger.info("Inside UI Service: testLDAPConnection");
+	const fnName = "testLDAPConnection";
+	logger.info("Inside UI Service: " + fnName);
 	try{
 		const reqData = req.body;
 		const ldapURL = (reqData.ldapURL || "").trim();
 		const secure = (reqData.secure || "false").trim();
 		const tlsCert = (reqData.tlsCert || "").trim() || false;
 		if(!ldap_url.test(ldapURL) || char_check.test(reqData.baseDN) || char_check.test(reqData.username)){
-			logger.error("Error occurred in admin/testLDAPConnection: Special characters found in LDAP configuration values");
+			logger.error("Error occurred in admin/"+fnName+": Special characters found in LDAP configuration values");
 			return res.send("spl_chars");
 		}
 		if (ldapURL.slice(0,8) == "ldaps://") {
 			if (secure === "false") {
-				logger.error("Error occurred in admin/testLDAPConnection: Secure connection must be enabled for 'ldaps' protocol");
+				logger.error("Error occurred in admin/"+fnName+": Secure connection must be enabled for 'ldaps' protocol");
 				return res.send("mismatch_secure");
 			} else if (!tlsCert) {
-				logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol require TLS Certificate.");
+				logger.error("Error occurred in admin/"+fnName+": 'ldaps' protocol require TLS Certificate.");
 				return res.send("invalid_cert");
 			}
 		} else if (ldapURL.slice(0,8) != "ldaps://" && ldapURL.slice(0,7) != "ldap://") {
-			logger.error("Error occurred in admin/testLDAPConnection: Invalid URL provided for connection test.");
+			logger.error("Error occurred in admin/"+fnName+": Invalid URL provided for connection test.");
 			return res.send("invalid_url");
 		}
 		const baseDN = (reqData.baseDN || "").trim();
@@ -511,33 +564,8 @@ exports.testLDAPConnection = (req, res) => {
 			var flag = "success";
 			var data = {fields:{}};
 			if (err) {
-				const errm = err.lde_message;
-				if (["EADDRNOTAVAIL", "ECONNREFUSED", "ETIMEDOUT"].includes(err.errno)) flag = "invalid_addr";
-				else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
-					if (authType == "simple") flag = "insufficient_access";
-					else flag = "success";
-				} else if (errm) {
-					if (errm.indexOf("DSID-0C0906E8") > -1) {
-						if (authType == "simple") flag = "insufficient_access";
-						else flag = "invalid_auth";
-					} else if (errm.indexOf("DSID-031522C9") > -1) {
-						flag = "insufficient_access";
-						logger.error("User Does not have sufficient Access!");
-					} else if (authType == "simple") {
-						if ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) || (errm.indexOf("DSID-0C090442") > -1))
-							flag = "invalid_credentials";
-					}
-					else if (errm.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
-				} else if (err.code == "UNABLE_TO_VERIFY_LEAF_SIGNATURE") flag = "invalid_cacert";
-				else if (err.code == "ERR_TLS_CERT_ALTNAME_INVALID") flag = "invalid_cacert_host";
-				else flag = "fail";
-				var errStack = "";
-				try {
-					errStack = JSON.stringify(err);
-				} catch(_){
-					errStack = JSON.stringify({"message": err.lde_message || err.message, "code": err.errno || err.code});
-				}
-				logger.debug("Error occurred in admin/testLDAPConnection: " + errStack);
+				var [flag, errStack] = parseLDAPErrors(err, authType, fnName);
+				logger.debug("Error occurred in admin/"+fnName+": " + errStack);
 			}
 			if (flag == "success") {
 				logger.info('LDAP Connection test passed!');
@@ -562,7 +590,7 @@ exports.testLDAPConnection = (req, res) => {
 			res.send("invalid_basedn");
 			logger.error('LDAP Connection test failed!');
 		} else {
-			logger.error("Error occurred in admin/testLDAPConnection", exception);
+			logger.error("Error occurred in admin/"+fnName+": ", exception);
 			res.status(500).send("fail");
 		}
 	}
@@ -617,14 +645,9 @@ exports.getLDAPConfig = async (req, res) => {
 				if (resSent) return;
 				resSent = !resSent;
 				if (err) {
-					if (err.lde_message && err.lde_message.indexOf("DSID-031522C9") > -1) {
-						logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: Insufficient Access");
-						data = "insufficient_access";
-					} else {
-						logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details:", err.lde_message || err.message);
-						logger.debug("ERROR: " + JSON.stringify(err));
-						data = "server_error";
-					}
+					var [data, errStack] = parseLDAPErrors(err, resConf.auth, fnName);
+					logger.debug("Error occurred in admin/"+fnName+": " + errStack);
+					if (data == "fail") data = "server_error";
 				}
 				else if (result) {
 					data = {
@@ -645,14 +668,9 @@ exports.getLDAPConfig = async (req, res) => {
 				if (resSent) return;
 				resSent = !resSent;
 				if (err) {
-					if (err.lde_message && err.lde_message.indexOf("DSID-031522C9") > -1) {
-						logger.error("Error occurred in admin/getLDAPConfig: Fetch Users: Insufficient Access");
-						data = "insufficient_access";
-					} else {
-						logger.error("Error occurred in admin/getLDAPConfig: Fetch Users:", err.lde_message || err.message);
-						logger.debug("ERROR: " + JSON.stringify(err));
-						data = "server_error";
-					}
+					var [data, errStack] = parseLDAPErrors(err, resConf.auth, fnName);
+					logger.debug("Error occurred in admin/"+fnName+": " + errStack);
+					if (data == "fail") data = "server_error";
 				}
 				else if (result) {
 					var groups = result.groups;
