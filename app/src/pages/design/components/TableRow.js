@@ -176,7 +176,7 @@ const TableRow = (props) => {
     
     return (
         <>
-        <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + (highlight || (props.focusedRow!== null  && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) ? " highlight-step" : "") + (props.edit ? " d__table_row_edit": "")}>
+        <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + (highlight || (props.focusedRow!== null  && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
                 <span className="step_col">{props.idx + 1}</span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onClick={onBoxCheck}/></span>
             <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>
