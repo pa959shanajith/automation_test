@@ -355,8 +355,7 @@ function check_pulse(){
 				server_pub.publish('ICE2_' + ice, dataToExecute);
 			}else{
 				writeStr = time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"]; 
-				logger.info(writeStr)
-				
+				logger.debug(writeStr)
 			}
 		}
 	}

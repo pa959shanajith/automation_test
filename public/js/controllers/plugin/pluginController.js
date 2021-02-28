@@ -106,7 +106,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 									taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 								}
 								var dataobj={
+									'accessibilityParameters': tasksJson[i].accessibilityParameters,
 									'scenarioflag':tasksJson[i].scenarioFlag,
+									'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
 									'apptype':tasksJson[i].appType,
 									'projectid':tasksJson[i].projectId,
 									'screenid':tasksJson[i].screenId,
@@ -296,8 +298,10 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				console.log("Error updating task status " + (error.data));
 			});
 		}
+		taskObj.accessibilityParameters  = dataobj_json.accessibilityParameters;
 		taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
 		taskObj.scenarioFlag = dataobj_json.scenarioflag;
+		taskObj.scenarioTaskType = dataobj_json.scenarioTaskType
 		taskObj.assignedTestScenarioIds = dataobj_json.assignedtestscenarioids;
 		taskObj.screenId = dataobj_json.screenid;
 		taskObj.screenName = dataobj_json.screenname;

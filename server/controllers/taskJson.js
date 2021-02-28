@@ -196,7 +196,8 @@ function next_function(resultobj,projectid){
 				'testSuiteDetails': [],
 				'scenarioFlag': 'False',
 				'releaseid': '',
-				'cycleid': ''
+				'cycleid': '',
+				'accessibilityParameters': []
 
 			};
 			taskDetails = {
@@ -225,7 +226,6 @@ function next_function(resultobj,projectid){
 				"assignedTestScenarioIds": []
 				//"scenarioFlag": "True",
 			};
-
 			/*t refers to task node, and m refers to its respective node */
 			var t = resultobj[ti];
 			var relName = cycles[t.cycleid][1];
@@ -318,11 +318,17 @@ function next_function(resultobj,projectid){
 					}
 					break;
 				case 'Execute Scenario':
+					task_json.scenarioTaskType = 'disable';
+					taskDetails.taskName = "Execute Scenario " + t.name;
+					break;
 				case 'Execute Scenario with Accessibility':
+					task_json.scenarioTaskType = 'enable';
+					taskDetails.taskName = "Execute Scenario "+ t.name + " with Accessibility Testing";
+					break;
 				case 'Execute Scenario Accessibility Only':
-					task_json.scenarioFlag = 'True';
-					task_json.assignedTestScenarioIds = [task_json.scenarioId];
-					t.taskType = 'Execute Scenario';
+					task_json.scenarioTaskType = "exclusive";
+					taskDetails.taskName = "Execute Accessibility Testing for Scenario " + t.name;
+					break;
 					// taskDetails.taskName = t.tasktype + ' ' + m.testScenarioName;
 					// task_json.scenarioName = m.testScenarioName;
 					//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
@@ -332,6 +338,14 @@ function next_function(resultobj,projectid){
 				// taskDetails.taskName = t.tasktype + ' ' + m.screenName;
 				// task_json.screenName = m.screenName
 
+			}
+			if (t.tasktype.includes("Scenario")){
+					if('accessibilityparameters' in resultobj[ti] && resultobj[ti].accessibilityparameters.length > 0){
+						task_json.accessibilityParameters = resultobj[ti].accessibilityparameters;
+					}
+					task_json.scenarioFlag = 'True';
+					task_json.assignedTestScenarioIds = [task_json.scenarioId];
+					t.taskType = 'Execute Scenario';
 			}
 			//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 			if (!batch_flag) {

@@ -58,8 +58,7 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"testsuitename": testsuite.name,
 			"moduleid": moduleId,
 			"testsuiteid": testsuite.testsuiteid,
-			"versionnumber": suite.versionnumber,
-			"accessibilityTestingMap": testscenarioDetails.accessibilitytestingmap
+			"versionnumber": suite.versionnumber
 		};
 		responsedata[moduleId] = finalSuite;
 	}
@@ -216,10 +215,8 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 		"id": scenarioid,
 		"userid": userid
 	};
-	var result = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
-	if (result == "fail") return "fail";
-	var testcases = result['testcases']
-	var accessibilityTestingType = result['accessibilitytestingtype']
+	var testcases = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
+	if (testcases == "fail") return "fail";
 
 	// Step 2: Get Testcasesteps
 	for (const tc of testcases) {
@@ -248,7 +245,6 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 	});
 
 	scenario.testcase = JSON.stringify(allTestcaseSteps);
-	scenario.accessibilityTestingType = accessibilityTestingType;
 	// Step 3: Get qcdetails
 	scenario.qcdetails = [];
 	for(var k =0; k<integrationType.length; ++k) {
@@ -287,7 +283,8 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		"batchId": "",
 		"executionIds": [],
 		"testsuiteIds": [],
-		"suitedetails": []
+		"suitedetails": [],
+		"reportType": "functionalTesting"
 	};
 	const batchInfo = batchData.batchInfo;
 	for (const suite of batchInfo) {
@@ -310,7 +307,6 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			"accessibilityMap":{}
 		};
 		const suiteDetails = suite.suiteDetails;
-		var reportType = "accessiblityTestingOnly";
 		for (const tsco of suiteDetails) {
 			var integrationType = [];
 			if(batchData.integration && batchData.integration.alm.url) {
@@ -325,7 +321,6 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
-			if (!scenario.accessibilityTestingType || scenario.accessibilityTestingType != "Exclusive") reportType = "functionalTesting";
 			suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibilityParameters;
 			suiteObj.condition.push(scenario.condition);
 			suiteObj.dataparampath.push(scenario.dataparam[0]);
@@ -336,8 +331,8 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			scenarioObj.qcdetails = scenario.qcdetails;
 			scenarioList.push(scenarioObj);
 		}
+		if (suite.scenarioTaskType == "exclusive") execReq.reportType = "accessiblityTestingOnly";
 		suiteObj[testsuiteid] = scenarioList;
-		execReq.reportType = reportType;
 		execReq.testsuiteIds.push(testsuiteid);
 		execReq.suitedetails.push(suiteObj);
 	}
@@ -504,7 +499,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						if (reportData.overallstatus.length == 0) {
 							completedSceCount++;
 							scenarioCount = testsuite.scenarioIds.length;
-							if (completedSceCount == scenarioCount) {
+							if (completedSceCount == scenarioCount && reportType != "accessiblityTestingOnly") {
 								completedSceCount = statusPass = 0;
 								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
 								await updateExecutionStatus([executionid], "fail");
@@ -531,7 +526,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 							// testsuite.reportData[scenarioIndex] = reportItem;
 							testsuite.reportData.push(reportItem);
 							completedSceCount++;
-							if (completedSceCount == scenarioCount) {
+							if (completedSceCount == scenarioCount && reportType != "accessiblityTestingOnly") {
 								const suiteStatus = (statusPass == scenarioCount) ? "pass" : "fail";
 								completedSceCount = statusPass = 0;
 								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
@@ -540,7 +535,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						}
 					} catch (ex) {
 						logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
-						notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
+						if(reportType != "accessiblityTestingOnly") notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
 						await updateExecutionStatus([executionid], "fail");
 					}
 				} else { // This block will trigger when resultData.status has "success or "Terminate"
@@ -713,7 +708,7 @@ exports.getTestcaseDetailsForScenario_ICE = async (req, res) => {
 		"id": req.body.testScenarioId
 	};
 	data = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
-	if (data != "fail") for (const e of data['testcases']) {
+	if (data != "fail") for (const e of data) {
 		testcasenamelist.push(e["name"]);
 		testcaseidlist.push(e["_id"]);
 		screenidlist.push(e["screenid"]);

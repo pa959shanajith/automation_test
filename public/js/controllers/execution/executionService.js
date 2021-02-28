@@ -77,6 +77,16 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 			})
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
+		},
+		updateAccessibilitySelection: function(suiteInfo){
+			var param = "updateAccessibilitySelection";
+			return $http.post('/updateAccessibilitySelection', suiteInfo)
+			.then (function(response){
+				return response.data;	
+			},
+			function(response){	
+				return $q.reject(response.data);
+			});	
 		}
 	}
 }]);
