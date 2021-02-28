@@ -6,7 +6,6 @@ import { ModalContainer, PopupMsg } from './pages/global';
 import {v4 as uuid} from 'uuid';
 import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
 import * as actionTypes from './pages/login/state/action';
-import { Redirect } from 'react-router-dom';
 
 /*Component SocketFactory
   use: creates/updates socket connection
@@ -48,7 +47,7 @@ const SocketFactory = () => {
                 title={"Execute Test Suite"}
                 content={
                     <p style={{cursor:'default'}}>{showAfterExecution.content} <br />
-                    <p> Go to <span onClick={()=>{redirectToReports()}} style={{color:'#643693',cursor:'pointer',fontWeight:'bold'}}>Reports</span></p></p>
+                    <p> Go to <span onClick={()=>{redirectToReports();setShowAfterExecution({show:false})}} style={{color:'#643693',cursor:'pointer',fontWeight:'bold'}}>Reports</span></p></p>
                 }
                 close={()=>setShowAfterExecution({show:false})}
                 footer={
