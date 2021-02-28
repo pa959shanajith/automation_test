@@ -24,3 +24,16 @@ exports.getProjectIDs = function (req, res) {
 		res.send("Invalid Session");
 	}
 };
+
+exports.updateAccessibilitySelection = function(req, res){
+	logger.info("Inside UI service: updateAccessibiltySelection");
+	try{
+		var result = utils.fetchData(req.body,"/plugins/updateAccessibilitySelection");
+		if(result != 'fail') res.send("success");
+		res.send("fail")
+	}catch(e){
+		logger.error("Error occurred in updateAccessibilitySelection: %s", e);
+		res.send("fail");
+	}
+
+}

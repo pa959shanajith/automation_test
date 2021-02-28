@@ -499,7 +499,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						if (reportData.overallstatus.length == 0) {
 							completedSceCount++;
 							scenarioCount = testsuite.scenarioIds.length;
-							if (completedSceCount == scenarioCount) {
+							if (completedSceCount == scenarioCount && reportType != "accessiblityTestingOnly") {
 								completedSceCount = statusPass = 0;
 								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
 								await updateExecutionStatus([executionid], "fail");
@@ -526,7 +526,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 							// testsuite.reportData[scenarioIndex] = reportItem;
 							testsuite.reportData.push(reportItem);
 							completedSceCount++;
-							if (completedSceCount == scenarioCount) {
+							if (completedSceCount == scenarioCount && reportType != "accessiblityTestingOnly") {
 								const suiteStatus = (statusPass == scenarioCount) ? "pass" : "fail";
 								completedSceCount = statusPass = 0;
 								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
@@ -535,7 +535,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						}
 					} catch (ex) {
 						logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
-						notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
+						if(reportType != "accessiblityTestingOnly") notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
 						await updateExecutionStatus([executionid], "fail");
 					}
 				} else { // This block will trigger when resultData.status has "success or "Terminate"

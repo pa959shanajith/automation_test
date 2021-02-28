@@ -438,6 +438,8 @@ if (cluster.isMaster) {
 		app.post('/saveResults', auth.protect, webocular.saveResults);
 		//Accessibility Testing routes
 		app.post('/getAccessibilityData_ICE', auth.protect, accessibilityTesting.getAccessibilityTestingData_ICE);
+		app.post('/updateAccessibilitySelection', plugin.updateAccessibilitySelection);	
+
 		//Chatbot Routes
 		app.post('/getTopMatches_ProfJ', auth.protect, chatbot.getTopMatches_ProfJ);
 		app.post('/updateFrequency_ProfJ', auth.protect, chatbot.updateFrequency_ProfJ);
