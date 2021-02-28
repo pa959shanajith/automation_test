@@ -249,8 +249,8 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
             
             <div className="s__task_container">
                 <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
-                    <select id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className="e__taskBtn e__btn">
-                        <option value="" selected disabled>Select Integration</option>
+                    <select defaultValue={""} id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className="e__taskBtn e__btn">
+                        <option value="" disabled>Select Integration</option>
                         <option value="1">ALM</option>
                         <option value="0">qTest</option>
                         <option value="2">Zephyr</option>
@@ -268,8 +268,8 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                 <div id="scheduleSuitesBottomSection">
                     <div id="page-taskName">
 						<span>Scheduled</span>
-                        <select onChange={(event)=>{selectStatus(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
-                            <option selected disabled={true}>Select Status</option>
+                        <select defaultValue={"Select Status"} onChange={(event)=>{selectStatus(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
+                            <option disabled={true}>Select Status</option>
                             <option>Completed</option>
                             <option>In Progress</option>
                             <option>Scheduled</option>

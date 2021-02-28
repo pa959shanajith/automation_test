@@ -2,7 +2,6 @@ import * as actionTypes from './action.js';
 
 const initialState = {
     progress: null,
-    postExecutionPopup : false
 };
 
 const reducer = (state = initialState , action) => {
@@ -11,10 +10,6 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state, progress: action.payload,
             }
-        case actionTypes.SET_POST_EXECUTION_POPUP:
-            return{
-                ...state, postExecutionPopup: action.payload,
-            }    
         default:
             return state;
     }

@@ -54,7 +54,7 @@ const LdapConfigEdit = (props) => {
 		const data = await getLDAPConfig("server");
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if(data == "empty") {
+        if(data === "empty") {
             if(props.popupState.show === true) setEmptyPopup(true);
             else props.setPopupState({show:true,title:"Edit Configuration",content: "There are no configurations created yet."});
             setSelBox([]);
@@ -99,7 +99,7 @@ const LdapConfigEdit = (props) => {
             const data = await getLDAPConfig("config", name);
             if(data.error){displayError(data.error);return;}
 			setLoading(false);
-			if(data == "fail") {
+			if(data === "fail") {
                 // props.setPopupState({show:true,title:"Edit Configuration",content: failMsg});
                 // if name required in popup remove fail condition from api 
 			} else {
@@ -154,7 +154,7 @@ const LdapConfigEdit = (props) => {
                     </div></div>
                     
                     <LdapConfigurationForm {...props}  />
-                    <LdapDataMapping setFieldmap={props.setFieldmap} ldapEdit={props.ldapEdit} fieldmap={props.fieldmap} fieldMapOpts={props.fieldMapOpts}  ldapFMapEmailErrBor={props.ldapFMapEmailErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapFnameErrBor={props.ldapFMapFnameErrBor} ldapFMapUnameErrBor={props.ldapFMapUnameErrBor} />
+                    <LdapDataMapping setFieldmap={props.setFieldmap} ldapEdit={props.ldapEdit} fieldmap={props.fieldmap} fieldMapOpts={props.fieldMapOpts}  ldapFMapEmailErrBor={props.ldapFMapEmailErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapFnameErrBor={props.ldapFMapFnameErrBor} ldapFMapUnameErrBor={props.ldapFMapUnameErrBor} />
                 </div>
                 </ScrollBar>
             </div>

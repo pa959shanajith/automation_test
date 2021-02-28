@@ -4,8 +4,6 @@ import { useHistory, Link, Redirect } from 'react-router-dom';
 import { loadUserInfo } from '../../login/api';
 import { getRoleNameByRoleId } from '../api';
 import * as actionTypes from '../../login/state/action';
-import { SET_POST_EXECUTION_POPUP } from '../state/action';
-import { UPDATE_REPORTDATA } from '../../plugin/state/action';
 import ClickAwayListener from 'react-click-away-listener';
 import ChangePassword from './ChangePassword';
 import ChangeDefaultIce from './ChangeDefaultIce';
@@ -41,18 +39,9 @@ const Header = () => {
     const [showOverlay, setShowOverlay] = useState("");
     const [redirectTo, setRedirectTo] = useState("");
     const [clickNotify,setClickNotify] = useState(false)
-    const [showAfterExecution,setShowAfterExecution] = useState({show:false})
-    const [showExecution_Pop,setShowExecution_Pop] = useState(false);
     const userInfo = useSelector(state=>state.login.userinfo);
     const selectedRole = useSelector(state=>state.login.SR);
-    const socket = useSelector(state=>state.login.socket);
     const notifyCnt = useSelector(state=>state.login.notify.unread)
-    const postExecutionPopup = useSelector(state=>state.progressbar.postExecutionPopup);
-
-    useEffect(()=>{
-        if(postExecutionPopup!==false)
-            executionDATA(postExecutionPopup)
-    },[postExecutionPopup])
 
     useEffect(()=>{
         //on Click back button on browser
@@ -60,29 +49,6 @@ const Header = () => {
             logout(e)
         })
     },[])
-    useEffect(()=>{
-        if(socket){
-            socket.on('notify',(value)=> {
-                if (value.count == 0 && 'notifyMsg' in value) {
-                    dispatch({type: actionTypes.UPDATE_NOTIFY, payload: value});
-                }
-                // if (value.to.indexOf($location.$$path) >= 0) {
-				// 	$('.top-left').notify({
-				// 		message: {
-				// 			text: value.notifyMsg
-				// 		},
-				// 		animate: {
-				// 			enter: 'animated fadeInRight',
-				// 			exit: 'animated fadeOutRight'
-				// 		}
-				// 	}).show();
-                // }
-            });
-            socket.on("result_ExecutionDataInfo",(result)=> {
-                dispatch({type: SET_POST_EXECUTION_POPUP, payload: result});
-            });
-        }
-    },[socket])
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0){
             setUserDetails(userInfo);
@@ -97,33 +63,6 @@ const Header = () => {
             }
         }
     }, [userInfo, selectedRole]);
-
-    const executionDATA = (result) => {
-        var data = result.status
-        var testSuiteIds = result.testSuiteDetails;
-        var msg = "";
-        testSuiteIds[0]["projectidts"] = testSuiteIds[0]["projectid"];
-        dispatch({type: UPDATE_REPORTDATA, payload: result});
-        msg = testSuiteIds[0]["testsuitename"]
-        
-        if (data == "Terminate") {
-            setShowAfterExecution({show:true, title:msg,content: "Execution terminated - By Program." })
-        } 
-        else if (data == "UserTerminate") {
-            setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By User." })
-        } 
-        else if (data == "unavailableLocalServer") {
-            setShowExecution_Pop({'title': 'Execute Test Suite', 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
-        } 
-        else if (data == "success") {
-            setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
-           
-        } else if(data == "Completed"){
-            setShowExecution_Pop({'title': 'Scheduled Execution Complete', 'content':msg});
-        }
-        else setShowExecution_Pop({'title': "Execute Test Suite", 'content':"Failed to execute."});
-        dispatch({type: SET_POST_EXECUTION_POPUP, payload: false});
-    }
 
     const naviPg = () => {
         
@@ -252,16 +191,6 @@ const Header = () => {
             submit={()=>setShowSR_Pop("")}
         />
     );
-    
-    const Execution_Pop = () => (
-        <PopupMsg 
-            title={showExecution_Pop.title}
-            content={showExecution_Pop.content}
-            submitText="OK"
-            close={()=>setShowExecution_Pop(false)}
-            submit={()=>setShowExecution_Pop(false)}
-        />
-    );
 
     const showConfPop = (rid, data) =>{
         setShowSR(false);
@@ -283,26 +212,6 @@ const Header = () => {
         />
     );
 
-    const redirectToReports = () =>{
-        window.localStorage['navigateScreen'] = "reports";
-        setRedirectTo('/reports');
-    }
-
-    const PostExecution = () => (
-        <div className="afterExecution-modal">
-            <ModalContainer 
-                title={"Execute Test Suite"}
-                content={
-                    <p >{showAfterExecution.content} <br /><p onClick={()=>{redirectToReports()}}> Go to Reports</p></p>
-                }
-                close={()=>setShowAfterExecution({show:false})}
-                footer={
-                    <button onClick={()=>setShowAfterExecution({show:false})}>Ok</button>
-                }
-            />
-        </div>
-    );
-
     return(
         <> 
             { redirectTo && <Redirect to={redirectTo} /> }
@@ -311,10 +220,7 @@ const Header = () => {
             { showSuccessPass && <PasswordSuccessPopup /> }
             { showConfSR && <ConfSwitchRole />  }
             { showSR_Pop && <SRPopup /> }
-            { showExecution_Pop && <Execution_Pop /> }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
-            { showAfterExecution.show ? <PostExecution /> :null } 
-
             <div className = "main-header">
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
                     <div className="dropdown user-options">

@@ -1,8 +1,7 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown} from '../../global' 
 import {updateTestSuite_ICE, reviewTask, ExecuteTestSuite_ICE} from '../api';
-import { useHistory } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import "../styles/ExecuteContent.scss";
 import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
@@ -19,9 +18,11 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [modalDetails,setModalDetails] = useState({title:"",task:""})
     const [moduleInfo,setModuleInfo] = useState([])
-    const [integration,setIntegration] = useState({alm: {url:"",username:"",password:""}, 
-                                                    qtest: {url:"",username:"",password:"",qteststeps:""}, 
-                                                    zephyr: {accountid:"",accesskey:"",secretkey:""}});
+    const [integration,setIntegration] = useState({
+        alm: {url:"",username:"",password:""}, 
+        qtest: {url:"",username:"",password:"",qteststeps:""}, 
+        zephyr: {accountid:"",accesskey:"",secretkey:""}
+    });
     const [selectAllBatch,setSelectAllBatch] = useState(0)
     const [allocateICE,setAllocateICE] = useState(false)
     var batch_name= taskName ==="Batch Execution"?": "+current_task.taskName.slice(13):""
@@ -211,8 +212,8 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                     {taskName==="Batch Execution"?<div><span className='parentBatchContainer'><input id="selectAllBatch" onClick={()=>{setSelectAllBatchClick()}} title='Select Batch' type='checkbox' className='checkParentBatch' /><span className='parentObject'>Select All</span></span></div>:null}
                     <button id="excSaveBtn" onClick={()=>{updateTestSuite()}} title="Save" className={"e__taskBtn e__btn "+ ((taskName==="Batch Execution") ? "e__btnLeft" : "")}>Save</button>
                     <button disabled={true} title="Configure" className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>Configure</button>
-                    <select id='syncScenario' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>
-                        <option value="" selected disabled>Select Integration</option>
+                    <select defaultValue={""} id='syncScenario' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>
+                        <option value=""  disabled>Select Integration</option>
                         <option value="1">ALM</option>
                         <option value="0">qTest</option>
                         <option value="2">Zephyr</option>
