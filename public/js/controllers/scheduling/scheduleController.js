@@ -295,6 +295,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 		}else{
 			$scope.selectedICE = ice
 			$('#userIdName').removeClass('error-border')
+			$('#iceDrop').click()
 		}
 	}
 
