@@ -1,40 +1,40 @@
-import React ,{useState} from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch ,useSelector } from 'react-redux';
 import Header from '../../global/components/Header';
 import Footer from '../../global/components/FooterTwo';
 import Leftbar from '../components/Leftbar';
 import Rightbar from '../components/Rightbar';
-import QTestCenter from './qTestCenter';
-import ALMCenter from './ALMCenter.js';
-import ZephyrCenter from './ZephyrCenter.js';
+import ALM from './ALM';
+import QTest from './QTest';
+import Zephyr from './Zephyr';
+import * as actionTypes from '../state/action';
 import '../styles/IntegrationHome.scss'
 
 //Integration Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 
-const  Integrations=()=>{
-    const screenType = useSelector(state=>state.integration.loginPopupType);
-    const [focus,setFocus] = useState(null);
+const Integrations = () => {
+    const dispatch = useDispatch();
+    const screenType = useSelector(state=>state.integration.screenType);
+
+    useEffect(()=>{
+        let currScreenType = window.localStorage['integrationScreenType'];
+        if (currScreenType) {
+            dispatch({type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: currScreenType});
+        }
+    }, [])
+
     return(
         <div className="parent">
             <Header/>
             <div id="holder">
-                <Leftbar 
-                    focus={focus} 
-                    setFocus={setFocus} 
-                />
-                {screenType== 'ALM'?
-                <ALMCenter/> 
-                :
-                screenType=="Zephyr"?
-                <ZephyrCenter
-                    setFocus={setFocus}
-                />
-                :
-                screenType=="qTest"?
-                <QTestCenter
-                    setFocus={setFocus}    
-                />:
-                <div className="integration_middleContent"></div>}
+                <Leftbar />
+
+                <div className="integration_middleContent">
+                    { screenType === 'ALM' && <ALM /> }
+                    { screenType === "Zephyr" && <Zephyr /> }
+                    { screenType === "qTest" && <QTest /> }
+                </div>
+
                 <Rightbar />
             </div>    
             <div className="integration_Footer"><Footer/></div>
