@@ -1,11 +1,11 @@
 import React, { useEffect, useState, Fragment} from 'react';
 import socketIOClient from "socket.io-client";
 import {useDispatch, useSelector} from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { ModalContainer, PopupMsg } from './pages/global';
 import {v4 as uuid} from 'uuid';
 import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
 import * as actionTypes from './pages/login/state/action';
-import { Redirect } from 'react-router-dom';
 
 /*Component SocketFactory
   use: creates/updates socket connection
@@ -14,7 +14,6 @@ import { Redirect } from 'react-router-dom';
 */
 
 const SocketFactory = () => {
-    const [redirectTo,setRedirectTo] = useState("")
     const [showAfterExecution,setShowAfterExecution] = useState({show:false})
     const [reportData,setReportData] = useState(undefined)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
@@ -22,6 +21,7 @@ const SocketFactory = () => {
     const socket = useSelector(state=>state.login.socket);
     const EndPoint = "https://"+window.location.hostname+":8443";
     const dispatch = useDispatch()
+    const history = useHistory();
     useEffect(()=>{
       if(socket){
         socket.on('notify',(value)=> {
@@ -47,7 +47,7 @@ const SocketFactory = () => {
                 title={"Execute Test Suite"}
                 content={
                     <p style={{cursor:'default'}}>{showAfterExecution.content} <br />
-                    <p> Go to <span onClick={()=>{redirectToReports()}} style={{color:'#643693',cursor:'pointer',fontWeight:'bold'}}>Reports</span></p></p>
+                    <p> Go to <span onClick={()=>{redirectToReports();setShowAfterExecution({show:false})}} style={{color:'#643693',cursor:'pointer',fontWeight:'bold'}}>Reports</span></p></p>
                 }
                 close={()=>setShowAfterExecution({show:false})}
                 footer={
@@ -62,7 +62,7 @@ const SocketFactory = () => {
         dispatch({type: UPDATE_REPORTDATA, payload: reportData});
         setPopupState({show:false})
         window.localStorage['navigateScreen'] = "reports";
-        setRedirectTo('/reports');
+        history.replace("/reports");
     }
 
     const executionDATA = (result) => {
@@ -93,7 +93,6 @@ const SocketFactory = () => {
     return(
         <Fragment>
             {popupState.show && <PopupMsg content={popupState.content} title={popupState.title} submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} submitText={"Ok"} />}
-            { redirectTo && < Redirect to={redirectTo} /> }
             { showAfterExecution.show && <PostExecution/> }
         </Fragment>
     )

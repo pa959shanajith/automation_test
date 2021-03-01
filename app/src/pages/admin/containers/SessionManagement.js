@@ -59,7 +59,7 @@ const SessionManagement = (props) => {
 
     const unlock = async (event) =>{
         var id = parseInt(event.target.dataset.id);
-		var msg, rootObj, obj;
+		var msg, obj;
 		msg = "Unlocking User Account ";
 		obj = lockedusers[id];
 		var user = obj.username;

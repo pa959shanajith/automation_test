@@ -23,7 +23,7 @@ export const JSOGTransform = createTransform(
 const persistConfig = {
     key: 'login',
     storage: storage,
-    whitelist: ['login', 'plugin','integration'], //reducer that needs to be saved for refresh
+    whitelist: ['login', 'plugin'], //reducer that needs to be saved for refresh
     transforms: [JSOGTransform]
   };
 
