@@ -9,11 +9,11 @@ const Leftbar=(props)=>{
             <div className="letfnav">
                 <h4>Utilities</h4>
                 <span onClick={()=>{props.setScreenType("encryption") ; setFocus("encryption")}}>
-                    <img src='static/imgs/ic-encryption-utility.png' id={(focus==="encryption")? "selected":null}/>
+                    <img src='static/imgs/ic-encryption-utility.png' alt="EncryptIcon" id={(focus==="encryption")? "selected":null}/>
                     <div>Encryption</div>
                 </span>
                 <span onClick={()=>{props.setScreenType("optimization");  setFocus("optimization") ; props.setPairwiseClicked(false)}}>
-                    <img src='static/imgs/ic-optimization.png' id={(focus==="optimization")? "selected":null}/>
+                    <img src='static/imgs/ic-optimization.png' alt="optimizationIcon" id={(focus==="optimization")? "selected":null}/>
                     <div>Optimization</div>
                 </span>
             </div>

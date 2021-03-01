@@ -1,11 +1,11 @@
-import React ,{Fragment,useState, useRef } from 'react';
-import {ScrollBar ,PopupMsg ,ScreenOverlay} from '../../global';
+import React ,{Fragment,useState } from 'react';
+import {ScrollBar ,PopupMsg} from '../../global';
 
 const Pairwise=(props)=>{
     const [optimizationType , SetOptimizationType]=useState(null);
 return(
     <Fragment>
-        {(optimizationType=="pairwise")?
+        {(optimizationType==="pairwise")?
                     <Fragment>
                         <div className="page-taskName" >
                             <span className="taskname">
