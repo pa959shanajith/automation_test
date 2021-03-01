@@ -6,6 +6,9 @@
 }
 .executionTableDnd
 {
+    height: calc(100% - 175px) !important;
+}
+.executionTableDnd-single{
     height: calc(100% - 65px) !important;
 }
 .e__batchSuites{
@@ -296,4 +299,7 @@ input[type="checkbox"] {
     flex: 0 1 auto;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.e__table_webImg{
+    background: inherit !important;
 }

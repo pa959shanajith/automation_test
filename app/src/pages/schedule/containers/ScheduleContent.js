@@ -297,7 +297,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                                     <div className="s__min">
                                         <div className="s__con">
                                             <div id="scheduledDataBody" className="scheduledDataBody">
-                                                <ScrollBar thumbColor="rgb(211, 211, 211)" trackColor="rgb(211, 211, 211)" >
+                                                <ScrollBar scrollId="scheduledDataBody" thumbColor="#929397" trackColor="rgb(211, 211, 211)" >
                                                     <div className='scheduleDataBodyRow'>
                                                         {pageOfItems.map((data,index)=>(
                                                             <div key={index} className="scheduleDataBodyRowChild">
