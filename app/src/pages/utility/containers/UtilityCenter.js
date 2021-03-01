@@ -1,7 +1,7 @@
 import React, { useState ,Fragment, useRef } from 'react';
 import Encryption from '../components/Encryption.js';
 import Pairwise from '../components/Optimization.js'
-import {ScrollBar ,PopupMsg ,ScreenOverlay} from '../../global';
+import {PopupMsg ,ScreenOverlay} from '../../global';
 import '../styles/UtilityCenter.scss'
 import {Encrypt_ICE } from '../api';
 

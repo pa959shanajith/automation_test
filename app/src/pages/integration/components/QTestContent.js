@@ -43,23 +43,38 @@ const QTestContent = props => {
                 <> { props.SearchIconClicked ?
                         <input onChange={(e)=>props.onSearch(e)} type="text" placeholder="Scenario Name"/> : null}
                     <span className="mapping__searchIcon" style={{display:"inline" , float:"right"}}> 
-                        <img onClick={()=>{props.setSearchIconClicked(!props.SearchIconClicked);props.setFilteredName(null)}} style={{cursor: "pointer" , display:"inline",float:"right"}} src="static/imgs/ic-searchIcon-black.png"></img>
+                        <img alt="searchIcon"
+                            onClick={()=>{props.setSearchIconClicked(!props.SearchIconClicked);props.setFilteredName(null)}} 
+                            style={{cursor: "pointer" , display:"inline",float:"right"}} 
+                            src="static/imgs/ic-searchIcon-black.png"
+                        />
                     </span>
                 </> : null }
             testList = { props.folderDetails ? 
                 <>    
                 <div className="test__rootDiv">
-                    <img className="test_tree_toggle" src="static/imgs/ic-qcCollapse.png"/>
+                    <img alt="rotIcon" 
+                        className="test_tree_toggle" 
+                        src="static/imgs/ic-qcCollapse.png"
+                    />
                     <label>Root</label>
                 <div className="test_tree_branches">
                     {props.folderDetails.map((e,i)=>(
                         <div>
-                            <img className="test_tree_toggle" id={i} onClick={()=>props.callCycleExpand({i})} style={{height:"16px" , cursor: "pointer"}} src={e.cycleOpen? "static/imgs/ic-qcCollapse.png" : "static/imgs/ic-qcExpand.png"}/>
+                            <img alt="expand-collapse" 
+                                className="test_tree_toggle" id={i} onClick={()=>props.callCycleExpand({i})} 
+                                style={{height:"16px" , cursor: "pointer"}} 
+                                src={e.cycleOpen? "static/imgs/ic-qcCollapse.png" : "static/imgs/ic-qcExpand.png"}
+                            />
                             <label>{e.cycle}</label>
                             { e.cycleOpen ?
                                 <Fragment> 
                                 <div className="test_tree_branches">
-                                    <img className="test_tree_toggle" onClick={()=>props.callTestSuiteExpand({i})} style={{height:"16px",cursor: "pointer"}} src={e.TestsuiteOpen?"static/imgs/ic-taskType-blue-minus.png" :"static/imgs/ic-taskType-blue-plus.png"}/>
+                                    <img alt="blueMinus-Plus" 
+                                        className="test_tree_toggle" onClick={()=>props.callTestSuiteExpand({i})} 
+                                        style={{height:"16px",cursor: "pointer"}} 
+                                        src={e.TestsuiteOpen?"static/imgs/ic-taskType-blue-minus.png" :"static/imgs/ic-taskType-blue-plus.png"}
+                                    />
                                     {e.testsuites &&
                                         e.testsuites.map((e,i)=>(
                                         <label>{e.name}</label>
@@ -73,11 +88,25 @@ const QTestContent = props => {
                                     e.testsuites.map((e,i)=>(
                                         e.testruns.map((e,i)=>(
                                             <Fragment key={i}>
-                                            <div className={"test_tree_leaves "+(props.selectedTestSuiteID == e.id? "slectedTestDiv": "")} style={{cursor: "pointer"}} onClick={(event)=>props.callTestSuiteSelection(event,e.id ,e.name)} id={e.id} >
+                                            <div 
+                                                className={"test_tree_leaves "+(props.selectedTestSuiteID === e.id? "slectedTestDiv": "")} 
+                                                style={{cursor: "pointer"}} 
+                                                onClick={(event)=>props.callTestSuiteSelection(event,e.id ,e.name)} id={e.id} 
+                                            >
                                                 <label>{e.name}</label>
-                                                { props.selectedTestSuiteID == e.id ? <>
-                                                {props.syncSuccess ?<img onClick={()=>props.callUnSync()} style={{cursor: "pointer",paddingRight:"10px"}} src="static/imgs/ic-qcUndoSyncronise.png"/>:null}
-                                                {!props.syncSuccess ?<img onClick={()=>props.callSyncronise()} style={{cursor: "pointer",paddingRight:"10px"}} src="static/imgs/ic-qcSyncronise.png"/>:null}
+                                                { props.selectedTestSuiteID === e.id ? <>
+                                                {props.syncSuccess ?
+                                                    <img alt="unsynIcon"
+                                                        onClick={()=>props.callUnSync()} 
+                                                        style={{cursor: "pointer",paddingRight:"10px"}} 
+                                                        src="static/imgs/ic-qcUndoSyncronise.png"
+                                                    />:null}
+                                                {!props.syncSuccess ?
+                                                    <img alt="syncIcon"
+                                                        onClick={()=>props.callSyncronise()} 
+                                                        style={{cursor: "pointer",paddingRight:"10px"}} 
+                                                        src="static/imgs/ic-qcSyncronise.png"
+                                                    />:null}
                                                 </>
                                                 : null}
                                             </div>
@@ -106,7 +135,7 @@ const QTestContent = props => {
                             <div 
                                 key={i}
                                 className={"test_tree_leaves " +(props.selectedScenario_ID == e._id ? "slectedTestDiv" : "")} 
-                                onClick={()=>{props.setSelectedScenario_ID(e._id);props.setSelectedScenarioName(e.name)}}
+                                onClick={()=>{props.setSelectedScenario_ID(e._id)}}
                                 style={{cursor: "pointer"}}
                             >
                             { props.filteredNames? props.filteredNames.map((element)=>(element == e.name ?element  : null)):  e.name}

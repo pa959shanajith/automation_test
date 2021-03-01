@@ -1,6 +1,5 @@
-import React,{Fragment, useState } from 'react';
-import {ScrollBar} from '../../global';
-import {loginQCServer_ICE,qcProjectDetails_ICE,qcFolderDetails_ICE,saveQcDetails_ICE,viewQcMappedList_ICE} from '../api.js';
+import React,{ useState } from 'react';
+import {qcProjectDetails_ICE,qcFolderDetails_ICE,saveQcDetails_ICE} from '../api.js';
 import { useSelector } from 'react-redux';
 import MappingPage from '../containers/MappingPage';
 import '../styles/ALM.scss';
@@ -23,11 +22,9 @@ const ALMContent = props => {
     const [releaseDropdn, setReleaseDropdn]=useState(null);
     const [mappedDetails ,setMappedDetails]= useState([]);
     const [SearchIconClicked , setSearchIconClicked] =useState(false);
-    const [errorPopUp , setErrorPopUp]= useState(false);
     const [syncSuccess , setSyncSuccess]= useState(false);
     const [filteredNames , setFilteredName]= useState(null);
     const [testSets , setTestSets]= useState([]);
-    const [saveSucess , setSaveSucess]=useState(false);
     const [screenexit , setScreenExit]= useState(false);
     
 
@@ -97,11 +94,9 @@ const ALMContent = props => {
         props.setBlockui({show:true,content:'Saving...'})
         const response = await saveQcDetails_ICE(mappedDetails);
         if(response.error){props.displayError("Error",response.error);props.setBlockui({show:false});return;}
-        if ( response == "success"){
+        if ( response === "success"){
             props.setBlockui({show:false})
-            setErrorPopUp(true);
             props.displayError("Save Mapped Testcase","Saved Succesfully");
-            setSaveSucess(true);
             setSyncSuccess(false);
         }
         props.setBlockui({show:false})
@@ -110,10 +105,7 @@ const ALMContent = props => {
         setScreenExit(true);
         setFolderDetails(null);
         setScenarioArr(null);
-        //setLoginSucess(false);
-        //setFailMsg(null);
         setReleaseDropdn("Select Release");
-        //setDisableSave(true);
         setProjectDropdn1("Select Project");
         setProjectDropdn2("Select Project");
         setMappedDetails([]);
@@ -194,9 +186,7 @@ const ALMContent = props => {
                     testset:  selectedtestSetName
                 }
             ]
-            // setViewMappedFiles(false);
             setMappedDetails(mapped_Details);
-            //setDisableSave(false)
             setSyncSuccess(true);
         }
     }
@@ -279,18 +269,29 @@ const ALMContent = props => {
                 <> { SearchIconClicked && 
                     <input onChange={(e)=>onSearch(e)} type="text" placeholder="Scenario Name"/> }
                     <span className="mapping__searchIcon" style={{display:"inline" , float:"right"}}> 
-                        <img onClick={()=>{setSearchIconClicked(!SearchIconClicked);setFilteredName(null)}} style={{cursor: "pointer" , display:"inline",float:"right"}} src="static/imgs/ic-searchIcon-black.png" />
+                        <img alt="searchIcon" 
+                            onClick={()=>{setSearchIconClicked(!SearchIconClicked);setFilteredName(null)}} 
+                            style={{cursor: "pointer" , display:"inline",float:"right"}} 
+                            src="static/imgs/ic-searchIcon-black.png" 
+                        />
                     </span> </> 
             }
             testList = {folderDetails.length ?
                 <>    
                 <div className="test__rootDiv">
-                    <img className="test_tree_toggle" src="static/imgs/ic-qcCollapse.png"/>
+                    <img alt="collapse"
+                        className="test_tree_toggle" 
+                        src="static/imgs/ic-qcCollapse.png"
+                    />
                     <label>Root</label>
                 <div className="test_tree_branches">
                     { folderDetails[0].testfolder.map((e,i)=>(
                         <div>
-                            <img className="test_tree_toggle" id={i} onClick={()=>calltestSuites(e.folderpath,i)} src= "static/imgs/ic-qcExpand.png"/>
+                            <img alt="expand" 
+                                className="test_tree_toggle" 
+                                id={i} onClick={()=>calltestSuites(e.folderpath,i)} 
+                                src= "static/imgs/ic-qcExpand.png"
+                            />
                             <label>{e.foldername}</label>
                             { testSuiteDetails.length ?
                             testSuiteDetails.map(ele=>(
@@ -299,7 +300,10 @@ const ALMContent = props => {
                                     element.testfolder.map( test => ( 
                                             (test.folderpath === e.folderpath.concat('\\', test.foldername)) &&
                                         <div className="test_tree_branches">
-                                            <img className="test_tree_toggle" src="static/imgs/ic-qcExpand.png"/>
+                                            <img alt="expand"
+                                                className="test_tree_toggle" 
+                                                src="static/imgs/ic-qcExpand.png"
+                                            />
                                             <label>{test.foldername}</label>
                                         </div> )) 
                                     :
@@ -307,7 +311,11 @@ const ALMContent = props => {
                                     element.TestSet.map(testCase => ( 
                                         (testCase.testsetpath === e.folderpath) ?
                                         <div className="test_tree_branches">
-                                            <img className="test_tree_toggle" onClick={()=>callTestSets(testCase.testsetid,testCase.testset,testCase.testsetpath)} src="static/imgs/ic-taskType-blue-plus.png"/>
+                                            <img alt="blue-Plus"
+                                                className="test_tree_toggle" 
+                                                onClick={()=>callTestSets(testCase.testsetid,testCase.testset,testCase.testsetpath)} 
+                                                src="static/imgs/ic-taskType-blue-plus.png"
+                                            />
                                             <label>{testCase.testset}</label>
                                             { testSets.length ?
                                             testSets.map(suite => ((suite.testsetid === testCase.testsetid) ?
@@ -319,8 +327,16 @@ const ALMContent = props => {
                                                         </label>
                                                         { (testSuiteSelected_name.indexOf(cases.slice(0,cases.indexOf("/")))!==-1) &&
                                                             <> { syncSuccess 
-                                                                ? <img onClick={()=>callUnSync()} style={{cursor: "pointer", paddingRight:"10px"}} src="static/imgs/ic-qcUndoSyncronise.png"/>
-                                                                : <img onClick={()=>callSyncronise(testCase.testsetpath)} style={{cursor: "pointer", paddingRight:"10px"}} src="static/imgs/ic-qcSyncronise.png"/> }
+                                                                ? <img alt="unsyncIcon" 
+                                                                    onClick={()=>callUnSync()} 
+                                                                    style={{cursor: "pointer", paddingRight:"10px"}} 
+                                                                    src="static/imgs/ic-qcUndoSyncronise.png"
+                                                                  />
+                                                                : <img alt="syncIcon"
+                                                                    onClick={()=>callSyncronise(testCase.testsetpath)} 
+                                                                    style={{cursor: "pointer", paddingRight:"10px"}} 
+                                                                    src="static/imgs/ic-qcSyncronise.png"
+                                                                  /> }
                                                             </> }
                                                     </div>
                                                 )) : null )) : null }
@@ -339,7 +355,7 @@ const ALMContent = props => {
                     (i == scenario_ID) && (e.scenario_details) &&
                     e.scenario_details.map(e => (
                         <div 
-                            className={"test_tree_leaves "+(selectedScenario_ID.indexOf(e._id)!==-1 ? "slectedTestDiv" : null)} 
+                            className={"test_tree_leaves "+(selectedScenario_ID.indexOf(e._id)!==-1 ? " slectedTestDiv" : "")} 
                             onClick={(event)=>{selectScenarioMultiple(event, e._id);}}
                             style={{cursor: "pointer"}}
                         >

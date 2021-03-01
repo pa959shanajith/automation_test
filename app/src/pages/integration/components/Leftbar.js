@@ -28,7 +28,10 @@ const Leftbar = () => {
                 <Fragment>
                     <h4>Integration</h4>
                 <span onClick={()=>callIconClick("qTest") }>
-                    <img  id={(screenType === "qTest")? "selectedIcon" : null}  src='static/imgs/qTest.png'/> 
+                    <img alt="qTestIcon" 
+                        id={(screenType === "qTest")? "selectedIcon" : null}  
+                        src='static/imgs/qTest.png'
+                    /> 
                     <div>qTest</div>
                 </span>
                 </Fragment>
@@ -38,7 +41,9 @@ const Leftbar = () => {
                 <Fragment>
                     <h4>Integration</h4>
                     <span onClick={()=>callIconClick("ALM")}>
-                        <img src='static/imgs/ALM.png'/>
+                        <img alt="ALMIcon" 
+                            src='static/imgs/ALM.png'
+                        />
                         <div>ALM</div>
                     </span>
                 </Fragment>)
@@ -47,7 +52,10 @@ const Leftbar = () => {
                 <Fragment>
                     <h4>Integration</h4>
                    <span onClick={()=>callIconClick("Zephyr")}>
-                        <img  id={(screenType === "Zephyr")? "selectedIcon" : null} src='static/imgs/Zephyr.png'/>
+                        <img alt="ZephyrIcon"  
+                            id={(screenType === "Zephyr")? "selectedIcon" : null} 
+                            src='static/imgs/Zephyr.png'
+                        />
                         <div>Zephyr</div>
                     </span> 
                 </Fragment> ) 
@@ -56,15 +64,23 @@ const Leftbar = () => {
             <Fragment>
                 <h4>Integration</h4>
                     <span onClick={()=>callIconClick("qTest") }>
-                        <img  id={(screenType === "qTest")? "selectedIcon" : null}  src='static/imgs/qTest.png'/> 
+                        <img alt="qTestIcon"  
+                            id={(screenType === "qTest")? "selectedIcon" : null}  
+                            src='static/imgs/qTest.png'
+                        /> 
                         <div>qTest</div>
                     </span>
                     <span onClick={()=>callIconClick("ALM")}>
-                        <img src='static/imgs/ALM.png'/>
+                        <img alt="AlmIcon" 
+                            src='static/imgs/ALM.png'
+                        />
                         <div>ALM</div>
                     </span>
                     <span onClick={()=>callIconClick("Zephyr")}>
-                        <img  id={(screenType === "Zephyr")? "selectedIcon" : null} src='static/imgs/Zephyr.png'/>
+                        <img alt="ZephyrIcon" 
+                            id={(screenType === "Zephyr")? "selectedIcon" : null} 
+                            src='static/imgs/Zephyr.png'
+                        />
                         <div>Zephyr</div>
                     </span>
             </Fragment>    )
@@ -73,17 +89,23 @@ const Leftbar = () => {
     const upperContent=()=>{
         return(
             <div className="letfnavi">
-                {screenType =="ALM" ? 
+                {screenType === "ALM" ? 
                 <Fragment>
                     <h4>ALM Integration</h4>
                     <span onClick={()=>callIconClick("ALM")}>
-                        <img id="selectedIcon" src='static/imgs/testplan.png'/>
+                        <img alt="tstPlanIcon" 
+                            id="selectedIcon" 
+                            src='static/imgs/testplan.png'
+                        />
                         <div>Test Lab</div>
                     </span>
-                    <span   onClick={()=>callIconClick("ALM")}
-                            style={{opacity:"0.5"}}
+                    <span 
+                        onClick={()=>callIconClick("ALM")}
+                        style={{opacity:"0.5"}}
                     >
-                        <img src='static/imgs/testlab.png'/> 
+                        <img alt="testlabIcon"
+                            src='static/imgs/testlab.png'
+                        /> 
                         <div>Test Plan</div>    
                     </span>
                 </Fragment>

@@ -1,5 +1,5 @@
-import React , {useRef , useEffect ,useState ,getState} from 'react';
-import {ModalContainer , ScrollBar , PopupMsg ,ScreenOverlay} from '../../global';
+import React , {useRef , useEffect ,useState } from 'react';
+import {ModalContainer ,  PopupMsg ,ScreenOverlay} from '../../global';
 import * as actionTypes from '../state/action.js';
 import ALMContent from '../components/ALMContent.js';
 import LoginALM from'../components/LoginALM.js';
@@ -12,7 +12,6 @@ const ALM = props => {
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
     const screenType = useSelector(state=>state.integration.screenType);
     const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
-    //const loginALM = reducer.getState().ALM_LOGIN;
     const dispatch = useDispatch();
     const urlRef = useRef();
     const userNameRef = useRef();
@@ -84,8 +83,8 @@ const ALM = props => {
         setBlockui({show:false})
     }
     const callExitcenter=()=>{
-        //dispatch({ type: actionTypes.ALM_LOGIN, payload: false });;
-        props.setAlmClicked(false)
+        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });;
+        //props.setAlmClicked(false)
     }
     const content = () =>{
             return(

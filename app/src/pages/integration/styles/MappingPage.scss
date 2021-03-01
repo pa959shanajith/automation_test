@@ -77,7 +77,7 @@
         height: 24px;
         border-radius: 5px;
         border: 1px solid #000;
-        flex-grow: 1;
+        width: 50%;
         margin: 0 2px;
         padding-left: 6px;
     }
@@ -137,4 +137,8 @@
     img{
         width: 24px;
     }
+}
+.slectedTestDiv{
+    background-color:#E1CAFF !important;
+    border-radius: 5px;
 }

@@ -23,7 +23,6 @@ const  QTest = props => {
     const [failMSg , setFailMsg] = useState(null);
     const [testSuiteSelected_name , setTestSuiteSelected_name] = useState(null);
     const [selectedScenario_ID , setSelectedScenario_ID]= useState(null);
-    const [selectedScenarioName , setSelectedScenarioName]=useState(null)
     const [selectedTestSuiteID , setSelectedTestSuiteID] = useState(null);
     const [scenarioArr , setScenarioArr] = useState(false);
     const [scenario_ID , setScenario_ID] = useState(null) ;
@@ -38,7 +37,6 @@ const  QTest = props => {
     const [blockui,setBlockui] = useState({show:false});
     const [popup ,setPopup]= useState({show:false});
     const [disableSave , setDisableSave]=useState(true);
-    const [saveSucess , setSaveSucess]=useState(false);
     const [logerror, setLogError]= useState(null);
     const [mappedFilesICERes , setMappedFIlesICERes]= useState([]);
     
@@ -89,7 +87,6 @@ const  QTest = props => {
     }
     const callProjectDetails_ICE=async(e)=>{
         setBlockui({show:true,content:'Loading...'})
-        const domain = e.target.value;
         const domainid = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id")
         setDomainID(domainid);
         const userid = user_id;
@@ -115,7 +112,7 @@ const  QTest = props => {
     const callCycleExpand =(idx)=>{
         var expandarr =[...folderDetails];
         expandarr.map((e,i)=>(
-            i== idx.i ? (e['cycleOpen'] == true)? e['cycleOpen'] = false : e['cycleOpen'] = true : null
+            i=== idx.i ? (e['cycleOpen'] === true)? e['cycleOpen'] = false : e['cycleOpen'] = true : null
         ))
         setFolderDetails(expandarr);
         
@@ -123,8 +120,8 @@ const  QTest = props => {
     const callTestSuiteExpand =(idx)=>{
         var expandarr=[...folderDetails];
         expandarr.map((e,i)=>(
-            i== idx.i ? 
-            e['TestsuiteOpen'] == true ? e['TestsuiteOpen'] = false : e['TestsuiteOpen'] = true : null
+            i=== idx.i ? 
+            e['TestsuiteOpen'] === true ? e['TestsuiteOpen'] = false : e['TestsuiteOpen'] = true : null
         ))
         setFolderDetails(expandarr);
     }
@@ -134,7 +131,7 @@ const  QTest = props => {
         
         if(event.target.childNodes.length){
             if(mappedDetails.length){
-                if(mappedDetails[0].testsuiteid == idx){
+                if(mappedDetails[0].testsuiteid === idx){
                 setSyncSuccess(true);
                 }
                 else{
@@ -155,13 +152,12 @@ const  QTest = props => {
         setProjectDropdn2(project_Name)
         setSearchIconClicked(false);
         setSelectedScenario_ID(null);
-        setSelectedScenarioName(null);
     }
     const callSyncronise =()=>{
         const Project_Name = selProjectRef.current.value;
         var project_id ;
         domainDetails.map((e,i)=>(
-            e.name == Project_Name ? 
+            e.name === Project_Name ? 
                     project_id = e.id : null
         ))
         if(!Project_Name){
@@ -185,7 +181,6 @@ const  QTest = props => {
                 testsuiteid: selectedTestSuiteID  
             }
         ]
-        //props.setViewMappedFiles(false);
         setMappedDetails(mapped_Details);
         setDisableSave(false)
         setSyncSuccess(true);
@@ -195,11 +190,10 @@ const  QTest = props => {
         setBlockui({show:true,content:'Saving...'})
         const response = await saveQtestDetails_ICE(mappedDetails);
         if(response.error){displayError(response.error);setBlockui({show:false});return;}
-        if ( response == "success"){
+        if ( response === "success"){
             setBlockui({show:false})
             setErrorPopUp(true);
             setFailMsg("Saved Successfully");
-            setSaveSucess(true);
             setSyncSuccess(false);
         }
         setBlockui({show:false})
@@ -223,7 +217,7 @@ const  QTest = props => {
     const callViewMappedFiles=async()=>{
         setBlockui({show:true,content:'Loading...'})
         const mappedResponse = await viewQtestMappedList_ICE(user_id)
-        if(mappedResponse.length == 0){
+        if(mappedResponse.length === 0){
             setPopup({
                 title:'Mapped Testcase',
                 content:"No mapped details",
@@ -289,16 +283,16 @@ const  QTest = props => {
     return (<Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-        {viewMappedFiles =="qTest" ? 
+        {viewMappedFiles === "qTest" ? 
             <MappedPage
+                screenType="qTest"
                 leftBoxTitle="qTest Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 mappedfilesRes={mappedFilesICERes}
             /> : 
         <>
-        {/* <div className="middle_holder"> */}
                 {
-                    screenType =="qTest" ?
+                    screenType === "qTest" ?
                     <QTestContent
                         disableSave={disableSave}
                         callSaveButton={callSaveButton}
@@ -328,7 +322,6 @@ const  QTest = props => {
                         onSearch={onSearch}
                         setSearchIconClicked={setSearchIconClicked}
                         setFilteredName={setFilteredName}
-                        setSelectedScenarioName={setSelectedScenarioName}
                         filteredNames={filteredNames}
                         scenario_ID={scenario_ID}
                         
@@ -358,12 +351,7 @@ const  QTest = props => {
                         close ={()=>setErrorPopUp(false)}/> 
                     : null
                 }
-                {/* {props.almClicked?
-                    <ALM/>
-                : null
-                } */}
             </>
-        // </div>
         }
         </Fragment>
     

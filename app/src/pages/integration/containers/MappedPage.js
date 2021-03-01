@@ -22,22 +22,34 @@ const MappedPage = props =>{
     useEffect(()=>{
         if (props.mappedfilesRes.length){
             let tempRow = [];
-            let totalCounts = 0;
-            let mappedScenarios = 0;
-            let mappedTests = 0;
+            if (props.screenType === "ALM") {
+                let totalCounts = 0;
+                let mappedScenarios = 0;
+                let mappedTests = 0;
 
-            props.mappedfilesRes.forEach(object => {
-                totalCounts = totalCounts + 1;
-                mappedScenarios = mappedScenarios + object.testscenarioname.length;
-                mappedTests = mappedTests + object.qctestcase.length;
-                tempRow.push([object.testscenarioname, object.qctestcase]);
-            });
+                props.mappedfilesRes.forEach(object => {
+                    totalCounts = totalCounts + 1;
+                    mappedScenarios = mappedScenarios + object.testscenarioname.length;
+                    mappedTests = mappedTests + object.qctestcase.length;
+                    tempRow.push([object.testscenarioname, object.qctestcase]);
+                });
 
-            setCounts({
-                totalCounts: totalCounts,
-                mappedScenarios: mappedScenarios,
-                mappedTests: mappedTests
-            });
+                setCounts({
+                    totalCounts: totalCounts,
+                    mappedScenarios: mappedScenarios,
+                    mappedTests: mappedTests
+                });
+            } 
+            else if (props.screenType === "qTest") {
+                props.mappedfilesRes.forEach(object => {
+                    tempRow.push([object.qtestsuite, object.testscenarioname]);
+                })
+            }
+            else if (props.screenType === "Zephyr") {
+                props.mappedfilesRes.forEach(object => {
+                    tempRow.push([object.testname, object.testscenarioname])
+                })
+            }
             setRows(tempRow);
         }
     }, [props.mappedfilesRes])
