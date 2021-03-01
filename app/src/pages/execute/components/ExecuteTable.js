@@ -182,39 +182,39 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                                         <div key={m} className="executionTableDnd" id={"batch_'"+m} >
                                             <div className='suiteNameTxt' id={"page-taskName_'" + m}><span title={rowData.testsuitename}  className='taskname'> {rowData.testsuitename} </span></div>
                                             <div id={'exeData_"' + m} className='exeDataTable testSuiteBatch'>
-                                                <table id={'executionDataTable_"' + m} className='executionDataTable' cellSpacing='0' cellPadding='0'>
-                                                    <thead>
-                                                        <tr>
-                                                            <th className='e__contextmenu' id='contextmenu'></th>
-                                                            <th className='e__selectAll' ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
-                                                                <input onChange={(event)=>{changeSelectALL(m,'parentExecute_"' + m,eachData,setEachData,batchStatusCheckbox)}} id={'parentExecute_"' + m} className='e-execute' type='checkbox' /></th>	
-                                                            <th className='e__scenario'>Scenario Name</th>
-                                                            <th className='e__param'>Data Parameterization</th>
-                                                            <th className='e__condition'>Condition</th>
-                                                            <th className='e__projectName'>Project Name</th>
-                                                            <th className='e__apptype' >App Type</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className={eachData.length>1?'e__testScenarioScroll':""}>
+                                                <div id={'executionDataTable_"' + m} className='executionDataTable' cellSpacing='0' cellPadding='0'>
+                                                    <div className="e__table-head">
+                                                        <div className="e__table-head-row">
+                                                            <div className='e__contextmenu' id='contextmenu'></div>
+                                                            <div className='e__selectAll' ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
+                                                                <input onChange={(event)=>{changeSelectALL(m,'parentExecute_"' + m,eachData,setEachData,batchStatusCheckbox)}} id={'parentExecute_"' + m} className='e-execute' type='checkbox' /></div>	
+                                                            <div className='e__scenario'>Scenario Name</div>
+                                                            <div className='e__param'>Data Parameterization</div>
+                                                            <div className='e__condition'>Condition</div>
+                                                            <div className='e__projectName'>Project Name</div>
+                                                            <div className='e__apptype' >App Type</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className={eachData.length>1?'e__testScenarioScroll e__table-bodyContainer':" e__table-bodyContainer"}>
                                                         <ScrollBar thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                         {rowData.scenarioids.map((sid,count)=>(
-                                                            <tr id={count} key={count} className={(initialTableList[m]!==undefined && initialTableList[m].executestatus[count]=== 0) ? "e__table_row_status" : ""}>
-                                                                <td title={count} className='tabeleCellPadding e__contextmenu' id={count}>{count+1}</td>
-                                                                <td  className='tabeleCellPadding exe-ExecuteStatus'>
+                                                            <div id={count} key={count} className={(initialTableList[m]!==undefined && initialTableList[m].executestatus[count]=== 0) ? "e__table_row_status e__table_row" : " e__table_row"}>
+                                                                <div title={count} className='e__table-col tabeleCellPadding e__contextmenu' id={count}>{count+1}</div>
+                                                                <div  className='e__table-col tabeleCellPadding exe-ExecuteStatus'>
                                                                     <input id={"executestatus_"+m+"_"+count} checked={rowData.executestatus[count]!== undefined && rowData.executestatus[count]!== 0 ? true:false} onChange={()=>{changeExecutestatus(m,count,eachData,batchStatusCheckbox,setEachData)}} type='checkbox' title='Select to execute this scenario' className='doNotExecuteScenario e-execute'/>
-                                                                </td>
-                                                                <td title={rowData.scenarionames[count]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(rowData.scenarionames[count],rowData.scenarioids[count]);setshowModal(true);}}>{rowData.scenarionames[count]}</td>
-                                                                <td className="tabeleCellPadding exe-dataParam"><input className="e__getParamPath" type="text" onChange={(event)=>{changeParamPath(m,count,event.target.value)}} value={rowData.dataparam[count].trim()}/></td>
-                                                                <td className="tabeleCellPadding exe-conditionCheck"><select onChange={(event)=>{conditionUpdate(m,count,event.target.value)}} value={JSON.parse(rowData.condition[count])} className={"conditionCheck form-control"+(((rowData.condition[count]===0 || rowData.condition[count]=== "0"))?" alertRed":" alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </td>
-                                                                <td title={rowData.projectnames[count]}  className='tabeleCellPadding projectName'>{rowData.projectnames[count]}</td>
-                                                                <td title={rowData.projectnames[count]}  className='tabeleCellPadding exe-apptype'>
+                                                                </div>
+                                                                <div title={rowData.scenarionames[count]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(rowData.scenarionames[count],rowData.scenarioids[count]);setshowModal(true);}}>{rowData.scenarionames[count]}</div>
+                                                                <div className="e__table-col tabeleCellPadding exe-dataParam"><input className="e__getParamPath" type="text" onChange={(event)=>{changeParamPath(m,count,event.target.value)}} value={rowData.dataparam[count].trim()}/></div>
+                                                                <div className="e__table-col tabeleCellPadding exe-conditionCheck"><select onChange={(event)=>{conditionUpdate(m,count,event.target.value)}} value={JSON.parse(rowData.condition[count])} className={"conditionCheck form-control"+(((rowData.condition[count]===0 || rowData.condition[count]=== "0"))?" alertRed":" alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </div>
+                                                                <div title={rowData.projectnames[count]}  className='e__table-col tabeleCellPadding projectName'>{rowData.projectnames[count]}</div>
+                                                                <div title={rowData.projectnames[count]}  className='e__table-col tabeleCellPadding exe-apptype'>
                                                                     <img src={"static/imgs/"+details[projectAppType[rowData.projectnames[count]].toLowerCase()]['img']+".png"} alt="apptype"/>
-                                                                </td>
-                                                            </tr>    
+                                                                </div>
+                                                            </div>    
                                                         ))}
                                                         </ScrollBar>
-                                                    </tbody>
-                                                </table>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
