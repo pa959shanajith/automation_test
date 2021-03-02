@@ -15,5 +15,9 @@
     "screenShotPath": {
         "default": "",
         "mac": ""
+    },
+    "objectPredictionPath": {
+        "default": "",
+        "mac": ""
     }
 }
