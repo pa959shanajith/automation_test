@@ -6671,19 +6671,28 @@ function contentTable(newTestScriptDataLS) {
 						if (objNamearray.length == 9){
 							if ( objNamearray[6] == 'textbox'){
 								obType = 'iristextbox';
-								//obType = "iris";
 							} else if (objNamearray[6] == 'radiobutton'){
 								obType = 'irisradiocheck';
-								//obType = "iris";
 							} else if (objNamearray[6] == 'checkbox'){
 								obType = 'irisradiocheck';
-								//obType = "iris";
 							} else if (objNamearray[6] == 'button'){
 								obType = 'irisbutton';
-								//obType = "iris";
 							} else if (objNamearray[6] == 'table'){
 								obType = 'iristable';
-								//obType = "iris";
+							} else if (objNamearray[6] == 'dropdown'){
+								obType = 'irisgeneric';
+							} else if (objNamearray[6] == 'hscroll'){
+								obType = 'irisgeneric';
+							} else if (objNamearray[6] == 'vscroll'){
+								obType = 'irisgeneric';
+							} else if (objNamearray[6] == 'label'){
+								obType = 'irisgeneric';
+							} else if (objNamearray[6] == 'listbox'){
+								obType = 'irisgeneric';
+							} else if (objNamearray[6] == 'tree'){
+								obType = 'irisgeneric';
+							} else if (objNamearray[6] == 'image'){
+								obType = 'irisgeneric';
 							} else{
 								obType = "iris";
 							}
@@ -6694,7 +6703,7 @@ function contentTable(newTestScriptDataLS) {
 
 					//changes from wasim
 					if (obType != 'a' && obType != 'select' && obType != 'radiobutton' && obType != 'checkbox' && obType != 'input' && obType != 'list' &&
-						obType != 'tablecell' && obType != 'table' && obType != 'grid' && obType != 'img' && obType != 'button' && obType != 'iris' && obType != 'iristextbox' && obType != 'irisradiocheck' && obType != 'irisbutton' && obType != 'iristable' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb') && !ob.tag.startsWith('@PDF')) {
+						obType != 'tablecell' && obType != 'table' && obType != 'grid' && obType != 'img' && obType != 'button' && obType != 'iris' && obType != 'iristextbox' && obType != 'irisradiocheck' && obType != 'irisbutton' && obType != 'iristable' && obType != 'irisgeneric' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb') && !ob.tag.startsWith('@PDF')) {
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
 						var res = '';
@@ -6808,6 +6817,9 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'irisbutton') {
 							sc = Object.keys(keywordArrayList.irisbutton);
 							selectedKeywordList = "irisbutton";
+						} else if (obType == 'irisgeneric') {
+							sc = Object.keys(keywordArrayList.irisgeneric);
+							selectedKeywordList = "irisgeneric";
 						} else if (obType == 'table') {
 							sc = Object.keys(keywordArrayList.table);
 							selectedKeywordList = "table";
@@ -6940,6 +6952,9 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'irisbutton') {
 							sc = Object.keys(keywordArrayList.irisbutton);
 							selectedKeywordList = "irisbutton";
+						} else if (obType == 'irisgeneric') {
+							sc = Object.keys(keywordArrayList.irisgeneric);
+							selectedKeywordList = "irisgeneric";
 						} else {
 							sc = Object.keys(keywordArrayList.element);
 							selectedKeywordList = "element";
@@ -7111,6 +7126,9 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'irisbutton') {
 							sc = Object.keys(keywordArrayList.irisbutton);
 							selectedKeywordList = "irisbutton";
+						} else if (obType == 'irisgeneric') {
+							sc = Object.keys(keywordArrayList.irisgeneric);
+							selectedKeywordList = "irisgeneric";
 						} else {
 							sc = Object.keys(keywordArrayList.element);
 							selectedKeywordList = "element";
