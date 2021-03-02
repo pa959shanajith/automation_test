@@ -89,7 +89,6 @@ const EmailConfig = ({resetMiddleScreen}) => {
                 <button ref={inputRef["toggleTest"]} className="btn-md adminBtn" onClick={onClickTest}  title="Test">Test</button>
             </div>
             <div id='conf_email' className='conf_email'>
-            <ScrollBar scrollId='conf_email' trackColor={'transperent'} thumbColor={'grey'}> 
                 <FormSelect inpRef={inputRef['selectprovider']} onChangeFn={onSelectProvider} defValue={"Select Provider"} label={"Provider"} option={['SMTP']}/>
                 <FormInput inpRef={inputRef['servername']} label={'Server Name'} placeholder={'Server Name'} validExp={"emailServerName"}/>
                 <div className='col-xs-9 form-group input-label'>
@@ -137,7 +136,6 @@ const EmailConfig = ({resetMiddleScreen}) => {
                 <FormInput inpRef={inputRef['proxyuser']} label={'Proxy User'} placeholder={'Username For Proxy Server'}/>
                 <FormInput inpRef={inputRef['proxypass']} label={'Proxy Password'} placeholder={'Password For Proxy Server'}/>
                 </div>
-            </ScrollBar>
             </div>
             {emailTest?<EmailTest setEmailTest={setEmailTest} confObj={emailTest}/>:null}
         </Fragment>

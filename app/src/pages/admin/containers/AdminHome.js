@@ -13,7 +13,7 @@ import TokenManagement from './TokenMangement';
 import LdapConfig from './LdapConfig';
 import EmailConfig from './EmailConfig';
 import AllocateIcePool from './AllocateIcePool';
-import {Header,FooterTwo,ReferenceBar} from '../../global';
+import {Header,FooterTwo,ReferenceBar,ScrollBar} from '../../global';
 import '../styles/AdminHome.scss';
 
 /*Component AdminHome
@@ -34,20 +34,24 @@ const AdminHome = () => {
                 <div className="abs-div">
                     <div className="min-h">
                         <div className='admin-container-wrap'>
-                            <div className="containerWrap admin-containerWrap-pad ">
-                                {(middleScreen==="createUser")?<CreateUser resetMiddleScreen={resetMiddleScreen} showEditUser={showEditUser} setShowEditUser={setShowEditUser} setMiddleScreen={setMiddleScreen} middleScreen={middleScreen}/>:null}
-                                {(middleScreen==="tokenTab")?<TokenManagement resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/> :null}
-                                {(middleScreen==="provisionTa")?<IceProvision resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen} />:null}
-                                {(middleScreen==="projectTab")?<Project resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
-                                {(middleScreen==="assignProjectTab")?<ProjectAssign resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
-                                {(middleScreen==="CreateIcePool")?<CreateIcePool resetMiddleScreen={resetMiddleScreen}/>:null}
-                                {(middleScreen==="AllocateIcePool")?<AllocateIcePool resetMiddleScreen={resetMiddleScreen}/>:null}
-                                {(middleScreen==="ldapConfigTab")?<LdapConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
-                                {(middleScreen==="samlConfigTab")?<SamlConfig resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
-                                {(middleScreen==="oidcConfigTab")?<OidcConfig resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
-                                {(middleScreen==="emailConfigTab")?<EmailConfig resetMiddleScreen={resetMiddleScreen}/>:null}
-                                {(middleScreen==="sessionTab")?<SessionManagement resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen}  />:null}
-                                {(middleScreen==="Preferences")?<Preferences resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
+                            <div className="containerWrap admin-containerWrap-pad " id="admin-container-scroll">
+                                <ScrollBar scrollId="admin-container-scroll" thumbColor="#929397" trackColor="rgb(211, 211, 211)" hideXbar={true}>
+                                    <div className="admin-container-page">
+                                    {(middleScreen==="createUser")?<CreateUser resetMiddleScreen={resetMiddleScreen} showEditUser={showEditUser} setShowEditUser={setShowEditUser} setMiddleScreen={setMiddleScreen} middleScreen={middleScreen}/>:null}
+                                    {(middleScreen==="tokenTab")?<TokenManagement resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/> :null}
+                                    {(middleScreen==="provisionTa")?<IceProvision resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen} />:null}
+                                    {(middleScreen==="projectTab")?<Project resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
+                                    {(middleScreen==="assignProjectTab")?<ProjectAssign resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
+                                    {(middleScreen==="CreateIcePool")?<CreateIcePool resetMiddleScreen={resetMiddleScreen}/>:null}
+                                    {(middleScreen==="AllocateIcePool")?<AllocateIcePool resetMiddleScreen={resetMiddleScreen}/>:null}
+                                    {(middleScreen==="ldapConfigTab")?<LdapConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
+                                    {(middleScreen==="samlConfigTab")?<SamlConfig resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
+                                    {(middleScreen==="oidcConfigTab")?<OidcConfig resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
+                                    {(middleScreen==="emailConfigTab")?<EmailConfig resetMiddleScreen={resetMiddleScreen}/>:null}
+                                    {(middleScreen==="sessionTab")?<SessionManagement resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen}  />:null}
+                                    {(middleScreen==="Preferences")?<Preferences resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
+                                    </div>
+                                </ScrollBar>
                             </div>
                         </div>
                     </div>    

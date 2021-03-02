@@ -219,8 +219,8 @@ const OidcConfig = (props) => {
                     </Fragment>
                     :<Fragment>
                         <span className="leftControl-oidc" title="Server Name">Server Name</span>
-                        <select value={name} onChange = {(event)=>{setName(event.target.value);oidcGetServerData(event.target.value);}} className={nameErrBorder?'selectErrorBorder adminSelect-oidc form-control-oidc':'adminSelect-oidc form-control-oidc'} id="oidcServerName" >
-                            <option value="" disabled selected>Select Server</option>
+                        <select defaultValue={""} onChange = {(event)=>{setName(event.target.value);oidcGetServerData(event.target.value);}} className={nameErrBorder?'selectErrorBorder adminSelect-oidc form-control-oidc':'adminSelect-oidc form-control-oidc'} id="oidcServerName" >
+                            <option value="" disabled>Select Server</option>
                             {selBox.map((data,index)=>(
                                 <option key={index}  value={data}>{data}</option>
                             ))}

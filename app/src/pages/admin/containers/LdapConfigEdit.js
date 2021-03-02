@@ -140,7 +140,6 @@ const LdapConfigEdit = (props) => {
                 <button className="btn-md-ldap adminBtn-ldap ldap-disabled-btn" onClick={()=>{props.ldapManage('update')}} disabled={props.serverName === ''} title="Update Configuration">Update</button>
             </div>
             <div className="ldap-content_wrapper-edit">
-                <ScrollBar thumbColor="#929397">
                 <div className="col-xs-9 form-group-ldap adminForm-ldap">
                 <h4 className='title-ldap' >LDAP Server Details</h4>
                     <div  className='userForm-ldap-edit adminControl-ldap'><div>
@@ -156,7 +155,6 @@ const LdapConfigEdit = (props) => {
                     <LdapConfigurationForm {...props}  />
                     <LdapDataMapping setFieldmap={props.setFieldmap} ldapEdit={props.ldapEdit} fieldmap={props.fieldmap} fieldMapOpts={props.fieldMapOpts}  ldapFMapEmailErrBor={props.ldapFMapEmailErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapFnameErrBor={props.ldapFMapFnameErrBor} ldapFMapUnameErrBor={props.ldapFMapUnameErrBor} />
                 </div>
-                </ScrollBar>
             </div>
             
 

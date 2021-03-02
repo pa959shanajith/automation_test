@@ -49,6 +49,11 @@
      margin: 0 5px;
      background-color: #fff;
 }
+.admin-container-page{
+    padding: 20px;
+    height: 100%;
+    width: 100%;
+}
 .admin__mid_section {
     display: flex;
     flex: auto;
@@ -90,6 +95,5 @@
     min-height: 0;
 }
 .admin-containerWrap-pad{
-    padding:20px;
     height: 100vh;
 }
