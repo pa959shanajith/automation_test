@@ -2583,7 +2583,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								break;
 							}
 						}
-						var custObjProps=[app_type, obj_cord, user_obj_type];
+						var custObjProps=[app_type, obj_cord, user_obj_type, obj_id];
 						DesignServices.userObjectElement_ICE(custObjProps)
 							.then(function (datairis) {
 								if (datairis == "unavailableLocalServer") {
@@ -2630,14 +2630,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								break;
 							}
 						}
-						var custObjProps=[app_type, obj_cord, user_obj_type];
+						var custObjProps=[app_type, obj_cord, user_obj_type, obj_id];
 						DesignServices.userObjectElement_ICE(custObjProps)
 							.then(function (datairis) {
 								if (datairis == "unavailableLocalServer") {
 									openDialog("IRIS Object Details", "Submitted successfully but failed to save IRIS image, ICE not available.")
 								} else if (datairis == "Invalid Session") {
 									return $rootScope.redirectPage();
-								} else if (datairis == "fail" && user_obj_type =="unrecognizableobject") {
+								} else if (datairis == "fail" && user_obj_type == "unrecognizableobject") {
 									openDialog("IRIS Object Details", "Submitted successfully.")
 								} else if (datairis == "fail") {
 									openDialog("IRIS Object Details", "Submitted successfully but failed to save IRIS image.")

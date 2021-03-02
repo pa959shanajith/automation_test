@@ -727,6 +727,7 @@ exports.userObjectElement_ICE = function (req, res) {
 							action:"update_dataset",
 							cord:req.body.object[1],
 							type:req.body.object[2],
+							id:req.body.object[3],
 							operation:operation
 						};
 						dataToIce = {"emitAction": "LAUNCH_DESKTOP_iris", "username" : icename, "data": props};
@@ -736,6 +737,7 @@ exports.userObjectElement_ICE = function (req, res) {
 							action:"update_dataset",
 							cord:req.body.object[1],
 							type:req.body.object[2],
+							id:req.body.object[3],
 							operation:operation
 						};
 						dataToIce = {"emitAction": "LAUNCH_OEBS_iris", "username" : icename, "data": props};
@@ -745,6 +747,7 @@ exports.userObjectElement_ICE = function (req, res) {
 							action:"update_dataset",
 							cord:req.body.object[1],
 							type:req.body.object[2],
+							id:req.body.object[3],
 							operation:operation
 						};
 						dataToIce = {"emitAction": "LAUNCH_SAP_iris", "username" : icename, "data": props};
@@ -754,6 +757,7 @@ exports.userObjectElement_ICE = function (req, res) {
 							action:"update_dataset",
 							cord:req.body.object[1],
 							type:req.body.object[2],
+							id:req.body.object[3],
 							operation:operation
 						};
 						dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
