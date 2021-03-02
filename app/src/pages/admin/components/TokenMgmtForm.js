@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect, useRef } from 'react';
 import {ScreenOverlay, PopupMsg } from '../../global' 
 import {getUserDetails, getCIUsersDetails, fetchICE} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
@@ -14,7 +14,8 @@ import '../styles/TokenMgmtForm.scss'
 */
 
 const TokenMgmtForm = (props) => {
-
+	const dateRef = useRef()
+	const timeRef = useRef()
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     const [allUsers,setAllUsers] = useState([['Select User',' ','','']])
@@ -176,6 +177,11 @@ const TokenMgmtForm = (props) => {
 		}, 1500);
 	}
 
+	const openTime = ()=> {
+        if(inputProps1Disable)return;
+        timeRef.current._onInputClick()
+    }
+
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
@@ -223,12 +229,29 @@ const TokenMgmtForm = (props) => {
 					<span className="adminControl-tkn-mgmt1__title leftControl-tkn-mgmt" title="Token Expiry">Token Expiry</span>
                     <div className="tokenSuite">
 						<span className="datePicContainer datePic-cust" >
-							<Datetime isValidDate={valid} value={props.dateVal} onChange={(event)=>{props.setdateVal(event.format("DD-MM-YYYY"));setInputProps1Disable(false);props.setTimeVal(new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)))}} dateFormat="DD-MM-YYYY" closeOnSelect={true} inputProps={inputProps} timeFormat={false} id="data-token"/> 
-                            <img className="datepickerIconToken" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
+							<Datetime 
+								ref={dateRef} 
+								isValidDate={valid} 
+								value={props.dateVal} 
+								onChange={(event)=>{props.setdateVal(event.format("DD-MM-YYYY"));setInputProps1Disable(false);props.setTimeVal(new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)))}} 
+								dateFormat="DD-MM-YYYY" 
+								closeOnSelect={true} 
+								inputProps={inputProps} 
+								timeFormat={false} 
+								id="data-token"
+							/> 
+                            <img onClick={()=>{dateRef.current._onInputClick()}} className="datepickerIconToken" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
 						</span>
 						<span className="timePicContainer">
-							<Datetime value={props.timeVal} onChange={(event)=>{props.setTimeVal(event.format("HH:mm"))}} inputProps={inputProps1} dateFormat={false} timeFormat="HH:mm" /> 
-                            <img className="timepickerIconToken" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
+							<Datetime 
+								ref={timeRef} 
+								value={props.timeVal} 
+								onChange={(event)=>{props.setTimeVal(event.format("HH:mm"))}} 
+								inputProps={inputProps1} 
+								dateFormat={false} 
+								timeFormat="HH:mm" 
+							/> 
+                            <img onClick={openTime} className="timepickerIconToken" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
 						</span>
 					</div>
                 </div></div>
