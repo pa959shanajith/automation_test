@@ -110,9 +110,14 @@ const Zephyr = props => {
     }
     const footer=()=>{
         return(
+            <div className="submit_row">
+            <span>
+                    {failMSg}
+            </span>
             <span>
                 <button onClick={()=>callLogin_zephyr()}>Submit</button>
             </span>
+            </div>
         )
     }
         return(

@@ -6,6 +6,7 @@ import LoginALM from'../components/LoginALM.js';
 import {viewQcMappedList_ICE,loginQCServer_ICE} from '../api.js';
 import MappedPage from '../containers/MappedPage';
 import { useSelector ,useDispatch} from 'react-redux';
+import Footer from '../../global/components/FooterTwo';
 
 
 const ALM = props => {
@@ -99,6 +100,18 @@ const ALM = props => {
                 />
             )
         }
+    const footer =()=>{
+        return(
+            <div className="submit_row">
+            <span>
+                    {failMSg}
+            </span>
+            <span>
+                <button onClick={()=>callLogin_ALM()}>Submit</button>
+            </span>
+            </div>
+        )
+    } 
     return(
         
         <>
@@ -117,7 +130,8 @@ const ALM = props => {
                             title="ALM Login"
                             close={()=>{dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });}}
                             content={content()}
-                            footer ={<button onClick={()=>callLogin_ALM() }>Submit</button>} /> 
+                            footer ={footer()} 
+                        /> 
                     </> }
             { screenType==="ALM" &&
                 <ALMContent

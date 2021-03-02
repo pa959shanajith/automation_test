@@ -9,7 +9,7 @@ return(
             </span>
         </div>
         <div>
-            <select value={props.encyptMethod} onChange={(e)=>props.onDropChange(e)} id = "dropdown">
+            <select value={props.encyptMethod ? props.encyptMethod : ''} onChange={(e)=>props.onDropChange(e)} id = "dropdown">
                 <option className="options" value="SelectMethod">Select Method</option>
                 <option className="options" value="AES">AES</option>
                 <option className="options" value="MD5">MD5</option>
@@ -19,7 +19,7 @@ return(
         
         <div >
             <div className={ props.emptyCall? "encryptionData-body emptycall" :"encryptionData-body"}>
-                <textarea value={props.encyptValue} id= "encryptData" placeholder="Enter Data For Encryption" onChange={(e)=>props.ontextchange(e)}/>
+                <textarea value={props.encyptValue ? props.encyptValue : ''} id= "encryptData" placeholder="Enter Data For Encryption" onChange={(e)=>props.ontextchange(e)}/>
             </div>
 
         {props.encyptBtn && 

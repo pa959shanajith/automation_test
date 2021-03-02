@@ -7,7 +7,7 @@ const LoginZephyr = props => {
                 <input  style={{ borderBottom:props.loginError ==="ACCID"? "2px solid red" : null}}
                         type="text" ref={props.accountidRef} 
                         className="launchPopupInput  form-control" 
-                        placeholder="Enter Zephyr Account ID " 
+                        placeholder="Enter Zephyr Account ID "
                 />
             </p>
             <p >
@@ -45,10 +45,6 @@ const LoginZephyr = props => {
                         placeholder="Enter Jira Access Token"
                 />    
             </p>
-            <p style={{color:"red",marginLeft:"10px"}}>
-                {props.failMSg}
-            </p>
-            
         </div>
     )
 }

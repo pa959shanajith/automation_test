@@ -16,7 +16,7 @@ const QTestContent = props => {
                     <option value="Select Project"selected disabled >Select Project</option>
                     { props.domainDetails.length &&
                         props.domainDetails.map((e,i)=>(
-                            <option id={e.id} key={i} value={e.id}>{e.name}</option>
+                            <option id={e.name} key={i} value={e.id}>{e.name}</option>
                         ))}
                 </select>
             }
