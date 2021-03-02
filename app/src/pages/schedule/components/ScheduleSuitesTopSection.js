@@ -166,7 +166,7 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
             <div className="s__ab">
                 <div className="s__min">
                     <div className="s__con" id="schSuiteTable">
-                        <ScrollBar scrollId="schSuiteTable" thumbColor="#929397" trackColor="rgb(211, 211, 211)">
+                        <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
                         {scheduleTableData.map((rowData,i)=>(
                             <div key={i} className="batchSuite">
                                 <div className="scheduleSuite" >
