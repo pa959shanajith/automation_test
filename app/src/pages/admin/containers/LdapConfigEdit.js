@@ -145,8 +145,8 @@ const LdapConfigEdit = (props) => {
                 <h4 className='title-ldap' >LDAP Server Details</h4>
                     <div  className='userForm-ldap-edit adminControl-ldap'><div>
                         <span  className="leftControl-ldap" title="Server Name">Server Name</span>
-                        <select onChange={(event)=>{props.setServerName(event.target.value);getServerData(event.target.value)}}  className={'adminSelect-ldap-edit form-control-ldap-edit'+ (props.ldapServerNameErrBor ? " selectErrorBorder" : "")} value={props.serverName} id="ldapServerName" >
-                            <option value="" disabled selected>Select Server</option>
+                        <select defaultValue={""} onChange={(event)=>{props.setServerName(event.target.value);getServerData(event.target.value)}}  className={'adminSelect-ldap-edit form-control-ldap-edit'+ (props.ldapServerNameErrBor ? " selectErrorBorder" : "")} id="ldapServerName" >
+                            <option value="" disabled>Select Server</option>
                             {selBox.map((data,index)=>(
                                 <option key={index} value={data}>{data}</option>
                             ))}
