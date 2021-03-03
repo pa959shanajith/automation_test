@@ -1,5 +1,5 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg} from '../../global' 
+import React, { useState, useEffect } from 'react';
+import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
 import {getPreferences} from '../api';
 import '../styles/Preferences.scss'
 
@@ -37,7 +37,8 @@ const Preferences = (props) => {
     }
 
     return (
-        <Fragment>
+        <ScrollBar thumbColor="#929397">
+        <div className="preferences_container">
             {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName"><span>Preferences</span></div>
@@ -89,8 +90,9 @@ const Preferences = (props) => {
                     </tbody>
 				</table>
 			</div>
-        </Fragment>
-  );
+        </div>
+        </ScrollBar>    
+    );
 }
 
 export default Preferences;

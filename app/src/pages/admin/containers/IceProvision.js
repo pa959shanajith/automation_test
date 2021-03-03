@@ -32,17 +32,19 @@ const IceProvision = (props) => {
     }
 
     return (
-        <Fragment>
+        <div className="ip_container">
             <div id="page-taskName"><span>ICE Provision</span></div>
             <div className="adminActionBtn">
                 <button className="btn-md pull-right adminBtn-ice-prov" onClick={()=>{setRunProvisionsIce(!runProvisionsIce)}}  title="Provision">Provision</button>
                 <button className="btn-md pull-right adminBtn-ice-prov adminBtn-ice-provision " onClick={()=>{refreshIceProvision()}} title="Refresh">Refresh</button>            
             </div>
             <div className="ip-content_wrapper">
+                <ScrollBar thumbColor="#929397">
                   <IceProvisionForm refreshIceList={refreshIceList} setRefreshIceList={setRefreshIceList} op={op} setOp={setOp} runProvisionsIce={runProvisionsIce} selectProvisionType={selectProvisionType} setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken} />
                   <IceProvisionList refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp} setSelectProvisionType={setSelectProvisionType}  icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken}/>
+                </ScrollBar>
             </div>
-        </Fragment>
+        </div>
   );
 }
 

@@ -129,7 +129,7 @@ const LdapConfigEdit = (props) => {
     }
 
     return (
-        <Fragment>
+        <div className="ldap_container-edit">
             {props.popupState.show?<PopupMsg content={props.popupState.content} title={props.popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
@@ -140,12 +140,13 @@ const LdapConfigEdit = (props) => {
                 <button className="btn-md-ldap adminBtn-ldap ldap-disabled-btn" onClick={()=>{props.ldapManage('update')}} disabled={props.serverName === ''} title="Update Configuration">Update</button>
             </div>
             <div className="ldap-content_wrapper-edit">
+                <ScrollBar thumbColor="#929397">
                 <div className="col-xs-9 form-group-ldap adminForm-ldap">
                 <h4 className='title-ldap' >LDAP Server Details</h4>
                     <div  className='userForm-ldap-edit adminControl-ldap'><div>
                         <span  className="leftControl-ldap" title="Server Name">Server Name</span>
-                        <select defaultValue={""} onChange={(event)=>{props.setServerName(event.target.value);getServerData(event.target.value)}}  className={'adminSelect-ldap-edit form-control-ldap-edit'+ (props.ldapServerNameErrBor ? " selectErrorBorder" : "")} id="ldapServerName" >
-                            <option value="" disabled >Select Server</option>
+                        <select onChange={(event)=>{props.setServerName(event.target.value);getServerData(event.target.value)}}  className={'adminSelect-ldap-edit form-control-ldap-edit'+ (props.ldapServerNameErrBor ? " selectErrorBorder" : "")} value={props.serverName} id="ldapServerName" >
+                            <option value="" disabled selected>Select Server</option>
                             {selBox.map((data,index)=>(
                                 <option key={index} value={data}>{data}</option>
                             ))}
@@ -155,13 +156,14 @@ const LdapConfigEdit = (props) => {
                     <LdapConfigurationForm {...props}  />
                     <LdapDataMapping setFieldmap={props.setFieldmap} ldapEdit={props.ldapEdit} fieldmap={props.fieldmap} fieldMapOpts={props.fieldMapOpts}  ldapFMapEmailErrBor={props.ldapFMapEmailErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapFnameErrBor={props.ldapFMapFnameErrBor} ldapFMapUnameErrBor={props.ldapFMapUnameErrBor} />
                 </div>
+                </ScrollBar>
             </div>
             
 
             {showDeleteModal?
                 <ModalContainer title="Delete Configuration" footer={deleteModalButtons(props.ldapManage, setshowDeleteModal)} close={closeModal} content="Are you sure you want to delete ? Users depending on this configuration will not be able to login." />
             :null} 
-        </Fragment>
+        </div>
     );
 }
 

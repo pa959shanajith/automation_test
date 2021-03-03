@@ -213,7 +213,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                     <button id="excSaveBtn" onClick={()=>{updateTestSuite()}} title="Save" className={"e__taskBtn e__btn "+ ((taskName==="Batch Execution") ? "e__btnLeft" : "")}>Save</button>
                     <button disabled={true} title="Configure" className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>Configure</button>
                     <select defaultValue={""} id='syncScenario' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>
-                        <option value=""  disabled>Select Integration</option>
+                        <option value="" disabled className="e__disableOption">Select Integration</option>
                         <option value="1">ALM</option>
                         <option value="0">qTest</option>
                         <option value="2">Zephyr</option>

@@ -107,7 +107,7 @@ const SessionManagement = (props) => {
     }
 
     return (
-        <Fragment>
+        <div className="sess-mgmt_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
@@ -116,6 +116,7 @@ const SessionManagement = (props) => {
                  <button className="btn-md pull-right adminBtn" onClick={()=>{refreshSessMgmt()}} >Refresh</button>
             </div> 
             <div className="content_wrapper-sess-mgmt">
+                <ScrollBar thumbColor="#929397">
                 <div className="col-xs-9 form-group__conv-Sess-mgmt adminForm" style={{height:"88%"}}>
                     <div className="containerWrap sessionItemWrap">
                         <div onClick={()=>{setShowSessions(!showSessions)}} className="sessionHeading" data-toggle="collapse" data-target="#activeUsers-x">
@@ -203,8 +204,9 @@ const SessionManagement = (props) => {
                         :null}
                     </div>       
                 </div>
+                </ScrollBar>
             </div>
-        </Fragment>
+        </div>
   );
 }
 

@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {ScreenOverlay, PopupMsg} from '../../global' 
+import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
 import {getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData} from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/CreateUser.scss'
@@ -533,6 +533,9 @@ const CreateUser = (props) => {
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
+            
+            <ScrollBar thumbColor="#929397">
+            <div className="createUser-container">
             <div id="page-taskName"><span>{(props.showEditUser===false)?"Create User":"Edit User"}</span></div>
             
             {(props.showEditUser===false)?
@@ -587,8 +590,9 @@ const CreateUser = (props) => {
                     </div>
                 :null}
                 
-
 			</div>	
+            </div>
+            </ScrollBar>
       </Fragment>
   );
 }

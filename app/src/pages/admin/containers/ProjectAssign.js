@@ -1,6 +1,6 @@
-import React ,  { Fragment, useEffect, useState} from 'react';
+import React ,  { useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
-import {ScreenOverlay, PopupMsg, ModalContainer} from '../../global'
+import {ScreenOverlay, PopupMsg, ModalContainer, ScrollBar} from '../../global'
 import { useSelector} from 'react-redux'; 
 import '../styles/ProjectAssign.scss';
 
@@ -349,7 +349,8 @@ const ProjectNew = (props) => {
     }
     
     return (
-        <Fragment>
+        <ScrollBar thumbColor="#929397">
+        <div className="projAssign_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
@@ -425,7 +426,8 @@ const ProjectNew = (props) => {
             </div>    
 
             {showAssignProjectModal? <ModalContainer title="Update Projects" footer={ModalButtons(clickAssignProjects1, setShowAssignProjectModal)} close={()=>{setShowAssignProjectModal(false)}} content="All the tasks that has been assigned to this user will be removed from this user's queue from the project(s) which are being unassigned (if any). Do you want to proceed?" modalClass=" modal-sm" /> :null}  
-        </Fragment>
+        </div>
+        </ScrollBar>
     )
 }
 

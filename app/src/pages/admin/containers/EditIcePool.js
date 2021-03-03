@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
-import {ModalContainer} from '../../global' 
+import {ModalContainer, ScrollBar} from '../../global' 
 import {FormInpDropDown, FormInput} from '../components/FormComp';
 import AssignOptionBox from '../components/AssignOptionBox'
 import {clearQueue,deleteICE_pools,updatePool,getPools} from '../api';
@@ -93,23 +93,27 @@ const EditIcePool = ({projList,displayError,setLoading}) => {
                 footer={<DelFooter clickDeletePool={clickDeletePool} setDeletePop={setDeletePop}/>}
                 content={<DelContainer selectedPool={selectedPool} />}
             />:null}
-            <div id="page-taskName">
-                <span>Edit ICE Pool</span>
-            </div>
-            <div className="adminActionBtn">
-                <button disabled={!selectedPool?true:false} ref={deleteBtn} className="btn-md adminBtn btn-edit" onClick={()=>setDeletePop(true)}  title="Edit">Delete</button>
-                <button disabled={!selectedPool?true:false} ref={updateBtn} className="btn-md adminBtn btn-edit" onClick={clickUpdatePool}  title="Save">Update</button>
-                <button ref={clearBtn} className="btn-md adminBtn" onClick={()=>setClearPop(true)}  title="Save">Clear Queue</button>
-            </div>
-            <div className='edit_ice-pool'>
-                <div className="col-xs-9 form-group assignBox-container">
-                    <AssignOptionBox 
-                        FilterComp={<FilterComp clickInp={clickInp} inpRef={filterRef} setFilter={FilterPool} data={poolList}/>} 
-                        disable={!selectedPool?true:false} leftBox={allProj} rightBox={assignProj} setLeftBox={setAllProj} setRightBox={setAssignProj}
-                    />
+            <ScrollBar thumbColor="#929397">
+                <div className="edit_ice-pool_container">
+                    <div id="page-taskName">
+                        <span>Edit ICE Pool</span>
+                    </div>
+                    <div className="adminActionBtn">
+                        <button disabled={!selectedPool?true:false} ref={deleteBtn} className="btn-md adminBtn btn-edit" onClick={()=>setDeletePop(true)}  title="Edit">Delete</button>
+                        <button disabled={!selectedPool?true:false} ref={updateBtn} className="btn-md adminBtn btn-edit" onClick={clickUpdatePool}  title="Save">Update</button>
+                        <button ref={clearBtn} className="btn-md adminBtn" onClick={()=>setClearPop(true)}  title="Save">Clear Queue</button>
+                    </div>
+                    <div className='edit_ice-pool'>
+                        <div className="col-xs-9 form-group assignBox-container">
+                            <AssignOptionBox 
+                                FilterComp={<FilterComp clickInp={clickInp} inpRef={filterRef} setFilter={FilterPool} data={poolList}/>} 
+                                disable={!selectedPool?true:false} leftBox={allProj} rightBox={assignProj} setLeftBox={setAllProj} setRightBox={setAssignProj}
+                            />
+                        </div>
+                        <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'} validExp={"poolName"}/>
+                    </div>
                 </div>
-                <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'} validExp={"poolName"}/>
-            </div>
+            </ScrollBar>        
         </Fragment>
     )
 }

@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ModalContainer} from '../../global' 
+import {ScreenOverlay, PopupMsg, ModalContainer, ScrollBar} from '../../global' 
 import {getSAMLConfig, manageSAMLConfig} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import '../styles/SamlConfig.scss'
@@ -224,7 +224,8 @@ const SamlConfig = (props) => {
     }
 
     return (
-        <Fragment>
+        <ScrollBar thumbColor="#929397">
+        <div className="saml_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
@@ -281,7 +282,8 @@ const SamlConfig = (props) => {
             {showDeleteModal?
                 <ModalContainer title="Delete Configuration" footer={deleteModalButtons()} close={closeModal} content="Are you sure you want to delete ? Users depending on this configuration will not be able to login." />
             :null} 
-    </Fragment>
+        </div>
+    </ScrollBar>
   );
 }
 
