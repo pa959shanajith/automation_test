@@ -454,7 +454,8 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         var screen_acc_reportdata = {};
                         var index = 1;
                         for (i = accessibility_data.length - 1; i >= 0; i--) {
-                            let time = accessibility_data[i]["executedtime"]
+                            let time = new Date(accessibility_data[i]["executedtime"]);
+                            time = time.toString().split("GMT")[0]
                             tableContainer.append("<tr class='screen_report'  style='cursor:pointer;' data-executionid='" + accessibility_data[i]["_id"] + "'><td class='executionNo' style='padding:3px;'>" + (index++) + "</td><td style='padding:3px;'>" + accessibility_data[i]["title"] + "</td><td style='padding:3px;'>" + time + "</td>");
                             screen_acc_reportdata[accessibility_data[i]["_id"]] = accessibility_data[i]
                         }

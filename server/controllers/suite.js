@@ -526,10 +526,10 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 							// testsuite.reportData[scenarioIndex] = reportItem;
 							testsuite.reportData.push(reportItem);
 							completedSceCount++;
-							if (completedSceCount == scenarioCount && reportType != "accessiblityTestingOnly") {
+							if (completedSceCount == scenarioCount) {
 								const suiteStatus = (statusPass == scenarioCount) ? "pass" : "fail";
 								completedSceCount = statusPass = 0;
-								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
+								if(reportType != "accessiblityTestingOnly") notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
 								await updateExecutionStatus([executionid], suiteStatus);
 							}
 						}

@@ -544,7 +544,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			suiteDetails.scenarioDescriptions = scenarioDescriptionText;
 			batchInfo.push(suiteDetails);
 		});
-		var throwErr = false;
 		if(scenarioTaskType != "disable"){
 			let input = {
 				taskId : $scope.taskId,
@@ -554,39 +553,66 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			.then((status)=>{
 				if(status != "success"){
 					openDialogExe("Save Test Suite", "Failed to save selected accessibility standards.");
-					throwErr = true;
+				}else{
+					var current_task = JSON.parse(window.localStorage['_CT']);
+					current_task.accessibilityParameters = accessibilityParameters;
+					window.localStorage['_CT'] = JSON.stringify(current_task);
+
+					//Getting ConditionChecks
+					ExecutionService.updateTestSuite_ICE(batchInfo)
+					.then(function (data) {
+						unblockUI();
+						if (data == "Invalid Session") {
+							return $rootScope.redirectPage();
+						}
+						if (data != "fail") {
+							openDialogExe("Save Test Suite", "Test suite saved successfully.");
+							//$("#saveSuitesModal").modal("show")
+							//Transaction Activity for Save Test Suite Button Action
+							// var labelArr = [];
+							// var infoArr = [];
+							// labelArr.push(txnHistory.codesDict['SaveTestSuite']);
+							// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+						} else {
+							openDialogExe("Save Test Suite", "Failed to save test suite.");
+							//$("#saveSuitesModalFail").show();
+						}
+						angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+					}, function (error) {
+						console.log(error);
+					});
 				}
 			}).catch((e)=>{
 				throwErr = true;
 				openDialogExe("Save Test Suite", "Failed to save selected accessibility standards.");
 				
 			});
+		}else{
+			//Getting ConditionChecks
+			ExecutionService.updateTestSuite_ICE(batchInfo)
+			.then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") {
+					return $rootScope.redirectPage();
+				}
+				if (data != "fail") {
+					openDialogExe("Save Test Suite", "Test suite saved successfully.");
+					//$("#saveSuitesModal").modal("show")
+					//Transaction Activity for Save Test Suite Button Action
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['SaveTestSuite']);
+					// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+				} else {
+					openDialogExe("Save Test Suite", "Failed to save test suite.");
+					//$("#saveSuitesModalFail").show();
+				}
+				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+			}, function (error) {
+				console.log(error);
+			})
 		}
-		if(throwErr) return;
-		//console.log("batchdetails", batchInfo);
-		//Getting ConditionChecks
-		ExecutionService.updateTestSuite_ICE(batchInfo)
-		.then(function (data) {
-			unblockUI();
-			if (data == "Invalid Session") {
-				return $rootScope.redirectPage();
-			}
-			if (data != "fail") {
-				openDialogExe("Save Test Suite", "Test suite saved successfully.");
-				//$("#saveSuitesModal").modal("show")
-				//Transaction Activity for Save Test Suite Button Action
-				// var labelArr = [];
-				// var infoArr = [];
-				// labelArr.push(txnHistory.codesDict['SaveTestSuite']);
-				// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-			} else {
-				openDialogExe("Save Test Suite", "Failed to save test suite.");
-				//$("#saveSuitesModalFail").show();
-			}
-			angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
-		}, function (error) {
-			console.log(error);
-		});
+
 	};
 	//Save TestSuite Functionality
 
