@@ -544,7 +544,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						let result = status;
 						let report_result = {};
 						report_result["status"] = status
-						if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess'
+						if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
+						if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
 						report_result["testSuiteDetails"] = execReq["suitedetails"]
 						if (resultData.userTerminated) result = "UserTerminate";
 						if (execType == "API") result = [d2R, status];
