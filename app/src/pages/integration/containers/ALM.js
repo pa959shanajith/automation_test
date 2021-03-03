@@ -6,7 +6,6 @@ import LoginALM from'../components/LoginALM.js';
 import {viewQcMappedList_ICE,loginQCServer_ICE} from '../api.js';
 import MappedPage from '../containers/MappedPage';
 import { useSelector ,useDispatch} from 'react-redux';
-import Footer from '../../global/components/FooterTwo';
 
 
 const ALM = props => {
@@ -28,6 +27,7 @@ const ALM = props => {
     useEffect(()=>{
         dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
         setMappedFilesRes([]);
+       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const displayError = (title,error) =>{

@@ -16,7 +16,7 @@ const Integrations = () => {
     const dispatch = useDispatch();
     const screenType = useSelector(state=>state.integration.screenType);
 
-    useEffect(()=>{
+    useEffect(()=>{//persist the screentype of integration (implementation for bug#18796)
         let currScreenType = window.localStorage['integrationScreenType'];
         if (currScreenType) {
             dispatch({type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: currScreenType});
