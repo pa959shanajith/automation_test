@@ -2722,6 +2722,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					break;
 				}
 			}
+			if (objType == ''){
+				objType = ele[0].attributes['data-tag'].value.split(';')[1];
+				if (objType == "Unable to recognize object type") objType = "unrecognizableobject";
+			}
 			img = ele[0].attributes["data-image"].value
 			image.src = 'data:image/png;base64,'+img;
 			$("#dialog-irisObject").modal("show");
