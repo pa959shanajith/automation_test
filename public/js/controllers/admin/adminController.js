@@ -1012,8 +1012,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		adminServices.getCIUsersDetails(generatetoken).then(function (data) {
 			unblockUI();
 			if (data == "Invalid Session") $rootScope.redirectPage();
-			else if (data == 'fail') openModalPopup("Token Management", "Failed to fetch token data");
-			else if (data.length == 0) openModalPopup("Token Management", "No tokens have been issued");
+			else if (data == 'fail'){
+				$scope.tokens.allTokens = [];
+				openModalPopup("Token Management", "Failed to fetch token data");
+			} 
+			else if (data.length == 0){
+				$scope.tokens.allTokens = [];
+				openModalPopup("Token Management", "No tokens have been issued");
+			}
 			else {
 				//openModalPopup("Token Management", "Fetch Token details successful");
 				data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));

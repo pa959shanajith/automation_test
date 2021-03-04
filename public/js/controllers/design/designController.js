@@ -1486,6 +1486,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			}
 			if (wsdlInputs[4]){
 				keywordVal.splice(4,0,'setParamValue');
+			}else{
+				wsdlInputs.splice(4,1);
 			}
 			var blockMsg = "Fetching Response Header & Body..."
 			blockUI(blockMsg);
@@ -2721,6 +2723,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					objType = "unrecognizableobject";
 					break;
 				}
+			}
+			if (objType == ''){
+				objType = ele[0].attributes['data-tag'].value.split(';')[1];
+				if (objType == "Unable to recognize object type") objType = "unrecognizableobject";
 			}
 			img = ele[0].attributes["data-image"].value
 			image.src = 'data:image/png;base64,'+img;

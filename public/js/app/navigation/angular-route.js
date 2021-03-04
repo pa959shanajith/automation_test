@@ -291,13 +291,15 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'css/bootstrap/bootstrap-datepicker.min.css',
+						'js/plugins/bootstrap/bootstrap-datepicker.min.js',
 						'js/directives/headerDirective.js',	
 						'js/controllers/chatbot/chatbotController.js',
 						'js/controllers/chatbot/chatbotService.js',
 						'js/controllers/login/loginService.js',						
 						'js/controllers/header/headerController.js',
 						'js/controllers/utility/utilityController.js',
-						'js/controllers/utility/utilityService.js'
+						'js/controllers/utility/utilityService.js',
                     ]);
                 }]
             }
