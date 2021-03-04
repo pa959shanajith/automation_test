@@ -77,7 +77,7 @@ const EmailConfig = ({resetMiddleScreen}) => {
         )
     }
     return(
-        <Fragment>
+        <div className="conf_email_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
@@ -140,7 +140,7 @@ const EmailConfig = ({resetMiddleScreen}) => {
             </ScrollBar>
             </div>
             {emailTest?<EmailTest setEmailTest={setEmailTest} confObj={emailTest}/>:null}
-        </Fragment>
+        </div>
     )
 }
 

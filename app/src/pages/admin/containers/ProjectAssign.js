@@ -1,6 +1,6 @@
-import React ,  { Fragment, useEffect, useState} from 'react';
+import React ,  { useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
-import {ScreenOverlay, PopupMsg, ModalContainer} from '../../global'
+import {ScreenOverlay, PopupMsg, ModalContainer, ScrollBar} from '../../global'
 import { useSelector} from 'react-redux'; 
 import '../styles/ProjectAssign.scss';
 
@@ -349,7 +349,8 @@ const ProjectNew = (props) => {
     }
     
     return (
-        <Fragment>
+        <ScrollBar thumbColor="#929397">
+        <div className="projAssign_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
@@ -363,8 +364,8 @@ const ProjectNew = (props) => {
             <div className="col-xs-9 form-group" style={{width: "83%"}}>
                 <div className='userForm-project projectForm-project project-custom-top' >
                     <div className='domainTxt'>User</div>
-                    <select onChange={(event)=>{clickSelAssignUser(event.target.value)}} className={userSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project select-margin':"adminSelect-project-assign form-control__conv-project select-margin"} id="selAssignUser" >
-                        <option disabled={true} key="" value="" selected>Select User</option>
+                    <select defaultValue={""} onChange={(event)=>{clickSelAssignUser(event.target.value)}} className={userSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project select-margin':"adminSelect-project-assign form-control__conv-project select-margin"} id="selAssignUser" >
+                        <option disabled={true} key="" value="" >Select User</option>
                         {selectBox.map((data)=>(
                             <option key={data[0]} data-id={data[1]} value={data[0]}>{data[0]}</option>
                         ))}
@@ -373,8 +374,8 @@ const ProjectNew = (props) => {
                 
                 <div className='userForm-project projectForm-project display-project'  >
                     <div className='domainTxt'>Domain</div>
-                    <select onChange={(event)=>{ClickSelDomains(event.target.value)}}  className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project ':"adminSelect-project-assign form-control__conv-project "} id="selDomains" style={{width: "100%",marginLeft:"16px"}} >
-                            <option disabled={true} key="" value="" selected>Please Select Your Domain</option>
+                    <select defaultValue={""} onChange={(event)=>{ClickSelDomains(event.target.value)}}  className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project ':"adminSelect-project-assign form-control__conv-project "} id="selDomains" style={{width: "100%",marginLeft:"16px"}} >
+                            <option disabled={true} key="" value="">Please Select Your Domain</option>
                             {selDomainsOptions.map((data)=>(
                                 <option key={data} value={data}>{data}</option>
                             ))}
@@ -425,7 +426,8 @@ const ProjectNew = (props) => {
             </div>    
 
             {showAssignProjectModal? <ModalContainer title="Update Projects" footer={ModalButtons(clickAssignProjects1, setShowAssignProjectModal)} close={()=>{setShowAssignProjectModal(false)}} content="All the tasks that has been assigned to this user will be removed from this user's queue from the project(s) which are being unassigned (if any). Do you want to proceed?" modalClass=" modal-sm" /> :null}  
-        </Fragment>
+        </div>
+        </ScrollBar>
     )
 }
 

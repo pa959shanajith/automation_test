@@ -1,6 +1,6 @@
 import React ,  { Fragment, useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
-import {ScreenOverlay,PopupMsg, ModalContainer} from '../../global' 
+import {ScreenOverlay,PopupMsg, ModalContainer, ScrollBar} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
 import ValidationExpression from '../../global/components/ValidationExpression';
@@ -799,7 +799,8 @@ const ProjectNew = (props) => {
     }
 
     return (
-    <Fragment>
+    <ScrollBar thumbColor="#929397">
+    <div className="project_conatiner">
         {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
         {loading?<ScreenOverlay content={loading}/>:null}
         <div id="page-taskName">
@@ -863,7 +864,8 @@ const ProjectNew = (props) => {
         {(showEditNameModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(updateReleaseName)} close={()=>{setShowEditNameModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder, "releaseTxt" )} modalClass=" modal-sm" />:null} 
         {(showEditNameModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(updateCycleName)} close={()=>{setShowEditNameModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder, "cycleTxt" )} modalClass=" modal-sm" /> :null}
         {showProjectEditModal? <ModalContainer title="Edit Project Name" footer={editModalButtons()} close={closeModal} content={editModalcontent(editProjectName, projectEditFunction, modalInputErrorBorder, projectNameErrorBorder)} modalClass=" modal-sm" /> :null}  
-    </Fragment>
+    </div>
+    </ScrollBar>
   );
 }
 

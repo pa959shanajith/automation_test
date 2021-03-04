@@ -179,7 +179,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                                 <div className="e__batchSuites">
                                 <ScrollBar  thumbColor="rgb(51,51,51)" trackColor="rgb(211, 211, 211)" >
                                     {arr.map((rowData,m)=>(
-                                        <div key={m} className="executionTableDnd" id={"batch_'"+m} >
+                                        <div key={m} className={arr.length>1?" executionTableDnd":" executionTableDnd-single"} id={"batch_'"+m} >
                                             <div className='suiteNameTxt' id={"page-taskName_'" + m}><span title={rowData.testsuitename}  className='taskname'> {rowData.testsuitename} </span></div>
                                             <div id={'exeData_"' + m} className='exeDataTable testSuiteBatch'>
                                                 <div id={'executionDataTable_"' + m} className='executionDataTable' cellSpacing='0' cellPadding='0'>
@@ -208,7 +208,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                                                                 <div className="e__table-col tabeleCellPadding exe-conditionCheck"><select onChange={(event)=>{conditionUpdate(m,count,event.target.value)}} value={JSON.parse(rowData.condition[count])} className={"conditionCheck form-control"+(((rowData.condition[count]===0 || rowData.condition[count]=== "0"))?" alertRed":" alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </div>
                                                                 <div title={rowData.projectnames[count]}  className='e__table-col tabeleCellPadding projectName'>{rowData.projectnames[count]}</div>
                                                                 <div title={rowData.projectnames[count]}  className='e__table-col tabeleCellPadding exe-apptype'>
-                                                                    <img src={"static/imgs/"+details[projectAppType[rowData.projectnames[count]].toLowerCase()]['img']+".png"} alt="apptype"/>
+                                                                    <img src={"static/imgs/"+details[projectAppType[rowData.projectnames[count]].toLowerCase()]['img']+".png"} alt="apptype" className="e__table_webImg"/>
                                                                 </div>
                                                             </div>    
                                                         ))}
