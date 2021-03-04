@@ -144,73 +144,46 @@ describe('<LoginFields/> negative scenario test ',()=>{
     let wrapper;
     beforeEach(()=>{
         wrapper=setUp()
-		jest.spyOn(api,'checkUser').mockImplementation(()=>{
-            return Promise.resolve({proceed:true})
+		jest.spyOn(api,'Encrypt_ICE').mockImplementation(()=>{
+            return Promise.resolve('')
         });
-        // jest.spyOn(api,'authenticateUser').mockImplementation((username, password)=>{
-        //   return Promise.resolve('inValidCredential')  
-        // }); 
-        jest.spyOn(api,'authenticateUser').mockResolvedValueOnce('inValidCredential')
-                                          .mockResolvedValueOnce('userLogged')
     })
 	afterEach(()=>{
         jest.restoreAllMocks()
     })
 
-    it('Should render username error for blank username input ', ()=>{
-        const btn=findByTestAtrr(wrapper,'login-username-button');
-
-        //Assert that default username image is displayed
-        expect(findByTestAtrr(wrapper,'username-image').prop('src')).toBe('static/imgs/ic-username.png')
-        
+    it('should highlight input box(if empty) and btn is clicked ', ()=>{
+        const dropdown=findByTestAtrr(wrapper,'utility_screen_selection_sel');
+        dropdown.simulate('change',{
+            target:dropdownOptions[0]
+        })
+        wrapper.update()
+        const btn=findByTestAtrr(wrapper,'encryption_options_btn');
         btn.simulate('click')
-
-        //Assert that image source is changed to the correspnding error image
-        expect(findByTestAtrr(wrapper,'username-image').prop('src')).toBe('static/imgs/ic-username-error.png')
-        
-        //Assert that clicking on arrow with blank username input will render the required error
-        expect(findByTestAtrr(wrapper,'login-username-error').length).toBe(1)
-        
-    })
- 
-    it('Should display "Please enter password" when no input for password field provided',()=>{
-        wrapper=inputFieldChange(wrapper,'username-input',USERCREDENTAILS.INVALIDUN)
-        const btn=findByTestAtrr(wrapper,'login-username-button')
-        btn.simulate('click')
-        
+        wrapper.update()
         setTimeout(()=>{
             wrapper.update();
-            const loginButton=findByTestAtrr(wrapper,'login-button')
-            //Assert that the default password image is being used
-            expect(findByTestAtrr(wrapper,'password-image').prop('src')).toBe('static/imgs/ic-password.png')
-            loginButton.simulate('click',{preventDefault:jest.fn()})
-            //Assert that password img src is changed to respective error image
-            expect(findByTestAtrr(wrapper,'password-image').prop('src')).toBe('static/imgs/ic-password-error.png')
-            // Assert that with no password the errpr message gets displayed
-            expect(findByTestAtrr(wrapper,'password-error').length).toBe(1)
-            
+            //Assert if the encrypted data field is highlighted->
+            expect(findByTestAtrr(wrapper,'utility_encryption_data_div').prop("className")).toBe("encryptionData-body emptycall")
+            //Assert if the encrypted data field is empty after the API call->
+            expect(findByTestAtrr(wrapper,'utility_encrypted_data_inp').text().length).toBe(0)
+            done();
         })
     })
 
-    it('Should render the corresponding error message when clicking the login button',(done)=>{
-        wrapper=inputFieldChange(wrapper,'username-input',USERCREDENTAILS.INVALIDUN)
-        const btn=findByTestAtrr(wrapper,'login-username-button')
-        btn.simulate('click')
+    it('user should not be able to change anything in encrypted data field ', ()=>{
+        let inp=findByTestAtrr(wrapper,"utility_encrypted_data_inp")
+        inp.simulate('change',{
+            target:{
+                value:"hellotryingtochangeyou"
+            }
+        })
+        wrapper.update()
         setTimeout(()=>{
             wrapper.update();
-            wrapper=inputFieldChange(wrapper,'password-input',USERCREDENTAILS.INVALIDPWD)
-            const loginButton=findByTestAtrr(wrapper,'login-button')
-            loginButton.simulate('click',{preventDefault:jest.fn()})
-        
-            setTimeout(()=>{
-                wrapper.update()
-
-                //Assert that login validation is being rendered depending on the inputs
-                expect(findByTestAtrr(wrapper,'login-validation').text()).toBe("The username or password you entered isn't correct. Please try again.")
-
-                done();
-            })      
+            //Assert if the encrypted data field is empty after the API call->
+            expect(findByTestAtrr(wrapper,'utility_encrypted_data_inp').text().length).toBe(0)
+            done();
         })
     })
-
 })

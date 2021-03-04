@@ -22,7 +22,7 @@ return(
         </div>
         
         <div className="ult_content_conatiner">
-            <div className={ props.emptyCall? "encryptionData-body emptycall" :"encryptionData-body"}>
+            <div data-test="utility_encryption_data_div" className={ props.emptyCall? "encryptionData-body emptycall" :"encryptionData-body"}>
                 <textarea data-test="utility_encryption_data_inp" value={props.encyptValue ? props.encyptValue : ''} id= "encryptData" placeholder="Enter Data For Encryption" onChange={(e)=>props.ontextchange(e)}/>
             </div>
 
