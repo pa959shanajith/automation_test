@@ -45,7 +45,7 @@ const ReferenceContent = ({mirror}) => {
 				<div className="scrsht_outerContainer" id="ss_ssId">
 				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' hideXbar={true}>
 					<div className="ss_scrsht_insideScroll">
-					{ mirror ? <img id="ss_screenshot" className="screenshot_img" src={`data:image/PNG;base64,${mirror}`} /> : "No Screenshot Available"}
+					{ mirror ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${mirror}`} /> : "No Screenshot Available"}
 					</div>
 				</ScrollBar>
 				</div>

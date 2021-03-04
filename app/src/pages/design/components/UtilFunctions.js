@@ -12,8 +12,8 @@ export const getObjNameList = (appType, data) => {
                             break;
         case "OEBS":        obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
                             break;
-        case "MobileApp":   if (navigator.appVersion.indexOf("Mac") == -1) obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action","@Excel","@Word"];
-                            else if (navigator.appVersion.indexOf("Mac") != -1) obnames = ["@Generic", "@Mobile", "@CustomiOS","@Excel","@Word"];
+        case "MobileApp":   if (navigator.appVersion.indexOf("Mac") === -1) obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action","@Excel","@Word"];
+                            else if (navigator.appVersion.indexOf("Mac") !== -1) obnames = ["@Generic", "@Mobile", "@CustomiOS","@Excel","@Word"];
                             break;
         case "MobileWeb":   obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action","@Excel","@Word","@Custom"];
                             break;
@@ -181,7 +181,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                 let ob = scriptData[i];
                 let custname = ob.custname.trim();
                 scrappedDataCustnames.push(custname);
-
+                //eslint-disable-next-line
                 if ((custname.replace(/\s/g, ' ') === (selectedObj.replace('/\s/g', ' ')).replace('\n', ' '))) {
                     let isIos = scriptData[i].text;
                     if (isIos === 'ios') objName = ob.xpath;
@@ -189,7 +189,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
 
                     url = ob.url;
                     let obType = ob.tag;
-                    let listType = ob.canselectmultiple;
+                    // let listType = ob.canselectmultiple;
                     if (ob.cord) {
                         selectedKeywordList = 'iris';
                         cord = ob.cord;
@@ -227,7 +227,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                                 selectedKeywordList = "select";
                                 break;
                             case 'list':
-                                if (listType == 'true') {
+                                if (listType === 'true') {
                                     keywords = Object.keys(keywordList.list);
                                     selectedKeywordList = "list";
                                 } else {
@@ -356,7 +356,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                                 selectedKeywordList = "toolbar";
                                 break;
                             case 'list':
-                                if (listType == 'true') {
+                                if (listType === 'true') {
                                     keywords = Object.keys(keywordList.list);
                                     selectedKeywordList = "list";
                                 } else {

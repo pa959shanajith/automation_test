@@ -46,7 +46,7 @@ const DesignContent = props => {
     const [checkedRows, setCheckedRows] = useState([]);
     const [focusedRow, setFocusedRow] = useState(null);
     const [draggable, setDraggable] = useState(false);
-    const [dataFormat, setDataFormat] = useState(null);
+    // const [dataFormat, setDataFormat] = useState(null);
     const [objNameList, setObjNameList] = useState(null);
     const [showConfPaste, setShowConfPaste] = useState(false);
     const [showPS, setShowPS] = useState(false);
@@ -88,6 +88,7 @@ const DesignContent = props => {
 
     useEffect(()=>{
         dispatch({type: designActions.SET_TESTCASES, payload: testCaseData})
+        //eslint-disable-next-line
     }, [testCaseData]);
 
     useEffect(()=>{
@@ -103,6 +104,7 @@ const DesignContent = props => {
             })
             .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
         }
+        //eslint-disable-next-line
     }, [props.imported]);
 
     useEffect(()=>{
@@ -121,6 +123,7 @@ const DesignContent = props => {
             })
             .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
         }
+        //eslint-disable-next-line
     }, [userInfo, props.current_task]);
 
     const fetchTestCases = () => {
@@ -162,8 +165,8 @@ const DesignContent = props => {
                         if (scriptData === "Invalid Session") return RedirectPage(history);
                         if (appType === "Webservice"){
                             if (scriptData.view.length > 0) {
-                                if (scriptData.view[0].header) setDataFormat(scriptData.view[0].header[0].split("##").join("\n"));
-                                else setDataFormat(scriptData.header[0].split("##").join("\n"));
+                                // if (scriptData.view[0].header) setDataFormat(scriptData.view[0].header[0].split("##").join("\n"));
+                                // else setDataFormat(scriptData.header[0].split("##").join("\n"));
                             }	
                         }
                         
@@ -259,7 +262,7 @@ const DesignContent = props => {
                         break;
                     } else {
                         testCases[i].custname = testCases[i].custname.trim();
-                         if (testCases[i].keywordVal == 'SwitchToFrame' && String(testScriptData) !== "undefined") {
+                         if (testCases[i].keywordVal === 'SwitchToFrame' && String(testScriptData) !== "undefined") {
                             let scriptData = [...testScriptData];
                             for (let j = 0; j < scriptData.length; j++) {
                                 if (!(['@Browser', '@Oebs', '@Window', '@Generic', '@Custom'].includes(scriptData[j].custname)) && scriptData[j].url !== "") {

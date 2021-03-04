@@ -32,6 +32,7 @@ const RefBarItems = props => {
 		dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
 		setHighlight(false);
 		setToFilter([]);
+		//eslint-disable-next-line
 	}, [subTaskId, newScrapedData])
 
 	useEffect(()=>{
@@ -60,6 +61,7 @@ const RefBarItems = props => {
 		setHighlight(false);
 		filter([]);
 		setToFilter([]);
+		//eslint-disable-next-line
 	}, [props.mirror])
 
 	useEffect(()=>{
@@ -83,7 +85,7 @@ const RefBarItems = props => {
 					top = top + 112;
 					left = left + 15;	
 				} 
-				else if (appType == "SAP" && createdthrough !== 'PD'){
+				else if (appType === "SAP" && createdthrough !== 'PD'){
 					top = top + 2;
 					left = left + 3;
 				}
@@ -110,6 +112,7 @@ const RefBarItems = props => {
 			} else setHighlight(false);
 		}
 		else setHighlight(false);
+		//eslint-disable-next-line
 	}, [objValue])
 
     const closeAllPopups = () => {
@@ -158,18 +161,18 @@ const RefBarItems = props => {
 					scrapedItems.forEach(item => {
                         if (!["button", "checkbox", "select", "img", "a", "radiobutton", "input", "list",
                              "link", "scroll bar", "internal frame", "table"].includes(item.tag) &&
-							item.tag.toLowerCase().indexOf("button") == -1 &&
-							item.tag.toLowerCase().indexOf("edit") == -1 &&
-							item.tag.toLowerCase().indexOf("edit box") == -1 &&
-							item.tag.toLowerCase().indexOf("text") == -1 &&
-							item.tag.toLowerCase().indexOf("edittext") == -1 &&
-							item.tag.toLowerCase().indexOf("combo box") == -1 &&
-							item.tag.toLowerCase().indexOf("hyperlink") == -1 &&
-							item.tag.toLowerCase().indexOf("check box") == -1 &&
-							item.tag.toLowerCase().indexOf("checkbox") == -1 &&
-							item.tag.toLowerCase().indexOf("image") == -1 &&
-							(item.tag.toLowerCase().indexOf("table") == -1 || item.tag.toLowerCase() == "tablecell") &&
-							item.tag.toLowerCase().indexOf("radio button") == -1) {
+							item.tag.toLowerCase().indexOf("button") === -1 &&
+							item.tag.toLowerCase().indexOf("edit") === -1 &&
+							item.tag.toLowerCase().indexOf("edit box") === -1 &&
+							item.tag.toLowerCase().indexOf("text") === -1 &&
+							item.tag.toLowerCase().indexOf("edittext") === -1 &&
+							item.tag.toLowerCase().indexOf("combo box") === -1 &&
+							item.tag.toLowerCase().indexOf("hyperlink") === -1 &&
+							item.tag.toLowerCase().indexOf("check box") === -1 &&
+							item.tag.toLowerCase().indexOf("checkbox") === -1 &&
+							item.tag.toLowerCase().indexOf("image") === -1 &&
+							(item.tag.toLowerCase().indexOf("table") === -1 || item.tag.toLowerCase() === "tablecell") &&
+							item.tag.toLowerCase().indexOf("radio button") === -1) {
 								item.hide = false;
 						}
 					});
@@ -180,18 +183,18 @@ const RefBarItems = props => {
 							  "android.widget.TimePicker", "android.widget.DatePicker", "android.widget.RadioButton",
 							 "android.widget.EditText", "android.widget.ListView", "android.widget.Spinner", "android.widget.Switch",
 							 "android.widget.ImageButton", "android.widget.SeekBar"].includes(item.tag) &&
-							item.tag.toLowerCase().indexOf("android.widget.button") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.checkbox") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.numberpicker") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.timepicker") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.datepicker") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.radiobutton") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.edittext") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.listview") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.spinner") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.switch") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.imagebutton") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.seekbar") == -1){
+							item.tag.toLowerCase().indexOf("android.widget.button") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.checkbox") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.numberpicker") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.timepicker") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.datepicker") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.radiobutton") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.edittext") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.listview") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.spinner") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.switch") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.imagebutton") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.seekbar") === -1){
 								item.hide = false;
 							}
 					});
@@ -223,12 +226,12 @@ const RefBarItems = props => {
 				}
 				else {
 					scrapedItems.forEach(item => {
-						if (tag == item.tag || (item.tag.toLowerCase().indexOf(tag.toLowerCase()) >= 0 && tag != "a" && item.tag.toLowerCase() != "radio button" && item.tag.toLowerCase() != "radiobutton" && item.tag.toLowerCase().indexOf("listview") < 0 && item.tag.toLowerCase().indexOf("tablecell") < 0) ||
-							(tag == "input" && (item.tag.indexOf("edit") >= 0 || item.tag.indexOf("Edit Box") >= 0 || item.tag.indexOf("text") >= 0 || item.tag.indexOf("EditText") >= 0 || item.tag.indexOf("TextField") >= 0)) ||
-							(tag == "select" && item.tag.indexOf("combo box") >= 0) ||
-							(tag == "a" && (item.tag.indexOf("hyperlink") >= 0)) ||
-							(tag == "checkbox" && item.tag.indexOf("check box") >= 0) ||
-							(tag == "radiobutton" && item.tag.indexOf("radio button") >= 0)
+						if (tag === item.tag || (item.tag.toLowerCase().indexOf(tag.toLowerCase()) >= 0 && tag !== "a" && item.tag.toLowerCase() !== "radio button" && item.tag.toLowerCase() !== "radiobutton" && item.tag.toLowerCase().indexOf("listview") < 0 && item.tag.toLowerCase().indexOf("tablecell") < 0) ||
+							(tag === "input" && (item.tag.indexOf("edit") >= 0 || item.tag.indexOf("Edit Box") >= 0 || item.tag.indexOf("text") >= 0 || item.tag.indexOf("EditText") >= 0 || item.tag.indexOf("TextField") >= 0)) ||
+							(tag === "select" && item.tag.indexOf("combo box") >= 0) ||
+							(tag === "a" && (item.tag.indexOf("hyperlink") >= 0)) ||
+							(tag === "checkbox" && item.tag.indexOf("check box") >= 0) ||
+							(tag === "radiobutton" && item.tag.indexOf("radio button") >= 0)
 						) {
 							item.hide = false;
 						}
@@ -253,7 +256,7 @@ const RefBarItems = props => {
 				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' hideXbar={true}>
 					<div className="ss_scrsht_insideScroll">
 					{ highlight && <div ref={highlightRef} style={{display: "flex", position: "absolute", ...highlight}}></div>}
-					{ props.mirror ? <img id="ss_screenshot" className="screenshot_img" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
+					{ props.mirror ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
 					</div>
 				</ScrollBar>
 				</div>

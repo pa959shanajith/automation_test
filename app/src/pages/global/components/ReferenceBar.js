@@ -115,6 +115,7 @@ const ReferenceBar = (props) => {
             setShowTask(false);
             setTaskInfo(info);
         }
+        //eslint-disable-next-line
     }, [current_task, current_task.screenName, props.scrapeScreenURL]);
 
     const onSearchHandler = event => {
@@ -216,10 +217,10 @@ const ReferenceBar = (props) => {
                     <ScrollBar scrollId="ref_bar_scroll" trackColor="transparent" thumbColor="#7143b3">
                         <div className="ref__content">
                             <div className="rb_upper_contents">
-                                {props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
+                                {props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} alt="task-ic" src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
                                     {props.children}
-                                {!props.taskTop && !props.hideTask?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
-                                {!props.hideInfo && <div className="ic_box"  onClick={toggleInfoPop} ><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
+                                {!props.taskTop && !props.hideTask?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} alt="task-ico" src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
+                                {!props.hideInfo && <div className="ic_box"  onClick={toggleInfoPop} ><img className="rb__ic-info thumb__ic" alt="info-ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                             </div>
                         </div>
                     </ScrollBar>

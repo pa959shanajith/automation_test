@@ -46,6 +46,7 @@ const CreateObjectModal = props => {
                 }})
                 .catch(error => console.log(error));
         }
+        //eslint-disable-next-line
     }, [])
 
     const newField = () => {
@@ -273,9 +274,9 @@ const CreateObjectModal = props => {
                                                     <option key={i} className="createObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>{objectType.name}</option>
                                                 ) }
                                             </select>
-                                            {!props.editFlag && <button className="createObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img src="static/imgs/ic-delete.png" /></button>}
-                                            <button className="createObj_btn" onClick={()=>onEdit(object.tempId)} style={props.editFlag ? {flex: "1 0"} : null}><img src="static/imgs/ic-jq-editstep.png" /></button>
-                                            {!props.editFlag && objects.length-1 === index && <button className="createObj_btn" onClick={newField}><img src="static/imgs/ic-add.png" /></button>}
+                                            {!props.editFlag && <button className="createObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img alt="del-ic" src="static/imgs/ic-delete.png" /></button>}
+                                            <button className="createObj_btn" onClick={()=>onEdit(object.tempId)} style={props.editFlag ? {flex: "1 0"} : null}><img alt="edit-ic" src="static/imgs/ic-jq-editstep.png" /></button>
+                                            {!props.editFlag && objects.length-1 === index && <button className="createObj_btn" onClick={newField}><img alt="add-ic" src="static/imgs/ic-add.png" /></button>}
                                         </div>
                                         {
                                             showFields.includes(object.tempId) && 

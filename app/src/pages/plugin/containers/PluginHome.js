@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Header, FooterOne } from '../../global'
+import { Header, FooterOne, ScrollBar } from '../../global'
 import PluginSection from '../components/PluginSection';
 import TaskSection from '../components/TaskSection';
 import { useSelector, useDispatch } from 'react-redux';
@@ -25,7 +25,8 @@ const PluginHome = () => {
         <div className="plugin-bg-container">
             <img className="plugin-bg-img" alt="bg-img" src="static/imgs/light-bg.png"/>
             <Header />
-            <div className="plugin-elements">
+            <div className="plugin-elements" id="plugin__mainScreen">
+                <ScrollBar scrollId="plugin__mainScreen" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                 <div className="greeting-text">
                     Welcome {name}!
                 </div>
@@ -36,6 +37,7 @@ const PluginHome = () => {
                     </div>
                     <TaskSection userInfo={userInfo} userRole={userRole} dispatch={dispatch}/>
                 </div>
+                </ScrollBar>
             </div>
             <FooterOne/>
         </div>

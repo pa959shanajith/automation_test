@@ -12,6 +12,7 @@ const EditIrisObject = props => {
     useEffect(()=>{
         setSelectedType(props.utils.object.tag.split(";").pop() || "unrecognizableobject");
         setSelectedStatus(0);
+        //eslint-disable-next-line
     }, [])
 
     const onSelectType = event => {
@@ -91,7 +92,7 @@ const EditIrisObject = props => {
                         <div className="ss__ei_img_panel">
                             <span>Object Image</span>
                             <div className="ss__ei_img_box">
-                                <img className="ss__ei_img" src={`data:image/PNG;base64,${props.utils.cord.substring(2, props.utils.cord.length - 1)}`}/>
+                                <img className="ss__ei_img" alt="iris" src={`data:image/PNG;base64,${props.utils.cord.substring(2, props.utils.cord.length - 1)}`}/>
                             </div>
                         </div>
                     </div>
