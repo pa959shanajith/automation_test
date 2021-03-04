@@ -54,9 +54,9 @@
             <label>Import from Excel</label>
             <input id="file-input" on-read-file="getSheetName($fileContent)" type="file" name="xlsfile" accept=".xls,.xlsx" required="" autofocus="" style="display:none"/>
          </div>
-         <div ng-click="importMindmap($event)" title="Import Mindmap">
+         <div title="Import Mindmap">
                <input style="visibility: hidden;display: none" type="file" id="importMindmapFile" accept=".json,.mm">
-               <img alt="Import from JSON" class="" src="imgs/ic-importfromexcel-mindmap.png">
+               <img ng-click="importMindmap($event)" alt="Import from JSON" class="" src="imgs/ic-importfromexcel-mindmap.png">
                <label>Update Mindmap</label>
          </div>
       </div>
