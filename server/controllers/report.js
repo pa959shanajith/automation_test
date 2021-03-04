@@ -269,6 +269,7 @@ exports.viewReport = async (req, res, next) => {
     const type = (url[2] || 'html').toLowerCase().split('?')[0];
     const embedImages = (url[2] || '').toLowerCase().split('?')[1] == 'images=true';
     let report = { overallstatus: [{}], rows: [], remarksLength: 0, commentsLength: 0 };
+    logger.info("Requesting report type - " + type);
     if (!req._passport.instance.verifySession(req)) {
         report.error = {
             ecode: "INVALID_SESSION",
