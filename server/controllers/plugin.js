@@ -25,10 +25,10 @@ exports.getProjectIDs = function (req, res) {
 	}
 };
 
-exports.updateAccessibilitySelection = function(req, res){
+exports.updateAccessibilitySelection = async function(req, res){
 	logger.info("Inside UI service: updateAccessibiltySelection");
 	try{
-		var result = utils.fetchData(req.body,"/plugins/updateAccessibilitySelection");
+		var result = await utils.fetchData(req.body,"/plugins/updateAccessibilitySelection");
 		if(result != 'fail') res.send("success");
 		res.send("fail")
 	}catch(e){

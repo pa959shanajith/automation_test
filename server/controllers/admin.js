@@ -243,7 +243,7 @@ exports.manageCIUsers = async (req, res) => {
 			const today= new Date();
 			let td = today;
 			td.setHours(today.getHours()+8);
-			if (now > today || (now <= today && now > td)) {
+			if (now < today || (now <= today && now > td)) {
 				logger.error("Error occurred in admin/"+fnName+" Expiry time should be 8 hours more than current time");
 				return res.send("invalid_past_time");
 			}

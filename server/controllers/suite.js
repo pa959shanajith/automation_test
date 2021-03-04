@@ -526,10 +526,10 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 							// testsuite.reportData[scenarioIndex] = reportItem;
 							testsuite.reportData.push(reportItem);
 							completedSceCount++;
-							if (completedSceCount == scenarioCount && reportType != "accessiblityTestingOnly") {
+							if (completedSceCount == scenarioCount) {
 								const suiteStatus = (statusPass == scenarioCount) ? "pass" : "fail";
 								completedSceCount = statusPass = 0;
-								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
+								if(reportType != "accessiblityTestingOnly") notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
 								await updateExecutionStatus([executionid], suiteStatus);
 							}
 						}
@@ -544,7 +544,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						let result = status;
 						let report_result = {};
 						report_result["status"] = status
-						if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess'
+						if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
+						if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
 						report_result["testSuiteDetails"] = execReq["suitedetails"]
 						if (resultData.userTerminated) result = "UserTerminate";
 						if (execType == "API") result = [d2R, status];

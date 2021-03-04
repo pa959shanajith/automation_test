@@ -451,11 +451,12 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     var tableContainer = $('#reportsAccTable tbody');
                     if (accessibility_data.length > 0) {
                         tableContainer.empty();
-                        var screen_acc_reportdata = {}
-                        var time = "new time"
-                        for (i = 0; i < accessibility_data.length; i++) {
-                            let time = accessibility_data[i]["executedtime"]
-                            tableContainer.append("<tr class='screen_report'   data-executionid='" + accessibility_data[i]["_id"] + "'><td class='executionNo'>" + (i + 1) + "</td><td>" + accessibility_data[i]["title"] + "</td><td>" + time + "</td>");
+                        var screen_acc_reportdata = {};
+                        var index = 1;
+                        for (i = accessibility_data.length - 1; i >= 0; i--) {
+                            let time = new Date(accessibility_data[i]["executedtime"]);
+                            time = time.toString().split("GMT")[0]
+                            tableContainer.append("<tr class='screen_report'  style='cursor:pointer;' data-executionid='" + accessibility_data[i]["_id"] + "'><td class='executionNo' style='padding:3px;'>" + (index++) + "</td><td style='padding:3px;'>" + accessibility_data[i]["title"] + "</td><td style='padding:3px;'>" + time + "</td>");
                             screen_acc_reportdata[accessibility_data[i]["_id"]] = accessibility_data[i]
                         }
                         $scope['acc_report_data'] = screen_acc_reportdata;
@@ -487,6 +488,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var proxy = "Disabled";
             $("#report-header").append('<div width="100%" height="100%" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Report Data</label></div><div style="display: flex;"><div style="width:100%;position:relative;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+ report.screenname + '</span></div><div><label class="webCrawler-report-label">' + "Agent" + '</label><span class="webCrawler-report-span" style="text-transform: capitalize;">'+ report.agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">0</span></div><div><label class="webCrawler-report-label">URL</label><span class="webCrawler-report-span">'+ report.url + '</span></div></div></div>')
             var body = document.getElementById('report-canvas');
+            body.style.height = 'fit-content';
             var headerDiv = document.createElement('div')
             headerDiv.innerHTML = '<div width="100%" style="margin-top:5%;" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Accessibility Reports by Standards</label></div>';
             body.appendChild(headerDiv)
@@ -494,6 +496,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             //reportDiv.setAttribute('class', 'scrollbar-inner');
 
             var tbl = document.createElement('table');
+            tbl.style.height = 'fit'
             tbl.setAttribute('width', '100%');
             tbl.setAttribute('height', '100%');
             tbl.setAttribute('class', 'dataTable');
