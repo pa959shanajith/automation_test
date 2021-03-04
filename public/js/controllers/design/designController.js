@@ -6679,21 +6679,9 @@ function contentTable(newTestScriptDataLS) {
 								obType = 'irisbutton';
 							} else if (objNamearray[6] == 'table'){
 								obType = 'iristable';
-							} else if (objNamearray[6] == 'dropdown'){
+							} else if (['dropdown', 'hscroll', 'vscroll', 'label', 'listbox', 'tree', 'image'].indexOf(objNamearray[6]) > -1) {
 								obType = 'irisgeneric';
-							} else if (objNamearray[6] == 'hscroll'){
-								obType = 'irisgeneric';
-							} else if (objNamearray[6] == 'vscroll'){
-								obType = 'irisgeneric';
-							} else if (objNamearray[6] == 'label'){
-								obType = 'irisgeneric';
-							} else if (objNamearray[6] == 'listbox'){
-								obType = 'irisgeneric';
-							} else if (objNamearray[6] == 'tree'){
-								obType = 'irisgeneric';
-							} else if (objNamearray[6] == 'image'){
-								obType = 'irisgeneric';
-							} else{
+							} else {
 								obType = "iris";
 							}
 						} else {
