@@ -358,7 +358,7 @@ const ScrapeScreen = ()=>{
                 //COMPARE & UPDATE SCRAPE OPERATION
                 if (data.action == "compare") {
                     if (data.status === "SUCCESS") {
-                        let compareObj = generateCompareObject(data);
+                        let compareObj = generateCompareObject(data, scrapeItems.filter(object => object.xpath.substring(0, 4)==="iris"));
                         dispatch({type: actionTypes.SET_COMPAREDATA, payload: data});
                         dispatch({type: actionTypes.SET_COMPAREOBJ, payload: compareObj});
                         dispatch({type: actionTypes.SET_COMPAREFLAG, payload: true});
@@ -531,7 +531,7 @@ function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData,
     else {
         if (compareFlag) {
             let viewString = Object.keys(newScrapedData).length ? {...newScrapedData, view: [...mainScrapedData.view, ...newScrapedData.view]} : { ...mainScrapedData };
-            screenViewObject.viewString = viewString;
+            screenViewObject.viewString = {...viewString, view: viewString.view.filter(object => object.xpath.substring(0, 4)!=="iris")};
             screenViewObject.action = "compare";
         }
         screenViewObject.browserType = browserType;
@@ -540,7 +540,7 @@ function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData,
     return screenViewObject;
 }
 
-function generateCompareObject(data){
+function generateCompareObject(data, irisObjects){
     let compareObj = {};
     if (data.view[0].changedobject.length > 0) {
         let localList = [];
@@ -578,23 +578,25 @@ function generateCompareObject(data){
         }   
         compareObj.notChangedObj = localList;
     }
-    if (data.view[2].notfoundobject.length > 0) {
+    if (data.view[2].notfoundobject.length > 0 || irisObjects.length > 0) {
         let localList = [];
-        for (let i = 0; i < data.view[2].notfoundobject.length; i++) {
-            let scrapeObject = data.view[2].notfoundobject[i];
-            
-            let scrapeItem = {
-                ObjId: scrapeObject._id,
-                objIdx: i,
-                val: i,
-                tag: scrapeObject.tag,
-                title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
-                custname: scrapeObject.custname,
+        if (data.view[2].notfoundobject.length > 0) {
+            for (let i = 0; i < data.view[2].notfoundobject.length; i++) {
+                let scrapeObject = data.view[2].notfoundobject[i];
+                
+                let scrapeItem = {
+                    ObjId: scrapeObject._id,
+                    objIdx: i,
+                    val: i,
+                    tag: scrapeObject.tag,
+                    title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
+                    custname: scrapeObject.custname,
+                }
+    
+                localList.push(scrapeItem);
             }
-
-            localList.push(scrapeItem);
         }
-        compareObj.notFoundObj = localList;
+        compareObj.notFoundObj = [...localList, ...irisObjects];
     }
     return compareObj;
 } 
