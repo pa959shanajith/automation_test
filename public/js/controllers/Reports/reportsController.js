@@ -543,7 +543,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     newRow.append(node);
                     newRow.append(statusNode);
                     var reportLink = document.createElement('td');;
-                    reportLink.innerHTML = '<div value="' +  report["access-rules"][k]["tag"] + '" data="' + report["access-rules"][k]["name"] + '" class="accessRules"> <label>Report</label></div>'
+                    reportLink.innerHTML = '<div value="' +  report["access-rules"][k]["tag"] + '" data="' + report["access-rules"][k]["name"] + '" class="accessRules" > <label style="cursor:pointer">Report</label></div>'
                     newRow.append(reportLink);
                     tbdy.appendChild(newRow);
                 }
