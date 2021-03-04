@@ -320,7 +320,10 @@ const ALMContent = props => {
                                             { testSets.length ?
                                             testSets.map(suite => ((suite.testsetid === testCase.testsetid) ?
                                                 suite.content[0].testcase.map(cases => (
-                                                    <div className={"test_tree_leaves"+(testSuiteSelected_name.indexOf(cases.slice(0,cases.indexOf("/")))!==-1?" selectedCase-backColor":"")} id={cases.substring(cases.indexOf("/")+1)} onClick={(event)=>callTestSuiteSelection(event,cases.substring(cases.indexOf("/")+1),cases.slice(0,cases.indexOf("/")),testCase.testset)}>
+                                                    <div className={"test_tree_leaves"+(testSuiteSelected_name.indexOf(cases.slice(0,cases.indexOf("/")))!==-1?" selectedCase-backColor":"")} 
+                                                        id={cases.substring(cases.indexOf("/")+1)} 
+                                                        onClick={(event)=>callTestSuiteSelection(event,cases.substring(cases.indexOf("/")+1),cases.slice(0,cases.indexOf("/")),testCase.testset)}
+                                                    >
                                                         <label title={cases}>
                                                             <span className="leafId">{cases.substring(cases.indexOf("/")+1)}</span>
                                                             <span>{cases.slice(0,cases.indexOf("/"))}</span>
