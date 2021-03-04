@@ -138,7 +138,7 @@ const ALMContent = props => {
         // sync async img logic
         if(e.target.childNodes.length){
             if(mappedDetails.length){
-                if(mappedDetails[0].testsuiteid == idx){
+                if(mappedDetails[0].testsuiteid === idx){
                    setSyncSuccess(true);
                 }
                 else{
@@ -197,7 +197,7 @@ const ALMContent = props => {
         var ScenarioName=[] 
         if(scenarioArr){
             projectDetails.avoassure_projects.map((e,i)=>(
-                (i == scenario_ID) ? 
+                (i === parseInt(scenario_ID)) ? 
                     e.scenario_details ? 
                     e.scenario_details.map((e,i)=>(
                         ScenarioName.push(e.name)
@@ -355,14 +355,14 @@ const ALMContent = props => {
             }
             scenarioList = { scenarioArr && 
                 projectDetails.avoassure_projects.map((e,i)=>(
-                    (i == scenario_ID) && (e.scenario_details) &&
+                    (i === parseInt(scenario_ID)) && (e.scenario_details) &&
                     e.scenario_details.map(e => (
                         <div 
                             className={"test_tree_leaves "+(selectedScenario_ID.indexOf(e._id)!==-1 ? " slectedTestDiv" : "")} 
                             onClick={(event)=>{selectScenarioMultiple(event, e._id);}}
                             style={{cursor: "pointer"}}
                         >
-                            { filteredNames ? filteredNames.map((element)=>(element == e.name && element)) :  e.name }
+                            { filteredNames ? filteredNames.map((element)=>(element === e.name && element)) :  e.name }
                         </div> )))) 
             }
         />

@@ -62,7 +62,7 @@ const ZephyrContent = props => {
         if(response.error){props.displayError("Error",response.error);props.setBlockui({show:false});return;}
         if ( response === "success"){
             props.setBlockui({show:false})
-            props.displayError("Error","Saved Succesfully");
+            props.displayError("Zephyr Integration","Saved Succesfully");
             setSyncSuccess(false);
         }
         props.setBlockui({show:false})
@@ -116,7 +116,7 @@ const ZephyrContent = props => {
         var ScenarioName=[] 
         if(scenarioArr){
             avoProjects.map((e,i)=>(
-                (i == (scenario_ID)) ? 
+                (i === parseInt(scenario_ID)) ? 
                     e.scenario_details ? 
                     e.scenario_details.map((e,i)=>(
                         ScenarioName.push(e.name)
@@ -198,9 +198,9 @@ const ZephyrContent = props => {
                                     {e.cycleOpen? 
                                         e.tests.map((ele ,i)=>(
                                             <div className="test_tree_branches" style={{cursor:"pointer"}} onClick={()=>callTestSuiteSelection(ele.id,ele.issueId,ele.name,e.versionId,e.cycleId,e.projectId)}>
-                                                <div className="test_tree_leaves" style={selectedTestSuiteID == ele.id? {backgroundColor:"rgb(225,202,255",borderRadius:"5px"} : null}>
+                                                <div className="test_tree_leaves" style={(selectedTestSuiteID) === ele.id? {backgroundColor:"rgb(225,202,255",borderRadius:"5px"} : null}>
                                                     <label>{ele.name}</label>
-                                                    { selectedTestSuiteID == ele.id ? <>
+                                                    { selectedTestSuiteID === ele.id ? <>
                                                         {syncSuccess ?
                                                         <img alt="unsyncIcon"
                                                             onClick={()=>callUnSync()} 
@@ -230,14 +230,14 @@ const ZephyrContent = props => {
                 scenarioList={
                     scenarioArr ? 
                     avoProjects.map((e,i)=>(
-                        (i == scenario_ID)? 
+                        (i === parseInt(scenario_ID))? 
                         (e.scenario_details)? 
                         e.scenario_details.map((scenario,i)=>(
                                 <div 
-                                    className={"test_tree_leaves" + (selectedScenario_ID == scenario._id ? " slectedTestDiv" : "")} 
+                                    className={"test_tree_leaves" + (selectedScenario_ID === scenario._id ? " slectedTestDiv" : "")} 
                                     onClick={()=>{setSelectedScenario_ID(scenario._id)}}
                                 >
-                                { filteredNames? filteredNames.map((element)=>(element == scenario.name ?element  : null)):  scenario.name}
+                                { filteredNames? filteredNames.map((element)=>(element === scenario.name ?element  : null)):  scenario.name}
                                 </div>
                         )):null : null
                         ))

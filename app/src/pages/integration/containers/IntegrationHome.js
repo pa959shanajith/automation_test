@@ -21,6 +21,7 @@ const Integrations = () => {
         if (currScreenType) {
             dispatch({type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: currScreenType});
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return(

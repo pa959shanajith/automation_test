@@ -201,7 +201,7 @@ const  QTest = props => {
         var ScenarioName=[] 
         if(scenarioArr){
             projectDetails.avoassure_projects.map((e,i)=>(
-                (i == scenario_ID) ? 
+                (i === parseInt(scenario_ID)) ? 
                     e.scenario_details ? 
                     e.scenario_details.map((e,i)=>(
                         ScenarioName.push(e.name)
