@@ -266,7 +266,7 @@ exports.updateScreen_ICE = function (req, res) {
 						}
 					}
 					if (appType.toUpperCase() === 'WEBSERVICE') {
-						if (parsedScrapedObj.method == 'POST' && 'body' in parsedScrapedObj ) {
+						if (parsedScrapedObj.method == 'POST' && parsedScrapedObj.body) {
 							parsedScrapedObj.body[0] = parsedScrapedObj.body[0].replace(/'+/g, "\"");
 						}
 					}
@@ -861,7 +861,7 @@ function parseRequestParam(paramerters){
 	try{
 		var params=paramerters.split('##');
 		for (var object of params) {
-			object=object.split(":");
+			object=object.split("=");
 			var scrapedObjectsWS = {};
 			scrapedObjectsWS.xpath = object[0].trim();
 			scrapedObjectsWS.custname = object[0].trim();
@@ -878,13 +878,13 @@ function parseRequestParam(paramerters){
 function parseRequest(readChild) {
 	try {
 		logger.info("Inside the function parseRequest ");
-		if ('name' in readChild) {
+		if (readChild.name) {
 			if (xpath == "") {
 				xpath = "/" + readChild.name;
 					allXpaths.push(xpath);
 				allCustnames.push(readChild.name);
 			}
-			if ('attributes' in readChild) {
+			if (readChild.attributes) {
 				var attrchildren = Object.keys(readChild.attributes);
 				if (attrchildren.length >= 1) {
 					var basexpath = xpath;
@@ -901,7 +901,7 @@ function parseRequest(readChild) {
 					}
 				}
 			}
-			if ('children' in readChild) {
+			if (readChild.children) {
 				if (readChild.children.length >= 1) {
 					var basexpath = xpath;
 					for (var childrenindex = 0; childrenindex < readChild.children.length; childrenindex++) {

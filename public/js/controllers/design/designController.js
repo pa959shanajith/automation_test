@@ -1287,7 +1287,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("#wsdlOperation").val(data.operations)
 						//Printing Request Data
 						$("#wsdlRequestHeader").val(data.header.split("##").join("\n"));
-						$("#wsdlRequestParam").val(data.param.split("##").join("\n"));
+						if (data.param) $("#wsdlRequestParam").val(data.param.split("##").join("\n"));
 						if (data.body.indexOf("{") == 0 || data.body.indexOf("[") == 0) {
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
@@ -1646,7 +1646,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("#wsdlOperation").val(data.operations)
 						//Printing Request Data
 						$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
-						$("#wsdlRequestParam").val(data.param[0].split("##").join("\n"));
+						if (data.param) $("#wsdlRequestParam").val(data.param[0].split("##").join("\n"));
 						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
