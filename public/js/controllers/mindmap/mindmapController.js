@@ -5172,10 +5172,8 @@ Purpose : displaying pop up for replication of project
                 return $rootScope.redirectPage();
             } else if (result == 'valueError') {
                 openDialogMindmap('Error', 'Empty column values in the sheet');
-            } else if (result == "emptySheet") {
-                openDialogMindmap('Error', 'Received excel sheet is empty');
-            } else if (result == 'fail') {
-                openDialogMindmap('Error', 'Some column names are invalid');
+            } else if (result == "emptySheet" || result == 'fail') {
+                openDialogMindmap('Error', 'Excel sheet is either empty or invalid');
             } else {
                 $scope.dataJSON = result;
                 $scope.dataJSON.forEach(function(e, i) {
