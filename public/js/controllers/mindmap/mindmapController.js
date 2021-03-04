@@ -3366,7 +3366,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var version_num = ($('.version-list').val() != undefined)? $('.version-list').val(): "0.0";
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": ""};
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
-        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"accountid":"","accesskey":"","secretkey":""}}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "","poolname":""} } ] };
+        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"url":"","username":"","password":""}}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "","poolname":""} } ] };
         var moduleInfo = { "batchInfo": [] };
         blockUI('Loading UI');
         var moduleid = $('#createNewConfirmationPopup').attr('mapid');
@@ -5171,8 +5171,10 @@ Purpose : displaying pop up for replication of project
         mindmapServices.excelToMindmap({'content':$scope.content,'flag':'data','sheetname':sheetname}).then(function(result) {
             if (result == "Invalid Session") {
                 return $rootScope.redirectPage();
-            } else if (result == 'fail') {
-                openDialogMindmap('Error', 'Some column names are invalid');
+            } else if (result == 'valueError') {
+                openDialogMindmap('Error', 'Empty column values in the sheet');
+            } else if (result == "emptySheet" || result == 'fail') {
+                openDialogMindmap('Error', 'Excel sheet is either empty or invalid');
             } else {
                 $scope.dataJSON = result;
                 $scope.dataJSON.forEach(function(e, i) {

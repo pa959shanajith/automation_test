@@ -609,6 +609,9 @@ exports.excelToMindmap = function (req, res) {
 		var numSheets = myCSV.length / 2;
 		var qObj = [];
 		var err;
+		if (numSheets == 0) {
+			return res.status(200).send("emptySheet");
+		}
 		for (var k = 0; k < numSheets; k++) {
 			var cSheet = myCSV[k * 2 + 1];
 			var cSheetRow = cSheet.split('\n');
@@ -627,6 +630,9 @@ exports.excelToMindmap = function (req, res) {
 			var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
 			for (var i = 1; i < cSheetRow.length; i++) {
 				var row = cSheetRow[i].split(',');
+				if (i==1 && (row[0]=="" || row[1]=="" || row[2]=="" || row[3]!="")) {
+					return res.status(200).send('valueError');
+				}
 				if (row.length < 3) continue;
 				if (row[modIdx] !== '') {
 					e = { id: uuidV4(), name: row[modIdx], type: 0 };

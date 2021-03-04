@@ -315,7 +315,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			if (batchData.integration && batchData.integration.qtest.url){
 				integrationType.push("qTest");
 			} 
-			if (batchData.integration && batchData.integration.zephyr.accountid) {
+			if (batchData.integration && batchData.integration.zephyr.url) {
 				integrationType.push("Zephyr");
 			}
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);

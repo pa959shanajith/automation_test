@@ -395,7 +395,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 	}
 	$scope.integration = {alm: {url:"",username:"",password:""}, 
 	qtest: {url:"",username:"",password:"",qteststeps:""}, 
-	zephyr: {accountid:"",accesskey:"",secretkey:""}};
+	zephyr: {url:"",username:"",password:""}};
 	//Add to list and schedule
 	$scope.initSchedule = function ($event) {
 		if (smartBatch) {
