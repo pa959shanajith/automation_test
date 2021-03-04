@@ -126,7 +126,7 @@ const LoginFields = (props) => {
             .then(data => {
                 SetProgressBar("stop");
                 setRequested(false);
-                if (data == 'success') {
+                if (data === 'success') {
                     setUserError(false);
                     setPassError(false);
                     setUnlockCond(false);
@@ -136,16 +136,16 @@ const LoginFields = (props) => {
                     setUsername("");
                     setforgotPassword(true);
                     setPopup({"title": "Unlock Account", "content": "Successfully unlocked the user account! Please login again"})
-                } else if (data == "invalid_username_password") {
+                } else if (data === "invalid_username_password") {
                     setUserError(true);
                     setPassError(true);
                     setLoginValidation("The username or password you entered isn't correct. Please try again.");
-                } else if(data == "timeout") setLoginValidation("Password expired."); 
-                else if (data == "userUnlocked") setLoginValidation("User account is already unlocked!"); 
+                } else if(data === "timeout") setLoginValidation("Password expired."); 
+                else if (data === "userUnlocked") setLoginValidation("User account is already unlocked!"); 
                 else setLoginValidation("Failed to Login.");
             })
             .catch(error=> {
-                console.log("Failed to Authenticate User.");
+                console.error("Failed to Authenticate User. ERROR::::", error);
                 setLoginValidation("Failed to Authenticate User.");
                 SetProgressBar("stop");
                 setRequested(false);
@@ -188,11 +188,11 @@ const LoginFields = (props) => {
                         setUserError(true);
                         setPassError(true);
                         setLoginValidation("The username or password you entered isn't correct. Please try again.");
-                    } else if (data == "changePwd") {
+                    } else if (data === "changePwd") {
                         setShowChangePass(true);
-                    } else if(data == "timeout") {
+                    } else if(data === "timeout") {
                        setLoginValidation("User Password has expired. Please reset forgot password or contact admin");
-                    } else if (data == "userLocked") {
+                    } else if (data === "userLocked") {
                         setLoginValidation("User account is locked!");
                         setLockedOut(true);
                         setforgotPassword(false);
@@ -242,16 +242,16 @@ const LoginFields = (props) => {
             api.forgotPasswordEmail(username.toLowerCase())
             .then(data => {
                 SetProgressBar("stop");
-				if (data == 'success') {
+				if (data === 'success') {
 					setUserError(false);
                     setPassError(false);
                     setPassword("");
                     setPopup({'title': "Forgot Password", "content":"Successfully sent an email to reset your password! Please login with the temporary password sent in the email"})                
-                } else if (data == "invalid_username_password") {
+                } else if (data === "invalid_username_password") {
 					setUserError(false);
                     setPassError(true);
                     setLoginValidation("The username or password you entered isn't correct. Please try again.");
-				} else if (data == "userLocked") {
+				} else if (data === "userLocked") {
 					setLockedOut(true);
                     setLoginValidation("User account is locked!");
                     setforgotPassword(false);
@@ -278,22 +278,22 @@ const LoginFields = (props) => {
             api.unlockAccountEmail(username.toLowerCase())
             .then(data => {
                 SetProgressBar("stop");
-				if (data == 'success') {
+				if (data === 'success') {
 					setUserError(false);
                     setPassError(false);
 					setPassword("");
                     setforgotPassword(false);
                     setUnlockCond(true);
                     setPopup({'title': "Unlock Account", "content":"Successfully sent an email! Please unlock the account using verification password sent in the email"})                
-                } else if (data == "invalid_username_password") {
+                } else if (data === "invalid_username_password") {
 					setUserError(false);
                     setPassError(true);
                     setLoginValidation("The username or password you entered isn't correct. Please try again.");
-				} else if (data == "userUnlocked") setLoginValidation("User account is already unlocked!");  
+				} else if (data === "userUnlocked") setLoginValidation("User account is already unlocked!");  
 				else setLoginValidation("Failed to Login.");
             })
             .catch(err=> {
-                console.log(err);
+                console.error(err);
 				setLoginValidation(err);
 				SetProgressBar("stop");
                 setRequested(false);

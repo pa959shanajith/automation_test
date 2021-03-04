@@ -1,7 +1,7 @@
 import * as actionTypes from './action.js';
 
 const initialState = {
-    progress: null,
+    progress: 0,
 };
 
 const reducer = (state = initialState , action) => {
@@ -13,7 +13,6 @@ const reducer = (state = initialState , action) => {
         default:
             return state;
     }
-    return state
 }
 
 export default reducer;

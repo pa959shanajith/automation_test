@@ -1,7 +1,13 @@
-.ss__compareContents, .ss__compareboxes{
+.ss__compareboxes{
     display: flex;
     flex-direction: column;
     height: 100%;
+}
+
+.ss__compareContents{
+    display: flex;
+    flex-direction: column;
+    height: 93%;
 }
 
 .ss__compareboxes{

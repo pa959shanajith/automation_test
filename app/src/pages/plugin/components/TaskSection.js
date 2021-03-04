@@ -40,6 +40,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 else {
                     pluginApi.getTaskJson_mindmaps(data)
                     .then(data1 => {
+                        //eslint-disable-next-line
                         dataDict = dataDictState;
                         // to render components which will populate under review
                         let review_items = []
@@ -104,9 +105,12 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                           dataDict.project[projectID].appType = { [data.appTypeName[dataIdx]]: data.appType[dataIdx] }
                           dataDict.projectDict[projectID] = data.projectName[dataIdx];
                           
+                          //eslint-disable-next-line
                           for (const releaseID in dataDict.project[projectID].release){
+                            //eslint-disable-next-line
                             dataDict.project[projectID].release[releaseID].forEach(cycleID=> {
-                              dataDict.cycleDict[cycleID] = data.cycles[cycleID][2];
+                                //eslint-disable-next-line
+                                dataDict.cycleDict[cycleID] = data.cycles[cycleID][2];
                             })
                           }
                         } 
@@ -261,8 +265,8 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 <span className={"task-nav-item " + (activeTab==="todo" && "active-tab")} onClick={onSelectTodo}>To Do</span>
                 <span className={"task-nav-item " + (activeTab==="review" && "active-tab")} onClick={onSelectReview}>To Review</span>
             </div>
-            { notManager && <div className="task-overflow">
-                <ScrollBar thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
+            { notManager && <div className="task-overflow" id="plugin__taskScroll">
+                <ScrollBar scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                     <div className="task-content" id="plugin_page__list">
                         <TaskContents items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} cycleDict={dataDictState.cycleDict} taskJson={taskJson} />
                     </div>

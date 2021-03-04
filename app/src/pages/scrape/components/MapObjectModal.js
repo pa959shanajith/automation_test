@@ -39,6 +39,7 @@ const MapObjectModal = props => {
             setCustomList(tempCustomList);
             setNonCustomList(tempNonCustom);
         }
+        //eslint-disable-next-line
     }, [])
 
     const onDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))

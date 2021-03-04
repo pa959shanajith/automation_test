@@ -11,6 +11,7 @@ const Design = () => {
         if(window.localStorage['navigateScreen'] !== "TestCase"){
             RedirectPage(history);
         }
+        //eslint-disable-next-line
     }, []);
 
     return (

@@ -98,6 +98,7 @@ const BrowserFp = hardwareOnly => {
                 k1 ^= (key.charCodeAt(i) & 0xff);
                 break
             }
+            default: break;
         }
 
         k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;

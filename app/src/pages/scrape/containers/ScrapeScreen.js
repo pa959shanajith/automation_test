@@ -1,4 +1,4 @@
-import React ,{ useState, useEffect, useRef } from 'react';
+import React ,{ useState, useEffect } from 'react';
 import {useSelector, useDispatch} from "react-redux"
 import { useHistory } from 'react-router-dom';
 import ScrapeObjectList from './ScrapeObjectList';
@@ -27,7 +27,7 @@ const ScrapeScreen = ()=>{
     const certificateInfo = useSelector(state=>state.scrape.cert);
     const  { user_id, role } = useSelector(state=>state.login.userinfo);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
-    const {endPointURL, method, opInput, reqHeader, reqBody, respHeader, respBody, paramHeader} = useSelector(state=>state.scrape.WsData);
+    const {endPointURL, method, opInput, reqHeader, reqBody, paramHeader} = useSelector(state=>state.scrape.WsData);
 
     const [overlay, setOverlay] = useState(null);
     const [showPop, setShowPop] = useState("");
@@ -44,11 +44,12 @@ const ScrapeScreen = ()=>{
     const [newScrapedData, setNewScrapedData] = useState({});
 
     useEffect(() => {
-        if(Object.keys(current_task).length != 0) {
+        if(Object.keys(current_task).length !== 0) {
             fetchScrapeData()
             .then(data => setIsUnderReview(current_task.status === "underReview"))
             .catch(error=> console.log(error));
         }
+        //eslint-disable-next-line
     }, [current_task])
 
     const fetchScrapeData = () => {
@@ -198,8 +199,11 @@ const ScrapeScreen = ()=>{
             let testCaseWS = []
             let keywordVal;
             let wsdlInputs = [ endPointURL, method, opInput ];
+            //eslint-disable-next-line
             wsdlInputs.push(reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
+            //eslint-disable-next-line
             wsdlInputs.push(paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
+            //eslint-disable-next-line
             wsdlInputs.push(reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"'));
             if (Object.keys(certificateInfo).length!==0){
                 wsdlInputs.push(certificateInfo.certsDetails+";");
@@ -285,12 +289,14 @@ const ScrapeScreen = ()=>{
                         setShowPop({title: "Data Retrieve", content: "Web Service response received successfully"});
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader: data.responseHeader[0].split("##").join("\n")}});
                         let localRespBody;
-                        if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+                        if (data.responseBody[0].indexOf("{") === 0 || data.responseBody[0].indexOf("[") === 0) {
                             var jsonObj = JSON.parse(data.responseBody[0]);
                             var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+                            //eslint-disable-next-line
                             localRespBody = jsonPretty.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
                         } else {
                             localRespBody = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+                            //eslint-disable-next-line
                             localRespBody = localRespBody.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
                         }
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respBody: localRespBody}});
@@ -356,14 +362,14 @@ const ScrapeScreen = ()=>{
                     return false;
                 }
                 //COMPARE & UPDATE SCRAPE OPERATION
-                if (data.action == "compare") {
+                if (data.action === "compare") {
                     if (data.status === "SUCCESS") {
-                        let compareObj = generateCompareObject(data);
+                        let compareObj = generateCompareObject(data, scrapeItems.filter(object => object.xpath.substring(0, 4)==="iris"));
                         dispatch({type: actionTypes.SET_COMPAREDATA, payload: data});
                         dispatch({type: actionTypes.SET_COMPAREOBJ, payload: compareObj});
                         dispatch({type: actionTypes.SET_COMPAREFLAG, payload: true});
                     } else {
-                        if (data.status =="EMPTY_OBJECT")
+                        if (data.status === "EMPTY_OBJECT")
                             setShowPop({title: "Compare Objects", content: "Failed to compare objects - Unmapped object(s) found"});
                         else
                             setShowPop({title: "Compare Objects", content: "Failed to compare objects"});
@@ -531,7 +537,7 @@ function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData,
     else {
         if (compareFlag) {
             let viewString = Object.keys(newScrapedData).length ? {...newScrapedData, view: [...mainScrapedData.view, ...newScrapedData.view]} : { ...mainScrapedData };
-            screenViewObject.viewString = viewString;
+            screenViewObject.viewString = {...viewString, view: viewString.view.filter(object => object.xpath.substring(0, 4)!=="iris")};
             screenViewObject.action = "compare";
         }
         screenViewObject.browserType = browserType;
@@ -540,7 +546,7 @@ function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData,
     return screenViewObject;
 }
 
-function generateCompareObject(data){
+function generateCompareObject(data, irisObjects){
     let compareObj = {};
     if (data.view[0].changedobject.length > 0) {
         let localList = [];
@@ -578,23 +584,25 @@ function generateCompareObject(data){
         }   
         compareObj.notChangedObj = localList;
     }
-    if (data.view[2].notfoundobject.length > 0) {
+    if (data.view[2].notfoundobject.length > 0 || irisObjects.length > 0) {
         let localList = [];
-        for (let i = 0; i < data.view[2].notfoundobject.length; i++) {
-            let scrapeObject = data.view[2].notfoundobject[i];
-            
-            let scrapeItem = {
-                ObjId: scrapeObject._id,
-                objIdx: i,
-                val: i,
-                tag: scrapeObject.tag,
-                title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
-                custname: scrapeObject.custname,
+        if (data.view[2].notfoundobject.length > 0) {
+            for (let i = 0; i < data.view[2].notfoundobject.length; i++) {
+                let scrapeObject = data.view[2].notfoundobject[i];
+                
+                let scrapeItem = {
+                    ObjId: scrapeObject._id,
+                    objIdx: i,
+                    val: i,
+                    tag: scrapeObject.tag,
+                    title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
+                    custname: scrapeObject.custname,
+                }
+    
+                localList.push(scrapeItem);
             }
-
-            localList.push(scrapeItem);
         }
-        compareObj.notFoundObj = localList;
+        compareObj.notFoundObj = [...localList, ...irisObjects];
     }
     return compareObj;
 } 
@@ -652,10 +660,11 @@ function formatXml(xml) {
 		if (node.match(/.+<\/\w[^>]*>$/)) {
 			indent = 0;
 		} else if (node.match(/^<\/\w/)) {
-			if (pad != 0) {
+			if (pad !== 0) {
 				pad -= 1;
 			}
-		} else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+        } //eslint-disable-next-line
+        else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
 			indent = 1;
 		} else {
 			indent = 0;

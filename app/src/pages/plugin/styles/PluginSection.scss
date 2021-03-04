@@ -91,3 +91,10 @@
         margin-top: 8px;
     }
 }
+
+@media screen and (max-height: 580px){
+    .plugin-ic{
+        height: 140px;
+        width: 140px;
+    }
+}
