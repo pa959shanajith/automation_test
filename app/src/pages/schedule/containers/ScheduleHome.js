@@ -11,7 +11,6 @@ const ScheduleHome = () => {
     const filter_data = useSelector(state=>state.plugin.FD)
 	const [browserTypeExe,setBrowserTypeExe] = useState([]);
 	const [execAction,setExecAction] = useState("serial");
-    // const [qccredentials,setQccredentials] = useState({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
     const [appType, setAppType] = useState(null);
     const [syncScenario, setSyncScenario] = useState(false);
     const [execEnv,setExecEnv] = useState("default");

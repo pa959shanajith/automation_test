@@ -1,5 +1,5 @@
-import React , {useRef , useEffect ,useState ,getState} from 'react';
-import {ModalContainer , ScrollBar , PopupMsg ,ScreenOverlay} from '../../global';
+import React , {useRef , useEffect ,useState } from 'react';
+import {ModalContainer ,  PopupMsg ,ScreenOverlay} from '../../global';
 import * as actionTypes from '../state/action.js';
 import ALMContent from '../components/ALMContent.js';
 import LoginALM from'../components/LoginALM.js';
@@ -12,7 +12,6 @@ const ALM = props => {
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
     const screenType = useSelector(state=>state.integration.screenType);
     const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
-    //const loginALM = reducer.getState().ALM_LOGIN;
     const dispatch = useDispatch();
     const urlRef = useRef();
     const userNameRef = useRef();
@@ -28,6 +27,7 @@ const ALM = props => {
     useEffect(()=>{
         dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
         setMappedFilesRes([]);
+       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const displayError = (title,error) =>{
@@ -84,8 +84,8 @@ const ALM = props => {
         setBlockui({show:false})
     }
     const callExitcenter=()=>{
-        //dispatch({ type: actionTypes.ALM_LOGIN, payload: false });;
-        props.setAlmClicked(false)
+        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });;
+        //props.setAlmClicked(false)
     }
     const content = () =>{
             return(
@@ -100,6 +100,18 @@ const ALM = props => {
                 />
             )
         }
+    const footer =()=>{
+        return(
+            <div className="submit_row">
+            <span>
+                    {failMSg}
+            </span>
+            <span>
+                <button onClick={()=>callLogin_ALM()}>Submit</button>
+            </span>
+            </div>
+        )
+    } 
     return(
         
         <>
@@ -118,7 +130,8 @@ const ALM = props => {
                             title="ALM Login"
                             close={()=>{dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });}}
                             content={content()}
-                            footer ={<button onClick={()=>callLogin_ALM() }>Submit</button>} /> 
+                            footer ={footer()} 
+                        /> 
                     </> }
             { screenType==="ALM" &&
                 <ALMContent

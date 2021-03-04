@@ -76,3 +76,13 @@
     padding: 5px 20px;
     font-size: 16px;
 }
+.submit_row{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+}
+.submit_row span:first-child{
+    color: red;
+}

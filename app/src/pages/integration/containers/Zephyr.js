@@ -10,8 +10,8 @@ import * as actionTypes from '../state/action.js';
 const Zephyr = props => {
     const dispatch= useDispatch();
     const user_id = useSelector(state=> state.login.userinfo.user_id);
-    const screenType = useSelector(state=>state.integration.loginPopupType); 
-    const viewMappedFlies = useSelector(state=>state.integration.mapped_scren_type);
+    const screenType = useSelector(state=>state.integration.screenType); 
+    const viewMappedFlies = useSelector(state=>state.integration.mappedScreenType);
     const accountidRef = useRef();
     const accessKeyRef = useRef();
     const secretKeyRef = useRef();
@@ -37,26 +37,29 @@ const Zephyr = props => {
     const callLogin_zephyr = async()=>{
         if(!(accountidRef.current.value) ){
             setFailMsg("Please Enter Zephyr Account ID");
-            setLoginError("URL")
+            setLoginError("ACCID")
         }
         else if(!(accessKeyRef.current.value)){
             setFailMsg("Please Enter Zephyr Access Key ");
-            setLoginError("UNAME");
+            setLoginError("ZAKEY");
 
         }
         else if(!(secretKeyRef.current.value)){
             setFailMsg("Please Enter Zephyr Secret Key ");
-            setLoginError("PASS");
+            setLoginError("ZSKEY");
 
         }
         else if(!(jiraUrlRef.current.value)){
             setFailMsg("Please Enter Jira URL");
+            setLoginError("JURL");
         }
         else if(!(jiraUserNameRef.current.value)){
             setFailMsg("Please Enter Jira Username");
+            setLoginError("JUNAME");
         }
         else if(!(jiraAcessToken.current.value)){
             setFailMsg("Please Enter Jira Access Token");
+            setLoginError("JATOKN");
         }
         else {
             setBlockui({show:true,content:'Logging...'})
@@ -101,14 +104,20 @@ const Zephyr = props => {
                 jiraUserNameRef={jiraUserNameRef}
                 jiraAcessToken={jiraAcessToken}
                 failMSg={failMSg}
+                loginError={loginError}
             />
         )
     }
     const footer=()=>{
         return(
+            <div className="submit_row">
+            <span>
+                    {failMSg}
+            </span>
             <span>
                 <button onClick={()=>callLogin_zephyr()}>Submit</button>
             </span>
+            </div>
         )
     }
         return(
@@ -116,14 +125,15 @@ const Zephyr = props => {
             <Fragment>
             {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
             {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-            {viewMappedFlies =="Zephyr" ? 
+            {viewMappedFlies === "Zephyr" ? 
                 <MappedPage
+                    screenType="Zephyr"
                     leftBoxTitle="Zephyr Tests"
                     rightBoxTitle="Avo Assure Scenarios"
                     mappedfilesRes={mappedfilesRes}/> :
             <>
                 {/* <div className="middle_holder"> */}
-                {screenType=="Zephyr"?
+                {screenType=== "Zephyr"?
                     <ZephyrContent
                         domainDetails={domainDetails}
                         setBlockui={setBlockui}

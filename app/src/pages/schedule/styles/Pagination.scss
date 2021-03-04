@@ -46,5 +46,10 @@
     cursor: not-allowed;
     background-color: #fff;
     border-color: #ddd;
+    pointer-events: none;
 }
 a { cursor: pointer; }
+
+.pagination-disabled{
+    cursor: not-allowed;
+}

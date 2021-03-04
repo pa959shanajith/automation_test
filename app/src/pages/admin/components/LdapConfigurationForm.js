@@ -102,11 +102,11 @@ const LdapConfigurationForm = (props) => {
             </div></div>
             <div className='adminControl-ldap'><div>
                 <span className="leftControl-ldap" title="Bind Principal">Bind Principal</span>
-                <input type="text" autoComplete="off" name="binddn" id="binddn" disabled={props.auth !== 'simple'} value={props.binddn} onChange={(event)=>{props.setBinddn(event.target.value)}}  className={"form-control-ldap form-control-custom-ldap input_border-ldap"+ (props.binddnErrBor ? " inputErrorBorder" : "")} placeholder="Authentication Principal" autoComplete="off"/>
+                <input type="text" autoComplete="off" name="binddn" id="binddn" disabled={props.auth !== 'simple'} value={props.binddn} onChange={(event)=>{props.setBinddn(event.target.value)}}  className={"form-control-ldap form-control-custom-ldap input_border-ldap"+ (props.binddnErrBor ? " inputErrorBorder" : "")} placeholder="Authentication Principal"/>
             </div></div>
             <div className='adminControl-ldap ldap-credentials'><div>
                 <span className="leftControl-ldap" title="Bind Credentials">Bind Credentials</span>
-                <input type="password" autoComplete="off" name="bindCredentials" id="bindCredentials" disabled={props.auth !== 'simple'} value={props.bindCredentials} onChange={(event)=>{props.setBindCredentials(event.target.value)}} className={"form-control-ldap form-control-custom-ldap input_border-ldap"+ (props.bindCredentialsErrBor ? " inputErrorBorder" : "")} placeholder="Authentication Credentials" autoComplete="off"/>
+                <input type="password" autoComplete="off" name="bindCredentials" id="bindCredentials" disabled={props.auth !== 'simple'} value={props.bindCredentials} onChange={(event)=>{props.setBindCredentials(event.target.value)}} className={"form-control-ldap form-control-custom-ldap input_border-ldap"+ (props.bindCredentialsErrBor ? " inputErrorBorder" : "")} placeholder="Authentication Credentials"/>
             </div></div>
         </Fragment>
     );

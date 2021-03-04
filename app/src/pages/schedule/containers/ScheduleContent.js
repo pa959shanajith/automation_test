@@ -249,8 +249,8 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
             
             <div className="s__task_container">
                 <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
-                    <select id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className="e__taskBtn e__btn">
-                        <option value="" selected disabled>Select Integration</option>
+                    <select defaultValue={""} id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className="e__taskBtn e__btn">
+                        <option value="" className="s__disableOption" disabled>Select Integration</option>
                         <option value="1">ALM</option>
                         <option value="0">qTest</option>
                         <option value="2">Zephyr</option>
@@ -268,8 +268,8 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                 <div id="scheduleSuitesBottomSection">
                     <div id="page-taskName">
 						<span>Scheduled</span>
-                        <select onChange={(event)=>{selectStatus(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
-                            <option selected disabled={true}>Select Status</option>
+                        <select defaultValue={"Select Status"} onChange={(event)=>{selectStatus(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
+                            <option disabled={true}>Select Status</option>
                             <option>Completed</option>
                             <option>In Progress</option>
                             <option>Scheduled</option>
@@ -297,10 +297,10 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                                     <div className="s__min">
                                         <div className="s__con">
                                             <div id="scheduledDataBody" className="scheduledDataBody">
-                                                <ScrollBar thumbColor="rgb(211, 211, 211)" trackColor="rgb(211, 211, 211)" >
+                                                <ScrollBar scrollId="scheduledDataBody" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                     <div className='scheduleDataBodyRow'>
-                                                        {pageOfItems.map((data)=>(
-                                                            <div className="scheduleDataBodyRowChild">
+                                                        {pageOfItems.map((data,index)=>(
+                                                            <div key={index} className="scheduleDataBodyRowChild">
                                                                 <div className="s__Table_date s__Table_date-time ">{data.scheduledatetime}</div>
                                                                 <div className="s__Table_host" >{data.target == nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
                                                                 <div className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
@@ -495,8 +495,12 @@ const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, cur
         suiteInfo.cycleId = cycid;
         suiteInfo.suiteDetails = selectedRowData;
         suiteInfo.poolid = schedulePoolDetails.poolid;
-        suiteInfo.targetUser = schedulePoolDetails.targetUser;
         suiteInfo.type = schedulePoolDetails.type;
+
+        if(schedulePoolDetails.type === "smartModule") suiteInfo.targetUser = "Module Smart Execution";
+        else if(schedulePoolDetails.type === "smartScenario") suiteInfo.targetUser = "Scenario Smart Execution";
+        else if(schedulePoolDetails.type === "normal") suiteInfo.targetUser = schedulePoolDetails.targetUser;
+        
         var iceList = [];
         if(schedulePoolDetails.type !== "normal") iceList = schedulePoolDetails.targetUser;
         suiteInfo.iceList = iceList;

@@ -39,8 +39,6 @@ const Header = () => {
     const [showOverlay, setShowOverlay] = useState("");
     const [redirectTo, setRedirectTo] = useState("");
     const [clickNotify,setClickNotify] = useState(false)
-    const [showAfterExecution,setShowAfterExecution] = useState({show:false})
-    const [showExecution_Pop,setShowExecution_Pop] = useState(false);
     const userInfo = useSelector(state=>state.login.userinfo);
     const selectedRole = useSelector(state=>state.login.SR);
     const notifyCnt = useSelector(state=>state.login.notify.unread)
@@ -191,16 +189,6 @@ const Header = () => {
             submitText="OK"
             close={()=>setShowSR_Pop("")}
             submit={()=>setShowSR_Pop("")}
-        />
-    );
-    
-    const Execution_Pop = () => (
-        <PopupMsg 
-            title={showExecution_Pop.title}
-            content={showExecution_Pop.content}
-            submitText="OK"
-            close={()=>setShowExecution_Pop(false)}
-            submit={()=>setShowExecution_Pop(false)}
         />
     );
 

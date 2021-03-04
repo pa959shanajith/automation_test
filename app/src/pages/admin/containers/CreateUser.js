@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {ScreenOverlay, PopupMsg} from '../../global' 
+import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
 import {getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData} from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/CreateUser.scss'
@@ -303,7 +303,7 @@ const CreateUser = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data == "empty") {
-            setPopupState({show:true,title:"Edit Configuration",content: "User not found"});
+            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
         } else {
             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
             data.sort((a,b)=>a.name.localeCompare(b.name));
@@ -398,7 +398,7 @@ const CreateUser = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data == "empty") {
-            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+            setPopupState({show:true,title:"Edit Configuration",content: "User not found"});
         } else {
             dispatch({type:actionTypes.UPDATE_LDAP_DATA,payload:data})
         }
@@ -533,6 +533,9 @@ const CreateUser = (props) => {
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
+            
+            <ScrollBar thumbColor="#929397">
+            <div className="createUser-container">
             <div id="page-taskName"><span>{(props.showEditUser===false)?"Create User":"Edit User"}</span></div>
             
             {(props.showEditUser===false)?
@@ -587,8 +590,9 @@ const CreateUser = (props) => {
                     </div>
                 :null}
                 
-
 			</div>	
+            </div>
+            </ScrollBar>
       </Fragment>
   );
 }

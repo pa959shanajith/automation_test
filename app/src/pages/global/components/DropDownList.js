@@ -31,11 +31,12 @@ const DropDownList = ({data,smartMode,selectedICE, setSelectedICE, placeholder})
 
     const selectOption = (icename, event) =>{
         if(smartMode!=='normal'){
-			if(selectedICE[icename]===undefined)selectedICE[icename]=true;
-            else selectedICE[icename]=!selectedICE[icename];
+            let selectedICEData = {...selectedICE}
+			if(selectedICEData[icename]===undefined)selectedICEData[icename]=true;
+            else selectedICEData[icename]=!selectedICEData[icename];
             inputRef.current.value = ""
             event.currentTarget.getElementsByTagName('input')[0].checked = !event.currentTarget.getElementsByTagName('input')[0].checked
-			setSelectedICE(selectedICE);
+			setSelectedICE(selectedICEData);
 		}else{
 			setSelectedICE(icename);
             inputRef.current.value = icename

@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ModalContainer} from '../../global' 
+import {ScreenOverlay, PopupMsg, ModalContainer, ScrollBar} from '../../global' 
 import {getSAMLConfig, manageSAMLConfig} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import '../styles/SamlConfig.scss'
@@ -224,7 +224,8 @@ const SamlConfig = (props) => {
     }
 
     return (
-        <Fragment>
+        <ScrollBar thumbColor="#929397">
+        <div className="saml_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
@@ -252,8 +253,8 @@ const SamlConfig = (props) => {
                     </Fragment>
                     :<Fragment>
                         <span className="leftControl-saml" title="Server Name">Server Name</span>
-                        <select value={name} onChange = {(event)=>{setName(event.target.value); samlGetServerData(event.target.value);}} className={nameErrBorder?'selectErrorBorder adminSelect-saml form-control-saml':'adminSelect-saml form-control-saml'} id="samlServerName" >
-                            <option value="" disabled selected>Select Server</option>
+                        <select defaultValue={""} onChange = {(event)=>{setName(event.target.value); samlGetServerData(event.target.value);}} className={nameErrBorder?'selectErrorBorder adminSelect-saml form-control-saml':'adminSelect-saml form-control-saml'} id="samlServerName" >
+                            <option value="" disabled >Select Server</option>
                             {selBox.map((data,index)=>(
                                 <option key={index}  value={data}>{data}</option>
                             ))}
@@ -272,7 +273,7 @@ const SamlConfig = (props) => {
 
                 <div className='adminControl-saml'><div>
 					<span className="leftControl-saml" title="X.509 certificate issued by provider">Certificate</span>
-					<label   id="samlCert" for="certInput" className={certNameErrBorder?"inputErrorText saml-cursor":"certInput-saml saml-cursor"}><span className="fa fa-upload cert-input-cust" ></span>{certName}</label>
+					<label   id="samlCert"  htmlFor="certInput" className={certNameErrBorder?"inputErrorText saml-cursor":"certInput-saml saml-cursor"}><span className="fa fa-upload cert-input-cust" ></span>{certName}</label>
 					<input type="file" accept=".cer,.crt,.cert,.pem" onChange={(event)=>{certInputClick(event)}} autoComplete="off" id="certInput" name="samlCert" className="no-disp cert-saml"/>
                     {samlEdit?<textarea autoComplete="off" id="samlCertValue" name="samlCertValue" disabled="" readOnly="readOnly" className="certTextarea-saml" value={cert} />:null}
                 </div></div>
@@ -281,7 +282,8 @@ const SamlConfig = (props) => {
             {showDeleteModal?
                 <ModalContainer title="Delete Configuration" footer={deleteModalButtons()} close={closeModal} content="Are you sure you want to delete ? Users depending on this configuration will not be able to login." />
             :null} 
-    </Fragment>
+        </div>
+    </ScrollBar>
   );
 }
 

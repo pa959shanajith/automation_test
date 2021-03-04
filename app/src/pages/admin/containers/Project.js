@@ -1,8 +1,9 @@
 import React ,  { Fragment, useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
-import {ScreenOverlay,PopupMsg, ModalContainer} from '../../global' 
+import {ScreenOverlay,PopupMsg, ModalContainer, ScrollBar} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
+import ValidationExpression from '../../global/components/ValidationExpression';
 import '../styles/Project.scss';
 
 /*Component ProjectNew
@@ -784,6 +785,7 @@ const ProjectNew = (props) => {
     } 
 
     const projectEditFunction = (newName) =>{
+        newName = ValidationExpression(newName,"projectName");
         setEditProjectName(newName);
         setModalInputErrorBorder(false);
         if(newName.trim() === ""){
@@ -791,8 +793,14 @@ const ProjectNew = (props) => {
         } 
     } 
 
+    const updateProjectName = (value) => {
+        value = ValidationExpression(value,"projectName");
+        setProjectName(value);
+    }
+
     return (
-    <Fragment>
+    <ScrollBar thumbColor="#929397">
+    <div className="project_conatiner">
         {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
         {loading?<ScreenOverlay content={loading}/>:null}
         <div id="page-taskName">
@@ -832,7 +840,7 @@ const ProjectNew = (props) => {
             
             :<div className='userForm-project adminControl-project display-project' >
                 <div className='domainTxt'>Name</div>
-                <input value={projectName} onChange={(event)=>{setProjectName(event.target.value)}} type="text" autoComplete="off" id="projectName" name="projectName" maxLength="50" className={projectNameErrorBorder?"inputErrorBorder middle__input__border form-control__conv-project form-control-custom def-margin":"middle__input__border form-control__conv-project form-control-custom def-margin"} placeholder="Project Name"/>
+                <input value={projectName} onChange={(event)=>{updateProjectName(event.target.value)}} type="text" autoComplete="off" id="projectName" name="projectName" maxLength="50" className={projectNameErrorBorder?"inputErrorBorder middle__input__border form-control__conv-project form-control-custom def-margin":"middle__input__border form-control__conv-project form-control-custom def-margin"} placeholder="Project Name"/>
             </div>
             }
             <div className='userForm-project adminControl-project display-project'>
@@ -851,18 +859,23 @@ const ProjectNew = (props) => {
 
         <ReleaseCycle clickAddRelease={clickAddRelease} releaseList={releaseList} clickReleaseListName={clickReleaseListName} setActiveRelease={setActiveRelease} clickEditRelease={clickEditRelease} activeRelease={activeRelease} count={count} clickAddCycle={clickAddCycle} cycleList={cycleList} clickEditCycle={clickEditCycle} delCount={delCount} disableAddRelease={disableAddRelease} taskName={taskName} disableAddCycle={disableAddCycle} />
        
-        {(showEditModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddReleaseName)} close={()=>{setShowEditModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder )} modalClass=" modal-sm" />:null}   
-        {(showEditModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddCycleName)} close={()=>{setShowEditModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder )} modalClass=" modal-sm" /> :null} 
-        {(showEditNameModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(updateReleaseName)} close={()=>{setShowEditNameModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder )} modalClass=" modal-sm" />:null} 
-        {(showEditNameModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(updateCycleName)} close={()=>{setShowEditNameModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder )} modalClass=" modal-sm" /> :null}
+        {(showEditModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddReleaseName)} close={()=>{setShowEditModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder, "releaseTxt" )} modalClass=" modal-sm" />:null}   
+        {(showEditModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddCycleName)} close={()=>{setShowEditModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder, "cycleTxt" )} modalClass=" modal-sm" /> :null} 
+        {(showEditNameModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(updateReleaseName)} close={()=>{setShowEditNameModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder, "releaseTxt" )} modalClass=" modal-sm" />:null} 
+        {(showEditNameModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(updateCycleName)} close={()=>{setShowEditNameModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder, "cycleTxt" )} modalClass=" modal-sm" /> :null}
         {showProjectEditModal? <ModalContainer title="Edit Project Name" footer={editModalButtons()} close={closeModal} content={editModalcontent(editProjectName, projectEditFunction, modalInputErrorBorder, projectNameErrorBorder)} modalClass=" modal-sm" /> :null}  
-    </Fragment>
+    </div>
+    </ScrollBar>
   );
 }
 
-const ModalContainerMiddleContent = (modalInputErrorBorder,Txt,setTxt, placeholder) => {
+const ModalContainerMiddleContent = (modalInputErrorBorder,Txt,setTxt, placeholder, ValidExpression) => {
+    const updateName = (value) => {
+        value = ValidationExpression(value,ValidExpression);
+        setTxt(value);
+    }
     return(
-        <p><input autoComplete="off" value={Txt} onChange={(event)=>{setTxt(event.target.value)}} maxLength="50" type="text" className={(modalInputErrorBorder)?"middle__input__border form-control__conv form-control-custom validationKeydown preventSpecialChar inputErrorBorder":"middle__input__border form-control__conv form-control-custom validationKeydown preventSpecialChar"}  placeholder={placeholder}/></p>
+        <p><input autoComplete="off" value={Txt} onChange={(event)=>{updateName(event.target.value)}} maxLength="50" type="text" className={(modalInputErrorBorder)?"middle__input__border form-control__conv form-control-custom inputErrorBorder":"middle__input__border form-control__conv form-control-custom"}  placeholder={placeholder}/></p>
     )
 }
 
