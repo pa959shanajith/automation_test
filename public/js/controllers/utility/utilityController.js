@@ -20,11 +20,54 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
         $scope.getScreenView = tabValue;
         if (tabValue == "utility-Encrytpion") {
             $(".selectAutility img").removeClass("select-utility");
+            $(".selectAutility i").removeClass("select-utility");
             $("#utilityEncrytpion img").addClass("select-utility");
         } else if (tabValue == "utility-Optimization") {
             $(".selectAutility img").removeClass("select-utility");
+            $(".selectAutility i").removeClass("select-utility");
             $("#utilityOptimization img").addClass("select-utility");
+        }else if (tabValue == 'executionMetrics') {
+            $(".selectAutility img").removeClass("select-utility");
+            $("#executionMetrics i").addClass("select-utility");
+            setTimeout(()=>{
+                $('.fc-datePicker').val('');
+                $(".fc-datePicker").datepicker({
+                    autoclose: "true",
+                    format: "dd-mm-yyyy",
+                    todayHighlight: true,
+                    // maxDate: new Date(),
+                    endDate: "today"
+                    // startDate: new Date()
+                })
+            },0)
+            // blockUI("Fetching users...");
+            // adminServices.getUserDetails("user")
+            // .then(function(data){
+            //     unblockUI();
+            //     if(data == "Invalid Session") {
+            //         $rootScope.redirectPage();
+            //     } else if(data == "fail") {
+            //         openModalPopup("Edit User", "Failed to fetch users.");
+            //     } else if(data == "empty") {
+            //         openModalPopup("Edit User", "There are no users created yet.");
+            //     } else {
+            //         data.sort((a,b) => a[0].localeCompare(b[0]));
+            //         $scope.userConf={allUsersList : data}
+            //     }
+            // }, function (error) {
+            //     unblockUI();
+            //     openModalPopup("Edit User", "Failed to fetch users.");
+            // });
         }
+
+        //Datepicker Function
+        $(document).on('focus', '.fc-datePicker', function () {
+            $(this).datepicker('show');
+        })
+        $(document).on('click', ".datepickerIcon", function () {
+            $(this).siblings(".fc-datePicker").focus()
+        })
+        //Datepicker Function
 
         //		Prevents special characters and alphabets for level and factor fields
         $(document).on("keydown", ".validationPairwise", function(e) {
@@ -80,6 +123,96 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
                     });
         };
         //$(TableData).appendTo("#modal-body-pairwise tbody");		
+    }
+
+    $scope.fetchExecMetrics = () => {
+        var err = false;
+        var arg = {'ui':true};
+        $('.inputErrorBorderFull').removeClass('inputErrorBorderFull')
+        if($('#fromDate input').val()){
+            arg.fromDate = $('#fromDate input').val();
+        }else{
+            $("#fromDate input").addClass("inputErrorBorderFull");
+            err= true;
+        }
+        if($('#toDate input').val()){
+            arg.toDate = $('#toDate input').val();
+        }else{
+            $("#toDate input").addClass("inputErrorBorderFull");
+            err= true;
+        }
+        if($('#LOB').val()){
+            arg.LOB = $('#LOB').val();
+        }else{
+            $("#LOB").addClass("inputErrorBorderFull");
+            err= true;
+        }
+        if($('#statusID').val()){
+            arg.status = $('#statusID').val();
+        }
+        if($('#executionID').val()){
+            arg.executionID = $('#executionID').val();
+        }
+        if($('#modifiedBy').val()){
+            arg.modifiedBy = $('#modifiedBy').val();
+        }
+        if(err)return;
+        var sd = $("#fromDate input").val().split('-');
+        var ed = $("#toDate input").val().split('-');
+        start_date = new Date(sd[2] + '-' + sd[1] + '-' + sd[0]);
+        end_date = new Date(ed[2] + '-' + ed[1] + '-' + ed[0]);
+        if (end_date < start_date) {
+            $("#fromDate input").addClass("inputErrorBorderFull");
+            $("#toDate input").addClass("inputErrorBorderFull");
+            return false;
+        }
+        blockUI('Fetching Metrics...')
+        utilityService.fetchMetrics(arg)
+        .then(function(result) {
+            unblockUI();
+            if (result == "Invalid Session") return $rootScope.redirectPage();
+                else if (result == "fail") openDialog("Fail", "Error while exporting Execution Metrics");
+                else if (result == "NoRecords") openDialog("Fail", "No records found");
+                else {
+                    openWindow = 0;
+                    if (openWindow == 0) {
+                        var isIE = /*@cc_on!@*/ false || !!document.documentMode;
+                        var file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                        if (isIE) {
+                            navigator.msSaveOrOpenBlob(file);
+                        }else{
+                            var fileURL = URL.createObjectURL(file);
+                            var a = document.createElement('a');
+                            a.href = fileURL;
+                            a.download = 'metrics.csv';
+                            //a.target="_new";
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            //$window.open(fileURL, '_blank');
+                            URL.revokeObjectURL(fileURL);
+                        }
+                        openDialog("Success", "Successfully exported Execution Metrics to CSV");
+                    }
+                    openWindow++;
+                }
+                
+        },
+        function(error) {
+            openDialog("ERROR", "Failed!");
+            console.error(error);
+        });
+    }
+
+    //Global modal popup
+	function openModalPopup(title, body) {
+		var mainModal = $("#adminModal");
+		mainModal.find('.modal-title').text(title);
+		mainModal.find('.modal-body p').html(body);
+		mainModal.modal("show");
+		setTimeout(function () {
+			$("#adminModal").find('.btn-default').focus();
+		}, 300);
     }
 
     //Reset Encrypt

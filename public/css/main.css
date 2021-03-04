@@ -1542,6 +1542,45 @@ input[disabled]{
 	text-align: center;
     padding: 5px 0;
 }
+
+.execMetrics-box{
+    padding-top: 70px;
+}
+.metric-row{
+    padding: 20px;
+    height: 50px;
+}
+.metric-title{
+    float: left;
+    width: 120px;
+    font-weight: 700;
+    margin-top: 5px;
+}
+.metric-row .datepickerIcon{
+    top: -1px;
+}
+.metric-row .form-control{
+    width: calc(50% - 70px);
+    height: 27px;
+} 
+
+#metric-user{
+    margin-bottom: 0px;
+    float: none;
+    position: relative;
+    padding: 20px;
+}
+#metric-user input{
+    width: calc(50% - 70px);
+    border: 1px solid #ccc;
+    text-align: left;
+}
+#metric-user .dropdown-menu{
+    width: calc(50% - 90px);
+    left: 140px;
+    background: white;
+}
+
 /* utility plugins */
 .comparedListItems
 {
