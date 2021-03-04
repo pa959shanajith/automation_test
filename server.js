@@ -210,6 +210,7 @@ if (cluster.isMaster) {
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
 		app.post('/getReport_API', report.getReport_API);
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
+		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
 
 		app.use(csrf({
@@ -433,6 +434,7 @@ if (cluster.isMaster) {
 		app.post('/updateTaskstatus_mindmaps', auth.protect, taskbuilder.updateTaskstatus_mindmaps);
 		//Utility plugins
 		app.post('/Encrypt_ICE', auth.protect, utility.Encrypt_ICE);
+		app.post('/getExecution_metrics', auth.protect, report.getExecution_metrics);
 		// Wecoccular Plugin
 		app.post('/crawlResults', auth.protect, webocular.getCrawlResults);
 		app.post('/saveResults', auth.protect, webocular.saveResults);

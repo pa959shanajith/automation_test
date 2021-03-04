@@ -1486,6 +1486,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			}
 			if (wsdlInputs[4]){
 				keywordVal.splice(4,0,'setParamValue');
+			}else{
+				wsdlInputs.splice(4,1);
 			}
 			var blockMsg = "Fetching Response Header & Body..."
 			blockUI(blockMsg);
