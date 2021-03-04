@@ -388,7 +388,7 @@ function loadReports() {
             else if (issuetype == "Sub-task" && !pissue) $("#jpIssueid").css('border-color', 'red');
             else if (!summary) $("#jSummary").css('border-color', 'red');
             //else if(!description) $("#jDescription").css('border-color','red');
-            //else if (!priority || priority == "Select Priority") $("#jPriority").css('border-color', 'red');
+            else if (!priority || priority == "Select Priority") $("#jPriority").css('border-color', 'red');
             //else if(!label) $("#jLabel").css('border-color','red');
             //else if(!attachment) $("#jAttachment").css('border-color','red');
             else {

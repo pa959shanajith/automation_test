@@ -105,7 +105,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$("#executionDataTable_" + m + " tbody tr").remove();
 					var rowData = eachData[m];
 					$("div.executionTableDnd").attr('id', 'batch_' + m);
-					$("#batch_" + m).append("<div class='suiteNameTxt' id='page-taskName_" + m + "'><span title=" + rowData.testsuitename + " class='taskname'><input id='parentSuite_" + m + "' class='parentSuiteChk' type='checkbox' name='' />" + rowData.testsuitename + "</span></div><div id='exeData_" + m + "' class='exeDataTable testSuiteBatch'><table id='executionDataTable_" + m + "' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_" + m + "' class='d-execute' type='checkbox' /></th>	<th style='width: 20%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 15%; border-right: 1px solid #fff' >Project Name</th><th style='width: 15%; '>Accessibility Testing</th></tr><input type='hidden' value='" + rowData.testsuiteid + "'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>"); //<th style='width: 8%; text-align: center;'>ALM</th>
+					$("#batch_" + m).append("<div class='suiteNameTxt' id='page-taskName_" + m + "'><span title=" + rowData.testsuitename + " class='taskname'><input id='parentSuite_" + m + "' class='parentSuiteChk' type='checkbox' name='' />" + rowData.testsuitename + "</span></div><div id='exeData_" + m + "' class='exeDataTable testSuiteBatch'><table id='executionDataTable_" + m + "' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_" + m + "' class='d-execute' type='checkbox' /></th>	<th style='width: 20%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 15%; border-right: 1px solid #fff'>Condition</th><th style='width: 13%; border-right: 1px solid #fff' >Project Name</th><th style='width: 19%; margin-left:1%; '>Accessibility Testing</th></tr><input type='hidden' value='" + rowData.testsuiteid + "'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>"); //<th style='width: 8%; text-align: center;'>ALM</th>
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 					var row = $("#executionDataTable_" + m).find('tbody');
@@ -137,8 +137,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							});
 						}
 					}
-					let projectNameWidth = "16";
-					let conditionCheckWidth = "17";
+					let projectNameWidth = "13";
+					let conditionCheckWidth = "14";
 					if(!scenarioTaskType || scenarioTaskType == "" || scenarioTaskType == "disable"){
 						$(".executionDataTable").toArray().forEach(element => {
 							if(element.children[0].children[0].children[6])
@@ -174,7 +174,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 						}
 						row.append($("<td class='projectName' title=" + getEachScenario[i].projectnames + " style='width:" + projectNameWidth + "%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
 						if (scenarioTaskType && scenarioTaskType != "" && scenarioTaskType != "disable"){
-							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">6 Standards Selected</span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ><input value="A" checked class = "acc-chk" type="checkbox"/><span style="margin-left: 5px;" id="methodA"></span>A</label></li><li><label title="method AA"  ><input class = "acc-chk" value="AA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAA"></span>AA</label></li><li><label title="method AAA"  ><input class = "acc-chk" value="AAA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAAA" ></span>AAA</label></li><li><label title="aria"  ><input class = "acc-chk" value="aria" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Aria</label></li><li><label title="method 508"  ><input class = "acc-chk" value="508" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ><input class = "acc-chk" value="Best Practice" checked type="checkbox"/><span style="margin-left: 5px;" id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
+							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:17%; margin-left:2.7%;word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">6 Standards Selected</span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label style="width:100%;" title="method A"  ><input value="A" checked class = "acc-chk" type="checkbox"/><span style="margin-left: 5px;" id="methodA"></span>A</label></li><li><label style="width:100%;" title="method AA"  ><input class = "acc-chk" value="AA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAA"></span>AA</label></li><li><label style="width:100%;" title="method AAA"  ><input class = "acc-chk" value="AAA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAAA" ></span>AAA</label></li><li><label style="width:100%;" title="aria"  ><input class = "acc-chk" value="aria" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Aria</label></li><li><label style="width:100%;" title="method 508"  ><input class = "acc-chk" value="508" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Section 508</label></li><li><label style="width:100%;" title="method Best Practice"  ><input class = "acc-chk" value="Best Practice" checked type="checkbox"/><span style="margin-left: 5px;" id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
 							$(".scrollbar-inner .testScenarioScroll")[0].style.overflow = "visible";
 							
 						}
@@ -544,7 +544,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			suiteDetails.scenarioDescriptions = scenarioDescriptionText;
 			batchInfo.push(suiteDetails);
 		});
-		var throwErr = false;
 		if(scenarioTaskType != "disable"){
 			let input = {
 				taskId : $scope.taskId,
@@ -554,39 +553,66 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			.then((status)=>{
 				if(status != "success"){
 					openDialogExe("Save Test Suite", "Failed to save selected accessibility standards.");
-					throwErr = true;
+				}else{
+					var current_task = JSON.parse(window.localStorage['_CT']);
+					current_task.accessibilityParameters = accessibilityParameters;
+					window.localStorage['_CT'] = JSON.stringify(current_task);
+
+					//Getting ConditionChecks
+					ExecutionService.updateTestSuite_ICE(batchInfo)
+					.then(function (data) {
+						unblockUI();
+						if (data == "Invalid Session") {
+							return $rootScope.redirectPage();
+						}
+						if (data != "fail") {
+							openDialogExe("Save Test Suite", "Test suite saved successfully.");
+							//$("#saveSuitesModal").modal("show")
+							//Transaction Activity for Save Test Suite Button Action
+							// var labelArr = [];
+							// var infoArr = [];
+							// labelArr.push(txnHistory.codesDict['SaveTestSuite']);
+							// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+						} else {
+							openDialogExe("Save Test Suite", "Failed to save test suite.");
+							//$("#saveSuitesModalFail").show();
+						}
+						angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+					}, function (error) {
+						console.log(error);
+					});
 				}
 			}).catch((e)=>{
 				throwErr = true;
 				openDialogExe("Save Test Suite", "Failed to save selected accessibility standards.");
 				
 			});
+		}else{
+			//Getting ConditionChecks
+			ExecutionService.updateTestSuite_ICE(batchInfo)
+			.then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") {
+					return $rootScope.redirectPage();
+				}
+				if (data != "fail") {
+					openDialogExe("Save Test Suite", "Test suite saved successfully.");
+					//$("#saveSuitesModal").modal("show")
+					//Transaction Activity for Save Test Suite Button Action
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['SaveTestSuite']);
+					// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+				} else {
+					openDialogExe("Save Test Suite", "Failed to save test suite.");
+					//$("#saveSuitesModalFail").show();
+				}
+				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+			}, function (error) {
+				console.log(error);
+			})
 		}
-		if(throwErr) return;
-		//console.log("batchdetails", batchInfo);
-		//Getting ConditionChecks
-		ExecutionService.updateTestSuite_ICE(batchInfo)
-		.then(function (data) {
-			unblockUI();
-			if (data == "Invalid Session") {
-				return $rootScope.redirectPage();
-			}
-			if (data != "fail") {
-				openDialogExe("Save Test Suite", "Test suite saved successfully.");
-				//$("#saveSuitesModal").modal("show")
-				//Transaction Activity for Save Test Suite Button Action
-				// var labelArr = [];
-				// var infoArr = [];
-				// labelArr.push(txnHistory.codesDict['SaveTestSuite']);
-				// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-			} else {
-				openDialogExe("Save Test Suite", "Failed to save test suite.");
-				//$("#saveSuitesModalFail").show();
-			}
-			angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
-		}, function (error) {
-			console.log(error);
-		});
+
 	};
 	//Save TestSuite Functionality
 
@@ -743,6 +769,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	
 	//Execute TestSuite Functionality
 	$scope.ExecuteTestSuite = function ($event) {
+		var execute = true;
 		if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
 		else if ((appType == "Web") && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select a browser");
 		else if (appType == "Webservice" && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select Web Services option");
@@ -771,6 +798,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							$(this).parent().siblings(".exe-accesibilityTesting").find("input:checked").each(function(){
 								accessibilityParameters.push($(this).val());
 							});
+							if(scenarioTaskType == "exclusive" && accessibilityParameters.length == 0){
+								openDialogExe("Accessibility Standards", "Please select one or more accessibility testing standard to proceed.")
+								execute = false;
+								return;
+							}
 							selectedRowData.push({
 								condition: parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
 								dataparam: [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
@@ -805,7 +837,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				integration: $scope.integration,
 				batchInfo: $scope.moduleInfo
 			};
-			$scope.allocateICEPopup()
+			if(execute) $scope.allocateICEPopup()
 		}
 	};
 
