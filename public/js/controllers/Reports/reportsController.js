@@ -452,11 +452,11 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     if (accessibility_data.length > 0) {
                         tableContainer.empty();
                         var screen_acc_reportdata = {};
-                        var index = 1;
+                        var index = accessibility_data.length;
                         for (i = accessibility_data.length - 1; i >= 0; i--) {
                             let time = new Date(accessibility_data[i]["executedtime"]);
                             time = time.toString().split("GMT")[0]
-                            tableContainer.append("<tr class='screen_report'  style='cursor:pointer;' data-executionid='" + accessibility_data[i]["_id"] + "'><td class='executionNo' style='padding:3px;'>" + (index++) + "</td><td style='padding:3px;'>" + accessibility_data[i]["title"] + "</td><td style='padding:3px;'>" + time + "</td>");
+                            tableContainer.append("<tr class='screen_report'  style='cursor:pointer;' data-executionid='" + accessibility_data[i]["_id"] + "'><td class='executionNo' style='padding:3px;'>E<sub>" + (index--) + "</sub></td><td style='padding:3px;'>" + accessibility_data[i]["title"] + "</td><td style='padding:3px;'>" + time + "</td>");
                             screen_acc_reportdata[accessibility_data[i]["_id"]] = accessibility_data[i]
                         }
                         $scope['acc_report_data'] = screen_acc_reportdata;
@@ -543,7 +543,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     newRow.append(node);
                     newRow.append(statusNode);
                     var reportLink = document.createElement('td');;
-                    reportLink.innerHTML = '<div value="' +  report["access-rules"][k]["tag"] + '" data="' + report["access-rules"][k]["name"] + '" class="accessRules"> <label>Report</label></div>'
+                    reportLink.innerHTML = '<div value="' +  report["access-rules"][k]["tag"] + '" data="' + report["access-rules"][k]["name"] + '" class="accessRules" > <label style="cursor:pointer">Report</label></div>'
                     newRow.append(reportLink);
                     tbdy.appendChild(newRow);
                 }
