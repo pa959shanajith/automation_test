@@ -14,19 +14,17 @@ const LoginALM = props => {
                 <input  style={{ borderBottom:props.loginError ==="UNAME"? "2px solid red" : null}}
                         type="text" ref={props.userNameRef} 
                         className="launchPopupInput form-control " 
-                        placeholder="Enter User Name "
+                        
                 />
             </p>
             <p >
                 <input  style={{ borderBottom:props.loginError ==="PASS"? "2px solid red" : null}}
                         type="password"ref={props.passwordRef} 
                         className="launchPopupInput form-control"
-                        placeholder="Enter Password " />
+                        placeholder="Enter Password " 
+                        value="nupoor"
+                />
             </p>
-            <p style={{color:"red",marginLeft:"10px"}}>
-                {props.failMSg}
-            </p>
-            
         </div>
     )
 }

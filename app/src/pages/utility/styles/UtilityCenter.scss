@@ -24,7 +24,6 @@
 
 .taskname{
     display: inline-block;
-    /* background: #2f1c49; */
     background: #331d4e;
     font-size: 18px;
     color: #fff;
@@ -85,8 +84,11 @@
     height: 28px;
     margin-bottom: 25px;
 }
+.ult_content_conatiner{
+    height: 90%;
+}
 .encryptionData-body{
-    height: 30vh;
+    height: 40%;
     float: left;
     width: 100%;
     resize: none;
@@ -106,7 +108,7 @@
     height: 100%;
     outline: none;
     resize: none;
-    font-size: x-large;
+    font-size: 16px;
 }
 #encryptedData{
     border: none;
@@ -114,7 +116,7 @@
     height: 100%;
     outline: none;
     resize: none;
-    font-size: x-large;
+    font-size: 16px;
 }
 #optimization-fn{
     border-radius: 1em;
@@ -158,6 +160,7 @@
 }
 
 .pairwise_scr{
+    padding-bottom: 15px;
     span{
         margin-right: 5px;
         font-size: 14px;
@@ -216,12 +219,12 @@
     width : 100%;
     position: relative;
 }
-.pairwise_array{
-    // overflow: scroll;
-    height: 90%;
-    width : 100%;
-    position: relative;
-}
+// .pairwise_array{
+//     // overflow: scroll;
+//     height: 90%;
+//     width : 100%;
+//     position: relative;
+// }
 .factor__row{
     white-space: nowrap;
     position: relative;
@@ -244,4 +247,9 @@
 }
 .factor__row > input[type="text"]:first-child{
     margin-right: 50px !important;
+}
+.pairsie_array_container{
+    height: 68vh;
+    width: 70vw;
+    margin-left: 10px;
 }
