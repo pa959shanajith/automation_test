@@ -9,6 +9,7 @@ const CompareObjectModal = props => {
     useEffect(() => {
         const macOS = navigator.appVersion.indexOf("Mac") !== -1;
         setIsMac(macOS);
+        //eslint-disable-next-line
     }, []);
 
     const webIcons = [

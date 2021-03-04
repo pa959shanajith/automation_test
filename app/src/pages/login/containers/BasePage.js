@@ -34,7 +34,7 @@ const BasePage = () => {
                 if ((typeof(checkLogout) === "object") && (checkLogout.length === 2)) {
                     if (checkLogout[1] === "dereg") setLoginValidation("Reason: User is deleted from Avo Assure");
                     else setLoginValidation("Your session has been terminated by "+checkLogout[0]);
-                } else if ((typeof(checkLogout) == "object") && (checkLogout.length == 1)) {
+                } else if ((typeof(checkLogout) === "object") && (checkLogout.length === 1)) {
                     setLoginValidation(checkLogout[0]);
                 } else setLoginValidation("You Have Successfully Logged Out!");
                 SetProgressBar("stop");
@@ -87,6 +87,7 @@ const BasePage = () => {
                 }
             }
         })()
+        //eslint-disable-next-line
     }, []);
 
     const loadProfile = userinfo => {

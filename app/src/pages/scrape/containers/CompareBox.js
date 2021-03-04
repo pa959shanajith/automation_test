@@ -11,6 +11,7 @@ const CompareBox = props => {
 
     useEffect(()=>{
         setObjectList(props.objList);
+        //eslint-disable-next-line
     }, [])
 
     const updateChecklist = (value, event) => {

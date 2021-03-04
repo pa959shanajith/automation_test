@@ -16,6 +16,7 @@ const Plugin = () => {
         }
         dispatch({type: actions.SET_CT, payload: {}});
         SetProgressBar("stop", dispatch);
+        //eslint-disable-next-line
     }, []);
 
     return (

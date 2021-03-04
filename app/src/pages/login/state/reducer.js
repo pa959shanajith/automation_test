@@ -28,7 +28,7 @@ const reducer = (state=initialState, action) => {
             var val = state.notify.unread
             var isDuplicateNotificationMsg = false;
             arr.forEach(e => {
-                if (value.notifyMsg == e.notifyMsg) {
+                if (value.notifyMsg === e.notifyMsg) {
 					isDuplicateNotificationMsg = true;
 				}
             });
@@ -43,7 +43,7 @@ const reducer = (state=initialState, action) => {
                 return {
                     ...state, notify:{...initialState.notify}
                 }
-            }
+            } else return state
         case actionTypes.UPDATE_NOTIFY_COUNT:
             return {
                 ...state, notify:{...state.notify,unread:action.payload}

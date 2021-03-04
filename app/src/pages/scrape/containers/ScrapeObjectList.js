@@ -35,6 +35,7 @@ const ScrapeObjectList = () => {
         setModified({});
         setEditableObj({});
         setSaved(true);
+        //eslint-disable-next-line
     }, [current_task])
 
     useEffect(()=>{
@@ -78,6 +79,7 @@ const ScrapeObjectList = () => {
 
         setDisableBtns({...disableBtns, ...disable})
         setSelAllCheck(checkAll);
+        //eslint-disable-next-line
     }, [scrapeItems])
 
     useEffect(()=>{
@@ -92,6 +94,7 @@ const ScrapeObjectList = () => {
             setSelAllCheck(false);
             setEditableObj({});
         }
+        //eslint-disable-next-line
     }, [saved])
 
     const updateChecklist = (value, event) => {
@@ -362,7 +365,7 @@ const ScrapeObjectList = () => {
                         <button className="ss__taskBtn ss__btn" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
                         <button className="ss__taskBtn ss__btn" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
                         <button className="ss__search-btn" onClick={toggleSearch}>
-                            <img className="ss__search-icon" src="static/imgs/ic-search-icon.png"/>
+                            <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
                         { showSearch && <input className="ss__search_field" value={searchVal} onChange={onSearch}/>}
                     </div>

@@ -40,6 +40,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 else {
                     pluginApi.getTaskJson_mindmaps(data)
                     .then(data1 => {
+                        //eslint-disable-next-line
                         dataDict = dataDictState;
                         // to render components which will populate under review
                         let review_items = []
@@ -104,9 +105,12 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                           dataDict.project[projectID].appType = { [data.appTypeName[dataIdx]]: data.appType[dataIdx] }
                           dataDict.projectDict[projectID] = data.projectName[dataIdx];
                           
+                          //eslint-disable-next-line
                           for (const releaseID in dataDict.project[projectID].release){
+                            //eslint-disable-next-line
                             dataDict.project[projectID].release[releaseID].forEach(cycleID=> {
-                              dataDict.cycleDict[cycleID] = data.cycles[cycleID][2];
+                                //eslint-disable-next-line
+                                dataDict.cycleDict[cycleID] = data.cycles[cycleID][2];
                             })
                           }
                         } 
