@@ -34,6 +34,6 @@ exports.updateAccessibilitySelection = async function(req, res){
 		return res.send(status);
 	}catch(e){
 		logger.error("Error occurred in updateAccessibilitySelection: %s", e);
+		return res.send("fail");
 	}
-	return res.send("fail");
 }
