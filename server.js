@@ -434,7 +434,7 @@ if (cluster.isMaster) {
 		app.post('/updateTaskstatus_mindmaps', auth.protect, taskbuilder.updateTaskstatus_mindmaps);
 		//Utility plugins
 		app.post('/Encrypt_ICE', auth.protect, utility.Encrypt_ICE);
-		app.post('/getExecution_metrics', report.getExecution_metrics);
+		app.post('/getExecution_metrics', auth.protect, report.getExecution_metrics);
 		// Wecoccular Plugin
 		app.post('/crawlResults', auth.protect, webocular.getCrawlResults);
 		app.post('/saveResults', auth.protect, webocular.saveResults);

@@ -124,7 +124,6 @@ const openScreenShot = async (username, path) => {
     }
 };
 
-
 // Render screenshots for html reports
 exports.openScreenShot = async (req, res) => {
     try {
@@ -994,23 +993,23 @@ const fetch_metrics=async (args) => {
 exports.getExecution_metrics_API = async(req, res) => {
     logger.info("Inside UI service: getExecution_metrics_API");
     try {
-            const userInfo = await utils.tokenValidation(req.body.userInfo);
-            var execResponse = userInfo.inputs;
-            var finalReport=[];
-            if (execResponse.tokenValidation == "passed"){
-                delete execResponse.error_message; 
-                var metrics_data=req.body.metrics_data;
-                metrics_data.api=true;
-				var reportResult = await fetch_metrics(metrics_data);
-                logger.info("Calling DAS Service from getExecution_metrics_API: reports/getExecution_metrics_API");
-				if(reportResult[0].errMsg != ""){
-					execResponse.error_message=reportResult[0].errMsg;       
-				}
-                finalReport.push(reportResult[0]);
-			}
-			finalReport.push(execResponse);
-			logger.info("Sending reports in the service getExecution_metrics_API: final function");
-			res.send(finalReport);    
+        const userInfo = await utils.tokenValidation(req.body.userInfo);
+        var execResponse = userInfo.inputs;
+        var finalReport=[];
+        if (execResponse.tokenValidation == "passed"){
+            delete execResponse.error_message;
+            var metrics_data=req.body.metrics_data;
+            metrics_data.api=true;
+            var reportResult = await fetch_metrics(metrics_data);
+            logger.info("Calling DAS Service from getExecution_metrics_API: reports/getExecution_metrics_API");
+            if(reportResult[0].errMsg != ""){
+                execResponse.error_message=reportResult[0].errMsg;
+            }
+            finalReport.push(reportResult[0]);
+        }
+        finalReport.push(execResponse);
+        logger.info("Sending reports in the service getExecution_metrics_API: final function");
+        res.send(finalReport);
     } catch (exception) {
         logger.error("Exception in the service getExecution_metrics_API - Error: %s", exception);
         res.send("fail");
@@ -1025,11 +1024,11 @@ exports.getExecution_metrics = async(req, res) => {
 			metrics_data.api=false;
             logger.info("Calling DAS Service from getExecution_metrics: reports/getExecution_metrics");
 			var reportResult = await fetch_metrics(metrics_data);
-			if (reportResult[0] == 'fail'){
-                res.send('fail');
-            }else if(reportResult[0].rows.length==0){
-                res.send('NoRecords');
-            }else{
+			if (reportResult[0] == 'fail') {
+                return res.send('fail');
+            } else if(reportResult[0].rows.length==0) {
+                return res.send('NoRecords');
+            } else {
                 var data=reportResult[0].rows;
                 var dir = './../../excel';
                 var excelDirPath = path.join(__dirname, dir);
@@ -1040,14 +1039,14 @@ exports.getExecution_metrics = async(req, res) => {
                 } catch (e) {
                     logger.error("Exception in getExecution_metrics: Create Directory/Remove file", e);
                 }
-                csv = data.map(row => Object.values(row));
+                var csv = data.map(row => Object.values(row));
                 csv.unshift(Object.keys(data[0]));
-                csvdata= `"${csv.join('"\n"').replace(/,/g, '","')}"`;
+                var csvdata= `"${csv.join('"\n"').replace(/,/g, '","')}"`;
                 fs.writeFile(filePath, csvdata, 'utf8', function (err) {
                     if (err) {
                         logger.error('Error in writing to CSV in the service getExecution_metrics');
-                        res.send('fail');
-                    } else{
+                        return res.send('fail');
+                    } else {
                         res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
                         var rstream = fs.createReadStream(filePath);
                         rstream.pipe(res);
