@@ -34,6 +34,7 @@ const Container = ({emailRef}) => {
   const Footer = ({emailRef,confObj}) =>{
       const [errMsg,setErrMsg] = useState('')
       const submit = async() => {
+            // eslint-disable-next-line
             const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             if (emailRef.current.value.length === 0 || !emailRegEx.test(emailRef.current.value)) {
                 setErrMsg("Recipient address is invalid!");

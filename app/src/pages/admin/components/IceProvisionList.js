@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, RedirectPage, ScrollBar} from '../../global' 
+import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
 import {fetchICE, provisions, manageSessionData} from '../api';
 import '../styles/IceProvisionList.scss'
 

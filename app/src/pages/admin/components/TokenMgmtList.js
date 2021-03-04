@@ -20,6 +20,7 @@ const TokenMgmtList = (props) => {
     useEffect(()=>{
         if(firstStop) setFirstStop(!firstStop);
         else setAllTokensModify(props.allTokens);
+        // eslint-disable-next-line
     },[props.allTokens])
 
     const closePopup = () =>{
@@ -66,7 +67,7 @@ const TokenMgmtList = (props) => {
 						<h4 onClick={()=>{props.setShowList(!props.showList);}} >CI Tokens</h4>
 						<div  className="search-tkn-mgmt search-list-tkn-mgmt">
 							<span className="searchIcon searchIcon-list" >
-								<img src={"static/imgs/ic-search-icon.png"} className="search-img-list" />
+								<img src={"static/imgs/ic-search-icon.png"} className="search-img-list" alt={"Search Icon"}/>
 							</span>
 							<input value={searchTasks} autoComplete="off" onChange={(event)=>{ setSearchTasks(event.target.value);searchList(event.target.value)}} type="text" id="searchTasks"  className="searchInput searchInput-list-tkn-mgmt" />
 						</div>

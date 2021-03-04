@@ -1,7 +1,6 @@
 /* Pagination Component 
 -------------------------------------------------*/
-import React, {useState, useEffect } from 'react';
-import propTypes from 'prop-types';
+import React  from 'react';
 import "../styles/Pagination.scss";
 
 // const propTypes = {

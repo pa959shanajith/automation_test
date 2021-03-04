@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
 import {manageSessionData, fetchLockedUsers, unlockUser} from '../api';
 import '../styles/SessionManagement.scss'
