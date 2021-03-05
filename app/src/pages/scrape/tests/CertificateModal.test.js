@@ -8,7 +8,7 @@ import {createStore} from 'redux';
 import reducer from '../state/reducer';
 import { SET_CERT } from '../state/action';
 
-
+// Positive
 describe('<CertificateModal/> Positive Scenarios',()=>{
     let wrapper;
     const props={
@@ -34,7 +34,6 @@ describe('<CertificateModal/> Positive Scenarios',()=>{
         expect(findByTestAtrr(wrapper,'authPass').length).toBe(1);
         expect(findByTestAtrr(wrapper,'reset').length).toBe(1);
         expect(findByTestAtrr(wrapper,'submit').length).toBe(1);
-        // console.log(wrapper.debug());
     });
     it('Should submit',()=>{
         findByTestAtrr(wrapper,'certPath').simulate('change',{target:{value:'C:\\Users'}});
@@ -51,9 +50,8 @@ describe('<CertificateModal/> Positive Scenarios',()=>{
         expect(props.setShowPop).toHaveBeenNthCalledWith(1,{title: "Certificate", content: "Certificate Saved successfully"});
         expect(props.setShow).toHaveBeenNthCalledWith(1,false)
     });
-    it('SHould rest the fields',()=>{
+    it('Should rest the fields',()=>{
         findByTestAtrr(wrapper,'certPath').simulate('change',{target:{value:'C:\\Users'}});
-
         findByTestAtrr(wrapper,'certPass').simulate('change',{target:{value:'dummyCertPWD'}});
         findByTestAtrr(wrapper,'certPath').simulate('change',{target:{value:'C:\\Users'}});
         findByTestAtrr(wrapper,'reset').simulate('click');
@@ -62,33 +60,6 @@ describe('<CertificateModal/> Positive Scenarios',()=>{
         expect(findByTestAtrr(wrapper,'certPath').prop('value')).toBe("");
         
     })
-}) 
+});
 
-// Negative
-// describe('<CertificateModal/> Negative Scenarios',()=>{
-//     let wrapper;
-//     const props={
-//         setShowPop:jest.fn(),
-//         setShow:jest.fn()
-//     };
-//     const store={
-//         scrape:{
-//                 cert:{
-//                         certsDetails:" ", 
-//                         authDetails:" "
-//                     }
-//     }}
-//     const mockDispatch=jest.fn();
-//     beforeEach(()=>{
-//         jest.spyOn(reactRedux,'useDispatch').mockReturnValue(mockDispatch);
-//         const mockStore=createStore(reducer,store);
-//         wrapper=mount(<Provider store={mockStore}><CertificateModal {...props}/></Provider>);
-//     })
-//     it('Should give error',()=>{
-//         console.log(findByTestAtrr(wrapper,'certPath').props())
-//         findByTestAtrr(wrapper,'certPath').simulate('change',{target:{value:''}});
-//         findByTestAtrr(wrapper,'submit').simulate('click');
-//         wrapper.update()
-//         console.log(findByTestAtrr(wrapper,'certPath').props())
-//     })
-// })
+

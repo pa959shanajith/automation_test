@@ -43,7 +43,6 @@ describe('<ScrapeObject/> Positive Scenarios',()=>{
         expect(findByTestAtrr(wrapper,'objectInput').length).toBe(0);
         expect(findByTestAtrr(wrapper,'checkBox').length).toBe(1);
         expect(findByTestAtrr(wrapper,'objectName').length).toBe(1);
-    
         findByTestAtrr(wrapper,'objectName').simulate('doubleclick');
         // Assert that the object name is editable after double clicking ion the object name
         expect(findByTestAtrr(wrapper,'objectInput').length).toBe(1);

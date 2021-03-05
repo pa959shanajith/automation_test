@@ -18,10 +18,8 @@ describe('<MapObjectModal/> Positive Scenarios',()=>{
             "setShowPop": jest.fn(),
             "setShow":jest.fn()
           }
-        // const wrapper=mount(<MapObjectModal {...props}/>)
         const propsError=checkProps(MapObjectModal,expectedProps)
         expect(propsError).toBeUndefined()
-        // console.log(wrapper.debug())
     })
 })
 
@@ -81,12 +79,7 @@ describe('<MapObjectModal/> Positive Scenarios',()=>{
         
       }
       wrapper=mount(<MapObjectModal {...props}/>);
-      jest.spyOn(api,'updateScreen_ICE')
-      .mockImplementation(()=>{
-        console.log("hello from mock")
-        return Promise.resolve("pass")
-      });
-        
+      jest.spyOn(api,'updateScreen_ICE').mockImplementation(()=>{return Promise.resolve("pass")}); 
     });
     afterEach(()=>{
       jest.resetAllMocks();
@@ -156,8 +149,7 @@ describe('<MapObjectModal/> Positive Scenarios',()=>{
 
 //Negative
 describe('<MapObjectModal/> Negative Sceanrio',()=>{
-  let wrapper;
-  let props
+  let wrapper, props;
   beforeEach(()=>{
     props={
       "scrapeItems":  [
@@ -209,29 +201,24 @@ describe('<MapObjectModal/> Negative Sceanrio',()=>{
       "setShowPop": jest.fn(),
       "setShow":jest.fn()
     }
-    jest.spyOn(api,'updateScreen_ICE')
-        .mockImplementation(()=>{
-          console.log("hello from mock")
-          return Promise.resolve("pass")
-    })
+    jest.spyOn(api,'updateScreen_ICE').mockImplementation(()=>{return Promise.resolve("pass")})
     wrapper=mount(<MapObjectModal {...props}/>);
   })
   it('Should error in "Please select atleast one object to Map"',()=>{
     findByTestAtrr(wrapper,'submit').simulate('click')
-    console.log(findByTestAtrr(wrapper,'errorMessage').text())
     expect(findByTestAtrr(wrapper,'errorMessage').length).toBe(1)
   });
   it('Should raise popup with Pas Scrape Data Failed',async ()=>{
     findByTestAtrr(wrapper,'mapObjectTagHead').simulate('click');
-      expect(findByTestAtrr(wrapper,'mapObjectListItem').length).toBe(1);
-      const setData=jest.fn()
-      findByTestAtrr(wrapper,'mapObjectListItem').simulate('dragStart',{dataTransfer:{setData:setData}})
-      const getData=jest.fn().mockReturnValue('{"objId":"6030dd3af6dadf602e5650d2","objIdx":2,"val":2,"tag":"input","hide":false,"title":"boxadd_txtbox","custname":"boxadd_txtbox","isCustom":false}')
-      findByTestAtrr(wrapper,'mapObjectCustomListItem').simulate('drop',{dataTransfer:{getData:getData}})
-      findByTestAtrr(wrapper,'submit').simulate('click');
-      await act(()=>Promise.resolve());
-      wrapper.update()
-      expect((props.setShowPop)).toHaveBeenCalledWith({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+    expect(findByTestAtrr(wrapper,'mapObjectListItem').length).toBe(1);
+    const setData=jest.fn()
+    findByTestAtrr(wrapper,'mapObjectListItem').simulate('dragStart',{dataTransfer:{setData:setData}})
+    const getData=jest.fn().mockReturnValue('{"objId":"6030dd3af6dadf602e5650d2","objIdx":2,"val":2,"tag":"input","hide":false,"title":"boxadd_txtbox","custname":"boxadd_txtbox","isCustom":false}')
+    findByTestAtrr(wrapper,'mapObjectCustomListItem').simulate('drop',{dataTransfer:{getData:getData}})
+    findByTestAtrr(wrapper,'submit').simulate('click');
+    await act(()=>Promise.resolve());
+    wrapper.update()
+    expect((props.setShowPop)).toHaveBeenCalledWith({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
 
   })
 });

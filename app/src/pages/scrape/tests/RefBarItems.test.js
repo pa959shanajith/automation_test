@@ -134,17 +134,17 @@ describe('<RefBarItems/> Positive Scenarios',()=>{
     };
     const d=jest.fn()
     beforeEach(()=>{
-        store = {
-            plugin:{CT:dummyData.CT,tasksJson:dummyData.tasksJson,FD:dummyData.FD},
-            login:{userinfo:dummyData.userinfo},
-            scrape:{
-                ScrapeData : [],
-                disableAction: false,
-                disableAppend: false,
-                compareFlag:false,
-                objValue:{val:0}
-            },   
-        }
+      store = {
+        plugin:{CT:dummyData.CT,tasksJson:dummyData.tasksJson,FD:dummyData.FD},
+        login:{userinfo:dummyData.userinfo},
+        scrape:{
+            ScrapeData : [],
+            disableAction: false,
+            disableAppend: false,
+            compareFlag:false,
+            objValue:{val:0}
+      },   
+      }
         const props={mirror:" "}
         const mockStore=createStore(reducer,store);
         jest.spyOn(React,'useContext').mockImplementation(()=>{return contextValues})
@@ -155,50 +155,40 @@ describe('<RefBarItems/> Positive Scenarios',()=>{
     afterEach(()=>{
         jest.restoreAllMocks()
     });
-    // it('asdq',()=>{
-    //   console.log(wrapper.debug())
-    // })
     it('Should contain all the components',()=>{
         expect(findByTestAtrr(wrapper,'screenshot').length).toBe(1);
         expect(findByTestAtrr(wrapper,'filter').length).toBe(1);
-        // contain the other components
-        // console.log(wrapper.children().debug())
-        // // expect(wrapper.children().lenght).toBe(5)
     });
     it('Should show screenshot popup and filter popup',async ()=>{
-        expect(findByTestAtrr(wrapper,'popupSS').length).toBe(0)
-        findByTestAtrr(wrapper,'screenshot').simulate('click')
-        await Promise.resolve();
-        wrapper.update();
-        const imgSS= findByTestAtrr(wrapper,'popupSS').find('img').at(1);
-        //  Assert that the screenshot popup is being displayed
-        expect(findByTestAtrr(wrapper,'popupSS').length).toBe(1);
-        // Assert that the screenshot image is been displayed in the popup
-        expect(imgSS.length).toBe(1)
-        
-        expect(findByTestAtrr(wrapper,'popupFilter').length).toBe(0);
-        findByTestAtrr(wrapper,'filter').simulate('click');
-        await Promise.resolve();
-        wrapper.update();
-        // Assert that pop filter is displayed
-        expect(findByTestAtrr(wrapper,'popupFilter').length).toBe(1);
-        
-        //  Assert that the all filter contents are being diaplyed accrodingly
-        expect(findByTestAtrr(wrapper,'popupFilterContent').children().length).toBe(14)
+      expect(findByTestAtrr(wrapper,'popupSS').length).toBe(0)
+      findByTestAtrr(wrapper,'screenshot').simulate('click')
+      await Promise.resolve();
+      wrapper.update();
+      const imgSS= findByTestAtrr(wrapper,'popupSS').find('img').at(1);
+      //  Assert that the screenshot popup is being displayed
+      expect(findByTestAtrr(wrapper,'popupSS').length).toBe(1);
+      // Assert that the screenshot image is been displayed in the popup
+      expect(imgSS.length).toBe(1)   
+      expect(findByTestAtrr(wrapper,'popupFilter').length).toBe(0);
+      findByTestAtrr(wrapper,'filter').simulate('click');
+      await Promise.resolve();
+      wrapper.update();
+      // Assert that pop filter is displayed
+      expect(findByTestAtrr(wrapper,'popupFilter').length).toBe(1);
+      //  Assert that the all filter contents are being diaplyed accrodingly
+      expect(findByTestAtrr(wrapper,'popupFilterContent').children().length).toBe(14)
     });
     it('SHould Filter the contents of the scrape',async ()=>{
-        findByTestAtrr(wrapper,'filter').simulate('click');
-        await Promise.resolve();
-        wrapper.update();
-
-        // Assert that pop filter is displayed
-        expect(findByTestAtrr(wrapper,'popupFilter').length).toBe(1);
-        wrapper.update();
-        
-        const filterButtons=findByTestAtrr(wrapper,'filterButton');
-        filterButtons.at(0).simulate('click');
-        wrapper.update();
-        // Assert that the items are filtered (only button is visible in the scrape items list)
-        expect(contextValues.setScrapeItems.mock.calls[0][0][1].hide).toBe(false);
+      findByTestAtrr(wrapper,'filter').simulate('click');
+      await Promise.resolve();
+      wrapper.update();
+      // Assert that pop filter is displayed
+      expect(findByTestAtrr(wrapper,'popupFilter').length).toBe(1);
+      wrapper.update();
+      const filterButtons=findByTestAtrr(wrapper,'filterButton');
+      filterButtons.at(0).simulate('click');
+      wrapper.update();
+      // Assert that the items are filtered (only button is visible in the scrape items list)
+      expect(contextValues.setScrapeItems.mock.calls[0][0][1].hide).toBe(false);
     })
 })

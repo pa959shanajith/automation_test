@@ -24,7 +24,6 @@ describe('<LaunchApplication/> Positive Scenarios (DESKTOP)',()=>{
         expect(findByTestAtrr(wrapper,'methodA').length).toBe(1)
         expect(findByTestAtrr(wrapper,'methodB').length).toBe(1)
         expect(findByTestAtrr(wrapper,'desktopLaunch').length).toBe(1)
-        // console.log(wrapper.debug())
     });
     it('Should Launch the desktop application',async ()=>{
         findByTestAtrr(wrapper,'windowName').simulate('change',{target:{value:'sampleWindow'}});
@@ -109,7 +108,6 @@ describe('<LaunchApplication/> Positive Scenarios (MobileApp)',()=>{
         wrapper.update();
         
         // Assert that the SAP scrape has been started
-        // console.log(props.appPop.startScrape.mock.calls)
         expect(props.appPop.startScrape).toHaveBeenCalledWith({
             'appPath': "/storage/emulated/0/Andriod",
             'sNum': "dummySerialNumber",

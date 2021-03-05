@@ -11,7 +11,7 @@ const props={
     setShow:jest.fn()
 }
 
-describe("<CompareObjectModal/>",()=>{
+describe("<CompareObjectModal/> Positve Scenarios",()=>{
     let winSpy;
     beforeEach(()=>{
         winSpy= jest.spyOn(window.navigator,'appVersion','get')
@@ -26,8 +26,6 @@ describe("<CompareObjectModal/>",()=>{
         expect(findByTestAtrr(wrapper,'compareObjectButtons').children().length).toBe(webWinLen);
         expect(findByTestAtrr(wrapper,'compareObjectButtons').find('button').length).toBe(5);
         expect(findByTestAtrr(wrapper,'compareObjectButtons').find('img').length).toBe(5);
-
-        
         wrapper=mount(<CompareObjectModal {...props} />);
         // Assert that if its MAC then should be 6 browser button in ModalContainer
         expect(findByTestAtrr(wrapper,'compareObjectButtons').children().length).toBe(webMacLen);
@@ -36,8 +34,7 @@ describe("<CompareObjectModal/>",()=>{
     });
     it('Should call startScrape with expected arguments (browser_name,"comapare"',()=>{
         let wrapper=mount(<CompareObjectModal {...props} />);
-        let objectButtons=findByTestAtrr(wrapper,'compareObjectButtons').find('button')
-        
+        let objectButtons=findByTestAtrr(wrapper,'compareObjectButtons').find('button')  
         // IE
         objectButtons.at(0).simulate('click')
         expect(props.startScrape).toHaveBeenNthCalledWith(1,'ie', 'compare')
@@ -58,10 +55,9 @@ describe("<CompareObjectModal/>",()=>{
         wrapper=mount(<CompareObjectModal {...props} />);
         objectButtons=findByTestAtrr(wrapper,'compareObjectButtons').find('button')
         objectButtons.at(2).simulate('click')
-        // console.log(objectButtons.debug())
         expect(props.startScrape).toHaveBeenNthCalledWith(6,'safari', 'compare')
     })
-    it('Should close',()=>{
+    it('Should close the modal',()=>{
         let wrapper=mount(<CompareObjectModal {...props} />);
         findByTestAtrr(wrapper,'cancelButton').simulate('click');
         expect(props.setShow).toHaveBeenCalledWith(false)

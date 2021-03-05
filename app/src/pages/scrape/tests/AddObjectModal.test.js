@@ -1,6 +1,6 @@
 import React from 'react';
 import {findByTestAtrr, checkProps} from '../../../setupTests';
-import { shallow,mount}from 'enzyme';
+import { shallow}from 'enzyme';
 import AddObjectModal from '../components/AddObjectModal';
 import ModalContainer from '../../global/components/ModalContainer'
 import ScrollBar from '../../global/components/ScrollBar';
@@ -123,8 +123,8 @@ describe('<AddObjectModel/> Positive Sceanrios',()=>{
         expect(findByTestAtrr(modalContainer,'addObjectInput').length).toBe(1);
         expect(findByTestAtrr(modalContainer,'addObjectTypeSelect').length).toBe(1);
         expect(findByTestAtrr(modalContainer,'addObjectButton').length).toBe(1);
-		expect(findByTestAtrr(modalContainer,'reset').length).toBe(1);
-        expect(findByTestAtrr(modalContainer,'submit').length).toBe(1);
+        expect(findByTestAtrr(modalContainer,'reset').length).toBe(1);
+        expect(findByTestAtrr(modalContainer,'submit').length).toBe(1)
     });
     
     it('Should clear the inputs when reset is clicked',()=>{
@@ -203,9 +203,7 @@ describe('<AddObjectModel/> Negative Sceanrios',()=>{
     });
     it('Should error when add object form is submitted when object type isn\'t selected',()=>{
       let modalContainer=wrapper.find(ModalContainer).dive();
-      findByTestAtrr(modalContainer,'addObjectInput').simulate('change',{target:{
-        value:'button'
-      }})
+      findByTestAtrr(modalContainer,'addObjectInput').simulate('change',{target:{value:'button'}})
       wrapper.update();
       modalContainer=wrapper.find(ModalContainer).dive();
       expect(findByTestAtrr(modalContainer,'addObjectTypeSelect').prop('className')).toBe('addObj_objType');
@@ -217,13 +215,8 @@ describe('<AddObjectModel/> Negative Sceanrios',()=>{
     it('Should throw popup with message Object Charcertistics are same',()=>{
       
       let modalContainer=wrapper.find(ModalContainer).dive();
-      findByTestAtrr(modalContainer,'addObjectInput').simulate('change',{target:{
-        value:'LocalTable'
-      }})
-      
-      findByTestAtrr(modalContainer,'addObjectTypeSelect').simulate('change',{target:{
-        value:'Table-tbl'
-      }})
+      findByTestAtrr(modalContainer,'addObjectInput').simulate('change',{target:{value:'LocalTable'}}) 
+      findByTestAtrr(modalContainer,'addObjectTypeSelect').simulate('change',{target:{value:'Table-tbl'}})
       wrapper.update()
       modalContainer=wrapper.find(ModalContainer).dive();
       let submitButton=findByTestAtrr(modalContainer,'submit')

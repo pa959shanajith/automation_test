@@ -52,25 +52,20 @@ describe('<EditIris/> Positive Sceanrios',()=>{
         jest.resetAllMocks();
     });
     it('Should render all the fields in the edit iris pop up field',()=>{
-        
-        // console.log(wrapper.debug())
+
         expect(findByTestAtrr(wrapper,'objTypeHeading').length).toBe(1);
         expect(findByTestAtrr(wrapper,'selectObjType').length).toBe(1);
         // Assert that the length of items in the select option is 13
         expect(findByTestAtrr(wrapper,'selectObjType').children().length).toBe(13);
-
         expect(findByTestAtrr(wrapper,'objStatusHeading').length).toBe(0);
         expect(findByTestAtrr(wrapper,'selectobjStatus').length).toBe(0);
-
-        expect(findByTestAtrr(wrapper,'objText').length).toBe(1);
-        expect(findByTestAtrr(wrapper,'objTextValue').length).toBe(1);
         expect(findByTestAtrr(wrapper,'objTag').length).toBe(1);
         expect(findByTestAtrr(wrapper,'objTagValue').length).toBe(1);
         // Assert that iris image is present
         expect(findByTestAtrr(wrapper,'irirsImage').length).toBe(1);
 
     });
-    it('Should submit',async ()=>{
+    it('Should submit edit iris form',async ()=>{
         findByTestAtrr(wrapper,'selectObjType').simulate('change',{target:{value:'button'}});
         wrapper.update();
         findByTestAtrr(wrapper,'submit').simulate('click');
@@ -82,7 +77,7 @@ describe('<EditIris/> Positive Sceanrios',()=>{
     });
 });
 
-describe('<EditIrisObject/>',()=>{
+describe('<EditIrisObject/> Positive Sceanrios',()=>{
     let wrapper;
     beforeEach(()=>{
         jest.spyOn(api,'updateIrisDataset').mockResolvedValueOnce(' ')
