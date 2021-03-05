@@ -911,37 +911,10 @@ const FD={
     "5fdde98cd2ce8ecfe9689649": "c1"
   }
 }
-const store = {
-  plugin:{CT:CT,tasksJson:tasksJson,FD:FD},
-  login:{userinfo:userinfo,notify:{data:[],unread:0}},
-  scrape:{
-      ScrapeData : [],
-      disableAction: false,
-      disableAppend: false,
-      compareFlag: false,
-      compareData: {},
-      compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
-      objValue: null,
-      cert: {},
-      WsData: {
-          endPointURL: "",
-          method: "0",
-          opInput: "",
-          reqHeader: "",
-          reqBody: "",
-          respHeader: "",
-          respBody: "",
-          paramHeader: "",
-      },
-      wsdlError: [],
-      actionError: []
-  }
-}
 module.exports={
       CT:CT,
       userinfo:userinfo,
       data:data,
       tasksJson:tasksJson,
-      FD:FD,
-      store:store
+      FD:FD
 }
