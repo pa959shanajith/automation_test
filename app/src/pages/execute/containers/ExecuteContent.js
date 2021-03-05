@@ -7,7 +7,7 @@ import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 
 
-const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, setExecutionActive, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
+const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
     const history = useHistory();
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
@@ -44,12 +44,6 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     const updateTestSuite = async () => {
         setLoading("Saving in progress. Please Wait...");
 		const batchInfo = [];
-		const suiteidsexecution = [];
-		// $(".parentSuiteChk:checked").each(function (i, e) {
-		// 	suiteidsexecution.push(e.getAttribute('id').split('_')[1]);
-		// });
-		// window.localStorage.setItem("executionidxreport", JSON.stringify({"idxlist": suiteidsexecution}));
-		
         for(var i =0 ; i < eachData.length ; i++) { 
 			const suiteDetails = {};
 			const scenarioDescriptionText = [];
@@ -89,22 +83,22 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
 		var version = current_task.versionnumber;
 		var batchTaskIDs = current_task.batchTaskIDs;
 		var projectId = current_task.projectId;
-		if (action != undefined && action == 'reassign') {
+		if (action !== undefined && action === 'reassign') {
 			taskstatus = action;
 		}
 
 		const result = await reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs);
         if(result.error){displayError(result.error);return;}
-        if (result == 'fail') {
+        if (result === 'fail') {
             setPopupState({show:true,title:"Task Submission Error",content:"Reviewer is not assigned !"});
-        }else if(result =='NotApproved'){
+        }else if(result ==='NotApproved'){
             setPopupState({show:true,title:"Task Submission Error",content:"All the dependent tasks (design, scrape) needs to be approved before Submission"});
         } 
-        else if (taskstatus == 'reassign') {
+        else if (taskstatus === 'reassign') {
             setPopupState({show:true,title:"Task Reassignment Success",content:"Task Reassigned successfully!"});
             window.localStorage['navigateScreen'] = "plugin";
             history.replace('/plugin');
-        } else if (taskstatus == 'underReview') {
+        } else if (taskstatus === 'underReview') {
             setPopupState({show:true,title:"Task Completion Success",content:"Task Approved successfully!"});
             window.localStorage['navigateScreen'] = "plugin";
             history.replace('/plugin');
@@ -132,19 +126,17 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
         executionData["browserType"]=browserTypeExe;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
-        setExecutionActive(true);
         ResetSession.start();
         try{
             setLoading(false);
             const data = await ExecuteTestSuite_ICE(executionData);
             if (data.errorapi){displayError(data.errorapi);return;}
-            if (data == "begin"){
+            if (data === "begin"){
                 return false;
             }
             ResetSession.end();
-            setExecutionActive(false);
             if(data.status) {
-                if(data.status == "fail") {
+                if(data.status === "fail") {
                     setPopupState({show:true,title:"Queue Test Suite",content:data["error"]});
                 } else {
                     setPopupState({show:true,title:"Queue Test Suite",content:data["message"]});
@@ -159,7 +151,6 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
             setLoading(false);
             ResetSession.end();
             setPopupState({show:true,title:"Execute Failed",content:"Failed to execute."});
-            setExecutionActive(false);
             setBrowserTypeExe([]);
             setModuleInfo([]);
             setExecAction("serial");
@@ -172,13 +163,13 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
         setIntegration({alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
         zephyr: {accountid:"",accesskey:"",secretkey:""}})
-        if (value == "1") {
+        if (value === "1") {
             setShowIntegrationModal("ALM")
 		}
-		else if (value == "0") {
+		else if (value === "0") {
             setShowIntegrationModal("qTest")
 		}
-        else if (value == "2") {
+        else if (value === "2") {
             setShowIntegrationModal("Zephyr")
 		}
     }
@@ -223,7 +214,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                     <button className="e__btn-md executeBtn" onClick={()=>{ExecuteTestSuitePopup()}} title="Execute">Execute</button>
                 </div>
 
-                <ExecuteTable current_task={current_task} selectAllBatch={selectAllBatch} setLoading={setLoading} setPopupState={setPopupState} selectAllBatch={selectAllBatch} filter_data={projectdata} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} eachDataFirst={eachDataFirst} setEachDataFirst={setEachDataFirst} />
+                <ExecuteTable current_task={current_task} setLoading={setLoading} setPopupState={setPopupState} selectAllBatch={selectAllBatch} filter_data={projectdata} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} eachDataFirst={eachDataFirst} setEachDataFirst={setEachDataFirst} />
                 </div>
                         
             {showDeleteModal?<ModalContainer title={modalDetails.title} footer={submitModalButtons(setshowDeleteModal, submit_task)} close={closeModal} content={"Are you sure you want to "+ modalDetails.task+" the task ?"} modalClass=" modal-sm" />:null} 
@@ -245,12 +236,13 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
 
 const checkSelectedModules = (data, setPopupState) => {
     let pass = false;
+    // eslint-disable-next-line
     data.map((rowData,m)=>{
         const indeterminate = document.getElementById('parentExecute_"' + m).indeterminate;
         const checked = document.getElementById('parentExecute_"' + m).checked;
         if(indeterminate || checked){
             pass = true;
-            return
+            return null
         } 
     })
     if (pass===false) setPopupState({show:true,title:"Execute Test Suite",content:"Please select atleast one scenario(s) to execute"});
@@ -258,16 +250,16 @@ const checkSelectedModules = (data, setPopupState) => {
 } 
 
 const SelectBrowserCheck = (appType,browserTypeExe,setPopupState,execAction)=>{
-    if ((appType == "Web") && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
-    else if (appType == "Webservice" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Web Services option"});
-    else if (appType == "MobileApp" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Mobile Apps option"});
-    else if (appType == "Desktop" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Desktop Apps option"});
-    else if (appType == "Mainframe" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Mainframe option"});
-    else if (appType == "OEBS" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select OEBS Apps option"});
-    else if (appType == "SAP" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select SAP Apps option"});
-    else if (appType == "MobileWeb" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content: "Please select Mobile Web option"});
+    if ((appType === "Web") && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
+    else if (appType === "Webservice" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Web Services option"});
+    else if (appType === "MobileApp" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Mobile Apps option"});
+    else if (appType === "Desktop" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Desktop Apps option"});
+    else if (appType === "Mainframe" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Mainframe option"});
+    else if (appType === "OEBS" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select OEBS Apps option"});
+    else if (appType === "SAP" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select SAP Apps option"});
+    else if (appType === "MobileWeb" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content: "Please select Mobile Web option"});
     else if (browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select " + appType + " option"});
-    else if ((appType == "Web") && browserTypeExe.length == 1 && execAction == "parallel") setPopupState({show:true,title:"Execute Test Suite",content:"Please select multiple browsers"});
+    else if ((appType === "Web") && browserTypeExe.length === 1 && execAction === "parallel") setPopupState({show:true,title:"Execute Test Suite",content:"Please select multiple browsers"});
     else return true;
     return false;
 }

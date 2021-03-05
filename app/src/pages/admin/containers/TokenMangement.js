@@ -35,6 +35,7 @@ const TokenManagement = (props) => {
 		setOp("normal");
 		setdateVal("");
 		setTimeVal("");
+		// eslint-disable-next-line
     },[props.resetMiddleScreen["tokenTab"],props.MiddleScreen])
 
 	const displayError = (error) =>{
@@ -74,28 +75,29 @@ const TokenManagement = (props) => {
 			td.setHours(today.getHours()+parseInt(tokendetails));
 			var dt = td.getDate();
 			var mon = td.getMonth()+1;
-			if(td.getDate().toString().length == 1) dt = "0"+dt;
-			if((td.getMonth()+1).toString().length == 1) mon = "0"+mon;
+			if(td.getDate().toString().length === 1) dt = "0"+dt;
+			if((td.getMonth()+1).toString().length === 1) mon = "0"+mon;
 			expdate = dt+"-"+(mon)+"-"+td.getFullYear()
 			setdateVal(expdate);
 		}
 		if (exptime === "") {
 			var sldate = timeVal;
 			var sldate_2 = sldate.split("-");
+			var hr, min;
 			if(parseInt(sldate_2[0])===today.getDate() && (parseInt(sldate_2[1]))===today.getMonth()+1 && parseInt(sldate_2[2])===today.getFullYear()){
 				td.setHours(today.getHours()+8);
-				var hr = td.getHours();
-                var min = td.getMinutes;
-                if( td.getHours().toString().length == 1) hr = "0"+hr;
-                if(td.getMinutes.toString().length == 1) min = "0"+min;
+				hr = td.getHours();
+                min = td.getMinutes;
+                if( td.getHours().toString().length === 1) hr = "0"+hr;
+                if(td.getMinutes.toString().length === 1) min = "0"+min;
 				exptime=""+hr+":"+min;
                 setTimeVal(exptime);
 			}
 			else{
-				var hr = today.getHours();
-                var min = today.getMinutes();
-                if( today.getHours().toString().length == 1) hr = "0"+hr;
-                if(today.getMinutes().toString().length == 1) min = "0"+min;
+				hr = today.getHours();
+                min = today.getMinutes();
+                if( today.getHours().toString().length === 1) hr = "0"+hr;
+                if(today.getMinutes().toString().length === 1) min = "0"+min;
 				exptime=""+hr+":"+min
 				setTimeVal(exptime);
 			}	

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { PopupMsg, ModalContainer, ScreenOverlay } from '..' 
 import DropDownList from './DropDownList'
@@ -19,12 +19,12 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
     const [poolList,setPoolList] = useState({})
     const [iceStatus,setIceStatus] = useState([])
     const [availableICE,setAvailableICE] = useState([])
-    const [showModal,setShowModal] = useState(false)
     const [chooseICEPoolOptions,setChooseICEPoolOptions] = useState([])
     const [selectedPool,setSelectedPool] = useState("")
 
     useEffect(()=>{
         fetchData();
+        // eslint-disable-next-line
     }, []);
 
     const fetchData = async () => {
@@ -43,7 +43,6 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
         if(data1.error){displayError(data1.error);return;}
         setIceStatus(data1)
         populateICElist(arr,true,data1)
-        setShowModal(true);
         setLoading(false);
     }
 
@@ -94,14 +93,15 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
     
     const onChangeChooseICEPool = (value) =>{
 		var unallocated = false
-		var id = value
+        var id = value
+        var arr;
 		if(id==='all'){
-			var arr = Object.entries(poolList)
+			arr = Object.entries(poolList)
 		}else if(id==='unallocated'){
             unallocated =  true;
             setSelectedPool("");
 		}else{
-            var arr = Object.entries({[id]:poolList[id]})
+            arr = Object.entries({[id]:poolList[id]})
             setSelectedPool(id);
 		}
         populateICElist(arr,unallocated)
@@ -140,7 +140,7 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
 const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode, selectedICE, setSelectedICE, ExeScreen, scheSmartMode) => {
 
     const setSelectedICEState = (value) => {
-        if(value='normal' ) setSelectedICE("");
+        if(value==='normal' ) setSelectedICE("");
         else setSelectedICE({});
     }
 

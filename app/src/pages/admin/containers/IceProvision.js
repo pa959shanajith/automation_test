@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {ScrollBar} from '../../global' 
 import '../styles/IceProvision.scss'
 import IceProvisionForm from '../components/IceProvisionForm';
@@ -24,6 +24,7 @@ const IceProvision = (props) => {
 
     useEffect(()=>{
       setOp('normal');
+      // eslint-disable-next-line
     },[props.resetMiddleScreen["provisionTa"],props.MiddleScreen])
 
     const refreshIceProvision = () =>{

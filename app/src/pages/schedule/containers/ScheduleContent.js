@@ -19,7 +19,6 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const current_task = useSelector(state=>state.plugin.CT)
     const [scheduleTableData,setScheduleTableData] = useState([])
-    const [moduleInfo,setModuleInfo] = useState([])
     const [integration,setIntegration] = useState({alm: {url:"",username:"",password:""}, 
                                                     qtest: {url:"",username:"",password:"",qteststeps:""}, 
                                                     zephyr: {accountid:"",accesskey:"",secretkey:""}});
@@ -46,7 +45,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
         try{
             setLoading("Loading...");
             const result = await getScheduledDetails_ICE();
-            if (result && result.length > 0 && result != "fail") {
+            if (result && result.length > 0 && result !== "fail") {
                 for (var k = 0; k < result.length; k++) {
                     if (result[k].scenariodetails[0].scenarioids !== undefined) result[k].scenariodetails = [result[k].scenariodetails];
                     result[k].browserlist = result[k].executeon;
@@ -78,7 +77,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                 
                 // $scope.scheduledData = result;
                 // $timeout(function () {
-                //     sortFlag == true ? $(".scheduleDataHeader span:first-child").trigger("click") :
+                //     sortFlag === true ? $(".scheduleDataHeader span:first-child").trigger("click") :
                 //         changeBackground();
                 //     $("#scheduledSuitesFilterData").prop('selectedIndex', 0);
                 //     triggeredSeconds = Math.round(new Date() / 1000);
@@ -152,19 +151,19 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
         const data = await testSuitesScheduler_ICE(executionData);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if (data == "NotApproved") setPopupState({show:true,title:"Schedule Test Suite",content: "All the dependent tasks (design, scrape) needs to be approved before execution"});
-        else if (data == "NoTask") setPopupState({show:true,title:"Schedule Test Suite",content: "Task does not exist for child node"});
-        else if (data == "Modified") setPopupState({show:true,title:"Schedule Test Suite",content: "Task has been modified, Please approve the task"});
-        else if (data.status == "booked") setPopupState({show:true,title:"Schedule Test Suite",content: "Schedule time is matching for testsuites scheduled for " + data.user});
-        else if (data == "success" || data.includes("success")) {
+        if (data === "NotApproved") setPopupState({show:true,title:"Schedule Test Suite",content: "All the dependent tasks (design, scrape) needs to be approved before execution"});
+        else if (data === "NoTask") setPopupState({show:true,title:"Schedule Test Suite",content: "Task does not exist for child node"});
+        else if (data === "Modified") setPopupState({show:true,title:"Schedule Test Suite",content: "Task has been modified, Please approve the task"});
+        else if (data.status === "booked") setPopupState({show:true,title:"Schedule Test Suite",content: "Schedule time is matching for testsuites scheduled for " + data.user});
+        else if (data === "success" || data.includes("success")) {
             if (data.includes("Set"))  setPopupState({show:true,title:"Schedule Test Suite",content: data.replace('success', '')}); 
             else setPopupState({show:true,title:"Schedule Test Suite",content:"Successfully scheduled."});
             updateDateTimeValues(scheduleTableData, setModuleSceduledate);
             getScheduledDetails();
-        } else if (data == "few") {
+        } else if (data === "few") {
             setPopupState({show:true,title:"Schedule Test Suite",content:"Failed to schedule few testsuites"});
             updateDateTimeValues(scheduleTableData, setModuleSceduledate);
-        } else if (data == "fail") {
+        } else if (data === "fail") {
             setPopupState({show:true,title:"Schedule Test Suite",content:"Failed to schedule few testsuites"});
         } else {
             setPopupState({show:true,title:"Schedule Test Suite",content:"Error in scheduling Testsuite. Scheduling failed"});
@@ -180,13 +179,13 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
         setIntegration({alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
         zephyr: {accountid:"",accesskey:"",secretkey:""}})
-        if (value == "1") {
+        if (value === "1") {
             setShowIntegrationModal("ALM")
 		}
-		else if (value == "0") {
+		else if (value === "0") {
             setShowIntegrationModal("qTest")
 		}
-        else if (value == "2") {
+        else if (value === "2") {
             setShowIntegrationModal("Zephyr")
 		}
     }
@@ -302,7 +301,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                                                         {pageOfItems.map((data,index)=>(
                                                             <div key={index} className="scheduleDataBodyRowChild">
                                                                 <div className="s__Table_date s__Table_date-time ">{data.scheduledatetime}</div>
-                                                                <div className="s__Table_host" >{data.target == nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                                <div className="s__Table_host" >{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
                                                                 <div className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                                 <div className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
                                                                 <div className="s__Table_appType">
@@ -336,6 +335,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
 const updateDateTimeValues = (scheduleTableData, setModuleSceduledate) => {
     //setting module date and time props
     let moduleSceduledateTime = {};
+    // eslint-disable-next-line
     scheduleTableData.map((rowData)=>{
         if(moduleSceduledateTime[rowData.testsuiteid] === undefined) {
             moduleSceduledateTime[rowData.testsuiteid] = {
@@ -371,53 +371,54 @@ const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,sta
         setPopupState({show:true,title:"Scheduled Test Suite",content:"Job is " + status + "."});
         // target.innerText = status;
         getScheduledDetails();
-    } else if (data == "inprogress") setPopupState({show:true,title:"Scheduled Test Suite",content:"Job is in progress.. cannot be cancelled."});
-    else if (data == "not authorised") setPopupState({show:true,title:"Scheduled Test Suite",content:"You are not authorized to cancel this job."});
+    } else if (data === "inprogress") setPopupState({show:true,title:"Scheduled Test Suite",content:"Job is in progress.. cannot be cancelled."});
+    else if (data === "not authorised") setPopupState({show:true,title:"Scheduled Test Suite",content:"You are not authorized to cancel this job."});
     else setPopupState({show:true,title:"Scheduled Test Suite",content:"Failed to cancel Job"});
 }
 
 const SelectBrowserCheck = (appType,browserTypeExe,setPopupState,execAction)=>{
-    if ((appType == "Web") && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select a browser"});
-    else if (appType == "Webservice" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Web Services option"});
-    else if (appType == "MobileApp" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Mobile Apps option"});
-    else if (appType == "Desktop" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Desktop Apps option"});
-    else if (appType == "Mainframe" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Mainframe option"});
-    else if (appType == "OEBS" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select OEBS Apps option"});
-    else if (appType == "SAP" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select SAP Apps option"});
-    else if (appType == "MobileWeb" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content: "Please select Mobile Web option"});
+    if ((appType === "Web") && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select a browser"});
+    else if (appType === "Webservice" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Web Services option"});
+    else if (appType === "MobileApp" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Mobile Apps option"});
+    else if (appType === "Desktop" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Desktop Apps option"});
+    else if (appType === "Mainframe" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Mainframe option"});
+    else if (appType === "OEBS" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select OEBS Apps option"});
+    else if (appType === "SAP" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select SAP Apps option"});
+    else if (appType === "MobileWeb" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content: "Please select Mobile Web option"});
     else if (browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select " + appType + " option"});
-    else if ((appType == "Web") && browserTypeExe.length == 1 && execAction == "parallel") setPopupState({show:true,title:"Schedule Test Suite",content:"Please select multiple browsers"});
+    else if ((appType === "Web") && browserTypeExe.length === 1 && execAction === "parallel") setPopupState({show:true,title:"Schedule Test Suite",content:"Please select multiple browsers"});
     else return true;
     return false;
 }
 
 const browImg = (brow, appType) => {
-    if (appType == "Web") {
-        if (parseInt(brow) == 1) return '/imgs/ic-ch-schedule.png';
-        else if (parseInt(brow) == 2) return '/imgs/ic-ff-schedule.png';
-        else if (parseInt(brow) == 3) return '/imgs/ic-ie-schedule.png';
-        else if (parseInt(brow) == 7) return '/imgs/ic-legacy-schedule.png';
-        else if (parseInt(brow) == 8) return '/imgs/ic-chromium-schedule.png';
+    if (appType === "Web") {
+        if (parseInt(brow) === 1) return '/imgs/ic-ch-schedule.png';
+        else if (parseInt(brow) === 2) return '/imgs/ic-ff-schedule.png';
+        else if (parseInt(brow) === 3) return '/imgs/ic-ie-schedule.png';
+        else if (parseInt(brow) === 7) return '/imgs/ic-legacy-schedule.png';
+        else if (parseInt(brow) === 8) return '/imgs/ic-chromium-schedule.png';
     }
-    else if (appType == "Webservice") return '/imgs/webservice.png';
-    else if (appType == "MobileApp") return '/imgs/mobileApps.png';
-    else if (appType == "System") return '/imgs/desktop.png';
-    else if (appType == "Desktop") return '/imgs/desktop.png';
-    else if (appType == "SAP") return '/imgs/sapApps.png';
-    else if (appType == "Mainframe") return '/imgs/mainframe.png';
-    else if (appType == "OEBS") return '/imgs/oracleApps.png';
-    else if (appType == "MobileWeb") return '/imgs/MobileWeb.png';
+    else if (appType === "Webservice") return '/imgs/webservice.png';
+    else if (appType === "MobileApp") return '/imgs/mobileApps.png';
+    else if (appType === "System") return '/imgs/desktop.png';
+    else if (appType === "Desktop") return '/imgs/desktop.png';
+    else if (appType === "SAP") return '/imgs/sapApps.png';
+    else if (appType === "Mainframe") return '/imgs/mainframe.png';
+    else if (appType === "OEBS") return '/imgs/oracleApps.png';
+    else if (appType === "MobileWeb") return '/imgs/MobileWeb.png';
 }
 
 const checkSelectedModules = (scheduleTableData, setPopupState) => {
     let pass = false;
+    // eslint-disable-next-line
     scheduleTableData.map((rowData,m)=>{
         const indeterminate = document.getElementById('selectScheduleSuite_' + m).indeterminate;
         const checked = document.getElementById('selectScheduleSuite_' + m).checked;
         if(indeterminate || checked){
             pass = true;
-            return
-        } 
+            return null
+        } else {}
     })
     if (pass===false) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select atleast one scenario(s) to execute"});
     return pass
@@ -464,6 +465,7 @@ const checkDateTimeValues = (eachData, moduleSceduledate, setModuleSceduledate, 
 
 const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, current_task, appType, projectdata ) => {
     let moduleInfo = [];
+    var j;
     for(var i =0 ;i<eachData.length;i++){
         var testsuiteDetails = current_task.testSuiteDetails[i];
         var suiteInfo = {};
@@ -472,7 +474,7 @@ const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, cur
         var cycid = testsuiteDetails.cycleid;
         var projectid = testsuiteDetails.projectidts;
         
-        for(var j =0 ; j<eachData[i].executestatus.length; j++){
+        for(j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
                 selectedRowData.push({
                     condition: eachData[i].condition[j],
@@ -504,7 +506,7 @@ const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, cur
         var iceList = [];
         if(schedulePoolDetails.type !== "normal") iceList = schedulePoolDetails.targetUser;
         suiteInfo.iceList = iceList;
-        for(var j =0 ; j<eachData[i].executestatus.length; j++){
+        for(j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
                 suiteInfo.date = moduleSceduledate[eachData[i].testsuiteid]["date"];
                 suiteInfo.time = moduleSceduledate[eachData[i].testsuiteid]["time"];

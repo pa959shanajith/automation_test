@@ -48,7 +48,7 @@ const  AllocateByIce = ({displayError,setLoading,selectedPool,setSelectedPool,sa
                     }
                 })
                 Object.keys(poolDict[selectedPool].ice_list).forEach((e)=>{
-                    if(ice_List.indexOf(e)==-1){
+                    if(ice_List.indexOf(e)===-1){
                         pool.ice_deleted.push(e)
                     }
                 })
@@ -59,10 +59,12 @@ const  AllocateByIce = ({displayError,setLoading,selectedPool,setSelectedPool,sa
             })()
         }
         setSaveAction(false)
+        // eslint-disable-next-line
     },[saveAction])
     //when component mounts
     useEffect(()=>{
         reset()
+        // eslint-disable-next-line
     },[])
     const reset = async() => {
         setLoading('...Loading')
@@ -81,13 +83,13 @@ const  AllocateByIce = ({displayError,setLoading,selectedPool,setSelectedPool,sa
             poolid:"all",
             projectids:[]
         }
-        var data = await getPools(arg)
-        if(data.error){displayError(data.error);return;}
-        var e = Object.entries(data)
+        var dataPools = await getPools(arg)
+        if(dataPools.error){displayError(dataPools.error);return;}
+        var e = Object.entries(dataPools)
         e.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
         setIceData(arr)
         setInitAssign(arr)
-        setPoolDict(data)
+        setPoolDict(dataPools)
         setPoolList(e)
         setLoading(false)
     }
