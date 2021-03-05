@@ -20,11 +20,6 @@ const reducer = (state = initialState , action) => {
                 suiteDetails:action.payload.suiteDetails,
                 suiteSelected:action.payload.suiteID
             }
-        case actionTypes.UPDATE_SUITEDETAILS:
-            return{
-                ...state,
-                suiteDetails:action.payload
-            }
         default: 
             return state
     }

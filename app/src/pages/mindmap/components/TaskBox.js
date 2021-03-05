@@ -8,8 +8,6 @@ import { useSelector } from 'react-redux';
 import {ModalContainer} from '../../global';
 import Complexity, {getComplexityLevel} from './Complexity';
 import CalendarComp from './CalendarComp';
-import Datetime from "react-datetime";
-import moment from "moment";
 
 var unassignTask = []
 var reassignFlag = false
@@ -108,10 +106,11 @@ const TaskBox = (props) => {
             tObj.t = taskAssign[t].task[0];
         }
         if (tObj.det === null || tObj.det.trim() == "") {
+            var type;
             if(dNodes[pi].type === 'endtoend') {
                 type = ' End to End'
             }else{
-                var type = dNodes[pi].type.slice(0,-1) //remove plural
+                type = dNodes[pi].type.slice(0,-1) //remove plural
                 // to avoid phrasing "Execute scenario scenarios"
                 type = (type)?" "+type.charAt(0).toUpperCase()+type.slice(1):""
                 if(tObj.t == 'Execute Scenario')type = ""
@@ -150,8 +149,8 @@ const TaskBox = (props) => {
                     return;
                 case 'ed':
                     if (tObj.ed != '' && tObj.ed.indexOf('/')==-1) {
-                        var d=new Date(tObj.ed);
-                        tObj.ed=d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
+                        var d1=new Date(tObj.ed);
+                        tObj.ed=d1.getDate()+"/"+(d1.getMonth()+1)+"/"+d1.getFullYear();
                     }
                     setEndDate({show:true,value:tObj.ed})
                     return;

@@ -64,6 +64,7 @@ const TableRow = (props) => {
 
     useEffect(()=>{
         setChecked(props.checkedRows.includes(props.idx));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.checkedRows]);
 
     useEffect(()=>{
@@ -111,6 +112,7 @@ const TableRow = (props) => {
                 }
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.focusedRow, props.edit]);
 
     useEffect(()=>{
@@ -121,6 +123,7 @@ const TableRow = (props) => {
         if (props.focusedRow !== null && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) {
             rowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     });
 
     const onBoxCheck = event => {

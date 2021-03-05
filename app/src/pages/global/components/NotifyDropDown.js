@@ -15,6 +15,7 @@ const NotifyDropDown = ({show}) =>{
         if(show){
             dispatch({type: actionTypes.UPDATE_NOTIFY_COUNT, payload: 0});
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[show])
     const clearAll = (e) => {
         e.preventDefault();
