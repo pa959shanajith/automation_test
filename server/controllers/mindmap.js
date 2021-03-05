@@ -630,7 +630,7 @@ exports.excelToMindmap = function (req, res) {
 			var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
 			for (var i = 1; i < cSheetRow.length; i++) {
 				var row = cSheetRow[i].split(',');
-				if (i==1 && (row[0]=="" || row[1]=="" || row[2]=="" || row[3]!="")) {
+				if (i==1 && (row[0]=="" || row[1]=="" || row[2]=="" || row[3]=="")) {
 					return res.status(200).send('valueError');
 				}
 				if (row.length < 3) continue;
