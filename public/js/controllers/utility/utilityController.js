@@ -31,13 +31,14 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
             $("#executionMetrics i").addClass("select-utility");
             setTimeout(()=>{
                 $('.fc-datePicker').val('');
+                $('#LOB').val('');
+                $('#statusID').val('');
+                $('#executionID').val('');
                 $(".fc-datePicker").datepicker({
                     autoclose: "true",
                     format: "dd-mm-yyyy",
                     todayHighlight: true,
-                    // maxDate: new Date(),
                     endDate: "today"
-                    // startDate: new Date()
                 })
             },0)
             // blockUI("Fetching users...");
@@ -124,6 +125,15 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
         };
         //$(TableData).appendTo("#modal-body-pairwise tbody");		
     }
+
+    $scope.resetExecMetrics = () => {
+        $('.fc-datePicker').val('');
+        $('#LOB').val('');
+        $('#statusID').val('');
+        $('#executionID').val('');
+        $('.inputErrorBorderFull').removeClass('inputErrorBorderFull');
+    }
+
 
     $scope.fetchExecMetrics = () => {
         var err = false;
