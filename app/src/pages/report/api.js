@@ -120,10 +120,10 @@ export const reportStatusScenarios_ICE = async(data) => {
 //[{"executedtime":"07-01-2020 10:37:11","browser":"chrome","status":"Fail","reportid":"5e1411ff9b0f1c95c23b2402","testscenarioid":"5de4e572d9cdd57f40624a35","testscenarioname":"Scenario_Generic1"},{"executedtime":"07-01-2020 10:38:40","browser":"chrome","status":"Fail","reportid":"5e1412589b0f1c95c23b2403","testscenarioid":"5de4e572d9cdd57f40624a36","testscenarioname":"Scenario_Generic2"}]
 export const viewReport = async(reportId, reportType) => {
     try{
-        var targetURL = '/viewreport/'+reportId+'/'+reportType+((reportType=='pdf')?'?images=true':'');
+        var targetURL = '/viewreport/'+reportId+'/'+reportType+((reportType==='pdf')?'?images=true':'');
         const res = await axios(url+targetURL, {
             method: 'GET',
-            responseType:(reportType == 'pdf')? 'arraybuffer':'application/json',
+            responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
             credentials: 'include'
         });
         if(res.status === 401){

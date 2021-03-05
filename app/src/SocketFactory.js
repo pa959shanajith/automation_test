@@ -25,7 +25,7 @@ const SocketFactory = () => {
     useEffect(()=>{
       if(socket){
         socket.on('notify',(value)=> {
-          if (value.count == 0 && 'notifyMsg' in value) {
+          if (value.count === 0 && 'notifyMsg' in value) {
             dispatch({type: actionTypes.UPDATE_NOTIFY, payload: value});
           }
         });
@@ -33,11 +33,13 @@ const SocketFactory = () => {
             executionDATA(result)
         });
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     },[socket])
     useEffect(()=>{
         var userName = Buffer.from((userInfo && userInfo.username)?userInfo.username:uuid()).toString('base64')
         var socket = socketIOClient(EndPoint, { forceNew: true, reconnect: true, query: {check: 'notify', key: userName}});
         dispatch({type:actionTypes.SET_SOCKET,payload:socket})
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[userInfo])
 
     const PostExecution = () =>{
@@ -73,19 +75,19 @@ const SocketFactory = () => {
         msg = testSuiteIds[0]["testsuitename"]
         setReportData(result)
         
-        if (data == "Terminate") {
+        if (data === "Terminate") {
             setShowAfterExecution({show:true, title:msg,content: "Execution terminated - By Program." })
         } 
-        else if (data == "UserTerminate") {
+        else if (data === "UserTerminate") {
             setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By User." })
         } 
-        else if (data == "unavailableLocalServer") {
+        else if (data === "unavailableLocalServer") {
             setPopupState({'title': 'Execute Test Suite', 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
         } 
-        else if (data == "success") {
+        else if (data === "success") {
             setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
            
-        } else if(data == "Completed"){
+        } else if(data === "Completed"){
             setPopupState({'title': 'Scheduled Execution Complete', 'content':msg});
         }
         else setPopupState({'title': "Execute Test Suite", 'content':"Failed to execute."});

@@ -21,10 +21,12 @@ const ExecutionPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails
         }else{
             setSuiteDetails([])
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[suDetails])
     useEffect(()=>{
         setSelectedDetails({_id:undefined,name:''})
         setScDetails([])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[suiteSelected._id,suDetails])
     const onClickRow = async(e) =>{
         const val = e.currentTarget.getAttribute('value')
@@ -98,22 +100,23 @@ const dateASC = (dateArray)=> {
         var gDate = fDate[2] + "-" + fDate[1] + "-" + fDate[0];
         var mDate = lDate[2] + "-" + lDate[1] + "-" + lDate[0];
         if (new Date(gDate + " " + timeA) >= new Date(mDate + " " + timeB)) return 1;
-        if (new Date(gDate + " " + timeA) <= new Date(mDate + " " + timeB)) return -1;
+        return -1;
     })
     var a = [...dateArray]
-    a.map((e,i)=>{
+    a.forEach((e,i)=>{
+        var eD , eT;
         var startDat = (e.start_time.split(' ')[0]).split("-")
         var startTym = (e.start_time.split(' ')[1]).split(":")
         var sD = ("0" + startDat[0]).slice(-2) + "-" + ("0" + startDat[1]).slice(-2) + "-" + startDat[2];
         var sT = ("0" + startTym[0]).slice(-2) + ":" + ("0" + startTym[1]).slice(-2);
-        if (e.end_time == '-') {
-            var eD = '-';
-            var eT = '';
+        if (e.end_time === '-') {
+            eD = '-';
+            eT = '';
         } else {
             var endDat = (e.end_time.split(' ')[0]).split("-")
             var endTym = (e.end_time.split(' ')[1]).split(":")
-            var eD = ("0" + endDat[0]).slice(-2) + "-" + ("0" + endDat[1]).slice(-2) + "-" + endDat[2];
-            var eT = ("0" + endTym[0]).slice(-2) + ":" + ("0" + endTym[1]).slice(-2);
+            eD = ("0" + endDat[0]).slice(-2) + "-" + ("0" + endDat[1]).slice(-2) + "-" + endDat[2];
+            eT = ("0" + endTym[0]).slice(-2) + ":" + ("0" + endTym[1]).slice(-2);
         }
         dateArray[i].start_time =  sD + " " + sT 
         dateArray[i].end_time =  eD + " " + eT 
