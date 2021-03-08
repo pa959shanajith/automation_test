@@ -1,7 +1,6 @@
 /* Pagination Component 
 -------------------------------------------------*/
-import React, {useState, useEffect } from 'react';
-import propTypes from 'prop-types';
+import React  from 'react';
 import "../styles/Pagination.scss";
 
 // const propTypes = {
@@ -116,21 +115,21 @@ class Pagination extends React.Component {
         return (
             <ul className="pagination">
                 <li className={pager.currentPage === 1 ? 'disabled pagination-disabled' : ''}>
-                    <a onClick={() => this.setPage(1)}>First</a>
+                    <p onClick={() => this.setPage(1)}>First</p>
                 </li>
                 <li className={pager.currentPage === 1 ? 'disabled pagination-disabled' : ''}>
-                    <a onClick={() => this.setPage(pager.currentPage - 1)}>Previous</a>
+                    <p onClick={() => this.setPage(pager.currentPage - 1)}>Previous</p>
                 </li>
                 {pager.pages.map((page, index) =>
                     <li key={index} className={pager.currentPage === page ? 'active' : ''}>
-                        <a onClick={() => this.setPage(page)}>{page}</a>
+                        <p onClick={() => this.setPage(page)}>{page}</p>
                     </li>
                 )}
                 <li className={pager.currentPage === pager.totalPages ? 'disabled pagination-disabled' : ''}>
-                    <a onClick={() => this.setPage(pager.currentPage + 1)}>Next</a>
+                    <p onClick={() => this.setPage(pager.currentPage + 1)}>Next</p>
                 </li>
                 <li className={pager.currentPage === pager.totalPages ? 'disabled pagination-disabled' : ''}>
-                    <a onClick={() => this.setPage(pager.totalPages)}>Last</a>
+                    <p onClick={() => this.setPage(pager.totalPages)}>Last</p>
                 </li>
             </ul>
         );

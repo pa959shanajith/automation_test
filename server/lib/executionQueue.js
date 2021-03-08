@@ -367,7 +367,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                     logger.debug("Removing Test Suite from queue");
                     cache.set("execution_queue", this.queue_list);
                 } catch (e) {
-                    logger.error("Error in triggerExecution. Error: %s", e);
+                    logger.error("Error in triggerExecution.");
+                    logger.debug("Error in triggerExecution. Error: %s", e);
                 }
                 break;
             }

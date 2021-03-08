@@ -41,7 +41,7 @@
 .leftQcStructure{margin-right: 35px;}
 .qcDomProContainer{padding: 10px 8px 2px 8px;}
 .qcProContainer{padding: 10px 4px 2px 8px;}
-.qcProContainer input{height: 24px; border-radius: 5px; border: 1px solid #000; width: 40%; opacity: 0; padding-left: 6px;}
+.qcProContainer input{height: 24px; border-radius: 5px; border: 1px solid #000; width: 30%; max-width: 160px; opacity: 0; padding-left: 6px;}
 .searchScenarioAvoAssure{padding: 4px 0 4px 0; border-radius: 5px; border: 1px solid #000; position: relative; top: 1px; cursor: pointer; display: none;}
 .searchScenarioAvoAssure img{width: 26px;}
 .qcDomProContainer select, .qcProContainer select{

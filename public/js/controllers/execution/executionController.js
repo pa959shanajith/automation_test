@@ -43,7 +43,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	var getTaskName = current_task.taskName;
 	var versionnumber = current_task.versionnumber;
 	var appType = current_task.appType;
-
+	var scenarioTaskType = current_task.scenarioTaskType;
+	var accessibilityParameters = current_task.accessibilityParameters;
+	$scope.taskId = current_task.subTaskId;
 	//Task Name Commented
 	//$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 	$(".projectInfoWrap").empty();
@@ -72,6 +74,8 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 	}, 1000);
 	$(document).on("change",".acc-chk",function(){
+		if(!this.checked) accessibilityParameters.splice(accessibilityParameters.indexOf(this.value));
+		else accessibilityParameters.push(this.value);
 		let parent = this.parentNode.parentElement.parentElement.parentElement
 		let selected_length = parent.querySelectorAll("input:checked").length;
 		if (selected_length != 0) parent.querySelector("span").textContent = selected_length.toString() + " Standards Selected"
@@ -101,7 +105,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$("#executionDataTable_" + m + " tbody tr").remove();
 					var rowData = eachData[m];
 					$("div.executionTableDnd").attr('id', 'batch_' + m);
-					$("#batch_" + m).append("<div class='suiteNameTxt' id='page-taskName_" + m + "'><span title=" + rowData.testsuitename + " class='taskname'><input id='parentSuite_" + m + "' class='parentSuiteChk' type='checkbox' name='' />" + rowData.testsuitename + "</span></div><div id='exeData_" + m + "' class='exeDataTable testSuiteBatch'><table id='executionDataTable_" + m + "' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_" + m + "' class='d-execute' type='checkbox' /></th>	<th style='width: 20%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 15%; border-right: 1px solid #fff' >Project Name</th><th style='width: 15%; '>Accessibility Testing</th></tr><input type='hidden' value='" + rowData.testsuiteid + "'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>"); //<th style='width: 8%; text-align: center;'>ALM</th>
+					$("#batch_" + m).append("<div class='suiteNameTxt' id='page-taskName_" + m + "'><span title=" + rowData.testsuitename + " class='taskname'><input id='parentSuite_" + m + "' class='parentSuiteChk' type='checkbox' name='' />" + rowData.testsuitename + "</span></div><div id='exeData_" + m + "' class='exeDataTable testSuiteBatch'><table id='executionDataTable_" + m + "' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_" + m + "' class='d-execute' type='checkbox' /></th>	<th style='width: 20%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 15%; border-right: 1px solid #fff'>Condition</th><th style='width: 13%; border-right: 1px solid #fff' >Project Name</th><th style='width: 19%; margin-left:1%; '>Accessibility Testing</th></tr><input type='hidden' value='" + rowData.testsuiteid + "'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>"); //<th style='width: 8%; text-align: center;'>ALM</th>
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 					var row = $("#executionDataTable_" + m).find('tbody');
@@ -109,10 +113,6 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 					//Building object for each row after getting the data from server
 					for (var k = 0; k < rowData.scenarioids.length; k++) {
-						let accessibilityTesting = "Disable";
-						if (rowData.accessibilityTestingMap && (rowData.scenarioids[k] in rowData.accessibilityTestingMap) && (rowData.accessibilityTestingMap[rowData.scenarioids[k]] == "Enable")){
-							accessibilityTesting = "Enable"
-						}
 						if (current_task.scenarioFlag == 'True') {
 							if (rowData.scenarioids[k] == assignedTestScenarioId) {
 								getEachScenario.push({
@@ -122,8 +122,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 									"scenarioIds": rowData.scenarioids[k],
 									"scenarionames": rowData.scenarionames[k],
 									"projectnames": rowData.projectnames[k],
-									"testSuiteId": rowData.testsuiteid[k],
-									"accessibilityTesting": accessibilityTesting
+									"testSuiteId": rowData.testsuiteid[k]
 								});
 							}
 						} else {
@@ -134,12 +133,23 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 								"scenarioIds": rowData.scenarioids[k],
 								"scenarionames": rowData.scenarionames[k],
 								"projectnames": rowData.projectnames[k],
-								"testSuiteId": rowData.testsuiteid[k],									
-								"accessibilityTesting": accessibilityTesting
+								"testSuiteId": rowData.testsuiteid[k]
 							});
 						}
 					}
-
+					let projectNameWidth = "13";
+					let conditionCheckWidth = "14";
+					if(!scenarioTaskType || scenarioTaskType == "" || scenarioTaskType == "disable"){
+						$(".executionDataTable").toArray().forEach(element => {
+							if(element.children[0].children[0].children[6])
+								element.children[0].children[0].children[6].remove();
+							element.children[0].children[0].children[5].style.width = "20%";
+							element.children[0].children[0].children[4].style.width = "28%";
+							element.children[0].children[0].children[5].style.borderRight = ""
+						});
+						projectNameWidth = "19";
+						conditionCheckWidth = "28.4"
+					}
 					//Building object for each row after getting the data from server
 					//Creating Table Rows for each of the Scenarios
 					for (var i = 0; i < getEachScenario.length; i++) {
@@ -158,20 +168,28 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							row.append($('<td style="width: 25%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value="' + getEachScenario[i].dataParam + '"/></td>'));
 						}
 						if (getEachScenario[i].condition == 0) {
-							row.append($('<td style="width:17%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertRed"><option value="1">True</option><option value="' + getEachScenario[i].condition + '" selected>False</option></select> </td>'));
+							row.append($('<td style="width:'+ conditionCheckWidth +'%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertRed"><option value="1">True</option><option value="' + getEachScenario[i].condition + '" selected>False</option></select> </td>'));
 						} else {
-							row.append($('<td style="width:17%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="' + getEachScenario[i].condition + '" selected>True</option><option value="0">False</option></select> </td>'));
+							row.append($('<td style="width:'+ conditionCheckWidth +'%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="' + getEachScenario[i].condition + '" selected>True</option><option value="0">False</option></select> </td>'));
 						}
-						row.append($("<td class='projectName' title=" + getEachScenario[i].projectnames + " style='width:16%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
-						if (getEachScenario[i].accessibilityTesting == "Enable"){
-							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">4 Standards Selected</span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label title="method A"  ><input value="A" checked class = "acc-chk" type="checkbox"/><span style="margin-left: 5px;" id="methodA"></span>A</label></li><li><label title="method AA"  ><input class = "acc-chk" value="AA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAA"></span>AA</label></li><li><label title="method 508"  ><input class = "acc-chk" value="508" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Section 508</label></li><li><label title="method Best Practice"  ><input class = "acc-chk" value="Best Practice" checked type="checkbox"/><span style="margin-left: 5px;" id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
-						}
-						else{
-							row.append($("<td class='projectName' title=" + "N/A" + " style='width:14%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + "N/A" + "</td>"));
+						row.append($("<td class='projectName' title=" + getEachScenario[i].projectnames + " style='width:" + projectNameWidth + "%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
+						if (scenarioTaskType && scenarioTaskType != "" && scenarioTaskType != "disable"){
+							row.append('<td class="tabeleCellPadding exe-accesibilityTesting" style="width:17%; margin-left:2.7%;word-break: break-all; padding-left: 1% !important; padding-right: 1% !important; position: absolute" ><div id ="paradigm"><span class = "btn btn-users dropdown-toggle" data-toggle="dropdown">6 Standards Selected</span><ul style="margin: 0;width: 100%;position: relative;float: none;"  id="paradigm-dropdown" class="dropdown-menu dropdown-menu-users "  aria-labelledby="paradigmName"><li><label style="width:100%;" title="method A"  ><input value="A" checked class = "acc-chk" type="checkbox"/><span style="margin-left: 5px;" id="methodA"></span>A</label></li><li><label style="width:100%;" title="method AA"  ><input class = "acc-chk" value="AA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAA"></span>AA</label></li><li><label style="width:100%;" title="method AAA"  ><input class = "acc-chk" value="AAA" checked type="checkbox"/><span style="margin-left: 5px;" id="methodAAA" ></span>AAA</label></li><li><label style="width:100%;" title="aria"  ><input class = "acc-chk" value="aria" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Aria</label></li><li><label style="width:100%;" title="method 508"  ><input class = "acc-chk" value="508" checked type="checkbox"/><span style="margin-left: 5px;" id="method508" ></span>Section 508</label></li><li><label style="width:100%;" title="method Best Practice"  ><input class = "acc-chk" value="Best Practice" checked type="checkbox"/><span style="margin-left: 5px;" id="methodBestPractice" ></span>Best Practice</label></li></ul></div></td>');
+							$(".scrollbar-inner .testScenarioScroll")[0].style.overflow = "visible";
+							
 						}
 						// row.append($("<td class='variableMap' title='' style='width:10%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important;cursor:pointer;' class='tabeleCellPadding'><span class='descriptionContainer'><img alt='scenarioDescription' title='' id=scenarioDesc_"+count+" src='imgs/ic-details-inactive.png' data-scenarioid='"+getEachScenario[i].scenarioIds+"' class='scenarioDescIcon inactiveDesc'></span></td>"));
 						//row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
 						count++;
+					}
+					if (scenarioTaskType && scenarioTaskType != "" && scenarioTaskType != "disable"){
+						row.find(".exe-accesibilityTesting").find("input").each((el)=>{
+							let element = row.find(".exe-accesibilityTesting").find("input")[el];
+							if(!accessibilityParameters.includes(element.value)) element.checked = false;
+						})
+						let selected_length = row.find(".exe-accesibilityTesting").find("input:checked").length;
+						if (selected_length != 0)	row.find(".exe-accesibilityTesting").find('.dropdown-toggle')[0].textContent = selected_length.toString() + " Standards Selected"
+						else row.find(".exe-accesibilityTesting").find('.dropdown-toggle')[0].textContent  = "Select Standards"
 					}
 
 					//Add Scenario Description Functionality
@@ -485,6 +503,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		blockUI("Saving in progress. Please Wait...");
 		const batchInfo = [];
 		const suiteidsexecution = [];
+		var accessibilityParameters = [];
 		$(".parentSuiteChk:checked").each(function (i, e) {
 			suiteidsexecution.push(e.getAttribute('id').split('_')[1]);
 		});
@@ -498,6 +517,12 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			const scenarioDescriptionText = [];
 			const scenarioAccNoMap = {};
 			$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function () {
+				if(scenarioTaskType != "disable"){
+					$(this).siblings(".exe-accesibilityTesting").find("input:checked").each((el)=>{
+						accessibilityParameters.push($(this).siblings(".exe-accesibilityTesting").find("input:checked")[el].value);
+					})
+
+				}
 				testScenarioIds.push($(this).attr("sId"));
 				getParamPaths.push($(this).parent().find(".getParamPath").val().trim());
 				conditionCheck.push($(this).parent().find(".conditionCheck option:selected").val());
@@ -519,37 +544,82 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			suiteDetails.scenarioDescriptions = scenarioDescriptionText;
 			batchInfo.push(suiteDetails);
 		});
-		//console.log("batchdetails", batchInfo);
-		//Getting ConditionChecks
-		ExecutionService.updateTestSuite_ICE(batchInfo)
-		.then(function (data) {
-			unblockUI();
-			if (data == "Invalid Session") {
-				return $rootScope.redirectPage();
+		if(scenarioTaskType != "disable"){
+			let input = {
+				taskId : $scope.taskId,
+				accessibilityParameters: accessibilityParameters
 			}
-			if (data != "fail") {
-				openDialogExe("Save Test Suite", "Test suite saved successfully.");
-				//$("#saveSuitesModal").modal("show")
-				//Transaction Activity for Save Test Suite Button Action
-				// var labelArr = [];
-				// var infoArr = [];
-				// labelArr.push(txnHistory.codesDict['SaveTestSuite']);
-				// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
-			} else {
-				openDialogExe("Save Test Suite", "Failed to save test suite.");
-				//$("#saveSuitesModalFail").show();
-			}
-			angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
-		}, function (error) {
-			console.log(error);
-		});
+			ExecutionService.updateAccessibilitySelection(input)
+			.then((status)=>{
+				if(status != "success"){
+					openDialogExe("Save Test Suite", "Failed to save selected accessibility standards.");
+				}else{
+					var current_task = JSON.parse(window.localStorage['_CT']);
+					current_task.accessibilityParameters = accessibilityParameters;
+					window.localStorage['_CT'] = JSON.stringify(current_task);
+
+					//Getting ConditionChecks
+					ExecutionService.updateTestSuite_ICE(batchInfo)
+					.then(function (data) {
+						unblockUI();
+						if (data == "Invalid Session") {
+							return $rootScope.redirectPage();
+						}
+						if (data != "fail") {
+							openDialogExe("Save Test Suite", "Test suite saved successfully.");
+							//$("#saveSuitesModal").modal("show")
+							//Transaction Activity for Save Test Suite Button Action
+							// var labelArr = [];
+							// var infoArr = [];
+							// labelArr.push(txnHistory.codesDict['SaveTestSuite']);
+							// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+						} else {
+							openDialogExe("Save Test Suite", "Failed to save test suite.");
+							//$("#saveSuitesModalFail").show();
+						}
+						angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+					}, function (error) {
+						console.log(error);
+					});
+				}
+			}).catch((e)=>{
+				throwErr = true;
+				openDialogExe("Save Test Suite", "Failed to save selected accessibility standards.");
+				
+			});
+		}else{
+			//Getting ConditionChecks
+			ExecutionService.updateTestSuite_ICE(batchInfo)
+			.then(function (data) {
+				unblockUI();
+				if (data == "Invalid Session") {
+					return $rootScope.redirectPage();
+				}
+				if (data != "fail") {
+					openDialogExe("Save Test Suite", "Test suite saved successfully.");
+					//$("#saveSuitesModal").modal("show")
+					//Transaction Activity for Save Test Suite Button Action
+					// var labelArr = [];
+					// var infoArr = [];
+					// labelArr.push(txnHistory.codesDict['SaveTestSuite']);
+					// txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
+				} else {
+					openDialogExe("Save Test Suite", "Failed to save test suite.");
+					//$("#saveSuitesModalFail").show();
+				}
+				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+			}, function (error) {
+				console.log(error);
+			})
+		}
+
 	};
 	//Save TestSuite Functionality
 
 	// $scope.qccredentials = {qcurl: "", qcusername: "", qcpassword: "", integrationType: ""};
 	$scope.integration = {alm: {url:"",username:"",password:""}, 
 	qtest: {url:"",username:"",password:"",qteststeps:""}, 
-	zephyr: {accountid:"",accesskey:"",secretkey:""}};
+	zephyr: {url:"",username:"",password:""}};
 
 	//Save QC Details
 	$scope.saveQcCredentials = function (e) {
@@ -651,16 +721,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	//Save Zephyr Details
 	$scope.saveZephyrCredentials = function (e) {
-		$("#ZephyrAccId, #ZephyrAccKey, #ZephyrSecKey").removeClass('inputErrorBorder');
-		if (!$scope.ZephyrAccId) {
-			$("#ZephyrAccId").addClass('inputErrorBorder');
-			$(".error-msg-exeQc").text("Please Enter Zephyr Account ID.");
-		} else if (!$scope.ZephyrAccKey) {
-			$("#ZephyrAccKey").addClass('inputErrorBorder');
-			$(".error-msg-exeQc").text("Please Enter Access Key.");
-		} else if (!$scope.ZephyrSecKey) {
-			$("#ZephyrSecKey").addClass('inputErrorBorder');
-			$(".error-msg-exeQc").text("Please Enter Secret Key.");
+		$("#zephyrURL, #zephyrUserName, #zephyrPassword").removeClass('inputErrorBorder');
+		if (!$scope.zephyrURL) {
+			$("#zephyrURL").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Zephyr URL.");
+		} else if (!$scope.zephyrUserName) {
+			$("#zephyrUserName").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Zephyr Username.");
+		} else if (!$scope.zephyrPassword) {
+			$("#zephyrPassword").addClass('inputErrorBorder');
+			$(".error-msg-exeQc").text("Please Enter Zephyr Password.");
 		} else if (appType != "SAP" && browserTypeExe.length === 0) {
 			$("#ZephyrSyncWindow").find("button.close").trigger("click");
 			openDialogExe("Execute Test Suite", "Please select a browser");
@@ -668,11 +738,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$("#ZephyrSyncWindow").find("button.close").trigger("click");
 			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
 		} else {
-			$("#ZephyrAccId,#ZephyrAccKey,#ZephyrSecKey").css({
+			$("#zephyrURL,#zephyrUserName,#zephyrPassword").css({
 				"background": "none"
 			});
 			$(".error-msg-exeQc").text("");
-			ExecutionService.loginZephyrServer_ICE($scope.ZephyrAccId, $scope.ZephyrAccKey, $scope.ZephyrSecKey,"Zephyr")
+			ExecutionService.loginZephyrServer_ICE($scope.zephyrURL, $scope.zephyrUserName, $scope.zephyrPassword,"Zephyr")
 			.then(function (data) {
 				if (data == "unavailableLocalServer") {
 					$(".error-msg-exeQc").text("Unavailable LocalServer");
@@ -684,9 +754,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					$(".error-msg-exeQc").text("Invalid URL");
 				} else {
 					$scope.integration.zephyr = {
-						accountid: $("#ZephyrAccId").val(),
-						accesskey: $("#ZephyrAccKey").val(),
-						secretkey: $("#ZephyrSecKey").val()
+						url: $("#zephyrURL").val(),
+						username: $("#zephyrUserName").val(),
+						password: $("#zephyrPassword").val()
 					}
 					$("#ZephyrSyncWindow").find("button.close").trigger("click");
 				}
@@ -699,6 +769,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	
 	//Execute TestSuite Functionality
 	$scope.ExecuteTestSuite = function ($event) {
+		var execute = true;
 		if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
 		else if ((appType == "Web") && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select a browser");
 		else if (appType == "Webservice" && browserTypeExe.length === 0) openDialogExe("Execute Test Suite", "Please select Web Services option");
@@ -727,6 +798,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							$(this).parent().siblings(".exe-accesibilityTesting").find("input:checked").each(function(){
 								accessibilityParameters.push($(this).val());
 							});
+							if(scenarioTaskType == "exclusive" && accessibilityParameters.length == 0){
+								openDialogExe("Accessibility Standards", "Please select one or more accessibility testing standard to proceed.")
+								execute = false;
+								return;
+							}
 							selectedRowData.push({
 								condition: parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
 								dataparam: [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
@@ -737,7 +813,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							});
 						}
 					});
-
+					suiteInfo.scenarioTaskType = scenarioTaskType;
 					suiteInfo.testsuiteName = $(this).parents('span.taskname').text();
 					suiteInfo.testsuiteId = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
 					suiteInfo.versionNumber = testsuiteDetails.versionnumber;
@@ -761,13 +837,14 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 				integration: $scope.integration,
 				batchInfo: $scope.moduleInfo
 			};
-			allocateICEPopup()
+			if(execute) $scope.allocateICEPopup()
 		}
 	};
 
-	const allocateICEPopup = () =>{
+	$scope.allocateICEPopup = () =>{
 		$scope.smartMode = false;
 		$scope.selectedICE = "";
+		$('#userIdName')[0].value = ""
 		var projId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].projectidts
 		var data = {poolid:"",projectids: [projId]}
 		$("#chooseICEPool option").slice(1).remove()
@@ -824,11 +901,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		}else{
 			$scope.selectedICE = ice
 			$('#userIdName').removeClass('error-border')
+			$('#iceDrop').click()
 		}
 	}
 
 	const populateICElist =(arr,unallocated)=>{
 		var ice=[]
+		$scope.iceNameIdMap = {}
 		var iceStatus = $scope.iceStatus.ice_ids
 		const statusUpdate = (ice) => {
 			var color = '#fdc010' ;
@@ -857,6 +936,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					Object.entries(e[1].ice_list).forEach((k)=>{
 						if(k[0] in iceStatus){
 							var res = statusUpdate(iceStatus[k[0]])
+							$scope.iceNameIdMap[k[1].icename] = {}
+							$scope.iceNameIdMap[k[1].icename].id = k[0];
+							$scope.iceNameIdMap[k[1].icename].status = iceStatus[k[0]].status;
 							k[1].color = res.color;
 							k[1].statusCode = res.status;
 							ice.push(k[1])
@@ -869,13 +951,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$scope.availableICE = ice
 	}
 
-	$scope.ExecuteOnclick = () =>{
-		$scope.selectedPool = $('#chooseICEPool').val()
-		if($('#chooseICEPool').val() == 'unallocated')$scope.selectedPool = "";
-		var iceList=[]
-		var smartModeType = ''
+	$scope.CheckStatusAndExecute = () =>{
+		let iceList = []
 		if($scope.smartMode){
-			smartModeType = $('#executionType').val() //change value of dropdown in execution.html if needed
 			$('#ice-dropdown input:checked').each(function(){
                 if($(this).parent().attr('title')=='Online'){
                     iceList.push($(this).val())
@@ -883,6 +961,33 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
             })
 			$scope.selectedICE = iceList
 		}
+		if(Array.isArray($scope.selectedICE)){
+			for(let icename in $scope.selectedICE){
+				let ice_id = $scope.iceNameIdMap[$scope.selectedICE[icename]];
+				if(ice_id && ice_id.status){
+					$("#selectIcePoolIce").modal("hide");
+					$("#proceedExecution").modal("show");
+					$('#proceedExecution').find('.btn-default-yes').focus();
+					return;
+				} 
+			}
+		}else{
+			let ice_id = $scope.iceNameIdMap[$scope.selectedICE];
+			if(ice_id && ice_id.status){
+				$("#selectIcePoolIce").modal("hide");
+				$("#proceedExecution").modal("show");
+				$('#proceedExecution').find('.btn-default-yes').focus();
+				return
+			} 
+		}
+		$scope.ExecuteOnclick();
+	}
+
+	$scope.ExecuteOnclick = () =>{
+		$scope.selectedPool = $('#chooseICEPool').val()
+		if($('#chooseICEPool').val() == 'unallocated')$scope.selectedPool = "";
+		var smartModeType = ''
+		if($scope.smartMode) smartModeType = $('#executionType').val() //change value of dropdown in execution.html if needed
 		else if(!$scope.selectedICE){
 			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0){
 				$scope.selectedICE = ""
@@ -988,12 +1093,12 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			$(".error-msg-exeQc").text('');
 		}
 		else if ($(this).val() == "2") {
-			$("#ZephyrAccId").val('');
-			$("#ZephyrAccKey").val('');
-			$("#ZephyrSecKey").val('');
-			$scope.ZephyrAccId = '';
-			$scope.ZephyrAccKey = '';
-			$scope.ZephyrSecKey = '';
+			$("#zephyrURL").val('');
+			$("#zephyrUserName").val('');
+			$("#zephyrPassword").val('');
+			$scope.zephyrURL = '';
+			$scope.zephyrUserName = '';
+			$scope.zephyrPassword = '';
 			$("#ZephyrSyncWindow").modal("show");
 			$(".error-msg-exeQc").text('');
 		}

@@ -28,6 +28,7 @@ const EditIcePool = ({projList,displayError,setLoading}) => {
             await resetData(prop)
             setLoading(false)
         })()
+        // eslint-disable-next-line
     },[projList])
     //on click of pool dropdown
     const clickInp = () =>{
@@ -68,7 +69,7 @@ const EditIcePool = ({projList,displayError,setLoading}) => {
             var a = []
             var b = []
             projList.forEach((e)=>{
-                if(prjarr.indexOf(e._id)!=-1) a.push(e);
+                if(prjarr.indexOf(e._id)!==-1) a.push(e);
                 else b.push(e);
             })
             setAllProj(b)
@@ -195,14 +196,14 @@ const clearIceQueue = async({selectedPool,setLoading,displayError}) =>{
 }
 
 const resetData = async({filterRef,setSelectedPool,poolName,projList,setAllProj,setAssignProj,setPoolDict,setProjList,setPoolList,setLoading,displayError,action}) => {
-    var data = {
+    var dataPool = {
         poolid:"all",
         projectids:[]
     }
     filterRef.current.value = ""
     poolName.current.disabled = true
     poolName.current.value = ""
-    var data = await getPools(data)
+    var data = await getPools(dataPool)
     if(data.error){
         if(data.val === 'empty'){
             displayError(data.error);

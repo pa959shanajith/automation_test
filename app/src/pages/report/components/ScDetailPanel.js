@@ -122,7 +122,7 @@ const dateASC = (dateArray)=> {
         var gDate = fDate[2] + "-" + fDate[1] + "-" + fDate[0];
         var mDate = lDate[2] + "-" + lDate[1] + "-" + lDate[0];
         if (new Date(gDate + " " + timeA) >= new Date(mDate + " " + timeB)) return 1;
-        if (new Date(gDate + " " + timeA) <= new Date(mDate + " " + timeB)) return -1;
+        else return -1;
     })
     return dateArray
 }

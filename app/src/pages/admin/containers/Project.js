@@ -1,4 +1,4 @@
-import React ,  { Fragment, useEffect, useState } from 'react';
+import React ,  { useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
 import {ScreenOverlay,PopupMsg, ModalContainer, ScrollBar} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
@@ -29,9 +29,7 @@ const ProjectNew = (props) => {
     const [delCount,setDelCount] = useState(0)
     const [count,setCount] = useState(0)
     const [title,setTitle] = useState([])
-    const [inputID,setInputID] = useState([])
     const [placeholder,setPlaceholder] = useState([])
-    const [buttonID,setButtonID] = useState([])
     const [applicationType,setApplicationType] = useState([])
     const [selDomainOptions,setSelDomainOptions] = useState([])
     const [showEditModalRelease,setShowEditModalRelease] = useState(false)
@@ -172,7 +170,7 @@ const ProjectNew = (props) => {
 
     const clickAddRelease = (props)=>{
         setFlag(false);
-        setTitle("Add Release"); setInputID("releaseTxt"); setPlaceholder("Add Release Name");setButtonID("addReleaseName");
+        setTitle("Add Release"); setPlaceholder("Add Release Name");
         setModalInputErrorBorder(false);
         setReleaseTxt("");
         setShowEditModalRelease(true);
@@ -367,7 +365,7 @@ const ProjectNew = (props) => {
 
     const clickEditRelease = (editId) =>{
         // setEditReleaseId(editId);
-        setTitle("Edit Release Name"); setInputID("releaseName"); setPlaceholder("Enter New Release Name");setButtonID("updateReleaseName");
+        setTitle("Edit Release Name");setPlaceholder("Enter New Release Name");
         if (editId !== "releaseName") {
             setModalInputErrorBorder(false);
         }
@@ -376,7 +374,7 @@ const ProjectNew = (props) => {
 
     const clickEditCycle = (editId,oldCycName) =>{
         setOldCyclename(oldCycName);
-        setTitle("Edit Cycle Name"); setInputID("cycleName"); setPlaceholder("Enter New Cycle Name");setButtonID("updateCycleName");
+        setTitle("Edit Cycle Name");setPlaceholder("Enter New Cycle Name");
         setCycleTxt(oldCycName);
         setModalInputErrorBorder(false);
         if (editId !== "cycleName") {
@@ -544,7 +542,7 @@ const ProjectNew = (props) => {
 
     const clickAddCycle = (props)=>{
         setFlag(false);
-        setTitle("Add Cycle"); setInputID("cycleTxt"); setPlaceholder("Add Cycle Name");setButtonID( "addCycleName");
+        setTitle("Add Cycle");setPlaceholder("Add Cycle Name");
         setModalInputErrorBorder(false);
         setCycleTxt("");
         setShowEditModalCycle(true);

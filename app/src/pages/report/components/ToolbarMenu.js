@@ -30,6 +30,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
             setRelList(res[0].releases)
             setBlockui({show:false})
         })()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
     useEffect(()=>{
         if(reportData && reportData.projectid && projData.length >0){
@@ -38,12 +39,14 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
                 var cyclData = {}
                 projData.some((e)=>{if(e._id===reportData.projectid){
                     data = e
-                    return true
-                }})
+                    }
+                    return e._id===reportData.projectid;
+                })
                 data.releases.some((e)=>{if(e.name===reportData.releaseid){
                     cyclData = e
-                    return true
-                }})
+                    }
+                    return e.name===reportData.releaseid
+                })
                 setRelList(data.releases)
                 setCycList(cyclData.cycles)
                 setAutoReport(true)            
@@ -52,6 +55,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
                 console.error(err)
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[reportData,projData])
     useEffect(()=>{
         if(autoReport){
@@ -63,6 +67,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
             CycChange()
             setAutoReport(false)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[autoReport])
     const projChange = (e) =>{
         relRef.current.value = 'def-val'

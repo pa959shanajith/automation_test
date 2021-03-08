@@ -1,4 +1,4 @@
-import React, { Fragment} from 'react';
+import React from 'react';
 import {ScrollBar} from '../../global'
 import '../styles/LdapConfigCreate.scss'
 import LdapConfigurationForm from '../components/LdapConfigurationForm';
@@ -35,7 +35,7 @@ const LdapConfigCreate = (props) => {
                         </div></div>
                     
                         <LdapConfigurationForm {...props}  />
-                        <LdapDataMapping setFieldmap={props.setFieldmap} fieldmap={props.fieldmap} fieldMapOpts={props.fieldMapOpts} ldapFMapEmailErrBor={props.ldapFMapEmailErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapFnameErrBor={props.ldapFMapFnameErrBor} ldapFMapUnameErrBor={props.ldapFMapUnameErrBor} />
+                        <LdapDataMapping setFieldmap={props.setFieldmap} fieldmap={props.fieldmap} fieldMapOpts={props.fieldMapOpts} ldapFMapEmailErrBor={props.ldapFMapEmailErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapFnameErrBor={props.ldapFMapFnameErrBor} ldapFMapUnameErrBor={props.ldapFMapUnameErrBor} />
                     </div>
                 </ScrollBar>
             </div>

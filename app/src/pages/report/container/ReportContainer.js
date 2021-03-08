@@ -34,6 +34,7 @@ const ReportContainer = () =>{
         return ()=>{
             dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
     useEffect(()=>{
         if(selectedScDetails._id){
@@ -55,6 +56,7 @@ const ReportContainer = () =>{
         }else{
             setScStatus({})
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[scDetails])
     return(
         <Fragment>

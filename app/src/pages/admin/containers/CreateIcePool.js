@@ -37,12 +37,12 @@ const CreateIcePool = (props) => {
         poolName.current.style = ""
         var projList = [];
         assignProj.forEach((e)=>projList.push(e._id))
-        var data = {
+        var dataCreate = {
 			poolname: val,
 			projectids: projList
         }
         setLoading('Saving ICE Pool ...')
-        var data = await createPool_ICE(data)
+        var data = await createPool_ICE(dataCreate)
         if(data.error){displayError(data.error);return;}
         await resetData({poolName,setAllProj,setAssignProj,setProjList,setLoading,displayError})
         displayError("ICE Pool created successfully.","success")
