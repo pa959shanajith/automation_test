@@ -1146,7 +1146,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             Object.keys(tObj).forEach(function(k) {
                 if (tObj[k] === undefined) tObj[k] = null;
             });
-            //if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/node-task-assigned.png').attr('x',29).attr('y',-10);
+            if(p.select('.ct-nodeTask')[0][0]==null){
+                switch(tObj.t){
+                    case "Execute Scenario Accessibility Only": 
+                        p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/ic-accessibility-enabled.png').attr('x',-14).attr('y',-10).style("width",'21px').style('height','21px')
+                        break;
+                    case "Execute Scenario with Accessibility":
+                        p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/ic-accessibility-enabled.png').attr('x',-14).attr('y',-10).style("width",'21px').style('height','21px') 
+                        p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/ic-functional-enabled.png').attr('x',29).attr('y',-10).style("width",'21px').style('height','21px')
+                        break;
+                    default:
+                        p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/ic-functional-enabled.png').attr('x',29).attr('y',-10).style("width",'21px').style('height','21px')
+                        break;
+                }
+            }
             if (nType == "modules" || nType == "endtoend") {
                 if (dNodes[pi]._id != "null") {
 
