@@ -1220,10 +1220,23 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
             if (validate[0]) {
                 taskflag = true;
-                // if (taskUndef) {
-                //     d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
-                // }
-                // If task already exists then set it to true
+                if (taskUndef && dNodes[pi].type == "scenarios") {
+                    switch(tObj.t){
+                        case "Execute Scenario Accessibility Only": 
+                            d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/ic-accessibility-enabled.png').attr('x', -14).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                            break;
+                        case "Execute Scenario with Accessibility":
+                            d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/ic-accessibility-enabled.png').attr('x', -14).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                            d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/ic-functional-enabled.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                            break;
+                        default:
+                            d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/ic-functional-enabled.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                            break;
+                    }
+                }else if(taskUndef){
+                    d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/ic-functional-enabled.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                }
+                //If task already exists then set it to true
                 if (dNodes[pi].task) taskStatus = dNodes[pi].task.status;
                 else taskStatus = 'assigned';
                 if (qid == 9)
