@@ -30,7 +30,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
             $(".selectAutility img").removeClass("select-utility");
             $("#executionMetrics i").addClass("select-utility");
             setTimeout(()=>{
-                $('.fc-datePicker').val('');
+                $('.fc-datePicker').val('').datepicker("update");
                 $('#LOB').val('');
                 $('#statusID').val('');
                 $('#executionID').val('');
@@ -127,7 +127,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
     }
 
     $scope.resetExecMetrics = () => {
-        $('.fc-datePicker').val('');
+        $('.fc-datePicker').val('').datepicker("update");
         $('#LOB').val('');
         $('#statusID').val('');
         $('#executionID').val('');
