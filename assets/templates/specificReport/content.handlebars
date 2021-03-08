@@ -362,10 +362,10 @@
       }
 
       .createIssueWindow {
-         width: 56%;
+         width: 500px;
          height: 80%;
          top: 10%;
-         left: 22%;
+         left: calc(50% - 250px);
          overflow: auto;
       }
 
@@ -384,7 +384,6 @@
       .createIssueWindow p:nth-child(3) {
          margin-bottom: 0;
          padding-bottom: 6px;
-         border-bottom: 1px solid #ddd;
       }
 
       .createIssueWindow p:nth-child(4) {
@@ -415,7 +414,9 @@
       .createIssueWindow p input {
          float: left;
       }
-
+	  .btn-footer {
+		 border-top: 1px solid #ddd;
+	  }
       .jirapopupinput {
          width: 250px;
          height: 28px;
@@ -423,6 +424,8 @@
          border-style: groove;
          text-align: center;
          margin-bottom: 10px;
+		 resize:none;	
+         border: 1px solid rgb(187, 187, 187);		 
       }
 
       .jiraWindow .jirapopupinput {
@@ -433,6 +436,10 @@
          text-align: center;
          margin-bottom: 15px;
       }
+	  
+	  select.jirapopupinput{
+	     width: 256px
+	  }
 
       .popupheader {
          width: 100%;
@@ -480,16 +487,14 @@
       #jSummary,
       #jDescription,
       #jlabel {
-         width: 500px;
+		   height: 80px;
          text-align: left;
-      }
-
-      .createIssueWindow #scrnShotPath {
-         width: 406px;
+		   resize: none;
       }
 
       #jDescription {
          height: 130px;
+		   resize: none;
       }
 
       #jDeadline {
@@ -498,7 +503,6 @@
 
       .createIssues,
       .cancelIssues {
-         float: right;
          margin-right: 45px;
          width: 88px;
          height: 26px;
@@ -1193,28 +1197,30 @@
          <label>Summary
             <span class="mandatory">*</span>
          </label>
-         <input type="text" class="jirapopupinput" id="jSummary" maxlength="255"
-            title="Maximum 255 characters accepted." />
+         <textarea type="text" class="jirapopupinput" id="jSummary" maxlength="255"
+            title="Maximum 255 characters accepted."></textarea>
       </p>
       <p>
          <label>Description</label>
          <textarea class="jirapopupinput" id="jDescription"></textarea>
       </p>
       <p>
-         <label>Priority</label>
+         <label>Priority
+		     <span class="mandatory">*</span>
+		 </label>
          <select class="jirapopupinput" id="jPriority">
             <option value="" selected disabled>Select Priority</option>
          </select>
       </p>
       <p>
          <label>Label</label>
-         <textarea class="jirapopupinput" id="jLabel"></textarea>
+         <input class="jirapopupinput" id="jLabel"/>
       </p>
       <p>
          <label>Attachment Path</label>
          <input type="text" id="scrnShotPath" class="jirapopupinput" />
       </p>
-      <p>
+      <p class='btn-footer'>
          <span class="error-msg"></span>
          <button type="button" class="cancelIssues">Cancel</button>
          <button type="button" class="createIssues">Create</button>

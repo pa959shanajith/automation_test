@@ -131,9 +131,9 @@ module.exports.approvalStatusCheck = async executionData => {
 	};
 	const result = await fetchData(inputs, "suite/checkApproval", "approvalStatusCheck", true);
 	data.statusCode = result[1].statusCode;
-	if (result[0] == "No task") data.res = 'Notask';
-	else if (result[0] == "Modified") data.res = 'Modified';
-	else if (result[0] != 0) data.res = 'NotApproved';
+	if (result[0].rows == "No task") data.res = 'Notask';
+	else if (result[0].rows == "Modified") data.res = 'Modified';
+	else if (result[0].rows != 0) data.res = 'NotApproved';
 	return data;
 };
 
@@ -163,7 +163,7 @@ const fetchData = async (inputs, url, from, all) => {
 				if (all) rsv(["fail", response, result]);
 				else rsv("fail");
 			} else {
-				result = (result.rows === undefined)? result:result.rows;
+				result = (result.rows === undefined || all)? result:result.rows;
 				if (cache.checkapi(url) && result != "fail") {
 					cache.setapi(url, inputs, result);
 				}

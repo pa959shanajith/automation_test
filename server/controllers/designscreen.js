@@ -253,7 +253,8 @@ exports.userObjectElement_ICE = function (req, res) {
 							selector:req.body.object[7],
 							tagname:req.body.object[8],
 							operation:operation
-						}
+						};
+						dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
 					}
 					else if(operation=='decrypt'){
 						props={
@@ -262,9 +263,49 @@ exports.userObjectElement_ICE = function (req, res) {
 							url:req.body.object[2],
 							tag:req.body.object[3],
 							operation:operation
-						}
+						};
+						dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
 					}
-					dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
+					else if(operation=='saveirisimage_Desktop'){
+						props={
+							action:"update_dataset",
+							cord:req.body.object[1],
+							type:req.body.object[2],
+							id:req.body.object[3],
+							operation:operation
+						};
+						dataToIce = {"emitAction": "LAUNCH_DESKTOP_iris", "username" : icename, "data": props};
+					}
+					else if(operation=='saveirisimage_OEBS'){
+						props={
+							action:"update_dataset",
+							cord:req.body.object[1],
+							type:req.body.object[2],
+							id:req.body.object[3],
+							operation:operation
+						};
+						dataToIce = {"emitAction": "LAUNCH_OEBS_iris", "username" : icename, "data": props};
+					}
+					else if(operation=='saveirisimage_SAP'){
+						props={
+							action:"update_dataset",
+							cord:req.body.object[1],
+							type:req.body.object[2],
+							id:req.body.object[3],
+							operation:operation
+						};
+						dataToIce = {"emitAction": "LAUNCH_SAP_iris", "username" : icename, "data": props};
+					}
+					else if(operation=='saveirisimage_Web'){
+						props={
+							action:"update_dataset",
+							cord:req.body.object[1],
+							type:req.body.object[2],
+							id:req.body.object[3],
+							operation:operation
+						};
+						dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
+					}
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function userObjectElement_ICE_listener(channel, message) {
 						var data = JSON.parse(message);
@@ -368,7 +409,7 @@ function parseRequestParam(paramerters){
 	try{
 		var params=paramerters.split('##');
 		for (var object of params) {
-			object=object.split(":");
+			object=object.split("=");
 			var scrapedObjectsWS = {};
 			scrapedObjectsWS.xpath = object[0].trim();
 			scrapedObjectsWS.custname = object[0].trim();
@@ -385,13 +426,13 @@ function parseRequestParam(paramerters){
 function parseRequest(readChild) {
 	try {
 		logger.info("Inside the function parseRequest ");
-		if ('name' in readChild) {
+		if (readChild.name) {
 			if (xpath == "") {
 				xpath = "/" + readChild.name;
 					allXpaths.push(xpath);
 				allCustnames.push(readChild.name);
 			}
-			if ('attributes' in readChild) {
+			if (readChild.attributes) {
 				var attrchildren = Object.keys(readChild.attributes);
 				if (attrchildren.length >= 1) {
 					var basexpath = xpath;
@@ -408,7 +449,7 @@ function parseRequest(readChild) {
 					}
 				}
 			}
-			if ('children' in readChild) {
+			if (readChild.children) {
 				if (readChild.children.length >= 1) {
 					var basexpath = xpath;
 					for (var childrenindex = 0; childrenindex < readChild.children.length; childrenindex++) {

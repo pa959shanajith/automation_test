@@ -205,6 +205,7 @@ if (cluster.isMaster) {
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
 		app.post('/getReport_API', report.getReport_API);
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
+		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
 
 		app.use(csrf({
@@ -432,11 +433,13 @@ if (cluster.isMaster) {
 		app.post('/updateTaskstatus_mindmaps', auth.protect, taskbuilder.updateTaskstatus_mindmaps);
 		//Utility plugins
 		app.post('/Encrypt_ICE', auth.protect, utility.Encrypt_ICE);
+		app.post('/getExecution_metrics', auth.protect, report.getExecution_metrics);
 		// Wecoccular Plugin
 		app.post('/crawlResults', auth.protect, webocular.getCrawlResults);
 		app.post('/saveResults', auth.protect, webocular.saveResults);
 		//Accessibility Testing routes
 		app.post('/getAccessibilityData_ICE', auth.protect, accessibilityTesting.getAccessibilityTestingData_ICE);
+		app.post('/updateAccessibilitySelection', auth.protect, plugin.updateAccessibilitySelection);	
 		//Chatbot Routes
 		app.post('/getTopMatches_ProfJ', auth.protect, chatbot.getTopMatches_ProfJ);
 		app.post('/updateFrequency_ProfJ', auth.protect, chatbot.updateFrequency_ProfJ);
@@ -460,6 +463,8 @@ if (cluster.isMaster) {
 		//Zephyr Plugin
 		app.post('/loginToZephyr_ICE', auth.protect, zephyr.loginToZephyr_ICE);
 		app.post('/zephyrProjectDetails_ICE', auth.protect, zephyr.zephyrProjectDetails_ICE);
+		app.post('/zephyrCyclePhase_ICE', auth.protect, zephyr.zephyrCyclePhase_ICE);
+		app.post('/zephyrTestcaseDetails_ICE', auth.protect, zephyr.zephyrTestcaseDetails_ICE);
 		app.post('/saveZephyrDetails_ICE', auth.protect, zephyr.saveZephyrDetails_ICE);
 		app.post('/viewZephyrMappedList_ICE', auth.protect, zephyr.viewZephyrMappedList_ICE);	
 		//app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);

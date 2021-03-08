@@ -59,8 +59,9 @@
 		  <!-- Mid Page Content  -->
 		  <div id="content">
 			 <!-- Page Header -->
-			 <div class="container-fluid pageTitle">
-				<h2><span id="reports-taskName" class="label label-default">Reports</span></h2>
+			 <div class="container-fluid pageTitle tabs">
+				<button id="reports-taskName" style="margin-left: 1.1%;border-radius: 5px; background-color: purple; color: white;" ng-click="toggle_accessibility(false)">Functional Testing Reports</button>
+				<button id="accessibility-taskName" style="border-radius: 5px;" ng-click="toggle_accessibility(true)" >Accessibility Testing Reports</button>
 			 </div>
 			 <!-- Page Header -->
 			 <!-- Module Box -->
@@ -97,9 +98,6 @@
 									 </select>
 								  </div>
 							   </div>
-							   <div class="col">
-								  <button class="webCrawler-toggle-btn" ng-click="toggle_accessibility($event)" style="background: blueviolet;color:white;"title="Enable Accessibility Testing Reports" id="accessibility_toggle">Accessibility Testing</button>
-						   		</div>
 							   <div class="col d-flex flex-row-reverse ">
 								  <input id='searchModule' class="reports-search" type="text" placeholder="Search Module" aria-label="Search">
 								  <img alt="Search Icon" class="searchReportsImg" src="imgs/ic-search-icon.png">
@@ -163,9 +161,9 @@
 										  <table id="reportsAccTable" class='display' style='width:100%'>
 											 <thead>
 												<tr>
-												   <th>Execution No</th>
-												   <th>Title</th>
-												   <th>Time </th>
+												   <th style="padding:4px;">Execution No</th>
+												   <th style="padding:4px;">Title</th>
+												   <th style="padding:4px;">Time </th>
 												</tr>
 											 </thead>
 											 <tbody>
