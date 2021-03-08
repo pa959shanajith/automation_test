@@ -52,7 +52,9 @@ const ReferenceBar = (props) => {
                 let tasktype = tasksJson[i].taskDetails[0].taskType;
                 let taskname = tasksJson[i].taskDetails[0].taskName;
                 let dataobj = {
+                    'accessibilityParameters': tasksJson[i].accessibilityParameters,
                     'scenarioflag':tasksJson[i].scenarioFlag,
+                    'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
                     'apptype':tasksJson[i].appType,
                     'projectid':tasksJson[i].projectId,
                     'screenid':tasksJson[i].screenId,

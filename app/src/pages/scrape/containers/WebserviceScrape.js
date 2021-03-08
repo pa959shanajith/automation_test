@@ -277,6 +277,8 @@ const WebserviceScrape = () => {
                     dispatch({type: actions.SET_WSDATA, payload: {method : data.method[0]}});
                     dispatch({type: actions.SET_WSDATA, payload: {opInput : data.operations[0]}});
                     dispatch({type: actions.SET_WSDATA, payload: {reqHeader : data.header[0].split("##").join("\n")}})
+                    dispatch({type: actions.SET_WSDATA, payload: {reqHeader : data.header[0].split("##").join("\n")}})
+                    if (data.param) dispatch({type: actions.SET_WSDATA, payload: {paramHeader : data.param[0].split("##").join("\n")}});
 
                     let localReqBody;
                     if (!data.body[0].indexOf("{") || !data.body[0].indexOf("[")) {
@@ -356,7 +358,7 @@ const WebserviceScrape = () => {
                     className={"ws__rqst_resp_header"+(actionError.includes("reqHeader")&&activeView==="req"?" ws_eb":"")}
                     value={activeView === "req" ? reqHeader : activeView === "param" ? paramHeader : respHeader} 
                     placeholder={activeView === "req" ? "Request Header" : 
-                        activeView === "param" ? "Request Param" : "Response Header"
+                        activeView === "param" ? "param_name = value" : "Response Header"
                     }
                     onChange={onHeaderChange}
                     disabled={disableAction || activeView === "resp"}

@@ -1,28 +1,26 @@
-import React , {useRef , Fragment ,useState} from 'react';
-import {ModalContainer , PopupMsg ,ScreenOverlay} from '../../global';
+import React , {useRef, useState} from 'react';
+import { PopupMsg, ScreenOverlay, RedirectPage } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import ZephyrContent from '../components/ZephyrContent';
 import MappedPage from '../containers/MappedPage';
-import LoginZypher from '../components/LoginZephyr';
+import LoginModal from '../components/LoginModal';
 import {loginToZephyr_ICE,viewZephyrMappedList_ICE} from '../api.js';
 import * as actionTypes from '../state/action.js';
 
 const Zephyr = props => {
+    const history = useHistory();
     const dispatch= useDispatch();
     const user_id = useSelector(state=> state.login.userinfo.user_id);
     const screenType = useSelector(state=>state.integration.screenType); 
     const viewMappedFlies = useSelector(state=>state.integration.mappedScreenType);
-    const accountidRef = useRef();
-    const accessKeyRef = useRef();
-    const secretKeyRef = useRef();
-    const jiraUrlRef= useRef();
-    const jiraUserNameRef = useRef();
-    const jiraAcessToken = useRef();
+    const zephyrUrlRef = useRef();
+    const zephyrUsernameRef = useRef();
+    const zephyrPasswordRef = useRef();
     const [blockui,setBlockui] = useState({show:false});
     const [popup ,setPopup]= useState({show:false});
-    const [failMSg , setFailMsg] = useState(null);
     const [domainDetails , setDomainDetails] = useState(null);
-    const [loginSucess , setLoginSucess]=useState(false);
+    const [loginSuccess , setLoginSuccess]=useState(false);
     const [loginError , setLoginError]= useState(null);
     const [mappedfilesRes,setMappedFilesRes]=useState([]);
 
@@ -35,54 +33,28 @@ const Zephyr = props => {
         })
     }
     const callLogin_zephyr = async()=>{
-        if(!(accountidRef.current.value) ){
-            setFailMsg("Please Enter Zephyr Account ID");
-            setLoginError("ACCID")
-        }
-        else if(!(accessKeyRef.current.value)){
-            setFailMsg("Please Enter Zephyr Access Key ");
-            setLoginError("ZAKEY");
+        setBlockui({show:true,content:'Logging...'})
 
-        }
-        else if(!(secretKeyRef.current.value)){
-            setFailMsg("Please Enter Zephyr Secret Key ");
-            setLoginError("ZSKEY");
+        const zephyrURL = zephyrUrlRef.current.value;
+        const zephyrUsername = zephyrUsernameRef.current.value;
+        const zephyrPassword = zephyrPasswordRef.current.value;
 
-        }
-        else if(!(jiraUrlRef.current.value)){
-            setFailMsg("Please Enter Jira URL");
-            setLoginError("JURL");
-        }
-        else if(!(jiraUserNameRef.current.value)){
-            setFailMsg("Please Enter Jira Username");
-            setLoginError("JUNAME");
-        }
-        else if(!(jiraAcessToken.current.value)){
-            setFailMsg("Please Enter Jira Access Token");
-            setLoginError("JATOKN");
-        }
+        const domainDetails = await loginToZephyr_ICE(zephyrURL, zephyrUsername, zephyrPassword);
+        if (domainDetails.error) displayError(domainDetails.error);
+        if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
+        else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        else if (domainDetails === "Invalid Session") return RedirectPage(history);
+        else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
+        else if (domainDetails === "noprojectfound") setLoginError("Invalid credentials or no project found");
+        else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
+        else if (domainDetails === "fail") setLoginError("Fail to Login");
+        else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Unable to run Zephyr");
+        else if (domainDetails === "Error:Zephyr Operations") setLoginError("Failed during execution");
         else {
-            setBlockui({show:true,content:'Logging...'})
-            const zephyrAcKey = accessKeyRef.current.value;
-            const zephyrAccNo = accountidRef.current.value;
-            const zephyrJiraAccToken = jiraAcessToken.current.value;
-            const zephyrJiraUserName= jiraUserNameRef.current.value;
-            const zephyrJiraUrl= jiraUrlRef.current.value;
-            const zephyrSecKey = secretKeyRef.current.value;
-            const domainDetails = await loginToZephyr_ICE(zephyrAcKey , zephyrAccNo , zephyrJiraAccToken,zephyrJiraUrl,zephyrSecKey,zephyrJiraUserName );
-            if(domainDetails.error){displayError(domainDetails.error);setBlockui({show:false});return;}
-            if(domainDetails === "unavailableLocalServer"){
-                setFailMsg("ICE Engine is not available, Please run the batch file and connect to the Server.")
-            }
-            else if(domainDetails ==="invalidcredentials"){
-                setFailMsg("Invalid Credentials")
-            }
-            else{
             setDomainDetails(domainDetails);
-            setLoginSucess(true);
+            setLoginSuccess(true);
         }
         setBlockui({show:false})
-        }
     }
     const callViewMappedFiles=async()=>{
         setBlockui({show:true,content:'Loading...'})
@@ -94,70 +66,38 @@ const Zephyr = props => {
         setBlockui({show:false})
     }
 
-    const content =()=>{
-        return(
-            <LoginZypher
-                accountidRef={accountidRef}
-                accessKeyRef={accessKeyRef}
-                secretKeyRef={secretKeyRef}
-                jiraUrlRef={jiraUrlRef}
-                jiraUserNameRef={jiraUserNameRef}
-                jiraAcessToken={jiraAcessToken}
-                failMSg={failMSg}
-                loginError={loginError}
-            />
-        )
-    }
-    const footer=()=>{
-        return(
-            <div className="submit_row">
-            <span>
-                    {failMSg}
-            </span>
-            <span>
-                <button onClick={()=>callLogin_zephyr()}>Submit</button>
-            </span>
-            </div>
-        )
-    }
-        return(
-            
-            <Fragment>
-            {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-            {viewMappedFlies === "Zephyr" ? 
-                <MappedPage
-                    screenType="Zephyr"
-                    leftBoxTitle="Zephyr Tests"
-                    rightBoxTitle="Avo Assure Scenarios"
-                    mappedfilesRes={mappedfilesRes}/> :
-            <>
-                {/* <div className="middle_holder"> */}
-                {screenType=== "Zephyr"?
-                    <ZephyrContent
-                        domainDetails={domainDetails}
-                        setBlockui={setBlockui}
-                        displayError={displayError}
-                        setPopup={setPopup}
-                        callViewMappedFiles={callViewMappedFiles}
-                    /> :null}
-                    {
-                    !loginSucess? 
-                        <Fragment>
-                            <ModalContainer 
-                                title="Zephyr Login"
-                                close={()=>{dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });}}
-                                content={content()}
-                                footer ={footer()} 
-                            />
-                        </Fragment>
-                        : null
-                    }
-                </>
-            // </div>
-            }
-            </Fragment> 
-        )
-    }
+    return(
+        <>
+        {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
+        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+        {viewMappedFlies === "Zephyr" ? 
+            <MappedPage
+                screenType="Zephyr"
+                leftBoxTitle="Zephyr Tests"
+                rightBoxTitle="Avo Assure Scenarios"
+                mappedfilesRes={mappedfilesRes}/> :
+        <>
+        { !loginSuccess && 
+            <LoginModal 
+                urlRef={zephyrUrlRef}
+                usernameRef={zephyrUsernameRef}
+                passwordRef={zephyrPasswordRef}
+                screenType={screenType}
+                error={loginError}
+                login={callLogin_zephyr}
+            /> }
+        { screenType=== "Zephyr" &&
+            <ZephyrContent
+                domainDetails={domainDetails}
+                setBlockui={setBlockui}
+                displayError={displayError}
+                setPopup={setPopup}
+                callViewMappedFiles={callViewMappedFiles}
+            /> }
+        </>
+        }
+        </> 
+    )
+}
 
 export default Zephyr;

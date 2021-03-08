@@ -320,24 +320,20 @@ export const viewQcMappedList_ICE = async(userID) => {
         return {error:'No Mapped Data Found'}
     }
 }
-export const loginToZephyr_ICE = async(zephyrAcKey , zephyrAccNo , zephyrJiraAccToken,zephyrJiraUrl,zephyrSecKey,zephyrJiraUserName ) => {
+export const loginToZephyr_ICE = async(url, username, password) => {
     try{
         const res = await axios(url+'/loginToZephyr_ICE', {
             method: 'POST',
             headers: {
-            'Content-type': 'application/json',
+                'Content-type': 'application/json',
             },
-           data: {
-            execFlag : '0',
-            zephyrAcKey: zephyrAcKey,
-            zephyrAccNo: zephyrAccNo,
-            zephyrJiraAccToken: zephyrJiraAccToken,
-            zephyrJiraUrl:zephyrJiraUrl,
-            zephyrSecKey:zephyrSecKey,
-            zephyrJiraUserName:zephyrJiraUserName,   
-            action : 'loginToZephyr_ICE',
-            zephyraction : "domain"
-        }
+            data: {
+                action: "loginToZephyr_ICE",
+				zephyrURL: url,
+				zephyrUserName:	username,
+				zephyrPassword: password,
+				zephyraction: "project"
+            }
         });
         if(res.status === 401){
             RedirectPage(history)
@@ -372,7 +368,7 @@ export const zephyrProjectDetails_ICE = async(domain ,user_id ) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200 && res.data !== "fail"){            
+        if(res.status===200){            
             return res.data;
         }
         console.error(res.data)

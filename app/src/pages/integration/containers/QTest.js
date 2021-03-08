@@ -1,20 +1,23 @@
-import React ,{useState , Fragment , useRef} from 'react';
-import {ModalContainer,  PopupMsg, ScreenOverlay} from '../../global';
+import React ,{useState, useRef} from 'react';
+import { PopupMsg, ScreenOverlay, RedirectPage } from '../../global';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { loginToQTest_ICE, qtestProjectDetails_ICE, qtestFolderDetails_ICE, saveQtestDetails_ICE, viewQtestMappedList_ICE } from '../api.js';
-import LoginQTest from "../components/LoginQTest";
+import LoginModal from '../components/LoginModal';
 import MappedPage from '../containers/MappedPage';
 import QTestContent from '../components/QTestContent.js';
 import * as actionTypes from '../state/action.js';
 
 const  QTest = props => {
+
+    const history = useHistory();
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
     const dispatch =useDispatch()
-    const [loginSucess , setLoginSucess] = useState(false);
+    const [loginSuccess , setLoginSuccess] = useState(false);
     const screenType = useSelector(state=>state.integration.screenType);
     const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
     const urlRef = useRef();
-    const userNameRef = useRef();
+    const usernameRef = useRef();
     const passwordRef = useRef();
     const selProjectRef = useRef();
     const [domainDetails , setDomainDetails] = useState([]);
@@ -39,7 +42,7 @@ const  QTest = props => {
     const [blockui,setBlockui] = useState({show:false});
     const [popup ,setPopup]= useState({show:false});
     const [disableSave , setDisableSave]=useState(true);
-    const [logerror, setLogError]= useState(null);
+    const [loginError, setLoginError]= useState(null);
     const [mappedFilesICERes , setMappedFIlesICERes]= useState([]);
     
     const displayError = (error) =>{ //generic Error Dsplay Function
@@ -52,39 +55,27 @@ const  QTest = props => {
     }
 
     const callLogin_ICE = async()=>{ // Checks all the fileds pf Login PopUp as well set states for errors and API call for login
-        if(!(urlRef.current.value) ){
-            setFailMsg("Please Enter URL");
-            setLogError("URL")
-        }
-        else if(!(userNameRef.current.value)){
-            setFailMsg("Please Enter Username ")
-            setLogError("UNAME")
-
-        }
-        else if(!(passwordRef.current.value)){
-            setFailMsg("Please Enter Password ")
-            setLogError("PASS")
-
-        }
-        else {
-            setBlockui({show:true,content:'Logging...'})
-            const qcPassword = passwordRef.current.value;
-            const qcURL = urlRef.current.value;
-            const qcUsername = userNameRef.current.value;
-            const domainDetails = await loginToQTest_ICE(qcPassword ,qcURL ,qcUsername);
-            if(domainDetails.error){displayError(domainDetails.error);return;}
-            if(domainDetails === "unavailableLocalServer"){
-                setFailMsg("ICE Engine is not available, Please run the batch file and connect to the Server.")
-            }
-            else if (domainDetails === "invalidcredentials"){
-                setFailMsg("Invalid Credentials , Retry Login")
-            }
-            else{
+        setBlockui({show:true,content:'Logging...'})
+        const qcPassword = passwordRef.current.value;
+        const qcURL = urlRef.current.value;
+        const qcUsername = usernameRef.current.value;
+        const domainDetails = await loginToQTest_ICE(qcPassword, qcURL, qcUsername);
+        
+        if(domainDetails.error) displayError(domainDetails.error);
+        else if(domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
+        else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials , Retry Login")
+        else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        else if (domainDetails === "Invalid Session") return RedirectPage(history);
+        else if(domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
+        else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
+        else if (domainDetails === "fail") setLoginError("Fail to Login");
+        else if (domainDetails === "Error:Failed in running Qc") setLoginError("Unable to run Qc");
+        else if(domainDetails === "Error:Qc Operations") setLoginError("Failed during execution");
+        else{
             setDomainDetails(domainDetails);
-            setLoginSucess(true);
+            setLoginSuccess(true);
         }
         setBlockui({show:false})
-        }
     }
     const callProjectDetails_ICE=async(e)=>{ // API call for the list of Projects of qTest and stores respone in array(state)
         setBlockui({show:true,content:'Loading...'})
@@ -233,7 +224,7 @@ const  QTest = props => {
     const callExit=()=>{
         setFolderDetails(null);
         setScenarioArr(null);
-        setLoginSucess(false);
+        setLoginSuccess(false);
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
         setFailMsg(null);
         setReleaseDropdn("Select Release");
@@ -250,31 +241,8 @@ const  QTest = props => {
         setDisableSave(true)
 
     }
-    const content =()=>{
-        return(
-            <LoginQTest
-                urlRef={urlRef}
-                userNameRef={userNameRef}
-                passwordRef={passwordRef}
-                failMSg={failMSg}
-                callLogin_ICE={callLogin_ICE}
-                logerror={logerror}
-            />
-        )
-    }
-    const footer=()=>{
-        return(
-            <div className="submit_row">
-            <span>
-                    {failMSg}
-            </span>
-            <span>
-                <button onClick={()=>callLogin_ICE() }>Submit</button>
-            </span>
-            </div>
-        )
-    }
-    return (<Fragment>
+
+    return (<>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
         {viewMappedFiles === "qTest" ? 
@@ -285,69 +253,63 @@ const  QTest = props => {
                 mappedfilesRes={mappedFilesICERes}
             /> : 
         <>
-                {
-                    screenType === "qTest" ?
-                    <QTestContent
-                        disableSave={disableSave}
-                        callSaveButton={callSaveButton}
-                        callViewMappedFiles={callViewMappedFiles}
-                        callExit={callExit}
-                        projectDropdn1={projectDropdn1}
-                        selProjectRef={selProjectRef}
-                        callProjectDetails_ICE={callProjectDetails_ICE}
-                        domainDetails={domainDetails}
-                        releaseDropdn={releaseDropdn}
-                        callFolderDetails_ICE={callFolderDetails_ICE}
-                        projectDetails={projectDetails}
-                        folderDetails={folderDetails}
-                        callCycleExpand={callCycleExpand}
-                        callTestSuiteExpand={callTestSuiteExpand}
-                        callTestSuiteSelection={callTestSuiteSelection}
-                        selectedTestSuiteID={selectedTestSuiteID}
-                        syncSuccess={syncSuccess}
-                        callUnSync={callUnSync}
-                        callSyncronise={callSyncronise}
-                        projectDropdn2={projectDropdn2}
-                        callScenarios={callScenarios}
-                        scenarioArr={scenarioArr}
-                        selectedScenario_ID={selectedScenario_ID}
-                        setSelectedScenario_ID={setSelectedScenario_ID}
-                        SearchIconClicked={SearchIconClicked}
-                        onSearch={onSearch}
-                        setSearchIconClicked={setSearchIconClicked}
-                        setFilteredName={setFilteredName}
-                        filteredNames={filteredNames}
-                        scenario_ID={scenario_ID}
-                        
-                    />  
-                    : null   
-                    }
-                    {
-                    (!loginSucess)? 
-                    <Fragment>
-                        <ModalContainer 
-                            title="qTest Login"
-                            close={()=>{dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });setFailMsg(null);setLogError(null)}}
-                            content={content()}
-                            footer={footer()}/>
-                        
-                    </Fragment>
-                    : null
-                }
-                {}
-                {
-                    errorPopUp ? 
-                        <PopupMsg
-                        content ={failMSg}
-                        submitText ="OK" 
-                        title ="Save Mapped Testcase"
-                        submit = {()=>setErrorPopUp(false)}
-                        close ={()=>setErrorPopUp(false)}/> 
-                    : null
-                }
-            </>
+        { !loginSuccess &&
+            <LoginModal 
+                urlRef={urlRef}
+                usernameRef={usernameRef}
+                passwordRef={passwordRef}
+                error={loginError}
+                screenType={screenType}
+                login={callLogin_ICE}
+            />
         }
-        </Fragment>
+        { screenType === "qTest" &&
+            <QTestContent
+                disableSave={disableSave}
+                callSaveButton={callSaveButton}
+                callViewMappedFiles={callViewMappedFiles}
+                callExit={callExit}
+                projectDropdn1={projectDropdn1}
+                selProjectRef={selProjectRef}
+                callProjectDetails_ICE={callProjectDetails_ICE}
+                domainDetails={domainDetails}
+                releaseDropdn={releaseDropdn}
+                callFolderDetails_ICE={callFolderDetails_ICE}
+                projectDetails={projectDetails}
+                folderDetails={folderDetails}
+                callCycleExpand={callCycleExpand}
+                callTestSuiteExpand={callTestSuiteExpand}
+                callTestSuiteSelection={callTestSuiteSelection}
+                selectedTestSuiteID={selectedTestSuiteID}
+                syncSuccess={syncSuccess}
+                callUnSync={callUnSync}
+                callSyncronise={callSyncronise}
+                projectDropdn2={projectDropdn2}
+                callScenarios={callScenarios}
+                scenarioArr={scenarioArr}
+                selectedScenario_ID={selectedScenario_ID}
+                setSelectedScenario_ID={setSelectedScenario_ID}
+                SearchIconClicked={SearchIconClicked}
+                onSearch={onSearch}
+                setSearchIconClicked={setSearchIconClicked}
+                setFilteredName={setFilteredName}
+                filteredNames={filteredNames}
+                scenario_ID={scenario_ID}
+                
+            />   
+        }
+        { errorPopUp &&
+            <PopupMsg
+                content ={failMSg}
+                submitText ="OK" 
+                title ="Save Mapped Testcase"
+                submit = {()=>setErrorPopUp(false)}
+                close ={()=>setErrorPopUp(false)}
+            />
+        }
+        </>
+        }
+        </>
     
     )
 }
