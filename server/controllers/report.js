@@ -970,12 +970,12 @@ const fetch_metrics=async (args) => {
     const status = args.status;
     const modifiedBy = args.modifiedBy;
     var inputs = {
-        "executionId" : executionId,
+        "executionid" : executionId,
         "fromdate" : fromDate,
         "todate" : toDate,
         "LOB" : LOB,
         "status" : status,
-        "modifiedBy" : modifiedBy,
+        "modifiedby" : modifiedBy,
         "api":args.api
     };
     var args = {
