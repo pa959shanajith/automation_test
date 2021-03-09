@@ -297,14 +297,14 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 		}
 		else{
 			getParent.addClass("zephyrCollapse");
-				if(getParent.hasClass("Tfolnode")){
-					$(this).prop("src","imgs/ic-qcCollapse.png");
-					getParent.find(".suiteList").show();
-				}
-				if(getParent.hasClass("testSuite") && getParent.next('ul.testcaselist').length>0){
-					$(this).prop("src","imgs/ic-taskType-blue-minus.png");
-					getParent.next('ul.testcaselist').show();
-				}
+			if(getParent.hasClass("Tfolnode")){
+				$(this).prop("src","imgs/ic-qcCollapse.png");
+				getParent.find(".suiteList").show();
+			}
+			else if(getParent.hasClass("testSuite") && getParent.next('ul.testcaselist').length>0){
+				$(this).prop("src","imgs/ic-taskType-blue-minus.png");
+				getParent.next('ul.testcaselist').show();
+			}
 			else{
 				$(this).prop("src","imgs/ic-taskType-blue-minus.png");
 				$(".zephyrExpand").addClass("stopPointerEvent");
