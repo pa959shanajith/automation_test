@@ -269,6 +269,7 @@ exports.viewReport = async (req, res, next) => {
     const type = (url[2] || 'html').toLowerCase().split('?')[0];
     const embedImages = (url[2] || '').toLowerCase().split('?')[1] == 'images=true';
     let report = { overallstatus: [{}], rows: [], remarksLength: 0, commentsLength: 0 };
+    logger.info("Requesting report type - " + type);
     if (!req._passport.instance.verifySession(req)) {
         report.error = {
             ecode: "INVALID_SESSION",
@@ -939,27 +940,124 @@ exports.getAccessibilityReports_API = async(req, res)=>{
     var userInfo = req.body.userInfo;
     var result = {"error":"Interanal Server Error", "userinfo":{"ice":userInfo.icename,"token":userInfo.tokenname}};
     try{
-        const token = await utils.tokenValidation(userInfo);
-        if(token.inputs.tokenValidation.toLowerCase() == "passed"){
-            const inputs = {
-                "executionid": executionId,
-            };
-            reports = await utils.fetchData(inputs,"reports/getAccessibilityReports_API", "getAccessibilityReports_API");
-            if(reports == 'fail'){
-                result['error'] = "Invalid Execution ID"
-            }else{
-                result['reports'] = reports;
-                delete result['error'];
-            } 
-        }else{
-            result["error"] = "Invalid Token";
-        }
-        res.send(result);
+        // const token = await utils.tokenValidation(userInfo);
+        // if(token.inputs.tokenValidation.toLowerCase() == "passed"){
+        //     const inputs = {
+        //         "executionid": executionId,
+        //     };
+        //     reports = await utils.fetchData(inputs,"reports/getAccessibilityReports_API", "getAccessibilityReports_API");
+        //     if(reports == 'fail'){
+        //         result['error'] = "Invalid Execution ID"
+        //     }else{
+        //         result['reports'] = reports;
+        //         delete result['error'];
+        //     } 
+        // }else{
+        //     result["error"] = "Invalid Token";
+        // }
+        res.send("Fail");
     }catch(e){
         logger.error("Exception occured in getAccessibilityReports_API service", exception);
         return res.status(500).send("fail");
     }
 }
+
+const fetch_metrics=async (args) => {
+    const executionId = args.executionId;
+    const fromDate = args.fromDate || "";
+    const toDate = args.toDate || "";
+    const LOB = args.LOB || "";
+    const status = args.status;
+    const modifiedBy = args.modifiedBy;
+    var inputs = {
+        "executionId" : executionId,
+        "fromdate" : fromDate,
+        "todate" : toDate,
+        "LOB" : LOB,
+        "status" : status,
+        "modifiedBy" : modifiedBy,
+        "api":args.api
+    };
+    var args = {
+        data: inputs,
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+    logger.info("Calling DAS Service from getExecution_metrics_API: reports/getExecution_metrics_API");
+    const result=await utils.fetchData(inputs,"reports/getExecution_metrics_API", "getExecution_metrics_API",true);
+    return result;
+};
+
+
+exports.getExecution_metrics_API = async(req, res) => {
+    logger.info("Inside UI service: getExecution_metrics_API");
+    try {
+        const userInfo = await utils.tokenValidation(req.body.userInfo);
+        var execResponse = userInfo.inputs;
+        var finalReport=[];
+        if (execResponse.tokenValidation == "passed"){
+            delete execResponse.error_message;
+            var metrics_data=req.body.metrics_data;
+            metrics_data.api=true;
+            var reportResult = await fetch_metrics(metrics_data);
+            logger.info("Calling DAS Service from getExecution_metrics_API: reports/getExecution_metrics_API");
+            if(reportResult[0].errMsg != ""){
+                execResponse.error_message=reportResult[0].errMsg;
+            }
+            finalReport.push(reportResult[0]);
+        }
+        finalReport.push(execResponse);
+        logger.info("Sending reports in the service getExecution_metrics_API: final function");
+        res.send(finalReport);
+    } catch (exception) {
+        logger.error("Exception in the service getExecution_metrics_API - Error: %s", exception);
+        res.send("fail");
+    }
+};
+
+
+exports.getExecution_metrics = async(req, res) => {
+    logger.info("Inside UI service: getExecution_metrics");
+    try {
+            var metrics_data=req.body.metrics_data;
+			metrics_data.api=false;
+            logger.info("Calling DAS Service from getExecution_metrics: reports/getExecution_metrics");
+			var reportResult = await fetch_metrics(metrics_data);
+			if (reportResult[0] == 'fail') {
+                return res.send('fail');
+            } else if(reportResult[0].rows.length==0) {
+                return res.send('NoRecords');
+            } else {
+                var data=reportResult[0].rows;
+                var dir = './../../excel';
+                var excelDirPath = path.join(__dirname, dir);
+                const filePath = path.join(excelDirPath, 'samp234.csv');
+                try {
+                    if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
+                    if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
+                } catch (e) {
+                    logger.error("Exception in getExecution_metrics: Create Directory/Remove file", e);
+                }
+                var csv = data.map(row => Object.values(row));
+                csv.unshift(Object.keys(data[0]));
+                var csvdata= `"${csv.join('"\n"').replace(/,/g, '","')}"`;
+                fs.writeFile(filePath, csvdata, 'utf8', function (err) {
+                    if (err) {
+                        logger.error('Error in writing to CSV in the service getExecution_metrics');
+                        return res.send('fail');
+                    } else {
+                        res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+                        var rstream = fs.createReadStream(filePath);
+                        rstream.pipe(res);
+                    }
+                });
+            }
+    } catch (exception) {
+        logger.error("Exception in the service getExecution_metrics_API - Error: %s", exception);
+        res.send("fail");
+    }
+};
 
 function validateData(content, type) {
     logger.info("Inside function: validateData");

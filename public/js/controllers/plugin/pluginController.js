@@ -106,7 +106,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 									taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 								}
 								var dataobj={
+									'accessibilityParameters': tasksJson[i].accessibilityParameters,
 									'scenarioflag':tasksJson[i].scenarioFlag,
+									'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
 									'apptype':tasksJson[i].appType,
 									'projectid':tasksJson[i].projectId,
 									'screenid':tasksJson[i].screenId,
@@ -296,8 +298,10 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				console.log("Error updating task status " + (error.data));
 			});
 		}
+		taskObj.accessibilityParameters  = dataobj_json.accessibilityParameters;
 		taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
 		taskObj.scenarioFlag = dataobj_json.scenarioflag;
+		taskObj.scenarioTaskType = dataobj_json.scenarioTaskType
 		taskObj.assignedTestScenarioIds = dataobj_json.assignedtestscenarioids;
 		taskObj.screenId = dataobj_json.screenid;
 		taskObj.screenName = dataobj_json.screenname;
@@ -497,6 +501,13 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		if(validID(obj.projectId) && $scope.filterDat.projectids.indexOf(obj.projectId) == -1){
 			$scope.filterDat.projectids.push(obj.projectId);
 			$scope.filterDat.prjrelmap[obj.projectId] = [obj.taskDetails[tidx].releaseid];
+			if(validID(obj.taskDetails[tidx].releaseid) && validID(obj.taskDetails[tidx].cycleid)){
+				if(!$scope.filterDat.prjRelCyclMap) $scope.filterDat.prjRelCyclMap = {}
+				var dict = $scope.filterDat.prjRelCyclMap
+				if(!dict[obj.projectId])dict[obj.projectId]={};
+				if(!dict[obj.projectId][obj.taskDetails[tidx].releaseid])dict[obj.projectId][obj.taskDetails[tidx].releaseid] = []
+				dict[obj.projectId][obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid)
+			}
 		}
 		if(validID(obj.taskDetails[tidx].releaseid) && $scope.filterDat.releaseids.indexOf(obj.taskDetails[tidx].releaseid) == -1){
 			$scope.filterDat.releaseids.push(obj.taskDetails[tidx].releaseid);
@@ -547,13 +558,13 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		$scope.filterData['relval']='Select Release';
 		$scope.filterData['cycval']='Select Cycle';
 		$scope.filterDat.releaseids.forEach(function(cval,i){
-			$('[value='+cval+']').attr('disabled','disabled');
+			$(`[value="${cval}"]`).attr('disabled','disabled');
 		});		
 		$scope.filterDat.cycleids.forEach(function(cval,i){
-			$('[value='+cval+']').attr('disabled','disabled');
+			$(`[value="${cval}"]`).attr('disabled','disabled');
 		});
 		$scope.filterDat.prjrelmap[$('#project-filter-list').val()].forEach(function(cval,i){
-			$('[value='+cval+']').removeAttr("disabled");
+			$(`[value="${cval}"]`).removeAttr("disabled");
 		});
 	});
 	
@@ -561,11 +572,12 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		//$('#cycle-filter-list').val('Select Cycle');
 		$('#cycle-filter-list').attr('disabled',false);
 		$scope.filterData['cycval']='Select Cycle';
+		var filterArr = $scope.filterDat.prjRelCyclMap[$('#project-filter-list').val()][$('#release-filter-list').val()]
 		$scope.filterDat.cycleids.forEach(function(cval,i){
-			$('[value='+cval+']').attr('disabled','disabled');
+			$(`[value="${cval}"]`).attr('disabled','disabled');
 		});
-		$scope.filterDat.relcycmap[$('#release-filter-list').val()].forEach(function(cval,i){
-			$('[value='+cval+']').removeAttr("disabled");
+		filterArr.forEach(function(cval,i){
+			$(`[value="${cval}"]`).removeAttr("disabled");
 		});
 	});
 

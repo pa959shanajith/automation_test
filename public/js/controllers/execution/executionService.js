@@ -64,19 +64,28 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 			function(response){	return $q.reject(response.data);});	
 		},
 
-		loginZephyrServer_ICE: function(zephyrAccNo,zephyrAcKey,zephyrSecKey, integrationType){
+		loginZephyrServer_ICE: function(zephyrURL,zephyrUserName,zephyrPassword, integrationType){
 			var param = "loginToZephyr_ICE";
 			return $http.post('/loginToZephyr_ICE', {
 				action: param,
-				zephyrAccNo: zephyrAccNo,
-				zephyrAcKey: zephyrAcKey,
-				zephyrSecKey : zephyrSecKey,
+				zephyrURL: zephyrURL,
+				zephyrUserName: zephyrUserName,
+				zephyrPassword : zephyrPassword,
 				integrationType : integrationType,
-				execFlag: "1",
-				zephyraction: "domain"
+				zephyraction: "project"
 			})
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
+		},
+		updateAccessibilitySelection: function(suiteInfo){
+			var param = "updateAccessibilitySelection";
+			return $http.post('/updateAccessibilitySelection', suiteInfo)
+			.then (function(response){
+				return response.data;	
+			},
+			function(response){	
+				return $q.reject(response.data);
+			});	
 		}
 	}
 }]);
