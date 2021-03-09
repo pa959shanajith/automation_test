@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ModalContainer, ScrollBar } from '../../global';
 import "../styles/AddObjectModal.scss";
+import PropTypes from 'prop-types';
 
 const AddObjectModal = props => {
 
@@ -156,4 +157,11 @@ const AddObjectModal = props => {
     );
 }
 
+AddObjectModal.propTypes={
+    scrapeItems:PropTypes.array,
+    setShow:PropTypes.func,
+    setScrapeItems:PropTypes.func,
+    setSaved:PropTypes.func,
+    setShowPop:PropTypes.func
+}
 export default AddObjectModal;

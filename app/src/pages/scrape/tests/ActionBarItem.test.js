@@ -1,14 +1,11 @@
 import * as React from 'react';
-import {findByTestAtrr, checkProps} from '../../../setupTests';
+import {findByTestAtrr} from '../../../setupTests';
 import {mount}from 'enzyme';
 import ActionBarItems from '../components/ActionBarItems';
-import ModalContainer from '../../global/components/ModalContainer'
-import ScrollBar from '../../global/components/ScrollBar';
 import dummyData from './dummyData'
 import {Provider}  from 'react-redux';
 import {createStore} from 'redux';
 import reducer from '../state/reducer';
-import { act } from 'react-dom/test-utils';
 import { Thumbnail } from '../../global';
 import * as api from '../api';
 

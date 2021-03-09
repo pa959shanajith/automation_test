@@ -1,5 +1,6 @@
 import React, { useState} from 'react';
 import { Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const PluginBox = ({plugin}) => {
 
@@ -25,5 +26,7 @@ const PluginBox = ({plugin}) => {
 		</>
     );
 }
-
+PluginBox.propTypes={
+    plugin:PropTypes.object
+}
 export default PluginBox;

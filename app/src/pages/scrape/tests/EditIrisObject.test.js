@@ -2,15 +2,10 @@ import * as React from 'react';
 import {findByTestAtrr, checkProps} from '../../../setupTests';
 import { mount}from 'enzyme';
 import EditIrisObject from '../components/EditIrisObject';
-import * as reactRedux from 'react-redux';
-import {Provider}  from 'react-redux';
-import {createStore} from 'redux';
-import reducer from '../state/reducer';
 import * as  api from '../api';
 
 // dummy props to mount the component EditIrisObject
-const props=
-    {
+const props={
         "utils": {
           "operation": "editIrisObject",
           "object": {
@@ -37,10 +32,21 @@ const props=
           "screenname": "Batch_Execution_Screen1",
           "versionnumber": 0
         },
-        setShow:jest.fn(),
-        setShowPop:jest.fn()
-      }
-
+        "setShow":jest.fn(),
+        "setShowPop":jest.fn()
+}
+describe('<EditIris/> Positive Scenarios',()=>{
+    it('Should contain the expected and required props',()=>{
+        const expectedProps={
+            "utils":{"a":1},
+            "taskDetails":{"b":1},
+            "setShow":jest.fn(),
+            "setShowPop":jest.fn()
+        }
+        const propsError=checkProps(EditIrisObject,expectedProps);
+        expect(propsError).toBeUndefined()
+    })
+})
 describe('<EditIris/> Positive Sceanrios',()=>{
     let wrapper;
     

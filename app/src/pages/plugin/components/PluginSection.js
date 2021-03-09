@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PluginBox from './PluginBox';
 import "../styles/PluginSection.scss"
+import PropTypes from 'prop-types';
 
 const PluginSection = ({userInfo}) => {
 
@@ -35,5 +36,7 @@ const PluginSection = ({userInfo}) => {
         </div>
     );
 }
-
+PluginSection.propTypes={
+    plugin:PropTypes.object
+}
 export default PluginSection;

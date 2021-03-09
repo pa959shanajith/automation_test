@@ -5,6 +5,8 @@ import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
+import PropTypes from 'prop-types';
+
 
 const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
@@ -275,5 +277,10 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         </div>
         </>
     );
+}
+TaskSection.propTypes={
+    userInfo : PropTypes.object,
+    userRole : PropTypes.string,
+    dispatch : PropTypes.func
 }
 export default TaskSection;

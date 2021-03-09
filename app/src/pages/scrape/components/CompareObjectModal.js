@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ModalContainer } from '../../global';
 import "../styles/CompareObjectModal.scss";
-
+import PropTypes from 'prop-types'
 const CompareObjectModal = props => {
 
     const [isMac, setIsMac] = useState(false);
@@ -40,5 +40,8 @@ const CompareObjectModal = props => {
         </div>
     )
 }
-
+CompareObjectModal.propTypes={
+    startScrape:PropTypes.func,
+    setShow:PropTypes.func
+}
 export default CompareObjectModal;

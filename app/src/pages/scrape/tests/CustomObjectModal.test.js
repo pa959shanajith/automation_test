@@ -1,7 +1,7 @@
 import React from 'react';
 import {findByTestAtrr, checkProps} from '../../../setupTests';
-import { shallow,mount}from 'enzyme';
-import { CreateObjectModal, EditObjectModal } from '../components/CustomObjectModal';
+import {mount}from 'enzyme';
+import { CreateObjectModal} from '../components/CustomObjectModal';
 import ModalContainer from '../../global/components/ModalContainer'
 import * as api from '../api';
 import { act } from 'react-dom/test-utils';
@@ -109,18 +109,18 @@ const props={
 describe('<CustomObjectModel/> Positive Scenarios',()=>{
     it('Should contain the expected and required props',()=>{
         const expectedProps={
-            "scrapeItems": [1,2,3,4],
-            "newScrapedData": [],
-            "setNewScrapedData":jest.fn(),
-            "setSaved": jest.fn(),
-            "setShow": jest.fn(),
-            "setShowPop": jest.fn(),
-            "updateScrapeItems":jest.fn() 
+            scrapeItems: [{"a":1},{"b":2}],
+            newScrapedData: [],
+            setNewScrapedData:jest.fn(),
+            setSaved: jest.fn(),
+            setShow: jest.fn(),
+            setShowPop: jest.fn(),
+            updateScrapeItems:jest.fn() 
         }
         const propsError=checkProps(CreateObjectModal,expectedProps)
         expect(propsError).toBeUndefined()
-    })
-})
+    });
+});
 
 describe('<CustomObjectModal/> Positive Scenarios',()=>{
     let wrapper;

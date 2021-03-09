@@ -97,11 +97,8 @@ describe('<FilterDialog/> Positive Scenarios',()=>{
                 }
             }
         })
-        console.log(findByTestAtrr(wrapper,'taskTypeCheckBox').debug())
         let tt=findByTestAtrr(wrapper,'taskTypeCheckBox')
         tt.simulate('change',{target:{checked:true}})
-        console.log(findByTestAtrr(wrapper,'taskTypeCheckBox').debug())
-
         // Assert that the values are changed
         expect(findByTestAtrr(wrapper,'selectReleaseDrop').prop('value')).toBe("r1")
        

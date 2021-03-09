@@ -3,7 +3,6 @@ import {findByTestAtrr, checkProps} from '../../../setupTests';
 import { shallow}from 'enzyme';
 import AddObjectModal from '../components/AddObjectModal';
 import ModalContainer from '../../global/components/ModalContainer'
-import ScrollBar from '../../global/components/ScrollBar';
 
 const props={
     "scrapeItems": [
@@ -89,9 +88,21 @@ const setUp=()=>{
   return wrapper;
 }
 // True Positive
+describe('<AddObjectModal/> Positive Scenarios',()=>{
+  it('Should contain the expected and required props',()=>{
+      const expectedProps={
+        "scrapeItems": [{"A":1},{"B":2}],
+        "setShow":jest.fn(),
+        "setScrapeItems":jest.fn(),
+        "setSaved":jest.fn(),
+        "setShowPop":jest.fn()
+      }
+      const propsError=checkProps(AddObjectModal,expectedProps)
+      expect(propsError).toBeUndefined()
+  })
+});
 describe('<AddObjectModal/> Positive Sceanrios',()=>{
     it('should contian the required and expected props',()=>{
-        const wrapper=setUp()
         const expectedProps={
             "scrapeItems":[1,2,3,4],
             "setShow":jest.fn(),
@@ -102,8 +113,7 @@ describe('<AddObjectModal/> Positive Sceanrios',()=>{
         const propsError=checkProps(AddObjectModal,expectedProps)
         expect(propsError).toBeUndefined()
     })
-})
-
+});
 describe('<AddObjectModel/> Positive Sceanrios',()=>{
     let wrapper;
     beforeEach(()=>{
@@ -128,17 +138,11 @@ describe('<AddObjectModel/> Positive Sceanrios',()=>{
     });
     
     it('Should clear the inputs when reset is clicked',()=>{
-        
       let modalContainer=wrapper.find(ModalContainer).dive();
-      findByTestAtrr(modalContainer,'addObjectInput').simulate('change',{target:{
-        value:'button'
-      }})
-      findByTestAtrr(modalContainer,'addObjectTypeSelect').simulate('change',{target:{
-        value:'Link'
-      }})
+      findByTestAtrr(modalContainer,'addObjectInput').simulate('change',{target:{value:'button'}})
+      findByTestAtrr(modalContainer,'addObjectTypeSelect').simulate('change',{target:{value:'Link'}})
       wrapper.update()
       modalContainer=wrapper.find(ModalContainer).dive()
- 
       findByTestAtrr(modalContainer,'reset').simulate('click')
       wrapper.update()
       modalContainer=wrapper.find(ModalContainer).dive()
@@ -155,24 +159,17 @@ describe('<AddObjectModel/> Positive Sceanrios',()=>{
       modalContainer=wrapper.find(ModalContainer).dive();
       // Assert that modal item has been added
       expect(findByTestAtrr(modalContainer,'objModalItem').length).toBe(2)
-      
       let secItem=findByTestAtrr(modalContainer,'objModalItem').at(1)
       findByTestAtrr(secItem,'deleteObjectButton').simulate('click')
       wrapper.update()
       modalContainer=wrapper.find(ModalContainer).dive();
       // Assert that modal item has been deleted
       expect(findByTestAtrr(modalContainer,'objModalItem').length).toBe(1)
-
-
     })
     it('Should accept the inputs and display the object saved popup',()=>{
       let modalContainer=wrapper.find(ModalContainer).dive();
-      findByTestAtrr(modalContainer,'addObjectInput').simulate('change',{target:{
-        value:'button'
-      }})
-      findByTestAtrr(modalContainer,'addObjectTypeSelect').simulate('change',{target:{
-        value:'a-lnk'
-      }})
+      findByTestAtrr(modalContainer,'addObjectInput').simulate('change',{target:{value:'button'}})
+      findByTestAtrr(modalContainer,'addObjectTypeSelect').simulate('change',{target:{value:'a-lnk'}})
       wrapper.update()
       modalContainer=wrapper.find(ModalContainer).dive();
       let submitButton=findByTestAtrr(modalContainer,'submit')
@@ -180,9 +177,7 @@ describe('<AddObjectModel/> Positive Sceanrios',()=>{
       wrapper.update();
       expect(props.setShowPop.mock.calls).toEqual([[{title: "Add Object", content: "Objects has been added successfully."}]])
     })
-})
-
-
+});
 // Negative Sceanrios
 describe('<AddObjectModel/> Negative Sceanrios',()=>{
     let wrapper;
@@ -199,7 +194,6 @@ describe('<AddObjectModel/> Negative Sceanrios',()=>{
       wrapper.update();
       modalContainer=wrapper.find(ModalContainer).dive();
       expect(findByTestAtrr(modalContainer,'addObjectInput').prop('className')).not.toBe('addObj_name')
-
     });
     it('Should error when add object form is submitted when object type isn\'t selected',()=>{
       let modalContainer=wrapper.find(ModalContainer).dive();
@@ -212,8 +206,7 @@ describe('<AddObjectModel/> Negative Sceanrios',()=>{
       modalContainer=wrapper.find(ModalContainer).dive();
       expect(findByTestAtrr(modalContainer,'addObjectTypeSelect').prop('className')).not.toBe('addObj_objType');
     });
-    it('Should throw popup with message Object Charcertistics are same',()=>{
-      
+    it('Should throw popup with message Object Charcertistics are same',()=>{  
       let modalContainer=wrapper.find(ModalContainer).dive();
       findByTestAtrr(modalContainer,'addObjectInput').simulate('change',{target:{value:'LocalTable'}}) 
       findByTestAtrr(modalContainer,'addObjectTypeSelect').simulate('change',{target:{value:'Table-tbl'}})
@@ -224,4 +217,4 @@ describe('<AddObjectModel/> Negative Sceanrios',()=>{
       wrapper.update();
       expect(props.setShowPop.mock.calls).toEqual([[{title: 'Add Objects', content: `Object Characteristics are same for LocalTable!`}]])
     })
-})
+});

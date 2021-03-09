@@ -10,6 +10,16 @@ import { SET_CERT } from '../state/action';
 
 // Positive
 describe('<CertificateModal/> Positive Scenarios',()=>{
+    it('Should contain the expected and required props',()=>{
+        const expectedProps={
+            setShowPop:jest.fn(),
+            setShow:jest.fn()
+        }
+        const propsError=checkProps(CertificateModal,expectedProps)
+        expect(propsError).toBeUndefined()
+    })
+});
+describe('<CertificateModal/> Positive Scenarios',()=>{
     let wrapper;
     const props={
         setShowPop:jest.fn(),

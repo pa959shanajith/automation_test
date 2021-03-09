@@ -2,8 +2,7 @@ import React from 'react';
 import { act } from 'react-dom/test-utils';
 import {Provider}  from 'react-redux';
 import {createStore} from 'redux';
-import { shallow,mount } from 'enzyme';
-
+import {mount} from 'enzyme';
 import TaskSection from '../components/TaskSection';
 import {findByTestAtrr, checkProps} from '../../../setupTests';
 import {userInfo,dummyData, dummyData1,firstCall,secondCall} from './dummyData';
@@ -17,10 +16,7 @@ const setUp=()=>{
         userRole:'Test Lead',
         dispatch: jest.fn()
     }
-    
     const wrapper=mount(<TaskSection {...props}/>)
-    // let wrapper;
-    // act(()=>{wrapper=mount(<TaskSection {...props}/>)})
     return wrapper
 }
 
@@ -32,7 +28,6 @@ const setUp=()=>{
 
 const sampleObject={test:'test'}
 describe('<TaskSection/> Positive Scenarios',()=>{
-    
     it('Should contain the required and expected props',()=>{
         const expectedProps={
             userInfo : sampleObject,
@@ -48,15 +43,14 @@ describe('<TaskSection/> Positive Scenarios',()=>{
     let wrapper;
     beforeEach(()=>{
         wrapper=setUp()
-
     })
     it('Should render all the required attributes of the my task section',()=>{
         // Assert that task header is renderd
         expect(findByTestAtrr(wrapper,'task-header').length).toBe(1)
         // Assert that my task heading is rendered
         expect(findByTestAtrr(wrapper,'my-task').length).toBe(1)
-        // Assert that search input is rendered
-        expect(findByTestAtrr(wrapper,'search-input').length).toBe(1)
+        // Assert that search input is not rendered
+        expect(findByTestAtrr(wrapper,'search-input').length).toBe(0)
         // Assert that search-icon is rendered
         expect(findByTestAtrr(wrapper,'search-icon').length).toBe(1)
         // Assert that filter-icon is rendered
@@ -80,7 +74,7 @@ describe('<TaskSection/> Positive Scenarios',()=>{
         let searchIcon=findByTestAtrr(wrapper,'search-icon')
         searchIcon.simulate('click')
         wrapper.update()
-        expect(findByTestAtrr(wrapper,'search-input').prop('className')).toBe("task-search-bar false")
+        expect(findByTestAtrr(wrapper,'search-input').length).toBe(1)
     })
     it('Should render the filter dialog pop up when clicked on filter icon',()=>{
         let fltr=findByTestAtrr(wrapper,'filter-icon');
@@ -130,25 +124,18 @@ describe('<TaskSection/> Positive Scenarios',()=>{
         
     })
     it('Should contain the required number of items under To Do and ToReview',async()=>{
-        // console.log(findByTestAtrr(wrapper,'taskcontent-component').children().length)
         wrapper.update()
         expect(findByTestAtrr(wrapper,'taskcontent-component').children().length).toBe(14)
         const tR=findByTestAtrr(wrapper,'task-toReview')
         tR.simulate('click') 
         wrapper.update()
-        // console.log(findByTestAtrr(wrapper,'taskcontent-component').children().length)
         expect(findByTestAtrr(wrapper,'taskcontent-component').children().length).toBe(2)
-        
-        
     })
     it('Should update the task section with the searched value',async ()=>{
-        
+        findByTestAtrr(wrapper,'search-icon').simulate('click')
+        wrapper.update()
         let searchInput=findByTestAtrr(wrapper,'search-input');   
-        searchInput.simulate('change',{
-            target:{
-                value:'username'
-            }
-        })
+        searchInput.simulate('change',{target:{value:'username'}})
         wrapper.update();
         expect(findByTestAtrr(wrapper,'taskcontent-component').children().length).toBe(1);  
     })

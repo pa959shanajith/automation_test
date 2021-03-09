@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ModalContainer, ScrollBar } from '../../global'
 import "../styles/FilterDialog.scss";
+import PropTypes from 'prop-types';
 
 const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
 
@@ -173,5 +174,10 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
         </div>
     );
 }
-
+FilterDialog.propTypes={
+    setShow:PropTypes.func,
+    dataDict:PropTypes.object, 
+    filterData:PropTypes.object, 
+    filterTasks:PropTypes.func
+}
 export default FilterDialog;

@@ -4,6 +4,7 @@ import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
 import { objectTypes } from './ListVariables';
 import { userObjectElement_ICE } from '../api';
 import "../styles/CreateObjectModal.scss";
+import PropTypes from 'prop-types'
 
 const CreateObjectModal = props => {
 
@@ -312,5 +313,14 @@ const EditObjectModal = props => {
     return (
         <CreateObjectModal {...props} editFlag={true} />
     );
+}
+CreateObjectModal.propTypes={
+    scrapeItems: PropTypes.arrayOf(PropTypes.object),
+    newScrapedData: PropTypes.array,
+    setNewScrapedData:PropTypes.func,
+    setSaved: PropTypes.func,
+    setShow: PropTypes.func,
+    setShowPop: PropTypes.func,
+    updateScrapeItems:PropTypes.func
 }
 export { CreateObjectModal, EditObjectModal };

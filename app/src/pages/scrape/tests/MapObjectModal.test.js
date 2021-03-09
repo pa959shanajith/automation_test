@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow,mount}from 'enzyme';
+import {mount}from 'enzyme';
 import { act } from 'react-dom/test-utils';
 import {findByTestAtrr, checkProps} from '../../../setupTests';
 import reducer from '../state/reducer';
@@ -10,11 +10,11 @@ import MapObjectModal from '../components/MapObjectModal';
 describe('<MapObjectModal/> Positive Scenarios',()=>{
     it('Should contain the expected and required props',()=>{
         const expectedProps={
-            "scrapeItems": [1,2,3,4],
+            "scrapeItems": [{"a":1}],
             "current_task":dummyData.CT,
             "user_id": "5fb4fbf9f4da702833d7e09e",
             "role": "Test Lead",
-            "fetchScrapeData":12,
+            "fetchScrapeData":jest.fn(),
             "setShowPop": jest.fn(),
             "setShow":jest.fn()
           }

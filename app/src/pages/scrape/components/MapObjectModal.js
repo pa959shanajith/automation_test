@@ -3,6 +3,7 @@ import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
 import { tagList } from  './ListVariables';
 import { updateScreen_ICE } from '../api';
 import "../styles/MapObjectModal.scss";
+import PropTypes from 'prop-types'
 
 const MapObjectModal = props => {
 
@@ -114,7 +115,7 @@ const MapObjectModal = props => {
                     })
                     .catch(err => {
                         props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
-                        console.err(err);
+                        // console.error(err);
                     });
         })
         .catch(error => {
@@ -212,6 +213,14 @@ const MapObjectModal = props => {
         </div>
     );
 }
-
+MapObjectModal.propTypes={
+    scrapeItems: PropTypes.arrayOf(PropTypes.object),
+    current_task:PropTypes.object,
+    user_id: PropTypes.string,
+    role: PropTypes.string,
+    fetchScrapeData:PropTypes.func,
+    setShow:PropTypes.func,
+    setShowPop: PropTypes.func,
+}
 export default MapObjectModal;
 

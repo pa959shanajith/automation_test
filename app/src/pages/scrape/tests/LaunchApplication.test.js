@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {findByTestAtrr, checkProps} from '../../../setupTests';
-import { shallow,mount}from 'enzyme';
+import {findByTestAtrr} from '../../../setupTests';
+import {mount}from 'enzyme';
 import LaunchApplication from '../components/LaunchApplication';
 
-
+// Positive
 describe('<LaunchApplication/> Positive Scenarios (DESKTOP)',()=>{
     // Props for desktop application
     const props={

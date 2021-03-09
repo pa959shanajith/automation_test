@@ -9,15 +9,13 @@ const setUp=()=>{
     let wrapper=mount(<PluginSection {...props}/>)
     return wrapper
 }
-const sampleObject={test:'test'}
-
 // True Positive
 // 1. Expected and Required Props are present
 // 2. Should render only the available plugins to the user
 describe('<PluginSection/> Positive Scenarios',()=>{
     it('Should contain the required and expected props',()=>{
         const expectedProps={
-            userInfo: sampleObject
+            userInfo: {test:'test'}
         }
         const propsError=checkProps(PluginSection,expectedProps)
         expect(propsError).toBeUndefined()
@@ -44,8 +42,7 @@ describe('<PluginSection/> Positive Scenarios',()=>{
         // (availablePlugins)
         let pluginsLength = availablePlugins.length;
         for(let i=0 ; i < pluginsLength ; i++){
-            if(availablePlugins[i].pluginValue == true)  count++;
-            
+            if(availablePlugins[i].pluginValue == true)  count++;  
         }
         const pluginsAll=findByTestAtrr(wrapper,'plugins-blocks')
         // Assert that plugins sections contains all the plugins which are available to the user

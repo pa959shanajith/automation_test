@@ -1,5 +1,5 @@
 import React from 'react';
-import { shallow,mount}from 'enzyme';
+import {mount}from 'enzyme';
 import {findByTestAtrr, checkProps} from '../../../setupTests';
 import CompareObjectModal from '../components/CompareObjectModal';
 
@@ -10,7 +10,17 @@ const props={
     startScrape:jest.fn(),
     setShow:jest.fn()
 }
-
+// POsitive
+describe('<CompareObjectModal/> Positive Scenarios',()=>{
+    it('Should contain the expected and required props',()=>{
+        const expectedProps={
+            startScrape:jest.fn(),
+            setShow:jest.fn()
+        }
+        const propsError=checkProps(CompareObjectModal,expectedProps)
+        expect(propsError).toBeUndefined()
+    });
+});
 describe("<CompareObjectModal/> Positve Scenarios",()=>{
     let winSpy;
     beforeEach(()=>{
