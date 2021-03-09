@@ -46,7 +46,7 @@ const DesignContent = props => {
     const [checkedRows, setCheckedRows] = useState([]);
     const [focusedRow, setFocusedRow] = useState(null);
     const [draggable, setDraggable] = useState(false);
-    const [dataFormat, setDataFormat] = useState(null);
+    // const [dataFormat, setDataFormat] = useState(null);
     const [objNameList, setObjNameList] = useState(null);
     const [showConfPaste, setShowConfPaste] = useState(false);
     const [showPS, setShowPS] = useState(false);
@@ -78,8 +78,8 @@ const DesignContent = props => {
 
     const tableActionBtnGroup = [
         {'title': 'Add Test Step', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add Steps', onClick: ()=>addRow()},
-        {'title': 'Select Test Step(s)', 'img': 'static/imgs/ic-selmulti.png', 'alt': 'Select Steps', onClick: ()=>selectMultiple()},
         {'title': 'Edit Test Step', 'img': 'static/imgs/ic-jq-editstep.png', 'alt': 'Edit Steps', onClick:  ()=>editRow()},
+        {'title': 'Select Test Step(s)', 'img': 'static/imgs/ic-selmulti.png', 'alt': 'Select Steps', onClick: ()=>selectMultiple()},
         {'title': 'Drag & Drop Test Step', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Steps', onClick:  ()=>toggleDrag()},
         {'title': 'Copy Test Step', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy Steps', onClick:  ()=>copySteps()},
         {'title': 'Paste Test Step', 'img': 'static/imgs/ic-jq-pastestep.png', 'alt': 'Paste Steps', onClick:  ()=>onPasteSteps()},
@@ -88,6 +88,7 @@ const DesignContent = props => {
 
     useEffect(()=>{
         dispatch({type: designActions.SET_TESTCASES, payload: testCaseData})
+        //eslint-disable-next-line
     }, [testCaseData]);
 
     useEffect(()=>{
@@ -103,6 +104,7 @@ const DesignContent = props => {
             })
             .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
         }
+        //eslint-disable-next-line
     }, [props.imported]);
 
     useEffect(()=>{
@@ -121,6 +123,7 @@ const DesignContent = props => {
             })
             .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
         }
+        //eslint-disable-next-line
     }, [userInfo, props.current_task]);
 
     const fetchTestCases = () => {
@@ -162,8 +165,8 @@ const DesignContent = props => {
                         if (scriptData === "Invalid Session") return RedirectPage(history);
                         if (appType === "Webservice"){
                             if (scriptData.view.length > 0) {
-                                if (scriptData.view[0].header) setDataFormat(scriptData.view[0].header[0].split("##").join("\n"));
-                                else setDataFormat(scriptData.header[0].split("##").join("\n"));
+                                // if (scriptData.view[0].header) setDataFormat(scriptData.view[0].header[0].split("##").join("\n"));
+                                // else setDataFormat(scriptData.header[0].split("##").join("\n"));
                             }	
                         }
                         
@@ -259,7 +262,7 @@ const DesignContent = props => {
                         break;
                     } else {
                         testCases[i].custname = testCases[i].custname.trim();
-                         if (testCases[i].keywordVal == 'SwitchToFrame' && String(testScriptData) !== "undefined") {
+                         if (testCases[i].keywordVal === 'SwitchToFrame' && String(testScriptData) !== "undefined") {
                             let scriptData = [...testScriptData];
                             for (let j = 0; j < scriptData.length; j++) {
                                 if (!(['@Browser', '@Oebs', '@Window', '@Generic', '@Custom'].includes(scriptData[j].custname)) && scriptData[j].url !== "") {
@@ -280,63 +283,57 @@ const DesignContent = props => {
                 }
 
                 if (!errorFlag) {
-                    let scrape_data = null;
-                    let { appType, screenId, projectId, testCaseId} = props.current_task;
-                    DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
-                        .then(res => {
-                            let getScrapeData=res
-                            scrape_data = JSON.parse(JSON.stringify(getScrapeData));
-                        })
-                        .catch(error=>{
-                            console.error("Error:::::", error)
-                        });
                     DesignApi.updateTestCase_ICE(testCaseId, testCaseName, testCases, userInfo, versionnumber, import_status)
                     .then(data => {
                         if (data === "Invalid Session") return RedirectPage(history);
                         if (data === "success") {
                             
                             if(props.current_task.appType.toLowerCase()==="web" && Object.keys(modified).length !== 0){
-                                // THIS SECTION NEEDS TO BE RECHECKED
-                                let screenId = props.current_task.screenId;
-                                let screenName = props.current_task.screenName;
-                                let projectId = props.current_task.projectId;
+                                let scrape_data = {};
+                                let { appType, projectId, testCaseId, versionnumber } = props.current_task;
                                 
-                                let scrapeObject = {};
-                                for(let i=0; i<scrape_data.view.length; i++){
-                                    if(scrape_data.view[i].custname in modified){
-                                        scrape_data.view[i].xpath=modified[scrape_data.view[i].custname]
-                                    }
-                                } 
+                                DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
+                                .then(res => {
+                                    scrape_data=res;
+                                    let modifiedObjects = [];
+                                    for(let i=0; i<scrape_data.view.length; i++){
+                                        if(scrape_data.view[i].custname in modified){
+                                            scrape_data.view[i].xpath = modified[scrape_data.view[i].custname];
+                                            modifiedObjects.push(scrape_data.view[i]);
+                                        }
+                                    } 
 
-                                scrapeObject.getScrapeData = JSON.stringify(scrape_data);
-                                scrapeObject.projectId = projectId;
-                                scrapeObject.screenId = screenId;
-                                scrapeObject.screenName = screenName;
-                                scrapeObject.userinfo = userInfo;
-                                scrapeObject.param = "updateScrapeData_ICE";
-                                scrapeObject.appType = props.current_task.appType;
-                                scrapeObject.versionnumber = props.current_task.versionnumber;
-                                scrapeObject.newData = {}; //viewString
-                                scrapeObject.type = "save";
-                                
-                                DesignApi.updateScreen_ICE(scrapeObject)
-                                .then(data1 => {
-                                    if (data1 === "Invalid Session") return RedirectPage(history);
+                                    let params = {
+                                        'deletedObj': [],
+                                        'modifiedObj': modifiedObjects,
+                                        'addedObj': {...scrape_data, view: []},
+                                        'testCaseId': testCaseId,
+                                        'userId': userInfo.user_id,
+                                        'roleId': userInfo.role,
+                                        'versionnumber': versionnumber,
+                                        'param': 'DebugModeScrapeData'
+                                    }
                                     
-                                    if (data1 === "success") {            
-                                        fetchTestCases()
-                                        .then(msg=>{
-                                            setChanged(false);
-                                            msg === "success"
-                                            ? props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'})
-                                            : props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."})
-                                        })
-                                        .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
-                                    } else props.setShowPop({'title': 'Save Testcase', 'content': 'Failed to save Testcase'});
+                                    DesignApi.updateScreen_ICE(params)
+                                    .then(data1 => {
+                                        if (data1 === "Invalid Session") return RedirectPage(history);
+                                        
+                                        if (data1 === "Success") {            
+                                            fetchTestCases()
+                                            .then(msg=>{
+                                                setChanged(false);
+                                                msg === "success"
+                                                ? props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'})
+                                                : props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."})
+                                            })
+                                            .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
+                                        } else props.setShowPop({'title': 'Save Testcase', 'content': 'Failed to save Testcase'});
+                                    })
+                                    .catch(error => {
+                                        console.error("Error::::", error)
+                                    })
                                 })
-                                .catch(error => {
-                                    console.error("Error::::", error)
-                                })
+                                .catch(error=> console.error("Error:::::", error) );
                             }
                             else{
                                 fetchTestCases()
@@ -447,6 +444,7 @@ const DesignContent = props => {
     const addRow = () => {
         let testCases = [...testCaseData]
         let insertedRowIdx = [];
+        runClickAway = false;
         if (checkedRows.length === 1) {
             const rowIdx = checkedRows[0];
             testCases.splice(rowIdx+1, 0, emptyRowData);
@@ -508,6 +506,7 @@ const DesignContent = props => {
         let selectedRows = [...checkedRows]
         let copyTestCases = []
         let copyContent = {}
+        let copyErrorFlag = false;
         if (selectedRows.length === 0) props.setShowPop({'title': 'Copy Test Step', 'content': 'Select step to copy'});
         else{
             let sortedSteps = selectedRows.map(step=>parseInt(step)).sort((a,b)=>a-b)
@@ -515,6 +514,7 @@ const DesignContent = props => {
                 if (!testCaseData[idx].custname) {
                     if (selectedRows.length === 1) props.setShowPop({'title': 'Copy Test Step', 'content': 'Empty step can not be copied.'});
                     else props.setShowPop({'title': 'Copy Test Step', 'content': 'The operation cannot be performed as the steps contains invalid/blank object references'});
+                    copyErrorFlag = true;
                     break
                 } 
                 else{
@@ -523,12 +523,14 @@ const DesignContent = props => {
                 }
             }
             
-            copyContent = {'appType': props.current_task.appType, 'testCaseId': props.current_task.testCaseId, 'testCases': copyTestCases}
+            if (!copyErrorFlag) {
+                copyContent = {'appType': props.current_task.appType, 'testCaseId': props.current_task.testCaseId, 'testCases': copyTestCases};
+                dispatch({type: designActions.SET_COPYTESTCASES, payload: copyContent});
+                setEdit(false);
+            }
             setCheckedRows([]);
             setHeaderCheck(false);
-            setEdit(false);
             setFocusedRow(null);
-            dispatch({type: designActions.SET_COPYTESTCASES, payload: copyContent});
         }
     }
 

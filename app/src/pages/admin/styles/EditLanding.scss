@@ -401,5 +401,13 @@
     margin-right:10px;
 }
 .dropdown-menu-edit .scrollbar-container{
-    padding-bottom: 5%;
+    width: 100%;
+}
+.c__usersList{
+    padding: 6px;
+    font-size: 14px;
+    -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    display: flex;
+    border: 1px solid rgba(0,0,0,.15);
 }

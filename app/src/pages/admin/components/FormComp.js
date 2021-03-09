@@ -1,6 +1,8 @@
 import React ,  { Fragment, useEffect, useState} from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import { ScrollBar } from '../../global';
+import ValidationExpression from '../../global/components/ValidationExpression';
+
 import '../styles/FormComp.scss'
 
 /*Component FormInput
@@ -13,11 +15,15 @@ const FormInput = (props) => {
     const type = props.type
     const placeholder = props.placeholder
     const inpRef = props.inpRef
+    const validExp = props.validExp
+    const upateInput=()=>{
+        inpRef.current.value = ValidationExpression(inpRef.current.value,validExp);
+    }
     return(
         <Fragment>
             <div className='col-xs-9 form-group input-label'>
                 <label>{name}</label>
-                <input type={type} ref={inpRef} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder}></input>
+                <input type={type} ref={inpRef} onChange={()=>{upateInput()}} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp==="poolName" || validExp=== "emailServerName"?"100":""}></input>
             </div>
         </Fragment>
     )
@@ -106,7 +112,7 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef}) => {
         <Fragment>
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
             <div>
-                <input type={'hidden'} autoComplete={"off"} ref={inputRef} className="btn-users dropdown-toggle-edit edit-user-dropdown-edit" onChange={inputFilter} onClick = {resetField} type="text"  id="userIdName" placeholder="Search ICE Pool.."/>
+                <input type={'hidden'} autoComplete={"off"} ref={inputRef} className="btn-users dropdown-toggle-edit edit-user-dropdown-edit" onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder="Search ICE Pool.."/>
                 <div className="form-inp-dropdown" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list.map((e) => (  

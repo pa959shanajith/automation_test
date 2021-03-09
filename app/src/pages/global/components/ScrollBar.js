@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { useState, useLayoutEffect, Fragment, useEffect } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
@@ -16,7 +16,27 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
     scrollId : container id
 */
 
+function useWindowSize() {
+    const [size, setSize] = useState([0, 0]);
+    useLayoutEffect(() => {
+      function updateSize() {
+        setSize([window.innerWidth, window.innerHeight]);
+      }
+      window.addEventListener('resize', updateSize);
+      updateSize();
+      return () => window.removeEventListener('resize', updateSize);
+    }, []);
+    return size;
+}
+
 const ScrollBar = (props) => {
+
+    const [width, height] = useWindowSize();
+
+    useEffect(()=>{
+
+    }, [width, height])
+
     return(
         <>
          <Fragment>
@@ -32,7 +52,6 @@ const ScrollBar = (props) => {
                     opacity: 1!important;
                     left: 0;
                     right: 0;
-                    ${props.minThumbSize ? `min-height: ${props.minThumbSize};` : ''}
                     width: ${props.verticalbarWidth?props.verticalbarWidth:'6px'}!important;
                     background:${props.thumbColor?props.thumbColor:'#000'}!important;
                 }
@@ -55,7 +74,7 @@ const ScrollBar = (props) => {
                 }
                 `}
             </style> 
-            <PerfectScrollbar style={{maxHeight:'inherit',height:'inherit'}}>
+            <PerfectScrollbar options={{minScrollbarLength:props.minScrollbarLength,wheelPropagation:false,suppressScrollX:props.hideXbar, useBothWheelAxes:false}} style={{maxHeight:'inherit',height:'inherit'}}>
                 {props.children}
             </PerfectScrollbar>
         </Fragment>

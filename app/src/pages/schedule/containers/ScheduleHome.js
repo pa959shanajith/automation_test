@@ -11,10 +11,10 @@ const ScheduleHome = () => {
     const filter_data = useSelector(state=>state.plugin.FD)
 	const [browserTypeExe,setBrowserTypeExe] = useState([]);
 	const [execAction,setExecAction] = useState("serial");
-    // const [qccredentials,setQccredentials] = useState({qcurl: "", qcusername: "", qcpassword: "", qctype: ""});
     const [appType, setAppType] = useState(null);
     const [syncScenario, setSyncScenario] = useState(false);
-	const [execEnv,setExecEnv] = useState("default");
+    const [execEnv,setExecEnv] = useState("default");
+    const [smartMode,setSmartMode] = useState('normal')
     const isMac = navigator.appVersion.indexOf("Mac") !== -1;
 	
     
@@ -51,9 +51,9 @@ const ScheduleHome = () => {
                 <div className="s__mid_section">
                     <ActionBar  
                     upperContent={<UpperContent key={666} appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />} 
-                    bottomContent={<BottomContent execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
+                    bottomContent={<BottomContent smartMode={smartMode} setSmartMode={setSmartMode} execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
                     <div className="s__content">
-                        <ScheduleContent syncScenario={syncScenario} setSyncScenario={setSyncScenario} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} appType={appType} browserTypeExe={browserTypeExe} execAction={execAction} />
+                        <ScheduleContent smartMode={smartMode} syncScenario={syncScenario} setSyncScenario={setSyncScenario} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} appType={appType} browserTypeExe={browserTypeExe} execAction={execAction} />
                     </div>
                     <ReferenceBar /> 
                 </div>

@@ -1,65 +1,121 @@
-import React ,{useState, Fragment} from 'react';
+import React, { Fragment} from 'react';
 import { ActionBar } from '../../global';
 import  "../styles/Leftbar.scss";
+import { useDispatch ,useSelector } from 'react-redux';
+import * as actionTypes from '../state/action.js';
 
-const Leftbar=(props)=>{
-    //const [focus,setFocus] = useState(null);
+const Leftbar = () => {
+    const dispatch = useDispatch();
+    const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
+    const screenType = useSelector(state=>state.integration.screenType);
 
-    const callIconClick = (iconType)=>{
-        if(iconType == "qTest" ){
-        props.setFocus(iconType);
-        props.setqTestClicked(true);
-        props.setPopUpEnable(true);
-        props.setViewMappedFiles(false);
-        props.setAlmClicked(false);
+    const callIconClick = iconType => {
+        let clickedScreen = null;
+
+        if(iconType === "qTest" ) clickedScreen = "qTest";
+        else if (iconType === "ALM") clickedScreen = "ALM";
+        else if(iconType === "Zephyr") clickedScreen = "Zephyr";
+
+        window.localStorage['integrationScreenType'] = clickedScreen;
+        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: clickedScreen });
+        dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null });
     }
-    else if (iconType == "ALM"){
-        //props.setFocus(iconType);
-        props.setAlmClicked(true);
-        props.setloginAlm(true)
-        //props.setPopUpEnable(true);
-        //props.setViewMappedFiles(false);
-    }
-    }
-    
-    const upperContent=()=>{
-        return(
-            <div className="letfnavi">
-                {props.almClicked ? 
-                <Fragment>
-                    <h4>ALM Integration</h4>
-                    <span>
-                        <img id="selectedIcon" src='static/imgs/testplan.png'/>
-                        <div>Test Lab</div>
-                    </span>
-                    <span style={{opacity:"0.5"}}>
-                        <img src='static/imgs/testlab.png'/> 
-                        <div>Test Plan</div>    
-                    </span>
-                </Fragment>:
+
+    const barRender=()=>{
+        switch(viewMappedFiles){
+            case "qTest": 
+            return(
                 <Fragment>
                     <h4>Integration</h4>
+                <span onClick={()=>callIconClick("qTest") }>
+                    <img alt="qTestIcon" 
+                        id={(screenType === "qTest")? "selectedIcon" : null}  
+                        src='static/imgs/qTest.png'
+                    /> 
+                    <div>qTest</div>
+                </span>
+                </Fragment>
+                )
+            case "ALM":
+                return(
+                <Fragment>
+                    <h4>Integration</h4>
+                    <span onClick={()=>callIconClick("ALM")}>
+                        <img alt="ALMIcon" 
+                            src='static/imgs/ALM.png'
+                        />
+                        <div>ALM</div>
+                    </span>
+                </Fragment>)
+            case "Zephyr":
+                return(
+                <Fragment>
+                    <h4>Integration</h4>
+                   <span onClick={()=>callIconClick("Zephyr")}>
+                        <img alt="ZephyrIcon"  
+                            id={(screenType === "Zephyr")? "selectedIcon" : null} 
+                            src='static/imgs/Zephyr.png'
+                        />
+                        <div>Zephyr</div>
+                    </span> 
+                </Fragment> ) 
+            default :
+            return(
+            <Fragment>
+                <h4>Integration</h4>
                     <span onClick={()=>callIconClick("qTest") }>
-                        <img  id={(props.focus === "qTest")? "selectedIcon" : null}  src='static/imgs/qTest.png'/> 
+                        <img alt="qTestIcon"  
+                            id={(screenType === "qTest")? "selectedIcon" : null}  
+                            src='static/imgs/qTest.png'
+                        /> 
                         <div>qTest</div>
                     </span>
                     <span onClick={()=>callIconClick("ALM")}>
-                        <img src='static/imgs/ALM.png'/>
+                        <img alt="AlmIcon" 
+                            src='static/imgs/ALM.png'
+                        />
                         <div>ALM</div>
                     </span>
-                </Fragment>}
+                    <span onClick={()=>callIconClick("Zephyr")}>
+                        <img alt="ZephyrIcon" 
+                            id={(screenType === "Zephyr")? "selectedIcon" : null} 
+                            src='static/imgs/Zephyr.png'
+                        />
+                        <div>Zephyr</div>
+                    </span>
+            </Fragment>    )
+        }
+    }
+    const upperContent=()=>{
+        return(
+            <div className="letfnavi">
+                {screenType === "ALM" ? 
+                <Fragment>
+                    <h4>ALM Integration</h4>
+                    <span onClick={()=>callIconClick("ALM")}>
+                        <img alt="tstPlanIcon" 
+                            id="selectedIcon" 
+                            src='static/imgs/testplan.png'
+                        />
+                        <div>Test Lab</div>
+                    </span>
+                    <span 
+                        onClick={()=>callIconClick("ALM")}
+                        style={{opacity:"0.5"}}
+                    >
+                        <img alt="testlabIcon"
+                            src='static/imgs/testlab.png'
+                        /> 
+                        <div>Test Plan</div>    
+                    </span>
+                </Fragment>
+                : 
+                barRender()}
             </div>
         )
     }
-    const bottomContent=()=>{
-        return null;
-    }
-    return (
-            <ActionBar 
-            upperContent={upperContent()} 
-            bottomContent={bottomContent()}
-            />
-    )
+
+    return <ActionBar upperContent={upperContent()} />;
 }
 
 export default Leftbar

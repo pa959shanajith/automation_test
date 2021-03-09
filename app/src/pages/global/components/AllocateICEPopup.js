@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { PopupMsg, ModalContainer, ScreenOverlay } from '..' 
 import DropDownList from './DropDownList'
@@ -8,7 +8,7 @@ import "../styles/AllocateICEPopup.scss";
 //use : Renders Execution Table 
 //todo : remove setEachDataFirst 
 
-const AllocateICEPopup = ( {exeTypeLabel, exeIceLabel, SubmitButton, setAllocateICE, allocateICE, modalTitle, modalButton , icePlaceholder} ) => {
+const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel, SubmitButton, setAllocateICE, allocateICE, modalTitle, modalButton , icePlaceholder} ) => {
 
     const current_task = useSelector(state=>state.plugin.CT)
 
@@ -19,12 +19,12 @@ const AllocateICEPopup = ( {exeTypeLabel, exeIceLabel, SubmitButton, setAllocate
     const [poolList,setPoolList] = useState({})
     const [iceStatus,setIceStatus] = useState([])
     const [availableICE,setAvailableICE] = useState([])
-    const [showModal,setShowModal] = useState(false)
     const [chooseICEPoolOptions,setChooseICEPoolOptions] = useState([])
     const [selectedPool,setSelectedPool] = useState("")
 
     useEffect(()=>{
         fetchData();
+        // eslint-disable-next-line
     }, []);
 
     const fetchData = async () => {
@@ -43,7 +43,6 @@ const AllocateICEPopup = ( {exeTypeLabel, exeIceLabel, SubmitButton, setAllocate
         if(data1.error){displayError(data1.error);return;}
         setIceStatus(data1)
         populateICElist(arr,true,data1)
-        setShowModal(true);
         setLoading(false);
     }
 
@@ -94,14 +93,15 @@ const AllocateICEPopup = ( {exeTypeLabel, exeIceLabel, SubmitButton, setAllocate
     
     const onChangeChooseICEPool = (value) =>{
 		var unallocated = false
-		var id = value
+        var id = value
+        var arr;
 		if(id==='all'){
-			var arr = Object.entries(poolList)
+			arr = Object.entries(poolList)
 		}else if(id==='unallocated'){
             unallocated =  true;
             setSelectedPool("");
 		}else{
-            var arr = Object.entries({[id]:poolList[id]})
+            arr = Object.entries({[id]:poolList[id]})
             setSelectedPool(id);
 		}
         populateICElist(arr,unallocated)
@@ -125,9 +125,9 @@ const AllocateICEPopup = ( {exeTypeLabel, exeIceLabel, SubmitButton, setAllocate
                 <div className="allocate-ice-Modal">
                     <ModalContainer 
                         title={modalTitle} 
-                        footer={submitModalButton(SubmitButton, selectedPool, smartMode, selectedICE, modalButton)} 
+                        footer={submitModalButton(SubmitButton, selectedPool, smartMode, selectedICE, modalButton,scheSmartMode,ExeScreen)} 
                         close={()=>{setAllocateICE(false)}}
-                        content={MiddleContent(exeTypeLabel, exeIceLabel, icePlaceholder, chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode,selectedICE, setSelectedICE)}
+                        content={MiddleContent(exeTypeLabel, exeIceLabel, icePlaceholder, chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode,selectedICE, setSelectedICE, ExeScreen, scheSmartMode)}
                         // modalClass=" modal-md"
                     />
                 </div>
@@ -137,26 +137,28 @@ const AllocateICEPopup = ( {exeTypeLabel, exeIceLabel, SubmitButton, setAllocate
     );
 } 
 
-const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode, selectedICE, setSelectedICE) => {
+const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode, selectedICE, setSelectedICE, ExeScreen, scheSmartMode) => {
 
     const setSelectedICEState = (value) => {
-        if(value='normal' ) setSelectedICE("");
+        if(value==='normal' ) setSelectedICE("");
         else setSelectedICE({});
     }
 
     return(
-        <div className="">
-            <div className='adminControl popup-content'>
-                <div>
-                    <span className="leftControl" title="Execution type">{exeTypeLabel}</span>
-                    <select onChange={(event)=>{setSmartMode(event.target.value);setSelectedICEState(event.target.value)}} id='executionType'>
-                        <option smart="false" value='normal' >Normal Execution</option>
-                        <option smart="true" value='smartModule' >Module Smart Execution</option>
-                        <option	smart="true" value='smartScenario'>Scenario Smart Execution</option>
-                    </select>
-                </div>
-            </div>
-            <div className='adminControl popup-content'>
+        <div >
+            {ExeScreen!==undefined && ExeScreen===true ?
+                <div className='adminControl-ice popup-content'>
+                    <div>
+                        <span className="leftControl" title="Execution type">{exeTypeLabel}</span>
+                        <select onChange={(event)=>{setSmartMode(event.target.value);setSelectedICEState(event.target.value)}} id='executionType'>
+                            <option smart="false" value='normal' >Normal Execution</option>
+                            <option smart="true" value='smartModule' >Module Smart Execution</option>
+                            <option	smart="true" value='smartScenario'>Scenario Smart Execution</option>
+                        </select>
+                    </div>
+                </div>:null
+            }
+            <div className='adminControl-ice popup-content'>
                 <div>
                     <span className="leftControl" title="Token Name">Select ICE Pool</span>
                     <select id='chooseICEPool' onChange={(event)=>{onChangeChooseICEPool(event.target.value)}} >
@@ -167,14 +169,14 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
                     </select>
                 </div>
             </div>
-            <div class='adminControl popup-content'>
+            <div className='adminControl-ice popup-content'>
 				<div>
-					<span class="leftControl" title="Token Name">{exeIceLabel}</span>
-                    <DropDownList placeholder={icePlaceholder} data={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
+					<span className="leftControl" title="Token Name">{exeIceLabel}</span>
+                    <DropDownList placeholder={icePlaceholder} data={availableICE} smartMode={(ExeScreen===true?smartMode:scheSmartMode)} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
 				</div>
 			</div>
 
-            <div className='adminControl popup-content popup-content-status'>
+            <div className='adminControl-ice popup-content popup-content-status'>
 				<div>
 					<span className="leftControl" title="Token Name">ICE Status:</span>
 					<div>
@@ -201,11 +203,12 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
     )
 }
 
-const submitModalButton = (SubmitButton,  selectedPool, smartMode, selectedICE, modalButton) => {
+const submitModalButton = (SubmitButton,  selectedPool, smartMode, selectedICE, modalButton, scheSmartMode, ExeScreen) => {
     const executionData = {};
-    executionData.targetUser = selectedICE
-    executionData.type = smartMode
+    executionData.type = (ExeScreen===true?smartMode:scheSmartMode)
     executionData.poolid =  selectedPool
+    if((ExeScreen===true?smartMode:scheSmartMode) !== "normal") executionData.targetUser = Object.keys(selectedICE);
+    else executionData.targetUser = selectedICE
 
     return(
         <div>

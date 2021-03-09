@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
-import {ModalContainer} from '../../global' 
+import {ModalContainer, ScrollBar} from '../../global' 
 import {FormInpDropDown, FormInput} from '../components/FormComp';
 import AssignOptionBox from '../components/AssignOptionBox'
 import {clearQueue,deleteICE_pools,updatePool,getPools} from '../api';
@@ -28,6 +28,7 @@ const EditIcePool = ({projList,displayError,setLoading}) => {
             await resetData(prop)
             setLoading(false)
         })()
+        // eslint-disable-next-line
     },[projList])
     //on click of pool dropdown
     const clickInp = () =>{
@@ -68,7 +69,7 @@ const EditIcePool = ({projList,displayError,setLoading}) => {
             var a = []
             var b = []
             projList.forEach((e)=>{
-                if(prjarr.indexOf(e._id)!=-1) a.push(e);
+                if(prjarr.indexOf(e._id)!==-1) a.push(e);
                 else b.push(e);
             })
             setAllProj(b)
@@ -93,23 +94,27 @@ const EditIcePool = ({projList,displayError,setLoading}) => {
                 footer={<DelFooter clickDeletePool={clickDeletePool} setDeletePop={setDeletePop}/>}
                 content={<DelContainer selectedPool={selectedPool} />}
             />:null}
-            <div id="page-taskName">
-                <span>Edit ICE Pool</span>
-            </div>
-            <div className="adminActionBtn">
-                <button disabled={!selectedPool?true:false} ref={deleteBtn} className="btn-md adminBtn btn-edit" onClick={()=>setDeletePop(true)}  title="Edit">Delete</button>
-                <button disabled={!selectedPool?true:false} ref={updateBtn} className="btn-md adminBtn btn-edit" onClick={clickUpdatePool}  title="Save">Update</button>
-                <button ref={clearBtn} className="btn-md adminBtn" onClick={()=>setClearPop(true)}  title="Save">Clear Queue</button>
-            </div>
-            <div className='edit_ice-pool'>
-                <div className="col-xs-9 form-group assignBox-container">
-                    <AssignOptionBox 
-                        FilterComp={<FilterComp clickInp={clickInp} inpRef={filterRef} setFilter={FilterPool} data={poolList}/>} 
-                        disable={!selectedPool?true:false} leftBox={allProj} rightBox={assignProj} setLeftBox={setAllProj} setRightBox={setAssignProj}
-                    />
+            <ScrollBar thumbColor="#929397">
+                <div className="edit_ice-pool_container">
+                    <div id="page-taskName">
+                        <span>Edit ICE Pool</span>
+                    </div>
+                    <div className="adminActionBtn">
+                        <button disabled={!selectedPool?true:false} ref={deleteBtn} className="btn-md adminBtn btn-edit" onClick={()=>setDeletePop(true)}  title="Edit">Delete</button>
+                        <button disabled={!selectedPool?true:false} ref={updateBtn} className="btn-md adminBtn btn-edit" onClick={clickUpdatePool}  title="Save">Update</button>
+                        <button ref={clearBtn} className="btn-md adminBtn" onClick={()=>setClearPop(true)}  title="Save">Clear Queue</button>
+                    </div>
+                    <div className='edit_ice-pool'>
+                        <div className="col-xs-9 form-group assignBox-container">
+                            <AssignOptionBox 
+                                FilterComp={<FilterComp clickInp={clickInp} inpRef={filterRef} setFilter={FilterPool} data={poolList}/>} 
+                                disable={!selectedPool?true:false} leftBox={allProj} rightBox={assignProj} setLeftBox={setAllProj} setRightBox={setAssignProj}
+                            />
+                        </div>
+                        <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'} validExp={"poolName"}/>
+                    </div>
                 </div>
-                <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'}/>
-            </div>
+            </ScrollBar>        
         </Fragment>
     )
 }
@@ -163,8 +168,8 @@ const updateIcePool = async(prop) =>{
     })
     var data = await updatePool(pool)
     if(data.error){prop.displayError(data.error);return;}
-    await resetData(prop)
-    prop.displayError("ICE Pool saved successfully.","Success")
+    var err = await resetData(prop)
+    if(!err)prop.displayError("ICE Pool saved successfully.","Success")
 }
 
 const deleteIcePool = async(prop) =>{
@@ -172,8 +177,8 @@ const deleteIcePool = async(prop) =>{
     var id = prop.selectedPool._id
     var data = await deleteICE_pools({'poolid':[id]})
     if(data.error){prop.displayError(data.error);return;}
-    await resetData(prop)
-    prop.displayError("ICE Pool deleted successfully.","Success")
+    var err = await resetData(prop)
+    if(!err)prop.displayError("ICE Pool deleted successfully.","Success")
 }
 
 const clearIceQueue = async({selectedPool,setLoading,displayError}) =>{
@@ -191,15 +196,23 @@ const clearIceQueue = async({selectedPool,setLoading,displayError}) =>{
 }
 
 const resetData = async({filterRef,setSelectedPool,poolName,projList,setAllProj,setAssignProj,setPoolDict,setProjList,setPoolList,setLoading,displayError,action}) => {
-    var data = {
+    var dataPool = {
         poolid:"all",
         projectids:[]
     }
     filterRef.current.value = ""
     poolName.current.disabled = true
     poolName.current.value = ""
-    var data = await getPools(data)
-    if(data.error){displayError(data.error);return;}
+    var data = await getPools(dataPool)
+    if(data.error){
+        if(data.val === 'empty'){
+            displayError(data.error);
+            data = {};
+        }else{
+            displayError(data.error);
+            return true;
+        }
+    }
     var e = Object.entries(data)
     e.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
     setPoolDict(data)

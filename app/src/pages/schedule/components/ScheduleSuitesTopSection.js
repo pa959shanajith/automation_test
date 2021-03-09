@@ -21,20 +21,42 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
             }
             readTestSuiteFunct(readTestSuite);
         }
+        // eslint-disable-next-line
     }, [current_task]);
 
     const readTestSuiteFunct = async (readTestSuite) => {
         setLoading("Loading in Progress. Please Wait");
         const result = await readTestSuite_ICE(readTestSuite, "schedule")
         setLoading(false);
-        if (result == "Invalid Session")
+        if (result === "Invalid Session")
             return RedirectPage(history);
         else if (result.testSuiteDetails) {
             var data = result.testSuiteDetails;
             var keys = Object.keys(data);
-            var dataLen = keys.length;
             var eachData2 = [];
             keys.map(itm => eachData2.push({...data[itm]}));
+
+            //setting module date and time props
+            let moduleSceduledateTime = {};
+            // eslint-disable-next-line
+            eachData2.map((rowData)=>{
+                if(moduleSceduledateTime[rowData.testsuiteid] === undefined) {
+                    moduleSceduledateTime[rowData.testsuiteid] = {
+                        date:"",time:"",
+                        inputPropstime: {readOnly:"readonly" ,
+                            disabled : true,
+                            className:"fc-timePicker",
+                            placeholder: "Select Time"
+                        },
+                        inputPropsdate : {
+                            placeholder: "Select Date",
+                            readOnly:"readonly" ,
+                            className:"fc-datePicker"
+                        }
+                    };
+                }
+            })
+            setModuleSceduledate(moduleSceduledateTime);
 
             //finding distinct projects : helpful for apptype column
             var flags = [], output = [];
@@ -46,6 +68,7 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
                 }
             }
             var projectApptype = {};
+            // eslint-disable-next-line
             keys.map(itm => {
                 for(var i =0 ; i<output.length; i++){
                     for( const [key,value] of Object.entries(filter_data.projectDict)){
@@ -60,19 +83,6 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
             updateScenarioStatus(eachData2);
         }
     }
-
-    let inputProps = {
-		placeholder: "Select Date",
-		readOnly:"readonly" ,
-		className:"fc-datePicker"
-    };
-
-    let inputProps1 = {
-		placeholder: "Select Time",
-		readOnly:"readonly" ,
-		// disabled : inputProps1Disable,
-        className:"fc-timePicker"
-    };
     
     const changeSelectALL = (m,id) => {
         let data = [...scheduleTableData];
@@ -86,7 +96,9 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
     }
     
     const updateScenarioStatus = (eachData1) => {
+        // eslint-disable-next-line
         eachData1.map((rowData,m)=>{
+            // eslint-disable-next-line
             rowData.scenarioids.map((sid,count)=>{
                 changeExecutestatusInitial(eachData1,m);
             })
@@ -130,74 +142,92 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
     }
 
     const updateDateTime = (date_time, value , testsuiteid) => {
-        if(moduleSceduledate[testsuiteid] === undefined) {
-            moduleSceduledate[testsuiteid] = ["",""];
+        let moduleSceduledatetime = {...moduleSceduledate}
+        if(moduleSceduledatetime[testsuiteid] === undefined) {
+            moduleSceduledatetime[testsuiteid] = {date:"",time:""};
         }
         if(date_time==="date"){
-            moduleSceduledate[testsuiteid][0] = value;
+            moduleSceduledatetime[testsuiteid]["date"] = value;
+            if(moduleSceduledatetime[testsuiteid]["time"] === "") {
+                var hr = new Date().getHours();
+                var min = parseInt(new Date().getMinutes());
+                if(new Date().getHours().toString().length === 1) hr = "0"+hr;
+                if(parseInt(new Date().getMinutes()).toString().length === 1) min = "0"+min;
+                moduleSceduledatetime[testsuiteid]["time"] = hr  + ':' + min;
+            }
+            moduleSceduledatetime[testsuiteid]["inputPropstime"]["disabled"]=false;
         }
-        if(date_time==="time"){
-            moduleSceduledate[testsuiteid][1] = value;
+        else if(date_time==="time"){
+            moduleSceduledatetime[testsuiteid]["time"] = value;
         }
-        setModuleSceduledate(moduleSceduledate);
+        setModuleSceduledate(moduleSceduledatetime);
     }
 
     return (
         <>
         {loading?<ScreenOverlay content={loading}/>:null}
         <div className="scheduleSuiteTable">
-            <ScrollBar thumbColor="#929397" trackColor="rgb(211, 211, 211)">
-            {scheduleTableData.map((rowData,i)=>(
-                <div className="batchSuite">
-                    <div className="scheduleSuite" >
-                        <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" />
-                        <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span>
-                        <span className="timePicContainer">
-                            <Datetime 
-                                onChange={(event)=>{updateDateTime("time",event.format("HH:mm" ),rowData.testsuiteid)}} 
-                                inputProps={inputProps1} 
-                                dateFormat={false} 
-                                timeFormat="HH:mm" 
-                            /> 
-                            <img className="timepickerIcon" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
-						</span>
-                        <span className="datePicContainer datePic-cust" >
-                            <Datetime 
-                                onChange={(event)=>{updateDateTime("date",event.format("DD-MM-YYYY"),rowData.testsuiteid)}} 
-                                dateFormat="DD-MM-YYYY" 
-                                closeOnSelect={true} 
-                                inputProps={inputProps} 
-                                timeFormat={false} 
-                                id="data-token"
-                                isValidDate={valid}
-                            /> 
-                            <img className="datepickerIcon" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
-						</span>
-                        
-                    </div>
-                    <table className="scenarioSchdCon scenarioSch_' + i + '">
-                        <thead className="scenarioHeaders">
-                            <tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td><td>App type</td></tr>
-                        </thead>
-                        <tbody className="scenarioBody scenarioTbCon_' + i + '">
-                        {rowData.scenarioids.map((sid,j)=>(
-                            <tr>
-                                <td><span>{j+1}</span><input type="checkbox" checked={rowData.executestatus[j]?true:false}  onChange={()=>{changeExecutestatus(i,j)}} id={"executestatus_"+i+"_"+j} className="selectToSched"/></td>
-								<td data-scenarioid={sid}>{rowData.scenarionames[j]}</td>
-								<td style={{padding: "2px 0 2px 0"}}><input type="text" value={rowData.dataparam[j]} disabled/></td>
-								<td><select disabled><option value="1" selected={(rowData.condition[j] == 0) ? '' : 'selected'} >True</option><option value="0" selected={(rowData.condition[j] == 0) ? 'selected' : '' }>False</option></select></td>
-								<td>{rowData.projectnames[j]}</td> 
-                                <td title={rowData.projectnames[j]}>
-                                    <img src={"static/imgs/"+details[projectAppType[rowData.projectnames[j]].toLowerCase()]['img']+".png"} alt="apptype"/>
-                                </td>
-                            </tr>
+            <div className="s__ab">
+                <div className="s__min">
+                    <div className="s__con" id="schSuiteTable">
+                        <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
+                        {scheduleTableData.map((rowData,i)=>(
+                            <div key={i} className="batchSuite">
+                                <div className="scheduleSuite" >
+                                    <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" />
+                                    <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span>
+                                    <span className="timePicContainer">
+                                        <Datetime 
+                                            onChange={(event)=>{updateDateTime("time",event.format("HH:mm" ),rowData.testsuiteid)}} 
+                                            inputProps={moduleSceduledate[rowData.testsuiteid]["inputPropstime"]} 
+                                            dateFormat={false} 
+                                            timeFormat="HH:mm"
+                                            value={moduleSceduledate[rowData.testsuiteid]["time"]}
+                                        /> 
+                                        <img className="timepickerIcon" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
+                                    </span>
+                                    <span className="datePicContainer datePic-cust" >
+                                        <Datetime 
+                                            onChange={(event)=>{updateDateTime("date",event.format("DD-MM-YYYY"),rowData.testsuiteid)}} 
+                                            dateFormat="DD-MM-YYYY" 
+                                            closeOnSelect={true} 
+                                            inputProps={moduleSceduledate[rowData.testsuiteid]["inputPropsdate"]} 
+                                            timeFormat={false}
+                                            isValidDate={valid}
+                                            value={moduleSceduledate[rowData.testsuiteid]["date"]}
+                                            renderInput={(props) => {
+                                                return <input {...props} value={(moduleSceduledate[rowData.testsuiteid]["date"]) ? props.value : ''} />
+                                            }}
+                                        /> 
+                                        <img className="datepickerIcon" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
+                                    </span>
+                                    
+                                </div>
+                                <table className="scenarioSchdCon scenarioSch_' + i + '">
+                                    <thead className="scenarioHeaders">
+                                        <tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td><td>App type</td></tr>
+                                    </thead>
+                                    <tbody className="scenarioBody scenarioTbCon_' + i + '">
+                                    {rowData.scenarioids.map((sid,j)=>(
+                                        <tr key={j}>
+                                            <td><span>{j+1}</span><input type="checkbox" checked={rowData.executestatus[j]?true:false}  onChange={()=>{changeExecutestatus(i,j)}} id={"executestatus_"+i+"_"+j} className="selectToSched"/></td>
+                                            <td data-scenarioid={sid}>{rowData.scenarionames[j]}</td>
+                                            <td style={{padding: "2px 0 2px 0"}}><input type="text" value={(rowData.dataparam[j]).trim()} disabled/></td>
+                                            <td><select disabled defaultValue={(rowData.condition[j] === 0) ? "0" : "1"} ><option value="1" >True</option><option value="0" >False</option></select></td>
+                                            <td>{rowData.projectnames[j]}</td> 
+                                            <td title={rowData.projectnames[j]}>
+                                                <img src={"static/imgs/"+details[projectAppType[rowData.projectnames[j]].toLowerCase()]['img']+".png"} alt="apptype"/>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         ))}
-                        </tbody>
-                    </table>
+                        </ScrollBar>
+                    </div>
                 </div>
-            ))}
-            
-        </ScrollBar>
+            </div>
         </div>
         </>
     );

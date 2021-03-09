@@ -271,14 +271,14 @@ export const populateUsers = async(projectId) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200 && res.data !== "fail"){            
+        if(res.status===200 && res.data !== "fail" && res.data.rows.length >0){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch scenarios'}
+        return {error:'Failed to fetch Users'}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch scenarios'}
+        return {error:'Failed to fetch Users'}
     }
 }
 
@@ -306,10 +306,10 @@ export const excelToMindmap = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'Error fetching excel data!'}
+        return {error:'Invalid data in excel, please check!'}
     }catch(err){
         console.error(err)
-        return {error:'Error fetching excel data!'}
+        return {error:'Invalid data in excel, please check!'}
     }
 }
 

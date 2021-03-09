@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
-import {ScreenOverlay, PopupMsg} from '../../global' 
+import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
 import {FormInput} from '../components/FormComp';
 import AssignOptionBox from '../components/AssignOptionBox'
 import {getDetails_ICE,createPool_ICE} from '../api';
@@ -37,12 +37,12 @@ const CreateIcePool = (props) => {
         poolName.current.style = ""
         var projList = [];
         assignProj.forEach((e)=>projList.push(e._id))
-        var data = {
+        var dataCreate = {
 			poolname: val,
 			projectids: projList
         }
         setLoading('Saving ICE Pool ...')
-        var data = await createPool_ICE(data)
+        var data = await createPool_ICE(dataCreate)
         if(data.error){displayError(data.error);return;}
         await resetData({poolName,setAllProj,setAssignProj,setProjList,setLoading,displayError})
         displayError("ICE Pool created successfully.","success")
@@ -52,7 +52,8 @@ const CreateIcePool = (props) => {
         resetData({poolName,setAllProj,setAssignProj,setProjList,setLoading,displayError})
     },[props.resetMiddleScreen])
     return(
-        <Fragment>
+        <ScrollBar thumbColor="#929397">
+        <div className="crt_ice-pool_container">
         {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} submitText={"Ok"} />:null}
         {loading?<ScreenOverlay content={loading}/>:null}
         {editPool?
@@ -66,14 +67,15 @@ const CreateIcePool = (props) => {
                     <button className=" btn-md adminBtn" onClick={ClickCreate}  title="Save">Create</button>
                 </div>
                 <div className='crt_ice-pool'>
-                    <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'}/>
+                    <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'} validExp={"poolName"}/>
                     <div className="col-xs-9 form-group assignBox-container">
                         <AssignOptionBox leftBox={allProj} rightBox={assignProj} setLeftBox={setAllProj} setRightBox={setAssignProj}/>
                     </div>
                 </div>
             </Fragment>
         }
-        </Fragment>
+        </div>
+        </ScrollBar>
     )
 }
 

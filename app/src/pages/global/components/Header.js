@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, Link, Redirect } from 'react-router-dom';
-import { RedirectPage, PopupMsg, ModalContainer, ScreenOverlay ,Encrypt } from '../../global';
-import "../styles/Header.scss";
 import { loadUserInfo } from '../../login/api';
 import { getRoleNameByRoleId } from '../api';
 import * as actionTypes from '../../login/state/action';
@@ -10,6 +8,9 @@ import ClickAwayListener from 'react-click-away-listener';
 import ChangePassword from './ChangePassword';
 import ChangeDefaultIce from './ChangeDefaultIce';
 import { persistor } from '../../../reducer';
+import NotifyDropDown from './NotifyDropDown';
+import { RedirectPage, PopupMsg, ModalContainer, ScreenOverlay } from '../../global';
+import "../styles/Header.scss";
 
 /*
     Component: Header Bar
@@ -37,20 +38,17 @@ const Header = () => {
     const [clickedRole, setClickedRole] = useState(null);
     const [showOverlay, setShowOverlay] = useState("");
     const [redirectTo, setRedirectTo] = useState("");
-
+    const [clickNotify,setClickNotify] = useState(false)
     const userInfo = useSelector(state=>state.login.userinfo);
     const selectedRole = useSelector(state=>state.login.SR);
-    const socket = useSelector(state=>state.login.socket);
+    const notifyCnt = useSelector(state=>state.login.notify.unread)
+
     useEffect(()=>{
-        if(socket){
-            // socket.on('ICEnotAvailable',(e)=> {
-            //     console.log(e)
-            // });
-            socket.on('notify',(a)=> {
-                console.log(a)
-            });
-        }
-    },[socket])
+        //on Click back button on browser
+        window.addEventListener('popstate', (e)=> {
+            logout(e)
+        })
+    },[])
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0){
             setUserDetails(userInfo);
@@ -201,7 +199,7 @@ const Header = () => {
     }
 
     const ConfSwitchRole = () => (
-       <ModalContainer 
+        <ModalContainer
             title="Switch Role"
             content={`Are you sure you want to switch role to: ${clickedRole.data}`}
             close={()=>setShowConfSR(false)}
@@ -223,13 +221,19 @@ const Header = () => {
             { showConfSR && <ConfSwitchRole />  }
             { showSR_Pop && <SRPopup /> }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
-
             <div className = "main-header">
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
                     <div className="dropdown user-options">
                         { !adminDisable &&
                         <>
-                        <div className="btn-container"><button className="fa fa-bell no-border bell-ic"></button></div>
+                        <div className="btn-container">
+                            <ClickAwayListener onClickAway={()=>setClickNotify(false)}>
+                                <button onClick={(e)=>setClickNotify(true)} className="fa fa-bell no-border bell-ic notify-btn">
+                                    {(notifyCnt !== 0) && <span className='notify-cnt'>{notifyCnt}</span>}
+                                </button>
+                                <NotifyDropDown show={clickNotify}/>
+                            </ClickAwayListener>
+                        </div>
                         <ClickAwayListener onClickAway={onClickAwaySR}>
                             <div className="switch-role-btn no-border" data-toggle="dropdown" onClick={switchRole} >
                                 <span><img className="switch-role-icon" alt="switch-ic" src="static/imgs/ic-switch-user.png"/></span>
@@ -239,7 +243,7 @@ const Header = () => {
                                 {roleList.map(role => 
                                     <div key={role.rid} data-id={role.rid} onClick={()=>showConfPop(role.rid, role.data)} >
                                         <Link to="#">{role.data}</Link>
-                                    </div>    
+                                    </div>
                                 )}
                             </div>
                         </ClickAwayListener>
@@ -270,5 +274,4 @@ const Header = () => {
         </>
     ); 
 }
-
 export default Header;

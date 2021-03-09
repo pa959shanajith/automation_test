@@ -60,26 +60,31 @@
     background-color: #888;
 }
 
-
-@media screen and (min-width: 1400px) and (min-height: 770px){
-    .plugin-bg-img{
-        width: 40%;
-    }
-    
+@media screen and (max-width: 1000px){
     .page-contents{
-        padding: 0 10% 0 15%;
-    }
-    
-    .greeting-text{
-        font-size: 3vw;
-        margin-bottom: 4vw; 
-    }
-    
-    .section-divider{
-        height: 85%;
-        width: .2vw;
+        padding: 0 7% 0 8%;
     }
 }
+
+// @media screen and (min-width: 1400px) and (min-height: 770px){
+//     .plugin-bg-img{
+//         width: 40%;
+//     }
+    
+//     .page-contents{
+//         padding: 0 10% 0 15%;
+//     }
+    
+//     .greeting-text{
+//         font-size: 3vw;
+//         margin-bottom: 4vw; 
+//     }
+    
+//     .section-divider{
+//         height: 85%;
+//         width: .2vw;
+//     }
+// }
 
 @media screen and (max-height: 650px){
     .plugin-bg-img{

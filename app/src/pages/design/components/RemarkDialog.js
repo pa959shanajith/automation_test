@@ -59,7 +59,7 @@ const RemarkDialog = ({setShow, onSetRowData, remarks, idx, firstname, lastname}
                         <>
                         <div className="remark_history_lbl">History</div>
                         <div className="remark_history_content">
-                            { remarks.split(';').filter(remark => remark.trim()!=="").map(remark=><li>{remark}</li>) }
+                            { remarks.split(';').filter(remark => remark.trim()!=="").map((remark, idx)=><li key={idx}>{remark}</li>) }
                         </div>
                         </>
                     }

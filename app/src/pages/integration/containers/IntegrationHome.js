@@ -1,54 +1,40 @@
-import React ,{useState} from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch ,useSelector } from 'react-redux';
 import Header from '../../global/components/Header';
 import Footer from '../../global/components/FooterTwo';
 import Leftbar from '../components/Leftbar';
 import Rightbar from '../components/Rightbar';
-import IntegrationCenter from './IntegrationCenter';
-import ALMCenter from './ALMCenter.js'
+import ALM from './ALM';
+import QTest from './QTest';
+import Zephyr from './Zephyr';
+import * as actionTypes from '../state/action';
 import '../styles/IntegrationHome.scss'
 
 //Integration Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 
-const  Integrations=()=>{
-    // const [screenType , setScreenType] = useState("encryption");
-    const [qTestClicked , setqTestClicked] = useState(false);
-    const [almClicked , setAlmClicked] = useState(false);
-    const [popUpEnable , setPopUpEnable] = useState(false);
-    const [loginAlm , setloginAlm]= useState(false);
-    const [focus,setFocus] = useState(null);
-    const [viewmappedFiles , setViewMappedFiles] = useState(false)
+const Integrations = () => {
+    const dispatch = useDispatch();
+    const screenType = useSelector(state=>state.integration.screenType);
+
+    useEffect(()=>{//persist the screentype of integration (implementation for bug#18796)
+        let currScreenType = window.localStorage['integrationScreenType'];
+        if (currScreenType) {
+            dispatch({type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: currScreenType});
+        }
+    }, [])
+
     return(
         <div className="parent">
             <Header/>
             <div id="holder">
-                <Leftbar 
-                    focus={focus} 
-                    setFocus={setFocus} 
-                    setqTestClicked={setqTestClicked} 
-                    setPopUpEnable={setPopUpEnable}
-                    setViewMappedFiles={setViewMappedFiles}
-                    setAlmClicked={setAlmClicked}
-                    setloginAlm={setloginAlm}
-                    qTestClicked={qTestClicked}
-                    almClicked={almClicked}
-                />
-                {almClicked ?
-                    <ALMCenter
-                    setloginAlm={setloginAlm}
-                    loginAlm={loginAlm}/>
-                    :
-                    <IntegrationCenter
-                    qTestClicked={qTestClicked}
-                    setqTestClicked={setqTestClicked}
-                    popUpEnable={popUpEnable}
-                    setPopUpEnable={setPopUpEnable}
-                    setFocus={setFocus}
-                    viewmappedFiles={viewmappedFiles}
-                    setViewMappedFiles={setViewMappedFiles}
-                    setAlmClicked={setAlmClicked}
-                    almClicked={almClicked}
-                    />
-                }
+                <Leftbar />
+
+                <div className="integration_middleContent">
+                    { screenType === 'ALM' && <ALM /> }
+                    { screenType === "Zephyr" && <Zephyr /> }
+                    { screenType === "qTest" && <QTest /> }
+                </div>
+
                 <Rightbar />
             </div>    
             <div className="integration_Footer"><Footer/></div>

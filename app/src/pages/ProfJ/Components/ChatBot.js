@@ -1,16 +1,18 @@
-import React , {useState ,  useRef ,useEffect, Fragment } from 'react';
+import React , {useState ,  useRef , Fragment } from 'react';
 import '../styles/ProfJ.scss';
 import {ScrollBar , PopupMsg} from '../../global';
 import {getTopMatches_ProfJ } from '../api';
 
 const  ChatBot = (props) => {
     const queryref = useRef(); //ref for query input tag to acess the current value of usermessage onClick.
+    const uMsgRef = useRef(); //to check the status of last printed user message for auto-scroll enable
+    const bMsgRef = useRef(); //to check the status of last printed bot message for auto-scroll enable
     const [chatBox , setChatBox] = useState(false); //State for chat aree open close 
     const [chat , setChat] = useState([])//State stores all the list of chat objects.
     const [linkMsgArr , setLinkMsgArr]= useState([])//stores all the links clicked on the Bot Message
     const [popup ,setPopup]= useState({show:false});
 
-    const displayError = (error) =>{
+    const displayError = (error) =>{ //the default display error funtion used in each component
         setPopup({
           title:'ERROR',
           content:error,
@@ -26,11 +28,13 @@ const  ChatBot = (props) => {
     
     const callsendbutton=()=>{ //stores a object containing Query from user
         let chatArr = [...chat]
-        const userQuery = queryref.current.value;
+        if(queryref.current.value){
+            const userQuery = queryref.current.value;
         chatArr.push({message: queryref.current.value , from: "user"})
         callProfJ(userQuery, chatArr)
         queryref.current.value = null;
         setLinkMsgArr([]);
+        }
     }
     
     const callClearbtn=()=>{ //clears chat input field
@@ -42,7 +46,8 @@ const  ChatBot = (props) => {
         if(chatReturn.error){displayError(chatReturn.error);return;}
         chatArr.push({message: chatReturn , from: "Bot"})
         setChat(chatArr) 
-        
+        uMsgRef.current && uMsgRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+        bMsgRef.current && bMsgRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
     }
 
     const callLinkClick=(idx)=>{ //if any of the links are clicked on te BOT message
@@ -73,13 +78,13 @@ const  ChatBot = (props) => {
                             {
                             chat.map((e,i)=>(
                                 (e.from === "user")? 
-                                    <span className="userQuerymessage" key={i} >
+                                    <span ref={uMsgRef} className="userQuerymessage" key={i} >
                                         {e.message}
                                     </span>
                                 : 
-                                    <div className="defautMssg">
-                                        {e.message.map((mes , i ) => ((mes[0] ==-1)?  mes[1] :
-                                        i ===0 ?
+                                    <div ref={bMsgRef} className="defautMssg">
+                                        {e.message && e.message.map((mes , i ) => ((mes[0] ===-1)?  mes[1] :
+                                        i === 0 ?
                                             <>Did you mean to ask about one of these? 
                                             Please click any of the links below or 
                                             type more keywords if you don't see the right option.<br/>
@@ -92,11 +97,10 @@ const  ChatBot = (props) => {
                                 ))
                             }
                             {
-                                linkMsgArr  ? 
+                                linkMsgArr  && 
                                 linkMsgArr.map((e,i)=>(
                                     <><span className="defautMssg">{e}</span><br/></>
                                 ))
-                                : null
                             }
                         </div>
                     </ScrollBar>

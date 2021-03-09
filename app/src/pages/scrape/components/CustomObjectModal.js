@@ -18,12 +18,10 @@ const CreateObjectModal = props => {
 
     useEffect(()=>{
         if (props.editFlag) {
-            console.log(props.utils)
             let customFields = ['decrypt', props.utils.object.xpath, props.utils.object.url, props.utils.object.tag];
             
             userObjectElement_ICE(customFields)
             .then(data => {
-                console.log(data);
                 if (data === "unavailableLocalServer") 
                     props.setShowPop({title: "Fail", content: "Failed to create object ICE not available"});
                 else if (data === "invalid session") return RedirectPage(history);
@@ -45,10 +43,10 @@ const CreateObjectModal = props => {
                     let obj = [...objects];
                     obj[0] = {...obj[0], ...newObj};
                     setObjects(obj);
-                    console.log(obj);
                 }})
                 .catch(error => console.log(error));
         }
+        //eslint-disable-next-line
     }, [])
 
     const newField = () => {
@@ -142,14 +140,30 @@ const CreateObjectModal = props => {
 
     const onSubmit = () => {
         if (props.editFlag) {
-            props.utils.modifyScrapeItem(props.utils.object.val, {
-                custname: customObjList[1].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
-                tag: customObjList[1].tag,
-                url: customObjList[1].url,
-                xpath: customObjList[1].xpath,
-                editable: true
-            }, true);
-            props.setShow(false);
+            let errorFlag = null;
+            let errorObj = {};
+            let custname = customObjList[1].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim();
+            for(let object of props.scrapeItems) {
+                if (object.title === custname) {
+                    errorObj = { [customObjList[1].tempId]: "objName", dTitle: custname };
+                    errorFlag = 'present';
+                    break;
+                }
+            }
+            if (errorFlag) {
+                setError(errorObj);
+                props.setShowPop({title: 'Edit Object', content: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`});
+            }
+            else {
+                props.utils.modifyScrapeItem(props.utils.object.val, {
+                    custname: custname,
+                    tag: customObjList[1].tag,
+                    url: customObjList[1].url,
+                    xpath: customObjList[1].xpath,
+                    editable: true
+                }, true);
+                props.setShow(false);
+            }
         }
         else {
             let localScrapeList = [];
@@ -157,30 +171,71 @@ const CreateObjectModal = props => {
             let lastObj = props.scrapeItems[props.scrapeItems.length-1]
             let lastVal = lastObj ? lastObj.val : 0;
             let lastIdx = props.newScrapedData.view ? props.newScrapedData.view.length : 0;
+
+            let duplicateDict = {};
+            let tempIdArr = [];
+            let duplicateFlag = false;
+            let errorFlag = null;
+            let errorObj = {};
+
             for (let tempId of Object.keys(customObjList)){
+
+                let custname = customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim();
+
+                for(let object of props.scrapeItems) {
+                    if (object.title === custname) {
+                        errorObj = { [tempId]: "objName", dTitle: custname };
+                        errorFlag = 'present';
+                        break;
+                    }
+                }
+
+                if (errorFlag==='present') break;
+
+                if (custname in duplicateDict){
+                    duplicateDict[custname].push(tempId);
+                    tempIdArr.push(...duplicateDict[custname]);
+                    duplicateFlag = true;
+                } else duplicateDict[custname] = [tempId]
+
                 localScrapeList.push({
                     objId: undefined,
                     objIdx: lastIdx++,
                     val: ++lastVal,
                     hide: false,
-                    title: customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim()
+                    title: custname,
+                    url: customObjList[tempId].url,
+                    tag: customObjList[tempId].tag,
+                    xpath: customObjList[tempId].xpath,
+                    editable: true
                 });
                 viewArray.push({
-                    custname: customObjList[tempId].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
+                    custname: custname,
                     tag: customObjList[tempId].tag,
                     url: customObjList[tempId].url,
                     xpath: customObjList[tempId].xpath,
                     editable: true
                 });  
             }
-            let updatedNewScrapeData = {...props.newScrapedData};
-            if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewArray);
-            else updatedNewScrapeData = { view: [...viewArray] };
-            props.setNewScrapedData(updatedNewScrapeData);
-            props.updateScrapeItems(localScrapeList)
-            props.setSaved(false);
-            props.setShow(false);
-            props.setShowPop({title: "Add Object", content: "Objects has been added successfully."})
+            
+            if (errorFlag) {
+                setError(errorObj);
+                props.setShowPop({title: 'Create Object', content: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`});
+            } 
+            else if (duplicateFlag) {
+                tempIdArr.forEach(tempId => errorObj[tempId] = "objName");
+                setError(errorObj);
+                props.setShowPop({title: 'Create Object', content: 'Duplicate Object Names Found!'});
+            } else {
+                let updatedNewScrapeData = {...props.newScrapedData};
+                if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewArray);
+                else updatedNewScrapeData = { view: [...viewArray] };
+                props.setNewScrapedData(updatedNewScrapeData);
+                props.updateScrapeItems(localScrapeList)
+                props.setSaved(false);
+                props.setShow(false);
+                props.setShowPop({title: "Add Object", content: "Objects has been created successfully."});
+            }
         }
     }
 
@@ -200,6 +255,7 @@ const CreateObjectModal = props => {
         }
         setObjects(emptyFields);
         setShowFields(showAll);
+        setError({type: '', tempId: ''});
     }
 
     return (
@@ -207,20 +263,20 @@ const CreateObjectModal = props => {
             <ModalContainer 
                 title={props.editFlag ? "Edit Object" : "Create Object"}
                 content={
-                    <div  data-test="createObjectModalContent" className="ss__createObj_content" id="createObjListId">
-                        <ScrollBar scrollId="createObjListId" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                    <div data-test="createObjectModalContent" className="ss__createObj_content" id="createObjListId">
+                        <ScrollBar scrollId="createObjListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                 { objects.map((object, index) => <div data-test="ssCreateObjectItem" className="ss__createObj_item" key={object.tempId}>
                                         <div data-test="createObjectRow" className="createObj_row">
                                             <input  data-test="createObjectInput" className={"createObj_input"+(error[object.tempId] === "objName" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} name="objName" onChange={(e)=>handleInputs(e, index)} value={object.objName} placeholder="Enter Object Name" />
-                                            <select   data-test="createObjectType" className={"createObj_objType"+(error[object.tempId] === "objType" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} value={object.objType} onChange={(e)=>handleType(e, index)}>
+                                            <select data-test="createObjectType" className={"createObj_objType"+(error[object.tempId] === "objType" ? " ss__error_border" : "")} disabled={!showFields.includes(object.tempId)} value={object.objType} onChange={(e)=>handleType(e, index)}>
                                                 <option className="createObj_option" disabled selected value="">Select Object Type</option>
-                                                { objectTypes.map( objectType =>
-                                                    <option className="createObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>{objectType.name}</option>
+                                                { objectTypes.map( (objectType, i) =>
+                                                    <option key={i} className="createObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>{objectType.name}</option>
                                                 ) }
                                             </select>
-                                            {!props.editFlag && <button data-test="objectDeleteButton" className="createObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img src="static/imgs/ic-delete.png" /></button>}
-                                            <button data-test="objectEditButton" className="createObj_btn" onClick={()=>onEdit(object.tempId)} style={props.editFlag ? {flex: "1 0"} : null}><img src="static/imgs/ic-jq-editstep.png" /></button>
-                                            {!props.editFlag && objects.length-1 === index && <button data-test="objectAddButton" className="createObj_btn" onClick={newField}><img src="static/imgs/ic-add.png" /></button>}
+                                            {!props.editFlag && <button data-test="objectDeleteButton" className="createObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img alt="del-ic" src="static/imgs/ic-delete.png" /></button>}
+                                            <button data-test="objectEditButton" className="createObj_btn" onClick={()=>onEdit(object.tempId)} style={props.editFlag ? {flex: "1 0"} : null}><img alt="edit-ic" src="static/imgs/ic-jq-editstep.png" /></button>
+                                            {!props.editFlag && objects.length-1 === index && <button data-test="objectAddButton" className="createObj_btn" onClick={newField}><img alt="add-ic" src="static/imgs/ic-add.png" /></button>}
                                         </div>
                                         {
                                             showFields.includes(object.tempId) && 

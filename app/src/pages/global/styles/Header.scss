@@ -134,82 +134,104 @@
     }
 }
 
-
-@media screen and (min-width: 1400px) and (min-height: 770px){
-    .main-header {
-        padding: .9vw 0 .9vw 1.5vw;
-        color: rgb(151, 151, 151);
-    }
-    
-    .header-logo{
-        height: 2.5vw;
-    }
-    
-    .no-border{
-        padding: 0 2vw;
-        font-size: 1.3vw;
-    }
-    
-    .user-name-icon{
-        height: 1.8vw;
-        width: 1.8vw;
-        margin-left: .8vw;
-    }
-    
-    .user-name-btn{
-        padding-right: 1vw;
-        border-left: .1vw solid gray;
-        .user-name{
-            margin: 0 1.9vh;
-        }
-    }
-    
-    .switch-role-menu, .user-name-menu{
-        z-index: 5;
-        font-size: 1.2vw;
-        color: #333;
+.notify-btn{
+    position: relative;
+    .notify-cnt{
         position: absolute;
-        margin-right: 1.3vw!important;
-        margin-top: 1vw!important;
-        div{
-            font-size: 1.2vw;
-        }
-        a{
-            padding: .1vw 1.2vw!important;
-            &:hover{
-                color: #333!important;
-            }
-        }
-        
-        .divider{
-            background-color: #eee;
-            width: 100%;
-            margin: .8vw 0;
-            height: .1vw;
-        }
-        .user-role-item{
-            pointer-events: none!important;
-            &:hover{
-                    background-color: transparent;
-                    pointer-events: none!important;
-            }
-        }
+        top: -10px;
+        right: 16px;
+        height: 15px;
+        width: 15px;
+        overflow: hidden;
+        background: #321e4f;
+        color: #FFF;
+        text-align: center;
+        border-radius: 100%;
+        font-size: 9px;
+        font-weight: bold;
+        line-height: 15px;
     }
-
-    .switch-role-menu{
-        left: 20%!important;
-        
-    }
-
-    .switch-role-icon{
-        height: 1.8vw;
-        width: 1.8vw;
-        margin-right: .9vw;
-    }
-    
-    .bell-ic{
-        font-size: 1.6vw!important;
-    }
-    
 }
 
+
+// @media screen and (min-width: 1400px) and (min-height: 770px){
+//     .main-header {
+//         padding: .9vw 0 .9vw 1.5vw;
+//         color: rgb(151, 151, 151);
+//     }
+    
+//     .header-logo{
+//         height: 2.5vw;
+//     }
+    
+//     .no-border{
+//         padding: 0 2vw;
+//         font-size: 1.3vw;
+//     }
+    
+//     .user-name-icon{
+//         height: 1.8vw;
+//         width: 1.8vw;
+//         margin-left: .8vw;
+//     }
+    
+//     .user-name-btn{
+//         padding-right: 1vw;
+//         border-left: .1vw solid gray;
+//         .user-name{
+//             margin: 0 1.9vh;
+//         }
+//     }
+    
+//     .switch-role-menu, .user-name-menu{
+//         z-index: 5;
+//         font-size: 1.2vw;
+//         color: #333;
+//         position: absolute;
+//         margin-right: 1.3vw!important;
+//         margin-top: 1vw!important;
+//         div{
+//             font-size: 1.2vw;
+//         }
+//         a{
+//             padding: .1vw 1.2vw!important;
+//             &:hover{
+//                 color: #333!important;
+//             }
+//         }
+        
+//         .divider{
+//             background-color: #eee;
+//             width: 100%;
+//             margin: .8vw 0;
+//             height: .1vw;
+//         }
+//         .user-role-item{
+//             pointer-events: none!important;
+//             &:hover{
+//                     background-color: transparent;
+//                     pointer-events: none!important;
+//             }
+//         }
+//     }
+
+//     .switch-role-menu{
+//         left: 20%!important;
+        
+//     }
+
+//     .switch-role-icon{
+//         height: 1.8vw;
+//         width: 1.8vw;
+//         margin-right: .9vw;
+//     }
+    
+//     .bell-ic{
+//         font-size: 1.6vw!important;
+//     }
+    
+// }
+
+.afterExecution-modal .modal-content{
+    max-width: 300px;
+}

@@ -43,11 +43,13 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
 
     useEffect(()=>{
         if (!showDlg) setDependCheck(dTcFlag);
+        //eslint-disable-next-line
     }, [showDlg]);
 
     useEffect(()=>{
         setDependCheck(false);
         setCheckedTc({});
+        //eslint-disable-next-line
     }, [current_task])
 
     const WebList = [
@@ -62,7 +64,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
     
     const desktopList = [{'title': "Desktop Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
     
-    const systemList = [{'title': "System Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable, 'disable': disable}]
+    const systemList = [{'title': "System Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
     
     const sapList = [{'title': "SAP Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
     
@@ -119,14 +121,12 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
                     let rows={}
                     mainTestCases.forEach((testCase, index) => {
                         if(index+1 in data){
-                            // $('#jqGrid').jqGrid('setCell', $(this)[0].id, 'objectName', data[$(this)[0].id].xpath);
-                            rows[testCase.custname]=data[index+1].xpath
+                            rows[testCase.custname]=data[index+1].xpath;
                         }
                     });
                     dispatch({type: DesignActions.SET_MODIFIED, payload: rows});
                     dispatch({type: DesignActions.SET_SAVEENABLE, payload: !saveEnable})
-                    console.log(`dispatching ${!saveEnable}`)
-                    setShowPop({'title': "Debug Testcase", 'content': "Debug completed successfully."})
+                    setShowPop({'title': "Debug Testcase", 'content': "Debug completed successfully."});
                 } else {
                     console.log(data);
                 }										
@@ -146,7 +146,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
                     break;
         case "OEBS": renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
                     break;
-        case "Desktop": renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} disable={icon.disable} />)}</Fragment>);
+        case "Desktop": renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
                         break;
         case "System": renderComp.splice(1, 0, <Fragment key={2}>{systemList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
                         break;
@@ -234,7 +234,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
                 else {
                     DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
                         .then(data => {
-                            if (data == "Invalid Session") RedirectPage(history);
+                            if (data === "Invalid Session") RedirectPage(history);
                             if (data === "success") {
                                 setImported(true);
                                 setShowPop({'title': "Import Testcase", 'content': "TestCase Json imported successfully."});

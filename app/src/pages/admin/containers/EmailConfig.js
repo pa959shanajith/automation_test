@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect , createRef } from 'react';
+import React, { useState, useEffect , createRef } from 'react';
 import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
 import {FormInput,FormRadio,FormSelect} from '../components/FormComp'
 import {getNotificationChannels,manageNotificationChannels} from '../api'
@@ -51,7 +51,9 @@ const EmailConfig = ({resetMiddleScreen}) => {
             inputRef.toggleUppdate.current.disabled = true
             inputRef.toggleStatus.current.disabled = true
             inputRef.toggleTest.current.disabled = true
+            fn.showAll();
         }
+        // eslint-disable-next-line
     },[inputRef])
     const onSelectProvider = () => {
         selectProvider({inputRef,...fn,displayError,setLoading});
@@ -76,7 +78,7 @@ const EmailConfig = ({resetMiddleScreen}) => {
         )
     }
     return(
-        <Fragment>
+        <div className="conf_email_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
@@ -90,7 +92,7 @@ const EmailConfig = ({resetMiddleScreen}) => {
             <div id='conf_email' className='conf_email'>
             <ScrollBar scrollId='conf_email' trackColor={'transperent'} thumbColor={'grey'}> 
                 <FormSelect inpRef={inputRef['selectprovider']} onChangeFn={onSelectProvider} defValue={"Select Provider"} label={"Provider"} option={['SMTP']}/>
-                <FormInput inpRef={inputRef['servername']} label={'Server Name'} placeholder={'Server Name'}/>
+                <FormInput inpRef={inputRef['servername']} label={'Server Name'} placeholder={'Server Name'} validExp={"emailServerName"}/>
                 <div className='col-xs-9 form-group input-label'>
                     <label>Status</label>
                     <span ref={inputRef['serverstatus']} style={{marginLeft:'20px'}} className={'left-opt'}>-</span>
@@ -139,7 +141,7 @@ const EmailConfig = ({resetMiddleScreen}) => {
             </ScrollBar>
             </div>
             {emailTest?<EmailTest setEmailTest={setEmailTest} confObj={emailTest}/>:null}
-        </Fragment>
+        </div>
     )
 }
 
@@ -148,11 +150,11 @@ const update = async(conf,action,setLoading,displayError,onSelectProvider) =>{
     setLoading(action.slice(0,-1) + "ing Configuration...")
     var data = await manageNotificationChannels({'action':action.toLowerCase(), conf})
     if(data.error){displayError(data.error,action+" Configuration");return;}
-    else if (data == "exists") {
+    else if (data === "exists") {
         displayError(action+" Configuration", "'"+conf.name+"' configuration already exists");
         return;
     }
-    else if (data == "success") {
+    else if (data === "success") {
         displayError("'"+conf.name+"' Configuration "+action+"d!",action+" Configuration");
         onSelectProvider()
         return;
@@ -172,9 +174,9 @@ const update = async(conf,action,setLoading,displayError,onSelectProvider) =>{
         if (+data[9]) errfields.push("Authentication");
         if (+data[10]) errfields.push("Avo Assure Application URL");
         if (+data[11]) errfields.push("Proxy URL");
-        if (+data[12] == 1) errfields.push("Proxy Username");
-        else if (+data[12] == 2) errfields.push("Proxy Password");
-        else if (+data[12] == 3) errfields.push("Proxy Credentials");
+        if (+data[12] === 1) errfields.push("Proxy Username");
+        else if (+data[12] === 2) errfields.push("Proxy Password");
+        else if (+data[12] === 3) errfields.push("Proxy Credentials");
         displayError(emsg+" Following values are invalid: "+errfields.join(", "),action+" Configuration");
     } else{
         displayError("Failed to "+ action +" configuration",action+" Configuration");
@@ -191,7 +193,7 @@ const clickToggle = async(servername,action,setLoading,displayError,onSelectProv
     setLoading(action.slice(0,-1) + "ing Configuration...")
     var data = await manageNotificationChannels({action : action.toLowerCase(), conf})
     if(data.error){displayError(data.error,action+" Configuration");return;}
-    if (data == "success") {
+    if (data === "success") {
         displayError("'"+conf.name+"' Configuration "+action+"d!",action+" Configuration");
         onSelectProvider()
         return;
@@ -209,13 +211,17 @@ const clickToggle = async(servername,action,setLoading,displayError,onSelectProv
     }
 }
 
-const selectProvider = async({inputRef,showPool,showAuth,showProxCred,showProxUrl,displayError,setLoading}) =>{
+const selectProvider = async({inputRef,showPool,showAuth,showAll,showProxCred,showProxUrl,displayError,setLoading}) =>{
     var arg = {"action":"provider","channel":"email","args":"smtp"}
     try{
         setLoading('Loading ...');
         var data = await getNotificationChannels(arg);
         if(data.error){displayError(data.error);return;}
-        if(data === 'empty'){inputRef.toggleUppdate.disabled=false;setLoading(false);return;}
+        if(data === 'empty'){
+            inputRef.toggleUppdate.current.disabled=false;
+            setLoading(false);
+            return;
+        }
         inputRef.toggleUppdate.current.innerText = 'Update'
         inputRef.servername.current.value = data.name
         if(data.name)inputRef.servername.current.readOnly = true
@@ -227,7 +233,7 @@ const selectProvider = async({inputRef,showPool,showAuth,showProxCred,showProxUr
         inputRef.secureconnect[data.tls.security].current.checked= true 
         inputRef.tlcerror[data.tls.insecure.toString()].current.checked = true
         const authType = (data.auth && data.auth.type) || data.auth;
-        if (authType == "basic"){
+        if (authType === "basic"){
             inputRef.selectauth.current.value = data.auth.type;
             inputRef.authname.current.value = data.auth.username
             inputRef.authpassword.current.value = data.auth.password
@@ -272,8 +278,8 @@ const selectProvider = async({inputRef,showPool,showAuth,showProxCred,showProxUr
 
 const factoryFn = (inputRef) =>{
     const showAuth = () => {
-        inputRef.authname.current.disabled = inputRef.selectauth.current.value === 'none'
-        inputRef.authpassword.current.disabled = inputRef.selectauth.current.value === 'none'
+        inputRef.authname.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt")
+        inputRef.authpassword.current.disabled = (inputRef.selectauth.current.value === 'none' || inputRef.selectauth.current.value === "def-opt")
     }
     const showProxCred = () =>{
         inputRef.proxyuser.current.disabled = !inputRef.checkproxycred.current.checked
@@ -286,7 +292,13 @@ const factoryFn = (inputRef) =>{
         inputRef.maxconnection.current.disabled =!inputRef.checkboxpool.current.checked 
         inputRef.maxmessages.current.disabled = !inputRef.checkboxpool.current.checked 
     }
-    return {showPool,showAuth,showProxCred,showProxUrl}
+    const showAll = () => {
+        showAuth();
+        showPool();
+        showProxUrl();
+        showProxCred();
+    }
+    return {showPool,showAuth,showProxCred,showProxUrl,showAll}
 }
 
 const getConfObj = (inputRef) => {
@@ -348,6 +360,7 @@ const validate = (inputRef,displayError)=> {
     const errBorder = '1px solid red';
     const regExName = /^[A-Za-z0-9]+([A-Za-z0-9-]*[A-Za-z0-9]+|[A-Za-z0-9]*)$/;
     const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+    // eslint-disable-next-line
     const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     
     var arr = ['selectprovider','selectauth','host','servername','port','sendername','senderaddr','assureurl']

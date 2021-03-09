@@ -1,17 +1,13 @@
-import React, { useState} from 'react';
-import {ScreenOverlay, PopupMsg, ModalContainer , IntegrationDropDown} from '../../global' 
-import {updateTestSuite_ICE, reviewTask, ExecuteTestSuite_ICE} from '../api';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown} from '../../global' 
+import {updateTestSuite_ICE, reviewTask, ExecuteTestSuite_ICE} from '../api';
 import "../styles/ExecuteContent.scss";
 import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
-// import socketIOClient from "socket.io-client";
-// const ENDPOINT = "https://"+window.location.hostname+":8443";
 
 
-const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, setExecutionActive, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
-
-    // const socket = socketIOClient(ENDPOINT);
+const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
     const history = useHistory();
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
@@ -22,9 +18,11 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [modalDetails,setModalDetails] = useState({title:"",task:""})
     const [moduleInfo,setModuleInfo] = useState([])
-    const [integration,setIntegration] = useState({alm: {url:"",username:"",password:""}, 
-                                                    qtest: {url:"",username:"",password:"",qteststeps:""}, 
-                                                    zephyr: {accountid:"",accesskey:"",secretkey:""}});
+    const [integration,setIntegration] = useState({
+        alm: {url:"",username:"",password:""}, 
+        qtest: {url:"",username:"",password:"",qteststeps:""}, 
+        zephyr: {accountid:"",accesskey:"",secretkey:""}
+    });
     const [selectAllBatch,setSelectAllBatch] = useState(0)
     const [allocateICE,setAllocateICE] = useState(false)
     var batch_name= taskName ==="Batch Execution"?": "+current_task.taskName.slice(13):""
@@ -46,12 +44,6 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
     const updateTestSuite = async () => {
         setLoading("Saving in progress. Please Wait...");
 		const batchInfo = [];
-		const suiteidsexecution = [];
-		// $(".parentSuiteChk:checked").each(function (i, e) {
-		// 	suiteidsexecution.push(e.getAttribute('id').split('_')[1]);
-		// });
-		// window.localStorage.setItem("executionidxreport", JSON.stringify({"idxlist": suiteidsexecution}));
-		
         for(var i =0 ; i < eachData.length ; i++) { 
 			const suiteDetails = {};
 			const scenarioDescriptionText = [];
@@ -75,12 +67,6 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
         setLoading(false);
         if (data !== "fail") {
             setPopupState({show:true,title:"Save Test Suite",content:"Test suite saved successfully."});
-            //$("#saveSuitesModal").modal("show")
-            //Transaction Activity for Save Test Suite Button Action
-            // var labelArr = [];
-            // var infoArr = [];
-            // labelArr.push(txnHistory.codesDict['SaveTestSuite']);
-            // txnHistory.log(e.type,labelArr,infoArr,$location.$$path);
         }
         setupdateAfterSave(!updateAfterSave);
     }
@@ -97,22 +83,22 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
 		var version = current_task.versionnumber;
 		var batchTaskIDs = current_task.batchTaskIDs;
 		var projectId = current_task.projectId;
-		if (action != undefined && action == 'reassign') {
+		if (action !== undefined && action === 'reassign') {
 			taskstatus = action;
 		}
 
 		const result = await reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs);
         if(result.error){displayError(result.error);return;}
-        if (result == 'fail') {
+        if (result === 'fail') {
             setPopupState({show:true,title:"Task Submission Error",content:"Reviewer is not assigned !"});
-        }else if(result =='NotApproved'){
+        }else if(result ==='NotApproved'){
             setPopupState({show:true,title:"Task Submission Error",content:"All the dependent tasks (design, scrape) needs to be approved before Submission"});
         } 
-        else if (taskstatus == 'reassign') {
+        else if (taskstatus === 'reassign') {
             setPopupState({show:true,title:"Task Reassignment Success",content:"Task Reassigned successfully!"});
             window.localStorage['navigateScreen'] = "plugin";
             history.replace('/plugin');
-        } else if (taskstatus == 'underReview') {
+        } else if (taskstatus === 'underReview') {
             setPopupState({show:true,title:"Task Completion Success",content:"Task Approved successfully!"});
             window.localStorage['navigateScreen'] = "plugin";
             history.replace('/plugin');
@@ -125,8 +111,8 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
     
     const ExecuteTestSuitePopup = () => {
         const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction)
-        // if ($(".exe-ExecuteStatus input:checked").length === 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
-        if(check) setAllocateICE(true);
+        const valid = checkSelectedModules(eachData, setPopupState);
+        if(check && valid) setAllocateICE(true);
     }    
 
     const ExecuteTestSuite = async (executionData) => {
@@ -140,23 +126,17 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
         executionData["browserType"]=browserTypeExe;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
-        setExecutionActive(true);
-        // $rootScope.resetSession.start();
-        // ResetSession("start");
+        ResetSession.start();
         try{
-            // setLoading(false);
-            // return //remove this after syncing with new changes
+            setLoading(false);
             const data = await ExecuteTestSuite_ICE(executionData);
             if (data.errorapi){displayError(data.errorapi);return;}
-            if (data == "begin"){
-                setLoading(false); //remove this when socket connection is done.
+            if (data === "begin"){
                 return false;
             }
-            setLoading(false);
-            // $rootScope.resetSession.end();
-            setExecutionActive(false);
+            ResetSession.end();
             if(data.status) {
-                if(data.status == "fail") {
+                if(data.status === "fail") {
                     setPopupState({show:true,title:"Queue Test Suite",content:data["error"]});
                 } else {
                     setPopupState({show:true,title:"Queue Test Suite",content:data["message"]});
@@ -164,15 +144,16 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
             }
             setBrowserTypeExe([]);
             setModuleInfo([]);
+            setExecAction("serial");
             setupdateAfterSave(!updateAfterSave);
             setSyncScenario(false);
         }catch(error) {
             setLoading(false);
-            // $rootScope.resetSession.end();
+            ResetSession.end();
             setPopupState({show:true,title:"Execute Failed",content:"Failed to execute."});
-            setExecutionActive(false);
             setBrowserTypeExe([]);
             setModuleInfo([]);
+            setExecAction("serial");
             setupdateAfterSave(!updateAfterSave);
             setSyncScenario(false);
         }
@@ -182,13 +163,13 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
         setIntegration({alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
         zephyr: {accountid:"",accesskey:"",secretkey:""}})
-        if (value == "1") {
+        if (value === "1") {
             setShowIntegrationModal("ALM")
 		}
-		else if (value == "0") {
+		else if (value === "0") {
             setShowIntegrationModal("qTest")
 		}
-        else if (value == "2") {
+        else if (value === "2") {
             setShowIntegrationModal("Zephyr")
 		}
     }
@@ -213,6 +194,7 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
                 icePlaceholder={'Search ICE to execute'}
                 exeTypeLabel={"Select Execution type"}
                 exeIceLabel={"Execute on ICE"}
+                ExeScreen={true}
             />:null}
             
             <div className="e__content">
@@ -221,8 +203,8 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
                     {taskName==="Batch Execution"?<div><span className='parentBatchContainer'><input id="selectAllBatch" onClick={()=>{setSelectAllBatchClick()}} title='Select Batch' type='checkbox' className='checkParentBatch' /><span className='parentObject'>Select All</span></span></div>:null}
                     <button id="excSaveBtn" onClick={()=>{updateTestSuite()}} title="Save" className={"e__taskBtn e__btn "+ ((taskName==="Batch Execution") ? "e__btnLeft" : "")}>Save</button>
                     <button disabled={true} title="Configure" className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>Configure</button>
-                    <select id='syncScenario' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>
-                        <option value="" selected disabled>Select Integration</option>
+                    <select defaultValue={""} id='syncScenario' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>
+                        <option value="" disabled className="e__disableOption">Select Integration</option>
                         <option value="1">ALM</option>
                         <option value="0">qTest</option>
                         <option value="2">Zephyr</option>
@@ -232,7 +214,7 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
                     <button className="e__btn-md executeBtn" onClick={()=>{ExecuteTestSuitePopup()}} title="Execute">Execute</button>
                 </div>
 
-                <ExecuteTable current_task={current_task} selectAllBatch={selectAllBatch} setLoading={setLoading} setPopupState={setPopupState} selectAllBatch={selectAllBatch} filter_data={projectdata} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} eachDataFirst={eachDataFirst} setEachDataFirst={setEachDataFirst} />
+                <ExecuteTable current_task={current_task} setLoading={setLoading} setPopupState={setPopupState} selectAllBatch={selectAllBatch} filter_data={projectdata} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} eachDataFirst={eachDataFirst} setEachDataFirst={setEachDataFirst} />
                 </div>
                         
             {showDeleteModal?<ModalContainer title={modalDetails.title} footer={submitModalButtons(setshowDeleteModal, submit_task)} close={closeModal} content={"Are you sure you want to "+ modalDetails.task+" the task ?"} modalClass=" modal-sm" />:null} 
@@ -252,17 +234,32 @@ const ExecuteContent = ({execEnv, taskName, status, readTestSuite, setSyncScenar
     );
 }
 
+const checkSelectedModules = (data, setPopupState) => {
+    let pass = false;
+    // eslint-disable-next-line
+    data.map((rowData,m)=>{
+        const indeterminate = document.getElementById('parentExecute_"' + m).indeterminate;
+        const checked = document.getElementById('parentExecute_"' + m).checked;
+        if(indeterminate || checked){
+            pass = true;
+            return null
+        } 
+    })
+    if (pass===false) setPopupState({show:true,title:"Execute Test Suite",content:"Please select atleast one scenario(s) to execute"});
+    return pass
+} 
+
 const SelectBrowserCheck = (appType,browserTypeExe,setPopupState,execAction)=>{
-    if ((appType == "Web") && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
-    else if (appType == "Webservice" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Web Services option"});
-    else if (appType == "MobileApp" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Mobile Apps option"});
-    else if (appType == "Desktop" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Desktop Apps option"});
-    else if (appType == "Mainframe" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Mainframe option"});
-    else if (appType == "OEBS" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select OEBS Apps option"});
-    else if (appType == "SAP" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select SAP Apps option"});
-    else if (appType == "MobileWeb" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content: "Please select Mobile Web option"});
+    if ((appType === "Web") && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
+    else if (appType === "Webservice" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Web Services option"});
+    else if (appType === "MobileApp" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Mobile Apps option"});
+    else if (appType === "Desktop" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Desktop Apps option"});
+    else if (appType === "Mainframe" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Mainframe option"});
+    else if (appType === "OEBS" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select OEBS Apps option"});
+    else if (appType === "SAP" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select SAP Apps option"});
+    else if (appType === "MobileWeb" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content: "Please select Mobile Web option"});
     else if (browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select " + appType + " option"});
-    else if ((appType == "Web") && browserTypeExe.length == 1 && execAction == "parallel") setPopupState({show:true,title:"Execute Test Suite",content:"Please select multiple browsers"});
+    else if ((appType === "Web") && browserTypeExe.length === 1 && execAction === "parallel") setPopupState({show:true,title:"Execute Test Suite",content:"Please select multiple browsers"});
     else return true;
     return false;
 }
@@ -292,7 +289,8 @@ const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleI
                     dataparam: [eachData[i].dataparam[j].trim()],
                     scenarioName: eachData[i].scenarionames[j],
                     scenarioId: eachData[i].scenarioids[j],
-                    scenariodescription: undefined
+                    scenariodescription: undefined,
+                    accessibilityParameters: "Disable"
                 });
             }
         }

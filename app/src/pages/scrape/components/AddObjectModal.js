@@ -4,7 +4,8 @@ import "../styles/AddObjectModal.scss";
 
 const AddObjectModal = props => {
 
-    const [objects, setObjects] = useState([{objName: "", objType: ""}]);
+    const [tempIdCounter, setTempIdCounter] = useState(1);
+    const [objects, setObjects] = useState([{objName: "", objType: "", tempId: tempIdCounter}]);
     const [error, setError] = useState({});
 
     const objectTypes = [
@@ -22,8 +23,10 @@ const AddObjectModal = props => {
 
     const newField = () => {
         let updatedObjects = [...objects];
-        updatedObjects.push({ objName: "", objType: ""});
+        let newTempId = tempIdCounter + 1;
+        updatedObjects.push({ objName: "", objType: "", tempId: newTempId});
         setObjects(updatedObjects);
+        setTempIdCounter(newTempId);
     }
 
     const deleteField = index => {
@@ -45,35 +48,69 @@ const AddObjectModal = props => {
     }
 
     const onSubmit = () => {
-        let newObjects = []
         let errorObj = {};
+        let errorFlag = null;
         let lastObj = props.scrapeItems[props.scrapeItems.length-1]
         let lastVal = lastObj ? lastObj.val : 0;
+
+        let duplicateDict = {};
+        let idArr = [];
+        let newObjects = [];
+        
         for (let i=0; i<objects.length; i++){
             let name = objects[i].objName;
             let type = objects[i].objType;
+            let tempId = objects[i].tempId;
+            let [tag, value] = type.split("-");
+            let custname = `${name}_${value}`;
+
+            for(let object of props.scrapeItems) {
+                if (object.title === custname) {
+                    errorObj = { type: "input", tempId: [tempId], dTitle: custname };
+                    errorFlag = 'present';
+                    break;
+                }
+            }
+            if (errorFlag==='present') break;
 
             if (!name || !type) {
-                errorObj = { type: !name ? "input" : "type", index: i };
+                errorObj = { type: !name ? "input" : "type", tempId: [tempId] };
+                errorFlag = 'empty';
                 break;
-            } else {
-                let [tag, value] = type.split("-");
-                newObjects.push({
-                    objIdx: i,
-                    title: `${name}_${value}`, 
-                    tag: tag, 
-                    xpath: "", 
-                    val: ++lastVal,
-                    isCustom: true
-                });
             }
+
+            if (custname in duplicateDict){
+                duplicateDict[custname].push(tempId);
+                idArr.push(...duplicateDict[custname]);
+                errorFlag = 'duplicate';
+            }
+            else duplicateDict[custname] = [tempId];
+
+            newObjects.push({
+                objIdx: i,
+                title: `${name}_${value}`, 
+                tag: tag, 
+                xpath: "", 
+                val: ++lastVal,
+                isCustom: true
+            });
         }
-        if (newObjects.length > 0 && !errorObj.index) {
+
+        if (errorFlag) {
+            if (errorFlag==='duplicate') {
+                errorObj = {type: 'input', tempId: idArr};
+                props.setShowPop({title: 'Add Objects', content: 'Duplicate Object Names Found!'})
+            } 
+            else if (errorFlag==='present') props.setShowPop({title: 'Add Objects', content: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`})
+            setError(errorObj);
+        };
+        
+        if (!errorFlag && newObjects.length > 0) {
             props.setScrapeItems([...props.scrapeItems, ...newObjects]);
             props.setShow(false);
             props.setSaved(false);
+            props.setShowPop({title: "Add Object", content: "Objects has been added successfully."});
         }
-        setError(errorObj)
     }
 
     const resetFields = () => {
@@ -82,6 +119,7 @@ const AddObjectModal = props => {
             emptyFields[i] = {objName: "", objType: ""};
         }
         setObjects(emptyFields);
+        setError({});
     }
 
     return (
@@ -90,19 +128,19 @@ const AddObjectModal = props => {
                 title="Add Object"
                 content={
                     <div data-test="ssObjModalContent" className="ss__objModal_content" id="ss__objModalListId">
-                        <ScrollBar scrollId="ss__objModalListId" hideXbar={true} thumbColor="#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' minThumbSize='20px'>
+                        <ScrollBar scrollId="ss__objModalListId" thumbColor="#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                 { objects.map((object, index) => <div data-test="objModalItem" className="ss__objModal_item" key={index}>
-                                        <input data-test="addObjectInput" className={"addObj_name"+(error.type==="input" && error.index === index ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
-                                        <select data-test="addObjectTypeSelect" className={"addObj_objType"+(error.type==="type" && error.index === index ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
+                                        <input data-test="addObjectInput" className={"addObj_name"+(error.type==="input" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
+                                        <select  data-test="addObjectTypeSelect" className={"addObj_objType"+(error.type==="type" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
                                             <option className="addObj_option" disabled selected value="">Select Object Type</option>
-                                            { objectTypes.map( objectType =>
-                                                <option className="addObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>
+                                            { objectTypes.map((objectType, i) =>
+                                                <option key={i} className="addObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>
                                                     {objectType.name}
                                                 </option>
                                             ) }
                                         </select>
-                                        <button data-test="deleteObjectButton" className="addObj_btn" onClick={()=>deleteField(index)}><img src="static/imgs/ic-delete.png" /></button>
-                                        { objects.length-1 === index && <button data-test="addObjectButton" className="addObj_btn" onClick={newField}><img src="static/imgs/ic-add.png" /></button>}
+                                        <button data-test="deleteObjectButton" className="addObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img alt="delete-ic" src="static/imgs/ic-delete.png" /></button>
+                                        { objects.length-1 === index && <button data-test="addObjectButton" className="addObj_btn" onClick={newField}><img alt="add-ic" src="static/imgs/ic-add.png" /></button>}
                                     </div>
                                 ) }
                         </ScrollBar>

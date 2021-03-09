@@ -29,6 +29,7 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
             ))
             setApp(types);
         }
+        //eslint-disable-next-line
     }, []);
 
     const onProjSel = event => {

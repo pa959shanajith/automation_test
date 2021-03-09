@@ -156,3 +156,30 @@
 .btn-list-tkn-mgmt{
     margin-left:-21%;
 }
+.tkn-table__row{
+    display: flex;
+    margin-right: 2px;
+}
+.tkn-table__name{
+    width: 30%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tkn-table__status{
+    width: 15%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tkn-table__exp{
+    width: 25%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tkn-table__action{
+    width: 30%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tkn-table__button{
+    margin-left: 0%
+}

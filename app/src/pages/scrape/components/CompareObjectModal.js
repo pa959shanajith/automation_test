@@ -9,6 +9,7 @@ const CompareObjectModal = props => {
     useEffect(() => {
         const macOS = navigator.appVersion.indexOf("Mac") !== -1;
         setIsMac(macOS);
+        //eslint-disable-next-line
     }, []);
 
     const webIcons = [
@@ -27,8 +28,8 @@ const CompareObjectModal = props => {
                 content={<div data-test="ssCompareObjectContent" className="ss__compareObj_content">
                     <span>Select one of the browsers below to compare objects</span>
                     <div data-test="compareObjectButtons" className="compareObj_btns">
-                        { webIcons.map(icon => !icon.hide && <button data-test="compareObjectButton" className="compareObj_btn" title={icon.title} onClick={icon.action}>
-                                <img  data-test="webIcons" className="ss__web_icons" src={icon.src} alt={icon.title}/>
+                        { webIcons.map((icon, i) => !icon.hide && <button data-test="compareObjectButton" key={i} className="compareObj_btn" title={icon.title} onClick={icon.action}>
+                                <img data-test="webIcons" className="ss__web_icons" src={icon.src} alt={icon.title}/>
                             </button>
                         ) }
                     </div>

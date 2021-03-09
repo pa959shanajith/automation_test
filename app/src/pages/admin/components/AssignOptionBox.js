@@ -52,6 +52,7 @@ const AssignOptionBox = ({rightBox,leftBox,setRightBox,setLeftBox,disable,Filter
 }
 
 const moveObj = (action,rightBox,leftBox,setRightBox,setLeftBox) => {
+    var lBox, rBox, el;
     switch(action){
         case "rightall": {
             setRightBox([...leftBox,...rightBox])
@@ -64,9 +65,9 @@ const moveObj = (action,rightBox,leftBox,setRightBox,setLeftBox) => {
             return;
         }
         case "rightgo": {
-            var lBox = [];
-            var rBox = [];
-            var el = document.getElementById("opt-box-left").options;
+            lBox = [];
+            rBox = [];
+            el = document.getElementById("opt-box-left").options;
             if(el && el.length>0){
                 Array.from(el).forEach((e)=>{
                     var obj = {_id:e.value,name:e.innerText}
@@ -82,9 +83,9 @@ const moveObj = (action,rightBox,leftBox,setRightBox,setLeftBox) => {
             return;
         }
         case "leftgo": {
-            var lBox = [];
-            var rBox = [];
-            var el = document.getElementById("opt-box-right").options;
+            lBox = [];
+            rBox = [];
+            el = document.getElementById("opt-box-right").options;
             if(el && el.length>0){
                 Array.from(el).forEach((e)=>{
                     var obj = {_id:e.value,name:e.innerText}
@@ -99,7 +100,7 @@ const moveObj = (action,rightBox,leftBox,setRightBox,setLeftBox) => {
             }
             return;
         }
-        return;
+        default: return;
     }
 }
 

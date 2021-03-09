@@ -10,7 +10,6 @@ const ExecuteHome = () => {
     const current_task = useSelector(state=>state.plugin.CT)
     const filter_data = useSelector(state=>state.plugin.FD)
 	const [browserTypeExe,setBrowserTypeExe] = useState([]); // Contains selected browser id for execution
-	const [executionActive,setExecutionActive] = useState(false); 
 	const [execAction,setExecAction] = useState("serial"); 
 	const [execEnv,setExecEnv] = useState("default");
     const [taskName, setTaskName] = useState(null);
@@ -27,6 +26,7 @@ const ExecuteHome = () => {
             else setTaskName("Batch Execution");
             setStatus(current_task.status);
             setAppType(current_task.appType);
+            // eslint-disable-next-line
             versionnumber = current_task.versionnumber;
             let readTestSuiteData = current_task.testSuiteDetails;
             if(typeof readTestSuiteData === "string") readTestSuiteData = JSON.parse(current_task.testSuiteDetails);
@@ -65,13 +65,12 @@ const ExecuteHome = () => {
                     <ActionBar 
                         upperContent={<UpperContent appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />}
                         bottomContent={<BottomContent execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
-                    <ExecuteContent execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} setSyncScenario={setSyncScenario} setExecutionActive={setExecutionActive} projectdata={filter_data} execAction={execAction} appType={appType} browserTypeExe={browserTypeExe} syncScenario={syncScenario} taskName={taskName} status={status} readTestSuite={readTestSuite} current_task={current_task} />
+                    <ExecuteContent execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} setSyncScenario={setSyncScenario} projectdata={filter_data} execAction={execAction} appType={appType} browserTypeExe={browserTypeExe} syncScenario={syncScenario} taskName={taskName} status={status} readTestSuite={readTestSuite} current_task={current_task} />
                     <ReferenceBar /> 
                 </div>
             <div className='e__footer'><Footer/></div>
         </div>
     );
 }
-
 
 export default ExecuteHome;

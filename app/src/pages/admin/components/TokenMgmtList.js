@@ -20,6 +20,7 @@ const TokenMgmtList = (props) => {
     useEffect(()=>{
         if(firstStop) setFirstStop(!firstStop);
         else setAllTokensModify(props.allTokens);
+        // eslint-disable-next-line
     },[props.allTokens])
 
     const closePopup = () =>{
@@ -66,7 +67,7 @@ const TokenMgmtList = (props) => {
 						<h4 onClick={()=>{props.setShowList(!props.showList);}} >CI Tokens</h4>
 						<div  className="search-tkn-mgmt search-list-tkn-mgmt">
 							<span className="searchIcon searchIcon-list" >
-								<img src={"static/imgs/ic-search-icon.png"} className="search-img-list" />
+								<img src={"static/imgs/ic-search-icon.png"} className="search-img-list" alt={"Search Icon"}/>
 							</span>
 							<input value={searchTasks} autoComplete="off" onChange={(event)=>{ setSearchTasks(event.target.value);searchList(event.target.value)}} type="text" id="searchTasks"  className="searchInput searchInput-list-tkn-mgmt" />
 						</div>
@@ -76,19 +77,19 @@ const TokenMgmtList = (props) => {
                             <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
                             <table className = "table table-hover sessionTable" id="tokensDetail">
                                 <tbody >
-                                <tr>
-                                    <th> Token Name </th>
-                                    <th> Status </th>
-                                    <th> Expiry </th>
-                                    <th> Action </th>
+                                <tr className="tkn-table__row">
+                                    <th className="tkn-table__name"> Token Name </th>
+                                    <th className="tkn-table__status"> Status </th>
+                                    <th className="tkn-table__exp"> Expiry </th>
+                                    <th className="tkn-table__action"> Action </th>
                                 </tr>
                                 {allTokensModify.map((token,index)=>(
-                                    <tr key={index} className='provisionTokens'>
-                                        <td> {token.name} </td>
-                                        <td> {token.deactivated} </td>
-                                        <td> {token.expireson} </td>
-                                        {token.deactivated === 'active'? <td><button className="btn btn-list-tkn-mgmt" onClick={()=>{deactivate(token)}} > Deactivate </button></td>:null}
-                                        {token.deactivated !== 'active'?<td ></td> :null}
+                                    <tr key={index} className='tkn-table__row provisionTokens'>
+                                        <td className="tkn-table__name"> {token.name} </td>
+                                        <td className="tkn-table__status"> {token.deactivated} </td>
+                                        <td className="tkn-table__exp"> {token.expireson} </td>
+                                        {token.deactivated === 'active'? <td className="tkn-table__action"><button className="btn btn-list-tkn-mgmt tkn-table__button" onClick={()=>{deactivate(token)}} > Deactivate </button></td>:null}
+                                        {token.deactivated !== 'active'?<td className="tkn-table__action"></td> :null}
                                     </tr> 
                                 ))}
                                 </tbody>

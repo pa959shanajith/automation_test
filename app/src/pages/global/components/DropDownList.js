@@ -15,7 +15,8 @@ const DropDownList = ({data,smartMode,selectedICE, setSelectedICE, placeholder})
         setList([...data])
         inputRef.current.value = ""
         if(smartMode==='normal') setSelectedICE("");
-		else setSelectedICE({});
+        else setSelectedICE({});
+        // eslint-disable-next-line
     },[data,smartMode])
     const inputFilter = () =>{
         var val = inputRef.current.value
@@ -31,11 +32,12 @@ const DropDownList = ({data,smartMode,selectedICE, setSelectedICE, placeholder})
 
     const selectOption = (icename, event) =>{
         if(smartMode!=='normal'){
-			if(selectedICE[icename]===undefined)selectedICE[icename]=true;
-            else selectedICE[icename]=!selectedICE[icename];
+            let selectedICEData = {...selectedICE}
+			if(selectedICEData[icename]===undefined)selectedICEData[icename]=true;
+            else selectedICEData[icename]=!selectedICEData[icename];
             inputRef.current.value = ""
             event.currentTarget.getElementsByTagName('input')[0].checked = !event.currentTarget.getElementsByTagName('input')[0].checked
-			setSelectedICE(selectedICE);
+			setSelectedICE(selectedICEData);
 		}else{
 			setSelectedICE(icename);
             inputRef.current.value = icename
@@ -49,7 +51,7 @@ const DropDownList = ({data,smartMode,selectedICE, setSelectedICE, placeholder})
         <Fragment>
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
             <div>
-                <input type={'hidden'} autoComplete={"off"} ref={inputRef} className="btn-users dropdown-toggle-edit edit-user-dropdown-edit" onChange={inputFilter} onClick = {resetField} type="text"  id="userIdName" placeholder={placeholder}/>
+                <input type={'hidden'} autoComplete={"off"} ref={inputRef} className="btn-users dropdown-toggle-edit edit-user-dropdown-edit" onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder={placeholder}/>
                 <div className="form-inp-dropdown-popup" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list.map((ice,index) => (  

@@ -75,6 +75,7 @@
     cursor: not-allowed;
     filter: alpha(opacity=65);
     -webkit-box-shadow: none;
+    background: lightgray !important;
     box-shadow: none;
     opacity: .65;
 }
@@ -179,4 +180,7 @@
 }
 #scheduledSuitesFilterData:focus{
 	box-shadow:none;
+}
+.e__disableOption{
+    background: lightgrey !important
 }

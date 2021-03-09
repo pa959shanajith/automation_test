@@ -1,11 +1,11 @@
-import React ,{Fragment,useState, useRef } from 'react';
-import {ScrollBar ,PopupMsg ,ScreenOverlay} from '../../global';
+import React ,{Fragment,useState } from 'react';
+import {ScrollBar ,PopupMsg} from '../../global';
 
 const Pairwise=(props)=>{
     const [optimizationType , SetOptimizationType]=useState(null);
 return(
     <Fragment>
-        {(optimizationType=="pairwise")?
+        {(optimizationType==="pairwise")?
                     <Fragment>
                         <div className="page-taskName" >
                             <span className="taskname">
@@ -27,7 +27,7 @@ return(
                             />
                             <button  className="btn-create" onClick={()=>{props.setLevel(parseInt(props.levelref.current.value));props.setFactor(parseInt(props.factref.current.value))}}>Create</button>
                             <button className="btn-utl" onClick={()=>props.callGenerate()}>Generate</button>
-                        </div>
+                        
                         <br/>
                             {props.gererateClick && <PopupMsg 
                                                 content={"Table values cannot be empty"} 
@@ -35,9 +35,12 @@ return(
                                                 submit={()=>props.setGenerateClick(false) } 
                                                 submitText={"Ok"} 
                                                 close={()=>props.setGenerateClick(false)}
-                                                />}
+                                                />}                        
+                        </div>
+                    <div className="pairsie_array_container">
+                        <ScrollBar thumbColor ={"#311d4e"} trackColor ={"rgb(211, 211, 211);"}>                        
                             <div className="pairwise_array">
-                            <ScrollBar thumbColor ={"#311d4e"} trackColor ={"rgb(211, 211, 211);"}>
+                            {/* <ScrollBar thumbColor ={"#311d4e"} trackColor ={"rgb(211, 211, 211);"}> */}
                                 {Array.from(Array(props.factor)).map((e,i)=>(
                                         <div className='factor__row' key={i} >
                                             <input  key={i} onChange={(e)=>props.updateInputFactorTable(e,i)} type="text"/>
@@ -47,9 +50,10 @@ return(
                                         </div>
                                 ))}
                                 
-                            </ScrollBar>
+                            {/* </ScrollBar> */}
                             </div>
-                        
+                        </ScrollBar>
+                        </div>
                     </Fragment> :
                     <Fragment>
                         <div className="page-taskName">

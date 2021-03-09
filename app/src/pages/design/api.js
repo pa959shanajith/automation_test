@@ -34,23 +34,21 @@ export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCase
 /*Component DesignContent
   api returns String (Invalid Session/Success)
 */
-export const updateScreen_ICE = (scrapeObject) => {
+export const updateScreen_ICE = arg => {
     return new Promise((resolve, reject)=>{
         axios(url+"/updateScreen_ICE", {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
             },
-            data : { scrapeObject : scrapeObject },
+            data : { 
+                data: arg
+            },
             credentials : 'include',
         })
         .then(res=>{
-            if (res.status === 200){
-                resolve(res.data);
-            }
-            else{
-                reject(res.status);
-            }
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
         })
         .catch(error=>reject(error));
     });

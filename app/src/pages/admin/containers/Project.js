@@ -1,8 +1,9 @@
-import React ,  { Fragment, useEffect, useState } from 'react';
+import React ,  { useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
-import {ScreenOverlay,PopupMsg, ModalContainer} from '../../global' 
+import {ScreenOverlay,PopupMsg, ModalContainer, ScrollBar} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
+import ValidationExpression from '../../global/components/ValidationExpression';
 import '../styles/Project.scss';
 
 /*Component ProjectNew
@@ -28,9 +29,7 @@ const ProjectNew = (props) => {
     const [delCount,setDelCount] = useState(0)
     const [count,setCount] = useState(0)
     const [title,setTitle] = useState([])
-    const [inputID,setInputID] = useState([])
     const [placeholder,setPlaceholder] = useState([])
-    const [buttonID,setButtonID] = useState([])
     const [applicationType,setApplicationType] = useState([])
     const [selDomainOptions,setSelDomainOptions] = useState([])
     const [showEditModalRelease,setShowEditModalRelease] = useState(false)
@@ -56,11 +55,14 @@ const ProjectNew = (props) => {
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
 
     useEffect(()=>{
-        getDomains();
+        getDomains("Create Project");
         setDisableAddRelease(true);
         setDisableAddCycle(true);
         setSelProject("");
         setModalInputErrorBorder(false);
+        setDomainSelectErrorBorder(false);
+        setProjectSelectErrorBorder(false);
+        setProjectNameInputErrorBorder(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.resetMiddleScreen["projectTab"]])
 
@@ -74,10 +76,10 @@ const ProjectNew = (props) => {
         })
     }
 
-    const getDomains = () => {
+    const getDomains = (screen) => {
         (async()=>{    
             setTaskName("Create Project")
-            resetForm();
+            resetForm(screen);
             setProjectDetails([]);
             setUpdateProjectDetails([]);
             var plugins = []; 
@@ -108,8 +110,9 @@ const ProjectNew = (props) => {
             for ( i = 0; i < plugins.length; i++) {
                 listPlugin.push(details[plugins[i]]);
             }
-            if(taskName==="Create Project") setSelDomain(data[0]);
-            if(taskName==="Update Project") setSelDomain("");
+            if(screen !== undefined) setSelDomain(data[0]);
+            else if(taskName==="Create Project") setSelDomain(data[0]);
+            else if(taskName==="Update Project") setSelDomain("");
             setApplicationType(listPlugin);
             setLoading(false); 
         })()
@@ -133,18 +136,28 @@ const ProjectNew = (props) => {
         setSelDomain("");
         setReleaseList([])
         setCycleList([])
+        setModalInputErrorBorder(false);
+        setDomainSelectErrorBorder(false);
+        setProjectSelectErrorBorder(false);
+        setProjectNameInputErrorBorder(false);
     }
 
-    const resetForm = ()=>{
+    const resetForm = (screen)=>{
         setProjectDetails([]);
         setProjectName("");
-        setEditProjectName("");
+        setEditProjectName(false);
         setSelProjectId("");
         setprojectTypeSelected("");
         setReleaseList([]);
         setCycleList([]);
+        setSelProjectOptions([]);
         toggleCycleClick();
-        if (taskName==="Update Project") setSelDomain("");
+        setDisableAddRelease(true);
+        setDisableAddCycle(true);
+        if (screen===undefined && taskName==="Update Project"){
+            setSelProject("");
+            setSelDomain("");
+        } 
         if(document.getElementById("selProjectOption") !== null)
             document.getElementById("selProjectOption").value="";
 	}
@@ -157,7 +170,7 @@ const ProjectNew = (props) => {
 
     const clickAddRelease = (props)=>{
         setFlag(false);
-        setTitle("Add Release"); setInputID("releaseTxt"); setPlaceholder("Add Release Name");setButtonID("addReleaseName");
+        setTitle("Add Release"); setPlaceholder("Add Release Name");
         setModalInputErrorBorder(false);
         setReleaseTxt("");
         setShowEditModalRelease(true);
@@ -352,7 +365,7 @@ const ProjectNew = (props) => {
 
     const clickEditRelease = (editId) =>{
         // setEditReleaseId(editId);
-        setTitle("Edit Release Name"); setInputID("releaseName"); setPlaceholder("Enter New Release Name");setButtonID("updateReleaseName");
+        setTitle("Edit Release Name");setPlaceholder("Enter New Release Name");
         if (editId !== "releaseName") {
             setModalInputErrorBorder(false);
         }
@@ -361,7 +374,7 @@ const ProjectNew = (props) => {
 
     const clickEditCycle = (editId,oldCycName) =>{
         setOldCyclename(oldCycName);
-        setTitle("Edit Cycle Name"); setInputID("cycleName"); setPlaceholder("Enter New Cycle Name");setButtonID("updateCycleName");
+        setTitle("Edit Cycle Name");setPlaceholder("Enter New Cycle Name");
         setCycleTxt(oldCycName);
         setModalInputErrorBorder(false);
         if (editId !== "cycleName") {
@@ -529,7 +542,7 @@ const ProjectNew = (props) => {
 
     const clickAddCycle = (props)=>{
         setFlag(false);
-        setTitle("Add Cycle"); setInputID("cycleTxt"); setPlaceholder("Add Cycle Name");setButtonID( "addCycleName");
+        setTitle("Add Cycle");setPlaceholder("Add Cycle Name");
         setModalInputErrorBorder(false);
         setCycleTxt("");
         setShowEditModalCycle(true);
@@ -601,7 +614,9 @@ const ProjectNew = (props) => {
                 } else {
                     var chk = true;
                     for (var j = 0; j < newProjectDetails.length; j++) {
-                        if (newProjectDetails[j].name === relName && newProjectDetails[j].releaseId === RelID) {
+                        // if (newProjectDetails[j].name === relName && newProjectDetails[j].releaseId === RelID) {
+                        //check when cycle is added to new created release RelID is undefined (check not needed)
+                        if (newProjectDetails[j].name === relName ) {
                             createCyc.name = cycleName;
                             newProjectDetails[j].cycles.push(createCyc);
                             setNewProjectDetails(newProjectDetails);
@@ -690,6 +705,7 @@ const ProjectNew = (props) => {
 
     const fetchProjectList = async (domain) =>{
         if(taskName==="Update Project"){
+            setLoading("Loading Projects...")
             var domainName =domain;
 			var requestedname = [];
             requestedname.push(domainName);
@@ -704,7 +720,11 @@ const ProjectNew = (props) => {
             }    
             
             projectOptions.sort((a,b)=>a.name.localeCompare(b.name));
-            setSelProjectOptions(projectOptions)
+            setSelProjectOptions(projectOptions);
+            document.getElementById("selProjectOption").selectedIndex = "0";  
+            setEditProjectName(false);
+            setSelProject("")
+            setLoading(false);
             clearUpdateProjectObjects();
         }    
     }
@@ -742,6 +762,7 @@ const ProjectNew = (props) => {
         setReleaseList(RelaseNames);
         setCycleList(cycleNames)
         setActiveRelease(RelaseNames[0]);
+        setDisableAddCycle(false);
         clearUpdateProjectObjects();
     }
 
@@ -756,12 +777,13 @@ const ProjectNew = (props) => {
     const editModalButtons = () =>{
         return(
             <div>
-                <button type="button" onClick={()=>{setShowProjectEditModal(false);}} className="btn-md adminBtn modal-btn">Save</button>
+                <button type="button" onClick={()=>{setShowProjectEditModal(false);}} >Save</button>
             </div>
         )
     } 
 
     const projectEditFunction = (newName) =>{
+        newName = ValidationExpression(newName,"projectName");
         setEditProjectName(newName);
         setModalInputErrorBorder(false);
         if(newName.trim() === ""){
@@ -769,8 +791,14 @@ const ProjectNew = (props) => {
         } 
     } 
 
+    const updateProjectName = (value) => {
+        value = ValidationExpression(value,"projectName");
+        setProjectName(value);
+    }
+
     return (
-    <Fragment>
+    <ScrollBar thumbColor="#929397">
+    <div className="project_conatiner">
         {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
         {loading?<ScreenOverlay content={loading}/>:null}
         <div id="page-taskName">
@@ -780,7 +808,7 @@ const ProjectNew = (props) => {
                 }
 		</div>
         
-        <ProjectButtons editProjectName={editProjectName} setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
+        <ProjectButtons setSelDomainOptions={setSelDomainOptions} editProjectName={editProjectName} setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
 
         <div className="col-xs-9 form-group" style={{width: "83%"}}>
             <div className='userForm-project projectForm-project display-project' >
@@ -810,11 +838,11 @@ const ProjectNew = (props) => {
             
             :<div className='userForm-project adminControl-project display-project' >
                 <div className='domainTxt'>Name</div>
-                <input value={projectName} onChange={(event)=>{setProjectName(event.target.value)}} type="text" autoComplete="off" id="projectName" name="projectName" maxLength="50" className={projectNameErrorBorder?"inputErrorBorder middle__input__border form-control__conv-project form-control-custom def-margin":"middle__input__border form-control__conv-project form-control-custom def-margin"} placeholder="Project Name"/>
+                <input value={projectName} onChange={(event)=>{updateProjectName(event.target.value)}} type="text" autoComplete="off" id="projectName" name="projectName" maxLength="50" className={projectNameErrorBorder?"inputErrorBorder middle__input__border form-control__conv-project form-control-custom def-margin":"middle__input__border form-control__conv-project form-control-custom def-margin"} placeholder="Project Name"/>
             </div>
             }
             <div className='userForm-project adminControl-project display-project'>
-                {editProjectName!==selProject && editProjectName!=="" && showProjectEditModal===false? 
+                {editProjectName!==selProject && editProjectName!=="" && editProjectName!==false && showProjectEditModal===false? 
                 <div className='edit-project__label'>New Project Name : {editProjectName}. Please click on Update.</div>:null}
             </div>
             
@@ -829,25 +857,30 @@ const ProjectNew = (props) => {
 
         <ReleaseCycle clickAddRelease={clickAddRelease} releaseList={releaseList} clickReleaseListName={clickReleaseListName} setActiveRelease={setActiveRelease} clickEditRelease={clickEditRelease} activeRelease={activeRelease} count={count} clickAddCycle={clickAddCycle} cycleList={cycleList} clickEditCycle={clickEditCycle} delCount={delCount} disableAddRelease={disableAddRelease} taskName={taskName} disableAddCycle={disableAddCycle} />
        
-        {(showEditModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddReleaseName)} close={()=>{setShowEditModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder )} modalClass=" modal-sm" />:null}   
-        {(showEditModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddCycleName)} close={()=>{setShowEditModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder )} modalClass=" modal-sm" /> :null} 
-        {(showEditNameModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(updateReleaseName)} close={()=>{setShowEditNameModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder )} modalClass=" modal-sm" />:null} 
-        {(showEditNameModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(updateCycleName)} close={()=>{setShowEditNameModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder )} modalClass=" modal-sm" /> :null}
+        {(showEditModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddReleaseName)} close={()=>{setShowEditModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder, "releaseTxt" )} modalClass=" modal-sm" />:null}   
+        {(showEditModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(clickAddCycleName)} close={()=>{setShowEditModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder, "cycleTxt" )} modalClass=" modal-sm" /> :null} 
+        {(showEditNameModalRelease)? <ModalContainer title={title} footer={ModalButtonsFooter(updateReleaseName)} close={()=>{setShowEditNameModalRelease(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, releaseTxt, setReleaseTxt, placeholder, "releaseTxt" )} modalClass=" modal-sm" />:null} 
+        {(showEditNameModalCycle)? <ModalContainer title={title} footer={ModalButtonsFooter(updateCycleName)} close={()=>{setShowEditNameModalCycle(false)}} content={ModalContainerMiddleContent(modalInputErrorBorder, cycleTxt, setCycleTxt, placeholder, "cycleTxt" )} modalClass=" modal-sm" /> :null}
         {showProjectEditModal? <ModalContainer title="Edit Project Name" footer={editModalButtons()} close={closeModal} content={editModalcontent(editProjectName, projectEditFunction, modalInputErrorBorder, projectNameErrorBorder)} modalClass=" modal-sm" /> :null}  
-    </Fragment>
+    </div>
+    </ScrollBar>
   );
 }
 
-const ModalContainerMiddleContent = (modalInputErrorBorder,Txt,setTxt, placeholder) => {
+const ModalContainerMiddleContent = (modalInputErrorBorder,Txt,setTxt, placeholder, ValidExpression) => {
+    const updateName = (value) => {
+        value = ValidationExpression(value,ValidExpression);
+        setTxt(value);
+    }
     return(
-        <p><input autoComplete="off" value={Txt} onChange={(event)=>{setTxt(event.target.value)}} maxLength="50" type="text" className={(modalInputErrorBorder)?"middle__input__border form-control__conv form-control-custom validationKeydown preventSpecialChar inputErrorBorder":"middle__input__border form-control__conv form-control-custom validationKeydown preventSpecialChar"}  placeholder={placeholder}/></p>
+        <p><input autoComplete="off" value={Txt} onChange={(event)=>{updateName(event.target.value)}} maxLength="50" type="text" className={(modalInputErrorBorder)?"middle__input__border form-control__conv form-control-custom inputErrorBorder":"middle__input__border form-control__conv form-control-custom"}  placeholder={placeholder}/></p>
     )
 }
 
 const ModalButtonsFooter = (saveAction) =>{
     return(
         <div>
-            <button type="button" onClick={()=>{saveAction();}} className="btn-md adminBtn modal-btn">Save</button>
+            <button type="button" onClick={()=>{saveAction();}} >Save</button>
         </div>
     )
 } 

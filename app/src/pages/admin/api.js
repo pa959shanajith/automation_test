@@ -373,6 +373,7 @@ export const createProject_ICE = async(createprojectObj) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
+            if(res.data === 'invalid_name_spl') return {error:"Failed to create project. Special characters found in project/release/cycle name"};
             return res.data;
         }
         console.error(res.data)
@@ -415,14 +416,15 @@ export const getDetails_ICE = async(idtype, requestedids) => {
   api returns string ex. "success"
 */
 
-export const updateProject_ICE = async(updateProjectObj) => { 
+export const updateProject_ICE = async(updateProjectObj, userDetails) => { 
     try{
         const res = await axios(url+'/updateProject_ICE', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {updateProjectObj: updateProjectObj},
+            data: {updateProjectObj: updateProjectObj,
+                userDetails: userDetails},
             credentials: 'include'
         });
         if(res.status === 401 || res.status === "Invalid Session" ){
@@ -516,7 +518,7 @@ export const manageSessionData = async(action, user, key, reason) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200){            
+        if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
@@ -577,7 +579,9 @@ export const provisions = async(tokeninfo) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200 ){            
+        if(res.status===200 ){    
+            if(res.data === 'DuplicateIceName') return {error:"ICE Provisioned Failed!<br/>ICE name or User already exists"};
+            if(res.data === 'invalid_splname') return {error:"ICE Provisioned Failed!<br/>Special characters found in icename"};
             return res.data;
         }
         console.error(res.data)
@@ -668,6 +672,8 @@ export const manageCIUsers = async(action,CIUser) => {
             return {error:'invalid session'};
         }
         if(res.status===200 && res.data !== "fail"){            
+            if(res.data === 'invalid_name_special') return {error:"Failed to generate token, Special characters found in token name"};
+            if(res.data === 'invalid_past_time') return {error:"Expiry time should be 8 hours more than current time"};
             return res.data;
         }
         console.error(res.data)
@@ -750,6 +756,7 @@ export const updatePool = async(data) => {
             return {error:'invalid session'};
         }
         if(res.status===200 && res.data !== "fail"){ 
+            if(res.data === 'invalid_splname') return {error:"Failed to update ICE Pool. Special characters found in poolname."};
             if(res.data === 'success')return res.data;
         }
         console.error(res.data)
@@ -801,6 +808,7 @@ export const createPool_ICE = async(data) => {
         }
         if(res.status===200 && res.data !== "fail"){ 
             if(res.data === 'Pool exists') return {error:"Pool name already exist!"};
+            if(res.data === 'invalid_splname') return {error:"Special characters found in poolname."};
             if(res.data === 'success')return res.data;
         }
         console.error(res.data)
@@ -905,7 +913,7 @@ export const getPools = async(data) => {
             return {error:'invalid session'};
         }
         if(res.status===200 && res.data !== "fail"){ 
-            if(res.data === 'empty' || Object.keys(res.data).length<1) return {error:"There are no users created yet."}           
+            if(res.data === 'empty' || Object.keys(res.data).length<1) return {val:"empty",error:"There are no ICE pools created yet."}           
             return res.data;
         }
         console.error(res.data)
@@ -995,5 +1003,62 @@ export const testNotificationChannels = async(data) => {
     }catch(err){
         console.error(err)
         return {error:"Failed! Re-check the configuration."}
+    }
+}
+
+
+/* Component Session Management
+  api returns
+*/
+
+export const fetchLockedUsers = async() => { 
+    try{
+        const res = await axios(url+'/fetchLockedUsers', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch locked users."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to fetch locked users"}
+    }
+}
+
+/* Component Session Management
+  api returns
+*/
+
+export const unlockUser = async(user) => { 
+    try{
+        const res = await axios(url+'/unlockUser', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {user: user},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to unlocked users."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to unlocked users"}
     }
 }

@@ -8,8 +8,11 @@ const PluginBox = ({plugin}) => {
 	const pluginRedirect = event => {
 		let pluginName = plugin.image.toLowerCase();
 		window.localStorage['navigateScreen'] = pluginName;
-		if (['p_Reports', 'performancetesting', 'dashboard'].indexOf(pluginName) > -1) window.location.href = "/"+ pluginName;
-		else setRedirectTo(`/${pluginName}`)
+		if (['report', 'performancetesting', 'dashboard'].indexOf(pluginName) > -1) window.location.href = "/"+ pluginName;
+		else {
+			if (pluginName === "integration") window.localStorage['integrationScreenType'] = null
+			setRedirectTo(`/${pluginName}`)
+		}
 	}
 
     return (

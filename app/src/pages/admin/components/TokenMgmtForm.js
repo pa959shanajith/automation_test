@@ -1,6 +1,7 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect, useRef } from 'react';
 import {ScreenOverlay, PopupMsg } from '../../global' 
 import {getUserDetails, getCIUsersDetails, fetchICE} from '../api';
+import ValidationExpression from '../../global/components/ValidationExpression';
 import ReactTooltip from 'react-tooltip';
 import Datetime from "react-datetime";
 import moment from "moment";
@@ -13,7 +14,8 @@ import '../styles/TokenMgmtForm.scss'
 */
 
 const TokenMgmtForm = (props) => {
-
+	const dateRef = useRef()
+	const timeRef = useRef()
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     const [allUsers,setAllUsers] = useState([['Select User',' ','','']])
@@ -123,7 +125,13 @@ const TokenMgmtForm = (props) => {
 		const tknlist = props.allTokens.map(e => e.name);
 		if (tknlist.indexOf(name) > -1)props.setNameErrBorder(true);
 		else props.setNameErrBorder(false);
-    }
+	}
+	
+	const updateTokenName = (value) => {
+		value = ValidationExpression(value,"tokenName")
+		props.setName(value);
+		verifyName(value)
+	}
 
     const copyTokenFunc = () =>{
 		const data = props.token;
@@ -169,6 +177,11 @@ const TokenMgmtForm = (props) => {
 		}, 1500);
 	}
 
+	const openTime = ()=> {
+        if(inputProps1Disable)return;
+        timeRef.current._onInputClick()
+    }
+
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
@@ -210,18 +223,35 @@ const TokenMgmtForm = (props) => {
 				</div>
                 <div className='adminControl-tkn-mgmt'><div>
 					<span className="leftControl-tkn-mgmt" title="Token Name">Token Name</span>
-					<input type="text" autoComplete="off" id="tokenName" name="tokenName" onChange={(event)=>{props.setName(event.target.value);verifyName(event.target.value)}} value={props.name} maxLength="100" className={props.nameErrBorder?"inputErrorBorder border_input-tkn-mgmt form-control-tkn-mgmt form-control-custom-tkn-mgmt":"border_input-tkn-mgmt form-control-tkn-mgmt form-control-custom-tkn-mgmt"} placeholder="Token Name"/>
+					<input type="text" autoComplete="off" id="tokenName" name="tokenName" onChange={(event)=>{updateTokenName(event.target.value)}} value={props.name} maxLength="100" className={props.nameErrBorder?"inputErrorBorder border_input-tkn-mgmt form-control-tkn-mgmt form-control-custom-tkn-mgmt":"border_input-tkn-mgmt form-control-tkn-mgmt form-control-custom-tkn-mgmt"} placeholder="Token Name"/>
 				</div></div>
                 <div className='adminControl-tkn-mgmt1'><div>
 					<span className="adminControl-tkn-mgmt1__title leftControl-tkn-mgmt" title="Token Expiry">Token Expiry</span>
                     <div className="tokenSuite">
 						<span className="datePicContainer datePic-cust" >
-							<Datetime isValidDate={valid} value={props.dateVal} onChange={(event)=>{props.setdateVal(event.format("DD-MM-YYYY"));setInputProps1Disable(false);props.setTimeVal(new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)))}} dateFormat="DD-MM-YYYY" closeOnSelect={true} inputProps={inputProps} timeFormat={false} id="data-token"/> 
-                            <img className="datepickerIconToken" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
+							<Datetime 
+								ref={dateRef} 
+								isValidDate={valid} 
+								value={props.dateVal} 
+								onChange={(event)=>{props.setdateVal(event.format("DD-MM-YYYY"));setInputProps1Disable(false);props.setTimeVal(new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)))}} 
+								dateFormat="DD-MM-YYYY" 
+								closeOnSelect={true} 
+								inputProps={inputProps} 
+								timeFormat={false} 
+								id="data-token"
+							/> 
+                            <img onClick={()=>{dateRef.current._onInputClick()}} className="datepickerIconToken" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
 						</span>
 						<span className="timePicContainer">
-							<Datetime value={props.timeVal} onChange={(event)=>{props.setTimeVal(event.format("H:m"))}} inputProps={inputProps1} dateFormat={false} timeFormat="H:m" /> 
-                            <img className="timepickerIconToken" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
+							<Datetime 
+								ref={timeRef} 
+								value={props.timeVal} 
+								onChange={(event)=>{props.setTimeVal(event.format("HH:mm"))}} 
+								inputProps={inputProps1} 
+								dateFormat={false} 
+								timeFormat="HH:mm" 
+							/> 
+                            <img onClick={openTime} className="timepickerIconToken" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
 						</span>
 					</div>
                 </div></div>

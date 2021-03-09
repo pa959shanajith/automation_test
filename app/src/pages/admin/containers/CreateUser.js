@@ -1,12 +1,13 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {ScreenOverlay, PopupMsg} from '../../global' 
+import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
 import {getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData} from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/CreateUser.scss'
 import CreateLanding from '../components/CreateLanding';
 import EditLanding from '../components/EditLanding';
 import useOnClickOutside from '../components/UseOnClickOutside'
+import ValidationExpression from '../../global/components/ValidationExpression';
 
 /*Component CreateUser
   use: defines Admin middle Section for create user
@@ -130,6 +131,7 @@ const CreateUser = (props) => {
                         return;
                     }
                     var errfields = [];
+                    let hints = 'Hint:';
                     if (JSON.parse(JSON.stringify(data)[2])) errfields.push("User Name");
                     if (JSON.parse(JSON.stringify(data)[3])) errfields.push("First Name");
                     if (JSON.parse(JSON.stringify(data)[4])) errfields.push("Last Name");
@@ -137,7 +139,9 @@ const CreateUser = (props) => {
                     if (JSON.parse(JSON.stringify(data)[6])) errfields.push("Email");
                     if (JSON.parse(JSON.stringify(data)[7])) errfields.push("Authentication Server");
                     if (JSON.parse(JSON.stringify(data)[8])) errfields.push("User Domain Name");
-                    setPopupState({show:true,title:bAction+" User",content:"Following values are invalid: "+errfields.join(", ")});
+                    if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+				    if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
+				    setPopupState({show:true,title:bAction+" User",content:"Following values are invalid: "+errfields.join(", ")+" "+hints});
                 }
             }
             catch(error){
@@ -298,7 +302,7 @@ const CreateUser = (props) => {
         var data = await getLDAPConfig("server");
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if (data == "empty") {
+        if (data === "empty") {
             setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
         } else {
             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
@@ -314,7 +318,7 @@ const CreateUser = (props) => {
             var data = await getSAMLConfig();
             if(data.error){displayError(data.error);return;}
             setLoading(false);
-            if (data == "empty") {
+            if (data === "empty") {
                 setPopupState({show:true,title:"Edit Configuration",content: "There are no SAML server configured. To proceed create a server configuration in SAML configuration section."});
             } else {
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
@@ -354,7 +358,7 @@ const CreateUser = (props) => {
         const data = await getLDAPConfig("user", ldapServer);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if (data == "empty") {
+        if (data === "empty") {
             setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
         }
         else if(data!==undefined) {
@@ -393,8 +397,8 @@ const CreateUser = (props) => {
         const data = await getLDAPConfig("user", ldapServer, ldapUser);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if (data == "empty") {
-            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+        if (data === "empty") {
+            setPopupState({show:true,title:"Edit Configuration",content: "User not found"});
         } else {
             dispatch({type:actionTypes.UPDATE_LDAP_DATA,payload:data})
         }
@@ -443,7 +447,7 @@ const CreateUser = (props) => {
                         var data1 = await getLDAPConfig("server");
                         if(data1.error){displayError(data1.error);return;}
                         setLoading(false);
-                        if (data1 == "empty") {
+                        if (data1 === "empty") {
                             setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
                         } else {
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
@@ -457,7 +461,7 @@ const CreateUser = (props) => {
                         data1 = await getSAMLConfig();
                         if(data1.error){displayError(data1.error);return;}
                         setLoading(false);
-                        if (data == "empty") {
+                        if (data === "empty") {
                             setPopupState({show:true,title:"Edit Configuration",content: "There are no SAML server configured. To proceed create a server configuration in SAML configuration section."});
                         } else {
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
@@ -500,7 +504,8 @@ const CreateUser = (props) => {
     }
 
     const searchFunctionLdap = async(val)=>{
-        const items = userConf.ldapAllUserList.filter((e)=>e.html.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        let items = [];
+        if(userConf.ldapAllUserList!=="") items = userConf.ldapAllUserList.filter((e)=>e.html.toUpperCase().indexOf(val.toUpperCase())!==-1)
         setLdapUserList(items);
     }
     
@@ -508,10 +513,29 @@ const CreateUser = (props) => {
         setPopupState({show:false,title:"",content:""});
     }
 
+    const passwordChange = (value) => {
+        value = ValidationExpression(value,"password")
+        dispatch({type:actionTypes.UPDATE_INPUT_PASSWORD,payload:value})
+    }
+
+    
+    const confirmPasswordChange = (value) => {
+        value = ValidationExpression(value,"password")
+        dispatch({type:actionTypes.UPDATE_INPUT_CONFIRMPASSWORD,payload:value})
+    }
+
+    const emailChange = (value) => {
+        value = ValidationExpression(value,"email")
+        dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:value})
+    }
+
     return (
         <Fragment>
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
+            
+            <ScrollBar thumbColor="#929397">
+            <div className="createUser-container">
             <div id="page-taskName"><span>{(props.showEditUser===false)?"Create User":"Edit User"}</span></div>
             
             {(props.showEditUser===false)?
@@ -524,10 +548,10 @@ const CreateUser = (props) => {
                 {(userConf.type === "inhouse")?
                     <Fragment>
                         <div className='leftControl adminControl'>
-                            <input value={userConf.passWord} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_PASSWORD,payload:event.target.value})}} type="password" autoComplete="new-password" name="passWord" id="password" maxLength="16" className={passwordAddClass?"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex inputErrorBorder" :"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex"} placeholder="Password" />
+                            <input value={userConf.passWord} onChange={(event)=>{passwordChange(event.target.value)}} type="password" autoComplete="new-password" name="passWord" id="password" maxLength="16" className={passwordAddClass?"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex inputErrorBorder" :"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex"} placeholder="Password" />
                         </div>
                         <div className='rightControl adminControl'>
-                            <input value={userConf.confirmPassword} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_CONFIRMPASSWORD,payload:event.target.value})}} type="password" autoComplete="new-password" name='confirmPassword' id='confirmPassword' maxLength="16" className={confirmPasswordAddClass?"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex inputErrorBorder" :"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex"}  placeholder="Confirm Password"/>
+                            <input value={userConf.confirmPassword} onChange={(event)=>{confirmPasswordChange(event.target.value)}} type="password" autoComplete="new-password" name='confirmPassword' id='confirmPassword' maxLength="16" className={confirmPasswordAddClass?"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex inputErrorBorder" :"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex"}  placeholder="Confirm Password"/>
                         </div>
                     </Fragment>
                     :null
@@ -535,7 +559,7 @@ const CreateUser = (props) => {
                 
                 {/* PRESENT FOR EACH USERTYPE */}
                 <div className='adminControl'>
-					<input value={userConf.email} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_INPUT_EMAIL,payload:event.target.value})}} type="email" autoComplete="off" name="email" id="email" maxLength="100" className={emailAddClass?"middle__input__border form-control__conv form-control-custom create inputErrorBorder":"middle__input__border form-control__conv form-control-custom create"} placeholder="Email Id"/>
+					<input value={userConf.email} onChange={(event)=>{emailChange(event.target.value)}} autoComplete="off" name="email" id="email" maxLength="100" className={emailAddClass?"middle__input__border form-control__conv form-control-custom create inputErrorBorder":"middle__input__border form-control__conv form-control-custom create"} placeholder="Email Id"/>
 				</div>
 				<div className="selectRole  adminControl role-padding" >
 					<label className="leftControl primaryRole">Primary Role</label>
@@ -566,8 +590,9 @@ const CreateUser = (props) => {
                     </div>
                 :null}
                 
-
 			</div>	
+            </div>
+            </ScrollBar>
       </Fragment>
   );
 }

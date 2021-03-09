@@ -22,6 +22,7 @@ const SelectMultipleDialog = props => {
 
     const SMHandler = event =>{
         let value = event.target.value
+        //eslint-disable-next-line
         value = value.replace(/[^0-9;\-]/g, "")
         setStepNum(value)
     }

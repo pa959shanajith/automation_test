@@ -32,19 +32,24 @@
     position: relative
 }
 
+.assign-container{
+    height: calc(100% - 165px);
+}
+
 .project-left2 {
     float: left;
     background: #fff;
     width: 100%;
     border-radius: 3px;
-    padding: 0 47px 0 0px;
+    display: flex;
+    justify-content: space-between;
     position: relative;
+    height: 100%;
 }
 
-.left-select
+.assign-select
 {
-    float: left;
-    width: 40%;
+    flex: 1 1 100%;
 }
 .labelStyle1 {
     float: left;
@@ -60,16 +65,16 @@
 }
 
 .seprator {
-    position: relative;
-    margin-bottom: 0px;
-    float: left;
-    width: 100%;
+    height: 100%;
+    padding-bottom: 5%;
 }
  #assignedProjectAP:hover,#allProjectAP:hover {
     background-color: #fff;
 }
  #allProjectAP,#assignedProjectAP {
     width: 100%;
+    height: calc(100% - 25px)!important;
+    outline: none;
     background-image: none;
     -webkit-appearance: select;
     margin-bottom: 0;
@@ -99,28 +104,17 @@
 	.suitestartend thead{width: calc(100% - 729px);}
 	.reportStatus{margin-top:12px;}
 	.scroll-wrapper.scrollbar-inner-rep{max-height: 154px !important;}
-	.project-left2{padding: 0 47px 0 0;}
 	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px !important;}
 	.endtoend-modulesContainer{height: 28% !important;}
 }
 
 .wrap-editpro {
     float: left;
-    top: 60%;
-    left: 48%;
-    transform: translateX(-50%) translateY(-50%);
-    position: absolute;
-    width: 10%;
-}
-@media screen and (max-width:800px){
-    .wrap-editpro {
-        left: 43%;
-    }
-}
-@media screen and (min-width:1700px){
-    .wrap-editpro {
-        left: 52%;
-    }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-basis: 42%;
 }
 @media screen and (min-width:1366px){
     .select-margin {
@@ -155,7 +149,6 @@
     -o-border-radius: 3px;
     -ms-border-radius: 3px;
     margin-top: 1%;
-    margin-left: 12%;
     clear: both;
     float: left;
 }
@@ -184,11 +177,7 @@
         font-size: 1vw;
     }
 }
-#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size] {
-    min-height: 400px;
-    outline: none;
-    overflow: auto;
-}
+
 select[multiple]:focus option:checked {
 	background: #633691 linear-gradient(0deg, #633691 0%, #633691 100%);
 }
@@ -197,9 +186,6 @@ select[multiple]:-internal-list-box option:checked {
 }
 .wrap { padding: 8px; }
 
-#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size] {
-    min-height: 238px !important;
-}
 
 select[size] {
     height: auto;
@@ -260,4 +246,9 @@ select[size] {
     border-radius: 20px;
     padding: 5px 20px;
     font-size: 16px;
+}
+.projAssign_container{
+    width: 100%;
+    padding: 20px;
+    height: 100%;
 }

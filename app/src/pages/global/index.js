@@ -15,7 +15,7 @@ import ResetSession from './components/ResetSession';
 import Report from './components/Report'
 import BrowserFp from './components/BrowserFp';
 import IntegrationDropDown from './components/IntegrationDropDown';
-import {Encrypt} from './components/Encrypt';
+import ChangePassword from './components/ChangePassword';
 
 export { Header, 
         FooterOne, 
@@ -35,5 +35,5 @@ export { Header,
         Report,
         BrowserFp,
         IntegrationDropDown,
-        Encrypt
+        ChangePassword
     };

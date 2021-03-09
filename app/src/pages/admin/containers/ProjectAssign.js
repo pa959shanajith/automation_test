@@ -1,6 +1,7 @@
-import React ,  { Fragment, useEffect, useState} from 'react';
+import React ,  { useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
-import {ScreenOverlay, PopupMsg, ModalContainer} from '../../global' 
+import {ScreenOverlay, PopupMsg, ModalContainer, ScrollBar} from '../../global'
+import { useSelector} from 'react-redux'; 
 import '../styles/ProjectAssign.scss';
 
 /*Component ProjectAssign
@@ -10,6 +11,7 @@ import '../styles/ProjectAssign.scss';
     
 const ProjectNew = (props) => {
     
+    const userInfo = useSelector(state=>state.login.userinfo);
     const [userSelectErrorBorder,setUserSelectErrorBorder] = useState(false)
     const [domainSelectErrorBorder,setDomainSelectErrorBorder] = useState(false)
     const [selectBox,setSelectBox] = useState([])
@@ -61,14 +63,16 @@ const ProjectNew = (props) => {
                 userOptions.push(data[i]);
             }
         }
-        setSelectBox(userOptions.sort());  
+        setSelectBox(userOptions.sort());
+        if(document.getElementById("selAssignUser") !== null)
+            document.getElementById("selAssignUser").selectedIndex = "0"; 
+        if(document.getElementById("selDomains") !== null)
+        document.getElementById("selDomains").selectedIndex = "0";       
+
     }
 
     const resetAssignProjectForm = () =>{
-		// $("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
-		assignProj.allProjectAP = [];
-        assignProj.assignedProjectAP = []; 
-        setAssignProj(assignProj);   
+        setAssignProj({allProjectAP:[],assignedProjectAP:[]});   
         setSelDomainsOptions([]);
         setSelectBox([]);
     }
@@ -84,20 +88,17 @@ const ProjectNew = (props) => {
         }
         setSelectedUserName(userName);
         setAssignedProjectInitial([]);
-		assignProj.allProjectAP = [];
-        assignProj.assignedProjectAP = [];
-        setAssignProj(assignProj);
+		setAssignProj({allProjectAP:[],assignedProjectAP:[]});
 		setShowload(true);
         const data = await getDomains_ICE();
         if(data.error){displayError(data.error);return;}
-        setSelDomainsOptions(data);    
+        setSelDomainsOptions(data);  
+        document.getElementById("selDomains").selectedIndex = "0";  
     }
 
     const ClickSelDomains = async(domainname) =>{
         setSelectedProject(domainname);
-		assignProj.allProjectAP = [];
-        assignProj.assignedProjectAP = [];
-        setAssignProj(assignProj);
+		setAssignProj({allProjectAP:[],assignedProjectAP:[]});
 		var requestedids = [];
 		requestedids.push(domainname);
 		var idtype = ["domaindetails"];
@@ -150,9 +151,7 @@ const ProjectNew = (props) => {
                     }
                     setAssignProj(assignProj);
                     if (selectedUserName === '') {
-                        assignProj.allProjectAP = [];
-                        assignProj.assignedProjectAP = [];
-                        setAssignProj(assignProj);
+                        setAssignProj({allProjectAP:[],assignedProjectAP:[]});
                     }
                     setShowload(false);
                     // $("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", false);
@@ -292,7 +291,8 @@ const ProjectNew = (props) => {
 		// assignProjectsObj.userInfo = userDetails;
 		assignProjectsObj.userId = userId;
 		assignProjectsObj.assignedProjects = assignedProjects1;
-		assignProjectsObj.getAssignedProjectsLen = getAssignedProjectsLen;
+        assignProjectsObj.getAssignedProjectsLen = getAssignedProjectsLen;
+        assignProjectsObj.userInfo = userInfo
 
 		/* Logic to get unassigned project list */
         setDiffprj([]);
@@ -349,7 +349,8 @@ const ProjectNew = (props) => {
     }
     
     return (
-        <Fragment>
+        <ScrollBar thumbColor="#929397">
+        <div className="projAssign_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
@@ -363,8 +364,8 @@ const ProjectNew = (props) => {
             <div className="col-xs-9 form-group" style={{width: "83%"}}>
                 <div className='userForm-project projectForm-project project-custom-top' >
                     <div className='domainTxt'>User</div>
-                    <select onChange={(event)=>{clickSelAssignUser(event.target.value)}} className={userSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project select-margin':"adminSelect-project-assign form-control__conv-project select-margin"} id="selAssignUser" >
-                        <option disabled={true} key="" value="" selected>Select User</option>
+                    <select defaultValue={""} onChange={(event)=>{clickSelAssignUser(event.target.value)}} className={userSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project select-margin':"adminSelect-project-assign form-control__conv-project select-margin"} id="selAssignUser" >
+                        <option disabled={true} key="" value="" >Select User</option>
                         {selectBox.map((data)=>(
                             <option key={data[0]} data-id={data[1]} value={data[0]}>{data[0]}</option>
                         ))}
@@ -373,8 +374,8 @@ const ProjectNew = (props) => {
                 
                 <div className='userForm-project projectForm-project display-project'  >
                     <div className='domainTxt'>Domain</div>
-                    <select onChange={(event)=>{ClickSelDomains(event.target.value)}}  className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project ':"adminSelect-project-assign form-control__conv-project "} id="selDomains" style={{width: "100%",marginLeft:"16px"}} >
-                            <option disabled={true} key="" value="" selected>Please Select Your Domain</option>
+                    <select defaultValue={""} onChange={(event)=>{ClickSelDomains(event.target.value)}}  className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project ':"adminSelect-project-assign form-control__conv-project "} id="selDomains" style={{width: "100%",marginLeft:"16px"}} >
+                            <option disabled={true} key="" value="">Please Select Your Domain</option>
                             {selDomainsOptions.map((data)=>(
                                 <option key={data} value={data}>{data}</option>
                             ))}
@@ -383,10 +384,10 @@ const ProjectNew = (props) => {
             </div>
 
 
-            <div className="col-xs-9 form-group" style={{width: "100%"}}>
+            <div className="col-xs-9 form-group assign-container" style={{width: "100%"}}>
 				<div className="project-left2">
 					{/* <!--Left Select Box--> */}
-					<div className="wrap left-select">
+					<div className="wrap assign-select">
 						{/* <!--Labels--> */}
 						<label className="labelStyle1">All Projects</label>
 						<div className="seprator" >
@@ -409,7 +410,7 @@ const ProjectNew = (props) => {
 					{/* <!--Center Input--> */}
 
 					{/* <!--Right Select Box--> */}
-					<div className="wrap right-select">
+					<div className="wrap assign-select">
 						{/* <!--Labels--> */}
 						<label className="labelStyle1">Assigned Projects</label>
                         <div className="seprator seprator-custom" >
@@ -425,7 +426,8 @@ const ProjectNew = (props) => {
             </div>    
 
             {showAssignProjectModal? <ModalContainer title="Update Projects" footer={ModalButtons(clickAssignProjects1, setShowAssignProjectModal)} close={()=>{setShowAssignProjectModal(false)}} content="All the tasks that has been assigned to this user will be removed from this user's queue from the project(s) which are being unassigned (if any). Do you want to proceed?" modalClass=" modal-sm" /> :null}  
-        </Fragment>
+        </div>
+        </ScrollBar>
     )
 }
 

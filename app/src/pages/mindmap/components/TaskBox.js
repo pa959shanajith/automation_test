@@ -8,8 +8,6 @@ import { useSelector } from 'react-redux';
 import {ModalContainer} from '../../global';
 import Complexity, {getComplexityLevel} from './Complexity';
 import CalendarComp from './CalendarComp';
-import Datetime from "react-datetime";
-import moment from "moment";
 
 var unassignTask = []
 var reassignFlag = false
@@ -108,10 +106,15 @@ const TaskBox = (props) => {
             tObj.t = taskAssign[t].task[0];
         }
         if (tObj.det === null || tObj.det.trim() == "") {
-            var type = dNodes[pi].type.slice(0,-1) //remove plural
-            // to avoid phrasing "Execute scenario scenarios" 
-            type = (type)?" "+type.charAt(0).toUpperCase()+type.slice(1):""
-            if(tObj.t == 'Execute Scenario')type = ""
+            var type;
+            if(dNodes[pi].type === 'endtoend') {
+                type = ' End to End'
+            }else{
+                type = dNodes[pi].type.slice(0,-1) //remove plural
+                // to avoid phrasing "Execute scenario scenarios"
+                type = (type)?" "+type.charAt(0).toUpperCase()+type.slice(1):""
+                if(tObj.t == 'Execute Scenario')type = ""
+            }
             taskDetailsRef.current.value = tObj.t + type + " " + dNodes[pi].name
         } else {
             taskDetailsRef.current.value = tObj.det
@@ -129,8 +132,9 @@ const TaskBox = (props) => {
                     (async()=>{
                         var res = await populateUsers(selectedProj)
                         if(res.error){displayError(res.error);setTaskBox(false);return;}
-                        setUserAsgList({loading:false,arr:res.rows,value:tObj.at,disabled:tObj.at?true:false})
-                        setUserRevList({loading:false,arr:res.rows,value:tObj.rw})
+                        var arr = [...res.rows].sort((a,b)=>a.name.localeCompare(b.name))
+                        setUserAsgList({loading:false,arr:arr,value:tObj.at,disabled:tObj.at?true:false})
+                        setUserRevList({loading:false,arr:arr,value:tObj.rw})
                     })()
                     return;
                 }
@@ -145,8 +149,8 @@ const TaskBox = (props) => {
                     return;
                 case 'ed':
                     if (tObj.ed != '' && tObj.ed.indexOf('/')==-1) {
-                        var d=new Date(tObj.ed);
-                        tObj.ed=d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
+                        var d1=new Date(tObj.ed);
+                        tObj.ed=d1.getDate()+"/"+(d1.getMonth()+1)+"/"+d1.getFullYear();
                     }
                     setEndDate({show:true,value:tObj.ed})
                     return;
@@ -356,8 +360,8 @@ const TaskBox = (props) => {
                 </div>
                 <div id='ct-submitTask'>
                     {(assignbtn.reassign)?
-                    <span id='unassign-btn' onClick={()=>unAssign(true)} className={(assignbtn.disable)?'disableButton':''}>Reassign</span>:
-                    <span id='unassign-btn' onClick={()=>unAssign(false)} className={(assignbtn.disable)?'disableButton':''}>Unassign</span>
+                    <span id='unassign-btn' tabIndex={'0'}  onKeyPress={()=>unAssign(true)} onClick={()=>unAssign(true)} className={(assignbtn.disable)?'disableButton':''}>Reassign</span>:
+                    <span id='unassign-btn' tabIndex={'0'}  onKeyPress={()=>unAssign(false)} onClick={()=>unAssign(false)} className={(assignbtn.disable)?'disableButton':''}>Unassign</span>
                     }
                     <span id='task-ok' tabIndex={'0'} onClick={addTask} onKeyPress={addTask}>Ok</span>
                 </div>

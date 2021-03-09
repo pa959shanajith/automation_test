@@ -14,15 +14,24 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
     const [scenarioDetails,setScenarioDetails] = useState({})
     const [showModal,setshowModal] = useState(false)
     const [projectAppType,setProjectApptype] = useState({})
+    // eslint-disable-next-line
     const [initialTableList,setInitialTableList] = useState([])
     const [popup,setPopup] = useState({show:false})
+    const [arr,setArr] = useState([])
     
     useEffect(()=>{
         if(readTestSuite !== "")  readTestSuiteFunct();
+        // eslint-disable-next-line
     }, [readTestSuite, updateAfterSave]);
     
     useEffect(()=>{
+        setArr(eachData)
+        // eslint-disable-next-line
+    },[eachData])
+
+    useEffect(()=>{
         updateSelectAllBatch();
+        // eslint-disable-next-line
     }, [selectAllBatch]);
 
     const displayError = (error) =>{
@@ -33,22 +42,28 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
             submitText:'Ok',
             show:true
         })
+        return
     }
 
     const updateSelectAllBatch = () => {
+        // eslint-disable-next-line
         eachData.map((rowData,m)=>{
             document.getElementById('parentExecute_"' + m).checked = selectAllBatch;
             changeSelectALL(m,'parentExecute_"' + m,eachData,setEachData,batchStatusCheckbox);
         })
+        return
     }
 
     const updateScenarioStatus = (eachData1) => {
+        // eslint-disable-next-line
         eachData1.map((rowData,m)=>{
+            // eslint-disable-next-line
             rowData.scenarioids.map((sid,count)=>{
                 changeExecutestatusInitial(eachData1,m,count);
             })
         })
         if(eachData1.length>1) batchStatusCheckbox(eachData, eachData1);
+        else return
     }
 
     //make a seperate component after resolving ref bar issue
@@ -65,15 +80,16 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                 var eachData2 = [];
                 keys.map(itm => eachData2.push({...data[itm]}));
                 var eachData1 = [];
+                var m, rowData;
                 //state management for single scenario
-                if (current_task.scenarioFlag == 'True') {
-                    for (var m = 0; m < dataLen; m++) {
-                        var rowData = eachData2[m];
+                if (current_task.scenarioFlag === 'True') {
+                    for ( m = 0; m < dataLen; m++) {
+                        rowData = eachData2[m];
                         for (var k = 0; k < eachData2[m].scenarioids.length; k++) {
-                            if (eachData2[m].scenarioids[k] == current_task.assignedTestScenarioIds) {
+                            if (eachData2[m].scenarioids[k] === current_task.assignedTestScenarioIds) {
                                 eachData1.push({
                                     "condition": [rowData.condition[k]],
-                                    "dataparam": [rowData.dataparam[k]],
+                                    "dataparam": [(rowData.dataparam[k]).trim()],
                                     "executestatus": [rowData.executestatus[k]],
                                     "scenarioids": [rowData.scenarioids[k]],
                                     "scenarionames": [rowData.scenarionames[k]],
@@ -83,7 +99,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                                 });
                                 initialTableList.push({
                                     "condition": [rowData.condition[k]],
-                                    "dataparam": [rowData.dataparam[k]],
+                                    "dataparam": [(rowData.dataparam[k]).trim()],
                                     "executestatus": [rowData.executestatus[k]],
                                     "scenarioids": [rowData.scenarioids[k]],
                                     "scenarionames": [rowData.scenarionames[k]],
@@ -95,37 +111,21 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                         }
                     }
                 } else {
+                    // eslint-disable-next-line
                     eachData2.map(itm =>{initialTableList.push({...itm})});
+                    // eslint-disable-next-line
                     eachData2.map(itm =>{eachData1.push({...itm})});
-                    for (var m = 0; m < dataLen; m++) {
-                        var rowData = eachData2[m];
+                    for ( m = 0; m < dataLen; m++) {
+                        rowData = eachData2[m];
                         let exeStatus = [];
+                        // eslint-disable-next-line
                         rowData.scenarioids.map((sid,count)=>{
                             exeStatus.push(rowData.executestatus[count]);
                         })
                         initialTableList[m].executestatus = exeStatus;
                     }
                 }
-                //finding distinct projects : helpful for apptype column
-                var flags = [], output = [];
-                for(var j=0; j<eachData1.length; j++) {
-                    for(var i=0; i<eachData1[j].projectnames.length; i++) {
-                        if( flags[eachData1[j].projectnames[i]]) continue;
-                        flags[eachData1[j].projectnames[i]] = true;
-                        output.push(eachData1[j].projectnames[i]);
-                    }
-                }
-                var projectApptype = {};
-                keys.map(itm => {
-                    for(var i =0 ; i<output.length; i++){
-                        for( const [key,value] of Object.entries(filter_data.projectDict)){
-                            if(output[i] === value){
-                                projectApptype[output[i]]= Object.keys(filter_data.project[key].appType)[0];
-                            } 
-                        }
-                    }
-                });
-                setProjectApptype(projectApptype);
+                distinctProjectType(eachData1, keys);
                 setEachData(eachData1);
                 setEachDataFirst(eachData2);
                 updateScenarioStatus(eachData1);
@@ -133,6 +133,30 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
         }catch(error){
             console.log(error);
         }
+    }
+
+    const distinctProjectType = (Data, keys) => {
+        //finding distinct projects : helpful for apptype column
+        var allProjects = [];
+        for(var j=0; j<Data.length; j++) {
+            for(var i=0; i<Data[j].projectnames.length; i++) {
+                allProjects.push(Data[j].projectnames[i]);
+            }
+        }
+        var distinctProjects = [...new Set(allProjects)];
+        var distinctAppType = {};
+        // eslint-disable-next-line
+        keys.map(itm => {
+            for(var i =0 ; i<distinctProjects.length; i++){
+                for( const [key,value] of Object.entries(filter_data.projectDict)){
+                    if(distinctProjects[i] === value){
+                        distinctAppType[distinctProjects[i]]= Object.keys(filter_data.project[key].appType)[0];
+                    } 
+                }
+            }
+        });
+        setArr([])
+        setProjectApptype(distinctAppType);
     }
 
     const changeParamPath = (m,count,value) => {
@@ -169,44 +193,43 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                             <ScrollBar thumbColor="#321e4f">
                                 <div className="e__batchSuites">
                                 <ScrollBar  thumbColor="rgb(51,51,51)" trackColor="rgb(211, 211, 211)" >
-                                    {eachData.map((rowData,m)=>(
-                                        <div className="executionTableDnd" id={"batch_'"+m} >
+                                    {arr.map((rowData,m)=>(
+                                        <div key={m} className={arr.length>1?" executionTableDnd":" executionTableDnd-single"} id={"batch_'"+m} >
                                             <div className='suiteNameTxt' id={"page-taskName_'" + m}><span title={rowData.testsuitename}  className='taskname'> {rowData.testsuitename} </span></div>
                                             <div id={'exeData_"' + m} className='exeDataTable testSuiteBatch'>
-                                                <table id={'executionDataTable_"' + m} className='executionDataTable' cellspacing='0' cellpadding='0'>
-                                                    <thead>
-                                                        <tr>
-                                                            <th className='e__contextmenu' id='contextmenu'></th>
-                                                            <th className='e__selectAll' ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
-                                                                <input onChange={(event)=>{changeSelectALL(m,'parentExecute_"' + m,eachData,setEachData,batchStatusCheckbox)}} id={'parentExecute_"' + m} className='e-execute' type='checkbox' /></th>	
-                                                            <th className='e__scenario'>Scenario Name</th>
-                                                            <th className='e__param'>Data Parameterization</th>
-                                                            <th className='e__condition'>Condition</th>
-                                                            <th className='e__projectName'>Project Name</th>
-                                                            <th className='e__apptype' >App Type</th>
-                                                        </tr>
-                                                        <input type='hidden' value={rowData.testsuiteid }/>
-                                                    </thead>
-                                                    <tbody className={eachData.length>1?'e__testScenarioScroll':""}>
+                                                <div id={'executionDataTable_"' + m} className='executionDataTable' cellSpacing='0' cellPadding='0'>
+                                                    <div className="e__table-head">
+                                                        <div className="e__table-head-row">
+                                                            <div className='e__contextmenu' id='contextmenu'></div>
+                                                            <div className='e__selectAll' ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
+                                                                <input onChange={(event)=>{changeSelectALL(m,'parentExecute_"' + m,eachData,setEachData,batchStatusCheckbox)}} id={'parentExecute_"' + m} className='e-execute' type='checkbox' /></div>	
+                                                            <div className='e__scenario'>Scenario Name</div>
+                                                            <div className='e__param'>Data Parameterization</div>
+                                                            <div className='e__condition'>Condition</div>
+                                                            <div className='e__projectName'>Project Name</div>
+                                                            <div className='e__apptype' >App Type</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className={eachData.length>1?'e__testScenarioScroll e__table-bodyContainer':" e__table-bodyContainer"}>
                                                         <ScrollBar thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                         {rowData.scenarioids.map((sid,count)=>(
-                                                            <tr id={count} className={(initialTableList[m]!==undefined && initialTableList[m].executestatus[count]=== 0) ? "e__table_row_status" : ""}>
-                                                                <td title={count} className='tabeleCellPadding e__contextmenu' id={count}>{count+1}</td>
-                                                                <td  className='tabeleCellPadding exe-ExecuteStatus'>
+                                                            <div id={count} key={count} className={(initialTableList[m]!==undefined && initialTableList[m].executestatus[count]=== 0) ? "e__table_row_status e__table_row" : " e__table_row"}>
+                                                                <div title={count} className='e__table-col tabeleCellPadding e__contextmenu' id={count}>{count+1}</div>
+                                                                <div  className='e__table-col tabeleCellPadding exe-ExecuteStatus'>
                                                                     <input id={"executestatus_"+m+"_"+count} checked={rowData.executestatus[count]!== undefined && rowData.executestatus[count]!== 0 ? true:false} onChange={()=>{changeExecutestatus(m,count,eachData,batchStatusCheckbox,setEachData)}} type='checkbox' title='Select to execute this scenario' className='doNotExecuteScenario e-execute'/>
-                                                                </td>
-                                                                <td title={rowData.scenarionames[count]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(rowData.scenarionames[count],rowData.scenarioids[count]);setshowModal(true);}} sId={rowData.scenarioids[count]} >{rowData.scenarionames[count]}</td>
-                                                                <td className="tabeleCellPadding exe-dataParam"><input className="e__getParamPath" type="text" onChange={(event)=>{changeParamPath(m,count,event.target.value)}} value={ rowData.dataparam[count]}/></td>
-                                                                <td className="tabeleCellPadding exe-conditionCheck"><select onChange={(event)=>{conditionUpdate(m,count,event.target.value)}} value={JSON.parse(rowData.condition[count])} className={"conditionCheck form-control"+(((rowData.condition[count]===0 || rowData.condition[count]=== "0"))?" alertRed":" alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </td>
-                                                                <td title={rowData.projectnames[count]}  className='tabeleCellPadding projectName'>{rowData.projectnames[count]}</td>
-                                                                <td title={rowData.projectnames[count]}  className='tabeleCellPadding exe-apptype'>
-                                                                    <img src={"static/imgs/"+details[projectAppType[rowData.projectnames[count]].toLowerCase()]['img']+".png"} alt="apptype"/>
-                                                                </td>
-                                                            </tr>    
+                                                                </div>
+                                                                <div title={rowData.scenarionames[count]} className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" onClick={()=>{loadLocationDetailsScenario(rowData.scenarionames[count],rowData.scenarioids[count]);setshowModal(true);}}>{rowData.scenarionames[count]}</div>
+                                                                <div className="e__table-col tabeleCellPadding exe-dataParam"><input className="e__getParamPath" type="text" onChange={(event)=>{changeParamPath(m,count,event.target.value)}} value={rowData.dataparam[count].trim()}/></div>
+                                                                <div className="e__table-col tabeleCellPadding exe-conditionCheck"><select onChange={(event)=>{conditionUpdate(m,count,event.target.value)}} value={JSON.parse(rowData.condition[count])} className={"conditionCheck form-control"+(((rowData.condition[count]===0 || rowData.condition[count]=== "0"))?" alertRed":" alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </div>
+                                                                <div title={rowData.projectnames[count]}  className='e__table-col tabeleCellPadding projectName'>{rowData.projectnames[count]}</div>
+                                                                <div title={rowData.projectnames[count]}  className='e__table-col tabeleCellPadding exe-apptype'>
+                                                                    <img src={"static/imgs/"+details[projectAppType[rowData.projectnames[count]].toLowerCase()]['img']+".png"} alt="apptype" className="e__table_webImg"/>
+                                                                </div>
+                                                            </div>    
                                                         ))}
                                                         </ScrollBar>
-                                                    </tbody>
-                                                </table>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -263,11 +286,13 @@ const changeSelectALL = (m,id,eachData,setEachData,batchStatusCheckbox) => {
     setEachData(data);
     document.getElementById('parentExecute_"' + m).indeterminate = false;
     if(eachData.length>1) batchStatusCheckbox(eachData);
+    else return;
 }
 
 const batchStatusCheckbox = (eachData, eachData1) => {
-    if(eachData1==undefined) eachData1 = eachData;
+    if(eachData1===undefined) eachData1 = eachData;
     let batchStatus = 0;
+    // eslint-disable-next-line
     eachData1.map((rowData,m)=>{
         if(document.getElementById('parentExecute_"' + m).checked === true && document.getElementById('parentExecute_"' + m).indeterminate === false ) batchStatus = batchStatus + 1;
     })
@@ -312,7 +337,7 @@ const scenarioDetailsContent = (scenarioDetails, userInfo, displayError) => {
                 {scenarioDetails.screennames!==undefined?
                 <>
                     {scenarioDetails.screennames.map((data,i)=>(
-                        <div className="sDInnerContentsWrap">
+                        <div key={i} className="sDInnerContentsWrap">
                             <div className="sDInnerContents viewReadOnlyTC" onClick={()=>{testCaseDetails(scenarioDetails.testcasenames[i], scenarioDetails.testcaseids[i], userInfo, displayError)}} >{scenarioDetails.testcasenames[i]}</div>
                             <div className="sDInnerContents">{scenarioDetails.screennames[i]}</div>
                             <div className="sDInnerContents">{scenarioDetails.projectnames[i]}</div>

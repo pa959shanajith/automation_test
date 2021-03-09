@@ -2,6 +2,7 @@
     display: flex;
     align-items: center;
     margin-bottom: 5px;
+    overflow: hidden;
 }
 
 .ss__red{
@@ -19,7 +20,10 @@
     font-size: 16px;
     color: #33363B;
     margin-left: 10px;
-    width: 100%;
+    width: 85%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
     &:hover{
         font-weight: bold;
     }
@@ -56,4 +60,8 @@
 .ss__customObject{
     background: linear-gradient(to right, #bb9cda, transparent 12%);
     border-radius: 5px;
+}
+
+.ss__newObj{
+    color: #7508ea;
 }

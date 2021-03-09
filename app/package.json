@@ -30,10 +30,11 @@
     "react-sortablejs": "^6.0.0",
     "react-tooltip": "^4.2.11",
     "react-top-loading-bar": "^2.0.1",
+    "react-xml-parser": "^1.1.8",
     "redux": "^4.0.5",
     "redux-persist": "^6.0.0",
     "simplebar-react": "^3.0.0-beta.5",
-    "socket.io-client": "^3.0.3",
+    "socket.io-client": "^2.2.0",
     "sortablejs": "^1.12.0",
     "uuid": "^8.3.0"
   },

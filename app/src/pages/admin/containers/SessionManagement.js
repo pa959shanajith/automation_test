@@ -1,6 +1,6 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
-import {manageSessionData} from '../api';
+import {manageSessionData, fetchLockedUsers, unlockUser} from '../api';
 import '../styles/SessionManagement.scss'
 
 /*Component SessionManagement
@@ -16,6 +16,8 @@ const SessionManagement = (props) => {
     const [clients,setClients] = useState([])
     const [showSessions,setShowSessions] = useState(true)
     const [showClients,setShowClients] = useState(true)
+    const [showLockedUsers,setShowLockedUsers] = useState(true)
+    const [lockedusers,setLockedusers] = useState([]);
 
     useEffect(()=>{
         refreshSessMgmt();
@@ -41,11 +43,34 @@ const SessionManagement = (props) => {
         data.clientData.sort(function(a,b) { return a.username > b.username; });
         setSessions(data.sessionData);
         setClients(data.clientData);
+        fetchLocked();
         setLoading(false);
     }
 
+    const fetchLocked = async () => {
+		const data = await fetchLockedUsers()
+		if(data.error){displayError(data.error);return;}
+        setLockedusers(data);
+	}
+
     const closePopup = () =>{
         setPopupState({show:false,title:"",content:""});
+    }
+
+    const unlock = async (event) =>{
+        var id = parseInt(event.target.dataset.id);
+		var msg, obj;
+		msg = "Unlocking User Account ";
+		obj = lockedusers[id];
+		var user = obj.username;
+		setLoading(msg+user+"...");
+		const data = await unlockUser(user);
+		if(data.error){displayError(data.error);return;}
+        setPopupState({show:true,title:"Session Management",content:msg+"successful!"});
+        let lockedusersData = lockedusers;
+        lockedusersData.splice(id,1);
+        setLockedusers(lockedusersData);
+        setLoading(false);
     }
 
     // Session Management: Logoff/Disconnect User
@@ -82,7 +107,7 @@ const SessionManagement = (props) => {
     }
 
     return (
-        <Fragment>
+        <div className="sess-mgmt_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
@@ -152,11 +177,36 @@ const SessionManagement = (props) => {
                             </ScrollBar>
                         </div>
                         :null}
-                    </div>      
+                    </div>
+                    <div className="containerWrap sessionItemWrap clientUsers-height" style={!showSessions?{top:"110px"}:{top:"420px"}}>
+                        <div onClick={()=>{setShowLockedUsers(!showLockedUsers)}} className="sessionHeading" >
+                            <h4>Locked Users</h4>
+                        </div>
+                        {showLockedUsers?
+                        <div id="clientUsers" className="wrap-sess-mgmt wrap-sess-mgmt-custom " >
+                            <ScrollBar scrollId='clientUsers' thumbColor="#929397" >
+                            <table className = "table table-hover sessionTable">
+                            <tbody>
+                                <tr>
+                                    <th> Username </th>
+                                    <th> </th>
+                                </tr>
+                                {lockedusers.map((user,index)=>(
+                                    <tr>
+                                        <td> {user.username} </td>
+                                        <td><button className="btn btn-table-cust" data-id={index} onClick={(event)=>{unlock(event)}} > Unlock </button></td>
+                                    </tr> 
+                                ))}
+                            </tbody> 
+                            </table>
+                            </ScrollBar>
+                        </div>
+                        :null}
+                    </div>       
                 </div>
                 </ScrollBar>
             </div>
-        </Fragment>
+        </div>
   );
 }
 

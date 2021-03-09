@@ -1,7 +1,7 @@
-import React, { useState ,Fragment, useRef } from 'react';
+import React, { useState ,useEffect ,Fragment, useRef } from 'react';
 import Encryption from '../components/Encryption.js';
 import Pairwise from '../components/Optimization.js'
-import {ScrollBar ,PopupMsg ,ScreenOverlay} from '../../global';
+import {PopupMsg ,ScreenOverlay} from '../../global';
 import '../styles/UtilityCenter.scss'
 import {Encrypt_ICE } from '../api';
 
@@ -23,6 +23,10 @@ const UtilityCenter=(props)=>{
     const LevelTable = [];
     const encryptionType = encyptMethod;
     const encryptionValue = encyptValue;
+    useEffect(()=>{
+        props.setScreenType("encryption")
+       // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
     const onDropChange =(e)=>{ //function to manage dropdown change set values to show encryption buttons , select method
         if(e.target.value==="SelectMethod"){
             setEncyptBtn(false)
@@ -65,6 +69,7 @@ const UtilityCenter=(props)=>{
         else{
             const items = await Encrypt_ICE(encryptionType ,encryptionValue);
             if(items.error){displayError(items.error);return;}
+            setEmptyCall(false);
             setEncryptedData(items);
             setBlockui({show:false});
         }
@@ -101,13 +106,12 @@ const UtilityCenter=(props)=>{
             setGenerateClick(true);
         }
     }
-
     return (
         <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
         <div className="UtlmiddleContent">
-            <div className="middle_holder">
+            <div data-test="utility_middle_screen" className="middle_holder">
             {(props.screenType ==="encryption")?
             <Encryption onDropChange={onDropChange}
                         encyptMethod={encyptMethod}

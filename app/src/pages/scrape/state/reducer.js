@@ -6,7 +6,21 @@ const initialState = {
     disableAppend: false,
     compareFlag: false,
     compareData: {},
-    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []}
+    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
+    objValue: { val: null },
+    cert: {},
+    WsData: {
+        endPointURL: "",
+        method: "0",
+        opInput: "",
+        reqHeader: "",
+        reqBody: "",
+        respHeader: "",
+        respBody: "",
+        paramHeader: "",
+    },
+    wsdlError: [],
+    actionError: []
 }
 
 const reducer = (state=initialState, action) => {
@@ -35,6 +49,26 @@ const reducer = (state=initialState, action) => {
                 return {
                     ...state, compareObj: action.payload
                 }
+        case actionTypes.SET_OBJVAL:
+            return {
+                ...state, objValue: action.payload
+            }
+        case actionTypes.SET_CERT:
+            return {
+                ...state, cert: action.payload
+            }
+        case actionTypes.SET_WSDATA:
+            return {
+                ...state, WsData: { ...state.WsData, ...action.payload}
+            }
+        case actionTypes.SET_WSDLERROR:
+            return {
+                ...state, wsdlError: action.payload
+            }
+        case actionTypes.SET_ACTIONERROR:
+            return {
+                ...state, actionError: action.payload
+            }
         default:
             return state
     }

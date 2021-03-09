@@ -1,6 +1,6 @@
 .arrow-circle {
     color:#a0a0a0;
-    font-size:25px
+    font-size:25px!important;
 }
 
 .ic-holder{
@@ -42,7 +42,7 @@
     background-color: #9f62e1;
     color: #FFF;
     padding: 4px 12px;
-    margin-top: 35px!important;
+    margin-top: 30px!important;
     cursor: pointer;
     touch-action: manipulation;
     outline: none;
@@ -91,6 +91,12 @@
     a{
         color: #d33c3c;
     }
+}
+
+.error-msg-hyperlink{
+    color:inherit;
+    cursor:pointer;
+    text-decoration: underline;
 }
 
 @media screen and (max-width: 800px){
@@ -145,4 +151,14 @@
         height: 1.5vw;
     }
     
+}
+
+.forget-password,
+.forget-password:hover {
+    float: right;
+    color: #9f62e1;
+    font-size: 14px;
+    font-family: 'LatoWeb';
+    text-decoration: underline;
+    cursor: pointer;
 }

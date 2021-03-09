@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { ScreenOverlay , PopupMsg } from '../../global';
+import { ScreenOverlay , PopupMsg , ChangePassword } from '../../global';
 import * as api from '../api';
 import "../styles/LoginFields.scss";
 
@@ -24,6 +24,11 @@ const LoginFields = (props) => {
     const [restartForm, setRestartForm] = useState(false);
     const [redirectTo, setRedirectTo] = useState("");
     const [focusBtn, setFocus] = useState("");
+    const [showChangePass, setShowChangePass] = useState(false);
+    const [showSuccessPass, setSuccessPass] = useState(false);
+    const [showForgotPassword, setforgotPassword] = useState(true);
+    const [lockedOut,setLockedOut] = useState(false);
+    const [unlockCond,setUnlockCond] = useState(false);
     const [overlayText, setOverlayText] = useState("");
     const [popup, setPopup] = useState("");
 
@@ -34,6 +39,8 @@ const LoginFields = (props) => {
         setShowPass(!showPass);
     }
 
+    const toggleChangePass = () => setShowChangePass(!showChangePass);
+    
     const handleUsername = event => {
         resetErrors();
         if (showPassField){
@@ -50,13 +57,14 @@ const LoginFields = (props) => {
         setPassError(false);
         setUserError(false);
         setLoginValidation("");
+        setLockedOut(false);
     }
 
     const hidePassField = () => {
         setPassField(false);
         setPassword("");
         setPassError(false);
-        setShowPass(false);
+        setPassField(false);
     }
 
     const checkUser = () => {
@@ -99,6 +107,51 @@ const LoginFields = (props) => {
         }
     }
 
+    const unlock = event => {
+        SetProgressBar("start");
+		setLoginValidation("");
+		setLockedOut(false);
+		resetErrors();
+		if (!username) {
+			setUserError(true);
+			setLoginValidation("Please Enter Username");
+			SetProgressBar("stop");
+		} else if (!password) {
+			setPassError(true);
+			setLoginValidation("Please Enter Password");
+			SetProgressBar("stop");
+		} else {
+			setRequested(true);
+            api.unlock(username.toLowerCase(), password)
+            .then(data => {
+                SetProgressBar("stop");
+                setRequested(false);
+                if (data === 'success') {
+                    setUserError(false);
+                    setPassError(false);
+                    setUnlockCond(false);
+                    setLockedOut(false);
+                    setPassField(false);
+                    setPassword("");
+                    setUsername("");
+                    setforgotPassword(true);
+                    setPopup({"title": "Unlock Account", "content": "Successfully unlocked the user account! Please login again"})
+                } else if (data === "invalid_username_password") {
+                    setUserError(true);
+                    setPassError(true);
+                    setLoginValidation("The username or password you entered isn't correct. Please try again.");
+                } else if(data === "timeout") setLoginValidation("Password expired."); 
+                else if (data === "userUnlocked") setLoginValidation("User account is already unlocked!"); 
+                else setLoginValidation("Failed to Login.");
+            })
+            .catch(error=> {
+                console.error("Failed to Authenticate User. ERROR::::", error);
+                setLoginValidation("Failed to Authenticate User.");
+                SetProgressBar("stop");
+                setRequested(false);
+            });
+        }
+    }
     
     const check_credentials = () => {
         if (username && password){
@@ -135,6 +188,14 @@ const LoginFields = (props) => {
                         setUserError(true);
                         setPassError(true);
                         setLoginValidation("The username or password you entered isn't correct. Please try again.");
+                    } else if (data === "changePwd") {
+                        setShowChangePass(true);
+                    } else if(data === "timeout") {
+                       setLoginValidation("User Password has expired. Please reset forgot password or contact admin");
+                    } else if (data === "userLocked") {
+                        setLoginValidation("User account is locked!");
+                        setLockedOut(true);
+                        setforgotPassword(false);
                     }
                     else if (data === "userLogged") setLoginValidation("User is already logged in! Please logout from the previous session.");
                     else if (data === "inValidLDAPServer") setLoginValidation("LDAP Server Configuration is invalid!");
@@ -169,6 +230,77 @@ const LoginFields = (props) => {
         });
     };
     
+    const forgotPasswordEmail = () => {
+        SetProgressBar("start");
+        setLoginValidation("");
+		setLockedOut(false);
+		setUserError(false);
+		if (username==="") {
+            setUserError(true);
+            setLoginValidation("Please Enter Username")
+		} else {
+            api.forgotPasswordEmail(username.toLowerCase())
+            .then(data => {
+                SetProgressBar("stop");
+				if (data === 'success') {
+					setUserError(false);
+                    setPassError(false);
+                    setPassword("");
+                    setPopup({'title': "Forgot Password", "content":"Successfully sent an email to reset your password! Please login with the temporary password sent in the email"})                
+                } else if (data === "invalid_username_password") {
+					setUserError(false);
+                    setPassError(true);
+                    setLoginValidation("The username or password you entered isn't correct. Please try again.");
+				} else if (data === "userLocked") {
+					setLockedOut(true);
+                    setLoginValidation("User account is locked!");
+                    setforgotPassword(false);
+				}
+				else setLoginValidation("Failed to Login.");
+            })
+            .catch(err=> {
+                setLoginValidation(err);
+				SetProgressBar("stop");
+                setRequested(false);
+            });
+		}
+    };
+    
+    const unlockAccountEmail = () => {
+        SetProgressBar("start");
+        setLoginValidation("")
+        setUserError(false);
+        setLockedOut(false);
+		if (username==="") {
+            setUserError(true);
+            setLoginValidation("Please Enter Username")
+		} else {
+            api.unlockAccountEmail(username.toLowerCase())
+            .then(data => {
+                SetProgressBar("stop");
+				if (data === 'success') {
+					setUserError(false);
+                    setPassError(false);
+					setPassword("");
+                    setforgotPassword(false);
+                    setUnlockCond(true);
+                    setPopup({'title': "Unlock Account", "content":"Successfully sent an email! Please unlock the account using verification password sent in the email"})                
+                } else if (data === "invalid_username_password") {
+					setUserError(false);
+                    setPassError(true);
+                    setLoginValidation("The username or password you entered isn't correct. Please try again.");
+				} else if (data === "userUnlocked") setLoginValidation("User account is already unlocked!");  
+				else setLoginValidation("Failed to Login.");
+            })
+            .catch(err=> {
+                console.error(err);
+				setLoginValidation(err);
+				SetProgressBar("stop");
+                setRequested(false);
+            });
+		}
+	};
+
     const PopUp = () => (
         <PopupMsg 
             title={popup.title}
@@ -179,11 +311,22 @@ const LoginFields = (props) => {
         />
     );
 
+    const PasswordSuccessPopup = () => (
+        <PopupMsg 
+            title={"Change Password"}
+            close={()=>setSuccessPass(false)}
+            content={"Password change successfull! Please login again with new password"}
+            submitText={"OK"}
+            submit={setSuccessPass(false)}
+        />
+    );
 
     return (
         <>
         { popup && <PopUp /> }
         { overlayText && <ScreenOverlay content={overlayText}/>}
+        { showSuccessPass && <PasswordSuccessPopup /> }
+        { showChangePass && <ChangePassword setShow={toggleChangePass} setSuccessPass={setSuccessPass} loginCurrPassword={password} loginPopup={true} /> }
         {redirectTo ? <Redirect to={redirectTo} /> :
             <>
             { restartForm 
@@ -209,9 +352,16 @@ const LoginFields = (props) => {
                     <input data-test="password-input" className="field" type={showPass ? "text" : "password"} autoFocus onFocus={()=>setFocus("password")} placeholder="Password" value={password} onChange={handlePassword}></input>
                     <button data-test="password-eyeIcon" className={ "no-decor " + (showPass ? res.eyeSlashIcon : res.eyeIcon) } onFocus={()=>setFocus("checkpass")}></button>
                 </div>
+                {showForgotPassword?
+                <div ><a id="forgotPassword" className="forget-password" onClick={()=>{forgotPasswordEmail()}} >Forgot Password?</a></div>:null}
                 {passError && !loginValidation? <div data-test='password-error' className="error-msg">Please Enter Password</div> : null}
-                <div data-test="login-validation" className="error-msg">{loginValidation}</div>
-                <button data-test='login-button' className="login-btn" type="submit" disabled={requested} onFocus={()=>{setFocus("login")}} onClick={login}>Login</button>
+                <div data-test="login-validation" className="error-msg">{loginValidation}
+                {lockedOut?
+                    <span className="error-msg"> Click 
+                    <a className="error-msg-hyperlink" onClick={()=>{unlockAccountEmail()}} > <b>here</b></a> to unlock.
+                    </span>
+                :""}</div>
+                <button data-test='login-button'  className="login-btn" type="submit" disabled={requested} onFocus={()=>{setFocus("login")}} onClick={unlockCond?unlock:login}>{unlockCond?"Unlock":"Login"}</button>
                 </>
             }
             </form>

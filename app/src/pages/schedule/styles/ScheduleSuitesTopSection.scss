@@ -2,7 +2,8 @@
 	float:left;
 	width:100%;
 	height: calc(100% - 31px);
-	overflow: auto;
+    overflow: auto;
+    position: relative;
 }
 .scheduleSuiteTable .batchSuite{
     margin-bottom: 38px;
@@ -147,4 +148,25 @@
 }
 .rdtPicker{
     position: fixed !important
+}
+.s__err-Border{
+    border: 2px solid red !important;
+}
+.s__ab{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+}
+.s__min {
+    min-height: 0;
+}
+.s__con {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    height: 92%;
 }

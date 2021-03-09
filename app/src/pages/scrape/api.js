@@ -29,27 +29,27 @@ export const initScraping_ICE = screenViewObject => {
     });
 }
 
-// export const highlightScrapElement_ICE = (xpath, url, appType) => {
-//     return new Promise((resolve, reject)=> {
-//         axios(url+"/highlightScrapElement_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {"action": "highlightScrapElement_ICE",
-//                     "elementXpath": xpath, 
-//                     "elementUrl": url,
-//                     "appType": appType
-//                 },
-//             credentials : 'include',
-//         })
-//         .then(res=>{
-//             if (res.status === 200) resolve(res.data);
-//             else reject(res.status);
-//         })
-//         .catch(err => reject(err));
-//     });
-// }
+export const highlightScrapElement_ICE = (xpath, objurl, appType) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/highlightScrapElement_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {"action": "highlightScrapElement_ICE",
+                    "elementXpath": xpath, 
+                    "elementUrl": objurl,
+                    "appType": appType
+                },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data);
+            else reject(res.status);
+        })
+        .catch(err => reject(err));
+    });
+}
 
 /*Component ScrapeScreen
   api returns {"mirror":"","name":"","reuse":bool,"scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
@@ -116,104 +116,88 @@ export const updateScreen_ICE = arg => {
     });
 }
 
-// export const initScrapeWS_ICE = async(initWSJson) => {
-//     try{
-//         const res = await axios(url+"/debugTestCase_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'debugTestCaseWS_ICE',
-//                 testCaseWS: initWSJson
-//             },
-//             credentials : 'include',
-//         });
-//         if (res.status === 200){
-//             return res.data;
-//         }
-//         else{
-//             console.log(res.status)
-//         }
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
+export const initScrapeWS_ICE = arg => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'debugTestCaseWS_ICE',
+                testCaseWS: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
 
-// export const launchWSDLGo = async(wsdlUrl) => {
-//     try{
-//         const res = await axios(url+"/debugTestCase_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'wsdlListGenerator_ICE',
-//                 wsdlurl: wsdlUrl
-//             },
-//             credentials : 'include',
-//         });
-//         if (res.status === 200){
-//             return res.data;
-//         }
-//         else{
-//             console.log(res.status)
-//         }
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
+export const launchWSDLGo = wsdlUrl => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'wsdlListGenerator_ICE',
+                wsdlurl: wsdlUrl
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
 
-// export const wsdlAdd = async(wsdlUrl, wsdlSelectedMethod, resultFile) => {
-//     try{
-//         const res = await axios(url+"/debugTestCase_ICE", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 param : 'wsdlServiceGenerator_ICE',
-//                 wsdlurl: wsdlUrl,
-//                 method : wsdlSelectedMethod,
-//                 resultFile:resultFile
-//             },
-//             credentials : 'include',
-//         });
-//         if (res.status === 200){
-//             return res.data;
-//         }
-//         else{
-//             console.log(res.status)
-//         }
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
+export const wsdlAdd = (wsdlUrl, wsdlSelectedMethod, resultFile) => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'wsdlServiceGenerator_ICE',
+                wsdlurl: wsdlUrl,
+                method : wsdlSelectedMethod,
+                resultFile:resultFile
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
 
-// export const updateIrisDataset = async(data) => {
-//     try{
-//         const res = await axios(url+"/updateIrisDataset", {
-//             method: 'POST',
-//             headers : {
-//                 'Content-type' : 'application/json'
-//             },
-//             data : {
-//                 data : data
-//             },
-//             credentials : 'include',
-//         });
-//         if (res.status === 200){
-//             return res.data;
-//         }
-//         else{
-//             console.log(res.status)
-//         }
-//     }
-//     catch(err){
-//         console.log(err);
-//     }
-// }
+export const updateIrisDataset = data => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/updateIrisDataset", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                data : data
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
 

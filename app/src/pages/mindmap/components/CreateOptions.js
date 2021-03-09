@@ -1,6 +1,6 @@
 import React, { useRef, Fragment, useState } from 'react';
 import {excelToMindmap} from '../api';
-import {ModalContainer,PopupMsg} from '../../global'
+import {ModalContainer,PopupMsg, ScreenOverlay} from '../../global'
 import { useDispatch} from 'react-redux';
 import * as actionTypes from '../state/action';
 import '../styles/CreateOptions.scss'
@@ -17,6 +17,7 @@ const CreateOptions = (props) => {
   const [sheetList,setSheetList] = useState(false)
   const [data,setData] = useState(false)
   const [popup,setPopup] = useState({show:false})
+  const [blockui,setBlockui] = useState({show:false})
   const [sheet,setSheet] = useState(undefined)
   const options = [
     {ico : "ic-create-newMindmap.png",label:'Create New',comp:'newmindmap'},
@@ -35,6 +36,13 @@ const CreateOptions = (props) => {
     var resdata = await excelToMindmap({'content':data,'flag':'data',sheetname: sheet})
     setSheetList(false);
     if(resdata.error){displayError(resdata.error);return;}
+    var validate =  true;
+    resdata.forEach((e, i) =>{
+      if (!validNodeDetails(e.name)) validate = false;
+    });
+    if(!validate){
+      displayError('Some node names are invalid!');return;
+    }
     props.setOptions('newmindmap')
     dispatch({type:actionTypes.UPDATE_IMPORTDATA,payload:{createdby:'excel',data:resdata}})
   }
@@ -44,6 +52,7 @@ const CreateOptions = (props) => {
   }
   return (
     <Fragment>
+      {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
       {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
       {sheetList!==false?<ModalContainer 
         modalClass = 'modal-sm'
@@ -57,7 +66,7 @@ const CreateOptions = (props) => {
           {options.map((e,i)=>(
             <div className='mindmap__option-box' onClick={()=>{(e.comp === 'importmindmap')?upload.current.click():props.setOptions(e.comp)}} key={i} data-test="OptionBox">
               <div>
-                {(e.comp === 'importmindmap')?<input onChange={(e)=>uploadFile(e,setSheetList,displayError,setData,fileImport)} style={{display:'none'}} type="file" name="xlsfile" accept=".pd,.xls,.xlsx,.mm" required="" autoFocus="" ref={upload}/>:null}
+                {(e.comp === 'importmindmap')?<input onClick={e=>e.target.value=null} onChange={(e)=>uploadFile(e,setSheetList,displayError,setData,fileImport,setBlockui)} style={{display:'none'}} type="file" name="xlsfile" accept=".pd,.xls,.xlsx,.mm" required="" autoFocus="" ref={upload}/>:null}
                 <img src={"static/imgs/"+e.ico} alt={e.label}/>
                 <div>{e.label}</div>
               </div>
@@ -122,9 +131,11 @@ function read(file) {
 
 // upload File funtion checks imported file extensions and returns data or error message
 
-const uploadFile = async(e,setSheetList,displayError,setData,fileImport) =>{
+const uploadFile = async(e,setSheetList,displayError,setData,fileImport,setBlockui) =>{
     var file = e.target.files[0]
+    if(!file)return;
     var extension = file.name.substr(file.name.lastIndexOf('.')+1)
+    setBlockui({content:'Loading ...',show:true})
     const result =  await read(file)
     setData(result)
     if(extension === 'pd'){
@@ -133,6 +144,7 @@ const uploadFile = async(e,setSheetList,displayError,setData,fileImport) =>{
         var res = await excelToMindmap({'content':result,'flag':"sheetname"})
         if(res.error){displayError(res.error);return;}
         if(res.length>0){
+            setBlockui({show:false})
             setSheetList(res)
         }else{
             displayError("File is empty")
@@ -150,5 +162,15 @@ const uploadFile = async(e,setSheetList,displayError,setData,fileImport) =>{
         displayError("File is not supported")
     }
 }
+
+const validNodeDetails = (value) =>{
+  var nName, flag = !0;
+  nName = value;
+  var regex = /^[a-zA-Z0-9_]*$/;;
+  if (nName.length == 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName)) || nName== 'Screen_0' || nName == 'Scenario_0' || nName == 'Testcase_0') {
+      flag = !1;
+  }
+  return flag;
+};
 
 export default CreateOptions;
