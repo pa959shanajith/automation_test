@@ -501,7 +501,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 "attributes": ["bn", "at", "rw", "sd", "ed", "reestimation", "pg"]
             },
             "scenarios": {
-                "task": ["Execute Scenario"],
+                "task": ["Execute Scenario","Execute Scenario with Accessibility", "Execute Scenario Accessibility Only"],
                 "attributes": ["at", "rw", "sd", "ed", "reestimation", "pg", "cx"]
             },
             "screens": {
@@ -858,12 +858,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         var img_src = 'imgs/node-' + n.type + '.png';
         if (n.reuse && (n.type == 'testcases' || n.type == 'screens')) img_src = 'imgs/' + n.type + '-reuse.png';
+        let accessibility = 'Disable'
+        if(n.task && n.task.tasktype == 'Execute Scenario Accessibility Only') accessibility = 'Exclusive'
+        else if(n.task && n.task.tasktype == 'Execute Scenario with Accessibility') accessibility = 'Enable'
+        
 
         $scope.nodeDisplay[n.id] = {
             'type': n.type,
             'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
             'opacity': !( n._id == null || n._id == undefined) ? 1 : 0.5,
             'title': n.name,
+            'ac': accessibility,
             'name': n.display_name,
             'img_src': img_src,
             '_id': n._id || null,
@@ -1043,11 +1048,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         if ($('.version-list') !== undefined)
             tvn = $('.version-list').val();
+        let accessibilityToggle = 'Disable';
+        if  ($('#ct-assignTask').val() == "Execute Scenario with Accessibility") accessibilityToggle = "Enable"
+        else if ($('#ct-assignTask').val() == "Execute Scenario Accessibility Only") accessibilityToggle = "Exclusive"
         var tObj = {
             tvn: tvn,
             t: $('#ct-assignTask').val(),
             bn: $('#ct-executeBatch').val(),
             at: $('#ct-assignedTo').val(),
+            ac: accessibilityToggle, 
             rw: /*(d3.select('#ct-assignRevw')[0][0])?*/ $('#ct-assignRevw').val() /*:null*/ ,
             sd: $('#startDate').val(),
             ed: $('#endDate').val(),
@@ -1079,6 +1088,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             task: tObj.t,
             assignedto: tObj.at,
             assignedToName: $('[value="' + tObj.at + '"]').attr('data-id'),
+            accessibilityTesting: tObj.ac,
             reviewer: tObj.rw,
             startdate: tObj.sd,
             enddate: tObj.ed,
@@ -1136,7 +1146,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             Object.keys(tObj).forEach(function(k) {
                 if (tObj[k] === undefined) tObj[k] = null;
             });
-            if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/node-task-assigned.png').attr('x',29).attr('y',-10);
+            //if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','imgs/node-task-assigned.png').attr('x',29).attr('y',-10);
             if (nType == "modules" || nType == "endtoend") {
                 if (dNodes[pi]._id != "null") {
 
@@ -1197,9 +1207,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
             if (validate[0]) {
                 taskflag = true;
-                if (taskUndef) {
-                    d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
-                }
+                // if (taskUndef) {
+                //     d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                // }
                 // If task already exists then set it to true
                 if (dNodes[pi].task) taskStatus = dNodes[pi].task.status;
                 else taskStatus = 'assigned';
@@ -1312,9 +1322,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             openDialogMindmap("Date Error", "Please select Date")
         } else if (reviewerFlag == false) {
             openDialogMindmap("Task Assignment Error", "Please select Reviewer/Assigned User")
-        } else if (taskflag) {
-            if (p.select('.ct-nodeTask')[0][0] == null) p.append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
-        } else if (taskflag == false) {
+        } 
+        // else if (taskflag) {
+        //     if (p.select('.ct-nodeTask')[0][0] == null) p.append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+        // } 
+        else if (taskflag == false) {
             openDialogMindmap("Task Assignment Error", "Please create the structure before assigning task")
         }
         if (errorRelCyc) {
@@ -1535,6 +1547,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
             det: (nt) ? nt.details : '',
             cx: (nt) ? nt.complexity : undefined,
+            ac: (nt) ? nt.accessibility_testing : 'Disable',
             _id:(nt)? nt._id:null
         };
 
@@ -1553,13 +1566,30 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
 
         $("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected');
-
-        if (tObj.det === null || tObj.det.trim() == "") {
-            d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name);
-        } else {
-            d3.select('#ct-assignDetails').property('value', tObj.det);
+        if(p.attr('data-nodetype') == 'scenarios' && apptype === "5db0022cf87fdec084ae49b6"){
+            switch(tObj.t){
+                case "Execute Scenario":
+                    $('#ct-assignTask')[0].options[0].selected = true;
+                    tObj.ac = "Disable";
+                    d3.select('#ct-assignDetails').property('value', "Execute Scenario "  + dNodes[pi].name);
+                    break;
+                case "Execute Scenario with Accessibility":
+                    $('#ct-assignTask')[0].options[1].selected = true;
+                    d3.select('#ct-assignDetails').property('value', "Execute Scenario "  + dNodes[pi].name + " with Accessibility Testing");
+                    tObj.ac = "Enable"
+                    break;
+                default:
+                    $('#ct-assignTask')[0].options[2].selected = true;
+                    d3.select('#ct-assignDetails').property('value', "Execute Accessibility Testing for Scenario "  + dNodes[pi].name);
+                    tObj.ac = "Exclusive"
+            }
+        }else if(p.attr('data-nodetype') == 'scenarios'){
+            $('#ct-assignTask')[0].options[1].style.display = "none";
+            $('#ct-assignTask')[0].options[2].style.display = "none";
         }
-
+        tObj.t = $('#ct-assignTask')[0].value
+        if (p.attr('data-nodetype') != 'scenarios' && p.attr('data-nodetype') != 'endtoend') d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name);
+		if (p.attr('data-nodetype') == 'endtoend') d3.select('#ct-assignDetails').property('value', tObj.t + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length) + " " + dNodes[pi].name);
         $("#ct-assignTask").change(function() {
             if ($("#ct-assignTask").val() == 'Execute Batch') {
                 $('#ct-executeBatch').removeAttr("disabled");
@@ -1568,8 +1598,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#ct-executeBatch').val('');
             }
         })
-
-
         var default_releaseid = '';
         taskAssign[t].attributes.forEach(function(tk) {
             v = tk != 'reestimation' ? u.append('li') : v;
@@ -1606,6 +1634,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('#ct-assignedTo').attr('disabled', 'disabled');
                             $('#ct-assignedTo').css('background', '#ebebe4');
                         }
+                        if (p.attr('data-nodetype') == 'scenarios' && $('#ct-assignedTo')[0].disabled) $('#ct-assignTask')[0].disabled = true;
                     }, function(error) {
                         console.log("Error:::::::::::::", error);
                         unblockUI();
@@ -3275,7 +3304,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
                 //Enhancement : Part of Issue 1685 showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
                 else if (d.taskexists && $scope.tab != 'tabCreate' && d.type !="modules" && d.type !="scenarios") {
-                    d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.5').attr('x', 29).attr('y', -10);
+                    //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'imgs/node-task-assigned.png').attr('style', 'opacity:0.5').attr('x', 29).attr('y', -10);
                     $scope.nodeDisplay[d.id].task = true;
                     $scope.nodeDisplay[d.id].taskOpacity = 0.5;
                 }
@@ -3335,9 +3364,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             return;
         }
         var version_num = ($('.version-list').val() != undefined)? $('.version-list').val(): "0.0";
-        var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
+        var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": ""};
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
-        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"accountid":"","accesskey":"","secretkey":""}}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "","poolname":""} } ] };
+        var executionData = { "executionData": [{ "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"url":"","username":"","password":""}}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))], "userInfo": { "tokenhash": "", "tokenname": "", "icename": "","poolname":""} } ] };
         var moduleInfo = { "batchInfo": [] };
         blockUI('Loading UI');
         var moduleid = $('#createNewConfirmationPopup').attr('mapid');
@@ -3590,7 +3619,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 "attributes": ["at", "rw", "sd", "ed"]
             },
             "scenarios": {
-                "task": ["Execute Scenario"],
+                "task": ["Execute Scenario","Execute Scenario with Accessibility", "Execute Scenario Accessibility Only"],
                 "attributes": ["at", "rw", "sd", "ed", "cx"]
             },
             "screens": {
@@ -4088,7 +4117,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             d.id = uNix++;
             addNode_W(d, !0, d.parent);
             if ($scope.tab != 'mindmapEndtoEndModules') {
-                if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+                //if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
                 // else
                 // {
                 //     d3.select('#ct-node-' + d.id).selectAll("img").remove();
@@ -5142,8 +5171,10 @@ Purpose : displaying pop up for replication of project
         mindmapServices.excelToMindmap({'content':$scope.content,'flag':'data','sheetname':sheetname}).then(function(result) {
             if (result == "Invalid Session") {
                 return $rootScope.redirectPage();
-            } else if (result == 'fail') {
-                openDialogMindmap('Error', 'Some column names are invalid');
+            } else if (result == 'valueError') {
+                openDialogMindmap('Error', 'Empty column values in the sheet');
+            } else if (result == "emptySheet" || result == 'fail') {
+                openDialogMindmap('Error', 'Excel sheet is either empty or invalid');
             } else {
                 $scope.dataJSON = result;
                 $scope.dataJSON.forEach(function(e, i) {

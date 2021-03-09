@@ -1,4 +1,4 @@
-mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$location', '$timeout', '$window', 'reportService', 'mindmapServices', 'cfpLoadingBar', '$sce', function($scope, $rootScope, $http, $location, $timeout, $window, reportService, mindmapServices, cfpLoadingBar, $sce) {
+mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$location', '$timeout', '$window', 'reportService', 'mindmapServices', 'cfpLoadingBar', '$sce', function ($scope, $rootScope, $http, $location, $timeout, $window, reportService, mindmapServices, cfpLoadingBar, $sce) {
     $("head").append('<link rel="stylesheet" href="css/css_reports/bootstrap/bootstrap.min.css"> <link rel="stylesheet" type="text/css" href="css/css_reports/datatables/dataTables.css"><link rel="stylesheet" type="text/css" href="css/css_reports/header.css"><link rel="stylesheet" type="text/css" href="css/css_reports/footer.css"><link rel="stylesheet" type="text/css" href="css/css_reports/leftSideBar.css"><link rel="stylesheet" type="text/css" href="css/css_reports/rightSideBar.css"><link rel="stylesheet" type="text/css" href="css/css_reports/reports.css"><script src="js/plugins/reports/bootstrap/popper.js"></script><script src="js/plugins/reports/bootstrap/bootstrap.min.js"></script><script src="js/plugins/reports/datatables/datatables.min.js"></script>');
     var getUserInfo = JSON.parse(window.localStorage['_UI']);
     var userID = getUserInfo.user_id;
@@ -7,11 +7,19 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     var openWindow = 0;
     var executionId, testsuiteId;
     var robj, redirected = false;
+    var access_only = false;
     var pauseloadinginterval = false;
     var clearIntervalList = [];
     var slideOpen = false;
     $scope.reportIdx = ''; // for execution count click
-    $scope.releases="";
+    $scope.prc = {
+        projects: [],
+        projectId: '',
+        releases: [],
+        releaseId: '',
+        cycles: [],
+        cycleId: ''
+    };
     $rootScope.reportData = "";
     $("#reportDataTableDiv").hide();
     $('.reports-search').attr('disabled', 'disabled');
@@ -22,6 +30,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     $timeout(function() {
         $('.scrollbar-inner').scrollbar();
         $('.scrollbar-macosx').scrollbar();
+		document.getElementById("currentYear").innerHTML = new Date().getFullYear();
         angular.element(document.getElementById("reportSection")).scope().getReports_ICE();
         $('#ct-expand-left,#ct-expand-right').trigger('click');
         $('#ct-expand-left,#ct-expand-right').css('pointerEvents', 'none');
@@ -42,27 +51,21 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             .then(function(data) {
                 if (data == "Invalid Session") {
                     return $rootScope.redirectPage();
-                }  
-                window.localStorage['project']=JSON.stringify(data)           
-                if (type == "projects" ) {
+                }
+                window.localStorage['project']=JSON.stringify(data)
+                if (type == "projects") {
                     if(data != "fail"){
-                        $(".project-list").empty();
-                        $(".project-list").append("<option selected disabled>Select Project</option>");
-                        for (i = 0; i < data.length; i++) {
-                            $(".project-list").append("<option value='" + data[i]._id + "'>" + data[i].name + "</option>");
-                        }
-                        $('.release-list').empty()
-                        $('.release-list').append("<option data-id='Select' value='Select' selected>Select</option>");
-                        $('.cycle-list').empty();
-                        $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                        unblockUI();
+                        $scope.prc.projects = data;
+                        $scope.prc.releases = [];
+                        $scope.prc.releaseId = '';
+                        $scope.prc.cycles = [];
+                        $scope.prc.cycleId = '';
                         if (redirected) {
                             $timeout(function() {
-                                unblockUI();
-                                $('#selectProjects').val(robj.testSuiteDetails[0].projectidts);
-                                $('#selectProjects').trigger('change');
-                              
-                            }, 500);
-
+                                $scope.prc.projectId = robj.testSuiteDetails[0].projectidts;
+                                $scope.prc.selProjectsFilter();
+                            }, 300);
                         }
                     } else console.log("Unable to load test suites.");
                     $('.searchScrapEle').css('display', 'none');
@@ -79,8 +82,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     //Bind releases on Projects Filter Change
-    $('.project-list').change(function() {
-        var projectId = $('.project-list option:selected').val();
+    $scope.prc.selProjectsFilter = function() {
+        var projectId = this.projectId;
+        if (projectId == null) return;
         blockUI("Loading releases.. please wait..");
         $(".moduleBox,.mid-report-section,#accordion").hide();
         $("#report-header,#report-canvas").hide();
@@ -89,80 +93,74 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         $("#expAssign").attr('src', 'imgs/ic-collapse.png');
         $('#searchModule').val('');
         $('#searchModule').attr('disabled', 'disabled');
-        data = JSON.parse(window.localStorage['project'])
-        try{ 
-            for (i=0; i< data.length; i++){
+        var data = JSON.parse(window.localStorage['project'])
+        try{
+            for (var i=0; i< data.length; i++){
                 if(projectId == data[i]._id){
-                    unblockUI();           
-                    $('.release-list').empty();
-                    $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                    $('.cycle-list').empty();
-                    $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                    for (j = 0; j < data[i].releases.length; j++) {
-                        $('.release-list').append("<option data-id='" + data[i].releases[j].name + "' value='" + data[i].releases[j].name + "'>" + data[i].releases[j].name + "</option>");
-                    }
-                    $scope.releases =  data[i].releases
+                    unblockUI();
+                    $scope.prc.releaseId = '';
+                    $scope.prc.cycles = [];
+                    $scope.prc.cycleId = '';
+                    $scope.prc.releases =  data[i].releases;
                     if (redirected) {
-                        $timeout(function() {
-                            $('#selectReleases').val(robj.testSuiteDetails[0].releaseid);
-                            $('#selectReleases').trigger('change');
-                        }, 500);
+                        $scope.prc.releaseId = robj.testSuiteDetails[0].releaseid;
+                        $scope.prc.selReleasesFilter();
                     }
+                    break;
                 }
-        }
-     } catch(exception){
+            }
+        } catch(exception){
             unblockUI();
             console.log("Error in service populateReleases while fetching projects -" + error);
         }
-    });
+    };
 
-         //Bind cycles on releases Filter Change
-         $('.release-list').change(function() {
-            var releaseName= $('.release-list option:selected').val();
-            blockUI("Loading cycles.. please wait..");
-            $(".moduleBox,.mid-report-section,#accordion").hide();
-            $("#expAssign").attr('src', 'imgs/ic-collapse.png');
-            $('#searchModule').val('');
-            $('#searchModule').attr('disabled', 'disabled');
-            result = $scope.releases;
-            try{ 
-                for (i=0;i< result.length;i++){
-                    if(releaseName == result[i].name){
-                        unblockUI();
-                        $('.cycle-list').empty();
-                        $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                        for (j = 0; j < result[i].cycles.length; j++) {
-                            $('.cycle-list').append("<option data-id='" +result[i].cycles[j]._id+ "' value='" + result[i].cycles[j]._id + "'>" + result[i].cycles[j].name + "</option>");
-                        }
-                        if (redirected) {
-                            $timeout(function() {
-                                $('#selectCycles').val(robj.testSuiteDetails[0].cycleid);
-                                unblockUI();
-                                $('#selectCycles').trigger('change');
-                            }, 500);
-                        }
+    //Bind cycles on releases Filter Change
+    $scope.prc.selReleasesFilter = function() {
+        var releaseName=this.releaseId;
+        if (releaseName == null) return;
+        blockUI("Loading cycles.. please wait..");
+        $(".moduleBox,.mid-report-section,#accordion").hide();
+        $("#expAssign").attr('src', 'imgs/ic-collapse.png');
+        $('#searchModule').val('');
+        $('#searchModule').attr('disabled', 'disabled');
+        var result = $scope.prc.releases;
+        try{
+            for (var i=0;i< result.length;i++){
+                if (releaseName == result[i].name) {
+                    unblockUI();
+                    $scope.prc.cycles = [];
+                    $scope.prc.cycleId = '';
+                    $scope.prc.cycles = result[i].cycles;
+                    if (redirected) {
+                        $scope.prc.cycleId = robj.testSuiteDetails[0].cycleid;
+                        $scope.prc.selCyclesFilter();
                     }
+                    break;
                 }
-            } catch(exception){
-                unblockUI();
-                console.log("Error in service populateReleases while fetching projects -" + error);
             }
-        });
+        } catch (exception) {
+            unblockUI();
+            console.log("Error in service populateReleases while fetching projects -" + error);
+        }
+    };
 
-        //Load modules on cycles filter change
-        $('.cycle-list').change(function() {
-            var cycleId = $('.cycle-list option:selected').val();
-            var reportsInputData = {};
-            reportsInputData.projectId = $.trim($('.project-list option:selected').val());
-            reportsInputData.releaseName = $.trim($('.release-list option:selected').val());
-            reportsInputData.cycleId = $.trim(cycleId);
-            reportsInputData.type = 'allmodules';
-            blockUI("Loading modules.. please wait..");
-            $("#accordion").hide();
-            $('#nodeBox').empty();
-            $('#searchModule').val('');
-            //$("#expAssign").attr('src', 'imgs/ic-collapse.png');
-            //Fetching Modules under cycle
+    //Bind cycles on releases Filter Change
+    $scope.prc.selCyclesFilter = function() {
+        var cycleId = this.cycleId;
+        if (cycleId == null) return;
+        var reportsInputData = {};
+        reportsInputData.projectId = this.projectId;
+        reportsInputData.releaseName = this.releaseId;
+        reportsInputData.cycleId = cycleId;
+        reportsInputData.type = 'allmodules';
+        blockUI("Loading modules.. please wait..");
+        $("#accordion").hide();
+        $('#nodeBox').empty();
+        $('#searchModule').val('');
+        //$("#expAssign").attr('src', 'imgs/ic-collapse.png');
+        //Fetching Modules under cycle
+        if (!access_only) {
             reportService.getReportsData_ICE(reportsInputData).then(function(result_res_reportData) {
                 unblockUI();
                 if (result_res_reportData == "Fail") {
@@ -174,8 +172,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                         openModalPopup("Modules", "No Modules Found");
                         $(".mid-report-section").hide();
                         $('#searchModule').attr('disabled', 'disabled');
-                        if($('.slideOpen').is(":visible") == true)
-                        {
+                        if($('.slideOpen').is(":visible") == true) {
                             $('div.moduleBox').removeClass('slideOpen');
                             $('#expAssign').trigger('click');
                         }
@@ -209,7 +206,40 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                 unblockUI();
                 console.log("Error in service getReportsData_ICE while fetching modules-"+error);
             });
-        });
+        }else{
+            reportsInputData.type = 'screendata';
+            reportService.getAccessibilityData_ICE(reportsInputData).then(function (accessibility_data) {
+                unblockUI()
+                if (accessibility_data == "Invalid Session") {
+                    $rootScope.redirectPage();
+                } else if (accessibility_data == "Fail") {
+                    openModalPopup("Reports", "Failed to load Accessibility Reports");
+                } else {
+                    $(".mid-report-section").hide();
+                    if (accessibility_data.length == 0) {
+                        //No Modules Found
+                        openModalPopup("Modules", "No Accessibility Modules Found");
+                        $(".mid-report-section").hide();
+                        $('#searchModule').attr('disabled', 'disabled');
+                    } else {
+                        angular.forEach(accessibility_data, function (value, index) {
+                            $('#nodeBox').append('<div class="nodeDiv"><div class="ct-node fl-left ng-scope"  data-screenname=' + value + '  title=' + value + ' style="width: 139px;"><img id=' + value + ' class="ct-nodeIcon1" src="imgs/node-screens.png" alt="Module Name" aria-hidden="true"><span class="ct-nodeLabel ng-binding" style="width: 115px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-left: 30px;">' + value + '</span></div>')
+                            $('.reports-search').removeAttr('disabled', 'disabled');
+                        });
+                        $('#searchModule').removeAttr('disabled', 'disabled');
+                        if ($('.moduleBox').is(':visible') != true) {
+                            $('div.moduleBox').removeClass('slideOpen');
+                            $('#expAssign').trigger('click');
+                        }
+                    }
+                    $('#ctExpandAssign').css('pointer-events', 'auto')
+                }
+            }, function (error) {
+                unblockUI();
+                console.log("Error in service getAccessibilityData_ICE while fetching modules-" + error);
+            });
+        }
+    };
 
 
     //Responsive Header Menu
@@ -222,7 +252,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             x.className = "topnav";
         }
     };
-  
+
     //Toggle(Show/Hide) Module Div
     $('#expAssign').on('click', function(e) {
         if($(".ct-nodeIcon").length == 0 && $(".ct-nodeIcon1").length == 0)
@@ -288,6 +318,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
     //Module node click to fetch module start/end date & time execution entries
     $(document).on('click', '.ct-nodeIcon', function(e) {
         blockUI('Loading.. Please wait..')
+        $("#accessibilityTblExecution").hide();
         $("#report-canvas").empty();
         $("#report-canvas").hide();
         $("#report-header").empty();
@@ -304,11 +335,10 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     $('#overallStatus,#accordion,.scenarioStatus').hide();
                     if (data == "Invalid Session") {
                         $rootScope.redirectPage();
-                    }
-                    if (data != "fail") {
-                        var tableContainer = $('.mid-report-section tbody');
+                    } else if (data != "fail") {
+                        var tableContainer = $('#reportsModuleTable tbody');
+                        tableContainer.empty();
                         if (data.length > 0) {
-                            tableContainer.empty();
                             var startDat, startTym, endDat, endTym, sD, sT, eD, eT;
                             for (i = 0; i < data.length; i++) {
                                 startDat = (data[i].start_time.split(' ')[0]).split("-")
@@ -365,24 +395,22 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             } else {
                                 $("#dateDESC, #dateASC, #dateDESC1, #dateASC1").hide();  
                             }
-                            var dateArray = $('.mid-report-section tbody').children('.scenariostatusreport');
+                            var dateArray = tableContainer.children('.scenariostatusreport');
                             dateASC(dateArray);
                             sortExecutions('#dateDESC',dateArray);
-                        } else if (data == "Fail") {
-                            unblockUI();
-                            openModalPopup("Reports", "Failed to load Reports");
                         } else {
-                            tableContainer.empty();
                             var executionsNameHeader = $('.highlight-module').next('span.ct-nodeLabel').text() + " - Executions";
                             $("#executionNameHeader").text(executionsNameHeader);
                             $('.modTbl,#accordionTblExecutions').show();
-                            $(".mid-report-section tbody").empty();
                             $("#reportsModuleTable th").addClass('no-data');
-                            $(".mid-report-section tbody").append("<tr><td class='align-center emptyRecords' colspan=3>No record(s) found</td></tr>");
+                            tableContainer.append("<tr><td class='align-center emptyRecords' colspan=3>No record(s) found</td></tr>");
                             $("#dateDESC, #dateASC").hide();
                             $("#dateDESC1, #dateASC1").hide();      
                             unblockUI();
                         }
+                    } else if (data == "Fail") {
+                        unblockUI();
+                        openModalPopup("Reports", "Failed to load Reports");
                     }
                     redirected = false;
                     localStorage.removeItem('fromExecution');
@@ -392,6 +420,260 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                     console.log("Error in service getSuiteDetailsInExecution_ICE" + error);
                 })
     });
+
+    $(document).on('click', '.ct-nodeIcon1', function (e) {
+        blockUI("Loading Reports");
+        $("#accordion").hide();
+        $("#report-canvas").empty();
+        $("#report-canvas").hide();
+        $("#report-header").empty();
+        $("#report-header").hide();
+        $('.mid-report-section').removeClass('hide');
+        $('img.highlight-module').removeClass('highlight-module');
+        $('span.highlight-moduleName').removeClass('highlight-moduleName');
+        $(this).addClass('highlight-module').next('span').addClass('highlight-moduleName');
+        $('#reportsAccTable tbody').empty();
+        $('#accordionTblExecutions').hide()
+        $scope.reportGenerated = true;
+        var inputdata = {};
+        inputdata['type'] = "reportdata_names_only";
+        inputdata['screendata'] = e.target.id;
+        reportService.getAccessibilityData_ICE(inputdata)
+            .then(function (accessibility_data) {
+                unblockUI();
+                if (accessibility_data == "Invalid Session") {
+                    $rootScope.redirectPage();
+                } else if (accessibility_data == "Fail") {
+                    openModalPopup("Reports", "Failed to load Accessibility Reports");
+                } if (accessibility_data != "fail") {
+                    $(".mid-report-section").show();
+                    $('#overallStatus,#accordion,.scenarioStatus').hide();
+                    var tableContainer = $('#reportsAccTable tbody');
+                    if (accessibility_data.length > 0) {
+                        tableContainer.empty();
+                        var screen_acc_reportdata = {};
+                        var index = accessibility_data.length;
+                        for (i = accessibility_data.length - 1; i >= 0; i--) {
+                            let time = new Date(accessibility_data[i]["executedtime"]);
+                            time = time.toString().split("GMT")[0]
+                            tableContainer.append("<tr class='screen_report'  style='cursor:pointer;' data-executionid='" + accessibility_data[i]["_id"] + "'><td class='executionNo' style='padding:3px;'>E<sub>" + (index--) + "</sub></td><td style='padding:3px;'>" + accessibility_data[i]["title"] + "</td><td style='padding:3px;'>" + time + "</td>");
+                            screen_acc_reportdata[accessibility_data[i]["_id"]] = accessibility_data[i]
+                        }
+                        $scope['acc_report_data'] = screen_acc_reportdata;
+                        $('.modTbl,#accessibilityTblExecution').show();
+
+                    }
+                }
+            }, function (error) {
+                unblockUI();
+                console.log("Error in service getAccessibilityData_ICE while fetching modules-" + error);
+            });
+
+    });
+
+    $(document).on('click', '.screen_report', function (e) {
+        blockUI("Fetching Accessibility Reports");
+        const id = $(this).attr('data-executionid');
+        var inputdata = {type:"reportdata", executionid: id}
+        reportService.getAccessibilityData_ICE(inputdata).then((report) => {
+            var report = report[0];
+            $scope.access_report = report;
+            $("#report-canvas").show();
+            $("#report-header").show();
+            $("#report-header").empty();
+            $("#accordion").hide();
+            $(".mid-report-section").hide();
+
+            $('#middle-content-section').attr('class', "webCrawler-report");
+            var proxy = "Disabled";
+            $("#report-header").append('<div width="100%" height="100%" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Report Data</label></div><div style="display: flex;"><div style="width:100%;position:relative;"><div><label class="webCrawler-report-label">Crawl Name</label><span class="webCrawler-report-span">'+ report.screenname + '</span></div><div><label class="webCrawler-report-label">' + "Agent" + '</label><span class="webCrawler-report-span" style="text-transform: capitalize;">'+ report.agent+'</span></div><div><label class="webCrawler-report-label">Level</label><span class="webCrawler-report-span">0</span></div><div><label class="webCrawler-report-label">URL</label><span class="webCrawler-report-span">'+ report.url + '</span></div></div></div>')
+            var body = document.getElementById('report-canvas');
+            body.style.height = 'fit-content';
+            var headerDiv = document.createElement('div')
+            headerDiv.innerHTML = '<div width="100%" style="margin-top:5%;" class="webCrawler-header"><label style="position: relative;bottom: 1px;">Accessibility Reports by Standards</label></div>';
+            body.appendChild(headerDiv)
+            var reportDiv = document.createElement('div');
+            //reportDiv.setAttribute('class', 'scrollbar-inner');
+
+            var tbl = document.createElement('table');
+            tbl.style.height = 'fit'
+            tbl.setAttribute('width', '100%');
+            tbl.setAttribute('height', '100%');
+            tbl.setAttribute('class', 'dataTable');
+            // $('.scrollbar-inner').scrollbar();
+            var tbdy = document.createElement('tbody');
+            var headrow = document.createElement('tr');
+            headrow.style.background = "gray"; 
+            headrow.style.color = "white"; 
+            headrow.style.fontSize = "12px"; 
+
+            var headData = { 0: 'S.No.', 1: 'Standard', 2: 'Status', 3: 'View Standard Report'};
+            jsonStruct = { 0: 'Standard', 1: 'Status',2:"Report"};
+            for (var i = 0; i < 4; i++) {
+                var th = document.createElement('th');
+                th.style.textAlign = "center";
+                th.style.width = "20%"
+                th.appendChild(document.createTextNode(headData[i]));
+                headrow.appendChild(th);
+            }
+            headrow.childNodes[0].style.width = "4%";
+
+            tbdy.appendChild(headrow);
+
+            // Adding if the Accessibly test passed or failed.
+            var reportNo = 1;
+            for (k = 0; k < 6; k++) {
+                if (report["access-rules"][k]["selected"]) {
+                    var newRow = document.createElement('tr');
+                    newRow.style.textAlign = "center"
+                    newRow.style.fontSize = "12px";
+                    var sNo = document.createElement('td');
+                    sNo.setAttribute('style', 'width: 55px');
+                    sNo.appendChild(document.createTextNode(reportNo++));
+                    newRow.appendChild(sNo);
+                    var statusNode = document.createElement('td');
+                    var node = document.createElement('td');
+                    if (report["access-rules"][k]["pass"]) {
+                        node.innerHTML = '<label style="margin-left: 3px;">' + report["access-rules"][k]["name"] + '</label>';
+                        statusNode.innerHTML = '<label style="color:green;">' + "Pass" + '</label>';
+                    } else {
+                        node.innerHTML = '<label style="margin-left: 3px;">' + report["access-rules"][k]["name"] + '</label>';
+                        statusNode.innerHTML = '<label style="color:red;">' + "Fail" + '</label>';;
+                    }
+                    newRow.append(node);
+                    newRow.append(statusNode);
+                    var reportLink = document.createElement('td');;
+                    reportLink.innerHTML = '<div value="' +  report["access-rules"][k]["tag"] + '" data="' + report["access-rules"][k]["name"] + '" class="accessRules" > <label style="cursor:pointer">Report</label></div>'
+                    newRow.append(reportLink);
+                    tbdy.appendChild(newRow);
+                }
+            }
+            
+            
+                
+            
+            tbl.appendChild(tbdy);
+            reportDiv.appendChild(tbl);
+            body.appendChild(reportDiv);
+            
+            unblockUI();
+
+        }).catch((error)=>{
+            $scope.access_report = false;
+            unblockUI();
+            console.log("Error in getAccessibilityData_ICE while fetching accessibility reports-" + error);
+        })
+        
+
+    });
+
+    $(document).on('click',".accessRules",function(e){
+        const report = $scope.access_report;
+        var standard = e.currentTarget.attributes.value.value;
+        if(report && standard){
+            standard = standard.replace(".","_");
+            var reportList = report.rulemap[standard];
+            var body = document.getElementById('report-canvas');
+            if(document.getElementById("tableHeading")) document.getElementById("tableHeading").remove();
+            if(document.getElementById("accessibilityTable")) document.getElementById("accessibilityTable").remove();
+            var tableHeader = document.createElement("div");
+            tableHeader.setAttribute("id","tableHeading")
+            var tableStandard = document.createElement("label");
+            tableStandard.textContent = "Slected Standard: " + e.currentTarget.attributes.data.value;
+            tableHeader.style.fontSize = "20px"
+            tableHeader.appendChild(tableStandard);
+            body.appendChild(tableHeader);
+            tableHeader.appendChild(document.createElement("label"))
+            var accessDiv = document.createElement('table');
+            accessDiv.setAttribute('id', 'accessibilityTable')
+            accessDiv.setAttribute('width', '100%');
+            accessDiv.setAttribute('class', 'webCrawler-report-table');
+
+            var tr1 = document.createElement('tr');
+            headers = ["SNo","Status", "Description", "Help", "Impact"];
+            header_widths = ["5%","10%","40%","35%","10%"]
+            datas = ["description", "help", "impact"];
+            for (i = 0; i < headers.length; i++) {
+                var th1 = document.createElement('th');
+                th1.appendChild(document.createTextNode(headers[i]));
+                th1.style.width = header_widths[i];
+                tr1.appendChild(th1);
+            }
+
+            accessDiv.appendChild(tr1);
+            let reportNo = 1;
+            for (let reportType in reportList) {
+                for(var i = 0; i < reportList[reportType].length; i++){
+                    var tr1 = document.createElement('tr');
+                    var td1 = document.createElement('td');
+                    var td2 = document.createElement('td');
+                    td1.appendChild(document.createTextNode(reportNo++));
+                    tr1.append(td1);
+                    td2.appendChild(document.createTextNode(reportType));
+                    tr1.append(td2)
+                    for (j = 0; j < datas.length; j++) {
+                        var td1 = document.createElement('td');
+                        var value = reportList[reportType][i][datas[j]] || "N/A";
+                        td1.appendChild(document.createTextNode(value));
+                        tr1.appendChild(td1);
+                    }
+                    accessDiv.appendChild(tr1);
+                }
+                
+            }
+            body.appendChild(accessDiv);
+        }
+    });
+     
+    
+    $scope.toggle_accessibility = function (flag) {
+        $(" .mid-report-section")[0].style.display = "none"
+        $("#accordion")[0].style.display = "none"
+        $("#report-header")[0].style.display = "none"
+        $("#report-canvas")[0].style.display = "none"
+        $('#nodeBox')[0].innerHTML = "";
+        $("#ctExpandAssign")[0].style.pointerEvents = "none"
+        $("#ctExpandAssign")[0].children[0].alt = "Collapse Icon"
+        $("#ctExpandAssign")[0].children[0].src = "imgs/ic-collapse.png"
+        $('.container-fluid .moduleBox')[0].style.display = "none"
+        var data = JSON.parse(window.localStorage['project'])
+        $scope.prc.projects = data;
+        $scope.prc.releaseId = '';
+        $scope.prc.cycleId = '';
+        $scope.prc.projectId = '';
+        if ($('.ct-nodeIcon1').parent().is(':hidden')) { $('.ct-nodeIcon1').parent().show() }
+        else { $('.ct-nodeIcon1').parent().hide() }
+        if (flag){
+            access_only = true;
+            let web_projects = [];
+            for(var projectIndex in data){
+                if(data[projectIndex].type == "5db0022cf87fdec084ae49b6"){
+                    web_projects.push(data[projectIndex]);
+                }
+            }
+            $scope.prc.projects = web_projects;
+            $("#reports-taskName")[0].style.background = "";
+            $("#accessibility-taskName")[0].style.background = "purple";
+            $("#accessibility-taskName")[0].style.color = "white"
+            $("#reports-taskName")[0].style.color = "black"
+
+            $("#searchModule")[0].placeholder = "Search Module";
+        }else{
+            access_only = false;
+            $("#reports-taskName")[0].style.background = "purple";
+            $("#accessibility-taskName")[0].style.background = "";
+            $("#accessibility-taskName")[0].style.color = "black"
+            $("#reports-taskName")[0].style.color = "white"
+           
+            $("#searchModule")[0].placeholder = "Search Screen";
+        }
+        
+        $("#selectProjects")[0].options[0].selected = true
+        $("#selectReleases")[0].options[0].selected = true
+        $("#selectCycles")[0].options[0].selected = true
+    }
+
+
     //Set status color for report status
     function setStatusColor() {
         $(".status").each(function() {
@@ -409,20 +691,19 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
 
     //sort start date & time executions
     function sortExecutions(ele, dateArray) {
-        $(".mid-report-section tbody").empty();
-        if($(ele).is(":visible") == true)
-        {
+        var tblBody = $(".mid-report-section tbody").filter((i,e)=> e.children && e.children.length>0);
+        tblBody.empty();
+        if($(ele).is(":visible") == true) {
             var j=dateArray.length;
             for (var i =0; i < dateArray.length; i++) {
                 dateArray[i].firstChild.innerHTML = "E<sub>" + parseInt(j) + "</sub>";
-                $(".mid-report-section tbody").append(dateArray[i]);
+                tblBody.append(dateArray[i]);
                 j--;
             }
-        }
-        else{
+        } else {
             for (var k =0; k < dateArray.length; k++) {
                 dateArray[k].firstChild.innerHTML = "E<sub>" + parseInt(k + 1) + "</sub>";
-                $(".mid-report-section tbody").append(dateArray[k]);
+                tblBody.append(dateArray[k]);
             }
         }
        
@@ -457,12 +738,14 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                             else if (data[i].browser.toLowerCase() == "firefox") browserIcon = "ic-reports-firefox.png";
                             else if (data[i].browser.toLowerCase() == "internet explorer") browserIcon = "ic-reports-ie.png";
                             else if (data[i].browser.toLowerCase() == "safari") browserIcon = "ic-reports-safari.png";
+                            else if (data[i].browser.toLowerCase() == "edge legacy") browserIcon = "ic-legacy-schedule.png";
+                            else if (data[i].browser.toLowerCase() == "edge chromium") browserIcon = "ic-chromium-schedule.png";
                             if (browserIcon) {
                                 brow = "imgs/" + browserIcon;
                                 alt = data[i].browser.toLowerCase();
                             }
                             else {
-                                brow = "imgs/no_img1.png"
+                                brow = "-";
                                 alt = "-";
                             }
                             if (data[i].status.toLowerCase() == "pass") {
@@ -487,7 +770,9 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
                                 status="Skipped"
                                 styleColor = "style='color: #343a40 !important; text-decoration-line: none;'";
                             }
-                            scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td><td><img  alt='"+alt+"' style='width: 21px;height: 22px;' src='"+brow+"' title='"+alt+"'></td><td><span>" + data[i].executedtime.trim() + "</span></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");
+                            var brIcon = "<td><img  alt='"+alt+"' style='width: 21px;height: 22px;' src='"+brow+"' title='"+alt+"'></td>";
+                            if (brow == '-') brIcon = "<td style='font-size: 50px; line-height: 0;'>-</td>";
+                            scenarioContainer.append("<tr class='scenarioTblReport'><td title='" + data[i].testscenarioname + "'>" + data[i].testscenarioname + "</td>" + brIcon + "<td><span>" + data[i].executedtime.trim() + "</span></td><td class='openReports' data-reportid='" + data[i].reportid + "'><a class='openreportstatus' " + styleColor + ">" + status + "</a></td><td class='viewReports'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='wkhtmltopdf' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus reportFormat' data-getrep='html' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON openreportstatus reportFormat' data-getrep='json' data-reportid=" + data[i].reportid + " data-reportidx='' style='cursor: pointer; width: 21px;height: 22px;' src='imgs/ic-export-to-json.png' title='Export to Json'></td></tr>");
                         }
                         if ($('.scenarioTblReport').length > 0) {
                             $("tr.scenarioTblReport:even").removeClass('even').addClass('even');
@@ -787,307 +1072,4 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
         }
     }
 
-    function htmlReportClick1(e) {
-        var reportType = $(this).attr('data-getrep');
-        var reportID = $(this).attr('data-reportid');
-        var testsuiteId = $(this).parents('tr').attr('id');
-        var testsuitename = $('#moduleNameHeader').children('span').text();
-        var scenarioName = $(this).parent().siblings('td.scenarioName').text();
-
-        var pass = fail = terminated = total = 0;
-        var scrShot = {
-            "idx": [],
-            "paths": []
-        };
-        var finalReports = {
-            overallstatus: [{
-                "domainName": "",
-                "projectName": "",
-                "releaseName": "",
-                "cycleName": "",
-                "scenarioName": "",
-                "browserVersion": "",
-                "browserType": "",
-                "StartTime": "",
-                "EndTime": "",
-                "overallstatus": "",
-                "EllapsedTime": "",
-                "date": "",
-                "time": "",
-                "pass": "",
-                "fail": "",
-                "terminate": "",
-                "reportId": "",
-                "executionId": "",
-                "moduleName": ""
-            }],
-            rows: []
-        };
-        reportService.getReport(reportID, testsuiteId, testsuitename)
-            .then(function(data) {
-                    if (data == "Invalid Session") {
-                        return $rootScope.redirectPage();
-                    }
-                    var remarksLength = [];
-                    var commentsLength = [];
-                    if (data == "fail") {
-                        blockUI("Unable to Generate Report!");
-                        console.log("Failed to get reports details");
-                        return setTimeout(()=>{unblockUI()}, 2000);
-                    }
-                    blockUI("Generating Report.. please wait..");
-                    finalReports.overallstatus[0].domainName = data.domainname
-                    finalReports.overallstatus[0].projectName = document.getElementById('selectProjects').selectedOptions[0].text
-                    finalReports.overallstatus[0].releaseName = document.getElementById('selectReleases').selectedOptions[0].text
-                    finalReports.overallstatus[0].cycleName = document.getElementById('selectCycles').selectedOptions[0].text
-                    finalReports.overallstatus[0].scenarioName = data.testscenarioname
-                    finalReports.overallstatus[0].reportId = reportID;
-                    finalReports.overallstatus[0].executionId = data.executionid;
-                    finalReports.overallstatus[0].moduleName = $(".highlight-moduleName").text();
-
-                    var obj2 = data.report;
-                    var elapTym;
-                    for (j = 0; j < obj2.overallstatus.length; j++) {
-                        finalReports.overallstatus[0].browserVersion = (obj2.overallstatus[j].browserVersion) == "" ? "-" : obj2.overallstatus[j].browserVersion;
-                        finalReports.overallstatus[0].browserType = (obj2.overallstatus[j].browserType) == "" ? "-" : obj2.overallstatus[j].browserType;
-                        finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime.split(".")[0];
-                        finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime.split(".")[0];
-                        var getTym = obj2.overallstatus[j].EndTime.split(".")[0];
-                        var getDat = getTym.split(" ")[0].split("-");
-                        finalReports.overallstatus[0].date = getDat[1] + "/" + getDat[2] + "/" + getDat[0];
-                        finalReports.overallstatus[0].time = getTym.split(" ")[1];
-                        finalReports.overallstatus[0].overallstatus = obj2.overallstatus[j].overallstatus;
-                        elapTym = (obj2.overallstatus[j].EllapsedTime.split(".")[0]).split(":");
-                        finalReports.overallstatus[0].EllapsedTime = "~" + ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2)
-                    }
-                    for (k = 0; k < obj2.rows.length; k++) {
-                        finalReports.rows.push(obj2.rows[k]);
-                        finalReports.rows[k].slno = k + 1;
-                        if (finalReports.rows[k]["Step "] != undefined) { // && finalReports.rows[k]["Step "].indexOf("Step") !== -1){
-                            finalReports.rows[k].Step = finalReports.rows[k]["Step "];
-                        }
-                        if (finalReports.rows[k].hasOwnProperty("EllapsedTime") && finalReports.rows[k].EllapsedTime.trim() != "") {
-                            elapTym = (finalReports.rows[k].EllapsedTime.split(".")[0]).split(":")
-                            if (finalReports.rows[k].EllapsedTime.split(".")[1] == undefined || finalReports.rows[k].EllapsedTime.split(".")[1] == "") {
-                                finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2);
-                            } else if (finalReports.rows[k].EllapsedTime.split(".").length < 3 && finalReports.rows[k].EllapsedTime.split(".")[0].indexOf(":") === -1) {
-                                finalReports.rows[k].EllapsedTime = ("0" + 0).slice(-2) + ":" + ("0" + 0).slice(-2) + ":" + ("0" + elapTym[0]).slice(-2) + ":" + ("0" + 0).slice(-2);
-                            } else {
-                                finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) + ":" + ("0" + elapTym[1]).slice(-2) + ":" + ("0" + elapTym[2]).slice(-2) + ":" + finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);
-                            }
-                        }
-                        if (finalReports.rows[k].status == "Pass") {
-                            pass++;
-                        } else if (finalReports.rows[k].status == "Fail") {
-                            fail++;
-                        } else if (finalReports.rows[k].hasOwnProperty("Step") && finalReports.rows[k].Step == "Terminated") {
-                            terminated++
-                        }
-                        if (reportType != "html" && !(finalReports.rows[k].screenshot_path == undefined)) {
-                            scrShot.idx.push(k);
-                            scrShot.paths.push(finalReports.rows[k].screenshot_path);
-                        }
-                        if ('testcase_details' in finalReports.rows[k]) {
-                            if (typeof(finalReports.rows[k].testcase_details) == "string" && finalReports.rows[k].testcase_details != "" && finalReports.rows[k].testcase_details != "undefined") {
-                                finalReports.rows[k].testcase_details = JSON.parse(finalReports.rows[k].testcase_details);
-                            } else if (typeof(finalReports.rows[k].testcase_details) == "object") {
-                                finalReports.rows[k].testcase_details = finalReports.rows[k].testcase_details;
-                            } else {
-                                finalReports.rows[k].testcase_details = finalReports.rows[k].testcase_details;
-                            }
-
-                            if (finalReports.rows[k].testcase_details == "") {
-                                finalReports.rows[k].testcase_details = {
-                                    "actualResult_pass": "",
-                                    "actualResult_fail": "",
-                                    "testcaseDetails": ""
-                                }
-                            }
-                        }
-
-                        if ('Remark' in finalReports.rows[k]) {
-                            if (finalReports.rows[k].Remark != " " && finalReports.rows[k].Remark != null && finalReports.rows[k].Remark != "") {
-                                remarksLength.push(finalReports.rows[k].Remark)
-                            }
-                        }
-                        if ('Comments' in finalReports.rows[k]) {
-                            if (finalReports.rows[k].Comments != " " && finalReports.rows[k].Comments != null && finalReports.rows[k].Comments != "") {
-                                commentsLength.push(finalReports.rows[k].Comments)
-                            }
-                        }
-                    }
-                    total = pass+fail+terminated;
-                    finalReports.overallstatus[0].pass = (parseFloat((pass / total) * 100).toFixed(2)) > 0 ? parseFloat((pass / total) * 100).toFixed(2) : parseInt(0);
-                    finalReports.overallstatus[0].fail = (parseFloat((fail / total) * 100).toFixed(2)) > 0 ? parseFloat((fail / total) * 100).toFixed(2) : parseInt(0);
-                    if(pass>0 && fail>0){
-                        finalReports.overallstatus[0].terminate = (100-(parseFloat(finalReports.overallstatus[0].fail)+parseFloat(finalReports.overallstatus[0].pass))).toFixed(2);
-                    } else{
-                        finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
-                    }
-                    // finalReports.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
-                    finalReports.remarksLength = remarksLength;
-                    finalReports.commentsLength = commentsLength;
-                    if (reportType == "html") {
-                        //Service call to get Html reports
-                        reportService.renderReport_ICE(finalReports, reportType).then(
-                            function(data1) {
-                                unblockUI();
-                                if (data1 == "Invalid Session") {
-                                    return $rootScope.redirectPage();
-                                } else if (data1 == "fail") {
-                                    console.log("Failed to render reports.");
-                                } else {
-                                    var myWindow;
-                                    myWindow = window.open();
-                                    myWindow.document.write(data1);
-                                }
-                                e.stopImmediatePropagation();
-                            },
-                            function(error) {
-                                unblockUI();
-                                console.log("Error in service renderReport_ICE" + error);
-                            });
-                        //Transaction Activity for HTMLReportClick
-                        // var labelArr = [];
-                        // var infoArr = [];
-                        // labelArr.push(txnHistory.codesDict['HTMLReportClick']);
-                        // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
-                    } else if (reportType == 'json') {
-                        exportJSONReport(finalReports);
-                    } else {
-                        //Service call to download pdf reports
-                        $rootScope.resetSession.start();
-                        var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-                        reportService.renderReport_ICE(finalReports, reportType, scrShot).then(
-                            function(data1) {
-                                unblockUI();
-                                $rootScope.resetSession.end();
-                                var strData = String.fromCharCode.apply(null, new Uint8Array(data1.slice(0, 20)));
-                                if (strData == "Invalid Session") return $rootScope.redirectPage();
-                                else if (strData === "fail") {
-                                    var msg = "Fail to load PDF Report";
-                                    openModalPopup("Reports", msg);
-                                    console.error(msg);
-                                } else if (strData === "limitExceeded") {
-                                    var msg = "Fail to load PDF Report. Report Limit size exceeded. Generate PDF Report using Avo Assure PDF utility available in ICE.";
-                                    openModalPopup("Reports", msg);
-                                    console.error(msg);
-                                } else {
-                                    openWindow = 0;
-                                    if (openWindow == 0) {
-                                        var file = new Blob([data1], {
-                                            type: 'application/pdf'
-                                        });
-                                        if (isIE) {
-                                            navigator.msSaveOrOpenBlob(file);
-                                        } else {
-                                            var fileURL = URL.createObjectURL(file);
-                                            var a = document.createElement('a');
-                                            a.href = fileURL;
-                                            a.download = finalReports.overallstatus[0].scenarioName;
-                                            //a.target="_new";
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            document.body.removeChild(a);
-                                            //$window.open(fileURL, '_blank');
-                                            URL.revokeObjectURL(fileURL);
-                                        }
-                                    }
-                                    openWindow++;
-                                    //Transaction Activity for PDFReportClick
-                                    // var labelArr = [];
-                                    // var infoArr = [];
-                                    // labelArr.push(txnHistory.codesDict['PDFReportClick']);
-                                    // txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
-                                    e.stopImmediatePropagation();
-                                }
-                            },
-                            function(error) {
-                                unblockUI();
-                                $rootScope.resetSession.end();
-                                console.log("Error in service renderReport_ICE" + error);
-                            });
-                    }
-                },
-                function(error) {
-                    console.log("Error in service renderReport_ICE " + error);
-                });
-    }
-    //Export To JSON
-    //Service call to get start and end details of suites
-    /************ EXPORT JSON CLICK *****************/
-
-    function exportJSONReport(response) {
-        filename = response.overallstatus[0].scenarioName + ".json";
-        var responseData = JSON.stringify(response, undefined, 2);
-        var objAgent = $window.navigator.userAgent;
-        var objbrowserName = navigator.appName;
-        var objfullVersion = '' + parseFloat(navigator.appVersion);
-        var objBrMajorVersion = parseInt(navigator.appVersion, 10);
-        var objOffsetName, objOffsetVersion, ix;
-        // In Chrome
-        if ((objOffsetVersion = objAgent.indexOf("Chrome")) != -1) {
-            objbrowserName = "Chrome";
-            objfullVersion = objAgent.substring(objOffsetVersion + 7);
-        }
-        // In Microsoft internet explorer
-        else if ((objOffsetVersion = objAgent.indexOf("MSIE")) != -1) {
-            objbrowserName = "Microsoft Internet Explorer";
-            objfullVersion = objAgent.substring(objOffsetVersion + 5);
-        }
-        // In Firefox
-        else if ((objOffsetVersion = objAgent.indexOf("Firefox")) != -1) {
-            objbrowserName = "Firefox";
-        }
-        // In Safari
-        else if ((objOffsetVersion = objAgent.indexOf("Safari")) != -1) {
-            objbrowserName = "Safari";
-            objfullVersion = objAgent.substring(objOffsetVersion + 7);
-            if ((objOffsetVersion = objAgent.indexOf("Version")) != -1)
-                objfullVersion = objAgent.substring(objOffsetVersion + 8);
-        }
-        // For other browser "name/version" is at the end of userAgent
-        else if ((objOffsetName = objAgent.lastIndexOf(' ') + 1) < (objOffsetVersion = objAgent.lastIndexOf('/'))) {
-            objbrowserName = objAgent.substring(objOffsetName, objOffsetVersion);
-            objfullVersion = objAgent.substring(objOffsetVersion + 1);
-            if (objbrowserName.toLowerCase() == objbrowserName.toUpperCase()) {
-                objbrowserName = navigator.appName;
-            }
-        }
-        // trimming the fullVersion string at semicolon/space if present
-        if ((ix = objfullVersion.indexOf(";")) != -1) objfullVersion = objfullVersion.substring(0, ix);
-        if ((ix = objfullVersion.indexOf(" ")) != -1) objfullVersion = objfullVersion.substring(0, ix);
-        objBrMajorVersion = parseInt('' + objfullVersion, 10);
-        if (isNaN(objBrMajorVersion)) {
-            objfullVersion = '' + parseFloat(navigator.appVersion);
-            objBrMajorVersion = parseInt(navigator.appVersion, 10);
-        }
-        if (objBrMajorVersion == "9") {
-            if (objbrowserName == "Microsoft Internet Explorer") {
-                window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
-                    type: "text/json;charset=utf-8"
-                }), filename);
-            }
-        } else {
-            var blob = new Blob([responseData], {
-                    type: 'text/json'
-                }),
-                e = document.createEvent('MouseEvents'),
-                a = document.createElement('a');
-            a.download = filename;
-            if (objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape") {
-                window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
-                    type: "text/json;charset=utf-8"
-                }), filename);
-                //saveAs(blob, filename);
-            } else {
-                a.href = window.URL.createObjectURL(blob);
-                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-                e.initMouseEvent('click', true, true, window,
-                    0, 0, 0, 0, 0, false, false, false, false, 0, null);
-                a.dispatchEvent(e);
-            }
-        }
-        unblockUI();
-    };
 }]);

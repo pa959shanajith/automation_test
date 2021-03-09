@@ -1,12 +1,12 @@
 const redis = require("redis");
 const validator =  require('validator');
 const logger = require("../../logger");
-const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.env.CACHEDB_PORT),"password" : process.env.CACHEDB_AUTH};
+const dbAuthStore = require('./dbAuthStore');
+const redisConfig = {"host": process.env.CACHEDB_IP, "port": parseInt(process.env.CACHEDB_PORT), "password": dbAuthStore.getCachedbAuth()};
 const default_sub = redis.createClient(redisConfig);
 const default_pub = redis.createClient(redisConfig);
 const server_sub = redis.createClient(redisConfig);
-var cache = require('../lib/cache')
-var fs = require('fs');
+var cache = require('./cache').getClient(2);
 var options = require('../config/options');
 var pulse_ICE = {}
 const server_pub = default_pub;
@@ -62,6 +62,18 @@ default_sub.on("message", (channel, message) => {
 
 	case "webscrape":
 		mySocket.emit("webscrape", data.data);
+		break;
+	
+	case "LAUNCH_DESKTOP_iris":
+		mySocket.emit("LAUNCH_DESKTOP", data.data);
+		break;
+	
+	case "LAUNCH_OEBS_iris":
+		mySocket.emit("LAUNCH_OEBS", data.data);
+		break;
+		
+	case "LAUNCH_SAP_iris":
+		mySocket.emit("LAUNCH_SAP", data.data);
 		break;
 
 	case "focus":
@@ -343,8 +355,7 @@ function check_pulse(){
 				server_pub.publish('ICE2_' + ice, dataToExecute);
 			}else{
 				writeStr = time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"]; 
-				logger.info(writeStr)
-				
+				logger.debug(writeStr)
 			}
 		}
 	}

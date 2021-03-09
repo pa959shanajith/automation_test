@@ -1,6 +1,7 @@
 var screenshotObj, scrapedGlobJson, enableScreenShotHighlight, mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, globalSelectedBrowserType, selectedKeywordList, keywordListData, dependentTestCaseFlag = false;
 checkedTestcases = [];
 pasteSelecteStepNo = [];
+var image = new Image();
 var initScraping = {};
 var mirrorObj = {};
 var scrapeTypeObj = {};
@@ -16,7 +17,7 @@ var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = [];
 window.localStorage['selectRowStepNo'] = '';
 window.localStorage['_modified'] = "";
-var getWSTemplateData = {} //Contains Webservice saved data
+// var getWSTemplateData = {} //Contains Webservice saved data
 var appType, projectId, projectDetails, screenName, testCaseName, subTaskType, subTask, draggedEle, getDraggedEle, allTasks;
 var updatedViewString = {};
 var allScreenNames = [];
@@ -584,7 +585,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									openDialog("Import Screen", "Screen Json imported successfully.");
 									// unblockUI()
 									//add popoup for error and saved 
-								}, function (error) {unblockUI() })
+								}, function (error) {
+									unblockUI();
+									openDialog("Import Screen", "Failed to import Json");
+								})
 							
 							var currentElements = $(".ellipsis:visible").length;
 							if (currentElements > 0) {
@@ -1086,15 +1090,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 							if (ob.cord && ob.cord != '') {  //in case of iris object
 								addcusOb = ""
 								ob.hiddentag = "No",
-									tag = "iris;" + ob.objectType,
+									tag = "iris;" + (ob.objectType || "").toLowerCase(),
 									ob.url = "",
-									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
-							}
-							if(ob.hasOwnProperty('editable')){
-								var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
+									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + (ob.objectType || "") + ";" + (ob.objectStatus || "0") + ";"  + ob.tag
+                                //if(ob.hasOwnProperty('editable')){
+                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
+                                //}else{
+                                    //var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    //}
 							}else{
-								var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-							}
+                                if(ob.hasOwnProperty('editable')){
+                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
+                                }else{
+                                    var li = "<li data-id="+objId+" data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                }
+                            }
 							// }									   
 							// }
 							angular.element(innerUL).append(li);
@@ -1221,15 +1231,28 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$scope.showWsdlRequest = function () {
 		$(".wsdlRqstWrap").show();
 		$(".wsdlRspnsWrap").hide();
+		$(".wsdlParamWrap").hide();
 		$("#showWsdlRequest").addClass("wsButtonActive")
+		$("#showWsdlResponse").removeClass("wsButtonActive")
+		$("#showParams").removeClass("wsButtonActive")
+	}
+
+	$scope.showParams = function () {
+		$(".wsdlParamWrap").show();
+		$(".wsdlRspnsWrap").hide();
+		$(".wsdlRqstWrap").hide();
+		$("#showParams").addClass("wsButtonActive")
+		$("#showWsdlRequest").removeClass("wsButtonActive")
 		$("#showWsdlResponse").removeClass("wsButtonActive")
 	}
 
 	$scope.showWsdlResponse = function () {
 		$(".wsdlRspnsWrap").show();
 		$(".wsdlRqstWrap").hide();
+		$(".wsdlParamWrap").hide();
 		$("#showWsdlResponse").addClass("wsButtonActive")
 		$("#showWsdlRequest").removeClass("wsButtonActive")
+		$("#showParams").removeClass("wsButtonActive")
 	}
 
 	$scope.getWSData = function () {
@@ -1264,6 +1287,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("#wsdlOperation").val(data.operations)
 						//Printing Request Data
 						$("#wsdlRequestHeader").val(data.header.split("##").join("\n"));
+						if (data.param) $("#wsdlRequestParam").val(data.param.split("##").join("\n"));
 						if (data.body.indexOf("{") == 0 || data.body.indexOf("[") == 0) {
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
@@ -1299,7 +1323,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$(".saveWS").prop("disabled", true);
 						$("#enbledWS").prop("disabled", false)
 						$(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")
-						$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").prop("disabled", true)
+						$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestParam, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").prop("disabled", true)
 					} else {
 						$(".saveWS").prop("disabled", false);
 						$("#enbledWS").prop("disabled", true)
@@ -1336,6 +1360,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var wsdlMethods = $("#wsdlMethods option:selected").val();
 		var wsdlOperation = $("#wsdlOperation").val();
 		var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+		var wsdlRequestParam = $("#wsdlRequestParam").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"');
 		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		var wsdlResponseHeader = $("#wsdlResponseHeader").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"');
 		var wsdlResponseBody = $("#wsdlResponseBody").val().replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
@@ -1350,17 +1375,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				"responseBody": wsdlResponseBody,
 				"method": wsdlMethods,
 				"endPointURL": endPointURL,
-				"header": wsdlRequestHeader
+				"header": wsdlRequestHeader,
+				"param": wsdlRequestParam
 			};
 			var appType = $scope.getScreenView;
-			getWSTemplateData = JSON.stringify(getWSData)
 			var projectId = tasks.projectId;
 			var screenId = tasks.screenId;
 			var screenName = tasks.screenName;
 			var userinfo = JSON.parse(window.localStorage['_UI']);
 			scrapeObject = {};
 			scrapeObject.param = 'updateScrapeData_ICE';
-			scrapeObject.getScrapeData = getWSTemplateData;
+			scrapeObject.getScrapeData = JSON.stringify(getWSData);
 			scrapeObject.projectId = projectId;
 			scrapeObject.appType = appType;
 			scrapeObject.screenId = screenId;
@@ -1394,7 +1419,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$(document).on("click", "#enbledWS", function () {
 		if ($(this).is(":checked") == true) {
 			$(".saveWS").prop("disabled", false)
-			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
+			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestParam, #wsdlRequestBody").prop("disabled", false)
 			//Additional to enable the web service icon
 			$.each($(this).parents("ul").children("li"), function () {
 				if ($(this).find("a").hasClass("disableActionsWS") == true) {
@@ -1404,13 +1429,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			//Additional to enable the web service icon
 		} else {
 			$(".saveWS").prop("disabled", true)
-			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", true)
+			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestParam, #wsdlRequestBody").prop("disabled", true)
 		}
 	})
 
 	//Init Webservice
 	$scope.initScrapeWS = function (e) {
-		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader, #wsdlOperation, #wsdlRequestBody").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
+		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader, #wsdlRequestParam, #wsdlOperation, #wsdlRequestBody").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
 		var initWSJson = {}
 		var testCaseWS = []
 		var proceed = false;
@@ -1422,6 +1447,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		wsdlInputs.push($("#wsdlMethods").val());
 		wsdlInputs.push($("#wsdlOperation").val());
 		wsdlInputs.push($("#wsdlRequestHeader").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
+		wsdlInputs.push($("#wsdlRequestParam").val().replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
 		wsdlInputs.push($("#wsdlRequestBody").val().replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"'));
 		var cert_data =$("#importCertificate").val();
 		if (cert_data.length!=0){
@@ -1439,20 +1465,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		if (e.currentTarget.className == "disableActionsWS") return false
 		else if (!wsdlInputs[0]) $("#endPointURL").addClass("inputErrorBorderFull")
 		else if (!$scope.wsdlMethods && !wsdlInputs[1]) $("#wsdlMethods").addClass("selectErrorBorder")
-		else if (wsdlInputs[5]){
+		else if (wsdlInputs[6]){
 			auth_cert = true;
 			proceed = true;
 		}
 		else {
-			if (wsdlInputs[1] == "GET" || wsdlInputs[1] == "HEAD" || wsdlInputs[1] == "PUT" || wsdlInputs[1] == "DELETE") {
-				if (wsdlInputs[3]) {
-					if (!wsdlInputs[2]) $("#wsdlOperation").addClass("inputErrorBorderFull")
-					else proceed = true;
-				} else proceed = true;
-			} else if (wsdlInputs[1] == "POST") {
+			if (wsdlInputs[1] == "POST") {
 				if (!wsdlInputs[3]) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
-				else if (!wsdlInputs[4]) $("#wsdlRequestBody").addClass("inputErrorBorderFull")
+				else if (!wsdlInputs[5]) $("#wsdlRequestBody").addClass("inputErrorBorderFull")
 				else proceed = true;
+			}else{
+				proceed = true;
 			}
 		}
 		if (proceed) {
@@ -1460,6 +1483,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody","addClientCertificate","setBasicAuth"]
 			}else{
 				keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"]
+			}
+			if (wsdlInputs[4]){
+				keywordVal.splice(4,0,'setParamValue');
+			}else{
+				wsdlInputs.splice(4,1);
 			}
 			var blockMsg = "Fetching Response Header & Body..."
 			blockUI(blockMsg);
@@ -1586,7 +1614,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	$scope.wsdlAdd = function () {
 		var resutFile='';
 		if (Object.keys(certObj).length!==0) resutFile=certObj;
-		$("#endPointURL, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").val("");
+		$("#endPointURL, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestParam, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").val("");
 		$("#wsdlMethods").prop('selectedIndex', 0);
 		$("#wsldInput").removeClass("inputErrorBorderFull");
 		$("#wsldSelect").removeClass("selectErrorBorder");
@@ -1620,6 +1648,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						$("#wsdlOperation").val(data.operations)
 						//Printing Request Data
 						$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
+						if (data.param) $("#wsdlRequestParam").val(data.param[0].split("##").join("\n"));
 						if (data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0) {
 							var jsonStr = data.body;
 							var jsonObj = JSON.parse(jsonStr);
@@ -2255,20 +2284,26 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									imgTag = "input"
 								} else imgTag = tag;
 
+								var irisFlg = false
 								if (ob.cord && ob.cord != '') {  //in case of iris object
 									addcusOb = ""
 									ob.hiddentag = "No",
-										tag = "iris;" + ob.objectType,
-										ob.url = "",
-										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+									tag = "iris;" + (ob.objectType || "").toLowerCase(),
+									ob.url = "",
+									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ((ob.objectType || "").toLowerCase() || "") + ";" + (ob.objectStatus || "0") + ";"  + ob.tag,
+									irisFlg = true
 								}
 
 								// if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
 								//	 var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 								// } else {
 								// }
-								// }								
-								if (appType == "OEBS" || appType == "Desktop") {
+								// }	
+
+								if (irisFlg){
+									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
+								}							
+								else if (appType == "OEBS" || appType == "Desktop") {
 									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 								}
 								else {
@@ -2346,14 +2381,19 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 									// if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
 									//	 var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									// } else {
+									var irisFlg = false;
 									if (ob.cord && ob.cord != '') {  //in case of iris object
 										addcusOb = ""
 										ob.hiddentag = "No",
-										tag = "iris;" + ob.objectType,
+										tag = "iris;" + (ob.objectType || "").toLowerCase(),
 										ob.url = "",
-										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ((ob.objectType || "").toLowerCase() || "") + ";" + (ob.objectStatus || "0") + ";"  + ob.tag,
+										irisFlg = true
 									}
-									if (appType == "OEBS" || appType == "Desktop") {
+									if (irisFlg){
+										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a><span id='decrypt' href='#' class='userObject'><img src='imgs/ic-jq-editstep.png' style='display:none'></span></li>";
+									}
+									else if (appType == "OEBS" || appType == "Desktop") {
 										var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 									}
 									else {
@@ -2405,17 +2445,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 								} else imgTag = tag;
 								// if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
 								//	 var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-								// } else {
+								// } 
+								var irisFlg = false;
 								if (ob.cord && ob.cord != '') {  //in case of iris object
 									addcusOb = ""
 									ob.hiddentag = "No",
-										tag = "iris;" + ob.objectType,
-										ob.url = "",
-										ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ob.tag
+									tag = "iris;" + (ob.objectType || "").toLowerCase(),
+									ob.url = "",
+									ob.xpath = "iris;" + ob.custname + ";" + ob.left + ";" + ob.top + ";" + (ob.width + ob.left) + ";" + (ob.height + ob.top) + ";" + ((ob.objectType || "").toLowerCase() || "") + ";" + (ob.objectStatus || "0") + ";"  + ob.tag,
+									irisFlg = true
 								}
-								// }
-								// }
-								if (appType == "OEBS" || appType == "Desktop") {
+								if (irisFlg){
+									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-image=" + ob.cord.substring(2,ob.cord.length-1) + " data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+								}
+								else if (appType == "OEBS" || appType == "Desktop") {
 									var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/[\'\"]/g, "\"") + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
 								}
 								else {
@@ -2492,28 +2535,28 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 	}
 	
-	$(document).on("click", ".ellipsis", function(e) {
-		if(this.clicks === undefined) this.clicks=0;
-		this.clicks++;
-		setTimeout(function(){
-			var clicks = e.target.clicks;
-			e.target.clicks = 0;
-			if(clicks != 1) return false;
-			if(!e.target.parentNode.parentNode.attributes['data-tag'].value.startsWith('iris')) return false;
-			obj_xpath = e.target.parentNode.parentNode.attributes['data-xpath'].value;
-			objType = '';
-			for(var i=0;i<viewString.view.length;i++){
-				if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType != ''){
-					objType = viewString.view[i].objectType[0].toUpperCase() + viewString.view[i].objectType.slice(1,viewString.view[i].objectType.length);
-					break;
-				}  
-			}
-			$("#dialog-irisObject").modal("show");
-			$("#addIrisObjContainer").empty()
-			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
-			$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option><option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
-		}, 500);
-	});
+	// $(document).on("click", ".ellipsis", function(e) {
+	// 	if(this.clicks === undefined) this.clicks=0;
+	// 	this.clicks++;
+	// 	setTimeout(function(){
+	// 		var clicks = e.target.clicks;
+	// 		e.target.clicks = 0;
+	// 		if(clicks != 1) return false;
+	// 		if(!e.target.parentNode.parentNode.attributes['data-tag'].value.startsWith('iris')) return false;
+	// 		obj_xpath = e.target.parentNode.parentNode.attributes['data-xpath'].value;
+	// 		objType = '';
+	// 		for(var i=0;i<viewString.view.length;i++){
+	// 			if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType != ''){
+	// 				objType = viewString.view[i].objectType[0].toUpperCase() + viewString.view[i].objectType.slice(1,viewString.view[i].objectType.length);
+	// 				break;
+	// 			}  
+	// 		}
+	// 		$("#dialog-irisObject").modal("show");
+	// 		$("#addIrisObjContainer").empty()
+	// 		if ($(".addObj-row").length > 1) $(".addObj-row").remove()
+	// 		$("#addIrisObjContainer").append('<div class = "row row-modal addObj-row"><div class = "form-group"><span><strong>Object Detected as:	'+objType+'</strong></span></div><br><br><span style="float:left"><strong>User input: </strong></span><div class = "form-group form-group-2" style="float:left; margin-left:10px;"><select class = "form-control form-control-custom" id="objectType"><option selected disabled > Select Object Type </option><option value = "textbox" > Textbox / Textarea </option><option value = "table" > Table </option><option value = "dropdown" > Dropdown </option><option value = "button" > Button </option><option value = "radiobutton" > Radiobutton </option><option value = "checkbox" > Checkbox </option><option value = "others" > Others </option></select></div> </div>');
+	// 	}, 500);
+	// });
 	
 	$scope.submitIrisObjectType = function (e) {
 		var obj_cord = '';
@@ -2521,6 +2564,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		var task = JSON.parse(window.localStorage['_CT']);
 		var identified_obj_type = objType.toLowerCase();
 		var user_obj_type = $('#objectType').val();
+		var app_type = 'saveirisimage_'+task.appType;
 		if(user_obj_type!=null && user_obj_type != identified_obj_type){
 			for(var i=0;i<viewString.view.length;i++){
 				if(viewString.view[i].xpath == obj_xpath){
@@ -2534,20 +2578,33 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			DesignServices.updateIrisDataset(data)
 				.then(function (val) {
 					$("#dialog-irisObject").find("button.close").click();
-					if(val=='unavailableLocalServer')  openDialog("Iris Object Type", $rootScope.unavailableLocalServer_msg);
-					else if(val=='unsavedObject') openDialog("Iris Object Type","Please save the object first.");
-					else{
-						if(val){
-							openDialog("Iris Object Type","Submitted Successfully.");
-							for(var i=0;i<viewString.view.length;i++){
-								if(viewString.view[i].xpath == obj_xpath){
-									viewString.view[i].objectType = user_obj_type;
-									break;
-								}
+					if(val === 'success'){
+						for(var i=0;i<viewString.view.length;i++){
+							if(viewString.view[i].xpath == obj_xpath){
+								viewString.view[i].objectType = user_obj_type;
+								break;
 							}
 						}
-						else
-							openDialog("Iris Object Type","Failed.");
+						var custObjProps=[app_type, obj_cord, user_obj_type, obj_id];
+						DesignServices.userObjectElement_ICE(custObjProps)
+							.then(function (datairis) {
+								if (datairis == "unavailableLocalServer") {
+									openDialog("IRIS Object Details", "Submitted successfully but failed to save IRIS image, ICE not available.")
+								} else if (datairis == "Invalid Session") {
+									return $rootScope.redirectPage();
+								} else if (datairis == "fail" && user_obj_type == "unrecognizableobject") {
+									openDialog("IRIS Object Details", "Submitted successfully.")
+								} else if (datairis == "fail") {
+									openDialog("IRIS Object Details", "Submitted successfully but failed to save IRIS image.")
+								} else{
+									openDialog("IRIS Object Details","Submitted Successfully. IRIS image saved.");
+									console.log("success!::::" + datairis);
+								}
+						}, function (error) { });
+					}
+					else if(val=='unsavedObject') openDialog("IRIS Object Details","Please save the object first.");
+					else{
+						openDialog("IRIS Object Details","Failed to updated IRIS Object Details.");
 					}
 				}, function (error) {
 					
@@ -2555,7 +2612,49 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}
 		else{
 			$("#dialog-irisObject").find("button.close").click();
-			openDialog("Iris Object Type","Submitted Successfully.");
+			success_flag = true;
+			for(var i=0;i<viewString.view.length;i++){
+				if(viewString.view[i].xpath == obj_xpath){
+					obj_cord = viewString.view[i].cord;
+					if("_id" in viewString.view[i]){obj_id = viewString.view[i]._id;}
+					break;
+				}
+			}
+			var data = {"_id":obj_id,"cord":obj_cord,"type":user_obj_type,"projectid":task.projectId,"screenid":task.screenId,
+			"screenname":task.screenName,"versionnumber":task.versionnumber,"xpath":obj_xpath};
+			DesignServices.updateIrisDataset(data)
+				.then(function (val) {
+					$("#dialog-irisObject").find("button.close").click();
+					if(val === 'success'){
+						for(var i=0;i<viewString.view.length;i++){
+							if(viewString.view[i].xpath == obj_xpath){
+								viewString.view[i].objectType = user_obj_type;
+								break;
+							}
+						}
+						var custObjProps=[app_type, obj_cord, user_obj_type, obj_id];
+						DesignServices.userObjectElement_ICE(custObjProps)
+							.then(function (datairis) {
+								if (datairis == "unavailableLocalServer") {
+									openDialog("IRIS Object Details", "Submitted successfully but failed to save IRIS image, ICE not available.")
+								} else if (datairis == "Invalid Session") {
+									return $rootScope.redirectPage();
+								} else if (datairis == "fail" && user_obj_type == "unrecognizableobject") {
+									openDialog("IRIS Object Details", "Submitted successfully.")
+								} else if (datairis == "fail") {
+									openDialog("IRIS Object Details", "Submitted successfully but failed to save IRIS image.")
+								} else{
+									openDialog("IRIS Object Details","Submitted Successfully. IRIS image saved.");
+									console.log("success!::::" + datairis);
+									obj=JSON.stringify(datairis)
+								}
+						}, function (error) { });
+					} else if(val=='unsavedObject') openDialog("IRIS Object Details","Please save the object first.");
+					else{
+						openDialog("IRIS Object Details","Failed to updated IRIS Object Details.");
+					}
+				}, function (error) {
+			});
 		}
 	}
 	
@@ -2606,14 +2705,60 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			});
 	}
 	//Edit Objects
-	$(document).on('click', '#editObjects', function () {
+	$(document).on('click', '#editObjects', function (e) {
 		ele=$("input[type=checkbox].checkall:checked:visible").parents('li.item.select_all')
 		$('.errorMessage').val('');
-			custObjProps=[]
-			custObjProps.push('decrypt')
-			custObjProps.push(ele.attr('data-xpath'))
-			custObjProps.push(ele.attr('data-url'))
-			custObjProps.push(ele.attr('data-tag'))
+		if(ele[0].attributes["data-xpath"].value.startsWith('iris')){
+			obj_xpath = ele[0].attributes['data-xpath'].value;
+			obj_tag = obj_xpath.split(";").pop();
+			obj_height = ele[0].attributes['data-height'].value;
+			obj_width = ele[0].attributes['data-width'].value;
+			objType = '';
+			for(var i=0;i<viewString.view.length;i++){
+				if(obj_xpath == viewString.view[i].xpath && viewString.view[i].objectType ){
+					objType = viewString.view[i].objectType[0].toUpperCase() + viewString.view[i].objectType.slice(1,viewString.view[i].objectType.length);
+					if (objType == "Unable to recognize object type") objType = "unrecognizableobject";
+					break;
+				}else if(obj_xpath == viewString.view[i].xpath && !viewString.view[i].objectType ){
+					objType = "unrecognizableobject";
+					break;
+				}
+			}
+			if (objType == ''){
+				objType = ele[0].attributes['data-tag'].value.split(';')[1];
+				if (objType == "Unable to recognize object type") objType = "unrecognizableobject";
+			}
+			img = ele[0].attributes["data-image"].value
+			image.src = 'data:image/png;base64,'+img;
+			$("#dialog-irisObject").modal("show");
+			$("#addIrisObjContainer").empty()
+			if ($(".addObj-row").length > 1) $(".addObj-row").remove()
+			$("#addIrisObjContainer").append('<div class="row row-modal addObj-row"><span style="float:left"><strong>Object Type:</strong></span><div class="form-group form-group-2" style="float:left;margin-left:10px"><select class="form-control form-control-custom" id="objectType"><option selected disabled>Select Object Type</option><option value="button">Button</option><option value="checkbox">Checkbox</option><option value="radiobutton">Radiobutton</option><option value="textbox">Textbox</option><option value="label">Label</option><option value="tree">Tree</option><option value="table">Table</option><option value="dropdown">Dropdown</option><option value="image">Image</option><option value="vscroll">Vertical-scroll</option><option value="hscroll">Horizontal-scroll</option><option value="unrecognizableobject">Others</option></select></div><span style="float:right;margin-right: 100px;"><strong>Object Image</strong></span><div class="irisimg" id="irisimg" style="float:right;margin-right:20px;width:210px;height:120px;justify-content: center;align-items: center;display: flex;margin-top: 20px;"></div><br><br><br><div class="iristag" id="iristag"></div></div>');
+			$('#objectType').val(objType.toLowerCase())
+			$('#irisimg').append(image)
+			if (obj_width < 0) obj_width= obj_width *-1
+			if (obj_height < 0) obj_height = obj_height *-1
+			if (obj_width > 200 ){ 
+				if(obj_width > 200 || obj_height > 130){
+					$('#irisimg').find('img').attr('style',"width: 200px;")
+				} else{
+					var wd = obj_width + "px;"
+                	$('#irisimg').find('img').attr('style',"width:"+wd)
+				}
+			} else if ( obj_height > 130){ 
+				if(obj_width < 200 || obj_height > 130){
+					$('#irisimg').find('img').attr('style',"height: 120px;")
+				} else{
+					var wd = obj_width + "px;"
+                	$('#irisimg').find('img').attr('style',"width:"+wd)
+				}
+			} else{
+                var wd = obj_width + "px;"
+                $('#irisimg').find('img').attr('style',"width:"+wd)
+			}
+			$('#iristag').append('<span><b style="text-transform: capitalize;">Object Tag : ' + obj_tag + '</b></span>')
+		}else{
+			var custObjProps=['decrypt', ele.attr('data-xpath'), ele.attr('data-url'), ele.attr('data-tag')];
 			DesignServices.userObjectElement_ICE(custObjProps)
 			.then(function (data) {
 				if (data == "unavailableLocalServer") {
@@ -2645,6 +2790,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 				}
 				// angular.element(document.getElementById("tableActionButtons")).scope().removeAddObjectSelection();
 			}, function (error) { });
+		}
 	});
 	//Show compared objects
 	$(document).on('click', '#comparedObjects', function () {
@@ -3601,11 +3747,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 		}else if(param=='decrypt'){
 			//$scope.errorMessage = "";
 			$('.errorMessage').val('');
-			custObjProps=[]
-			custObjProps.push('decrypt')
-			custObjProps.push($(e.target.parentElement.parentElement).attr('data-xpath'))
-			custObjProps.push($(e.target.parentElement.parentElement).attr('data-url'))
-			custObjProps.push($(e.target.parentElement.parentElement).attr('data-tag'))
+			var ele = $(e.target.parentElement.parentElement);
+			var custObjProps=['decrypt', ele.attr('data-xpath'), ele.attr('data-url'), ele.attr('data-tag')];
 			DesignServices.userObjectElement_ICE(custObjProps)
 			.then(function (data) {
 				if (data == "unavailableLocalServer") {
@@ -3646,7 +3789,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 	
 	//Save User Object
 	$(document).on("click", ".btn-defaultsave", function () {
-			custObjProps=[];
+			var custObjProps=[];
 			custObjNames=[];
 			var flag="false";
 			custObjProps.push('encrypt');
@@ -4632,7 +4775,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					//enableScreenShotHighlight = false;
 					openDialog("Save Scraped data", "Failed to save");
 				}
-			}, function (error) { })
+			}, function (error) {
+				unblockUI();
+				openDialog("Save Scraped data", "Failed to save");
+			})
 
 		if ($("#window-filter").is(":visible")) {
 			var filters = $(".popupContent-filter .filterObjects");
@@ -4677,6 +4823,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 			$("#deleteObjects").prop("disabled", true)
 		}
 		if (checkedLength == 1 && $('input.checkall.checked').offsetParent().parent().find('#decrypt').length==1) {
+			$("#editObjects").prop("disabled", false)
+		} else if (checkedLength == 1 && $('input.checkall.checked').offsetParent().parent().attr('data-xpath').startsWith('iris')) {
 			$("#editObjects").prop("disabled", false)
 		} else {
 			$("#editObjects").prop("disabled", true)
@@ -6519,16 +6667,34 @@ function contentTable(newTestScriptDataLS) {
 					url = ob.url;
 					var obType = ob.tag;
 					var listType = ob.canselectmultiple;
+					var objNamearray = objName.split(';');
 					if (ob.cord) {
 						selectedKeywordList = 'iris';
 						cord = ob.cord;
-						obType = "iris";
 						url = "";
+						if (objNamearray.length == 9){
+							if ( objNamearray[6] == 'textbox'){
+								obType = 'iristextbox';
+							} else if (objNamearray[6] == 'radiobutton'){
+								obType = 'irisradiocheck';
+							} else if (objNamearray[6] == 'checkbox'){
+								obType = 'irisradiocheck';
+							} else if (objNamearray[6] == 'button'){
+								obType = 'irisbutton';
+							} else if (objNamearray[6] == 'table'){
+								obType = 'iristable';
+							} else if (['dropdown', 'hscroll', 'vscroll', 'label', 'listbox', 'tree', 'image'].indexOf(objNamearray[6]) > -1) {
+								obType = 'irisgeneric';
+							} else {
+								obType = "iris";
+							}
+						} else {
+							obType = "iris";
+						}
 					}
 
-					//changes from wasim
 					if (obType != 'a' && obType != 'select' && obType != 'radiobutton' && obType != 'checkbox' && obType != 'input' && obType != 'list' &&
-						obType != 'tablecell' && obType != 'table' && obType != 'img' && obType != 'button' && obType != 'iris' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb') && !ob.tag.startsWith('@PDF')) {
+						obType != 'tablecell' && obType != 'table' && obType != 'grid' && obType != 'img' && obType != 'button' && obType != 'iris' && obType != 'iristextbox' && obType != 'irisradiocheck' && obType != 'irisbutton' && obType != 'iristable' && obType != 'irisgeneric' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb') && !ob.tag.startsWith('@PDF')) {
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
 						var res = '';
@@ -6630,6 +6796,21 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'iris') {
 							sc = Object.keys(keywordArrayList.iris);
 							selectedKeywordList = "iris";
+						} else if (obType == 'iristextbox') {
+							sc = Object.keys(keywordArrayList.iristextbox);
+							selectedKeywordList = "iristextbox";
+						} else if (obType == 'irisradiocheck') {
+							sc = Object.keys(keywordArrayList.irisradiocheck);
+							selectedKeywordList = "irisradiocheck";
+						} else if (obType == 'iristable') {
+							sc = Object.keys(keywordArrayList.iristable);
+							selectedKeywordList = "iristable";
+						} else if (obType == 'irisbutton') {
+							sc = Object.keys(keywordArrayList.irisbutton);
+							selectedKeywordList = "irisbutton";
+						} else if (obType == 'irisgeneric') {
+							sc = Object.keys(keywordArrayList.irisgeneric);
+							selectedKeywordList = "irisgeneric";
 						} else if (obType == 'table') {
 							sc = Object.keys(keywordArrayList.table);
 							selectedKeywordList = "table";
@@ -6750,6 +6931,21 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'iris') {
 							sc = Object.keys(keywordArrayList.iris);
 							selectedKeywordList = "iris";
+						} else if (obType == 'iristextbox') {
+							sc = Object.keys(keywordArrayList.iristextbox);
+							selectedKeywordList = "iristextbox";
+						} else if (obType == 'irisradiocheck') {
+							sc = Object.keys(keywordArrayList.irisradiocheck);
+							selectedKeywordList = "irisradiocheck";
+						} else if (obType == 'iristable') {
+							sc = Object.keys(keywordArrayList.iristable);
+							selectedKeywordList = "iristable";
+						} else if (obType == 'irisbutton') {
+							sc = Object.keys(keywordArrayList.irisbutton);
+							selectedKeywordList = "irisbutton";
+						} else if (obType == 'irisgeneric') {
+							sc = Object.keys(keywordArrayList.irisgeneric);
+							selectedKeywordList = "irisgeneric";
 						} else {
 							sc = Object.keys(keywordArrayList.element);
 							selectedKeywordList = "element";
@@ -6909,6 +7105,21 @@ function contentTable(newTestScriptDataLS) {
 						} else if (obType == 'iris') {
 							sc = Object.keys(keywordArrayList.iris);
 							selectedKeywordList = "iris";
+						} else if (obType == 'iristextbox') {
+							sc = Object.keys(keywordArrayList.iristextbox);
+							selectedKeywordList = "iristextbox";
+						} else if (obType == 'irisradiocheck') {
+							sc = Object.keys(keywordArrayList.irisradiocheck);
+							selectedKeywordList = "irisradiocheck";
+						} else if (obType == 'iristable') {
+							sc = Object.keys(keywordArrayList.iristable);
+							selectedKeywordList = "iristable";
+						} else if (obType == 'irisbutton') {
+							sc = Object.keys(keywordArrayList.irisbutton);
+							selectedKeywordList = "irisbutton";
+						} else if (obType == 'irisgeneric') {
+							sc = Object.keys(keywordArrayList.irisgeneric);
+							selectedKeywordList = "irisgeneric";
 						} else {
 							sc = Object.keys(keywordArrayList.element);
 							selectedKeywordList = "element";

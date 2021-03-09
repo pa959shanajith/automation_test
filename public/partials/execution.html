@@ -255,6 +255,26 @@
 </div>
 <!-- Submitting Task -->
 
+<!-- Submitting Task -->
+<div class="modal fade" id="proceedExecution" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">ICE Busy</h4>
+			</div>
+			<div class="modal-body">
+				<p>Selected ICE is already executing a Test Suite. Press Proceed to queue this execution on selected ICE, press No to select any other ICE.</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-default-yes" ng-click="ExecuteOnclick()"  data-dismiss="modal">Proceed</button>
+				<button type="button" class="btn btn-default" ng-click="allocateICEPopup()"  data-dismiss="modal">No</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Submitting Task -->
+
 <!-- Submitting Task Success -->
 <div class="modal fade" id="globalTaskSubmit" role="dialog" data-keyboard="false" data-backdrop="static">
 	<div class="modal-dialog modal-sm">
@@ -439,13 +459,13 @@
 				<!-- Top -->
 				<div class="textFieldsContainer">
 					<p>
-						<input type="text" class="form-control form-control-custom" placeholder="Enter Zephyr Account ID" ng-model="ZephyrAccId" id="ZephyrAccId" />
+						<input type="text" class="form-control form-control-custom" placeholder="Enter Zephyr URL (Ex. http(s)://SERVER[:PORT])" ng-model="zephyrURL" id="zephyrURL" />
 					</p>
 					<p class="halfWrap" style="margin-right: 3%">
-						<input type="text" class="form-control form-control-custom" placeholder="Enter Access Key" ng-model="ZephyrAccKey" id="ZephyrAccKey" />
+						<input type="text" class="form-control form-control-custom" placeholder="Enter Zephyr Username" ng-model="zephyrUserName" id="zephyrUserName" />
 					</p>
 					<p class="halfWrap">
-						<input type="password" class="form-control form-control-custom" placeholder="Enter Secret Key" ng-model="ZephyrSecKey" id="ZephyrSecKey" />
+						<input type="password" class="form-control form-control-custom" placeholder="Enter Zephyr Password" ng-model="zephyrPassword" id="zephyrPassword" />
 					</p>
 					<p align="right">
 						<span class="error-msg-exeQc"></span>
@@ -524,7 +544,7 @@
 			</div>
 			<div class='adminControl'>
 				<div>
-					<span class="leftControl" title="Token Name">Execute on ICE</span>
+					<span id='iceDrop' class="leftControl" title="Execute on ICE">Execute on ICE</span>
 					<div>
 						<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-click='availableICEFilter.icename="";selectedICE=false' ng-model="availableICEFilter.icename" placeholder="{{'Search ICE to execute'}}">
 						<ul id='ice-dropdown' class="dropdown-menu dropdown-menu-users "  aria-labelledby="userIdName">
@@ -564,7 +584,7 @@
 			</div>
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-default btn-default-modal" ng-click="ExecuteOnclick($event)">Execute</button>
+			<button type="button" class="btn btn-default btn-default-modal" ng-click="CheckStatusAndExecute($event)">Execute</button>
 		  </div>
 	   </div>
 	</div>

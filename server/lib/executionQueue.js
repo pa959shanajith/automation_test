@@ -1,7 +1,7 @@
-const utils = require('../lib/utils');
+const utils = require('./utils');
 const suite = require('../controllers/suite')
 const redisServer = require('./redisSocketHandler');
-const cache = require("./cache")
+const cache = require("./cache").getClient(2);
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var logger = require('../../logger');
@@ -15,6 +15,7 @@ const SOCK_SCHD_MSG = "ICE is connected in Scheduling mode";
 const SOCK_NA_MSG = "ICE is not Available";
 const DO_NOT_PROCESS = "do_not_process_response";
 const EMPTYUSER = process.env.nulluser;
+
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -186,6 +187,11 @@ module.exports.Execution_Queue = class Execution_Queue {
                         response["message"] = "Can't establish connection with ICE: " + targetICE + " Re-Connect to server!";
                         return response;
                     }
+                    if(this.ice_list[targetICE]['status']){
+                        response["status"] = "pass";
+                        response["message"] = "Execution or Termination already in progress on ICE: " + targetICE;
+                        return response;
+                    }
                     if ((this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser) || !this.ice_list[targetICE]["mode"]) {
                         if (type == "ACTIVE") {
                             this.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
@@ -235,11 +241,10 @@ module.exports.Execution_Queue = class Execution_Queue {
             }
             // Check if request came from Azure DevOps. If yes, then send the acknowledgement
             if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
-                res.send("Request Recieved");
+                return res.send("Request Recieved");
             }
             if (!multiBatchExecutionData || multiBatchExecutionData.constructor !== Array || multiBatchExecutionData.length === 0) {
-                res.send({"error":"Empty or Invalid Batch Data"});
-                return;
+                return res.send({"error":"Empty or Invalid Batch Data"});
             }
             let suiteRequest = {"executionData":testSuiteRequest.body.executionData,"headers":testSuiteRequest.headers}
             let userInfo = testSuiteRequest.body.executionData[0].userInfo;
@@ -264,17 +269,17 @@ module.exports.Execution_Queue = class Execution_Queue {
                 testSuite['res'] = res; 
             } else if(this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]){
                     const sockmode = await utils.channelStatus(targetICE);
-                    if((!sockmode.normal && !sockmode.schedule)) res.send({"error":"Can't establish connection with ICE Re-Connect to server!"})
+                    if((!sockmode.normal && !sockmode.schedule)) return res.send({"error":"Can't establish connection with ICE Re-Connect to server!"})
                     testSuite['res'] = res;
                     this.executeAPI(testSuite);
             } else if(targetICE === EMPTYUSER && (!poolid || poolid === "")){
-                res.send({"error":"ICE name and Pool Id not provided."})
+                return res.send({"error":"ICE name and Pool Id not provided."})
             } else{
-                res.send({"error":targetICE + " not connected to server!"})
+                return res.send({"error":targetICE + " not connected to server!"})
             }
         } catch (e) {
-            res.send({"error":"Error while adding test suite to queue"});
             logger.error("Error in addAPITestSuiteToQueue. Error: %s", e);
+            return res.send({"error":"Error while adding test suite to queue"});
         }
         return;
     }
@@ -362,7 +367,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                     logger.debug("Removing Test Suite from queue");
                     cache.set("execution_queue", this.queue_list);
                 } catch (e) {
-                    logger.error("Error in triggerExecution. Error: %s", e);
+                    logger.error("Error in triggerExecution.");
+                    logger.debug("Error in triggerExecution. Error: %s", e);
                 }
                 break;
             }
@@ -522,7 +528,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 msg = "Scenario execution failed due to an error encountered during execution";
             }
             const tsuIds = batchExecutionData.batchInfo.map(u => u.testsuiteId);
-            const currExecIds = await generateExecutionIds(execIds, tsuIds, userInfo.userid);
+            const currExecIds = await suite.generateExecutionIds(execIds, tsuIds, userInfo.userid);
             if (currExecIds != "fail") {
                 const batchObj = {
                     "executionIds": tsuIds.map(i => currExecIds.execids[i]),
@@ -633,12 +639,10 @@ module.exports.Execution_Queue = class Execution_Queue {
         const res = testSuite['res'];
         if(!res){
             logger.error("Error while sending response in executeAPI, response object undefined");
-            return
-        }        
-        if (!reqFromADO){
-            res.send(finalResult);
             return;
-        } 
+        } else if (!reqFromADO){
+            return res.send(finalResult);
+        }
         // This code only executes when request comes from Azure DevOps
         let adoStatus = finalResult.executionStatus.every(e => e.status == "success");
         const args = {
@@ -668,7 +672,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         }));
         try { return await promiseData; }
         catch (e) { logger.error(e); }
-
     }
     /** 
     * @param {string} ice_name

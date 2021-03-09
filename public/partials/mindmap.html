@@ -54,9 +54,9 @@
             <label>Import from Excel</label>
             <input id="file-input" on-read-file="getSheetName($fileContent)" type="file" name="xlsfile" accept=".xls,.xlsx" required="" autofocus="" style="display:none"/>
          </div>
-         <div ng-click="importMindmap($event)" title="Import Mindmap">
+         <div title="Import Mindmap">
                <input style="visibility: hidden;display: none" type="file" id="importMindmapFile" accept=".json,.mm">
-               <img alt="Import from JSON" class="" src="imgs/ic-importfromexcel-mindmap.png">
+               <img ng-click="importMindmap($event)" alt="Import from JSON" class="" src="imgs/ic-importfromexcel-mindmap.png">
                <label>Update Mindmap</label>
          </div>
       </div>
@@ -266,8 +266,9 @@
                 <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
                 <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
                     <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{node.img_src}} style="opacity:{{node.opacity}};" ng-click="nodeUniversalClick(id)"></image>
-                    <image ng-if="node.task == true && node.status != 'complete'" class="ct-nodeTask" width="21px" height="21px" xlink:href="imgs/node-task-assigned.png" style="opacity:{{node.taskOpacity}}" x="29" y="-10"></image>                    
-                    <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
+                    <image ng-if="node.type=='scenarios' && node.ac != 'Disable'" class="ct-nodeTask" width="21px" height="21px" xlink:href="imgs/ic-accessibility-enabled.png" style="opacity:{{node.taskOpacity}}" x="-14" y="-10"></image>
+                    <image ng-if="node.task == true && node.status != 'complete'" class="ct-nodeTask" width="21px" height="21px" xlink:href="imgs/ic-functional-enabled.png" style="opacity:{{node.taskOpacity}}" x="29" y="-10"></image>                    
+                    <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="53">{{node.name}}</text>
                     <title>{{node.title}}</title>
                     <circle ng-if="(node.type=='scenarios' && modType == 'generic') || node.type=='screens' || node.type=='modules' || node.type=='modules_endtoend'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4" ng-click="toggleNode(id)"></circle>
                     <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='testcases'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="-3" cy="20" r="4" ></circle>    

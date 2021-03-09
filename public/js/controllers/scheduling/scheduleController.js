@@ -35,7 +35,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 
 	//update scheduled table every 60 seconds
 	$interval(getScheduledDetailsInterval, 60000);
-
+	$(document).on('click',".dropdown-menu",function(e){e.stopPropagation()})
 	$scope.readTestSuite_ICE = function () {
 		ScheduleService.readTestSuite_ICE(readTestSuite, "schedule")
 			.then(function (result) {
@@ -49,19 +49,21 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					var eachData = Object.keys(data).map(function (itm) { return data[itm]; });
 					for (i = 0; i < dataLen; i++) {
 						$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/>'
-							+ '<span class="scheduleSuiteName" data-testsuiteid="' + eachData[i].testsuiteid + '" data-moduleid="' + eachData[i].moduleid + '" data-versionnumber="' + eachData[i].versionnumber + '">' + eachData[i].testsuitename + '</span>'
-							+ '<span style="display:none" class="ipContainer"><select id="mod' + i + '" onchange="openPopup(id)"" class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
-							+ '<span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span>'
-							+ '<span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" class="cursor:not-allowed" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
-							+ '<table class="scenarioSchdCon scenarioSch_' + i + '"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead>'
-							+ '<tbody class="scenarioBody scenarioTbCon_' + i + '"></tbody></table>');
+						+ '<span class="scheduleSuiteName" data-testsuiteid="' + eachData[i].testsuiteid + '" data-moduleid="' + eachData[i].moduleid + '" data-versionnumber="' + eachData[i].versionnumber + '">' + eachData[i].testsuitename + '</span>'
+						+ '<span style="display:none" class="ipContainer"><select id="mod' + i + '" onchange="openPopup(id)"" class="form-control ipformating"><option selected disabled>Select User</option></select></span>'
+						+ '<span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span>'
+						+ '<span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" class="cursor:not-allowed" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
+						+ '<table class="scenarioSchdCon scenarioSch_' + i + '"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td style="width:12%;">Project Name</td></tr></thead>'
+						+ '<tbody class="scenarioBody scenarioTbCon_' + i + '"></tbody></table>');
+				
 						for (j = 0; j < eachData[i].scenarioids.length; j++) {
 							const flag = eachData[i].condition[j] == 0;
-							$(document).find(".scenarioTbCon_" + i + "").append('<tr><td><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
-								+ '<td data-scenarioid="' + eachData[i].scenarioids[j] + '">' + eachData[i].scenarionames[j] + '</td>'
-								+ '<td style="padding: 2px 0 2px 0;"><input type="text" value="' + eachData[i].dataparam[j] + '" disabled/></td>'
-								+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
-								+ '<td>' + eachData[i].projectnames[j] + '</td></tr>');
+							$(document).find(".scenarioTbCon_" + i + "").append('<tr><td class = "tabeleCellPadding"><span>' + (j + 1) + '</span><input type="checkbox" class="selectToSched"/></td>'
+							+ '<td data-scenarioid="' + eachData[i].scenarioids[j] + '">' + eachData[i].scenarionames[j] + '</td>'
+							+ '<td style="padding: 2px 0 2px 0;"><input type="text" value="' + eachData[i].dataparam[j] + '" disabled/></td>'
+							+ '<td><select disabled><option value="1" ' + ((flag) ? '' : 'selected') + '>True</option><option value="0" ' + ((flag) ? 'selected' : '') + '>False</option></select></td>'
+							+ '<td>' + eachData[i].projectnames[j] + '</td>'
+							+ '</tr>');
 						}
 						$(".ipformating").empty();
 						// $(".ipformating").append("<option value=' ' selected disabled>Select User</option>")			
@@ -293,6 +295,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 		}else{
 			$scope.selectedICE = ice
 			$('#userIdName').removeClass('error-border')
+			$('#iceDrop').click()
 		}
 	}
 
@@ -390,7 +393,9 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 		ice.sort((a,b) => a.icename.localeCompare(b.icename))
 		$scope.availableICE = ice
 	}
-
+	$scope.integration = {alm: {url:"",username:"",password:""}, 
+	qtest: {url:"",username:"",password:"",qteststeps:""}, 
+	zephyr: {url:"",username:"",password:""}};
 	//Add to list and schedule
 	$scope.initSchedule = function ($event) {
 		if (smartBatch) {
@@ -444,11 +449,13 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 					if (doNotSchedule) return false;
 					$(this).find(".scenarioSchdCon tbody tr").each(function () {
 						if ($(this).find(".selectToSched").is(":checked")) {
+							let accessibilityParameters = []
 							selectedScenarioData.push({
 								condition: parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
 								dataparam: [$(this).children("td:nth-child(3)").find("input").val().trim()],
 								scenarioId: $(this).children("td:nth-child(2)").data("scenarioid"),
 								scenarioName: $(this).children("td:nth-child(2)").text(),
+								accessibilityParameters: accessibilityParameters
 							});
 						}
 					});
@@ -485,6 +492,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 				exectionMode: execAction,
 				browserType: browserTypeExe,
 				qccredentials: { "qcurl": "", "qcusername": "", "qcpassword": "" },
+				integration: $scope.integration,
 				batchInfo: moduleInfo
 			};
 			$('#userIdName').val("")
@@ -497,7 +505,7 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 		$scope.selectedPool = $('#chooseICEPool').val() 
 		if($('#chooseICEPool').val() == 'unallocated')$scope.selectedPool = "";
 		if(!smartBatch && !$scope.selectedICE){
-			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0){
+			if($('#userIdName').val() == "" && $scope.availableICE && $scope.availableICE.length>0 && $scope.selectedPool != ""){
 				$scope.selectedICE = ""
 			}else{
 				$('#userIdName').addClass('error-border')

@@ -1,5 +1,6 @@
 const uiConfig = require('./../config/options');
 const screenShotPath = uiConfig.screenShotPath;
+const objectPredictionPath = uiConfig.objectPredictionPath;
 const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 const pingTimer = uiConfig.pingTimer;
 const eula = uiConfig.showEULA;
@@ -25,7 +26,7 @@ var logger = require('../../logger');
 var redisServer = require('./redisSocketHandler');
 var utils = require('./utils');
 var notificationMsg = require('./../notifications').broadcast;
-const cache = require("./cache")
+const cache = require("./cache").getClient(2);
 
 io.on('connection', async socket => {
 	logger.info("Inside Socket connection");
@@ -85,7 +86,7 @@ io.on('connection', async socket => {
 					if(!userICEMap[result.username].includes(icename)) userICEMap[result.username].push(icename);
 					setTimeout(()=> {
 						socket.send('connected', result.ice_check);
-						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes,pingTimer);
+						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes,pingTimer,objectPredictionPath);
 					}, 300);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);

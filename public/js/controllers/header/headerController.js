@@ -159,7 +159,12 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			}, 300);
 		} else if(data == "Completed"){
 			openHeaderModalPopup("executeGlobalModal","Scheduled Execution Complete", msg);
-		}else openHeaderModalPopup("executeGlobalModal","Execute Test Suite", "Failed to execute.");
+		} else if(data == 'accessibilityTestingSuccess') {
+			openHeaderModalPopup("executeGlobalModal","Accessibility Testing ", msg + ": Accessibility Testing completed Successfully.");
+		} else if(data == 'accessibilityTestingTerminate'){
+			openHeaderModalPopup("executeGlobalModal","Accessibility Testing ", "Accessibility Testing Terminated.");
+		}
+		else openHeaderModalPopup("executeGlobalModal","Execute Test Suite", "Failed to execute.");
 	});
 
 	
@@ -351,13 +356,15 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				} else if(data == "success") {
 					$("#resetPassPopup").modal("hide");
 					openHeaderModalPopup("resetSuccessPopup");
-				} else if(data == "same"){
-					$(".ic-newpassword").parent().addClass("input-border-error");
-					$(".ic-confpassword").parent().addClass("input-border-error");
-					$scope.passwordValidation = "Sorry! You can't use the existing password again";
 				} else if(data == "incorrect") {
 					$(".ic-currpassword").parent().addClass("input-border-error");
 					$scope.passwordValidation = "Current Password is incorrect";
+				} else if(data == "reusedPass" || data == "insuff" || data == "same") {
+					$(".ic-newpassword").parent().addClass("input-border-error");
+					$(".ic-confpassword").parent().addClass("input-border-error");
+					if (data == "same") $scope.passwordValidation = "New Password provided is same as old password";
+					else if (data == "insuff") $scope.passwordValidation = "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+					else $scope.passwordValidation = "Password provided does not meet length, complexity or history requirements of application.";
 				} else if(data == "fail") {
 					$scope.passwordValidation = "Failed to Change Password";
 				} else if(/^2[0-4]{10}$/.test(data)) {
@@ -365,7 +372,8 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				}
 			}, function (error) {
 				$(".ic-currpassword").parent().addClass("input-border-error");
-				$scope.passwordValidation = "Failed to Authenticate Current Password.";
+				if(error == "Invalid Session") $scope.passwordValidation = "Invalid Session";
+				else $scope.passwordValidation = "Failed to Authenticate user with Current Password.";
 			});
 		}
 	};

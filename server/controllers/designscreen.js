@@ -253,7 +253,8 @@ exports.userObjectElement_ICE = function (req, res) {
 							selector:req.body.object[7],
 							tagname:req.body.object[8],
 							operation:operation
-						}
+						};
+						dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
 					}
 					else if(operation=='decrypt'){
 						props={
@@ -262,9 +263,49 @@ exports.userObjectElement_ICE = function (req, res) {
 							url:req.body.object[2],
 							tag:req.body.object[3],
 							operation:operation
-						}
+						};
+						dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
 					}
-					dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
+					else if(operation=='saveirisimage_Desktop'){
+						props={
+							action:"update_dataset",
+							cord:req.body.object[1],
+							type:req.body.object[2],
+							id:req.body.object[3],
+							operation:operation
+						};
+						dataToIce = {"emitAction": "LAUNCH_DESKTOP_iris", "username" : icename, "data": props};
+					}
+					else if(operation=='saveirisimage_OEBS'){
+						props={
+							action:"update_dataset",
+							cord:req.body.object[1],
+							type:req.body.object[2],
+							id:req.body.object[3],
+							operation:operation
+						};
+						dataToIce = {"emitAction": "LAUNCH_OEBS_iris", "username" : icename, "data": props};
+					}
+					else if(operation=='saveirisimage_SAP'){
+						props={
+							action:"update_dataset",
+							cord:req.body.object[1],
+							type:req.body.object[2],
+							id:req.body.object[3],
+							operation:operation
+						};
+						dataToIce = {"emitAction": "LAUNCH_SAP_iris", "username" : icename, "data": props};
+					}
+					else if(operation=='saveirisimage_Web'){
+						props={
+							action:"update_dataset",
+							cord:req.body.object[1],
+							type:req.body.object[2],
+							id:req.body.object[3],
+							operation:operation
+						};
+						dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
+					}
 					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 					function userObjectElement_ICE_listener(channel, message) {
 						var data = JSON.parse(message);
@@ -329,76 +370,15 @@ exports.highlightScrapElement_ICE = function (req, res) {
 	}
 };
 
-exports.updateIrisDataset = function updateIrisDataset(req, res) {
+exports.updateIrisDataset = async(req, res) => {
 	try{
 		logger.info("Inside UI service: updateIrisDataset");
-		if (utils.isSessionActive(req)) {
-			var username=req.session.username
-			var icename = undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-			image_data = req.body.data;
-			redisServer.redisSubServer.subscribe('ICE2_' + icename);
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , icename);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
-				if (redisres[1]>0) {
-					logger.info("Sending socket request for updateIrisDataset to cachedb");
-					dataToIce = {"emitAction" : "irisOperations","username" : icename, "image_data":image_data, "param":"updateDataset"};
-					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
-					function updateIrisDataset_listener(channel,message) {
-						var data = JSON.parse(message);
-						if(icename == data.username && ["unavailableLocalServer", "iris_operations_result"].includes(data.onAction)){
-							redisServer.redisSubServer.removeListener('message',updateIrisDataset_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in updateIrisDataset: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[username];
-									soc.emit("ICEnotAvailable");
-								}
-							} else if (data.onAction == "iris_operations_result") {
-								if(data.value==true){
-									var args = {
-										data: image_data,
-										headers: {
-											"Content-Type": "application/json"
-										}
-									};
-									logger.info("Calling DAS Service from updateIrisDataset: design/updateIrisObjectType");
-									client.post(epurl + "design/updateIrisObjectType", args,
-										function (result, response) {
-										try {
-											if (response.statusCode != 200 || result.rows == "fail") res.send(false);
-											else if (result.rows == "unsavedObject") res.send("unsavedObject");
-											else res.send(true);
-										} catch (exception) {
-											logger.error("Exception in the service updateIrisObjectType: %s", exception);
-											res.send(false);
-										}
-									});
-								}
-								else  res.send(data.value);
-							}
-						}
-					}
-					redisServer.redisSubServer.on("message",updateIrisDataset_listener);
-				} else {
-					utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
-						var flag="";
-						if (found) flag = "scheduleModeOn";
-						else {
-							flag = "unavailableLocalServer";
-							logger.info("ICE Socket not Available");
-						}
-						res.send(flag);
-					});
-				}
-			});
-		} else {
-			logger.error("Error occurred in the service updateIrisDataset: Invalid Session");
-			res.send("Invalid Session");
-		}
+		var image_data = req.body.data;
+		const result = await utils.fetchData(image_data, "design/updateIrisObjectType", 'updateIrisDataset');
+		res.send(result)
 	} catch(exception){
 		logger.error("Exception in the service updateIrisDataset: %s", exception);
+		res.send("fail");
 	}
 }
 
@@ -423,16 +403,36 @@ function buildObject(scrapedObjects, modifiedBy, modifiedByrole, screenID, proje
 	}
 }
 
+function parseRequestParam(paramerters){
+	logger.info("Inside the function parseRequest ");
+	var paramsArray=[];
+	try{
+		var params=paramerters.split('##');
+		for (var object of params) {
+			object=object.split("=");
+			var scrapedObjectsWS = {};
+			scrapedObjectsWS.xpath = object[0].trim();
+			scrapedObjectsWS.custname = object[0].trim();
+			scrapedObjectsWS.tag = "elementWS";
+			paramsArray.push(scrapedObjectsWS);
+		}
+	}catch (Exception){
+		logger.info("Exception in the function parseRequest : %s",exception);
+	}	
+	return paramsArray										
+}
+
+
 function parseRequest(readChild) {
 	try {
 		logger.info("Inside the function parseRequest ");
-		if ('name' in readChild) {
+		if (readChild.name) {
 			if (xpath == "") {
 				xpath = "/" + readChild.name;
 					allXpaths.push(xpath);
 				allCustnames.push(readChild.name);
 			}
-			if ('attributes' in readChild) {
+			if (readChild.attributes) {
 				var attrchildren = Object.keys(readChild.attributes);
 				if (attrchildren.length >= 1) {
 					var basexpath = xpath;
@@ -449,7 +449,7 @@ function parseRequest(readChild) {
 					}
 				}
 			}
-			if ('children' in readChild) {
+			if (readChild.children) {
 				if (readChild.children.length >= 1) {
 					var basexpath = xpath;
 					for (var childrenindex = 0; childrenindex < readChild.children.length; childrenindex++) {

@@ -24,16 +24,16 @@ exports.updateTaskstatus_mindmaps = function (req, res) {
 			};
 
 			client.post(epurl+"mindmap/manageTask", args,
-			function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRDAS");
-					res.send("fail");
-				} else {
-					res.send('inprogress');
-				}
+				function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRDAS");
+						res.send("fail");
+					} else {
+						res.send('inprogress');
+					}
 
-			})
-			
+				})
+
 		} catch (error) {
 			logger.error("exception occurred in updateTaskstatus_mindmaps",error);
 		}
@@ -96,22 +96,22 @@ exports.getTaskJson_mindmaps = function (req, res) {
 			};
 
 			client.post(epurl+"plugins/getTasksJSON", args,
-			function (result, response) {
-				try {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in plugins/getModules: getTasksJSON, Error Code : ERRDAS");
-						res.send("fail");
-					} else {
+				function (result, response) {
+					try {
+						if (response.statusCode != 200 || result.rows == "fail") {
+							logger.error("Error occurred in plugins/getModules: getTasksJSON, Error Code : ERRDAS");
+							res.send("fail");
+						} else {
 							taskJSON=next_function(result.rows,prjId);
 							// console.log("came here");
 							res.send(taskJSON);
-					}
+						}
 						// res.send(result.rows);
-					
-				} catch (ex) {
-					logger.error("Exception in the service getTasksJSON: %s", ex);
-				}
-			});
+
+					} catch (ex) {
+						logger.error("Exception in the service getTasksJSON: %s", ex);
+					}
+				});
 
 			// var qlist_query = [{'statement': "MATCH (b{assignedTo:'" + userid + "'})<-[r:FNTT]-(a) with b,collect (a) as set return set,b"}];
 			// neo4jAPI.executeQueries(qlist_query,function(status,result){
@@ -123,15 +123,15 @@ exports.getTaskJson_mindmaps = function (req, res) {
 			// 			"result": result,
 			// 			"prjId": prjId
 			// 		};
-					// next_function(resultobj, function (err, data) {
-					// 	if (err) {
-					// 		logger.error('error occurred in getTaskJson_mindmaps',err);
-					// 		res.send('fail');
-					// 	} else {
-					// 		res.send(data);
-					// 	}
-					// });
-				// }
+			// next_function(resultobj, function (err, data) {
+			// 	if (err) {
+			// 		logger.error('error occurred in getTaskJson_mindmaps',err);
+			// 		res.send('fail');
+			// 	} else {
+			// 		res.send(data);
+			// 	}
+			// });
+			// }
 			// });
 		} catch (error) {
 			logger.error('exception in getTaskJson_mindmaps',error);
@@ -146,6 +146,8 @@ var tasktypes = {
 	'Update': ['TestCase', 'Design', 'Update Testcase'],
 	'UpdateSuite': ['TestSuite', 'Execution', 'Execute'],
 	'Execute': ['TestSuite', 'Execution', 'Execute'],
+	'Execute Scenario with Accessibility': ['TestSuite', 'Execution', 'Execute'],
+	'Execute Scenario Accessibility Only': ['TestSuite', 'Execution', 'Execute'],
 	'Execute Scenario': ['TestSuite', 'Execution', 'Execute'],
 	'Execute Batch': ['TestSuite', 'Execution', 'Execute'],
 	'Scrape': ['Scrape', 'Design', 'Create Screen'],
@@ -161,25 +163,24 @@ var projectTypes = {};
 var screen_tasks=['scrape','append','compare','add','map'];
 
 
-function next_function(resultobj,projectid) 
-{
+function next_function(resultobj,projectid){
 	logger.info("Inside function: next_function ");
 	var result = resultobj;
 	var prjId = projectid.projectId;
 	var appTypes = projectid.appType;
-	var projectTypes=projectid.projecttypes;
-	var cycles=projectid.cycles;
+	var projectTypes = projectid.projecttypes;
+	var cycles = projectid.cycles;
 	var jsonData = result;
 	var alltasks = jsonData;
 	var user_task_json = [];
 	var batch_indx = [];
 	var taskDetails = {};
 	var batch_dict = {};
-	var status_dict={"inprogress":0,"assigned":0,"underReview":0,"complete":0}
-	suitename={}
-	for(var ti=0;ti<resultobj.length;ti++){
-		try{
-		// async.forEachSeries(alltasks, function (a, maincallback) {
+	var status_dict = { "inprogress": 0, "assigned": 0, "underReview": 0, "complete": 0 }
+	suitename = {}
+	for (var ti = 0; ti < resultobj.length; ti++) {
+		try {
+			// async.forEachSeries(alltasks, function (a, maincallback) {
 			var task_json = {
 				'appType': '',
 				'projectId': '',
@@ -194,8 +195,9 @@ function next_function(resultobj,projectid)
 				'taskDetails': [],
 				'testSuiteDetails': [],
 				'scenarioFlag': 'False',
-				'releaseid':'',
-				'cycleid':''
+				'releaseid': '',
+				'cycleid': '',
+				'accessibilityParameters': []
 
 			};
 			taskDetails = {
@@ -208,14 +210,14 @@ function next_function(resultobj,projectid)
 				'reviewer': '',
 				'startDate': '',
 				'expectedEndDate': '',
-				'batchTaskIDs':[],
+				'batchTaskIDs': [],
 				'status': 'assigned',
-				'reuse':'False',
+				'reuse': 'False',
 				'releaseid': '',
-				'cycleid':''
+				'cycleid': ''
 			};
 			var testSuiteDetails_obj = {
-				"assignedTime":"",
+				"assignedTime": "",
 				"releaseid": "",
 				"cycleid": "",
 				"testsuiteid": "",
@@ -224,22 +226,21 @@ function next_function(resultobj,projectid)
 				"assignedTestScenarioIds": []
 				//"scenarioFlag": "True",
 			};
-
 			/*t refers to task node, and m refers to its respective node */
 			var t = resultobj[ti];
-			var relName=cycles[t.cycleid][1];
-			var reuseflag='False';
+			var relName = cycles[t.cycleid][1];
+			var reuseflag = 'False';
 			// var m = a.row[0][0];
 			// if(a.row[0].length>1) reuseflag='True';
 			var abc = tasktypes[t.tasktype];
 			var batch_flag = false;
 			//To support the task assignmnet in scenario
-			if (t.tasktype == 'Execute' || t.tasktype == 'Execute Scenario' || t.tasktype == 'Execute Batch') {
+			if (['Execute', 'Execute Scenario', 'Execute Batch', 'Execute Scenario with Accessibility', 'Execute Scenario Accessibility Only'].includes(t.tasktype)) {
 				testSuiteDetails_obj.releaseid = t.release || relName;
 				testSuiteDetails_obj.cycleid = t.cycleid;
-			}else{
-				task_json.releaseid=t.release || relName;
-				task_json.cycleid=t.cycleid;
+			} else {
+				task_json.releaseid = t.release || relName;
+				task_json.cycleid = t.cycleid;
 			}
 			if (t.taskvn !== undefined) {
 				task_json.versionnumber = t.versionnumber;
@@ -264,91 +265,98 @@ function next_function(resultobj,projectid)
 			// var parent_length = parent.length;
 			task_json.projectId = t.projectid;
 			var index = prjId.indexOf(t.projectid);
-			var apptype=projectTypes[appTypes[index]];
-			task_json.appType=apptype;
-						if(t.nodetype=="testsuites")
-						{
-							testSuiteDetails_obj.testsuiteid=t.nodeid;
-							testSuiteDetails_obj.testsuitename = t.name;
-							suitename[t.nodeid]=t.name
-						}
-						else if(t.nodetype=="testscenarios")
-						{
-							testSuiteDetails_obj.testsuiteid=t.parent|| null;
-							testSuiteDetails_obj.testsuitename = suitename[t.parent] || 'testsuitename';
-							task_json.scenarioId = t.nodeid;
-							task_json.scenarioName=t.name;
-						}
-						else if(t.nodetype=="screens")
-						{
-							//task_json.projectId=t.parent|| null;
-							task_json.screenId=t.nodeid;
-							task_json.screenName = t.name;
-						}
-						else if(t.nodetype=="testcases")
-						{
-							task_json.scenarioId=t.parent|| null;
-							task_json.testCaseId=t.nodeid;
-							task_json.testCaseName = t.name;
-						}
-						
-						testSuiteDetails_obj.projectidts = t.projectid;
-						testSuiteDetails_obj.assignedTestScenarioIds = '';
-						
-						
-						
-						//Check if versioning exists
-						function versioningCheck() {
-							versioningEnabled = ' ';
-							if (process.env.projectVersioning != "disabled")
-								versioningEnabled += 'version_'+ task_json.versionnumber+ ' : ';
-							return versioningEnabled;
-						}
+			var apptype = projectTypes[appTypes[index]];
+			task_json.appType = apptype;
+			switch (t.nodetype) {
+				case "testsuites":
+					testSuiteDetails_obj.testsuiteid = t.nodeid;
+					testSuiteDetails_obj.testsuitename = t.name;
+					suitename[t.nodeid] = t.name
+					break;
+				case "screens":
+					//task_json.projectId=t.parent|| null;
+					task_json.screenId = t.nodeid;
+					task_json.screenName = t.name;
+					break;
+				case "testcases":
+					task_json.scenarioId = t.parent || null;
+					task_json.testCaseId = t.nodeid;
+					task_json.testCaseName = t.name;
+					break;
+				case "testscenarios":
+					testSuiteDetails_obj.testsuiteid = t.parent || null;
+					testSuiteDetails_obj.testsuitename = suitename[t.parent] || 'testsuitename';
+					task_json.scenarioId = t.nodeid;
+					task_json.scenarioName = t.name;
+					break;
+			}
+			testSuiteDetails_obj.projectidts = t.projectid;
+			testSuiteDetails_obj.assignedTestScenarioIds = '';
 
-						if (t.tasktype == 'Design' || t.tasktype == 'Update') {
-							// taskDetails.taskName = t.tasktype + versioningCheck() + m.testCaseName;
-							taskDetails.reuse=reuseflag;
-							// task_json.testCaseName = m.testCaseName;
-						} else if (t.tasktype == 'Execute') {
-							// taskDetails.taskName = t.tasktype + versioningCheck()  + m.moduleName;
-							// testSuiteDetails_obj.testsuitename = m.moduleName;
-						} else if (t.tasktype == 'Execute Batch') {
-							task_json.projectId = "";
-							taskDetails.taskName = t.tasktype + versioningCheck() + t.batchname;
-							// testSuiteDetails_obj.testsuitename = m.moduleName;
-							testSuiteDetails_obj.assignedTime = t.assignedTime;
-							if (batch_dict[t.batchname+'_'+t.cycleid] == undefined) {
-								batch_dict[t.batchname+'_'+t.cycleid] = user_task_json.length;
-							} else {
-								parent_index = batch_dict[t.batchname+'_'+t.cycleid];
-								batch_task = user_task_json[parent_index];
-								batch_task.taskDetails[0].batchTaskIDs.push(t._id);
-								testSuiteDetails_obj.subTaskId = t._id;
-								batch_task.testSuiteDetails.push(testSuiteDetails_obj);
-								batch_flag = true;
-								batch_indx = Object.values(batch_dict);
-							}
-						} else if (t.tasktype == 'Execute Scenario') {
-							task_json.scenarioFlag = 'True';
-							task_json.assignedTestScenarioIds = [task_json.scenarioId];
-							// taskDetails.taskName = t.tasktype + versioningCheck() + m.testScenarioName;
-							// task_json.scenarioName = m.testScenarioName;
-							//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
-						} else {
-							// taskDetails.taskName = t.tasktype + versioningCheck() + m.screenName;
-							// task_json.screenName = m.screenName;
-							taskDetails.reuse=reuseflag;
-						}
-						//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
-						if (!batch_flag) {
-							testSuiteDetails_obj.subTaskId = t._id;
-							task_json.testSuiteDetails.push(testSuiteDetails_obj);
-							taskDetails.batchTaskIDs.push(t._id);
-							task_json.taskDetails.push(taskDetails);
-							user_task_json.push(task_json);
-						}
-					// }	
-				// }	
+			switch (t.tasktype) {
+				case 'Design':
+				case 'Update':
+					taskDetails.reuse = reuseflag;
+					break;
+				case 'Execute':
+					break;
+				case 'Execute Batch':
+					task_json.projectId = "";
+					taskDetails.taskName = t.tasktype + ' ' + t.batchname;
+					// testSuiteDetails_obj.testsuitename = m.moduleName;
+					testSuiteDetails_obj.assignedTime = t.assignedTime;
+					if (batch_dict[t.batchname + '_' + t.cycleid] == undefined) {
+						batch_dict[t.batchname + '_' + t.cycleid] = user_task_json.length;
+					} else {
+						parent_index = batch_dict[t.batchname + '_' + t.cycleid];
+						batch_task = user_task_json[parent_index];
+						batch_task.taskDetails[0].batchTaskIDs.push(t._id);
+						testSuiteDetails_obj.subTaskId = t._id;
+						batch_task.testSuiteDetails.push(testSuiteDetails_obj);
+						batch_flag = true;
+						batch_indx = Object.values(batch_dict);
+					}
+					break;
+				case 'Execute Scenario':
+					task_json.scenarioTaskType = 'disable';
+					taskDetails.taskName = "Execute Scenario " + t.name;
+					break;
+				case 'Execute Scenario with Accessibility':
+					task_json.scenarioTaskType = 'enable';
+					taskDetails.taskName = "Execute Scenario "+ t.name + " with Accessibility Testing";
+					break;
+				case 'Execute Scenario Accessibility Only':
+					task_json.scenarioTaskType = "exclusive";
+					taskDetails.taskName = "Execute Accessibility Testing for Scenario " + t.name;
+					break;
+					// taskDetails.taskName = t.tasktype + ' ' + m.testScenarioName;
+					// task_json.scenarioName = m.testScenarioName;
+					//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
+					break;
+				default:
+					taskDetails.reuse = reuseflag;
+				// taskDetails.taskName = t.tasktype + ' ' + m.screenName;
+				// task_json.screenName = m.screenName
+
+			}
+			if (t.tasktype.includes("Scenario")){
+					if('accessibilityparameters' in resultobj[ti] && resultobj[ti].accessibilityparameters.length > 0){
+						task_json.accessibilityParameters = resultobj[ti].accessibilityparameters;
+					}
+					task_json.scenarioFlag = 'True';
+					task_json.assignedTestScenarioIds = [task_json.scenarioId];
+					t.taskType = 'Execute Scenario';
+			}
+			//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
+			if (!batch_flag) {
+				testSuiteDetails_obj.subTaskId = t._id;
+				task_json.testSuiteDetails.push(testSuiteDetails_obj);
+				taskDetails.batchTaskIDs.push(t._id);
+				task_json.taskDetails.push(taskDetails);
+				user_task_json.push(task_json);
+			}
+			// }	
+			// }	
 			// }
 			// task_json.testSuiteDetails.push(testSuiteDetails_obj);
 			// taskDetails.batchTaskIDs.push(t.taskID);
@@ -359,5 +367,5 @@ function next_function(resultobj,projectid)
 			logger.error("Exception in the next_function: %s", ex);
 		}
 	}
-	return user_task_json;	
+	return user_task_json;
 }

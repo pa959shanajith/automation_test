@@ -274,7 +274,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		$scope.createIcePool.allProjectList.forEach((e)=>{
 			$("#allProjectAP").append('<option value='+e._id+'>'+e.name+'</option>');
 		})
-		$scope.createIcePool.allIcePoolListFilter=''
+		$scope.createIcePool.allIcePoolListFilter={}
 		$scope.createIcePool.selectedIcePool = undefined
 	}
 
@@ -336,6 +336,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if(data  == 'Pool exists') {
 				$('#tokenName').addClass('error-border')
 				openModalPopup("Error", "Pool name already exist");
+			} else if (data == 'invalid_splname') {
+				openModalPopup("Create ICE Pool", "Special characters found in poolname.");
 			} else {
 				openModalPopup("Create ICE Pool", "There are no projects created yet.");
 			}
@@ -399,6 +401,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if(data  == 'Pool exists') {
 				$('#tokenName').addClass('error-border')
 				openModalPopup("Error", "Pool name already exist");
+			} else if (data == 'invalid_splname') {
+				openModalPopup("Create ICE Pool", "Failed to update ICE Pool. Special characters found in poolname.");
 			} else {
 				openModalPopup("Create ICE Pool", "Failed to update ICE Pool.");
 			}
@@ -497,6 +501,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				openModalPopup("Success", "ICE Pool updated successfully.");
 			} else if(data == "Invalid Session") {
 				$rootScope.redirectPage();
+			} else if (data == 'invalid_splname') {
+				openModalPopup("Create ICE Pool", "Failed to update ICE Pool. Special characters found in poolname.");
 			} else {
 				openModalPopup("ICE Pool", "Failed to update ICE Pool");
 				unblockUI()
@@ -534,7 +540,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.allocationPoolReset = () => {
 		var type = $scope.allocateIcePool.type 
-		$scope.allocateIcePool.allIcePoolListFilter=''
+		$scope.allocateIcePool.allIcePoolListFilter={}
 		$scope.allocateIcePool.selectedIcePool = undefined	
 		if(type == 'quantity'){
 			$('#update-icepool-count').addClass("hide")
@@ -746,7 +752,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		if (flag) return false;
 
-		var tokeninfo = {
+		const tokeninfo = {
 			userid: userid,
 			icename: icename,
 			icetype: icetype,
@@ -757,7 +763,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			unblockUI();
 			if (data == "Invalid Session") return $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("ICE Provision Error", "ICE Provisioned Failed");
-			else if (data=='DuplicateIceName') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>ICE name or User already exists");
+			else if (data == 'DuplicateIceName') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>ICE name or User already exists");
+			else if (data == 'invalid_splname') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>Special characters found in icename");
 			else {
 				$scope.tokeninfo.icename = icename;
 				$scope.tokeninfo.token = data;
@@ -830,6 +837,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			unblockUI();
 			if (data == "Invalid Session") return $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("ICE Provisions", "ICE Deregister Failed");
+			else if (data == 'invalid_splname') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>Special characters found in icename");
 			else {
 				adminServices.manageSessionData('disconnect', icename, "?", "dereg").then(function (data) {
 					if (data == "Invalid Session") return $rootScope.redirectPage();
@@ -859,6 +867,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			unblockUI();
 			if (data == "Invalid Session") return $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("ICE Provisions", "ICE "+event+" Failed");
+			else if (data == 'invalid_splname') openModalPopup("ICE Provision Error", "ICE Provisioned Failed!<br/>Special characters found in icename");
 			else {
 				adminServices.manageSessionData('disconnect', icename, "?", "dereg").then(function (data) {
 					if (data == "Invalid Session") return $rootScope.redirectPage();
@@ -1003,19 +1012,25 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		adminServices.getCIUsersDetails(generatetoken).then(function (data) {
 			unblockUI();
 			if (data == "Invalid Session") $rootScope.redirectPage();
-			else if (data == 'fail') openModalPopup("Token Management", "Failed to fetch token data");
-			else if (data.length == 0) openModalPopup("Token Management", "No tokens have been issued");
+			else if (data == 'fail'){
+				$scope.tokens.allTokens = [];
+				openModalPopup("Token Management", "Failed to fetch token data");
+			} 
+			else if (data.length == 0){
+				$scope.tokens.allTokens = [];
+				openModalPopup("Token Management", "No tokens have been issued");
+			}
 			else {
 				//openModalPopup("Token Management", "Fetch Token details successful");
 				data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
 				data.forEach(e=>e.expiry=new Date(e.expiry).toString().slice(0,-22))
 				$scope.tokens.allTokens = data;
-				if (clearFields) {
-					$scope.tokens.name = '';
-					$scope.tokens.token = '';
-					$('.fc-datePicker').val('');
-					$('.fc-timePicker').val('');
-				}
+			}
+			if (clearFields) {
+				$scope.tokens.name = '';
+				$scope.tokens.token = '';
+				$('.fc-datePicker').val('');
+				$('.fc-timePicker').val('');
 			}
 		}, function (error) {
 			unblockUI();
@@ -1047,7 +1062,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var exptime=$(".tokenSuite .timePicContainer .fc-timePicker").val();
 		var today = new Date();
 		var td = new Date();
-		var expiry = "";
 		if (expdate == "") {
 			td.setHours(today.getHours()+parseInt(tokendetails));
 			expdate = td.getDate()+"-"+(td.getMonth()+1)+"-"+td.getFullYear()
@@ -1068,7 +1082,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		var sldate_2 = expdate.split("-");
 		var sltime_2 = exptime.split(":");
-		expiry = expdate+" "+exptime;
 		var now = new Date(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1]);
 		td = today;
 		td.setHours(today.getHours()+8);
@@ -1081,7 +1094,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		const CIUser = {
 			'userId': userId,
-			'expiry': expiry,
+			'expiry': now,
 			'tokenname': tokenname,
 			'icetype': icetype
 		};
@@ -1092,6 +1105,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			if (data == "Invalid Session") $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("Token Management", "Failed to generate token");
 			else if (data == 'duplicate') openModalPopup("Token Management", "Failed to generate token, Token Name already exists");
+			else if (data == 'invalid_name_special') openModalPopup("Token Management", "Failed to generate token, Special characters found in token name");
+			else if (data == 'invalid_past_time') openModalPopup("Token Management", "Expiry time should be 8 hours more than current time");
 			else {
 				$scope.tokens.token = data.token;
 				$scope.tokens.loadData($event);
@@ -1112,6 +1127,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			unblockUI();
 			if (data == "Invalid Session") $rootScope.redirectPage();
 			else if (data == 'fail') openModalPopup("Token Management", "Failed to deactivate token");
+			else if (data == 'invalid_name_special') openModalPopup("Token Management", "Failed to generate token, Special characters found in token name");
 			else {
 				openModalPopup("Token Management", "Token '"+CIUser.tokenName+"' has been Deactivated");
 				data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
@@ -1374,12 +1390,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 									}
 									if (createProjectRes == 'success') {
 										openModalPopup("Create Project", "Project created successfully");
-										resetForm();
 										projectDetails = [];
 									} else {
-										openModalPopup("Create Project", "Failed to create project");
-										resetForm();
+										if (createProjectRes == 'invalid_name_spl') openModalPopup("Create Project", "Failed to create project. Special characters found in project/release/cycle name");
+										else openModalPopup("Create Project", "Failed to create project");
 									}
+									resetForm();
 									unblockUI();
 								}, function (error) {
 									console.log("Error:::::::::::::", error);
@@ -2795,6 +2811,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 					return;
 				}
 				var errfields = [];
+				let hints = 'Hint:';
 				if (parseInt(data[2])) errfields.push("User Name");
 				if (parseInt(data[3])) errfields.push("First Name");
 				if (parseInt(data[4])) errfields.push("Last Name");
@@ -2802,7 +2819,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (parseInt(data[6])) errfields.push("Email");
 				if (parseInt(data[7])) errfields.push("Authentication Server");
 				if (parseInt(data[8])) errfields.push("User Domain Name");
-				openModalPopup(bAction+" User", "Following values are invalid: "+errfields.join(", "));
+				if (parseInt(data[5]) == '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+				if (parseInt(data[5]) == '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
+				openModalPopup(bAction+" User", "Following values are invalid: "+errfields.join(", ")+" "+hints);
 			}
 		}, function (error) {
 			unblockUI();
@@ -3241,6 +3260,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.bindCredentials = "";
 		this.basedn = "";
 		this.cert = "";
+		this.servers = [];
 		this.certName = "No file choosen";
 		this.secure = "false";
 		this.fieldmap = {uname: "", fname: "", lname: "", email: ""};
@@ -3380,7 +3400,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (parseInt(data[6])) errfields.push("Authentication Principal");
 				if (parseInt(data[7])) errfields.push("Authentication Credentials");
 				if (parseInt(data[8])) errfields.push("Data Mapping Settings");
-				openModalPopup(bAction+" Configuration", "Following values are invalid: "+errfields.join(", ")+ (errHints.length!=0)? (". Note: "+errHints):'.');
+				openModalPopup(bAction+" Configuration", "Following values are invalid: "+errfields.join(", ")+ ((errHints.length!=0)? (". Note: "+errHints):'.'));
 			}
 		}, function (error) {
 			unblockUI();
@@ -3401,19 +3421,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				openModalPopup("Edit Configuration", "Failed to fetch configurations.");
 			} else if(data == "empty") {
 				openModalPopup("Edit Configuration", "There are no configurations created yet.");
-				var selBox = $("#ldapServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				selBox.prop("selectedIndex", 0);
+				$scope.ldapConf.servers = [];
 			} else {
 				data.sort(function(a,b){ return a > b; });
-				var selBox = $("#ldapServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				for(var i = 0; i < data.length; i++){
-					selBox.append("<option value=\""+data[i].name+"\">"+data[i].name+"</option>");
-				}
-				selBox.prop("selectedIndex", 0);
+				$scope.ldapConf.servers = data.map(e=> e.name);
 			}
 		}, function (error) {
 			unblockUI();
@@ -3432,6 +3443,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.ldapConf.getServerData = function () {
 		var name = this.serverName;
+		if (name == null) return;
 		ldapConf = $scope.ldapConf;
 		var failMsg = "Failed to fetch details for '"+name+"' configuration.";
 		blockUI("Fetching details...");
@@ -3498,6 +3510,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "insufficient_access") openModalPopup("Test Connection", "Test Connection Failed! Credentials provided does not have required privileges for setting up LDAP.");
 			else if(data == "invalid_basedn") openModalPopup("Test Connection", "Test Connection Failed! Base Domain Name is incorrect.");
 			else if(data == "empty") openModalPopup("Test Connection", "Test Connection Successful but LDAP directory is empty!");
+			else if(data == "spl_chars") openModalPopup("Test Connection", "Test Connection Failed! Special characters found in LDAP configuration values.");
 			else if(data == "fail") openModalPopup("Test Connection", "Test Connection Failed!");
 			else openModalPopup("Test Connection", "Test Connection Failed due to unexpected error!");
 		}, function (error) {
@@ -3533,6 +3546,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.url = "";
 		this.idp = "";
 		this.cert = "";
+		this.servers = [];
 		this.certName = "No file choosen";
 		this.urlToolTip = "Single Sign-On URL (SAML assertion URL)"
 		this.idpToolTip = "Identity Issuer (Can be text or URL)"
@@ -3646,19 +3660,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "fail") openModalPopup("Edit Configuration", "Failed to fetch configurations.");
 			else if(data == "empty") {
 				openModalPopup("Edit Configuration", "There are no configurations created yet.");
-				const selBox = $("#samlServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				selBox.prop("selectedIndex", 0);
+				$scope.samlConf.servers = [];
 			} else {
 				data.sort(function(a,b){ return a > b; });
-				const selBox = $("#samlServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				for(var i = 0; i < data.length; i++){
-					selBox.append("<option value='"+data[i].name+"'>"+data[i].name+"</option>");
-				}
-				selBox.prop("selectedIndex", 0);
+				$scope.samlConf.servers = data.map(e=> e.name);
 			}
 		}, function (error) {
 			unblockUI();
@@ -3692,6 +3697,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.samlConf.getServerData = function () {
 		const name = $scope.samlConf.name;
+		if (name == null) return;
 		const failMsg = "Failed to fetch details for '"+name+"' configuration.";
 		blockUI("Fetching details...");
 		adminServices.getSAMLConfig(name)
@@ -3719,6 +3725,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		this.url = "";
 		this.clientId = "";
 		this.secret = "";
+		this.servers = [];
 		this.idToolTip = "Public identifier for the client"
 		this.secretToolTip = "Secret used by the client to exchange an authorization code for a token"
 		$("#oidcUrl,#oidcClientId,#oidcClientSecret").removeClass("inputErrorBorder");
@@ -3828,19 +3835,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			else if(data == "fail") openModalPopup("Edit Configuration", "Failed to fetch configurations.");
 			else if(data == "empty") {
 				openModalPopup("Edit Configuration", "There are no configurations created yet.");
-				const selBox = $("#oidcServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				selBox.prop("selectedIndex", 0);
+				$scope.oidcConf.servers = [];
 			} else {
 				data.sort(function(a,b){ return a > b; });
-				const selBox = $("#oidcServerName");
-				selBox.empty();
-				selBox.append("<option value='' disabled selected>Select Server</option>");
-				for(var i = 0; i < data.length; i++){
-					selBox.append("<option value='"+data[i].name+"'>"+data[i].name+"</option>");
-				}
-				selBox.prop("selectedIndex", 0);
+				$scope.oidcConf.servers = data.map(e=> e.name);
 			}
 		}, function (error) {
 			unblockUI();
@@ -3859,6 +3857,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 
 	$scope.oidcConf.getServerData = function () {
 		const name = $scope.oidcConf.name;
+		if (name == null) return;
 		const failMsg = "Failed to fetch details for '"+name+"' configuration.";
 		blockUI("Fetching details...");
 		adminServices.getOIDCConfig(name)
@@ -3927,6 +3926,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	};
 
 	$scope.mailConf.getProviderInfo = function() {
+		if (this.provider == null) return;
 		$("#mailName,#mailHost,#mailPort,#senderName,#senderEmail").removeClass("inputErrorBorder");
 		$("#mailProvider,#authenticationType").removeClass("selectErrorBorder");
 		blockUI("Loading Configurations...");
@@ -4166,9 +4166,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				if (+data[4]) errfields.push("Provider");
 				if (+data[5]) errfields.push("Server Host");
 				if (+data[6]) errfields.push("Server Port");
-				if (+data[7]) errfields.push("Sender Email");
+				if (+data[7]==1) errfields.push("Sender Email");
+				if (+data[7]==2) errfields.push("Sender Name");
 				if (+data[8]) errfields.push("Secure Connection");
-				if (+data[9]) errfields.push("Authentication");
+				if (+data[9]==1) errfields.push("Authentication");
+				if (+data[9]==2) errfields.push("Authentication Username");
 				if (+data[10]) errfields.push("Avo Assure Application URL");
 				if (+data[11]) errfields.push("Proxy URL");
 				if (+data[12] == 1) errfields.push("Proxy Username");
@@ -4197,12 +4199,31 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 				data.clientData.sort(function(a,b) { return a.username > b.username; });
 				$scope.sessionConf.sessions = data.sessionData;
 				$scope.sessionConf.clients = data.clientData;
+				$scope.sessionConf.fetchLockedUsers();
 			}
 			unblockUI();
 		}, function (error) {
 			console.error("Fail to load session data", error);
 		});
 	};
+
+	$scope.sessionConf.fetchLockedUsers = function () {
+		// blockUI("Fetching locked users...");
+		adminServices.fetchLockedUsers()
+		.then(function(data){
+			// unblockUI();
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Session Management", "Unable to fetch locked users accounts.");
+			} else {
+				$scope.sessionConf.lockedusers = data;
+			}
+		}, function (error) {
+			// unblockUI();
+			openModalPopup("Session Management", "Unable to fetch locked users accounts.");
+		});
+	}
 
 	// Session Management: Logoff/Disconnect User
 	$scope.sessionConf.kill = function ($event) {
@@ -4230,6 +4251,31 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			} else if (data == "fail") {
 				openModalPopup("Session Management", msg+"failed!")
 			} else {
+				openModalPopup("Session Management", msg+"successful!")
+				rootObj.splice(id,1);
+			}
+			unblockUI();
+		}, function (error) {
+			console.error("Fail to load session data", error);
+		});
+	};
+
+	$scope.sessionConf.unlock = function ($event) {
+		var id = parseInt($event.target.dataset.id);
+		var msg, rootObj, obj;
+		msg = "Unlocking User Account ";
+		rootObj = $scope.sessionConf.lockedusers;
+		obj = rootObj[id];
+		var user = obj.username;
+		blockUI(msg+user+"...");
+		adminServices.unlockUser(user)
+		.then(function (data) {
+			if (data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if (data == "fail") {
+				openModalPopup("Session Management", msg+"failed!")
+			} else {
+				openModalPopup("Session Management", msg+"successful!")
 				rootObj.splice(id,1);
 			}
 			unblockUI();

@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
+const randexp = require('randexp');
 const logger = require('../../logger');
 const myserver = require('../../server');
-const cache = require('./cache');
+const cache = require('./cache').getClient();
 const redisServer = require('./redisSocketHandler');
 const taskflow = require('../config/options').strictTaskWorkflow;
 const epurl = process.env.DAS_URL;
@@ -105,12 +106,20 @@ module.exports.cloneSession = async (req) => {
 };
 
 module.exports.isSessionActive = function (req){
+	/* Session validation is now handled by passport middleware. 
+	   This function is retained until all serives are updated. */
+	return true;
 	var sessionToken = (req.session)? req.session.uniqueId:undefined;
 	var sessionCheck = (sessionToken!==undefined) && (req.sessionID==sessionToken);
 	var cookies = req.signedCookies;
 	var cookieCheck = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
 	return sessionCheck && cookieCheck;
 };
+
+module.exports.generateDefPassword = function () {
+	let passwordtemp = new randexp(/^([A-Z][a-z][0-9][!#$%&,:;<>@_~])(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!*#$%&@_^])[A-Za-z\d!*#$%&@_^]{4,6}$/).gen();
+	return passwordtemp;
+}
 
 module.exports.approvalStatusCheck = async executionData => {
 	var data = {res: "pass", status: null};
@@ -122,9 +131,9 @@ module.exports.approvalStatusCheck = async executionData => {
 	};
 	const result = await fetchData(inputs, "suite/checkApproval", "approvalStatusCheck", true);
 	data.statusCode = result[1].statusCode;
-	if (result[0] == "No task") data.res = 'Notask';
-	else if (result[0] == "Modified") data.res = 'Modified';
-	else if (result[0] != 0) data.res = 'NotApproved';
+	if (result[0].rows == "No task") data.res = 'Notask';
+	else if (result[0].rows == "Modified") data.res = 'Modified';
+	else if (result[0].rows != 0) data.res = 'NotApproved';
 	return data;
 };
 
@@ -154,7 +163,7 @@ const fetchData = async (inputs, url, from, all) => {
 				if (all) rsv(["fail", response, result]);
 				else rsv("fail");
 			} else {
-				result = (result.rows === undefined)? result:result.rows;
+				result = (result.rows === undefined || all)? result:result.rows;
 				if (cache.checkapi(url) && result != "fail") {
 					cache.setapi(url, inputs, result);
 				}

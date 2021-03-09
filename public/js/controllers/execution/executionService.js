@@ -7,7 +7,7 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 				fromFlag:	"execution"
 			})
 			.then(function(response)  { return response.data},
-			function(response)        {return $q.reject(response.data)})
+			function(response)  {return $q.reject(response.data)})
 		},
 		
 		updateTestSuite_ICE: function(batchDetails){
@@ -16,7 +16,7 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 				batchDetails: batchDetails
 			})
 			.then(function(response)  { return response.data},
-			function(response)        {return $q.reject(response.data)})
+			function(response)  {return $q.reject(response.data)})
 		},
 		
 		ExecuteTestSuite_ICE : function(executionData){
@@ -25,87 +25,67 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 				executionData: executionData
 			})
 			.then(function(response)  { return response.data},
-			function(response)        {return $q.reject(response.data)})
+			function(response)  {return $q.reject(response.data)})
 		},
-		QClogin : function(url, userName, passWord){
-			return $http.post('/QCLOGIN_ICE',{
-				param : 'QCLOGIN_ICE',
-				url : url,
-            	uname : userName,
-            	password : passWord
-			})
-			.then(function(response)  { return response.data},
-			function(response)        {return $q.reject(response.data)})
-		},
-		
-		saveQcScenarioDetails : function(scenarioIdQC,domainName,projectName,testSetName,testCaseName,folderPath){
-			return $http.post('/saveQcScenarioDetails_ICE',{
-				param : 'saveQcScenarioDetails_ICE',
-				testScenarioId : scenarioIdQC,
-            	domainName : domainName,
-            	projectName : projectName,
-            	testset : testSetName,
-            	testcase : testCaseName,
-            	folderpath : folderPath
-			})
-			.then(function(response)  { return response.data},
-			function(response)        {return $q.reject(response.data)})
-		},
-		
-		getQcScenarioDetails: function(scenarioIdQC){
-			return $http.post('/getQcScenarioDetails_ICE',{
-				param : 'getQcScenarioDetails_ICE',
-				testScenarioId : scenarioIdQC
-			})
-			.then(function(response)  { return response.data},
-			function(response)        {return $q.reject(response.data)})
-	    },
-	    loadLocationDetails: function(scenarioName, scenarioId){
+
+		loadLocationDetails: function(scenarioName, scenarioId){
 			return $http.post('/getTestcaseDetailsForScenario_ICE',{
 				param : 'getTestcaseDetailsForScenario_ICE',
 				testScenarioId : scenarioId
 			})
 			.then(function(response)  { return response.data},
-			function(response)        {return $q.reject(response.data)})
-	    },
+			function(response)  {return $q.reject(response.data)})
+		},
+
 		loginQCServer_ICE: function(qcURL,qcUserName,qcPassword){
-    		var param = "loginQCServer_ICE";
-	        return $http.post('/loginQCServer_ICE', {
+			var param = "loginQCServer_ICE";
+			return $http.post('/loginQCServer_ICE', {
 				action: param,
-              	qcURL: qcURL,
+				qcURL: qcURL,
 				qcUsername: qcUserName,
 				qcPassword : qcPassword,
 				qcaction: "domain"
-	        })
+			})
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
 		},
+
 		loginQTestServer_ICE: function(qcURL,qcUserName,qcPassword, integrationType){
-    		var param = "loginToQTest_ICE";
-	        return $http.post('/loginToQTest_ICE', {
+			var param = "loginToQTest_ICE";
+			return $http.post('/loginToQTest_ICE', {
 				action: param,
-              	qcURL: qcURL,
+				qcURL: qcURL,
 				qcUsername: qcUserName,
 				qcPassword : qcPassword,
 				integrationType : integrationType,
 				qcaction: "domain"
-	        })
+			})
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
-    	},
-		loginZephyrServer_ICE: function(zephyrAccNo,zephyrAcKey,zephyrSecKey, integrationType){
-    		var param = "loginToZephyr_ICE";
-	        return $http.post('/loginToZephyr_ICE', {
+		},
+
+		loginZephyrServer_ICE: function(zephyrURL,zephyrUserName,zephyrPassword, integrationType){
+			var param = "loginToZephyr_ICE";
+			return $http.post('/loginToZephyr_ICE', {
 				action: param,
-				zephyrAccNo: zephyrAccNo,
-				zephyrAcKey: zephyrAcKey,
-				zephyrSecKey : zephyrSecKey,
+				zephyrURL: zephyrURL,
+				zephyrUserName: zephyrUserName,
+				zephyrPassword : zephyrPassword,
 				integrationType : integrationType,
-				execFlag: "1",
-				zephyraction: "domain"
-	        })
+				zephyraction: "project"
+			})
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
-    	}
+		},
+		updateAccessibilitySelection: function(suiteInfo){
+			var param = "updateAccessibilitySelection";
+			return $http.post('/updateAccessibilitySelection', suiteInfo)
+			.then (function(response){
+				return response.data;	
+			},
+			function(response){	
+				return $q.reject(response.data);
+			});	
+		}
 	}
 }]);

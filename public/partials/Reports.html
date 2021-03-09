@@ -59,8 +59,9 @@
 		  <!-- Mid Page Content  -->
 		  <div id="content">
 			 <!-- Page Header -->
-			 <div class="container-fluid pageTitle">
-				<h2><span id="reports-taskName" class="label label-default">Reports</span></h2>
+			 <div class="container-fluid pageTitle tabs">
+				<button id="reports-taskName" style="margin-left: 1.1%;border-radius: 5px; background-color: purple; color: white;" ng-click="toggle_accessibility(false)">Functional Testing Reports</button>
+				<button id="accessibility-taskName" style="border-radius: 5px;" ng-click="toggle_accessibility(true)" >Accessibility Testing Reports</button>
 			 </div>
 			 <!-- Page Header -->
 			 <!-- Module Box -->
@@ -73,24 +74,27 @@
 							   <div class="col">
 								  <div class="form-group inline-form-control">
 									 <label>Project:</label>
-									 <select id="selectProjects" class="project-list ng-pristine ng-valid ng-touched" ng-model='projectNames' ng-change='selProjectsFilter()'>
-										<option class="" selected="selected">Web</option>
-									 </select>
+									 <select id="selectProjects" class="project-list ng-pristine ng-valid ng-touched" ng-model='prc.projectId' ng-change='prc.selProjectsFilter()'>
+										<option value="" selected="selected" disabled="disabled">Select Project</option>
+										<option ng-repeat="prj in prc.projects" value="{{prj._id}}">{{prj.name}}</option>
+									</select>
 								  </div>
 							   </div>
 							   <div class="col">
 								  <div class="form-group inline-form-control">
 									 <label>Release:</label>
-									 <select id="selectReleases" class="release-list ng-pristine ng-valid ng-touched" ng-model="releaseNames" ng-change='selReleasesFilter()'>
-										<option class="ng-binding ng-scope" selected="selected">Release</option>
+									 <select id="selectReleases" class="release-list ng-pristine ng-valid ng-touched" ng-model="prc.releaseId" ng-change='prc.selReleasesFilter()'>
+										<option value='' class="ng-binding ng-scope" selected="selected" disabled="disabled">Select Release</option>
+										<option ng-repeat="rel in prc.releases" value="{{rel.name}}">{{rel.name}}</option>
 									 </select>
 								  </div>
 							   </div>
 							   <div class="col">
 								  <div class="form-group inline-form-control">
 									 <label>Cycle:</label>
-									 <select id="selectCycles" class="cycle-list ng-pristine ng-valid ng-touched" ng-model="cycleNames" ng-change='selCyclesFilter()'>
-										<option class="ng-binding ng-scope" selected="selected">Cycle</option>
+									 <select id="selectCycles" class="cycle-list ng-pristine ng-valid ng-touched" ng-model="prc.cycleId" ng-change='prc.selCyclesFilter()'>
+										<option value="" class="ng-binding ng-scope" selected="selected" disabled="disabled">Select Cycle</option>
+										<option ng-repeat="cyc in prc.cycles" data-id="{{cyc._id}}" value="{{cyc._id}}">{{cyc.name}}</option>
 									 </select>
 								  </div>
 							   </div>
@@ -144,6 +148,30 @@
 										</div>
 									 </div>
 								  </div>
+								  <div class="panel-group" id="accessibilityTblExecution">
+									<div class="panel panel-default">
+									   <div class="panel-heading executionsHeader">
+										  <h4 class="panel-title" id='panelTitle'>
+											 <a id='executionNameHeader' data-toggle="" data-parent="#accessibilityTblExecution" href="#">
+												Accessibility Reports
+											 </a>
+										  </h4>
+									   </div>
+									   <div class='container-fluid dataTableReports modTbl'>
+										  <table id="reportsAccTable" class='display' style='width:100%'>
+											 <thead>
+												<tr>
+												   <th style="padding:4px;">Execution No</th>
+												   <th style="padding:4px;">Title</th>
+												   <th style="padding:4px;">Time </th>
+												</tr>
+											 </thead>
+											 <tbody>
+											 </tbody>
+										  </table>
+									   </div>
+									</div>
+								 </div>
 							   </div>
 							   <div class="col colReportsWidth">
 								  <div class="panel-group scenarioStatus" id="accordionTbloverallStatus">
@@ -345,7 +373,7 @@
  <!-- Reports Modal Box -->
  <!-- Footer  -->
  <footer class="footer">
-	<div class="card-header text-white d-flex card-footer"> <a href="#" class="text-white leftFooterTxt">&copy; <span id="currentYear">2020</span> Avo Automation. All Rights Reserved</a>
+	<div class="card-header text-white d-flex card-footer"> <a href="#" class="text-white leftFooterTxt">&copy; <span id="currentYear">2021</span> Avo Automation. All Rights Reserved</a>
 	   <a href="#" class="text-white ml-auto rightFooterTxt" style='top: 0px;'>Powered By <img class="f-logo" src="imgs/ftr-avo-logo.png" /></a>
 	</div>
  </footer>

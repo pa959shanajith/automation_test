@@ -6,9 +6,10 @@ var myserver = require('../lib/socket');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+const accessibility_testing = require("./accessibilityTesting")
 const notifications = require('../notifications');
 var queue = require('../lib/executionQueue')
-var cache = require('../lib/cache')
+var cache = require('../lib/cache').getClient(2);
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const scheduleJobMap = {};
 const SOCK_NORM = "normalModeOn";
@@ -92,13 +93,12 @@ async function getICEList (projectids,userid){
 	var result = {ice_ids:{}}
 	result["ice_list"] = []
 	result["unallocatedICE"] = {}
-	try{
+	try {
 		const pool_req =  {
 			"projectids":[projectids],
 			"poolid": ""
 		}
-		
-		pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
+		let pool_list = await utils.fetchData(pool_req,"admin/getPools",fnName);
 		unallocatedICE = await utils.fetchData({}, "admin/getAvailable_ICE");
 		ice_status = await cache.get("ICE_status");
 		unallocatedICE = unallocatedICE["available_ice"];
@@ -225,6 +225,7 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 				"testcaseid": tc._id,
 				"screenid": tc.screenid,
 				"versionnumber": tc.versionnumber,
+				"userid": userid,
 				"query": "readtestcase"
 			};
 			const testcasedata = await utils.fetchData(inputs, "design/readTestCase_ICE", fnName);
@@ -237,12 +238,13 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 		allTestcaseSteps.push({
 			"template": "",
 			"testcase": allTestcaseObj[tc._id].steps,
-			"testcasename": allTestcaseObj[tc._id].name
+			"testcasename": allTestcaseObj[tc._id].name,
+			"screenid": tc.screenid,
+			"screenname":tc.screenname
 		});
 	});
 
 	scenario.testcase = JSON.stringify(allTestcaseSteps);
-
 	// Step 3: Get qcdetails
 	scenario.qcdetails = [];
 	for(var k =0; k<integrationType.length; ++k) {
@@ -281,7 +283,8 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		"batchId": "",
 		"executionIds": [],
 		"testsuiteIds": [],
-		"suitedetails": []
+		"suitedetails": [],
+		"reportType": "functionalTesting"
 	};
 	const batchInfo = batchData.batchInfo;
 	for (const suite of batchInfo) {
@@ -300,23 +303,25 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			"condition": [],
 			"dataparampath": [],
 			"scenarioNames": [],
-			"scenarioIds": []
+			"scenarioIds": [],
+			"accessibilityMap":{}
 		};
 		const suiteDetails = suite.suiteDetails;
 		for (const tsco of suiteDetails) {
 			var integrationType = [];
-			if(batchData.integration.alm.url) {
+			if(batchData.integration && batchData.integration.alm.url) {
 				integrationType.push("ALM");
 			} 
-			if (batchData.integration.qtest.url){
+			if (batchData.integration && batchData.integration.qtest.url){
 				integrationType.push("qTest");
 			} 
-			if (batchData.integration.zephyr.accountid) {
+			if (batchData.integration && batchData.integration.zephyr.url) {
 				integrationType.push("Zephyr");
 			}
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
 			if (scenario == "fail") return "fail";
 			scenario = Object.assign(scenario, tsco);
+			suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibilityParameters;
 			suiteObj.condition.push(scenario.condition);
 			suiteObj.dataparampath.push(scenario.dataparam[0]);
 			suiteObj.scenarioNames.push(scenario.scenarioName);
@@ -326,6 +331,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			scenarioObj.qcdetails = scenario.qcdetails;
 			scenarioList.push(scenarioObj);
 		}
+		if (suite.scenarioTaskType == "exclusive") execReq.reportType = "accessiblityTestingOnly";
 		suiteObj[testsuiteid] = scenarioList;
 		execReq.testsuiteIds.push(testsuiteid);
 		execReq.suitedetails.push(suiteObj);
@@ -424,7 +430,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 	const channel = "normal";
 	var completedSceCount = 0;
 	var statusPass = 0;
-
+	var reportType = "accessiblityTestingOnly";
 	logger.info("Sending request to ICE for executeTestSuite");
 	const dataToIce = {"emitAction" : "executeTestSuite","username" : icename, "executionRequest": execReq};
 	redisServer.redisPubICE.publish('ICE1_' + channel + '_' + icename, JSON.stringify(dataToIce));
@@ -470,6 +476,11 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 			} else if (event == "result_executeTestSuite") {
 				if (!status) { // This block is for report data
 					const executionid = resultData.executionId;
+					if("accessibility_reports" in resultData){	
+						const accessibility_reports = resultData.accessibility_reports
+						accessibility_testing.saveAccessibilityReports(accessibility_reports);
+					}
+					if (resultData.report_type != "accessiblityTestingOnly") reportType = "functionalTesting";
 					const scenarioid = resultData.scenarioId;
 					const testsuiteid = resultData.testsuiteId;
 					const testsuiteIndex = execReq.testsuiteIds.indexOf(testsuiteid);
@@ -488,7 +499,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						if (reportData.overallstatus.length == 0) {
 							completedSceCount++;
 							scenarioCount = testsuite.scenarioIds.length;
-							if (completedSceCount == scenarioCount) {
+							if (completedSceCount == scenarioCount && reportType != "accessiblityTestingOnly") {
 								completedSceCount = statusPass = 0;
 								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
 								await updateExecutionStatus([executionid], "fail");
@@ -518,13 +529,13 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 							if (completedSceCount == scenarioCount) {
 								const suiteStatus = (statusPass == scenarioCount) ? "pass" : "fail";
 								completedSceCount = statusPass = 0;
-								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
+								if(reportType != "accessiblityTestingOnly") notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
 								await updateExecutionStatus([executionid], suiteStatus);
 							}
 						}
 					} catch (ex) {
 						logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
-						notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
+						if(reportType != "accessiblityTestingOnly") notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
 						await updateExecutionStatus([executionid], "fail");
 					}
 				} else { // This block will trigger when resultData.status has "success or "Terminate"
@@ -533,6 +544,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						let result = status;
 						let report_result = {};
 						report_result["status"] = status
+						if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
+						if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
 						report_result["testSuiteDetails"] = execReq["suitedetails"]
 						if (resultData.userTerminated) result = "UserTerminate";
 						if (execType == "API") result = [d2R, status];
@@ -676,7 +689,7 @@ function clubBatches(batchInfo){
 /** This service executes the testsuite(s) for request from API */
 exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	// Several client apps do not send TCP Keep-Alive. Hence this is handled in applicaton side.
-	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +process.env.KEEP_ALIVE);
+	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +(process.env.KEEP_ALIVE || "30000"));
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
 	await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
 };

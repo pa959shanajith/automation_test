@@ -9,9 +9,15 @@ const client = new Client();
 const epurl = process.env.DAS_URL;
 const validator =  require('validator');
 const logger = require('../../logger');
+const login = require('./login');
 const utils = require('../lib/utils');
 const notifications = require('../notifications');
 const queue = require("../lib/executionQueue")
+const regEx= /[~*+=?^%<>()|\\|\/]/;
+const ldap_url=/^ldap:\/\/[A-Za-z0-9._-]/;
+const char_check=/[<'>"]/;
+const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
+const regEx_email=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 //GetUserRoles
 exports.getUserRoles = async (req, res) => {
@@ -39,6 +45,7 @@ exports.manageUserDetails = async (req, res) => {
 	logger.info("Inside UI Service: " + fnName);
 	try {
 		let flag = ['2','0','0','0','0','0','0','0','0'];
+		let regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
 		const reqData = req.body.user;
 		const action = req.body.action;
 		const internalUser = reqData.type == "inhouse";
@@ -52,12 +59,16 @@ exports.manageUserDetails = async (req, res) => {
 				password: reqData.password || ""
 			},
 		};
+		const username = inputs.name; 
+		let input_pass = {
+			username
+		};
 
 		if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
 			logger.error("Error occurred in admin/"+fnName+": Invalid action.");
 			flag[1]='1';
 		}
-		if (!validator.isLength(inputs.name,1,100)) {
+		if (!validator.isLength(inputs.name,1,100) || regEx.test(reqData.username)) {
 			logger.error("Error occurred in admin/"+fnName+": Invalid User name.");
 			flag[2]='1';
 		}
@@ -65,31 +76,46 @@ exports.manageUserDetails = async (req, res) => {
 			inputs.userid = (reqData.userid || "").trim();
 		}
 		if (action != "delete") {
-			// if (internalUser) {
-			// 	if (validator.isEmpty(inputs.auth.password) && !(validator.isLength(inputs.auth.password,1,12))) {
-			// 		logger.error("Error occurred in admin/"+fnName+": Invalid Password.");
-			// 		flag[5]='1';
-			// 	}
-			// }
+			if (internalUser) {
+				//check if password is valid iff it is not empty
+				if (!validator.isEmpty(inputs.auth.password) && (!validator.isLength(inputs.auth.password,8,16) || !regexPassword.test(inputs.auth.password))) {
+					logger.error("Error occurred in admin/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.");
+					flag[5]='1';
+				} else if (action == "update") {
+					const userData = {username, newpass: inputs.auth.password, oldpass: ''};
+					const fresh = await login.verifyPasswordHistory(userData);
+					if (fresh == "fail") {
+						logger.error("Error occurred in admin/"+fnName+": Unable to retrive user profile");
+						return res.status(500).send("fail");
+					} else if (fresh != "valid") {
+						logger.error("Error occurred in admin/"+fnName+": Password provided does not meet length, complexity or history requirements of application.");
+						flag[5]='2'
+					} else {
+						//Add previous password to history
+						inputs.oldPassword = userData.oldpass;
+					}
+				}
+			}
 			if (inputs.auth.password != '') {
 				const salt = bcrypt.genSaltSync(10);
 				inputs.auth.password = bcrypt.hashSync(inputs.auth.password, salt);
-			} else delete inputs.auth.password;
+			}
+			// else delete inputs.auth.password;
 			inputs.firstname = (reqData.firstname || "").trim();
 			inputs.lastname = (reqData.lastname || "").trim();
 			inputs.email = (reqData.email || "").trim();
 			inputs.defaultrole = (reqData.role || "").trim();
 
-			if (!validator.isLength(inputs.firstname,1,100)) {
+			if (!validator.isLength(inputs.firstname,1,100) || regEx.test(reqData.firstname)) {
 				logger.error("Error occurred in admin/"+fnName+": Invalid First name.");
 				flag[3]='1';
 			}
-			if (!validator.isLength(inputs.lastname,1,100)) {
+			if (!validator.isLength(inputs.lastname,1,100) || regEx.test(reqData.lastname)) {
 				logger.error("Error occurred in admin/"+fnName+": Invalid Last name.");
 				flag[4]='1';
 			}
-			if (!validator.isLength(inputs.email,1,100)) {
-				logger.error("Error occurred in admin/"+fnName+": Email cannot be empty.");
+			if (!validator.isLength(inputs.email,1,100) || !regEx_email.test(reqData.email)) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid Email Address.");
 				flag[6]='1';
 			}
 			if (action == "update") {
@@ -164,130 +190,110 @@ exports.getUserDetails = async (req, res) => {
 	}
 };
 
-exports.getDomains_ICE = function getDomains_ICE(req, res) {
-	logger.info("Inside UI service: getDomains_ICE");
+// Fetch Locked Users
+exports.fetchLockedUsers = async (req, res) => {
+	const fnName = "fetchLockedUsers";
+	logger.info("Inside UI Service: " + fnName);
 	try {
-		if (utils.isSessionActive(req)) {
-			var responsedata = [];
-			var args = {
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling DAS Service: getDomains_ICE");
-			client.post(epurl + "admin/getDomains_ICE", args,
-				function (result, response) {
-				try {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in getDomains_ICE Error Code : ERRDAS");
-						res.send("fail");
-					} else {
-						res.send(result.rows)
-					}
-				} catch (exception) {
-				logger.error(exception.message);
-				}
+		const result = await utils.fetchData({}, "admin/fetchLockedUsers", fnName);
+		if (result == "fail") res.status(500).send("fail");
+		else {
+			const lockedUsers = [];
+			result.forEach(function(e) {
+				lockedUsers.push({
+					username: e.name,
+					role: e.defaultrole
+				});
 			});
-			function finalresult() {
-				logger.info("Domains fetched successfully");
-				res.send(responsedata);
-			}
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
+			return res.send(lockedUsers);
 		}
-	} catch (exception) {
-		logger.error(exception.message);
-		res.send("fail");
-	}
-};
-
-//Generate Token for CI User
-exports.manageCIUsers = function (req, res) {
-	logger.info("Inside UI service: manageCIUsers");
-	try {
-		if (utils.isSessionActive(req)) {
-			if(req.body.action=="create")
-			{
-				var requestDetails = req.body.CIUser;
-				const tokgen2 = new TokenGenerator(256, TokenGenerator.BASE62);
-				var token=tokgen2.generate()
-				var salt = bcrypt.genSaltSync(10);
-				var inputs = {
-					userid: requestDetails.userId,
-					expireson: requestDetails.expiry,
-					name: requestDetails.tokenname,
-					icetype:requestDetails.icetype,
-					hash: bcrypt.hashSync(token, salt),
-					action: req.body.action,
-					type: "TOKENS",
-					deactivated: "active"
-				};
-			}
-			if(req.body.action=="deactivate") {
-				var requestDetails = req.body.CIUser;
-				var inputs = {
-					userid: requestDetails.userId,
-					name: requestDetails.tokenName,
-					action: req.body.action,
-				};
-			}
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling DAS Service : admin/manageCIUsers");
-			client.post(epurl + "admin/manageCIUsers",args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					res.send("fail");
-				} else if (response.statusCode != 200 || result.rows == "duplicate"){
-					res.send("duplicate")
-				} else {
-					result.rows.token = token;
-					res.send(result.rows);
-				}
-			});
-		} else {
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error("Error occurred in admin/manageCIUsers:", exception);
+	} catch (exception){
+		logger.error("Error occurred in admin/"+fnName+":", exception);
 		res.status(500).send("fail");
 	}
 };
 
-//Fetch CI User details
-exports.getCIUsersDetails = function(req,res){
-	logger.info("Inside UI Service: getCIUsersDetails");
+exports.getDomains_ICE = async (req, res) => {
+	const fnName = "getDomains_ICE";
+	logger.info("Inside UI service: " + fnName);
 	try {
-		if (utils.isSessionActive(req)) {
-			var requestDetails = req.body.CIUser;
-			var inputs = {
-				user_id: requestDetails.userId
+		const result = await utils.fetchData({}, "admin/getDomains_ICE", fnName);
+		if (result == "fail") return res.send("fail");
+		else return res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in admin/"+fnName+":", exception);
+		res.status(500).send("fail");
+	}
+};
+
+//Generate Token for CI User
+exports.manageCIUsers = async (req, res) => {
+	const fnName = "manageCIUsers";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const requestDetails = req.body.CIUser;
+		let token = '';
+		let inputs = {
+			type: "TOKENS",
+			action: req.body.action,
+			userid: requestDetails.userId,
+			name: requestDetails.tokenName
+		}
+		if (req.body.action=="create") {
+			const now = new Date(requestDetails.expiry);
+			const today= new Date();
+			let td = today;
+			td.setHours(today.getHours()+8);
+			if (now < today || (now <= today && now > td)) {
+				logger.error("Error occurred in admin/"+fnName+" Expiry time should be 8 hours more than current time");
+				return res.send("invalid_past_time");
+			}
+			const tokgen2 = new TokenGenerator(256, TokenGenerator.BASE62);
+			token = tokgen2.generate()
+			const salt = bcrypt.genSaltSync(10);
+			inputs = {
+				...inputs,
+				expireson: requestDetails.expiry,
+				icetype:requestDetails.icetype,
+				hash: bcrypt.hashSync(token, salt),
+				deactivated: "active",
+				name: requestDetails.tokenname,
 			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling DAS Service : admin/getCIUsersDetails");
-			client.post(epurl + "admin/getCIUsersDetails",args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					res.send("fail");
-				} else {
-					res.send(result.rows);
-				}
-			});
-		} else {
-			res.send("Invalid Session");
+		}
+
+		if(regEx.test(inputs.name)) {
+			logger.error("Error occurred in admin/"+fnName+": Special characters found in token name");
+			return res.send("invalid_name_special");
+		}
+
+		const result = await utils.fetchData(inputs, "admin/manageCIUsers", fnName);
+		if (result == "fail") return res.send("fail");
+		else if (result == "duplicate") return res.send("duplicate");
+		else {
+			result.token = token;
+			return res.send(result);
 		}
 	} catch (exception) {
-		logger.error("Error occurred in admin/getCIUsersDetails:", exception);
+		logger.error("Error occurred in admin/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+//Fetch CI User details
+exports.getCIUsersDetails = async (req,res) => {
+	const fnName = "getCIUsersDetails";
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		const requestDetails = req.body.CIUser;
+		const inputs = {
+			user_id: requestDetails.userId
+		};
+		const result = await utils.fetchData(inputs, "admin/getCIUsersDetails", fnName);
+		logger.info("Calling DAS Service : admin/getCIUsersDetails");
+		if (result == "fail") return res.send("fail");
+		else return res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in admin/"+fnName+":", exception);
 		res.status(500).send("fail");
 	}
 };
@@ -365,130 +371,174 @@ exports.manageSessionData = async (req, res) => {
 	}
 };
 
-exports.getNames_ICE = function (req, res) {
-	logger.info("Inside UI service: getNames_ICE");
+//Unlock user by admin
+exports.unlockUser = async (req, res) => {
+	const fnName = "unlockUser";
+	logger.info("Inside UI Service: " + fnName);
 	try {
-		if (utils.isSessionActive(req)) {
-			var id=req.body.requestedids;
-			var type=req.body.idtype[0];
-			logger.info("Inside function namesfetcher");
-			var inputs = {
-				"type": type,
-				"id": id,
+		const username = req.body.user;
+		inputs = { username };
+		const status = await utils.fetchData(inputs, "admin/unlockUser", fnName);
+		if(status=="fail") res.status(500).send("fail");
+		else res.send("success");
+	} catch (exception) {
+		logger.error("Error occurred in admin/"+fnName+":", exception);
+		res.status(500).send("fail");
+	}
+	
+};
+
+exports.getNames_ICE = async (req, res) => {
+	const fnName = "getNames_ICE";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const inputs = {
+			"type": req.body.idtype[0],
+			"id": req.body.requestedids,
+		};
+		const queryStringresult = await utils.fetchData(inputs, "admin/getNames_ICE", fnName);
+		if (queryStringresult == "fail") {
+			res.send("fail");
+		} else if (queryStringresult.length == 0) {
+			logger.info('No projects found');
+			return res.send("No Projects");
+		} else {
+			let responsedata = {
+				projectIds: [],
+				projectNames: []
 			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling DAS Service from namesfetcher: admin/getNames_ICE");
-			client.post(epurl + "admin/getNames_ICE", args,
-				function (queryStringresult, response) {
-				try {
-					if (response.statusCode != 200 || queryStringresult.rows == "fail") {
-						var statusFlag = "Error occurred in namesfetcher : Fail";
-						logger.error("Error occurred in admin/getNames_ICE from namesfetcher Error Code : ERRDAS");
-						// namesfetchercallback(statusFlag, null);
-					} else {
-						respLength = queryStringresult.rows.length;
-						responsedata = {
-							projectIds: [],
-							projectNames: []
-						};
-						if (respLength <= 0) {
-							logger.info('No projects found');
-							res.send("No Projects");
-						} else {
-							for (var i = 0; i < respLength; i++) {
-								responsedata.projectIds.push(queryStringresult.rows[i]._id);
-								responsedata.projectNames.push(queryStringresult.rows[i].name);
-								if (i == respLength - 1) {
-									logger.info('Project details fetched successfully');
-									res.send(responsedata);
-								}
-							}
-						}
-					}
-				} catch (exception) {
-					logger.error(exception.message);
-				}
-			});
-		}
-		else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
+			for (let row of queryStringresult) {
+				responsedata.projectIds.push(row._id);
+				responsedata.projectNames.push(row.name);
+			}
+			return res.send(responsedata);
 		}
 	} catch (exception) {
-		logger.error(exception.message);
+		logger.error("Error occurred in admin/"+fnName+":", exception);
+		res.status(500).send("fail");
 	}
 };
 
-exports.createProject_ICE = function createProject_ICE(req, res) {
+exports.createProject_ICE = async (req, res) => {
+	const fnName = "createProject_ICE";
+	logger.info("Inside UI service: " + fnName);
 	try {
-		logger.info("Inside UI service: createProject_ICE");
-		if (utils.isSessionActive(req)) {
-			var createProjectObj=req.body.createProjectObj;
-			var userDetails = {
-				role: req.session.activeRoleId,
-                user_id: req.session.userid
-            };
-			var inputs={
-				name: createProjectObj.projectName,
-				domain: createProjectObj.domain,
-				type: createProjectObj.appType,
-				releases: createProjectObj.projectDetails,
-				createdbyrole: userDetails.role,
-				createdby: userDetails.user_id,
-				modifiedby: userDetails.user_id,
-				modifiedbyrole: userDetails.role
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling DAS Service: createProject_ICE");
-			client.post(epurl + "admin/createProject_ICE", args,
-				function (result, response) {
-				try {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in createProject_ICE Error Code : ERRDAS");
-						res.send("fail");
-					} else {
-						res.send(result.rows)
+		const createProjectObj=req.body.createProjectObj;
+		if (regEx.test(createProjectObj.projectName)) {
+			logger.error("Error occurred in admin/"+fnName+": Special characters found in project name");
+			return res.send("invalid_name_spl");
+		}
+		for(let rel of createProjectObj.projectDetails) {
+			if (regEx.test(rel.name)) {
+				logger.error("Error occurred in admin/"+fnName+": Special characters found in release name");
+				return res.send("invalid_name_spl");
+			} else {
+				for (let cyc of rel.cycles) {
+					if(regEx.test(cyc.name)) {
+						logger.error("Error occurred in admin/"+fnName+": Special characters found in cycle name");
+						return res.send("invalid_name_spl");
 					}
-				} catch (exception) {
-				logger.error(exception.message);
 				}
-			});
+			}
+		}
+		const userid = req.session.userid;
+		const roleId = req.session.activeRoleId;
+		const inputs = {
+			name: createProjectObj.projectName,
+			domain: createProjectObj.domain,
+			type: createProjectObj.appType,
+			releases: createProjectObj.projectDetails,
+			createdby: userid,
+			createdbyrole: roleId,
+			modifiedby: userid,
+			modifiedbyrole: roleId
+		};
+		const result = await utils.fetchData(inputs, "admin/createProject_ICE", fnName);
+		if (result == "fail") {
+			return res.send("fail");
 		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
+			return res.send(result)
 		}
 	} catch (exception) {
-		logger.error(exception.message);
+		logger.error("Error occurred in admin/"+fnName+":", exception);
+		res.status(500).send("fail");
 	}
+};
+
+const parseLDAPErrors = (err, authType, fnName) => {
+	var flag = "fail"
+	const errm = err.lde_message;
+	if (["EADDRNOTAVAIL", "ECONNREFUSED", "ETIMEDOUT"].includes(err.errno)) {
+		flag = "invalid_addr";
+		logger.error("Error occurred in admin/"+fnName+": Invalid LDAP Server address");
+	} else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
+		if (authType == "simple") {
+			flag = "insufficient_access";
+			logger.error("Error occurred in admin/"+fnName+": Insufficient Access");
+		} else flag = "success";
+	} else if (errm) {
+		if (errm.indexOf("DSID-0C0906E8") > -1) {
+			if (authType == "simple") {
+				flag = "insufficient_access";
+				logger.error("Error occurred in admin/"+fnName+": Insufficient Access");
+			} else {
+				flag = "invalid_auth";
+				logger.error("Error occurred in admin/"+fnName+": Invalid Credentials");
+			}
+		} else if (errm.indexOf("DSID-031522C9") > -1) {
+			flag = "insufficient_access";
+			logger.error("Error occurred in admin/"+fnName+": Insufficient Access");
+		} else if (authType == "simple") {
+			if ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) ||
+				(errm.indexOf("DSID-0C090442") > -1) || (errm.indexOf("DSID-0C090453") > -1)) {
+				flag = "invalid_credentials";
+				logger.error("Error occurred in admin/"+fnName+": Invalid Credentials");
+			}
+		} else if (errm.indexOf("DSID-031007DB") > -1) {
+			flag = "invalid_basedn";
+			logger.error("Error occurred in admin/"+fnName+": Invalid Base DN");
+		} else {
+			flag = "server_error";
+			logger.error("Error occurred in admin/"+fnName+":", err.lde_message || err.message);
+		}
+	} else if (err.code == "UNABLE_TO_VERIFY_LEAF_SIGNATURE") {
+		flag = "invalid_cacert";
+		logger.error("Error occurred in admin/"+fnName+": Invalid TLS certificate");
+	} else if (err.code == "ERR_TLS_CERT_ALTNAME_INVALID") {
+		flag = "invalid_cacert_host";
+		logger.error("Error occurred in admin/"+fnName+": Invalid TLS Certificate - Hostname verification failed!");
+	}
+	var errStack = "";
+	try {
+		errStack = JSON.stringify(err);
+	} catch(_){
+		errStack = JSON.stringify({"message": err.lde_message || err.message, "code": err.errno || err.code});
+	}
+	return [flag, errStack];
 };
 
 exports.testLDAPConnection = (req, res) => {
-	logger.info("Inside UI Service: testLDAPConnection");
+	const fnName = "testLDAPConnection";
+	logger.info("Inside UI Service: " + fnName);
 	try{
 		const reqData = req.body;
 		const ldapURL = (reqData.ldapURL || "").trim();
 		const secure = (reqData.secure || "false").trim();
 		const tlsCert = (reqData.tlsCert || "").trim() || false;
+		if(!ldap_url.test(ldapURL) || char_check.test(reqData.baseDN) || char_check.test(reqData.username)){
+			logger.error("Error occurred in admin/"+fnName+": Special characters found in LDAP configuration values");
+			return res.send("spl_chars");
+		}
 		if (ldapURL.slice(0,8) == "ldaps://") {
 			if (secure === "false") {
-				logger.error("Error occurred in admin/testLDAPConnection: Secure connection must be enabled for 'ldaps' protocol");
+				logger.error("Error occurred in admin/"+fnName+": Secure connection must be enabled for 'ldaps' protocol");
 				return res.send("mismatch_secure");
 			} else if (!tlsCert) {
-				logger.error("Error occurred in admin/testLDAPConnection: 'ldaps' protocol require TLS Certificate.");
+				logger.error("Error occurred in admin/"+fnName+": 'ldaps' protocol require TLS Certificate.");
 				return res.send("invalid_cert");
 			}
 		} else if (ldapURL.slice(0,8) != "ldaps://" && ldapURL.slice(0,7) != "ldap://") {
-			logger.error("Error occurred in admin/testLDAPConnection: Invalid URL provided for connection test.");
+			logger.error("Error occurred in admin/"+fnName+": Invalid URL provided for connection test.");
 			return res.send("invalid_url");
 		}
 		const baseDN = (reqData.baseDN || "").trim();
@@ -515,33 +565,8 @@ exports.testLDAPConnection = (req, res) => {
 			var flag = "success";
 			var data = {fields:{}};
 			if (err) {
-				const errm = err.lde_message;
-				if (["EADDRNOTAVAIL", "ECONNREFUSED", "ETIMEDOUT"].includes(err.errno)) flag = "invalid_addr";
-				else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
-					if (authType == "simple") flag = "insufficient_access";
-					else flag = "success";
-				} else if (errm) {
-					if (errm.indexOf("DSID-0C0906E8") > -1) {
-						if (authType == "simple") flag = "insufficient_access";
-						else flag = "invalid_auth";
-					} else if (errm.indexOf("DSID-031522C9") > -1) {
-						flag = "insufficient_access";
-						logger.error("User Does not have sufficient Access!");
-					} else if (authType == "simple") {
-						if ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) || (errm.indexOf("DSID-0C090442") > -1))
-							flag = "invalid_credentials";
-					}
-					else if (errm.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
-				} else if (err.code == "UNABLE_TO_VERIFY_LEAF_SIGNATURE") flag = "invalid_cacert";
-				else if (err.code == "ERR_TLS_CERT_ALTNAME_INVALID") flag = "invalid_cacert_host";
-				else flag = "fail";
-				var errStack = "";
-				try {
-					errStack = JSON.stringify(err);
-				} catch(_){
-					errStack = JSON.stringify({"message": err.lde_message || err.message, "code": err.errno || err.code});
-				}
-				logger.debug("Error occurred in admin/testLDAPConnection: " + errStack);
+				var [flag, errStack] = parseLDAPErrors(err, authType, fnName);
+				logger.debug("Error occurred in admin/"+fnName+": " + errStack);
 			}
 			if (flag == "success") {
 				logger.info('LDAP Connection test passed!');
@@ -566,7 +591,7 @@ exports.testLDAPConnection = (req, res) => {
 			res.send("invalid_basedn");
 			logger.error('LDAP Connection test failed!');
 		} else {
-			logger.error("Error occurred in admin/testLDAPConnection", exception);
+			logger.error("Error occurred in admin/"+fnName+": ", exception);
 			res.status(500).send("fail");
 		}
 	}
@@ -621,14 +646,9 @@ exports.getLDAPConfig = async (req, res) => {
 				if (resSent) return;
 				resSent = !resSent;
 				if (err) {
-					if (err.lde_message && err.lde_message.indexOf("DSID-031522C9") > -1) {
-						logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: Insufficient Access");
-						data = "insufficient_access";
-					} else {
-						logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details:", err.lde_message || err.message);
-						logger.debug("ERROR: " + JSON.stringify(err));
-						data = "server_error";
-					}
+					var [data, errStack] = parseLDAPErrors(err, resConf.auth, fnName);
+					logger.debug("Error occurred in admin/"+fnName+": " + errStack);
+					if (data == "fail") data = "server_error";
 				}
 				else if (result) {
 					data = {
@@ -649,14 +669,9 @@ exports.getLDAPConfig = async (req, res) => {
 				if (resSent) return;
 				resSent = !resSent;
 				if (err) {
-					if (err.lde_message && err.lde_message.indexOf("DSID-031522C9") > -1) {
-						logger.error("Error occurred in admin/getLDAPConfig: Fetch Users: Insufficient Access");
-						data = "insufficient_access";
-					} else {
-						logger.error("Error occurred in admin/getLDAPConfig: Fetch Users:", err.lde_message || err.message);
-						logger.debug("ERROR: " + JSON.stringify(err));
-						data = "server_error";
-					}
+					var [data, errStack] = parseLDAPErrors(err, resConf.auth, fnName);
+					logger.debug("Error occurred in admin/"+fnName+": " + errStack);
+					if (data == "fail") data = "server_error";
 				}
 				else if (result) {
 					var groups = result.groups;
@@ -699,8 +714,8 @@ exports.manageLDAPConfig = async (req, res) => {
 			logger.error("Error occurred in admin/manageLDAPConfig: Invalid action.");
 			flag[1] = '1';
 		}
-		if (validator.isEmpty(inputs.name)) {
-			logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server Name cannot be empty.");
+		if (validator.isEmpty(inputs.name) || regEx.test(inputs.name)) {
+			logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server Name cannot be empty or have restricted characters.");
 			flag[2] = '1';
 		}
 		if  (action != "delete") {
@@ -711,8 +726,8 @@ exports.manageLDAPConfig = async (req, res) => {
 			inputs.fieldmap = reqData.fieldmap || {};
 			const secure = (reqData.secure !== "false");
 			const protocol = (inputs.url.slice(0,7) + ((inputs.url.slice(7,8)=='/')?'/':'')).slice(0,-3);
-			if (validator.isEmpty(inputs.url)) {
-				logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
+			if (validator.isEmpty(inputs.url) || !ldap_url.test(reqData.url)) {
+				logger.error("Error occurred in admin/manageLDAPConfig: LDAP Server URL cannot be empty or have restricted characters.");
 				flag[3] = '1';
 			} else if (secure && protocol == "ldap") {
 				logger.error("Error occurred in admin/manageLDAPConfig: Secure Connection needs 'ldaps' protocol.");
@@ -730,7 +745,7 @@ exports.manageLDAPConfig = async (req, res) => {
 				logger.error("Error occurred in admin/manageLDAPConfig: Invalid URL provided. URL should start with ldap or ldaps");
 				flag[3] = '5';
 			}
-			if (validator.isEmpty(inputs.basedn)) {
+			if (validator.isEmpty(inputs.basedn) || char_check.test(reqData.basedn)) {
 				logger.error("Error occurred in admin/manageLDAPConfig: Invalid Base Domain Name.");
 				flag[4] = '1';
 			}
@@ -741,7 +756,7 @@ exports.manageLDAPConfig = async (req, res) => {
 			if (inputs.auth == "simple") {
 				inputs.binddn = (reqData.binddn || "").trim();
 				inputs.bindcredentials = (reqData.bindcredentials || "").trim();
-				if (validator.isEmpty(inputs.binddn)) {
+				if (validator.isEmpty(inputs.binddn) || char_check.test(reqData.binddn)) {
 					logger.error("Error occurred in admin/manageLDAPConfig: Invalid Bind Domain Name.");
 					flag[6] = '1';
 				}
@@ -754,8 +769,8 @@ exports.manageLDAPConfig = async (req, res) => {
 					}
 				}
 			}
-			if (!inputs.fieldmap.uname || !inputs.fieldmap.fname || !inputs.fieldmap.lname || !inputs.fieldmap.email) {
-				logger.error("Error occurred in admin/manageLDAPConfig: Invalid Field Map.");
+			if (!inputs.fieldmap.uname || !inputs.fieldmap.fname || !inputs.fieldmap.lname || !inputs.fieldmap.email || char_check.test(reqData.fieldmap.email) || char_check.test(reqData.fieldmap.fname) || char_check.test(reqData.fieldmap.lname) || char_check.test(reqData.fieldmap.uname)) {
+				logger.error("Error occurred in admin/manageLDAPConfig: Invalid Field Map or restricted characters found.");
 				flag[8] = '1';
 			} else inputs.fieldmap = JSON.stringify(inputs.fieldmap);
 		}
@@ -802,23 +817,23 @@ exports.manageSAMLConfig = async (req, res) => {
 			logger.error(errPretext + ": Invalid action.");
 			flag[1] = '1';
 		}
-		if (validator.isEmpty(inputs.name)) {
-			logger.error(errPretext + ": SAML Server Name cannot be empty.");
+		if (validator.isEmpty(inputs.name) || regEx.test(reqData.name)) {
+			logger.error(errPretext + ": SAML Server Name cannot be empty or have restricted characters.");
 			flag[2] = '1';
 		}
 		if  (action != "delete") {
 			inputs.url = (reqData.url || "").trim();
 			inputs.idp = (reqData.idp || "").trim();
 			inputs.cert = (reqData.cert || "").trim();
-			if (validator.isEmpty(inputs.url)) {
-				logger.error(errPretext + ": Single Sign-On URL cannot be empty.");
+			if (validator.isEmpty(inputs.url) || !regExURL.test(reqData.url)) {
+				logger.error(errPretext + ": Single Sign-On URL cannot be empty or have restricted characters.");
 				flag[3] = '1';
 			} else if (!inputs.url.startsWith("https://") && !inputs.url.startsWith("http://")) {
 				logger.error(errPretext + ": Single Sign-On URL must start with http:// or https://");
 				flag[3] = '2';
 			}
-			if (validator.isEmpty(inputs.idp)) {
-				logger.error(errPretext + ": Issuer cannot be empty.");
+			if (validator.isEmpty(inputs.idp) || char_check.test(reqData.idp)) {
+				logger.error(errPretext + ": Issuer cannot be empty or have restricted characters.");
 				flag[4] = '1';
 			}
 			if (validator.isEmpty(inputs.cert)) {
@@ -872,27 +887,27 @@ exports.manageOIDCConfig = async (req, res) => {
 			logger.error(errPretext + ": Invalid action.");
 			flag[1] = '1';
 		}
-		if (validator.isEmpty(inputs.name)) {
-			logger.error(errPretext + ": OIDC Server Name cannot be empty.");
+		if (validator.isEmpty(inputs.name) || regEx.test(reqData.name)) {
+			logger.error(errPretext + ": OIDC Server Name cannot be empty or have restricted characters.");
 			flag[2] = '1';
 		}
 		if  (action != "delete") {
 			inputs.url = (reqData.url || "").trim();
 			inputs.clientid = (reqData.clientid || "").trim();
 			inputs.secret = (reqData.secret || "").trim();
-			if (validator.isEmpty(inputs.url)) {
-				logger.error(errPretext + ": Issuer URL cannot be empty.");
+			if (validator.isEmpty(inputs.url) || !regExURL.test(reqData.url)) {
+				logger.error(errPretext + ": Issuer URL cannot be empty or have restricted characters.");
 				flag[3] = '1';
 			} else if (!inputs.url.startsWith("https://") && !inputs.url.startsWith("http://")) {
 				logger.error(errPretext + ": Issuer URL must start with http:// or https://");
 				flag[3] = '2';
 			}
-			if (validator.isEmpty(inputs.clientid)) {
-				logger.error(errPretext + ": Client ID cannot be empty.");
+			if (validator.isEmpty(inputs.clientid) || char_check.test(reqData.clientid)) {
+				logger.error(errPretext + ": Client ID cannot be empty or have restricted characters.");
 				flag[4] = '1';
 			}
-			if (validator.isEmpty(inputs.secret)) {
-				logger.error(errPretext + ": Client Secret cannot be empty.");
+			if (validator.isEmpty(inputs.secret) || char_check.test(reqData.secret)) {
+				logger.error(errPretext + ": Client Secret cannot be empty or have restricted characters.");
 				flag[5] = '1';
 			}
 		}
@@ -909,150 +924,137 @@ exports.manageOIDCConfig = async (req, res) => {
 
 exports.getDetails_ICE = function (req, res) {
 	logger.info("Inside UI service: getDetails_ICE");
-	var checkresBody = validator.isJSON(JSON.stringify(req.body));
-	if (checkresBody == true) {
-		try {
-			if (utils.isSessionActive(req)) {
-				var id=req.body.requestedids[0];
-				var type=req.body.idtype[0];
-				logger.info("Inside function namesfetcher");
-					var inputs = {
-						"type": type,
-						"id": id,
+	try {
+		var id=req.body.requestedids[0];
+		var type=req.body.idtype[0];
+		logger.info("Inside function namesfetcher");
+		var inputs = {
+			"type": type,
+			"id": id,
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		logger.info("Calling DAS Service from namesfetcher: admin/getDetails_ICE");
+		client.post(epurl + "admin/getDetails_ICE", args,
+			function (queryStringresult, response) {
+			try {
+				if (response.statusCode != 200 || queryStringresult.rows == "fail") {
+					var statusFlag = "Error occurred in namesfetcher : Fail";
+					logger.error("Error occurred in admin/getDetails_ICE from namesfetcher Error Code : ERRDAS");
+					// namesfetchercallback(statusFlag, null);
+				} else {
+					if(type=="projectsdetails"){
+					responsedata = {
+						appType: "",
+						projectName: "",
+						projectId: "",
+						projectDetails: []
 					};
-					var args = {
-						data: inputs,
-						headers: {
-							"Content-Type": "application/json"
+					responsedata.appType=queryStringresult.rows.type
+					responsedata.projectName=queryStringresult.rows.name
+					responsedata.projectId=queryStringresult.rows._id
+					responsedata.projectDetails=queryStringresult.rows.releases
+					res.send(responsedata);
+					}
+					else if(type == "domaindetails"){
+						var responsedatadomains = {
+							projectIds: [],
+							projectNames: []
+						};
+						for (var i = 0; i < queryStringresult.rows.length; i++) {
+							responsedatadomains.projectIds.push(queryStringresult.rows[i]._id);
+							responsedatadomains.projectNames.push(queryStringresult.rows[i].name);
 						}
-					};
-					logger.info("Calling DAS Service from namesfetcher: admin/getDetails_ICE");
-					client.post(epurl + "admin/getDetails_ICE", args,
-						function (queryStringresult, response) {
-						try {
-							if (response.statusCode != 200 || queryStringresult.rows == "fail") {
-								var statusFlag = "Error occurred in namesfetcher : Fail";
-								logger.error("Error occurred in admin/getDetails_ICE from namesfetcher Error Code : ERRDAS");
-								// namesfetchercallback(statusFlag, null);
-							} else {
-								if(type=="projectsdetails"){
-								responsedata = {
-									appType: "",
-									projectName: "",
-									projectId: "",
-									projectDetails: []
-								};
-								responsedata.appType=queryStringresult.rows.type
-								responsedata.projectName=queryStringresult.rows.name
-								responsedata.projectId=queryStringresult.rows._id
-								responsedata.projectDetails=queryStringresult.rows.releases
-								res.send(responsedata);
-								}
-								else if(type == "domaindetails"){
-									var responsedatadomains = {
-										projectIds: [],
-										projectNames: []
-									};
-									for (var i = 0; i < queryStringresult.rows.length; i++) {
-										responsedatadomains.projectIds.push(queryStringresult.rows[i]._id);
-										responsedatadomains.projectNames.push(queryStringresult.rows[i].name);
-									}
-									res.send(responsedatadomains)
-								}else{
-									res.send(queryStringresult.rows);
-								}
-							}
-						} catch (exception) {
-							logger.error(exception.message);
-						}
-					});
-				}
-				else {
-					logger.info("Invalid Session");
-					res.send("Invalid Session");
+						res.send(responsedatadomains)
+					}else{
+						res.send(queryStringresult.rows);
+					}
 				}
 			} catch (exception) {
 				logger.error(exception.message);
 			}
-		};
-}
+		});
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
 
 exports.assignProjects_ICE = function (req, res) {
 	logger.info("Inside UI Service: assignProjects_ICE");
 	try {
-		if (utils.isSessionActive(req)) {
-			var assignProjectsDetails = req.body.assignProjectsObj;
-			var projectDetails = assignProjectsDetails.assignedProjects;
-			var projectIds = [];
-			var alreadyassigned = false;
-			for (var i = 0; i < projectDetails.length; i++) {
-				projectIds.push(projectDetails[i].projectId);
+		var assignProjectsDetails = req.body.assignProjectsObj;
+		var projectDetails = assignProjectsDetails.assignedProjects;
+		var projectIds = [];
+		var alreadyassigned = false;
+		for (var i = 0; i < projectDetails.length; i++) {
+			projectIds.push(projectDetails[i].projectId);
+		}
+		var inputs = {};
+		validateAssignProjects();
+		var valid_domainId, valid_objects, valid_userId;
+		function validateAssignProjects() {
+			logger.info("Inside function validateAssignProjects");
+			var check_domainId = validator.isEmpty(assignProjectsDetails.domainname);
+			if (check_domainId == false) {
+				valid_domainId = true;
 			}
-			var inputs = {};
-			validateAssignProjects();
-			var valid_domainId, valid_objects, valid_userId;
-			function validateAssignProjects() {
-				logger.info("Inside function validateAssignProjects");
-				var check_domainId = validator.isEmpty(assignProjectsDetails.domainname);
-				if (check_domainId == false) {
-					valid_domainId = true;
-				}
-				valid_userId = true;
-				// var check_userid = validator.isUUID(assignProjectsDetails.userId);
-				// if (check_userid == true) {
-				// 	valid_userId = true;
-				// }
-				var check_userInfo = validator.isJSON(JSON.stringify(req.session));
-				var check_assignProjectDetails = validator.isJSON(JSON.stringify(req.session));
-				if (check_userInfo == true && check_assignProjectDetails == true) {
-					valid_objects = true;
-				}
-
+			valid_userId = true;
+			// var check_userid = validator.isUUID(assignProjectsDetails.userId);
+			// if (check_userid == true) {
+			// 	valid_userId = true;
+			// }
+			var check_userInfo = validator.isJSON(JSON.stringify(assignProjectsDetails.userInfo));
+			var check_assignProjectDetails = validator.isJSON(JSON.stringify(assignProjectsDetails.userInfo));
+			if (check_userInfo == true && check_assignProjectDetails == true) {
+				valid_objects = true;
 			}
 
-			if (assignProjectsDetails.getAssignedProjectsLen > 0) {
-				alreadyassigned = true;
-				inputs = {
-					"alreadyassigned": alreadyassigned,
-					"userid": assignProjectsDetails.userId,
-					"domainid": assignProjectsDetails.domainname,
-					"modifiedbyrole": req.session.defaultRoleId,
-					"modifiedby": req.session.username.toLowerCase(),
-					"projectids": projectIds
-				};
-			} else {
-				inputs = {
-					"alreadyassigned": alreadyassigned,
-					"userid": assignProjectsDetails.userId,
-					"domainid": assignProjectsDetails.domainname,
-					"createdby": req.session.username.toLowerCase(),
-					"projectids": projectIds
-				};
-			}
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
+		}
+
+		if (assignProjectsDetails.getAssignedProjectsLen > 0) {
+			alreadyassigned = true;
+			inputs = {
+				"alreadyassigned": alreadyassigned,
+				"userid": assignProjectsDetails.userId,
+				"domainid": assignProjectsDetails.domainname,
+				"modifiedbyrole": assignProjectsDetails.userInfo.role,
+				"modifiedby": assignProjectsDetails.userInfo.username.toLowerCase(),
+				"projectids": projectIds
 			};
-			if (valid_domainId == true && valid_userId == true && valid_objects == true) {
-				logger.info("Calling DAS Service : admin/assignProjects_ICE");
-				client.post(epurl + "admin/assignProjects_ICE", args,
-					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in admin/assignProjects_ICE Error Code : ERRDAS");
-						res.send("fail");
-					} else {
-                        inputs.projectids1 = "'"+inputs.projectids.join('\',\'')+"'";
-						res.send(result.rows);
-					}
-				});
-			} else {
-				res.send('fail');
-			}
 		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
+			inputs = {
+				"alreadyassigned": alreadyassigned,
+				"userid": assignProjectsDetails.userId,
+				"domainid": assignProjectsDetails.domainname,
+				"createdby": assignProjectsDetails.userInfo.username.toLowerCase(),
+				"projectids": projectIds
+			};
+		}
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		if (valid_domainId == true && valid_userId == true && valid_objects == true) {
+			logger.info("Calling DAS Service : admin/assignProjects_ICE");
+			client.post(epurl + "admin/assignProjects_ICE", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in admin/assignProjects_ICE Error Code : ERRDAS");
+					res.send("fail");
+				} else {
+					inputs.projectids1 = "'"+inputs.projectids.join('\',\'')+"'";
+					res.send(result.rows);
+				}
+			});
+		} else {
+			res.send('fail');
 		}
 	} catch (exception) {
 		logger.error(exception.message);
@@ -1063,77 +1065,71 @@ exports.assignProjects_ICE = function (req, res) {
 exports.getAssignedProjects_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: getAssignedProjects_ICE");
-		if (utils.isSessionActive(req)) {
-			var requestDetails = req.body.getAssignProj;
-			var assignedProjectIds = [];
-			var assignedProjObj = [];
-			var inputs = {
-				"query": "projectid",
-				"userid": requestDetails.userId
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling DAS Service : admin/getAssignedProjects_ICE");
-			client.post(epurl + "admin/getAssignedProjects_ICE", args,
-				function (result, response) {
-				try {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in admin/getAssignedProjects_ICE Error Code : ERRDAS");
-						res.send("fail");
-					} else {
-						assignedProjectIds = result.rows.projects;
-						// async.forEachSeries(assignedProjectIds, function (iterator, assignProjectCallback) {
-							try {
-								var inputs = {
-									"query": "projectname",
-									"domain": requestDetails.domainname,
-									"projectid": assignedProjectIds
-								};
-								var args = {
-									data: inputs,
-									headers: {
-										"Content-Type": "application/json"
-									}
-								};
-								logger.info("Calling DAS Service : admin/getAssignedProjects_ICE inside async function");
-								client.post(epurl + "admin/getAssignedProjects_ICE", args,
-									function (result, response) {
-									try {
-										if (response.statusCode != 200 || result.rows == "fail") {
-											logger.error("Error occurred in admin/getAssignedProjects_ICE inside async function Error Code : ERRDAS");
-											res.send("fail");
-										} else {
-											res.send(result.rows)
-										}
-									} catch (exception) {
-										logger.error(exception.message);
-										res.send("fail");
-									}
-								});
-							} catch (exception) {
-								logger.error(exception.message);
-								res.send("fail");
-							}
-						// }, finalfunction);
-
-					}
-					// function finalfunction() {
-					// 	logger.info('Assigned projects fetched successfully');
-					// 	res.send(assignedProjObj);
-					// }
-				} catch (exception) {
-					logger.error(exception.message);
+		var requestDetails = req.body.getAssignProj;
+		var assignedProjectIds = [];
+		var inputs = {
+			"query": "projectid",
+			"userid": requestDetails.userId
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		logger.info("Calling DAS Service : admin/getAssignedProjects_ICE");
+		client.post(epurl + "admin/getAssignedProjects_ICE", args,
+			function (result, response) {
+			try {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in admin/getAssignedProjects_ICE Error Code : ERRDAS");
 					res.send("fail");
+				} else {
+					assignedProjectIds = result.rows.projects;
+					// async.forEachSeries(assignedProjectIds, function (iterator, assignProjectCallback) {
+						try {
+							var inputs = {
+								"query": "projectname",
+								"domain": requestDetails.domainname,
+								"projectid": assignedProjectIds
+							};
+							var args = {
+								data: inputs,
+								headers: {
+									"Content-Type": "application/json"
+								}
+							};
+							logger.info("Calling DAS Service : admin/getAssignedProjects_ICE inside async function");
+							client.post(epurl + "admin/getAssignedProjects_ICE", args,
+								function (result, response) {
+								try {
+									if (response.statusCode != 200 || result.rows == "fail") {
+										logger.error("Error occurred in admin/getAssignedProjects_ICE inside async function Error Code : ERRDAS");
+										res.send("fail");
+									} else {
+										res.send(result.rows)
+									}
+								} catch (exception) {
+									logger.error(exception.message);
+									res.send("fail");
+								}
+							});
+						} catch (exception) {
+							logger.error(exception.message);
+							res.send("fail");
+						}
+					// }, finalfunction);
+
 				}
-			});
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
-		}
+				// function finalfunction() {
+				// 	logger.info('Assigned projects fetched successfully');
+				// 	res.send(assignedProjObj);
+				// }
+			} catch (exception) {
+				logger.error(exception.message);
+				res.send("fail");
+			}
+		});
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send("fail");
@@ -1170,129 +1166,262 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 	qList=[];
 	try {
 		logger.info("Inside UI Service: updateProject_ICE");
-		if (utils.isSessionActive(req)) {
-			var updateProjectDetails = req.body.updateProjectObj;
-			var userinfo = {
-                role: req.session.activeRoleId,
-                user_id: req.session.userid
-            };
-			var flag = "";
-			var requestedprojectid = updateProjectDetails.projectId;
-			validateUpdateProject();
-			var valid_projectName,valid_appType, valid_projectDetails;
-			function validateUpdateProject() {
-				logger.info("Inside function validateUpdateProject");
-				var check_project = validator.isEmpty(updateProjectDetails.projectName);
-				var check_projectId = validator.isMongoId(updateProjectDetails.projectId);
-				var check_projectLen = validator.isLength(updateProjectDetails.projectName, 1, 50);
-				if (check_project == false && check_projectLen == true && check_projectId == true) {
-					valid_projectName = true;
-				}
-				var check_appType = validator.isEmpty(updateProjectDetails.appType);
-				if (check_appType == false) {
-					valid_appType = true;
-				}
-				var check_updateProjectDetails = validator.isJSON(JSON.stringify(updateProjectDetails));
-				if (check_updateProjectDetails == true) {
-					valid_projectDetails = true;
+		var updateProjectDetails = req.body.updateProjectObj;
+		var userinfo = req.body.userDetails;
+		var flag = "";
+		var requestedprojectid = updateProjectDetails.projectId;
+		validateUpdateProject();
+		var valid_projectName,valid_appType, valid_projectDetails;
+		function validateUpdateProject() {
+			logger.info("Inside function validateUpdateProject");
+			var check_project = validator.isEmpty(updateProjectDetails.projectName);
+			var check_projectId = validator.isMongoId(updateProjectDetails.projectId);
+			var check_projectLen = validator.isLength(updateProjectDetails.projectName, 1, 50);
+			if (check_project == false && check_projectLen == true && check_projectId == true && !regEx.test(updateProjectDetails.projectName)) {
+				valid_projectName = true;
+			}
+			var check_appType = validator.isEmpty(updateProjectDetails.appType);
+			if (check_appType == false) {
+				valid_appType = true;
+			}
+			var check_updateProjectDetails = validator.isJSON(JSON.stringify(updateProjectDetails));
+			if (check_updateProjectDetails == true) {
+				valid_projectDetails = true;
+			}
+		}
+		
+		var projectDetails = updateProjectDetails.newProjectDetails;
+		for(var i=0;i<projectDetails.length;i++){
+			if(regEx.test(projectDetails[i].name)){
+				return res.send("Error: Special characters are found");
+			}
+			else{
+				for(var j=0;j<projectDetails[i].cycles.length;j++){
+					if(regEx.test(projectDetails[i].cycles[j].name)){
+						return res.send("Error: Special characters are found");
+					}
 				}
 			}
-			if (valid_projectName == true && valid_appType == true && valid_projectDetails == true) {
-				async.series({
-					newProjectDetails: function (newProjectDetailsCallback) {
-						var projectDetails = updateProjectDetails.newProjectDetails;
+		}
+
+		var projectDetails = updateProjectDetails.editedProjectDetails;
+		for(var i=0;i<projectDetails.length;i++){
+			if(regEx.test(projectDetails[i].name)){
+				return res.send("Error: Special characters are found");
+			}
+			else{
+				for(var j=0;j<projectDetails[i].cycles.length;j++){
+					if(regEx.test(projectDetails[i].cycles[j].cyclename)){
+						return res.send("Error: Special characters are found");
+					}
+				}
+			}
+		}
+
+		if (valid_projectName == true && valid_appType == true && valid_projectDetails == true) {
+			async.series({
+				newProjectDetails: function (newProjectDetailsCallback) {
+					var projectDetails = updateProjectDetails.newProjectDetails;
+					async.forEachSeries(projectDetails, function (eachprojectDetail, eachprojectDetailcallback) {
+						try {
+							var releaseCreateStatus = eachprojectDetail.newStatus;
+							var releaseDetails = eachprojectDetail;
+							var cycles = releaseDetails.cycles;
+							if (releaseCreateStatus) {
+								try {
+									var releaseName = releaseDetails.name;
+									var newReleaseID = "";
+									var inputs = {
+										"query": "createrelease",
+										"projectid": requestedprojectid,
+										"releasename": releaseName,
+										"cycles":cycles,
+										"createdby": userinfo.user_id,
+										"createdbyrole":userinfo.role
+									};
+									var args = {
+										data: inputs,
+										headers: {
+											"Content-Type": "application/json"
+										}
+									};
+									logger.info("Calling DAS Service from newProjectDetails : admin/createProject_ICE");
+									client.post(epurl + "admin/updateProject_ICE", args,
+										function (data, response) {
+
+										try {
+											if (response.statusCode != 200 || data.rows == "fail") {
+											logger.error("Error occurred in admin/createProject_ICE from newProjectDetails Error Code : ERRDAS");
+											} else {
+												//newReleaseID = data.rows[0].releaseid;
+												res.send("success")
+												// async.forEachSeries(cycles, function (eachCycleDetail, cycleNamescallback) {
+												// 	try {
+												// 		var eachCycleName = eachCycleDetail.cycleName;
+												// 		var inputs = {
+												// 			"query": "createcycle",
+												// 			"releaseid": newReleaseID,
+												// 			"cyclename": eachCycleName,
+												// 			"createdby": userinfo.username.toLowerCase(),
+												// 			"skucodecycle": "skucodecycle",
+												// 			"tags": "tags"
+												// 		};
+												// 	} catch (exception) {
+												// 		logger.error(exception.message);
+												// 	}
+												// }, eachprojectDetailcallback);
+											}
+										} catch (exception) {
+										logger.error(exception.message);
+										}
+									});
+								} catch (exception) {
+									logger.error(exception.message);
+								}
+							} else {
+								try {
+									//this piece of code runs when only cycles needs to be created
+									//in a specified release
+									var releaseId = releaseDetails.releaseId;
+									async.forEachSeries(cycles, function (eachCycleDetail, cycleNamescallback) {
+										try {
+											var eachCycleName = eachCycleDetail.name;
+											var inputs = {
+												"query": "createcycle",
+												"projectid":requestedprojectid,
+												"createdbyrole":userinfo.role,
+												"releaseid": releaseId,
+												"name": eachCycleName,
+												"createdby": userinfo.user_id
+											};
+											var args = {
+												data: inputs,
+												headers: {
+													"Content-Type": "application/json"
+												}
+											};
+											createCycle(args, function (error, response) {
+												if (error) {
+													logger.error(error);
+												} else {
+													try {
+														cycleNamescallback();
+													} catch (exception) {
+														logger.error(exception.message);
+													}
+												}
+											});
+										} catch (exception) {
+											logger.error(exception.message);
+										}
+									}, eachprojectDetailcallback);
+								} catch (exception) {
+									logger.error(exception.message);
+								}
+							}
+						} catch (exception) {
+							logger.error(exception.message);
+						}
+					}, newProjectDetailsCallback);
+				},
+				deletedProjectDetails: function (deletedProjectDetailsCallback) {
+					try {
+						var projectDetails = updateProjectDetails.deletedProjectDetails;
 						async.forEachSeries(projectDetails, function (eachprojectDetail, eachprojectDetailcallback) {
 							try {
-								var releaseCreateStatus = eachprojectDetail.newStatus;
-								var releaseDetails = eachprojectDetail;
-								var cycles = releaseDetails.cycles;
-								if (releaseCreateStatus) {
-									try {
-										var releaseName = releaseDetails.name;
-										var newReleaseID = "";
-										var inputs = {
-											"query": "createrelease",
-											"projectid": requestedprojectid,
-											"releasename": releaseName,
-											"cycles":cycles,
-											"createdby": userinfo.user_id,
-											"createdbyrole":userinfo.role
-										};
-										var args = {
-											data: inputs,
-											headers: {
-												"Content-Type": "application/json"
+								var deleteStatus = eachprojectDetail.deleteStatus;
+								if (deleteStatus) {
+									var inputs = {
+										"query": "deleterelease",
+										"releasename": eachprojectDetail.releaseName,
+										"projectid": requestedprojectid,
+										"releaseid": eachprojectDetail.releaseId
+									};
+									var args = {
+										data: inputs,
+										headers: {
+											"Content-Type": "application/json"
+										}
+									};
+									logger.info("Calling DAS Service from deletedProjectDetails : admin/updateProject_ICE");
+									client.post(epurl + "admin/updateProject_ICE", args,
+										function (result, response) {
+										try {
+											if (response.statusCode != 200 || result.rows == "fail") {
+												flag = "Error in deleteRelease-updateProject_ICE : Fail";
+												logger.error("Error occurred in admin/updateProject_ICE from deletedProjectDetails Error Code : ERRDAS");
+												res.send(flag);
+											} else {
+												var cyclesOfRelease = eachprojectDetail.cycles;
+												async.forEachSeries(cyclesOfRelease, function (eachCycleDetail, eachCycleCallback) {
+													try {
+														var inputs = {
+															"query": "deletecycle",
+															"name": eachCycleDetail.cycleName,
+															"releaseid": eachprojectDetail.releaseId,
+															"cycleid": eachCycleDetail.cycleId
+														};
+														var args = {
+															data: inputs,
+															headers: {
+																"Content-Type": "application/json"
+															}
+														};
+														logger.info("Calling DAS Service from deletedProjectDetails inside async : admin/updateProject_ICE");
+														client.post(epurl + "admin/updateProject_ICE", args,
+															function (result, response) {
+															if (response.statusCode != 200 || result.rows == "fail") {
+																logger.error("Error occurred in admin/updateProject_ICE inside async Error Code : ERRDAS");
+																flag = "Error in deleteCycles(true)-updateProject_ICE : Fail";
+																res.send(flag);
+															} else {
+																eachCycleCallback();
+															}
+														});
+													} catch (exception) {
+														logger.error(exception.message);
+													}
+												}, eachprojectDetailcallback);
 											}
-										};
-										logger.info("Calling DAS Service from newProjectDetails : admin/createProject_ICE");
-										client.post(epurl + "admin/updateProject_ICE", args,
-											function (data, response) {
-
-											try {
-												if (response.statusCode != 200 || data.rows == "fail") {
-												logger.error("Error occurred in admin/createProject_ICE from newProjectDetails Error Code : ERRDAS");
-												} else {
-													//newReleaseID = data.rows[0].releaseid;
-                                                  res.send("success")
-
-													// async.forEachSeries(cycles, function (eachCycleDetail, cycleNamescallback) {
-													// 	try {
-													// 		var eachCycleName = eachCycleDetail.cycleName;
-													// 		var inputs = {
-													// 			"query": "createcycle",
-													// 			"releaseid": newReleaseID,
-													// 			"cyclename": eachCycleName,
-													// 			"createdby": userinfo.username.toLowerCase(),
-													// 			"skucodecycle": "skucodecycle",
-													// 			"tags": "tags"
-													// 		};
-															
-															
-													// 	} catch (exception) {
-													// 		logger.error(exception.message);
-													// 	}
-													// }, eachprojectDetailcallback);
-												}
-											} catch (exception) {
+										} catch (exception) {
 											logger.error(exception.message);
-											}
-										});
-									} catch (exception) {
-										logger.error(exception.message);
-									}
-								} else {
+										}
+									});
+								} else if (!deleteStatus) {
 									try {
-										//this piece of code runs when only cycles needs to be created
-										//in a specified release
-										var releaseId = releaseDetails.releaseId;
-										async.forEachSeries(cycles, function (eachCycleDetail, cycleNamescallback) {
+										var cycles = eachprojectDetail.cycles;
+										async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
 											try {
-												var eachCycleName = eachCycleDetail.name;
-												var inputs = {
-													"query": "createcycle",
-													"projectid":requestedprojectid,
-													"createdbyrole":userinfo.role,
-													"releaseid": releaseId,
-													"name": eachCycleName,
-													"createdby": userinfo.user_id
-												};
-												var args = {
-													data: inputs,
-													headers: {
-														"Content-Type": "application/json"
+												var deleteStatusCycles = eachCycleDetail.deleteStatus;
+												if (deleteStatusCycles) {
+													try {
+														var inputs = {
+															"query": "deletecycle",
+															"cyclename": eachCycleDetail.cycleName,
+															"releaseid": eachprojectDetail.releaseId,
+															"cycleid": eachCycleDetail.cycleId
+														};
+														var args = {
+															data: inputs,
+															headers: {
+																"Content-Type": "application/json"
+															}
+														};
+														logger.info("Calling DAS Service inside async from !deleteStatus: admin/updateProject_ICE");
+														client.post(epurl + "admin/updateProject_ICE", args,
+															function (result, response) {
+															if (response.statusCode != 200 || result.rows == "fail") {
+																logger.error("Error occurred in admin/updateProject_ICE inside async from !deleteStatus Error Code : ERRDAS");
+																flag = "Error in deleteCycles(false)-updateProject_ICE : Fail";
+																res.send(flag);
+															} else {
+																eachCycleCallback();
+															}
+														});
+													} catch (exception) {
+														logger.error(exception.message);
 													}
-												};
-												createCycle(args, function (error, response) {
-													if (error) {
-														logger.error(error);
-													} else {
-														try {
-															cycleNamescallback();
-														} catch (exception) {
-															logger.error(exception.message);
-														}
-													}
-												});
+												}
 											} catch (exception) {
 												logger.error(exception.message);
 											}
@@ -1304,20 +1433,29 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 							} catch (exception) {
 								logger.error(exception.message);
 							}
-						}, newProjectDetailsCallback);
-					},
-					deletedProjectDetails: function (deletedProjectDetailsCallback) {
-						try {
-							var projectDetails = updateProjectDetails.deletedProjectDetails;
-							async.forEachSeries(projectDetails, function (eachprojectDetail, eachprojectDetailcallback) {
-								try {
-									var deleteStatus = eachprojectDetail.deleteStatus;
-									if (deleteStatus) {
+						}, deletedProjectDetailsCallback);
+					} catch (exception) {
+							logger.error(exception.message);
+					}
+				},
+				editedProjectDetails: function (editedProjectDetailsCallback) {
+					try {
+						var projectDetails = updateProjectDetails.editedProjectDetails;
+						async.forEachSeries(projectDetails, function (eachprojectDetail, eachprojectDetailcallback) {
+							try {
+								var editedStatus = eachprojectDetail.editStatus;
+								var newReleaseName = eachprojectDetail.name;
+								var releaseId = eachprojectDetail.releaseId;
+								if (editedStatus) {
+									try {
 										var inputs = {
-											"query": "deleterelease",
-											"releasename": eachprojectDetail.releaseName,
+											"query": "editrelease",
+											"releasename": eachprojectDetail.oldreleaseName,
+											"newreleasename": newReleaseName,
 											"projectid": requestedprojectid,
-											"releaseid": eachprojectDetail.releaseId
+											"releaseid": releaseId,
+											"modifiedby":userinfo.user_id,
+											"modifiedbyrole":userinfo.role
 										};
 										var args = {
 											data: inputs,
@@ -1325,329 +1463,153 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												"Content-Type": "application/json"
 											}
 										};
-										logger.info("Calling DAS Service from deletedProjectDetails : admin/updateProject_ICE");
+										logger.info("Calling DAS Service from editedProjectDetails : admin/updateProject_ICE");
 										client.post(epurl + "admin/updateProject_ICE", args,
 											function (result, response) {
 											try {
 												if (response.statusCode != 200 || result.rows == "fail") {
-													flag = "Error in deleteRelease-updateProject_ICE : Fail";
-													logger.error("Error occurred in admin/updateProject_ICE from deletedProjectDetails Error Code : ERRDAS");
+													logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRDAS");
+													flag = "Error in delete-Release(true)-updateProject_ICE : Fail";
 													res.send(flag);
 												} else {
-                                                    //Execute neo4j query!! deleterelease
-                                                    //var qList=[];
-                                                    /*qList.push({"statement":"MATCH (n:RELEASES_NG {projectid:'"+inputs.projectid+
-                                                                "',releaseid:'"+inputs.releaseid+"',releasename:'"+
-                                                                inputs.releasename+"'}) detach delete n"});*/
-                                                    //reqToAPI(qList,urlData);
-													var cyclesOfRelease = eachprojectDetail.cycles;
-													async.forEachSeries(cyclesOfRelease, function (eachCycleDetail, eachCycleCallback) {
-														try {
-															var inputs = {
-																"query": "deletecycle",
-																"name": eachCycleDetail.cycleName,
-																"releaseid": eachprojectDetail.releaseId,
-																"cycleid": eachCycleDetail.cycleId
-															};
-															var args = {
-																data: inputs,
-																headers: {
-																	"Content-Type": "application/json"
-																}
-															};
-															logger.info("Calling DAS Service from deletedProjectDetails inside async : admin/updateProject_ICE");
-															client.post(epurl + "admin/updateProject_ICE", args,
-																function (result, response) {
-																if (response.statusCode != 200 || result.rows == "fail") {
-																	logger.error("Error occurred in admin/updateProject_ICE inside async Error Code : ERRDAS");
-																	flag = "Error in deleteCycles(true)-updateProject_ICE : Fail";
-																	res.send(flag);
+													try {
+														var cycles = eachprojectDetail.cycles;
+														var newCycleName = "";
+														var cycleId = "";
+														async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
+															try {
+																var editedStatusCycles = eachCycleDetail.editStatus;
+																if (editedStatusCycles) {
+																	try {
+																		newCycleName = eachCycleDetail.cyclename;
+																		cycleId = eachCycleDetail._id;
+																		var inputs = {
+																			"query": "editcycle",
+																			"cyclename": eachCycleDetail.oldCycleName,
+																			"releaseid": releaseId,
+																			"cycleid": cycleId,
+																			"projectid": requestedprojectid,
+																			"newcyclename": newCycleName,
+																			"modifiedby":userinfo.user_id,
+																			"modifiedbyrole":userinfo.role
+																		};
+																		var args = {
+																			data: inputs,
+																			headers: {
+																				"Content-Type": "application/json"
+																			}
+																		};
+																		logger.info("Calling DAS Service from editedProjectDetails :admin/updateProject_ICE");
+																		client.post(epurl + "admin/updateProject_ICE", args,
+																			function (result, response) {
+																			if (response.statusCode != 200 || result.rows == "fail") {
+																				logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRDAS");
+																				flag = "Error in delete-Cycle(true)-updateProject_ICE : Fail";
+																				res.send(flag);
+																			} else {
+																				try {
+																					res.send(result.rows)
+																				} catch (exception) {
+																					logger.error(exception.message);
+																				}
+																			}
+																		});
+																	} catch (exception) {
+																		logger.error(exception.message);
+																	}
 																} else {
-                                                                    //Execute neo4j query!! deletecycle
-                                                                    //var qList=[];
-                                                                   /* qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
-                                                                                "',releaseid:'"+inputs.releaseid+"',cyclename:'"+
-                                                                                inputs.cyclename+"'}) detach delete n"});*/
-                                                                    //reqToAPI(qList,urlData);
-                                                                    eachCycleCallback();
+																	eachCycleCallback();
 																}
-															});
-														} catch (exception) {
+															} catch (exception) {
+																logger.error(exception.message);
+															}
+														}, eachprojectDetailcallback);
+													} catch (exception) {
 															logger.error(exception.message);
-														}
-													}, eachprojectDetailcallback);
+													}
 												}
 											} catch (exception) {
 												logger.error(exception.message);
 											}
 										});
-									} else if (!deleteStatus) {
-										try {
-											var cycles = eachprojectDetail.cycles;
-											async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
-												try {
-													var deleteStatusCycles = eachCycleDetail.deleteStatus;
-													if (deleteStatusCycles) {
-														try {
-															var inputs = {
-																"query": "deletecycle",
-																"cyclename": eachCycleDetail.cycleName,
-																"releaseid": eachprojectDetail.releaseId,
-																"cycleid": eachCycleDetail.cycleId
-															};
-															var args = {
-																data: inputs,
-																headers: {
-																	"Content-Type": "application/json"
-																}
-															};
-															logger.info("Calling DAS Service inside async from !deleteStatus: admin/updateProject_ICE");
-															client.post(epurl + "admin/updateProject_ICE", args,
-																function (result, response) {
-																if (response.statusCode != 200 || result.rows == "fail") {
-																	logger.error("Error occurred in admin/updateProject_ICE inside async from !deleteStatus Error Code : ERRDAS");
-																	flag = "Error in deleteCycles(false)-updateProject_ICE : Fail";
-																	res.send(flag);
-																} else {
-                                                                    //Execute neo4j query!! deletecycle
-                                                                    //var qList=[];
-                                                                    /*qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
-                                                                                "',releaseid:'"+inputs.releaseid+"',cyclename:'"+
-                                                                                inputs.cyclename+"'}) detach delete n"});*/
-                                                                    //reqToAPI(qList,urlData);
-                                                                    eachCycleCallback();
-																}
-															});
-														} catch (exception) {
-															logger.error(exception.message);
-														}
-													}
-												} catch (exception) {
-													logger.error(exception.message);
-												}
-											}, eachprojectDetailcallback);
-										} catch (exception) {
+									} catch (exception) {
 											logger.error(exception.message);
-										}
 									}
-								} catch (exception) {
-									logger.error(exception.message);
-								}
-							}, deletedProjectDetailsCallback);
-						} catch (exception) {
-								logger.error(exception.message);
-						}
-					},
-					editedProjectDetails: function (editedProjectDetailsCallback) {
-						try {
-							var projectDetails = updateProjectDetails.editedProjectDetails;
-							async.forEachSeries(projectDetails, function (eachprojectDetail, eachprojectDetailcallback) {
-								try {
-									var editedStatus = eachprojectDetail.editStatus;
-									var newReleaseName = eachprojectDetail.name;
-									var releaseId = eachprojectDetail.releaseId;
-									if (editedStatus) {
-										try {
-											var inputs = {
-												"query": "editrelease",
-												"releasename": eachprojectDetail.oldreleaseName,
-												"newreleasename": newReleaseName,
-												"projectid": requestedprojectid,
-												"releaseid": releaseId,
-												"modifiedby":userinfo.user_id,
-												"modifiedbyrole":userinfo.role
-											};
-											var args = {
-												data: inputs,
-												headers: {
-													"Content-Type": "application/json"
-												}
-											};
-											logger.info("Calling DAS Service from editedProjectDetails : admin/updateProject_ICE");
-											client.post(epurl + "admin/updateProject_ICE", args,
-												function (result, response) {
-												try {
-													if (response.statusCode != 200 || result.rows == "fail") {
-														logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRDAS");
-														flag = "Error in delete-Release(true)-updateProject_ICE : Fail";
-														res.send(flag);
-													} else {
-														try {
-															var cycles = eachprojectDetail.cycles;
-															var newCycleName = "";
-															var cycleId = "";
-															async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
-																try {
-																	var editedStatusCycles = eachCycleDetail.editStatus;
-																	if (editedStatusCycles) {
-																		try {
-																			newCycleName = eachCycleDetail.cyclename;
-																			cycleId = eachCycleDetail._id;
-																			var inputs = {
-																				"query": "editcycle",
-																				"cyclename": eachCycleDetail.oldCycleName,
-																				"releaseid": releaseId,
-																				"cycleid": cycleId,
-																				"projectid": requestedprojectid,
-																				"newcyclename": newCycleName,
-																				"modifiedby":userinfo.user_id,
-																				"modifiedbyrole":userinfo.role
-																			};
-																			var args = {
-																				data: inputs,
-																				headers: {
-																					"Content-Type": "application/json"
-																				}
-																			};
-																			logger.info("Calling DAS Service from editedProjectDetails :admin/updateProject_ICE");
-																			client.post(epurl + "admin/updateProject_ICE", args,
-																				function (result, response) {
-																				if (response.statusCode != 200 || result.rows == "fail") {
-																					logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRDAS");
-																					flag = "Error in delete-Cycle(true)-updateProject_ICE : Fail";
-																					res.send(flag);
-																				} else {
-																					try {
-																						res.send(result.rows)
-																					} catch (exception) {
-																						logger.error(exception.message);
-																					}
-																				}
-																			});
-																		} catch (exception) {
-																			logger.error(exception.message);
-																		}
-																	} else {
-																		eachCycleCallback();
-																	}
-																} catch (exception) {
-																	logger.error(exception.message);
-																}
-															}, eachprojectDetailcallback);
-														} catch (exception) {
-																logger.error(exception.message);
-														}
-													}
-												} catch (exception) {
-													logger.error(exception.message);
-												}
-											});
-										} catch (exception) {
-												logger.error(exception.message);
-										}
-									} else {
-										try {
-											var cycles = eachprojectDetail.cycles;
-											var newCycleName = "";
-											var cycleId = "";
-											async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
-												try {
-													var editedStatusCycles = eachCycleDetail.editStatus;
-													if (editedStatusCycles) {
-														try {
-															newCycleName = eachCycleDetail.cyclename ? eachCycleDetail.cyclename : eachCycleDetail.cycleName;
-															cycleId = eachCycleDetail._id ? eachCycleDetail._id : eachCycleDetail.cycleId;
-															var inputs = {
-																"query": "editcycle",
-																"cyclename": eachCycleDetail.oldCycleName,
-																"newcyclename": newCycleName,
-																"releaseid": eachprojectDetail.name,
-																"cycleid": cycleId,
-																"projectid": requestedprojectid,
-																"modifiedby":userinfo.user_id,
-																"modifiedbyrole":userinfo.role
-															};
-															var args = {
-																data: inputs,
-																headers: {
-																	"Content-Type": "application/json"
-																}
-															};
-															logger.info("Calling DAS Service : admin/updateProject_ICE");
-															client.post(epurl + "admin/updateProject_ICE", args,
-																function (result, response) {
-																if (response.statusCode != 200 || result.rows == "fail") {
-																	logger.error("Error occurred in admin/updateProject_ICE Error Code : ERRDAS");
-																	flag = "Error in delete-Cycle(true)-updateProject_ICE : Fail";
-																	res.send(flag);
-																} else {
-																	try {
-																		res.send(result.rows)
-																	} catch (exception) {
-																			logger.error(exception.message);
-																	}
-																}
-															});
-														} catch (exception) {
-															logger.error(exception.message);
-														}
-													} else {
-														eachCycleCallback();
-													}
-												} catch (exception) {
-													logger.error(exception.message);
-												}
-											}, eachprojectDetailcallback);
-										} catch (exception) {
-											logger.error(exception.message);
-										}
-									}
-								} catch (exception) {
-									logger.error(exception.message);
-								}
-							}, editedProjectDetailsCallback);
-						} catch (exception) {
-							logger.error(exception.message);
-						}
-					}
-				}, function (error, response) {
-					if (error) {
-						logger.error("Error occurred in function newProjectDetails");
-						res.send("fail");
-					} else{
-						res.send("success");
-					}
-				});
-				if(updateProjectDetails.newProjectName !== undefined) {
-					try {
-						var newpProjectName = updateProjectDetails.newProjectName;
-						var inputs = {
-							"query": "updateprojectname",
-							"projectid":requestedprojectid,
-							"newprojectname": newpProjectName,
-							"modifiedby":userinfo.user_id,
-							"modifiedbyrole":userinfo.role
-						};
-						var args = {
-							data: inputs,
-							headers: {
-								"Content-Type": "application/json"
-							}
-						};
-						logger.info("Calling DAS Service from updateProjectName : admin/createProject_ICE");
-						client.post(epurl + "admin/updateProject_ICE", args,
-							function (data, response) {
-
-							try {
-								if (response.statusCode != 200 || data.rows == "fail") {
-								logger.error("Error occurred in admin/createProject_ICE from updateProjectName Error Code : ERRDAS");
 								} else {
-									res.send("success")
+									try {
+										var cycles = eachprojectDetail.cycles;
+										var newCycleName = "";
+										var cycleId = "";
+										async.forEachSeries(cycles, function (eachCycleDetail, eachCycleCallback) {
+											try {
+												var editedStatusCycles = eachCycleDetail.editStatus;
+												if (editedStatusCycles) {
+													try {
+														newCycleName = eachCycleDetail.cyclename ? eachCycleDetail.cyclename : eachCycleDetail.cycleName;
+														cycleId = eachCycleDetail._id ? eachCycleDetail._id : eachCycleDetail.cycleId;
+														var inputs = {
+															"query": "editcycle",
+															"cyclename": eachCycleDetail.oldCycleName,
+															"newcyclename": newCycleName,
+															"releaseid": eachprojectDetail.name,
+															"cycleid": cycleId,
+															"projectid": requestedprojectid,
+															"modifiedby":userinfo.user_id,
+															"modifiedbyrole":userinfo.role
+														};
+														var args = {
+															data: inputs,
+															headers: {
+																"Content-Type": "application/json"
+															}
+														};
+														logger.info("Calling DAS Service : admin/updateProject_ICE");
+														client.post(epurl + "admin/updateProject_ICE", args,
+															function (result, response) {
+															if (response.statusCode != 200 || result.rows == "fail") {
+																logger.error("Error occurred in admin/updateProject_ICE Error Code : ERRDAS");
+																flag = "Error in delete-Cycle(true)-updateProject_ICE : Fail";
+																res.send(flag);
+															} else {
+																try {
+																	res.send(result.rows)
+																} catch (exception) {
+																		logger.error(exception.message);
+																}
+															}
+														});
+													} catch (exception) {
+														logger.error(exception.message);
+													}
+												} else {
+													eachCycleCallback();
+												}
+											} catch (exception) {
+												logger.error(exception.message);
+											}
+										}, eachprojectDetailcallback);
+									} catch (exception) {
+										logger.error(exception.message);
+									}
 								}
 							} catch (exception) {
-							logger.error(exception.message);
+								logger.error(exception.message);
 							}
-						});
+						}, editedProjectDetailsCallback);
 					} catch (exception) {
 						logger.error(exception.message);
 					}
 				}
-			} else {
-				res.send('fail');
-			}
+			}, function (error, response) {
+				if (error) {
+					logger.error("Error occurred in function newProjectDetails");
+					res.send("fail");
+				} else{
+					res.send("success");
+				}
+			});
 		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
+			res.send('fail');
 		}
 	} catch (exception) {
 		logger.error(exception.message);
@@ -1734,6 +1696,10 @@ exports.provisionICE = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const tokeninfo = req.body.tokeninfo;
+		if (regEx.test(tokeninfo.icename)) {
+			logger.error("Error occurred in admin/"+fnName+": Special characters found in icename");
+			return res.send("invalid_splname");
+		}
 		const inputs = {
 			provisionedto: tokeninfo.userid,
 			icename: tokeninfo.icename.toLowerCase(),
@@ -1743,7 +1709,7 @@ exports.provisionICE = async (req, res) => {
 		const result = await utils.fetchData(inputs, "admin/provisionICE", fnName);
 		res.send(result);
 	} catch (exception) {
-		logger.error("Error occurred in admin/provisionICE:", exception);
+		logger.error("Error occurred in admin/"+fnName+":", exception);
 		res.send("fail");
 	}
 };
@@ -1753,6 +1719,10 @@ exports.createPool_ICE = async(req,res) => {
 	logger.info("Inside UI service: " + fnName)
 	try{
 		const poolinfo = req.body;
+		if (regEx.test(poolinfo.poolname)) {
+			logger.error("Error occurred in admin/"+fnName+": Special characters found in poolname");
+			return res.send("invalid_name");
+		}
 		const inputs = {
 			poolname: poolinfo.poolname,
 			createdby: req.session.userid,
@@ -1762,7 +1732,7 @@ exports.createPool_ICE = async(req,res) => {
 		const result = await utils.fetchData(inputs, "admin/createPool_ICE", fnName);
 		if(result && result != "fail") queue.Execution_Queue.updatePools("create",poolinfo);
 		res.send(result);
-	}catch (exception){
+	} catch (exception){
 		logger.error("Error occurred in admin/createPools_ICE:", exception);
 		res.send("fail");
 	}
@@ -1774,6 +1744,10 @@ exports.updatePool = async(req,res) => {
 	logger.info("Inside UI service: " + fnName)
 	try{
 		const poolinfo = req.body;
+		if (regEx.test(poolinfo.poolname)) {
+			logger.error("Error occurred in admin/"+fnName+": Special characters found in poolname");
+			return res.send("invalid_name");
+		}
 		const inputs = {
 			poolname: poolinfo.poolname,
 			poolid: poolinfo._id,
@@ -1957,7 +1931,6 @@ const removeDir = function(path) {
 
 const getEmailConf = async (conf, fnName, inputs, flag) => {
 	if (!flag) flag = ['1','0','0','0','0','0','0','0','0','0','0','0','0'];
-	const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 	inputs.host = (conf.host || "").trim();
 	inputs.port = conf.port || "";
 	if (!inputs.host && !validator.isIP(inputs.host) && !validator.isFQDN(inputs.host)) { // Allow Anything as of now
@@ -1973,9 +1946,13 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 		name: (conf.sender.name || "Avo Assure Alerts").trim(),
 		email: (conf.sender.email || "avoassure-alerts@avoautomation.com").trim()
 	}
-	if (!validator.isEmail(inputs.sender.email)) {
+	if (!validator.isEmail(inputs.sender.email) || !regEx_email.test(inputs.sender.email)) {
 		logger.error("Error occurred in admin/"+fnName+": Invalid sender email address.");
 		flag[7]='1';
+	}
+	if(char_check.test(inputs.sender.name)) {
+		logger.error("Error occurred in admin/"+fnName+": Invalid sender name. Restricted Characters found.");
+		flag[7]='2';
 	}
 	inputs.tls = {
 		security: conf.enabletls || "auto",
@@ -2004,6 +1981,11 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 		else if (!["basic"].includes(inputs.auth.type)) {
 			logger.error("Error occurred in admin/"+fnName+": Invalid auth type.");
 			flag[9]='1';
+		} else {
+			if (char_check.test(inputs.auth.username)) {
+				logger.error("Error occurred in admin/"+fnName+": Invalid auth username. Restricted Characters found.");
+				flag[9]='2';
+			}
 		}
 	}
 	const timeouts = conf.timeouts || "";
@@ -2038,7 +2020,7 @@ const getEmailConf = async (conf, fnName, inputs, flag) => {
 				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Credentials.");
 				flag[12]='3';
 			}
-			else if (inputs.proxy.user.length == 0) {
+			else if (inputs.proxy.user.length == 0 || char_check.test(inputs.proxy.user)) {
 				logger.error("Error occurred in admin/"+fnName+": Invalid Proxy Username.");
 				flag[12]='1';
 			}
@@ -2166,5 +2148,62 @@ exports.getNotificationChannels = async (req, res) => {
 	} catch (exception){
 		logger.error("Error occurred in admin/"+fnName, exception);
 		res.status(500).send("fail");
+	}
+};
+
+exports.restartService = async (req, res) => {
+	logger.info("Inside UI Service: restartService");
+	var childProcess = require("child_process");
+	var serverList = ["License Server", "DAS Server", "Web Server"];
+	var svcNA = "service does not exist";
+	var svcRun = "RUNNING";
+	var svcRunPending = "START_PENDING";
+	var svcStop = "STOPPED";
+	var svcStopPending = "STOP_PENDING";
+	var svc = req.body.id;
+	var batFile = require.resolve("./assets/svc.bat");
+	var execCmd = batFile + " ";
+	try {
+		if (svc == "query") {
+			var svcStatus = [];
+			childProcess.exec(execCmd + "0 QUERY", function(error, stdout, stderr) {
+				if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+				else svcStatus.push(false);
+				childProcess.exec(execCmd + "1 QUERY", function(error, stdout, stderr) {
+					if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+					else svcStatus.push(false);
+					childProcess.exec(execCmd + "2 QUERY", function(error, stdout, stderr) {
+						if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+						else svcStatus.push(false);
+						return res.send(svcStatus);
+					});
+				});
+			});
+		} else {
+			execCmd = execCmd + svc.toString() + " ";
+			childProcess.exec(execCmd + "QUERY", function(error, stdout, stderr) {
+				if (stdout) {
+					if (stdout.indexOf(svcNA) > 0) {
+						logger.error("Error occured in restartService:", serverList[svc], "Service is not installed");
+						return res.send("na");
+					} else {
+						if (stdout.indexOf(svcRun) > 0 || stdout.indexOf(svcRunPending) > 0) execCmd += "RESTART";
+						else execCmd += "START";
+						logger.error(serverList[svc], "Service restarted successfully");
+						res.send("success");
+						childProcess.exec("START " + execCmd, function(error, stdout, stderr) {
+							return;
+						});
+						return true;
+					}
+				} else {
+					logger.error("Error occured in restartService: Fail to restart", serverList[svc], "Service");
+					return res.status(500).send("fail");
+				}
+			});
+		}
+	} catch (exception) {
+		logger.error(exception.message);
+		return res.status(500).send("fail");
 	}
 };
