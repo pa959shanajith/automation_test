@@ -40,6 +40,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
                     todayHighlight: true,
                     endDate: "today"
                 })
+                $('.fc-datePicker').datepicker('setDate', null);
             },0)
             // blockUI("Fetching users...");
             // adminServices.getUserDetails("user")
@@ -128,6 +129,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
 
     $scope.resetExecMetrics = () => {
         $('.fc-datePicker').val('');
+        $('.fc-datePicker').datepicker('setDate', null);
         $('#LOB').val('');
         $('#statusID').val('');
         $('#executionID').val('');
@@ -161,7 +163,7 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
             arg.status = $('#statusID').val();
         }
         if($('#executionID').val()){
-            arg.executionID = $('#executionID').val();
+            arg.executionId = $('#executionID').val();
         }
         if($('#modifiedBy').val()){
             arg.modifiedBy = $('#modifiedBy').val();
