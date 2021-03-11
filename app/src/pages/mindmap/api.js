@@ -302,7 +302,13 @@ export const excelToMindmap = async(data) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200 && res.data !== "fail"){            
+        else if (res.data == 'valueError') {
+            return {error : 'Empty column values in the sheet'}
+        } 
+        else if (res.data == "emptySheet" || res.data == 'fail') {
+            return {error : 'Excel sheet is either empty or invalid'}
+        }
+        else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)

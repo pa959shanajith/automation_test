@@ -6,6 +6,8 @@ import { useDispatch } from 'react-redux';
 import ExecutionPanel from '../components/ExecutionPanel';
 import ScStatusPanel from '../components/ScStatusPanel';
 import ScDetailPanel from '../components/ScDetailPanel';
+import TestingReport from './TestingReport';
+import AccessibilityReport from './AccessibilityReport';
 import * as actionTypes from '../state/action';
 import '../styles/ReportContainer.scss';
 
@@ -14,13 +16,10 @@ import '../styles/ReportContainer.scss';
 */
 
 const ReportContainer = () =>{
-    const dispatch = useDispatch()
     const [modDrop,setModDrop] = useState(true)
     const [popup,setPopup] = useState({show:false})
     const [blockui,setBlockui] = useState({show:false})
-    const [scDetails,setScDetails] = useState([])
-    const [selectedScDetails,setSelectedDetails] = useState({_id:undefined,name:""})
-    const [scStatus,setScStatus] = useState({})
+    const [FnReport,setFnReport] =  useState({show:true})
     const displayError = (error) =>{
         setBlockui(false)
         setPopup({
@@ -30,34 +29,6 @@ const ReportContainer = () =>{
             show:true
         })
     }
-    useEffect(()=>{
-        return ()=>{
-            dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[])
-    useEffect(()=>{
-        if(selectedScDetails._id){
-            var arr = {
-                total : scDetails.length,
-                pass : 0,
-                fail : 0,
-                terminate : 0,
-                incomplete : 0,
-                skipped : 0
-            }
-            scDetails.forEach((e,i)=>{
-                var status = e.status.toLowerCase()
-                if(status in arr){
-                    arr[status]=++arr[status]
-                }
-            })
-            setScStatus(arr)   
-        }else{
-            setScStatus({})
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[scDetails])
     return(
         <Fragment>
             {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
@@ -67,6 +38,10 @@ const ReportContainer = () =>{
                 <div className='container-padding'>
                     <div className='rp__title'>
                         <span>Reports</span>
+                    </div>
+                    <div className='rp__title-btn'>
+                        <span className={FnReport ? 'active-btn' : ''} onClick={()=>setFnReport(true)}>Functional Testing</span>
+                        <span className={!FnReport ? 'active-btn' : ''} onClick={()=>setFnReport(false)}>Accessibility Testing</span>
                     </div>
                     <div className='rp__body'>
                         <div className='rp__header-select' style={{height:(modDrop?'60px':'250px')}}>
@@ -78,17 +53,10 @@ const ReportContainer = () =>{
                                 </span>
                             </div>
                         </div>
-                        <div className='rp__content'>
-                            <div className='left-content'>
-                                <ExecutionPanel selectedScDetails={selectedScDetails} setSelectedDetails={setSelectedDetails} setScDetails={setScDetails} setBlockui={setBlockui} displayError={displayError}/>
-                            </div>
-                            <div className='right-content'>
-                                <ScStatusPanel selectedScDetails={selectedScDetails} arr={scStatus} setBlockui={setBlockui} displayError={displayError}/>
-                            </div>
-                        </div>
-                        <div className='bottom-content'>
-                            <ScDetailPanel selectedScDetails={selectedScDetails} scDetails={scDetails} setBlockui={setBlockui} displayError={displayError}/>
-                        </div>
+                        {FnReport ? 
+                            <TestingReport setBlockui={setBlockui} displayError={displayError}/>:
+                            <AccessibilityReport setBlockui={setBlockui} displayError={displayError}/>
+                        }
                     </div>
                 </div>
                 </ScrollBar>

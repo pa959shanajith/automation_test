@@ -17,7 +17,8 @@ const types = {
     'screens': 363,
     'testcases': 488
 };
-const assignedIco = "static/imgs/node-task-assigned.png"
+const assignedIco = "static/imgs/Functional.svg"
+const accessibilityIco = "static/imgs/Accessibility.svg"
 var count;
 var zoom //global var to store zoom
 var nodeMoving = false;
@@ -139,6 +140,7 @@ const CanvasAssign =(props)=>{
                     <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
                         <image  onClick={(e)=>nodeClick(e)} style={{height:'40px',width:'40px',opacity:(node[1].state==="created"?0.5:1)}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                         <image className={"ct-nodeTask"+(node[1].task?"":" no-disp")} style={{opacity:node[1].taskOpacity}} xlinkHref={assignedIco} x="29" y="-10" width="21px" height="21px"></image>
+                        <image className={"ct-nodeTask"+((node[1].task && node[1].ac !== 'Disable' && node[1].type==='scenarios')?"":" no-disp")} style={{opacity:node[1].taskOpacity}} xlinkHref={accessibilityIco} x="-10" y="-10" width="21px" height="21px"></image>
                         <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
                         <title val={node[0]} className="ct-node-title">{node[1].title}</title>
                         {(node[1].type!=='testcases')?
