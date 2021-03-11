@@ -307,7 +307,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 							getObject.after("<ul class='testcaselist'></ul>");
 							for(var a=0; a<data.length; a++){			
 								if(getObject.hasClass("testSuite")){
-									getObject.next("ul").append("<li class='testSet testcaselink'><label title='"+data[a].name+"'> <span class='zephyrTestcaseId'>"+data[a].id+"</span><span class='zephyrTestcaseName'>"+data[a].name+"</span></label><img class='zephyrUndoSyncronise' style='float:right' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='zephyrSyncronise' style='float:right' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
+									getObject.next("ul").append("<li class='testSet testcaselink' data-cyclephaseid='"+data[a].cyclePhaseId+"'><label title='"+data[a].name+"'> <span class='zephyrTestcaseId'>"+data[a].id+"</span><span class='zephyrTestcaseName'>"+data[a].name+"</span></label><img class='zephyrUndoSyncronise' style='float:right' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='zephyrSyncronise' style='float:right' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
 								}
 							}
 						}
@@ -362,7 +362,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 	$(document).on('click', ".zephyrSyncronise", function(event){
 		var projectid = $(".zephyrSelectProject option:selected").data("projectid");
 		var releaseid = $(".zephyrSelectRelease option:selected").data("releaseid");
-		var treeid = $(this).parent().parent().prev()[0].getAttribute('data-phaseid');
+		var treeid = $(this).parent()[0].getAttribute('data-cyclePhaseId');
 		var testid = $(this).parent().find('span.zephyrTestcaseId')[0].innerText;
 		var testname = $(this).parent().find('span.zephyrTestcaseName')[0].innerText;
 		// }
