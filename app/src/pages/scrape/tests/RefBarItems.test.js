@@ -7,53 +7,12 @@ import {Provider}  from 'react-redux';
 import {createStore} from 'redux';
 import reducer from '../state/reducer';
 import * as reactRedux from 'react-redux';
-const scrapeItems=  [
-    {
-      "objId": "6030dd3af6dadf602e5650cf",
-      "objIdx": 0,
-      "val": 0,
-      "tag": "img",
-      "hide": false,
-      "title": "img_NONAME1_img",
-      "custname": "img_NONAME1_img",
-      "isCustom": false
-    },
-    {
-      "objId": "6030dd3af6dadf602e5650d1",
-      "objIdx": 1,
-      "val": 1,
-      "tag": "button",
-      "hide": false,
-      "title": "btnK1_btn",
-      "custname": "btnK1_btn",
-      "isCustom": false
-    },
-    {
-      "objId": "6030dd3af6dadf602e5650d2",
-      "objIdx": 2,
-      "val": 2,
-      "tag": "input",
-      "hide": false,
-      "title": "boxadd_txtbox",
-      "custname": "boxadd_txtbox",
-      "isCustom": false
-    },
-    {
-      "objId": "6030dd6cf6dadf602e5650d3",
-      "objIdx": 3,
-      "val": 3,
-      "tag": "input",
-      "hide": false,
-      "title": "qwe_txtbox",
-      "custname": "qwe_txtbox",
-      "isCustom": true
-    }
-]
+
 describe('<RefBarItems/> Positive Scenarios',()=>{
     let store;
     let wrapper;
     const contextValues={
-        scrapeItems:scrapeItems, 
+        scrapeItems:dummyData.scrapeItems, 
         setScrapeItems:jest.fn(), 
         scrapedURL:'google.com', 
         mainScrapedData:{
