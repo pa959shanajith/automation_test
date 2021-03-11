@@ -1,5 +1,5 @@
 import React ,{useState, useRef} from 'react';
-import { PopupMsg, ScreenOverlay, RedirectPage } from '../../global';
+import { RedirectPage } from '../../global';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { loginToQTest_ICE, qtestProjectDetails_ICE, qtestFolderDetails_ICE, saveQtestDetails_ICE, viewQtestMappedList_ICE } from '../api.js';
@@ -25,7 +25,6 @@ const  QTest = props => {
     const [projectDetails , setProjectDetails] = useState(null);
     const [folderDetails , setFolderDetails ] = useState(null);
     const [domainID , setDomainID]= useState(null);
-    const [failMSg , setFailMsg] = useState(null);
     const [testSuiteSelected_name , setTestSuiteSelected_name] = useState(null);
     const [selectedScenario_ID , setSelectedScenario_ID]= useState(null);
     const [selectedTestSuiteID , setSelectedTestSuiteID] = useState(null);
@@ -36,32 +35,20 @@ const  QTest = props => {
     const [releaseDropdn, setReleaseDropdn]=useState(null);
     const [mappedDetails ,setMappedDetails]= useState([]);
     const [SearchIconClicked , setSearchIconClicked] =useState(false);
-    const [errorPopUp , setErrorPopUp]= useState(false);
     const [syncSuccess , setSyncSuccess]= useState(false);
     const [filteredNames , setFilteredName]= useState(null);
-    const [blockui,setBlockui] = useState({show:false});
-    const [popup ,setPopup]= useState({show:false});
     const [disableSave , setDisableSave]=useState(true);
     const [loginError, setLoginError]= useState(null);
     const [mappedFilesICERes , setMappedFIlesICERes]= useState([]);
-    
-    const displayError = (error) =>{ //generic Error Dsplay Function
-        setPopup({
-        title:'ERROR',
-        content:error,
-        submitText:'Ok',
-        show:true
-        })
-    }
 
     const callLogin_ICE = async()=>{ // Checks all the fileds pf Login PopUp as well set states for errors and API call for login
-        setBlockui({show:true,content:'Logging...'})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Logging...'});
         const qcPassword = passwordRef.current.value;
         const qcURL = urlRef.current.value;
         const qcUsername = usernameRef.current.value;
         const domainDetails = await loginToQTest_ICE(qcPassword, qcURL, qcUsername);
         
-        if(domainDetails.error) displayError(domainDetails.error);
+        if(domainDetails.error) dispatch({type: actionTypes.SHOW_POPUP, payload:{title: "Error", content: domainDetails.error}});
         else if(domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials , Retry Login")
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
@@ -75,33 +62,38 @@ const  QTest = props => {
             setDomainDetails(domainDetails);
             setLoginSuccess(true);
         }
-        setBlockui({show:false})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callProjectDetails_ICE=async(e)=>{ // API call for the list of Projects of qTest and stores respone in array(state)
-        setBlockui({show:true,content:'Loading...'})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
         const domainid = (e.target.childNodes[e.target.selectedIndex]).getAttribute("value")
         const domainName = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id")
         setDomainID(domainid);
-        const userid = user_id;
-        const projectDetails = await qtestProjectDetails_ICE(domainid , userid )
-        if(projectDetails.error){displayError(projectDetails.error);return;}
-        setProjectDetails(projectDetails)
-        setFolderDetails(null);
-        setBlockui({show:false});
-        setReleaseDropdn("Select Release")
-        setProjectDropdn1(domainid);
-        setSelectedProjectName(domainName)
+        const projectDetails = await qtestProjectDetails_ICE(domainid , user_id )
+        if (projectDetails.error){
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: projectDetails.error}});
+        } else {
+            setProjectDetails(projectDetails)
+            setFolderDetails(null);
+            setReleaseDropdn("Select Release")
+            setProjectDropdn1(domainid);
+            setSelectedProjectName(domainName)
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callFolderDetails_ICE = async(e)=>{ // API call for list of Testcases for each Project and Release Type 
-        setBlockui({show:true,content:'Loading TestCases...'})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading TestCases...'});
         const projectName = e.target.value;
         const project_ID = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id")
         const domain_ID = domainID
         const folderDetails = await qtestFolderDetails_ICE(project_ID,"root",domain_ID,"folder",)
-        if(folderDetails.error){displayError(folderDetails.error);return;} 
-        setFolderDetails(folderDetails);
-        setBlockui({show:false})
-        setReleaseDropdn(projectName);
+        if (folderDetails.error){
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title:"Error", content: folderDetails.error}});
+        } else {            
+            setFolderDetails(folderDetails);
+            setReleaseDropdn(projectName);
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callCycleExpand =(idx)=>{//sets the state for logo of expand collapse for cycles 
         var expandarr =[...folderDetails];
@@ -152,39 +144,38 @@ const  QTest = props => {
         const Project_Name = selectedProjectName;
         
         if(!selectedScenario_ID){
-            setPopup({
+            let popupMsg = {
                 title:'Save Mapped Testcase ',
-                content:"Please Select a Scenario",
-                submitText:'Ok',
-                show:true
-            });
+                content:"Please Select a Scenario"
+            };
+            dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});
         }
-            else{
-        const mapped_Details=[
-            {
-                project: Project_Name,
-                projectid: project_id,
-                scenarioId: selectedScenario_ID,
-                testsuite: testSuiteSelected_name,
-                testsuiteid: selectedTestSuiteID  
-            }
-        ]
-        setMappedDetails(mapped_Details);
-        setDisableSave(false)
-        setSyncSuccess(true);
-    }
+        else {
+            const mapped_Details=[
+                {
+                    project: Project_Name,
+                    projectid: project_id,
+                    scenarioId: selectedScenario_ID,
+                    testsuite: testSuiteSelected_name,
+                    testsuiteid: selectedTestSuiteID  
+                }
+            ]
+            setMappedDetails(mapped_Details);
+            setDisableSave(false)
+            setSyncSuccess(true);
+        }
     }
     const callSaveButton =async()=>{ //API call for 
-        setBlockui({show:true,content:'Saving...'})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Saving...'});
         const response = await saveQtestDetails_ICE(mappedDetails);
-        if(response.error){displayError(response.error);setBlockui({show:false});return;}
-        if ( response === "success"){
-            setBlockui({show:false})
-            setErrorPopUp(true);
-            setFailMsg("Saved Successfully");
+        if (response.error){
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: response.error}});
+        }
+        else if ( response === "success"){
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Saved Mapped Testcases", content: "Saved Successfully."}});
             setSyncSuccess(false);
         }
-        setBlockui({show:false})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const onSearch=(e)=>{
         var val = e.target.value;
@@ -203,30 +194,26 @@ const  QTest = props => {
         setFilteredName(filter)
     }
     const callViewMappedFiles=async()=>{
-        setBlockui({show:true,content:'Loading...'})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
         const mappedResponse = await viewQtestMappedList_ICE(user_id)
         if(mappedResponse.length === 0){
-            setPopup({
+            let popupMsg = {
                 title:'Mapped Testcase',
-                content:"No mapped details",
-                submitText:'Ok',
-                show:true
-            })
-            setBlockui({show:false})
+                content:"No mapped details"
+            };
+            dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});
         }
         else{
             dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "qTest" });
             setMappedFIlesICERes(mappedResponse);
-            setBlockui({show:false})
-
-    }
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callExit=()=>{
         setFolderDetails(null);
         setScenarioArr(null);
         setLoginSuccess(false);
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
-        setFailMsg(null);
         setReleaseDropdn("Select Release");
         setDisableSave(true);
         setProjectDropdn1("Select Project");
@@ -243,8 +230,6 @@ const  QTest = props => {
     }
 
     return (<>
-        {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
         {viewMappedFiles === "qTest" ? 
             <MappedPage
                 screenType="qTest"
@@ -297,15 +282,6 @@ const  QTest = props => {
                 scenario_ID={scenario_ID}
                 
             />   
-        }
-        { errorPopUp &&
-            <PopupMsg
-                content ={failMSg}
-                submitText ="OK" 
-                title ="Save Mapped Testcase"
-                submit = {()=>setErrorPopUp(false)}
-                close ={()=>setErrorPopUp(false)}
-            />
         }
         </>
         }

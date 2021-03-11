@@ -50,6 +50,7 @@ const LoginModal = props => {
                         <input
                             className={"ilm__input"+(error.password ? " ilm_input_error" : "")}
                             ref={props.passwordRef}
+                            type="password"
                             placeholder={`Enter ${props.screenType} Password`}
                         />
                     </div>

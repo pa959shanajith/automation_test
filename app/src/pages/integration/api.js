@@ -320,7 +320,7 @@ export const viewQcMappedList_ICE = async(userID) => {
         return {error:'No Mapped Data Found'}
     }
 }
-export const loginToZephyr_ICE = async(url, username, password) => {
+export const loginToZephyr_ICE = async(zephyrurl, username, password) => {
     try{
         const res = await axios(url+'/loginToZephyr_ICE', {
             method: 'POST',
@@ -329,7 +329,7 @@ export const loginToZephyr_ICE = async(url, username, password) => {
             },
             data: {
                 action: "loginToZephyr_ICE",
-				zephyrURL: url,
+				zephyrURL: zephyrurl,
 				zephyrUserName:	username,
 				zephyrPassword: password,
 				zephyraction: "project"
@@ -350,7 +350,7 @@ export const loginToZephyr_ICE = async(url, username, password) => {
     }
 }
 
-export const zephyrProjectDetails_ICE = async(domain ,user_id ) => {
+export const zephyrProjectDetails_ICE = async(projectId, user_id) => {
     try{
         const res = await axios(url+'/zephyrProjectDetails_ICE', {
             method: 'POST',
@@ -358,11 +358,11 @@ export const zephyrProjectDetails_ICE = async(domain ,user_id ) => {
             'Content-type': 'application/json',
             },
            data: {
-            action : 'zephyrProjectDetails_ICE',
-            domain: domain,
-            user_id: user_id,
-            zephyraction : "project"
-        }
+                action : 'zephyrProjectDetails_ICE',
+                projectId:	projectId,
+                zephyraction: "release",
+                user_id : user_id 
+            }
         });
         if(res.status === 401){
             RedirectPage(history)
@@ -372,12 +372,43 @@ export const zephyrProjectDetails_ICE = async(domain ,user_id ) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'No Projects Found ,Please add Projects'}
+        return {error:'No Projects Found, Please add Projects'}
     }catch(err){
         console.error(err)
-        return {error:'No Projects Found ,Please add Projects'}
+        return {error:'No Projects Found, Please add Projects'}
     }
 }
+
+
+export const zephyrCyclePhase_ICE = async(releaseId, user_id) => {
+    try{
+        const res = await axios(url+'/zephyrCyclePhase_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                action: 'zephyrCyclePhase_ICE',
+                releaseId:	releaseId,
+                zephyraction: "cyclephase",
+                user_id : user_id
+           }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'No Release Found, Please add Release'}
+    } catch(err){
+        console.error(err)
+        return {error:'No Release Found, Please add Release'}
+    }
+}
+
 export const viewZephyrMappedList_ICE = async(userID) => {
     try{
         const res = await axios(url+'/viewZephyrMappedList_ICE', {
@@ -385,10 +416,9 @@ export const viewZephyrMappedList_ICE = async(userID) => {
             headers: {
             'Content-type': 'application/json',
             },
-           data: {
-            user_id : userID,
-            action : 'viewZephyrMappedList_ICE'
-            
+            data: {
+                user_id : userID,
+                action : 'viewZephyrMappedList_ICE'
            }
         });
         if(res.status === 401){
@@ -431,5 +461,33 @@ export const saveZephyrDetails_ICE = async(mappedDetails) => {
     }catch(err){
         console.error(err)
         return {error:'Failed to Save Mapped Testcases'}
+    }
+}
+
+export const zephyrTestcaseDetails_ICE = async(zephyraction, treeId) => {
+    try{
+        const res = await axios(url+'/zephyrTestcaseDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                action : 'zephyrTestcaseDetails_ICE',
+                treeId: treeId,
+                zephyraction: zephyraction,
+           }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Error in getting list.'}
+    }catch(err){
+        console.error(err)
+        return {error:'Error in getting list.'}
     }
 }

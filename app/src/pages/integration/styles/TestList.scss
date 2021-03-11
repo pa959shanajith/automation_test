@@ -3,30 +3,40 @@
     height: 16px;
 }
 
-.test_tree_branches{
-    padding-left: 17px;
-
-    .test_tree_leaves{
-        margin-left: 40px;
-        display: flex;
-        align-items: center;
-        width: 88%;
-    }
-
-    .test_tree_toggle {
-        cursor: pointer;
-    }
-}
 
 .test_tree_leaves{
+    margin-left: 40px;
+    display: flex;
+    align-items: center;
+    width: 88%;
+}
+
+.scenario__listItem {
+    display: flex;
+    align-items: center;
+    width: 88%;
+}
+
+
+.test_tree_toggle {
+    cursor: pointer;
+}
+
+.test_tree_leaves, .scenario__listItem{
+    padding: 3px 0 3px 10px!important;
+    border-radius: 5px;
     label{ 
-        margin: 3px 0 3px 10px!important;
+        margin: 0!important;
         flex-grow: 1;
     }
     &:hover{
         background-color: rgb(225, 223, 255); 
         border-radius: 5px;
     }
+}
+
+.scenario__listItem{
+    cursor: pointer;
 }
 
 
@@ -59,5 +69,29 @@
     padding: 0px;
     label {
         margin: 0 0 10px 10px;
+    }
+}
+
+.test__selectedTC, .scenario__selectedTC{
+    background-color:#E1CAFF !important;
+}
+
+.test__syncedTC{
+    background-color: rgb(221, 221, 221)!important;
+}
+
+// .test__leaf{
+//     display: flex;
+// }
+
+// .test__tcName{
+//     flex-grow: 1;
+// }
+
+.test__syncBtns{
+    float: right;
+
+    .test__syncBtn{
+        cursor: pointer;
     }
 }

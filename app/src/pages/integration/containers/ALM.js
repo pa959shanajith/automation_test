@@ -18,9 +18,6 @@ const ALM = props => {
     const urlRef = useRef();
     const usernameRef = useRef();
     const passwordRef = useRef();
-    const [blockui,setBlockui] = useState({show:false});
-    const [popup ,setPopup]= useState({show:false});
-    const [failMSg , setFailMsg] = useState(null);
     const [domainDetails , setDomainDetails] = useState(null);
     const [loginSuccess , setLoginSuccess]=useState(false);
     const [loginError , setLoginError]= useState(null);
@@ -31,24 +28,17 @@ const ALM = props => {
         setMappedFilesRes([]);
        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+    
 
-    const displayError = (title,error) =>{
-        setPopup({
-        title:title?title:'ERROR',
-        content:error,
-        submitText:'Ok',
-        show:true
-        })
-    }
     const callLogin_ALM = async()=>{
-        setBlockui({show:true,content:'Logging...'})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Logging...'});
         const qcPassword = passwordRef.current.value;
         const qcURL = urlRef.current.value;
         const qcUsername = usernameRef.current.value;
         const domainDetails = await loginQCServer_ICE(qcPassword ,qcURL ,qcUsername);
 
-        if (domainDetails.error) displayError(domainDetails.error)
-        if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available,Please run the batch file and connect to the Server.");
+        if (domainDetails.error) dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: domainDetails.error} });
+        else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available,Please run the batch file and connect to the Server.");
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
         else if (domainDetails === "Invalid Session") return RedirectPage(history);
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
@@ -60,17 +50,18 @@ const ALM = props => {
             setDomainDetails(domainDetails);
             setLoginSuccess(true);
         }
-        setBlockui({show:false})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callViewMappedFiles = async()=>{
-        setBlockui({show:true,content:'Fetching...'})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Fetching...'});
         //props.setViewMappedFiles(true)
         dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "ALM" });
         const userid = user_id;
         const response = await viewQcMappedList_ICE(userid);
-        if(response.error){props.displayError(response.error);props.setBlockui({show:false});return;}
-        setMappedFilesRes(response);
-        setBlockui({show:false})
+        if (response.error){
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: response.error}});
+        } else setMappedFilesRes(response);
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callExitcenter=()=>{
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });;
@@ -78,10 +69,7 @@ const ALM = props => {
     }
 
     return(
-        
         <>
-        {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
         { viewMappedFiles === "ALM" ?
             <MappedPage 
                 screenType="ALM"
@@ -103,9 +91,6 @@ const ALM = props => {
         { screenType === "ALM" &&
             <ALMContent
                 domainDetails={domainDetails}
-                setBlockui={setBlockui}
-                displayError={displayError}
-                setPopup={setPopup}
                 callViewMappedFiles={callViewMappedFiles}
                 callExitcenter={callExitcenter}
             /> }

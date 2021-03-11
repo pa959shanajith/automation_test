@@ -134,7 +134,7 @@ const QTestContent = props => {
                     e.scenario_details.map((e,i)=>(
                             <div 
                                 key={i}
-                                className={"test_tree_leaves " +(props.selectedScenario_ID == e._id ? "slectedTestDiv" : "")} 
+                                className={"scenario__listItem " +(props.selectedScenario_ID == e._id ? "slectedTestDiv" : "")} 
                                 onClick={()=>{props.setSelectedScenario_ID(e._id)}}
                                 style={{cursor: "pointer"}}
                             >
