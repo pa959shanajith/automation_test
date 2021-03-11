@@ -98,31 +98,48 @@ const TaskBox = (props) => {
             ed: (nt) ? nt.enddate : '',
             re: (nt && nt.release != null) ? nt.release : '',
             cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
+            ac: (nt) ? nt.accessibility_testing : 'Disable',
             det: (nt) ? nt.details : '',
             cx: (nt) ? nt.complexity : undefined,
             _id:(nt)? nt._id:null
         };
+        var taskList = {...taskAssign[t]}
         if (tObj.t == null || tObj.t == "") {
-            tObj.t = taskAssign[t].task[0];
+            tObj.t = taskList.task[0];
+        }
+        if(t === 'scenarios' && appType === 'Web' ){
+            switch(tObj.t){
+                case taskList.task[0]:
+                    tObj.ac = "Disable";
+                    break;
+                case taskList.task[1]:
+                    tObj.ac = "Enable"
+                    break;
+                case taskList.task[2]:
+                    tObj.ac = "Exclusive"
+                    break;
+                default:
+                    tObj.ac = "Disable"
+            }
+        }else if(t === 'scenarios'){
+            taskList.task = taskList.task[0]
         }
         if (tObj.det === null || tObj.det.trim() == "") {
-            var type;
-            if(dNodes[pi].type === 'endtoend') {
-                type = ' End to End'
-            }else{
-                type = dNodes[pi].type.slice(0,-1) //remove plural
-                // to avoid phrasing "Execute scenario scenarios"
-                type = (type)?" "+type.charAt(0).toUpperCase()+type.slice(1):""
-                if(tObj.t == 'Execute Scenario')type = ""
+            switch(dNodes[pi].type){
+                case 'endtoend' :
+                    tObj.det = tObj.t + ' End to End ' + dNodes[pi].name
+                case 'scenarios' :
+                    tObj.det = tObj.t + ' ' + dNodes[pi].name
+                default :
+                    var type = dNodes[pi].type.slice(0,-1) //remove plural
+                    tObj.det = tObj.t + type + " " + dNodes[pi].name
             }
-            taskDetailsRef.current.value = tObj.t + type + " " + dNodes[pi].name
-        } else {
-            taskDetailsRef.current.value = tObj.det
         }
+        taskDetailsRef.current.value = tObj.det
         // populate task 
         var val = dNodes[pi].task ? dNodes[pi].task.tasktype:dNodes[pi].task
-        setTask({arr:taskAssign[t].task,initVal:val})
-        taskAssign[t].attributes.forEach(e => {
+        setTask({arr:taskList.task,initVal:val,disabled:tObj.at?true:false})
+        taskList.attributes.forEach(e => {
             switch(e){
                 case 'bn':{
                     changeTask(val=='Execute Batch'?val:'Execute')
@@ -290,7 +307,7 @@ const TaskBox = (props) => {
                     {task.arr.length>0?
                         <li>
                             <label>Task</label>
-                            <select onChange={changeTask}  disabled={assignbtn.reassign}  defaultValue={task.initVal} ref={taskRef}>
+                            <select onChange={changeTask}  disabled={assignbtn.reassign || task.disabled}  defaultValue={task.initVal} ref={taskRef}>
                                 {task.arr.map((e)=>
                                     <option key={e} value={e}>{e}</option>
                                 )}
@@ -402,6 +419,7 @@ function addTask_11(pi, tObj, qid, cycleid,dNodes,nodeDisplay,cTask) {
             nodeDisplay[pi].task=true;
             //d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
         }
+        nodeDisplay[pi].ac=tObj.ac;
         // If task already exists then set it to true
         if (dNodes[pi].task) taskStatus = dNodes[pi].task.status;
         else taskStatus = 'assigned';
@@ -516,6 +534,7 @@ function updateTaskObject(tObj, data,taskUndef) {
         task: tObj.t,
         assignedto: tObj.at,
         assignedToName: tObj.atName,
+        accessibilityTesting: tObj.ac,
         reviewer: tObj.rw,
         startdate: tObj.sd,
         enddate: tObj.ed,
@@ -571,6 +590,9 @@ const initTaskObject = ({pi,dNodes,userAsgList,userRevList,batchNameRef,taskRef,
             }
         }
     }
+    var accessibilityToggle = 'Disable';
+    if  (taskRef.current.value == taskAssign.scenarios.task[1]) accessibilityToggle = "Enable"
+    else if (taskRef.current.value == taskAssign.scenarios.task[2]) accessibilityToggle = "Exclusive"
     var tObj = {
         // tvn: tvn,
         t: taskRef.current.value,
@@ -581,6 +603,7 @@ const initTaskObject = ({pi,dNodes,userAsgList,userRevList,batchNameRef,taskRef,
         sd: startDate.value,
         ed: endDate.value,
         reestimation: estimationCount,
+        ac: accessibilityToggle,
         re: releaseid,
         cy: cycleid,
         app: appType,
@@ -748,7 +771,7 @@ const taskAssign = {
         "attributes": ["bn", "at", "rw", "sd", "ed", "reestimation", "pg"]
     },
     "scenarios": {
-        "task": ["Execute Scenario"],
+        "task": ["Execute Scenario","Execute Scenario with Accessibility", "Execute Scenario Accessibility Only"],
         "attributes": ["at", "rw", "sd", "ed", "reestimation", "pg", "cx"]
     },
     "screens": {
