@@ -83,6 +83,10 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 					} else {
 						var tasksJson = data1;
 						$scope.taskJson = data1;
+						for(var index in tasksJson){
+							tasksJson[index].uid = Math.floor(Math.random() * 26) + Date.now();
+						}
+						taskJson = angular.toJson(tasksJson);
 					 	window.localStorage['_TJ'] = angular.toJson(tasksJson);
 						if (tasksJson.length == 0) unblockUI();
 						/*	Build a list of releaseids and cycleids
@@ -106,6 +110,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 									taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 								}
 								var dataobj={
+									'uid': tasksJson[i].uid,
 									'accessibilityParameters': tasksJson[i].accessibilityParameters,
 									'scenarioflag':tasksJson[i].scenarioFlag,
 									'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
@@ -319,6 +324,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		taskObj.releaseid = dataobj_json.releaseid;
 		taskObj.cycleid = dataobj_json.cycleid;
 		taskObj.reuse = dataobj_json.reuse;
+		taskObj.uid = dataobj_json.uid;
 	
 		window.localStorage['_CT'] = JSON.stringify(taskObj);
 		if(dataobj_json.subtask == "Scrape"){
