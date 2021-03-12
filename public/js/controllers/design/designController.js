@@ -4253,6 +4253,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
 		//openDialog("Compare Object", "");
 		$rootScope.compareFlag = true;
+		$('.scrollbar-compare').first().removeClass('ng-hide')
 		if ($rootScope.compareFlag == true) {
 			if (appType == "Web") {
 				$("#compareObjectModal").modal("show");

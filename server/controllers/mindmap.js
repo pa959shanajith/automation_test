@@ -1397,7 +1397,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 								'74': 'ctrl+n', '75': 'ctrl+o', '76': 'ctrl+x', '77': 'ctrl+c', '78': 'ctrl+v', '79': 'ctrl+z', '80': 'ctrl+pageup', '81': 'pageup', '82': 'pagedown', '83': 'ctrl+pagedown',
 								'84': 'ctrl+g', '85': 'ctrl+r', '86': 'ctrl+p'
 							}
-							testcaseObj = getTestcaseStep(step,null,'@Generic','sendFunctionKeys',keycode_map[key],null,null,"SAP");
+							testcaseObj = getTestcaseStep(step,null,'@Generic','sendFunctionKeys',keycode_map[key],null,null,"Generic");
 						} else {
 							logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
 						}
