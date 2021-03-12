@@ -170,6 +170,7 @@ const ZephyrContent = props => {
                             <label>Root</label>
                             { Object.keys(projectDetails)
                                 .map( cycleName => <CycleNode 
+                                        key={cycleName}
                                         phaseList={projectDetails[cycleName]} 
                                         cycleName={cycleName}
                                         projectId={projectDropdn1}
@@ -186,6 +187,7 @@ const ZephyrContent = props => {
                         (e.scenario_details)? 
                         e.scenario_details.map((scenario,i)=>(
                                 <div 
+                                    key={i}
                                     className={"scenario__listItem" + (selectedScIds === scenario._id ? " scenario__selectedTC" : "")} 
                                     onClick={()=>{dispatch({type: actionTypes.SEL_SCN_IDS, payload: scenario._id})}}
                                 >

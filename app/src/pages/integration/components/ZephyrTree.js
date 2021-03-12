@@ -23,11 +23,12 @@ const CycleNode = props => {
             { !collapse && props.phaseList.length > 0 
                 ? <div> {
                     props.phaseList
-                        .map(phase => <PhaseNode 
-                                            phase={phase}
-                                            projectId={props.projectId}
-                                            releaseId={props.releaseId}
-                                        />)
+                        .map((phase, idx) => <PhaseNode 
+                                                key={`phase-${idx}`}
+                                                phase={phase}
+                                                projectId={props.projectId}
+                                                releaseId={props.releaseId}
+                                            />)
                 } </div>
                 : null
             }
@@ -76,6 +77,7 @@ const PhaseNode = props => {
                     ? <div> {
                         testCases
                             .map(testCase => <TestCaseNode 
+                                                key={`testCase-${testCase.id}`}       
                                                 testCase={testCase}
                                                 phaseId={phaseid}
                                                 projectId={props.projectId}

@@ -56,33 +56,36 @@ const FolderNode = props => {
         { !collapse && subFolders.length > 0 
             ? <div> {
                 subFolders
-                    .map(folder => <FolderNode 
-                                        folderObject={folder}
-                                        type="folder"
-                                        projectName={props.projectName}
-                                        releaseName={props.releaseName}
-                                    />)
+                    .map((folder, idx) => <FolderNode 
+                                            key={`folder-${idx}`}
+                                            folderObject={folder}
+                                            type="folder"
+                                            projectName={props.projectName}
+                                            releaseName={props.releaseName}
+                                        />)
             } </div>
             : !collapse && subTestSets.length > 0 
             ? <div> {
                 subTestSets
-                    .map(testSet => <FolderNode 
-                                        testSetObject={testSet}
-                                        type="testcase"
-                                        projectName={props.projectName}
-                                        releaseName={props.releaseName}
-                                    />)
+                    .map((testSet, idx) => <FolderNode 
+                                            key={`testSet-${idx}`}
+                                            testSetObject={testSet}
+                                            type="testcase"
+                                            projectName={props.projectName}
+                                            releaseName={props.releaseName}
+                                        />)
             } </div>
             : !collapse && testCases.length > 0 
             ? <div> {
                 testCases
-                    .map(testCase => <TestCaseNode 
-                                        testCaseName={testCase.slice(0, testCase.indexOf("/"))}
-                                        testCaseId={testCase.substring(testCase.indexOf("/")+1)}
-                                        testSetObject={props.testSetObject}
-                                        projectName={props.projectName}
-                                        releaseName={props.releaseName}
-                                    />)
+                    .map((testCase, idx) => <TestCaseNode 
+                                            key={`testCase-${idx}`}
+                                            testCaseName={testCase.slice(0, testCase.indexOf("/"))}
+                                            testCaseId={testCase.substring(testCase.indexOf("/")+1)}
+                                            testSetObject={props.testSetObject}
+                                            projectName={props.projectName}
+                                            releaseName={props.releaseName}
+                                        />)
             } </div>
             : null
         }
