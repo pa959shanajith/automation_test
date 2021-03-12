@@ -111,7 +111,7 @@ const ALMContent = props => {
         var ScenarioName=[] 
         if(scenarioArr){
             projectDetails.avoassure_projects.map((e,i)=>(
-                (i === scenario_ID) ? 
+                (i == scenario_ID) ? 
                     e.scenario_details ? 
                     e.scenario_details.map((e,i)=>(
                         ScenarioName.push(e.name)
@@ -204,7 +204,7 @@ const ALMContent = props => {
             }
             scenarioList = { scenarioArr && 
                 projectDetails.avoassure_projects.map((e,i)=>(
-                    (i === scenario_ID) && (e.scenario_details) &&
+                    (i == scenario_ID) && (e.scenario_details) &&
                     e.scenario_details.map(e => (
                         <div 
                             className={"scenario__listItem "+(selectedScenarioIds.indexOf(e._id)!==-1 ? " scenario__selectedTC" : "")} 

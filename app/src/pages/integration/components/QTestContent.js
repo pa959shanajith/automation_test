@@ -58,7 +58,7 @@ const QTestContent = props => {
                         src="static/imgs/ic-qcCollapse.png"
                     />
                     <label>Root</label>
-                <div className="test_tree_branches">
+                <div className="test_tree_branches" style={{paddingLeft: 17}}>
                     {props.folderDetails.map((e,i)=>(
                         <div>
                             <img alt="expand-collapse" 
@@ -69,7 +69,7 @@ const QTestContent = props => {
                             <label>{e.cycle}</label>
                             { e.cycleOpen ?
                                 <Fragment> 
-                                <div className="test_tree_branches">
+                                <div className="test_tree_branches" style={{paddingLeft: 17}}>
                                     <img alt="blueMinus-Plus" 
                                         className="test_tree_toggle" onClick={()=>props.callTestSuiteExpand({i})} 
                                         style={{height:"16px",cursor: "pointer"}} 
@@ -83,7 +83,7 @@ const QTestContent = props => {
                                     }
                                 {
                                     e.TestsuiteOpen ?
-                                    <div className="test_tree_branches">
+                                    <div className="test_tree_branches" style={{paddingLeft: 17}}>
                                     {e.testsuites &&
                                     e.testsuites.map((e,i)=>(
                                         e.testruns.map((e,i)=>(
@@ -129,12 +129,12 @@ const QTestContent = props => {
             scenarioList = {
                 props.scenarioArr ? 
                 props.projectDetails.avoassure_projects.map((e,i)=>(
-                    (i === props.scenario_ID)? 
+                    (i == props.scenario_ID)? 
                     (e.scenario_details)? 
                     e.scenario_details.map((e,i)=>(
                             <div 
                                 key={i}
-                                className={"scenario__listItem " +(props.selectedScenario_ID === e._id ? "slectedTestDiv" : "")} 
+                                className={"scenario__listItem " +(props.selectedScenario_ID == e._id ? "slectedTestDiv" : "")} 
                                 onClick={()=>{props.setSelectedScenario_ID(e._id)}}
                                 style={{cursor: "pointer"}}
                             >

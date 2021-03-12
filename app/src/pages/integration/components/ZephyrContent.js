@@ -94,7 +94,7 @@ const ZephyrContent = props => {
         var ScenarioName=[] 
         if(scenarioArr){
             avoProjects.map((e,i)=>(
-                (i === (scenario_ID)) ? 
+                (i == scenario_ID) ? 
                     e.scenario_details ? 
                     e.scenario_details.map((e,i)=>(
                         ScenarioName.push(e.name)
@@ -183,12 +183,12 @@ const ZephyrContent = props => {
                 scenarioList={
                     scenarioArr ? 
                     avoProjects.map((e,i)=>(
-                        (i === scenario_ID)? 
+                        (i == scenario_ID)? 
                         (e.scenario_details)? 
                         e.scenario_details.map((scenario,i)=>(
                                 <div 
                                     key={i}
-                                    className={"scenario__listItem" + (selectedScIds === scenario._id ? " scenario__selectedTC" : "")} 
+                                    className={"scenario__listItem" + (selectedScIds == scenario._id ? " scenario__selectedTC" : "")} 
                                     onClick={()=>{dispatch({type: actionTypes.SEL_SCN_IDS, payload: scenario._id})}}
                                 >
                                 { filteredNames? filteredNames.map((element)=>(element === scenario.name ?element  : null)):  scenario.name}

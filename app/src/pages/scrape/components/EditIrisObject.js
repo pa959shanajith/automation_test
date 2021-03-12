@@ -12,7 +12,9 @@ const EditIrisObject = props => {
     const [selectedStatus, setSelectedStatus] = useState("");
 
     useEffect(()=>{
-        setSelectedType(props.utils.object.tag.split(";").pop() || "unrecognizableobject");
+        let objType = props.utils.object.tag.split(";").pop()
+        if (objType==='' || objType==='Unable to recognize object type') objType = "unrecognizableobject";
+        setSelectedType(objType);
         setSelectedStatus(0);
         //eslint-disable-next-line
     }, [])
