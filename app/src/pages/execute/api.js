@@ -345,3 +345,34 @@ export const loginZephyrServer_ICE = async(zephyrAccNo,zephyrAcKey,zephyrSecKey,
         return {error:"Failed to login Zephyr server."}
     }
 }
+
+
+
+/*Component  ExecuteContent
+  api returns  string - success/fail
+*/
+
+export const updateAccessibilitySelection = async(suiteInfo) => { 
+    try{
+        const res = await axios(url+'/updateAccessibilitySelection', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: suiteInfo,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to save selected accessibility standards."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to save selected accessibility standards."}
+    }
+}

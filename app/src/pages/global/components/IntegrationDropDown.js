@@ -66,9 +66,9 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, setPo
                 }
                 else if(type === "Zephyr"){
                     integration.zephyr = {
-						accountid: credentials.url,
-						accesskey: credentials.userName,
-						secretkey: credentials.password,
+						url: credentials.url,
+						username: credentials.userName,
+						password: credentials.password,
 					}
                 }
                 setCredentialsExecution(integration)

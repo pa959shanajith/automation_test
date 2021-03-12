@@ -21,7 +21,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
     const [scheduleTableData,setScheduleTableData] = useState([])
     const [integration,setIntegration] = useState({alm: {url:"",username:"",password:""}, 
                                                     qtest: {url:"",username:"",password:"",qteststeps:""}, 
-                                                    zephyr: {accountid:"",accesskey:"",secretkey:""}});
+                                                    zephyr: {url:"",username:"",password:""}});
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [moduleSceduledate,setModuleSceduledate] = useState({})
     const [sort,setSort] = useState(true)
@@ -38,7 +38,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
             var schFilterData = document.getElementById("scheduledSuitesFilterData");
             if(schFilterData !== null && schFilterData!==undefined)
                 schFilterData.selectedIndex = "0"; 
-        }, 30000);
+        }, 60000);
     }, [scheDetails]);
 
     const getScheduledDetails = async () => {
@@ -178,7 +178,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
     const syncScenarioChange = (value) => {
         setIntegration({alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {accountid:"",accesskey:"",secretkey:""}})
+        zephyr: {url:"",username:"",password:""}})
         if (value === "1") {
             setShowIntegrationModal("ALM")
 		}
