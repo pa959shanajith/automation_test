@@ -108,17 +108,13 @@ const ALMContent = props => {
     const onSearch=(e)=>{
         var val = e.target.value;
         var filter = []
-        var ScenarioName=[] 
         if(scenarioArr){
-            projectDetails.avoassure_projects.map((e,i)=>(
-                (i == scenario_ID) ? 
-                    e.scenario_details ? 
-                    e.scenario_details.map((e,i)=>(
-                        ScenarioName.push(e.name)
-                    )):null : null 
-            ))
-            }
-        filter = [...ScenarioName].filter((e)=>e.toUpperCase().indexOf(val.toUpperCase())!==-1)
+            projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details
+                .forEach(e=>{
+                    if (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
+                        filter.push(e);
+                })
+        }
         setFilteredName(filter)
     }
 
@@ -203,15 +199,14 @@ const ALMContent = props => {
                 </> : null
             }
             scenarioList = { scenarioArr && 
-                projectDetails.avoassure_projects.map((e,i)=>(
-                    (i == scenario_ID) && (e.scenario_details) &&
-                    e.scenario_details.map(e => (
+                (filteredNames ? filteredNames : projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details)
+                    .map(e => (
                         <div 
                             className={"scenario__listItem "+(selectedScenarioIds.indexOf(e._id)!==-1 ? " scenario__selectedTC" : "")} 
                             onClick={(event)=>{selectScenarioMultiple(event, e._id);}}
                         >
-                            { filteredNames ? filteredNames.map((element)=>(element === e.name && element)) :  e.name }
-                        </div> )))) 
+                            {e.name}
+                        </div> ))
             }
         />
     ); 

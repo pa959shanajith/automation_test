@@ -179,18 +179,14 @@ const  QTest = props => {
     }
     const onSearch=(e)=>{
         var val = e.target.value;
-        var filter = []
-        var ScenarioName=[] 
+        var filter = []; 
         if(scenarioArr){
-            projectDetails.avoassure_projects.map((e,i)=>(
-                (i == scenario_ID) ? 
-                    e.scenario_details ? 
-                    e.scenario_details.map((e,i)=>(
-                        ScenarioName.push(e.name)
-                    )):null : null 
-            ))
+            projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details
+                .forEach((e,i)=>{
+                    if (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
+                        filter.push(e);
+                })
             }
-        filter = [...ScenarioName].filter((e)=>e.toUpperCase().indexOf(val.toUpperCase())!==-1)
         setFilteredName(filter)
     }
     const callViewMappedFiles=async()=>{

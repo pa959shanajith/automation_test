@@ -90,18 +90,15 @@ const ZephyrContent = props => {
     
     const onSearch=(e)=>{
         var val = e.target.value;
-        var filter = []
-        var ScenarioName=[] 
+        var filter = [];
         if(scenarioArr){
-            avoProjects.map((e,i)=>(
-                (i == scenario_ID) ? 
-                    e.scenario_details ? 
-                    e.scenario_details.map((e,i)=>(
-                        ScenarioName.push(e.name)
-                    )):null : null 
-            ))
+            avoProjects[parseInt(scenario_ID)].scenario_details
+                .forEach((e,i)=>{
+                    if (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) 
+                        filter.push(e);
+                    }
+                )
             }
-        filter = [...ScenarioName].filter((e)=>e.toUpperCase().indexOf(val.toUpperCase())!==-1)
         setFilteredName(filter)
     }
 
@@ -182,18 +179,15 @@ const ZephyrContent = props => {
                 }
                 scenarioList={
                     scenarioArr ? 
-                    avoProjects.map((e,i)=>(
-                        (i == scenario_ID)? 
-                        (e.scenario_details)? 
-                        e.scenario_details.map((scenario,i)=>(
+                    (filteredNames ? filteredNames : avoProjects[parseInt(scenario_ID)].scenario_details)
+                        .map((scenario, i)=>(
                                 <div 
                                     key={i}
                                     className={"scenario__listItem" + (selectedScIds == scenario._id ? " scenario__selectedTC" : "")} 
                                     onClick={()=>{dispatch({type: actionTypes.SEL_SCN_IDS, payload: scenario._id})}}
                                 >
-                                { filteredNames? filteredNames.map((element)=>(element === scenario.name ?element  : null)):  scenario.name}
+                                    {scenario.name}
                                 </div>
-                        )):null : null
                         ))
                         : null 
                 }

@@ -19,9 +19,11 @@ const Integrations = () => {
 
     useEffect(()=>{//persist the screentype of integration (implementation for bug#18796)
         let currScreenType = window.localStorage['integrationScreenType'];
-        if (currScreenType) {
+        if (currScreenType)
             dispatch({type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: currScreenType});
-        }
+        else 
+            dispatch({type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null});
+        dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null });
     }, [dispatch])
 
     const PopupDialog = () => (
