@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState } from 'react';
-import { PopupMsg, ScreenOverlay, RedirectPage} from '../../global';
+import { RedirectPage} from '../../global';
 import { useHistory } from 'react-router-dom';
 import * as actionTypes from '../state/action.js';
 import ALMContent from '../components/ALMContent.js';

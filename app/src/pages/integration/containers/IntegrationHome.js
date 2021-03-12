@@ -22,7 +22,7 @@ const Integrations = () => {
         if (currScreenType) {
             dispatch({type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: currScreenType});
         }
-    }, [])
+    }, [dispatch])
 
     const PopupDialog = () => (
         <PopupMsg 

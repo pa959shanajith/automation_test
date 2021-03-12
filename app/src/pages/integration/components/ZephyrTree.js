@@ -60,7 +60,8 @@ const PhaseNode = props => {
             }
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         }
-        else setCollapse(true);        
+        else setCollapse(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps        
     }, [collapse, setCollapse])
     
 
@@ -99,12 +100,12 @@ const TestCaseNode = props => {
 
     let uniqueTCpath = `${props.phaseId}\\${props.testCase.id}`;
 
-    const handleClick = useCallback(()=>{
+    const handleClick = () => {
         dispatch({type: actionTypes.SEL_TC, payload: uniqueTCpath});
         dispatch({type: actionTypes.SYNCED_TC, payload: []});
-    })
+    }
 
-    const handleSync = useCallback(()=>{
+    const handleSync = () => {
         let popupMsg = false;
         if(selectedScIds.length===0){
             popupMsg = {
@@ -127,12 +128,12 @@ const TestCaseNode = props => {
             dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
             dispatch({type: actionTypes.SYNCED_TC, payload: uniqueTCpath});
         }
-    })
+    }
 
-    const handleUnSync = useCallback(()=>{
+    const handleUnSync = () => {
         dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
         dispatch({type: actionTypes.SYNCED_TC, payload: []});
-    })
+    }
 
     return <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(uniqueTCpath) ? " test__syncedTC" : "")}>
                 <label className="test__leaf" title={props.testCase.name} onClick={handleClick}>

@@ -40,6 +40,7 @@ const FolderNode = props => {
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         } 
         else setCollapse(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [collapse, setCollapse])
 
     return <div className="int__folderNode" style={{paddingLeft: 17}}>
@@ -132,7 +133,7 @@ const TestCaseNode = props => {
         dispatch({type: actionTypes.SEL_TC, payload: newSelectedTC});
     };
 
-    const handleSync = useCallback(()=>{
+    const handleSync = () => {
         let popupMsg = false;
         if(selectedScIds.length===0){
             popupMsg = {
@@ -168,12 +169,12 @@ const TestCaseNode = props => {
             dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
             dispatch({type: actionTypes.SYNCED_TC, payload: selectedTCDetails.selectedTCNames});
         }
-    })
+    }
 
-    const handleUnSync = useCallback(()=>{
+    const handleUnSync = () => {
         dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
         dispatch({type: actionTypes.SYNCED_TC, payload: []});
-    })
+    }
 
     return <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(props.testCaseName) ? " test__syncedTC" : "")}>
                 <label className="test__leaf" title={props.testCaseName} onClick={handleClick}>

@@ -129,16 +129,16 @@ const QTestContent = props => {
             scenarioList = {
                 props.scenarioArr ? 
                 props.projectDetails.avoassure_projects.map((e,i)=>(
-                    (i == props.scenario_ID)? 
+                    (i === props.scenario_ID)? 
                     (e.scenario_details)? 
                     e.scenario_details.map((e,i)=>(
                             <div 
                                 key={i}
-                                className={"scenario__listItem " +(props.selectedScenario_ID == e._id ? "slectedTestDiv" : "")} 
+                                className={"scenario__listItem " +(props.selectedScenario_ID === e._id ? "slectedTestDiv" : "")} 
                                 onClick={()=>{props.setSelectedScenario_ID(e._id)}}
                                 style={{cursor: "pointer"}}
                             >
-                            { props.filteredNames? props.filteredNames.map((element)=>(element == e.name ?element  : null)):  e.name}
+                            { props.filteredNames? props.filteredNames.map((element)=>(element === e.name ?element  : null)):  e.name}
                             </div>
                     )):null : null ))
                     : null 

@@ -55,6 +55,7 @@ const TableRow = (props) => {
             setOutputPlaceholder(null);
             setKeywordList(null);
             setTcAppType(props.testCase.appType);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             objList = props.objList;
             setRemarks(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
             setCommented(props.testCase.outputVal.slice(-2) === "##");
@@ -115,6 +116,7 @@ const TableRow = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.focusedRow, props.edit]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(()=>{
         if (props.focusedRow !== props.idx) {
             setFocused(false);
