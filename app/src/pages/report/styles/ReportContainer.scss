@@ -11,6 +11,7 @@
 }
 .rp__title{
     height: 30px;
+    margin-bottom: 15px;
     span{
         background: #331d4e ;
         font-weight: normal;
@@ -23,6 +24,27 @@
         white-space: nowrap;
         vertical-align: baseline;
         border-radius: 4px;
+    }
+}
+.rp__title-btn{
+    height: 30px;
+    cursor: pointer;
+    span{
+        background: #7777;
+        font-weight: normal;
+        font-size: 14px;
+        padding: 4px 10px;
+        margin: 3px;
+        line-height: 1;
+        color: black;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 15px;
+    }
+    .active-btn{
+        background: #643693;
+        color: #fff;
     }
 }
 .rp__body{
@@ -66,38 +88,4 @@
             }
         }
     }
-    .rp__content{
-        width: 100%;
-        position: absolute;
-        height: 255px;
-        top: 70px;
-        margin-top: 20px;
-        .left-content{
-            height: 100%;
-            width: 50%;
-            float: left;
-            padding-right: 30px;
-        }
-        .right-content{
-            height: 100%;
-            width: 50%;
-            float: right;
-            padding-left: 30px;
-        }
-    }
-}
-.bottom-content {
-    top: 377px;
-    height: 150px;
-    width: 100%;
-    position: absolute;
-}
-.panel {
-    margin-bottom: 20px;
-    background-color: #fff;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
-    box-shadow: 0 1px 1px rgba(0,0,0,.05);
-    border-color: #ddd;
 }
