@@ -27,6 +27,8 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
         zephyr: {url:"",username:"",password:""}
     });
     const [selectAllBatch,setSelectAllBatch] = useState(0)
+    const [proceedExecution, setProceedExecution] = useState(false);
+    const [dataExecution, setDataExecution] = useState({});
     const [allocateICE,setAllocateICE] = useState(false)
     const [accessibilityParameters,setAccessibilityParameters] = useState(current_task.accessibilityParameters)
     const [scenarioTaskType,setScenarioTaskType] = useState(current_task.scenarioTaskType);
@@ -144,8 +146,32 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
         if(check && valid) setAllocateICE(true);
     }    
 
+    const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
+        if(Array.isArray(executionData.targetUser)){
+			for(let icename in executionData.targetUser){
+				let ice_id = iceNameIdMap[executionData.targetUser[icename]];
+				if(ice_id && ice_id.status){
+                    setDataExecution(executionData);
+					setAllocateICE(false);
+                    setProceedExecution(true);
+                    return
+				} 
+			}
+		}else{
+			let ice_id = iceNameIdMap[executionData.targetUser];
+			if(ice_id && ice_id.status){
+                setDataExecution(executionData);
+				setAllocateICE(false);
+                setProceedExecution(true);
+                return
+			} 
+		}
+        ExecuteTestSuite(executionData);
+    }
+
     const ExecuteTestSuite = async (executionData) => {
        
+        if(executionData === undefined) executionData = dataExecution;
         setAllocateICE(false);
         const modul_Info = parseLogicExecute(eachData, current_task, appType, projectdata, moduleInfo, accessibilityParameters, scenarioTaskType, setPopupState);
         if(modul_Info === false) return;
@@ -216,7 +242,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
             {loading?<ScreenOverlay content={loading}/>:null}
             {allocateICE?
             <AllocateICEPopup 
-                SubmitButton={ExecuteTestSuite} 
+                SubmitButton={CheckStatusAndExecute} 
                 setAllocateICE={setAllocateICE}
                 modalButton={"Execute"} 
                 allocateICE={allocateICE} 
@@ -246,7 +272,21 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
 
                 <ExecuteTable setAccessibilityParameters={setAccessibilityParameters} scenarioTaskType={scenarioTaskType} accessibilityParameters={accessibilityParameters} current_task={current_task} setLoading={setLoading} setPopupState={setPopupState} selectAllBatch={selectAllBatch} filter_data={projectdata} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} eachDataFirst={eachDataFirst} setEachDataFirst={setEachDataFirst} />
                 </div>
-                        
+
+            {proceedExecution?
+                <ModalContainer
+                    title={"ICE Busy"} 
+                    footer={
+                        <>
+                        <button onClick={()=>{ExecuteTestSuite()}}>Proceed</button>
+                        <button onClick={()=>{setAllocateICE(true)}}>No</button>
+                        </>
+                    }
+                    close={()=>{setProceedExecution(false)}} 
+                    content={"Selected ICE is already executing a Test Suite. Press Proceed to queue this execution on selected ICE, press No to select any other ICE."} 
+                    modalClass=" modal-sm" 
+                />
+            :null} 
             {showDeleteModal?<ModalContainer title={modalDetails.title} footer={submitModalButtons(setshowDeleteModal, submit_task)} close={closeModal} content={"Are you sure you want to "+ modalDetails.task+" the task ?"} modalClass=" modal-sm" />:null} 
             { showIntegrationModal ? 
                 <IntegrationDropDown

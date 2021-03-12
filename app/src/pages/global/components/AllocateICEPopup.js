@@ -21,6 +21,7 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
     const [availableICE,setAvailableICE] = useState([])
     const [chooseICEPoolOptions,setChooseICEPoolOptions] = useState([])
     const [selectedPool,setSelectedPool] = useState("")
+    const [iceNameIdMap,setIceNameIdMap] = useState({})
 
     useEffect(()=>{
         fetchData();
@@ -74,18 +75,23 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
 				ice.push(e[1])
 			})
 		}else{
+            var iceNameIdMapData = {...iceNameIdMap};
 			arr.forEach((e)=>{
 				if(e[1].ice_list){
 					Object.entries(e[1].ice_list).forEach((k)=>{
 						if(k[0] in iceStatusValue){
-							var res = statusUpdate(iceStatusValue[k[0]])
+                            var res = statusUpdate(iceStatusValue[k[0]])
+                            iceNameIdMapData[k[1].icename] = {}
+							iceNameIdMapData[k[1].icename].id = k[0];
+							iceNameIdMapData[k[1].icename].status = iceStatusValue[k[0]].status;
 							k[1].color = res.color;
 							k[1].statusCode = res.status;
 							ice.push(k[1])
 						}
 					})
 				}
-			})
+            })
+            setIceNameIdMap(iceNameIdMapData);
 		}
 		ice.sort((a,b) => a.icename.localeCompare(b.icename))
         setAvailableICE(ice);
@@ -125,7 +131,7 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
                 <div className="allocate-ice-Modal">
                     <ModalContainer 
                         title={modalTitle} 
-                        footer={submitModalButton(SubmitButton, selectedPool, smartMode, selectedICE, modalButton,scheSmartMode,ExeScreen)} 
+                        footer={submitModalButton(iceNameIdMap, SubmitButton, selectedPool, smartMode, selectedICE, modalButton,scheSmartMode,ExeScreen)} 
                         close={()=>{setAllocateICE(false)}}
                         content={MiddleContent(exeTypeLabel, exeIceLabel, icePlaceholder, chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode,selectedICE, setSelectedICE, ExeScreen, scheSmartMode)}
                         // modalClass=" modal-md"
@@ -203,7 +209,7 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
     )
 }
 
-const submitModalButton = (SubmitButton,  selectedPool, smartMode, selectedICE, modalButton, scheSmartMode, ExeScreen) => {
+const submitModalButton = (iceNameIdMap, SubmitButton,  selectedPool, smartMode, selectedICE, modalButton, scheSmartMode, ExeScreen) => {
     const executionData = {};
     executionData.type = (ExeScreen===true?smartMode:scheSmartMode)
     executionData.poolid =  selectedPool
@@ -212,7 +218,7 @@ const submitModalButton = (SubmitButton,  selectedPool, smartMode, selectedICE, 
 
     return(
         <div>
-            <button type="button" onClick={()=>{SubmitButton(executionData);}} >{modalButton}</button>
+            <button type="button" onClick={()=>{SubmitButton(executionData, iceNameIdMap);}} >{modalButton}</button>
         </div>
     )
 }
