@@ -249,12 +249,12 @@ const RefBarItems = props => {
         {
             showScreenPop && 
             // <ClickAwayListener onClickAway={closeAllPopups}>
-            <div className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`, height: `${mirrorHeight}px`}}>
+            <div data-test="popupSS" className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`, height: `${mirrorHeight}px`}}>
                 <h4 className="pop__header" onClick={()=>setShowScreenPop(false)}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
 				<div className="screenshot_pop__content" >
 				<div className="scrsht_outerContainer" id="ss_ssId">
 				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' hideXbar={true}>
-					<div className="ss_scrsht_insideScroll">
+					<div data-test="ssScroll" className="ss_scrsht_insideScroll">
 					{ highlight && <div ref={highlightRef} style={{display: "flex", position: "absolute", ...highlight}}></div>}
 					{ props.mirror ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
 					</div>
@@ -267,12 +267,12 @@ const RefBarItems = props => {
 		{
             showFilterPop && 
             <ClickAwayListener onClickAway={closeAllPopups}>
-            <div className="ref_pop filter_pop" style={{marginTop: `calc(${filterY}px - 15vh)`}}>
+            <div  data-test="popupFilter" className="ref_pop filter_pop" style={{marginTop: `calc(${filterY}px - 15vh)`}}>
                 <h4 className="pop__header" onClick={()=>setShowFilterPop(false)}><span className="pop__title">Filter</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
-                <div className="filter_pop__content">
+                <div data-test="popupFilterContent" className="filter_pop__content">
 					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length}/><span>Select All</span></div>
 					{ tagList.map((tag, index)=>(<div key={index} className="d__filter-btnbox">
-						<button className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
+						<button data-test="filterButton" className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
 					</div>))}
                 </div>
             </div>
@@ -285,8 +285,8 @@ const RefBarItems = props => {
     return (
     
         <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} scrapeScreenURL={scrapedURL} >
-			{ appType!=="Webservice" && appType!=="Mainframe" && <div className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
-            { appType!=="Webservice" && <span onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>}
+			{ appType!=="Webservice" && appType!=="Mainframe" && <div data-test="screenshot" className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
+            { appType!=="Webservice" && <span data-test="filter" onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>}
         </ReferenceBar>
         
     

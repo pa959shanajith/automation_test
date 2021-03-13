@@ -337,31 +337,31 @@ const LoginFields = (props) => {
                 })}
             </div>
             :
-            <form className="login-form" onSubmit={login}>
-            <div className="username-wrap" style={userError ? loginValidation ? {borderColor: "#d33c3c"} : styles.errorBorder : null }>
-                <span className="ic-holder"><img className="ic-username" alt="user-ic" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
-                <input className="field" placeholder="Username" onFocus={()=>setFocus("username")} value={username} onChange={handleUsername}></input>
-                {showPassField && username ? true : <button className="ic-rightarrow fa fa-arrow-circle-right arrow-circle no-decor" onFocus={()=>setFocus("checkuser")} onClick={checkUser}></button>}
+            <form data-test='login-form' className="login-form" onSubmit={login}>
+            <div data-test='login-username' className="username-wrap" style={userError ? loginValidation ? {borderColor: "#d33c3c"} : styles.errorBorder : null }>
+                <span data-test='username-icon' className="ic-holder"><img data-test="username-image" className="ic-username" alt="user-ic" src={userError ? res.errorUserIcon : res.defaultUserIcon}/></span>
+                <input data-test='username-input' className="field" placeholder="Username" onFocus={()=>setFocus("username")} value={username} onChange={handleUsername}></input>
+                {showPassField && username ? true : <button data-test='login-username-button' className="ic-rightarrow fa fa-arrow-circle-right arrow-circle no-decor" onFocus={()=>setFocus("checkuser")} onClick={checkUser}></button>}
             </div>
-            {userError && !loginValidation ? <div className="error-msg">Please Enter Username</div> : null}
+            {userError && !loginValidation ? <div data-test='login-username-error' className="error-msg">Please Enter Username</div> : null}
             {
             showPassField &&
                 <>
-                <div className="password-wrap" style={passError ? styles.errorBorder : null }>
-                    <span className="ic-holder"><img className="ic-password" alt="pass-ic" src={passError ? res.errorPassIcon : res.defaultPassIcon}/></span>
-                    <input className="field" type={showPass ? "text" : "password"} autoFocus onFocus={()=>setFocus("password")} placeholder="Password" value={password} onChange={handlePassword}></input>
-                    <button className={ "no-decor " + (showPass ? res.eyeSlashIcon : res.eyeIcon) } onFocus={()=>setFocus("checkpass")}></button>
+                <div data-test='login-password' className="password-wrap" style={passError ? styles.errorBorder : null }>
+                    <span data-test="password-icon" className="ic-holder"><img data-test="password-image" className="ic-password" alt="pass-ic" src={passError ? res.errorPassIcon : res.defaultPassIcon}/></span>
+                    <input data-test="password-input" className="field" type={showPass ? "text" : "password"} autoFocus onFocus={()=>setFocus("password")} placeholder="Password" value={password} onChange={handlePassword}></input>
+                    <button data-test="password-eyeIcon" className={ "no-decor " + (showPass ? res.eyeSlashIcon : res.eyeIcon) } onFocus={()=>setFocus("checkpass")}></button>
                 </div>
                 {showForgotPassword?
                 <div ><a id="forgotPassword" className="forget-password" onClick={()=>{forgotPasswordEmail()}} >Forgot Password?</a></div>:null}
-                {passError && !loginValidation? <div className="error-msg">Please Enter Password</div> : null}
-                <div className="error-msg">{loginValidation}
+                {passError && !loginValidation? <div data-test='password-error' className="error-msg">Please Enter Password</div> : null}
+                <div data-test="login-validation" className="error-msg">{loginValidation}
                 {lockedOut?
                     <span className="error-msg"> Click 
                     <a className="error-msg-hyperlink" onClick={()=>{unlockAccountEmail()}} > <b>here</b></a> to unlock.
                     </span>
                 :""}</div>
-                <button className="login-btn" type="submit" disabled={requested} onFocus={()=>{setFocus("login")}} onClick={unlockCond?unlock:login}>{unlockCond?"Unlock":"Login"}</button>
+                <button data-test='login-button'  className="login-btn" type="submit" disabled={requested} onFocus={()=>{setFocus("login")}} onClick={unlockCond?unlock:login}>{unlockCond?"Unlock":"Login"}</button>
                 </>
             }
             </form>

@@ -355,19 +355,19 @@ const ScrapeObjectList = () => {
             buttonGroup={
                 <div className="ss__btngroup">
                     <div className="ss__left-btns">
-                        <label className="ss__select-all">
+                        <label data-test="selectalllabel" className="ss__select-all">
                             <input className="ss__select-all-chkbox" type="checkbox" checked={selAllCheck} disabled={disableBtns.selAll} onChange={(e)=>updateChecklist("all", e)}/>
                             <span className="ss__select-all-lbl">
                                 Select all
                             </span>
                         </label>
-                        <button className="ss__taskBtn ss__btn" disabled={disableBtns.save} onClick={onSave}>Save</button>
-                        <button className="ss__taskBtn ss__btn" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
-                        <button className="ss__taskBtn ss__btn" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
-                        <button className="ss__search-btn" onClick={toggleSearch}>
+                        <button data-test="save" className="ss__taskBtn ss__btn" disabled={disableBtns.save} onClick={onSave}>Save</button>
+                        <button data-test="delete"className="ss__taskBtn ss__btn" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
+                        <button data-test="edit"className="ss__taskBtn ss__btn" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
+                        <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
-                        { showSearch && <input className="ss__search_field" value={searchVal} onChange={onSearch}/>}
+                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>}
                     </div>
 
                     <SubmitTask />
@@ -380,7 +380,7 @@ const ScrapeObjectList = () => {
                     <div className="sc__min">
                     <div className="sc__con" id="scrapeObjCon">
                     <ScrollBar scrollId="scrapeObjCon" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                    <div className="scrape_object_container">
+                    <div data-test="scrapeObjectContainer"className="scrape_object_container">
                     {
                         scrapeItems.map((object, index) => !object.hide && <ScrapeObject key={object.val} 
                                                                             idx={index}
