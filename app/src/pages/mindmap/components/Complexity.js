@@ -1,6 +1,7 @@
 import React, { createRef, useEffect, useState } from 'react';
 import {ModalContainer, ScrollBar} from '../../global'
 import '../styles/Complexity.scss'
+import PropTypes from 'prop-types';
 
 /*Component Complexity
   use: returns ComplexityBox near module
@@ -32,7 +33,7 @@ const Complexity = (props) => {
         }
     }
     return(
-        <div className='complx_btn'>
+        <div data-test="complexButton" className='complx_btn'>
         <ModalContainer
         title='Complexity'
         close={()=>setShowcomplexity(false)}
@@ -62,10 +63,10 @@ const Container = ({type,nclist,refs,setRefs,setNclist}) => {
         setNclist(a)
     }
     return(
-        <div className='complx_container'>
+        <div data-test="complexityContainer" className='complx_container'>
             <ScrollBar>
             {Object.entries(arr).map((e,i)=>(
-                <div key={i+'_cmplx'} className='complx_row'>
+                <div data-test="complexRows" key={i+'_cmplx'} className='complx_row'>
                     <label>{e[0]}</label>  
                     <select ref={refs[i]} label={e[0]} defaultValue={nclist?nclist[i+1]:undefined} onChange={onFormChange}>
                         <option selected disabled={true}>Select Option</option>
@@ -81,9 +82,9 @@ const Container = ({type,nclist,refs,setRefs,setNclist}) => {
 const Footer = ({nclist,type,submitComplexity}) =>{
     var val = nclist.length>0?getComplexityLevel(type,nclist[0]):'Not Set'
     return(
-    <div className='complx_footer'>
-        <label>{'complexity : ' +val}</label>
-        <button className='complx_btn' onClick={submitComplexity}>OK</button>
+    <div data-test="complexityFooter"className='complx_footer'>
+        <label data-test="complexityLabel">{'complexity : ' +val}</label>
+        <button data-test="okButton"className='complx_btn' onClick={submitComplexity}>OK</button>
     </div>
 )}
 
@@ -210,6 +211,10 @@ const cTableData = {
         'Database Check points': ['2', '3-8', '>8']
     }
 };
-
+Complexity.propTypes={
+    "complexity":PropTypes.object.isRequired,
+    "setComplexity":PropTypes.func,
+    "setShowcomplexity":PropTypes.func
+}
 export {getComplexityLevel};
 export default Complexity;
