@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ModalContainer, ScrollBar } from '../../global';
 import "../styles/AddObjectModal.scss";
+import PropTypes from 'prop-types';
 
 const AddObjectModal = props => {
 
@@ -123,15 +124,15 @@ const AddObjectModal = props => {
     }
 
     return (
-        <div className="ss__objModal">
+        <div data-test="ssObjectModal" className="ss__objModal">
             <ModalContainer 
                 title="Add Object"
                 content={
-                    <div className="ss__objModal_content" id="ss__objModalListId">
+                    <div data-test="ssObjModalContent" className="ss__objModal_content" id="ss__objModalListId">
                         <ScrollBar scrollId="ss__objModalListId" thumbColor="#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                                { objects.map((object, index) => <div className="ss__objModal_item" key={index}>
-                                        <input className={"addObj_name"+(error.type==="input" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
-                                        <select className={"addObj_objType"+(error.type==="type" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
+                                { objects.map((object, index) => <div data-test="objModalItem" className="ss__objModal_item" key={index}>
+                                        <input data-test="addObjectInput" className={"addObj_name"+(error.type==="input" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
+                                        <select  data-test="addObjectTypeSelect" className={"addObj_objType"+(error.type==="type" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
                                             <option className="addObj_option" disabled selected value="">Select Object Type</option>
                                             { objectTypes.map((objectType, i) =>
                                                 <option key={i} className="addObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>
@@ -139,8 +140,8 @@ const AddObjectModal = props => {
                                                 </option>
                                             ) }
                                         </select>
-                                        <button className="addObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img alt="delete-ic" src="static/imgs/ic-delete.png" /></button>
-                                        { objects.length-1 === index && <button className="addObj_btn" onClick={newField}><img alt="add-ic" src="static/imgs/ic-add.png" /></button>}
+                                        <button data-test="deleteObjectButton" className="addObj_btn" onClick={()=>deleteField(index)} disabled={objects.length === 1}><img alt="delete-ic" src="static/imgs/ic-delete.png" /></button>
+                                        { objects.length-1 === index && <button data-test="addObjectButton" className="addObj_btn" onClick={newField}><img alt="add-ic" src="static/imgs/ic-add.png" /></button>}
                                     </div>
                                 ) }
                         </ScrollBar>
@@ -148,12 +149,19 @@ const AddObjectModal = props => {
                 }
                 close={()=>props.setShow(false)}
                 footer={<>
-                    <button onClick={resetFields}>Reset</button>
-                    <button onClick={onSubmit}>Submit</button>
+                    <button  data-test="reset" onClick={resetFields}>Reset</button>
+                    <button  data-test="submit" onClick={onSubmit}>Submit</button>
                 </>}
             />
         </div>
     );
 }
 
+AddObjectModal.propTypes={
+    scrapeItems:PropTypes.array,
+    setShow:PropTypes.func,
+    setScrapeItems:PropTypes.func,
+    setSaved:PropTypes.func,
+    setShowPop:PropTypes.func
+}
 export default AddObjectModal;

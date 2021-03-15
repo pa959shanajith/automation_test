@@ -76,11 +76,11 @@ const ModuleListDrop = (props) =>{
                 modalClass='modal-sm'
             />:null}
             {(moddrop)?
-                <div id='toolbar_module-list' className='toolbar__module-container'>
+                <div data-test="moduleList" id='toolbar_module-list' className='toolbar__module-container'>
                     <ScrollBar scrollId='toolbar_module-list' trackColor={'transperent'} thumbColor={'grey'}> 
                         {moduleList.map((e,i)=>{
                             return(
-                                <div onClick={(e)=>selectModule(e)} value={e._id} key={i} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")}>
+                                <div data-test="modules" onClick={(e)=>selectModule(e)} value={e._id} key={i} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")}>
                                     <img value={e._id}  src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
                                     <span value={e._id} >{e.name}</span>
                                 </div>
@@ -90,7 +90,7 @@ const ModuleListDrop = (props) =>{
                 </div>
                 :null
             }
-            <div className={'toolbar__module-footer'+ (moddrop?' z-up':'')} onClick={()=>setModdrop(!moddrop)}>
+            <div data-test="dropDown" className={'toolbar__module-footer'+ (moddrop?' z-up':'')} onClick={()=>setModdrop(!moddrop)}>
                 <div><i className={(!moddrop)?"fa fa-caret-down":"fa fa-caret-up"} title="Drop down button"></i></div>
             </div>
         </Fragment>

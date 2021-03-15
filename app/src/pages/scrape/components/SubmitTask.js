@@ -58,16 +58,16 @@ const SubmitTask = () => {
         <div className="ss__right-btns">
             { isUnderReview && 
                 <>
-                <button className="ss__reassignBtn" onClick={()=>onAction("reassign")}>
+                <button data-test="reassignButton" className="ss__reassignBtn" onClick={()=>onAction("reassign")}>
                     Reassign
                 </button>
-                <button className="ss__approveBtn" onClick={()=>onAction("approve")}>
+                <button data-test="approveButton" className="ss__approveBtn" onClick={()=>onAction("approve")}>
                     Approve
                 </button>
                 </>
             }
             { !hideSubmit && !isUnderReview &&
-                <button className="ss__submitBtn" onClick={()=>onAction("submit")}>
+                <button data-test="submitButton"className="ss__submitBtn" onClick={()=>onAction("submit")}>
                     Submit
                 </button>
             }

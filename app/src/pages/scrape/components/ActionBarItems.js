@@ -62,11 +62,11 @@ const UpperContent = props => {
     }
 
     let renderComp = [
-        <div key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Scrape On</div>,
-        (appType!=="Webservice" && <Thumbnail key="pdf-icon-scrape" title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
+        <div data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Scrape On</div>,
+        (appType!=="Webservice" && <Thumbnail data-test="pdfUtility" key="pdf-icon-scrape" title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
         <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
-            <input id="enable_append" type="checkbox" onChange={onAppend} checked={appendCheck} />
-            <span className="ss__thumbnail_title">{appType==="Webservice" ? "Edit" : "Append"}</span>
+            <input data-test="appendInput" id="enable_append" type="checkbox" onChange={onAppend} checked={appendCheck} />
+            <span data-test="append" className="ss__thumbnail_title">{appType==="Webservice" ? "Edit" : "Append"}</span>
         </div>
     ];
 
@@ -233,8 +233,8 @@ const BottomContent = () => {
 
     return (
         <>
-            {lowerList.map((icon, i) => icon.show && <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
-            <input id="importScreenField" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json"/>
+            {lowerList.map((icon, i) => icon.show && <Thumbnail data-test="bottomContent" key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
+            <input data-test="fileInput" id="importScreenField" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json"/>
         </>
     );
 }
