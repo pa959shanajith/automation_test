@@ -212,6 +212,7 @@ if (cluster.isMaster) {
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
 		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
+		app.post('/importFromGit_ICE', suite.importFromGit_ICE);
 
 		app.use(csrf({
 			cookie: true
@@ -343,6 +344,7 @@ if (cluster.isMaster) {
 		app.post('/exportMindmap', auth.protect, mindmap.exportMindmap);
 		app.post('/importMindmap', auth.protect, mindmap.importMindmap);
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
+		app.post('/exportToGit', auth.protect, mindmap.exportToGit);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
@@ -393,6 +395,7 @@ if (cluster.isMaster) {
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
 		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
 		app.post('/restartService', auth.protect, admin.restartService);
+		app.post('/saveGitConfig', auth.protect, admin.saveGitConfig);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);

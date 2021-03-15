@@ -694,6 +694,47 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
 };
 
+/** this service imports the data from git repo and invoke execution */
+exports.importFromGit_ICE = async (req, res) => {
+	const actionName = 'importFromGit'
+	logger.info("Inside API importFromGit_ICE");
+	try {
+		const data = req.body;
+		const gitAccessToken = data.gitAccessToken;
+		const gitRepoClonePath = data.gitRepoClonePath;
+		const commitId = data.commitId;
+		const gitVersionName = data.gitVersionName
+		const folderPath = 'AvoAssureTest_Artifacts'+'/'+data.folderPath;
+		const userInfo = await utils.tokenValidation(req.body.userInfo);
+		const inputs = {
+			"gitRepoClonePath": gitRepoClonePath,
+			"gitAccessToken": gitAccessToken,
+			"commitId":commitId,
+			"gitVersionName":gitVersionName,
+			"folderPath":folderPath,
+			"createdBy":userInfo.userid,
+			"source":data.source,
+			"exectionMode":data.exectionMode,
+			"executionEnv":data.executionEnv,
+			"browserType":data.browserType,
+			"integration":data.integration
+		};
+		if(inputs['commitId']=='') delete inputs['commitId']
+		const module_data = await utils.fetchData(inputs, "git/importFromGit_ICE", actionName);
+		if(module_data=="fail") return res.send("fail")
+		userInfo['invokingusername'] = userInfo.username
+		userInfo['invokinguser'] = userInfo.userid;
+		userInfo['invokinguserrole'] = userInfo.role;
+		redisServer.redisSubServer.subscribe('ICE2_' + userInfo.icename);
+		const result = await executionRequestToICE(module_data, 'API', userInfo);
+		res.send('success')
+		return
+	} catch (ex) {
+		logger.error("Exception in the service importFromGit: %s", ex);
+		return res.status(500).send("fail");
+	}
+};
+
 /** Service to fetch all the testcase, screen and project names for provided scenarioid */
 exports.getTestcaseDetailsForScenario_ICE = async (req, res) => {
 	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");

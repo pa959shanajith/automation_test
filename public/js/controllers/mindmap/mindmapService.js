@@ -198,6 +198,16 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 			})
 			.then(function (response) { return response.data; },
 					function (response) { return $q.reject(response.data); });
+		},
+		exportToGit: function(mindmapId,gitBranch,gitFolderPath,gitVersionName){
+			return $http.post('/exportToGit',{
+				mindmapId:mindmapId,
+				gitFolderPath: gitFolderPath,
+				gitVersion: gitVersionName,
+				gitBranch: gitBranch
+			})
+			.then(function (response) { return response.data; },
+					function (response) { return $q.reject(response.data); });
 		}
 	}
 }]);

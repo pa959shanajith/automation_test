@@ -24,6 +24,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 	$scope.tokens = {};
 	$scope.provision = {};
 	$scope.tokeninfo={};
+	$scope.gitConfigure={};
 
 	$('.dropdown').on('show.bs.dropdown', function (e) {
 		$(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
@@ -599,6 +600,139 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 			console.log("Error:::::::::::::", error);
 			unblockUI()
 		})
+	}
+
+	$scope.gitConfigure.click = function () {
+		$(".selectedIcon").removeClass("selectedIcon");
+		$("#gitConfigure").find("span.fa").addClass("selectedIcon");
+		adminServices.getUserDetails("user")
+		.then(function(data){
+			if(data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else if(data == "fail") {
+				openModalPopup("Git Configuration", "Failed to fetch users.");
+			} else if(data == "empty") {
+				openModalPopup("Git Configuration", "There are no users present.");
+			} else {
+				data.sort(function(a,b){ return a[0] > b[0]; });
+				var selectBox = $("#selGitUser");
+				selectBox.empty();
+				selectBox.append('<option data-id="" value disabled selected>Select User</option>');
+				for(i=0; i<data.length; i++){
+					if(data[i][3] != "Admin"){
+						selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
+					}
+				}
+				selectBox.prop('selectedIndex', 0);
+			}
+		}, function (error) {
+			console.log("Error:::::::::::::", error);
+		});
+	};
+
+	$(document).on('change', '#selGitUser', function (e) {
+		$scope.assignedProjectInitial = [];
+		$scope.assignProj.allProjectAP = [];
+		$scope.assignProj.assignedProjectAP = [];
+		$(".load").show();
+		adminServices.getDomains_ICE()
+		.then(function (data) {
+			if (data == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else {
+				$("#selGitDomains").empty()
+				$("#selGitDomains").append('<option> Select Domain </option>')
+				for (var i=0;i<data.length;i++){
+					$("#selGitDomains").append('<option value="'+data[i]+'">'+data[i]+'</option>')
+				}
+				
+			}
+		});
+	});
+
+	$(document).on('change','#selGitDomains', function() {
+		var domainName = $("#selGitDomains option:selected").val();
+		console.log(domainName)
+		var requestedname = [];
+		requestedname.push(domainName);
+		var idtype = ["domaindetails"];
+		adminServices.getDetails_ICE(idtype, requestedname)
+		.then(function (getDetailsResponse) {
+			if (getDetailsResponse == "Invalid Session") {
+				$rootScope.redirectPage();
+			}
+			$('#selGitProject').empty();
+			$('#selGitProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
+			for (var i = 0; i < getDetailsResponse.projectNames.length; i++) {
+				$('#selGitProject').append($("<option value=" + getDetailsResponse.projectIds[i] + "></option>").text(getDetailsResponse.projectNames[i]));
+			}
+			//sorting the dropdown values in alphabetical order
+			var selectOptions = $("#selGitProject option:not(:first)");
+			selectOptions.sort(function (a, b) {
+				if (a.text > b.text)
+					return 1;
+				else if (a.text < b.text)
+					return -1;
+				else
+					return 0;
+			});
+			$("#selGitProject").empty();
+			$("#selGitProject").append('<option data-id="" value disabled selected>Please Select Your Project</option>');
+			for (i = 0; i < selectOptions.length; i++) {
+				$("#selGitProject").append(selectOptions[i]);
+			}
+			$("#selGitProject").prop('selectedIndex', 0);
+		}, function (error) {
+			console.log("Error:::::::::::::", error);
+		});
+		clearUpdateProjectObjects();
+	});
+
+	$scope.saveGitConfig = function ($event) {
+		$("#selGitDomains,#selGitProject,#selGitUser,#GitAccToken,#GitUrl").removeClass("selectErrorBorder");
+		if($('#selGitUser option:selected').val() == ""){
+			$("#selGitUser").addClass("selectErrorBorder");
+		} else if ($('#selGitDomains option:selected').val() == "") {
+			$("#selGitDomains").addClass("selectErrorBorder");
+		} else if ($('#selGitProject option:selected').val() == "") {
+			$("#selGitProject").addClass("selectErrorBorder");
+		} else if($('#GitAccToken').val() == ""){
+			$("#GitAccToken").addClass("selectErrorBorder");
+		} else if($('#GitUrl').val() == ""){
+			$("#GitUrl").addClass("selectErrorBorder");
+		} else {
+			blockUI("Loading...");
+			var userId = $('#selGitUser option:selected').attr("data-id");
+			var projectId = $('#selGitProject option:selected').val();
+			var gitAccToken = $('#GitAccToken').val();
+			var gitUrl = $('#GitUrl').val(); 
+			adminServices.saveGitConfig(userId,projectId,gitAccToken,gitUrl)
+				.then(function (data) {
+					if (data == "Invalid Session") {
+						$rootScope.redirectPage();
+					}else if (data == "fail") openModalPopup("Fail", "Error while saving Git Configuration");
+					else if(data  == 'GitUser Already Exists') {
+						openModalPopup("Error", "GitUser Already Exists!!");
+					}
+					else openModalPopup("Save Git Config", "Git User created successfully");
+					unblockUI();
+					resetGitConfig();
+					$(".selectedIcon").removeClass("selectedIcon");
+				}, function (error) {
+					console.log("Error:::::::::::::", error);
+				});
+		}
+	}
+
+	function resetGitConfig(){ 
+		$('#selGitUser').empty();
+		$("#selGitUser").append('<option data-id="" value disabled selected>Select User</option>');
+		$("#selGitDomains").empty();
+		$("#selGitDomains").append('<option data-id="" value disabled selected>Please Select your domain</option>');
+		$("#selGitProject").empty();
+		$("#selGitProject").append('<option data-id="" value disabled selected>Please Select your project</option>');
+		$('#GitAccToken').empty();
+		$('#GitUrl').empty();
 	}
 
 	// Assign Projects Tab Click

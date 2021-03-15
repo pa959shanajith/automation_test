@@ -1520,6 +1520,32 @@ var encrypt = (data) => {
 	return 	encryptedData.toUpperCase();
 }
 
+/* Export data to Git repository. */
+exports.exportToGit = async (req, res) => {
+	const actionName = "exportToGit";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const gitVersionName = data.gitVersion;
+		const gitFolderPath = data.gitFolderPath;
+		const gitBranch = data.gitBranch;
+		const moduleId = data.mindmapId;
+		const inputs = {
+			"moduleId":moduleId,
+			"action":actionName,
+			"gitBranch":gitBranch,
+			"gitVersionName": gitVersionName,
+			"gitFolderPath": gitFolderPath
+		};
+		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
+		if (module_data['rows'] == "fail") return res.send("fail");
+		res.send('Success');
+	} catch (ex) {
+		logger.error("Exception in the service exportToGit: %s", ex);
+		return res.status(500).send("fail");
+	}
+};
+
 exports.exportMindmap = async (req, res) => {
 	const fnName = "exportMindmap";
 	logger.info("Inside UI service: " + fnName);

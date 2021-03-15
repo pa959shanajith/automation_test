@@ -261,6 +261,15 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
-		
+		saveGitConfig: function(userId,projectId,gitAccToken,gitUrl) {
+			return $http.post('/saveGitConfig', {
+				userId: userId,
+				projectId: projectId,
+				gitAccToken: gitAccToken,
+				gitUrl: gitUrl
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) })
+		},		
 	};
 }]);

@@ -196,6 +196,7 @@
                   <option value='select' disabled selected>Select</option>
                   <option value="json">JSON</option>
                   <option value="excel">Excel</option>
+				  <option value="git">Git</option>
                </select>
             </span>
          </div>
@@ -525,6 +526,38 @@
       </div>
    </div>
 </div>
+<!-- Mindmaps Git-->
+<div class="modal fade" id="mindmapGitGlobalDialog" role="dialog" data-keyboard="false" data-backdrop="static">
+   <div class="modal-dialog modal-md">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Git Config</h4>
+         </div>
+         <div class="modal-body">
+            <div>
+               <p>
+                  <input class="launchPopupInput form-control" type="text" placeholder="Enter Git Branch Name" id="gitBranch">
+               </p>
+               <p>
+                  <input class="launchPopupInput form-control" type="text" placeholder="Enter Git Folder Path. Ex: projectName/moduleName(optional)" id="gitFolder">
+               </p>
+               <p>
+                  <input class="launchPopupInput form-control" type="text" placeholder="Enter Git Version Name" id="gitVersionName">
+               </p>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <span id="" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
+            <img class="gitExport" src="imgs/loader.gif" alt="Loading..." style="float: left; display: none;">
+            <button ng-click="clearNodes()" type="button" id="resetObjRow" class="btn btn-default">Reset</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="submitToGit()" id="submitToGit">Submit</button>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- Mindmaps Git-->
+
 <!-- MIndmaps Versioning-dialog box -->
 <div class="modal fade" id="versioningSuccessDialog" role="dialog" data-keyboard="false" data-backdrop="static">
    <div class="modal-dialog modal-sm">

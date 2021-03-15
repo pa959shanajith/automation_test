@@ -672,6 +672,53 @@
 			</div>
 		</div>
 		<!-- Allocate ICE Pools -->
+		
+		<!-- Git Configuration -->
+		<div class="containerWrap" ng-if="tab == 'gitConfigure'">
+			<div id="page-taskName">
+				<span>Git Configuration</span>
+			</div>
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="gitEditConfig($event)" style="margin-right:10px">Edit</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="saveGitConfig($event)" style="margin-right:10px">Create</button>
+			</div>
+			<div class="col-xs-9 form-group" style="width: 83%">
+				<div class='userForm projectForm'>
+					<div class='domainTxt'>User  </div>
+					<select class="adminSelect form-control selectDomain" style="width: 91%" id="selGitUser">
+						<option value="" disabled selected>Please Select User</option>
+					</select>
+					<span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
+				</div>
+				<div class='userForm projectForm'>
+					<label class='domainTxt' style="margin-left: 1px;">Domain  </label>
+					<select class="adminSelect form-control selectDomain" style="width: 91%; margin-left: 8%" id="selGitDomains">
+						<option value="" disabled selected>Please Select Your Domain</option>
+					</select>
+					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
+				</div>
+				<div class='userForm adminControl'>
+					<div class='domainTxt'>Project  </div>
+					<select class="adminSelect form-control" style="width: 91.5%" id="selGitProject">
+						<option value="" disabled selected>Please Select Your Project</option>
+					</select>
+					<span ng-show="projectNameRequired" class="error-msg ng-cloak errorlbl">{{projectNameRequired}}</span>
+				</div>
+				<div class='adminControl'>
+					<div>
+						<span class="leftControl" title="Git Access Token">Git Access Token</span>
+						<input type="text" id="GitAccToken" name="GitAccToken" maxlength="50" class="form-control form-control-custom create" placeholder="Enter Git Access Token"/>
+					</div>
+				</div>
+				<div class='adminControl'>
+					<div>
+						<span class="leftControl" title="Git URL">Git URL</span>
+						<input type="email" id="GitUrl" name="GitUrl" maxlength="50" class="form-control form-control-custom create" placeholder="Enter Git URL"/>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Git Configuration -->
 
 		<!-- Assign Projects -->
 		<div class="containerWrap" ng-if="tab == 'tabAssignProject'">

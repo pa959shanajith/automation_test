@@ -46,6 +46,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var excelMap = {};
     var excelFlag = 0;
     var versionFlag = 0;
+	var exportGitFlag = 0;
     var dragsearch = false;
     $scope.allMMaps = [];
     var split_char = (isIE)? ' ':',';
@@ -199,6 +200,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (!selectedProject) {
                     selectedProject = res.projectId[0];
                     selectedProjectIndex = 0;
+					localStorage.git=res.projectName[0]
                 }
                 if (!$scope.projectNameO) {
                     $scope.projectNameO = res.projectId[0];
@@ -281,6 +283,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.projectListChange = function(prjName) {
         versionFlag = 0;
         excelFlag = 0;
+		exportGitFlag = 0;
         $scope.projectNameO = prjName;
         $scope.projectName4 = $scope.projectNameO;
         $scope.projectName3 = $scope.projectNameO;
@@ -295,7 +298,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if ($scope.tab == 'mindmapEndtoEndModules') {
             selectedProject = $("#selectProjectEtem").val();
             $scope.projectList.forEach(function(p,i){
-                if ((p.id)==selectedProject) selectedProjectIndex=i;
+                if ((p.id)==selectedProject) {
+					selectedProjectIndex=i;
+					localStorage.git=p.name;
+				}
             })
             //alert($scope.projectName);
             $('#eteSearchModules').val('');
@@ -648,6 +654,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.functionTBE = 'loadMapPopupConfirmed';
         excelFlag = 1;
         versionFlag = 1;
+		exportGitFlag = 1;
         $('#createNewConfirmationPopup').attr('mapname', $scope.allMMaps[idx].name);
         $('#createNewConfirmationPopup').attr('mapid', $scope.allMMaps[idx]._id);
         // $('#createNewConfirmationPopup').attr('_id',$scope.allMaps[idx]._id);
@@ -3474,9 +3481,64 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $scope.exportToExcel();
         } else if (exportMode == 'version'){
             $scope.exportData();
+        } else if (exportMode == 'git'){
+            $("#mindmapGitGlobalDialog").modal("show");
         }
     }
-
+	
+	$('#submitToGit').click(function() {
+        $(".gitExport").show();
+        $("#gitBranch,#gitVersionName").css("background","none");
+		$("#gitErrormsg").text("");
+		$("#gitBranch,#gitVersionName").removeClass("inputErrorBorder");
+		var gitBranch = $("#gitBranch").val();
+		var gitFolderPath =$("#gitFolder").val();
+		var gitVersionName = $("#gitVersionName").val();
+        if(!gitFolderPath){
+            module_name=$('#createNewConfirmationPopup').attr('mapname');
+            gitFolderPath="AvoAssureTest_Artifacts"+"/"+localStorage.git+"/"+module_name;
+        } else{
+            gitFolderPath="AvoAssureTest_Artifacts"+"/"+gitFolderPath;
+        }
+		if(!gitBranch){
+			$("#gitErrormsg").text("Please Enter Git Branch");
+			$("#gitBranch").addClass("inputErrorBorder");
+			$(".gitExport").hide();
+		} else if(!gitVersionName){
+            $("#gitErrormsg").text("Please Enter Git Version Name");
+			$("#gitVersionName").addClass("inputErrorBorder");
+			$(".gitExport").hide();
+		} else{
+            $("#gitBranch,#gitVersionName").removeClass("inputErrorBorder");
+            if (exportGitFlag != 1) {
+                openDialogMindmap("Fail", "Please select a module to proceed");
+                return;
+            }
+            blockUI('Loading UI');
+            var mindmapId = $('#createNewConfirmationPopup').attr('mapid');
+            mindmapServices.exportToGit(mindmapId,gitBranch,gitFolderPath,gitVersionName).then(
+                    function(response1) {
+                        $(".gitExport").hide();
+                        if (response1 == "Invalid Session") {
+                            return $rootScope.redirectPage();
+                        } else if (response1 == 'fail' || response1 == 'unavailableLocalServer') {
+                            unblockUI();
+                            openDialogMindmap('Mindmap', "Export to Git Failed");
+                            return;
+                        } else if (response1=='Success'){
+                            unblockUI();
+                            openDialogMindmap('Mindmap', "Data exported to Git successfully.");
+                            return;
+                        }
+                    },
+                    function(err) {
+                        console.log(err);
+                        unblockUI();
+                        openDialogMindmap('Mindmap', "Export to Git Failed");
+                    }
+            );
+        }
+    });
 
 
     /*
@@ -4727,6 +4789,7 @@ Purpose : displaying pop up for replication of project
         $('#expAssign').attr('src','imgs/ic-collapse.png');
         $scope.tab = option;
         excelFlag=0;
+		exportGitFlag=0;
         unloadMindmapData();
         dNodes = [];
         dLinks = [];
