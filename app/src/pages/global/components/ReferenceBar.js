@@ -184,7 +184,7 @@ const ReferenceBar = (props) => {
                             </div>
                             <div className="task_pop__list">
                                 <div id='task_pop_scroll' className="task_pop__overflow">
-                                    <ScrollBar scrollId='task_pop_scroll' trackColor="#46326b" thumbColor="#fff">
+                                    <ScrollBar scrollId='task_pop_scroll' trackColor={'transparent'} thumbColor={'grey'}>
                                         <div className="task_pop__content" id="rb__pop_list">
                                             <TaskContents items={searchValue ? searchItems : taskList} testCaseId={current_task.testCaseId} taskName={current_task.taskName} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
                                         </div>
