@@ -3,6 +3,7 @@ import {ModalContainer} from '../../global';
 import {useSelector} from 'react-redux'
 import {readTestSuite_ICE,exportMindmap,exportToExcel} from '../api';
 import '../styles/ExportMapButton.scss'
+import PropTypes from 'prop-types'
 
 /*Component ExportMapButton
   use: renders ExportMapButton and popups for selection on click 
@@ -46,7 +47,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
             footer={<Footer clickExport={clickExport}/>}
             content={<Container fnameRef={fnameRef} ftypeRef={ftypeRef} modName={selectedModule.name} isAssign={isAssign}/>} 
             />:null}
-            <svg className={"ct-exportBtn"+(selectedModule._id?"":" disableButton")} id="ct-save" onClick={openExport}>
+            <svg data-test="exportButton" className={"ct-exportBtn"+(selectedModule._id?"":" disableButton")} id="ct-save" onClick={openExport}>
                 <g id="ct-exportAction" className="ct-actionButton">
                     <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                     <text x="16" y="18">Export</text>
@@ -58,11 +59,11 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
 
 const Container = ({fnameRef,ftypeRef,modName,isAssign}) =>(
     <div>
-        <div className='export-row'>
+        <div data-test="exportRow"className='export-row'>
             <label>File Name: </label>
             <input ref={fnameRef} defaultValue={modName} placeholder={'Enter file name'}></input>
         </div>
-        <div className='export-row'>
+        <div data-test="exportRow" className='export-row'>
             <label>Export As: </label>
             <select defaultValue={'def-option'} ref={ftypeRef}>
                 <option value={'def-option'} disabled>Select Export Format</option>
@@ -73,7 +74,7 @@ const Container = ({fnameRef,ftypeRef,modName,isAssign}) =>(
         </div>
     </div>
 )
-const Footer = ({clickExport}) => <div><button onClick={clickExport}>Export</button></div>
+const Footer = ({clickExport}) => <div><button data-test="footerExportButton" onClick={clickExport}>Export</button></div>
 
 /*
     function : toExcel()
@@ -209,6 +210,14 @@ function jsonDownload(filename, responseData) {
     e.initMouseEvent('click', true, true, window,
         0, 0, 0, 0, 0, false, false, false, false, 0, null);
     a.dispatchEvent(e);
+}
+ExportMapButton.propTypes={
+    isAssign:PropTypes.bool.isRequired,
+    setBlockui:PropTypes.func.isRequired,
+    setPopup:PropTypes.func.isRequired,
+    displayError:PropTypes.func.isRequired,
+    releaseRef:PropTypes.object.isRequired,
+    cycleRef:PropTypes.object.isRequired
 }
 
 export default ExportMapButton;
