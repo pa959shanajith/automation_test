@@ -58,6 +58,7 @@ const ExecutionMetrics = props => {
                     if (result === "Invalid Session") return RedirectPage(history);
                     else if (result === "fail") props.setPopup({title: "Fail", content: "Error while exporting Execution Metrics", submitText: "OK", show: true });
                     else if (result === "NoRecords") props.setPopup({title: "Fail", content: "No records found", show: true, submitText: "OK"});
+                    else if (result.error) props.setPopup({title: "Fail", content: result.error, show: true, submitText: "OK"});
                     else {
                         let isIE = false || !!document.documentMode;
                         let file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
