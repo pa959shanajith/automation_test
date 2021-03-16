@@ -1,137 +1,107 @@
-import React,{Fragment, useState,useRef} from 'react';
-import {zephyrProjectDetails_ICE,saveZephyrDetails_ICE} from '../api.js';
+import React,{Fragment, useState } from 'react';
+import * as api from '../api.js';
 import MappingPage from '../containers/MappingPage';
-import { useSelector } from 'react-redux';
+import CycleNode from './ZephyrTree';
+import { useSelector, useDispatch } from 'react-redux';
+import * as actionTypes from '../state/action';
 
 
 const ZephyrContent = props => {
+    const dispatch = useDispatch();
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
-    const selProjectRef = useRef();
-    const [projectDetails , setProjectDetails]=useState(null);
-    const [avoProjects , setAvoprojects]= useState(null);
-    const [selectedIssueId , setSelectedIssueID] = useState(null);
-    const [selectedScenario_ID , setSelectedScenario_ID]= useState(null);
-    const [selectedtestName , setSelectectedTestName]= useState(null);
-    const [selectedTestSuiteID , setSelectedTestSuiteID] = useState(null);
-    const [selectedProjectID , setSelectedProjectId]=useState(null);
+    const mappedPair = useSelector(state=>state.integration.mappedPair);
+    const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
+
+    const [projectDetails , setProjectDetails]=useState({});
+    const [avoProjects , setAvoProjects]= useState(null);
     const [scenarioArr , setScenarioArr] = useState(false);
     const [scenario_ID , setScenario_ID] = useState(null) ;
     const [projectDropdn1 , setProjectDropdn1]= useState(null);
-    const [projectDropdn2 , setProjectDropdn2]= useState(null);
-    const [mappedDetails ,setMappedDetails]= useState([]);
     const [SearchIconClicked , setSearchIconClicked] =useState(false);
-    const [syncSuccess , setSyncSuccess]= useState(false);
     const [filteredNames , setFilteredName]= useState(null);
     const [screenexit , setScreenExit]= useState(false);
-    const[selectedCycleId , setSelectedCycleId]=useState(null);
-    const[selectedVersionId , setSelectedVersionId] =useState(null)
+    const [releaseArr, setReleaseArr] = useState([]);
+    const [selectedRel, setSelectedRel] = useState("Select Release");
     
 
     const callProjectDetails_ICE=async(e)=>{
-        props.setBlockui({show:true,content:'Loading...'})
-        const domain = e.target.value;
-        const userid = user_id;
-        const projectDetails = await zephyrProjectDetails_ICE(domain , userid )
-        if(projectDetails.error){props.displayError(projectDetails.error);return;}
-        setProjectDetails(projectDetails.project_dets);
-        setAvoprojects(projectDetails.avoassure_projects);
-        props.setBlockui({show:false});
-        setProjectDropdn1(domain);
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+        const projectId = e.target.value;
+        const releaseData = await api.zephyrProjectDetails_ICE(projectId, user_id);
+        if (releaseData.error)
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: releaseData.error}});
+        else {
+            setReleaseArr(releaseData);
+            setProjectDropdn1(projectId);
+            clearSelections();
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    }
+
+    const onReleaseSelect = async(event) => {
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+        const releaseId = event.target.value;
+        const testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId, user_id);
+        if (testAndScenarioData.error)
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: testAndScenarioData.error}});
+        else {
+            setProjectDetails(testAndScenarioData.project_dets);
+            setAvoProjects(testAndScenarioData.avoassure_projects);  
+            setSelectedRel(releaseId);  
+            clearSelections();
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
 
     const callScenarios =(e)=>{
-        const scenarioID = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id");
-        const project_Name= e.target.value
+        const scenarioID = e.target.value;
         setScenarioArr(true);
         setScenario_ID(scenarioID);
         setFilteredName(null);
-        setProjectDropdn2(project_Name)
         setSearchIconClicked(false);
-        setSelectedScenario_ID(null);
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []})
     }
-    const calltestSuites=(e)=>{
-        const arr =[...projectDetails];
-        arr.map((element,i)=>(
-            element.cycleId === e ? (element['cycleOpen'] === true)? element['cycleOpen'] = false : element['cycleOpen'] = true : null
-        ))
-        setProjectDetails(arr);
-    }
+
     const callSaveButton =async()=>{ 
-        props.setBlockui({show:true,content:'Saving...'})
-        const response = await saveZephyrDetails_ICE(mappedDetails);
-        if(response.error){props.displayError("Error",response.error);props.setBlockui({show:false});return;}
-        if ( response === "success"){
-            props.setBlockui({show:false})
-            props.displayError("Error","Saved Succesfully");
-            setSyncSuccess(false);
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Saving...'});
+        const response = await api.saveZephyrDetails_ICE(mappedPair);
+        if (response.error){
+            dispatch({type: actionTypes.SHOW_POPUP , payload: {title: "Error", content: response.error}});
+        } 
+        else if ( response === "success"){
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr", content: "Saved Successfully."}});
         }
-        props.setBlockui({show:false})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callExit=()=>{
         setScreenExit(true);
         setScenarioArr(null);
         setProjectDropdn1("Select Project");
-        setProjectDropdn2("Select Project");
-        setMappedDetails([]);
-        setSelectedScenario_ID(null);
-        setSelectedTestSuiteID(null);
+        setScenario_ID("Select Project");
+        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
+        dispatch({type: actionTypes.MAPPED_PAIR, payload: []})
+        clearSelections();
     }
-    const callTestSuiteSelection=(id , issueid , name, versionId,cycleId,projectId )=>{
-        setSelectedTestSuiteID(id)
-        setSelectectedTestName(name)
-        setSelectedCycleId(cycleId)
-        setSelectedIssueID(issueid)
-        setSelectedVersionId(versionId)
-        setSelectedProjectId(projectId)
-    }
-    const callSyncronise =(folderpath)=>{
-        if(!selectedScenario_ID){
-            props.setPopup({
-                title:'Save Mapped Testcase ',
-                content:"Please Select a Scenario",
-                submitText:'Ok',
-                show:true
-              });
-        }
-            else{
-        const mapped_Details=[
-            {
-                cycleid: selectedCycleId,
-                issueid: selectedIssueId,
-                projectid: selectedProjectID,
-                scenarioId: selectedScenario_ID,
-                testid: selectedTestSuiteID,
-                testname:  selectedtestName,
-                versionid : selectedVersionId
-            }
-         ]
-        setMappedDetails(mapped_Details);
-        setSyncSuccess(true);
-    }
+    
+    const clearSelections = () => {
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []})
+        dispatch({type: actionTypes.SEL_TC, payload: []})
     }
     
     const onSearch=(e)=>{
         var val = e.target.value;
-        var filter = []
-        var ScenarioName=[] 
+        var filter = [];
         if(scenarioArr){
-            avoProjects.map((e,i)=>(
-                (i == (scenario_ID)) ? 
-                    e.scenario_details ? 
-                    e.scenario_details.map((e,i)=>(
-                        ScenarioName.push(e.name)
-                    )):null : null 
-            ))
+            avoProjects[parseInt(scenario_ID)].scenario_details
+                .forEach((e,i)=>{
+                    if (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) 
+                        filter.push(e);
+                    }
+                )
             }
-        filter = [...ScenarioName].filter((e)=>e.toUpperCase().indexOf(val.toUpperCase())!==-1)
         setFilteredName(filter)
     }
-    const callUnSync=()=>{
-        setSyncSuccess(false);
-        setMappedDetails([]);
-    
-    }
-    console.log(projectDetails);
+
     return(
          !screenexit?
         <Fragment>
@@ -143,23 +113,33 @@ const ZephyrContent = props => {
                 leftBoxTitle="Zephyr Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 selectTestProject={
-                    <select value={projectDropdn1} ref={selProjectRef} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
-                        <option value="Select Project"selected disabled >Select Project</option>
+                    <select value={projectDropdn1} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
+                        <option value="Select Project" selected disabled >Select Project</option>
 
                         {   props.domainDetails ? 
-                            props.domainDetails.map((e,i)=>(
-                                <option id={e.id} value={e.name}>{e.name}</option>
+                            props.domainDetails.map(e => (
+                                <option key={e.id} value={e.id}>{e.name}</option>
                             )) : null
                         }
                     </select>
                 }
+                selectTestRelease={
+                    <select value={selectedRel} onChange={onReleaseSelect} className="qcSelectDomain" style={{marginRight : "5px"}}>
+                        <option value="Select Release" disabled >Select Release</option>
+                        {   releaseArr.length &&
+                            releaseArr.map(e => (
+                                <option key={e.id} value={e.id}>{e.name}</option>
+                            ))
+                        }
+                    </select>
+                }
                 selectScenarioProject={
-                    <select value={projectDropdn2} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
+                    <select value={scenario_ID} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
                         <option value="Select Project"selected disabled >Select Project</option>
                         {
                             avoProjects? 
                             avoProjects.map((e,i)=>(
-                                <option id={i} value={e.project_name} >{e.project_name}</option>))
+                                <option value={i} >{e.project_name}</option>))
                                 : null 
                         }
                     </select>
@@ -177,69 +157,37 @@ const ZephyrContent = props => {
                         </span>
                     </> : null    
                 }
-                testList={ projectDetails? 
+                testList={ Object.keys(projectDetails).length ? 
                     <Fragment>    
                         <div className="test__rootDiv">
-                                <img alt="collapse"
-                                    className="test_tree_toggle" 
-                                    src="static/imgs/ic-qcCollapse.png"
-                                />
-                                <label>Root</label>
-                            <div className="test_tree_branches">
-                            {projectDetails.map((e,i)=>(
-                                <div>
-                                    <img alt="expand-collapse" 
-                                        className="test_tree_toggle" 
-                                        id={e.cycleId} onClick={()=>calltestSuites(e.cycleId)} 
-                                        style={{height:"16px" , cursor: "pointer"}} 
-                                        src={e.cycleOpen? "static/imgs/ic-qcCollapse.png" : "static/imgs/ic-qcExpand.png"}
-                                    />
-                                    <label>{e.cycle}</label>
-                                    {e.cycleOpen? 
-                                        e.tests.map((ele ,i)=>(
-                                            <div className="test_tree_branches" style={{cursor:"pointer"}} onClick={()=>callTestSuiteSelection(ele.id,ele.issueId,ele.name,e.versionId,e.cycleId,e.projectId)}>
-                                                <div className="test_tree_leaves" style={selectedTestSuiteID == ele.id? {backgroundColor:"rgb(225,202,255",borderRadius:"5px"} : null}>
-                                                    <label>{ele.name}</label>
-                                                    { selectedTestSuiteID == ele.id ? <>
-                                                        {syncSuccess ?
-                                                        <img alt="unsyncIcon"
-                                                            onClick={()=>callUnSync()} 
-                                                            style={{cursor: "pointer",float:"right",paddingRight:"10px"}} 
-                                                            src="static/imgs/ic-qcUndoSyncronise.png"
-                                                        />:null}
-                                                        {!syncSuccess ?
-                                                        <img alt="syncIcon" 
-                                                            onClick={()=>callSyncronise()} 
-                                                            style={{cursor: "pointer",float:"right",paddingRight:"10px"}} 
-                                                            src="static/imgs/ic-qcSyncronise.png"
-                                                        />:null}
-                                                        </>
-                                                        : null}
-                                                </div>
-                                            </div>
-                                            
-                                        )): null}
-
-                                </div>
-                            ))}                                  
-                        </div>
+                            <img alt="collapse"
+                                className="test_tree_toggle" 
+                                src="static/imgs/ic-qcCollapse.png"
+                            />
+                            <label>Root</label>
+                            { Object.keys(projectDetails)
+                                .map( cycleName => <CycleNode 
+                                        key={cycleName}
+                                        phaseList={projectDetails[cycleName]} 
+                                        cycleName={cycleName}
+                                        projectId={projectDropdn1}
+                                        releaseId={selectedRel}
+                                />) }
                         </div>   
                     </Fragment>
                         : null
                 }
                 scenarioList={
                     scenarioArr ? 
-                    avoProjects.map((e,i)=>(
-                        (i == scenario_ID)? 
-                        (e.scenario_details)? 
-                        e.scenario_details.map((scenario,i)=>(
+                    (filteredNames ? filteredNames : avoProjects[parseInt(scenario_ID)].scenario_details)
+                        .map((scenario, i)=>(
                                 <div 
-                                    className={"test_tree_leaves" + (selectedScenario_ID == scenario._id ? " slectedTestDiv" : "")} 
-                                    onClick={()=>{setSelectedScenario_ID(scenario._id)}}
+                                    key={i}
+                                    className={"scenario__listItem" + (selectedScIds == scenario._id ? " scenario__selectedTC" : "")} 
+                                    onClick={()=>{dispatch({type: actionTypes.SEL_SCN_IDS, payload: scenario._id})}}
                                 >
-                                { filteredNames? filteredNames.map((element)=>(element == scenario.name ?element  : null)):  scenario.name}
+                                    {scenario.name}
                                 </div>
-                        )):null : null
                         ))
                         : null 
                 }

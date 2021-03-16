@@ -1,11 +1,10 @@
-import React ,{useState,useEffect} from 'react';
+import React ,{useState} from 'react';
 import Header from '../../global/components/Header';
 import Footer from '../../global/components/FooterTwo';
 import Leftbar from '../components/Leftbar';
 import Rightbar from '../components/Rightbar';
 import UtilityCenter from './UtilityCenter'
 import '../styles/UtilityHome.scss';
-import Encrypt from '../components/Encryption';
 
 //Utility Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 

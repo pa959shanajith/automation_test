@@ -52,7 +52,7 @@ const MappedPage = props =>{
             }
             setRows(tempRow);
         }
-    }, [props.mappedfilesRes])
+    }, [props.mappedfilesRes, props.screenType])
 
 
     return(

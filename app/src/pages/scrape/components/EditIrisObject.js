@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { ModalContainer } from '../../global';
+import { useHistory } from 'react-router-dom';
+import { ModalContainer, RedirectPage } from '../../global';
 import { irisObjectTypes } from './ListVariables';
-import { updateIrisDataset } from '../api';
+import { updateIrisDataset, userObjectElement_ICE } from '../api';
 import "../styles/EditIrisObject.scss";
 import PropTypes from 'prop-types'
 
 const EditIrisObject = props => {
 
+    const history = useHistory();
     const [selectedType, setSelectedType] = useState("");
     const [selectedStatus, setSelectedStatus] = useState("");
 
     useEffect(()=>{
-        setSelectedType(props.utils.object.tag.split(";").pop() || "unrecognizableobject");
+        let objType = props.utils.object.tag.split(";").pop()
+        if (objType==='' || objType==='Unable to recognize object type') objType = "unrecognizableobject";
+        setSelectedType(objType);
         setSelectedStatus(0);
         //eslint-disable-next-line
     }, [])
@@ -26,23 +30,26 @@ const EditIrisObject = props => {
 
     const submitData = () => {
         let existingType = props.utils.object.tag.split(";").pop() || "unrecognizableobject";
-        if(selectedType !== existingType){
-			let data = {
-                "_id": props.utils.object.objId,
-                "cord": props.utils.cord,
-                "type": selectedType, 
-                "xpath": props.utils.object.xpath,
-                "status": selectedStatus,
-                ...props.taskDetails
-            };
+        
+        let data = {
+            "_id": (props.utils.object.objId || ''),
+            "cord": props.utils.cord,
+            "type": selectedType, 
+            "xpath": props.utils.object.xpath,
+            "status": selectedStatus,
+            ...props.taskDetails
+        };
 
-            if (!props.utils.object.objId) props.setShowPop({title: "IRIS Object Details", content: "Please save the object first."});
-            else {
-                updateIrisDataset(data)
-                .then(val => {
-                    props.setShow(false);
-                    if(val === 'success'){
-                        props.setShowPop({title: "IRIS Object Details", content: "Submitted Successfully."});
+        let irisAppType = `saveirisimage_${props.taskDetails.appType}`;
+
+        if (!props.utils.object.objId) props.setShowPop({title: "IRIS Object Details", content: "Please save the object first."});
+        else {
+            updateIrisDataset(data)
+            .then(val => {
+                props.setShow(false);
+                if(val === 'success'){
+                    // props.setShowPop({title: "IRIS Object Details", content: "Submitted Successfully."});
+                    if(selectedType !== existingType){
                         props.utils.modifyScrapeItem(props.utils.object.val, {
                             custname: props.utils.object.custname,
                             tag: `iris;${selectedType}`,
@@ -51,15 +58,33 @@ const EditIrisObject = props => {
                             editable: true
                         }, true);
                     }
-                    else props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
-                })
-                .catch(error => console.error(error));
-            }
-		}
-		else{
-			props.setShow(false);
-			props.setShowPop({title: "IRIS Object Details", content: "Submitted Successfully."});
-		}
+                    
+                    let args =[irisAppType, props.utils.cord, selectedType, (props.utils.object.objId || '')];
+                    userObjectElement_ICE(args)
+                        .then(datairis => {
+                            let msg = null;
+                            if (datairis === "Invalid Session") return RedirectPage(history);
+                            else if (datairis === "unavailableLocalServer") msg ={title: "IRIS Object Details", content: "Submitted successfully but failed to save IRIS image, ICE not available."};
+                            else if (datairis === "fail" && selectedType === "unrecognizableobject") msg = {title: "IRIS Object Details", content: "Submitted successfully."};
+                            else if (datairis === "fail") msg = {title: "IRIS Object Details", content: "Submitted successfully but failed to save IRIS image."};
+                            else msg = {title: "IRIS Object Details", content: "Submitted Successfully. IRIS image saved."};
+                            if (msg) props.setShowPop(msg);
+                            props.setShow(false);
+                        })
+                        .catch(error => {
+                            props.setShowPop({title: "IRIS Object Details", content: "Submitted successfully but failed to save IRIS image."});
+                            props.setShow(false);
+                            console.error("ERROR::::", error);
+                        });
+                }
+                else props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
+            })
+            .catch(error => {
+                props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
+                props.setShow(false);
+                console.error("ERROR::::", error);
+            });
+        }
     }
 
     return (

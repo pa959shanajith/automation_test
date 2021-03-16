@@ -1,26 +1,25 @@
-import React , {useRef , useEffect ,useState } from 'react';
-import {ModalContainer ,  PopupMsg ,ScreenOverlay} from '../../global';
+import React, {useRef, useEffect, useState } from 'react';
+import { RedirectPage} from '../../global';
+import { useHistory } from 'react-router-dom';
 import * as actionTypes from '../state/action.js';
 import ALMContent from '../components/ALMContent.js';
-import LoginALM from'../components/LoginALM.js';
+import LoginModal from '../components/LoginModal';
 import {viewQcMappedList_ICE,loginQCServer_ICE} from '../api.js';
 import MappedPage from '../containers/MappedPage';
 import { useSelector ,useDispatch} from 'react-redux';
 
 
 const ALM = props => {
+    const history = useHistory();
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
     const screenType = useSelector(state=>state.integration.screenType);
     const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
     const dispatch = useDispatch();
     const urlRef = useRef();
-    const userNameRef = useRef();
+    const usernameRef = useRef();
     const passwordRef = useRef();
-    const [blockui,setBlockui] = useState({show:false});
-    const [popup ,setPopup]= useState({show:false});
-    const [failMSg , setFailMsg] = useState(null);
     const [domainDetails , setDomainDetails] = useState(null);
-    const [loginSucess , setLoginSucess]=useState(false);
+    const [loginSuccess , setLoginSuccess]=useState(false);
     const [loginError , setLoginError]= useState(null);
     const [mappedfilesRes,setMappedFilesRes]=useState([]);
 
@@ -29,95 +28,49 @@ const ALM = props => {
         setMappedFilesRes([]);
        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+    
 
-    const displayError = (title,error) =>{
-        setPopup({
-        title:title?title:'ERROR',
-        content:error,
-        submitText:'Ok',
-        show:true
-        })
-    }
     const callLogin_ALM = async()=>{
-        if(!(urlRef.current.value) ){
-            setFailMsg("Please Enter URL");
-            setLoginError("URL")
-        }
-        else if(!(userNameRef.current.value)){
-            setFailMsg("Please Enter Username ");
-            setLoginError("UNAME");
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Logging...'});
+        const qcPassword = passwordRef.current.value;
+        const qcURL = urlRef.current.value;
+        const qcUsername = usernameRef.current.value;
+        const domainDetails = await loginQCServer_ICE(qcPassword ,qcURL ,qcUsername);
 
-        }
-        else if(!(passwordRef.current.value)){
-            setFailMsg("Please Enter Password ");
-            setLoginError("PASS");
-
-        }
-        else {
-            setBlockui({show:true,content:'Logging...'})
-            const qcPassword = passwordRef.current.value;
-            const qcURL = urlRef.current.value;
-            const qcUsername = userNameRef.current.value;
-            const domainDetails = await loginQCServer_ICE(qcPassword ,qcURL ,qcUsername);
-            if(domainDetails.error){displayError(domainDetails.error);setBlockui({show:false});return;}
-            if(domainDetails === "unavailableLocalServer"){
-                setFailMsg("ICE Engine is not available, Please run the batch file and connect to the Server.")
-            }
-            else if(domainDetails ==="invalidcredentials"){
-                setFailMsg("Invalid Credentials")
-            }
-            else{
+        if (domainDetails.error) dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: domainDetails.error} });
+        else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available,Please run the batch file and connect to the Server.");
+        else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        else if (domainDetails === "Invalid Session") return RedirectPage(history);
+        else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
+        else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
+        else if (domainDetails === "fail") setLoginError("Fail to Login");
+        else if (domainDetails === "Error:Failed in running Qc") setLoginError("Unable to run Qc");
+        else if (domainDetails === "Error:Qc Operations") setLoginError("Failed during execution");
+        else{
             setDomainDetails(domainDetails);
-            setLoginSucess(true);
+            setLoginSuccess(true);
         }
-        setBlockui({show:false})
-        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callViewMappedFiles = async()=>{
-        setBlockui({show:true,content:'Fetching...'})
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Fetching...'});
         //props.setViewMappedFiles(true)
         dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "ALM" });
         const userid = user_id;
         const response = await viewQcMappedList_ICE(userid);
-        if(response.error){props.displayError(response.error);props.setBlockui({show:false});return;}
-        setMappedFilesRes(response);
-        setBlockui({show:false})
+        if (response.error){
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: response.error}});
+        } else setMappedFilesRes(response);
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callExitcenter=()=>{
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });;
         //props.setAlmClicked(false)
     }
-    const content = () =>{
-            return(
-                <LoginALM
-                    urlRef={urlRef}
-                    userNameRef={userNameRef}
-                    passwordRef={passwordRef}
-                    failMSg={failMSg}
-                    callLogin_ALM={callLogin_ALM}
-                    loginError={loginError}
-                    
-                />
-            )
-        }
-    const footer =()=>{
-        return(
-            <div className="submit_row">
-            <span>
-                    {failMSg}
-            </span>
-            <span>
-                <button onClick={()=>callLogin_ALM()}>Submit</button>
-            </span>
-            </div>
-        )
-    } 
+
     return(
-        
         <>
-        {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
-        {viewMappedFiles === "ALM" ?
+        { viewMappedFiles === "ALM" ?
             <MappedPage 
                 screenType="ALM"
                 leftBoxTitle="Avo Assure Scenarios"
@@ -125,23 +78,22 @@ const ALM = props => {
                 mappedfilesRes={mappedfilesRes}
             /> :
         <>
-            {!loginSucess &&
-                    <> <ModalContainer 
-                            title="ALM Login"
-                            close={()=>{dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });}}
-                            content={content()}
-                            footer ={footer()} 
-                        /> 
-                    </> }
-            { screenType==="ALM" &&
-                <ALMContent
-                    domainDetails={domainDetails}
-                    setBlockui={setBlockui}
-                    displayError={displayError}
-                    setPopup={setPopup}
-                    callViewMappedFiles={callViewMappedFiles}
-                    callExitcenter={callExitcenter}
-                /> }
+        { !loginSuccess &&
+            <LoginModal 
+                urlRef={urlRef}
+                usernameRef={usernameRef}
+                passwordRef={passwordRef}
+                login={callLogin_ALM}
+                error={loginError}
+                screenType={screenType}
+            />
+        }
+        { screenType === "ALM" &&
+            <ALMContent
+                domainDetails={domainDetails}
+                callViewMappedFiles={callViewMappedFiles}
+                callExitcenter={callExitcenter}
+            /> }
         </>}
         </> 
     )

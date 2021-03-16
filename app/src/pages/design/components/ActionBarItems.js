@@ -187,16 +187,18 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
                 let filename = testCaseName + ".json";
 
                 let testCaseBlob = new Blob([responseData], {
-                    type: "text/json;charset=utf-8"
+                    type: "text/json"
                 })
 
 				if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-                    window.navigator.msSaveOrOpenBlob(testCaseBlob, filename);
+                    window.navigator.msSaveOrOpenBlob(new Blob([responseData], {
+                        type: "text/json;charset=utf-8"
+                    }), filename);
                 }
                 else {
                     let a = document.createElement('a');
                     a.download = filename;
-                    a.href = 'data:text/json;charset=utf-8,' + responseData;
+                    a.href = window.URL.createObjectURL(testCaseBlob);
                     a.target = '_blank';
                     document.body.appendChild(a);
                     a.click();

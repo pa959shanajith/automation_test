@@ -32,7 +32,6 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0) {
             resetStates();
-            let i;
             if(userRole === "Test Manager") setNotManager(false);
             
             setOverlay("Loading Tasks..Please wait...");
@@ -57,12 +56,14 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                             
                             let length_tasksJson = tasksJson.length;
                             let tempDataObj = [];
-                            for (i=0 ; i < length_tasksJson ; i++){
+                            for (let i=0 ; i < length_tasksJson ; i++){
                                 let taskname = tasksJson[i].taskDetails[0].taskName;
                                 let tasktype = tasksJson[i].taskDetails[0].taskType;
                                 let status = tasksJson[i].taskDetails[0].status;
                                 let dataobj={
-                                    'scenarioflag':tasksJson[i].scenarioFlag,
+                                    'accessibilityParameters': tasksJson[i].accessibilityParameters,
+									'scenarioflag':tasksJson[i].scenarioFlag,
+									'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
                                     'apptype':tasksJson[i].appType,
                                     'projectid':tasksJson[i].projectId,
                                     'screenid':tasksJson[i].screenId,
@@ -124,14 +125,14 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                     .catch(error => {
                         setOverlay("");
                         setShowPopup({'title': 'Tasks', 'content': "Fail to load tasks!"});
-                        console.error("Error:::::::::::::", error);
+                        console.error("Error::::", error);
                     });
                 }
             })
             .catch(error => {
                 setOverlay("");
                 setShowPopup({'title': 'Tasks', 'content': "Fail to load tasks!"});
-                console.error("Error:::::::::::::", error);
+                console.error("Error::::", error);
             });
         }
     }, [userInfo, userRole]);
