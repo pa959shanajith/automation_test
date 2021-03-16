@@ -46,6 +46,12 @@
         grid-gap: 5px 5%;
     }
 }
+
+@media screen and (min-width: 1800px), screen and (min-height: 850px){
+    .plugin-section{
+        justify-content: center;
+    }
+}
 // @media screen and (min-width: 1400px) and (min-height: 770px){
 //     .plugin-blocks{
 //         grid-gap: 1.3vh 5.8vh;
