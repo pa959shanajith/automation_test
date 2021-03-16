@@ -34,3 +34,30 @@ export const Encrypt_ICE = async(encryptionType ,encryptionValue) => {
         return {error:'Failed to Encrypt'}
     }
 }
+
+
+export const fetchMetrics = async(arg) => {
+    try{
+        const res = await axios(url+'/getExecution_metrics', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                metrics_data : arg
+            }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to Fetch'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to Fetch'}
+    }
+}
