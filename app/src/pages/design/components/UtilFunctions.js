@@ -190,14 +190,33 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                     url = ob.url;
                     let obType = ob.tag;
                     // let listType = ob.canselectmultiple;
+                    let objNameArray = objName.split(';');
                     if (ob.cord) {
                         selectedKeywordList = 'iris';
                         cord = ob.cord;
-                        obType = "iris";
                         url = "";
+                        if (objNameArray.length === 9){
+                            switch (objNameArray[6]){
+                                case 'textbox': obType = 'iristextbox'; break;
+                                case 'radiobutton': obType = 'irisradiocheck'; break;
+                                case 'checkbox': obType = 'irisradiocheck'; break;
+                                case 'button': obType = 'irisbutton'; break;
+                                case 'table': obType = 'iristable'; break;
+                                case 'dropdown':    /* FALL THROUGH */
+                                case 'hscroll':     /* FALL THROUGH */
+                                case 'vscroll':     /* FALL THROUGH */
+                                case 'label':       /* FALL THROUGH */
+                                case 'listbox':     /* FALL THROUGH */
+                                case 'tree':        /* FALL THROUGH */
+                                case 'image': obType = 'irisgeneric'; break;
+                                default: obType = "iris"; break;
+                            }
+						} else {
+                            obType = "iris";
+                        }
                     }
 
-                    if (!(['a', 'select', 'radiobutton', 'checkbox', 'input', 'list', 'tablecell', 'table', 'img', 'button', 'iris'].includes(obType)) && ['Web', 'MobileWeb'].includes(appType) && !ob.tag.startsWith('@PDF')) {
+                    if (!(['a', 'select', 'radiobutton', 'checkbox', 'input', 'list', 'tablecell', 'table', 'grid', 'img', 'button', 'iris', 'iristextbox', 'irisradiocheck', 'irisbutton', 'iristable', 'irisgeneric'].includes(obType)) && ['Web', 'MobileWeb'].includes(appType) && !ob.tag.startsWith('@PDF')) {
                         keywords = Object.keys(keywordList.element);
                         selectedKeywordList = "element";
                         break;
@@ -269,6 +288,26 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                             case 'iris':
                                 keywords = Object.keys(keywordList.iris);
                                 selectedKeywordList = "iris";
+                                break;
+                            case 'iristextbox':
+                                keywords = Object.keys(keywordList.iristextbox);
+                                selectedKeywordList = "iristextbox";
+                                break;
+                            case 'irisradiocheck':
+                                keywords = Object.keys(keywordList.irisradiocheck);
+                                selectedKeywordList = "irisradiocheck";
+                                break;
+                            case 'iristable':
+                                keywords = Object.keys(keywordList.iristable);
+                                selectedKeywordList = "iristable";
+                                break;
+                            case 'irisbutton':
+                                keywords = Object.keys(keywordList.irisbutton);
+                                selectedKeywordList = "irisbutton";
+                                break;
+                            case 'irisgeneric':
+                                keywords = Object.keys(keywordList.irisgeneric);
+                                selectedKeywordList = "irisgeneric";
                                 break;
                             case 'table':
                                 keywords = Object.keys(keywordList.table);
@@ -384,6 +423,26 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                             case 'iris':
                                 keywords = Object.keys(keywordList.iris);
                                 selectedKeywordList = "iris";
+                                break;
+                            case 'iristextbox':
+                                keywords = Object.keys(keywordList.iristextbox);
+                                selectedKeywordList = "iristextbox";
+                                break;
+                            case 'irisradiocheck':
+                                keywords = Object.keys(keywordList.irisradiocheck);
+                                selectedKeywordList = "irisradiocheck";
+                                break;
+                            case 'iristable':
+                                keywords = Object.keys(keywordList.iristable);
+                                selectedKeywordList = "iristable";
+                                break;
+                            case 'irisbutton':
+                                keywords = Object.keys(keywordList.irisbutton);
+                                selectedKeywordList = "irisbutton";
+                                break;
+                            case 'irisgeneric':
+                                keywords = Object.keys(keywordList.irisgeneric);
+                                selectedKeywordList = "irisgeneric";
                                 break;
                             default: 
                                 keywords = Object.keys(keywordList.element);
@@ -506,6 +565,26 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                             case 'iris':
                                 keywords = Object.keys(keywordList.iris);
                                 selectedKeywordList = "iris";
+                                break;
+                            case 'iristextbox':
+                                keywords = Object.keys(keywordList.iristextbox);
+                                selectedKeywordList = "iristextbox";
+                                break;
+                            case 'irisradiocheck':
+                                keywords = Object.keys(keywordList.irisradiocheck);
+                                selectedKeywordList = "irisradiocheck";
+                                break;
+                            case 'iristable':
+                                keywords = Object.keys(keywordList.iristable);
+                                selectedKeywordList = "iristable";
+                                break;
+                            case 'irisbutton':
+                                keywords = Object.keys(keywordList.irisbutton);
+                                selectedKeywordList = "irisbutton";
+                                break;
+                            case 'irisgeneric':
+                                keywords = Object.keys(keywordList.irisgeneric);
+                                selectedKeywordList = "irisgeneric";
                                 break;
                             default:
                                 keywords = Object.keys(keywordList.element);

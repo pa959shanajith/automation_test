@@ -11,6 +11,13 @@
     cursor: pointer;
 }
 
+@media screen and (min-width: 1800px), screen and (min-height: 850px){
+    .header-logo{
+        height: 50px;
+    }
+}
+
+
 .header-logo-span{
     flex-grow: 1;
 }
