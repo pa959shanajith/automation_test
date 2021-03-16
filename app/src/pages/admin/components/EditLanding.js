@@ -21,8 +21,8 @@ const EditLanding = (props) => {
     return (
         <Fragment>
             <div className="adminActionBtn">
-                <button className=" btn-md-create pull-right adminBtn Create-User__btn_edit" onClick={()=>props.manage({action:'update'})} disabled={userConf.userIdName===''} title="Update User">Update</button>
-                <button className=" btn-md-create pull-right adminBtn Create-User__btn_edit" onClick={()=>{setshowDeleteModal(true)}} disabled={userConf.userIdName===''} style={{marginRight:"10px"}} title="Delete Configuration">Delete</button>           
+                <button className=" a__btn pull-right Create-User__btn_edit" onClick={()=>props.manage({action:'update'})} disabled={userConf.userIdName===''} title="Update User">Update</button>
+                <button className=" a__btn pull-right Create-User__btn_edit" onClick={()=>{setshowDeleteModal(true)}} disabled={userConf.userIdName===''} style={{marginRight:"10px"}} title="Delete Configuration">Delete</button>           
             </div>
 
             <div className="col-xs-9 " style={{paddingTop:"5%"}}>
@@ -56,7 +56,7 @@ const EditLanding = (props) => {
                     
                     <div className="userForm-edit" style={{display:"inline-flex"}}>
                         <input type="text" autoComplete="off" id="ldapDirectory" name="ldapDirectory" value={userConf.ldap.user} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_LDAP_USER,payload:event.target.value})}}  className={props.ldapDirectoryAddClass?((props.ldapDirectoryAddClass==="selectErrorBorder")?"middle__input__border-edit form-control__conv-edit form-control-custom-edit create selectErrorBorder":"middle__input__border-edit form-control__conv-edit form-control-custom-edit create inputErrorBorder"):"middle__input__border-edit form-control__conv-edit form-control-custom-edit create"}  placeholder="User Domain Name"/>
-                        <button title="Fetch" disabled={userConf.server === ''} onClick={()=>{props.ldapGetUser();}} className=" btn-md-create pull-right adminBtn Create-User__btn_edit btn-disabled" >Fetch</button>
+                        <button title="Fetch" disabled={userConf.server === ''} onClick={()=>{props.ldapGetUser();}} className=" a__btn pull-right  Create-User__btn_edit btn-disabled" >Fetch</button>
                     </div>
                     :null
                 }

@@ -142,8 +142,8 @@ const TokenManagement = (props) => {
 			<div className="tkn-mgmt_container">
 				<div id="page-taskName"><span>Token Management</span></div>
 				<div className="adminActionBtn">
-					<button className="btn-md pull-right adminBtn-tkn-mgmt" onClick={()=>{generateCIusertokens();}}  title="Generate New Token">Generate</button>
-					<button className="btn-md pull-right adminBtn-tkn-mgmt btn-right-cust-tkn" onClick={()=>{setRefresh(!refresh);setOp("normal")}} title="Refresh">Refresh</button>            
+					<button className="a__btn pull-right" onClick={()=>{generateCIusertokens();}}  title="Generate New Token">Generate</button>
+					<button className="a__btn pull-right btn-right-cust-tkn" onClick={()=>{setRefresh(!refresh);setOp("normal")}} title="Refresh">Refresh</button>            
 				</div>
 				<div className="content_wrapper-tkn-mgmt">
 					<ScrollBar thumbColor="#929397">

@@ -9,37 +9,9 @@
     right: 0;
     background: #eeeeee;
 }
-.container-fluid-inner {
-    padding: 0;
-    text-align: left;
-    width: 100%;
-    float: left;
-    position: relative;
-    height: calc(100% - 108px)
-}
-#right-dependencies-section {
-    width: 90px;
-    height: 85%;
-    /*background: #321e4f;*/
-    background: #311d4e;
-    color: #fff;
-    /* overflow: auto; */
-    word-wrap: break-word;
-    padding: 50px 5px;
-    margin-right: 1px;
-    text-align: center;
-    position: absolute;
-    right: -1px;
-}
-
 #middle-content-section {
-    // width: calc(100% - 270px); /* Required when sidebars added */
-     /* width: 100%; */
-    //  height: 85%;
      box-sizing: border-box;
      position: relative;
-    //  position: absolute;
-    //  left: 173px;           /* Required when sidebars added */
      font-family: LatoWeb;
      display: flex;
      flex-direction: column;
@@ -59,15 +31,6 @@
 }
 .admin-footer .main-footer{
     position: inherit;
-}
-.popup-back{
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: black;
-    opacity: 0.8;
 }
 .admin-container-wrap{
     display: flex;
@@ -91,4 +54,19 @@
 }
 .admin-containerWrap-pad{
     height: 100vh;
+}
+.a__btn.focus,
+.a__btn,
+.a__btn:active:focus,
+.a__btn:focus,
+.a__btn:hover {
+    color: #fff;
+    border: 0;
+    border-radius: 20px;
+    padding: 2px 15px;
+    font-size: 17px;
+    background: #643693;
+	font-family: 'LatoWebLight';
+    outline: 0;
+    padding: 2px 25px !important;
 }

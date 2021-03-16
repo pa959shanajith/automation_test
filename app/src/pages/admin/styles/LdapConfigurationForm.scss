@@ -15,15 +15,6 @@
 .admin-ldap__secure{
     margin-bottom:2%
 }
-.adminFormRadio-ldap input {
-    position: absolute;
-    width: auto!important;
-    margin-top: 7px;
-}
-.adminFormRadio-ldap span {
-    padding-left: 18px;
-    width: fit-content;
-}
 .ldapCert__lable{
     cursor:pointer;
 }
@@ -55,21 +46,10 @@
     float: right;
     outline: 0;
 }
-@media screen and (min-width: 1801px) {
-    .certTextarea-ldap {
-        width: calc(100% - 200px);
-    }
-}
 .certTextarea-edit{
     height:70px;
 }
-.inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
-}
 
-.selectErrorBorder{
-	border: 2px solid #d33c3c !important;
-}
 #ldapCertValue{
     &::-webkit-scrollbar {
         width: 8px;

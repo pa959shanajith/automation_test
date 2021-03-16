@@ -278,8 +278,8 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                     title={"ICE Busy"} 
                     footer={
                         <>
-                        <button onClick={()=>{ExecuteTestSuite()}}>Proceed</button>
-                        <button onClick={()=>{setAllocateICE(true)}}>No</button>
+                        <button onClick={()=>{ExecuteTestSuite();setProceedExecution(false);}}>Proceed</button>
+                        <button onClick={()=>{setAllocateICE(true);setProceedExecution(false);}}>No</button>
                         </>
                     }
                     close={()=>{setProceedExecution(false)}} 

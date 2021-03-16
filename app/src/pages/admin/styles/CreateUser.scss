@@ -1,9 +1,3 @@
-
-@media screen and (min-width:1801px){ 
-    #page-taskName span,[id^=page-taskName] span {
-        font-size: 1.2vw
-    }
-}
 #page-taskName,[id^=page-taskName] {
     float: left;
     width: 100%;
@@ -21,58 +15,11 @@
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
 }
-
-#userRoles, #userTypes{  
-    position: relative;
-    left: 10px;
-    top: -2px;
-}
-@media screen and (min-width:1700px){
-    #userRoles, #userTypes{  
-        position: relative;
-        left: 10px;
-        top: 5px;
-    }
-}
-@media screen and (min-width:1366px) and (max-width:1700px){
-    #userRoles, #userTypes{  
-        position: relative;
-        left: 10px;
-        top: 2px;
-    }
-}
-
 #additionalRole_options {
     position: relative;
     left: 10px;
     top: 2px;
 }
-
-@media screen and (max-width:770px){
-    
-    #additionalRole_options {
-        position: relative;
-        left: 10px;
-        top: 2px;
-    }
-}
-@media screen and (max-width:1700px) and (min-width:1366px){
-    
-    #additionalRole_options {
-        position: relative;
-        left: 10px;
-        top: 6px;
-    }
-}
-@media screen and (min-width:1800px){
-    
-    #additionalRole_options {
-        position: relative;
-        left: 10px;
-        top: 12px;
-    }
-}
-
 .userLDAPFetch label{
 	margin-right: 50px;
 }
@@ -112,76 +59,10 @@
     border-radius: 3px;
     color:#fff;
     cursor: pointer;
-}  
-@media screen and (min-width:1800px){
-    .edit-user-dropdown{
-        width: 78%;
-        background: none;
-        height: 35px;
-        font-size: 0.8vw;
-    }
-    .dropdown-menu-users{
-        width: 78%;
-    }
-}
-@media screen and (max-width:1056px){
-    .edit-user-dropdown{
-        width: 78%;
-        background: none;
-        height: 30px;
-    }
-    .dropdown-menu-users{
-        width: 78%;
-    }
-}
-
-@media screen and (max-width:850px){
-    .edit-user-dropdown{
-        width: 68%;
-        background: none;
-        height: 30px;
-    }
-    .dropdown-menu-users{
-        width: 68%;
-    }
-}
-@media screen and (max-width:700px){
-    .edit-user-dropdown{
-        width: 58%;
-        background: none;
-        height: 30px;
-    }
-    .dropdown-menu-users{
-        width: 58%;
-    }
 }
 .adminActionBtn {
 	float: right;
 	width: auto;
-}
-
-.btn-md-create.focus,
-.btn-md-create,
-.btn-md-create:active:focus,
-.btn-md-create:focus,
-.btn-md-create:hover {
-    color: #fff;
-    border: 0;
-    border-radius: 20px;
-    padding: 2px 15px;
-    font-size: 17px;
-    background: #643693;
-	font-family: 'LatoWebLight';
-    outline: 0;
-}
-@media screen and (min-width:1800px){
-    .btn-md-create{
-        font-size: 1.2vw;
-    }
-}
-
-.adminBtn {
-	padding: 2px 25px !important;
 }
 .btn-disabled:disabled {
 	opacity: 0.5;
@@ -189,56 +70,6 @@
 .Create-User__btn_edit:disabled {
 	opacity: 0.5;
 }
-.adminFormRadio input {
-    position: absolute;
-    width: auto!important;
-    margin-top: 7px;
-}
-.adminFormRadio span {
-    padding-left: 18px;
-    width: fit-content;
-}
-
-.userTypeBtn_conv{
-    margin: 4px 0px;
-    right: 0px;
-    cursor: default;
-    position: absolute;
-    width: 80px;
-    z-index: 1;
-    background: #5e636b;
-    color: #fff;
-    outline: 0;
-    border-radius: 20px;
-    padding: 0px 12px;
-    font-size: 13px;
-    font-family: "LatoWeb";
-    margin-right: 7px;
-    font-family: 'LatoWebLight';
-    text-align: center;
-    white-space: nowrap;
-    border: 0;
-    vertical-align: middle;
-}
-@media screen and (min-width:1800px){
-    .userTypeBtn_conv{
-        font-size: 0.8vw;
-    }
-}
-
-.userTypeBtn.focus, .userTypeBtn, .userTypeBtn:active:focus, .userTypeBtn:focus, .userTypeBtn:hover {
-	margin: 6px 0;
-	position: absolute;
-	width: 80px;
-    z-index: 1;
-    background: #5e636b;
-	/* padding: 0px 20px !important; */
-}
-
-.userTypeBtnActive{
-    background: #643693 !important;
-}
-
 
 
 
@@ -260,17 +91,8 @@
     font-weight: 700;
     margin-top: 5px;
 }
-@media screen and (min-width:1366px){
-    .adminControl div span {
-        width: 100%;
-        font-size: 1.2vw;
-    }
-}
-
-
 .adminControl div input, .adminControl div select {
-    /* display: inline-block; */
-	width: calc(100% - 130px);
+    width: calc(100% - 130px);
 }
 .userForm {
 	float: left;
@@ -291,18 +113,6 @@
 	font-weight: 600;
     line-height: 2;
     font-size: 14px;
-} 
-@media screen and (min-width: 1801px) {
-    .primaryRole {
-        font-size: 1.2vw;
-        margin-top: 2px;
-    }
-}
-
-
-.rightControl {
-	float: right;
-	width: 50%;
 }
 .selectControl {
 	position: relative;
@@ -333,7 +143,7 @@
     text-transform: lowercase;
 }
 
-.modal-body .row-modal .form-control-custom, .form-control-custom{
+.form-control-custom{
 	border: 1px solid #656565 !important;
 	border-left:0 !important;
 	border-right:0 !important;
@@ -343,11 +153,11 @@
 	color:#333;
 }
 
-.modal-body .row-modal .form-control-custom:focus, .form-control-custom:focus {
+.form-control-custom:focus {
     box-shadow: none !important;
 }
 
-.modal-body .row-modal .form-control-custom-prop, .form-control-custom-prop{
+.form-control-custom-prop{
 	border: 1px solid #656565 !important;
 	border-left:0 !important;
 	border-right:0 !important;
@@ -357,10 +167,10 @@
 	color:#333;
 }
 
-.modal-body .row-modal .form-control-custom-prop:focus, .form-control-custom-prop:focus {
+.form-control-custom-prop:focus {
     box-shadow: none !important;
 }
-.modal-body .row-modal .form-control-custom.inputErrorBorderBottom, .form-control-custom.inputErrorBorderBottom{
+.form-control-custom.inputErrorBorderBottom{
     border: 2px solid #d33c3c !important;
     border-left: 0 !important;
     border-right: 0 !important;
@@ -370,7 +180,7 @@
     color: #333;
 }
 
-.modal-body .row-modal .form-control-custom-prop.inputErrorBorderBottom, .form-control-custom-prop.inputErrorBorderBottom
+.form-control-custom-prop.inputErrorBorderBottom
 {
     border: 2px solid #d33c3c !important;
     border-left: 0 !important;
@@ -398,21 +208,6 @@
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: 0;
 }
-@media screen and (min-width: 1801px) {
-    .form-control__conv {
-        font-size: 1.2vw;
-        height: 2.2vw;
-    }
-    .adminSelect {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-
-.selectlg {
-    margin-left: 0;
-    width: 100%;
-}
 .middle__input__border{
     border-radius: 0;
 }
@@ -430,51 +225,8 @@
 .adminSelect:focus {
 	box-shadow: none !important;
 }
-@media screen and (min-width: 1801px) {
-    .adminSelect {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
 .dropdown, .dropup {
     position: relative;
-}
-
-.dropdown-userPart{
-    float: right;
-    width: auto;
-}
-
-.dropdown-userPart .dropdown-toggle:active:focus {
-    outline: 0;
-    box-shadow: none
-}
-
-.dropdown-userPart .col-md-6 {
-    text-align: right;
-    padding: 0 10px
-}
-.dropdown-userPart .col-md-6:first-child {
-    border-right: 1px solid #d2d2d2
-}
-
-.dropdown-userPart .dropdown-menu {
-    /* right: 0; */
-    margin-top: 10px
-}
-
-.dropdown-userinfo,
-.dropdown-userrole {
-    background: 0 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    font-size: 15px
-}
-
-.dropdown-userinfo .header-ic,
-.dropdown-userrole .header-ic {
-    height: 23px;
-    width: 22px;
 }
 
 .dropdown-menu-multiselect>li>input {
@@ -490,7 +242,6 @@
 .dropdown-menu-multiselect>li> :hover{
     background:#633691;
     color: white;
-    /*cursor: pointer;*/
 }
 
 .dropdown-menu-multiselect{
@@ -511,21 +262,6 @@
     border-radius: 1px;
 
 }
-
-@media screen and (min-width: 1801px) {
-    .dropdown-menu-multiselect{
-        font-size: 24px;
-        margin-top: 11px;
-    }
-}
-
-@media screen and (min-width: 1366px) and (max-width: 1800px) {
-    .dropdown-menu-multiselect{
-        margin-top: 1px;
-    }
-}
-
-
 .dropdown-menu-multiselect>li{
     border-bottom: 1px solid #eceaea;
     margin-top: 3px;
@@ -534,33 +270,7 @@
   .dropdown-menu-multiselect>li:last-child { border-bottom: none; }
   
   .dropdown-menu-multiselect>li:first-child { margin-top: none; }
-  .dropdown-menu-domains{
-    max-height:165px;
-    overflow-y:scroll;
-    padding: 6px;
-    left: 9%;
-    position: absolute;
-    width: 83%;
-    top: 28%
-}
-.dropdown-menu-domains>li{
-    padding: 3px 12px;
-}
-.dropdown-menu-domains>li:hover{
-    background:#633691;
-    border-radius: 3px;
-    color:#fff;
-    cursor: pointer;
-}
-
-.d-dropdown{
-    border: 0px;
-    width:100px;
-    height:22px;
-    border-radius:5px;
-    padding:2px;
-}
-
+  
 .inputErrorBorder{
 	border-bottom: 2px solid #d33c3c !important;
 }
@@ -568,55 +278,12 @@
 .selectErrorBorder{
 	border: 2px solid #d33c3c !important;
 }
-
-.btn-xs.focus,
-.btn-xs,
-.btn-xs:active:focus,
-.btn-xs:focus,
-.btn-xs:hover {
-    /*background: #643693;*/
-    background: #633693;
-    color: #fff;
-    outline: 0;
-    border-radius: 20px;
-    padding: 0px 12px;
-    font-size: 13px;
-    font-family: "LatoWeb";
-    margin-right: 7px;
-    font-family: 'LatoWebLight';
-}
-
-.userTypeBtn.focus, .userTypeBtn, .userTypeBtn:active:focus, .userTypeBtn:focus, .userTypeBtn:hover {
-	margin: 6px 0;
-	position: absolute;
-	width: 80px;
-    z-index: 1;
-    background: #5e636b;
-	/* padding: 0px 20px !important; */
-}
-
-.userTypeBtnActive{
-    background: #643693 !important;
-}
-.adminFormRadio input {
-    position: absolute;
-    width: auto!important;
-    margin-top: 7px;
-}
-
-.adminFormRadio span {
-    padding-left: 18px;
-    width: fit-content;
-}
-
 .secondaryRole{
 	width: auto;
 	vertical-align: middle;
 	font-weight: normal;
 	line-height: 2;
 }
-
-
 .chooseRole{
     /*cursor: pointer;*/
     float: left;
@@ -637,14 +304,6 @@
     color: #555;
     font-size: 14px;
 }
-@media screen and (min-width:1801px){
-    .chooseRole{
-        font-size: 1vw;
-        height: 40px;
-        width: 290px;
-        top: 11px;
-    }
-}
 .rolesSpan>label{
     font-weight: normal;
     padding-left: 7px;
@@ -662,25 +321,6 @@
   }
 .rolesChecklabel{
     margin-bottom: 5px;
-}
-
-.btn-search-user{
-    
-        display: inline-block;
-        font-weight: 400;
-        color: #212529;
-        text-align: center;
-        vertical-align: middle;
-        -webkit-user-select: none;
-        user-select: none;
-        background-color: transparent;
-        border: 1px solid transparent;
-        padding: .375rem .75rem;
-        font-size: 1rem;
-        line-height: 1.5;
-        border-radius: .25rem;
-        transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-    
 }
 
 .role-padding{

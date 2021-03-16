@@ -32,29 +32,6 @@
 .adminSelect-ldap-edit:focus {
 	box-shadow: none !important;
 }
-@media screen and (min-width: 1801px) {
-    .adminSelect-ldap-edit {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-@media screen and (min-width: 1801px) {
-    .form-control-ldap-dm {
-        font-size: 1.2vw;
-        height: 2.2vw;
-    }
-    .adminSelect-ldap-edit {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-.inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
-}
-
-.selectErrorBorder{
-	border: 2px solid #d33c3c !important;
-}
 .ldap-content_wrapper-edit{
     height: 100%;
     float: left;

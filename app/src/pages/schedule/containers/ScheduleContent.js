@@ -74,14 +74,6 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                 } 
                 setScheduledData(scheduledDataParsed);
                 setScheduledDataOriginal(scheduledDataParsed);
-                
-                // $scope.scheduledData = result;
-                // $timeout(function () {
-                //     sortFlag === true ? $(".scheduleDataHeader span:first-child").trigger("click") :
-                //         changeBackground();
-                //     $("#scheduledSuitesFilterData").prop('selectedIndex', 0);
-                //     triggeredSeconds = Math.round(new Date() / 1000);
-                // }, 100)
             }
             document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
             setLoading(false);
@@ -168,9 +160,6 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
         } else {
             setPopupState({show:true,title:"Schedule Test Suite",content:"Error in scheduling Testsuite. Scheduling failed"});
         }
-        // $("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
-        // $("#scheduledSuitesFilterData").prop('selectedIndex', 0);
-        // $(".selectScheduleSuite, .selectToSched").prop("checked", false);
         setExecAction("serial");
         setBrowserTypeExe([]);
     }

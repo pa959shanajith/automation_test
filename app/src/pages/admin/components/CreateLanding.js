@@ -31,9 +31,9 @@ const CreateLanding = (props) => {
     return (
         <Fragment>
             <div className="adminActionBtn">
-                <button className=" btn-md-create pull-right adminBtn" onClick={()=>{props.setShowEditUser(true);props.edit();}}  title="Edit User">Edit</button>
-                <button className=" btn-md-create pull-right adminBtn Create-User__btn btn-create-cust"  onClick={()=>{props.manage({action:"create"})}} disabled={userConf.nocreate} title="Create User" >Create</button>
-                <button className=" btn-md-create pull-right adminBtn Create-User__btn btn-create-cust" title="Clear" onClick={()=>{props.click();dispatch({type:actionTypes.UPDATE_TYPE,payload:"inhouse"})}}  >Clear</button>               
+                <button className=" a__btn pull-right " onClick={()=>{props.setShowEditUser(true);props.edit();}}  title="Edit User">Edit</button>
+                <button className=" a__btn pull-right Create-User__btn btn-create-cust"  onClick={()=>{props.manage({action:"create"})}} disabled={userConf.nocreate} title="Create User" >Create</button>
+                <button className=" a__btn pull-right Create-User__btn btn-create-cust" title="Clear" onClick={()=>{props.click();dispatch({type:actionTypes.UPDATE_TYPE,payload:"inhouse"})}}  >Clear</button>               
             </div>
 
             <div className="Create-outer form-group__conv-create" >
@@ -74,7 +74,7 @@ const CreateLanding = (props) => {
                             </div>
                             {(userConf.ldap.fetch !== 'import')?
                                 <div className="userForm-create">
-                                    <button title="Fetch" disabled={userConf.server === ''} onClick={()=>{props.ldapGetUser();}} className=" btn-md-create pull-right adminBtn Create-User__btn btn-disabled" >Fetch</button>
+                                    <button title="Fetch" disabled={userConf.server === ''} onClick={()=>{props.ldapGetUser();}} className=" a__btn pull-right  Create-User__btn btn-disabled" >Fetch</button>
                                     <input type="text" autoComplete="off" id="ldapDirectory" name="ldapDirectory" value={userConf.ldap.user} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_LDAP_USER,payload:event.target.value})}}  className={props.ldapDirectoryAddClass?((props.ldapDirectoryAddClass==="selectErrorBorder")?"middle__input__border-create form-control__conv-create form-control-custom-create create selectErrorBorder":"middle__input__border-create form-control__conv-create form-control-custom-create create inputErrorBorder"):"middle__input__border-create form-control__conv-create form-control-custom-create create"}  placeholder="User Domain Name"/>
                                 </div>
                                 :null

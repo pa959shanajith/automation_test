@@ -13,12 +13,6 @@
     font-weight: 700;
     margin-top: 5px;
 }
-@media screen and (min-width:1801px){
-    .adminControl-tkn-mgmt div span {
-        width: 100%;
-        font-size: 1.2vw;
-    }
-}
 .adminControl-tkn-mgmt div input, .adminControl-tkn-mgmt div select {
     width: calc(100% - 130px);
     font-size: 14px;
@@ -30,27 +24,6 @@
     position: relative;
     float: left;
     width: 100%;
-}
-
-
-.adminFormRadio input {
-    position: absolute;
-    width: auto!important;
-    margin-top: 7px;
-}
-.adminFormRadio span {
-    padding-left: 18px;
-    width: fit-content;
-}
-.adminFormRadio input {
-    position: absolute;
-    width: auto!important;
-    margin-top: 7px;
-}
-
-.adminFormRadio span {
-    padding-left: 18px;
-    width: fit-content;
 }
 .leftControl-tkn-mgmt {
 	float: left;
@@ -116,23 +89,6 @@
 .adminSelect-tkn-mgmt:focus {
 	box-shadow: none !important;
 }
-@media screen and (min-width: 1801px) {
-    .adminSelect-tkn-mgmt {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-@media screen and (min-width: 1801px) {
-    .form-control-tkn-mgmt {
-        font-size: 1.2vw;
-        height: 2.2vw;
-    }
-    .adminSelect-tkn-mgmt {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-
 #tokenarea textarea {
     margin-top: 5px;
     width: calc(100% - 180px);
@@ -152,12 +108,6 @@
     background: #ddd;
     border-radius: 7px;
     cursor: pointer;
-}
-.inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
-}
-.selectErrorBorder{
-	border: 2px solid #d33c3c !important;
 }
 .tokenSuite .datePicContainer, .tokenSuite .timePicContainer{
 	position: relative;
@@ -203,12 +153,6 @@
     width: 130px;
     font-weight: 700;
     margin-top: 5px;
-}
-@media screen and (min-width:1801px){
-    .adminControl-tkn-mgmt1__title {
-        width: 100%;
-        font-size: 1.2vw;
-    }
 }
 .token-tkn-mgmt{
     margin-top: 5px;

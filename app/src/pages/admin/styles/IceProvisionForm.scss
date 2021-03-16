@@ -13,34 +13,8 @@
     font-weight: 700;
     margin-top: 5px;
 }
-@media screen and (min-width:1801px){
-    .adminControl-ip div span {
-        width: 100%;
-        font-size: 1.2vw;
-    }
-}
 .adminControl-ip div input, .adminControl-ip div select {
-    /* display: inline-block; */
-	width: calc(100% - 130px);
-}
-.adminFormRadio input {
-    position: absolute;
-    width: auto!important;
-    margin-top: 7px;
-}
-.adminFormRadio span {
-    padding-left: 18px;
-    width: fit-content;
-}
-.adminFormRadio input {
-    position: absolute;
-    width: auto!important;
-    margin-top: 7px;
-}
-
-.adminFormRadio span {
-    padding-left: 18px;
-    width: fit-content;
+    width: calc(100% - 130px);
 }
 .leftControl-ip {
 	float: left;
@@ -106,23 +80,6 @@
 .adminSelect-ip:focus {
 	box-shadow: none !important;
 }
-@media screen and (min-width: 1801px) {
-    .adminSelect-ip {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-@media screen and (min-width: 1801px) {
-    .form-control-ip {
-        font-size: 1.2vw;
-        height: 2.2vw;
-    }
-    .adminSelect-ip {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-
 #icetokenarea textarea {
     margin-top: 5px;
     width: calc(100% - 180px);
@@ -142,12 +99,6 @@
     background: #ddd;
     border-radius: 7px;
     cursor: pointer;
-}
-.inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
-}
-.selectErrorBorder{
-	border: 2px solid #d33c3c !important;
 }
 .adminControl-ip-cust{
     margin-bottom:2%;
