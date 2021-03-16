@@ -42,6 +42,7 @@ const ModuleList = ({displayError,setBlockui,setModDrop}) =>{
                 setModDrop(true)
             })()
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[reportData,moduleList])
     return(
         <div id='rp_module-list' className='rp_moduleList'>

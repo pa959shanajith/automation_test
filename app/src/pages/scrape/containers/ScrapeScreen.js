@@ -1,4 +1,4 @@
-import React ,{ useState, useEffect, useRef } from 'react';
+import React ,{ useState, useEffect } from 'react';
 import {useSelector, useDispatch} from "react-redux"
 import { useHistory } from 'react-router-dom';
 import ScrapeObjectList from './ScrapeObjectList';
@@ -27,7 +27,7 @@ const ScrapeScreen = ()=>{
     const certificateInfo = useSelector(state=>state.scrape.cert);
     const  { user_id, role } = useSelector(state=>state.login.userinfo);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
-    const {endPointURL, method, opInput, reqHeader, reqBody, respHeader, respBody, paramHeader} = useSelector(state=>state.scrape.WsData);
+    const {endPointURL, method, opInput, reqHeader, reqBody, paramHeader} = useSelector(state=>state.scrape.WsData);
 
     const [overlay, setOverlay] = useState(null);
     const [showPop, setShowPop] = useState("");
@@ -44,11 +44,12 @@ const ScrapeScreen = ()=>{
     const [newScrapedData, setNewScrapedData] = useState({});
 
     useEffect(() => {
-        if(Object.keys(current_task).length != 0) {
+        if(Object.keys(current_task).length !== 0) {
             fetchScrapeData()
             .then(data => setIsUnderReview(current_task.status === "underReview"))
             .catch(error=> console.log(error));
         }
+        //eslint-disable-next-line
     }, [current_task])
 
     const fetchScrapeData = () => {
@@ -79,7 +80,7 @@ const ScrapeScreen = ()=>{
                     haveItems = viewString.view.length !== 0;
                     
                     if (haveItems) {
-                        let newScrapeList = generateScrapeItemList(-1, 0, viewString, true);
+                        let newScrapeList = generateScrapeItemList(-1, 0, viewString);
 
                         setMainScrapedData(viewString);
                         setMirror(viewString.mirror);
@@ -198,8 +199,11 @@ const ScrapeScreen = ()=>{
             let testCaseWS = []
             let keywordVal;
             let wsdlInputs = [ endPointURL, method, opInput ];
+            //eslint-disable-next-line
             wsdlInputs.push(reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
+            //eslint-disable-next-line
             wsdlInputs.push(paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
+            //eslint-disable-next-line
             wsdlInputs.push(reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"'));
             if (Object.keys(certificateInfo).length!==0){
                 wsdlInputs.push(certificateInfo.certsDetails+";");
@@ -215,14 +219,11 @@ const ScrapeScreen = ()=>{
                 proceed = true;
             }
             else {
-                if (["GET", "HEAD", "PUT", "DELETE"].includes(wsdlInputs[1])) {
-                    if (wsdlInputs[3] && !wsdlInputs[2]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["opInput"]}); // error
-                    else proceed = true;
-                } else if (wsdlInputs[1] === "POST") {
+                if (wsdlInputs[1] === "POST") {
                     if (!wsdlInputs[3]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqHeader"]}); // error
                     else if (!wsdlInputs[5]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqBody"]}); // error
                     else proceed = true;
-                }
+                } else proceed = true;
             }
             if (proceed) {
                 dispatch({type: actionTypes.SET_ACTIONERROR, payload: []});
@@ -231,9 +232,10 @@ const ScrapeScreen = ()=>{
                 }else{
                     keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"]
                 }
-                if (wsdlInputs[4]){
-                    keywordVal.splice(4,0,'setParam');
-                }
+
+                if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
+                else wsdlInputs.splice(4, 1);
+
                 setOverlay("Fetching Response Header & Body...");
                 ResetSession.start();
                 for (let i = 0; i < wsdlInputs.length; i++) {
@@ -285,12 +287,14 @@ const ScrapeScreen = ()=>{
                         setShowPop({title: "Data Retrieve", content: "Web Service response received successfully"});
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader: data.responseHeader[0].split("##").join("\n")}});
                         let localRespBody;
-                        if (data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0) {
+                        if (data.responseBody[0].indexOf("{") === 0 || data.responseBody[0].indexOf("[") === 0) {
                             var jsonObj = JSON.parse(data.responseBody[0]);
                             var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+                            //eslint-disable-next-line
                             localRespBody = jsonPretty.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
                         } else {
                             localRespBody = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
+                            //eslint-disable-next-line
                             localRespBody = localRespBody.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
                         }
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respBody: localRespBody}});
@@ -356,14 +360,14 @@ const ScrapeScreen = ()=>{
                     return false;
                 }
                 //COMPARE & UPDATE SCRAPE OPERATION
-                if (data.action == "compare") {
+                if (data.action === "compare") {
                     if (data.status === "SUCCESS") {
-                        let compareObj = generateCompareObject(data);
+                        let compareObj = generateCompareObject(data, scrapeItems.filter(object => object.xpath.substring(0, 4)==="iris"));
                         dispatch({type: actionTypes.SET_COMPAREDATA, payload: data});
                         dispatch({type: actionTypes.SET_COMPAREOBJ, payload: compareObj});
                         dispatch({type: actionTypes.SET_COMPAREFLAG, payload: true});
                     } else {
-                        if (data.status =="EMPTY_OBJECT")
+                        if (data.status === "EMPTY_OBJECT")
                             setShowPop({title: "Compare Objects", content: "Failed to compare objects - Unmapped object(s) found"});
                         else
                             setShowPop({title: "Compare Objects", content: "Failed to compare objects"});
@@ -449,11 +453,11 @@ const ScrapeScreen = ()=>{
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} />}
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
-        { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: current_task.projectId, screenid: current_task.screenId, screenname: current_task.screenName,versionnumber: current_task.versionnumber}} />}
+        { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: current_task.projectId, screenid: current_task.screenId, screenname: current_task.screenName,versionnumber: current_task.versionnumber, appType: current_task.appType}} />}
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}
-        <div  className="ss__body">
+        <div data-test="ssBody" className="ss__body">
             <Header/>
-            <div className="ss__mid_section">
+            <div data-test="ssMidSection" className="ss__mid_section">
                 <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems }}>
                     <ActionBarItems />
                     { current_task.appType === "Webservice" 
@@ -462,7 +466,7 @@ const ScrapeScreen = ()=>{
                     <RefBarItems mirror={mirror}/>
                 </ScrapeContext.Provider>
             </div>
-            <div className='ss__footer'><Footer/></div>
+            <div data-test="ssFooter"className='ss__footer'><Footer/></div>
         </div>
         </>
     );
@@ -531,7 +535,7 @@ function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData,
     else {
         if (compareFlag) {
             let viewString = Object.keys(newScrapedData).length ? {...newScrapedData, view: [...mainScrapedData.view, ...newScrapedData.view]} : { ...mainScrapedData };
-            screenViewObject.viewString = viewString;
+            screenViewObject.viewString = {...viewString, view: viewString.view.filter(object => object.xpath.substring(0, 4)!=="iris")};
             screenViewObject.action = "compare";
         }
         screenViewObject.browserType = browserType;
@@ -540,7 +544,7 @@ function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData,
     return screenViewObject;
 }
 
-function generateCompareObject(data){
+function generateCompareObject(data, irisObjects){
     let compareObj = {};
     if (data.view[0].changedobject.length > 0) {
         let localList = [];
@@ -578,28 +582,30 @@ function generateCompareObject(data){
         }   
         compareObj.notChangedObj = localList;
     }
-    if (data.view[2].notfoundobject.length > 0) {
+    if (data.view[2].notfoundobject.length > 0 || irisObjects.length > 0) {
         let localList = [];
-        for (let i = 0; i < data.view[2].notfoundobject.length; i++) {
-            let scrapeObject = data.view[2].notfoundobject[i];
-            
-            let scrapeItem = {
-                ObjId: scrapeObject._id,
-                objIdx: i,
-                val: i,
-                tag: scrapeObject.tag,
-                title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
-                custname: scrapeObject.custname,
+        if (data.view[2].notfoundobject.length > 0) {
+            for (let i = 0; i < data.view[2].notfoundobject.length; i++) {
+                let scrapeObject = data.view[2].notfoundobject[i];
+                
+                let scrapeItem = {
+                    ObjId: scrapeObject._id,
+                    objIdx: i,
+                    val: i,
+                    tag: scrapeObject.tag,
+                    title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
+                    custname: scrapeObject.custname,
+                }
+    
+                localList.push(scrapeItem);
             }
-
-            localList.push(scrapeItem);
         }
-        compareObj.notFoundObj = localList;
+        compareObj.notFoundObj = [...localList, ...irisObjects];
     }
     return compareObj;
 } 
 
-function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
+function generateScrapeItemList(lastVal, lastIdx, viewString){
     let localScrapeList = [];
     for (let i = 0; i < viewString.view.length; i++) {
                             
@@ -608,9 +614,9 @@ function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
         
         if (scrapeObject.cord) {
             scrapeObject.hiddentag = "No";
-            newTag = `iris;${scrapeObject.objectType}`;
+            newTag = `iris;${(scrapeObject.objectType || "").toLowerCase()}`;
             scrapeObject.url = "";
-            scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${scrapeObject.tag}`;
+            scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${(scrapeObject.objectType || "")};${(scrapeObject.objectStatus || "0")};${scrapeObject.tag}`;
         }
 
         let scrapeItem = {  objId: scrapeObject._id,
@@ -626,14 +632,14 @@ function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
                             xpath: scrapeObject.xpath,
                         }
 
-        // if (fetchDataFlag){
-            if(scrapeObject.hasOwnProperty('editable') || scrapeObject.cord){
-                scrapeItem.editable = true;
-            } else {
-                let isCustom = scrapeObject.xpath === "";
-                scrapeItem.isCustom = isCustom;
-            };
-        // }
+        
+        if(scrapeObject.hasOwnProperty('editable') || scrapeObject.cord){
+            scrapeItem.editable = true;
+        } else {
+            let isCustom = scrapeObject.xpath === "";
+            scrapeItem.isCustom = isCustom;
+        };
+    
         
         localScrapeList.push(scrapeItem);
     }
@@ -652,10 +658,11 @@ function formatXml(xml) {
 		if (node.match(/.+<\/\w[^>]*>$/)) {
 			indent = 0;
 		} else if (node.match(/^<\/\w/)) {
-			if (pad != 0) {
+			if (pad !== 0) {
 				pad -= 1;
 			}
-		} else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+        } //eslint-disable-next-line
+        else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
 			indent = 1;
 		} else {
 			indent = 0;

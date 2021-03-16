@@ -3,6 +3,7 @@ import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
 import { tagList } from  './ListVariables';
 import { updateScreen_ICE } from '../api';
 import "../styles/MapObjectModal.scss";
+import PropTypes from 'prop-types'
 
 const MapObjectModal = props => {
 
@@ -39,6 +40,7 @@ const MapObjectModal = props => {
             setCustomList(tempCustomList);
             setNonCustomList(tempNonCustom);
         }
+        //eslint-disable-next-line
     }, [])
 
     const onDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))
@@ -113,7 +115,7 @@ const MapObjectModal = props => {
                     })
                     .catch(err => {
                         props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
-                        console.err(err);
+                        // console.error(err);
                     });
         })
         .catch(error => {
@@ -134,25 +136,25 @@ const MapObjectModal = props => {
     }
 
     return (
-        <div className="ss__mapObj">
+        <div  data-test="mapObject" className="ss__mapObj">
             <ModalContainer 
                 title="Map Object"
                 content={
                     <div className="ss__mapObjBody">
-                        <div className="ss__mo_lbl headerMargin">Please select the objects to drag and drop</div>
+                        <div   data-test="mapObjectHeading" className="ss__mo_lbl headerMargin">Please select the objects to drag and drop</div>
                         <div className="ss__mo_lists">
-                            <div className="ss__mo_scrapeObjectList">
-                                <div className="ss__mo_lbl lblMargin">Scraped Objects</div>
+                            <div data-test="mapObjectScrapeObjectList" className="ss__mo_scrapeObjectList">
+                                <div  data-test="mapObjectLabel" className="ss__mo_lbl lblMargin">Scraped Objects</div>
                                 <div className="mo_scrapeListContainer">
                                     <div className="mo_listCanvas">
                                         <div className="mo_listMinHeight">
-                                            <div className="mo_listContent" id="moListId">
+                                            <div data-test="mapObjectListContent" className="mo_listContent" id="moListId">
                                             <ScrollBar scrollId="moListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                             <>
                                             { (()=> selectedTag ? scrapedList[selectedTag] : nonCustomList)()
                                             .map((object, i) => {
                                                 let mapped = object.val in map;
-                                                return (<div key={i} className={"ss__mo_listItem"+(mapped ? " mo_mapped" : "")} draggable={ mapped ? "false" : "true"} onDragStart={(e)=>onDragStart(e, object)}>
+                                                return (<div data-test="mapObjectListItem" key={i} className={"ss__mo_listItem"+(mapped ? " mo_mapped" : "")} draggable={ mapped ? "false" : "true"} onDragStart={(e)=>onDragStart(e, object)}>
                                                     {object.title}
                                                 </div>)
                                             }) }
@@ -164,27 +166,27 @@ const MapObjectModal = props => {
                                 </div>
                             </div>
                             
-                            <div className="ss__mo_customObjectList">
-                                <div className="ss__mo_lbl lblMargin">Custom Objects</div>
+                            <div  data-test="mapObjectCustomObjectList" className="ss__mo_customObjectList">
+                                <div  data-test="mapObjectCustomHeading" className="ss__mo_lbl lblMargin">Custom Objects</div>
                                 <div className="ss__mo_customOutContainer">
                                 <div className="mo_listCanvas">
                                 <div className="mo_listMinHeight">
                                 <div className="mo_listContent" id="moListId">
                                 <ScrollBar scrollId="moListId">
-                                <div className="ss__mo_customInContainer">
+                                <div data-test="mapObjectCustomContainer" className="ss__mo_customInContainer">
                                 { Object.keys(customList).map((elementType, i) => (
                                     <Fragment key={i}>
-                                    <div className="mo_tagHead" onClick={()=>setSelectedTag(elementType === selectedTag ? "" : elementType )}>{elementType}</div>
+                                    <div data-test="mapObjectTagHead" className="mo_tagHead" onClick={()=>setSelectedTag(elementType === selectedTag ? "" : elementType )}>{elementType}</div>
                                     { selectedTag === elementType && <div className="mo_tagItemList"> 
-                                        {customList[selectedTag].map((object, j) => <div key={j} className={"mo_tagItems"+(selectedItems.includes(object.val) ? " mo_selectedTag" : "")} onDragOver={onDragOver} onDrop={(e)=>onDrop(e, object)}>
+                                        {customList[selectedTag].map((object, j) => <div data-test="mapObjectCustomListItem" key={j} className={"mo_tagItems"+(selectedItems.includes(object.val) ? " mo_selectedTag" : "")} onDragOver={onDragOver} onDrop={(e)=>onDrop(e, object)}>
                                             { object.val in map ?
                                             <>
-                                            <span className="mo_mappedName" onClick={()=>onCustomClick("", object.val)}>
+                                            <span data-test="mapObjectMappedName" className="mo_mappedName" onClick={()=>onCustomClick("", object.val)}>
                                                 { showName === object.val ? object.title : map[object.val][0].title }
                                             </span>
-                                            <span className="mo_nameFlip" onClick={()=>onCustomClick(object.val, object.val)}></span>
+                                            <span data-test="mapObjectFlipName" className="mo_nameFlip" onClick={()=>onCustomClick(object.val, object.val)}></span>
                                             </> : 
-                                            <span>{object.title}</span> }
+                                            <span data-test="h3">{object.title}</span> }
                                             
                                         </div>)} 
                                     </div> }
@@ -202,15 +204,23 @@ const MapObjectModal = props => {
                 }
                 close={()=>props.setShow(false)}
                 footer={<>
-                    { errorMsg && <span className="mo_errorMsg">{errorMsg}</span>}
-                    <button onClick={onShowAllObjects}>Show All Objects</button>
-                    <button onClick={onUnlink} disabled={!selectedItems.length}>Un-Link</button>
-                    <button onClick={submitMap}>Submit</button>
+                    { errorMsg && <span  data-test="errorMessage" className="mo_errorMsg">{errorMsg}</span>}
+                    <button data-test="showAll" onClick={onShowAllObjects}>Show All Objects</button>
+                    <button data-test="unLink" onClick={onUnlink} disabled={!selectedItems.length}>Un-Link</button>
+                    <button data-test="submit" onClick={submitMap}>Submit</button>
                 </>}
             />
         </div>
     );
 }
-
+MapObjectModal.propTypes={
+    scrapeItems: PropTypes.arrayOf(PropTypes.object),
+    current_task:PropTypes.object,
+    user_id: PropTypes.string,
+    role: PropTypes.string,
+    fetchScrapeData:PropTypes.func,
+    setShow:PropTypes.func,
+    setShowPop: PropTypes.func,
+}
 export default MapObjectModal;
 

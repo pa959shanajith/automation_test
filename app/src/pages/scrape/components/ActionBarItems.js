@@ -26,6 +26,7 @@ const UpperContent = props => {
     useEffect(() => {
         setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
         if (saved || disableAction) setAppendCheck(false);
+        //eslint-disable-next-line
     }, [appType, saved, subTaskId]);
 
 
@@ -61,28 +62,28 @@ const UpperContent = props => {
     }
 
     let renderComp = [
-        <div key={1} className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Scrape On</div>,
-        (appType!=="Webservice" && <Thumbnail title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
-        <div key={3} className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
-            <input id="enable_append" type="checkbox" onChange={onAppend} checked={appendCheck} />
-            <span className="ss__thumbnail_title">{appType==="Webservice" ? "Edit" : "Append"}</span>
+        <div data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Scrape On</div>,
+        (appType!=="Webservice" && <Thumbnail data-test="pdfUtility" key="pdf-icon-scrape" title="Launch PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
+        <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
+            <input data-test="appendInput" id="enable_append" type="checkbox" onChange={onAppend} checked={appendCheck} />
+            <span data-test="append" className="ss__thumbnail_title">{appType==="Webservice" ? "Edit" : "Append"}</span>
         </div>
     ];
 
     switch (appType) {
-        case "Web": renderComp.splice(1, 0, <Fragment key={2}> {WebList.map((icon, i) => icon.title !== "Safari" || isMac ? <Thumbnail key={i} title={icon.title} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable} /> : null)}</Fragment>);
+        case "Web": renderComp.splice(1, 0, <Fragment key="scrape-upper-section"> {WebList.map((icon, i) => icon.title !== "Safari" || isMac ? <Thumbnail key={i} title={icon.title} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable} /> : null)}</Fragment>);
             break;
-        case "OEBS": renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
+        case "OEBS": renderComp.splice(1, 0, <Fragment key="scrape-upper-section">{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
             break;
-        case "Desktop": renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} disable={icon.disable} />)}</Fragment>);
+        case "Desktop": renderComp.splice(1, 0, <Fragment key="scrape-upper-section">{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
             break;
-        case "SAP": renderComp.splice(1, 0, <Fragment key={2}>{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
+        case "SAP": renderComp.splice(1, 0, <Fragment key="scrape-upper-section">{sapList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
             break;
-        case "Webservice": renderComp.splice(1, 0, <Fragment key={2}>{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
+        case "Webservice": renderComp.splice(1, 0, <Fragment key="scrape-upper-section">{webserviceList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
             break;
-        case "MobileApp": renderComp.splice(1, 0, <Fragment key={2}>{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
+        case "MobileApp": renderComp.splice(1, 0, <Fragment key="scrape-upper-section">{mobileAppList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
             break;
-        case "MobileWeb": renderComp.splice(1, 0, <Fragment key={2}>{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
+        case "MobileWeb": renderComp.splice(1, 0, <Fragment key="scrape-upper-section">{mobileWebList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
             break;
         default: break;
     }
@@ -232,8 +233,8 @@ const BottomContent = () => {
 
     return (
         <>
-            {lowerList.map((icon, i) => icon.show && <Thumbnail key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
-            <input id="importScreenField" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json"/>
+            {lowerList.map((icon, i) => icon.show && <Thumbnail data-test="bottomContent" key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
+            <input data-test="fileInput" id="importScreenField" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json"/>
         </>
     );
 }

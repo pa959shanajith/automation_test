@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {ScreenOverlay, PopupMsg, ModalContainer, ScrollBar} from '../../global' 
 import {getLDAPConfig} from '../api';
 import '../styles/LdapConfigEdit.scss'
@@ -129,7 +129,7 @@ const LdapConfigEdit = (props) => {
     }
 
     return (
-        <Fragment>
+        <div className="ldap_container-edit">
             {props.popupState.show?<PopupMsg content={props.popupState.content} title={props.popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
@@ -145,8 +145,8 @@ const LdapConfigEdit = (props) => {
                 <h4 className='title-ldap' >LDAP Server Details</h4>
                     <div  className='userForm-ldap-edit adminControl-ldap'><div>
                         <span  className="leftControl-ldap" title="Server Name">Server Name</span>
-                        <select onChange={(event)=>{props.setServerName(event.target.value);getServerData(event.target.value)}}  className={'adminSelect-ldap-edit form-control-ldap-edit'+ (props.ldapServerNameErrBor ? " selectErrorBorder" : "")} value={props.serverName} id="ldapServerName" >
-                            <option value="" disabled selected>Select Server</option>
+                        <select defaultValue={""} onChange={(event)=>{props.setServerName(event.target.value);getServerData(event.target.value)}}  className={'adminSelect-ldap-edit form-control-ldap-edit'+ (props.ldapServerNameErrBor ? " selectErrorBorder" : "")} id="ldapServerName" >
+                            <option value="" disabled>Select Server</option>
                             {selBox.map((data,index)=>(
                                 <option key={index} value={data}>{data}</option>
                             ))}
@@ -163,7 +163,7 @@ const LdapConfigEdit = (props) => {
             {showDeleteModal?
                 <ModalContainer title="Delete Configuration" footer={deleteModalButtons(props.ldapManage, setshowDeleteModal)} close={closeModal} content="Are you sure you want to delete ? Users depending on this configuration will not be able to login." />
             :null} 
-        </Fragment>
+        </div>
     );
 }
 

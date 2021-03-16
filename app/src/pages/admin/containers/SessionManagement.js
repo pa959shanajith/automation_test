@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
 import {manageSessionData, fetchLockedUsers, unlockUser} from '../api';
 import '../styles/SessionManagement.scss'
@@ -107,7 +107,7 @@ const SessionManagement = (props) => {
     }
 
     return (
-        <Fragment>
+        <div className="sess-mgmt_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
@@ -206,7 +206,7 @@ const SessionManagement = (props) => {
                 </div>
                 </ScrollBar>
             </div>
-        </Fragment>
+        </div>
   );
 }
 

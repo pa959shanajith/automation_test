@@ -518,7 +518,7 @@ export const manageSessionData = async(action, user, key, reason) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.status===200){            
+        if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)

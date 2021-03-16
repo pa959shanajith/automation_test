@@ -57,11 +57,13 @@ const AllocateByQuantity = ({resetMiddleScreen,selectedPool,setSelectedPool,disp
             })()
         }
         setSaveAction(false)
+        // eslint-disable-next-line
     },[saveAction])
 
     //on reload and load
     useEffect(()=>{
         reset()
+        // eslint-disable-next-line
     },[resetMiddleScreen])
     
     const reset = async() => {
@@ -80,11 +82,11 @@ const AllocateByQuantity = ({resetMiddleScreen,selectedPool,setSelectedPool,disp
             poolid:"all",
             projectids:[]
         }
-        var data = await getPools(arg)
-        if(data.error){displayError(data.error);return;}
-        var e = Object.entries(data)
+        var dataPools = await getPools(arg)
+        if(dataPools.error){displayError(dataPools.error);return;}
+        var e = Object.entries(dataPools)
         e.sort((a,b) => a[1].poolname.localeCompare(b[1].poolname))
-        setPoolDict(data)
+        setPoolDict(dataPools)
         setPoolList(e)
         setLoading(false)
     }

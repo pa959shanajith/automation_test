@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ModalContainer } from '../../global';
 import { SET_CERT } from '../state/action';
 import "../styles/CertificateModal.scss";
+import PropTypes from 'prop-types';
 
 const CertificateModal = props => {
 
@@ -59,19 +60,22 @@ const CertificateModal = props => {
         <ModalContainer 
             title="Add Certificate"
             content={<>
-                <input className={"cert_input"+( error ? " cert_error" : "")} onChange={certPathHandler} value={certPath} placeholder="Enter Certificate Path;Enter Certificate Key(optional)"/>
-                <input className="cert_input" onChange={certPassHandler} value={certPass} placeholder="Enter Certificate Password(AES Encrypted);Enter server Certificate Path(Optional)"/>
-                <input className="cert_input" onChange={authNameHandler} value={authName} placeholder="Enter AuthUserName"/>
-                <input className="cert_input" onChange={authPassHandler} value={authPass} placeholder="Enter AuthUserPassword(AES Encrypted)"/>
+                <input data-test="certPath" className={"cert_input"+( error ? " cert_error" : "")} onChange={certPathHandler} value={certPath} placeholder="Enter Certificate Path;Enter Certificate Key(optional)"/>
+                <input data-test="certPass" className="cert_input" onChange={certPassHandler} value={certPass} placeholder="Enter Certificate Password(AES Encrypted);Enter server Certificate Path(Optional)"/>
+                <input data-test="authUserName" className="cert_input" onChange={authNameHandler} value={authName} placeholder="Enter AuthUserName"/>
+                <input data-test="authPass" className="cert_input" onChange={authPassHandler} value={authPass} placeholder="Enter AuthUserPassword(AES Encrypted)"/>
             </>}
             footer={<>
-                <button onClick={resetFields}>Reset</button>
-                <button onClick={submitCert}>Submit</button>
+                <button data-test="reset" onClick={resetFields}>Reset</button>
+                <button data-test="submit" onClick={submitCert}>Submit</button>
             </>}
             close={()=>props.setShow(false)}
         />
         </div>
     );
 }
-
+CertificateModal.propTypes={
+    setShowPop:PropTypes.func,
+    setShow:PropTypes.func
+}
 export default CertificateModal;

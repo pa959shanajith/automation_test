@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ModalContainer } from '../../global';
 import "../styles/CompareObjectModal.scss";
-
+import PropTypes from 'prop-types'
 const CompareObjectModal = props => {
 
     const [isMac, setIsMac] = useState(false);
@@ -9,6 +9,7 @@ const CompareObjectModal = props => {
     useEffect(() => {
         const macOS = navigator.appVersion.indexOf("Mac") !== -1;
         setIsMac(macOS);
+        //eslint-disable-next-line
     }, []);
 
     const webIcons = [
@@ -24,20 +25,23 @@ const CompareObjectModal = props => {
         <div className="ss__compareObj">
             <ModalContainer 
                 title="Compare Object"
-                content={<div className="ss__compareObj_content">
+                content={<div data-test="ssCompareObjectContent" className="ss__compareObj_content">
                     <span>Select one of the browsers below to compare objects</span>
-                    <div className="compareObj_btns">
-                        { webIcons.map((icon, i) => !icon.hide && <button key={i} className="compareObj_btn" title={icon.title} onClick={icon.action}>
-                                <img className="ss__web_icons" src={icon.src} alt={icon.title}/>
+                    <div data-test="compareObjectButtons" className="compareObj_btns">
+                        { webIcons.map((icon, i) => !icon.hide && <button data-test="compareObjectButton" key={i} className="compareObj_btn" title={icon.title} onClick={icon.action}>
+                                <img data-test="webIcons" className="ss__web_icons" src={icon.src} alt={icon.title}/>
                             </button>
                         ) }
                     </div>
                 </div>}
-                footer={<button onClick={()=>props.setShow(false)}>Cancel</button>}
+                footer={<button  data-test="cancelButton" onClick={()=>props.setShow(false)}>Cancel</button>}
                 close={()=>props.setShow(false)}
             />
         </div>
     )
 }
-
+CompareObjectModal.propTypes={
+    startScrape:PropTypes.func,
+    setShow:PropTypes.func
+}
 export default CompareObjectModal;

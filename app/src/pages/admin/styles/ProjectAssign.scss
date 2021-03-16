@@ -33,7 +33,7 @@
 }
 
 .assign-container{
-    height: calc(100% - 155px);
+    height: calc(100% - 165px);
 }
 
 .project-left2 {
@@ -246,4 +246,9 @@ select[size] {
     border-radius: 20px;
     padding: 5px 20px;
     font-size: 16px;
+}
+.projAssign_container{
+    width: 100%;
+    padding: 20px;
+    height: 100%;
 }

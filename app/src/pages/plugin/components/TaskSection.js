@@ -5,6 +5,8 @@ import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
+import PropTypes from 'prop-types';
+
 
 const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
@@ -30,7 +32,6 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0) {
             resetStates();
-            let i;
             if(userRole === "Test Manager") setNotManager(false);
             
             setOverlay("Loading Tasks..Please wait...");
@@ -40,6 +41,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 else {
                     pluginApi.getTaskJson_mindmaps(data)
                     .then(data1 => {
+                        //eslint-disable-next-line
                         dataDict = dataDictState;
                         // to render components which will populate under review
                         let review_items = []
@@ -54,12 +56,14 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                             
                             let length_tasksJson = tasksJson.length;
                             let tempDataObj = [];
-                            for (i=0 ; i < length_tasksJson ; i++){
+                            for (let i=0 ; i < length_tasksJson ; i++){
                                 let taskname = tasksJson[i].taskDetails[0].taskName;
                                 let tasktype = tasksJson[i].taskDetails[0].taskType;
                                 let status = tasksJson[i].taskDetails[0].status;
                                 let dataobj={
-                                    'scenarioflag':tasksJson[i].scenarioFlag,
+                                    'accessibilityParameters': tasksJson[i].accessibilityParameters,
+									'scenarioflag':tasksJson[i].scenarioFlag,
+									'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
                                     'apptype':tasksJson[i].appType,
                                     'projectid':tasksJson[i].projectId,
                                     'screenid':tasksJson[i].screenId,
@@ -104,9 +108,12 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                           dataDict.project[projectID].appType = { [data.appTypeName[dataIdx]]: data.appType[dataIdx] }
                           dataDict.projectDict[projectID] = data.projectName[dataIdx];
                           
+                          //eslint-disable-next-line
                           for (const releaseID in dataDict.project[projectID].release){
+                            //eslint-disable-next-line
                             dataDict.project[projectID].release[releaseID].forEach(cycleID=> {
-                              dataDict.cycleDict[cycleID] = data.cycles[cycleID][2];
+                                //eslint-disable-next-line
+                                dataDict.cycleDict[cycleID] = data.cycles[cycleID][2];
                             })
                           }
                         } 
@@ -118,14 +125,14 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                     .catch(error => {
                         setOverlay("");
                         setShowPopup({'title': 'Tasks', 'content': "Fail to load tasks!"});
-                        console.error("Error:::::::::::::", error);
+                        console.error("Error::::", error);
                     });
                 }
             })
             .catch(error => {
                 setOverlay("");
                 setShowPopup({'title': 'Tasks', 'content': "Fail to load tasks!"});
-                console.error("Error:::::::::::::", error);
+                console.error("Error::::", error);
             });
         }
     }, [userInfo, userRole]);
@@ -247,29 +254,34 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
     return (
         <>
-        { showPopup && <Popup />}
-        {overlay && <ScreenOverlay content={overlay}/>}
-        { showFltrDlg && <FilterDialog setShow={setShowFltrDlg} dataDict={dataDictState} filterData={filterData} filterTasks={filterTasks} /> }
-        <div className="task-section">
-            <div className="task-header">
-                <span className="my-task">My Task(s)</span>
-                { showSearch && <input className="task-search-bar " autoFocus onChange={onSearchHandler} value={searchValue} />}
-                <span className={"task-ic-container"+(showSearch?" plugin__showSearch":"")} onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
-                <span className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span>
+        { showPopup && <Popup data-test="popup" />}
+        {overlay && <ScreenOverlay data-test="screenoverlay-component" content={overlay}/>}
+        { showFltrDlg && <FilterDialog data-test="filterdialog-component" setShow={setShowFltrDlg} dataDict={dataDictState} filterData={filterData} filterTasks={filterTasks} /> }
+        <div  data-test="task-section" className="task-section">
+            <div data-test="task-header" className="task-header">
+                <span data-test="my-task" className="my-task">My Task(s)</span>
+                { showSearch && <input data-test="search-input" className="task-search-bar " autoFocus onChange={onSearchHandler} value={searchValue} />}
+                <span data-test="search-icon" className={"task-ic-container"+(showSearch?" plugin__showSearch":"")} onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
+                <span data-test="filter-icon" className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span>
             </div>
             <div className="task-nav-bar">
-                <span className={"task-nav-item " + (activeTab==="todo" && "active-tab")} onClick={onSelectTodo}>To Do</span>
-                <span className={"task-nav-item " + (activeTab==="review" && "active-tab")} onClick={onSelectReview}>To Review</span>
+                <span data-test="task-toDo" className={"task-nav-item " + (activeTab==="todo" && "active-tab")} onClick={onSelectTodo}>To Do</span>
+                <span  data-test="task-toReview" className={"task-nav-item " + (activeTab==="review" && "active-tab")} onClick={onSelectReview}>To Review</span>
             </div>
-            { notManager && <div className="task-overflow">
-                <ScrollBar thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                    <div className="task-content" id="plugin_page__list">
-                        <TaskContents items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} cycleDict={dataDictState.cycleDict} taskJson={taskJson} />
+            { notManager && <div className="task-overflow" id="plugin__taskScroll">
+                <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
+                    <div data-test="task-content" className="task-content" id="plugin_page__list">
+                        <TaskContents data-test="taskcontent-component" items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} cycleDict={dataDictState.cycleDict} taskJson={taskJson} />
                     </div>
                  </ScrollBar>
             </div>}
         </div>
         </>
     );
+}
+TaskSection.propTypes={
+    userInfo : PropTypes.object,
+    userRole : PropTypes.string,
+    dispatch : PropTypes.func
 }
 export default TaskSection;

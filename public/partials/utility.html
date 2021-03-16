@@ -14,6 +14,9 @@
 								src='imgs/ic-encryption-utility.png' alt='Encryption' /></span>Encryption</a></li>
 					<li><a href='#' id="utilityOptimization" ng-click="encrypt_optimize('utility-Optimization')" title="Optimization" class="selectAutility"><span><img
 								src='imgs/ic-optimization.png' alt='Optimization' /></span>Optimization</a></li>
+					<li><a href='#' id="executionMetrics" ng-click="encrypt_optimize('executionMetrics')" title="Execution Metrics" class="selectAutility"><span>
+						<i class="fa fa-database fa-2x" style="padding:10px" aria-hidden="true"></i>
+					</span>Execution Metrics</a></li>
 				</ul>
 			</div>
 
@@ -176,6 +179,60 @@
 			
 		</div>
 		<!-- After pairwise selection -->
+
+	<!-- executionMetrics selection -->
+	<div ng-if="getScreenView == 'executionMetrics'" style="height: 100%;">
+		<!--Task Name-->
+		<div id="page-taskName">
+			<span>Execution Metrics</span>
+		</div>
+		<!--Task Name-->
+		<div class="adminActionBtn">
+			<button title="Fetch" class="btn btn-md pull-right adminBtn" ng-click="fetchExecMetrics()" style="margin-right:10px">Fetch</button>
+			<button title="Reset" class="btn btn-md pull-right adminBtn" ng-click="resetExecMetrics()" style="margin-right:10px">Reset</button>
+			
+		</div>
+		<div class='execMetrics-box'>
+			<div class="tokenSuite metric-row" id='fromDate'>
+				<span class="metric-title">From Date</span>
+				<span class="datePicContainer">
+					<input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/>
+					<img class="datepickerIcon" src="../imgs/ic-datepicker.png" />
+				</span>
+			</div>
+			<div class="tokenSuite metric-row" id='toDate'>
+				<span class="metric-title">To Date</span>
+				<span class="datePicContainer">
+					<input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/>
+					<img class="datepickerIcon" src="../imgs/ic-datepicker.png" />
+				</span>
+			</div>
+			<div class="tokenSuite metric-row">
+				<span class="metric-title">LOB</span>
+				<input class="form-control" id='LOB' placeholder="Enter LOB"/>
+			</div>
+			<div class="tokenSuite metric-row">
+				<span class="metric-title">Status</span>
+				<input class="form-control" id='statusID' placeholder="Enter status"/>
+			</div>
+			<div class="tokenSuite metric-row">
+				<span class="metric-title">ExecutionID</span>
+				<input class="form-control" id='executionID' placeholder="Enter Execution ID"/>
+			</div>
+			<!-- <div class="tokenSuite metric-row">
+				<span class="metric-title">ModifiedBy</span>
+				<input class="form-control" id='modifiedBy' placeholder="Enter user ID"/>
+			</div> -->
+			<!-- <div id='metric-user' class='tokenSuite metric-row adminControl'>
+				<span class="metric-title">Select User</span>
+				<input class="btn btn-users dropdown-toggle" type="text" autocomplete="off" id="userIdName" data-toggle="dropdown" ng-model="userConf.allUserFilter" placeholder="Search User.." ng-click = "userConf.allUserFilter='';userConf.userIdName=''">
+				<ul class="dropdown-menu dropdown-menu-users" role="menu" aria-labelledby="userIdName">
+					<li role="presentation" ng-repeat='uid in userConf.allUsersList | filter:userConf.allUserFilter' ng-click="userConf.userIdName=uid[1];userConf.allUserFilter=uid[0];" value="{{uid[1]}};{{uid[0]}}"> {{uid[0]}}</li>
+				</ul>
+			</div> -->
+		</div>
+	</div>
+	<!-- executionMetrics selection -->
 
 	</div>
 	<!--Middle Panel-->

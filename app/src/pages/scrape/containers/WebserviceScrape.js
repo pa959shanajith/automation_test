@@ -74,10 +74,15 @@ const WebserviceScrape = () => {
     const onSave = () => {
         let arg = {};
         let callApi = true;
-		let rReqHeader = reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
-		let rParamHeader = paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        //eslint-disable-next-line
+        let rReqHeader = reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        //eslint-disable-next-line
+        let rParamHeader = paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        //eslint-disable-next-line
         let rReqBody = reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"').replace(/'+/g, "\"");
-		let rRespHeader = respHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        //eslint-disable-next-line
+        let rRespHeader = respHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        //eslint-disable-next-line
 		let rRespBody = respBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		if (!endPointURL) dispatch({type: actions.SET_ACTIONERROR, payload: ["endPointURL"]}); // error
 		else if (method==="0") dispatch({type: actions.SET_ACTIONERROR, payload: ["method"]}); // error
@@ -129,7 +134,7 @@ const WebserviceScrape = () => {
                                 try{
                                     
                                     //Parsing Request Parameters
-                                    if (rParamHeader.trim() != ""){
+                                    if (rParamHeader.trim() !== ""){
                                         let reqparams = parseRequestParam(rParamHeader);
                                         if (reqparams.length > 0) viewArray.concat(reqparams);
                                     }
@@ -153,7 +158,7 @@ const WebserviceScrape = () => {
                     } else if (method === 'GET' && rParamHeader) {
                         try{
                             //Parsing Request Parameters
-                            if (rParamHeader.trim() != ""){
+                            if (rParamHeader.trim() !== ""){
                                 var reqparams=parseRequestParam(rParamHeader);
                                 if (reqparams.length>0) viewArray=reqparams;
                             }	
@@ -272,6 +277,8 @@ const WebserviceScrape = () => {
                     dispatch({type: actions.SET_WSDATA, payload: {method : data.method[0]}});
                     dispatch({type: actions.SET_WSDATA, payload: {opInput : data.operations[0]}});
                     dispatch({type: actions.SET_WSDATA, payload: {reqHeader : data.header[0].split("##").join("\n")}})
+                    dispatch({type: actions.SET_WSDATA, payload: {reqHeader : data.header[0].split("##").join("\n")}})
+                    if (data.param) dispatch({type: actions.SET_WSDATA, payload: {paramHeader : data.param[0].split("##").join("\n")}});
 
                     let localReqBody;
                     if (!data.body[0].indexOf("{") || !data.body[0].indexOf("[")) {
@@ -339,7 +346,7 @@ const WebserviceScrape = () => {
                     </select>
                     <input className={"ws__input ws__op_input"+(actionError.includes("opInput")?" ws_eb":"")} type="text" placeholder="Operation" onChange={opInputHandler} value={opInput} disabled={disableAction} />
                     <button className="ws__cert_btn" onClick={()=>setShowObjModal("addCert")}>
-                        <img src="static/imgs/certificate_ws.png"/>
+                        <img alt="cert-icon" src="static/imgs/certificate_ws.png"/>
                     </button>
                     <button className="ws__action_btn ws__bigBtn" disabled={saved && disableAction } onClick={onSave}>Save</button>
                     <button className="ws__action_btn ws__bigBtn" disabled={
@@ -351,7 +358,7 @@ const WebserviceScrape = () => {
                     className={"ws__rqst_resp_header"+(actionError.includes("reqHeader")&&activeView==="req"?" ws_eb":"")}
                     value={activeView === "req" ? reqHeader : activeView === "param" ? paramHeader : respHeader} 
                     placeholder={activeView === "req" ? "Request Header" : 
-                        activeView === "param" ? "Request Param" : "Response Header"
+                        activeView === "param" ? "param_name = value" : "Response Header"
                     }
                     onChange={onHeaderChange}
                     disabled={disableAction || activeView === "resp"}
@@ -383,10 +390,11 @@ function formatXml(xml) {
 		if (node.match(/.+<\/\w[^>]*>$/)) {
 			indent = 0;
 		} else if (node.match(/^<\/\w/)) {
-			if (pad != 0) {
+			if (pad !== 0) {
 				pad -= 1;
 			}
-		} else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+        } //eslint-disable-next-line
+        else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
 			indent = 1;
 		} else {
 			indent = 0;

@@ -25,6 +25,7 @@ const CompareObjectList = () => {
         let newViewString = {...viewString};
         newViewString = Object.keys(newScrapedData).length ? {...newScrapedData, view: [...mainScrapedData.view, ...newScrapedData.view]} : { ...mainScrapedData };
         setViewString(newViewString);
+        //eslint-disable-next-line
     }, [])
 
     const closeCompare = () => {

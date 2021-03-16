@@ -1012,19 +1012,25 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		adminServices.getCIUsersDetails(generatetoken).then(function (data) {
 			unblockUI();
 			if (data == "Invalid Session") $rootScope.redirectPage();
-			else if (data == 'fail') openModalPopup("Token Management", "Failed to fetch token data");
-			else if (data.length == 0) openModalPopup("Token Management", "No tokens have been issued");
+			else if (data == 'fail'){
+				$scope.tokens.allTokens = [];
+				openModalPopup("Token Management", "Failed to fetch token data");
+			} 
+			else if (data.length == 0){
+				$scope.tokens.allTokens = [];
+				openModalPopup("Token Management", "No tokens have been issued");
+			}
 			else {
 				//openModalPopup("Token Management", "Fetch Token details successful");
 				data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
 				data.forEach(e=>e.expiry=new Date(e.expiry).toString().slice(0,-22))
 				$scope.tokens.allTokens = data;
-				if (clearFields) {
-					$scope.tokens.name = '';
-					$scope.tokens.token = '';
-					$('.fc-datePicker').val('');
-					$('.fc-timePicker').val('');
-				}
+			}
+			if (clearFields) {
+				$scope.tokens.name = '';
+				$scope.tokens.token = '';
+				$('.fc-datePicker').val('');
+				$('.fc-timePicker').val('');
 			}
 		}, function (error) {
 			unblockUI();
@@ -1056,7 +1062,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		var exptime=$(".tokenSuite .timePicContainer .fc-timePicker").val();
 		var today = new Date();
 		var td = new Date();
-		var expiry = "";
 		if (expdate == "") {
 			td.setHours(today.getHours()+parseInt(tokendetails));
 			expdate = td.getDate()+"-"+(td.getMonth()+1)+"-"+td.getFullYear()
@@ -1077,7 +1082,6 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		var sldate_2 = expdate.split("-");
 		var sltime_2 = exptime.split(":");
-		expiry = expdate+" "+exptime;
 		var now = new Date(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1]);
 		td = today;
 		td.setHours(today.getHours()+8);
@@ -1090,7 +1094,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location
 		}
 		const CIUser = {
 			'userId': userId,
-			'expiry': expiry,
+			'expiry': now,
 			'tokenname': tokenname,
 			'icetype': icetype
 		};

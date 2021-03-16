@@ -29,9 +29,16 @@ const RefBarItems = props => {
 	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, setShowPop } = useContext(ScrapeContext);
 
 	useEffect(()=>{
+		return ()=>{
+			dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
+		}
+	}, [dispatch])
+
+	useEffect(()=>{
 		dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
 		setHighlight(false);
 		setToFilter([]);
+		//eslint-disable-next-line
 	}, [subTaskId, newScrapedData])
 
 	useEffect(()=>{
@@ -60,6 +67,7 @@ const RefBarItems = props => {
 		setHighlight(false);
 		filter([]);
 		setToFilter([]);
+		//eslint-disable-next-line
 	}, [props.mirror])
 
 	useEffect(()=>{
@@ -83,7 +91,7 @@ const RefBarItems = props => {
 					top = top + 112;
 					left = left + 15;	
 				} 
-				else if (appType == "SAP" && createdthrough !== 'PD'){
+				else if (appType === "SAP" && createdthrough !== 'PD'){
 					top = top + 2;
 					left = left + 3;
 				}
@@ -110,6 +118,7 @@ const RefBarItems = props => {
 			} else setHighlight(false);
 		}
 		else setHighlight(false);
+		//eslint-disable-next-line
 	}, [objValue])
 
     const closeAllPopups = () => {
@@ -158,18 +167,18 @@ const RefBarItems = props => {
 					scrapedItems.forEach(item => {
                         if (!["button", "checkbox", "select", "img", "a", "radiobutton", "input", "list",
                              "link", "scroll bar", "internal frame", "table"].includes(item.tag) &&
-							item.tag.toLowerCase().indexOf("button") == -1 &&
-							item.tag.toLowerCase().indexOf("edit") == -1 &&
-							item.tag.toLowerCase().indexOf("edit box") == -1 &&
-							item.tag.toLowerCase().indexOf("text") == -1 &&
-							item.tag.toLowerCase().indexOf("edittext") == -1 &&
-							item.tag.toLowerCase().indexOf("combo box") == -1 &&
-							item.tag.toLowerCase().indexOf("hyperlink") == -1 &&
-							item.tag.toLowerCase().indexOf("check box") == -1 &&
-							item.tag.toLowerCase().indexOf("checkbox") == -1 &&
-							item.tag.toLowerCase().indexOf("image") == -1 &&
-							(item.tag.toLowerCase().indexOf("table") == -1 || item.tag.toLowerCase() == "tablecell") &&
-							item.tag.toLowerCase().indexOf("radio button") == -1) {
+							item.tag.toLowerCase().indexOf("button") === -1 &&
+							item.tag.toLowerCase().indexOf("edit") === -1 &&
+							item.tag.toLowerCase().indexOf("edit box") === -1 &&
+							item.tag.toLowerCase().indexOf("text") === -1 &&
+							item.tag.toLowerCase().indexOf("edittext") === -1 &&
+							item.tag.toLowerCase().indexOf("combo box") === -1 &&
+							item.tag.toLowerCase().indexOf("hyperlink") === -1 &&
+							item.tag.toLowerCase().indexOf("check box") === -1 &&
+							item.tag.toLowerCase().indexOf("checkbox") === -1 &&
+							item.tag.toLowerCase().indexOf("image") === -1 &&
+							(item.tag.toLowerCase().indexOf("table") === -1 || item.tag.toLowerCase() === "tablecell") &&
+							item.tag.toLowerCase().indexOf("radio button") === -1) {
 								item.hide = false;
 						}
 					});
@@ -180,18 +189,18 @@ const RefBarItems = props => {
 							  "android.widget.TimePicker", "android.widget.DatePicker", "android.widget.RadioButton",
 							 "android.widget.EditText", "android.widget.ListView", "android.widget.Spinner", "android.widget.Switch",
 							 "android.widget.ImageButton", "android.widget.SeekBar"].includes(item.tag) &&
-							item.tag.toLowerCase().indexOf("android.widget.button") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.checkbox") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.numberpicker") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.timepicker") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.datepicker") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.radiobutton") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.edittext") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.listview") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.spinner") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.switch") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.imagebutton") == -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.seekbar") == -1){
+							item.tag.toLowerCase().indexOf("android.widget.button") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.checkbox") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.numberpicker") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.timepicker") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.datepicker") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.radiobutton") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.edittext") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.listview") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.spinner") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.switch") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.imagebutton") === -1 &&
+							item.tag.toLowerCase().indexOf("android.widget.seekbar") === -1){
 								item.hide = false;
 							}
 					});
@@ -223,12 +232,12 @@ const RefBarItems = props => {
 				}
 				else {
 					scrapedItems.forEach(item => {
-						if (tag == item.tag || (item.tag.toLowerCase().indexOf(tag.toLowerCase()) >= 0 && tag != "a" && item.tag.toLowerCase() != "radio button" && item.tag.toLowerCase() != "radiobutton" && item.tag.toLowerCase().indexOf("listview") < 0 && item.tag.toLowerCase().indexOf("tablecell") < 0) ||
-							(tag == "input" && (item.tag.indexOf("edit") >= 0 || item.tag.indexOf("Edit Box") >= 0 || item.tag.indexOf("text") >= 0 || item.tag.indexOf("EditText") >= 0 || item.tag.indexOf("TextField") >= 0)) ||
-							(tag == "select" && item.tag.indexOf("combo box") >= 0) ||
-							(tag == "a" && (item.tag.indexOf("hyperlink") >= 0)) ||
-							(tag == "checkbox" && item.tag.indexOf("check box") >= 0) ||
-							(tag == "radiobutton" && item.tag.indexOf("radio button") >= 0)
+						if (tag === item.tag || (item.tag.toLowerCase().indexOf(tag.toLowerCase()) >= 0 && tag !== "a" && item.tag.toLowerCase() !== "radio button" && item.tag.toLowerCase() !== "radiobutton" && item.tag.toLowerCase().indexOf("listview") < 0 && item.tag.toLowerCase().indexOf("tablecell") < 0) ||
+							(tag === "input" && (item.tag.indexOf("edit") >= 0 || item.tag.indexOf("Edit Box") >= 0 || item.tag.indexOf("text") >= 0 || item.tag.indexOf("EditText") >= 0 || item.tag.indexOf("TextField") >= 0)) ||
+							(tag === "select" && item.tag.indexOf("combo box") >= 0) ||
+							(tag === "a" && (item.tag.indexOf("hyperlink") >= 0)) ||
+							(tag === "checkbox" && item.tag.indexOf("check box") >= 0) ||
+							(tag === "radiobutton" && item.tag.indexOf("radio button") >= 0)
 						) {
 							item.hide = false;
 						}
@@ -246,14 +255,14 @@ const RefBarItems = props => {
         {
             showScreenPop && 
             // <ClickAwayListener onClickAway={closeAllPopups}>
-            <div className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`, height: `${mirrorHeight}px`}}>
+            <div data-test="popupSS" className="ref_pop screenshot_pop" style={{marginTop: `calc(${screenshotY}px - 15vh)`, height: `${mirrorHeight}px`}}>
                 <h4 className="pop__header" onClick={()=>setShowScreenPop(false)}><span className="pop__title">Screenshot</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
 				<div className="screenshot_pop__content" >
 				<div className="scrsht_outerContainer" id="ss_ssId">
 				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' hideXbar={true}>
-					<div className="ss_scrsht_insideScroll">
+					<div data-test="ssScroll" className="ss_scrsht_insideScroll">
 					{ highlight && <div ref={highlightRef} style={{display: "flex", position: "absolute", ...highlight}}></div>}
-					{ props.mirror ? <img id="ss_screenshot" className="screenshot_img" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
+					{ props.mirror ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
 					</div>
 				</ScrollBar>
 				</div>
@@ -264,12 +273,12 @@ const RefBarItems = props => {
 		{
             showFilterPop && 
             <ClickAwayListener onClickAway={closeAllPopups}>
-            <div className="ref_pop filter_pop" style={{marginTop: `calc(${filterY}px - 15vh)`}}>
+            <div  data-test="popupFilter" className="ref_pop filter_pop" style={{marginTop: `calc(${filterY}px - 15vh)`}}>
                 <h4 className="pop__header" onClick={()=>setShowFilterPop(false)}><span className="pop__title">Filter</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
-                <div className="filter_pop__content">
+                <div data-test="popupFilterContent" className="filter_pop__content">
 					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length}/><span>Select All</span></div>
 					{ tagList.map((tag, index)=>(<div key={index} className="d__filter-btnbox">
-						<button className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
+						<button data-test="filterButton" className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
 					</div>))}
                 </div>
             </div>
@@ -282,8 +291,8 @@ const RefBarItems = props => {
     return (
     
         <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} scrapeScreenURL={scrapedURL} >
-			{ appType!=="Webservice" && appType!=="Mainframe" && <div className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
-            { appType!=="Webservice" && <span onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>}
+			{ appType!=="Webservice" && appType!=="Mainframe" && <div data-test="screenshot" className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
+            { appType!=="Webservice" && <span data-test="filter" onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>}
         </ReferenceBar>
         
     

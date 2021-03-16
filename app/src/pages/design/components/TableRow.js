@@ -24,7 +24,7 @@ import "../styles/TableRow.scss";
 const TableRow = (props) => {
 
     const rowRef = useRef(null);
-    const [checked, setChecked] = useState(null);
+    const [checked, setChecked] = useState(false);
     const [objName, setObjName] = useState(null);
     const [objType, setObjType] = useState(null);
     const [keyword, setKeyword] = useState(null);
@@ -55,6 +55,7 @@ const TableRow = (props) => {
             setOutputPlaceholder(null);
             setKeywordList(null);
             setTcAppType(props.testCase.appType);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
             objList = props.objList;
             setRemarks(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
             setCommented(props.testCase.outputVal.slice(-2) === "##");
@@ -64,6 +65,7 @@ const TableRow = (props) => {
 
     useEffect(()=>{
         setChecked(props.checkedRows.includes(props.idx));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.checkedRows]);
 
     useEffect(()=>{
@@ -111,8 +113,10 @@ const TableRow = (props) => {
                 }
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.focusedRow, props.edit]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(()=>{
         if (props.focusedRow !== props.idx) {
             setFocused(false);
@@ -121,6 +125,7 @@ const TableRow = (props) => {
         if (props.focusedRow !== null && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) {
             rowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     });
 
     const onBoxCheck = event => {
@@ -178,7 +183,7 @@ const TableRow = (props) => {
         <>
         <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + (highlight || (props.focusedRow!== null  && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
                 <span className="step_col">{props.idx + 1}</span>
-                <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onClick={onBoxCheck}/></span>
+                <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>
             <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>
                 <span className="objname_col">
                     { focused ? 

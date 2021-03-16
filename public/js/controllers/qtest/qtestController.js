@@ -188,25 +188,29 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 				structContainer.append("<ul class='root scrollbar-inner'><li class='testfolder_'><img class='qcCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>");
 				if(data.length>0) {
 					for(var i=0 ; i<data.length;++i) {
-						var keyVal = data[i].cycle;
-						if(i == 0){				
-							structContainer.find(".root").append("<ul class='cycleList'></ul>");
-						}
-						structContainer.find(".cycleList").append("<li class='Tfolnode testfolder_"+(i+1)+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+keyVal+"'>"+keyVal+"</label></li>");
-						var suites = data[i].testsuites;
-						for (var j=0;j<suites.length;++j){
-							if(j==0){
-								structContainer.find(".testfolder_"+(i+1)).append("<ul class='suiteList suiteList_"+(i+1)+"'></ul>")
-								$(".suiteList_"+(i+1)).hide();
+						if(Object.keys(data[i]).length>0){
+							var keyVal = data[i].cycle;
+							if(i == 0){				
+								structContainer.find(".root").append("<ul class='cycleList'></ul>");
 							}
-							structContainer.find(".suiteList_"+(i+1)).append("<li  class='testSuite testSet_"+(i+1)+""+(j+1)+"' data-suiteid="+suites[j].id+" data-type='testsuite'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px; float:left; margin-left:19px' src='imgs/ic-taskType-blue-plus.png'><label title='"+suites[j].name+"' style='margin-left:0px'>"+suites[j].name+"</label></li>");
-							for (var k=0; k<suites[j].testruns.length;++k){
-								if(k==0){
-									structContainer.find(".suiteList_"+(i+1)).append("<ul class='runList runList_"+(i+1)+""+(j+1)+"'></ul>")
-									$(".runList_"+(i+1)+""+(j+1)).hide();
+							structContainer.find(".cycleList").append("<li class='Tfolnode testfolder_"+(i+1)+"'><img class='qcExpand qcExpandFolder selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-qcExpand.png'><label title='"+keyVal+"'>"+keyVal+"</label></li>");
+							var suites = data[i].testsuites;
+							for (var j=0;j<suites.length;++j){
+								if(j==0){
+									structContainer.find(".testfolder_"+(i+1)).append("<ul class='suiteList suiteList_"+(i+1)+"'></ul>")
+									$(".suiteList_"+(i+1)).hide();
 								}
-								structContainer.find(".runList_"+(i+1)+""+(j+1)).append("<li  class='testRun testcaselink' data-runid="+suites[j].testruns[k].id+" data-type='testrun'><label title='"+suites[j].testruns[k].name+"' style='margin-left:57px'>"+suites[j].testruns[k].name+"</label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
+								structContainer.find(".suiteList_"+(i+1)).append("<li  class='testSuite testSet_"+(i+1)+""+(j+1)+"' data-suiteid="+suites[j].id+" data-type='testsuite'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px; float:left; margin-left:19px' src='imgs/ic-taskType-blue-plus.png'><label title='"+suites[j].name+"' style='margin-left:0px'>"+suites[j].name+"</label></li>");
+								for (var k=0; k<suites[j].testruns.length;++k){
+									if(k==0){
+										structContainer.find(".suiteList_"+(i+1)).append("<ul class='runList runList_"+(i+1)+""+(j+1)+"'></ul>")
+										$(".runList_"+(i+1)+""+(j+1)).hide();
+									}
+									structContainer.find(".runList_"+(i+1)+""+(j+1)).append("<li  class='testRun testcaselink' data-runid="+suites[j].testruns[k].id+" data-type='testrun'><label title='"+suites[j].testruns[k].name+"' style='margin-left:57px'>"+suites[j].testruns[k].name+"</label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
+								}
 							}
+						}else{
+							openModelPopup('Empty Release','No testcases found in the following release')
 						}
 					}
 					// if($(".mtgScenarioList").find("li").length > 11){
@@ -236,27 +240,26 @@ mySPA.controller('qtestController',['$scope', '$rootScope', '$window','$http','$
 					//if(scnDetails.length >= 25)
 					$('.scrollbar-inner').scrollbar();
 					$(".searchScenarioAvoAssure").show();
+						//Search scenarios
+					var flgTog = 1;
+					$(document).on('click', ".searchScenarioAvoAssure", function(){
+						$('.searchScenarioQC').val('');
+						if(flgTog){
+							$(this).siblings("input").css({"opacity":1});
+							flgTog = 0;
+						}
+						else{
+							$(this).siblings("input").css({"opacity":0});
+							flgTog = 1;
+						}
+						filter($(this).siblings("input"));
+					});
 				} else{
 					AvoAssureContainer.append("This project does not contain any scenarios");
 					$(".searchScenarioAvoAssure").hide();
 				}
 			}
 		}
-	});
-
-	//Search scenarios
-	var flgTog = 1;
-	$(document).on('click', ".searchScenarioAvoAssure", function(){
-		$('.searchScenarioQC').val('');
-		if(flgTog){
-			$(this).siblings("input").css({"opacity":1});
-			flgTog = 0;
-		}
-		else{
-			$(this).siblings("input").css({"opacity":0});
-			flgTog = 1;
-		}
-		filter($(this).siblings("input"));
 	});
 
 	$(document).on('keyup', '.searchScenarioQC', function() {

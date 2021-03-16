@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ModalContainer, ScrollBar } from '../../global'
 import "../styles/FilterDialog.scss";
+import PropTypes from 'prop-types';
 
 const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
 
@@ -29,6 +30,7 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
             ))
             setApp(types);
         }
+        //eslint-disable-next-line
     }, []);
 
     const onProjSel = event => {
@@ -75,14 +77,14 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
     const Content = () => (
         <div className="filter_body">
             <ScrollBar thumbColor="#311d4e" trackColor="#fff" hideXbar={true}>
-            <div className="filter_content">
+            <div data-test="filterContent" className="filter_content">
                 
                 { /* Project Selection */ }
-                <div className="selection-lbl">
+                <div data-test="selectProjectLabel" className="selection-lbl">
                     <span>Select Project</span>
                 </div>
                 
-                <select className="selection-select" onChange={onProjSel} value={proj}>
+                <select data-test="selectProjectDrop" className="selection-select" onChange={onProjSel} value={proj}>
                     <option className="select__menu" disabled value="Select Project">Select Project</option>
                     {Object.keys(dataDict.project).map((id, i)=>(
                         <option key={i} className="select__menu" value={id}>
@@ -92,11 +94,11 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
                 </select>
             
                 { /* Release Selection */ }
-                <div className="selection-lbl">
+                <div data-test="selectReleaseLabel" className="selection-lbl">
                     <span>Select Release</span>
                 </div>
                 
-                <select className="selection-select" onChange={onRelSel} disabled={proj==="Select Project"} value={rel}>
+                <select  data-test="selectReleaseDrop" className="selection-select" onChange={onRelSel} disabled={proj==="Select Project"} value={rel}>
                     <option className="select__menu" disabled value="Select Release">Select Release</option>
                     { dataDict.project[proj] && Object.keys(dataDict.project[proj].release).map((rel, i)=>(
                         <option key={i} className="select__menu" value={rel}>
@@ -106,10 +108,10 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
                 </select>
             
                 { /* Cycle Selection */ }
-                <div className="selection-lbl">
+                <div  data-test="selectCycleLabel" className="selection-lbl">
                     <span>Select Cycle</span>
                 </div>
-                <select className="selection-select" onChange={onCycSel} disabled={rel==="Select Release"} value={cyc}>
+                <select data-test="selectCycleDrop" className="selection-select" onChange={onCycSel} disabled={rel==="Select Release"} value={cyc}>
                     <option className="select__menu" disabled value="Select Cycle">Select Cycle</option>
                     { dataDict.project[proj] && dataDict.project[proj].release[rel] && dataDict.project[proj].release[rel].map((cycID, i)=>(
                         <option key={i} className="select__menu" value={cycID}>
@@ -119,18 +121,18 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
                 </select>
 
                 {/*  Task Types */}
-                <div className="selection-lbl">
+                <div data-test="taskTypeLabel" className="selection-lbl">
                     <span>Task Type:</span>
                 </div>
-                <span className="chkbx_div">{dataDict.tasktypes.map((item, i)=>(
+                <span data-test="taskTypeCheckBox" className="chkbx_div">{dataDict.tasktypes.map((item, i)=>(
                     <label key={i} className="filter_checkbox"><input className="chkbx" type="checkbox" checked={task[item]} onChange={onTaskSel} value={item}/>{item}</label>
                 ))}</span>
 
                 {/*  App Types */}
-                <div className="selection-lbl">
+                <div  data-test="appTypeLabel" className="selection-lbl">
                     <span>AppTypes:</span>
                 </div>
-                <span className="chkbx_div">{dataDict.apptypes.map((item, i)=>(
+                <span data-test="appTypeCheckBox" className="chkbx_div">{dataDict.apptypes.map((item, i)=>(
                     <label key={i} className="filter_checkbox"><input className="chkbx" type="checkbox" checked={app[item]} onChange={onAppSel} value={item}/>{item}</label>
                 ))}</span>
             </div>
@@ -156,13 +158,13 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
 
     const Footer = () => (
         <>
-            <button onClick={onResetFields}>Reset Fields</button>
-            <button onClick={filter}>Filter</button>
+            <button data-test="reset" onClick={onResetFields}>Reset Fields</button>
+            <button data-test="filter" onClick={filter}>Filter</button>
         </>
     )
 
     return (
-        <div className="filter__pop">
+        <div data-test="filterModalPop" className="filter__pop">
         <ModalContainer 
             title="Filter Tasks"
             content={Content()}
@@ -172,5 +174,10 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
         </div>
     );
 }
-
+FilterDialog.propTypes={
+    setShow:PropTypes.func,
+    dataDict:PropTypes.object, 
+    filterData:PropTypes.object, 
+    filterTasks:PropTypes.func
+}
 export default FilterDialog;

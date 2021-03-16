@@ -1,4 +1,4 @@
-import React , { useEffect, useState} from 'react';
+import React , { useState} from 'react';
 import {ModalContainer} from '../../global' 
 import '../styles/IntegrationDropDown.scss'
 import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE } from '../../execute/api';
@@ -26,7 +26,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, setPo
 		} else if (!credentials.password) {
             setPassErrBor(true);
             setErrorMsg("Please "+placeholder[type].password);
-		} else if (appType != "SAP" && browserTypeExe.length === 0) {
+		} else if (appType !== "SAP" && browserTypeExe.length === 0) {
             setshowModal(false);
             setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
         }
@@ -37,13 +37,13 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, setPo
             else if(type === "qTest") apiIntegration = loginQTestServer_ICE;
 			const data = await apiIntegration(credentials.url, credentials.userName, credentials.password, type);
             if(data.error){displayError(data.error);return;}
-            else if (data == "unavailableLocalServer") {
+            else if (data === "unavailableLocalServer") {
                 setErrorMsg("Unavailable LocalServer");
-            } else if (data == "Invalid Session") {
+            } else if (data === "Invalid Session") {
                 setErrorMsg("Invalid Session");
-            } else if (data == "invalidcredentials") {
+            } else if (data === "invalidcredentials") {
                 setErrorMsg("Invalid Credentials");
-            } else if (data == "invalidurl") {
+            } else if (data === "invalidurl") {
                 setErrorMsg("Invalid URL");
             } else {
                 var integration = {alm: {url:"",username:"",password:""}, 

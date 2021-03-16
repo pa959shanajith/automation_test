@@ -301,12 +301,15 @@ export const addNode = (n) =>{
     }
     var img_src = 'static/imgs/node-' + n.type + '.png';
     if (n.reuse && (n.type === 'testcases' || n.type === 'screens')) img_src = 'static/imgs/' + n.type + '-reuse.png';
-
+    var accessibility = 'Disable'
+    if(n.task && n.task.tasktype == 'Execute Scenario Accessibility Only') accessibility = 'Exclusive'
+    else if(n.task && n.task.tasktype == 'Execute Scenario with Accessibility') accessibility = 'Enable'
     var nodeDisplay= {
         'type': n.type,
         'transform': "translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
         'opacity': !( n._id === null || n._id === undefined) ? 1 : 0.5,
         'title': n.name,
+        'ac': accessibility,
         'hidden': false,
         'name': n.display_name,
         'img_src': img_src,
@@ -663,7 +666,7 @@ const xml2json = (xml, tab) => {
         },
         escape: function (txt) {
             return txt.replace(/[\\]/g, "\\\\")
-                .replace(/[\"]/g, '\\"')
+                // .replace(/[\"]/g, '\\"')
                 .replace(/[\n]/g, '\\n')
                 .replace(/[\r]/g, '\\r');
         },

@@ -1,6 +1,7 @@
 import React, { useState ,useEffect ,Fragment, useRef } from 'react';
 import Encryption from '../components/Encryption.js';
 import Pairwise from '../components/Optimization.js'
+import ExecutionMetrics from '../components/ExecutionMetrics.js';
 import {PopupMsg ,ScreenOverlay} from '../../global';
 import '../styles/UtilityCenter.scss'
 import {Encrypt_ICE } from '../api';
@@ -143,6 +144,12 @@ const UtilityCenter=(props)=>{
                     gererateClick={gererateClick}
                 />
             : null}
+
+            { props.screenType === "execution" 
+                && <ExecutionMetrics 
+                        setBlockui={setBlockui} 
+                        setPopup={setPopup}
+                    /> }
                 
         </div>
         </div>

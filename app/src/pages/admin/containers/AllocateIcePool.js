@@ -1,5 +1,5 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg} from '../../global' 
+import React, { useState, useEffect } from 'react';
+import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
 import AllocateByQuantity from '../components/AllocateByQuantity';
 import AllocateByIce from '../components/AllocateByIce';
 import '../styles/AllocateIcePool.scss'
@@ -26,7 +26,8 @@ const AllocateIcePool = ({resetMiddleScreen}) => {
         })
     }
     return(
-        <Fragment>
+        <ScrollBar thumbColor="#929397" hideXbar={true}>
+            <div className="crt_ice-pool_container">
             {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
@@ -42,7 +43,8 @@ const AllocateIcePool = ({resetMiddleScreen}) => {
             {quant?
             <AllocateByQuantity resetMiddleScreen={resetMiddleScreen} saveAction={saveAction} selectedPool={selectedPool} setSelectedPool={setSelectedPool} setSaveAction={setSaveAction} displayError={displayError} setLoading={setLoading} setPopupState={setPopupState}/>:
             <AllocateByIce  saveAction={saveAction} selectedPool={selectedPool} setSelectedPool={setSelectedPool} setSaveAction={setSaveAction} displayError={displayError} setLoading={setLoading} setPopupState={setPopupState}/>}
-        </Fragment>
+            </div>
+        </ScrollBar>    
     )
 }
 

@@ -52,7 +52,9 @@ const ReferenceBar = (props) => {
                 let tasktype = tasksJson[i].taskDetails[0].taskType;
                 let taskname = tasksJson[i].taskDetails[0].taskName;
                 let dataobj = {
+                    'accessibilityParameters': tasksJson[i].accessibilityParameters,
                     'scenarioflag':tasksJson[i].scenarioFlag,
+                    'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
                     'apptype':tasksJson[i].appType,
                     'projectid':tasksJson[i].projectId,
                     'screenid':tasksJson[i].screenId,
@@ -115,6 +117,7 @@ const ReferenceBar = (props) => {
             setShowTask(false);
             setTaskInfo(info);
         }
+        //eslint-disable-next-line
     }, [current_task, current_task.screenName, props.scrapeScreenURL]);
 
     const onSearchHandler = event => {
@@ -181,7 +184,7 @@ const ReferenceBar = (props) => {
                             </div>
                             <div className="task_pop__list">
                                 <div id='task_pop_scroll' className="task_pop__overflow">
-                                    <ScrollBar scrollId='task_pop_scroll' trackColor="#46326b" thumbColor="#fff">
+                                    <ScrollBar scrollId='task_pop_scroll' trackColor={'transparent'} thumbColor={'grey'}>
                                         <div className="task_pop__content" id="rb__pop_list">
                                             <TaskContents items={searchValue ? searchItems : taskList} testCaseId={current_task.testCaseId} taskName={current_task.taskName} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
                                         </div>
@@ -216,10 +219,10 @@ const ReferenceBar = (props) => {
                     <ScrollBar scrollId="ref_bar_scroll" trackColor="transparent" thumbColor="#7143b3">
                         <div className="ref__content">
                             <div className="rb_upper_contents">
-                                {props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
+                                {props.taskTop?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} alt="task-ic" src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
                                     {props.children}
-                                {!props.taskTop && !props.hideTask?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
-                                {!props.hideInfo && <div className="ic_box"  onClick={toggleInfoPop} ><img className="rb__ic-info thumb__ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
+                                {!props.taskTop && !props.hideTask?<div className="ic_box" onClick={toggleTaskPop}><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} alt="task-ico" src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
+                                {!props.hideInfo && <div className="ic_box"  onClick={toggleInfoPop} ><img className="rb__ic-info thumb__ic" alt="info-ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                             </div>
                         </div>
                     </ScrollBar>

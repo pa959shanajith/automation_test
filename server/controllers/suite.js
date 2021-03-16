@@ -58,8 +58,7 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"testsuitename": testsuite.name,
 			"moduleid": moduleId,
 			"testsuiteid": testsuite.testsuiteid,
-			"versionnumber": suite.versionnumber,
-			"accessibilityTestingMap": testscenarioDetails.accessibilitytestingmap
+			"versionnumber": suite.versionnumber
 		};
 		responsedata[moduleId] = finalSuite;
 	}
@@ -246,7 +245,6 @@ const fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
 	});
 
 	scenario.testcase = JSON.stringify(allTestcaseSteps);
-
 	// Step 3: Get qcdetails
 	scenario.qcdetails = [];
 	for(var k =0; k<integrationType.length; ++k) {
@@ -285,7 +283,8 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 		"batchId": "",
 		"executionIds": [],
 		"testsuiteIds": [],
-		"suitedetails": []
+		"suitedetails": [],
+		"reportType": "functionalTesting"
 	};
 	const batchInfo = batchData.batchInfo;
 	for (const suite of batchInfo) {
@@ -316,7 +315,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			if (batchData.integration && batchData.integration.qtest.url){
 				integrationType.push("qTest");
 			} 
-			if (batchData.integration && batchData.integration.zephyr.accountid) {
+			if (batchData.integration && batchData.integration.zephyr.url) {
 				integrationType.push("Zephyr");
 			}
 			var scenario = await fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
@@ -332,6 +331,7 @@ const prepareExecutionRequest = async (batchData, userInfo) => {
 			scenarioObj.qcdetails = scenario.qcdetails;
 			scenarioList.push(scenarioObj);
 		}
+		if (suite.scenarioTaskType == "exclusive") execReq.reportType = "accessiblityTestingOnly";
 		suiteObj[testsuiteid] = scenarioList;
 		execReq.testsuiteIds.push(testsuiteid);
 		execReq.suitedetails.push(suiteObj);
@@ -430,7 +430,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 	const channel = "normal";
 	var completedSceCount = 0;
 	var statusPass = 0;
-
+	var reportType = "accessiblityTestingOnly";
 	logger.info("Sending request to ICE for executeTestSuite");
 	const dataToIce = {"emitAction" : "executeTestSuite","username" : icename, "executionRequest": execReq};
 	redisServer.redisPubICE.publish('ICE1_' + channel + '_' + icename, JSON.stringify(dataToIce));
@@ -480,6 +480,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						const accessibility_reports = resultData.accessibility_reports
 						accessibility_testing.saveAccessibilityReports(accessibility_reports);
 					}
+					if (resultData.report_type != "accessiblityTestingOnly") reportType = "functionalTesting";
 					const scenarioid = resultData.scenarioId;
 					const testsuiteid = resultData.testsuiteId;
 					const testsuiteIndex = execReq.testsuiteIds.indexOf(testsuiteid);
@@ -498,7 +499,7 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						if (reportData.overallstatus.length == 0) {
 							completedSceCount++;
 							scenarioCount = testsuite.scenarioIds.length;
-							if (completedSceCount == scenarioCount) {
+							if (completedSceCount == scenarioCount && reportType != "accessiblityTestingOnly") {
 								completedSceCount = statusPass = 0;
 								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
 								await updateExecutionStatus([executionid], "fail");
@@ -528,13 +529,13 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 							if (completedSceCount == scenarioCount) {
 								const suiteStatus = (statusPass == scenarioCount) ? "pass" : "fail";
 								completedSceCount = statusPass = 0;
-								notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
+								if(reportType != "accessiblityTestingOnly") notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus});
 								await updateExecutionStatus([executionid], suiteStatus);
 							}
 						}
 					} catch (ex) {
 						logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
-						notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
+						if(reportType != "accessiblityTestingOnly") notifications.notify("report", {...testsuite, user: userInfo, status, suiteStatus: "fail"});
 						await updateExecutionStatus([executionid], "fail");
 					}
 				} else { // This block will trigger when resultData.status has "success or "Terminate"
@@ -543,6 +544,8 @@ const executionRequestToICE = async (execReq, execType, userInfo) => {
 						let result = status;
 						let report_result = {};
 						report_result["status"] = status
+						if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
+						if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
 						report_result["testSuiteDetails"] = execReq["suitedetails"]
 						if (resultData.userTerminated) result = "UserTerminate";
 						if (execType == "API") result = [d2R, status];
