@@ -89,7 +89,7 @@ export const readTestCase_ICE = (userInfo, testCaseId, testCaseName, versionnumb
 /*Component DesignContent
   api returns String (Invalid Session/Success)
 */
-export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userInfo, versionnumber, import_status) => {
+export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userInfo, versionnumber, import_status, copiedTestCases) => {
     return new Promise((resolve, reject)=>{
         axios(url+"/updateTestCase_ICE", {
             method: 'POST',
@@ -105,7 +105,8 @@ export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userI
                 skucodetestcase : "skucodetestcase",
                 tags: "tags",
                 versionnumber: versionnumber,
-                import_status: import_status
+                import_status: import_status,
+                copiedTestCases: copiedTestCases
             },
             credentials : 'include',
         })

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from  'react';
+import React, { useState } from  'react';
 import { useHistory } from 'react-router-dom';
 import { RedirectPage } from '../../global';
 import CalendarComp from './CalendarComp';
@@ -9,36 +9,35 @@ const ExecutionMetrics = props => {
 
     const history = useHistory();
 
-    const lob = useRef();
-    const status = useRef();
-    const executionId = useRef();
-
     const [error, setErrors] = useState({});
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
+    const [lob, setLob] = useState("");
+    const [status, setStatus] = useState("");
+    const [executionId, setExecutionId] = useState("");
 
     const handleReset = () => {
         setFromDate("");
         setToDate("");
-        lob.current.value = "";
-        status.current.value = "";
-        executionId.current.value = "";
+        setLob("");
+        setStatus("");
+        setExecutionId("");
     }
 
     const handleSubmit = () => {
         let arg;
         let err;
 
-        if (!fromDate || !toDate || !lob.current.value){
-            err = {fromDate: !fromDate, toDate: !toDate, lob: !lob.current.value};
+        if (!fromDate || !toDate || !lob){
+            err = {fromDate: !fromDate, toDate: !toDate, lob: !lob};
         } else {
             arg = {
                 ui: true,
                 fromDate: fromDate,
                 toDate: toDate,
-                LOB: lob.current.value,
-                status: status.current.value,
-                executionID: executionId.current.value
+                LOB: lob,
+                status: status,
+                executionID: executionId
             }
         }
 
@@ -97,7 +96,7 @@ const ExecutionMetrics = props => {
  
     return ( <>
         <div className="page-taskName" >
-            <span className="taskname">
+            <span className="taskname" data-test="util__pageTitle">
                 Execution Metrics
             </span>
         </div>
@@ -106,30 +105,22 @@ const ExecutionMetrics = props => {
             <button onClick={handleReset}>Reset</button>
         </div>
         <div className="execM__inputGroup">
-            <Label name="From Date" star={true} />
+            <span className="execM__inputLabel" data-test="util__inputLabel">From Date<span className="execM__mandate">*</span></span>
             <CalendarComp date={fromDate} setDate={(val)=>setFromDate(val)} error={error.fromDate} />
 
-            <Label name="To Date" star={true} />
+            <span className="execM__inputLabel" data-test="util__inputLabel">To Date<span className="execM__mandate">*</span></span>
             <CalendarComp date={toDate} setDate={(val)=>setToDate(val)} error={error.toDate} />
 
-            <Label name="LOB" star={true} />
-            <Input inputRef={lob} placeholder="Enter LOB" error={error.lob} />
+            <span className="execM__inputLabel" data-test="util__inputLabel">LOB<span className="execM__mandate">*</span></span>
+            <input data-test="util__input" className={"execM__input" + (error.lob ? " execM__inputError":"")} placeholder="Enter LOB" value={lob} onChange={(e)=>setLob(e.target.value)} />
 
-            <Label name="Status" />
-            <Input inputRef={status} placeholder="Enter Status" />
+            <span className="execM__inputLabel" data-test="util__inputLabel">Status</span>
+            <input data-test="util__input" className={"execM__input" + (error.status ? " execM__inputError":"")} placeholder="Enter Status" value={status} onChange={(e)=>setStatus(e.target.value)} />
 
-            <Label name="ExecutionID" />
-            <Input inputRef={executionId} placeholder="Enter Execution ID"/>
+            <span className="execM__inputLabel" data-test="util__inputLabel">ExecutionID</span>
+            <input data-test="util__input" className={"execM__input" + (error.status ? " execM__inputError":"")} placeholder="Enter Execution ID" value={executionId} onChange={(e)=>setExecutionId(e.target.value)} />
         </div>
     </> );
 }
-
-const Star = () => <span className="execM__mandate">*</span>;
-
-const Input = props => <input className={"execM__input" + (props.error ? " execM__inputError":"")} ref={props.inputRef} placeholder={props.placeholder}/>;
-
-const Label = props => <span className="execM__inputLabel">{props.name}{props.star && <Star />}</span>;
-
-
 
 export default ExecutionMetrics;

@@ -34,6 +34,7 @@ const CalendarComp = (props) => {
     return(
         <span className="execM__date-container" >
             <Datetime
+                data-test="util__dateSelect"
                 closeOnClickOutside={true}
                 ref={dateRef} 
                 closeOnSelect={true}
@@ -42,7 +43,7 @@ const CalendarComp = (props) => {
                 onChange={submit}
                 dateFormat="DD-MM-YYYY"
                 inputProps={inputProps} timeFormat={false} id="data-token"
-                renderInput={()=><input className={"execM__input"+ (props.error ? " execM__inputError":"")} value={dateVal || ""} placeholder= "Select Date" onClick={openDate}/>}
+                renderInput={()=><input className={"execM__input"+ (props.error ? " execM__inputError":"")} value={dateVal || ""} placeholder= "Select Date" onClick={openDate} data-test="util__input"/>}
             />
             <img onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
         </span>

@@ -159,6 +159,7 @@ exports.updateTestCase_ICE = function (req, res) {
 			var requestedversionnumber = req.body.versionnumber;
 			var requestedtestcasesteps = JSON.parse(req.body.testcasesteps);
 			var import_status = req.body.import_status;
+			var copiedTestCases = req.body.copiedTestCases;
 			var userinfo = req.body.userinfo;
 			var inputs = {
 				"screenid": requestedscreenid,
@@ -170,6 +171,7 @@ exports.updateTestCase_ICE = function (req, res) {
 				"testcaseid": requestedtestcaseid,
 				"testcasename": requestedtestcasename,
 				"import_status": import_status,
+				"copiedTestCases": copiedTestCases,
 			};
 			logger.info("Calling function uploadTestCaseData from updateTestCase_ICE");
 			uploadTestCaseData(inputs, function (error, response) {

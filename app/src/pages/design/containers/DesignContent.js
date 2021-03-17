@@ -59,6 +59,7 @@ const DesignContent = props => {
     const [rowChange, setRowChange] = useState(false);
     const [headerCheck, setHeaderCheck] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
+    const [pastedTC, setPastedTC] = useState([]);
     let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
@@ -169,7 +170,7 @@ const DesignContent = props => {
                                 // else setDataFormat(scriptData.header[0].split("##").join("\n"));
                             }	
                         }
-                        
+
                         setTestScriptData(scriptData.view);
                         props.setMirror(scriptData.mirror);
                         
@@ -205,6 +206,7 @@ const DesignContent = props => {
                                     setOverlay("");
                                 }
                                 setTestCaseData(testcaseArray);
+                                setPastedTC([]);
                                 setObjNameList(getObjNameList(props.current_task.appType, scriptData.view));
                                 let msg = deleteObjectFlag ? "deleteObjs" : "success"
                                 resolve(msg);
@@ -283,7 +285,7 @@ const DesignContent = props => {
                 }
 
                 if (!errorFlag) {
-                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, testCases, userInfo, versionnumber, import_status)
+                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, testCases, userInfo, versionnumber, import_status, pastedTC)
                     .then(data => {
                         if (data === "Invalid Session") return RedirectPage(history);
                         if (data === "success") {
@@ -431,8 +433,20 @@ const DesignContent = props => {
     }
 
     const onDeleteTestStep = () => {
-        let testCases = [...testCaseData]
-        testCases = testCases.filter((val, idx) => !checkedRows.includes(idx))
+        let testCases = []
+        let localPastedTc = [...pastedTC];
+
+        testCaseData.forEach((val, idx) => {
+            if (!checkedRows.includes(idx)) {
+                testCases.push(val);
+            }
+            else {
+                let tcIndex = pastedTC.indexOf(val.objectid)
+                if (tcIndex > -1) localPastedTc.splice(tcIndex, 1);
+            }
+        })
+
+        setPastedTC(localPastedTc);
         setTestCaseData(testCases);
         setCheckedRows([]);
         setHeaderCheck(false);
@@ -593,6 +607,12 @@ const DesignContent = props => {
             }
             offset=offset+copiedContent.testCases.length;
         }
+
+        let localPastedTc = [...pastedTC];
+        copiedContent.testCases.forEach(testcase => testcase.objectid ? localPastedTc.push(testcase.objectid) : null)
+
+        localPastedTc = [...new Set(localPastedTc)];
+        setPastedTC(localPastedTc);
         setTestCaseData(testCases);
         setShowPS(false);
         setFocusedRow(toFocus);
