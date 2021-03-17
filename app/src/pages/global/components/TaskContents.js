@@ -65,15 +65,13 @@ const TaskPanel = (props) => {
         if(dataobj.status==='assigned'){
             dataobj.status='inprogress';
             updateTaskStatus(dataobj.subtaskid)
-                    .then(data => {
-                        dataobj.status=data;
-                    })
-                    .catch(error=> {
-                        console.log("Error updating task status " + (error.data));
-                    });
+                .then(data => dataobj.status=data)
+                .catch(error=> console.error("Error updating task status. ERROR::::", error.data));
         }
         taskObj.testSuiteDetails = taskSuiteDetails;
         taskObj.scenarioFlag = dataobj.scenarioflag;
+        taskObj.accessibilityParameters  = dataobj.accessibilityParameters;
+		taskObj.scenarioTaskType = dataobj.scenarioTaskType;
         taskObj.assignedTestScenarioIds = dataobj.assignedtestscenarioids;
         taskObj.screenId = dataobj.screenid;
         taskObj.screenName = dataobj.screenname;

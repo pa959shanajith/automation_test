@@ -109,15 +109,21 @@
 
 @media screen and (min-width: 1400px) and (min-height: 770px){
     .task-section{
-        width: 30%;
+        width: 35%;
         min-width: 100px;
+    }
+}
+
+@media screen and (min-width: 1800px) and (min-height: 850px){
+    .task-section{
+        width: 35%;
     }
 }
 
 
 @media screen and (max-width: 1000px){
     .task-section{
-        min-width: 30%;
+        width: 35%;
     }
 }
 

@@ -80,7 +80,7 @@ const ScrapeScreen = ()=>{
                     haveItems = viewString.view.length !== 0;
                     
                     if (haveItems) {
-                        let newScrapeList = generateScrapeItemList(-1, 0, viewString, true);
+                        let newScrapeList = generateScrapeItemList(-1, 0, viewString);
 
                         setMainScrapedData(viewString);
                         setMirror(viewString.mirror);
@@ -219,14 +219,11 @@ const ScrapeScreen = ()=>{
                 proceed = true;
             }
             else {
-                if (["GET", "HEAD", "PUT", "DELETE"].includes(wsdlInputs[1])) {
-                    if (wsdlInputs[3] && !wsdlInputs[2]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["opInput"]}); // error
-                    else proceed = true;
-                } else if (wsdlInputs[1] === "POST") {
+                if (wsdlInputs[1] === "POST") {
                     if (!wsdlInputs[3]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqHeader"]}); // error
                     else if (!wsdlInputs[5]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqBody"]}); // error
                     else proceed = true;
-                }
+                } else proceed = true;
             }
             if (proceed) {
                 dispatch({type: actionTypes.SET_ACTIONERROR, payload: []});
@@ -235,9 +232,10 @@ const ScrapeScreen = ()=>{
                 }else{
                     keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"]
                 }
-                if (wsdlInputs[4]){
-                    keywordVal.splice(4,0,'setParam');
-                }
+
+                if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
+                else wsdlInputs.splice(4, 1);
+
                 setOverlay("Fetching Response Header & Body...");
                 ResetSession.start();
                 for (let i = 0; i < wsdlInputs.length; i++) {
@@ -455,7 +453,7 @@ const ScrapeScreen = ()=>{
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} />}
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
-        { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: current_task.projectId, screenid: current_task.screenId, screenname: current_task.screenName,versionnumber: current_task.versionnumber}} />}
+        { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: current_task.projectId, screenid: current_task.screenId, screenname: current_task.screenName,versionnumber: current_task.versionnumber, appType: current_task.appType}} />}
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}
         <div data-test="ssBody" className="ss__body">
             <Header/>
@@ -607,7 +605,7 @@ function generateCompareObject(data, irisObjects){
     return compareObj;
 } 
 
-function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
+function generateScrapeItemList(lastVal, lastIdx, viewString){
     let localScrapeList = [];
     for (let i = 0; i < viewString.view.length; i++) {
                             
@@ -616,9 +614,9 @@ function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
         
         if (scrapeObject.cord) {
             scrapeObject.hiddentag = "No";
-            newTag = `iris;${scrapeObject.objectType}`;
+            newTag = `iris;${(scrapeObject.objectType || "").toLowerCase()}`;
             scrapeObject.url = "";
-            scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${scrapeObject.tag}`;
+            scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${(scrapeObject.objectType || "")};${(scrapeObject.objectStatus || "0")};${scrapeObject.tag}`;
         }
 
         let scrapeItem = {  objId: scrapeObject._id,
@@ -634,14 +632,14 @@ function generateScrapeItemList(lastVal, lastIdx, viewString, fetchDataFlag){
                             xpath: scrapeObject.xpath,
                         }
 
-        // if (fetchDataFlag){
-            if(scrapeObject.hasOwnProperty('editable') || scrapeObject.cord){
-                scrapeItem.editable = true;
-            } else {
-                let isCustom = scrapeObject.xpath === "";
-                scrapeItem.isCustom = isCustom;
-            };
-        // }
+        
+        if(scrapeObject.hasOwnProperty('editable') || scrapeObject.cord){
+            scrapeItem.editable = true;
+        } else {
+            let isCustom = scrapeObject.xpath === "";
+            scrapeItem.isCustom = isCustom;
+        };
+    
         
         localScrapeList.push(scrapeItem);
     }

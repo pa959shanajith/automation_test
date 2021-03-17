@@ -16,6 +16,10 @@ const Leftbar=(props)=>{
                     <img src='static/imgs/ic-optimization.png' alt="optimizationIcon" id={(focus==="optimization")? "selected":null}/>
                     <div>Optimization</div>
                 </span>
+                <span onClick={()=>{props.setScreenType("execution");  setFocus("execution") ; props.setPairwiseClicked(false)}}>
+                    <div className="fa fa-database fa-2x util__execution_ic" id={(focus==="execution")? "selected":""}/>
+                    <div>Execution Metrics</div>
+                </span>
             </div>
         )
     }

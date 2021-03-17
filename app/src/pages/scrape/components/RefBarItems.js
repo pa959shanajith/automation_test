@@ -29,6 +29,12 @@ const RefBarItems = props => {
 	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, setShowPop } = useContext(ScrapeContext);
 
 	useEffect(()=>{
+		return ()=>{
+			dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
+		}
+	}, [dispatch])
+
+	useEffect(()=>{
 		dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
 		setHighlight(false);
 		setToFilter([]);
