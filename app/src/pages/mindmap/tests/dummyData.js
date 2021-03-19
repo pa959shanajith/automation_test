@@ -108,7 +108,9 @@ export const selectedModule={
                     "display_name":"Scenario_test31"
                 }],
     "completeFlow":true,
-    "name":"Module_test31","projectID":"5fb4fc98f4da702833d7e0a0","state":"saved",
+    "name":"Module_test31",
+    "projectID":"5fb4fc98f4da702833d7e0a0",
+    "state":"saved",
     "task":{
         "_id":"5fecc81dd2ce8ecfe96896a5",
         "assignedtime":"Thu, 31 Dec 2020 00:04:05 GMT",
