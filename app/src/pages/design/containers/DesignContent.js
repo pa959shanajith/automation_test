@@ -678,6 +678,7 @@ const DesignContent = props => {
         setHeaderCheck(headerCheckFlag);
         setFocusedRow(focusIdx); 
         setCheckedRows(check);
+        document.getElementById('design__tcCheckbox').indeterminate = check.length!==0 && check.length !== testCaseData.length;
     }
 
     const onAction = (operation) => {
@@ -766,7 +767,7 @@ const DesignContent = props => {
             <div className="d__table">
                 <div className="d__table_header">
                     <span className="step_col d__step_head" ></span>
-                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll}/></span>
+                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} id="design__tcCheckbox" /></span>
                     <span className="objname_col d__obj_head" >Object Name</span>
                     <span className="keyword_col d__key_head" >Keyword</span>
                     <span className="input_col d__inp_head" >Input</span>

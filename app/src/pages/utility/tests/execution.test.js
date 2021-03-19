@@ -45,21 +45,6 @@ describe('Execution Metrics', () => {
         
         const fieldComponents = findByTestAtrr(wrapper, 'util__input');
 
-        // const d=fieldComponents.at(0)
-        // console.log(d.debug())
-        // d.simulate('click')
-        // wrapper.update()
-        // console.log(wrapper.find(Datetime).at(0).prop('value'))
-        // jest.spyOn(React,'useState')
-
-        // const props = {
-        //     date: "sdfsdf",
-        //     setDate: jest.fn()
-        // }
-        // const dateWrapper = mount(<CalendarComp {...props} />)
-
-        // console.log(dateWrapper.props())
-
         for (let i=0; i<fieldComponents.length; i++){
             if (i>1){
                 fieldComponents.at(i).simulate('focus');
@@ -69,10 +54,22 @@ describe('Execution Metrics', () => {
                     }
                 })
                 expect(fieldComponents.at(i).instance().value.length).toBeGreaterThan(0);
-            }
-            
+            }            
         }
 
+        const resetButton = findByTestAtrr(wrapper, "util__reset");
+
+        resetButton.simulate("click");
+        wrapper.update();
+        for (let i=0; i<fieldComponents.length; i++){
+            if (i>1){
+                expect(fieldComponents.at(i).instance().value.length).toBe(0);
+            }            
+        }
+
+    })
+
+    it("Should Fetch Without Mandatory Values", ()=>{
 
     })
 });

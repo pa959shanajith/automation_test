@@ -101,8 +101,8 @@ const ExecutionMetrics = props => {
             </span>
         </div>
         <div className="execM__btnGroup">
-            <button onClick={handleSubmit}>Fetch</button>
-            <button onClick={handleReset}>Reset</button>
+            <button onClick={handleSubmit} data-test="util__fetch">Fetch</button>
+            <button onClick={handleReset} data-test="util__reset">Reset</button>
         </div>
         <div className="execM__inputGroup">
             <span className="execM__inputLabel" data-test="util__inputLabel">From Date<span className="execM__mandate">*</span></span>
