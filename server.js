@@ -145,7 +145,7 @@ if (cluster.isMaster) {
 				httpOnly: true,
 				secure: true,
 				maxAge: parseInt(process.env.SESSION_AGE),
-				sameSite: true
+				sameSite: 'lax'
 			},
 			resave: false,
 			rolling: true,
