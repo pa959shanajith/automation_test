@@ -91,20 +91,20 @@ const Toolbarmenu = ({setPopup,setBlockui,displayError}) => {
     return(
         <Fragment>
         <div className='toolbar__header'>
-            <label>Project:</label>
-            <select value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
+            <label data-test="projectLabel">Project:</label>
+            <select data-test="projectSelect" value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
                 {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
             </select>
-            <span className='toolbar__header-menus'>
+            <span data-test="headerMenu" className='toolbar__header-menus'>
                 <i className={"fa fa-crop fa-lg"+(selectBox?' active-map':'')} title="add a rectangle" onClick={clickSelectBox}></i>
                 <i className="fa fa-files-o fa-lg" title="copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
             </span>
-            <span className='toolbar__header-searchbox'>
+            <span data-test="searchBox" className='toolbar__header-searchbox'>
                 <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
                 <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
             </span>
-            <button className='btn' title="Create New Mindmap" onClick={()=>CreateNew()}>Create New</button>
+            <button data-test="createNew" className='btn' title="Create New Mindmap" onClick={()=>CreateNew()}>Create New</button>
         </div>
         </Fragment>
     )

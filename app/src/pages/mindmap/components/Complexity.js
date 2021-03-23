@@ -69,8 +69,8 @@ const Container = ({type,nclist,refs,setRefs,setNclist}) => {
                 <div data-test="complexRows" key={i+'_cmplx'} className='complx_row'>
                     <label>{e[0]}</label>  
                     <select ref={refs[i]} label={e[0]} defaultValue={nclist?nclist[i+1]:undefined} onChange={onFormChange}>
-                        <option selected disabled={true}>Select Option</option>
-                        {e[1].map(k=><option value={k}>{k}</option>)} 
+                        <option  selected disabled={true}>Select Option</option>
+                        {e[1].map(k=><option key={k+"_cr"} value={k}>{k}</option>)} 
                     </select>
                 </div>
             ))}
