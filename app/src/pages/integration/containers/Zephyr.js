@@ -37,12 +37,12 @@ const Zephyr = () => {
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
         else if (domainDetails === "Invalid Session") return RedirectPage(history);
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
-        else if (domainDetails === "noprojectfound") setLoginError("Invalid credentials or no project found");
-        else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
+        // else if (domainDetails === "noprojectfound") setLoginError("Invalid credentials or no project found");
+        // else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
         else if (domainDetails === "fail") setLoginError("Fail to Login");
-        else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Unable to run Zephyr");
-        else if (domainDetails === "Error:Zephyr Operations") setLoginError("Failed during execution");
-        else {
+        // else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Unable to run Zephyr");
+        // else if (domainDetails === "Error:Zephyr Operations") setLoginError("Failed during execution");
+        else if (domainDetails) {
             setDomainDetails(domainDetails);
             setLoginSuccess(true);
         }

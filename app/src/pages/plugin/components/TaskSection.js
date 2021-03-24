@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, PopupMsg } from '../../global';
+import {v4 as uuid} from 'uuid';
+import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, PopupMsg, GenerateTaskList } from '../../global';
 import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as pluginApi from "../api";
@@ -10,6 +12,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
     const history = useHistory();
 
+    const taskJson = useSelector(state=>state.plugin.tasksJson);
     const [showSearch, setShowSearch] = useState(false);
     const [activeTab, setActiveTab] = useState("todo");
     const [reviewItems, setReviewItems] = useState([]);
@@ -17,7 +20,6 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [searchItems, setSearchItems] = useState([]);
     const [dataObj, setDataObj] = useState([]);
     const [dataDictState, setDataDictState] = useState({ 'project' : {}, 'apptypes' : [], 'tasktypes' : [], 'projectDict': {}, 'cycleDict': {}});
-    const [taskJson, setTaskJson] = useState(null);
     const [searchValue, setSearchValue] = useState("");
     const [overlay, setOverlay] = useState("");
     const [notManager, setNotManager] = useState(true);
@@ -38,64 +40,24 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 if(data === "Fail" || data === "Invalid Session") return RedirectPage(history);
                 else {
                     pluginApi.getTaskJson_mindmaps(data)
-                    .then(data1 => {
+                    .then(tasksJson => {
                         //eslint-disable-next-line
                         dataDict = dataDictState;
-                        // to render components which will populate under review
-                        let review_items = []
-                        // to render components which will populate under todo
-                        let todo_items = []
-                        if(data1 === "Fail" || data1 === "Invalid Session") return RedirectPage(history);
-                        else {
-                            let tasksJson = data1;
-                            setTaskJson(data1);
-                            dispatch({type: actionTypes.SET_TASKSJSON, payload: tasksJson});
-                            if (tasksJson.length === 0) setOverlay("");
-                            
-                            let length_tasksJson = tasksJson.length;
-                            let tempDataObj = [];
-                            for (let i=0 ; i < length_tasksJson ; i++){
-                                let taskname = tasksJson[i].taskDetails[0].taskName;
-                                let tasktype = tasksJson[i].taskDetails[0].taskType;
-                                let status = tasksJson[i].taskDetails[0].status;
-                                let dataobj={
-                                    'accessibilityParameters': tasksJson[i].accessibilityParameters,
-									'scenarioflag':tasksJson[i].scenarioFlag,
-									'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
-                                    'apptype':tasksJson[i].appType,
-                                    'projectid':tasksJson[i].projectId,
-                                    'screenid':tasksJson[i].screenId,
-                                    'screenname':tasksJson[i].screenName,
-                                    'testcaseid':tasksJson[i].testCaseId,
-                                    'testcasename':tasksJson[i].testCaseName,
-                                    'taskname':taskname,
-                                    'scenarioid':tasksJson[i].scenarioId,
-                                    'taskdes':tasksJson[i].taskDetails[0].taskDescription,
-                                    'tasktype':tasktype,
-                                    'subtask':tasksJson[i].taskDetails[0].subTaskType,
-                                    'subtaskid':tasksJson[i].taskDetails[0].subTaskId,
-                                    'assignedtestscenarioids':tasksJson[i].assignedTestScenarioIds,
-                                    'assignedto':tasksJson[i].taskDetails[0].assignedTo,
-                                    'startdate':tasksJson[i].taskDetails[0].startDate,
-                                    'exenddate':tasksJson[i].taskDetails[0].expectedEndDate,
-                                    'status':status,
-                                    'versionnumber':tasksJson[i].versionnumber,
-                                    'batchTaskIDs':tasksJson[i].taskDetails[0].batchTaskIDs,
-                                    'releaseid':tasksJson[i].taskDetails[0].releaseid,
-                                    'cycleid':tasksJson[i].taskDetails[0].cycleid,
-                                    'reuse':tasksJson[i].taskDetails[0].reuse
-                                    }
-                                
-                                tempDataObj.push(dataobj);
-                                
-                                if (status === 'underReview') review_items.push({'panel_idx': i, 'testSuiteDetails': tasksJson[i].testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-                                else todo_items.push({'panel_idx': i, 'testSuiteDetails': tasksJson[i].testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-                                
+
+                        if(tasksJson === "Fail" || tasksJson === "Invalid Session") return RedirectPage(history);
+                        else {                            
+                            for (let i=0 ; i < tasksJson.length ; i++){
+                                tasksJson[i].uid = uuid();
                                 fillFilterValues(tasksJson[i],0);
                             }
-                            setReviewItems(review_items);
-                            setTodoItems(todo_items);
-                            setDataObj(tempDataObj);
+
+                            let { dataObjList, reviewList, todoList } = GenerateTaskList(tasksJson, "pluginList");
+
+                            // setTaskJson(tasksJson);
+                            dispatch({type: actionTypes.SET_TASKSJSON, payload: tasksJson});
+                            setReviewItems(reviewList);
+                            setTodoItems(todoList);
+                            setDataObj(dataObjList);
                             setOverlay("");
                         }
 
@@ -142,7 +104,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         setTodoItems([]);
         setSearchItems([]);
         setDataDictState({ 'project' : {}, 'apptypes' : [], 'tasktypes' : [], 'projectDict': {}, 'cycleDict': {} });
-        setTaskJson(null);
+        // setTaskJson(null);
         setSearchValue("");
         setOverlay("");
         setNotManager(true);

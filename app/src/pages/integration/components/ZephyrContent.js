@@ -1,13 +1,16 @@
 import React,{Fragment, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import * as api from '../api.js';
 import MappingPage from '../containers/MappingPage';
+import { RedirectPage } from '../../global/index.js';
 import CycleNode from './ZephyrTree';
-import { useSelector, useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
 
 
 const ZephyrContent = props => {
     const dispatch = useDispatch();
+    const history = useHistory();
     const user_id = useSelector(state=> state.login.userinfo.user_id); 
     const mappedPair = useSelector(state=>state.integration.mappedPair);
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
@@ -30,7 +33,15 @@ const ZephyrContent = props => {
         const releaseData = await api.zephyrProjectDetails_ICE(projectId, user_id);
         if (releaseData.error)
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: releaseData.error}});
-        else {
+        else if (releaseData === "unavailableLocalServer")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ICE not available", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
+        else if (releaseData === "scheduleModeOn")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
+        else if (releaseData === "Invalid Session")
+            return RedirectPage(history);
+        else if (releaseData === "invalidcredentials")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Invalid Credentials"}});
+        else if (releaseData) {
             setReleaseArr(releaseData);
             setProjectDropdn1(projectId);
             clearSelections();
@@ -44,7 +55,13 @@ const ZephyrContent = props => {
         const testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId, user_id);
         if (testAndScenarioData.error)
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: testAndScenarioData.error}});
-        else {
+        else if (testAndScenarioData === "unavailableLocalServer")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ICE not available", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
+        else if (testAndScenarioData === "scheduleModeOn")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
+        else if (testAndScenarioData === "Invalid Session")
+            return RedirectPage(history);
+        else if (testAndScenarioData) {
             setProjectDetails(testAndScenarioData.project_dets);
             setAvoProjects(testAndScenarioData.avoassure_projects);  
             setSelectedRel(releaseId);  

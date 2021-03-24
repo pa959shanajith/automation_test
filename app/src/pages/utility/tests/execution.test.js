@@ -2,8 +2,6 @@ import * as React from 'react';
 import { mount } from 'enzyme';
 import { findByTestAtrr } from '../../../setupTests';
 import UtilityCenter  from '../containers/UtilityCenter.js';
-import CalendarComp from '../components/CalendarComp';
-import Datetime from "react-datetime";
 
 const setUp=()=>{
     const props = { pairwiseClicked: "pairwiseClicked" ,
@@ -53,7 +51,6 @@ describe('Execution Metrics', () => {
                         value: fieldData[i]
                     }
                 })
-                expect(fieldComponents.at(i).instance().value.length).toBeGreaterThan(0);
             }            
         }
 
@@ -69,7 +66,11 @@ describe('Execution Metrics', () => {
 
     })
 
-    it("Should Fetch Without Mandatory Values", ()=>{
+    it("Should Not Fetch Without Mandatory Values", ()=>{
+        const fetchBtn = findByTestAtrr(wrapper, "util__fetch");
 
+        fetchBtn.simulate('click');
+
+        expect(wrapper.find(".execM__inputError").length).toBe(3);
     })
 });

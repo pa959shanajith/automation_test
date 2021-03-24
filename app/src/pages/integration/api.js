@@ -343,10 +343,10 @@ export const loginToZephyr_ICE = async(zephyrurl, username, password) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'No User Details Found ,Please Login Again'}
+        return {error:'Failed to get list.'}
     }catch(err){
         console.error(err)
-        return {error:'No User Details Found ,Please Login Again'}
+        return {error:'Failed to get list.'}
     }
 }
 
@@ -402,10 +402,10 @@ export const zephyrCyclePhase_ICE = async(releaseId, user_id) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'No Release Found, Please add Release'}
+        return {error:'Failed to get list.'}
     } catch(err){
         console.error(err)
-        return {error:'No Release Found, Please add Release'}
+        return {error:'Failed to get list.'}
     }
 }
 
@@ -485,9 +485,9 @@ export const zephyrTestcaseDetails_ICE = async(zephyraction, treeId) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'Error in getting list.'}
+        return {error:'Failed to fetch testcases'}
     }catch(err){
         console.error(err)
-        return {error:'Error in getting list.'}
+        return {error:'Failed to fetch testcases'}
     }
 }

@@ -166,7 +166,7 @@ const RefBarItems = props => {
 				if (tag === "others") {
 					scrapedItems.forEach(item => {
                         if (!["button", "checkbox", "select", "img", "a", "radiobutton", "input", "list",
-                             "link", "scroll bar", "internal frame", "table"].includes(item.tag) &&
+                             "link", "scroll bar", "internal frame", "table", "grid"].includes(item.tag) &&
 							item.tag.toLowerCase().indexOf("button") === -1 &&
 							item.tag.toLowerCase().indexOf("edit") === -1 &&
 							item.tag.toLowerCase().indexOf("edit box") === -1 &&
@@ -177,6 +177,7 @@ const RefBarItems = props => {
 							item.tag.toLowerCase().indexOf("check box") === -1 &&
 							item.tag.toLowerCase().indexOf("checkbox") === -1 &&
 							item.tag.toLowerCase().indexOf("image") === -1 &&
+							item.tag.toLowerCase().indexOf("grid") == -1 &&
 							(item.tag.toLowerCase().indexOf("table") === -1 || item.tag.toLowerCase() === "tablecell") &&
 							item.tag.toLowerCase().indexOf("radio button") === -1) {
 								item.hide = false;

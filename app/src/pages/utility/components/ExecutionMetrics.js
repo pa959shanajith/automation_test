@@ -37,7 +37,7 @@ const ExecutionMetrics = props => {
                 toDate: toDate,
                 LOB: lob,
                 status: status,
-                executionID: executionId
+                executionId: executionId
             }
         }
 
