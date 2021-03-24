@@ -473,11 +473,12 @@ const DesignContent = props => {
         setHeaderCheck(false);
         setFocusedRow(insertedRowIdx);
         setChanged(true);
+        document.getElementById('design__tcCheckbox').indeterminate = false;
         // setEdit(false);
     }
 
     const selectMultiple = () => {
-        setHeaderCheck(false);
+        // setHeaderCheck(false);
         setFocusedRow(null);
         setShowSM(true);
     }
@@ -486,6 +487,7 @@ const DesignContent = props => {
         stepList.push(...checkedRows)
         let newChecks = Array.from(new Set(stepList))
         setCheckedRows([...newChecks]);
+        document.getElementById('design__tcCheckbox').indeterminate = newChecks.length!==0 && newChecks.length !== testCaseData.length;
         setShowSM(false);
     }
 
@@ -503,6 +505,7 @@ const DesignContent = props => {
             setFocusedRow(focus);
             setEdit(true);
             setDraggable(false);
+            document.getElementById('design__tcCheckbox').indeterminate = check.length!==0 && check.length !== testCaseData.length;
         }
     }
 
@@ -511,6 +514,7 @@ const DesignContent = props => {
         setFocusedRow(null);
         setHeaderCheck(false);
         setEdit(false);
+        document.getElementById('design__tcCheckbox').indeterminate = false;
 
         if (draggable) setDraggable(false);
         else setDraggable(true);
@@ -543,6 +547,7 @@ const DesignContent = props => {
                 setEdit(false);
             }
             setCheckedRows([]);
+            document.getElementById('design__tcCheckbox').indeterminate = false;
             setHeaderCheck(false);
             setFocusedRow(null);
         }
@@ -617,6 +622,7 @@ const DesignContent = props => {
         setShowPS(false);
         setFocusedRow(toFocus);
         setCheckedRows([]);
+        document.getElementById('design__tcCheckbox').indeterminate = false;
         setHeaderCheck(false);
         setChanged(true);
     }
@@ -644,6 +650,7 @@ const DesignContent = props => {
             // setRowChange(!rowChange);
             setChanged(true);
             setCommentFlag(true);
+            document.getElementById('design__tcCheckbox').indeterminate = false;
         }
     }
 
