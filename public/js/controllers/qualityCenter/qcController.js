@@ -771,7 +771,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 							$(".mappedFiles").find(".mapline"+i).append('<label class="almtestcaselink viewTab" style="display:none; float: right; width: 50%; background-color: #fad7f1fb; margin-bottom: 0px; border-radius: 0px" data-qctestset="'+data[i].qctestset[j]+'" data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath[j]+'" data-qcproject="'+data[i].qcproject+'" title="'+data[i].qctestcase[j]+'"><span class="viewTextSpan">'+data[i].qctestcase[j]+'</span><span class="viewImageSpan"><img  class="viewUndoSyncronise" title="Undo" src="imgs/ic-qcUndoSyncronise.png"></span></label>');
 							almTestCaseMapping+=1;
 						} else {
-							$(".mappedFiles").find(".mapline"+i).append('<label class="viewTab" style="display:none; float: right; width: 50%; margin-bottom: 0px; height: 32px;"></label>');
+							$(".mappedFiles").find(".mapline"+i).append('<label class="viewTab" style="display:none; float: right; width: 50%; margin-bottom: 5px; height: 32px;"></label>');
 						}
 					} 
 				}	
