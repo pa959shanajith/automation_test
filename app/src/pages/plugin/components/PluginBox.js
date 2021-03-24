@@ -1,6 +1,5 @@
 import React, { useState} from 'react';
 import { Redirect } from 'react-router-dom';
-import PropTypes from 'prop-types';
 
 const PluginBox = ({plugin}) => {
 
@@ -18,15 +17,13 @@ const PluginBox = ({plugin}) => {
 
     return (
 		<>
-			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
-            <div data-test="plugin-blocks" className="plugin-block" onClick={pluginRedirect}>
-                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${plugin.image}.png`} />
-                <span data-test="plugin-name" className="plugin-text">{plugin.pluginName}</span>
+			{ redirectTo && <Redirect to={redirectTo} />}
+            <div className="plugin-block" onClick={pluginRedirect}>
+                <img className="plugin-ic" alt="plugin-ic" src={`static/imgs/${plugin.pluginName}.svg`} />
+                <span className="plugin-text">{plugin.pluginName}</span>
         	</div>
 		</>
     );
 }
-PluginBox.propTypes={
-    plugin:PropTypes.object
-}
+
 export default PluginBox;
