@@ -4,6 +4,7 @@ import { ModalContainer, RedirectPage } from '../../global';
 import { irisObjectTypes } from './ListVariables';
 import { updateIrisDataset, userObjectElement_ICE } from '../api';
 import "../styles/EditIrisObject.scss";
+import PropTypes from 'prop-types'
 
 const EditIrisObject = props => {
 
@@ -93,8 +94,8 @@ const EditIrisObject = props => {
                 content={
                     <div className="ss__ei_body">
                         <div className="ss__ei_info_panel">
-                            <span>Object Type:</span>
-                            <span><select className="ss__ei_objType" value={selectedType} onChange={onSelectType}>
+                            <span data-test="objTypeHeading">Object Type:</span>
+                            <span><select data-test="selectObjType" className="ss__ei_objType" value={selectedType} onChange={onSelectType}>
                                 <option className="ss__ei_options" disabled value={0}>Select Object Type</option>
                                 { Object.keys(irisObjectTypes).map((key, i) => <option key={i} className="ss__ei_options" value={key}>
                                         {irisObjectTypes[key].name}
@@ -102,33 +103,38 @@ const EditIrisObject = props => {
                             </select></span>
                             { irisObjectTypes[selectedType] && irisObjectTypes[selectedType].states.length > 1 ?
                                 <> 
-                                <span>Object Status:</span>
+                                <span data-test="objStatusHeading">Object Status:</span>
                                 <span>
-                                    <select className="ss__ei_objType" value={selectedStatus} onChange={onSelectStatus}>
+                                    <select data-test="selectobjStatus" className="ss__ei_objType" value={selectedStatus} onChange={onSelectStatus}>
                                         <option className="ss__ei_options" value={0}>Unchecked</option>
                                         <option className="ss__ei_options" value={1}>Checked</option>
                                     </select>
                                 </span>
                                 </>
                                 : null }
-                            <span>Object Tag:</span>
-                            <span>{props.utils.object.xpath.split(";").pop()}</span>
+                            <span data-test="objTag">Object Tag:</span>
+                            <span data-test="objTagValue">{props.utils.object.xpath.split(";").pop()}</span>
                         </div>
                         <div className="ss__ei_img_panel">
                             <span>Object Image</span>
                             <div className="ss__ei_img_box">
-                                <img className="ss__ei_img" alt="iris" src={`data:image/PNG;base64,${props.utils.cord.substring(2, props.utils.cord.length - 1)}`}/>
+                                <img data-test="irirsImage" className="ss__ei_img" alt="iris" src={`data:image/PNG;base64,${props.utils.cord.substring(2, props.utils.cord.length - 1)}`}/>
                             </div>
                         </div>
                     </div>
                 }
                 footer={
-                    <button onClick={submitData}>Submit</button>
+                    <button data-test="submit" onClick={submitData}>Submit</button>
                 }
                 close={()=>props.setShow(false)}
             />
         </div>
     ); 
 }
-
+EditIrisObject.propTypes={
+    utils:PropTypes.object,
+    taskDetails:PropTypes.object,
+    setShow:PropTypes.func,
+    setShowPop:PropTypes.func
+}
 export default EditIrisObject;

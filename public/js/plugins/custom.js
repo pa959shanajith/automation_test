@@ -204,7 +204,7 @@ $(document).ready(function() {
 			if(window.location.pathname != "/scheduling"){
 				var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
 				for(var i = 0 ; i < selectedTask.length ; i++){
-					if(ct.taskName === selectedTask[i].textContent && (ct.cycleid === tj[i].testSuiteDetails[0].cycleid || ct.cycleid === tj[i].cycleid)){
+					if(ct.uid == tj[i].uid){
 						selectedTask[i].onclick = null;
 						selectedTask[i].parentNode.style.cursor = "default";
 						selectedTask[i].parentNode.style.webkitFilter = "brightness(50%)";
@@ -377,6 +377,9 @@ function loadUserTasks(){
 				taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 			}
 			var dataobj = {
+				'uid': tasksJson[i].uid,
+				'accessibilityParameters': tasksJson[i].accessibilityParameters,
+				'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',					
 				'scenarioflag':tasksJson[i].scenarioFlag,
 				'apptype':tasksJson[i].appType,
 				'projectid':tasksJson[i].projectId,
@@ -455,6 +458,8 @@ function taskRedirectionInner(testsuitedetails,dataobj){
 		dataobj_json.status='inprogress';
 	}
 	taskObj.scenarioFlag = dataobj_json.scenarioflag;
+	taskObj.scenarioTaskType = dataobj_json.scenarioTaskType;
+	taskObj.accessibilityParameters = dataobj_json.accessibilityParameters;
 	taskObj.assignedTestScenarioIds = dataobj_json.assignedtestscenarioids;
 	taskObj.screenId = dataobj_json.screenid;
 	taskObj.screenName = dataobj_json.screenname;
@@ -472,6 +477,7 @@ function taskRedirectionInner(testsuitedetails,dataobj){
 	taskObj.releaseid = dataobj_json.releaseid;
 	taskObj.cycleid = dataobj_json.cycleid;
 	taskObj.reuse=dataobj_json.reuse;
+	taskObj.uid = dataobj_json.uid;
 	taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
 	window.localStorage['_CT'] = JSON.stringify(taskObj);
 	if(dataobj_json.subtasktype == "Scrape"){

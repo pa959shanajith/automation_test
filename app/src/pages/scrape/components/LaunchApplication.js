@@ -38,20 +38,20 @@ const LaunchApplication = props => {
 
     const desktopApp = {
         'content': <div className="ss__desktop_dlg">
-            <input className={'ss__dsktp_wndw_name'+(error.windowName ? " la_invalid": "")} placeholder='Enter window name' value={windowName} onChange={windowNameHandler}/>
-            <input className={"ss__dsktp_prc_id"+(error.processID ? " la_invalid" : "")} placeholder='Enter process ID' value={processID} onChange={processIDHandler}/>
+            <input data-test="windowName" className={'ss__dsktp_wndw_name'+(error.windowName ? " la_invalid": "")} placeholder='Enter window name' value={windowName} onChange={windowNameHandler}/>
+            <input data-test="processID" className={"ss__dsktp_prc_id"+(error.processID ? " la_invalid" : "")} placeholder='Enter process ID' value={processID} onChange={processIDHandler}/>
         </div>,
         'footer': <div className="ss__sdkpt_footer">
             <span className="ss__dskp_footer_span">
                 Object Identification: 
                 <label className="ss__dsktp_method">
-                    <input className="ss__dsktp_method_rad" type="radio" name="method" value="A" checked={selectedMethod === "A"} onChange={onMethodSelect}/>Method A
+                    <input data-test="methodA" className="ss__dsktp_method_rad" type="radio" name="method" value="A" checked={selectedMethod === "A"} onChange={onMethodSelect}/>Method A
                 </label>
                 <label className="ss__dsktp_method">
-                    <input className="ss__dsktp_method_rad" type="radio" name="method" value="B" checked={selectedMethod === "B"} onChange={onMethodSelect}/>Method B
+                    <input data-test="methodB" className="ss__dsktp_method_rad" type="radio" name="method" value="B" checked={selectedMethod === "B"} onChange={onMethodSelect}/>Method B
                 </label>
             </span>
-            <button onClick={onDesktopLaunch} style={{width: "100px"}}>
+            <button data-test="desktopLaunch" onClick={onDesktopLaunch} style={{width: "100px"}}>
                 Launch
             </button>
         </div>
@@ -75,8 +75,8 @@ const LaunchApplication = props => {
     }
 
     const sapApp = {
-        'content': <input className={'ss__sap_input'+(error.appName ? " la_invalid" : "")} placeholder='Enter the .exe path;App Name' value={appName} onChange={appNameHandler}/>,
-        'footer': <button onClick={onSapLaunch} style={{width: "100px"}}>Launch</button>
+        'content': <input data-test="exePath" className={'ss__sap_input'+(error.appName ? " la_invalid" : "")} placeholder='Enter the .exe path;App Name' value={appName} onChange={appNameHandler}/>,
+        'footer': <button data-test="sapLaunch"onClick={onSapLaunch} style={{width: "100px"}}>Launch</button>
     }
 
     // Mobile App
@@ -124,22 +124,22 @@ const LaunchApplication = props => {
         'content': <div className="ss__mblapp_inputs">
                 { !os && <div className="ss__mblapp_os_op">Choose OS</div>}
                 <div className="ss__mblapp_chooseApp">
-                    <button className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={()=>{setOS("android"); setError(false);}}>Android</button>
-                    <button className={"ss__mblapp_os_b"+(os==="ios" ? " ss__os_active":"")} onClick={()=>{setOS("ios"); setError(false);}}>iOS</button>
+                    <button data-test="chooseAndriod" className={"ss__mblapp_os_b"+(os==="android" ? " ss__os_active":"")} onClick={()=>{setOS("android"); setError(false);}}>Android</button>
+                    <button data-test="chooseIOS"className={"ss__mblapp_os_b"+(os==="ios" ? " ss__os_active":"")} onClick={()=>{setOS("ios"); setError(false);}}>iOS</button>
                 </div>
                 { os === "ios" && <>
-                    <input className={"ss__mblapp_input"+(error.appPath2 ? " la_invalid": "")} placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler}/>
-                    <input className={"ss__mblapp_input"+(error.verNum ? " la_invalid": "")} placeholder='Enter Version Number' value={verNum} onChange={verNumHandler}/>
-                    <input className={"ss__mblapp_input"+(error.deviceName ? " la_invalid": "")} placeholder='Enter Device Name'value={deviceName} onChange={deviceNameHandler}/>
-                    <input className={"ss__mblapp_input"+(error.uuid ? " la_invalid": "")} placeholder='Enter UDID' value={uuid} onChange={uuidHandler}/>
+                    <input data-test="iosApppath" className={"ss__mblapp_input"+(error.appPath2 ? " la_invalid": "")} placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler}/>
+                    <input data-test="iosVersionNumber" className={"ss__mblapp_input"+(error.verNum ? " la_invalid": "")} placeholder='Enter Version Number' value={verNum} onChange={verNumHandler}/>
+                    <input data-test="iosDeviceName" className={"ss__mblapp_input"+(error.deviceName ? " la_invalid": "")} placeholder='Enter Device Name'value={deviceName} onChange={deviceNameHandler}/>
+                    <input data-test="iosUDID" className={"ss__mblapp_input"+(error.uuid ? " la_invalid": "")} placeholder='Enter UDID' value={uuid} onChange={uuidHandler}/>
                 </> }
                 { os === "android" && <>
-                    <input className={"ss__mblapp_input"+(error.appPath ? " la_invalid": "")} placeholder="Enter Application path" value={appPath} onChange={appPathHandler}/> 
-                    <input className={"ss__mblapp_input"+(error.sNum ? " la_invalid": "")} placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} />
+                    <input data-test="andriodAppPath" className={"ss__mblapp_input"+(error.appPath ? " la_invalid": "")} placeholder="Enter Application path" value={appPath} onChange={appPathHandler}/> 
+                    <input data-test="andriodSerialNumber" className={"ss__mblapp_input"+(error.sNum ? " la_invalid": "")} placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} />
                 </> }
         </div>,
 
-        'footer': <button onClick={onMobileAppLaunch} style={{width: "100px"}}>Launch</button>
+        'footer': <button data-test="mobileAppLaunch" onClick={onMobileAppLaunch} style={{width: "100px"}}>Launch</button>
     }
 
     // OEBS
@@ -159,8 +159,8 @@ const LaunchApplication = props => {
     }
 
     const oebsApp = {
-        'content': <input className={'ss__oebs_input'+(error.winName ? " la_invalid": "")} placeholder='Enter window name' value={winName} onChange={winNameHandler}/>,
-        'footer': <button onClick={onWinLaunch} style={{width: "100px"}}>Launch</button>
+        'content': <input data-test="oebsWinName" className={'ss__oebs_input'+(error.winName ? " la_invalid": "")} placeholder='Enter window name' value={winName} onChange={winNameHandler}/>,
+        'footer': <button data-test="oebsLaunch" onClick={onWinLaunch} style={{width: "100px"}}>Launch</button>
     }
     
     
@@ -186,11 +186,11 @@ const LaunchApplication = props => {
 
     const mobileWeb = {
         'content': <div className="ss__mblweb_inputs">    
-            <input className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler}/> 
-            <input className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} />
+            <input data-test="MWserdev" className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler}/> 
+            <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} />
         </div>,
 
-        'footer': <button onClick={onMobileWebLaunch} style={{width: "100px"}}>Launch</button>
+        'footer': <button data-test="MWLaunch" onClick={onMobileWebLaunch} style={{width: "100px"}}>Launch</button>
     }
 
     const appDict = {'Desktop': desktopApp, "SAP": sapApp, 'MobileApp': mobileApp, 'OEBS': oebsApp, 'MobileWeb': mobileWeb}

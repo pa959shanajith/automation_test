@@ -474,8 +474,8 @@ function parseRequest(readChild) {
 }
 
 
-function parseJsonRequest(requestedBody,base_key,cur_key) {
-	xpaths=[]
+function parseJsonRequest(requestedBody,base_key,cur_key,xpaths) {
+	var xpaths=xpaths;
 	try {
 		logger.info("Inside the function parseRequest ");
      	for (var key in requestedBody){
@@ -484,13 +484,13 @@ function parseJsonRequest(requestedBody,base_key,cur_key) {
 				if (base_key!== "")  base_key+='/'+key;
 				else  base_key=key;
 				xpaths.push(base_key);
-				xpaths.concat(parseJsonRequest(value,base_key,key));
+				xpaths.concat(parseJsonRequest(value,base_key,key,xpaths));
 				base_key=base_key.slice(0,-key.length-1);
 
 			 }else if(Array.isArray(value)){
 				for (var i=0;i<value.length;i++){
 					base_key+=key+"["+i.toString()+"]";
-					xpaths.concat(parseJsonRequest(value[i],base_key,key));
+					xpaths.concat(parseJsonRequest(value[i],base_key,key,xpaths));
 				}
 					
 			 }else{
@@ -502,5 +502,5 @@ function parseJsonRequest(requestedBody,base_key,cur_key) {
 	} catch (exception) {
 		logger.error("Exception in the function parseRequest: %s", exception);
 	}
-	return xpaths
+	return xpaths;
 }
