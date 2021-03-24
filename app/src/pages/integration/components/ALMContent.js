@@ -182,11 +182,13 @@ const ALMContent = props => {
             testList = {folderDetails.length && ("testfolder" in folderDetails[0]) ?
                 <>    
                 <div className="test__rootDiv">
-                    <img alt="collapse"
-                        className="test_tree_toggle" 
-                        src="static/imgs/ic-qcCollapse.png"
-                    />
-                    <label>Root</label>
+                    <div className="test_tree_branches">
+                        <img alt="collapse"
+                            className="test_tree_toggle" 
+                            src="static/imgs/ic-qcCollapse.png"
+                        />
+                        <label>Root</label>
+                    </div>
                     {folderDetails[0].testfolder.map(folder =>
                         <FolderNode 
                             folderObject={folder}

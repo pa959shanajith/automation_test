@@ -177,11 +177,13 @@ const ZephyrContent = props => {
                 testList={ Object.keys(projectDetails).length ? 
                     <Fragment>    
                         <div className="test__rootDiv">
-                            <img alt="collapse"
-                                className="test_tree_toggle" 
-                                src="static/imgs/ic-qcCollapse.png"
-                            />
-                            <label>Root</label>
+                            <div className="test_tree_branches">
+                                <img alt="collapse"
+                                    className="test_tree_toggle" 
+                                    src="static/imgs/ic-qcCollapse.png"
+                                />
+                                <label>Root</label>
+                            </div>
                             { Object.keys(projectDetails)
                                 .map( cycleName => <CycleNode 
                                         key={cycleName}

@@ -491,3 +491,30 @@ export const zephyrTestcaseDetails_ICE = async(zephyraction, treeId) => {
         return {error:'Failed to fetch testcases'}
     }
 }
+
+export const saveUnsyncDetails = async(undoMapList) => {
+    try{
+        const res = await axios(url+'/saveUnsyncDetails', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                action: "saveUnsyncDetails",
+                undoMapList : undoMapList, 
+           }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to Unsync Mapped Files.'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to Unsync Mapped Files.'}
+    }
+}
