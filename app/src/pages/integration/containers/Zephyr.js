@@ -68,8 +68,8 @@ const Zephyr = () => {
         {viewMappedFlies === "Zephyr" ? 
             <MappedPage
                 screenType="Zephyr"
-                leftBoxTitle="Zephyr Tests"
-                rightBoxTitle="Avo Assure Scenarios"
+                leftBoxTitle="Avo Assure Scenarios"
+                rightBoxTitle="Zephyr Tests"
                 mappedfilesRes={mappedfilesRes}
             /> :
         <>
