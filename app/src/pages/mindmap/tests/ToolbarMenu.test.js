@@ -6,6 +6,7 @@ import ToolbarMenu from '../components/ToolbarMenu';
 import {Provider}  from 'react-redux';
 import {createStore} from 'redux';
 import reducer from '../state/reducer';
+import * as dummyData from './dummyData'
 const props={
     setPopup:jest.fn(),
     setBlockui:jest.fn(),
@@ -16,7 +17,7 @@ const state={
         selectBoxState:false,
         selectNodes:{"nodes":[],"links":[]},
         copyNodes:{"nodes":[],"links":[]},
-        projectList:{"5fb4fc98f4da702833d7e0a0":{"apptype":"5db0022cf87fdec084ae49b6","name":"test","apptypeName":"Web","id":"5fb4fc98f4da702833d7e0a0","releases":[{"cycles":[{"_id":"5fb4fc98f4da702833d7e09f","name":"c1"}],"name":"r1"}],"domains":"Banking"},"5fdde98cd2ce8ecfe968964a":{"apptype":"5db0022cf87fdec084ae49af","name":"desk","apptypeName":"Desktop","id":"5fdde98cd2ce8ecfe968964a","releases":[{"cycles":[{"_id":"5fdde98cd2ce8ecfe9689649","name":"c1"}],"name":"r1"}],"domains":"Banking"}},
+        projectList:dummyData.projectList,
         selectedProj:"5fb4fc98f4da702833d7e0a0",
         moduleList:[
             {"_id":"5fb4ffc5f4da702833d7e0a1","name":"Module_login","type":"basic"},
@@ -25,7 +26,19 @@ const state={
             {"_id":"605873b0b4e87f2ff0b0cb3d","name":"Module_789","type":"basic"}]
 }}
 const dataTestList=['projectLabel','projectSelect','headerMenu','searchBox','createNew']
-describe('rend',()=>{
+// positive
+describe('<ToolbarMenu/> Positive scenarios',()=>{
+    it('Shoudld contain the requied and expected props',()=>{ 
+        const expectedProps= {
+            setPopup:()=>{},
+            setBlockui:()=>{},
+            displayError:()=>{}
+    }
+        const propsError=checkProps(ToolbarMenu,expectedProps)
+        expect(propsError).toBeUndefined()
+    });
+});
+describe('<ToolbarMenu/> Positive Scenarios',()=>{
     let wrapper;
     beforeEach(()=>{
         const mockStore=createStore(reducer,state)

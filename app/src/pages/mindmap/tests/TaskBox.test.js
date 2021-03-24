@@ -13,44 +13,7 @@ document.body.innerHTML=dummyData.docTaskBox
 
 const state={
     mindmap:{
-        projectList:{
-            "5fb4fc98f4da702833d7e0a0": {
-                "apptype": "5db0022cf87fdec084ae49b6",
-                "name": "test",
-                "apptypeName": "Web",
-                "id": "5fb4fc98f4da702833d7e0a0",
-                "releases": [
-                    {
-                        "cycles": [
-                            {
-                                "_id": "5fb4fc98f4da702833d7e09f",
-                                "name": "c1"
-                            }
-                        ],
-                        "name": "r1"
-                    }
-                ],
-                "domains": "Banking"
-            },
-            "5fdde98cd2ce8ecfe968964a": {
-                "apptype": "5db0022cf87fdec084ae49af",
-                "name": "desk",
-                "apptypeName": "Desktop",
-                "id": "5fdde98cd2ce8ecfe968964a",
-                "releases": [
-                    {
-                        "cycles": [
-                            {
-                                "_id": "5fdde98cd2ce8ecfe9689649",
-                                "name": "c1"
-                            }
-                        ],
-                        "name": "r1"
-                    }
-                ],
-                "domains": "Banking"
-            }
-        },
+        projectList:dummyData.projectList,
         unassignTask:[],
         selectedProj:"5fb4fc98f4da702833d7e0a0"
     },
@@ -142,6 +105,29 @@ const itemList=['taskLabel','taskSelect','assignedtoLabel','assignedselect1','re
 const notDisplayed=['batchLabel','batchInput','assignedselect2','reviewSelect2','propogateLabel','propogateInput','reassign']
 
 // Positive 
+describe('<TaskBox/> Positive scenarios',()=>{
+    it('Shoudld contain the requied and expected props',()=>{ 
+        const expectedProps= {
+            "setPopup": ()=>{},
+            "clickUnassign": ()=>{},
+            "nodeDisplay": {"A":1},
+            "releaseid": "0",
+            "cycleid": "abcd",
+            "ctScale": {
+              "x": 240.17000000000002,
+              "y": 159.5,
+              "k": 1
+            },
+            "nid": "node_3",
+            "dNodes":[],
+            "setTaskBox": ()=>{},
+            "clickAddTask": ()=>{},
+            "displayError": ()=>{}
+    }
+        const propsError=checkProps(TaskBox,expectedProps)
+        expect(propsError).toBeUndefined()
+    });
+});
 describe('<TaskBox/> Positive Scenarios',()=>{
     let wrapper;
     beforeEach(()=>{

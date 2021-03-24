@@ -4,6 +4,7 @@ import {mount}from 'enzyme';
 import ToolbarMenuAssign from '../components/ToolbarMenuAssign';
 import {Provider}  from 'react-redux';
 import {createStore} from 'redux';
+import * as dummyData from './dummyData'
 import reducer from '../state/reducer';
 const props={
     "cycleRef": {
@@ -18,44 +19,7 @@ const props={
 const state={
     mindmap:{
         selectedProj:"5fb4fc98f4da702833d7e0a0",
-        projectList:{
-            "5fb4fc98f4da702833d7e0a0": {
-                "apptype": "5db0022cf87fdec084ae49b6",
-                "name": "test",
-                "apptypeName": "Web",
-                "id": "5fb4fc98f4da702833d7e0a0",
-                "releases": [
-                    {
-                        "cycles": [
-                            {
-                                "_id": "5fb4fc98f4da702833d7e09f",
-                                "name": "c1"
-                            }
-                        ],
-                        "name": "r1"
-                    }
-                ],
-                "domains": "Banking"
-            },
-            "5fdde98cd2ce8ecfe968964a": {
-                "apptype": "5db0022cf87fdec084ae49af",
-                "name": "desk",
-                "apptypeName": "Desktop",
-                "id": "5fdde98cd2ce8ecfe968964a",
-                "releases": [
-                    {
-                        "cycles": [
-                            {
-                                "_id": "5fdde98cd2ce8ecfe9689649",
-                                "name": "c1"
-                            }
-                        ],
-                        "name": "r1"
-                    }
-                ],
-                "domains": "Banking"
-            }
-        }
+        projectList:dummyData.projectList
     }
 }
 // Positive

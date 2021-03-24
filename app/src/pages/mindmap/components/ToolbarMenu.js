@@ -4,6 +4,7 @@ import {getModules,getScreens} from '../api';
 import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
+import PropTypes from 'prop-types'
 
 
 /*Component ToolbarMenu
@@ -197,5 +198,9 @@ const copy = (selectNodes,setPopup,copyNodes) =>{
     })
     return true;
 }
-
+Toolbarmenu.propTypes={
+    setPopup:PropTypes.func,
+    setBlockui:PropTypes.func,
+    displayError:PropTypes.func
+}
 export default Toolbarmenu;

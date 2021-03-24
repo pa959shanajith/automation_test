@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import {ModalContainer} from '../../global';
 import Complexity, {getComplexityLevel} from './Complexity';
 import CalendarComp from './CalendarComp';
+import PropTypes from 'prop-types'
 
 var unassignTask = []
 var reassignFlag = false
@@ -783,4 +784,17 @@ const taskAssign = {
         "attributes": ["at", "rw", "sd", "ed", "reestimation", "cx"]
     }
 };
+TaskBox.propTypes={
+    setPopup: PropTypes.func,
+    clickUnassign:PropTypes.func ,
+    nodeDisplay: PropTypes.object,
+    releaseid: PropTypes.string,
+    cycleid: PropTypes.string,
+    ctScale:PropTypes.object ,
+    nid:PropTypes.string,
+    dNodes:PropTypes.array,
+    setTaskBox:PropTypes.func ,
+    clickAddTask:PropTypes.func ,
+    displayError:PropTypes.func 
+}
 export default TaskBox;
