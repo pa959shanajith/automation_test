@@ -13,6 +13,7 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
     const current_task = useSelector(state=>state.plugin.CT)
 
     const [popupState,setPopupState] = useState({show:false})
+    const [inputErrorBorder,setInputErrorBorder] = useState(false)
     const [loading,setLoading] = useState(false)
     const [smartMode,setSmartMode] = useState('normal')
     const [selectedICE,setSelectedICE] = useState("")
@@ -131,9 +132,9 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
                 <div className="allocate-ice-Modal">
                     <ModalContainer 
                         title={modalTitle} 
-                        footer={submitModalButton(iceNameIdMap, SubmitButton, selectedPool, smartMode, selectedICE, modalButton,scheSmartMode,ExeScreen)} 
+                        footer={submitModalButton(setInputErrorBorder, iceNameIdMap, SubmitButton, selectedPool, smartMode, selectedICE, modalButton,scheSmartMode,ExeScreen)} 
                         close={()=>{setAllocateICE(false)}}
-                        content={MiddleContent(exeTypeLabel, exeIceLabel, icePlaceholder, chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode,selectedICE, setSelectedICE, ExeScreen, scheSmartMode)}
+                        content={MiddleContent(inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeIceLabel, icePlaceholder, chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode,selectedICE, setSelectedICE, ExeScreen, scheSmartMode)}
                         // modalClass=" modal-md"
                     />
                 </div>
@@ -143,7 +144,7 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
     );
 } 
 
-const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode, selectedICE, setSelectedICE, ExeScreen, scheSmartMode) => {
+const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode, selectedICE, setSelectedICE, ExeScreen, scheSmartMode) => {
 
     const setSelectedICEState = (value) => {
         if(value==='normal' ) setSelectedICE("");
@@ -178,7 +179,7 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
             <div className='adminControl-ice popup-content'>
 				<div>
 					<span className="leftControl" title="Token Name">{exeIceLabel}</span>
-                    <DropDownList placeholder={icePlaceholder} data={availableICE} smartMode={(ExeScreen===true?smartMode:scheSmartMode)} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
+                    <DropDownList inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={icePlaceholder} data={availableICE} smartMode={(ExeScreen===true?smartMode:scheSmartMode)} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
 				</div>
 			</div>
 
@@ -209,16 +210,21 @@ const MiddleContent = (exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOp
     )
 }
 
-const submitModalButton = (iceNameIdMap, SubmitButton,  selectedPool, smartMode, selectedICE, modalButton, scheSmartMode, ExeScreen) => {
+const submitModalButton = (setInputErrorBorder, iceNameIdMap, SubmitButton,  selectedPool, smartMode, selectedICE, modalButton, scheSmartMode, ExeScreen) => {
     const executionData = {};
     executionData.type = (ExeScreen===true?smartMode:scheSmartMode)
     executionData.poolid =  selectedPool
     if((ExeScreen===true?smartMode:scheSmartMode) !== "normal") executionData.targetUser = Object.keys(selectedICE);
     else executionData.targetUser = selectedICE
 
+    const buttonAction = () => {
+        if(ExeScreen!==true && selectedICE==="") setInputErrorBorder(true);
+        else SubmitButton(executionData, iceNameIdMap);
+    }
+
     return(
         <div>
-            <button type="button" onClick={()=>{SubmitButton(executionData, iceNameIdMap);}} >{modalButton}</button>
+            <button type="button" onClick={()=>{buttonAction()}} >{modalButton}</button>
         </div>
     )
 }

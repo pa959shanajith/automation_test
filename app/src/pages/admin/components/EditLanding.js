@@ -28,7 +28,7 @@ const EditLanding = (props) => {
             <div className="col-xs-9 " style={{paddingTop:"5%"}}>
                 <div className='userForm-edit adminControl-edit'>
                     <button title={userConf.fType} className="userTypeBtn_conv-edit " style={{margin:"4px 0",right:"0",cursor:"default"}}>{userConf.fType}</button>
-                    <input data-test="userListInputEdit" list="allUsersListauto" className=" btn-users dropdown-toggle-edit edit-user-dropdown-edit" onClick = {()=>{props.click();props.setShowDropdownEdit(!props.showDropdownEdit);}} type="text"  id="userIdName"  onChange={(event)=>{dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:event.target.value});props.searchFunctionUser(event.target.value);}} value={userConf.allUserFilter}  placeholder="Search User.." autoComplete="none"/>
+                    <input data-test="userListInputEdit" list="allUsersListauto" className=" btn-users edit-user-dropdown-edit" onClick = {()=>{props.click();props.setShowDropdownEdit(!props.showDropdownEdit);}} type="text"  id="userIdName"  onChange={(event)=>{dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:event.target.value});props.searchFunctionUser(event.target.value);}} value={userConf.allUserFilter}  placeholder="Search User.." autoComplete="none"/>
                     {(props.showDropdownEdit && userConf.allUsersList!==[])?
                         <div ref={node} className=" dropdown-menu-edit dropdown-menu-users-edit create-user__dropdown c__usersList" role="menu" style={{}}>
                             <ScrollBar scrollId='allUsersListauto' thumbColor="#929397" >
