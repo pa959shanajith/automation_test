@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {getAllSuites_ICE , getReportsData_ICE} from '../api';
+import {getAllSuites_ICE , getReportsData_ICE ,getAccessibilityData} from '../api';
 import * as actionTypes from '../state/action';
+import PropTypes from 'prop-types';
 import '../styles/ToolbarMenu.scss';
 
 
@@ -9,11 +10,12 @@ import '../styles/ToolbarMenu.scss';
   use: renders ToolbarMenu to set project, cycle, releases.
 */
 
-const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
+const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
     const dispatch = useDispatch()
     const [autoReport,setAutoReport] = useState(false)
     const [modlist,setModList] = useState([])
     const [projData,setProjData] = useState([])
+    const [initProjData,setInitProjData] = useState([])
     const [relList,setRelList] = useState([])
     const [cycList,setCycList] = useState([])
     const reportData = useSelector(state=>state.plugin.RD);
@@ -26,6 +28,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
             setBlockui({show:true,content:'Loading...'})
             var res = await getAllSuites_ICE({readme:"projects"})
             if(res.error){displayError(res.error);return;}
+            setInitProjData(res)
             setProjData(res)
             setRelList(res[0].releases)
             setBlockui({show:false})
@@ -69,6 +72,28 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[autoReport])
+    useEffect(()=>{
+        setBlockui({show:true,content:'Loading...'})
+        setModDrop(true)
+        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
+        if(!FnReport){
+            (async()=>{
+                var arr = [...projData].filter(e=>e.type==='5db0022cf87fdec084ae49b6')//seperate web project for accessibility
+                setProjData(arr)
+                setRelList(arr[0].releases)
+                relRef.current.value = 'def-val'
+                setCycList([])
+            })()
+        }else{
+            if(initProjData.length>0){
+                setProjData(initProjData)
+                setRelList(initProjData[0].releases)
+                setCycList([])
+                relRef.current.value = 'def-val'
+            }
+        }
+        setBlockui({show:false})
+    },[FnReport])
     const projChange = (e) =>{
         relRef.current.value = 'def-val'
         setRelList(projData[e.target.selectedIndex].releases)
@@ -87,19 +112,34 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
         setModDrop(true)
     }
     const CycChange = async() =>{
-        var arg = {
-            "param":"getReportsData_ICE",
-            "reportsInputData":{
-                "projectId":projRef.current.value,
-                "releaseName":relRef.current.value,
-                "cycleId":cycRef.current.value,
-                "type":"allmodules"
+        var res, arg;
+        if(!FnReport){
+            arg ={
+                'cycleId': cycRef.current.value,
+                'projectId': projRef.current.value,
+                'releaseName': relRef.current.value,
+                'type': "screendata"
             }
+            var data = await getAccessibilityData(arg)
+            if(data.error){displayError(data.error);return;}
+            res = []
+            Object.entries(data).forEach(e=>res.push({_id:e[0],name:e[1],type:'screens'}))
+        }else{
+            arg = {
+                "param":"getReportsData_ICE",
+                "reportsInputData":{
+                    "projectId":projRef.current.value,
+                    "releaseName":relRef.current.value,
+                    "cycleId":cycRef.current.value,
+                    "type":"allmodules"
+                }
+            }
+            res = await getReportsData_ICE(arg)
+            if(res.error){displayError(res.error);return;}
+            res = res.rows
         }
-        var res = await getReportsData_ICE(arg)
-        if(res.error){displayError(res.error);return;}
-        setModList(res.rows)
-        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:res.rows})
+        setModList(res)
+        dispatch({type:actionTypes.UPDATE_MODULELIST,payload:res})
         searchRef.current.value = ""
         searchRef.current.disabled = false;
         setModDrop(false)
@@ -111,31 +151,38 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop}) =>{
     return(
         <div className='rp__toolbar'>
             <label>Project:</label>
-            <select ref={projRef} onChange={projChange}>
+            <select data-test='rp_toolbar-proj' ref={projRef} onChange={projChange}>
                 {
                     projData.map((e)=><option key={e._id} value={e._id}>{e.name}</option>)
                 }
             </select>
             <label>Release:</label>
-            <select ref={relRef} onChange={RelChange} defaultValue={'def-val'} disabled={relList.length<1}>
+            <select data-test='rp_toolbar-rel' ref={relRef} onChange={RelChange} defaultValue={'def-val'} disabled={relList.length<1}>
                 <option disabled value='def-val'>Select Release</option>
                 {
                     relList.map((e)=><option key={e.name} value={e.name}>{e.name}</option>)
                 }
             </select>
             <label>Cycle:</label>
-            <select ref={cycRef} onChange={CycChange} defaultValue={'def-val'} disabled={cycList.length<1}>
+            <select data-test='rp_toolbar-cycl' ref={cycRef} onChange={CycChange} defaultValue={'def-val'} disabled={cycList.length<1}>
                 <option disabled value='def-val'>Select Cycle</option>
                 {
                     cycList.map((e)=><option key={e._id} value={e._id}>{e.name}</option>)
                 }
             </select>
             <span className='toolbar__header-searchbox'>
-                <input ref={searchRef} placeholder="Search Modules" disabled={true} onChange={(e)=>searchModule(e.target.value)}></input>
+                <input data-test='rp_toolbar-search' ref={searchRef} placeholder="Search Modules" disabled={true} onChange={(e)=>searchModule(e.target.value)}></input>
                 <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
             </span>
         </div>
     )
+}
+
+ToolbarMenu.propTypes={
+    displayError:PropTypes.func.isRequired,
+    setBlockui:PropTypes.func.isRequired,
+    setModDrop:PropTypes.func.isRequired,
+    FnReport:PropTypes.bool
 }
 
 export default ToolbarMenu;
