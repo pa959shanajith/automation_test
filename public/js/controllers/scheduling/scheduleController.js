@@ -526,6 +526,9 @@ mySPA.controller('scheduleController', ['$scope', '$rootScope', '$http', '$timeo
 			executionData.batchInfo[i].poolid = $scope.selectedPool
 			executionData.batchInfo[i].iceList = iceList
 		})
+		$('.selectScnSmart img').removeClass('sb');
+		$('.selectModSmart img').removeClass('sb');
+		smartBatch = false;
 		blockUI("Scheduling...");
 		ScheduleService.testSuitesScheduler_ICE(executionData)
 			.then(function (data) {
