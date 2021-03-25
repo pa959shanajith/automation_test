@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown} from '../../global' 
 import {updateTestSuite_ICE, updateAccessibilitySelection, reviewTask, ExecuteTestSuite_ICE} from '../api';
@@ -12,6 +13,7 @@ import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
     const history = useHistory();
     const dispatch = useDispatch();
+    const tasksJson = useSelector(state=>state.plugin.tasksJson)
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const [eachData,setEachData] = useState([])
@@ -89,6 +91,15 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                 var curr_task = {...current_task};
                 curr_task.accessibilityParameters = accessibilityParameters;
                 dispatch({type: actionTypes.SET_CT, payload: curr_task});
+
+                let tj = {...tasksJson};
+                for(var index in tj){
+                    if(tj[index].uid === curr_task.uid){
+                        tj[index].accessibilityParameters = curr_task.accessibilityParameters;
+                        break;
+                    }
+                }
+                dispatch({type: actionTypes.SET_TASKSJSON, payload: tj});
             }
         }      
 
