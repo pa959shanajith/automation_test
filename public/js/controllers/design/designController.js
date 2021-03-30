@@ -1319,7 +1319,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 					}
 
 					//Printing the Save data in UI
-					if ($("#wsdlRequestHeader").val().length > 0 && $("#wsdlRequestBody").val().length > 0) {
+					if (($("#wsdlRequestHeader").val().length > 0 && $("#wsdlRequestBody").val().length > 0) || $("#wsdlRequestParam").val().length > 0) {
 						$(".saveWS").prop("disabled", true);
 						$("#enbledWS").prop("disabled", false)
 						$(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")

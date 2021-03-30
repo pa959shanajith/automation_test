@@ -448,6 +448,7 @@ exports.updateScreen_ICE = function (req, res) {
 						"endPointURL" : newData.endPointURL,
 						"header" : newData.header,
 						"method" : newData.method,
+						"param": newData.param,
 						"operations" : newData.operations,
 						"responseBody" : newData.responseBody,
 						"responseHeader" : newData.responseHeader
