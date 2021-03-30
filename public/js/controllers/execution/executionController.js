@@ -557,7 +557,14 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					var current_task = JSON.parse(window.localStorage['_CT']);
 					current_task.accessibilityParameters = accessibilityParameters;
 					window.localStorage['_CT'] = JSON.stringify(current_task);
-
+					let tj =  JSON.parse(window.localStorage['_TJ']);
+					for(var index in tj){
+						if(tj[index].uid == current_task.uid){
+							tj[index].accessibilityParameters = current_task.accessibilityParameters;
+							break;
+						}
+					}
+					window.localStorage['_TJ'] = angular.toJson(tj);
 					//Getting ConditionChecks
 					ExecutionService.updateTestSuite_ICE(batchInfo)
 					.then(function (data) {

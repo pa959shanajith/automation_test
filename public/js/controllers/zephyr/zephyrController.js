@@ -21,7 +21,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 
 	socket.on('ICEnotAvailable', function () {
 		unblockUI();
-		openModelPopup("ALM Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.");
+		openModelPopup("Zephyr Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.");
 	});
 
 	$scope.almlogin = function(event){
@@ -84,20 +84,9 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 					return $rootScope.redirectPage();
 				} else if(data == "invalidcredentials"){
 					$("#zephyrErrorMsg").text("Invalid Credentials");
-				} else if(data == "noprojectfound"){
-					$("#zephyrErrorMsg").text("Invalid credentials or no project found");
-				} else if(data == "invalidurl"){
-					$("#zephyrErrorMsg").text("Invalid URL");
 				} else if(data == "fail"){
 					$("#zephyrErrorMsg").text("Fail to Login");
-				}
-				else if(data == "Error:Failed in running Zephyr"){
-					$("#zephyrErrorMsg").text("Unable to run Zephyr");
-				} 
-				else if(data=="Error:Zephyr Operations"){
-					$("#zephyrErrorMsg").text("Failed during execution");
-				}
-				else if(data){
+				} else if(data){
 					$(".zephyrSelectProject").empty();
 					$(".zephyrSelectProject").append("<option selected disabled>Select Project</option>");
 					for(var i=0;i<data.length;i++){
@@ -132,20 +121,11 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 					return $rootScope.redirectPage();
 				} else if(data == "invalidcredentials"){
 					$("#zephyrErrorMsg").text("Invalid Credentials");
-				} else if(data == "noprojectfound"){
-					$("#zephyrErrorMsg").text("Invalid credentials or no project found");
 				} else if(data == "invalidurl"){
 					$("#zephyrErrorMsg").text("Invalid URL");
 				} else if(data == "fail"){
 					$("#zephyrErrorMsg").text("Fail to Login");
-				}
-				else if(data == "Error:Failed in running Zephyr"){
-					$("#zephyrErrorMsg").text("Unable to run Zephyr");
-				} 
-				else if(data=="Error:Zephyr Operations"){
-					$("#zephyrErrorMsg").text("Failed during execution");
-				}
-				else if(data){
+				} else if(data){
 					$(".zephyrSelectRelease").empty();
 					$(".zephyrSelectRelease").append("<option selected disabled>Select Release</option>");
 					for(var i=0;i<data.length;i++){
@@ -168,16 +148,15 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 			.then(function(data){
 				avoassure_projects_details = data.avoassure_projects;
 				if(data == "unavailableLocalServer"){
-					openModelPopup("ALM Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.");
-				}	
-				else if(data == "scheduleModeOn") {
-					openModelPopup("ALM Connection", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-				}
-				else if(data == "Invalid Session"){
-					//openModelPopup("ALM Connection", "Invalid Session");
+					openModelPopup("Zephyr Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.");
+				} else if(data == "scheduleModeOn") {
+					openModelPopup("Zephyr Connection", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+				} else if(data == "Invalid Session"){
+					//openModelPopup("Zephyr Connection", "Invalid Session");
 					return $rootScope.redirectPage();
-				}
-				else if(data){
+				} else if(data == "fail"){
+					openModelPopup("Zephyr Connection", "Failed to fetch cycles");
+				} else if(data){
 
 					$(".zephyrAvoAssureSelectProject").empty();					
 					$(".zephyrAvoAssureSelectProject").append("<option value='' selected disabled>Select Project</option>");
@@ -297,14 +276,14 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 		}
 		else{
 			getParent.addClass("zephyrCollapse");
-				if(getParent.hasClass("Tfolnode")){
-					$(this).prop("src","imgs/ic-qcCollapse.png");
-					getParent.find(".suiteList").show();
-				}
-				if(getParent.hasClass("testSuite") && getParent.next('ul.testcaselist').length>0){
-					$(this).prop("src","imgs/ic-taskType-blue-minus.png");
-					getParent.next('ul.testcaselist').show();
-				}
+			if(getParent.hasClass("Tfolnode")){
+				$(this).prop("src","imgs/ic-qcCollapse.png");
+				getParent.find(".suiteList").show();
+			}
+			else if(getParent.hasClass("testSuite") && getParent.next('ul.testcaselist').length>0){
+				$(this).prop("src","imgs/ic-taskType-blue-minus.png");
+				getParent.next('ul.testcaselist').show();
+			}
 			else{
 				$(this).prop("src","imgs/ic-taskType-blue-minus.png");
 				$(".zephyrExpand").addClass("stopPointerEvent");
@@ -316,11 +295,19 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 				blockUI('Loading....');
 				zephyrServices.zephyrTestcaseDetails_ICE(dataAction,treeid)
 					.then(function(data){
-						if(data){
+						if(data == "unavailableLocalServer"){
+							openModelPopup("Zephyr Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.");
+						} else if(data == "scheduleModeOn") {
+							openModelPopup("Zephyr Connection", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+						} else if(data == "Invalid Session"){
+							return $rootScope.redirectPage();
+						} else if(data == "fail"){
+							openModelPopup("Zephyr Connection", "Failed to fetch testcases");
+						} else if(data){
 							getObject.after("<ul class='testcaselist'></ul>");
 							for(var a=0; a<data.length; a++){			
 								if(getObject.hasClass("testSuite")){
-									getObject.next("ul").append("<li class='testSet testcaselink'><label title='"+data[a].name+"'> <span class='zephyrTestcaseId'>"+data[a].id+"</span><span class='zephyrTestcaseName'>"+data[a].name+"</span></label><img class='zephyrUndoSyncronise' style='float:right' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='zephyrSyncronise' style='float:right' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
+									getObject.next("ul").append("<li class='testSet testcaselink' data-cyclephaseid='"+data[a].cyclePhaseId+"'><label title='"+data[a].name+"'> <span class='zephyrTestcaseId'>"+data[a].id+"</span><span class='zephyrTestcaseName'>"+data[a].name+"</span></label><img class='zephyrUndoSyncronise' style='float:right' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='zephyrSyncronise' style='float:right' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
 								}
 							}
 						}
@@ -375,7 +362,7 @@ mySPA.controller('zephyrController',['$scope', '$rootScope', '$window','$http','
 	$(document).on('click', ".zephyrSyncronise", function(event){
 		var projectid = $(".zephyrSelectProject option:selected").data("projectid");
 		var releaseid = $(".zephyrSelectRelease option:selected").data("releaseid");
-		var treeid = $(this).parent().parent().prev()[0].getAttribute('data-phaseid');
+		var treeid = $(this).parent()[0].getAttribute('data-cyclePhaseId');
 		var testid = $(this).parent().find('span.zephyrTestcaseId')[0].innerText;
 		var testname = $(this).parent().find('span.zephyrTestcaseName')[0].innerText;
 		// }
