@@ -22,10 +22,13 @@ const UtilityCenter=(props)=>{
     const [popup ,setPopup]= useState({show:false});
     const FactorTable = [];
     const LevelTable = [];
+    const[emptyCreateCall , setEmptyCreateCall]=useState('')
     const encryptionType = encyptMethod;
     const encryptionValue = encyptValue;
     useEffect(()=>{
         props.setScreenType("encryption")
+        setLevel(0)
+        setFactor(0)
        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     const onDropChange =(e)=>{ //function to manage dropdown change set values to show encryption buttons , select method
@@ -99,6 +102,23 @@ const UtilityCenter=(props)=>{
         LevelTable.splice(i,1,e.target.value)
         console.log(LevelTable);
     }
+    const callCreate=()=>{
+        let fact = factref.current.value || 0;
+        let lev = levelref.current.value || 0;
+        if(!fact){
+            setEmptyCreateCall("factor")
+            console.log("factor")
+        }
+        else if(!lev){
+            setEmptyCreateCall("level")
+            console.log("level")
+        }
+        else {
+            setLevel(parseInt(levelref.current.value));
+            setFactor(parseInt(factref.current.value));
+            setEmptyCreateCall('')
+            console.log("common")
+    }}
     const callGenerate =()=>{ // Genrate API will be called here rightnow Dummy
         if(FactorTable.length && LevelTable.length){
             console.log("APi will be called");
@@ -142,6 +162,8 @@ const UtilityCenter=(props)=>{
                     factor={factor}
                     level={level}
                     gererateClick={gererateClick}
+                    callCreate={callCreate}
+                    emptyCreateCall={emptyCreateCall}
                 />
             : null}
 

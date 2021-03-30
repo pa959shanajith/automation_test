@@ -5,7 +5,6 @@ import Leftbar from '../components/Leftbar';
 import Rightbar from '../components/Rightbar';
 import UtilityCenter from './UtilityCenter'
 import '../styles/UtilityHome.scss';
-
 //Utility Screen main Home Renders--> Header, LefbarScreen , CenterScreen, RIghtbarScreen and Main FooterBar // 
 
 const  Utilities=()=>{

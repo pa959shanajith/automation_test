@@ -142,7 +142,7 @@ const ALMContent = props => {
             leftBoxTitle="ALM Tests"            
             rightBoxTitle="Avo Assure Scenarios"
             selectTestDomain = {
-                <select value={projectDropdn1} onChange={(e)=>callProjectDetails_ICE(e)} style={{marginRight : "5px"}}>
+                <select data-test='intg_alm_domain_drpdwn'value={projectDropdn1} onChange={(e)=>callProjectDetails_ICE(e)} style={{marginRight : "5px"}}>
                     <option value="Select Project" selected disabled >Select Domain</option>
                     { props.domainDetails && 
                         props.domainDetails.domain.map((e, i) => (
@@ -151,7 +151,7 @@ const ALMContent = props => {
                 </select>
             }
             selectTestRelease = {
-                <select value={releaseDropdn} onChange={(e)=>callFolderDetails_ICE(e)}>
+                <select data-test='intg_alm_release_drpdwn' value={releaseDropdn} onChange={(e)=>callFolderDetails_ICE(e)}>
                     <option value="Select Release" selected disabled >Select Release</option>
                     { projectDetails &&
                         projectDetails.qc_projects.map((e, i) => (
@@ -160,7 +160,7 @@ const ALMContent = props => {
                 </select>
             }
             selectScenarioProject = {
-                <select value={projectDropdn2} onChange={(e)=>callScenarios(e)}>
+                <select data-test='intg_alm_project_dropdwn'value={projectDropdn2} onChange={(e)=>callScenarios(e)}>
                     <option value="Select Project" selected disabled >Select Project</option>
                     { projectDetails && 
                         projectDetails.avoassure_projects.map((e,i)=>(
@@ -181,7 +181,7 @@ const ALMContent = props => {
             }
             testList = {folderDetails.length && ("testfolder" in folderDetails[0]) ?
                 <>    
-                <div className="test__rootDiv">
+                <div data-test='intg_alm_test_list' className="test__rootDiv">
                     <img alt="collapse"
                         className="test_tree_toggle" 
                         src="static/imgs/ic-qcCollapse.png"
