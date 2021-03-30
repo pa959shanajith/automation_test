@@ -45,6 +45,13 @@ const setUp=(FnReport)=>{
     return wrapper
 }
 
+const updateWrapper = async(wrapper) => {
+    await act(async()=>{
+        await new Promise(r=>setTimeout(r))
+        wrapper.update()
+    })
+}
+
 describe('<ToolbarMenu/> Positive Scenarios',()=>{
     let wrapper
     let projDrop
@@ -62,8 +69,7 @@ describe('<ToolbarMenu/> Positive Scenarios',()=>{
     })
     it('Should render 4 project options',async()=>{
         wrapper=setUp(true)
-        await act(()=>Promise.resolve())
-        wrapper.update()
+        await updateWrapper(wrapper)
         projDrop=findByTestAtrr(wrapper,'rp_toolbar-proj');
         expect(projDrop.find('option').length).toBe(5)  
     })
@@ -72,7 +78,7 @@ describe('<ToolbarMenu/> Positive Scenarios',()=>{
         projDrop.at(0).simulate('change',{
             target:{selectedIndex:1}
         })
-        wrapper.update()
+        await updateWrapper(wrapper)
         expect(relDrop.find('option').length).toBe(2) 
     })
     it('Select a release populate cycle',async()=>{
@@ -80,7 +86,7 @@ describe('<ToolbarMenu/> Positive Scenarios',()=>{
             target:{selectedIndex:1}
         })
         cyclDrop=findByTestAtrr(wrapper,'rp_toolbar-cycl');
-        wrapper.update()
+        await updateWrapper(wrapper)
         expect(cyclDrop.find('option').length).toBe(2) 
     })
 });
@@ -92,10 +98,7 @@ describe('<ToolbarMenu/> Negative Scenarios',()=>{
     let cyclDrop
     it('change in project resets release list and empty cycle list',async()=>{
         wrapper=setUp(true)
-        await act(async()=>{
-            await new Promise(r=>setTimeout(r))
-            wrapper.update()
-        })
+        await updateWrapper(wrapper)
         relDrop=findByTestAtrr(wrapper,'rp_toolbar-rel');
         cyclDrop=findByTestAtrr(wrapper,'rp_toolbar-cycl');
         expect(relDrop.find('option').length).toBe(2)
@@ -104,10 +107,7 @@ describe('<ToolbarMenu/> Negative Scenarios',()=>{
         relDrop.at(0).simulate('change',{
             target:{selectedIndex:1}
         })
-        await act(async()=>{
-            await new Promise(r=>setTimeout(r))
-            wrapper.update()
-        })
+        await updateWrapper(wrapper)
         cyclDrop=findByTestAtrr(wrapper,'rp_toolbar-cycl');
         expect(cyclDrop.find('option').length).toBe(2) 
         projDrop=findByTestAtrr(wrapper,'rp_toolbar-proj');
@@ -115,10 +115,7 @@ describe('<ToolbarMenu/> Negative Scenarios',()=>{
         projDrop.at(0).simulate('change',{
             target:{selectedIndex:4}
         })
-        await act(async()=>{
-            await new Promise(r=>setTimeout(r))
-            wrapper.update()
-        })
+        await updateWrapper(wrapper)
         relDrop=findByTestAtrr(wrapper,'rp_toolbar-rel'); 
         cyclDrop=findByTestAtrr(wrapper,'rp_toolbar-cycl');
         expect(relDrop.find('option').length).toBe(3)
@@ -132,10 +129,7 @@ describe('<ToolbarMenu/> Negative Scenarios',()=>{
         cyclDrop.at(0).simulate('change',{
             target:{selectedIndex:2}
         })
-        await act(async()=>{
-            await new Promise(r=>setTimeout(r))
-            wrapper.update()
-        })
+        await updateWrapper(wrapper)
         var searchBox = findByTestAtrr(wrapper,'rp_toolbar-search');
         expect(searchBox.getDOMNode().disabled).toBe(false)
     })
