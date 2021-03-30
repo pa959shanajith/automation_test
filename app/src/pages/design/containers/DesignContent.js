@@ -720,7 +720,7 @@ const DesignContent = props => {
     let key = 0;
     return (
         <>
-        { showSM && <SelectMultipleDialog setShow={setShowSM} selectSteps={selectSteps} upperLimit={testCaseData.length} /> }
+        { showSM && <SelectMultipleDialog data-test="d__selectMultiple" setShow={setShowSM} selectSteps={selectSteps} upperLimit={testCaseData.length} /> }
         { showPS && <PasteStepDialog setShow={setShowPS} pasteSteps={pasteSteps} upperLimit={testCaseData.length}/> }
         { showRemarkDlg && <RemarkDialog remarks={testCaseData[parseInt(showRemarkDlg)].remarks} setShow={setShowRemarkDlg} onSetRowData={setRowData} idx={showRemarkDlg} firstname={userInfo.firstname} lastname={userInfo.lastname}/> }
         { showDetailDlg && <DetailsDialog TCDetails={testCaseData[showDetailDlg].addTestCaseDetailsInfo && JSON.parse(testCaseData[showDetailDlg].addTestCaseDetailsInfo)} setShow={setShowDetailDlg} onSetRowData={setRowData} idx={showDetailDlg} /> }
@@ -730,7 +730,7 @@ const DesignContent = props => {
             <div className="d__content_wrap">
             { /* Task Name */ }
             <div className="d__task_title">
-                <div className="d__task_name">{props.current_task.taskName}</div>
+                <div className="d__task_name" data-test="d__taskName">{props.current_task.taskName}</div>
             </div>
 
             { /* Button Group */ }
@@ -738,17 +738,17 @@ const DesignContent = props => {
                 <div className="d__table_ac_btn_grp">
                 {
                     tableActionBtnGroup.map((btn, i) => 
-                        <button key={i} className="d__tblBtn" onClick={()=>btn.onClick()}><img className="d__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title}/> </button>
+                        <button data-test="d__tblActionBtns" key={i} className="d__tblBtn" onClick={()=>btn.onClick()}><img className="d__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title}/> </button>
                     )
                 }
                 </div>
 
                 <div className="d__taskBtns">
-                    <button className="d__taskBtn d__btn" onClick={saveTestCases} disabled={!changed}>Save</button>
-                    <button className="d__taskBtn d__btn" onClick={deleteTestcase} disabled={!checkedRows.length}>Delete</button>
+                    <button className="d__taskBtn d__btn" data-test="d__saveBtn" onClick={saveTestCases} disabled={!changed}>Save</button>
+                    <button className="d__taskBtn d__btn" data-test="d__deleteBtn" onClick={deleteTestcase} disabled={!checkedRows.length}>Delete</button>
                 </div>
 
-                <div className="d__submit">
+                <div className="d__submit" data-test="d__actionBtn">
                     { isUnderReview && 
                         <>
                         <button className="d__reassignBtn d__btn" 
@@ -791,7 +791,7 @@ const DesignContent = props => {
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setFocusedRow(null) : runClickAway=true}} style={{height: "100%"}}>
                             <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row">
                                 {
-                                testCaseData.map((testCase, i) => <TableRow 
+                                testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row"
                                     key={key++} idx={i} objList={objNameList} testCase={testCase} edit={edit} 
                                     getKeywords={getKeywords} getRowPlaceholders={getRowPlaceholders} checkedRows={checkedRows}
                                     updateChecklist={updateChecklist} focusedRow={focusedRow} setFocusedRow={setFocusedRow}

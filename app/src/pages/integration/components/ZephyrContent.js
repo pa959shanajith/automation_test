@@ -18,8 +18,8 @@ const ZephyrContent = props => {
     const [projectDetails , setProjectDetails]=useState({});
     const [avoProjects , setAvoProjects]= useState(null);
     const [scenarioArr , setScenarioArr] = useState(false);
-    const [scenario_ID , setScenario_ID] = useState(null) ;
-    const [projectDropdn1 , setProjectDropdn1]= useState(null);
+    const [scenario_ID , setScenario_ID] = useState("Select Project") ;
+    const [projectDropdn1 , setProjectDropdn1]= useState("Select Project");
     const [SearchIconClicked , setSearchIconClicked] =useState(false);
     const [filteredNames , setFilteredName]= useState(null);
     const [screenexit , setScreenExit]= useState(false);
@@ -131,7 +131,7 @@ const ZephyrContent = props => {
                 rightBoxTitle="Avo Assure Scenarios"
                 selectTestProject={
                     <select value={projectDropdn1} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
-                        <option value="Select Project" selected disabled >Select Project</option>
+                        <option value="Select Project" disabled >Select Project</option>
 
                         {   props.domainDetails ? 
                             props.domainDetails.map(e => (
@@ -152,7 +152,7 @@ const ZephyrContent = props => {
                 }
                 selectScenarioProject={
                     <select value={scenario_ID} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
-                        <option value="Select Project"selected disabled >Select Project</option>
+                        <option value="Select Project" disabled >Select Project</option>
                         {
                             avoProjects? 
                             avoProjects.map((e,i)=>(
@@ -194,7 +194,7 @@ const ZephyrContent = props => {
                                 />) }
                         </div>   
                     </Fragment>
-                        : null
+                        : <div></div>
                 }
                 scenarioList={
                     scenarioArr ? 
@@ -208,7 +208,7 @@ const ZephyrContent = props => {
                                     {scenario.name}
                                 </div>
                         ))
-                        : null 
+                        : <div></div>
                 }
             />
     </Fragment>
