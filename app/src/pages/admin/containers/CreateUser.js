@@ -535,8 +535,8 @@ const CreateUser = (props) => {
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <ScrollBar thumbColor="#929397">
-            <div className="createUser-container">
-            <div id="page-taskName"><span>{(props.showEditUser===false)?"Create User":"Edit User"}</span></div>
+            <div data-test="create__container" className="createUser-container">
+            <div data-test="heading" id="page-taskName"><span>{(props.showEditUser===false)?"Create User":"Edit User"}</span></div>
             
             {(props.showEditUser===false)?
                 <CreateLanding firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown} ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap}  ldapDirectoryAddClass={ldapDirectoryAddClass} confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={props.setShowEditUser} ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} />
@@ -548,10 +548,10 @@ const CreateUser = (props) => {
                 {(userConf.type === "inhouse")?
                     <Fragment>
                         <div className='leftControl adminControl'>
-                            <input value={userConf.passWord} onChange={(event)=>{passwordChange(event.target.value)}} type="password" autoComplete="new-password" name="passWord" id="password" maxLength="16" className={passwordAddClass?"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex inputErrorBorder" :"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex"} placeholder="Password" />
+                            <input data-test="password" value={userConf.passWord} onChange={(event)=>{passwordChange(event.target.value)}} type="password" autoComplete="new-password" name="passWord" id="password" maxLength="16" className={passwordAddClass?"middle__input__border form-control__conv form-control-custom inputErrorBorder" :"middle__input__border form-control__conv form-control-custom"} placeholder="Password" />
                         </div>
                         <div className='rightControl adminControl'>
-                            <input value={userConf.confirmPassword} onChange={(event)=>{confirmPasswordChange(event.target.value)}} type="password" autoComplete="new-password" name='confirmPassword' id='confirmPassword' maxLength="16" className={confirmPasswordAddClass?"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex inputErrorBorder" :"middle__input__border form-control__conv form-control-custom create spaceRegex passwordRegex"}  placeholder="Confirm Password"/>
+                            <input data-test="confirmPassword" value={userConf.confirmPassword} onChange={(event)=>{confirmPasswordChange(event.target.value)}} type="password" autoComplete="new-password" name='confirmPassword' id='confirmPassword' maxLength="16" className={confirmPasswordAddClass?"middle__input__border form-control__conv form-control-custom inputErrorBorder" :"middle__input__border form-control__conv form-control-custom"}  placeholder="Confirm Password"/>
                         </div>
                     </Fragment>
                     :null
@@ -559,11 +559,11 @@ const CreateUser = (props) => {
                 
                 {/* PRESENT FOR EACH USERTYPE */}
                 <div className='adminControl'>
-					<input value={userConf.email} onChange={(event)=>{emailChange(event.target.value)}} autoComplete="off" name="email" id="email" maxLength="100" className={emailAddClass?"middle__input__border form-control__conv form-control-custom create inputErrorBorder":"middle__input__border form-control__conv form-control-custom create"} placeholder="Email Id"/>
+					<input data-test="email" value={userConf.email} onChange={(event)=>{emailChange(event.target.value)}} autoComplete="off" name="email" id="email" maxLength="100" className={emailAddClass?"middle__input__border form-control__conv form-control-custom inputErrorBorder":"middle__input__border form-control__conv form-control-custom"} placeholder="Email Id"/>
 				</div>
 				<div className="selectRole  adminControl role-padding" >
-					<label className="leftControl primaryRole">Primary Role</label>
-					<select value={userConf.role} disabled={props.showEditUser===true} className={userRolesAddClass?'adminSelect form-control__conv selectErrorBorder':'adminSelect form-control__conv '} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_USERROLE,payload:event.target.value})}} id="userRoles" style={(props.showEditUser===true)?{backgroundColor: "#eee",cursor: "not-allowed"}:{}} >
+					<label data-test="primaryRoleLabel" className="leftControl primaryRole">Primary Role</label>
+					<select data-test="primaryRoleDropdown" value={userConf.role} disabled={props.showEditUser===true} className={userRolesAddClass?'adminSelect form-control__conv selectErrorBorder':'adminSelect form-control__conv '} onChange={(event)=>{dispatch({type:actionTypes.UPDATE_USERROLE,payload:event.target.value})}} id="userRoles" style={(props.showEditUser===true)?{backgroundColor: "#eee",cursor: "not-allowed"}:{}} >
 						<option value="" >Select User Role</option>
                         {userConf.allRoles.map((i,index) => (      
                             <option key={index} value={i[1]}>{i[0]}</option>

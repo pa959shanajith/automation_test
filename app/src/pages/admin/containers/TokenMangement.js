@@ -70,7 +70,6 @@ const TokenManagement = (props) => {
 		var exptime=timeVal;
 		var today = new Date();
 		var td = new Date();
-		var expiry = "";
 		if (expdate === "") {
 			td.setHours(today.getHours()+parseInt(tokendetails));
 			var dt = td.getDate();
@@ -104,7 +103,6 @@ const TokenManagement = (props) => {
 		}
 		sldate_2 = expdate.split("-");
 		var sltime_2 = exptime.split(":");
-		expiry = expdate+" "+exptime;
 		var now = new Date(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1]);
 		td = today;
 		td.setHours(today.getHours()+8);
@@ -117,7 +115,7 @@ const TokenManagement = (props) => {
 		}
 		const CIUser = {
 			'userId': userId,
-			'expiry': expiry,
+			'expiry': now,
 			'tokenname': tokenname,
 			'icetype': icetype
 		};
@@ -144,8 +142,8 @@ const TokenManagement = (props) => {
 			<div className="tkn-mgmt_container">
 				<div id="page-taskName"><span>Token Management</span></div>
 				<div className="adminActionBtn">
-					<button className="btn-md pull-right adminBtn-tkn-mgmt" onClick={()=>{generateCIusertokens();}}  title="Generate New Token">Generate</button>
-					<button className="btn-md pull-right adminBtn-tkn-mgmt btn-right-cust-tkn" onClick={()=>{setRefresh(!refresh);setOp("normal")}} title="Refresh">Refresh</button>            
+					<button className="a__btn pull-right" onClick={()=>{generateCIusertokens();}}  title="Generate New Token">Generate</button>
+					<button className="a__btn pull-right btn-right-cust-tkn" onClick={()=>{setRefresh(!refresh);setOp("normal")}} title="Refresh">Refresh</button>            
 				</div>
 				<div className="content_wrapper-tkn-mgmt">
 					<ScrollBar thumbColor="#929397">

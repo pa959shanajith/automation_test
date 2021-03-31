@@ -112,7 +112,7 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef}) => {
         <Fragment>
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
             <div>
-                <input type={'hidden'} autoComplete={"off"} ref={inputRef} className="btn-users dropdown-toggle-edit edit-user-dropdown-edit" onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder="Search ICE Pool.."/>
+                <input type={'text'} autoComplete={"off"} ref={inputRef} className="btn-users edit-user-dropdown-edit" onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder="Search ICE Pool.."/>
                 <div className="form-inp-dropdown" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list.map((e) => (  

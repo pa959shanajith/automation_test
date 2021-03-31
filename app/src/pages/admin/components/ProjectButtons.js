@@ -260,10 +260,10 @@ const ProjectButtons = (props) => {
             <div className="adminActionBtn">
                 {props.taskName==="Create Project"?
                     <Fragment>
-                        <button className="btn-md pull-right adminBtn" onClick={()=>props.editProjectTab()}  title="Edit Project">Edit</button>
-                        <button id="create_button" onClick={()=>{create_project()}} title="Create Project"  className="btn-md pull-right adminBtn btn-project-cust">Create</button>            
+                        <button className="a__btn pull-right " onClick={()=>props.editProjectTab()}  title="Edit Project">Edit</button>
+                        <button id="create_button" onClick={()=>{create_project()}} title="Create Project"  className="a__btn pull-right  btn-project-cust">Create</button>            
                     </Fragment>
-                :<button className="btn-md pull-right adminBtn" onClick={()=>{updateProject()}}  title="Update Project">Update</button>
+                :<button className="a__btn pull-right " onClick={()=>{updateProject()}}  title="Update Project">Update</button>
                 }
             </div> 
         </Fragment>

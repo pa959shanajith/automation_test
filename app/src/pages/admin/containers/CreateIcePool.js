@@ -63,8 +63,8 @@ const CreateIcePool = (props) => {
                     <span>Create ICE Pool</span>
                 </div>
                 <div className="adminActionBtn">
-                    <button className=" btn-md adminBtn btn-edit" onClick={()=>setEditPool(true)}  title="Edit">Edit</button>
-                    <button className=" btn-md adminBtn" onClick={ClickCreate}  title="Save">Create</button>
+                    <button className=" a__btn btn-edit" onClick={()=>setEditPool(true)}  title="Edit">Edit</button>
+                    <button className=" a__btn " onClick={ClickCreate}  title="Save">Create</button>
                 </div>
                 <div className='crt_ice-pool'>
                     <FormInput inpRef={poolName} label={'ICE pool'} placeholder={'Enter ICE Pool Name'} validExp={"poolName"}/>

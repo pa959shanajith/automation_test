@@ -23,24 +23,6 @@
     height: 36px;
     width: 36px;
 }
-@media screen and (min-width: 1400px) and (min-height: 770px){
-    
-    .e__thumbnail input[type='checkbox']{
-        width: 2.34vh;
-        height: 2.34vh;
-    }
-    .e__thumbnail{
-        font-size: 2.08vh;
-    }
-    .e__debugOn{
-        font-size: 2.34vh;
-    }
-    .cls-1{
-        height: 5.6vh;
-        width: 6vh;
-        padding: 0.26vh;
-    }
-}
 .e__parallel_icon{
     display: flex;
     flex-direction: column;
@@ -60,17 +42,4 @@
     border-radius: 5px;
     height: 55px;
     width: 57px;
-}
-@media screen and (min-width: 1400px) and (min-height: 770px){
-    .e__parallel_icon{
-        font-size: 1.56vh;
-        margin: 10% 0 5%;
-    }
-    .e__parallel_icon__img{
-        padding: 1.04vh 1.30vh;
-        height: 6.7vh;
-        width: 7.29vh;
-        margin-bottom: 0.26vh;
-        border-radius: 0.65vh;
-    }
 }

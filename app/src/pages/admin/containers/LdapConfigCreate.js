@@ -20,10 +20,10 @@ const LdapConfigCreate = (props) => {
     return (
         <div className="ldap_container-create">
             <div id="page-taskName"><span>Create LDAP Configuration</span></div>
-            <div className="adminActionBtn-oidc">
-                <button className="btn-md-ldap adminBtn-ldap btn-margin-ldap" onClick={()=>{props.ldapTest()}} title="Test Configuration">Test</button> 
-                <button className="btn-md-ldap adminBtn-ldap ldap-disabled-btn btn-margin-ldap" onClick={()=>{props.ldapManage('create')}} disabled={props.testStatus !== 'success'} title="Create Configuration">Create</button>            
-                <button className="btn-md-ldap adminBtn-ldap" onClick={()=>{props.setLdapEdit(true)}}  title="Edit Configuration">Edit</button>
+            <div className="adminActionBtn">
+                <button className="a__btn btn-margin-ldap" onClick={()=>{props.ldapTest()}} title="Test Configuration">Test</button> 
+                <button className="a__btn ldap-disabled-btn btn-margin-ldap" onClick={()=>{props.ldapManage('create')}} disabled={props.testStatus !== 'success'} title="Create Configuration">Create</button>            
+                <button className="a__btn " onClick={()=>{props.setLdapEdit(true)}}  title="Edit Configuration">Edit</button>
             </div> 
             <div className="ldap-content_wrapper-create">
                 <ScrollBar thumbColor="#929397">
