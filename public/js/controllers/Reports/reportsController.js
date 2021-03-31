@@ -579,7 +579,7 @@ mySPA.controller('reportsController', ['$scope', '$rootScope', '$http', '$locati
             var tableHeader = document.createElement("div");
             tableHeader.setAttribute("id","tableHeading")
             var tableStandard = document.createElement("label");
-            tableStandard.textContent = "Slected Standard: " + e.currentTarget.attributes.data.value;
+            tableStandard.textContent = "Selected Standard: " + e.currentTarget.attributes.data.value;
             tableHeader.style.fontSize = "20px"
             tableHeader.appendChild(tableStandard);
             body.appendChild(tableHeader);
