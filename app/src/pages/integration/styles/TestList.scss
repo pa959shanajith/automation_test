@@ -20,6 +20,7 @@
 
 .test_tree_toggle {
     cursor: pointer;
+    margin-right: 10px;
 }
 
 .test_tree_leaves, .scenario__listItem{
@@ -68,7 +69,11 @@
     max-height: 310.391px;
     padding: 0px;
     label {
-        margin: 0 0 10px 10px;
+        // margin: 0 0 10px 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 85%;
+        margin: 0;
     }
 }
 
@@ -80,18 +85,19 @@
     background-color: rgb(221, 221, 221)!important;
 }
 
-// .test__leaf{
-//     display: flex;
-// }
-
-// .test__tcName{
-//     flex-grow: 1;
-// }
-
 .test__syncBtns{
     float: right;
 
     .test__syncBtn{
         cursor: pointer;
     }
+}
+
+.test_tree_branches{
+    display: flex;
+    margin: 0 0 10px 10px;
+}
+
+.int__folderNode, .int__phaseNode, .int__cycleNode{
+    margin: 0 0 10px 10px;
 }

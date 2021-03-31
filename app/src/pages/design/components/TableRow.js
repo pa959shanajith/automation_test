@@ -77,7 +77,7 @@ const TableRow = (props) => {
                 let caseData = null;
                 let placeholders = null;
 
-                if (objName !== "OBJECT_DELETED"){
+                if (!objName || (objName !== "OBJECT_DELETED" && objList.includes(objName))){
                     let obj = !objName ? objList[0] : objName;
                     caseData = props.getKeywords(obj);
                     let key = (!keyword || !objName) ? caseData.keywords[0] : keyword;

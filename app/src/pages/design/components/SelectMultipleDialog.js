@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PopupMsg } from '../../global';
+import { ModalContainer } from '../../global';
 import "../styles/SelectMultipleDialog.scss";
 
 /*
@@ -73,8 +73,9 @@ const SelectMultipleDialog = props => {
         else showSelectError('empty');
     }
 
-    return (<PopupMsg 
+    return (<ModalContainer 
         title="Select Test Step(s)"
+        modalClass="modal-sm"
         content={
         <div className="sm_dialog"> 
             <div className="sm_lbl">Select step(s) no:</div>
@@ -88,8 +89,9 @@ const SelectMultipleDialog = props => {
             showSelectError("");
             props.setShow(false)
         }}
-        submitText="Submit"
-        submit={()=>selectSteps()}
+        footer={
+            <button onClick={selectSteps}>Submit</button>
+        }
     />
 )
 }

@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { RedirectPage } from '../../global';
 import * as actionTypes from '../state/action';
 import * as api from '../api.js';
 
@@ -38,6 +40,7 @@ const CycleNode = props => {
 const PhaseNode = props => {
 
     const dispatch = useDispatch();
+    const history = useHistory();
     const [collapse, setCollapse] = useState(true);
     const [testCases, setTestCases] = useState([]);
 
@@ -50,11 +53,15 @@ const PhaseNode = props => {
 
             const data = await api.zephyrTestcaseDetails_ICE("testcase", phaseid);
             
-            if (data.error){
+            if (data.error)
                 dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: data.error}});
-            } else if (typeof(data) !== "object") {
-                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Error in getting list."}});
-            } else {
+            else if (data === "unavailableLocalServer")
+                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr Connection", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
+            else if (data === "scheduleModeOn")
+                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr Connection", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
+            else if (data === "Invalid Session")
+                return RedirectPage(history);
+            else {
                 setTestCases(data);
                 setCollapse(false);
             }
