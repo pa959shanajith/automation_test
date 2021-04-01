@@ -752,6 +752,17 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	if (batchInfo[0].targetUser && batchInfo[0].targetUser.includes('Smart')) {
 		smart = true;
 		const dateTimeUtc = new Date(parseInt(batchInfo[0].timestamp)).toUTCString();
+		if (poolid == EMPTYPOOL){
+			let iceList = batchInfo[0].iceList
+			batchInfo = await getAvailableICE(batchInfo, batchInfo[0].iceList)
+			if(!batchInfo){
+				let msg = "ICE: \n";
+				for (let ice in iceList){
+					msg = msg + "\n" + iceList[ice];
+				}
+				return res.send({ "status": "booked", "user": msg});
+			}
+		}
 		result = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeUtc, multiExecutionData.browserType.length)
 		if (result["status"] == "fail") {
 			return res.send("fail")
@@ -828,6 +839,27 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 	if (schResult == "success" && stat != "none") schResult = displayString + " " + "success";
 	return res.send(schResult);
 };
+
+
+const getAvailableICE = async (batchInfo, iceList) => {
+	dateTimeList = batchInfo.map(u => u.timestamp);
+	const fnName = "getAvailableICE"
+	available_ice = []
+	for (let ice in iceList){
+		var inputs = {
+			"query": "checkscheduleddetails",
+			"scheduledatetime": [dateTimeList[0]],
+			"targetaddress": [iceList[ice]]
+		};
+		const chkResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
+		if (chkResult == -1) available_ice.push(iceList[ice])
+	}
+	if (available_ice.length == 0) return false;
+	for(let batch in batchInfo){
+		batchInfo[batch].iceList = available_ice
+	}
+	return batchInfo
+}
 
 /**
  * Function responsible for creating smart batches

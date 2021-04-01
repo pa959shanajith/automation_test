@@ -7,7 +7,7 @@ import '../styles/DropDownList.scss'
   use: renders searchable available ice dropdown
 */
 
-const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,selectedICE, setSelectedICE, placeholder}) => {
+const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,selectedICE, setSelectedICE, placeholder, ExeScreen}) => {
     const inputRef = useRef()
     const [list,setList] =  useState([])
     const [dropDown,setDropDown] = useState(false)
@@ -56,7 +56,7 @@ const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,sel
                 <div className="form-inp-dropdown-popup" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list.map((ice,index) => (  
-                        <ul key={index} role="presentation" style={{ display: (!(smartMode==='normal') && JSON.parse(ice.statusCode !== "Online") ) ? 'none' : 'block' }} className="dropdown-ul" >
+                        <ul key={index} role="presentation" style={{ display: (!(smartMode==='normal') && JSON.parse(ice.statusCode !== "Online") && (ExeScreen===true) ) ? 'none' : 'block' }} className="dropdown-ul" >
                             <li value={ice.icename} onClick={(event)=>{selectOption(ice.icename,event)}} title={ice.statusCode} className={"dropdown-list-item "+((selectedICE[ice.icename]!==undefined)?" selectedCheckBox":"") } >
                                 <input id={ice.icename} checked={selectedICE[ice.icename]} type="checkbox" style={{ width:"auto", display: (smartMode==='normal') ? 'none' : 'block' }} onClick={()=>{selectOptionCheckBox(ice.icename)}} />
                                 <span id='status' style={{ backgroundColor: ice.color }}></span>
