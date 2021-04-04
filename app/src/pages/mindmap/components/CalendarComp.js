@@ -7,6 +7,7 @@ import '../styles/CalendarComp.scss'
 
 /*Component CalendarComp
   use: returns Calendar component
+  props : {setDate:state,date:datevalue,disbled:boolean}
 */
 
 const CalendarComp = (props) => {

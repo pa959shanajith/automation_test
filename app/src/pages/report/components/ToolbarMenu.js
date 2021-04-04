@@ -74,7 +74,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
     },[autoReport])
     useEffect(()=>{
         setBlockui({show:true,content:'Loading...'})
-        setModDrop(true)
+        setModDrop('close')
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         if(!FnReport){
             (async()=>{
@@ -101,7 +101,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         searchRef.current.value = ""
         searchRef.current.disabled = true;
-        setModDrop(true)
+        setModDrop('close')
     }
     const RelChange = (e) =>{
         cycRef.current.value = 'def-val'
@@ -109,7 +109,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
         searchRef.current.value = ""
         searchRef.current.disabled = true;
-        setModDrop(true)
+        setModDrop('close')
     }
     const CycChange = async() =>{
         var res, arg;
@@ -142,7 +142,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:res})
         searchRef.current.value = ""
         searchRef.current.disabled = false;
-        setModDrop(false)
+        setModDrop('semi')
     }
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)

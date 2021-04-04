@@ -140,3 +140,32 @@ export const viewReport = async(reportId, reportType) => {
         return {error:'Failed to fetch suite details'}
     }
 }
+
+
+export const getAccessibilityData = async(data) =>{
+    try{
+        const res = await axios(url+'/getAccessibilityData_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status === 200 && Object.keys(res.data).length < 1){
+            return {error:'No accessibility screen is created yet!'}
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to fetch suite details'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to fetch suite details'}
+    }
+}

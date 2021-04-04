@@ -9,6 +9,7 @@ import '../styles/SaveMapButton.scss'
   use: renders save button below canvas on click trigers save node
   for assingn send isAssign={true}
   for end send isEnE={true}
+  props.createnew is to auto save imported mindmap
 */
 
 const SaveMapButton = (props) => {
