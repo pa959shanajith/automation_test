@@ -82,7 +82,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						return $rootScope.redirectPage();
 					} else {
 						var tasksJson = data1;
-						$scope.taskJson = data1;
+						for(var index in tasksJson){
+							tasksJson[index].uid = Math.floor(Math.random() * 26) + Date.now() + Math.random() + 1; 
+						}
+						$scope.taskJson = tasksJson;
+						taskJson = angular.toJson(tasksJson);
 					 	window.localStorage['_TJ'] = angular.toJson(tasksJson);
 						if (tasksJson.length == 0) unblockUI();
 						/*	Build a list of releaseids and cycleids
@@ -106,6 +110,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 									taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 								}
 								var dataobj={
+									'uid': tasksJson[i].uid,
 									'accessibilityParameters': tasksJson[i].accessibilityParameters,
 									'scenarioflag':tasksJson[i].scenarioFlag,
 									'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
@@ -319,6 +324,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		taskObj.releaseid = dataobj_json.releaseid;
 		taskObj.cycleid = dataobj_json.cycleid;
 		taskObj.reuse = dataobj_json.reuse;
+		taskObj.uid = dataobj_json.uid;
 	
 		window.localStorage['_CT'] = JSON.stringify(taskObj);
 		if(dataobj_json.subtask == "Scrape"){
@@ -391,6 +397,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
 				//console.log(i,testSuiteDetails);
 				var dataobj={
+					'accessibilityParameters': tasksJson[i].accessibilityParameters,
+					'uid': tasksJson[i].uid,
+					'scenarioTaskType':tasksJson[i].scenarioTaskType,
 					'scenarioflag':tasksJson[i].scenarioFlag,
 					'apptype':tasksJson[i].appType,
 					'projectid':tasksJson[i].projectId,
@@ -418,11 +427,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				dataobj = JSON.stringify(dataobj);
 				if(passFilterTest(tasksJson[i],0)){
 					if(status == 'underReview'){
-						$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+"' class='taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
+						$('.plugin-taks-listing.review').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ counterreview +"</h4><span class='assignedTask' data-testsuitedetails='"+testSuiteDetails+"' data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 						counterreview++;
 					}
 					else{
-						$('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+"' class='taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails="+testSuiteDetails+" data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
+						$('.plugin-taks-listing.todo').append("<div class='panel panel-default' panel-id='"+i+"'><div class='panel-heading'><div class='taskDirection' href='#collapse"+counter+"'><h4 class='taskNo "+classIndex+" taskRedir'>"+ countertodo +"</h4><span class='assignedTask' data-testsuitedetails='"+testSuiteDetails+"' data-dataobj='"+dataobj+"' onclick='taskRedirection(this.dataset.testsuitedetails,this.dataset.dataobj,event)'>"+taskname+"</span><!--Addition--><div class='panel-additional-details'><button class='panel-head-tasktype'>"+tasktype+"</button></div><!--Addition--></div></div></div>").fadeIn();
 						countertodo++;
 					}
 					counter++;

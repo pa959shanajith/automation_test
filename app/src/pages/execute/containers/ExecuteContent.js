@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown} from '../../global' 
-import {updateTestSuite_ICE, reviewTask, ExecuteTestSuite_ICE} from '../api';
+import {updateTestSuite_ICE, updateAccessibilitySelection, reviewTask, ExecuteTestSuite_ICE} from '../api';
 import "../styles/ExecuteContent.scss";
+import * as actionTypes from "../../plugin/state/action";
 import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 
 
 const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
     const history = useHistory();
+    const dispatch = useDispatch();
+    const tasksJson = useSelector(state=>state.plugin.tasksJson)
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const [eachData,setEachData] = useState([])
@@ -21,11 +26,22 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     const [integration,setIntegration] = useState({
         alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {accountid:"",accesskey:"",secretkey:""}
+        zephyr: {url:"",username:"",password:""}
     });
     const [selectAllBatch,setSelectAllBatch] = useState(0)
+    const [proceedExecution, setProceedExecution] = useState(false);
+    const [dataExecution, setDataExecution] = useState({});
     const [allocateICE,setAllocateICE] = useState(false)
+    const [accessibilityParameters,setAccessibilityParameters] = useState(current_task.accessibilityParameters)
+    const [scenarioTaskType,setScenarioTaskType] = useState(current_task.scenarioTaskType);
     var batch_name= taskName ==="Batch Execution"?": "+current_task.taskName.slice(13):""
+
+    useEffect(()=>{
+        if (Object.keys(current_task).length!==0){
+            setAccessibilityParameters(current_task.accessibilityParameters);
+            setScenarioTaskType(current_task.scenarioTaskType);
+        }
+    }, [current_task]);
 
     const closePopup = () => {
         setPopupState({show:false,title:"",content:""});
@@ -61,7 +77,33 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
 			suiteDetails.scenarioAccNoMap = scenarioAccNoMap;
 			suiteDetails.scenarioDescriptions = scenarioDescriptionText;
 			batchInfo.push(suiteDetails);
-		}
+        }
+        
+        if(scenarioTaskType !== "disable"){
+			let input = {
+				taskId : current_task.subTaskId,
+				accessibilityParameters: accessibilityParameters
+			}
+            const status = await updateAccessibilitySelection(input);
+            if(status.error){displayError(status.error);return;}
+            else if(status !== "success") setPopupState({show:true,title:"Save Test Suite",content:"Failed to save selected accessibility standards."});
+            else{
+                var curr_task = {...current_task};
+                curr_task.accessibilityParameters = accessibilityParameters;
+                dispatch({type: actionTypes.SET_CT, payload: curr_task});
+
+                let tj = {...tasksJson};
+                for(var index in tj){
+                    if(tj[index].uid === curr_task.uid){
+                        tj[index].accessibilityParameters = curr_task.accessibilityParameters;
+                        break;
+                    }
+                }
+                dispatch({type: actionTypes.SET_TASKSJSON, payload: tj});
+            }
+        }      
+
+
 		const data = await updateTestSuite_ICE(batchInfo);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
@@ -115,10 +157,35 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
         if(check && valid) setAllocateICE(true);
     }    
 
+    const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
+        if(Array.isArray(executionData.targetUser)){
+			for(let icename in executionData.targetUser){
+				let ice_id = iceNameIdMap[executionData.targetUser[icename]];
+				if(ice_id && ice_id.status){
+                    setDataExecution(executionData);
+					setAllocateICE(false);
+                    setProceedExecution(true);
+                    return
+				} 
+			}
+		}else{
+			let ice_id = iceNameIdMap[executionData.targetUser];
+			if(ice_id && ice_id.status){
+                setDataExecution(executionData);
+				setAllocateICE(false);
+                setProceedExecution(true);
+                return
+			} 
+		}
+        ExecuteTestSuite(executionData);
+    }
+
     const ExecuteTestSuite = async (executionData) => {
        
+        if(executionData === undefined) executionData = dataExecution;
         setAllocateICE(false);
-        const modul_Info = parseLogicExecute(eachData, current_task, appType, projectdata, moduleInfo);
+        const modul_Info = parseLogicExecute(eachData, current_task, appType, projectdata, moduleInfo, accessibilityParameters, scenarioTaskType, setPopupState);
+        if(modul_Info === false) return;
         setLoading("Sending Execution Request");
         executionData["source"]="task";
         executionData["exectionMode"]=execAction;
@@ -162,7 +229,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     const syncScenarioChange = (value) => {
         setIntegration({alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {accountid:"",accesskey:"",secretkey:""}})
+        zephyr: {url:"",username:"",password:""}})
         if (value === "1") {
             setShowIntegrationModal("ALM")
 		}
@@ -186,7 +253,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
             {loading?<ScreenOverlay content={loading}/>:null}
             {allocateICE?
             <AllocateICEPopup 
-                SubmitButton={ExecuteTestSuite} 
+                SubmitButton={CheckStatusAndExecute} 
                 setAllocateICE={setAllocateICE}
                 modalButton={"Execute"} 
                 allocateICE={allocateICE} 
@@ -214,9 +281,23 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                     <button className="e__btn-md executeBtn" onClick={()=>{ExecuteTestSuitePopup()}} title="Execute">Execute</button>
                 </div>
 
-                <ExecuteTable current_task={current_task} setLoading={setLoading} setPopupState={setPopupState} selectAllBatch={selectAllBatch} filter_data={projectdata} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} eachDataFirst={eachDataFirst} setEachDataFirst={setEachDataFirst} />
+                <ExecuteTable setAccessibilityParameters={setAccessibilityParameters} scenarioTaskType={scenarioTaskType} accessibilityParameters={accessibilityParameters} current_task={current_task} setLoading={setLoading} setPopupState={setPopupState} selectAllBatch={selectAllBatch} filter_data={projectdata} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} eachDataFirst={eachDataFirst} setEachDataFirst={setEachDataFirst} />
                 </div>
-                        
+
+            {proceedExecution?
+                <ModalContainer
+                    title={"ICE Busy"} 
+                    footer={
+                        <>
+                        <button onClick={()=>{ExecuteTestSuite();setProceedExecution(false);}}>Proceed</button>
+                        <button onClick={()=>{setAllocateICE(true);setProceedExecution(false);}}>No</button>
+                        </>
+                    }
+                    close={()=>{setProceedExecution(false)}} 
+                    content={"Selected ICE is already executing a Test Suite. Press Proceed to queue this execution on selected ICE, press No to select any other ICE."} 
+                    modalClass=" modal-sm" 
+                />
+            :null} 
             {showDeleteModal?<ModalContainer title={modalDetails.title} footer={submitModalButtons(setshowDeleteModal, submit_task)} close={closeModal} content={"Are you sure you want to "+ modalDetails.task+" the task ?"} modalClass=" modal-sm" />:null} 
             { showIntegrationModal ? 
                 <IntegrationDropDown
@@ -273,7 +354,7 @@ const submitModalButtons = (setshowDeleteModal, submit_task) => {
     )
 }
 
-const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleInfo) => {
+const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleInfo,accessibilityParameters, scenarioTaskType, setPopupState) => {
     for(var i =0 ;i<eachData.length;i++){
         var testsuiteDetails = current_task.testSuiteDetails[i];
         var suiteInfo = {};
@@ -284,16 +365,21 @@ const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleI
         
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
+                if(scenarioTaskType === "exclusive" && accessibilityParameters.length === 0){
+                    setPopupState({show:true,title:"Accessibility Standards",content:"Please select one or more accessibility testing standard to proceed."});
+                    return false;
+                }
                 selectedRowData.push({
                     condition: eachData[i].condition[j],
                     dataparam: [eachData[i].dataparam[j].trim()],
                     scenarioName: eachData[i].scenarionames[j],
                     scenarioId: eachData[i].scenarioids[j],
                     scenariodescription: undefined,
-                    accessibilityParameters: "Disable"
+                    accessibilityParameters: accessibilityParameters
                 });
             }
         }
+        suiteInfo.scenarioTaskType = scenarioTaskType;
         suiteInfo.testsuiteName = eachData[i].testsuitename;
         suiteInfo.testsuiteId = eachData[i].testsuiteid;
         suiteInfo.versionNumber = testsuiteDetails.versionnumber;

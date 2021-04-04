@@ -813,9 +813,9 @@ const ProjectNew = (props) => {
         <div className="col-xs-9 form-group" style={{width: "83%"}}>
             <div className='userForm-project projectForm-project display-project' >
                 <div className='domainTxt'>Domain</div>
-                <select value={selDomain} onChange={(event)=>{fetchProjectList(event.target.value);setSelDomain(event.target.value);}} className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project domain-custom':"adminSelect-project form-control__conv-project domain-custom"} id="selDomain" >
+                <select defaultValue={""} value={selDomain} onChange={(event)=>{fetchProjectList(event.target.value);setSelDomain(event.target.value);}} className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project form-control__conv-project domain-custom':"adminSelect-project form-control__conv-project domain-custom"} id="selDomain" >
                     {(taskName==="Update Project")?
-                        <option disabled={true} value="" selected>Please Select Your Domain</option>
+                        <option disabled={true} value="">Please Select Your Domain</option>
                     :null}
                     {selDomainOptions.map((e,i)=>(
                         <option key={i}  value={selDomainOptions[i]} onClick={()=>{fetchProjectList();setSelDomain(selDomainOptions[i]);}}>{selDomainOptions[i]}</option>

@@ -7,7 +7,7 @@ import '../styles/DropDownList.scss'
   use: renders searchable available ice dropdown
 */
 
-const DropDownList = ({data,smartMode,selectedICE, setSelectedICE, placeholder}) => {
+const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,selectedICE, setSelectedICE, placeholder}) => {
     const inputRef = useRef()
     const [list,setList] =  useState([])
     const [dropDown,setDropDown] = useState(false)
@@ -42,7 +42,8 @@ const DropDownList = ({data,smartMode,selectedICE, setSelectedICE, placeholder})
 			setSelectedICE(icename);
             inputRef.current.value = icename
             setDropDown(false)
-		}
+        }
+        setInputErrorBorder(false);
     }
 
     const selectOptionCheckBox = (value) => document.getElementById(value).checked = !document.getElementById(value).checked
@@ -51,7 +52,7 @@ const DropDownList = ({data,smartMode,selectedICE, setSelectedICE, placeholder})
         <Fragment>
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
             <div>
-                <input type={'hidden'} autoComplete={"off"} ref={inputRef} className="btn-users dropdown-toggle-edit edit-user-dropdown-edit" onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder={placeholder}/>
+                <input autoComplete={"off"} ref={inputRef} className={ (inputErrorBorder?" dropdownInputError ":"") + "btn-users edit-user-dropdown-edit"} onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder={placeholder}/>
                 <div className="form-inp-dropdown-popup" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list.map((ice,index) => (  

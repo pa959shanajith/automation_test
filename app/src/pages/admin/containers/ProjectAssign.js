@@ -154,7 +154,6 @@ const ProjectNew = (props) => {
                         setAssignProj({allProjectAP:[],assignedProjectAP:[]});
                     }
                     setShowload(false);
-                    // $("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", false);
                 }
             } else {
                 const res = await getDetails_ICE(idtype, requestedids);
@@ -358,7 +357,7 @@ const ProjectNew = (props) => {
 		    </div>
 
             <div className="adminActionBtn">
-                <button className=" btn-md adminBtn " onClick={()=>{clickAssignProjects()}}  title="Save">Save</button>
+                <button className=" a__btn " onClick={()=>{clickAssignProjects()}}  title="Save">Save</button>
             </div> 
 
             <div className="col-xs-9 form-group" style={{width: "83%"}}>

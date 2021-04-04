@@ -1,24 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import PluginBox from './PluginBox';
 import "../styles/PluginSection.scss"
 import PropTypes from 'prop-types';
 
 const PluginSection = ({userInfo}) => {
 
-    const [pluginList, setPluginList] = useState([]);
+    const [pluginList, setPluginList] = useState({
+        "Integration": { title: "Integrations", show: false },
+        "Mindmap": { title: "Mindmaps", show: false },
+        "Reports": { title: "Reports", show: false},
+        "Utility" : { title: "Utilities", show: false},
+        "showList" : false,
+    });
 
     useEffect(()=>{
         if (Object.keys(userInfo).length!==0){
-            let tempList = [];
+            let tempList = { ...pluginList };
             let availablePlugins = userInfo.pluginsInfo;
             let pluginsLength = availablePlugins.length;
-            let nameMap = {"Integration": "Integrations", "Mindmap": "Mindmaps", "Reports": "Reports", "Utility": "Utilities"}
+    
             for(let i=0 ; i < pluginsLength ; i++){
                 if(availablePlugins[i].pluginValue !== false){
                     let pluginName = availablePlugins[i].pluginName;
-                    tempList.push({'pluginName': nameMap[pluginName] || pluginName, image: pluginName });
+                    
+                    if (tempList[pluginName]) tempList[pluginName].show = true;
+                    else tempList[pluginName] = { title: pluginName, show: true};
                 }
             }
+
+            tempList.showList = true;
             setPluginList(tempList);
         }
     }, [userInfo]);
@@ -28,8 +38,16 @@ const PluginSection = ({userInfo}) => {
             <div data-test="available-plugins-title" className="avail-plugin-title">Available Plugins</div>
             <div data-test="plugins-blocks" className="plugin-blocks">
                 {
-                    pluginList.length !==0 && pluginList.map((plugin, i)=>
-                        <PluginBox key={i} plugin={plugin}/>
+                    pluginList.showList && Object.keys(pluginList).map(pluginName =>
+                        <Fragment key={pluginName} >
+                        {
+                            pluginList[pluginName].show && 
+                            <PluginBox 
+                                pluginName={pluginName} 
+                                pluginTitle={pluginList[pluginName].title}
+                            />
+                        }
+                        </Fragment>
                     )
                 }
             </div>

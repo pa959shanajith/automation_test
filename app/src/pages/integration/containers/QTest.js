@@ -229,8 +229,8 @@ const  QTest = props => {
         {viewMappedFiles === "qTest" ? 
             <MappedPage
                 screenType="qTest"
-                leftBoxTitle="qTest Tests"
-                rightBoxTitle="Avo Assure Scenarios"
+                leftBoxTitle="Avo Assure Scenarios"
+                rightBoxTitle="qTest Tests"
                 mappedfilesRes={mappedFilesICERes}
             /> : 
         <>

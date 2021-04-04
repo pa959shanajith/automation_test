@@ -134,10 +134,10 @@ const LdapConfigEdit = (props) => {
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <div id="page-taskName"><span>Create LDAP Configuration</span></div>
-            <div className="adminActionBtn-oidc">
-                <button className="btn-md-ldap adminBtn-ldap ldap-disabled-btn btn-margin-ldap" onClick={()=>{props.ldapTest()}} disabled={props.serverName === ''} title="Test Configuration">Test</button> 
-                <button className="btn-md-ldap adminBtn-ldap ldap-disabled-btn btn-margin-ldap" onClick={()=>{setshowDeleteModal(true)}} disabled={props.serverName === ''} title="Delete Configuration">Delete</button>            
-                <button className="btn-md-ldap adminBtn-ldap ldap-disabled-btn" onClick={()=>{props.ldapManage('update')}} disabled={props.serverName === ''} title="Update Configuration">Update</button>
+            <div className="adminActionBtn">
+                <button className="a__btn ldap-disabled-btn btn-margin-ldap" onClick={()=>{props.ldapTest()}} disabled={props.serverName === ''} title="Test Configuration">Test</button> 
+                <button className="a__btn ldap-disabled-btn btn-margin-ldap" onClick={()=>{setshowDeleteModal(true)}} disabled={props.serverName === ''} title="Delete Configuration">Delete</button>            
+                <button className="a__btn ldap-disabled-btn" onClick={()=>{props.ldapManage('update')}} disabled={props.serverName === ''} title="Update Configuration">Update</button>
             </div>
             <div className="ldap-content_wrapper-edit">
                 <ScrollBar thumbColor="#929397">

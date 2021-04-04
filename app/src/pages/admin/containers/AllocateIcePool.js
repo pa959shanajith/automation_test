@@ -34,7 +34,7 @@ const AllocateIcePool = ({resetMiddleScreen}) => {
                 <span>Allocate ICE Pool</span>
             </div>
             <div className="adminActionBtn">
-                <button disabled={selectedPool?false:true} className=" btn-md adminBtn" onClick={()=>setSaveAction(true)}  title="Save">Save</button>
+                <button disabled={selectedPool?false:true} className=" a__btn " onClick={()=>setSaveAction(true)}  title="Save">Save</button>
             </div>
             <div className='col-xs-9 form-group allocate-opt'>
                 <div className={!quant?"unactive-opt":""} onClick={()=>setQuant(true)}>Quantity</div>

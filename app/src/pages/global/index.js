@@ -16,6 +16,7 @@ import Report from './components/Report'
 import BrowserFp from './components/BrowserFp';
 import IntegrationDropDown from './components/IntegrationDropDown';
 import ChangePassword from './components/ChangePassword';
+import GenerateTaskList from './components/GenerateTaskList';
 
 export { Header, 
         FooterOne, 
@@ -35,5 +36,6 @@ export { Header,
         Report,
         BrowserFp,
         IntegrationDropDown,
-        ChangePassword
+        ChangePassword,
+        GenerateTaskList
     };

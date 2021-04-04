@@ -71,24 +71,3 @@
     margin: 12px 11px;
     user-select: none;
 }
-.modal-footer-edit{
-    padding: 15px;
-    text-align: right;
-    border-top: 1px solid #e5e5e5;
-}
-.modal-footer-edit button {
-    background: #643693;
-    color: #fff;
-    border: 0;
-    border-radius: 20px;
-    padding: 5px 20px;
-    font-size: 16px;
-}
-.btn-default.focus, .btn-default, .btn-default:active:focus, .btn-default:focus, .btn-default:hover {
-    background: #643693;
-    color: #fff;
-    outline: 0;
-}
-.inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
-}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {ScrollBar, TaskContents} from '../../global';
+import {ScrollBar, TaskContents, GenerateTaskList } from '../../global';
 import { useSelector } from 'react-redux';
 import "../styles/ReferenceBar.scss";
 import ClickAwayListener from 'react-click-away-listener';
@@ -42,47 +42,8 @@ const ReferenceBar = (props) => {
             // } else if(window.location.pathname != "/neuronGraphs") {
             //     $("#nGraphsCSS").remove();
             // }
-            if (Object.keys(tasksJson)!==0){
-                setTaskList([]);
-            }
-            let lenght_tasksJson = tasksJson.length;
-            let task_list = [];
-            for(let i=0; i < lenght_tasksJson; i++) {
-                let testSuiteDetails =tasksJson[i].testSuiteDetails;
-                let tasktype = tasksJson[i].taskDetails[0].taskType;
-                let taskname = tasksJson[i].taskDetails[0].taskName;
-                let dataobj = {
-                    'accessibilityParameters': tasksJson[i].accessibilityParameters,
-                    'scenarioflag':tasksJson[i].scenarioFlag,
-                    'scenarioTaskType': tasksJson[i].scenarioTaskType || 'disable',
-                    'apptype':tasksJson[i].appType,
-                    'projectid':tasksJson[i].projectId,
-                    'screenid':tasksJson[i].screenId,
-                    'screenname':tasksJson[i].screenName,
-                    'testcaseid':tasksJson[i].testCaseId,
-                    'testcasename':tasksJson[i].testCaseName,
-                    'scenarioid':tasksJson[i].scenarioId,
-                    'taskname':taskname,
-                    'taskdes':tasksJson[i].taskDetails[0].taskDescription,
-                    'tasktype':tasksJson[i].taskDetails[0].taskType,
-                    'subtask':tasksJson[i].taskDetails[0].subTaskType,
-                    'subtaskid':tasksJson[i].taskDetails[0].subTaskId,
-                    'assignedtestscenarioids':tasksJson[i].assignedTestScenarioIds,
-                    'assignedto':tasksJson[i].taskDetails[0].assignedTo,
-                    'startdate':tasksJson[i].taskDetails[0].startDate,
-                    'exenddate':tasksJson[i].taskDetails[0].expectedEndDate,
-                    'status':tasksJson[i].taskDetails[0].status,
-                    'versionnumber':tasksJson[i].versionnumber,
-                    'batchTaskIDs':tasksJson[i].taskDetails[0].batchTaskIDs,
-                    'releaseid':tasksJson[i].taskDetails[0].releaseid,
-                    'cycleid':tasksJson[i].taskDetails[0].cycleid,
-                    'reuse':tasksJson[i].taskDetails[0].reuse
-                }
-
-                task_list.push({'panel_idx': i, 'testSuiteDetails': testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype});
-                
-            }
-            setTaskList(task_list);
+            let taskList = GenerateTaskList(tasksJson, "refList");
+            setTaskList(taskList);
     }, [tasksJson]);
     useEffect(()=>{
         setCollapse(props.collapse)
@@ -186,7 +147,7 @@ const ReferenceBar = (props) => {
                                 <div id='task_pop_scroll' className="task_pop__overflow">
                                     <ScrollBar scrollId='task_pop_scroll' trackColor={'transparent'} thumbColor={'grey'}>
                                         <div className="task_pop__content" id="rb__pop_list">
-                                            <TaskContents items={searchValue ? searchItems : taskList} testCaseId={current_task.testCaseId} taskName={current_task.taskName} cycleDict={dataDict.cycleDict} taskJson={tasksJson}/>
+                                            <TaskContents items={searchValue ? searchItems : taskList} cycleDict={dataDict.cycleDict} taskJson={tasksJson} currUid={current_task.uid} />
                                         </div>
                                     </ScrollBar>
                                 </div>

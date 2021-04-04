@@ -36,8 +36,8 @@ const IceProvision = (props) => {
         <div className="ip_container">
             <div id="page-taskName"><span>ICE Provision</span></div>
             <div className="adminActionBtn">
-                <button className="btn-md pull-right adminBtn-ice-prov" onClick={()=>{setRunProvisionsIce(!runProvisionsIce)}}  title="Provision">Provision</button>
-                <button className="btn-md pull-right adminBtn-ice-prov adminBtn-ice-provision " onClick={()=>{refreshIceProvision()}} title="Refresh">Refresh</button>            
+                <button className="a__btn pull-right" onClick={()=>{setRunProvisionsIce(!runProvisionsIce)}}  title="Provision">Provision</button>
+                <button className="a__btn pull-right adminBtn-ice-provision " onClick={()=>{refreshIceProvision()}} title="Refresh">Refresh</button>            
             </div>
             <div className="ip-content_wrapper">
                 <ScrollBar thumbColor="#929397">
