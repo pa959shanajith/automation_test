@@ -131,7 +131,7 @@ const ZephyrContent = props => {
                 rightBoxTitle="Avo Assure Scenarios"
                 selectTestProject={
                     <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
-                        <option value="Select Project" selected disabled >Select Project</option>
+                        <option value="Select Project" disabled >Select Project</option>
 
                         {   props.domainDetails ? 
                             props.domainDetails.map(e => (
@@ -152,7 +152,7 @@ const ZephyrContent = props => {
                 }
                 selectScenarioProject={
                     <select data-test="intg_zephyr_scenario_dwpdwn" value={scenario_ID} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
-                        <option value="Select Project"selected disabled >Select Project</option>
+                        <option value="Select Project" disabled >Select Project</option>
                         {
                             avoProjects? 
                             avoProjects.map((e,i)=>(
@@ -177,11 +177,13 @@ const ZephyrContent = props => {
                 testList={ Object.keys(projectDetails).length ? 
                     <Fragment>    
                         <div data-test="intg_zephyr_test_list" className="test__rootDiv">
-                            <img alt="collapse"
-                                className="test_tree_toggle" 
-                                src="static/imgs/ic-qcCollapse.png"
-                            />
-                            <label>Root</label>
+                            <div className="test_tree_branches">
+                                <img alt="collapse"
+                                    className="test_tree_toggle" 
+                                    src="static/imgs/ic-qcCollapse.png"
+                                />
+                                <label>Root</label>
+                            </div>
                             { Object.keys(projectDetails)
                                 .map( cycleName => <CycleNode 
                                         key={cycleName}

@@ -97,7 +97,6 @@ const  QTest = props => {
     }
     const callCycleExpand =(idx)=>{//sets the state for logo of expand collapse for cycles 
         var expandarr =[...folderDetails];
-        console.log(expandarr[0].cycleOpen)
         expandarr.map((e,i)=>(
             i=== idx.i ? (e['cycleOpen'] === true)? e['cycleOpen'] = false : e['cycleOpen'] = true : null
         ))
