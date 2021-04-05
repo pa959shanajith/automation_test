@@ -9,9 +9,20 @@ import reducer from '../state/reducer';
 import { act } from 'react-dom/test-utils';
 import * as data from './DummyData';
 import * as api from "../api";
-import DesignHome from '../containers/DesignHome';
+import DependentTestCaseDialog from '../components/DependentTestCaseDialog';
 
-describe('<DesignHome /> Positive Scenario', ()=>{
+let props = {
+    scenarioId: data.CT.scenarioId,
+    setShowDlg: jest.fn(),
+    checkedTc: [],
+    setCheckedTc: jest.fn(),
+    setDTcFlag: jest.fn(),
+    taskName: data.CT.testCaseName,
+    taskId: data.CT.testCaseId,
+    setShowPop: jest.fn(),
+}
+
+describe('<DependentTestCaseDialog /> positive scenario test', ()=>{
 
     let wrapper;
     let mockDispatch;
@@ -20,7 +31,7 @@ describe('<DesignHome /> Positive Scenario', ()=>{
         plugin: {
             CT: data.CT,
             FD: data.FD,
-            tasksJson: data.taskJson,
+            // tasksJson: data.taskJson,
         },
         design: {
             copiedTestCases: {},
@@ -31,6 +42,7 @@ describe('<DesignHome /> Positive Scenario', ()=>{
     }
     
     beforeEach(async() => {
+
         const mockStore = createStore(reducer, state);
 
         mockDispatch = jest.fn();
@@ -40,17 +52,18 @@ describe('<DesignHome /> Positive Scenario', ()=>{
 
         jest.spyOn(api, 'readTestCase_ICE')
             .mockImplementation( ()=> Promise.resolve(data.tcData));
+        
+        jest.spyOn(api, 'getTestcasesByScenarioId_ICE')
+            .mockImplementation( ()=> Promise.resolve(data.dependentTestCases));
 
-        jest.spyOn(api, 'getScrapeDataScreenLevel_ICE')
-            .mockImplementation( ()=> Promise.resolve(data.scrapeData));
-
-        jest.spyOn(api, 'getKeywordDetails_ICE')
-            .mockImplementation( ()=> Promise.resolve(data.keywordData));
+            
+        let windowMock = jest.fn();
+        window.document = windowMock;
 
         wrapper = mount(
             <Provider store={mockStore}>
                 <BrowserRouter>
-                    <DesignHome />
+                    <DependentTestCaseDialog {...props} />
                 </BrowserRouter>
             </Provider>
         );
@@ -62,28 +75,22 @@ describe('<DesignHome /> Positive Scenario', ()=>{
         jest.resetAllMocks()
     })
 
-    it('Should Render Header', ()=>{
-        const header = findByTestAtrr(wrapper, 'd__header');
-        expect(header.length).toBe(1);
+    it('Should Render Dependent Testcase Modal', ()=>{
+        const dtcModal = findByTestAtrr(wrapper, 'd__dtc');
+        expect(dtcModal.length).toBe(1);
     })
 
-    it('Should Render Action Bar', ()=>{
-      const actionBar = findByTestAtrr(wrapper, 'd__actionBar');
-      expect(actionBar.length).toBe(1);
+    it('Should Render all TestCases', ()=>{
+        wrapper.update();
+        const testCases = findByTestAtrr(wrapper, 'd__dtc_item');
+        expect(testCases.length).toBe(data.dependentTestCases.length);
     })
 
-    it('Should Render Content', ()=>{
-        const contents = findByTestAtrr(wrapper, 'd__contents');
-        expect(contents.length).toBe(1);
+    it('Should Save on Pressing Save Button', ()=>{
+        const saveBtn = findByTestAtrr(wrapper, 'd__dtc_save');
+        saveBtn.simulate('click');
+        
+        expect(props.setShowPop).toHaveBeenCalled();
     })
 
-    it('Should Render Reference Bar', ()=>{
-        const refBar = findByTestAtrr(wrapper, 'd__refBar');
-        expect(refBar.length).toBe(1);
-    })
-
-    it('Should Render Footer', ()=>{
-        const footer = findByTestAtrr(wrapper, 'd__footer');
-        expect(footer.length).toBe(1);
-    })
 })

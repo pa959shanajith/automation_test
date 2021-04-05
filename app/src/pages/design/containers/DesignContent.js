@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
@@ -35,6 +35,8 @@ const DesignContent = props => {
     const copiedContent = useSelector(state=>state.design.copiedTestCases);
     const modified = useSelector(state=>state.design.modified);
     const saveEnable = useSelector(state=>state.design.saveEnable);
+
+    const headerCheckRef = useRef();
 
     const history = useHistory();
     const dispatch = useDispatch();
@@ -117,6 +119,7 @@ const DesignContent = props => {
                 setEdit(false);
                 setFocusedRow(null);
                 setCheckedRows([]);
+                headerCheckRef.current.indeterminate = false;
                 setDraggable(false);
                 setChanged(false);
                 setHeaderCheck(false);
@@ -358,6 +361,7 @@ const DesignContent = props => {
         }
         setFocusedRow(null);
         setCheckedRows([]);
+        headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
     }
 
@@ -449,6 +453,7 @@ const DesignContent = props => {
         setPastedTC(localPastedTc);
         setTestCaseData(testCases);
         setCheckedRows([]);
+        headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
         setFocusedRow(null);
         props.setShowConfirmPop(false);
@@ -473,7 +478,7 @@ const DesignContent = props => {
         setHeaderCheck(false);
         setFocusedRow(insertedRowIdx);
         setChanged(true);
-        document.getElementById('design__tcCheckbox').indeterminate = false;
+        headerCheckRef.current.indeterminate = false;
         // setEdit(false);
     }
 
@@ -487,7 +492,7 @@ const DesignContent = props => {
         stepList.push(...checkedRows)
         let newChecks = Array.from(new Set(stepList))
         setCheckedRows([...newChecks]);
-        document.getElementById('design__tcCheckbox').indeterminate = newChecks.length!==0 && newChecks.length !== testCaseData.length;
+        headerCheckRef.current.indeterminate = newChecks.length!==0 && newChecks.length !== testCaseData.length;
         setShowSM(false);
     }
 
@@ -505,7 +510,7 @@ const DesignContent = props => {
             setFocusedRow(focus);
             setEdit(true);
             setDraggable(false);
-            document.getElementById('design__tcCheckbox').indeterminate = check.length!==0 && check.length !== testCaseData.length;
+            headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
         }
     }
 
@@ -514,7 +519,7 @@ const DesignContent = props => {
         setFocusedRow(null);
         setHeaderCheck(false);
         setEdit(false);
-        document.getElementById('design__tcCheckbox').indeterminate = false;
+        headerCheckRef.current.indeterminate = false;
 
         if (draggable) setDraggable(false);
         else setDraggable(true);
@@ -547,7 +552,7 @@ const DesignContent = props => {
                 setEdit(false);
             }
             setCheckedRows([]);
-            document.getElementById('design__tcCheckbox').indeterminate = false;
+            headerCheckRef.current.indeterminate = false;
             setHeaderCheck(false);
             setFocusedRow(null);
         }
@@ -622,7 +627,7 @@ const DesignContent = props => {
         setShowPS(false);
         setFocusedRow(toFocus);
         setCheckedRows([]);
-        document.getElementById('design__tcCheckbox').indeterminate = false;
+        headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
         setChanged(true);
     }
@@ -650,7 +655,7 @@ const DesignContent = props => {
             // setRowChange(!rowChange);
             setChanged(true);
             setCommentFlag(true);
-            document.getElementById('design__tcCheckbox').indeterminate = false;
+            headerCheckRef.current.indeterminate = false;
         }
     }
 
@@ -685,7 +690,7 @@ const DesignContent = props => {
         setHeaderCheck(headerCheckFlag);
         setFocusedRow(focusIdx); 
         setCheckedRows(check);
-        document.getElementById('design__tcCheckbox').indeterminate = check.length!==0 && check.length !== testCaseData.length;
+        headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
     }
 
     const onAction = (operation) => {
@@ -712,6 +717,7 @@ const DesignContent = props => {
         setFocusedRow(null); 
         setHeaderCheck(event.target.checked);
         setCheckedRows(checkList);
+        headerCheckRef.current.indeterminate = false;
     }
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
@@ -774,7 +780,7 @@ const DesignContent = props => {
             <div className="d__table">
                 <div className="d__table_header">
                     <span className="step_col d__step_head" ></span>
-                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} id="design__tcCheckbox" /></span>
+                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Object Name</span>
                     <span className="keyword_col d__key_head" >Keyword</span>
                     <span className="input_col d__inp_head" >Input</span>

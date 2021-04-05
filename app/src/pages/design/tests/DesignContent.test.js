@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { useRef } from 'react';
 import * as reactRedux  from 'react-redux';
 import { Provider }  from 'react-redux';
 import { createStore } from 'redux';
-import { shallow, mount } from 'enzyme';
+import { mount } from 'enzyme';
 import { findByTestAtrr } from '../../../setupTests';
 import { BrowserRouter } from 'react-router-dom';
 import reducer from '../state/reducer';
@@ -138,6 +137,15 @@ describe('<DesignContent /> positive scenario test', ()=>{
 
         const psBtn = findByTestAtrr(wrapper, 'd__tblActionBtns').at(5);
         psBtn.simulate('click');
+        
+        expect(props.setShowPop).toHaveBeenCalled();
+    })
+
+    it('Should Display no Steps to Comment when clicked Comment Icon', ()=>{
+        wrapper.update();
+
+        const cmtBtn = findByTestAtrr(wrapper, 'd__tblActionBtns').at(6);
+        cmtBtn.simulate('click');
         
         expect(props.setShowPop).toHaveBeenCalled();
     })

@@ -87,7 +87,7 @@ const DependentTestCaseDialog = props => {
     }
 
     return (
-        <div className="dependentTestCaseContainer">
+        <div className="dependentTestCaseContainer" data-test="d__dtc">
         <ModalContainer 
             title="Select Dependent Test Cases"
             content={
@@ -104,7 +104,7 @@ const DependentTestCaseDialog = props => {
                     </div>
                 </div>
             }
-            footer={ <button onClick={onSave}>Save Dependent Test Cases</button> }
+            footer={ <button onClick={onSave} data-test="d__dtc_save">Save Dependent Test Cases</button> }
             close={()=>{
                 setError("");
                 props.setShowDlg(false)
@@ -143,7 +143,7 @@ const TestCaseItem = ({index, testCase, updateChecklist}) => {
     }
     
     return (
-        <div className="testCaseItem">
+        <div className="testCaseItem" data-test="d__dtc_item">
             <input className="tcCheck" type="checkbox" onChange={handleCheck} disabled={testCase.disableAndBlock} checked={check}/>
             <label className="tcName" >{testCase.testCaseName}</label>
             <Link className="tcView" to="#" onClick={onView}>View</Link>
