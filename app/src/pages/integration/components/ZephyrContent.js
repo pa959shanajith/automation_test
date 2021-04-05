@@ -55,7 +55,6 @@ const ZephyrContent = props => {
 
     const callScenarios =(e)=>{
         const scenarioID = e.target.value;
-        console.log(e.target.value)
         setScenarioArr(true);
         setScenario_ID(scenarioID);
         setFilteredName(null);

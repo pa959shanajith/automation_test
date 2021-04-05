@@ -96,28 +96,23 @@ const UtilityCenter=(props)=>{
     }
     const updateInputFactorTable=(e,i)=>{ //updates user input in Factor in the table
         FactorTable.splice(i , 1 , e.target.value)
-        console.log(FactorTable);
     }
     const updateInputLevelTable =(e,i)=>{ //updates user input in level in the table
         LevelTable.splice(i,1,e.target.value)
-        console.log(LevelTable);
     }
     const callCreate=()=>{
         let fact = factref.current.value || 0;
         let lev = levelref.current.value || 0;
         if(!fact){
             setEmptyCreateCall("factor")
-            console.log("factor")
         }
         else if(!lev){
             setEmptyCreateCall("level")
-            console.log("level")
         }
         else {
             setLevel(parseInt(levelref.current.value));
             setFactor(parseInt(factref.current.value));
             setEmptyCreateCall('')
-            console.log("common")
     }}
     const callGenerate =()=>{ // Genrate API will be called here rightnow Dummy
         if(FactorTable.length && LevelTable.length){

@@ -97,6 +97,7 @@ const  QTest = props => {
     }
     const callCycleExpand =(idx)=>{//sets the state for logo of expand collapse for cycles 
         var expandarr =[...folderDetails];
+        console.log(expandarr[0].cycleOpen)
         expandarr.map((e,i)=>(
             i=== idx.i ? (e['cycleOpen'] === true)? e['cycleOpen'] = false : e['cycleOpen'] = true : null
         ))
@@ -104,14 +105,12 @@ const  QTest = props => {
     }
     const callTestSuiteExpand =(idx)=>{//sets the state for logo of expand collapse testSuites
         var expandarr=[...folderDetails];
-        console.log(parseInt(idx))
         expandarr.map((e,i)=>(
             e.testsuites.map((testsuite , index)=>(
                 (testsuite.id) === (idx) ? 
                 testsuite['TestsuiteOpen'] === true ? testsuite['TestsuiteOpen'] = false : testsuite['TestsuiteOpen'] = true : null            
         ))))
         setFolderDetails(expandarr)
-        console.log(folderDetails)
     }
     const callTestSuiteSelection=(event ,idx , name)=>{//sets the selectedtestSuite (id and Name) 
         setSelectedTestSuiteID(idx)
