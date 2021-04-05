@@ -16,6 +16,7 @@ import '../styles/TokenMgmtForm.scss'
 const TokenMgmtForm = (props) => {
 	const dateRef = useRef()
 	const timeRef = useRef()
+	const dateVal = props.dateVal;
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     const [allUsers,setAllUsers] = useState([['Select User',' ','','']])
@@ -232,13 +233,16 @@ const TokenMgmtForm = (props) => {
 							<Datetime 
 								ref={dateRef} 
 								isValidDate={valid} 
-								value={props.dateVal} 
+								value={dateVal} 
 								onChange={(event)=>{props.setdateVal(event.format("DD-MM-YYYY"));setInputProps1Disable(false);props.setTimeVal(new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)))}} 
 								dateFormat="DD-MM-YYYY" 
 								closeOnSelect={true} 
 								inputProps={inputProps} 
 								timeFormat={false} 
 								id="data-token"
+								renderInput={(props) => {
+									return <input {...props} value={ dateVal ? props.value : ''} />
+								}}
 							/> 
                             <img onClick={()=>{dateRef.current._onInputClick()}} className="datepickerIconToken" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
 						</span>
