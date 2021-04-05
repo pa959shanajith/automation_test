@@ -19,11 +19,6 @@
 	font-family: 'LatoWebLight' !important;
     outline: 0 !important;
 }
-@media screen and (min-width:1800px){
-    .e__btn-md{
-        font-size: 1.2vw !important;
-    }
-}
 .e__content{
     display: flex;
     flex-direction: column;
@@ -168,18 +163,6 @@
 .qtestSteps{
     margin-top:10px;
     margin-bottom:20px;
-}
-#scheduledSuitesFilterData{
-	margin-bottom: 0;
-    border: 1px solid #5e636b !important;
-    display: inline-block;
-    float: none;
-    width: 15%;
-    height: 30px;
-    margin-left: 15px;
-}
-#scheduledSuitesFilterData:focus{
-	box-shadow:none;
 }
 .e__disableOption{
     background: lightgrey !important

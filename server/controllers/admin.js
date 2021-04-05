@@ -1608,6 +1608,40 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 					res.send("success");
 				}
 			});
+			if(updateProjectDetails.newProjectName !== undefined) {
+				try {
+					var newpProjectName = updateProjectDetails.newProjectName;
+					var inputs = {
+						"query": "updateprojectname",
+						"projectid":requestedprojectid,
+						"newprojectname": newpProjectName,
+						"modifiedby":userinfo.user_id,
+						"modifiedbyrole":userinfo.role
+					};
+					var args = {
+						data: inputs,
+						headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					logger.info("Calling DAS Service from updateProjectName : admin/createProject_ICE");
+					client.post(epurl + "admin/updateProject_ICE", args,
+						function (data, response) {
+
+						try {
+							if (response.statusCode != 200 || data.rows == "fail") {
+							logger.error("Error occurred in admin/createProject_ICE from updateProjectName Error Code : ERRDAS");
+							} else {
+								res.send("success")
+							}
+						} catch (exception) {
+						logger.error(exception.message);
+						}
+					});
+				} catch (exception) {
+					logger.error(exception.message);
+				}
+			}
 		} else {
 			res.send('fail');
 		}

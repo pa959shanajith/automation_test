@@ -3,7 +3,7 @@ import ModuleList from '../components/ModuleList';
 import ToolbarMenu from '../components/ToolbarMenu';
 import { ScreenOverlay ,PopupMsg, ScrollBar} from '../../global';
 import { useDispatch } from 'react-redux';
-import ExecutionPanel from '../components/ExecutionPanel';
+import ExecPanel from '../components/ExecPanel';
 import ScStatusPanel from '../components/ScStatusPanel';
 import ScDetailPanel from '../components/ScDetailPanel';
 import * as actionTypes from '../state/action';
@@ -20,7 +20,8 @@ const TestingReport = ({setBlockui,displayError}) =>{
     const [scStatus,setScStatus] = useState({})
     useEffect(()=>{
         return ()=>{
-            dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
+            // dispatch({type:actionTypes.UPDATE_MODULELIST,payload:[]})
+            dispatch({type:actionTypes.RESET_DETAILS})
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
@@ -48,18 +49,16 @@ const TestingReport = ({setBlockui,displayError}) =>{
     },[scDetails])
     return(
         <Fragment>
-            <div className='tr__body'>
-                <div className='rp__content'>
-                    <div className='left-content'>
-                        <ExecutionPanel selectedScDetails={selectedScDetails} setSelectedDetails={setSelectedDetails} setScDetails={setScDetails} setBlockui={setBlockui} displayError={displayError}/>
-                    </div>
-                    <div className='right-content'>
-                        <ScStatusPanel selectedScDetails={selectedScDetails} arr={scStatus} setBlockui={setBlockui} displayError={displayError}/>
-                    </div>
+            <div className='tr__body rp__content'>
+                <div className='left-content'>
+                    <ExecPanel selectedScDetails={selectedScDetails} setSelectedDetails={setSelectedDetails} setScDetails={setScDetails} setBlockui={setBlockui} displayError={displayError}/>
                 </div>
-                <div className='bottom-content'>
-                    <ScDetailPanel selectedScDetails={selectedScDetails} scDetails={scDetails} setBlockui={setBlockui} displayError={displayError}/>
+                <div className='right-content'>
+                    <ScStatusPanel selectedScDetails={selectedScDetails} arr={scStatus} setBlockui={setBlockui} displayError={displayError}/>
                 </div>
+            </div>
+            <div className=' tr__body bottom-content'>
+                <ScDetailPanel selectedScDetails={selectedScDetails} scDetails={scDetails} setBlockui={setBlockui} displayError={displayError}/>
             </div>
         </Fragment>
     )

@@ -69,15 +69,15 @@ const LdapConfigurationForm = (props) => {
             </div></div>
             <div className='adminControl-ldap admin-ldap__secure'><div>
                 <span className="leftControl-ldap" title="Secure Connection (ldaps protocol)">Secure Connection</span>
-                <label className="adminFormRadio-ldap" title="Disable Secure LDAP (No ldaps)">
+                <label className="adminFormRadio" title="Disable Secure LDAP (No ldaps)">
                     <input type="radio" checked={props.secure==="false"} value="false" name="ldapSecure" onChange={()=>{props.setSecure("false");switchSecureUrl("false")}}/>
                     <span>Disable</span>
                 </label>
-                <label className="adminFormRadio-ldap" title="Enable Secure LDAP (ldaps)">
+                <label className="adminFormRadio" title="Enable Secure LDAP (ldaps)">
                     <input type="radio" checked={props.secure==="secure"} value="secure" name="ldapSecure" onChange={()=>{props.setSecure("secure");switchSecureUrl("secure")}}/>
                     <span>Enable</span>
                 </label>
-                <label className="adminFormRadio-ldap" title="Enable Secure LDAP (ldaps) but ignore TLS errors">
+                <label className="adminFormRadio" title="Enable Secure LDAP (ldaps) but ignore TLS errors">
                     <input type="radio" checked={props.secure==="insecure"} value="insecure" name="ldapSecure" onChange={()=>{props.setSecure("insecure");switchSecureUrl("insecure")}}/>
                     <span>Enable Insecure</span>
                 </label>
@@ -91,11 +91,11 @@ const LdapConfigurationForm = (props) => {
 			</div></div>
             <div className='adminControl-ldap admin-ldap__secure'><div>
                 <span className="leftControl-ldap" title="Secure Connection">Authentication</span>
-                <label className="adminFormRadio-ldap">
+                <label className="adminFormRadio">
                     <input type="radio" checked={props.auth==="anonymous"} value="anonymous" name="ldapAuth" onChange={()=>{props.setAuth("anonymous");switchAuthType("anonymous")}} />
                     <span>Anonymous</span>
                 </label>
-                <label className="adminFormRadio-ldap">
+                <label className="adminFormRadio">
                     <input type="radio" checked={props.auth==="simple"} value="simple" name="ldapAuth" onChange={()=>{props.setAuth("simple")}}/>
                     <span>Simple</span>
                 </label>
