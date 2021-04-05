@@ -65,9 +65,7 @@ const ALM = props => {
     }
     const callExitcenter=()=>{
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });;
-        //props.setAlmClicked(false)
     }
-
     return(
         <>
         { viewMappedFiles === "ALM" ?

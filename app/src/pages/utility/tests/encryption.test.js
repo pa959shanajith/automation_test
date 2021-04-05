@@ -111,7 +111,7 @@ describe('<Encryption/> positive scenario test',()=>{
         
     })
     
-    it('Should render the encrypted data when encryption files is changes and encode btn is clicked', async(done)=>{
+    it('Should render the encrypted data when encryption field is changed and encode btn is clicked', async(done)=>{
         const dropdown=findByTestAtrr(wrapper,'utility_screen_selection_sel');
         dropdown.simulate('change',{
             target:dropdownOptions[0]
@@ -152,7 +152,7 @@ describe('<LoginFields/> negative scenario test ',()=>{
         jest.restoreAllMocks()
     })
 
-    it('should highlight input box(if empty) and btn is clicked ', ()=>{
+    it('should highlight input box(if empty) and btn is clicked ', (done)=>{
         const dropdown=findByTestAtrr(wrapper,'utility_screen_selection_sel');
         dropdown.simulate('change',{
             target:dropdownOptions[0]
@@ -171,7 +171,7 @@ describe('<LoginFields/> negative scenario test ',()=>{
         })
     })
 
-    it('user should not be able to change anything in encrypted data field ', ()=>{
+    it('user should not be able to change anything in encrypted data field ', (done)=>{
         let inp=findByTestAtrr(wrapper,"utility_encrypted_data_inp")
         inp.simulate('change',{
             target:{

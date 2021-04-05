@@ -252,6 +252,32 @@
 }
 .pairsie_array_container{
     height: 68vh;
-    width: 70vw;
+    width: 65vw;
     margin-left: 10px;
+}
+#EmptyCall{
+        border: 1px solid red !important;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        outline: none;
+        width: 113px;
+        height: 24px;
+        padding: 3px;
+        margin: 0px 6px;
+        font-size: 14px;
+        font-family: 'Latoweb';
+        text-align: center;
+}
+#EmptyCall1{
+        border: 1px solid red !important;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        outline: none;
+        width: 113px;
+        height: 24px;
+        padding: 3px;
+        margin: 0px 6px;
+        font-size: 14px;
+        font-family: 'Latoweb';
+        text-align: center;
 }

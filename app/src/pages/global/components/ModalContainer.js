@@ -17,8 +17,8 @@ const ModalContainer = (props) => {
             <div className={'modal-dialog '+(props.modalClass?props.modalClass:"")}>
                 <div className='modal__content modal-content'>
                     <div className='modal-header modal__header'>
-                        <button onClick={(e)=>props.close(e)}>×</button>
-                        <h4 className='modal-title'>{props.title}</h4>
+                        <button data-test="modal_close_btn"onClick={(e)=>props.close(e)}>×</button>
+                        <h4 data-test="modal_title_head" className='modal-title'>{props.title}</h4>
                     </div>
                     <div className='modal-body modal__body'>
                         {props.content}

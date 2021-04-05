@@ -1,32 +1,62 @@
-import React ,{Fragment,useState } from 'react';
+import React ,{Fragment,useEffect,useState } from 'react';
 import {ScrollBar ,PopupMsg} from '../../global';
+import ValidationExpression from '../../global/components/ValidationExpression';
 
 const Pairwise=(props)=>{
-    const [optimizationType , SetOptimizationType]=useState(null);
+    const [optimizationType , SetOptimizationType]=useState(null);    
+    useEffect(()=>{
+        props.setLevel(0)
+        props.setFactor(0)
+       // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+    const callKeyDown=(type)=>{   
+        type ==="factor"?
+        props.factref.current.value = ValidationExpression(props.factref.current.value,"optimazationInput"):
+        props.levelref.current.value = ValidationExpression(props.levelref.current.value,"optimazationInput")
+
+    }
 return(
     <Fragment>
         {(optimizationType==="pairwise")?
                     <Fragment>
                         <div className="page-taskName" >
-                            <span className="taskname">
+                            <span data-test="utl_pairwise_scr_name" className="taskname">
                                 Pairwise
                             </span>
                         </div> 
                         <div className="pairwise_scr">
                             <span>Factor</span>
                             <input 
-                                type="number" 
+                                data-test="utl_pairwise_factor_inp"
                                 placeholder="Enter Factor" 
                                 ref={props.factref}
-                            />
+                                id={props.emptyCreateCall==="factor"?"EmptyCall":""}  
+                                onChange={()=>{callKeyDown('factor')}}  
+                                //value={props.factor}
+                            />                            
                             <span>Level</span>
                             <input 
-                                type="number"  
+                                data-test="utl_pairwise_level_inp"
                                 placeholder="Enter Level" 
                                 ref={props.levelref}
+                                id={props.emptyCreateCall==="level"?"EmptyCall":""}
+                                onChange={()=>{callKeyDown("level")}}  
+
                             />
-                            <button  className="btn-create" onClick={()=>{props.setLevel(parseInt(props.levelref.current.value));props.setFactor(parseInt(props.factref.current.value))}}>Create</button>
-                            <button className="btn-utl" onClick={()=>props.callGenerate()}>Generate</button>
+                            <button 
+                                    className="btn-create"
+                                    onClick={()=>props.callCreate()}
+                                    data-test="utl_pairwise_create_btn"
+                            >
+                                Create
+                            </button>
+                            <button 
+                                    className="btn-utl" 
+                                    onClick={()=>props.callGenerate()}
+                                    data-test="utl_pairwise_generate_btn"
+                            >
+                                Generate
+                            </button>
                         
                         <br/>
                             {props.gererateClick && <PopupMsg 
@@ -57,18 +87,18 @@ return(
                     </Fragment> :
                     <Fragment>
                         <div className="page-taskName">
-                            <span className="taskname">
+                            <span data-test="utl_optimization_scr_name" className="taskname">
                                 Optimization
                             </span>
                         </div>
                         <div id="optimization-fn">
                             <div>
-                                <div onClick={()=>SetOptimizationType("pairwise")} className="pairwise">
-                                    <img src='static/imgs/ic-pairwise.png' alt="Pairwise_img"/>
+                                <div data-test="utl_optimization_pairwise_div" onClick={()=>SetOptimizationType("pairwise")} className="pairwise">
+                                    <img data-test="utl_optimization_pairwise_logo" src='static/imgs/ic-pairwise.png' alt="Pairwise_img"/>
                                     <div>Pairwise</div>
                                 </div>
-                                <div className="pairwise">
-                                    <img src='static/imgs/ic-orthogonal-array.png' alt="Orthogonal_img"/>
+                                <div data-test="utl_optimization_orthogonal_div" className="pairwise">
+                                    <img data-test="utl_optimization_orthogonal_logo" src='static/imgs/ic-orthogonal-array.png' alt="Orthogonal_img"/>
                                     <div>Orthogonal Array</div>
                                 </div>
                             </div>
