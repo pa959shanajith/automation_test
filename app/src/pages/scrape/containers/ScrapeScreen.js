@@ -411,6 +411,14 @@ const ScrapeScreen = ()=>{
     }
 
     const PopupDialog = () => (
+        showPop.type === "modal" ? 
+        <ModalContainer 
+            title={showPop.title}
+            modalClass="modal-sm"
+            close={()=>setShowPop("")}
+            content={showPop.content}
+            footer={showPop.footer}
+        /> :
         <PopupMsg 
             title={showPop.title}
             close={()=>setShowPop("")}

@@ -1,13 +1,13 @@
 import React, { useState} from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types';
 
-const PluginBox = ({plugin}) => {
+const PluginBox = ({pluginName, pluginTitle}) => {
 
 	const [redirectTo, setRedirectTo] = useState("");
 
-	const pluginRedirect = event => {
-		let pluginName = plugin.image.toLowerCase();
+	const pluginRedirect = () => {
+		pluginName = pluginName.toLowerCase();
 		window.localStorage['navigateScreen'] = pluginName;
 		if (['report', 'performancetesting', 'dashboard'].indexOf(pluginName) > -1) window.location.href = "/"+ pluginName;
 		else {
@@ -20,8 +20,8 @@ const PluginBox = ({plugin}) => {
 		<>
 			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
             <div data-test="plugin-blocks" className="plugin-block" onClick={pluginRedirect}>
-                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${plugin.image}.png`} />
-                <span data-test="plugin-name" className="plugin-text">{plugin.pluginName}</span>
+                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName}.png`} />
+                <span data-test="plugin-name" className="plugin-text">{pluginTitle}</span>
         	</div>
 		</>
     );

@@ -266,6 +266,7 @@ const ScrapeObjectList = () => {
             if (dCustname) {
                 continueSave = false;
                 setShowPop({
+                    'type': 'modal',
                     'title': 'Save Scrape data',
                     'content': <div className="ss__dup_labels">
                         Please rename/delete duplicate scraped objects
@@ -276,7 +277,8 @@ const ScrapeObjectList = () => {
                             { dCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
                             </div>
                         </ScrollBar>
-                    </div>
+                    </div>,
+                    'footer': <button onClick={()=>setShowPop("")}>OK</button>
                 })
             } else if (dXpath) {
                 continueSave = false;

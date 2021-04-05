@@ -59,6 +59,7 @@ const DesignContent = props => {
     const [rowChange, setRowChange] = useState(false);
     const [headerCheck, setHeaderCheck] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
+    const [pastedTC, setPastedTC] = useState([]);
     let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
@@ -169,7 +170,7 @@ const DesignContent = props => {
                                 // else setDataFormat(scriptData.header[0].split("##").join("\n"));
                             }	
                         }
-                        
+
                         setTestScriptData(scriptData.view);
                         props.setMirror(scriptData.mirror);
                         
@@ -205,6 +206,7 @@ const DesignContent = props => {
                                     setOverlay("");
                                 }
                                 setTestCaseData(testcaseArray);
+                                setPastedTC([]);
                                 setObjNameList(getObjNameList(props.current_task.appType, scriptData.view));
                                 let msg = deleteObjectFlag ? "deleteObjs" : "success"
                                 resolve(msg);
@@ -283,7 +285,7 @@ const DesignContent = props => {
                 }
 
                 if (!errorFlag) {
-                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, testCases, userInfo, versionnumber, import_status)
+                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, testCases, userInfo, versionnumber, import_status, pastedTC)
                     .then(data => {
                         if (data === "Invalid Session") return RedirectPage(history);
                         if (data === "success") {
@@ -431,8 +433,20 @@ const DesignContent = props => {
     }
 
     const onDeleteTestStep = () => {
-        let testCases = [...testCaseData]
-        testCases = testCases.filter((val, idx) => !checkedRows.includes(idx))
+        let testCases = []
+        let localPastedTc = [...pastedTC];
+
+        testCaseData.forEach((val, idx) => {
+            if (!checkedRows.includes(idx)) {
+                testCases.push(val);
+            }
+            else {
+                let tcIndex = pastedTC.indexOf(val.objectid)
+                if (tcIndex > -1) localPastedTc.splice(tcIndex, 1);
+            }
+        })
+
+        setPastedTC(localPastedTc);
         setTestCaseData(testCases);
         setCheckedRows([]);
         setHeaderCheck(false);
@@ -459,11 +473,12 @@ const DesignContent = props => {
         setHeaderCheck(false);
         setFocusedRow(insertedRowIdx);
         setChanged(true);
+        document.getElementById('design__tcCheckbox').indeterminate = false;
         // setEdit(false);
     }
 
     const selectMultiple = () => {
-        setHeaderCheck(false);
+        // setHeaderCheck(false);
         setFocusedRow(null);
         setShowSM(true);
     }
@@ -472,6 +487,7 @@ const DesignContent = props => {
         stepList.push(...checkedRows)
         let newChecks = Array.from(new Set(stepList))
         setCheckedRows([...newChecks]);
+        document.getElementById('design__tcCheckbox').indeterminate = newChecks.length!==0 && newChecks.length !== testCaseData.length;
         setShowSM(false);
     }
 
@@ -489,6 +505,7 @@ const DesignContent = props => {
             setFocusedRow(focus);
             setEdit(true);
             setDraggable(false);
+            document.getElementById('design__tcCheckbox').indeterminate = check.length!==0 && check.length !== testCaseData.length;
         }
     }
 
@@ -497,6 +514,7 @@ const DesignContent = props => {
         setFocusedRow(null);
         setHeaderCheck(false);
         setEdit(false);
+        document.getElementById('design__tcCheckbox').indeterminate = false;
 
         if (draggable) setDraggable(false);
         else setDraggable(true);
@@ -529,6 +547,7 @@ const DesignContent = props => {
                 setEdit(false);
             }
             setCheckedRows([]);
+            document.getElementById('design__tcCheckbox').indeterminate = false;
             setHeaderCheck(false);
             setFocusedRow(null);
         }
@@ -593,10 +612,17 @@ const DesignContent = props => {
             }
             offset=offset+copiedContent.testCases.length;
         }
+
+        let localPastedTc = [...pastedTC];
+        copiedContent.testCases.forEach(testcase => testcase.objectid ? localPastedTc.push(testcase.objectid) : null)
+
+        localPastedTc = [...new Set(localPastedTc)];
+        setPastedTC(localPastedTc);
         setTestCaseData(testCases);
         setShowPS(false);
         setFocusedRow(toFocus);
         setCheckedRows([]);
+        document.getElementById('design__tcCheckbox').indeterminate = false;
         setHeaderCheck(false);
         setChanged(true);
     }
@@ -624,6 +650,7 @@ const DesignContent = props => {
             // setRowChange(!rowChange);
             setChanged(true);
             setCommentFlag(true);
+            document.getElementById('design__tcCheckbox').indeterminate = false;
         }
     }
 
@@ -658,6 +685,7 @@ const DesignContent = props => {
         setHeaderCheck(headerCheckFlag);
         setFocusedRow(focusIdx); 
         setCheckedRows(check);
+        document.getElementById('design__tcCheckbox').indeterminate = check.length!==0 && check.length !== testCaseData.length;
     }
 
     const onAction = (operation) => {
@@ -692,7 +720,7 @@ const DesignContent = props => {
     let key = 0;
     return (
         <>
-        { showSM && <SelectMultipleDialog setShow={setShowSM} selectSteps={selectSteps} upperLimit={testCaseData.length} /> }
+        { showSM && <SelectMultipleDialog data-test="d__selectMultiple" setShow={setShowSM} selectSteps={selectSteps} upperLimit={testCaseData.length} /> }
         { showPS && <PasteStepDialog setShow={setShowPS} pasteSteps={pasteSteps} upperLimit={testCaseData.length}/> }
         { showRemarkDlg && <RemarkDialog remarks={testCaseData[parseInt(showRemarkDlg)].remarks} setShow={setShowRemarkDlg} onSetRowData={setRowData} idx={showRemarkDlg} firstname={userInfo.firstname} lastname={userInfo.lastname}/> }
         { showDetailDlg && <DetailsDialog TCDetails={testCaseData[showDetailDlg].addTestCaseDetailsInfo && JSON.parse(testCaseData[showDetailDlg].addTestCaseDetailsInfo)} setShow={setShowDetailDlg} onSetRowData={setRowData} idx={showDetailDlg} /> }
@@ -702,7 +730,7 @@ const DesignContent = props => {
             <div className="d__content_wrap">
             { /* Task Name */ }
             <div className="d__task_title">
-                <div className="d__task_name">{props.current_task.taskName}</div>
+                <div className="d__task_name" data-test="d__taskName">{props.current_task.taskName}</div>
             </div>
 
             { /* Button Group */ }
@@ -710,17 +738,17 @@ const DesignContent = props => {
                 <div className="d__table_ac_btn_grp">
                 {
                     tableActionBtnGroup.map((btn, i) => 
-                        <button key={i} className="d__tblBtn" onClick={()=>btn.onClick()}><img className="d__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title}/> </button>
+                        <button data-test="d__tblActionBtns" key={i} className="d__tblBtn" onClick={()=>btn.onClick()}><img className="d__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title}/> </button>
                     )
                 }
                 </div>
 
                 <div className="d__taskBtns">
-                    <button className="d__taskBtn d__btn" onClick={saveTestCases} disabled={!changed}>Save</button>
-                    <button className="d__taskBtn d__btn" onClick={deleteTestcase} disabled={!checkedRows.length}>Delete</button>
+                    <button className="d__taskBtn d__btn" data-test="d__saveBtn" onClick={saveTestCases} disabled={!changed}>Save</button>
+                    <button className="d__taskBtn d__btn" data-test="d__deleteBtn" onClick={deleteTestcase} disabled={!checkedRows.length}>Delete</button>
                 </div>
 
-                <div className="d__submit">
+                <div className="d__submit" data-test="d__actionBtn">
                     { isUnderReview && 
                         <>
                         <button className="d__reassignBtn d__btn" 
@@ -746,7 +774,7 @@ const DesignContent = props => {
             <div className="d__table">
                 <div className="d__table_header">
                     <span className="step_col d__step_head" ></span>
-                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll}/></span>
+                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} id="design__tcCheckbox" /></span>
                     <span className="objname_col d__obj_head" >Object Name</span>
                     <span className="keyword_col d__key_head" >Keyword</span>
                     <span className="input_col d__inp_head" >Input</span>
@@ -763,7 +791,7 @@ const DesignContent = props => {
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setFocusedRow(null) : runClickAway=true}} style={{height: "100%"}}>
                             <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row">
                                 {
-                                testCaseData.map((testCase, i) => <TableRow 
+                                testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row"
                                     key={key++} idx={i} objList={objNameList} testCase={testCase} edit={edit} 
                                     getKeywords={getKeywords} getRowPlaceholders={getRowPlaceholders} checkedRows={checkedRows}
                                     updateChecklist={updateChecklist} focusedRow={focusedRow} setFocusedRow={setFocusedRow}

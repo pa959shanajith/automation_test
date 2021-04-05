@@ -1,12 +1,15 @@
 .rp__main_container{
-    position: relative;
+    position: absolute;
     margin: 2px;
     min-width: 0;
     float: left;
     flex: 0 1 100%;
     height: 100%;
+    width: 100%;
     .container-padding{
         padding: 20px;
+        display: flex;
+        flex-direction: column;
     }
 }
 .rp__title{
@@ -29,6 +32,7 @@
 .rp__title-btn{
     height: 30px;
     cursor: pointer;
+    margin-bottom: 10px;
     span{
         background: #7777;
         font-weight: normal;
@@ -51,7 +55,9 @@
     font-size: 13px;
     font-family: Latoweb;
     font-weight: normal;
-    height: calc(100% - 30px);
+    // height: calc(100% - 30px);
+    display: flex;
+    flex-direction: column;
     .rp__header-select{
         transition-duration: 2s;
         z-index: 1;
@@ -61,7 +67,7 @@
         border-radius: 4px;
         -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
         box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
-        position: absolute;
+        // position: absolute;
     }
     .rp__footer{
         position: relative;
@@ -78,7 +84,7 @@
             position: absolute;
             border-radius: 2px;
             cursor: pointer;
-            top: -12px;
+            // top: -12px;
             left: calc( 50% - 46px);
             i{
                 position: absolute;
