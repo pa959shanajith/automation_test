@@ -52,7 +52,10 @@ const  QTest = props => {
         else if(domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials , Retry Login")
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-        else if (domainDetails === "Invalid Session") return RedirectPage(history);
+        else if (domainDetails === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            return RedirectPage(history);
+        }
         else if(domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
         else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
         else if (domainDetails === "fail") setLoginError("Fail to Login");

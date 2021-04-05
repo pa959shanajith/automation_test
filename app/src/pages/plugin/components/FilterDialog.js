@@ -125,7 +125,7 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
                     <span>Task Type:</span>
                 </div>
                 <span data-test="taskTypeCheckBox" className="chkbx_div">{dataDict.tasktypes.map((item, i)=>(
-                    <label key={i} className="filter_checkbox"><input className="chkbx" type="checkbox" checked={task[item]} onChange={onTaskSel} value={item}/>{item}</label>
+                    <label key={i} className="filter_checkbox"><input className="chkbx" type="checkbox" checked={task[item] || false} onChange={onTaskSel} value={item}/>{item}</label>
                 ))}</span>
 
                 {/*  App Types */}
@@ -133,7 +133,7 @@ const FilterDialog = ({setShow, dataDict, filterData, filterTasks}) => {
                     <span>AppTypes:</span>
                 </div>
                 <span data-test="appTypeCheckBox" className="chkbx_div">{dataDict.apptypes.map((item, i)=>(
-                    <label key={i} className="filter_checkbox"><input className="chkbx" type="checkbox" checked={app[item]} onChange={onAppSel} value={item}/>{item}</label>
+                    <label key={i} className="filter_checkbox"><input className="chkbx" type="checkbox" checked={app[item] || false} onChange={onAppSel} value={item}/>{item}</label>
                 ))}</span>
             </div>
             </ScrollBar>

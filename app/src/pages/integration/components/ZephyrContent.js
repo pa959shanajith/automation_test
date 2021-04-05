@@ -37,8 +37,10 @@ const ZephyrContent = props => {
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ICE not available", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
         else if (releaseData === "scheduleModeOn")
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
-        else if (releaseData === "Invalid Session")
+        else if (releaseData === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             return RedirectPage(history);
+        }
         else if (releaseData === "invalidcredentials")
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Invalid Credentials"}});
         else if (releaseData) {
@@ -59,8 +61,10 @@ const ZephyrContent = props => {
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ICE not available", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
         else if (testAndScenarioData === "scheduleModeOn")
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
-        else if (testAndScenarioData === "Invalid Session")
+        else if (testAndScenarioData === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             return RedirectPage(history);
+        }
         else if (testAndScenarioData) {
             setProjectDetails(testAndScenarioData.project_dets);
             setAvoProjects(testAndScenarioData.avoassure_projects);  

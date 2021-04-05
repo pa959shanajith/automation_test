@@ -59,8 +59,10 @@ const PhaseNode = props => {
                 dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr Connection", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
             else if (data === "scheduleModeOn")
                 dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr Connection", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
-            else if (data === "Invalid Session")
+            else if (data === "Invalid Session"){
+                dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
                 return RedirectPage(history);
+            }
             else {
                 setTestCases(data);
                 setCollapse(false);
