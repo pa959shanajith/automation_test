@@ -49,7 +49,7 @@ const RemarkDialog = ({setShow, onSetRowData, remarks, idx, firstname, lastname}
         }
     }
 
-    return ( <div className="remark_container">
+    return ( <div className="remark_container" data-test="d__remcontainer">
         <ModalContainer
             title="Remarks"
             content={
@@ -57,18 +57,18 @@ const RemarkDialog = ({setShow, onSetRowData, remarks, idx, firstname, lastname}
                     { 
                         remarks.split(';').filter(remark => remark.trim()!=="").length > 0 &&
                         <>
-                        <div className="remark_history_lbl">History</div>
-                        <div className="remark_history_content">
-                            { remarks.split(';').filter(remark => remark.trim()!=="").map((remark, idx)=><li key={idx}>{remark}</li>) }
+                        <div className="remark_history_lbl" data-test="d__remhistorylbl">History</div>
+                        <div className="remark_history_content" data-test="d__remhistory">
+                            { remarks.split(';').filter(remark => remark.trim()!=="").map((remark, idx)=><li data-test="d__remhistoryitem" key={idx}>{remark}</li>) }
                         </div>
                         </>
                     }
-                    <div className="d__add_remark_lbl">Add Remarks</div>
-                    <textarea className={"remark_input" + (remarkError ? " remark_error" : "")} value={remark} onChange={onRemarkChange} />
+                    <div className="d__add_remark_lbl" data-test="d__remaddlbl">Add Remarks</div>
+                    <textarea data-test="d__remtextarea" className={"remark_input" + (remarkError ? " remark_error" : "")} value={remark} onChange={onRemarkChange} />
                 </div>
             }
             footer={
-                <button onClick={submitRemark}>Submit</button>
+                <button onClick={submitRemark} data-test="d__rembtn">Submit</button>
             }
             close={()=>{
                 setRemark("");

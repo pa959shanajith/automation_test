@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PopupMsg } from '../../global';
+import { ModalContainer } from '../../global';
 import "../styles/PasteStepDialog.scss";
 
 /*
@@ -55,15 +55,17 @@ const PasteStepDialog = (props) => {
         setStepNum(value)
     };
     
-    return (<PopupMsg 
+    return (<ModalContainer 
+        data-test="d__psd"
+        modalClass="modal-sm"
         title="Paste Test Step"
         content={
         <div className="ps_dialog"> 
-            <div className="ps_lbl">Paste after step no:</div>
-            <div className="ps_hint">For multiple paste. Eg: 5;10;20</div>
-            <input className="ps_input" placeholder="Enter a value" onChange={PSHandler} value={stepNum}/>
+            <div className="ps_lbl" data-test="d__pslbl">Paste after step no:</div>
+            <div className="ps_hint" data-test="d__pslbl">For multiple paste. Eg: 5;10;20</div>
+            <input data-test="d__psinp" className="ps_input" placeholder="Enter a value" onChange={PSHandler} value={stepNum}/>
             { pasteError && 
-                <div className="ps_error">{pasteErrors[pasteError]}</div>
+                <div data-test="d__pserrmsg" className="ps_error">{pasteErrors[pasteError]}</div>
             }
         </div>}
         close={()=>{
@@ -71,8 +73,7 @@ const PasteStepDialog = (props) => {
             showPasteError("");
             props.setShow(false)
         }}
-        submitText="Submit"
-        submit={()=>pasteCopiedSteps()}
+        footer={ <button onClick={pasteCopiedSteps} data-test="d__psbtn">Submit</button> }
     />
 )
 }

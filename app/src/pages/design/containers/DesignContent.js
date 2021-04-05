@@ -117,6 +117,7 @@ const DesignContent = props => {
                 setEdit(false);
                 setFocusedRow(null);
                 setCheckedRows([]);
+                document.getElementById('design__tcCheckbox').indeterminate = false;
                 setDraggable(false);
                 setChanged(false);
                 setHeaderCheck(false);
@@ -358,6 +359,7 @@ const DesignContent = props => {
         }
         setFocusedRow(null);
         setCheckedRows([]);
+        document.getElementById('design__tcCheckbox').indeterminate = false;
         setHeaderCheck(false);
     }
 
@@ -449,6 +451,7 @@ const DesignContent = props => {
         setPastedTC(localPastedTc);
         setTestCaseData(testCases);
         setCheckedRows([]);
+        document.getElementById('design__tcCheckbox').indeterminate = false;
         setHeaderCheck(false);
         setFocusedRow(null);
         props.setShowConfirmPop(false);
@@ -712,6 +715,7 @@ const DesignContent = props => {
         setFocusedRow(null); 
         setHeaderCheck(event.target.checked);
         setCheckedRows(checkList);
+        document.getElementById('design__tcCheckbox').indeterminate = false;
     }
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
