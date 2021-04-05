@@ -74,6 +74,7 @@ const ALM = props => {
                 leftBoxTitle="Avo Assure Scenarios"
                 rightBoxTitle="ALM Testcases"
                 mappedfilesRes={mappedfilesRes}
+                fetchMappedFiles={callViewMappedFiles}
             /> :
         <>
         { !loginSuccess &&

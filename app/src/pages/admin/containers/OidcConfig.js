@@ -199,15 +199,15 @@ const OidcConfig = (props) => {
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <div id="page-taskName"><span>{(oidcEdit===false)?"Create OpenID Connect Configuration":"Edit OpenID Connect Configuration"}</span></div>
-            <div className="adminActionBtn-oidc">
+            <div className="adminActionBtn">
                 {oidcEdit===false?
                     <Fragment>
-                        <button className="btn-md pull-right adminBtn" onClick={()=>{setOidcEdit(true);onClickEditButton();}}  title="Edit Configuration">Edit</button>
-                        <button className="btn-md pull-right adminBtn btn-margin" onClick={()=>{oidcConfManage("create")}} title="Create Project">Create</button>            
+                        <button className="a__btn pull-right " onClick={()=>{setOidcEdit(true);onClickEditButton();}}  title="Edit Configuration">Edit</button>
+                        <button className="a__btn pull-right btn-margin" onClick={()=>{oidcConfManage("create")}} title="Create Project">Create</button>            
                     </Fragment>
                 :   <Fragment>
-                        <button className="btn-md pull-right adminBtn oidc__btn_edit" onClick={()=>{oidcConfManage("update")}} disabled={name===''} title="Update Configuration">Update</button>
-                        <button className="btn-md pull-right adminBtn oidc__btn_edit btn-margin" onClick={()=>{oidcConfDelete()}} disabled={name===''} title="Delete Configuration">Delete</button>
+                        <button className="a__btn pull-right oidc__btn_edit" onClick={()=>{oidcConfManage("update")}} disabled={name===''} title="Update Configuration">Update</button>
+                        <button className="a__btn pull-right oidc__btn_edit btn-margin" onClick={()=>{oidcConfDelete()}} disabled={name===''} title="Delete Configuration">Delete</button>
                     </Fragment>
                 }
             </div> 

@@ -2,7 +2,6 @@
     width: 85%;
     background: none;
     height: 30px;
-    
     display: inline-block;
     font-weight: 400;
     color: #212529;
@@ -19,7 +18,7 @@
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
   
 }
-.modal-body .row-modal .form-control-custom-edit, .form-control-custom-edit{
+.form-control-custom-edit{
 	border: 1px solid #656565 !important;
 	border-left:0 !important;
 	border-right:0 !important;
@@ -29,40 +28,15 @@
 	color:#333;
 }
 
-.modal-body .row-modal .form-control-custom-edit:focus, .form-control-custom-edit:focus {
+.form-control-custom-edit:focus {
     box-shadow: none !important;
 }
-
-.modal-body .row-modal .form-control-custom-edit-prop, .form-control-custom-edit-prop{
-	border: 1px solid #656565 !important;
-	border-left:0 !important;
-	border-right:0 !important;
-	border-top:0 !important;
-	border-radius:0;
-	box-shadow: none;
-	color:#333;
-}
-
-.modal-body .row-modal .form-control-custom-edit-prop:focus, .form-control-custom-edit-prop:focus {
-    box-shadow: none !important;
-}
-.modal-body .row-modal .form-control-custom-edit.inputErrorBorderBottom, .form-control-custom-edit.inputErrorBorderBottom{
+.form-control-custom-edit.inputErrorBorderBottom{
     border: 2px solid #d33c3c !important;
     border-left: 0 !important;
     border-right: 0 !important;
     border-top: 0 !important;
     border-radius: 0  ;
-    box-shadow: none;
-    color: #333;
-}
-
-.modal-body .row-modal .form-control-custom-edit-prop.inputErrorBorderBottom, .form-control-custom-edit-prop.inputErrorBorderBottom
-{
-    border: 2px solid #d33c3c !important;
-    border-left: 0 !important;
-    border-right: 0 !important;
-    border-top: 0 !important;
-    border-radius: 0 ;
     box-shadow: none;
     color: #333;
 }
@@ -83,17 +57,6 @@
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: 0;
 }
-@media screen and (min-width: 1801px) {
-    .form-control__conv-edit {
-        font-size: 1.2vw;
-        height: 2.2vw;
-    }
-    .adminSelect-edit {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-
 .adminSelect-edit {
 	padding: 0px;
 	height: 25px;
@@ -108,25 +71,6 @@
 .adminSelect-edit:focus {
 	box-shadow: none !important;
 }
-@media screen and (min-width: 1801px) {
-    .adminSelect-edit {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-
-
-.dropdown-menu-users-edit-ldap{
-    max-height:165px;
-    overflow-y:scroll;
-    width: 100%;
-    padding: 6px;
-}
-.dropdown-menu-users-edit-ldap>li{
-    padding: 3px 12px;
-}
-
-
 .dropdown-menu-users-edit{
     max-height:165px;
     overflow-y:hidden;
@@ -149,74 +93,11 @@
 }  
 @media screen and (min-width:1800px){
     .edit-user-dropdown-edit{
-        width: 78%;
-        background: none;
-        height: 35px;
-        font-size: 0.8vw;
+        width: 90%;
     }
     .dropdown-menu-users-edit{
-        width: 78%;
+        width: 90%;
     }
-}
-@media screen and (max-width:1056px){
-    .edit-user-dropdown-edit{
-        width: 78%;
-        background: none;
-        height: 30px;
-    }
-    .dropdown-menu-users-edit{
-        width: 78%;
-    }
-}
-
-@media screen and (max-width:850px){
-    .edit-user-dropdown-edit{
-        width: 68%;
-        background: none;
-        height: 30px;
-    }
-    .dropdown-menu-users-edit{
-        width: 68%;
-    }
-}
-@media screen and (max-width:700px){
-    .edit-user-dropdown-edit{
-        width: 58%;
-        background: none;
-        height: 30px;
-    }
-    .dropdown-menu-users-edit{
-        width: 58%;
-    }
-}
-
-.adminActionBtn {
-	float: right;
-	width: auto;
-}
-
-.btn-md-create.focus,
-.btn-md-create,
-.btn-md-create:active:focus,
-.btn-md-create:focus,
-.btn-md-create:hover {
-    color: #fff;
-    border: 0;
-    border-radius: 20px;
-    padding: 2px 15px;
-    font-size: 17px;
-    background: #643693;
-	font-family: 'LatoWebLight';
-    outline: 0;
-}
-@media screen and (min-width:1800px){
-    .btn-md-create{
-        font-size: 1.2vw;
-    }
-}
-
-.adminBtn {
-	padding: 2px 25px !important;
 }
 .btn-disabled:disabled {
 	opacity: 0.5;
@@ -252,15 +133,8 @@
     font-weight: 700;
     margin-top: 5px;
 }
-@media screen and (min-width:1366px){
-    .adminControl-edit div span {
-        width: 100%;
-        font-size: 1.2vw;
-    }
-}
 .adminControl-edit div input, .adminControl-edit div select {
-    /* display: inline-block; */
-	width: calc(100% - 130px);
+    width: calc(100% - 130px);
 }
 .rightControl-edit {
 	float: right;
@@ -293,95 +167,6 @@
 }
 .userTypeBtn_conv-edit:focus{
     outline: 0;
-}
-@media screen and (min-width:1800px){
-    .userTypeBtn_conv-edit{
-        font-size: 0.8vw;
-    }
-}
-.dropdown-userPart .dropdown-toggle-edit:active:focus {
-    outline: 0;
-    box-shadow: none
-}
-.dropdown-userPart .dropdown-menu-edit {
-    /* right: 0; */
-    margin-top: 10px
-}
-.dropdown-menu-edit-multiselect>li>input {
-    display: block;
-    padding: 3px 20px;
-    clear: both;
-    font-weight: 400;
-    line-height: 1.42857143;
-    color: #333;
-    white-space: nowrap;
-}
-
-.dropdown-menu-edit-multiselect>li> :hover{
-    background:#633691;
-    color: white;
-    /*cursor: pointer;*/
-}
-
-.dropdown-menu-edit-multiselect{
-    position: relative;
-    left: 10px;
-    margin-top: -6px;
-    z-index: 1000;
-    float: left;
-    min-width: 187px;
-    padding: 5px 0;
-    font-size: 14px;
-    text-align: left;
-    list-style: none;
-    background-color: #fff;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    border: 1px solid #adabab;
-    border-radius: 1px;
-
-}
-
-@media screen and (min-width: 1801px) {
-    .dropdown-menu-edit-multiselect{
-        font-size: 24px;
-        margin-top: 11px;
-    }
-}
-
-.dropdown-menu-edit-multiselect>li{
-    border-bottom: 1px solid #eceaea;
-    margin-top: 3px;
-  }
-  
-  .dropdown-menu-edit-multiselect>li:last-child { border-bottom: none; }
-  
-  .dropdown-menu-edit-multiselect>li:first-child { margin-top: none; }
-  .dropdown-menu-edit-domains{
-    max-height:165px;
-    overflow-y:scroll;
-    padding: 6px;
-    left: 9%;
-    position: absolute;
-    width: 83%;
-    top: 28%
-}
-.dropdown-menu-edit-domains>li{
-    padding: 3px 12px;
-}
-.dropdown-menu-edit-domains>li:hover{
-    background:#633691;
-    border-radius: 3px;
-    color:#fff;
-    cursor: pointer;
-}
-
-.inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
-}
-
-.selectErrorBorder{
-	border: 2px solid #d33c3c !important;
 }
 .middle__input__border-edit{
     border-radius: 0;

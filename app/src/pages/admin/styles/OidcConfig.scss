@@ -1,54 +1,3 @@
-
-#page-taskName,[id^=page-taskName] {
-    float: left;
-    width: 100%;
-	margin-bottom: 10px;
-}
-#page-taskName span,[id^=page-taskName] span {
-    display: inline-block;
-    /*background: #2f1c49;*/
-    background: #331d4e;
-    font-size: 18px;
-    color: #fff;
-    font-family: 'LatoWebLight';
-    padding: 2px 14px 1px;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-}
-
-@media screen and (min-width:1801px){ 
-    #page-taskName span,[id^=page-taskName] span {
-        font-size: 1.2vw
-    }
-}
-.adminActionBtn-oidc {
-	float: right;
-	width: auto;
-}
-.btn-md.focus,
-.btn-md,
-.btn-md:active:focus,
-.btn-md:focus,
-.btn-md:hover {
-    color: #fff;
-    border: 0;
-    border-radius: 20px;
-    padding: 2px 15px;
-    font-size: 17px;
-    background: #643693;
-	font-family: 'LatoWebLight';
-    outline: 0;
-}
-@media screen and (min-width: 1700px){
-    .btn-md {
-        font-size: 1.2vw;
-    }
-}
-
-.adminBtn {
-	padding: 2px 25px !important;
-}
 .oidc__btn_edit:disabled {
 	opacity: 0.5;
 }
@@ -100,19 +49,8 @@
     font-weight: 700;
     margin-top: 5px;
 }
-@media screen and (min-width:1801px){
-    .adminControl-oidc div span {
-        width: 200px;
-        font-size: 1.2vw;
-    }
-}
 .adminControl-oidc div input, .adminControl-oidc div select {
 	width: calc(100% - 130px);
-}
-@media screen and (min-width:1801px){
-    .adminControl-oidc div input, .adminControl-oidc div select {
-        width: calc(100% - 220px);
-    }
 }
 .userForm-oidc {
 	float: left;
@@ -148,33 +86,8 @@
 .adminSelect-oidc:focus {
 	box-shadow: none !important;
 }
-@media screen and (min-width: 1801px) {
-    .adminSelect-oidc {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-@media screen and (min-width: 1801px) {
-    .form-control-oidc {
-        font-size: 1.2vw;
-        height: 2.2vw;
-    }
-    .adminSelect-oidc {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-
-
 .middle__input__border-oidc{
     border-radius: 0;
-}
-.inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
-}
-
-.selectErrorBorder{
-	border: 2px solid #d33c3c !important;
 }
 .btn-default {
     color: #fff;

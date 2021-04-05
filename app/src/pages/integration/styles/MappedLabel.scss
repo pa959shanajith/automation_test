@@ -1,4 +1,5 @@
 .mlalm__container{
+    position: relative;
     border-radius: 5px;
     font-size: 16px;
     font-family: 'LatoWebLight';
@@ -12,6 +13,7 @@
         border: none;
         outline: none;
         background-color: transparent;
+        padding: 0;
     }
 }
 
@@ -19,11 +21,30 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
+    border-radius: inherit;
+    padding: 5px 5px 5px 10px;
+    
+    &[data-selected="true"]{
+        background-color:rgb(200, 200, 255);
+        border-radius: inherit;
+    }
 }
 
 .mlalm_label{
-    width: 85%;
-    padding: 5px 5px 5px 10px;
+    // width: 85%;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-grow: 1;
+}
+
+.mlalm__container[data-type="scenario"] {
+    background-color: #E1CAFF;
+}
+.mlalm__container[data-type="testcase"] {
+    background-color: rgba(250, 215, 241, 0.984);
+}
+
+
+.mlalm__syncBtn{
+    cursor: pointer;
 }

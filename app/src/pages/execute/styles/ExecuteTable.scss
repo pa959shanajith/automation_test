@@ -202,12 +202,22 @@ input[type="checkbox"] {
     text-align:center;
     float: right
 }
+.e__accessibilityTesting{
+    border-left: 1px solid rgb(255, 255, 255);  
+    width: 23%
+}
 .exe-ExecuteStatus{
     width: 3%;
     padding-top: 7px !important;
 }
 .exe-dataParam{
     width: 27%
+}
+.exe__table-multiDropDown{
+    width: 23%;
+}
+.exe__table-multiDropDown-pad{
+    padding-left: 8%;
 }
 .exe-conditionCheck{
     width: 18%

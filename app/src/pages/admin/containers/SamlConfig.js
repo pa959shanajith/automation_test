@@ -231,15 +231,15 @@ const SamlConfig = (props) => {
             
             <div id="page-taskName"><span>{(samlEdit===false)?"Create SAML Configuration":"Edit SAML Configuration"}</span></div>
             
-            <div className="adminActionBtn-saml">
+            <div className="adminActionBtn">
                 {samlEdit===false?
                     <Fragment>
-                        <button className="btn-md pull-right adminBtn" onClick={()=>{setSamlEdit(true);samlEditClick();}}  title="Edit Configuration">Edit</button>
-                        <button className="btn-md pull-right adminBtn btn-right-saml" onClick={()=>{samlConfManage("create")}}  title="Create Project">Create</button>            
+                        <button className="a__btn pull-right " onClick={()=>{setSamlEdit(true);samlEditClick();}}  title="Edit Configuration">Edit</button>
+                        <button className="a__btn pull-right btn-right-saml" onClick={()=>{samlConfManage("create")}}  title="Create Project">Create</button>            
                     </Fragment>
                 :   <Fragment>
-                        <button className="btn-md pull-right adminBtn saml__btn_edit" onClick={()=>{samlConfManage("update")}} disabled={name===''} title="Update Configuration">Update</button>
-                        <button className="btn-md pull-right adminBtn saml__btn_edit btn-right-saml" onClick={()=>{samlConfDelete()}} disabled={name===''} title="Delete Configuration">Delete</button>
+                        <button className="a__btn pull-right saml__btn_edit" onClick={()=>{samlConfManage("update")}} disabled={name===''} title="Update Configuration">Update</button>
+                        <button className="a__btn pull-right saml__btn_edit btn-right-saml" onClick={()=>{samlConfDelete()}} disabled={name===''} title="Delete Configuration">Delete</button>
                     </Fragment>
                 }
             </div>

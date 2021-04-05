@@ -1,26 +1,3 @@
-.adminActionBtn {
-	float: right;
-	width: auto;
-}
-.btn-md.focus,
-.btn-md,
-.btn-md:active:focus,
-.btn-md:focus,
-.btn-md:hover {
-    color: #fff;
-    border: 0;
-    border-radius: 20px;
-    padding: 2px 15px;
-    font-size: 17px;
-    background: #643693;
-	font-family: 'LatoWebLight';
-    outline: 0;
-}
-@media screen and (min-width: 1700px){
-    .btn-md {
-        font-size: 1.2vw;
-    }
-}
 .btn-project-cust{
     margin-right: 10px;
 }

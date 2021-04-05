@@ -34,11 +34,6 @@
 	font-family: 'LatoWebLight' !important;
     outline: 0 !important;
 }
-@media screen and (min-width:1800px){
-    .s__btn-md{
-        font-size: 1.2vw !important;
-    }
-}
 .s__btn-md-cust{
     margin-bottom: 25px !important;
 }
@@ -190,7 +185,7 @@
     overflow: auto;
     -ms-overflow-style: none;
     -webkit-overflow-style: none;
-    max-height: 100%;
+    max-height: 97%;
 }
 .scheduleDataBodyRowChild{
 	width: 100%;

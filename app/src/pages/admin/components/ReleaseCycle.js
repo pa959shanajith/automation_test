@@ -18,7 +18,7 @@ const ReleaseCycle = (props) => {
                     <li key={index} id={'releaseList_' + props.count} onClick={()=>{props.clickReleaseListName({id:'releaseList_' + props.count,releaseName:releaseName});props.setActiveRelease(releaseName);}} className={(releaseName===props.activeRelease)?"active-release":""} >
                         <img src={"static/imgs/ic-release.png"} alt="Release"/><span title={releaseName} className='releaseName'>{releaseName}</span>
                         {(releaseName===props.activeRelease)?
-                        <span className='actionOnHover'>
+                        <span >
                             <img onClick={()=>{props.clickEditRelease("editReleaseName_" + props.count)}} id={"editReleaseName_" + props.count} title='Edit Release Name' src={"static/imgs/ic-edit-sm.png"} alt="Edit Release Name" className='editReleaseName'/>
                         </span>
                         :null}
@@ -33,7 +33,7 @@ const ReleaseCycle = (props) => {
                     <li key={index} className={props.cycleListClass?'cycleList createCycle':"createCycle"}>
                         <img src={"static/imgs/ic-cycle.png"} alt="Cycle" />
                         <span title="cycleName" className='cycleName'>{cycleName}</span>
-                        <span className='actionOnHover'>
+                        <span >
                             <img onClick={()=>{props.clickEditCycle("editReleaseName_" + props.count,cycleName)}} id={"editCycleName_" + props.delCount}  title='Edit Cycle Name' src={"static/imgs/ic-edit-sm.png"} alt='Edit Cycle Name' className='editCycleName'/>
                             {/* <img id={"deleteCycleName_" + delCount } title='Delete Cycle' src={"static/imgs/ic-delete-sm.png"} class='deleteCycle'/> */}
                         </span>

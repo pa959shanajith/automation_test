@@ -4,11 +4,12 @@ import { PopupMsg, ModalContainer ,ScrollBar, Report} from '../../global'
 import {readTestSuite_ICE, loadLocationDetails, readTestCase_ICE} from '../api';
 import Handlebars from "handlebars"
 import "../styles/ExecuteTable.scss";
+import MultiSelectDropDown from './MultiSelectDropDown';
 
 //use : Renders Execution Table 
 //todo : remove setEachDataFirst
 
-const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEachData,setEachDataFirst,filter_data,setPopupState,setLoading,updateAfterSave}) => {
+const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,readTestSuite,setAccessibilityParameters,selectAllBatch,eachData,setEachData,setEachDataFirst,filter_data,setPopupState,setLoading,updateAfterSave}) => {
 
     const userInfo = useSelector(state=>state.login.userinfo);
     const [scenarioDetails,setScenarioDetails] = useState({})
@@ -86,7 +87,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                     for ( m = 0; m < dataLen; m++) {
                         rowData = eachData2[m];
                         for (var k = 0; k < eachData2[m].scenarioids.length; k++) {
-                            if (eachData2[m].scenarioids[k] === current_task.assignedTestScenarioIds) {
+                            if (eachData2[m].scenarioids[k] === current_task.assignedTestScenarioIds || eachData2[m].scenarioids[k] === current_task.assignedTestScenarioIds[0]) {
                                 eachData1.push({
                                     "condition": [rowData.condition[k]],
                                     "dataparam": [(rowData.dataparam[k]).trim()],
@@ -208,6 +209,7 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                                                             <div className='e__condition'>Condition</div>
                                                             <div className='e__projectName'>Project Name</div>
                                                             <div className='e__apptype' >App Type</div>
+                                                            {(!(!scenarioTaskType || scenarioTaskType == "" || scenarioTaskType == "disable"))?<div className='e__accessibilityTesting' >Accessibility Testing</div>:null}
                                                         </div>
                                                     </div>
                                                     <div className={eachData.length>1?'e__testScenarioScroll e__table-bodyContainer':" e__table-bodyContainer"}>
@@ -225,6 +227,8 @@ const ExecuteTable = ({current_task,readTestSuite,selectAllBatch,eachData,setEac
                                                                 <div title={rowData.projectnames[count]}  className='e__table-col tabeleCellPadding exe-apptype'>
                                                                     <img src={"static/imgs/"+details[projectAppType[rowData.projectnames[count]].toLowerCase()]['img']+".png"} alt="apptype" className="e__table_webImg"/>
                                                                 </div>
+                                                                {(!(!scenarioTaskType || scenarioTaskType == "" || scenarioTaskType == "disable"))?
+                                                                <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} /></div>:null}
                                                             </div>    
                                                         ))}
                                                         </ScrollBar>

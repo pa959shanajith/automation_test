@@ -100,9 +100,9 @@ const EditIcePool = ({projList,displayError,setLoading}) => {
                         <span>Edit ICE Pool</span>
                     </div>
                     <div className="adminActionBtn">
-                        <button disabled={!selectedPool?true:false} ref={deleteBtn} className="btn-md adminBtn btn-edit" onClick={()=>setDeletePop(true)}  title="Edit">Delete</button>
-                        <button disabled={!selectedPool?true:false} ref={updateBtn} className="btn-md adminBtn btn-edit" onClick={clickUpdatePool}  title="Save">Update</button>
-                        <button ref={clearBtn} className="btn-md adminBtn" onClick={()=>setClearPop(true)}  title="Save">Clear Queue</button>
+                        <button disabled={!selectedPool?true:false} ref={deleteBtn} className="a__btn btn-edit" onClick={()=>setDeletePop(true)}  title="Edit">Delete</button>
+                        <button disabled={!selectedPool?true:false} ref={updateBtn} className="a__btn btn-edit" onClick={clickUpdatePool}  title="Save">Update</button>
+                        <button ref={clearBtn} className="a__btn" onClick={()=>setClearPop(true)}  title="Save">Clear Queue</button>
                     </div>
                     <div className='edit_ice-pool'>
                         <div className="col-xs-9 form-group assignBox-container">

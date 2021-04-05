@@ -32,9 +32,7 @@ const TaskContents = (props) => {
                         counter={i+1}
                         showPanel={showPanel} 
                         setShowPanel={setShowPanel}
-                        taskJson={props.taskJson}
-                        testCaseId={props.testCaseId}
-                        taskName={props.taskName}
+                        disableTask = { props.currUid === props.taskJson[item.panel_idx].uid }
                         cycleDict={props.cycleDict}
                     />
         })}
@@ -45,7 +43,7 @@ const TaskContents = (props) => {
 }
 
 
-const TaskPanel = (props) => {
+const TaskPanel = props => {
 
     const taskSuiteDetails = props.item.testSuiteDetails;
     const dataobj = props.item.dataobj;
@@ -89,6 +87,7 @@ const TaskPanel = (props) => {
         taskObj.releaseid = dataobj.releaseid;
         taskObj.cycleid = dataobj.cycleid;
         taskObj.reuse = dataobj.reuse;
+        taskObj.uid = dataobj.uid;
 
         dispatch({type: actionTypes.SET_CT, payload: taskObj});
 
@@ -138,11 +137,11 @@ const TaskPanel = (props) => {
         <>
             <div className={"task-panel " + (props.showPanel === props.item.panel_idx ? "active-task " : "")} panel-id={props.item.panel_idx}>
             <div className="panel-content " id={`panelBlock_${props.item.panel_idx}`}>
-                <h4 className={"task-num" + (props.testCaseId === dataobj.testcaseid && props.taskName === props.item.taskname ? " disable-task" : "")}>{props.counter}</h4>
-                <span className={"assign-task" + (props.testCaseId === dataobj.testcaseid && props.taskName === props.item.taskname  ? "  disable-task" : "")} onClick={taskRedirection} >
+                <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4>
+                <span className={"assign-task" + (props.disableTask ? "  disable-task" : "")} onClick={taskRedirection} >
                     {props.item.taskname.length >= 45 ? props.item.taskname.substr(0, 44)+"..." : props.item.taskname}
                 </span>
-                <div className={"tasktype-btndiv" + (props.testCaseId === dataobj.testcaseid && props.taskName === props.item.taskname  ? " dark-bg " : "")}>
+                <div className={"tasktype-btndiv" + (props.disableTask ? " dark-bg " : "")}>
                     <button className="tasktype-btn" onClick={expandDetails}>{props.item.tasktype}</button>
                 </div>
             </div>

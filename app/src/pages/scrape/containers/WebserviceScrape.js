@@ -104,11 +104,10 @@ const WebserviceScrape = () => {
                                     allXpaths = [];
                                     allCustnames = [];
                                     
-                                    // NOT IMPLEMENTING PARAM YET
-                                    // if (requestedparam.trim() != ""){
-                                    //     var reqparams=parseRequestParam(requestedparam);
-                                    //     if (reqparams.length>0) viewArray.concat(reqparams);
-                                    // }
+                                    if (rParamHeader.trim() !== ""){
+                                        let reqparams=parseRequestParam(rParamHeader);
+                                        if (reqparams.length>0) viewArray.concat(reqparams);
+                                    }
                                     try {
                                         parseRequest(parsedReqBody);
                                     } catch (err) {
@@ -139,7 +138,7 @@ const WebserviceScrape = () => {
                                         if (reqparams.length > 0) viewArray.concat(reqparams);
                                     }
                                     //Parsing Request Body
-                                    let xpaths = parseJsonRequest(rReqBody,"","");
+                                    let xpaths = parseJsonRequest(rReqBody,"","", []);
                                     for (let object of xpaths) {
                                         let scrapedObjectsWS = {};
                                         scrapedObjectsWS.xpath = object;
@@ -155,7 +154,7 @@ const WebserviceScrape = () => {
                                 }
                             }
                         }
-                    } else if (method === 'GET' && rParamHeader) {
+                    } else if (method === 'GET' && rParamHeader.trim() !== "") {
                         try{
                             //Parsing Request Parameters
                             if (rParamHeader.trim() !== ""){
@@ -458,21 +457,21 @@ function parseRequest(readChild) {
 	}
 }
 
-function parseJsonRequest(requestedBody, base_key, cur_key) {
-	let xpaths=[]
+function parseJsonRequest(requestedBody, base_key, cur_key, xpath) {
+	let xpaths=xpath;
 	try {
      	for (let key in requestedBody){
 			 var value=requestedBody[key];
 			 if (typeof(value)==="object" && !(Array.isArray(value))){
 				if (base_key!== "")  base_key+='/'+key;
-				else  base_key=key;
+				else base_key=key;
 				xpaths.push(base_key);
-				xpaths.concat(parseJsonRequest(value,base_key,key));
+				xpaths.concat(parseJsonRequest(value,base_key,key,xpaths));
 				base_key=base_key.slice(0,-key.length-1);
 			 } else if (Array.isArray(value)) {
 				for (var i=0;i<value.length;i++){
 					base_key+=key+"["+i.toString()+"]";
-					xpaths.concat(parseJsonRequest(value[i],base_key,key));
+					xpaths.concat(parseJsonRequest(value[i],base_key,key,xpaths));
 				}
 			 } else {
 				xpaths.push(base_key+'/'+key);
@@ -482,7 +481,7 @@ function parseJsonRequest(requestedBody, base_key, cur_key) {
 	} catch (exception) {
 		console.error("Exception in the function parseRequest: ERROR::::", exception);
 	}
-	return xpaths
+	return xpaths;
 }
 
 function parseRequestParam(parameters){

@@ -1,7 +1,7 @@
 import React, { useState , useEffect } from 'react';
 import { useSelector } from 'react-redux'
 import { ScrollBar } from '../../global';
-import '../styles/ExecutionPanel.scss';
+import '../styles/ExecPanel.scss';
 import { reportStatusScenarios_ICE } from '../api';
 
 
@@ -9,7 +9,7 @@ import { reportStatusScenarios_ICE } from '../api';
   use: renders ExecutionPanel in report landing page
 */
 
-const ExecutionPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,selectedScDetails}) =>{
+const ExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,selectedScDetails}) =>{
     const suDetails = useSelector(state=>state.report.suiteDetails)
     const suiteSelected = useSelector(state=>state.report.suiteSelected)
     const [suiteDetails,setSuiteDetails] =  useState([])
@@ -124,4 +124,4 @@ const dateASC = (dateArray)=> {
     return dateArray
 }
 
-export default ExecutionPanel;
+export default ExecPanel;

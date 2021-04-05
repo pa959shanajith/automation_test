@@ -18,21 +18,9 @@
     font-weight: 700;
     margin-top: 5px;
 }
-@media screen and (min-width:1801px){
-    .adminControl-ldap-dm div span {
-        width: 200px;
-        font-size: 1.2vw;
-    }
-}
 .adminControl-ldap-dm div input, .adminControl-ldap-dm div select {
 	width: calc(100% - 130px);
 }
-@media screen and (min-width:1801px){
-    .adminControl-ldap-dm div input, .adminControl-ldap-dm div select {
-        width: calc(100% - 220px);
-    }
-}
-
 .form-control-ldap-dm {
     display: block;
     width: 100%;
@@ -63,37 +51,6 @@
 .adminSelect-ldap-dm:focus {
 	box-shadow: none !important;
 }
-@media screen and (min-width: 1801px) {
-    .adminSelect-ldap-dm {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
-@media screen and (min-width: 1801px) {
-    .form-control-ldap-dm {
-        font-size: 1.2vw;
-        height: 2.2vw;
-    }
-    .adminSelect-ldap-dm {
-        font-size: 1.2vw;
-        height: 1.4vw;
-    }
-}
 .title-ldap-dm{
     font-size:14px;
-}
-@media screen and (min-width: 1801px) {
-    .title-ldap{
-        font-size:1.2vw;
-    }
-    .title-ldap-dm{
-        font-size:1.2vw;
-    }
-}
-.inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
-}
-
-.selectErrorBorder{
-	border: 2px solid #d33c3c !important;
 }

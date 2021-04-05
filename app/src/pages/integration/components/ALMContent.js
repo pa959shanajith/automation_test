@@ -196,7 +196,7 @@ const ALMContent = props => {
                         />
                     )} 
                 </div>
-                </> : null
+                </> : <div></div>
             }
             scenarioList = { scenarioArr && 
                 (filteredNames ? filteredNames : projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details)

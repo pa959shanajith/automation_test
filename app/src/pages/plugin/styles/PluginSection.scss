@@ -1,12 +1,12 @@
 .plugin-blocks{
     display: grid;
-    grid-template-columns: auto auto;
-    grid-gap: 10px 45px;
+    grid-template-columns: auto auto auto;
+    grid-gap: 10px 20px;
 }
 
 .plugin-ic{
-    height: 160px;
-    width: 160px;
+    height: 130px;
+    width: 130px;
 }
 
 .plugin-block{
@@ -33,7 +33,7 @@
 
 .plugin-text{
     font-family: "LatoWeb";
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
     line-height: 1.1;
     margin-top: 10px;
@@ -43,7 +43,18 @@
 
 @media screen and (max-width: 1200px){
     .plugin-blocks{
-        grid-gap: 5px 5%;
+        grid-gap: 5px 0%;
+    }
+    .plugin-ic{
+        height: 105px;
+        width: 130px;
+    }
+}
+
+@media screen and (max-width: 1000px){
+    .plugin-blocks{
+        grid-template-columns: auto auto;
+        grid-gap: 10px 20px;
     }
 }
 
@@ -52,37 +63,15 @@
         justify-content: center;
     }
 }
-// @media screen and (min-width: 1400px) and (min-height: 770px){
-//     .plugin-blocks{
-//         grid-gap: 1.3vh 5.8vh;
-//     }
-    
-//     .plugin-ic{
-//         height: 12vw;
-//         width: 12vw;
-//     }
-    
-    
-//     .avail-plugin-title{
-//         font-size: 2.4vw;
-//         padding-left: 1.6vw;
-//         margin-bottom: 1vw;
-//     }
-    
-//     .plugin-text{
-//         font-size: 2.1vw;
-//         margin-top: .3vw;
-//     }
-// }
 
-@media screen and (max-height: 650px){
+@media screen and (max-height: 600px){
     .plugin-blocks{
-        grid-gap: 7px 38px;
+        grid-gap: 7px 10px;
     }
     
     .plugin-ic{
-        height: 145px;
-        width: 145px;
+        height: 105px;
+        width: 130px;
     }
     
     
@@ -93,14 +82,14 @@
     }
     
     .plugin-text{
-        font-size: 16px;
+        font-size: 15px;
         margin-top: 8px;
     }
 }
 
-@media screen and (max-height: 580px){
-    .plugin-ic{
-        height: 140px;
-        width: 140px;
-    }
-}
+// @media screen and (max-height: 580px){
+//     .plugin-ic{
+//         height: 90px;
+//         width: 135px;
+//     }
+// }

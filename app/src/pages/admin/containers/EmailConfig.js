@@ -85,9 +85,9 @@ const EmailConfig = ({resetMiddleScreen}) => {
                 <span>Manage Email Server Configuration</span>
 		    </div>
             <div className="adminActionBtn">
-                <button ref={inputRef["toggleStatus"]} className="btn-md adminBtn btn-edit" onClick={onClickToggle} title="Disable">Disable</button>
-                <button ref={inputRef["toggleUppdate"]} className="btn-md adminBtn btn-edit" onClick={onClickUpdate}  title="Update">Create</button>
-                <button ref={inputRef["toggleTest"]} className="btn-md adminBtn" onClick={onClickTest}  title="Test">Test</button>
+                <button ref={inputRef["toggleStatus"]} className="a__btn btn-edit" onClick={onClickToggle} title="Disable">Disable</button>
+                <button ref={inputRef["toggleUppdate"]} className="a__btn btn-edit" onClick={onClickUpdate}  title="Update">Create</button>
+                <button ref={inputRef["toggleTest"]} className="a__btn " onClick={onClickTest}  title="Test">Test</button>
             </div>
             <div id='conf_email' className='conf_email'>
             <ScrollBar scrollId='conf_email' trackColor={'transperent'} thumbColor={'grey'}> 

@@ -66,9 +66,9 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, setPo
                 }
                 else if(type === "Zephyr"){
                     integration.zephyr = {
-						accountid: credentials.url,
-						accesskey: credentials.userName,
-						secretkey: credentials.password,
+						url: credentials.url,
+						username: credentials.userName,
+						password: credentials.password,
 					}
                 }
                 setCredentialsExecution(integration)
@@ -120,7 +120,7 @@ export default IntegrationDropDown;
 
 
 const placeholder={
-    Zephyr:{url:"Enter Zephyr Account ID" ,username:"Enter Access Key", password:"Enter Secret Key"  },
+    Zephyr:{url:"Enter Zephyr URL (Ex. http(s)://SERVER[:PORT])" ,username:"Enter Zephyr Username", password:"Enter Zephyr Password"  },
     ALM:{url:"Enter ALM Url" ,username:"Enter User Name", password:"Enter Password" },
     qTest:{url:"Enter qTest Url" ,username:"Enter User Name", password:"Enter Password" },
 }

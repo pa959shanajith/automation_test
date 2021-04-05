@@ -112,8 +112,8 @@ const SessionManagement = (props) => {
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <div id="page-taskName"><span>Session Management</span></div>
-            <div className="adminActionBtn-sess-mgmt">
-                 <button className="btn-md pull-right adminBtn" onClick={()=>{refreshSessMgmt()}} >Refresh</button>
+            <div className="adminActionBtn">
+                 <button className="a__btn pull-right " onClick={()=>{refreshSessMgmt()}} >Refresh</button>
             </div> 
             <div className="content_wrapper-sess-mgmt">
                 <ScrollBar thumbColor="#929397">

@@ -1,27 +1,3 @@
-
-#page-taskName,[id^=page-taskName] {
-    float: left;
-    width: 100%;
-	margin-bottom: 10px;
-}#page-taskName span,[id^=page-taskName] span {
-    display: inline-block;
-    /*background: #2f1c49;*/
-    background: #331d4e;
-    font-size: 18px;
-    color: #fff;
-    font-family: 'LatoWebLight';
-    padding: 2px 14px 1px;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-}
-
-@media screen and (min-width:1700px){
-    #page-taskName span,[id^=page-taskName] span {
-        font-size: 1.2vw
-    }
-}
-
 #selAssignUser{
     margin-left: 37px;
 }
@@ -58,12 +34,6 @@
     font-weight: 300;
     cursor: default;
 }
-@media screen and (min-width:1700px){
-    .labelStyle1 {
-        font-size: 1.2vw
-    }
-}
-
 .seprator {
     height: 100%;
     padding-bottom: 5%;
@@ -96,16 +66,7 @@
 }
 
 @media screen and (min-height: 1000px) and (max-height: 1080px){
-	#left-bottom-section ul li{margin-bottom:12px;}
-	.list-inline-right{padding-right: 0;}
-	.list-inline-right li:first-child{margin-right:6px;}
-	.list-inline-right li:nth-child(2){margin-right:-24px;}
-	.mindmap-left-section{margin-top:65px;}
-	.suitestartend thead{width: calc(100% - 729px);}
-	.reportStatus{margin-top:12px;}
-	.scroll-wrapper.scrollbar-inner-rep{max-height: 154px !important;}
 	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px !important;}
-	.endtoend-modulesContainer{height: 28% !important;}
 }
 
 .wrap-editpro {
@@ -152,13 +113,6 @@
     clear: both;
     float: left;
 }
-@media screen and (min-width:1801px){
-    .center-button button {
-        font-size: 1vw;
-        width: 53px;
-        height: 53px;
-    }
-}
 .center-button button:focus {
     outline: 0;
 }
@@ -172,12 +126,6 @@
     padding: 10px;
     user-select: none;
 }
-@media screen and (min-width:1801px){
-    #allProjectAP option,#assignedProjectAP option{
-        font-size: 1vw;
-    }
-}
-
 select[multiple]:focus option:checked {
 	background: #633691 linear-gradient(0deg, #633691 0%, #633691 100%);
 }
@@ -207,13 +155,6 @@ select[size] {
     border: 1px solid #656565 !important;
     -webkit-text-stroke: thin;
 }
-@media screen and (min-width:1801px){
-    .adminSelect-project-assign{
-        height: 1.4vw;
-        margin-top: 10px;
-    }
-}
-
 .adminSelect-project-assign:focus {
 	box-shadow: none !important;
 }
