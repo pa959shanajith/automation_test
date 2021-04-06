@@ -3,6 +3,7 @@
     "showEULA": false,
     "pingTimer":"120000",
     "strictTaskWorkflow": false,
+    "dateFormat": "MM-DD-YYYY",
     "benchmarkRuntimes": ["00:05","08:00","13:00","18:55"],
     "certificate": {
         "key": "./server/https/server.key",

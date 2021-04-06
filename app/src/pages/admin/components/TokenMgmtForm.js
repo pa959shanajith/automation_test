@@ -1,11 +1,10 @@
-import React, { Fragment, useState, useEffect, useRef } from 'react';
-import {ScreenOverlay, PopupMsg } from '../../global' 
+import React, { Fragment, useState, useEffect } from 'react';
+import {ScreenOverlay, PopupMsg, CalendarComp } from '../../global' 
 import {getUserDetails, getCIUsersDetails, fetchICE} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import ReactTooltip from 'react-tooltip';
-import Datetime from "react-datetime";
-import moment from "moment";
 import '../styles/TokenMgmtForm.scss'
+import TimeComp from '../../global/components/TimeComp';
 
 
 /*Component TokenMgmtForm
@@ -14,8 +13,7 @@ import '../styles/TokenMgmtForm.scss'
 */
 
 const TokenMgmtForm = (props) => {
-	const dateRef = useRef()
-	const timeRef = useRef()
+	const dateVal = props.dateVal;
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     const [allUsers,setAllUsers] = useState([['Select User',' ','','']])
@@ -24,12 +22,6 @@ const TokenMgmtForm = (props) => {
     const [copyToolTip,setCopyToolTip] = useState("Click To Copy")
 	const [downloadToolTip,setDownloadToolTip] = useState("Download Token")
 	
-	let inputProps = {
-		placeholder: "Select Date",
-		readOnly:"readonly" ,
-		className:"fc-datePicker"
-    };
-
     let inputProps1 = {
 		placeholder: "Select Time",
 		readOnly:"readonly" ,
@@ -57,11 +49,6 @@ const TokenMgmtForm = (props) => {
 		else loadData(props.targetid);
 		// eslint-disable-next-line
     },[props.runLoadData])
-
-    function valid(current) {
-		const yesterday = moment().subtract(1, "day");
-        return current.isAfter(yesterday);
-    }
 
     const repopulateEntries = async (tokenOp) =>{
 		setInputProps1Disable(true);
@@ -177,10 +164,15 @@ const TokenMgmtForm = (props) => {
 		}, 1500);
 	}
 
-	const openTime = ()=> {
-        if(inputProps1Disable)return;
-        timeRef.current._onInputClick()
-    }
+	const changeDate = (val) => {
+		props.setdateVal(val);
+		setInputProps1Disable(false);
+		var hr = new Date().getHours();
+		var min = parseInt(new Date().getMinutes()+5);
+		if( new Date().getHours().toString().length === 1) hr = "0"+hr;
+		if(parseInt(new Date().getMinutes()+5).toString().length === 1) min = "0"+min;
+		props.setTimeVal(""+hr+":"+min)
+	}
 
     return (
         <Fragment>
@@ -228,31 +220,8 @@ const TokenMgmtForm = (props) => {
                 <div className='adminControl-tkn-mgmt1'><div>
 					<span className="adminControl-tkn-mgmt1__title leftControl-tkn-mgmt" title="Token Expiry">Token Expiry</span>
                     <div className="tokenSuite">
-						<span className="datePicContainer datePic-cust" >
-							<Datetime 
-								ref={dateRef} 
-								isValidDate={valid} 
-								value={props.dateVal} 
-								onChange={(event)=>{props.setdateVal(event.format("DD-MM-YYYY"));setInputProps1Disable(false);props.setTimeVal(new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)))}} 
-								dateFormat="DD-MM-YYYY" 
-								closeOnSelect={true} 
-								inputProps={inputProps} 
-								timeFormat={false} 
-								id="data-token"
-							/> 
-                            <img onClick={()=>{dateRef.current._onInputClick()}} className="datepickerIconToken" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
-						</span>
-						<span className="timePicContainer">
-							<Datetime 
-								ref={timeRef} 
-								value={props.timeVal} 
-								onChange={(event)=>{props.setTimeVal(event.format("HH:mm"))}} 
-								inputProps={inputProps1} 
-								dateFormat={false} 
-								timeFormat="HH:mm" 
-							/> 
-                            <img onClick={openTime} className="timepickerIconToken" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
-						</span>
+						<CalendarComp date={dateVal} setDate={(val)=>{changeDate(val)}} classCalender="admin_calender"/>
+						<TimeComp time={props.timeVal} setTime={(val)=>{props.setTimeVal(val)}} inputProps={inputProps1}  classTimer="admin_timer"/>
 					</div>
                 </div></div>
 

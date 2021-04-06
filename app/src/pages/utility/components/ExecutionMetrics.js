@@ -1,7 +1,6 @@
 import React, { useState } from  'react';
 import { useHistory } from 'react-router-dom';
-import { RedirectPage } from '../../global';
-import CalendarComp from './CalendarComp';
+import { RedirectPage, CalendarComp } from '../../global';
 import { fetchMetrics } from '../api';
 import "../styles/ExecutionMetrics.scss";
 

@@ -1,7 +1,5 @@
 import React, {useState, useEffect } from 'react';
-import {ScreenOverlay, RedirectPage , ScrollBar} from '../../global' 
-import Datetime from "react-datetime";
-import moment from "moment";
+import {ScreenOverlay, RedirectPage , ScrollBar, CalendarComp, TimeComp} from '../../global'
 import {readTestSuite_ICE} from '../api';
 import { useHistory } from 'react-router-dom';
 import "../styles/ScheduleSuitesTopSection.scss";
@@ -176,32 +174,8 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
                                 <div className="scheduleSuite" >
                                     <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" />
                                     <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span>
-                                    <span className="timePicContainer">
-                                        <Datetime 
-                                            onChange={(event)=>{updateDateTime("time",event.format("HH:mm" ),rowData.testsuiteid)}} 
-                                            inputProps={moduleSceduledate[rowData.testsuiteid]["inputPropstime"]} 
-                                            dateFormat={false} 
-                                            timeFormat="HH:mm"
-                                            value={moduleSceduledate[rowData.testsuiteid]["time"]}
-                                        /> 
-                                        <img className="timepickerIcon" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
-                                    </span>
-                                    <span className="datePicContainer datePic-cust" >
-                                        <Datetime 
-                                            onChange={(event)=>{updateDateTime("date",event.format("DD-MM-YYYY"),rowData.testsuiteid)}} 
-                                            dateFormat="DD-MM-YYYY" 
-                                            closeOnSelect={true} 
-                                            inputProps={moduleSceduledate[rowData.testsuiteid]["inputPropsdate"]} 
-                                            timeFormat={false}
-                                            isValidDate={valid}
-                                            value={moduleSceduledate[rowData.testsuiteid]["date"]}
-                                            renderInput={(props) => {
-                                                return <input {...props} value={(moduleSceduledate[rowData.testsuiteid]["date"]) ? props.value : ''} />
-                                            }}
-                                        /> 
-                                        <img className="datepickerIcon" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
-                                    </span>
-                                    
+                                    <TimeComp time={moduleSceduledate[rowData.testsuiteid]["time"]} setTime={(val)=>{updateDateTime("time",val,rowData.testsuiteid)}} inputProps={moduleSceduledate[rowData.testsuiteid]["inputPropstime"]} classTimer="schedule_timer"/>
+                                    <CalendarComp inputProps={moduleSceduledate[rowData.testsuiteid]["inputPropsdate"]}  date={moduleSceduledate[rowData.testsuiteid]["date"]} setDate={(val)=>{updateDateTime("date",val,rowData.testsuiteid)}} classCalender="schedule_calender"/>
                                 </div>
                                 <table className="scenarioSchdCon scenarioSch_' + i + '">
                                     <thead className="scenarioHeaders">
@@ -231,11 +205,6 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
         </div>
         </>
     );
-}
-
-function valid(current) {
-    const yesterday = moment().subtract(1, "day");
-    return current.isAfter(yesterday);
 }
 
 var details = {
