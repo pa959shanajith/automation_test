@@ -666,8 +666,6 @@ exports.getScreens = async (req, res) => {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
-	var data = await utils.fetchData(inputs, "mindmap/exportMindmap","exportMindmap");
-	res.send(data)
 };
 
 exports.exportToExcel = async (req, res) =>{
@@ -682,54 +680,66 @@ exports.exportToExcel = async (req, res) =>{
 		var excelDirPath = path.join(__dirname, dir);
 		var filePath = path.join(excelDirPath, 'samp234.xlsx');
 
-	try {
-		if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
-		if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
-	} catch (e) {
-		logger.error("Exception in mindmapService: exportToExcel: Create Directory/Remove file", e);
-	}
+		try {
+			if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
+			if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
+		} catch (e) {
+			logger.error("Exception in mindmapService: exportToExcel: Create Directory/Remove file", e);
+		}
 
-	//create a new workbook file in current working directory
-	var wb = new xl.Workbook();
-	var ws = wb.addWorksheet('Sheet1');
+		//create a new workbook file in current working directory
+		var wb = new xl.Workbook();
+		var ws = wb.addWorksheet('Sheet1');
 
-	logger.debug(excelMap.name);
+		logger.debug(excelMap.name);
 
-	//create the new worksheet with 10 coloumns and rows equal to number of testcases
-	var curr = excelMap;
+		//create the new worksheet with 10 coloumns and rows equal to number of testcases
+		var curr = excelMap;
 
-	//Sorting the positions of the child nodes according to their childindex
-	for (i = 0; i < curr.children.length; i++) {
-		for (j = 0; j < curr.children[i].children.length; j++) {
-			//sort the testcases based on childindex
-			curr.children[i].children[j].children.sort(function(a,b){
+		//Sorting the positions of the child nodes according to their childindex
+		for (i = 0; i < curr.children.length; i++) {
+			for (j = 0; j < curr.children[i].children.length; j++) {
+				//sort the testcases based on childindex
+				curr.children[i].children[j].children.sort(function(a,b){
+					return parseInt(a.childIndex)-parseInt(b.childIndex)});
+			}
+			//sort the screens based on childindex
+			curr.children[i].children.sort(function(a,b){
 				return parseInt(a.childIndex)-parseInt(b.childIndex)});
 		}
-		//sort the screens based on childindex
-		curr.children[i].children.sort(function(a,b){
-			return parseInt(a.childIndex)-parseInt(b.childIndex)});
-	}
-	//sort the scenarios based on childindex
-	curr.children.sort(function(a,b){
-	return parseInt(a.childIndex)-parseInt(b.childIndex)});
+		//sort the scenarios based on childindex
+		curr.children.sort(function(a,b){
+		return parseInt(a.childIndex)-parseInt(b.childIndex)});
 
-	//Set some width for first 4 columns
-	ws.column(1).setWidth(40);
-	ws.column(2).setWidth(40);
-	ws.column(3).setWidth(40);
-	ws.column(4).setWidth(40);
+		//Set some width for first 4 columns
+		ws.column(1).setWidth(40);
+		ws.column(2).setWidth(40);
+		ws.column(3).setWidth(40);
+		ws.column(4).setWidth(40);
 
-	var style = wb.createStyle({
-		font: {
-			color: '000000',
-			bold: true,
-				size: 12,
-			}
-			});
+		var style = wb.createStyle({
+			font: {
+				color: '000000',
+				bold: true,
+					size: 12,
+				}
+				});
 
-	ws.cell(1, 1)
-			.string('Module')
-			.style(style);
+		ws.cell(1, 1)
+				.string('Module')
+				.style(style);
+
+		ws.cell(1, 2)
+				.string('Scenario')
+				.style(style);
+
+		ws.cell(1, 3)
+				.string('Screen')
+				.style(style);
+
+		ws.cell(1, 4)
+				.string('Script')
+				.style(style);
 
 		var min_scen_idx = 1;
 		var min_scr_idx = 1;
