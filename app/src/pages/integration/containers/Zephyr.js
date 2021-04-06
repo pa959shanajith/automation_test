@@ -35,7 +35,10 @@ const Zephyr = () => {
         if (domainDetails.error) dispatch({ type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: domainDetails.error}});
         else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-        else if (domainDetails === "Invalid Session") return RedirectPage(history);
+        else if (domainDetails === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            return RedirectPage(history);
+        }
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
         // else if (domainDetails === "noprojectfound") setLoginError("Invalid credentials or no project found");
         // else if (domainDetails === "invalidurl") setLoginError("Invalid URL");

@@ -68,6 +68,9 @@ return(
                                                 />}                        
                         </div>
                     <div className="pairsie_array_container">
+                    <div className="pw__ab">
+                    <div className="pw__min">
+                    <div className="pw__con" id="scrapeObjCon">
                         <ScrollBar thumbColor ={"#311d4e"} trackColor ={"rgb(211, 211, 211);"}>                        
                             <div className="pairwise_array">
                             {/* <ScrollBar thumbColor ={"#311d4e"} trackColor ={"rgb(211, 211, 211);"}> */}
@@ -83,7 +86,7 @@ return(
                             {/* </ScrollBar> */}
                             </div>
                         </ScrollBar>
-                        </div>
+                        </div></div></div></div>
                     </Fragment> :
                     <Fragment>
                         <div className="page-taskName">

@@ -53,36 +53,43 @@ const QTestContent = props => {
             testList = { props.folderDetails ? 
                 <>    
                 <div data-test="intg_qTest_test_list"className="test__rootDiv">
+                    <div className="test_tree_branches">
                     <img alt="rotIcon" 
                         className="test_tree_toggle" 
                         src="static/imgs/ic-qcCollapse.png"
                     />
                     <label>Root</label>
-                <div className="test_tree_branches" style={{paddingLeft: 17}}>
+                    </div>
+                <div className="int__folderNode">
                     {props.folderDetails.map((e,i)=>(
-                        <div>
+                        <Fragment key={i}>
+                        <div className="test_tree_branches" style={{paddingLeft: 17}}>
                             <img alt="expand-collapse" 
                                 className="test_tree_toggle" id={i} onClick={()=>props.callCycleExpand({i})} 
                                 style={{height:"16px" , cursor: "pointer"}} 
                                 src={e.cycleOpen? "static/imgs/ic-qcCollapse.png" : "static/imgs/ic-qcExpand.png"}
                             />
                             <label>{e.cycle}</label>
+                        </div>
+                        <div className="int__folderNode">
                             { e.cycleOpen ?
                                 <Fragment> 
-                                <div className="test_tree_branches" style={{paddingLeft: 17}}>
-                                    
+                                <div>
                                     {e.testsuites &&
                                         e.testsuites.map((testSuite,index)=>(
-                                        <div>
+                                        <Fragment key={index}>
+                                        <div className="test_tree_branches" style={{paddingLeft: 17}}>
                                             <img alt="blueMinus-Plus" 
                                             className="test_tree_toggle" onClick={()=>props.callTestSuiteExpand(testSuite.id)} 
                                             style={{height:"16px",cursor: "pointer"}} 
                                             src={testSuite.TestsuiteOpen?"static/imgs/ic-taskType-blue-minus.png" :"static/imgs/ic-taskType-blue-plus.png"}
                                             />
                                             <label>{testSuite.name}</label>
+                                        </div>
+                                        <div className="int__folderNode">
                                             {
                                             testSuite.TestsuiteOpen ?
-                                            <div className="test_tree_branches" style={{paddingLeft: 17}}>
+                                            <div>
                                             {
                                                 testSuite.testruns.map((e,i)=>(
                                                     <Fragment key={i}>
@@ -115,13 +122,14 @@ const QTestContent = props => {
 
                                         }
                                         </div>
-                                    
+                                        </Fragment>
                                     ))
                                     }
-                                
-                                </div> </Fragment>: null
+                                </div> 
+                                </Fragment>: null
                             }
                         </div>
+                        </Fragment>
                     ))}                                  
                 </div>
                 </div>
