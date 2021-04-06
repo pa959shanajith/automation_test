@@ -33,7 +33,7 @@ const CalendarComp = (props) => {
         setDate(event.format("DD/MM/YYYY"))
     }
     return(
-        <span className="date-container" >
+        <span data-test="dateContainer" className="date-container" >
             <Datetime
                 closeOnClickOutside={true}
                 ref={dateRef} 
@@ -44,7 +44,7 @@ const CalendarComp = (props) => {
                 dateFormat="DD/MM/YYYY"
                 inputProps={inputProps} timeFormat={false} id="data-token"
             />
-            <img onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
+            <img  data-test="datePickerIcon"onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
         </span>
     )
 }

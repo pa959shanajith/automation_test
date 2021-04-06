@@ -9,22 +9,22 @@ import '../styles/Legends.scss'
 const Legends = ({isEnE}) => {
     return(
         <svg className="ct-legendBox">
-            <g transform="translate(10,10)">
-                <g>
+            <g  transform="translate(10,10)">
+                <g data-test="modules">
                     <circle className="ct-modules" cx="0" cy="0" r="10"></circle>
                     <text className="ct-nodeLabel" x="15" y="3">Modules</text>
                 </g>
-                <g>
+                <g data-test="scenarios">
                     <circle className="ct-scenarios" cx="90" cy="0" r="10"></circle>
                     <text className="ct-nodeLabel" x="105" y="3">Scenarios</text>
                 </g>
                 {!isEnE?
                 <Fragment>
-                    <g>
+                    <g data-test="screens">
                         <circle className="ct-screens" cx="180" cy="0" r="10"></circle>
                         <text className="ct-nodeLabel" x="195" y="3">Screens</text>
                     </g>
-                    <g>
+                    <g data-test="testcases">
                         <circle className="ct-testcases" cx="270" cy="0" r="10"></circle>
                         <text className="ct-nodeLabel" x="285" y="3">Test Cases</text>
                     </g>

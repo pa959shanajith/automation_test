@@ -65,19 +65,19 @@ const NavButton = (props) => {
             <div id="navigate-widget">
                 <div className="arrow-box">
                     <p>
-                        <i className="arrow-box-ic up" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('up')}></i>
+                        <i data-test="upArrow" className="arrow-box-ic up" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('up')}></i>
                     </p>
                     <p>
-                        <i className="arrow-box-ic left" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('left')}></i>
-                        <i className="arrow-box-ic right" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>{setMove('right')}}></i>
+                        <i data-test="leftArrow" className="arrow-box-ic left" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('left')}></i>
+                        <i data-test="rightArrow" className="arrow-box-ic right" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>{setMove('right')}}></i>
                     </p>
                     <p>
-                        <i className="arrow-box-ic down" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('down')}></i>
+                        <i data-test="downArrow" className="arrow-box-ic down" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('down')}></i>
                     </p>
                 </div>
                 <div className="zoom-box">
-                    <div><button className="zoom-btn" id="zoom_in" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('zoom-up')}><span>+</span></button></div>
-                    <div><button className="zoom-btn" id="zoom_out" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('zoom-down')}><span>-</span></button></div>
+                    <div><button data-test="zoomInBtn" className="zoom-btn" id="zoom_in" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('zoom-up')}><span>+</span></button></div>
+                    <div><button data-test="zoomOutBtn"className="zoom-btn" id="zoom_out" onMouseUp={()=>{setMove(false)}} onMouseDown={()=>setMove('zoom-down')}><span>-</span></button></div>
                 </div>      
             </div>
         </Rnd>
