@@ -4,7 +4,8 @@ const initialState = {
     userinfo:{},
     SR:{},
     socket:undefined,
-    notify:{data:[],unread:0}
+    notify:{data:[],unread:0},
+    dateformat:"DD-MM-YYYY"
 }
 
 const reducer = (state=initialState, action) => {
@@ -47,6 +48,10 @@ const reducer = (state=initialState, action) => {
         case actionTypes.UPDATE_NOTIFY_COUNT:
             return {
                 ...state, notify:{...state.notify,unread:action.payload}
+            }
+        case actionTypes.SET_DATEFORMAT:
+            return{
+                ...state, dateformat: action.payload
             }
         default:
             return state
