@@ -1,5 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
+import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global'
+import { useSelector } from 'react-redux';
 import {manageCIUsers} from '../api';
 import '../styles/TokenMgmtList.scss'
 
@@ -10,7 +11,7 @@ import '../styles/TokenMgmtList.scss'
 */
 
 const TokenMgmtList = (props) => {
-
+    const dateFormat = useSelector(state=>state.login.dateformat);
     const [loading,setLoading] = useState(false)
 	const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 	const [searchTasks,setSearchTasks] = useState("")
@@ -55,6 +56,39 @@ const TokenMgmtList = (props) => {
             show:true
         })
     }
+    const formatDate = (date) => {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear(),
+            hour = '' + d.getHours(),
+            minute = '' + d.getMinutes();
+    
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+        if (hour.length < 2)
+            hour = '0' + hour
+        if (minute.length < 2)
+            minute = '0' + minute 
+
+        let map = {"MM":month,"YYYY": year, "DD": day};
+        let def = [day,month,year];
+        let format = dateFormat.split("-");
+        let arr = []
+        let used = {}
+        for (let index in format){
+            if (!(format[index] in map) || format[index] in used){
+                return def.join('-') + " " + [hour,minute].join(':');
+            }
+            arr.push(map[format[index]]) 
+            used[format[index]] = 1
+        }
+
+        return arr.join('-') + " " + [hour,minute].join(':');
+    }
+
 
     return (
         <Fragment>
@@ -87,7 +121,7 @@ const TokenMgmtList = (props) => {
                                     <tr key={index} className='tkn-table__row provisionTokens'>
                                         <td className="tkn-table__name"> {token.name} </td>
                                         <td className="tkn-table__status"> {token.deactivated} </td>
-                                        <td className="tkn-table__exp"> {token.expireson} </td>
+                                        <td className="tkn-table__exp"> {formatDate(token.expireson)} </td>
                                         {token.deactivated === 'active'? <td className="tkn-table__action"><button className="btn btn-list-tkn-mgmt tkn-table__button" onClick={()=>{deactivate(token)}} > Deactivate </button></td>:null}
                                         {token.deactivated !== 'active'?<td className="tkn-table__action"></td> :null}
                                     </tr> 
