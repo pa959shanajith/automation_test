@@ -14,6 +14,8 @@ const ValidationExpression = (value,id) =>{
         regex = /[^a-zA-Z0-9@._-]/g;
     else if (['projectName', 'releaseTxt', 'cycleTxt'].includes(id))
         regex = /[~`%*()+=|:;"'?/><,]/g;
+    else if(id === "optimazationInput")
+        regex = /[^0-9]/g;
     else
         return value;
     var replacedValue = value.replace(regex, "");

@@ -4,6 +4,7 @@ import { useSelector, useDispatch} from 'react-redux';
 import {getModules,populateScenarios}  from '../api'
 import * as actionTypes from '../state/action';
 import '../styles/ModuleListDropEnE.scss'
+import PropTypes from 'prop-types';
 
 /*Component ModuleListDropEnE
   use: renders modulelist and scenarios in dropdown for ene called by ToolbarMenuEnE
@@ -114,11 +115,11 @@ return(
     modalClass='modal-sm'
     />:null}
     <div className='ene_toolbar__dropdown' style={{'height':(dropdown)?'90px':'250px'}}>
-        <div className='ene_toolbar__dropdown_module'>
+        <div data-test="moduleList"className='ene_toolbar__dropdown_module'>
             <ScrollBar scrollId='toolbar_module-list' trackColor={'transperent'} thumbColor={'grey'}>
             {moduleList.map((e,i)=>{
                 return(
-                    <div name={e.name} value={e._id} type={e.type} onClick={(e)=>selectModule(e)} key={i} className={'ene_toolbar__module-box'+((moduleSelect._id === e._id)?" selected":"")}>
+                    <div data-test="individualModules"name={e.name} value={e._id} type={e.type} onClick={(e)=>selectModule(e)} key={i} className={'ene_toolbar__module-box'+((moduleSelect._id === e._id)?" selected":"")}>
                         <img src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img>
                         <span value={e._id} >{e.name}</span>
                     </div>
@@ -126,7 +127,7 @@ return(
             })}
             </ScrollBar>
         </div>      
-        <div className='ene_toolbar__dropdown_scenario'>
+        <div data-test="scenarioList" className='ene_toolbar__dropdown_scenario'>
             <div className='ene_toolbar__scrollwrap'>
                 <ScrollBar scrollId='toolbar_module-list' trackColor={'transperent'} thumbColor={'grey'}>
                 <div>
@@ -138,7 +139,7 @@ return(
                 </div>
                 </ScrollBar>
             </div>
-            <div className='ene_toolbar__buttons'>
+            <div data-test="EnEbuttons"className='ene_toolbar__buttons'>
                 <button onClick={clickAdd} className={'btn'+(selectedSc.length<1?' disabled':'')}>Add</button>
                 <button onClick={clickCreateNew}className='btn'>Create New</button>
             </div>
@@ -162,5 +163,10 @@ const Footer = (props) => (
         <button onClick={()=>{props.setWarning(false)}}>No</button>
     </div>
 )
-
+ModuleListDropEnE.propTypes={
+    setBlockui:PropTypes.func.isRequired,
+    setPopup:PropTypes.func.isRequired,
+    filterSc:PropTypes.string.isRequired,
+    setModName: PropTypes.func.isRequired
+}
 export default ModuleListDropEnE;

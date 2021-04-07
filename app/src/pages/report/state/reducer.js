@@ -24,7 +24,7 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 suiteDetails:[],
-                moduleList:{},
+                moduleList:[],
                 suiteSelected:{_id:undefined,name:""}
             }
         default: 

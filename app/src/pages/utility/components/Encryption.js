@@ -34,7 +34,7 @@ return(
             <button data-test="encryption_reset_btn" onClick={()=>props.callReset()} className="btn-reset">Reset</button>
         </div>}
         <div data-test="utility_encrypted_data_div" className="encryptionData-body">
-            <textarea data-test="utility_encrypted_data_inp" id="encryptedData" readOnly placeholder="Encrypted Data" value={props.encryptedData}/>
+            <textarea data-test="utility_encrypted_data_inp" id="encryptedData" readOnly={true} placeholder="Encrypted Data" value={props.encryptedData}/>
         </div>
         </div>
         

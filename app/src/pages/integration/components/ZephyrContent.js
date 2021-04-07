@@ -37,8 +37,10 @@ const ZephyrContent = props => {
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ICE not available", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
         else if (releaseData === "scheduleModeOn")
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
-        else if (releaseData === "Invalid Session")
+        else if (releaseData === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             return RedirectPage(history);
+        }
         else if (releaseData === "invalidcredentials")
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Invalid Credentials"}});
         else if (releaseData) {
@@ -59,8 +61,10 @@ const ZephyrContent = props => {
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ICE not available", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
         else if (testAndScenarioData === "scheduleModeOn")
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
-        else if (testAndScenarioData === "Invalid Session")
+        else if (testAndScenarioData === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             return RedirectPage(history);
+        }
         else if (testAndScenarioData) {
             setProjectDetails(testAndScenarioData.project_dets);
             setAvoProjects(testAndScenarioData.avoassure_projects);  
@@ -130,7 +134,7 @@ const ZephyrContent = props => {
                 leftBoxTitle="Zephyr Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 selectTestProject={
-                    <select value={projectDropdn1} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
+                    <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
                         <option value="Select Project" disabled >Select Project</option>
 
                         {   props.domainDetails ? 
@@ -141,7 +145,7 @@ const ZephyrContent = props => {
                     </select>
                 }
                 selectTestRelease={
-                    <select value={selectedRel} onChange={onReleaseSelect} className="qcSelectDomain" style={{marginRight : "5px"}}>
+                    <select data-test="intg_zephyr_release_drpdwn" value={selectedRel} onChange={onReleaseSelect} className="qcSelectDomain" style={{marginRight : "5px"}}>
                         <option value="Select Release" disabled >Select Release</option>
                         {   releaseArr.length &&
                             releaseArr.map(e => (
@@ -151,7 +155,7 @@ const ZephyrContent = props => {
                     </select>
                 }
                 selectScenarioProject={
-                    <select value={scenario_ID} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
+                    <select data-test="intg_zephyr_scenario_dwpdwn" value={scenario_ID} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
                         <option value="Select Project" disabled >Select Project</option>
                         {
                             avoProjects? 
@@ -176,7 +180,7 @@ const ZephyrContent = props => {
                 }
                 testList={ Object.keys(projectDetails).length ? 
                     <Fragment>    
-                        <div className="test__rootDiv">
+                        <div data-test="intg_zephyr_test_list" className="test__rootDiv">
                             <div className="test_tree_branches">
                                 <img alt="collapse"
                                     className="test_tree_toggle" 

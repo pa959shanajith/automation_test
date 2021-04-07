@@ -52,7 +52,10 @@ const  QTest = props => {
         else if(domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials , Retry Login")
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-        else if (domainDetails === "Invalid Session") return RedirectPage(history);
+        else if (domainDetails === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            return RedirectPage(history);
+        }
         else if(domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
         else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
         else if (domainDetails === "fail") setLoginError("Fail to Login");
@@ -66,8 +69,8 @@ const  QTest = props => {
     }
     const callProjectDetails_ICE=async(e)=>{ // API call for the list of Projects of qTest and stores respone in array(state)
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
-        const domainid = (e.target.childNodes[e.target.selectedIndex]).getAttribute("value")
-        const domainName = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id")
+        const domainid = e.target.value;
+        const domainName = e.target.childNodes? (e.target.childNodes[e.target.selectedIndex]).getAttribute("id") : null;
         setDomainID(domainid);
         const projectDetails = await qtestProjectDetails_ICE(domainid , user_id )
         if (projectDetails.error){
@@ -84,7 +87,7 @@ const  QTest = props => {
     const callFolderDetails_ICE = async(e)=>{ // API call for list of Testcases for each Project and Release Type 
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading TestCases...'});
         const projectName = e.target.value;
-        const project_ID = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id")
+        const project_ID = e.target.childNodes? (e.target.childNodes[e.target.selectedIndex]).getAttribute("id") : null;
         const domain_ID = domainID
         const folderDetails = await qtestFolderDetails_ICE(project_ID,"root",domain_ID,"folder",)
         if (folderDetails.error){
@@ -101,15 +104,15 @@ const  QTest = props => {
             i=== idx.i ? (e['cycleOpen'] === true)? e['cycleOpen'] = false : e['cycleOpen'] = true : null
         ))
         setFolderDetails(expandarr);
-        
     }
     const callTestSuiteExpand =(idx)=>{//sets the state for logo of expand collapse testSuites
         var expandarr=[...folderDetails];
         expandarr.map((e,i)=>(
-            i=== idx.i ? 
-            e['TestsuiteOpen'] === true ? e['TestsuiteOpen'] = false : e['TestsuiteOpen'] = true : null
-        ))
-        setFolderDetails(expandarr);
+            e.testsuites.map((testsuite , index)=>(
+                (testsuite.id) === (idx) ? 
+                testsuite['TestsuiteOpen'] === true ? testsuite['TestsuiteOpen'] = false : testsuite['TestsuiteOpen'] = true : null            
+        ))))
+        setFolderDetails(expandarr)
     }
     const callTestSuiteSelection=(event ,idx , name)=>{//sets the selectedtestSuite (id and Name) 
         setSelectedTestSuiteID(idx)
@@ -130,7 +133,7 @@ const  QTest = props => {
         }
     }
     const callScenarios =(e)=>{//sets the selected Scenario
-        const scenarioID = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id");
+        const scenarioID = e.target.childNodes?(e.target.childNodes[e.target.selectedIndex]).getAttribute("id"):null;
         const project_Name= e.target.value
         setScenarioArr(true);
         setScenario_ID(scenarioID);
@@ -224,7 +227,6 @@ const  QTest = props => {
         setDisableSave(true)
 
     }
-
     return (<>
         {viewMappedFiles === "qTest" ? 
             <MappedPage

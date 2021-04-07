@@ -12,7 +12,7 @@ const QTestContent = props => {
             leftBoxTitle="qTest Tests"            
             rightBoxTitle="Avo Assure Scenarios"
             selectTestDomain = {
-                <select value={props.projectDropdn1} ref={props.selProjectRef} onChange={(e)=>props.callProjectDetails_ICE(e)} style={{marginRight : "5px"}}>
+                <select data-test="intg_qTest_project_dropdwn" value={props.projectDropdn1} ref={props.selProjectRef} onChange={(event)=>props.callProjectDetails_ICE(event)} style={{marginRight : "5px"}}>
                     <option value="Select Project"selected disabled >Select Project</option>
                     { props.domainDetails.length &&
                         props.domainDetails.map((e,i)=>(
@@ -21,7 +21,7 @@ const QTestContent = props => {
                 </select>
             }
             selectTestRelease = {
-                <select value={props.releaseDropdn} onChange={(e)=>props.callFolderDetails_ICE(e)}>
+                <select data-test="intg_qTest_release_drpdwn"value={props.releaseDropdn} onChange={(e)=>props.callFolderDetails_ICE(e)}>
                     <option value="Select Release" selected disabled >Select Release</option>
                     { props.projectDetails &&
                         props.projectDetails.qc_projects.map((e,i)=>(
@@ -30,7 +30,7 @@ const QTestContent = props => {
                 </select>
             }
             selectScenarioProject = {
-                <select value={props.projectDropdn2} onChange={(e)=>props.callScenarios(e)} >
+                <select data-test="intg_qTest_Project_scenarios_drpdwn" value={props.projectDropdn2} onChange={(e)=>props.callScenarios(e)} >
                     <option value="Select Project"selected disabled >Select Project</option>
                     { props.projectDetails &&
                         props.projectDetails.avoassure_projects.map((e,i)=>(
@@ -52,75 +52,84 @@ const QTestContent = props => {
                 </> : null }
             testList = { props.folderDetails ? 
                 <>    
-                <div className="test__rootDiv">
+                <div data-test="intg_qTest_test_list"className="test__rootDiv">
+                    <div className="test_tree_branches">
                     <img alt="rotIcon" 
                         className="test_tree_toggle" 
                         src="static/imgs/ic-qcCollapse.png"
                     />
                     <label>Root</label>
-                <div className="test_tree_branches" style={{paddingLeft: 17}}>
+                    </div>
+                <div className="int__folderNode">
                     {props.folderDetails.map((e,i)=>(
-                        <div>
+                        <Fragment key={i}>
+                        <div className="test_tree_branches" style={{paddingLeft: 17}}>
                             <img alt="expand-collapse" 
                                 className="test_tree_toggle" id={i} onClick={()=>props.callCycleExpand({i})} 
                                 style={{height:"16px" , cursor: "pointer"}} 
                                 src={e.cycleOpen? "static/imgs/ic-qcCollapse.png" : "static/imgs/ic-qcExpand.png"}
                             />
                             <label>{e.cycle}</label>
+                        </div>
+                        <div className="int__folderNode">
                             { e.cycleOpen ?
                                 <Fragment> 
-                                <div className="test_tree_branches" style={{paddingLeft: 17}}>
-                                    <img alt="blueMinus-Plus" 
-                                        className="test_tree_toggle" onClick={()=>props.callTestSuiteExpand({i})} 
-                                        style={{height:"16px",cursor: "pointer"}} 
-                                        src={e.TestsuiteOpen?"static/imgs/ic-taskType-blue-minus.png" :"static/imgs/ic-taskType-blue-plus.png"}
-                                    />
+                                <div>
                                     {e.testsuites &&
-                                        e.testsuites.map((e,i)=>(
-                                        <label>{e.name}</label>
-                                    
+                                        e.testsuites.map((testSuite,index)=>(
+                                        <Fragment key={index}>
+                                        <div className="test_tree_branches" style={{paddingLeft: 17}}>
+                                            <img alt="blueMinus-Plus" 
+                                            className="test_tree_toggle" onClick={()=>props.callTestSuiteExpand(testSuite.id)} 
+                                            style={{height:"16px",cursor: "pointer"}} 
+                                            src={testSuite.TestsuiteOpen?"static/imgs/ic-taskType-blue-minus.png" :"static/imgs/ic-taskType-blue-plus.png"}
+                                            />
+                                            <label>{testSuite.name}</label>
+                                        </div>
+                                        <div className="int__folderNode">
+                                            {
+                                            testSuite.TestsuiteOpen ?
+                                            <div>
+                                            {
+                                                testSuite.testruns.map((e,i)=>(
+                                                    <Fragment key={i}>
+                                                    <div 
+                                                        className={"test_tree_leaves "+(props.selectedTestSuiteID === e.id? "slectedTestDiv": "")} 
+                                                        style={{cursor: "pointer"}} 
+                                                        onClick={(event)=>props.callTestSuiteSelection(event,e.id ,e.name)} id={e.id} 
+                                                    >
+                                                        <label>{e.name}</label>
+                                                        { props.selectedTestSuiteID === e.id ? <>
+                                                        {props.syncSuccess ?
+                                                            <img alt="unsynIcon"
+                                                                onClick={()=>props.callUnSync()} 
+                                                                style={{cursor: "pointer",paddingRight:"10px"}} 
+                                                                src="static/imgs/ic-qcUndoSyncronise.png"
+                                                            />:null}
+                                                        {!props.syncSuccess ?
+                                                            <img alt="syncIcon"
+                                                                onClick={()=>props.callSyncronise()} 
+                                                                style={{cursor: "pointer",paddingRight:"10px"}} 
+                                                                src="static/imgs/ic-qcSyncronise.png"
+                                                            />:null}
+                                                        </>
+                                                        : null}
+                                                    </div>
+                                                    </Fragment>
+                                                ))}
+                                            </div> 
+                                                : null
+
+                                        }
+                                        </div>
+                                        </Fragment>
                                     ))
                                     }
-                                {
-                                    e.TestsuiteOpen ?
-                                    <div className="test_tree_branches" style={{paddingLeft: 17}}>
-                                    {e.testsuites &&
-                                    e.testsuites.map((e,i)=>(
-                                        e.testruns.map((e,i)=>(
-                                            <Fragment key={i}>
-                                            <div 
-                                                className={"test_tree_leaves "+(props.selectedTestSuiteID === e.id? "slectedTestDiv": "")} 
-                                                style={{cursor: "pointer"}} 
-                                                onClick={(event)=>props.callTestSuiteSelection(event,e.id ,e.name)} id={e.id} 
-                                            >
-                                                <label>{e.name}</label>
-                                                { props.selectedTestSuiteID === e.id ? <>
-                                                {props.syncSuccess ?
-                                                    <img alt="unsynIcon"
-                                                        onClick={()=>props.callUnSync()} 
-                                                        style={{cursor: "pointer",paddingRight:"10px"}} 
-                                                        src="static/imgs/ic-qcUndoSyncronise.png"
-                                                    />:null}
-                                                {!props.syncSuccess ?
-                                                    <img alt="syncIcon"
-                                                        onClick={()=>props.callSyncronise()} 
-                                                        style={{cursor: "pointer",paddingRight:"10px"}} 
-                                                        src="static/imgs/ic-qcSyncronise.png"
-                                                    />:null}
-                                                </>
-                                                : null}
-                                            </div>
-                                            </Fragment>
-                                        ))
-                                    
-                                    ))}
-                                    </div> 
-                                        : null
-
-                                }
-                                </div> </Fragment>: null
+                                </div> 
+                                </Fragment>: null
                             }
                         </div>
+                        </Fragment>
                     ))}                                  
                 </div>
                 </div>

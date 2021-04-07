@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import '../styles/ControlBox.scss'
 import * as d3 from 'd3';
+import PropTypes from 'prop-types'
 
 /*Component ControlBox
   use: returns node control options 
@@ -96,14 +97,22 @@ const ControlBox = (props) => {
     return(
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
             <div id="ct-ctrlBox" className={(isEnE?'end-to-end':'')}>
-                <p className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}><span className="ct-tooltiptext">Create Scenarios</span></p>
-                <p className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}><span className="ct-tooltiptext">Create Multiple Scenarios</span></p>
-                <p className="ct-ctrl fa fa-pencil-square-o"onClick={editNode} ><span className="ct-tooltiptext">Edit Module</span></p>
-                <p className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode} ><span className="ct-tooltiptext"></span></p>
+                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}><span className="ct-tooltiptext">Create Scenarios</span></p>
+                <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}><span className="ct-tooltiptext">Create Multiple Scenarios</span></p>
+                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode} ><span className="ct-tooltiptext">Edit Module</span></p>
+                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode} ><span className="ct-tooltiptext"></span></p>
             </div>
         </ClickAwayListener>
     )
 }
 
-
+ControlBox.propTypes={
+    nid: PropTypes.string.isRequired,
+    setMultipleNode: PropTypes.func.isRequired,
+    clickAddNode: PropTypes.func.isRequired,
+    clickDeleteNode: PropTypes.func.isRequired,
+    setCtrlBox: PropTypes.func.isRequired,
+    setInpBox:PropTypes.func.isRequired,
+    ctScale: PropTypes.object.isRequired
+}
 export default ControlBox;

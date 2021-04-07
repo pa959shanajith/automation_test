@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect, useMemo } from 'react';
 import { ModalContainer, ScrollBar, PopupMsg } from '../../global'
 import '../styles/MultiNodeBox.scss'
+import PropTypes from 'prop-types';
 
 /*Component MultiNodeBox
   use: return MultiNodeBox popup to add nodes
@@ -30,10 +31,10 @@ const MultiNodeBox = (props) =>{
 const Footer = (props) =>{
     return(
         <Fragment>
-            <label className='err-message'>{props.errMsg}</label>
+            <label data-test="errorMessageLabel" className='err-message'>{props.errMsg}</label>
             <div className='mnode__buttons'>
-                <button onClick={()=>{props.setReset(true)}}>Reset</button>
-                <button onClick={()=>{props.setSubmit(true)}}>Create</button>
+                <button data-test="reset" onClick={()=>{props.setReset(true)}}>Reset</button>
+                <button data-test="submit" onClick={()=>{props.setSubmit(true)}}>Create</button>
             </div>
         </Fragment>
     )
@@ -123,7 +124,7 @@ const AddnodeContainer = (props) =>{
     }
     return(
         <Fragment>
-            <div onClick={()=>{
+            <div data-test="addButtonDiv"onClick={()=>{
                 var arr = [...mnode]
                 arr.push(type+count)
                 setCount(count+1)
@@ -137,15 +138,15 @@ const AddnodeContainer = (props) =>{
             {mnode.map((e,i)=>{
                 return(
                     <div className='row mnode__row' key={i}>
-                        <div className='col-sm-3'>{i+1}</div>
-                        <div className='col-sm-6 mnode__input'>
+                        <div data-test="index" className='col-sm-3'>{i+1}</div>
+                        <div data-test="scenarioName" className='col-sm-6 mnode__input'>
                             <input className={(errList.includes(i))?'err-border':''} id={'mnode_'+i} value={e} maxLength={255} placeholder={'Enter node name'} onChange={(e)=>{
                                 var arr = [...mnode]
                                 arr[e.target.id.split('mnode_')[1]] = e.target.value
                                 setMnode(arr)
                             }}></input>
                         </div>
-                        <div className='col-sm-3'>
+                        <div data-test="deleteButton" className='col-sm-3'>
                             <img onClick={(e)=>{
                                 var arr=[...mnode]
                                 var errArr=[...errList]
@@ -174,5 +175,9 @@ const ValidateNode = (nName) => {
     }
     return true
 }
-
+MultiNodeBox.propTypes={
+    count:PropTypes.object.isRequired,
+    setMultipleNode:PropTypes.func.isRequired,
+    createMultipleNode:PropTypes.func.isRequired
+}
 export default MultiNodeBox;
