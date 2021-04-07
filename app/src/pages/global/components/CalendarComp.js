@@ -1,6 +1,7 @@
 
 import React, { useRef } from 'react';
 import Datetime from "react-datetime";
+import {useSelector} from 'react-redux';
 import moment from "moment";
 import '../styles/CalendarComp.scss'
 
@@ -11,10 +12,12 @@ import '../styles/CalendarComp.scss'
 */
 
 const CalendarComp = (props) => {
+    console.log(props)
     const dateRef = useRef()
     const setDate = props.setDate
-    const dateVal = props.date
+    var dateVal = props.date
     const disabled = props.disabled
+    const dateFormat = useSelector(state=>state.login.dateformat);
     const classCalender = props.classCalender
     const error = props.error
     const inputProps = props.inputProps
@@ -36,7 +39,7 @@ const CalendarComp = (props) => {
         setDate(event.format("DD/MM/YYYY"))
     }
     return(
-        <span className={"date-container " + (classCalender? " "+classCalender:"")} >
+        <span data-test='calendar-comp' className={"date-container " + (classCalender? " "+classCalender:"")} >
             <Datetime
                 closeOnClickOutside={true}
                 ref={dateRef} 
@@ -44,12 +47,12 @@ const CalendarComp = (props) => {
                 isValidDate={valid}
                 value={dateVal} 
                 onChange={submit}
-                dateFormat="DD/MM/YYYY"
+                dateFormat={dateFormat}
                 inputProps={inputProps!==undefined?inputProps:inputPropsDefault} 
                 timeFormat={false} 
                 id="data-token"
                 renderInput={(props) => {
-                    return <input {...props} value={ dateVal ? props.value : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
+                    return <input data-test='calendar-input' {...props} value={ dateVal ? props.value : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
                 }}
             />
             <img onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
