@@ -25,7 +25,7 @@ exports.loadUserInfo = async (req, res) => {
 			role: userData.defaultrole,
 			taskwflow: configpath.strictTaskWorkflow,
 			token: configpath.defaultTokenExpiry,
-			dateformat: configpath.dateformat,
+			dateformat: configpath.dateFormat,
 			dbuser: userType=="inhouse",
 			ldapuser: userType=="ldap",
 			samluser: userType=="saml",

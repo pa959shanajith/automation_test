@@ -15,7 +15,8 @@ const CalendarComp = (props) => {
     const dateRef = useRef()
     const setDate = props.setDate
     const disabled = props.disabled
-    const dateFormat = useSelector(state=>state.login.dateformat);
+    var dateFormat = useSelector(state=>state.login.dateformat);
+    dateFormat = dateFormat.replaceAll("-","/")
     var dateVal = props.date;
     const classCalender = props.classCalender
     const error = props.error
@@ -38,13 +39,13 @@ const CalendarComp = (props) => {
         setDate(event.format("DD-MM-YYYY"))
     }
     const formatDate = (date) => {
-        console.log(date)
-        if (date.includes("-")) return date;
-        var d = new Date(date),
-            month = '' + (d.getMonth() + 1),
+        if (!(date.includes("/") || date.includes("-"))) return date;
+        if (date.includes("/")) date = date.replaceAll("/","-");
+        let splitDate = date.split("-");
+        let d = new Date(splitDate[2], splitDate[1], splitDate[0]),
+            month = '' + (d.getMonth()),
             day = '' + d.getDate(),
             year = d.getFullYear();
-    
         if (month.length < 2) 
             month = '0' + month;
         if (day.length < 2) 
@@ -52,7 +53,7 @@ const CalendarComp = (props) => {
 
         let map = {"MM":month,"YYYY": year, "DD": day};
         let def = [day,month,year];
-        let format = dateFormat.split("-");
+        let format = dateFormat.split("/");
         let arr = []
         let used = {}
         for (let index in format){
@@ -62,7 +63,6 @@ const CalendarComp = (props) => {
             arr.push(map[format[index]]) 
             used[format[index]] = 1
         }
-
         return arr.join('-');
     }
     return(
@@ -74,12 +74,12 @@ const CalendarComp = (props) => {
                 isValidDate={valid}
                 value={dateVal} 
                 onChange={submit}
-                dateFormat={dateFormat}
+                dateFormat="DD/MM/YYYY"
                 inputProps={inputProps!==undefined?inputProps:inputPropsDefault} 
                 timeFormat={false} 
                 id="data-token"
                 renderInput={(props) => {
-                    return <input data-test='calendar-input' {...props} value={ dateVal ? formatDate(props.value) : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
+                    return <input data-test='calendar-input' {...props} value={ formatDate(dateVal) ? formatDate(props.value) : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
                 }}
             />
             <img onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />

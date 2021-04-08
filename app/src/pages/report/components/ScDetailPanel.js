@@ -17,7 +17,7 @@ const ScDetailPanel = ({scDetails,setBlockui,displayError,selectedScDetails}) =>
         setArr(data)
     },[scDetails])
     const getReport = (e) => {
-        Report(e,setBlockui,displayError)
+        Report(e, setBlockui, displayError, dateFormat, formatDate)
     }
     const sortTable = () => {
         var data = [...arr].reverse()
@@ -28,25 +28,28 @@ const ScDetailPanel = ({scDetails,setBlockui,displayError,selectedScDetails}) =>
     const formatDate = (date) => {
         let dateTime = date.replace(" ", "-").split("-");
         let time = dateTime[dateTime.length - 1].split(":");
-        let day = dateTime[0]
-        let month = dateTime[1]
-        let year = dateTime[2]
+        
+        var day = dateTime[0];
+        var month = dateTime[1];
+        var year = dateTime[2];
+    
         let hour = time[0]
         let minute = time[1]
+        let seconds = time[2]
         let map = {"MM":month,"YYYY": year, "DD": day};
-        let def = [day,month,year];
-        let format = dateFormat.split("-");
-        let arr = []
-        let used = {}
-        for (let index in format){
-            if (!(format[index] in map) || format[index] in used){
-                return def.join('-') + " " + [hour,minute].join(':');
+            let def = [day,month,year];
+            let format = dateFormat.split("-");
+            let arr = []
+            let used = {}
+            for (let index in format){
+                if (!(format[index] in map) || format[index] in used){
+                    return def.join('-') + " " + [hour,minute,seconds].join(':');
+                }
+                arr.push(map[format[index]]) 
+                used[format[index]] = 1
             }
-            arr.push(map[format[index]]) 
-            used[format[index]] = 1
-        }
-
-        return arr.join('-') + " " + [hour,minute].join(':');
+    
+            return arr.join('-') + " " + [hour,minute,seconds].join(':');
     }
 
     if(!selectedScDetails._id){
