@@ -1214,7 +1214,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	var firstScript = false,windowId;
 	var temp_screendata=screendata;
 	var menu_input='';
-	var menu_count=0;
+	var menu_count=step;
 	var mflag=0;
 	if(adjacentItems){
 		// in case is first script
