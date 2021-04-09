@@ -42,8 +42,8 @@ const CalendarComp = (props) => {
         if (!(date.includes("/") || date.includes("-"))) return date;
         if (date.includes("/")) date = date.replaceAll("/","-");
         let splitDate = date.split("-");
-        let d = new Date(splitDate[2], splitDate[1], splitDate[0]),
-            month = '' + (d.getMonth()),
+        let d = new Date(splitDate[2], splitDate[1] - 1, splitDate[0]),
+            month = '' + (d.getMonth() + 1),
             day = '' + d.getDate(),
             year = d.getFullYear();
         if (month.length < 2) 
