@@ -213,7 +213,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
             year = d.getFullYear(),
             hour = '' + d.getHours(),
             minute = '' + d.getMinutes();
-    
+            
         if (month.length < 2) 
             month = '0' + month;
         if (day.length < 2) 

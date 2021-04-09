@@ -898,8 +898,10 @@ exports.getReport_API = async(req, res) => {
                                 reportData.overallstatus[0].cycleName=reportInfo.cycleName;
                                 reportData.overallstatus[0].reportId=reportInfo.reportId;
                                 var getTym = reportData.overallstatus[0].EndTime.split(".")[0];
-                                var getDat = getTym.split(" ")[0].split("-");
-                                reportData.overallstatus[0].date = getDat[1] + "/" + getDat[2] + "/" + getDat[0];
+                                var getDat = formatDate(getTym) || "N/A ";
+                                reportData.overallstatus[0].EndTime = getDat;
+                                reportData.overallstatus[0].StartTime = formatDate(reportData.overallstatus[0].StartTime.split(".")[0]) || "N/A "
+                                reportData.overallstatus[0].date = getDat.split(" ")[0];
                                 reportData.overallstatus[0].time = getTym.split(" ")[1];
                                 for(j=0;j<reportData.rows.length;++j){
                                     if (reportData.rows[j].status == "Pass") {
