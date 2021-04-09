@@ -681,26 +681,27 @@
 				<span>Git Configuration</span>
 			</div>
 			<div class="adminActionBtn">
-				<button class="btn btn-md pull-right adminBtn" ng-click="gitEditConfig($event)" style="margin-right:10px">Edit</button>
-				<button class="btn btn-md pull-right adminBtn" ng-click="saveGitConfig($event)" style="margin-right:10px">Create</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="tab='tabgitconfigedit';gitConfigure.gitEditConfig('edit', $event)" style="margin-right:10px">Edit</button>
+				<!-- <button class="btn btn-md pull-right adminBtn" ng-click="saveGitConfig($event)" style="margin-right:10px">Create</button> -->
+				<button  title="Create Git Configuration" class="btn btn-md pull-right adminBtn" ng-click="gitConfigure.saveGitConfig('create', $event)" style="margin-right:10px">Create</button>
 			</div>
 			<div class="col-xs-9 form-group" style="width: 83%">
 				<div class='userForm projectForm'>
-					<div class='domainTxt'>User  </div>
+					<div class='domainTxt' style="font-weight: bold;">User  </div>
 					<select class="adminSelect form-control selectDomain" style="width: 91%; margin-left: 8%" id="selGitUser">
-						<option value="" disabled selected>Please Select User</option>
+						<option value="" disabled selected>Select User</option>
 					</select>
 					<span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
 				</div>
 				<div class='userForm projectForm'>
-					<label class='domainTxt' style="margin-left: 1px;">Domain  </label>
+					<label class='domainTxt'>Domain  </label>
 					<select class="adminSelect form-control selectDomain" style="width: 91%; margin-left: 8%" id="selGitDomains">
-						<option value="" disabled selected>Please Select Your Domain</option>
+						<option value="" disabled selected>Please Select Domain</option>
 					</select>
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 				<div class='userForm adminControl'>
-					<div class='domainTxt'>Project  </div>
+					<div class='domainTxt' style="font-weight: bold;">Project  </div>
 					<select class="adminSelect form-control" style="width: 91%; margin-left: 8%" id="selGitProject">
 						<option value="" disabled selected>Please Select Your Project</option>
 					</select>
@@ -709,18 +710,66 @@
 				<div class='adminControl'>
 					<div>
 						<span class="leftControl" title="Git Access Token">Git Access Token</span>
-						<input type="text" id="GitAccToken" name="GitAccToken" maxlength="50" class="form-control form-control-custom create" placeholder="Enter Git Access Token"/>
+						<input type="text" autocomplete="off" id="GitAccToken" name="GitAccToken" maxlength="50" class="form-control form-control-custom create" placeholder="Enter Git Access Token"/>
 					</div>
 				</div>
 				<div class='adminControl'>
 					<div>
 						<span class="leftControl" title="Git URL">Git URL</span>
-						<input type="email" id="GitUrl" name="GitUrl" maxlength="50" class="form-control form-control-custom create" placeholder="Enter Git URL"/>
+						<input type="email" autocomplete="off" id="GitUrl" name="GitUrl" maxlength="50" class="form-control form-control-custom create" placeholder="Enter Git URL"/>
 					</div>
 				</div>
 			</div>
 		</div>
 		<!-- Git Configuration -->
+
+		<!-- Edit Git Configuration -->
+		<div class="containerWrap" ng-if="tab == 'tabgitconfigedit'">
+			<div id="page-taskName">
+				<span>Edit Git Configuration</span>
+			</div>
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-disabled="gitConfigure.gitproject==undefined" ng-click="gitConfigure.delete()" style="margin-right:10px">Delete</button>
+				<button class="btn btn-md pull-right adminBtn" ng-disabled="gitConfigure.gitaccesstoken==undefined && gitConfigure.giturl==undefined" ng-click="gitConfigure.saveGitConfig('update', $event)" style="margin-right:10px">Update</button>
+			</div>
+			<div class="col-xs-9 form-group" style="width: 83%">
+				<div class='userForm projectForm'>
+					<div class='domainTxt' style="font-weight: bold;">User  </div>
+					<select class="adminSelect form-control selectDomain" style="width: 91%; margin-left: 8%" id="selGitUser">
+						<option value="" disabled selected>Please Select User</option>
+					</select>
+					<span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
+				</div>
+				<div class='userForm projectForm'>
+					<label class='domainTxt'>Domain  </label>
+					<select class="adminSelect form-control selectDomain" style="width: 91%; margin-left: 8%" id="selGitDomains">
+						<option value="" disabled selected>Please Select Domain</option>
+					</select>
+					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
+				</div>
+				<div class='userForm adminControl'>
+					<div class='domainTxt' style="font-weight: bold;">Project  </div>
+					<select class="adminSelect form-control" style="width: 91%; margin-left: 8%" id="selGitProject">
+						<option value="" disabled selected>Please Select Your Project</option>
+					</select>
+					<span ng-show="projectNameRequired" class="error-msg ng-cloak errorlbl">{{projectNameRequired}}</span>
+				</div>
+				<div class='adminControl'>
+					<div>
+						<span class="leftControl" title="Git Access Token">Git Access Token</span>
+						<input type="text" autocomplete="off" ng-model="gitConfigure.gitaccesstoken" id="GitAccToken" name="GitAccToken" maxlength="50" class="form-control form-control-custom create" placeholder="Enter Git Access Token"/>
+					</div>
+				</div>
+				<div class='adminControl'>
+					<div>
+						<span class="leftControl" title="Git URL">Git URL</span>
+						<input type="email" autocomplete="off" ng-model="gitConfigure.giturl" id="GitUrl" name="GitUrl" maxlength="50" class="form-control form-control-custom create" placeholder="Enter Git URL (Eg: https://example.git)"/>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Edit Git Configuration -->
+
 
 		<!-- Assign Projects -->
 		<div class="containerWrap" ng-if="tab == 'tabAssignProject'">

@@ -261,8 +261,9 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			}).then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) });
 		},
-		saveGitConfig: function(userId,projectId,gitAccToken,gitUrl) {
+		saveGitConfig: function(action, userId,projectId,gitAccToken,gitUrl) {
 			return $http.post('/saveGitConfig', {
+				action: action,
 				userId: userId,
 				projectId: projectId,
 				gitAccToken: gitAccToken,
@@ -270,6 +271,14 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 			})
 			.then(function(response) { return response.data },
 			function(response) { return $q.reject(response.data) })
-		},		
+		},	
+		gitEditConfig: function(userId, projectId) {
+			return $http.post('/gitEditConfig', {
+				userId: userId,
+				projectId: projectId
+			})
+			.then(function(response) { return response.data },
+			function(response) { return $q.reject(response.data) })
+		},	
 	};
 }]);

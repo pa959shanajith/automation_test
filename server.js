@@ -396,6 +396,7 @@ if (cluster.isMaster) {
 		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
 		app.post('/restartService', auth.protect, admin.restartService);
 		app.post('/saveGitConfig', auth.protect, admin.saveGitConfig);
+		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);
