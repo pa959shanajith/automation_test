@@ -122,17 +122,19 @@ const TaskBox = (props) => {
                     tObj.ac = "Disable"
             }
         }else if(t === 'scenarios'){
-            taskList.task = taskList.task[0]
+            taskList.task = [taskList.task[0]]
         }
         if (tObj.det === null || tObj.det.trim() == "") {
             switch(dNodes[pi].type){
                 case 'endtoend' :
-                    tObj.det = tObj.t + ' End to End ' + dNodes[pi].name
+                    tObj.det = tObj.t + ' End to End ' + dNodes[pi].name;
+                    break;
                 case 'scenarios' :
                     tObj.det = tObj.t + ' ' + dNodes[pi].name
+                    break;
                 default :
                     var type = dNodes[pi].type.slice(0,-1) //remove plural
-                    tObj.det = tObj.t + type + " " + dNodes[pi].name
+                    tObj.det = tObj.t + ' ' + type + ' ' + dNodes[pi].name
             }
         }
         taskDetailsRef.current.value = tObj.det
