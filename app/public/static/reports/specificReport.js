@@ -237,18 +237,20 @@ function loadReports() {
             $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color', '#bbb');
             $("#jiraURL").val('');
             $("#jiraUserName").val('');
+            $('.error-msg').empty()
             $("#jiraPassword").val('');
         });
         $(document).on('click', '.loginJiraCredentials', function(e) {
+            var error = false
             $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color', '#bbb');
             url = $("#jiraURL").val().trim();
             userName = $("#jiraUserName").val();
             pwd = $("#jiraPassword").val();
             var urlPattern = new RegExp("(http|ftp|https)://[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?")
-            if (!url && urlPattern.test(url)) $("#jiraURL").css('border-color', 'red');
-            else if (!userName) $("#jiraUserName").css('border-color', 'red');
-            else if (!pwd) $("#jiraPassword").css('border-color', 'red');
-            else {
+            if (!url && !urlPattern.test(url)){ $("#jiraURL").css('border-color', 'red'); error = true}
+            if (!userName){ $("#jiraUserName").css('border-color', 'red'); error = true}
+            if (!pwd){ $("#jiraPassword").css('border-color', 'red'); error = true}
+            if(!error) {
                 var hostName = window.location.host;
                 var posturl = 'https://' + hostName + '/connectJira_ICE';
                 blockUI('Loading....');
