@@ -707,6 +707,7 @@ exports.importFromGit_ICE = async (req, res) => {
 		const folderPath = 'AvoAssureTest_Artifacts'+'/'+data.folderPath;
 		const userInfo = await utils.tokenValidation(req.body.userInfo);
 		const inputs = {
+			"userid":userInfo.userid,
 			"gitRepoClonePath": gitRepoClonePath,
 			"gitAccessToken": gitAccessToken,
 			"commitId":commitId,

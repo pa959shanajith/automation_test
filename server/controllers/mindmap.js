@@ -1538,7 +1538,8 @@ exports.exportToGit = async (req, res) => {
 			"gitFolderPath": gitFolderPath
 		};
 		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
-		if (module_data['rows'] == "fail") return res.send("fail");
+		if (module_data == "fail") return res.status(500).send("fail");
+		else if(module_data=="empty") return res.status(500).send("empty")
 		res.send('Success');
 	} catch (ex) {
 		logger.error("Exception in the service exportToGit: %s", ex);

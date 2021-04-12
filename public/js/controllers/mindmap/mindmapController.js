@@ -200,7 +200,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (!selectedProject) {
                     selectedProject = res.projectId[0];
                     selectedProjectIndex = 0;
-					localStorage.git=res.projectName[0]
+					// localStorage.git=res.projectName[0]
                 }
                 if (!$scope.projectNameO) {
                     $scope.projectNameO = res.projectId[0];
@@ -293,7 +293,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         selectedProject = $scope.projectNameO;
         selectedProjectIndex=0;
         $scope.projectList.forEach(function(p,i){
-            if ((p.id)==selectedProject) selectedProjectIndex=i;
+            if ((p.id)==selectedProject) {
+                selectedProjectIndex=i;
+                localStorage.git=p.name;
+            }
         })
         if ($scope.tab == 'mindmapEndtoEndModules') {
             selectedProject = $("#selectProjectEtem").val();
@@ -3482,6 +3485,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else if (exportMode == 'version'){
             $scope.exportData();
         } else if (exportMode == 'git'){
+            $("#gitBranch,#gitVersionName,#gitFolder").val("");
+            $(".gitExport").hide();
+            $("#gitBranch,#gitVersionName").removeClass("inputErrorBorder");
             $("#mindmapGitGlobalDialog").modal("show");
         }
     }
@@ -3503,11 +3509,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		if(!gitBranch){
 			$("#gitErrormsg").text("Please Enter Git Branch");
 			$("#gitBranch").addClass("inputErrorBorder");
-			$(".gitExport").hide();
+			// $(".gitExport").hide();
 		} else if(!gitVersionName){
             $("#gitErrormsg").text("Please Enter Git Version Name");
 			$("#gitVersionName").addClass("inputErrorBorder");
-			$(".gitExport").hide();
+			// $(".gitExport").hide();
 		} else{
             $("#gitBranch,#gitVersionName").removeClass("inputErrorBorder");
             if (exportGitFlag != 1) {
@@ -3519,14 +3525,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             mindmapServices.exportToGit(mindmapId,gitBranch,gitFolderPath,gitVersionName).then(
                     function(response1) {
                         $(".gitExport").hide();
+                        unblockUI();
+                        err = "Export to Git failed"
                         if (response1 == "Invalid Session") {
                             return $rootScope.redirectPage();
                         } else if (response1 == 'fail' || response1 == 'unavailableLocalServer') {
-                            unblockUI();
                             openDialogMindmap('Mindmap', "Export to Git Failed");
                             return;
                         } else if (response1=='Success'){
-                            unblockUI();
                             openDialogMindmap('Mindmap', "Data exported to Git successfully.");
                             return;
                         }
@@ -3534,7 +3540,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     function(err) {
                         console.log(err);
                         unblockUI();
-                        openDialogMindmap('Mindmap', "Export to Git Failed");
+                        if(err=='empty') err="Project is not Git Configured"
+                        openDialogMindmap('Mindmap', err);
                     }
             );
         }
