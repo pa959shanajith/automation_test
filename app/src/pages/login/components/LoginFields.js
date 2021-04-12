@@ -242,16 +242,12 @@ const LoginFields = (props) => {
             api.forgotPasswordEmail(username.toLowerCase())
             .then(data => {
                 SetProgressBar("stop");
-				if (data === 'success') {
+				if (data === 'success' || data === "invalid_username_password") {
 					setUserError(false);
                     setPassError(false);
                     setPassword("");
                     setPopup({'title': "Forgot Password", "content":"Successfully sent an email to reset your password! Please login with the temporary password sent in the email"})                
-                } else if (data === "invalid_username_password") {
-					setUserError(false);
-                    setPassError(true);
-                    setLoginValidation("The username or password you entered isn't correct. Please try again.");
-				} else if (data === "userLocked") {
+                } else if (data === "userLocked") {
 					setLockedOut(true);
                     setLoginValidation("User account is locked!");
                     setforgotPassword(false);
