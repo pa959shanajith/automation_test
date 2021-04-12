@@ -179,7 +179,7 @@ const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeI
             <div className='adminControl-ice popup-content'>
 				<div>
 					<span className="leftControl" title="Token Name">{exeIceLabel}</span>
-                    <DropDownList inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={icePlaceholder} data={availableICE} smartMode={(ExeScreen===true?smartMode:scheSmartMode)} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
+                    <DropDownList ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={icePlaceholder} data={availableICE} smartMode={(ExeScreen===true?smartMode:scheSmartMode)} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
 				</div>
 			</div>
 
