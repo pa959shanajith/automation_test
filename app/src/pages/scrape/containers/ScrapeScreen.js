@@ -52,6 +52,30 @@ const ScrapeScreen = ()=>{
         //eslint-disable-next-line
     }, [current_task])
 
+    useEffect(()=>{
+        if (!showObjModal) {
+            let selected = 0;
+            let selectedObj = null;
+
+            scrapeItems.forEach(item=>{
+                if (!item.hide && item.checked) {
+                    selected++;
+                    selectedObj = item;
+                }
+            })
+
+            if (selected === 1 && selectedObj && selectedObj.editable && selectedObj.tag && selectedObj.tag.substring(0, 4) === "iris") {
+                let localScrapeItems = [...scrapeItems];
+
+                localScrapeItems.forEach(item => { if (!item.hide) {
+                    item.checked = false;
+                }})
+                
+                setScrapeItems(localScrapeItems);
+            }
+        }
+    }, [showObjModal])
+
     const fetchScrapeData = () => {
 		return new Promise((resolve, reject) => {
             dispatch({type: actionTypes.SET_COMPAREDATA, payload: {}});
