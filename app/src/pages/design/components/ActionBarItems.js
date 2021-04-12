@@ -239,6 +239,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
                             if (data === "Invalid Session") RedirectPage(history);
                             if (data === "success") {
                                 setImported(true);
+                                hiddenInput.current.value = '';
                                 setShowPop({'title': "Import Testcase", 'content': "TestCase Json imported successfully."});
                             } else setShowPop({'title': "Import Testcase",'content': "Please Check the file format you have uploaded!"});
                         })
@@ -260,8 +261,8 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
 		.then(response => {
 				if (response === "Invalid Session") RedirectPage(history);
                 if (response.testcase.length === 0 || overWrite) {
-                    // hiddenInput.current.click();
-                    document.getElementById("importTestCaseField").click();
+                    hiddenInput.current.click();
+                    // document.getElementById("importTestCaseField").click();
                 }
                 else{
                     setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue?', 'onClick': ()=>importTestCase(true)});
