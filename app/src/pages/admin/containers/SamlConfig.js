@@ -249,7 +249,7 @@ const SamlConfig = (props) => {
                     {(samlEdit===false)?
                     <Fragment>
                         <span className="leftControl-saml" title="Server Name">Server Name</span>
-                        <input type="text" autoComplete="off" id="samlServerName" name="samlServerName" value={name} onChange={(event)=>{updateSamlServerName(event.target.value)}} maxLength="50" className={nameErrBorder?"inputErrorBorder middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create":" middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create"} placeholder="Server Name"/>
+                        <input type="text" autoComplete="off" id="samlServerName" name="samlServerName" value={name} onChange={(event)=>{updateSamlServerName(event.target.value)}} maxLength="100" className={nameErrBorder?"inputErrorBorder middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create":" middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create"} placeholder="Server Name"/>
                     </Fragment>
                     :<Fragment>
                         <span className="leftControl-saml" title="Server Name">Server Name</span>
