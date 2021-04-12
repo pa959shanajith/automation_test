@@ -78,11 +78,11 @@ const SelectMultipleDialog = props => {
         modalClass="modal-sm"
         content={
         <div className="sm_dialog"> 
-            <div className="sm_lbl">Select step(s) no:</div>
-            <div className="sm_hint">For multiple select. Eg: 5;10-15;20;22</div>
-            <input className="sm_input" placeholder="Enter a value" onChange={SMHandler} value={stepNum}/>
+            <div className="sm_lbl" data-test="d__smlbl">Select step(s) no:</div>
+            <div className="sm_hint" data-test="d__smlbl">For multiple select. Eg: 5;10-15;20;22</div>
+            <input className="sm_input" data-test="d__sminp" placeholder="Enter a value" onChange={SMHandler} value={stepNum}/>
             { selectError && 
-                <div className="sm_error">{selectErrors[selectError]}</div>            }
+                <div className="sm_error" data-test="d__smerror">{selectErrors[selectError]}</div>            }
         </div>}
         close={()=>{
             setStepNum("");
@@ -90,7 +90,7 @@ const SelectMultipleDialog = props => {
             props.setShow(false)
         }}
         footer={
-            <button onClick={selectSteps}>Submit</button>
+            <button onClick={selectSteps} data-test="d__smactionbtn">Submit</button>
         }
     />
 )
