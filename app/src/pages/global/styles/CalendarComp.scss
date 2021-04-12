@@ -1,6 +1,7 @@
 .date-container{
     position: relative;
     .fc-datePicker {
+        width: 100%;
         background-color: white;
         border-width: 1px;
         font-size: 14px;
@@ -26,4 +27,23 @@
     img.disabled{
         opacity: 0.7;
     }
+    .inputError{
+        border: 2px solid #d33c3c !important;
+    }
+}
+.admin_calender{
+    position: relative;
+    float: left;
+    width: calc(50% - 70px);
+    font-weight: normal;
+    margin-right: 10px;
+}
+.schedule_calender{
+    position: relative;
+    float: right;
+    margin-right: 10px;
+    font-size: 14px;
+    margin-top: 2px;
+    width: 183px;
+    font-family: 'LatoWeb';
 }

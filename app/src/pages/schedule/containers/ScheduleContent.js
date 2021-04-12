@@ -499,7 +499,7 @@ const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, cur
             if(eachData[i].executestatus[j]===1){
                 suiteInfo.date = moduleSceduledate[eachData[i].testsuiteid]["date"];
                 suiteInfo.time = moduleSceduledate[eachData[i].testsuiteid]["time"];
-                const sldate_2 = suiteInfo.date.split("-");
+                const sldate_2 = suiteInfo.date.split("/");
                 const sltime_2 = suiteInfo.time.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 suiteInfo.timestamp = timestamp.valueOf().toString();
