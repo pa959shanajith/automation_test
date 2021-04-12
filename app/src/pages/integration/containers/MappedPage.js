@@ -76,6 +76,21 @@ const MappedPage = props =>{
             }
             setRows(tempRow);
         }
+        else {
+            setSelectedSc([]);
+            setSelectedTc([]);
+            setUnSynced(false);
+            setUnSyncMaps({
+                type: '',
+                maps: {}
+            });
+            setRows([]);
+            setCounts({
+                totalCounts: 0,
+                mappedScenarios: 0,
+                mappedTests: 0
+            })
+        }
     }, [props.mappedfilesRes, props.screenType])
 
     const handleClick = (e, type, mapIdx) => {
