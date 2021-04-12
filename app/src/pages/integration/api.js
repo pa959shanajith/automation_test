@@ -75,21 +75,21 @@ export const qtestProjectDetails_ICE = async(domain , userid) => {
   use: get Cycle and TestSuite Details of a Particular Release 
   api returns [Cycle:"Cycle Name",testsuites:[0:{id: ,name: , testruns:[0:{id: , name:}]}]]
 */
-export const qtestFolderDetails_ICE = async(projectName ,foldername, domainID , qcaction ,testCasename) => {
+export const qtestFolderDetails_ICE = async(releaseId, foldername, projectId, qcaction, testCasename) => {
     try{
         const res = await axios(url+'/qtestFolderDetails_ICE', {
             method: 'POST',
             headers: {
-            'Content-type': 'application/json',
+                'Content-type': 'application/json',
             },
-           data: {
-            project: projectName,
-            foldername : foldername,
-            domain : domainID, 
-            action : 'qtestFolderDetails_ICE',
-            qcaction : qcaction,
-            testset :testCasename
-           }
+            data: {
+                project: releaseId,
+                foldername : foldername,
+                domain : projectId, 
+                action : 'qtestFolderDetails_ICE',
+                qcaction : qcaction,
+                testset: testCasename
+            }
         });
         if(res.status === 401){
             RedirectPage(history)
@@ -114,13 +114,12 @@ export const saveQtestDetails_ICE = async(mappedDetails) => {
         const res = await axios(url+'/saveQtestDetails_ICE', {
             method: 'POST',
             headers: {
-            'Content-type': 'application/json',
+                'Content-type': 'application/json',
             },
-           data: {
-            mappedDetails : mappedDetails,
-            action : 'saveQtestDetails_ICE'
-            
-           }
+            data: {
+                mappedDetails : mappedDetails,
+                action : 'saveQtestDetails_ICE'
+            }
         });
         if(res.status === 401){
             RedirectPage(history)

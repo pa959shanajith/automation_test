@@ -75,7 +75,7 @@ const MappedPage = props =>{
                 })
             }
             setRows(tempRow);
-        }
+        } 
         else {
             setSelectedSc([]);
             setSelectedTc([]);
@@ -221,11 +221,11 @@ const MappedPage = props =>{
                         <ScrollBar scrollId="viewMapScrollId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                             { rows.map(({scenarioNames, testCaseNames}, index) => <div key={index} className="viewMap__labelRow">
                                 <MappedLabel 
-                                    list={scenarioNames} 
-                                    type="scenario" 
+                                    list={testCaseNames} 
+                                    type="testcase" 
                                     mapIdx={index} 
                                     handleClick={props.screenType === "ALM" ? handleClick : null} 
-                                    selected={selectedSc} 
+                                    selected={selectedTc} 
                                     unSynced={unSynced}
                                     handleUnSync={props.screenType === "ALM" ? onUnSync : null}
                                 />
@@ -235,11 +235,11 @@ const MappedPage = props =>{
                                     </div>
                                 }
                                 <MappedLabel 
-                                    list={testCaseNames} 
-                                    type="testcase" 
+                                    list={scenarioNames} 
+                                    type="scenario" 
                                     mapIdx={index} 
                                     handleClick={props.screenType === "ALM" ? handleClick : null} 
-                                    selected={selectedTc} 
+                                    selected={selectedSc} 
                                     unSynced={unSynced}
                                     handleUnSync={props.screenType === "ALM" ? onUnSync : null}
                                 />
