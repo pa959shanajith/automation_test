@@ -7,7 +7,7 @@ import '../styles/CalendarComp.scss'
 
 /*Component CalendarComp
   use: returns Calendar component
-  props : {setDate:state,date:datevalue,disbled:boolean}
+  props : {setDate:state,date:datevalue,disbled:boolean,classCalender:string,error:boolean}
 */
 
 const CalendarComp = (props) => {
@@ -15,11 +15,21 @@ const CalendarComp = (props) => {
     const setDate = props.setDate
     const dateVal = props.date
     const disabled = props.disabled
+    const classCalender = props.classCalender
+    const error = props.error
+    const inputProps = props.inputProps
     const valid = (current) =>{
-        const yesterday = moment().subtract(1, "day");
-        return current.isAfter(yesterday);
+        var yesterday;
+        if(props.execMetrics){
+            yesterday = moment();
+            return current.isBefore(yesterday);
+        }
+        else {
+            const yesterday = moment().subtract(1, "day");
+            return current.isAfter(yesterday);
+        }
     }
-    const inputProps = {
+    const inputPropsDefault = {
 		placeholder: "Select Date",
 		readOnly:"readonly" ,
         className:"fc-datePicker",
@@ -33,7 +43,7 @@ const CalendarComp = (props) => {
         setDate(event.format("DD/MM/YYYY"))
     }
     return(
-        <span data-test="dateContainer" className="date-container" >
+        <span data-test="dateContainer"  className={"date-container " + (classCalender? " "+classCalender:"")} >
             <Datetime
                 closeOnClickOutside={true}
                 ref={dateRef} 
@@ -42,7 +52,12 @@ const CalendarComp = (props) => {
                 value={dateVal} 
                 onChange={submit}
                 dateFormat="DD/MM/YYYY"
-                inputProps={inputProps} timeFormat={false} id="data-token"
+                inputProps={inputProps!==undefined?inputProps:inputPropsDefault} 
+                timeFormat={false} 
+                id="data-token"
+                renderInput={(props) => {
+                    return <input {...props} value={ dateVal ? props.value : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
+                }}
             />
             <img  data-test="datePickerIcon"onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
         </span>

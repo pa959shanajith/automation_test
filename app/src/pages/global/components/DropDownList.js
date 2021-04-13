@@ -7,7 +7,7 @@ import '../styles/DropDownList.scss'
   use: renders searchable available ice dropdown
 */
 
-const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,selectedICE, setSelectedICE, placeholder}) => {
+const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,selectedICE, setSelectedICE, placeholder, ExeScreen}) => {
     const inputRef = useRef()
     const [list,setList] =  useState([])
     const [dropDown,setDropDown] = useState(false)
@@ -46,8 +46,10 @@ const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,sel
         setInputErrorBorder(false);
     }
 
-    const selectOptionCheckBox = (value) => document.getElementById(value).checked = !document.getElementById(value).checked
-			
+    const selectOptionCheckBox = (value) => {
+        document.getElementById(value).checked = !document.getElementById(value).checked
+    }
+
     return(
         <Fragment>
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
@@ -56,9 +58,9 @@ const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,sel
                 <div className="form-inp-dropdown-popup" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list.map((ice,index) => (  
-                        <ul key={index} role="presentation" style={{ display: (!(smartMode==='normal') && JSON.parse(ice.statusCode !== "Online") ) ? 'none' : 'block' }} className="dropdown-ul" >
-                            <li value={ice.icename} onClick={(event)=>{selectOption(ice.icename,event)}} title={ice.statusCode} className={"dropdown-list-item "+((selectedICE[ice.icename]!==undefined)?" selectedCheckBox":"") } >
-                                <input id={ice.icename} checked={selectedICE[ice.icename]} type="checkbox" style={{ width:"auto", display: (smartMode==='normal') ? 'none' : 'block' }} onClick={()=>{selectOptionCheckBox(ice.icename)}} />
+                        <ul key={index} role="presentation" style={{ display: (!(smartMode==='normal') && JSON.parse(ice.statusCode !== "Online") && (ExeScreen===true) ) ? 'none' : 'block' }} className="dropdown-ul"  onClick={()=>{selectOptionCheckBox(ice.icename)}} >
+                            <li value={ice.icename} onClick={(event)=>{selectOption(ice.icename,event)}} title={ice.statusCode} className={"dropdown-list-item "+((selectedICE[ice.icename]!==undefined && selectedICE[ice.icename]===true)?" selectedCheckBox":"") } >
+                                <input id={ice.icename} checked={selectedICE[ice.icename]} type="checkbox" style={{ width:"auto", marginTop:"3px", display: (smartMode==='normal') ? 'none' : 'block' }}/>
                                 <span id='status' style={{ backgroundColor: ice.color }}></span>
                                 {ice.icename}
                             </li>

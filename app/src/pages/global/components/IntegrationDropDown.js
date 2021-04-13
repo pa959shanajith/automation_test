@@ -48,7 +48,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, setPo
             } else {
                 var integration = {alm: {url:"",username:"",password:""}, 
                 qtest: {url:"",username:"",password:"",qteststeps:""}, 
-                zephyr: {accountid:"",accesskey:"",secretkey:""}};
+                zephyr: {url:"",username:"",password:""}};
                 if(type === "ALM"){
                     integration.alm = {
 						url:credentials.url,
