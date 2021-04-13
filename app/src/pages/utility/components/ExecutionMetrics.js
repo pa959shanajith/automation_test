@@ -36,9 +36,9 @@ const ExecutionMetrics = props => {
                 fromDate: fromDate,
                 toDate: toDate,
                 LOB: lob,
-                status: status,
-                executionId: executionId
             }
+            if (executionId) arg['executionId'] = executionId;
+            if (status) arg['status'] = status
         }
 
         if (err) setErrors(err);

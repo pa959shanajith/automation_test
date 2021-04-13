@@ -104,6 +104,8 @@ const DesignContent = props => {
             .then(data=>{
                 data !== "success" && props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
                 props.setImported(false)
+                setCheckedRows([]);
+                headerCheckRef.current.indeterminate = false;
             })
             .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
         }
@@ -257,7 +259,7 @@ const DesignContent = props => {
 
                 for (let i = 0; i < testCases.length; i++) {
                     let step = i + 1
-                    testCases[i].stepNo = step;
+                    testCases[i].stepNo = String(step);
 
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
                         let col = "Object Name";
@@ -609,9 +611,11 @@ const DesignContent = props => {
 
         for(let step of sortedSteps){
             let stepInt = parseInt(step)
+            let testCasesToCopy = JSON.parse(JSON.stringify(copiedContent.testCases));
+            
             stepInt = stepInt+offset
-            if (testCases.length === 1 && !testCases[0].custname) testCases = copiedContent.testCases
-            else testCases.splice(stepInt, 0, ...copiedContent.testCases);
+            if (testCases.length === 1 && !testCases[0].custname) testCases = testCasesToCopy;
+            else testCases.splice(stepInt, 0, ...testCasesToCopy);
             for(let i=0; i<copiedContent.testCases.length; i++){
                 toFocus.push(stepInt+i);
             }
@@ -622,6 +626,7 @@ const DesignContent = props => {
         copiedContent.testCases.forEach(testcase => testcase.objectid ? localPastedTc.push(testcase.objectid) : null)
 
         localPastedTc = [...new Set(localPastedTc)];
+        runClickAway = false;
         setPastedTC(localPastedTc);
         setTestCaseData(testCases);
         setShowPS(false);

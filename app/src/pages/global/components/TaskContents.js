@@ -33,6 +33,7 @@ const TaskContents = (props) => {
                         showPanel={showPanel} 
                         setShowPanel={setShowPanel}
                         disableTask = { props.currUid === props.taskJson[item.panel_idx].uid }
+                        taskJson = {props.taskJson}
                         cycleDict={props.cycleDict}
                     />
         })}

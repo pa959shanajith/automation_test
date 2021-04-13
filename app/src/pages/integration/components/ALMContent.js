@@ -1,4 +1,6 @@
 import React,{ useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { RedirectPage } from '../../global';
 import {qcProjectDetails_ICE,qcFolderDetails_ICE,saveQcDetails_ICE} from '../api.js';
 import { useSelector, useDispatch } from 'react-redux';
 import MappingPage from '../containers/MappingPage';
@@ -8,6 +10,8 @@ import '../styles/ALM.scss';
 import "../styles/TestList.scss"
 
 const ALMContent = props => {
+
+    const history = useHistory();
     const dispatch = useDispatch();
     const user_id = useSelector(state=> state.login.userinfo.user_id);
     const selectedScenarioIds = useSelector(state=>state.integration.selectedScenarioIds);
@@ -23,7 +27,6 @@ const ALMContent = props => {
     const [releaseDropdn, setReleaseDropdn]=useState(null);
     const [SearchIconClicked , setSearchIconClicked] =useState(false);
     const [filteredNames , setFilteredName]= useState(null);
-    const [screenexit , setScreenExit]= useState(false);
     
 
     const callProjectDetails_ICE=async(e)=>{
@@ -35,12 +38,21 @@ const ALMContent = props => {
         if (projectDetails.error){
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: projectDetails.error}});
         }
-        setProjectDetails(projectDetails)
-        setFolderDetails([]);
+        else if(projectDetails === "unavailableLocalServer")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ALM Connection", content: "ICE Engine is not available, Please run the batch file and connect to the Server."}});
+        else if(projectDetails === "scheduleModeOn")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ALM Connection", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
+        else if(projectDetails === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            return RedirectPage(history);
+        } else {
+            setProjectDetails(projectDetails)
+            setFolderDetails([]);
+            setReleaseDropdn("Select Release")
+            setProjectDropdn1(domain);
+            clearSelections();
+        }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-        setReleaseDropdn("Select Release")
-        setProjectDropdn1(domain);
-        clearSelections();
     }
     const callFolderDetails_ICE = async(e)=>{
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Testcases...'});
@@ -50,9 +62,12 @@ const ALMContent = props => {
         if (folderDetails.error){
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: folderDetails.error}});
         }
-        setReleaseDropdn(project_Name);
-        setFolderDetails(folderDetails);
-        clearSelections();
+        else if (folderDetails){
+            setReleaseDropdn(project_Name);
+            setFolderDetails(folderDetails);
+            clearSelections();
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+        }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     
@@ -73,7 +88,11 @@ const ALMContent = props => {
         if(response.error){
             dispatch({type: actionTypes.SHOW_POPUP, payload:{title: "Error", content: response.error}});
         }
-        if ( response === "success"){
+        else if(response === "unavailableLocalServer")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "ICE Engine is not available, Please run the batch file and connect to the Server."}});
+        else if(response === "scheduleModeOn")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
+        else if ( response === "success"){
             dispatch({type: actionTypes.SHOW_POPUP, payload:{title: "Save Mapped Testcase", content: "Saved Succesfully"}});
             dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
             clearSelections();
@@ -81,14 +100,12 @@ const ALMContent = props => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callExit=()=>{
-        setScreenExit(true);
         setFolderDetails(null);
         setScenarioArr(null);
         setReleaseDropdn("Select Release");
         setProjectDropdn1("Select Project");
         setProjectDropdn2("Select Project");
-        dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
-        clearSelections();
+        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
     }
 
     const clearSelections = () => {
@@ -109,7 +126,8 @@ const ALMContent = props => {
         var val = e.target.value;
         var filter = []
         if(scenarioArr){
-            projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details
+            (projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details.length?
+                projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details : [])
                 .forEach(e=>{
                     if (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
                         filter.push(e);
@@ -133,7 +151,6 @@ const ALMContent = props => {
     }
 
     return ( 
-        !screenexit &&
         <MappingPage 
             pageTitle="ALM Integration"
             onSave={()=>callSaveButton()}
@@ -201,7 +218,9 @@ const ALMContent = props => {
                 </> : <div></div>
             }
             scenarioList = { scenarioArr && 
-                (filteredNames ? filteredNames : projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details)
+                (filteredNames ? filteredNames : 
+                    projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details.length ?
+                    projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details :[] )
                     .map(e => (
                         <div 
                             className={"scenario__listItem "+(selectedScenarioIds.indexOf(e._id)!==-1 ? " scenario__selectedTC" : "")} 

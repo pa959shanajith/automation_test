@@ -1,154 +1,218 @@
-import React,{Fragment} from 'react';
+import React,{Fragment, useState} from 'react';
+import { useHistory } from 'react-router-dom';
+import { RedirectPage } from '../../global';
+import { useSelector, useDispatch } from 'react-redux';
 import MappingPage from '../containers/MappingPage';
+import CycleNode from './QTestTree';
+import { qtestProjectDetails_ICE, qtestFolderDetails_ICE, saveQtestDetails_ICE } from '../api.js';
+import * as actionTypes from '../state/action.js';
 import "../styles/TestList.scss"
 
 const QTestContent = props => {
+
+    const dispatch = useDispatch();
+    const history = useHistory();
+    const user_id = useSelector(state=> state.login.userinfo.user_id);
+    const mappedPair = useSelector(state=>state.integration.mappedPair);
+    const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
+    const [projectDetails , setProjectDetails] = useState(null);
+    const [folderDetails , setFolderDetails ] = useState([]);
+    const [scenarioArr , setScenarioArr] = useState(false);
+    const [selectedAvoProj, setSelectedAvoProj] = useState([]);
+    const [testProject, setTestProject]= useState("Select Project");
+    const [avoProject, setAvoProject]= useState("Select Project");
+    const [release, setRelease]=useState("Select Release");
+    const [SearchIconClicked , setSearchIconClicked] =useState(false);
+    const [filteredNames , setFilteredName]= useState(null);
+
+    const onProjectChange = async(e) => {
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+       
+        const [projectId, projectName] = e.target.value.split('||');
+    
+        const projectDetails = await qtestProjectDetails_ICE(projectId, user_id);
+
+        if (projectDetails.error)
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: projectDetails.error}});
+        else if(projectDetails === "unavailableLocalServer")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ALM Connection", content: "ICE Engine is not available, Please run the batch file and connect to the Server."}});
+        else if(projectDetails === "scheduleModeOn")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ALM Connection", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
+        else if(projectDetails === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            return RedirectPage(history);
+        }
+        else if (projectDetails){
+            setProjectDetails(projectDetails)
+            setFolderDetails([]);
+            setRelease("Select Release")
+            setTestProject(`${projectId}||${projectName}`);
+            clearSelections();
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    }
+
+    const onReleaseChange = async(e) => { 
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading TestCases...'});
+       
+        const [releaseId, releaseName] = e.target.value.split('||');
+        const projectId = testProject.split('||')[0];
+        
+        const folderDetails = await qtestFolderDetails_ICE(releaseId, "root", projectId, "folder");
+        if (folderDetails.error){
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title:"Error", content: folderDetails.error}});
+        } else if (folderDetails) {            
+            setFolderDetails(folderDetails);
+            clearSelections();
+            setRelease(`${releaseId}||${releaseName}`);
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    }
+
+    const onScenarioChange = e => {
+        const scenarioIndex = e.target.value;
+        setScenarioArr(true);
+        setSelectedAvoProj(projectDetails.avoassure_projects[parseInt(scenarioIndex)].scenario_details);
+        setFilteredName(null);
+        setAvoProject(scenarioIndex)
+        setSearchIconClicked(false);
+        clearSelections();
+    }
+
+    const onSave = async() => { 
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Saving...'});
+        const response = await saveQtestDetails_ICE(mappedPair);
+        if (response.error)
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: response.error}});
+        else if(response === "unavailableLocalServer")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "ICE Engine is not available, Please run the batch file and connect to the Server."}});
+        else if(response === "scheduleModeOn")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
+        else if(response === "fail")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "failed to save"}});
+        else if(response === "success"){
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Saved Mapped Testcases", content: "Saved Successfully."}});
+            dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+            clearSelections();
+        }
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    }
+
+    const clearSelections = () => {
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+        dispatch({type: actionTypes.SYNCED_TC, payload: []});
+        dispatch({type: actionTypes.SEL_TC, payload: []});
+    }
+
+    const onSearch=(e)=>{
+        var val = e.target.value;
+        var filter = []; 
+        if(scenarioArr){
+            (selectedAvoProj.length ? 
+            selectedAvoProj : [])
+                .forEach((e,i)=>{
+                    if (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
+                        filter.push(e);
+                })
+            }
+        setFilteredName(filter)
+    }
+
+    
+    const onExit = () => {
+        setFolderDetails([]);
+        setScenarioArr(null);
+        setRelease("Select Release");
+        setTestProject("Select Project");
+        setAvoProject("Select Project");
+        setSelectedAvoProj([]);
+        dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
+    }
+   
     return (
         <MappingPage 
             pageTitle="qTest Integration"
-            onSave={()=>props.callSaveButton()}
-            onViewMap={()=>props.callViewMappedFiles()}
-            onExit={()=>props.callExit()}
+            onSave={onSave}
+            onViewMap={props.onViewMappedFiles}
+            onExit={onExit}
             leftBoxTitle="qTest Tests"            
             rightBoxTitle="Avo Assure Scenarios"
             selectTestDomain = {
-                <select data-test="intg_qTest_project_dropdwn" value={props.projectDropdn1} ref={props.selProjectRef} onChange={(event)=>props.callProjectDetails_ICE(event)} style={{marginRight : "5px"}}>
-                    <option value="Select Project"selected disabled >Select Project</option>
+                <select data-test="intg_qTest_project_dropdwn" value={testProject} onChange={onProjectChange} style={{marginRight : "5px"}}>
+                    <option value="Select Project" disabled >Select Project</option>
                     { props.domainDetails.length &&
-                        props.domainDetails.map((e,i)=>(
-                            <option id={e.name} key={i} value={e.id}>{e.name}</option>
+                        props.domainDetails.map(e => (
+                            <option key={e.id} value={`${e.id}||${e.name}`}>{e.name}</option>
                         ))}
                 </select>
             }
             selectTestRelease = {
-                <select data-test="intg_qTest_release_drpdwn"value={props.releaseDropdn} onChange={(e)=>props.callFolderDetails_ICE(e)}>
-                    <option value="Select Release" selected disabled >Select Release</option>
-                    { props.projectDetails &&
-                        props.projectDetails.qc_projects.map((e,i)=>(
-                            <option id={e.id} key={i} value={e.name}>{e.name}</option>
+                <select data-test="intg_qTest_release_drpdwn" value={release} onChange={onReleaseChange}>
+                    <option value="Select Release" disabled >Select Release</option>
+                    { projectDetails &&
+                        projectDetails.qc_projects.map(e => (
+                            <option key={e.id} value={`${e.id}||${e.name}`}>{e.name}</option>
                         ))}
                 </select>
             }
             selectScenarioProject = {
-                <select data-test="intg_qTest_Project_scenarios_drpdwn" value={props.projectDropdn2} onChange={(e)=>props.callScenarios(e)} >
-                    <option value="Select Project"selected disabled >Select Project</option>
-                    { props.projectDetails &&
-                        props.projectDetails.avoassure_projects.map((e,i)=>(
-                            <option id={i} value={e.project_name} >{e.project_name}</option>
+                <select data-test="intg_qTest_Project_scenarios_drpdwn" value={avoProject} onChange={onScenarioChange} >
+                    <option value="Select Project" disabled >Select Project</option>
+                    { projectDetails &&
+                        projectDetails.avoassure_projects.map((e,i)=>(
+                            <option key={i} value={i}>{e.project_name}</option>
                         ))}
                 </select>
             }
             searchScenario = {
-                props.scenarioArr ?
-                <> { props.SearchIconClicked ?
-                        <input onChange={(e)=>props.onSearch(e)} type="text" placeholder="Scenario Name"/> : null}
+                scenarioArr ?
+                <> { SearchIconClicked ?
+                        <input onChange={onSearch} type="text" placeholder="Scenario Name"/> : null}
                     <span className="mapping__searchIcon" style={{display:"inline" , float:"right"}}> 
                         <img alt="searchIcon"
-                            onClick={()=>{props.setSearchIconClicked(!props.SearchIconClicked);props.setFilteredName(null)}} 
+                            onClick={()=>{setSearchIconClicked(!SearchIconClicked);setFilteredName(null)}} 
                             style={{cursor: "pointer" , display:"inline",float:"right"}} 
                             src="static/imgs/ic-searchIcon-black.png"
                         />
                     </span>
                 </> : null }
-            testList = { props.folderDetails ? 
-                <>    
-                <div data-test="intg_qTest_test_list"className="test__rootDiv">
-                    <div className="test_tree_branches">
-                    <img alt="rotIcon" 
-                        className="test_tree_toggle" 
-                        src="static/imgs/ic-qcCollapse.png"
-                    />
-                    <label>Root</label>
-                    </div>
-                <div className="int__folderNode">
-                    {props.folderDetails.map((e,i)=>(
-                        <Fragment key={i}>
-                        <div className="test_tree_branches" style={{paddingLeft: 17}}>
-                            <img alt="expand-collapse" 
-                                className="test_tree_toggle" id={i} onClick={()=>props.callCycleExpand({i})} 
-                                style={{height:"16px" , cursor: "pointer"}} 
-                                src={e.cycleOpen? "static/imgs/ic-qcCollapse.png" : "static/imgs/ic-qcExpand.png"}
+            testList = { folderDetails.length ? 
+                <Fragment>    
+                    <div data-test="intg_zephyr_test_list" className="test__rootDiv">
+                        <div className="test_tree_branches">
+                            <img alt="collapse"
+                                className="test_tree_toggle" 
+                                src="static/imgs/ic-qcCollapse.png"
                             />
-                            <label>{e.cycle}</label>
+                            <label>Root</label>
                         </div>
-                        <div className="int__folderNode">
-                            { e.cycleOpen ?
-                                <Fragment> 
-                                <div>
-                                    {e.testsuites &&
-                                        e.testsuites.map((testSuite,index)=>(
-                                        <Fragment key={index}>
-                                        <div className="test_tree_branches" style={{paddingLeft: 17}}>
-                                            <img alt="blueMinus-Plus" 
-                                            className="test_tree_toggle" onClick={()=>props.callTestSuiteExpand(testSuite.id)} 
-                                            style={{height:"16px",cursor: "pointer"}} 
-                                            src={testSuite.TestsuiteOpen?"static/imgs/ic-taskType-blue-minus.png" :"static/imgs/ic-taskType-blue-plus.png"}
-                                            />
-                                            <label>{testSuite.name}</label>
-                                        </div>
-                                        <div className="int__folderNode">
-                                            {
-                                            testSuite.TestsuiteOpen ?
-                                            <div>
-                                            {
-                                                testSuite.testruns.map((e,i)=>(
-                                                    <Fragment key={i}>
-                                                    <div 
-                                                        className={"test_tree_leaves "+(props.selectedTestSuiteID === e.id? "slectedTestDiv": "")} 
-                                                        style={{cursor: "pointer"}} 
-                                                        onClick={(event)=>props.callTestSuiteSelection(event,e.id ,e.name)} id={e.id} 
-                                                    >
-                                                        <label>{e.name}</label>
-                                                        { props.selectedTestSuiteID === e.id ? <>
-                                                        {props.syncSuccess ?
-                                                            <img alt="unsynIcon"
-                                                                onClick={()=>props.callUnSync()} 
-                                                                style={{cursor: "pointer",paddingRight:"10px"}} 
-                                                                src="static/imgs/ic-qcUndoSyncronise.png"
-                                                            />:null}
-                                                        {!props.syncSuccess ?
-                                                            <img alt="syncIcon"
-                                                                onClick={()=>props.callSyncronise()} 
-                                                                style={{cursor: "pointer",paddingRight:"10px"}} 
-                                                                src="static/imgs/ic-qcSyncronise.png"
-                                                            />:null}
-                                                        </>
-                                                        : null}
-                                                    </div>
-                                                    </Fragment>
-                                                ))}
-                                            </div> 
-                                                : null
-
-                                        }
-                                        </div>
-                                        </Fragment>
-                                    ))
-                                    }
-                                </div> 
-                                </Fragment>: null
-                            }
-                        </div>
-                        </Fragment>
-                    ))}                                  
-                </div>
-                </div>
-                </>
-                    : null}
+                        { folderDetails
+                            .map( (cycleNode, idx) => <CycleNode 
+                                    key={`cycle-${idx}`}
+                                    cycleNode={cycleNode}
+                                    projectId={testProject.split('||')[0]}
+                                    projectName={testProject.split('||')[1]}
+                            />) }
+                    </div>   
+                </Fragment>
+                    : <div></div>
+            }
             scenarioList = {
-                props.scenarioArr ? 
-                (props.filteredNames ? props.filteredNames : props.projectDetails.avoassure_projects[parseInt(props.scenario_ID)].scenario_details)
+                scenarioArr ? 
+                (filteredNames ? filteredNames : 
+                    selectedAvoProj.length ? 
+                    selectedAvoProj : [])
                     .map((e,i)=>(
                                 <div 
                                     key={i}
-                                    className={"scenario__listItem " +(props.selectedScenario_ID == e._id ? "slectedTestDiv" : "")} 
-                                    onClick={()=>{props.setSelectedScenario_ID(e._id)}}
+                                    className={"scenario__listItem " +(selectedScIds == e._id ? "scenario__selectedTC" : "")} 
+                                    onClick={()=>{dispatch({type: actionTypes.SEL_SCN_IDS, payload: e._id})}}
                                     style={{cursor: "pointer"}}
                                 >
                                 { e.name }
                                 </div>
                         ))
-                    : null 
+                    : <div></div> 
             }
         />
     );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, useContext } from 'react';
+import React, { useState, useEffect, Fragment, useContext, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import '../styles/ActionBarItems.scss'
@@ -93,6 +93,7 @@ const UpperContent = props => {
 
 const BottomContent = () => {
 
+    const hiddenInput = useRef();
     const { appType, screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
     const disableAction = useSelector(state => state.scrape.disableAction);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
@@ -190,11 +191,11 @@ const BottomContent = () => {
                             // }
                             // else{
                                 if (data === "Invalid Session") return RedirectPage(history);
-                                else fetchScrapeData().then(response => (
-                                        response === "success" ?
-                                        setShowPop({title: "Import Screen", content: "Screen Json imported successfully."}) 
-                                        : false
-                                    ));
+                                else fetchScrapeData().then(response => {
+                                        hiddenInput.current.value = '';
+                                        if (response === "success")
+                                            setShowPop({title: "Import Screen", content: "Screen Json imported successfully."}) 
+                                });
                             // }
                         })
                         .catch(error => console.log(error));
@@ -212,8 +213,8 @@ const BottomContent = () => {
 		// .then(response => {
 		// 		if (response === "Invalid Session") RedirectPage(history);
         //         if (response.testcase.length === 0 || overWrite) {
-        //             // hiddenInput.current.click();
-                    document.getElementById("importScreenField").click();
+                    hiddenInput.current.click();
+                    // document.getElementById("importScreenField").click();
         //         }
         //         else{
         //             setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue?', 'onClick': ()=>importTestCase(true)});
@@ -234,7 +235,7 @@ const BottomContent = () => {
     return (
         <>
             {lowerList.map((icon, i) => icon.show && <Thumbnail data-test="bottomContent" key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
-            <input data-test="fileInput" id="importScreenField" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json"/>
+            <input ref={hiddenInput} data-test="fileInput" id="importScreenField" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json"/>
         </>
     );
 }
