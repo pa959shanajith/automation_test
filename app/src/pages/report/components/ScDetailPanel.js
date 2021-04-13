@@ -48,7 +48,7 @@ const ScDetailPanel = ({scDetails,setBlockui,displayError,selectedScDetails}) =>
                             <div className='rp__col browser'>
                                 {e.browser.toLowerCase() in imgs?
                                 <img src={"static/imgs/"+imgs[e.browser.toLowerCase()]} alt={e.browser}/>:
-                                "-"
+                                <div style={{lineHeight:0.3,fontSize:'50px'}}>-</div>
                                 }
                             </div>
                             <div className='rp__col'>{e.executedtime}</div>
@@ -75,7 +75,9 @@ const imgs = {
     chrome : "ic-reports-chrome.png",
     firefox : "ic-reports-firefox.png",
     "internet explorer" : "ic-reports-ie.png",
-    safari : "ic-reports-safari.png"
+    safari : "ic-reports-safari.png",
+    "edge chromium" : "ic-reports-edge-chromium.svg",
+    "edge legacy": "ic-reports-edge.svg"
 } 
 
 const Report = async(e,setBlockui,displayError)=>{

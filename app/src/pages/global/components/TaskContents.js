@@ -35,6 +35,7 @@ const TaskContents = (props) => {
                         disableTask = { props.currUid === props.taskJson[item.panel_idx].uid }
                         taskJson = {props.taskJson}
                         cycleDict={props.cycleDict}
+                        taskJson={props.taskJson}
                     />
         })}
         </> }

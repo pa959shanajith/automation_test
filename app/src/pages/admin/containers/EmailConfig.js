@@ -286,6 +286,15 @@ const factoryFn = (inputRef) =>{
         inputRef.proxypass.current.disabled = !inputRef.checkproxycred.current.checked
     }
     const showProxUrl = () =>{
+        if(!inputRef.checkproxyurl.current.checked){
+            inputRef.checkproxycred.current.disabled = true
+            inputRef.proxyuser.current.disabled = true
+            inputRef.proxypass.current.disabled = true
+
+        }else{
+            inputRef.checkproxycred.current.disabled = false
+            showProxCred()
+        }
         inputRef.proxyurl.current.disabled = !inputRef.checkproxyurl.current.checked
     }
     const showPool = () =>{

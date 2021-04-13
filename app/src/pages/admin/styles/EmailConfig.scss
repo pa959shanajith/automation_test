@@ -36,4 +36,9 @@
     width: 100%;
     padding: 20px;
     height: 100%;
+    button:disabled{
+        cursor: not-allowed;
+        filter: alpha(opacity=65);
+        opacity: .65;
+    }
 }
