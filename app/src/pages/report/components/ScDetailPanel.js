@@ -82,7 +82,7 @@ const ScDetailPanel = ({scDetails,setBlockui,displayError,selectedScDetails}) =>
                                 <div style={{lineHeight:0.3,fontSize:'50px'}}>-</div>
                                 }
                             </div>
-                            <div className='rp__col'>{formatDate(e.executedtime)}</div>
+                            <div data-test="executed_time" className='rp__col'>{formatDate(e.executedtime)}</div>
                             <div className={'rp__col status '+e.status.toLowerCase()}>{e.status}</div>
                             <div className='rp__col export' scname={e.testscenarioname}>
                                 <img type={'pdf'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-pdf.png"} alt={e.browser}/>

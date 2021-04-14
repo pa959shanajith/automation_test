@@ -86,7 +86,7 @@ const CalendarComp = (props) => {
                 timeFormat={false} 
                 id="data-token"
                 renderInput={(props) => {
-                    return <input {...props} value={ dateVal ? props.value : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
+                    return <input {...props} value={ formatDate(dateVal) ? formatDate(props.value) : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
                 }}
             />
             <img  data-test="datePickerIcon"onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
