@@ -208,6 +208,15 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 			})
 			.then(function (response) { return response.data; },
 					function (response) { return $q.reject(response.data); });
+		},
+		importGitMindmap: function(projectid, versionname, folderpath) {
+			return $http.post('/importGitMindmap',{
+				projectid: projectid,
+				gitfolderpath: folderpath,
+				gitversion: versionname
+			})
+			.then(function (response) { return response.data; },
+					function (response) { return $q.reject(response.data); });
 		}
 	}
 }]);
