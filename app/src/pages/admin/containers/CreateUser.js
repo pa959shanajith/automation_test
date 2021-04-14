@@ -11,8 +11,7 @@ import ValidationExpression from '../../global/components/ValidationExpression';
 
 /*Component CreateUser
   use: defines Admin middle Section for create user
-  ToDo: only ldap code red border class divs USERIDNAME
-        delete modal on delete (currently direct delete happening)
+  ToDo:
 */
 
 const CreateUser = (props) => {

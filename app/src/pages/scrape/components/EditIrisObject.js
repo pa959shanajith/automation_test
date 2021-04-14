@@ -42,11 +42,13 @@ const EditIrisObject = props => {
 
         let irisAppType = `saveirisimage_${props.taskDetails.appType}`;
 
-        if (!props.utils.object.objId) props.setShowPop({title: "IRIS Object Details", content: "Please save the object first."});
+        if (!props.utils.object.objId) {
+            props.setShow(false);
+            props.setShowPop({title: "IRIS Object Details", content: "Please save the object first."});
+        }
         else {
             updateIrisDataset(data)
             .then(val => {
-                props.setShow(false);
                 if(val === 'success'){
                     // props.setShowPop({title: "IRIS Object Details", content: "Submitted Successfully."});
                     if(selectedType !== existingType){
@@ -77,7 +79,10 @@ const EditIrisObject = props => {
                             console.error("ERROR::::", error);
                         });
                 }
-                else props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
+                else {
+                    props.setShow(false);
+                    props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
+                }
             })
             .catch(error => {
                 props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});

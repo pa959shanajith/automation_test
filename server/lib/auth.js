@@ -327,6 +327,7 @@ module.exports.checkUser = async (req, res) => {
 					else if (status == "invalid") result = "invalidServerConf";
 				}
 			}
+			else if (uType === "ldap") result.ldapuser = true;
 		}
 		return res.send(result);
 	} catch (exception) {

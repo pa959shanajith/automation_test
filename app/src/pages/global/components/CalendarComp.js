@@ -22,8 +22,15 @@ const CalendarComp = (props) => {
     const error = props.error
     const inputProps = props.inputProps
     const valid = (current) =>{
-        const yesterday = moment().subtract(1, "day");
-        return current.isAfter(yesterday);
+        var yesterday;
+        if(props.execMetrics){
+            yesterday = moment();
+            return current.isBefore(yesterday);
+        }
+        else {
+            const yesterday = moment().subtract(1, "day");
+            return current.isAfter(yesterday);
+        }
     }
     const inputPropsDefault = {
 		placeholder: "Select Date",
@@ -79,10 +86,10 @@ const CalendarComp = (props) => {
                 timeFormat={false} 
                 id="data-token"
                 renderInput={(props) => {
-                    return <input data-test='calendar-input' {...props} value={ formatDate(dateVal) ? formatDate(props.value) : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
+                    return <input {...props} value={ dateVal ? props.value : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
                 }}
             />
-            <img onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
+            <img  data-test="datePickerIcon"onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
         </span>
     )
 }

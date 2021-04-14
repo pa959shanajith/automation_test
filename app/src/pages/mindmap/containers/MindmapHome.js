@@ -43,7 +43,7 @@ const MindmapHome = () => {
           <div className='mp__middle_container'>
             <CreateOptions setOptions={setOptions}/>
           </div>
-          <ReferenceBar taskTop={true} collapsible={true}/>
+          <ReferenceBar taskTop={true} collapsible={true} hideInfo={true}/>
         </Fragment>:
         <Component/>
         }

@@ -27,7 +27,23 @@ const TimeComp = (props) => {
         timeRef.current._onInputClick()
     }
     const submit = (event) => {
-        setTime(event.format("HH:mm"))
+        var prevTime = event._i.split(":");
+        var newTime = event.format("HH:mm").split(":");
+        if(prevTime[1] === "00" && newTime[1] === "59") {
+            if(newTime[0][0]==="0"){
+                if(newTime[0][1]==="0") setTime("23:"+newTime[1]);
+                else setTime("0"+JSON.stringify(JSON.parse(newTime[0][1])-1)+":"+newTime[1]);
+            }
+            else setTime(JSON.stringify(JSON.parse(newTime[0])-1)+":"+newTime[1]);
+        } else if(prevTime[1] === "59" && newTime[1] === "00") {
+            if(newTime[0][0]==="0"){
+                if(newTime[0][1]==="9") setTime(JSON.stringify(JSON.parse(newTime[0][1])+1)+":"+newTime[1]);
+                else setTime("0"+JSON.stringify(JSON.parse(newTime[0][1])+1)+":"+newTime[1]);
+            }
+            else if(newTime[0]==="23") setTime("00:"+newTime[1]);
+            else setTime(JSON.stringify(JSON.parse(newTime[0])+1)+":"+newTime[1]);
+        }
+        else setTime(event.format("HH:mm"))
     }
     return(
         <span className={"time-container " + (classTimer? " "+classTimer:"")} >

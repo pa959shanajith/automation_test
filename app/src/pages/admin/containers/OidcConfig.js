@@ -216,7 +216,7 @@ const OidcConfig = (props) => {
                     {(oidcEdit===false)?
                     <Fragment>
                         <span className="leftControl-oidc" title="Server Name">Server Name</span>
-                        <input type="text" autoComplete="off" id="oidcServerName" name="oidcServerName" value={name} onChange={(event)=>{updateOidcServerName(event.target.value)}} maxLength="50" className={nameErrBorder?"inputErrorBorder middle__input__border-oidc form-control-oidc form-control-custom-oidc validationKeydown preventSpecialChar create":" middle__input__border-oidc form-control-oidc form-control-custom-oidc validationKeydown preventSpecialChar create"} placeholder="Server Name"/>
+                        <input type="text" autoComplete="off" id="oidcServerName" name="oidcServerName" value={name} onChange={(event)=>{updateOidcServerName(event.target.value)}} maxLength="100" className={nameErrBorder?"inputErrorBorder middle__input__border-oidc form-control-oidc form-control-custom-oidc validationKeydown preventSpecialChar create":" middle__input__border-oidc form-control-oidc form-control-custom-oidc validationKeydown preventSpecialChar create"} placeholder="Server Name"/>
                     </Fragment>
                     :<Fragment>
                         <span className="leftControl-oidc" title="Server Name">Server Name</span>

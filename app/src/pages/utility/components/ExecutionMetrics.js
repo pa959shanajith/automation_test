@@ -35,9 +35,9 @@ const ExecutionMetrics = props => {
                 fromDate: fromDate,
                 toDate: toDate,
                 LOB: lob,
-                status: status,
-                executionId: executionId
             }
+            if (executionId) arg['executionId'] = executionId;
+            if (status) arg['status'] = status
         }
 
         if (err) setErrors(err);
@@ -105,10 +105,10 @@ const ExecutionMetrics = props => {
         </div>
         <div className="execM__inputGroup">
             <span className="execM__inputLabel" data-test="util__inputLabel">From Date<span className="execM__mandate">*</span></span>
-            <CalendarComp date={fromDate} setDate={(val)=>setFromDate(val)} error={error.fromDate} />
+            <CalendarComp execMetrics={true} date={fromDate} setDate={(val)=>setFromDate(val)} error={error.fromDate} />
 
             <span className="execM__inputLabel" data-test="util__inputLabel">To Date<span className="execM__mandate">*</span></span>
-            <CalendarComp date={toDate} setDate={(val)=>setToDate(val)} error={error.toDate} />
+            <CalendarComp execMetrics={true} date={toDate} setDate={(val)=>setToDate(val)} error={error.toDate} />
 
             <span className="execM__inputLabel" data-test="util__inputLabel">LOB<span className="execM__mandate">*</span></span>
             <input data-test="util__input" className={"execM__input" + (error.lob ? " execM__inputError":"")} placeholder="Enter LOB" value={lob} onChange={(e)=>setLob(e.target.value)} />

@@ -271,16 +271,17 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
             
             <div className="s__task_container">
                 <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
-                    <select defaultValue={""} id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className="e__taskBtn e__btn">
-                        <option value="" className="s__disableOption" disabled>Select Integration</option>
-                        <option value="1">ALM</option>
-                        <option value="0">qTest</option>
-                        <option value="2">Zephyr</option>
-                    </select>
+                    
                 </div>
                 <div id="pageContent">
                     <div id="scheduleSuitesTopSection">
-                        <div id="tableActionButtons">
+                        <select defaultValue={""} id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className=" e__btn">
+                            <option value="" className="s__disableOption" disabled>Select Integration</option>
+                            <option value="1">ALM</option>
+                            <option value="0">qTest</option>
+                            <option value="2">Zephyr</option>
+                        </select>
+                        <div id="s__btns">
                             <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}} title="Add">Schedule</button>
                         </div>
                         <ScheduleSuitesTopSection moduleSceduledate={moduleSceduledate} setModuleSceduledate={setModuleSceduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} />
@@ -533,7 +534,7 @@ const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, cur
             if(eachData[i].executestatus[j]===1){
                 suiteInfo.date = moduleSceduledate[eachData[i].testsuiteid]["date"];
                 suiteInfo.time = moduleSceduledate[eachData[i].testsuiteid]["time"];
-                const sldate_2 = suiteInfo.date.split("-");
+                const sldate_2 = suiteInfo.date.split("/");
                 const sltime_2 = suiteInfo.time.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 suiteInfo.timestamp = timestamp.valueOf().toString();

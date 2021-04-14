@@ -18,31 +18,35 @@ const ChangeDefaultIce = ({}) => {
     const [showPopup,setShowPopup] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
 
-    useEffect( async ()=>{
-            setLoading("Fetching ICE ...")
-            try{
-                const data = await getUserICE();
-                setLoading(false);
-                if(data == 'fail'){
-                    setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
-                }
-                else{
-                    if(!data.ice_list || data.ice_list.length<1){
-                        setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
-                        return;
-                    } else {
-                        setChooseDefICE(data.ice_list);
-                        setDefICE(data.ice_list[0]);
-                        setShowPopup(true);
-                    }
-                }
-            }catch(error){
-                setLoading(false)
-                console.error(error)
-                setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
-            }
+    useEffect( ()=>{
+        fetchIce();
     }, []);
    
+    const fetchIce = async () => {
+        setLoading("Fetching ICE ...");
+        try{
+            const data = await getUserICE();
+            setLoading(false);
+            if(data == 'fail'){
+                setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
+            }
+            else{
+                if(!data.ice_list || data.ice_list.length<1){
+                    setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
+                    return;
+                } else {
+                    setChooseDefICE(data.ice_list);
+                    setDefICE(data.ice_list[0]);
+                    setShowPopup(true);
+                }
+            }
+        }catch(error){
+            setLoading(false)
+            console.error(error)
+            setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
+        }
+    };
+
     const Content = () => (
         <div className="defIce_inputs_container">
             <span className="leftControl defIce-span " title="Token Name">Select Default ICE :</span>

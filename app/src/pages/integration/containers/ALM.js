@@ -26,6 +26,21 @@ const ALM = props => {
     useEffect(()=>{
         dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
         setMappedFilesRes([]);
+
+        return ()=>{
+            dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+            dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+            dispatch({
+                type: actionTypes.SEL_TC_DETAILS, 
+                payload: {
+                    selectedTCNames: [],
+                    selectedTSNames: [],
+                    selectedFolderPaths: []
+                }
+            });
+            dispatch({type: actionTypes.SYNCED_TC, payload: []});
+            dispatch({type: actionTypes.SEL_TC, payload: []});
+        }
        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     
@@ -56,15 +71,25 @@ const ALM = props => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
     const callViewMappedFiles = async()=>{
-        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Fetching...'});
-        //props.setViewMappedFiles(true)
-        dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "ALM" });
-        const userid = user_id;
-        const response = await viewQcMappedList_ICE(userid);
-        if (response.error){
-            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: response.error}});
-        } else setMappedFilesRes(response);
-        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+        try{
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Fetching...'});
+            //props.setViewMappedFiles(true)
+            const userid = user_id;
+            const response = await viewQcMappedList_ICE(userid);
+            if (response.error){
+                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: response.error}});
+            } 
+            else if (response.length){
+                dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "ALM" });
+                setMappedFilesRes(response);
+            }
+            else dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Mapped Testcase", content: "No mapped details"}});
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+        }
+        catch(err) {
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Failed to Fetch Data."}});
+        }
     }
     const callExitcenter=()=>{
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });;
@@ -74,8 +99,8 @@ const ALM = props => {
         { viewMappedFiles === "ALM" ?
             <MappedPage 
                 screenType="ALM"
-                leftBoxTitle="Avo Assure Scenarios"
-                rightBoxTitle="ALM Testcases"
+                leftBoxTitle="ALM Testcases"
+                rightBoxTitle="Avo Assure Scenarios"
                 mappedfilesRes={mappedfilesRes}
                 fetchMappedFiles={callViewMappedFiles}
             /> :

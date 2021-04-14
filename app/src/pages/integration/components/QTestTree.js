@@ -1,9 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { RedirectPage } from '../../global';
 import * as actionTypes from '../state/action';
-import * as api from '../api.js';
 
 const CycleNode = props => {
 
@@ -13,64 +10,38 @@ const CycleNode = props => {
         setCollapse(!collapse);
     }, [collapse, setCollapse])
 
-    return <div className="int__cycleNode" style={{paddingLeft: 17}}>
-            { <div className="test_tree_branches">
+    return (
+        Object.keys(props.cycleNode).length ?
+        <div className="int__cycleNode" style={{paddingLeft: 17}}>
+             <div className="test_tree_branches">
                 <img alt="ce-ic"
                     className="test_tree_toggle" 
                     src={ `static/imgs/ic-qc${collapse ? "Expand" : "Collapse"}.png` }
                     onClick={handleClick}
                 />
-                <label>{ props.cycleName }</label>
-            </div> }
-            { !collapse && props.phaseList.length > 0 
+                <label>{ props.cycleNode.cycle }</label>
+            </div> 
+            { !collapse && props.cycleNode.testsuites.length > 0 
                 ? <div> {
-                    props.phaseList
-                        .map((phase, idx) => <PhaseNode 
-                                                key={`phase-${idx}`}
-                                                phase={phase}
+                    props.cycleNode.testsuites
+                        .map((testSuite, idx) => <TestSuiteNode 
+                                                key={`TestSuite-${idx}`}
+                                                testSuite={testSuite}
                                                 projectId={props.projectId}
-                                                releaseId={props.releaseId}
+                                                projectName={props.projectName}
                                             />)
                 } </div>
                 : null
             }
-        </div>;
+        </div> : null);
 }
 
-const PhaseNode = props => {
+const TestSuiteNode = props => {
 
-    const dispatch = useDispatch();
-    const history = useHistory();
     const [collapse, setCollapse] = useState(true);
-    const [testCases, setTestCases] = useState([]);
 
-    let phaseid = Object.keys(props.phase)[0];
-    let phasename = props.phase[phaseid];
-
-    const handleClick = useCallback(async()=>{
-        if (collapse) {
-            dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Testcases...'});
-
-            const data = await api.zephyrTestcaseDetails_ICE("testcase", phaseid);
-            
-            if (data.error)
-                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: data.error}});
-            else if (data === "unavailableLocalServer")
-                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr Connection", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
-            else if (data === "scheduleModeOn")
-                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr Connection", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
-            else if (data === "Invalid Session"){
-                dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-                return RedirectPage(history);
-            }
-            else {
-                setTestCases(data);
-                setCollapse(false);
-            }
-            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-        }
-        else setCollapse(true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps        
+    const handleClick = useCallback(()=>{
+        setCollapse(!collapse);
     }, [collapse, setCollapse])
     
 
@@ -81,17 +52,17 @@ const PhaseNode = props => {
                         src={ `static/imgs/ic-taskType-blue-${collapse ? "plus" : "minus"}.png` }
                         onClick={handleClick}
                     />
-                    <label>{ phasename }</label>
+                    <label>{ props.testSuite.name }</label>
                 </div> }
-                { !collapse && testCases.length > 0 
+                { !collapse && props.testSuite.testruns.length > 0 
                     ? <div> {
-                        testCases
-                            .map(testCase => <TestCaseNode 
-                                                key={`testCase-${testCase.id}`}       
-                                                testCase={testCase}
-                                                phaseId={phaseid}
+                        props.testSuite.testruns
+                            .map(testRun => <TestRunNode 
+                                                key={`testRun-${testRun.id}`}       
+                                                testSuiteId={props.testSuite.id}
+                                                testRun={testRun}
                                                 projectId={props.projectId}
-                                                releaseId={props.releaseId}
+                                                projectName={props.projectName}
                                             />)
                     } </div>
                     : null
@@ -100,14 +71,14 @@ const PhaseNode = props => {
 }
 
 
-const TestCaseNode = props => {
+const TestRunNode = props => {
 
     const dispatch = useDispatch();
     const selectedTC = useSelector(state=>state.integration.selectedTestCase);
     const syncedTestCases = useSelector(state=>state.integration.syncedTestCases);
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
 
-    let uniqueTCpath = `|${props.phaseId}\\${props.testCase.id}|`;
+    let uniqueTCpath = `|${props.testSuiteId}\\${props.testRun.id}|`;
 
     const handleClick = () => {
         dispatch({type: actionTypes.SEL_TC, payload: uniqueTCpath});
@@ -126,11 +97,10 @@ const TestCaseNode = props => {
         else{
             const mappedPair=[
                 {
+                    project: props.projectName,
                     projectid: props.projectId,			
-                    releaseid: props.releaseId,
-                    treeid: props.phaseId,
-                    testid: props.testCase.id,
-                    testname: props.testCase.name,
+                    testsuite: props.testRun.name,
+                    testsuiteid: props.testRun.id,
                     scenarioId: selectedScIds
                 }
             ]
@@ -145,9 +115,8 @@ const TestCaseNode = props => {
     }
 
     return <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(uniqueTCpath) ? " test__syncedTC" : "")}>
-                <label className="test__leaf" title={props.testCase.name} onClick={handleClick}>
-                    <span className="leafId">{props.testCase.id}</span>
-                    <span className="test__tcName">{props.testCase.name}</span>
+                <label className="test__leaf" title={props.testRun.name} onClick={handleClick}>
+                    <span className="test__tcName">{props.testRun.name}</span>
                 </label>
                 { selectedTC.includes(uniqueTCpath)
                         && <><div className="test__syncBtns"> 

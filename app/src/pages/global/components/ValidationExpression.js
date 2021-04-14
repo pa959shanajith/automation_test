@@ -13,7 +13,7 @@ const ValidationExpression = (value,id) =>{
     else if (id === "email")
         regex = /[^a-zA-Z0-9@._-]/g;
     else if (['projectName', 'releaseTxt', 'cycleTxt'].includes(id))
-        regex = /[~`%*()+=|:;"'?/><,]/g;
+        regex = /[~`%*()+=|:;"'?><,\/\\]/g;
     else if(id === "optimazationInput")
         regex = /[^0-9]/g;
     else

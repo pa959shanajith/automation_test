@@ -80,7 +80,7 @@ const ZephyrContent = props => {
         setScenario_ID(scenarioID);
         setFilteredName(null);
         setSearchIconClicked(false);
-        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []})
+        clearSelections();
     }
 
     const callSaveButton =async()=>{ 
@@ -89,8 +89,14 @@ const ZephyrContent = props => {
         if (response.error){
             dispatch({type: actionTypes.SHOW_POPUP , payload: {title: "Error", content: response.error}});
         } 
+        else if(response === "unavailableLocalServer")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
+        else if(response === "scheduleModeOn")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
         else if ( response === "success"){
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr", content: "Saved Successfully."}});
+            dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+            clearSelections();
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
@@ -100,20 +106,20 @@ const ZephyrContent = props => {
         setProjectDropdn1("Select Project");
         setScenario_ID("Select Project");
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
-        dispatch({type: actionTypes.MAPPED_PAIR, payload: []})
-        clearSelections();
     }
     
     const clearSelections = () => {
-        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []})
-        dispatch({type: actionTypes.SEL_TC, payload: []})
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+        dispatch({type: actionTypes.SYNCED_TC, payload: []});
+        dispatch({type: actionTypes.SEL_TC, payload: []});
     }
     
     const onSearch=(e)=>{
         var val = e.target.value;
         var filter = [];
         if(scenarioArr){
-            avoProjects[parseInt(scenario_ID)].scenario_details
+            (avoProjects[parseInt(scenario_ID)].scenario_details.length ? 
+            avoProjects[parseInt(scenario_ID)].scenario_details : [])
                 .forEach((e,i)=>{
                     if (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) 
                         filter.push(e);
@@ -202,7 +208,9 @@ const ZephyrContent = props => {
                 }
                 scenarioList={
                     scenarioArr ? 
-                    (filteredNames ? filteredNames : avoProjects[parseInt(scenario_ID)].scenario_details)
+                    (filteredNames ? filteredNames : 
+                        avoProjects[parseInt(scenario_ID)].scenario_details.length ? 
+                        avoProjects[parseInt(scenario_ID)].scenario_details : [])
                         .map((scenario, i)=>(
                                 <div 
                                     key={i}
