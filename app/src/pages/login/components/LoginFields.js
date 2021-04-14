@@ -84,7 +84,11 @@ const LoginFields = (props) => {
                 if (data.redirect) {
                     window.location.href = data.redirect;
                 }
-                else if (data.proceed) setPassField(true);
+                else if (data.proceed) {
+                    setPassField(true);
+                    if(data.ldapuser) setforgotPassword(false);
+                    else setforgotPassword(true);
+                } 
                 else if (data === "invalidServerConf") setLoginValidation("Authentication Server Configuration is invalid!");
                 else setLoginValidation(err);    
             }
