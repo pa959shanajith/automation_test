@@ -16,7 +16,7 @@ const CalendarComp = (props) => {
     const setDate = props.setDate
     const disabled = props.disabled
     var dateFormat = useSelector(state=>state.login.dateformat);
-    dateFormat = dateFormat.replaceAll("-","/")
+    dateFormat = dateFormat.replace(/-/g,"/")
     var dateVal = props.date;
     const classCalender = props.classCalender
     const error = props.error
