@@ -1580,11 +1580,7 @@ exports.importGitMindmap = async (req, res) => {
 			"gitfolderpath":gitfolderpath
 		}
 		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);
-		if (result == "fail") {
-			return res.send("fail");
-		} else {
-			return res.send(result);
-		}
+		res.send(result)
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");

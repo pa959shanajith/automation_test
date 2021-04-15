@@ -17,6 +17,7 @@ const MindmapHome = () => {
   const [options,setOptions] = useState(undefined)
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
+    'importmindmap': React.memo(() => (<CreateNew importRedirect={true}/>)),
     'enemindmap': React.memo(() => (<CreateEnE/>)),
     'assignmap': React.memo(() => (<CreateAssign/>))
   }
