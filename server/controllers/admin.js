@@ -2243,8 +2243,8 @@ exports.restartService = async (req, res) => {
 };
 
 /*Saving Git configuration */
-exports.saveGitConfig = async (req, res) => {
-	const actionName = "saveGitConfig";
+exports.gitSaveConfig = async (req, res) => {
+	const actionName = "gitSaveConfig";
 	logger.info("Inside UI service: " + actionName);
 	try {
 		const data = req.body;
@@ -2260,12 +2260,10 @@ exports.saveGitConfig = async (req, res) => {
 			"gitAccToken": gitAccToken,
 			"gitUrl":gitUrl
 		};
-		const result = await utils.fetchData(inputs, "admin/saveGitConfig", actionName);
-		if (result == "fail") return res.send("fail");
-		else if(result == "GitUser Already Exists") return res.send("GitUser Already Configured!")
-		res.send('Success');
+		const result = await utils.fetchData(inputs, "admin/gitSaveConfig", actionName);
+		return res.send(result);
 	} catch (ex) {
-		logger.error("Exception in the service saveGitConfig: %s", ex);
+		logger.error("Exception in the service gitSaveConfig: %s", ex);
 		return res.status(500).send("fail");
 	}
 };
@@ -2284,7 +2282,6 @@ exports.gitEditConfig = async (req, res) => {
 		};
 		const result = await utils.fetchData(inputs, "admin/gitEditConfig", actionName);
 		if (result == "fail") res.status(500).send("fail");
-		else if (result==null) res.send("empty");
 		else {
 			let data = [];
 			data.push(result['gitaccesstoken'], result['giturl']);

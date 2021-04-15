@@ -728,8 +728,7 @@ exports.importFromGit_ICE = async (req, res) => {
 		userInfo['invokinguserrole'] = userInfo.role;
 		redisServer.redisSubServer.subscribe('ICE2_' + userInfo.icename);
 		const result = await executionRequestToICE(module_data, 'API', userInfo);
-		res.send('success')
-		return
+		return res.send(result)
 	} catch (ex) {
 		logger.error("Exception in the service importFromGit: %s", ex);
 		return res.status(500).send("fail");

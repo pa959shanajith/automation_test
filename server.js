@@ -395,7 +395,7 @@ if (cluster.isMaster) {
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
 		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
 		app.post('/restartService', auth.protect, admin.restartService);
-		app.post('/saveGitConfig', auth.protect, admin.saveGitConfig);
+		app.post('/gitSaveConfig', auth.protect, admin.gitSaveConfig);
 		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
 
 		//Design Screen Routes
