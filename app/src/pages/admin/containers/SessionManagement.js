@@ -172,7 +172,7 @@ const SessionManagement = (props) => {
                                     <tr >
                                         <td> {user.username} </td>
                                         <td> {user.role} </td>
-                                        <td> {formatDate(user.loggedin)} </td>
+                                        <td data-test="login_date_time"> {formatDate(user.loggedin)} </td>
                                         <td> {user.ip} </td>
                                         <td><button className="btn btn-table-cust" data-id={index} onClick={(event)=>{disconnectLogoff(event)}}> Logout </button></td>
                                     </tr> 

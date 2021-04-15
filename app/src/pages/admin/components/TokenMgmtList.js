@@ -121,7 +121,7 @@ const TokenMgmtList = (props) => {
                                     <tr key={index} className='tkn-table__row provisionTokens'>
                                         <td className="tkn-table__name"> {token.name} </td>
                                         <td className="tkn-table__status"> {token.deactivated} </td>
-                                        <td className="tkn-table__exp"> {formatDate(token.expireson)} </td>
+                                        <td data-test="token_expiry_date" className="tkn-table__exp"> {formatDate(token.expireson)} </td>
                                         {token.deactivated === 'active'? <td className="tkn-table__action"><button className="btn btn-list-tkn-mgmt tkn-table__button" onClick={()=>{deactivate(token)}} > Deactivate </button></td>:null}
                                         {token.deactivated !== 'active'?<td className="tkn-table__action"></td> :null}
                                     </tr> 
