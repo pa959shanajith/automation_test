@@ -1194,7 +1194,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	var firstScript = false,windowId;
 	var temp_screendata=screendata;
 	var menu_input='';
-	var menu_count=0;
+	var menu_count=step;
 	var mflag=0;
 	if(adjacentItems){
 		// in case is first script
@@ -1500,6 +1500,33 @@ var encrypt = (data) => {
 	return 	encryptedData.toUpperCase();
 }
 
+/* Export data to Git repository. */
+exports.exportToGit = async (req, res) => {
+	const actionName = "exportToGit";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const gitVersionName = data.gitVersion;
+		const gitFolderPath = data.gitFolderPath;
+		const gitBranch = data.gitBranch;
+		const moduleId = data.mindmapId;
+		const inputs = {
+			"moduleId":moduleId,
+			"action":actionName,
+			"gitBranch":gitBranch,
+			"gitVersionName": gitVersionName,
+			"gitFolderPath": gitFolderPath
+		};
+		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
+		if (module_data == "fail") return res.status(500).send("fail");
+		else if(module_data=="empty") return res.status(500).send("empty")
+		res.send('Success');
+	} catch (ex) {
+		logger.error("Exception in the service exportToGit: %s", ex);
+		return res.status(500).send("fail");
+	}
+};
+
 exports.exportMindmap = async (req, res) => {
 	const fnName = "exportMindmap";
 	logger.info("Inside UI service: " + fnName);
@@ -1531,6 +1558,30 @@ exports.importMindmap = async (req, res) => {
 			"query":"importMindmap"
 		}
 		const result = await utils.fetchData(inputs, "mindmap/importMindmap", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+exports.importGitMindmap = async (req, res) => {
+	const fnName = "importGitMindmap";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const projectid = req.body.projectid;
+		const gitversion = req.body.gitversion;
+		const gitfolderpath = req.body.gitfolderpath;
+		const inputs= {
+			"projectid": projectid,
+			"gitversion":gitversion,
+			"gitfolderpath":gitfolderpath
+		}
+		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);
 		if (result == "fail") {
 			return res.send("fail");
 		} else {

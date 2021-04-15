@@ -2241,3 +2241,57 @@ exports.restartService = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+/*Saving Git configuration */
+exports.saveGitConfig = async (req, res) => {
+	const actionName = "saveGitConfig";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const action = data.action;
+		const userId = data.userId;
+		const projectId = data.projectId;
+		const gitAccToken = data.gitAccToken;
+		const gitUrl = data.gitUrl;
+		const inputs = {
+			"action":action,
+			"userId":userId,
+			"projectId":projectId,
+			"gitAccToken": gitAccToken,
+			"gitUrl":gitUrl
+		};
+		const result = await utils.fetchData(inputs, "admin/saveGitConfig", actionName);
+		if (result == "fail") return res.send("fail");
+		else if(result == "GitUser Already Exists") return res.send("GitUser Already Configured!")
+		res.send('Success');
+	} catch (ex) {
+		logger.error("Exception in the service saveGitConfig: %s", ex);
+		return res.status(500).send("fail");
+	}
+};
+
+/*Edit Git configuration */
+exports.gitEditConfig = async (req, res) => {
+	const actionName = "gitEditConfig";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = data.userId;
+		const projectId = data.projectId;
+		let inputs = {
+			"userId":userId,
+			"projectId":projectId
+		};
+		const result = await utils.fetchData(inputs, "admin/gitEditConfig", actionName);
+		if (result == "fail") res.status(500).send("fail");
+		else if (result==null) res.send("empty");
+		else {
+			let data = [];
+			data.push(result['gitaccesstoken'], result['giturl']);
+			return res.send(data);
+		}
+	} catch (exception){
+		logger.error("Exception in the service gitEditConfig: %s", ex);
+		return res.status(500).send("fail");
+	}
+};
