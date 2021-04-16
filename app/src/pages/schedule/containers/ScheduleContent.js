@@ -11,6 +11,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
 
     const nulluser = "5fc137cc72142998e29b5e63";
     const filter_data = useSelector(state=>state.plugin.FD)
+    const dateFormat = useSelector(state=>state.login.dateformat);
     const [loading,setLoading] = useState(false)
     const [pageOfItems,setPageOfItems] = useState([])
     const [scheduledData,setScheduledData] = useState([])
@@ -205,6 +206,39 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
         setScheduledData(data);
     }
 
+    const formatDate = (date) => {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear(),
+            hour = '' + d.getHours(),
+            minute = '' + d.getMinutes();
+            
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+        if (hour.length < 2)
+            hour = '0' + hour
+        if (minute.length < 2)
+            minute = '0' + minute 
+
+        let map = {"MM":month,"YYYY": year, "DD": day};
+        let def = [day,month,year];
+        let format = dateFormat.split("-");
+        let arr = []
+        let used = {}
+        for (let index in format){
+            if (!(format[index] in map) || format[index] in used){
+                return def.join('-') + " " + [hour,minute].join(':');
+            }
+            arr.push(map[format[index]]) 
+            used[format[index]] = 1
+        }
+
+        return arr.join('-') + " " + [hour,minute].join(':');
+    }
+
     return (
         <>
             {loading?<ScreenOverlay content={loading}/>:null}
@@ -290,16 +324,16 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                                                     <div className='scheduleDataBodyRow'>
                                                         {pageOfItems.map((data,index)=>(
                                                             <div key={index} className="scheduleDataBodyRowChild">
-                                                                <div className="s__Table_date s__Table_date-time ">{data.scheduledatetime}</div>
-                                                                <div className="s__Table_host" >{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
-                                                                <div className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
-                                                                <div className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
-                                                                <div className="s__Table_appType">
+                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time ">{formatDate(data.scheduledatetime)}</div>
+                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" >{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                                <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
+                                                                <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
+                                                                <div data-test = "schedule_data_browser_type" className="s__Table_appType">
                                                                     {data.browserlist.map((brow,index)=>(
                                                                         <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
                                                                     ))}
                                                                 </div>
-                                                                <div className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
+                                                                <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
                                                                     {data.status}
                                                                     {(data.status === 'scheduled')?
                                                                         <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,setPopupState)}} ng-click='cancelThisJob($event,"cancelled")' title='Cancel Job'/>

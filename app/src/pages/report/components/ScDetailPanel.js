@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollBar } from '../../global';
+import { useSelector } from 'react-redux';
 import { viewReport } from '../api'
 import '../styles/ScDetailPanel.scss';
 
@@ -8,23 +9,53 @@ import '../styles/ScDetailPanel.scss';
 */
 
 const ScDetailPanel = ({scDetails,setBlockui,displayError,selectedScDetails}) =>{
-    const [sortUp,setSortUp] = useState(true)
+    const [sortUp,setSortUp] = useState(true);
+    const dateFormat = useSelector(state=>state.login.dateformat);
     const [arr,setArr] = useState([])
     useEffect(()=>{
         var data = dateASC([...scDetails])
         setArr(data)
     },[scDetails])
     const getReport = (e) => {
-        Report(e,setBlockui,displayError)
+        Report(e, setBlockui, displayError, dateFormat, formatDate)
     }
     const sortTable = () => {
         var data = [...arr].reverse()
         setArr(data)
         setSortUp(!sortUp)
     }
+
+    const formatDate = (date) => {
+        let dateTime = date.replace(" ", "-").split("-");
+        let time = dateTime[dateTime.length - 1].split(":");
+        
+        var day = dateTime[0];
+        var month = dateTime[1];
+        var year = dateTime[2];
+    
+        let hour = time[0]
+        let minute = time[1]
+        let seconds = time[2]
+        let map = {"MM":month,"YYYY": year, "DD": day};
+            let def = [day,month,year];
+            let format = dateFormat.split("-");
+            let arr = []
+            let used = {}
+            for (let index in format){
+                if (!(format[index] in map) || format[index] in used){
+                    return def.join('-') + " " + [hour,minute,seconds].join(':');
+                }
+                arr.push(map[format[index]]) 
+                used[format[index]] = 1
+            }
+    
+            return arr.join('-') + " " + [hour,minute,seconds].join(':');
+    }
+
     if(!selectedScDetails._id){
         return null;
     }
+    
     return(
         <div id='rp__detail-panel' className='panel rp__detail'>
             <div className='rp__panel-head'>E<sub>{selectedScDetails.name}</sub> -   Scenario Details</div>
@@ -51,7 +82,7 @@ const ScDetailPanel = ({scDetails,setBlockui,displayError,selectedScDetails}) =>
                                 <div style={{lineHeight:0.3,fontSize:'50px'}}>-</div>
                                 }
                             </div>
-                            <div className='rp__col'>{e.executedtime}</div>
+                            <div data-test="executed_time" className='rp__col'>{formatDate(e.executedtime)}</div>
                             <div className={'rp__col status '+e.status.toLowerCase()}>{e.status}</div>
                             <div className='rp__col export' scname={e.testscenarioname}>
                                 <img type={'pdf'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-pdf.png"} alt={e.browser}/>

@@ -10,6 +10,7 @@ var utils = require('../lib/utils');
 var Handlebars = require('../lib/handlebar.js');
 var wkhtmltopdf = require('wkhtmltopdf');
 var fs = require('fs');
+var options = require('../config/options');
 const Readable = require('stream').Readable;
 var path = require('path');
 wkhtmltopdf.command = path.join(__dirname, '..', '..', 'assets', 'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
@@ -185,6 +186,37 @@ exports.renderReport_ICE = async (req, res) => {
     }
 };
 
+const formatDate = (date) => {
+    if (!date || date == ""){
+        return false;
+    }
+    let dateTime = date.replace(" ", "-").split("-");
+    let time = dateTime[dateTime.length - 1].split(":");
+    
+    var day = dateTime[2];
+    var month = dateTime[1];
+    var year = dateTime[0];
+
+    let hour = time[0]
+    let minute = time[1]
+    let seconds = time[2]
+    let map = {"MM":month,"YYYY": year, "DD": day};
+    let def = [day,month,year];
+    let format = options.dateFormat.split("-");
+    let arr = []
+    let used = {}
+    for (let index in format){
+        if (!(format[index] in map) || format[index] in used){
+            return def.join('-') + " " + [hour,minute,seconds].join(':');
+        }
+        arr.push(map[format[index]]) 
+        used[format[index]] = 1
+    }
+
+    return arr.join('-') + " " + [hour,minute,seconds].join(':');
+    
+};
+
 const prepareReportData = (reportData, embedImages) => {
     let pass = fail = terminated = 0;
     const remarksLength = [];
@@ -205,9 +237,9 @@ const prepareReportData = (reportData, embedImages) => {
     report.overallstatus[0].moduleName = reportData.testsuitename;
     report.overallstatus[0].browserVersion = report.overallstatus[0].browserVersion || '-';
     report.overallstatus[0].browserType = report.overallstatus[0].browserType || '-';
-    report.overallstatus[0].StartTime = report.overallstatus[0].StartTime.split(".")[0] || '-';
-    report.overallstatus[0].EndTime = endTimeStamp || '-';
-    report.overallstatus[0].date = endDate && (endDate[1] + "/" + endDate[2] + "/" + endDate[0]) || '-';
+    report.overallstatus[0].StartTime = formatDate(report.overallstatus[0].StartTime.split(".")[0]) || '-';
+    report.overallstatus[0].EndTime = formatDate(endTimeStamp) || '-';
+    report.overallstatus[0].date = report.overallstatus[0].EndTime && report.overallstatus[0].EndTime.split(" ")[0]  || '-';
     report.overallstatus[0].time = endTimeStamp.split(" ")[1] || '-';
     report.overallstatus[0].EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
     report.overallstatus[0].video = report.overallstatus[0].video || '-'
@@ -863,8 +895,10 @@ exports.getReport_API = async(req, res) => {
                                 reportData.overallstatus[0].cycleName=reportInfo.cycleName;
                                 reportData.overallstatus[0].reportId=reportInfo.reportId;
                                 var getTym = reportData.overallstatus[0].EndTime.split(".")[0];
-                                var getDat = getTym.split(" ")[0].split("-");
-                                reportData.overallstatus[0].date = getDat[1] + "/" + getDat[2] + "/" + getDat[0];
+                                var getDat = formatDate(getTym) || "N/A ";
+                                reportData.overallstatus[0].EndTime = getDat;
+                                reportData.overallstatus[0].StartTime = formatDate(reportData.overallstatus[0].StartTime.split(".")[0]) || "N/A "
+                                reportData.overallstatus[0].date = getDat.split(" ")[0];
                                 reportData.overallstatus[0].time = getTym.split(" ")[1];
                                 for(j=0;j<reportData.rows.length;++j){
                                     if (reportData.rows[j].status == "Pass") {
