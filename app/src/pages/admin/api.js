@@ -1062,3 +1062,65 @@ export const unlockUser = async(user) => {
         return {error:"Failed to unlocked users"}
     }
 }
+
+/* Component 
+  api returns
+*/
+
+export const gitSaveConfig = async(action, userId,projectId,gitAccToken,gitUrl) => { 
+    try{
+        const res = await axios(url+'/gitSaveConfig', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,
+                    userId: userId,
+                    projectId: projectId,
+                    gitAccToken: gitAccToken,
+                    gitUrl: gitUrl},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Error while Git "+action+ " Configuration"}
+    }catch(err){
+        console.error(err)
+        return {error:"Error while Git "+action+ " Configuration"}
+    }
+}
+
+
+/* Component GitConfig
+  api returns
+*/
+
+export const gitEditConfig = async(userId, projectId) => { 
+    try{
+        const res = await axios(url+'/gitEditConfig', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {userId: userId,
+				projectId: projectId},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.status === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch git configurations."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to fetch git configurations."}
+    }
+}

@@ -37,6 +37,8 @@ const LeftPanel = (props) => {
 						<span><img style={{height:'60px'}} src={"static/imgs/CreateICEPool.png"} alt={"Create ICE Pool"} className={((props.middleScreen==="CreateIcePool") ? " selected-icon" : "")} ></img></span><span>ICE Pool</span></i></li>
 					<li className='userDivider'><i id='AllocateIcePool' alt={"Allocate ICE Pool"} onClick={()=>{props.setMiddleScreen("AllocateIcePool");resetScreen("AllocateIcePool");}} className="selectBrowser">
 						<span><img style={{height:'60px'}} src={"static/imgs/AllocateICEPool.png"} alt={"Allocate ICE Pool"} className={((props.middleScreen==="AllocateIcePool") ? " selected-icon" : "")} ></img></span><span>Allocate ICE Pool</span></i></li>
+					<li><i id='gitConfigure' title="Manage Git Configuration" onClick={()=>{props.setMiddleScreen("gitConfigure");resetScreen("gitConfigure")}} className="selectBrowser" >
+						<span><span className={'fa fa-git' + ((props.middleScreen==="gitConfigure") ? " selected-icon" : "")} ></span></span>Git Configuration</i></li>
 					<li><i id='ldapConfigTab' title="Manage LDAP Configuration" onClick={()=>{props.setMiddleScreen("ldapConfigTab");resetScreen("ldapConfigTab")}} className="selectBrowser" >
 						<span><span className={'fa fa-address-book' + ((props.middleScreen==="ldapConfigTab") ? " selected-icon" : "")} ></span></span>LDAP Configuration</i></li>
 					<li><i id='samlConfigTab' title="Manage SAML Configuration" onClick={()=>{props.setMiddleScreen("samlConfigTab");resetScreen("samlConfigTab")}} className="selectBrowser" >

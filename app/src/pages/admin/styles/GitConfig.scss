@@ -1,0 +1,33 @@
+.git_container{
+    width: 100%;
+    padding: 20px;
+    height: 100%;
+    .col-xs-9{
+        width: 83%;
+    }
+    .adminActionBtn{
+        margin-bottom: 5%;
+    }
+    .input-label {
+        margin-top: 0;
+        .left-opt{
+            width: calc(100% - 70px);
+        }
+    }    
+    .input-label{
+        label{
+            width: 50px;
+        }
+    }
+    .git_token{
+        label{
+            width: 130px;
+        }
+        .left-opt{
+            width: calc(100% - 150px);
+        }
+    }
+    .adminActionBtn .btn-edit:disabled {
+        opacity: 0.5;
+    }
+}
