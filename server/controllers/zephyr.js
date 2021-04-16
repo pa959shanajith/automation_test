@@ -437,6 +437,7 @@ exports.saveZephyrDetails_ICE = function (req, res) {
 		var treeid = itr.treeid;
 		var testid = itr.testid;
 		var testname = itr.testname;
+		var reqdetails = itr.reqdetails;
 		var inputs = {
 			"testscenarioid": testscenarioid,
 			'projectid': projectid,			
@@ -444,6 +445,7 @@ exports.saveZephyrDetails_ICE = function (req, res) {
 			'treeid': treeid,
 			'testid': testid,
 			'testname': testname,
+			'reqdetails': reqdetails,
 			"query": "saveZephyrDetails_ICE"
 		};
 		var args = {
@@ -693,4 +695,3 @@ function projectandmodule(projectid,cb,data){
         cb(projectDetails);
     });
 }
-
