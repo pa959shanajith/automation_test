@@ -217,9 +217,6 @@ const formatDate = (date) => {
     
 };
 
-
-// const hell = () =>{}
-
 const prepareReportData = (reportData, embedImages) => {
     let pass = fail = terminated = 0;
     const remarksLength = [];
