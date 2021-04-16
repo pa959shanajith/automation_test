@@ -39,6 +39,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
     const ftypeRef = useRef()
     const uploadFileRef = useRef()
     const projRef = useRef()
+    const gitBranchRef = useRef()
     const gitVerRef = useRef()
     const gitPathRef = useRef()
     const sheetRef = useRef()
@@ -65,22 +66,39 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
         if(submit){
             setSubmit(false)
             setError('')
-            var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitVerRef,gitPathRef,sheetRef})
+            var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
             if(err){
                 return;
             }
+            var importData = fileUpload;
             (async()=>{
                 if(importType === 'git'){
                     var data = await importGitMindmap ({
                         projectid : projRef.current.value,
+                        gitbranch : gitBranchRef.current.value,
                         gitversion : gitVerRef.current.value,
                         gitfolderpath : gitPathRef.current.value
                     })
-                    if(data.error){displayError(data.error);return;}
+                    if(data.error){setImportPop(false);displayError(data.error);return;}
+                    var importProj = data.projectid
+                    if(!importProj || !projList[importProj]){
+                        displayError('This project is not assigned to user')
+                        return;
+                    }
+                    var req={
+                        tab:"tabCreate",
+                        projectid:data.projectid,
+                        version:0,
+                        cycId: null,
+                        moduleid:data._id
+                    }
+                    var res = await getModules(req)
+                    if(res.error){displayError(res.error);return;}
+                    importData = res
                 }
                 loadImportData({
                     importType,
-                    importData:fileUpload, 
+                    importData, 
                     importProj:projRef.current ? projRef.current.value: undefined,
                     sheet:sheetRef.current? sheetRef.current.value: undefined,
                     dispatch:dispatch,
@@ -118,12 +136,16 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                                 </select>
                             </div>
                             <div>
+                                <label>Git Branch: </label>
+                                <input placeholder={'git branch name'} ref={gitBranchRef}/>
+                            </div>
+                            <div>
                                 <label>Version: </label>
-                                <input placeholder={'Ex: version name'} ref={gitVerRef}/>
+                                <input placeholder={'version name'} ref={gitVerRef}/>
                             </div>
                             <div>
                                 <label>Folder Path: </label>
-                                <input placeholder={'Ex: Projectname/modulename'} ref={gitPathRef}/>
+                                <input placeholder={'Ex: Projectname/modulename (optional)'} ref={gitPathRef}/>
                             </div>
                         </Fragment>:
                         <div>
@@ -197,9 +219,9 @@ const Footer = ({error,setSubmit}) =>{
     )
 }
 
-const validate = ({ftypeRef,uploadFileRef,projRef,gitVerRef,gitPathRef,sheetRef}) =>{
+const validate = ({ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef}) =>{
     var err = false;
-    [ftypeRef,uploadFileRef,projRef,gitVerRef,gitPathRef,sheetRef].forEach((e)=>{
+    [ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef].forEach((e)=>{
         if(e.current){
             e.current.style.border = '1px solid black';
             if(e.current.value === 'def-val'){
@@ -238,9 +260,6 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
         if(res.error){displayError(res.error);return;}
         var data = getJsonPd(res.data)
         mindmapData = {createnew:true,importData:{createdby:'pd',data:data}}
-    }
-    if(importType === 'git'){
-
     }
     var moduledata = await getModules({"tab":"tabCreate","projectid":importProj,"moduleid":null})
     if(moduledata.error){displayError(moduledata.error);return;}
