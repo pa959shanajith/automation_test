@@ -48,8 +48,8 @@ const GitConfig = (props) => {
                         <button onClick={()=>gitConfigAction('create')} className="a__btn btn-edit" title="Create">Create</button>
                         <button onClick={onClickEdit} className="a__btn" title="Edit">Edit</button>
                     </>:<>
-                        <button ref={updateBtnRef} onClick={()=>gitConfigAction('update')} className="a__btn btn-edit" title="Update">Update</button>
-                        <button onClick={()=>setShowDeleteModal(true)} className="a__btn" title="Delete">Delete</button>
+                        <button ref={updateBtnRef} onClick={()=>gitConfigAction('update')} className="a__btn btn-edit" title="Update" disabled={Project.current.value ==="def-opt"}>Update</button>
+                        <button onClick={()=>setShowDeleteModal(true)} className="a__btn" title="Delete" disabled={Project.current.value ==="def-opt"} >Delete</button>
                     </>
                 }
             </div>  

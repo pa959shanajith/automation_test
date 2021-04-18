@@ -63,7 +63,7 @@ const GitConfig = (props) => {
                 <FormSelect inpId={'domainGit'} inpRef={domainRef} onChangeFn={()=>fetchProjectList(domainRef.current.value, setProjectList, setProjectData, displayError, setLoading)} defValue={"Select Domain"} label={"Domain"} option={domainList}/>
                 <FormSelect inpId={'projectGit'} inpRef={ProjectRef} onChangeFn={()=>{onChangeProject(resetFields,displayError, showEdit, urlRef, tokenRef ,userData, userRef, projectData, ProjectRef, setLoading, setPopupState)}} defValue={"Select Project"} label={"Project"} option={projectList}/>
                 <div className="git_token" >
-                    <FormInput inpRef={tokenRef} label={'Git Access Token'} placeholder={'Enter Git Access Token'} validExp={"tokenName"}/>
+                    <FormInput inpRef={tokenRef} label={'Git Access Token'} placeholder={'Enter Git Access Token'} validExp={"GitToken"}/>
                     <FormInput inpRef={urlRef} label={'Git URL'} placeholder={'Enter Git URL'}/>
                 </div>
             </div>
@@ -77,10 +77,9 @@ const onChangeProject = async (resetFields, displayError, showEdit, urlRef, toke
     const data = await gitEditConfig(userData[userRef.current.value], projectData[ProjectRef.current.value]);
     if(data.error){displayError(data.error);return;}
     else if(data == "empty") {
-        setPopupState({show:false,title:"Edit Git User",content:"There are no git users created yet."})
+        setPopupState({show:true,title:"Edit Git User",content:"No git configuration created yet."})
         resetFields();
     } else {
-        if(data.length === 0) setPopupState({show:false,title:"Edit Git User",content:"No git configurations crated yet."})
         tokenRef.current.value = data[0];
         urlRef.current.value = data[1]
     }
@@ -106,7 +105,7 @@ const refreshFields = ( domainRef, ProjectRef, userRef, tokenRef, urlRef, setDom
 }
 
 const fetchDomainList = async (setDomainList, displayError, setLoading) => {
-    setLoading(true);
+    setLoading("Loading...");
     let data = await getDomains_ICE() 
     if(data.error){displayError(data.error);return;}
     setDomainList(data);
