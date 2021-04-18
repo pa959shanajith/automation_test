@@ -2282,6 +2282,7 @@ exports.gitEditConfig = async (req, res) => {
 		};
 		const result = await utils.fetchData(inputs, "admin/gitEditConfig", actionName);
 		if (result == "fail") res.status(500).send("fail");
+		else if (result == "empty") res.send("empty");
 		else {
 			let data = [];
 			data.push(result['gitaccesstoken'], result['giturl']);
