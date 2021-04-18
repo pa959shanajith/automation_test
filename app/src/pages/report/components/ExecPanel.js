@@ -11,6 +11,7 @@ import { reportStatusScenarios_ICE } from '../api';
 
 const ExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,selectedScDetails}) =>{
     const suDetails = useSelector(state=>state.report.suiteDetails)
+    const dateFormat = useSelector(state=>state.login.dateformat);
     const suiteSelected = useSelector(state=>state.report.suiteSelected)
     const [suiteDetails,setSuiteDetails] =  useState([])
     const [sortUp,setSortUp] = useState(false)
@@ -48,6 +49,31 @@ const ExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,sele
         setSuiteDetails(arr)
         setSortUp(!sortUp)
     }
+
+    const formatDate = (date) => {
+        let dateTime = date.replace(" ", "-").split("-");
+        let time = dateTime[dateTime.length - 1].split(":");
+        let day = dateTime[0]
+        let month = dateTime[1]
+        let year = dateTime[2]
+        let hour = time[0]
+        let minute = time[1]
+        let map = {"MM":month,"YYYY": year, "DD": day};
+        let def = [day,month,year];
+        let format = dateFormat.split("-");
+        let arr = []
+        let used = {}
+        for (let index in format){
+            if (!(format[index] in map) || format[index] in used){
+                return def.join('-') + " " + [hour,minute].join(':');
+            }
+            arr.push(map[format[index]]) 
+            used[format[index]] = 1
+        }
+
+        return arr.join('-') + " " + [hour,minute].join(':');
+    }
+
     if(!suiteSelected._id){
         return null;
     }
@@ -72,8 +98,8 @@ const ExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,sele
                             suiteDetails.map((e,i)=>
                             <div key={e.execution_id} onClick={onClickRow} name={(sortUp)?i+1:suiteDetails.length-i} value={e.execution_id} className={'rp__row'+(selectedScDetails._id===e.execution_id?" selected-row":"")}>
                                 <div className='rp__col'>E<sub>{(sortUp)?i+1:suiteDetails.length-i}</sub></div>
-                                <div className='rp__col'>{e.start_time}</div>
-                                <div className='rp__col'>{e.end_time}</div>
+                                <div data-test="start_date" className='rp__col'>{formatDate(e.start_time)}</div>
+                                <div data-test="end_date" className='rp__col'>{formatDate(e.end_time)}</div>
                             </div>):
                             <div style={{textAlign:'center',padding:'30px',height:'100%'}} className='rp__row'>
                                 No record(s) found
