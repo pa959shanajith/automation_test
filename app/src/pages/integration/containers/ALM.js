@@ -85,6 +85,8 @@ const ALM = props => {
             }
             else dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Mapped Testcase", content: "No mapped details"}});
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+
+            return response;
         }
         catch(err) {
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
