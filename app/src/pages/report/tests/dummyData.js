@@ -145,3 +145,51 @@ export const reportData = [
 		"type": "5db0022cf87fdec084ae49b6"
 	}
 ]
+
+export const suiteSelected = {
+    "_id": "5df71837d9be728cf8e7fe8e",
+    "name": "Batch_Execution2_Module1"
+}
+
+export const suSelected = 
+[
+    {
+        "execution_id": "5df71838d9be728cf8e80358",
+        "start_time": "29-08-2019 04:31",
+        "end_time": "29-08-2019 10:08"
+    },
+    {
+        "execution_id": "5df71838d9be728cf8e80359",
+        "start_time": "26-07-2019 12:25",
+        "end_time": "29-07-2019 09:24"
+    },
+    {
+        "execution_id": "5df71838d9be728cf8e8035a",
+        "start_time": "30-08-2019 04:53",
+        "end_time": "30-08-2019 11:32"
+    },
+    {
+        "execution_id": "5df71838d9be728cf8e8035b",
+        "start_time": "29-07-2019 04:17",
+        "end_time": "29-07-2019 09:59"
+    }
+]
+
+export const scDetails = [
+    {
+        "executedtime": "19-01-2021 16:04:02",
+        "browser": "N/A",
+        "status": "Terminate",
+        "reportid": "6006b59a9c572309b8698884",
+        "testscenarioid": "5de4e572d9cdd57f40624a5b",
+        "testscenarioname": "Batch_Execution2_Scenario1"
+    },
+    {
+        "executedtime": "19-01-2021 16:04:04",
+        "browser": "N/A",
+        "status": "Terminate",
+        "reportid": "6006b59c9c572309b8698885",
+        "testscenarioid": "5de4e572d9cdd57f40624a5d",
+        "testscenarioname": "Batch_Execution2_Scenario2"
+    }
+]

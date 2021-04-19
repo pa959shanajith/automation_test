@@ -28,7 +28,7 @@ export const readTestSuite_ICE = async(readTestSuite) => {
         return {error:'Failed to fetch test suite data.'}
     }catch(err){
         console.error(err)
-        return {error:'Failed to test suite data.'}
+        return {error:'Failed to fetch test suite data.'}
     }
 }
 

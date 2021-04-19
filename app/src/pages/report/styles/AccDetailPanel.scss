@@ -1,0 +1,62 @@
+#ar__detail-panel{
+    .ar__standard-table{
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 100%;
+    }
+    .ar__standard-head{
+        display: flex;
+        justify-content: space-between;
+        background: gray;
+        color: white;
+        font-size: 13px;
+        font-family: 'LatoWebBold';
+    }
+    .ar__standard-row{
+        display: flex;
+        justify-content: space-between;
+        background: white;
+        color: #212529;
+        font-size: 13px;
+        font-family: 'LatoWebBold';
+    }
+    .ar__sn{
+        flex: 0 0 10%;
+        overflow: hidden;
+        text-align: center;
+        width: 100%;
+        padding: 8px 10px;
+    }
+    .ar__standard{
+        flex: 0 0 30%;
+        overflow: hidden;
+        text-align: center;
+        width: 100%;
+        padding: 8px 10px;
+    }
+    .ar__status{
+        flex: 0 0 30%;  
+        width: 100%;
+        overflow: hidden;
+        text-align: center;
+        width: 100%;
+        padding: 8px 10px;
+    }
+    .ar__report{
+        flex: 0 0 30%;
+        width: 100%;
+        overflow: hidden;
+        text-align: center;
+        width: 100%;
+        padding: 8px 10px;
+        .ar__report-generate{
+            cursor: pointer;
+        }
+    }
+    .pass{
+        color: green;
+    }
+    .fail{
+        color: red;
+    }
+}

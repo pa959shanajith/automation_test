@@ -4,7 +4,7 @@ const ValidationExpression = (value,id) =>{
     if (id === 'userName')
         // eslint-disable-next-line
         regex = /[\\\~`|;:"',<>?/%*()+=]/g;
-    else if (['ldapServerName', 'samlServerName', 'oidcServerName', 'poolName'].includes(id))
+    else if (['ldapServerName', 'samlServerName', 'oidcServerName', 'poolName','GitToken'].includes(id))
         regex = /[^a-zA-Z0-9]/g;
     else if (['iceName', 'tokenName', 'emailServerName'].includes(id))
         regex = /[^a-zA-Z0-9 \n]/g;

@@ -11,6 +11,7 @@ import { Fragment } from 'react';
 */
 
 const AccExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,selectedScDetails}) =>{
+    const dateFormat = useSelector(state=>state.login.dateformat);
     const suDetails = useSelector(state=>state.report.suiteDetails)
     const suiteSelected = useSelector(state=>state.report.suiteSelected)
     const [suiteDetails,setSuiteDetails] =  useState([])
@@ -49,6 +50,39 @@ const AccExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,s
         setScDetails([])
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[suiteSelected._id,suDetails])
+
+    const formatDate = (date) => {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear(),
+            hour = '' + d.getHours(),
+            minute = '' + d.getMinutes();
+    
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+        if (hour.length < 2)
+            hour = '0' + hour
+        if (minute.length < 2)
+            minute = '0' + minute 
+
+        let map = {"MM":month,"YYYY": year, "DD": day};
+        let def = [day,month,year];
+        let format = dateFormat.split("-");
+        let arr = []
+        let used = {}
+        for (let index in format){
+            if (!(format[index] in map) || format[index] in used){
+                return def.join('-') + " " + [hour,minute].join(':');
+            }
+            arr.push(map[format[index]]) 
+            used[format[index]] = 1
+        }
+
+        return arr.join('-') + " " + [hour,minute].join(':');
+    }
     return(
         <Fragment>
         { suiteSelected.name &&
@@ -70,7 +104,7 @@ const AccExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,s
                         <div key={e.execution_id} onClick={onClickRow} name={(sortUp)?i+1:suiteDetails.length-i} value={e._id} className={'ac__row'+(false?" selected-row":"")}>
                             <div className='ac__col'>E<sub>{(sortUp)?i+1:suiteDetails.length-i}</sub></div>
                             <div className='ac__col'>{e.title}</div>
-                            <div className='ac__col'>{e.executedtime}</div>
+                            <div className='ac__col'>{formatDate(e.executedtime)}</div>
                         </div>):
                         <div style={{textAlign:'center',padding:'30px',height:'100%'}} className='ac__row'>
                             No record(s) found

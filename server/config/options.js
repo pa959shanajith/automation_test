@@ -15,6 +15,9 @@ try {
 		parsed.socketio.pingTimeout = parseInt(parsed.socketio.pingTimeout);
 		parsed.socketio.pingInterval = parseInt(parsed.socketio.pingInterval);
 	}
+	if(parsed.dateFormat != "DD-MM-YYYY" && parsed.dateFormat != "YYYY-MM-DD" && parsed.dateFormat != "MM-DD-YYYY"){
+		throw "Invalid date format";
+	}
 } catch (e) {
 	logger.error(e);
 	throw "Please provide valid values in config.json file";
