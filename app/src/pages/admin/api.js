@@ -734,10 +734,10 @@ export const manageLDAPConfig = async(action, confObj) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:"Test Connection Failed!"}
+        return {error:"Failed to manage LDAP config!"}
     }catch(err){
         console.error(err)
-        return {error:"Test Connection Failed!"}
+        return {error:"Failed to manage LDAP config!"}
     }
 }
 
