@@ -87,11 +87,46 @@ const EditLandingProps = {
     getUserData: jest.fn(),
 }
 
+const TokenMgmtProps = {
+    "showList": true,
+    "allTokens": [
+        {
+            "_id": "5fe1f8453ab69388058237ec",
+            "deactivated": "active",
+            "expireson": "Thu, 28 Oct 2021 19:14:00 GMT",
+            "generatedon": "Tue, 22 Dec 2020 19:14:37 GMT",
+            "icetype": "normal",
+            "name": "token",
+            "projects": [],
+            "type": "TOKENS",
+            "userid": "5f2d658f29ab779aceb37586",
+            "expiry": ""
+        }
+    ],
+    "targetid": "5f2d658f29ab779aceb37586"
+}
+
+const SessionData = {
+    "sessionData":
+    [
+        {
+            "username":"admin",
+            "id":"QktMYUtGbm5LcldyaWdJQzMtdjExUGdxS1BVbDZiWW8=",
+            "role":"Admin",
+            "loggedin":"4/15/2021, 1:05:29 PM"
+        }
+    ],
+    "clientData":[]
+}
+
+
 module.exports={
     userConf:userConf,
     getUserRolesApiResponse:getUserRolesApiResponse,
     getSAMLConfigResponse:getSAMLConfigResponse,
     getOIDCConfigResponse:getOIDCConfigResponse,
     getLDAPConfigResponse:getLDAPConfigResponse,
-    EditLandingProps:EditLandingProps
+    EditLandingProps:EditLandingProps,
+    TokenMgmgProps: TokenMgmtProps,
+    SessionData: SessionData
 }

@@ -9,7 +9,7 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
     const history = useHistory();
     const [loading,setLoading] = useState(false)
     const [projectAppType,setProjectApptype] = useState({})
-    
+
     useEffect(()=>{
         if (Object.keys(current_task).length!==0){
         let readTestSuite = current_task.testSuiteDetails;
@@ -106,7 +106,7 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
     const changeExecutestatusInitial = (eachData1,m) => {
         let zeroExist = eachData1[m].executestatus.includes(0);
         let oneExist = eachData1[m].executestatus.includes(1);
-
+        if(!document.getElementById('selectScheduleSuite_' + m)) return;
         if(zeroExist ===true && oneExist === true) document.getElementById('selectScheduleSuite_' + m).indeterminate = true;
         else if (zeroExist ===false && oneExist === true) {
             document.getElementById('selectScheduleSuite_' + m).indeterminate = false;
