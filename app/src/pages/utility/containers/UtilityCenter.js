@@ -153,7 +153,8 @@ const UtilityCenter=(props)=>{
                     setGenerateClick={setGenerateClick}
                     updateInputFactorTable={updateInputFactorTable}
                     updateInputLevelTable={updateInputLevelTable}
-                    callPairwise={callPairwise}
+                    setPairwiseClicked={props.setPairwiseClicked}
+                    pairwiseClicked={props.pairwiseClicked}
                     factor={factor}
                     level={level}
                     gererateClick={gererateClick}

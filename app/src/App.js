@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
 import {Provider} from 'react-redux';
 import {store} from './reducer';
-import {ProgressBar} from './pages/global'
+import {ProgressBar, ErrorPage} from './pages/global'
 import Login, {Base} from './pages/login';
 import Admin from './pages/admin';
 import Plugin from './pages/plugin';
@@ -56,7 +56,7 @@ const RouteApp = () => {
       <Route path = "/reports" component={Report}/>
       <Route path ="/execute" component={Execute}/>
       <Route path ="/scheduling" component={Schedule}/>
-      <Route component={Base} />
+      <Route component={ErrorPage} />
     </Switch>
   </Router>
   )

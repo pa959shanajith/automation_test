@@ -648,7 +648,8 @@ function generateScrapeItemList(lastVal, lastIdx, viewString){
             scrapeObject.hiddentag = "No";
             newTag = `iris;${(scrapeObject.objectType || "").toLowerCase()}`;
             scrapeObject.url = "";
-            scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${(scrapeObject.objectType || "")};${(scrapeObject.objectStatus || "0")};${scrapeObject.tag}`;
+            if (scrapeObject.xpath.split(';').length<2)
+                scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${(scrapeObject.objectType || "")};${(scrapeObject.objectStatus || "0")};${scrapeObject.tag}`;
         }
 
         let scrapeItem = {  objId: scrapeObject._id,

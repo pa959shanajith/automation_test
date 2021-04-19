@@ -1,7 +1,7 @@
 export const mobileMacFilters = [
     { label: "Button", tag: "Button"},
     { label: "links", tag: "links"},
-    { label: "statictexts", tag: "statictexts"},
+    { label: "statictexts", tag: "statictext"},
     { label: "image", tag: "image"},
     { label: "RadioButton", tag: "RadioButton"},
     { label: "Slider", tag: "XCUIElementTypeSlider"},
@@ -11,8 +11,8 @@ export const mobileMacFilters = [
     { label: "OtherElements", tag: "otherElements"},
     { label: "SearchField", tag: "iOSXCUIElementTypeSearchField"},
     { label: "PickerWheelPickerWheel", tag: "XCUIElementTypePickerWheel"},
-    { label: "textView", tag: "textViews"},
-    { label: "cells", tag: "cellscells"},
+    { label: "textView", tag: "textView"},
+    { label: "cells", tag: "cell"},
     { label: "Duplicate Custnames", tag: "duplicateCustnames"}
 ]
 
@@ -74,7 +74,6 @@ export const irisObjectTypes = {
     "table": { name: "Table", states: [0]}, 
     "dropdown": { name: "Dropdown", states: [0]}, 
     "image": { name: "Image", states: [0]}, 
-    "vscroll": { name: "Vertical-scroll", states: [0]}, 
-    "hscroll": { name: "Horizontal-scroll", states: [0]}, 
+    "scroll": { name: "Scroll", states: [0]}, 
     "unrecognizableobject": { name: "Others", states: [0]}
 };

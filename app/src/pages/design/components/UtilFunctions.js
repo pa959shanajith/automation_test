@@ -202,9 +202,8 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                                 case 'checkbox': obType = 'irisradiocheck'; break;
                                 case 'button': obType = 'irisbutton'; break;
                                 case 'table': obType = 'iristable'; break;
+                                case 'scroll': obType = 'irisscroll'; break;
                                 case 'dropdown':    /* FALL THROUGH */
-                                case 'hscroll':     /* FALL THROUGH */
-                                case 'vscroll':     /* FALL THROUGH */
                                 case 'label':       /* FALL THROUGH */
                                 case 'listbox':     /* FALL THROUGH */
                                 case 'tree':        /* FALL THROUGH */
@@ -216,7 +215,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                         }
                     }
 
-                    if (!(['a', 'select', 'radiobutton', 'checkbox', 'input', 'list', 'tablecell', 'table', 'grid', 'img', 'button', 'iris', 'iristextbox', 'irisradiocheck', 'irisbutton', 'iristable', 'irisgeneric'].includes(obType)) && ['Web', 'MobileWeb'].includes(appType) && !ob.tag.startsWith('@PDF')) {
+                    if (!(['a', 'select', 'radiobutton', 'checkbox', 'input', 'list', 'tablecell', 'table', 'grid', 'img', 'button', 'iris', 'iristextbox', 'irisradiocheck', 'irisbutton', 'iristable', 'irisgeneric', 'irisscroll'].includes(obType)) && ['Web', 'MobileWeb'].includes(appType) && !ob.tag.startsWith('@PDF')) {
                         keywords = Object.keys(keywordList.element);
                         selectedKeywordList = "element";
                         break;
@@ -308,6 +307,10 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                             case 'irisgeneric':
                                 keywords = Object.keys(keywordList.irisgeneric);
                                 selectedKeywordList = "irisgeneric";
+                                break;
+                            case 'irisscroll':
+                                keywords = Object.keys(keywordList.irisscroll);
+                                selectedKeywordList = "irisscroll";
                                 break;
                             case 'table':
                                 keywords = Object.keys(keywordList.table);
@@ -443,6 +446,10 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                             case 'irisgeneric':
                                 keywords = Object.keys(keywordList.irisgeneric);
                                 selectedKeywordList = "irisgeneric";
+                                break;
+                            case 'irisscroll':
+                                keywords = Object.keys(keywordList.irisscroll);
+                                selectedKeywordList = "irisscroll";
                                 break;
                             default: 
                                 keywords = Object.keys(keywordList.element);
@@ -585,6 +592,10 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                             case 'irisgeneric':
                                 keywords = Object.keys(keywordList.irisgeneric);
                                 selectedKeywordList = "irisgeneric";
+                                break;
+                            case 'irisscroll':
+                                keywords = Object.keys(keywordList.irisscroll);
+                                selectedKeywordList = "irisscroll";
                                 break;
                             default:
                                 keywords = Object.keys(keywordList.element);
