@@ -340,10 +340,10 @@ export const importMindmap = async(data) => {
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
     }catch(err){
         console.error(err)
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
     }
 }
 
@@ -368,9 +368,86 @@ export const pdProcess = async(data) => {
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
     }catch(err){
         console.error(err)
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
+    }
+}
+
+/*Component importGitMindmap
+  api returns {"success":true,"data":[[{"label":"Login_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Order_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Logout_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"}]],"history":"W3siYWN0aW9uIjoiQ3JlYXRlZCIsInJldmlld2VyIjoiSm9obiBTbWl0aCIsImFzc2lnbmVlIjoiQW5keSBSb2dlciIsInRpbWUiOiJNb24gTWFyIDAyIDIwMjAgMTk6MjI6MDUgR01UIn0seyJhY3Rpb24iOiJQZW5kaW5nIEFwcHJvdmFsIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0NzowMyBHTVQifSx7ImFjdGlvbiI6IkFwcHJvdmVkIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0ODowMyBHTVQifSx7ImFjdGlvbiI6ImV4cG9ydCIsImFzc2lnbmVlIjoiVmlrcmFtIFByYWJodSIsInJldmlld2VyIjoiIiwidGltZSI6IjIwMjAtMDMtMzFUMTI6NDE6MTguMjA2WiJ9XQ=="}
+*/
+
+export const importGitMindmap = async(data) => {
+    try{
+        const res = await axios(url+'/importGitMindmap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.data === "empty"){
+            console.error(res.data)
+            return {error:'Module does not exist in git repo. Please verify your inputs!!'}
+        }
+        if (!('testscenarios' in res.data)){
+            console.error(res.data)
+            return {error:"Incorrect JSON imported. Please check the contents!!"}
+        }else if(res.data.testscenarios.length === 0){
+            console.error(res.data)
+            return {error:"The file has no node structure to import, please check!!"}
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Error in importing module from git'}
+    }catch(err){
+        console.error(err)
+        return {error:'Error in importing module from git'}
+    }
+}
+
+/*Component exportToGit
+  api returns {"success":true,"data":[[{"label":"Login_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Order_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Logout_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"}]],"history":"W3siYWN0aW9uIjoiQ3JlYXRlZCIsInJldmlld2VyIjoiSm9obiBTbWl0aCIsImFzc2lnbmVlIjoiQW5keSBSb2dlciIsInRpbWUiOiJNb24gTWFyIDAyIDIwMjAgMTk6MjI6MDUgR01UIn0seyJhY3Rpb24iOiJQZW5kaW5nIEFwcHJvdmFsIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0NzowMyBHTVQifSx7ImFjdGlvbiI6IkFwcHJvdmVkIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0ODowMyBHTVQifSx7ImFjdGlvbiI6ImV4cG9ydCIsImFzc2lnbmVlIjoiVmlrcmFtIFByYWJodSIsInJldmlld2VyIjoiIiwidGltZSI6IjIwMjAtMDMtMzFUMTI6NDE6MTguMjA2WiJ9XQ=="}
+*/
+
+export const exportToGit = async(data) => {
+    try{
+        const res = await axios(url+'/exportToGit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.data==='empty'){
+            console.error(res.data)
+            return {error:'Project is not git configured'}
+        }
+        if(res.data==='commit exists'){
+            console.error(res.data)
+            return {error:'Git commit already exists'}
+        }
+        if(res.status===200 && res.data !== "fail"){          
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Error while exporting to git'}
+    }catch(err){
+        console.error(err)
+        return {error:'Error while exporting to git'}
     }
 }

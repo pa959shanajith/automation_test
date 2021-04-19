@@ -700,19 +700,14 @@ exports.importFromGit_ICE = async (req, res) => {
 	logger.info("Inside API importFromGit_ICE");
 	try {
 		const data = req.body;
-		const gitAccessToken = data.gitAccessToken;
-		const gitRepoClonePath = data.gitRepoClonePath;
-		const commitId = data.commitId;
-		const gitVersionName = data.gitVersionName
+		const gitVersionName = data.gitVersionName;
+		const gitbranch = data.gitbranch;
 		const folderPath = 'AvoAssureTest_Artifacts'+'/'+data.folderPath;
 		const userInfo = await utils.tokenValidation(req.body.userInfo);
 		const inputs = {
-			"userid":userInfo.userid,
-			"gitRepoClonePath": gitRepoClonePath,
-			"gitAccessToken": gitAccessToken,
-			"commitId":commitId,
+			"gitbranch":gitbranch,
 			"gitVersionName":gitVersionName,
-			"folderPath":folderPath,
+			"folderPath":folderPath.toLowerCase(),
 			"createdBy":userInfo.userid,
 			"source":data.source,
 			"exectionMode":data.exectionMode,
@@ -720,9 +715,9 @@ exports.importFromGit_ICE = async (req, res) => {
 			"browserType":data.browserType,
 			"integration":data.integration
 		};
-		if(inputs['commitId']=='') delete inputs['commitId']
 		const module_data = await utils.fetchData(inputs, "git/importFromGit_ICE", actionName);
-		if(module_data=="fail") return res.send("fail")
+		if(module_data=="fail") return res.status(500).send("fail")
+		if(module_data=="empty") return res.status(500).send("Module does not exists in git. Please check your inputs!!")
 		userInfo['invokingusername'] = userInfo.username
 		userInfo['invokinguser'] = userInfo.userid;
 		userInfo['invokinguserrole'] = userInfo.role;

@@ -224,6 +224,8 @@ const MappedPage = props =>{
                                     list={testCaseNames} 
                                     type="testcase" 
                                     mapIdx={index} 
+                                    screenType = {props.screenType}
+                                    reqDetails = {props.mappedfilesRes[index].reqdetails}
                                     handleClick={props.screenType === "ALM" ? handleClick : null} 
                                     selected={selectedTc} 
                                     unSynced={unSynced}

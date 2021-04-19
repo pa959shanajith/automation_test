@@ -166,7 +166,7 @@ const ZephyrContent = props => {
                         {
                             avoProjects? 
                             avoProjects.map((e,i)=>(
-                                <option value={i} >{e.project_name}</option>))
+                                <option value={i} key={i+'_proj'} >{e.project_name}</option>))
                                 : null 
                         }
                     </select>

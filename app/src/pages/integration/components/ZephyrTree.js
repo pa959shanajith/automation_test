@@ -130,6 +130,7 @@ const TestCaseNode = props => {
                     treeid: String(props.testCase.cyclePhaseId),
                     testid: String(props.testCase.id),
                     testname: props.testCase.name,
+                    reqdetails: props.testCase.reqdetails, 
                     scenarioId: selectedScIds
                 }
             ]
