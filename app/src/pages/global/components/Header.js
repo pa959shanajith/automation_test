@@ -4,6 +4,7 @@ import { useHistory, Link, Redirect } from 'react-router-dom';
 import { loadUserInfo } from '../../login/api';
 import { getRoleNameByRoleId } from '../api';
 import * as actionTypes from '../../login/state/action';
+import { SWITCHED } from '../state/action';
 import ClickAwayListener from 'react-click-away-listener';
 import ChangePassword from './ChangePassword';
 import ChangeDefaultIce from './ChangeDefaultIce';
@@ -57,10 +58,10 @@ const Header = () => {
             if (userInfo.firstname === userInfo.lastname) setUsername(userInfo.firstname);
             else setUsername(userInfo.firstname + ' ' + userInfo.lastname);
             
-            if(window.localStorage['_SRS']==="success"){
-                delete window.localStorage['_SRS']; 
-                setShowSR_Pop({'title': 'Switch Role', 'content': `Your role is changed to ${selectedRole}`});
-            }
+            // if(window.localStorage['_SRS']==="success"){
+            //     delete window.localStorage['_SRS']; 
+            //     setShowSR_Pop({'title': 'Switch Role', 'content': `Your role is changed to ${selectedRole}`});
+            // }
         }
     }, [userInfo, selectedRole]);
 
@@ -151,8 +152,9 @@ const Header = () => {
             setShowOverlay("");
 			if (data !== "fail") {
                 dispatch({type: actionTypes.SET_SR, payload: clickedRole.data});
-				dispatch({type: actionTypes.SET_USERINFO, payload: data});
-				window.localStorage['_SRS'] = "success";
+                dispatch({type: actionTypes.SET_USERINFO, payload: data});
+                // window.localStorage['_SRS'] = "success";
+                dispatch({type: SWITCHED, payload: true});
 				if (clickedRole.data === "Admin") {
 					window.localStorage['navigateScreen'] = "admin";
                     setRedirectTo('/admin');
