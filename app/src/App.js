@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
 import {Provider} from 'react-redux';
 import {store} from './reducer';
-import {ProgressBar} from './pages/global'
+import {ProgressBar, ErrorPage} from './pages/global'
 import Login, {Base} from './pages/login';
 import Admin from './pages/admin';
 import Plugin from './pages/plugin';
@@ -14,7 +14,6 @@ import Scrape from './pages/scrape';
 import Design from './pages/design';
 import Utility from './pages/utility';
 import Report from './pages/report';
-import ErrorPage from './pages/error';
 import Integration from './pages/integration';
 import {ScreenOverlay} from './pages/global';
 import SocketFactory from './SocketFactory';
