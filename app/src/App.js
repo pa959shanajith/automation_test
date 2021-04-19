@@ -14,6 +14,7 @@ import Scrape from './pages/scrape';
 import Design from './pages/design';
 import Utility from './pages/utility';
 import Report from './pages/report';
+import ErrorPage from './pages/error';
 import Integration from './pages/integration';
 import {ScreenOverlay} from './pages/global';
 import SocketFactory from './SocketFactory';
@@ -56,7 +57,7 @@ const RouteApp = () => {
       <Route path = "/reports" component={Report}/>
       <Route path ="/execute" component={Execute}/>
       <Route path ="/scheduling" component={Schedule}/>
-      <Route component={Base} />
+      <Route component={ErrorPage} />
     </Switch>
   </Router>
   )
