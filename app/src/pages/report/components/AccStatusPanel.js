@@ -11,13 +11,12 @@ const AccStatusPanel = ({arr,selectedScDetails,scDetails}) =>{
     const [data,setData] = useState({P:0,F:0,T:0,I:0})
     useEffect(()=>{
         if(Object.keys(arr).length>0 && arr.total !== 0){
-            var P = parseFloat((arr.pass / arr.total) * 100).toFixed();
-            var F = parseFloat((arr.fail / arr.total) * 100).toFixed();
-            var T = parseFloat((arr.terminate / arr.total) * 100).toFixed();
-            var I = parseFloat((arr.incomplete / arr.total) * 100).toFixed();
-            setData({P,F,T,I})
+            var inapplicable = parseFloat((arr.inapplicable / arr.total) * 100).toFixed();
+            var passes = parseFloat((arr.passes / arr.total) * 100).toFixed();
+            var violations = parseFloat((arr.violations / arr.total) * 100).toFixed();
+            setData({inapplicable,passes,violations})
         }else{
-            setData({P:0,F:0,T:0,I:0})
+            setData({inapplicable:0,passes:0,violations:0})
         }
     },[arr])
     if(Object.keys(arr).length<1 || scDetails.length < 1){
@@ -43,24 +42,24 @@ const AccStatusPanel = ({arr,selectedScDetails,scDetails}) =>{
                     <div className='ac__panel-head'>Executions</div>
                     <div className='status-panel'>
                         <div className='status-row' style={{color:'#28a745'}}>
-                            <span className='label'>Pass</span>
-                            <span className='perc'>{data.P+'%'}</span>
+                            <span className='label'>Passes</span>
+                            <span className='perc'>{data.passes+'%'}</span>
                             <div className='progress'>
-                                <div className='progress-bar' style={{width:data.P+'%',background:'#28a745'}}></div>
+                                <div className='progress-bar' style={{width:data.passes+'%',background:'#28a745'}}></div>
                             </div>
                         </div>
-                        <div className='status-row' style={{color:'#28a745'}}>
-                            <span className='label'>Pass</span>
-                            <span className='perc'>{data.P+'%'}</span>
+                        <div className='status-row' style={{color:'#dc3545'}}>
+                            <span className='label'>Violations</span>
+                            <span className='perc'>{data.violations+'%'}</span>
                             <div className='progress'>
-                                <div className='progress-bar' style={{width:data.P+'%',background:'#dc3545'}}></div>
+                                <div className='progress-bar' style={{width:data.violations+'%',background:'#dc3545'}}></div>
                             </div>
                         </div>
-                        <div className='status-row' style={{color:'#28a745'}}>
-                            <span className='label'>Pass</span>
-                            <span className='perc'>{data.P+'%'}</span>
+                        <div className='status-row' style={{color:'#ffc107'}}>
+                            <span className='label'>Inapplicable</span>
+                            <span className='perc'>{data.inapplicable+'%'}</span>
                             <div className='progress'>
-                                <div className='progress-bar' style={{width:data.P+'%',background:'#ffc107'}}></div>
+                                <div className='progress-bar' style={{width:data.inapplicable+'%',background:'#ffc107'}}></div>
                             </div>
                         </div>
                     </div>
