@@ -3,12 +3,12 @@ import { ModalContainer } from '../../global';
 import {gitSaveConfig} from '../api';
 import '../styles/GitConfig.scss'
 
-/*Component GitConfig
-  use: defines Admin middle Section for Git Configuration
+/*Component GitButtonActions
+  use: defines Admin middle Section for Git Configuration buttons
   ToDo:
 */
 
-const GitConfig = (props) => {
+const GitButtonActions = (props) => {
     const updateBtnRef = useRef()
     const onClickEdit = props.onClickEdit;
     const user = props.user 
@@ -103,4 +103,4 @@ const gitValidate = (action, user, domain, Project, gitAccToken, gitUrl) => {
     return flag;
 }
 
-export default GitConfig;
+export default GitButtonActions;    
