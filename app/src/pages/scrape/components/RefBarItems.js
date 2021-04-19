@@ -233,12 +233,12 @@ const RefBarItems = props => {
 				}
 				else {
 					scrapedItems.forEach(item => {
-						if (tag === item.tag || (item.tag.toLowerCase().indexOf(tag.toLowerCase()) >= 0 && tag !== "a" && item.tag.toLowerCase() !== "radio button" && item.tag.toLowerCase() !== "radiobutton" && item.tag.toLowerCase().indexOf("listview") < 0 && item.tag.toLowerCase().indexOf("tablecell") < 0) ||
-							(tag === "input" && (item.tag.indexOf("edit") >= 0 || item.tag.indexOf("Edit Box") >= 0 || item.tag.indexOf("text") >= 0 || item.tag.indexOf("EditText") >= 0 || item.tag.indexOf("TextField") >= 0)) ||
-							(tag === "select" && item.tag.indexOf("combo box") >= 0) ||
-							(tag === "a" && (item.tag.indexOf("hyperlink") >= 0)) ||
-							(tag === "checkbox" && item.tag.indexOf("check box") >= 0) ||
-							(tag === "radiobutton" && item.tag.indexOf("radio button") >= 0)
+						if (tag.toLowerCase() === item.tag.toLowerCase() || (item.tag.toLowerCase().indexOf(tag.toLowerCase()) >= 0 && tag !== "a" && item.tag.toLowerCase() !== "radio button" && item.tag.toLowerCase() !== "radiobutton" && item.tag.toLowerCase().indexOf("listview") < 0 && item.tag.toLowerCase().indexOf("tablecell") < 0) ||
+							(tag.toLowerCase() === "input" && (item.tag.indexOf("edit") >= 0 || item.tag.indexOf("Edit Box") >= 0 || item.tag.indexOf("text") >= 0 || item.tag.indexOf("EditText") >= 0 || item.tag.indexOf("TextField") >= 0)) ||
+							(tag.toLowerCase() === "select" && item.tag.indexOf("combo box") >= 0) ||
+							(tag.toLowerCase() === "a" && (item.tag.indexOf("hyperlink") >= 0)) ||
+							(tag.toLowerCase() === "checkbox" && item.tag.indexOf("check box") >= 0) ||
+							(tag.toLowerCase() === "radiobutton" && item.tag.indexOf("radio button") >= 0)
 						) {
 							item.hide = false;
 						}
