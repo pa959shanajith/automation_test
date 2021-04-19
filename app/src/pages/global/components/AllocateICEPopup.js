@@ -212,7 +212,7 @@ const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeI
 
 const submitModalButton = (setInputErrorBorder, iceNameIdMap, SubmitButton,  selectedPool, smartMode, selectedICE, modalButton, scheSmartMode, ExeScreen) => {
     const executionData = {};
-    executionData.type = (ExeScreen===true?smartMode:scheSmartMode)
+    executionData.type = (ExeScreen===true?((smartMode==="normal")?"":smartMode):scheSmartMode)
     executionData.poolid =  selectedPool
     if((ExeScreen===true?smartMode:scheSmartMode) !== "normal") executionData.targetUser = Object.keys(selectedICE);
     else executionData.targetUser = selectedICE
