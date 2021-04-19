@@ -32,16 +32,20 @@ const Container = ({reqDetails}) =>{
                     {reqDetails.map((e,i)=>
                         <div key={'info__'+i}>
                             <div>
+                                <label className='title'>ID : </label>
+                                <label>{e.reqid}</label>
+                            </div>
+                            <div>
                                 <label className='title'>name : </label>
-                                <label>{e.reqName}</label>
+                                <label>{e.reqname}</label>
                             </div>
                             <div>
                                 <label className='title'>Create Date : </label>
-                                <label>{e.reqCreationDate}</label>
+                                <label>{e.reqcreationdate}</label>
                             </div>
                             <div>
                                 <label className='title'>Description : </label>
-                                <label>{e.reqDescription}</label>
+                                <label>{e.reqdescription}</label>
                             </div>
                         </div>
                     )}

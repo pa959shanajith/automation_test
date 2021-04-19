@@ -131,7 +131,7 @@ const TestCaseNode = props => {
                     treeid: props.phaseId,
                     testid: props.testCase.id,
                     testname: props.testCase.name,
-                    reqdetails: props.testCase.reqDetails, 
+                    reqdetails: props.testCase.reqdetails, 
                     scenarioId: selectedScIds
                 }
             ]
