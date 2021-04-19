@@ -1,7 +1,7 @@
 import React, { Fragment, useRef, useState } from 'react';
 import {ModalContainer} from '../../global';
 import {useSelector} from 'react-redux'
-import {readTestSuite_ICE,exportMindmap,exportToExcel} from '../api';
+import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit} from '../api';
 import '../styles/ExportMapButton.scss'
 import PropTypes from 'prop-types'
 
@@ -35,7 +35,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
         if(ftype === 'json') toJSON(selectedModule,fnameRef.current.value,displayError,setPopup,setBlockui);
         if(ftype === 'excel') toExcel(selectedProj,selectedModule,fnameRef.current.value,displayError,setPopup,setBlockui);
         if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setPopup,setBlockui);
-        if(ftype === 'git') toGit(selectedProj,selectedModule,projectList,releaseRef,cycleRef,displayError,setPopup,setBlockui);
+        if(ftype === 'git') toGit({displayError,setBlockui,gitVerRef,gitPathRef,gitBranchRef,selectedModule,setPopup});
     }
     return(
         <Fragment>
@@ -90,15 +90,15 @@ const Container = ({fnameRef,ftypeRef,modName,isAssign,gitBranchRef,gitVerRef,gi
                 <Fragment>
                     <div className='export-row'>
                         <label>Branch Name: </label>
-                        <input placeholder={'Ex: branch name'} ref={gitBranchRef}/>
+                        <input placeholder={'branch name'} ref={gitBranchRef}/>
                     </div>
                     <div className='export-row'>
                         <label>version: </label>
-                        <input placeholder={'Ex: version name'} ref={gitVerRef}/>
+                        <input placeholder={'version name'} ref={gitVerRef}/>
                     </div>
                     <div className='export-row'>
                         <label>Folder Path: </label>
-                        <input placeholder={'Ex: Projectname/modulename'} ref={gitPathRef}/>
+                        <input placeholder={'Ex: Projectname/Modulename(optional)'} ref={gitPathRef}/>
                     </div>
                 </Fragment>:null
             }
@@ -172,13 +172,26 @@ const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
 }
 
 /*
-    function : toCustom()
+    function : toGit()
     Purpose : Exporting testsuite and executiondata in json file
     param :
 */
 
-const toGit = async () => {
-    
+const toGit = async ({displayError,setBlockui,setPopup,gitVerRef,gitPathRef,gitBranchRef,selectedModule}) => {
+    var res = await exportToGit({
+        gitVersion: gitVerRef.current.value,
+		gitFolderPath: gitPathRef.current.value,
+		gitBranch: gitBranchRef.current.value,
+		mindmapId: selectedModule._id
+    })
+    if(res.error){displayError(res.error);return;}
+    setBlockui({show:false})
+    setPopup({
+        title:'Mindmap',
+        content:'Data Exported Successfully.',
+        submitText:'Ok',
+        show:true
+    })
 }
 
 /*
