@@ -340,10 +340,10 @@ export const importMindmap = async(data) => {
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
     }catch(err){
         console.error(err)
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
     }
 }
 
@@ -368,10 +368,10 @@ export const pdProcess = async(data) => {
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
     }catch(err){
         console.error(err)
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
     }
 }
 

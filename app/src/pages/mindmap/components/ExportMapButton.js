@@ -272,12 +272,12 @@ function jsonDownload(filename, responseData) {
     a.dispatchEvent(e);
 }
 ExportMapButton.propTypes={
-    isAssign:PropTypes.bool.isRequired,
-    setBlockui:PropTypes.func.isRequired,
-    setPopup:PropTypes.func.isRequired,
-    displayError:PropTypes.func.isRequired,
-    releaseRef:PropTypes.object.isRequired,
-    cycleRef:PropTypes.object.isRequired
+    isAssign:PropTypes.bool,
+    setBlockui:PropTypes.func,
+    setPopup:PropTypes.func,
+    displayError:PropTypes.func,
+    releaseRef:PropTypes.object,
+    cycleRef:PropTypes.object
 }
 
 export default ExportMapButton;
