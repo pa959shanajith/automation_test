@@ -375,7 +375,7 @@ const ScrapeScreen = ()=>{
                     err = { 'title': 'Scrape Screen', 'content': 'Scrape Terminated' };
                 }
                 else if (data === "wrongWindowName")
-                    err = { 'title': 'Scrape', 'content': 'Wrong window name.' };
+                    err = { 'title': 'Scrape', 'content': 'Window not found - Please provide valid window name.' };
                 else if (data === "ExecutionOnlyAllowed")
                     err = { 'title': 'Scrape Screen', 'content': 'Execution Only Allowed' };
 
