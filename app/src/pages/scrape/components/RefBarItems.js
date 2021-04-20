@@ -95,6 +95,10 @@ const RefBarItems = props => {
 					top = top + 2;
 					left = left + 3;
 				}
+				else if (appType === "OEBS" && createdthrough === 'PD'){
+					top = top + 35;
+					left = left-36;
+				}
 				
 				setHighlight({
 					top: `${Math.round(top)}px`, 
