@@ -565,6 +565,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                                 keywords = Object.keys(keywordList.scrollbar);
                                 selectedKeywordList = "scrollbar";
                                 break;
+                            case 'frame':
                             case 'internal frame':
                                 keywords = Object.keys(keywordList.internalframe);
                                 selectedKeywordList = "internalframe";
