@@ -59,12 +59,12 @@ const GitConfig = (props) => {
 
                 <div id="page-taskName"><span>{(showEdit===false)?"Git Configuration":"Edit Git Configuration"}</span></div>
                 <GitButtonActions resetFields={resetFields} showEdit={showEdit} onClickEdit={onClickEdit} domain={domainRef} user={userRef} Project={ProjectRef} token={tokenRef} url={urlRef} userData={userData} projectData={projectData} setLoading={setLoading} displayError={displayError} refreshFields={refreshFields} setPopupState={setPopupState} />        
-                <FormSelect inpId={'userGit'} inpRef={userRef} onChangeFn={()=>fetchDomainList(setDomainList, displayError, setLoading)} defValue={"Select User"} label={"User"} option={userList}/>
-                <FormSelect inpId={'domainGit'} inpRef={domainRef} onChangeFn={()=>fetchProjectList(domainRef.current.value, setProjectList, setProjectData, displayError, setLoading)} defValue={"Select Domain"} label={"Domain"} option={domainList}/>
-                <FormSelect inpId={'projectGit'} inpRef={ProjectRef} onChangeFn={()=>{onChangeProject(resetFields,displayError, showEdit, urlRef, tokenRef ,userData, userRef, projectData, ProjectRef, setLoading, setPopupState)}} defValue={"Select Project"} label={"Project"} option={projectList}/>
+                <FormSelect data-test="user_git" inpId={'userGit'} inpRef={userRef} onChangeFn={()=>fetchDomainList(setDomainList, displayError, setLoading)} defValue={"Select User"} label={"User"} option={userList}/>
+                <FormSelect data-test="domain_git" inpId={'domainGit'} inpRef={domainRef} onChangeFn={()=>fetchProjectList(domainRef.current.value, setProjectList, setProjectData, displayError, setLoading)} defValue={"Select Domain"} label={"Domain"} option={domainList}/>
+                <FormSelect data-test="project_git" inpId={'projectGit'} inpRef={ProjectRef} onChangeFn={()=>{onChangeProject(resetFields,displayError, showEdit, urlRef, tokenRef ,userData, userRef, projectData, ProjectRef, setLoading, setPopupState)}} defValue={"Select Project"} label={"Project"} option={projectList}/>
                 <div className="git_token" >
-                    <FormInput inpRef={tokenRef} label={'Git Access Token'} placeholder={'Enter Git Access Token'} validExp={"GitToken"}/>
-                    <FormInput inpRef={urlRef} label={'Git URL'} placeholder={'Enter Git URL'}/>
+                    <FormInput data-test="token_git" inpRef={tokenRef} label={'Git Access Token'} placeholder={'Enter Git Access Token'} validExp={"GitToken"}/>
+                    <FormInput data-test="url_git" inpRef={urlRef} label={'Git URL'} placeholder={'Enter Git URL'}/>
                 </div>
             </div>
         </ScrollBar>
