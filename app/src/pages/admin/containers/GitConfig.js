@@ -63,7 +63,7 @@ const GitConfig = (props) => {
                 <FormSelect inpId={'domainGit'} inpRef={domainRef} onChangeFn={()=>fetchProjectList(domainRef.current.value, setProjectList, setProjectData, displayError, setLoading)} defValue={"Select Domain"} label={"Domain"} option={domainList}/>
                 <FormSelect inpId={'projectGit'} inpRef={ProjectRef} onChangeFn={()=>{onChangeProject(resetFields,displayError, showEdit, urlRef, tokenRef ,userData, userRef, projectData, ProjectRef, setLoading, setPopupState)}} defValue={"Select Project"} label={"Project"} option={projectList}/>
                 <div className="git_token" >
-                    <FormInput inpRef={tokenRef} label={'Git Access Token'} placeholder={'Enter Git Access Token'} validExp={"GitToken"}/>
+                    <FormInput inpRef={tokenRef} label={'Git Access Token'} placeholder={'Enter Git Access Token'} />
                     <FormInput inpRef={urlRef} label={'Git URL'} placeholder={'Enter Git URL'}/>
                 </div>
             </div>
