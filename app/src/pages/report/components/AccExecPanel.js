@@ -37,8 +37,7 @@ const AccExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails})
     }
     useEffect(()=>{
         if(suDetails!==undefined && suDetails.length>0){
-            // var arr = dateASC([...suDetails]).reverse()
-            var arr=[...suDetails]
+            var arr=[...suDetails].reverse()
             setSuiteDetails(arr)           
         }else{
             setSuiteDetails([])
