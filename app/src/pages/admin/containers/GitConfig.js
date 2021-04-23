@@ -47,6 +47,15 @@ const GitConfig = (props) => {
         })
     }
 
+    const resetSelectList = (changeDropDown) => {
+        if(changeDropDown === "userChange") {
+            if(document.getElementById("domainGit") !== null) document.getElementById("domainGit").selectedIndex = "0"; 
+            if(document.getElementById("projectGit") !== null) document.getElementById("projectGit").selectedIndex = "0";
+            setProjectList([])
+            setProjectData({})
+        } else if(changeDropDown === "domainChange")  if(document.getElementById("projectGit") !== null) document.getElementById("projectGit").selectedIndex = "0";
+    } 
+
     const resetFields = () => {
         refreshFields(domainRef, ProjectRef, userRef, tokenRef, urlRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading); 
     }
@@ -59,10 +68,10 @@ const GitConfig = (props) => {
 
                 <div id="page-taskName"><span>{(showEdit===false)?"Git Configuration":"Edit Git Configuration"}</span></div>
                 <GitButtonActions resetFields={resetFields} showEdit={showEdit} onClickEdit={onClickEdit} domain={domainRef} user={userRef} Project={ProjectRef} token={tokenRef} url={urlRef} userData={userData} projectData={projectData} setLoading={setLoading} displayError={displayError} refreshFields={refreshFields} setPopupState={setPopupState} />        
-                <FormSelect data-test="user_git" inpId={'userGit'} inpRef={userRef} onChangeFn={()=>fetchDomainList(setDomainList, displayError, setLoading)} defValue={"Select User"} label={"User"} option={userList}/>
-                <FormSelect data-test="domain_git" inpId={'domainGit'} inpRef={domainRef} onChangeFn={()=>fetchProjectList(domainRef.current.value, setProjectList, setProjectData, displayError, setLoading)} defValue={"Select Domain"} label={"Domain"} option={domainList}/>
-                <FormSelect data-test="project_git" inpId={'projectGit'} inpRef={ProjectRef} onChangeFn={()=>{onChangeProject(resetFields,displayError, showEdit, urlRef, tokenRef ,userData, userRef, projectData, ProjectRef, setLoading, setPopupState)}} defValue={"Select Project"} label={"Project"} option={projectList}/>
                 <div className="git_token" >
+                <FormSelect data-test="user_git" inpId={'userGit'} inpRef={userRef} onChangeFn={()=>fetchDomainList(resetSelectList, setDomainList, displayError, setLoading)} defValue={"Select User"} label={"User"} option={userList}/>
+                <FormSelect data-test="domain_git" inpId={'domainGit'} inpRef={domainRef} onChangeFn={()=>fetchProjectList(resetSelectList, domainRef.current.value, setProjectList, setProjectData, displayError, setLoading)} defValue={"Select Domain"} label={"Domain"} option={domainList}/>
+                <FormSelect data-test="project_git" inpId={'projectGit'} inpRef={ProjectRef} onChangeFn={()=>{onChangeProject(resetFields,displayError, showEdit, urlRef, tokenRef ,userData, userRef, projectData, ProjectRef, setLoading, setPopupState)}} defValue={"Select Project"} label={"Project"} option={projectList}/>
                     <FormInput data-test="token_git" inpRef={tokenRef} label={'Git Access Token'} placeholder={'Enter Git Access Token'} />
                     <FormInput data-test="url_git" inpRef={urlRef} label={'Git URL'} placeholder={'Enter Git URL'}/>
                 </div>
@@ -104,11 +113,12 @@ const refreshFields = ( domainRef, ProjectRef, userRef, tokenRef, urlRef, setDom
     userRef.current.style.outline = "";
 }
 
-const fetchDomainList = async (setDomainList, displayError, setLoading) => {
+const fetchDomainList = async (resetSelectList, setDomainList, displayError, setLoading) => {
     setLoading("Loading...");
     let data = await getDomains_ICE() 
     if(data.error){displayError(data.error);return;}
     setDomainList(data);
+    resetSelectList("userChange");
     setLoading(false);
 }
 
@@ -129,7 +139,7 @@ const fetchUsers = async (setUserList, setUserData, displayError, setLoading)=>{
     setLoading(false); 
 }
 
-const fetchProjectList = async (domain, setProjectList, setProjectData, displayError, setLoading) => {
+const fetchProjectList = async (resetSelectList, domain, setProjectList, setProjectData, displayError, setLoading) => {
     setLoading("Loading Projects...")
     var idtype = ["domaindetails"];
     var requestedname = [];
@@ -145,6 +155,7 @@ const fetchProjectList = async (domain, setProjectList, setProjectData, displayE
     projectOptions.sort();
     setProjectData(projectData);
     setProjectList(projectOptions);
+    resetSelectList("domainChange");
     setLoading(false);
 }
 
