@@ -54,7 +54,7 @@ const ReferenceBar = (props) => {
             let identify = current_task.taskName.slice(0, 3).toLowerCase();
             let info = identify === "exe" ?
             {
-                'Project Name' : dataDict.projectDict[current_task.projectId],
+                'Project Name' : dataDict.projectDict[current_task.projectId] || dataDict.projectDict[current_task.testSuiteDetails[0].projectidts],
                 'Release' : current_task.releaseid,
                 'Cycle' : dataDict.cycleDict[current_task.cycleid]
             }
