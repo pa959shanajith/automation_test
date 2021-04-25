@@ -83,7 +83,7 @@ const CreateUser = (props) => {
         const createdbyrole = userConf.allRoles.filter((e)=> (e[0].toLowerCase() === "admin"));;
         var userObj = {
             userid: userConf.userId,
-            username: userConf.userName.toLowerCase(),
+            username: userConf.userName,
             password: userConf.passWord,
             firstname: userConf.firstname,
             lastname: userConf.lastname,
