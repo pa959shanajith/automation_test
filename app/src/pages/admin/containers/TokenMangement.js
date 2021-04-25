@@ -54,6 +54,7 @@ const TokenManagement = (props) => {
 		const icetype = op;
 		const userId = targetid.trim();
 		const tokenname = name.trim();
+		const activeTokens = allTokens.filter((e)=>e.deactivated === 'active');
 		if (userId === "") {
 			setSelAssignUser2ErrBorder(true);
 			return false;
@@ -109,7 +110,7 @@ const TokenManagement = (props) => {
 		if (now < today || (now >= today && now < td)) {
             setPopupState({show:true,title:"Token Management",content:"Expiry time should be 8 hours more than current time"});
 			return false;
-		} else if(allTokens.length>=10){
+		} else if(activeTokens.length>=10){
             setPopupState({show:true,title:"Token Management",content:"User can have max 10 active tokens. Please Deactivate old tokens"});
             return false;
 		}
