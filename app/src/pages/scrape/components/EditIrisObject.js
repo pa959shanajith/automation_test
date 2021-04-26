@@ -130,7 +130,14 @@ const EditIrisObject = props => {
                         <div className="ss__ei_img_panel">
                             <span>Object Image</span>
                             <div className="ss__ei_img_box">
-                                <img data-test="irirsImage" className="ss__ei_img" alt="iris" src={`data:image/PNG;base64,${props.utils.cord.substring(2, props.utils.cord.length - 1)}`}/>
+                                <img    
+                                    data-test="irirsImage" 
+                                    className="ss__ei_img" 
+                                    alt="iris" 
+                                    src={`data:image/PNG;base64,
+                                        ${getImage(props.utils.cord)}
+                                    `}
+                                />
                             </div>
                         </div>
                     </div>
@@ -149,4 +156,14 @@ EditIrisObject.propTypes={
     setShow:PropTypes.func,
     setShowPop:PropTypes.func
 }
+
+const getImage = base64 => {
+    let newBase64;
+    if (base64.substring(base64.length-2) === "''")
+        newBase64 = base64.substring(3, base64.length - 2);
+    else 
+        newBase64 = base64.substring(2, base64.length - 1)
+    return newBase64;
+}
+
 export default EditIrisObject;
