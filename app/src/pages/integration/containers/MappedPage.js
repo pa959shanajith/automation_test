@@ -75,6 +75,10 @@ const MappedPage = props =>{
                 })
             }
             setRows(tempRow);
+            setUnSyncMaps({
+                type: '',
+                maps: {}
+            });
         } 
         else {
             setSelectedSc([]);
@@ -168,17 +172,8 @@ const MappedPage = props =>{
                     dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
 				else if(data === "fail")
                     dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Failed to Save."}});
-				else if(data == "success"){
-                    (async()=>{
-                        setSelectedSc([]);
-                        setSelectedTc([]);
-                        setUnSynced(false);
-                        setUnSyncMaps({ type: '', maps: {} });
-                        const res = await props.fetchMappedFiles();
-                        if (res.length===0) dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
-                        dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Saved successfully"}});
-                    })()
-				}
+				else if(data == "success")
+                    props.fetchMappedFiles(true);        
 			})
 			.catch (error => dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Failed to Save."}}))
 		}
@@ -226,7 +221,7 @@ const MappedPage = props =>{
                                     type="testcase" 
                                     mapIdx={index} 
                                     screenType = {props.screenType}
-                                    reqDetails = {props.mappedfilesRes[index].reqdetails}
+                                    reqDetails = {props.mappedfilesRes[index] && props.mappedfilesRes[index].reqdetails}
                                     handleClick={props.screenType === "ALM" ? handleClick : null} 
                                     selected={selectedTc} 
                                     unSynced={unSynced}
