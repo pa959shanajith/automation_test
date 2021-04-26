@@ -26,6 +26,12 @@ const CompareObjectList = () => {
         newViewString = Object.keys(newScrapedData).length ? {...newScrapedData, view: [...mainScrapedData.view, ...newScrapedData.view]} : { ...mainScrapedData };
         newViewString = {...newViewString, view: newViewString.view.filter(object => object.xpath.substring(0, 4)!=="iris")}
         setViewString(newViewString);
+
+        return ()=>{
+            dispatch({type: actions.SET_COMPAREOBJ, payload: {changedObj: [], notChangedObj: [], notFoundObj: []}})
+            dispatch({type: actions.SET_COMPAREFLAG, payload: false});
+            dispatch({type: actions.SET_COMPAREDATA, payload: {}});
+        }
         //eslint-disable-next-line
     }, [])
 

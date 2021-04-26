@@ -195,37 +195,30 @@ const ScrapeObjectList = () => {
     }
 
     const onDelete = () => {
-        // setShowConfirmPop({
-            // title: "Delete Scraped Data",
-            // content: current_task.reuse === 'True' ? "Screen is been reused. Are you sure you want to delete objects?" : "Are you sure you want to delete objects?",
-            // onClick: ()=>{
-                let deletedArr = [];
-                let scrapeItemsL = [...scrapeItems];
-                let modifiedDict = {...modified}
-                let newScrapeList = [];
-                newScrapeList = scrapeItemsL.filter( item => {
-                    if (item.checked){
-                        if (item.objId) {
-                            deletedArr.push(item.objId);
-                            if (item.objId in modifiedDict)
-                                delete modifiedDict[item.objId]
-                        }
-                        return false;
-                    } else return true;
-                });
-                setScrapeItems(newScrapeList)
-                setDeleted(deletedArr);
-                setModified(modifiedDict);
-                setDisableBtns({...disableBtns, delete: true, save: false})
-        //         onSave(null, {deletedArr: deletedArr, newScrapeList: newScrapeList, modifiedDict: modifiedDict});
-        //     }
-        // });
+        let deletedArr = [];
+        let scrapeItemsL = [...scrapeItems];
+        let modifiedDict = {...modified}
+        let newScrapeList = [];
+        newScrapeList = scrapeItemsL.filter( item => {
+            if (item.checked){
+                if (item.objId) {
+                    deletedArr.push(item.objId);
+                    if (item.objId in modifiedDict)
+                        delete modifiedDict[item.objId]
+                }
+                return false;
+            } else return true;
+        });
+        setScrapeItems(newScrapeList)
+        setDeleted(deletedArr);
+        setModified(modifiedDict);
+        setDisableBtns({...disableBtns, delete: true, save: false})
     }
 
     const onSave = () => {
         let continueSave = true;
         
-        if (current_task.reuse === 'True') {
+        if (mainScrapedData.reuse === 'True') {
             setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen is been reused. Are you sure you want to save objects?', 'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();}})
             continueSave = false;
         }

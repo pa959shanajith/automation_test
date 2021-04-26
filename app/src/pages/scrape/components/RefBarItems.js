@@ -15,7 +15,7 @@ const RefBarItems = props => {
 	const dispatch = useDispatch();
 	const highlightRef = useRef();
 	const history = useHistory();
-	const { appType, subTaskId, createdthrough } = useSelector(state=>state.plugin.CT);
+	const { appType, uid } = useSelector(state=>state.plugin.CT);
 	const compareFlag = useSelector(state=>state.scrape.compareFlag);
 	const objValue = useSelector(state=>state.scrape.objValue);
     const [toFilter, setToFilter] = useState([]);
@@ -40,7 +40,7 @@ const RefBarItems = props => {
 		setHighlight(false);
 		setToFilter([]);
 		//eslint-disable-next-line
-	}, [subTaskId, newScrapedData])
+	}, [uid, newScrapedData])
 
 	useEffect(()=>{
 		if (appType === "MobileApp") navigator.appVersion.indexOf("Mac") !== -1 ? setTagList(list.mobileMacFilters) : setTagList(list.mobileFilters);
@@ -92,11 +92,11 @@ const RefBarItems = props => {
 					top = top + 112;
 					left = left + 15;	
 				} 
-				else if (appType === "SAP" && createdthrough !== 'PD'){
+				else if (appType === "SAP" && mainScrapedData.createdthrough !== 'PD'){
 					top = top + 2;
 					left = left + 3;
 				}
-				else if (appType === "OEBS" && createdthrough === 'PD'){
+				else if (appType === "OEBS" && mainScrapedData.createdthrough === 'PD'){
 					top = top + 35;
 					left = left-36;
 				}
