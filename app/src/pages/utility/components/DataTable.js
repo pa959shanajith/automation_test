@@ -14,6 +14,7 @@ const DataTable = props => {
     const [headers, setHeaders] = useState([{id: uuid(), name: 'Header 1'}, {id: uuid(), name: 'Header 2'}]);
     const [checkList, setCheckList] = useState({type: 'row', list: []});
     const [dnd, setDnd] = useState(false);
+    const [headerCounter, setHeaderCounter] = useState(3);
     const [showPop, setShowPop] = useState(false);
 
     useEffect(()=>{
@@ -44,14 +45,14 @@ const DataTable = props => {
     const onAdd = type => {
         if (type==="col") {
             let newHeaders = [...headers];
-            let headerLength = newHeaders.length;
             
             newHeaders.push({
                 id: uuid(),
-                name: `Header ${headerLength+1}`
+                name: `Header ${headerCounter}`
             })
 
             setHeaders(newHeaders);
+            setHeaderCounter(count => count + 1);
         }
         else if (checkList.list.length===1){
             if (checkList.type==="row"){
@@ -69,14 +70,13 @@ const DataTable = props => {
                     if (header.id === headerId) locToAdd = headerIndex;
                 })
                 
-                let headerLength = newHeaders.length;
-                
                 newHeaders.splice(locToAdd+1, 0, {
                     id: uuid(),
-                    name: `Header ${headerLength+1}`
+                    name: `Header ${headerCounter}`
                 })
 
                 setHeaders(newHeaders);
+                setHeaderCounter(count => count + 1);
             }
         }
     }
