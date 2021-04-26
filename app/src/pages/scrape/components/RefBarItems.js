@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
 import { ReferenceBar, ScrollBar, RedirectPage } from '../../global';
+import  * as ScrapeFilter  from './FilterScrapeObjects';
 import * as list from './ListVariables';
 import { ScrapeContext } from './ScrapeContext';
 import * as actions from '../state/action';
@@ -165,64 +166,21 @@ const RefBarItems = props => {
 			for (let tag of toFilter) {
 				if (tag === "others") {
 					scrapedItems.forEach(item => {
-                        if (!["button", "checkbox", "select", "img", "a", "radiobutton", "input", "list",
-                             "link", "scroll bar", "internal frame", "table", "grid"].includes(item.tag) &&
-							item.tag.toLowerCase().indexOf("button") === -1 &&
-							item.tag.toLowerCase().indexOf("edit") === -1 &&
-							item.tag.toLowerCase().indexOf("edit box") === -1 &&
-							item.tag.toLowerCase().indexOf("text") === -1 &&
-							item.tag.toLowerCase().indexOf("edittext") === -1 &&
-							item.tag.toLowerCase().indexOf("combo box") === -1 &&
-							item.tag.toLowerCase().indexOf("hyperlink") === -1 &&
-							item.tag.toLowerCase().indexOf("check box") === -1 &&
-							item.tag.toLowerCase().indexOf("checkbox") === -1 &&
-							item.tag.toLowerCase().indexOf("image") === -1 &&
-							item.tag.toLowerCase().indexOf("grid") == -1 &&
-							(item.tag.toLowerCase().indexOf("table") === -1 || item.tag.toLowerCase() === "tablecell") &&
-							item.tag.toLowerCase().indexOf("radio button") === -1) {
+                        if (ScrapeFilter.otherObjects(item.tag)) {
 								item.hide = false;
 						}
 					});
 				}
 				else if (tag === "othersAndroid"){
 					scrapedItems.forEach(item => {
-						if (!["android.widget.Button", "android.widget.CheckBox", "android.widget.NumberPicker",
-							  "android.widget.TimePicker", "android.widget.DatePicker", "android.widget.RadioButton",
-							 "android.widget.EditText", "android.widget.ListView", "android.widget.Spinner", "android.widget.Switch",
-							 "android.widget.ImageButton", "android.widget.SeekBar"].includes(item.tag) &&
-							item.tag.toLowerCase().indexOf("android.widget.button") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.checkbox") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.numberpicker") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.timepicker") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.datepicker") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.radiobutton") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.edittext") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.listview") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.spinner") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.switch") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.imagebutton") === -1 &&
-							item.tag.toLowerCase().indexOf("android.widget.seekbar") === -1){
+						if (ScrapeFilter.otherAndroidObjects(item.tag)){
 								item.hide = false;
 							}
 					});
 				}
 				/*** Filtering Duplicate Objects ***/
 				else if (tag === "duplicateCustnames") {
-					let reversedScrapeItems = scrapedItems.reverse();
-					let uniqueBucket = []
-
-					reversedScrapeItems.forEach(item => {
-						let custname = item.title.trim().replace(/[<>]/g, '');
-						if (!uniqueBucket.includes(custname)) {
-							uniqueBucket.push(custname);
-						}
-						else {
-							item.hide = false;
-							item.duplicate = true;
-						}
-					})
-
-					scrapedItems = reversedScrapeItems.reverse();
+					scrapedItems = ScrapeFilter.duplicateObjects(scrapedItems);
 				}
 				else if(tag === "userobj"){
 					scrapedItems.forEach(item => {
@@ -233,13 +191,7 @@ const RefBarItems = props => {
 				}
 				else {
 					scrapedItems.forEach(item => {
-						if (tag.toLowerCase() === item.tag.toLowerCase() || (item.tag.toLowerCase().indexOf(tag.toLowerCase()) >= 0 && tag !== "a" && item.tag.toLowerCase() !== "radio button" && item.tag.toLowerCase() !== "radiobutton" && item.tag.toLowerCase().indexOf("listview") < 0 && item.tag.toLowerCase().indexOf("tablecell") < 0) ||
-							(tag.toLowerCase() === "input" && (item.tag.indexOf("edit") >= 0 || item.tag.indexOf("Edit Box") >= 0 || item.tag.indexOf("text") >= 0 || item.tag.indexOf("EditText") >= 0 || item.tag.indexOf("TextField") >= 0)) ||
-							(tag.toLowerCase() === "select" && item.tag.indexOf("combo box") >= 0) ||
-							(tag.toLowerCase() === "a" && (item.tag.indexOf("hyperlink") >= 0)) ||
-							(tag.toLowerCase() === "checkbox" && item.tag.indexOf("check box") >= 0) ||
-							(tag.toLowerCase() === "radiobutton" && item.tag.indexOf("radio button") >= 0)
-						) {
+						if (ScrapeFilter.isSelectedElement(tag, item.tag)) {
 							item.hide = false;
 						}
 					});
