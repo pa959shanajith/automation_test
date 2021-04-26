@@ -72,9 +72,35 @@ const ScrollBar = (props) => {
                     `
                     : ''
                 }
+
+                ${props.scrollId?'#'+props.scrollId+' > .ps ':''}.ps__thumb-x,
+                ${props.scrollId?'#'+props.scrollId+' > .ps ':''}.ps__thumb-x:hover {
+                    opacity: 1!important;
+                    left: 0;
+                    right: 0;
+                    height: ${props.horizontalbarWidth?props.horizontalbarWidth:'6px'}!important;
+                    background:${props.thumbColor?props.thumbColor:'#000'}!important;
+                }
+                ${props.scrollId?'#'+props.scrollId+' > .ps ':''}.ps__rail-x, 
+                ${props.scrollId?'#'+props.scrollId+' > .ps ':''}.ps__rail-x:hover {
+                    border-radius: 3px;
+                    margin-right: 2px;
+                    background: ${props.trackColor?props.trackColor:'white'}!important;
+                    height: ${props.horizontalbarWidth?props.horizontalbarWidth:'6px'}!important;
+                    ${(props.hideYbar)?'visibility: hidden!important':''};
+                }
+                ${
+                    props.hoverColor ? 
+                    `${props.scrollId?`#${props.scrollId}:hover > .ps `:''}.ps__thumb-x,
+                    ${props.scrollId?`#${props.scrollId}:hover > .ps `:''}.ps__thumb-x:hover {
+                        background:${props.hoverColor}!important;
+                    }
+                    `
+                    : ''
+                }
                 `}
             </style> 
-            <PerfectScrollbar options={{minScrollbarLength:props.minScrollbarLength,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false}} style={{maxHeight:'inherit',height:'inherit'}}>
+            <PerfectScrollbar options={{minScrollbarLength:props.minScrollbarLength,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}} style={{maxHeight:'inherit',height:'inherit'}}>
                 {props.children}
             </PerfectScrollbar>
         </Fragment>
