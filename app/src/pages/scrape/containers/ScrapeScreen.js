@@ -95,11 +95,17 @@ const ScrapeScreen = ()=>{
 
                     viewString = data;
 
+                    let changeFlag = false;
+                    let task = { ...current_task };
                     if(viewString.reuse && current_task.reuse !== viewString.reuse){
-                        let task = { ...current_task }
                         task.reuse = true;
-                        dispatch({ type: pluginActions.SET_CT, payload: task });
+                        changeFlag = true;
                     }
+                    if (viewString.createdthrough && viewString.createdthrough==="PD" && viewString.createdthrough !== current_task.createdthrough ) {
+                        task.createdthrough = "PD";
+                        changeFlag = true;
+                    }
+                    if (changeFlag) dispatch({ type: pluginActions.SET_CT, payload: task });
                     
                     haveItems = viewString.view.length !== 0;
                     
@@ -375,7 +381,7 @@ const ScrapeScreen = ()=>{
                     err = { 'title': 'Scrape Screen', 'content': 'Scrape Terminated' };
                 }
                 else if (data === "wrongWindowName")
-                    err = { 'title': 'Scrape', 'content': 'Wrong window name.' };
+                    err = { 'title': 'Scrape', 'content': 'Window not found - Please provide valid window name.' };
                 else if (data === "ExecutionOnlyAllowed")
                     err = { 'title': 'Scrape Screen', 'content': 'Execution Only Allowed' };
 
