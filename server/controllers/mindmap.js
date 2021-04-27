@@ -1514,6 +1514,7 @@ exports.exportToGit = async (req, res) => {
 		const moduleId = data.mindmapId;
 		const inputs = {
 			"moduleId":moduleId,
+			"userid":req.session.userid,
 			"action":actionName,
 			"gitBranch":gitBranch,
 			"gitVersionName": gitVersionName,
