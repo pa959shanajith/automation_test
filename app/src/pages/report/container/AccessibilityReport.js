@@ -28,13 +28,20 @@ const AccessibilityReport = ({setBlockui,displayError}) =>{
     useEffect(()=>{
         if(selectedScDetails._id){
             var arr = {
-                total : 10,
-                pass : 7,
-                fail : 3,
-                terminate : 1,
-                incomplete : 0,
-                skipped : 0
+                total : 0,
+                inapplicable : 0,
+                passes : 0,
+                violations : 0
             }
+            scDetails[0]["access-rules"].forEach(data => {
+                if(data["selected"]) {
+                    var statusData = scDetails[0].rulemap[data['tag'].replace(".","_")];
+                    if(statusData.inapplicable!==undefined) arr.inapplicable +=  statusData.inapplicable.length;
+                    if(statusData.passes!==undefined) arr.passes +=  statusData.passes.length;
+                    if(statusData.violations!==undefined) arr.violations +=  statusData.violations.length;
+                }
+            })
+            arr.total = arr.inapplicable + arr.passes + arr.violations;
             setScStatus(arr)   
         }else{
             setScStatus({})
@@ -51,7 +58,7 @@ const AccessibilityReport = ({setBlockui,displayError}) =>{
                         <AccStatusPanel selectedScDetails={selectedScDetails} scDetails={scDetails} arr={scStatus} setBlockui={setBlockui} displayError={displayError}/>
                     </div>
                 </div>
-                <div className='bottom-content'>
+                <div className='ar__bottom-content'>
                     <AccDetailPanel selectedScDetails={selectedScDetails} scDetails={scDetails} setBlockui={setBlockui} displayError={displayError}/>
 				</div>
             </div>

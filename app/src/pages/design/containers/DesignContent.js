@@ -259,7 +259,7 @@ const DesignContent = props => {
 
                 for (let i = 0; i < testCases.length; i++) {
                     let step = i + 1
-                    testCases[i].stepNo = String(step);
+                    testCases[i].stepNo = step;
 
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
                         let col = "Object Name";

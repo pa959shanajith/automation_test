@@ -174,7 +174,8 @@ const MappedPage = props =>{
                         setSelectedTc([]);
                         setUnSynced(false);
                         setUnSyncMaps({ type: '', maps: {} });
-                        await props.fetchMappedFiles();
+                        const res = await props.fetchMappedFiles();
+                        if (res.length===0) dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
                         dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Saved successfully"}});
                     })()
 				}

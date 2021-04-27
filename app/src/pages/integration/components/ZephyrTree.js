@@ -89,7 +89,6 @@ const PhaseNode = props => {
                             .map(testCase => <TestCaseNode 
                                                 key={`testCase-${testCase.id}`}       
                                                 testCase={testCase}
-                                                phaseId={phaseid}
                                                 projectId={props.projectId}
                                                 releaseId={props.releaseId}
                                             />)
@@ -126,10 +125,10 @@ const TestCaseNode = props => {
         else{
             const mappedPair=[
                 {
-                    projectid: props.projectId,			
-                    releaseid: props.releaseId,
-                    treeid: props.phaseId,
-                    testid: props.testCase.id,
+                    projectid: parseInt(props.projectId),			
+                    releaseid: parseInt(props.releaseId),
+                    treeid: String(props.testCase.cyclePhaseId),
+                    testid: String(props.testCase.id),
                     testname: props.testCase.name,
                     reqdetails: props.testCase.reqdetails, 
                     scenarioId: selectedScIds

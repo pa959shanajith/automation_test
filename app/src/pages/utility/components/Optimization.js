@@ -3,7 +3,16 @@ import {ScrollBar ,PopupMsg} from '../../global';
 import ValidationExpression from '../../global/components/ValidationExpression';
 
 const Pairwise=(props)=>{
-    const [optimizationType , SetOptimizationType]=useState(null);    
+    const [optimizationType , SetOptimizationType]=useState(null);   
+    
+    useEffect(()=>{
+        if (!props.pairwiseClicked) {
+            SetOptimizationType(null);
+            props.setLevel(0)
+            props.setFactor(0)
+        }
+    }, [props.pairwiseClicked])
+
     useEffect(()=>{
         props.setLevel(0)
         props.setFactor(0)
@@ -96,7 +105,7 @@ return(
                         </div>
                         <div id="optimization-fn">
                             <div>
-                                <div data-test="utl_optimization_pairwise_div" onClick={()=>SetOptimizationType("pairwise")} className="pairwise">
+                                <div data-test="utl_optimization_pairwise_div" onClick={()=>{SetOptimizationType("pairwise"); props.setPairwiseClicked(true);}} className="pairwise">
                                     <img data-test="utl_optimization_pairwise_logo" src='static/imgs/ic-pairwise.png' alt="Pairwise_img"/>
                                     <div>Pairwise</div>
                                 </div>
