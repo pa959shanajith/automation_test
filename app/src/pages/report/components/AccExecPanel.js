@@ -10,7 +10,7 @@ import { Fragment } from 'react';
   use: renders ExecutionPanel in report landing page
 */
 
-const AccExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,selectedScDetails}) =>{
+const AccExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails}) =>{
     const dateFormat = useSelector(state=>state.login.dateformat);
     const suDetails = useSelector(state=>state.report.suiteDetails)
     const suiteSelected = useSelector(state=>state.report.suiteSelected)
@@ -36,9 +36,8 @@ const AccExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,s
         setBlockui({show:false})
     }
     useEffect(()=>{
-        if(suDetails.length>0){
-            // var arr = dateASC([...suDetails]).reverse()
-            var arr=[...suDetails]
+        if(suDetails!==undefined && suDetails.length>0){
+            var arr=[...suDetails].reverse()
             setSuiteDetails(arr)           
         }else{
             setSuiteDetails([])
@@ -89,7 +88,7 @@ const AccExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,s
         <div id='ac__execution-panel' className='panel ac__executions'>
             <div className='ac__panel-head'>{suiteSelected.name} - Executions</div>
             <div className='ac__execution-table'>
-                <div className='ac__row'>
+                <div data-test="ac_head" className='ac__row'>
                     <div className='ac__col'>Execution No</div>
                     <div className='ac__col'>Title</div>
                     <div className='ac__col'>
@@ -103,8 +102,8 @@ const AccExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,s
                         suiteDetails.map((e,i)=>
                         <div key={e.execution_id} onClick={onClickRow} name={(sortUp)?i+1:suiteDetails.length-i} value={e._id} className={'ac__row'+(false?" selected-row":"")}>
                             <div className='ac__col'>E<sub>{(sortUp)?i+1:suiteDetails.length-i}</sub></div>
-                            <div className='ac__col'>{e.title}</div>
-                            <div className='ac__col'>{formatDate(e.executedtime)}</div>
+                            <div data-test="ac_title" className='ac__col'>{e.title}</div>
+                            <div data-test="ac_executedtime" className='ac__col'>{formatDate(e.executedtime)}</div>
                         </div>):
                         <div style={{textAlign:'center',padding:'30px',height:'100%'}} className='ac__row'>
                             No record(s) found

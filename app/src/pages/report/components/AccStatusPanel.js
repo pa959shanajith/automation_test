@@ -43,21 +43,21 @@ const AccStatusPanel = ({arr,selectedScDetails,scDetails}) =>{
                     <div className='status-panel'>
                         <div className='status-row' style={{color:'#28a745'}}>
                             <span className='label'>Passes</span>
-                            <span className='perc'>{data.passes+'%'}</span>
+                            <span data-test="passes" className='perc'>{data.passes+'%'}</span>
                             <div className='progress'>
                                 <div className='progress-bar' style={{width:data.passes+'%',background:'#28a745'}}></div>
                             </div>
                         </div>
                         <div className='status-row' style={{color:'#dc3545'}}>
                             <span className='label'>Violations</span>
-                            <span className='perc'>{data.violations+'%'}</span>
+                            <span data-test="violation" className='perc'>{data.violations+'%'}</span>
                             <div className='progress'>
                                 <div className='progress-bar' style={{width:data.violations+'%',background:'#dc3545'}}></div>
                             </div>
                         </div>
                         <div className='status-row' style={{color:'#ffc107'}}>
                             <span className='label'>Inapplicable</span>
-                            <span className='perc'>{data.inapplicable+'%'}</span>
+                            <span data-test="inapplicable" className='perc'>{data.inapplicable+'%'}</span>
                             <div className='progress'>
                                 <div className='progress-bar' style={{width:data.inapplicable+'%',background:'#ffc107'}}></div>
                             </div>
