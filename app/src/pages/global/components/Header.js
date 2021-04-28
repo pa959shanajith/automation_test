@@ -83,9 +83,9 @@ const Header = () => {
     
     const getIce = async () => {
 		try {
-			const res = await fetch("/AvoAssure_ICE");
+			const res = await fetch("/AvoAssure_ICE.zip");
 			const status = await res.text();
-			if (status === "available") window.location.href = window.location.origin+"/AvoAssure_ICE?file=getICE"
+			if (status === "available") window.location.href = window.location.origin+"/AvoAssure_ICE.zip?file=getICE"
 			else setShowSR_Pop({'title': 'Download Avo Assure ICE', 'content': 'Package is not available'})
 		} catch (ex) {
 			console.error("Error while downloading ICE package. Error:", ex);
