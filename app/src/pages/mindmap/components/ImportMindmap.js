@@ -4,6 +4,7 @@ import {ModalContainer } from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
+import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss'
 
 
@@ -113,7 +114,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
         }
     },[submit])
     return(
-        <div className = 'mp__import-popup'>
+        <div data-test='mp__import-popup' className = 'mp__import-popup'>
             <div>
                 <label>Import As: </label>
                 <select className='imp-inp' defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
@@ -151,7 +152,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                             </div>
                         </Fragment>:
                         <div>
-                            <label>upload File: </label>
+                            <label>Upload File: </label>
                             <input accept={acceptType[importType]} type='file' onChange={upload} ref={uploadFileRef}/>
                         </div>
                     }
@@ -371,5 +372,13 @@ const validNodeDetails = (value) =>{
     }
     return flag;
 };
+
+
+ImportMindmap.propTypes={
+    setImportPop : PropTypes.func.isRequired,
+    setBlockui :  PropTypes.func.isRequired,
+    displayError : PropTypes.func.isRequired,
+    setOptions :   PropTypes.func.isRequired
+}
 
 export default ImportMindmap;

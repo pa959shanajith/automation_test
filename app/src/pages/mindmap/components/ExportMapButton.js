@@ -93,7 +93,7 @@ const Container = ({fnameRef,ftypeRef,modName,isAssign,gitBranchRef,gitVerRef,gi
                         <input placeholder={'branch name'} ref={gitBranchRef}/>
                     </div>
                     <div className='export-row'>
-                        <label>version: </label>
+                        <label>Version: </label>
                         <input placeholder={'version name'} ref={gitVerRef}/>
                     </div>
                     <div className='export-row'>
