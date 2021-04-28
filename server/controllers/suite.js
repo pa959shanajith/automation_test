@@ -55,6 +55,7 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"scenarioids": testsuite.testscenarioids,
 			"scenarionames": testscenarioDetails.testscenarionames,
 			"projectnames": testscenarioDetails.projectnames,
+			"apptypes": testscenarioDetails.apptypes,
 			"testsuitename": testsuite.name,
 			"moduleid": moduleId,
 			"testsuiteid": testsuite.testsuiteid,
