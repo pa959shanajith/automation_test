@@ -6,15 +6,13 @@ import Handlebars from "handlebars"
 import "../styles/ExecuteTable.scss";
 import MultiSelectDropDown from './MultiSelectDropDown';
 
-//use : Renders Execution Table 
-//todo : remove setEachDataFirst
+//use : Renders Execution Table
 
-const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,readTestSuite,setAccessibilityParameters,selectAllBatch,eachData,setEachData,setEachDataFirst,filter_data,setPopupState,setLoading,updateAfterSave}) => {
+const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,readTestSuite,setAccessibilityParameters,selectAllBatch,eachData,setEachData,updateScreen,update,setLoading,updateAfterSave}) => {
 
     const userInfo = useSelector(state=>state.login.userinfo);
     const [scenarioDetails,setScenarioDetails] = useState({})
     const [showModal,setshowModal] = useState(false)
-    // eslint-disable-next-line
     const [initialTableList,setInitialTableList] = useState([])
     const [popup,setPopup] = useState({show:false})
     const [arr,setArr] = useState([])
@@ -80,6 +78,7 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
                 var eachData2 = [];
                 keys.map(itm => eachData2.push({...data[itm]}));
                 var eachData1 = [];
+                var initialTableData = [];
                 var m, rowData;
                 //state management for single scenario
                 if (current_task.scenarioFlag === 'True') {
@@ -98,41 +97,31 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
                                     "testsuitename":rowData.testsuitename,
                                     "apptypes": [rowData.apptypes[k]],
                                 });
-                                initialTableList.push({
-                                    "condition": [rowData.condition[k]],
-                                    "dataparam": [(rowData.dataparam[k]).trim()],
-                                    "executestatus": [rowData.executestatus[k]],
-                                    "scenarioids": [rowData.scenarioids[k]],
-                                    "scenarionames": [rowData.scenarionames[k]],
-                                    "projectnames": [rowData.projectnames[k]],
-                                    "testsuiteid": rowData.testsuiteid,
-                                    "testsuitename":rowData.testsuitename,
-                                    "apptypes": [rowData.apptypes[k]],
+                                initialTableData.push({
+                                    "executestatus": [rowData.executestatus[k]]
                                 })
                             } 
                         }
                     }
                 } else {
-                    // eslint-disable-next-line
-                    eachData2.map(itm =>{initialTableList.push({...itm})});
-                    // eslint-disable-next-line
-                    eachData2.map(itm =>{eachData1.push({...itm})});
+                    eachData2.forEach(itm =>{
+                        initialTableData.push({...itm});
+                        eachData1.push({...itm})
+                    })
                     for ( m = 0; m < dataLen; m++) {
-                        rowData = eachData2[m];
                         let exeStatus = [];
-                        // eslint-disable-next-line
-                        rowData.scenarioids.map((sid,count)=>{
-                            exeStatus.push(rowData.executestatus[count]);
-                        })
-                        initialTableList[m].executestatus = exeStatus;
+                        for(var i =0;i<eachData2[m].scenarioids.length;i++) exeStatus.push(eachData2[m].executestatus[i]);
+                        initialTableData[m].executestatus=exeStatus;
                     }
                 }
+                setInitialTableList(initialTableData);
                 setEachData(eachData1);
-                setEachDataFirst(eachData2);
+                updateScreen(!update);
                 updateScenarioStatus(eachData1);
             }
         }catch(error){
             console.log(error);
+            setPopup({title:'ERROR',content:"Error while fetching Test Suite Data.",submitText:'Ok',show:true})
         }
     }
     const changeParamPath = (m,count,value) => {

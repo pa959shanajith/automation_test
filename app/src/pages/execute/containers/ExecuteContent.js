@@ -17,7 +17,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const [eachData,setEachData] = useState([])
-    const [eachDataFirst,setEachDataFirst] = useState([])
+    const [update,updateScreen] = useState(true)
     const [updateAfterSave,setupdateAfterSave] = useState(false)
     const [showDeleteModal,setshowDeleteModal] = useState(false)
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
@@ -280,7 +280,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                     <button className="e__btn-md executeBtn" onClick={()=>{ExecuteTestSuitePopup()}} title="Execute">Execute</button>
                 </div>
 
-                <ExecuteTable setAccessibilityParameters={setAccessibilityParameters} scenarioTaskType={scenarioTaskType} accessibilityParameters={accessibilityParameters} current_task={current_task} setLoading={setLoading} setPopupState={setPopupState} selectAllBatch={selectAllBatch} filter_data={projectdata} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} eachDataFirst={eachDataFirst} setEachDataFirst={setEachDataFirst} />
+                <ExecuteTable setAccessibilityParameters={setAccessibilityParameters} scenarioTaskType={scenarioTaskType} accessibilityParameters={accessibilityParameters} current_task={current_task} setLoading={setLoading} selectAllBatch={selectAllBatch} updateScreen={updateScreen} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} update={update} />
                 </div>
 
             {proceedExecution?
