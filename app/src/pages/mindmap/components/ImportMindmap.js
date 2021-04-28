@@ -85,12 +85,14 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                         displayError('This project is not assigned to user')
                         return;
                     }
+                    var res = await importMindmap(data)
+                    if(res.error){setError(res.error);setBlockui({show:false});return;}
                     var req={
                         tab:"tabCreate",
                         projectid:data.projectid,
                         version:0,
                         cycId: null,
-                        moduleid:data._id
+                        moduleid:res._id
                     }
                     var res = await getModules(req)
                     if(res.error){displayError(res.error);return;}
