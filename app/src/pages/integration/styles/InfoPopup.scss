@@ -3,10 +3,11 @@
     .title{
         width: 100px;
         font-weight: 600;
-        text-align: end;
         padding-right: 10px;
     } 
-    .empty-data{
-        text-align: center;
+    span{    
+        font-weight: 600;
+        width: 7px;
+        display: inline-block;
     }
 }

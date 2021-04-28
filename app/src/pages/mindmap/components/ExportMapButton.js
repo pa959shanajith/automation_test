@@ -27,7 +27,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
     }
     const clickExport = () => {
         if(!selectedModule._id)return;
-        var err = validate([fnameRef,ftypeRef,gitBranchRef,gitVerRef,gitPathRef])
+        var err = validate([fnameRef,ftypeRef,gitBranchRef,gitVerRef])
         if(err)return
         setExportBox(false)
         setBlockui({show:true,content:'Exporting Mindmap ...'})
@@ -35,7 +35,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
         if(ftype === 'json') toJSON(selectedModule,fnameRef.current.value,displayError,setPopup,setBlockui);
         if(ftype === 'excel') toExcel(selectedProj,selectedModule,fnameRef.current.value,displayError,setPopup,setBlockui);
         if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setPopup,setBlockui);
-        if(ftype === 'git') toGit({displayError,setBlockui,gitVerRef,gitPathRef,gitBranchRef,selectedModule,setPopup});
+        if(ftype === 'git') toGit({projectList,displayError,setBlockui,gitVerRef,gitPathRef,gitBranchRef,selectedModule,setPopup});
     }
     return(
         <Fragment>
@@ -93,7 +93,7 @@ const Container = ({fnameRef,ftypeRef,modName,isAssign,gitBranchRef,gitVerRef,gi
                         <input placeholder={'branch name'} ref={gitBranchRef}/>
                     </div>
                     <div className='export-row'>
-                        <label>version: </label>
+                        <label>Version: </label>
                         <input placeholder={'version name'} ref={gitVerRef}/>
                     </div>
                     <div className='export-row'>
@@ -177,11 +177,15 @@ const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
     param :
 */
 
-const toGit = async ({displayError,setBlockui,setPopup,gitVerRef,gitPathRef,gitBranchRef,selectedModule}) => {
+const toGit = async ({projectList,displayError,setBlockui,setPopup,gitVerRef,gitPathRef,gitBranchRef,selectedModule}) => {
+    var gitpath=gitBranchRef.current.value;
+	if(!gitpath){
+        gitpath = 'avoassuretest_artifacts/'+selectedModule.name+'/'+projectList[selectedProj].name;
+    }
     var res = await exportToGit({
         gitVersion: gitVerRef.current.value,
 		gitFolderPath: gitPathRef.current.value,
-		gitBranch: gitBranchRef.current.value,
+		gitBranch: gitpath,
 		mindmapId: selectedModule._id
     })
     if(res.error){displayError(res.error);return;}

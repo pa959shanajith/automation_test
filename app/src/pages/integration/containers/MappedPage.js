@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { useDispatch } from 'react-redux';
-import {ScrollBar} from '../../global';
+import {ScrollBar, PopupMsg} from '../../global';
 import MappedLabel from '../components/MappedLabel';
 import { saveUnsyncDetails } from '../api';
 import * as actionTypes from '../state/action';
@@ -17,6 +17,7 @@ const MappedPage = props =>{
     
     const dispatch = useDispatch();
     const [selectedSc, setSelectedSc] = useState([]);
+    const [popup,setPopup] = useState({show:false})
     const [selectedTc, setSelectedTc] = useState([]);
     const [unSynced, setUnSynced] = useState(false);
     const [unSyncMaps, setUnSyncMaps] = useState({
@@ -179,76 +180,88 @@ const MappedPage = props =>{
 		}
 		else dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Unmap testcase/scenario before Save"}})
     }
-
+    const displayError = (error) =>{
+        setPopup({
+            title:'ERROR',
+            content:error,
+            submitText:'Ok',
+            show:true
+        })
+    }
     return(
-        <div  className="integration_middleContent">
-            <div className="viewMap__task_title" >
-                <span className="viewMap__task_name">
-                    Mapped files
-                </span>
-                { props.screenType === "ALM" && 
-                <> 
-                    <div className="viewMap__counterContainer">
-                        <div className="viewMap__totalCount">
-                            <div>Total Mappings</div>
-                            <div>{counts.totalCounts}</div>
+        <Fragment>
+            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+            <div  className="integration_middleContent">
+                <div className="viewMap__task_title" >
+                    <span className="viewMap__task_name">
+                        Mapped files
+                    </span>
+                    { props.screenType === "ALM" && 
+                    <> 
+                        <div className="viewMap__counterContainer">
+                            <div className="viewMap__totalCount">
+                                <div>Total Mappings</div>
+                                <div>{counts.totalCounts}</div>
+                            </div>
+                            <div className="viewMap__scenarioCount">
+                                <div>Mapped Scenarios</div>
+                                <div>{counts.mappedScenarios}</div>
+                            </div>
+                            <div className="viewMap__testCount">
+                                <div>Mapped ALM Tests</div>
+                                <div>{counts.mappedTests}</div>
+                            </div>
                         </div>
-                        <div className="viewMap__scenarioCount">
-                            <div>Mapped Scenarios</div>
-                            <div>{counts.mappedScenarios}</div>
-                        </div>
-                        <div className="viewMap__testCount">
-                            <div>Mapped ALM Tests</div>
-                            <div>{counts.mappedTests}</div>
+                        <button onClick={onSave}>Save</button> 
+                    </> }
+                </div>
+                <div className="viewMap__mappingsContainer">
+                    <div className="viewMap__tileRow">
+                        <span className="viewMap_actionRow"><label>{props.leftBoxTitle}</label></span>
+                        <span className="viewMap_actionRow"><label>{props.rightBoxTitle}</label></span>
+                    </div>
+                    <div className="viewMap__labelContainer">
+                    <div className="viewMap__canvas">
+                        <div className="viewMap__inner">
+                            <div className="viewMap__contents" id="viewMapScrollId">
+                            <ScrollBar scrollId="viewMapScrollId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
+                                { rows.map(({scenarioNames, testCaseNames}, index) => <div key={index} className="viewMap__labelRow">
+                                    <MappedLabel 
+                                        list={testCaseNames} 
+                                        type="testcase" 
+                                        mapIdx={index} 
+                                        screenType = {props.screenType}
+                                        reqDetails = {props.mappedfilesRes[index].reqdetails}
+                                        handleClick={props.screenType === "ALM" ? handleClick : null} 
+                                        selected={selectedTc} 
+                                        unSynced={unSynced}
+                                        handleUnSync={props.screenType === "ALM" ? onUnSync : null}
+                                        displayError={displayError}
+                                    />
+                                    { props.screenType!=="ALM" && 
+                                        <div className="viewMap__ropeContainer">
+                                            <div className="viewMap__rope"></div>
+                                        </div>
+                                    }
+                                    <MappedLabel 
+                                        list={scenarioNames} 
+                                        type="scenario" 
+                                        mapIdx={index} 
+                                        handleClick={props.screenType === "ALM" ? handleClick : null} 
+                                        selected={selectedSc} 
+                                        unSynced={unSynced}
+                                        displayError={displayError}
+                                        handleUnSync={props.screenType === "ALM" ? onUnSync : null}
+                                    />
+                                </div>) }
+                            </ScrollBar>
+                            </div>   
                         </div>
                     </div>
-                    <button onClick={onSave}>Save</button> 
-                </> }
-            </div>
-            <div className="viewMap__mappingsContainer">
-                <div className="viewMap__tileRow">
-                    <span className="viewMap_actionRow"><label>{props.leftBoxTitle}</label></span>
-                    <span className="viewMap_actionRow"><label>{props.rightBoxTitle}</label></span>
                 </div>
-                <div className="viewMap__labelContainer">
-                <div className="viewMap__canvas">
-                    <div className="viewMap__inner">
-                        <div className="viewMap__contents" id="viewMapScrollId">
-                        <ScrollBar scrollId="viewMapScrollId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                            { rows.map(({scenarioNames, testCaseNames}, index) => <div key={index} className="viewMap__labelRow">
-                                <MappedLabel 
-                                    list={testCaseNames} 
-                                    type="testcase" 
-                                    mapIdx={index} 
-                                    screenType = {props.screenType}
-                                    reqDetails = {props.mappedfilesRes[index] && props.mappedfilesRes[index].reqdetails}
-                                    handleClick={props.screenType === "ALM" ? handleClick : null} 
-                                    selected={selectedTc} 
-                                    unSynced={unSynced}
-                                    handleUnSync={props.screenType === "ALM" ? onUnSync : null}
-                                />
-                                { props.screenType!=="ALM" && 
-                                    <div className="viewMap__ropeContainer">
-                                        <div className="viewMap__rope"></div>
-                                    </div>
-                                }
-                                <MappedLabel 
-                                    list={scenarioNames} 
-                                    type="scenario" 
-                                    mapIdx={index} 
-                                    handleClick={props.screenType === "ALM" ? handleClick : null} 
-                                    selected={selectedSc} 
-                                    unSynced={unSynced}
-                                    handleUnSync={props.screenType === "ALM" ? onUnSync : null}
-                                />
-                            </div>) }
-                        </ScrollBar>
-                        </div>   
-                    </div>
                 </div>
             </div>
-            </div>
-        </div>
+        </Fragment>
     );
 }
 export default MappedPage;
