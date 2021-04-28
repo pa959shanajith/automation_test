@@ -107,10 +107,12 @@ const BottomContent = () => {
     
     useEffect(()=>{
         let customs = 0;
+        let savedObjects = 0;
         for (let scrapeItem of scrapeItems){
-            if (scrapeItem.isCustom) customs++;
+            if ( scrapeItem.objId && scrapeItem.isCustom) customs++;
+            if (scrapeItem.objId) savedObjects++;
         }
-        setScrapeLen(scrapeItems.length);
+        setScrapeLen(savedObjects);
         setCustomLen(customs);
     }, [scrapeItems])
 
@@ -164,6 +166,7 @@ const BottomContent = () => {
         let file = event.target.files[0];
         let reader = new FileReader();
         reader.onload = function (e) {
+            hiddenInput.current.value = '';
             if (file.name.split('.').pop().toLowerCase() === "json") {
                 let resultString = JSON.parse(reader.result);
                 if (!('appType' in resultString))
@@ -192,7 +195,6 @@ const BottomContent = () => {
                             // else{
                                 if (data === "Invalid Session") return RedirectPage(history);
                                 else fetchScrapeData().then(response => {
-                                        hiddenInput.current.value = '';
                                         if (response === "success")
                                             setShowPop({title: "Import Screen", content: "Screen Json imported successfully."}) 
                                 });

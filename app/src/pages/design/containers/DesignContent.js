@@ -659,7 +659,7 @@ const DesignContent = props => {
             // setEdit(false);
             // setRowChange(!rowChange);
             setChanged(true);
-            setCommentFlag(true);
+            if(edit) setCommentFlag(true);
             headerCheckRef.current.indeterminate = false;
         }
     }
@@ -800,7 +800,7 @@ const DesignContent = props => {
                         <div className="con" id="d__tcListId">
                             <ScrollBar scrollId="d__tcListId" verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setFocusedRow(null) : runClickAway=true}} style={{height: "100%"}}>
-                            <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row">
+                            <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row" onEnd={()=>{ if (!changed)setChanged(true)}}>
                                 {
                                 testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row"
                                     key={key++} idx={i} objList={objNameList} testCase={testCase} edit={edit} 

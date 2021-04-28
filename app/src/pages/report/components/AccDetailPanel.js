@@ -27,7 +27,7 @@ const AccDetailPanel = ({scDetails}) => {
             <div id='ar__detail-panel' className='panel rp__detail'>
                 <div className="ac__panel-head">Accessibility Reports by Standards</div>
                 <div className='ar__standard-table'>
-                    <div className="ar__standard-head">
+                    <div data-test="ar_detail-head" className="ar__standard-head">
                         <div className="ar__sn" >S.No.</div>
                         <div className="ar__standard" >Standard </div>
                         <div className="ar__status" >Status</div>
@@ -35,10 +35,10 @@ const AccDetailPanel = ({scDetails}) => {
                     </div>
                     {tableData.map((data,i)=>(
                         <div key={i} className="ar__standard-row">
-                            <div className="ar__sn" >{i+1}</div>
-                            <div className="ar__standard" >{data["name"]} </div>
-                            <div className={"ar__status "+(data["pass"]?"pass":"fail")} >{data["pass"]?"Pass":"Fail"}</div>
-                            <div className="ar__report" ><label className="ar__report-generate" onClick={()=>{setShowStandardDescTable({rowData:Object.entries(scDetails[0].rulemap[data['tag'].replace(".","_")]),name:data["name"]});}}>Report</label></div>
+                            <div data-test="ar_detail-sn" className="ar__sn" >{i+1}</div>
+                            <div data-test="ar_detail-stname" className="ar__standard" >{data["name"]} </div>
+                            <div data-test="ar_detail-status" className={"ar__status "+(data["pass"]?"pass":"fail")} >{data["pass"]?"Pass":"Fail"}</div>
+                            <div data-test="ar_detail-report" className="ar__report" ><label className="ar__report-generate" onClick={()=>{setShowStandardDescTable({rowData:Object.entries(scDetails[0].rulemap[data['tag'].replace(".","_")]),name:data["name"]});}}>Report</label></div>
                         </div>
                     ))}
                 </div>

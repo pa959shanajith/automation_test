@@ -6,25 +6,17 @@
         width: 83%;
     }
     .adminActionBtn{
-        margin-bottom: 5%;
+        padding-bottom: 5%;
     }
     .input-label {
         margin-top: 0;
-        .left-opt{
-            width: calc(100% - 70px);
-        }
-    }    
-    .input-label{
-        label{
-            width: 50px;
-        }
     }
     .git_token{
         label{
-            width: 130px;
+            width: 120px;
         }
         .left-opt{
-            width: calc(100% - 150px);
+            width: calc(100% - 180px);
         }
     }
     .adminActionBtn .a__btn:disabled {

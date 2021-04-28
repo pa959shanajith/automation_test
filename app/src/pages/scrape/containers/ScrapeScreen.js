@@ -78,9 +78,6 @@ const ScrapeScreen = ()=>{
 
     const fetchScrapeData = () => {
 		return new Promise((resolve, reject) => {
-            dispatch({type: actionTypes.SET_COMPAREDATA, payload: {}});
-            dispatch({type: actionTypes.SET_COMPAREOBJ, payload: {changedObj: [], notChangedObj: [], notFoundObj: []}});
-            dispatch({type: actionTypes.SET_COMPAREFLAG, payload: false});
             setOverlay("Loading...");
             
             let viewString = scrapeItems;
@@ -94,18 +91,6 @@ const ScrapeScreen = ()=>{
                 else if (typeof data === "object" && current_task.appType!=="Webservice") {
 
                     viewString = data;
-
-                    let changeFlag = false;
-                    let task = { ...current_task };
-                    if(viewString.reuse && current_task.reuse !== viewString.reuse){
-                        task.reuse = true;
-                        changeFlag = true;
-                    }
-                    if (viewString.createdthrough && viewString.createdthrough==="PD" && viewString.createdthrough !== current_task.createdthrough ) {
-                        task.createdthrough = "PD";
-                        changeFlag = true;
-                    }
-                    if (changeFlag) dispatch({ type: pluginActions.SET_CT, payload: task });
                     
                     haveItems = viewString.view.length !== 0;
                     
@@ -131,9 +116,6 @@ const ScrapeScreen = ()=>{
                         setHideSubmit(true);
                         dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                         dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
-                        dispatch({type: actionTypes.SET_COMPAREDATA, payload: {}});
-                        dispatch({type: actionTypes.SET_COMPAREOBJ, payload: {changedObj: [], notChangedObj: [], notFoundObj: []}});
-                        dispatch({type: actionTypes.SET_COMPAREFLAG, payload: false});
                         setOverlay("");
                     }
                 }

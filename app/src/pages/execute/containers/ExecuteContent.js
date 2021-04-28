@@ -229,9 +229,6 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     }
 
     const syncScenarioChange = (value) => {
-        setIntegration({alm: {url:"",username:"",password:""}, 
-        qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {url:"",username:"",password:""}})
         if (value === "1") {
             setShowIntegrationModal("ALM")
 		}
@@ -309,6 +306,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                     appType={appType} 
                     setPopupState={setPopupState} 
                     setCredentialsExecution={setIntegration}
+                    integrationCred={integration}
                     displayError={displayError}
                     browserTypeExe={browserTypeExe}
                 />

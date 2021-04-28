@@ -21,7 +21,7 @@ const AccStandardDesc = ({scDetails, standardTypeDetails}) => {
             <div id='ar__StDesc-panel'>
                 <div className="ar__Desc-head">Selected Standard: {standardTypeDetails.name}</div>
                 <div className='ar__stDesc-table'>
-                    <div className="ar__stDesc-head">
+                    <div data-test="ar_desc-head" className="ar__stDesc-head">
                         <div className="ar__stDesc-sn" >S.No.</div>
                         <div className="ar__stDesc-status" >Status</div>
                         <div className="ar__stDesc-desc" >Description </div>
@@ -31,11 +31,11 @@ const AccStandardDesc = ({scDetails, standardTypeDetails}) => {
                     {descData.map((status)=>(
                         status[1].map((data,index)=>(
                             <div key={index} className="ar__stDesc-row">
-                                <div className="ar__stDesc-sn" >{status[2]+index+1}</div>
-                                <div className="ar__stDesc-status" >{status[0] || "N/A"}</div>
-                                <div className="ar__stDesc-desc" >{data.description || "N/A"} </div>
-                                <div className="ar__stDesc-help" >{data.help || "N/A"}</div>
-                                <div className="ar__stDesc-impact" >{data.impact || "N/A"}</div>
+                                <div data-test="ar_sn" className="ar__stDesc-sn" >{status[2]+index+1}</div>
+                                <div data-test="ar_status" className="ar__stDesc-status" >{status[0] || "N/A"}</div>
+                                <div data-test="ar_desc" className="ar__stDesc-desc" >{data.description || "N/A"} </div>
+                                <div data-test="ar_help" className="ar__stDesc-help" >{data.help || "N/A"}</div>
+                                <div data-test="ar_impact" className="ar__stDesc-impact" >{data.impact || "N/A"}</div>
                             </div>
                         ))
                     ))} 

@@ -46,7 +46,7 @@ const FormSelect = (props) => {
         <Fragment>
             <div className='col-xs-9 form-group input-label'>
                 <label>{name}</label>
-                <select onChange={onChangeFn} ref={inpRef} defaultValue={'def-opt'} className={"adminSelect-project-assign form-control__conv-project left-opt"} id={inpId || "selectForm"}>
+                <select data-test="select_comp" onChange={onChangeFn} ref={inpRef} defaultValue={'def-opt'} className={"adminSelect-project-assign form-control__conv-project left-opt"} id={inpId || "selectForm"}>
                     <option key={'def-opt'} value={'def-opt'} disabled={true}>{defValue}</option>
                     {option.map((e,i)=><option key={i+'_def'} value={e}>{e}</option>)}
                 </select>            
