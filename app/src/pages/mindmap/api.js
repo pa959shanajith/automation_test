@@ -395,7 +395,7 @@ export const importGitMindmap = async(data) => {
         }
         if(res.data === "empty"){
             console.error(res.data)
-            return {error:'Module does not exist in git repo. Please verify your inputs!!'}
+            return {error:'Module does not exist in Git repo. Please verify your inputs!!'}
         }
         if (!('testscenarios' in res.data)){
             console.error(res.data)
@@ -408,10 +408,10 @@ export const importGitMindmap = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'Error in importing module from git'}
+        return {error:'Error in importing module from Git'}
     }catch(err){
         console.error(err)
-        return {error:'Error in importing module from git'}
+        return {error:'Error in importing module from Git'}
     }
 }
 
@@ -435,7 +435,7 @@ export const exportToGit = async(data) => {
         }
         if(res.data==='empty'){
             console.error(res.data)
-            return {error:'Project is not git configured'}
+            return {error:'Project is not Git configured'}
         }
         if(res.data==='commit exists'){
             console.error(res.data)
@@ -445,9 +445,9 @@ export const exportToGit = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:'Error while exporting to git'}
+        return {error:'Error while exporting to Git'}
     }catch(err){
         console.error(err)
-        return {error:'Error while exporting to git'}
+        return {error:'Error while exporting to Git'}
     }
 }
