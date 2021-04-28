@@ -70,7 +70,7 @@ const ALM = props => {
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
-    const callViewMappedFiles = async()=>{
+    const callViewMappedFiles = async(saveFlag)=>{
         try{
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Fetching...'});
             //props.setViewMappedFiles(true)
@@ -81,9 +81,19 @@ const ALM = props => {
             } 
             else if (response.length){
                 dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "ALM" });
+                if (saveFlag) 
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Saved successfully"}});
                 setMappedFilesRes(response);
             }
-            else dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Mapped Testcase", content: "No mapped details"}});
+            else {
+                if (saveFlag) {
+                    dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Saved successfully"}});
+                }
+                else {
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Mapped Testcase", content: "No mapped details"}});
+                }
+            }
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
 
             return response;

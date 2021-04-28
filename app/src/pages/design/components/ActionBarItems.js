@@ -219,6 +219,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
         let file = event.target.files[0];
         let reader = new FileReader();
         reader.onload = function (e) {
+            hiddenInput.current.value = '';
             if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() === "json") {
                 let resultString = JSON.parse(reader.result);
                 for (let i = 0; i < resultString.length; i++) {
@@ -239,7 +240,6 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
                             if (data === "Invalid Session") RedirectPage(history);
                             if (data === "success") {
                                 setImported(true);
-                                hiddenInput.current.value = '';
                                 setShowPop({'title': "Import Testcase", 'content': "TestCase Json imported successfully."});
                             } else setShowPop({'title': "Import Testcase",'content': "Please Check the file format you have uploaded!"});
                         })
