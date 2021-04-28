@@ -4,6 +4,7 @@ import CreateUser from './CreateUser';
 import Project from './Project';
 import ProjectAssign from './ProjectAssign';
 import OidcConfig from './OidcConfig'
+import GitConfig from './GitConfig'
 import SamlConfig from './SamlConfig';
 import Preferences from './Preferences';
 import SessionManagement from './SessionManagement';
@@ -24,7 +25,7 @@ import '../styles/AdminHome.scss';
 const AdminHome = () => {
   const [middleScreen,setMiddleScreen] = useState("createUser")
   const [showEditUser,setShowEditUser] = useState(false)
-  const [resetMiddleScreen,setResetMiddleScreen] =useState({tokenTab:true,provisionTa:true,Preferences:true,sessionTab:true,ldapConfigTab:true,createUser:true,projectTab:true,assignProjectTab:true,samlConfigTab:true,oidcConfigTab:true})
+  const [resetMiddleScreen,setResetMiddleScreen] =useState({tokenTab:true,provisionTa:true,Preferences:true,sessionTab:true,gitConfigure:true,ldapConfigTab:true,createUser:true,projectTab:true,assignProjectTab:true,samlConfigTab:true,oidcConfigTab:true})
   return (
     <div className='admin-container'>
         <Header />
@@ -42,6 +43,7 @@ const AdminHome = () => {
                                 {(middleScreen==="assignProjectTab")?<ProjectAssign resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
                                 {(middleScreen==="CreateIcePool")?<CreateIcePool resetMiddleScreen={resetMiddleScreen}/>:null}
                                 {(middleScreen==="AllocateIcePool")?<AllocateIcePool resetMiddleScreen={resetMiddleScreen}/>:null}
+                                {(middleScreen==="gitConfigure")?<GitConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
                                 {(middleScreen==="ldapConfigTab")?<LdapConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
                                 {(middleScreen==="samlConfigTab")?<SamlConfig resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
                                 {(middleScreen==="oidcConfigTab")?<OidcConfig resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}

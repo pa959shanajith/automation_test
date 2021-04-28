@@ -118,8 +118,10 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     }
     
     const submit_task = async () => {
-        let action = "reassign";
-        if(status!=='underReview') action = "approve";
+        let action = "approve";
+        if(modalDetails.task==='approve') action = "approve";
+        else if(modalDetails.task==='submit') action = "submit";
+        if(modalDetails.task==='reassign') action = "reassign";
 		var taskid = current_task.subTaskId;
 		var taskstatus = current_task.status;
 		var version = current_task.versionnumber;

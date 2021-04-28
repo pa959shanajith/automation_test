@@ -8,10 +8,11 @@ const MappedLabel = props => {
     const type = props.type
     const screenType = props.screenType
     const reqDetails = props.reqDetails
+    const displayError = props.displayError
 
     return (
         <Fragment>
-            {info?<InfoPopup reqDetails={reqDetails} setInfo={setInfo}/>:null}
+            {info?<InfoPopup reqDetails={reqDetails} displayError={displayError} screenType={screenType} setInfo={setInfo}/>:null}
             <div className="mlalm__container" data-type={props.type}>
                 <div className="mlalm_topLabel" data-selected={props.selected.includes(`${props.mapIdx}-0`)}>
                     <div className="mlalm_label" 

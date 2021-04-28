@@ -14,7 +14,6 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
     const userInfo = useSelector(state=>state.login.userinfo);
     const [scenarioDetails,setScenarioDetails] = useState({})
     const [showModal,setshowModal] = useState(false)
-    const [projectAppType,setProjectApptype] = useState({})
     // eslint-disable-next-line
     const [initialTableList,setInitialTableList] = useState([])
     const [popup,setPopup] = useState({show:false})
@@ -96,7 +95,8 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
                                     "scenarionames": [rowData.scenarionames[k]],
                                     "projectnames": [rowData.projectnames[k]],
                                     "testsuiteid": rowData.testsuiteid,
-                                    "testsuitename":rowData.testsuitename
+                                    "testsuitename":rowData.testsuitename,
+                                    "apptypes": [rowData.apptypes[k]],
                                 });
                                 initialTableList.push({
                                     "condition": [rowData.condition[k]],
@@ -106,7 +106,8 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
                                     "scenarionames": [rowData.scenarionames[k]],
                                     "projectnames": [rowData.projectnames[k]],
                                     "testsuiteid": rowData.testsuiteid,
-                                    "testsuitename":rowData.testsuitename
+                                    "testsuitename":rowData.testsuitename,
+                                    "apptypes": [rowData.apptypes[k]],
                                 })
                             } 
                         }
@@ -126,7 +127,6 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
                         initialTableList[m].executestatus = exeStatus;
                     }
                 }
-                distinctProjectType(eachData1, keys);
                 setEachData(eachData1);
                 setEachDataFirst(eachData2);
                 updateScenarioStatus(eachData1);
@@ -135,31 +135,6 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
             console.log(error);
         }
     }
-
-    const distinctProjectType = (Data, keys) => {
-        //finding distinct projects : helpful for apptype column
-        var allProjects = [];
-        for(var j=0; j<Data.length; j++) {
-            for(var i=0; i<Data[j].projectnames.length; i++) {
-                allProjects.push(Data[j].projectnames[i]);
-            }
-        }
-        var distinctProjects = [...new Set(allProjects)];
-        var distinctAppType = {};
-        // eslint-disable-next-line
-        keys.map(itm => {
-            for(var i =0 ; i<distinctProjects.length; i++){
-                for( const [key,value] of Object.entries(filter_data.projectDict)){
-                    if(distinctProjects[i] === value){
-                        distinctAppType[distinctProjects[i]]= Object.keys(filter_data.project[key].appType)[0];
-                    } 
-                }
-            }
-        });
-        setArr([])
-        setProjectApptype(distinctAppType);
-    }
-
     const changeParamPath = (m,count,value) => {
         let data = [...eachData];
         data[m].dataparam[count]=value;
@@ -225,7 +200,7 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
                                                                 <div className="e__table-col tabeleCellPadding exe-conditionCheck"><select onChange={(event)=>{conditionUpdate(m,count,event.target.value)}} value={JSON.parse(rowData.condition[count])} className={"conditionCheck form-control"+(((rowData.condition[count]===0 || rowData.condition[count]=== "0"))?" alertRed":" alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </div>
                                                                 <div title={rowData.projectnames[count]}  className='e__table-col tabeleCellPadding projectName'>{rowData.projectnames[count]}</div>
                                                                 <div title={rowData.projectnames[count]}  className='e__table-col tabeleCellPadding exe-apptype'>
-                                                                    <img src={"static/imgs/"+details[projectAppType[rowData.projectnames[count]].toLowerCase()]['img']+".png"} alt="apptype" className="e__table_webImg"/>
+                                                                    <img src={"static/imgs/"+details[rowData.apptypes[count].toLowerCase()]['img']+".png"} alt="apptype" className="e__table_webImg"/>
                                                                 </div>
                                                                 {(!(!scenarioTaskType || scenarioTaskType == "" || scenarioTaskType == "disable"))?
                                                                 <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} /></div>:null}

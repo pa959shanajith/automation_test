@@ -24,6 +24,7 @@ const CompareObjectList = () => {
     useEffect(()=>{
         let newViewString = {...viewString};
         newViewString = Object.keys(newScrapedData).length ? {...newScrapedData, view: [...mainScrapedData.view, ...newScrapedData.view]} : { ...mainScrapedData };
+        newViewString = {...newViewString, view: newViewString.view.filter(object => object.xpath.substring(0, 4)!=="iris")}
         setViewString(newViewString);
         //eslint-disable-next-line
     }, [])

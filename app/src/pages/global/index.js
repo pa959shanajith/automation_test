@@ -19,6 +19,7 @@ import ChangePassword from './components/ChangePassword';
 import GenerateTaskList from './components/GenerateTaskList';
 import CalendarComp from './components/CalendarComp'
 import TimeComp from'./components/TimeComp'
+import ErrorPage from './components/ErrorPage';
 
 export { Header, 
         FooterOne, 
@@ -41,5 +42,6 @@ export { Header,
         ChangePassword,
         GenerateTaskList,
         CalendarComp,
-        TimeComp
+        TimeComp,
+        ErrorPage
     };
