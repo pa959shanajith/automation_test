@@ -35,7 +35,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
         if(ftype === 'json') toJSON(selectedModule,fnameRef.current.value,displayError,setPopup,setBlockui);
         if(ftype === 'excel') toExcel(selectedProj,selectedModule,fnameRef.current.value,displayError,setPopup,setBlockui);
         if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setPopup,setBlockui);
-        if(ftype === 'git') toGit({projectList,displayError,setBlockui,gitVerRef,gitPathRef,gitBranchRef,selectedModule,setPopup});
+        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitVerRef,gitPathRef,gitBranchRef,selectedModule,setPopup});
     }
     return(
         <Fragment>
@@ -177,7 +177,7 @@ const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
     param :
 */
 
-const toGit = async ({projectList,displayError,setBlockui,setPopup,gitVerRef,gitPathRef,gitBranchRef,selectedModule}) => {
+const toGit = async ({projectList,displayError,setBlockui,setPopup,gitVerRef,gitPathRef,gitBranchRef,selectedModule,selectedProj}) => {
     var gitpath=gitBranchRef.current.value;
 	if(!gitpath){
         gitpath = 'avoassuretest_artifacts/'+selectedModule.name+'/'+projectList[selectedProj].name;
