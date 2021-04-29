@@ -48,6 +48,8 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
     const [fileUpload,setFiledUpload] = useState(undefined)
     const [sheetList,setSheetList] = useState([])
     const upload = () => {
+        setError('')
+        setFiledUpload(undefined)
         uploadFile({setBlockui,projList,uploadFileRef,setSheetList,setError,setFiledUpload})
     }
     const changeImportType = (e) => {
@@ -283,7 +285,7 @@ const uploadFile = async({uploadFileRef,setSheetList,setError,setFiledUpload,pro
     var file = uploadFileRef.current.files[0]
     if(!file)return;
     var extension = file.name.substr(file.name.lastIndexOf('.')+1)
-    setBlockui({content:'uploading ...',show:true})
+    setBlockui({content:'Uploading ...',show:true})
     try{
         const result =  await read(file)
         if(extension === 'pd'){
