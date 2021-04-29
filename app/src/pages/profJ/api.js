@@ -19,7 +19,7 @@ export const getTopMatches_ProfJ = async(userQuery) => {
             param : 'getTopMatches_ProfJ'
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
