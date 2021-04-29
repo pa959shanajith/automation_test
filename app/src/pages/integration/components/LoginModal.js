@@ -36,24 +36,20 @@ const LoginModal = props => {
                         <input
                             className={"ilm__input"+(error.url ? " ilm_input_error" : "")}
                             ref={props.urlRef}
-                            placeholder={
-                                props.screenType === "Zephyr"
-                                ? "Enter Zephyr URL (Ex. http(s)://SERVER[:PORT])"
-                                : `Enter ${props.screenType} URL`
-                            }
+                            placeholder={inpPlaceHolder[props.screenType].url}
                             data-test="intg_url_inp"
                         />
                         <input
                             className={"ilm__input"+(error.username ? " ilm_input_error" : "")}
                             ref={props.usernameRef}
-                            placeholder={`Enter ${props.screenType} Username`}
+                            placeholder={inpPlaceHolder[props.screenType].username}
                             data-test="intg_username_inp"
                         />
                         <input
                             className={"ilm__input"+(error.password ? " ilm_input_error" : "")}
                             ref={props.passwordRef}
                             type="password"
-                            placeholder={`Enter ${props.screenType} Password`}
+                            placeholder={inpPlaceHolder[props.screenType].password}
                             data-test="intg_password_inp"
                         />
                     </div>
@@ -66,6 +62,24 @@ const LoginModal = props => {
             />
         </div>
     );
+}
+
+const inpPlaceHolder = {
+    ALM : {
+        url : "Enter ALM URL",
+        username : "Enter ALM Username / Client ID",
+        password : "Enter ALM Password / Client Secret Key"
+    },
+    Zephyr : {
+        url : "Enter Zephyr URL (Ex. http(s)://SERVER[:PORT])",
+        username : "Enter Zephyr Username",
+        password : "Enter Zephyr Password"
+    },
+    qTest : {
+        url : "Enter qTest URL",
+        username : "Enter qTest Username",
+        password : "Enter qTest Password"
+    }
 }
 
 export default LoginModal;

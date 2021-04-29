@@ -178,14 +178,14 @@ const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
 */
 
 const toGit = async ({projectList,displayError,setBlockui,setPopup,gitVerRef,gitPathRef,gitBranchRef,selectedModule,selectedProj}) => {
-    var gitpath=gitBranchRef.current.value;
+    var gitpath=gitPathRef.current.value;
 	if(!gitpath){
         gitpath = 'avoassuretest_artifacts/'+selectedModule.name+'/'+projectList[selectedProj].name;
     }
     var res = await exportToGit({
         gitVersion: gitVerRef.current.value,
-		gitFolderPath: gitPathRef.current.value,
-		gitBranch: gitpath,
+		gitFolderPath:gitpath,
+		gitBranch: gitBranchRef.current.value,
 		mindmapId: selectedModule._id
     })
     if(res.error){displayError(res.error);return;}
