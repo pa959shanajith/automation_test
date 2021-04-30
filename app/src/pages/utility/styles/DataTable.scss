@@ -15,7 +15,6 @@
 
 .dt__table_ac_btn_grp{
     display: inherit;
-    flex-grow: 1;
 }
 
 .dt__tblBtn{
@@ -39,6 +38,8 @@
     display: flex;
     align-items: center;
     font-size: 17px;
+    flex-grow: 1;
+    justify-content: flex-end;
 }
 
 .dt__taskBtn{
@@ -52,10 +53,56 @@
     }
 }
 
+// .dt__importexport{
+//     // margin-top: 15px;
+// }
+
 .dt__searchDataTable{
+    position: relative;
     display: flex;
-    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 20px;
+    height: 30px;
+    z-index: 111;
+
     input{
+        position: absolute;
         width: 70%;
+    }
+
+    .dt__form_dropdown{
+        position: absolute;
+        top: 30px;
+        font-size: 14px;
+        box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
+        display: block;
+        max-height: 100px;
+        width: 70%;
+        background: #ffff;
+        margin-top: 2px;
+        option{
+            padding-left: 2px;
+            margin: 4px;
+            width: calc(100% - 14px);
+        }
+        option:hover{
+            background: #633691;
+            border-radius: 3px;
+            color: #fff;
+            cursor: pointer;
+        }
+    }
+    
+}
+
+
+#editscreen{
+    height: 95%;
+    .dt__table_rows_container, .dt__ab, .dt__min{
+        height: 95%;
+    }
+    .dt__con{
+        height: 100%;
     }
 }

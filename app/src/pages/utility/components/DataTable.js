@@ -1,20 +1,22 @@
 import React, { useState, useEffect, useRef }  from 'react';
 import { v4 as uuid } from 'uuid';
-// import { tableData } from './dummydata';
+// import { tableData, datatables } from './dummydata';
 import ClickAwayListener from 'react-click-away-listener';
 import { PopupMsg, ScrollBar } from '../../global';
 import Table from './Table';
+import * as utilApi from '../api';
 import "../styles/DataTable.scss";
 
 const DataTable = props => {
 
-    const [currScreen, setCurrScreen] = useState("Create");
+    const [currScreen, setCurrScreen] = useState(props.currScreen);
     const [data, setData] = useState([{id: uuid()}]);
 
     const [headers, setHeaders] = useState([{id: uuid(), name: 'Header 1'}, {id: uuid(), name: 'Header 2'}]);
     const [checkList, setCheckList] = useState({type: 'row', list: []});
     const [dnd, setDnd] = useState(false);
     const [headerCounter, setHeaderCounter] = useState(3);
+    const [dataTables, setDataTables] = useState([]);
     const [showPop, setShowPop] = useState(false);
 
     useEffect(()=>{
@@ -35,6 +37,24 @@ const DataTable = props => {
         // }
         // setHeaders(newHeaders);
     }, [])
+
+    useEffect(()=>{
+        setCurrScreen(props.currScreen)
+        resetStates();
+    }, [props.currScreen])
+
+    const resetStates = () => {
+        if (props.currScreen === "Create") {
+            setData([{id: uuid()}]);
+            setDataTables([]);
+        }
+        else setData([]);
+        setHeaders([{id: uuid(), name: 'Header 1'}, {id: uuid(), name: 'Header 2'}]);
+        setCheckList({type: 'row', list: []});
+        setDnd(false);
+        setHeaderCounter(3);
+        setShowPop(false);
+    }
 
 
     const displayData = () => {
@@ -57,8 +77,15 @@ const DataTable = props => {
         else if (checkList.list.length===1){
             if (checkList.type==="row"){
                 let newData = [...data];
-                let locToAdd = checkList.list[0].split('||').pop();
+                let locToAdd = null;
+                let rowId = checkList.list[0].split('||').pop();
+
+                newData.forEach((row, rowIndex) => {
+                    if (rowId === row.id) locToAdd = rowIndex;
+                })
+                
                 newData.splice(locToAdd+1, 0, {id: uuid()});
+
                 setData(newData);
             }
             else{
@@ -88,10 +115,10 @@ const DataTable = props => {
                 let newData = [...data];
                 
                 for (let listItem of checkList.list){
-                    let rowIndex = listItem.split('||').pop();
+                    let rowId = listItem.split('||').pop();
                     
                     for (let i=0; i<newData.length; i++){
-                        if (rowIndex === newData[i].id) {
+                        if (rowId === newData[i].id) {
                             newData.splice(i, 1);
                             break;
                         }
@@ -123,10 +150,19 @@ const DataTable = props => {
         }
     }
 
-    const goToEditScreen = () => {
-        setCurrScreen('Edit');
-        setData([]);
-        setCheckList({type: 'row', list: []});
+    const goToEditScreen = async() => {
+        // FETCHING DATATABLES VIA API
+        try{
+            // const datatables = await utilApi.fetchDataTables();
+
+            // if (datatables.error) throw datatables.error;
+            
+            // setDataTables(datatables);
+            props.setScreenType('datatable-Edit');
+        }
+        catch(error) {
+
+        }
     }
 
     const Popup = () => (
@@ -159,9 +195,9 @@ const DataTable = props => {
             }
         </div>
 
-        { currScreen==="Edit" &&<SearchDataTable /> }
+        { currScreen==="Edit" && <SearchDataTable dataTables={dataTables} setData={setData} setHeaders={setHeaders} /> }
 
-        <div className="dt__table_container full__dt">
+        <div className="dt__table_container full__dt" id={currScreen==="Create"?"createscreen":"editscreen"}>
             {data.length>0 && 
             <Table 
                 data={data}
@@ -174,15 +210,17 @@ const DataTable = props => {
                 dnd={dnd} 
             />}
         </div>
+
+        <ImportExport currScreen={currScreen}/>
     </>;
 }
 
 const TableActionButtons = ({ onAdd, setDnd, onDelete }) => {
 
     const tableActionBtnGroup = [
-        {'title': 'Add Row', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add Row', onClick: ()=>onAdd()},
+        {'title': 'Add Selected Row/Column', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add', onClick: ()=>onAdd()},
         {'title': 'Drag & Drop Row', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Row', onClick:  ()=>setDnd(dnd => !dnd)},
-        {'title': 'Remove Row', 'img': 'static/imgs/ic-delete.png', 'alt': 'Remove Row', onClick:  ()=>onDelete()}
+        {'title': 'Remove Selected Row/Column', 'img': 'static/imgs/ic-delete.png', 'alt': 'Remove', onClick:  ()=>onDelete()}
     ]
 
     return (
@@ -216,16 +254,33 @@ const EditScreenActionButtons = props => {
 
 const SearchDataTable = props => {
     const searchRef = useRef('');
-    const [list, setList] =  useState([])
-    const [dropdown,setDropdown] = useState(false)
+    const [list, setList] =  useState([]);
+    const [filteredList, setFilteredList] = useState([]);
+    const [dropdown, setDropdown] = useState(false);
+
+    useEffect(()=>{
+        setList(props.dataTables);
+    }, [props.dataTables])
+
+    const onTableSelect = event => {
+        // const [newData, newHeaders] = parseTableData(tableData)
+        // props.setData(newData);
+        // props.setHeaders(newHeaders);
+        // searchRef.current.value = event.target.value;
+        // setDropdown(false);
+    }
 
     const inputFilter = () =>{
-
+        const searchInput = searchRef.current.value;
+        let newFilteredList=[];
+        if (searchInput) 
+            newFilteredList = list.filter(item => item.datatablename === searchInput);
+        setFilteredList(newFilteredList);
     }
     const resetField = () => {
         searchRef.current.value = "";
-        setList([]);
-        setDropdown(true)
+        setFilteredList([]);
+        setDropdown(true);
     }
 
     return(
@@ -234,17 +289,49 @@ const SearchDataTable = props => {
         <ClickAwayListener onClickAway={()=>setDropdown(false)}>
         <div className="dt__searchDataTable">
             <input ref={searchRef} type='text' autoComplete="off" className="btn-users edit-user-dropdown-edit" onChange={inputFilter} onClick={resetField} placeholder="Search Data Table..."/>
-            <div className="form-inp-dropdown" role="menu" style={{display: (dropdown?"block":"none")}}>
+            <div className="dt__form_dropdown" role="menu" style={{display: (dropdown?"block":"none")}}>
                 <ScrollBar thumbColor="#929397" >
-                {list.map((e, i) => (  
-                    <option key={i}value={e}> {e}</option> 
-                ))}
+                {(filteredList.length ? filteredList : list)
+                    .map((e, i) => (  
+                        <option key={e._id} value={e.datatablename} onClick={onTableSelect}>{e.datatablename}</option> 
+                    ))}
                 </ScrollBar>
             </div>
         </div>
         </ClickAwayListener>
         </>
     )
+}
+
+const ImportExport = props => {
+    return (
+        <div className="dt__taskBtns dt__importexport">
+            {
+                props.currScreen === "Create"
+                ? <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" >Import</button>
+                : <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" >Export</button>
+            }
+        </div>
+    );
+}
+
+const parseTableData = table => {
+    let newData = JSON.parse(JSON.stringify([...table.datatable]));
+    newData.forEach(row => {
+        row['id'] = uuid();
+    })
+    
+    // SETTING UP COLUMN HEADERS
+    let colHeaders = [...table.dtheaders];
+    let newHeaders = [];
+    for(let i=0; i<colHeaders.length; i++) {
+        newHeaders.push({
+            id: uuid(),
+            name: colHeaders[i],
+        })
+    }
+    
+    return [newData, newHeaders]
 }
 
 export default DataTable;

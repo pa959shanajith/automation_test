@@ -28,17 +28,13 @@ const CompareObjectList = () => {
         setViewString(newViewString);
 
         return ()=>{
-            dispatch({type: actions.SET_COMPAREOBJ, payload: {changedObj: [], notChangedObj: [], notFoundObj: []}})
-            dispatch({type: actions.SET_COMPAREFLAG, payload: false});
-            dispatch({type: actions.SET_COMPAREDATA, payload: {}});
+            dispatch({type: actions.RESET_COMPARE, payload: null})
         }
         //eslint-disable-next-line
     }, [])
 
     const closeCompare = () => {
-        dispatch({type: actions.SET_COMPAREOBJ, payload: {changedObj: [], notChangedObj: [], notFoundObj: []}})
-        dispatch({type: actions.SET_COMPAREFLAG, payload: false});
-        dispatch({type: actions.SET_COMPAREDATA, payload: {}});
+        dispatch({type: actions.RESET_COMPARE, payload: null})
     }
 
     const updateObjects = () => {

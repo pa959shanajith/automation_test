@@ -170,10 +170,12 @@ const UtilityCenter=(props)=>{
                         setPopup={setPopup}
                     /> }
                 
-            { props.screenType === "datatable"
+            { props.screenType.split('-')[0] === "datatable"
                 && <DataTable 
+                        currScreen={props.screenType.split('-').pop()}
                         setBlockui={setBlockui} 
                         setPopup={setPopup}
+                        setScreenType={props.setScreenType}
                     /> }
                 
         </div>
