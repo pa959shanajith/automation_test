@@ -4,6 +4,7 @@ import {ModalContainer } from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
+import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss'
 
 
@@ -47,6 +48,8 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
     const [fileUpload,setFiledUpload] = useState(undefined)
     const [sheetList,setSheetList] = useState([])
     const upload = () => {
+        setError('')
+        setFiledUpload(undefined)
         uploadFile({setBlockui,projList,uploadFileRef,setSheetList,setError,setFiledUpload})
     }
     const changeImportType = (e) => {
@@ -85,12 +88,14 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                         displayError('This project is not assigned to user')
                         return;
                     }
+                    var res = await importMindmap(data)
+                    if(res.error){setError(res.error);setBlockui({show:false});return;}
                     var req={
                         tab:"tabCreate",
                         projectid:data.projectid,
                         version:0,
                         cycId: null,
-                        moduleid:data._id
+                        moduleid:res._id
                     }
                     var res = await getModules(req)
                     if(res.error){displayError(res.error);return;}
@@ -111,7 +116,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
         }
     },[submit])
     return(
-        <div className = 'mp__import-popup'>
+        <div data-test='mp__import-popup' className = 'mp__import-popup'>
             <div>
                 <label>Import As: </label>
                 <select className='imp-inp' defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
@@ -149,7 +154,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                             </div>
                         </Fragment>:
                         <div>
-                            <label>upload File: </label>
+                            <label>Upload File: </label>
                             <input accept={acceptType[importType]} type='file' onChange={upload} ref={uploadFileRef}/>
                         </div>
                     }
@@ -280,7 +285,7 @@ const uploadFile = async({uploadFileRef,setSheetList,setError,setFiledUpload,pro
     var file = uploadFileRef.current.files[0]
     if(!file)return;
     var extension = file.name.substr(file.name.lastIndexOf('.')+1)
-    setBlockui({content:'uploading ...',show:true})
+    setBlockui({content:'Uploading ...',show:true})
     try{
         const result =  await read(file)
         if(extension === 'pd'){
@@ -369,5 +374,13 @@ const validNodeDetails = (value) =>{
     }
     return flag;
 };
+
+
+ImportMindmap.propTypes={
+    setImportPop : PropTypes.func.isRequired,
+    setBlockui :  PropTypes.func.isRequired,
+    displayError : PropTypes.func.isRequired,
+    setOptions :   PropTypes.func.isRequired
+}
 
 export default ImportMindmap;

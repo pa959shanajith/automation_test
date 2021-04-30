@@ -45,11 +45,11 @@ const GitButtonActions = (props) => {
             <div className="adminActionBtn">
                 {!props.showEdit?
                     <>
-                        <button onClick={()=>gitConfigAction('create')} className="a__btn btn-edit" title="Create">Create</button>
-                        <button onClick={onClickEdit} className="a__btn" title="Edit">Edit</button>
+                        <button data-test="git_create" onClick={()=>gitConfigAction('create')} className="a__btn btn-edit" title="Create">Create</button>
+                        <button data-test="git_edit" onClick={onClickEdit} className="a__btn" title="Edit">Edit</button>
                     </>:<>
-                        <button ref={updateBtnRef} onClick={()=>gitConfigAction('update')} className="a__btn btn-edit" title="Update" disabled={Project.current.value ==="def-opt"}>Update</button>
-                        <button onClick={()=>setShowDeleteModal(true)} className="a__btn" title="Delete" disabled={Project.current.value ==="def-opt"} >Delete</button>
+                        <button data-test="git_update" ref={updateBtnRef} onClick={()=>gitConfigAction('update')} className="a__btn btn-edit" title="Update" disabled={Project.current.value ==="def-opt"}>Update</button>
+                        <button data-test="git_delete" onClick={()=>setShowDeleteModal(true)} className="a__btn" title="Delete" disabled={Project.current.value ==="def-opt"} >Delete</button>
                     </>
                 }
             </div>  

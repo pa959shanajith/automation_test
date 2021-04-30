@@ -55,9 +55,9 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                         + ("0" + dt.getDate()).slice(-2) + " " + ("0" + dt.getHours()).slice(-2) + ":" + ("0" + dt.getMinutes()).slice(-2);
                 }
                 var scheduledDataParsed = [];
-                for(var i =0 ; i < result.length ; i++ ) {
+                for(var i =result.length-1 ; i>=0  ; i-- ) {
                     const eachScenarioDetails = result[i].scenariodetails[0];
-                    for(var j =0 ; j < eachScenarioDetails.length ; j++ ) {
+                    for(var j =eachScenarioDetails.length-1 ; j>=0  ; j-- ) {
                         let newScheduledScenario = {};
                         newScheduledScenario["target"] = result[i].target;
                         newScheduledScenario["cycleid"] = eachScenarioDetails[j].cycleid;

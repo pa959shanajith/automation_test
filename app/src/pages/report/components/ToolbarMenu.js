@@ -82,6 +82,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
                 setProjData(arr)
                 setRelList(arr[0].releases)
                 relRef.current.value = 'def-val'
+                projRef.current.value = arr[0].name
                 setCycList([])
             })()
         }else{
@@ -90,6 +91,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
                 setRelList(initProjData[0].releases)
                 setCycList([])
                 relRef.current.value = 'def-val'
+                projRef.current.value = initProjData[0].name
             }
         }
         setBlockui({show:false})

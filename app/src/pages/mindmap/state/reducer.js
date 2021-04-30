@@ -100,7 +100,7 @@ const reducer = (state = initialState , action) => {
                 ...state,
                 selectedProj : res.selectProj,
                 selectedModule : res.selectModule,
-                screenData : res.screendata,
+                screenData : res.screenData,
                 moduleList : res.moduleList,
                 importData : res.importData
             }
