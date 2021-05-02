@@ -17,7 +17,7 @@ export const readTestSuite_ICE = async(readTestSuite) => {
             data: {param : 'readTestSuite_ICE', readTestSuite : readTestSuite, fromFlag:"execution"},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -46,7 +46,7 @@ export const updateTestSuite_ICE = async(batchDetails) => {
             data: {param : 'updateTestSuite_ICE', batchDetails: batchDetails},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -80,7 +80,7 @@ export const reviewTask = async(projectId,taskId,taskstatus,version,batchTaskIDs
 				batchIds:batchTaskIDs},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -109,7 +109,7 @@ export const loadLocationDetails = async(scenarioName, scenarioId) => {
             data: {param : 'getTestcaseDetailsForScenario_ICE', testScenarioId : scenarioId},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -143,7 +143,7 @@ export const readTestCase_ICE = async(userInfo,testCaseId,testCaseName,versionnu
             screenName : screenName},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -173,7 +173,7 @@ export const ExecuteTestSuite_ICE = async(executionData) => {
             executionData: executionData},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {errorapi:'invalid session'};
         }
@@ -206,7 +206,7 @@ export const loginQCServer_ICE = async(qcURL,qcUserName,qcPassword) => {
                 qcaction: "domain"},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -240,7 +240,7 @@ export const loginQTestServer_ICE = async(qcURL,qcUserName,qcPassword, qcType) =
             qcaction: "domain"},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -265,7 +265,7 @@ export const getPools = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -295,7 +295,7 @@ export const getICE_list = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -331,7 +331,7 @@ export const loginZephyrServer_ICE = async(zephyrURL,zephyrUserName,zephyrPasswo
             },
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -362,7 +362,7 @@ export const updateAccessibilitySelection = async(suiteInfo) => {
             data: suiteInfo,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
