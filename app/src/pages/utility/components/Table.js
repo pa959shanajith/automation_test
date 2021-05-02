@@ -163,7 +163,7 @@ const HeaderCell = props => {
     return (
         <div className="dt__cell dt__table_header_cell" data-test="dt__header_cell">
             { edit 
-                ? <ClickAwayListener onClickAway={onBlur}><input value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress}/></ClickAwayListener>
+                ? <ClickAwayListener onClickAway={onBlur}><input value={value || ''} autoFocus onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress}/></ClickAwayListener>
                 : <div onDoubleClick={()=>setEdit(true)}  onClick={(e)=>props.updateCheckList(e, "col", props.headerId)}>{value}</div> }
         </div>
     );

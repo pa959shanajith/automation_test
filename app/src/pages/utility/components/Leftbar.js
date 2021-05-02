@@ -20,7 +20,7 @@ const Leftbar=(props)=>{
                     <div className="fa fa-database fa-2x util__execution_ic" id={(focus==="execution")? "selected":""}/>
                     <div>Execution Metrics</div>
                 </span>
-                <span onClick={()=>{props.setScreenType("datatable");  setFocus("datatable"); }}>
+                <span onClick={()=>{props.setScreenType("datatable-Create");  setFocus("datatable"); }}>
                     <div className="fa fa-database fa-2x util__execution_ic" id={(focus==="datatable")? "selected":""}/>
                     <div>Data Table</div>
                 </span>

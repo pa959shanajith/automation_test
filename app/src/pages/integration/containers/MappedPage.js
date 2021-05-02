@@ -63,7 +63,8 @@ const MappedPage = props =>{
                 props.mappedfilesRes.forEach(object => {
                     tempRow.push({
                         "testCaseNames": object.qtestsuite, 
-                        "scenarioNames": object.testscenarioname
+                        "scenarioNames": object.testscenarioname,
+                        "reqDetails": object.reqdetails
                     });
                 })
             }
@@ -225,13 +226,13 @@ const MappedPage = props =>{
                         <div className="viewMap__inner">
                             <div className="viewMap__contents" id="viewMapScrollId">
                             <ScrollBar scrollId="viewMapScrollId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                                { rows.map(({scenarioNames, testCaseNames}, index) => <div key={index} className="viewMap__labelRow">
+                                { rows.map(({scenarioNames, testCaseNames, reqDetails}, index) => <div key={index} className="viewMap__labelRow">
                                     <MappedLabel 
                                         list={testCaseNames} 
                                         type="testcase" 
                                         mapIdx={index} 
                                         screenType = {props.screenType}
-                                        reqDetails = {props.mappedfilesRes[index].reqdetails}
+                                        reqDetails = {reqDetails}
                                         handleClick={props.screenType === "ALM" ? handleClick : null} 
                                         selected={selectedTc} 
                                         unSynced={unSynced}
