@@ -150,7 +150,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                             </div>
                             <div>
                                 <label>Folder Path: </label>
-                                <input placeholder={'Ex: Projectname/modulename (optional)'} ref={gitPathRef}/>
+                                <input placeholder={'Ex: Projectname/Modulename'} ref={gitPathRef}/>
                             </div>
                         </Fragment>:
                         <div>
