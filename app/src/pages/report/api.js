@@ -17,7 +17,7 @@ export const getAllSuites_ICE = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -45,7 +45,7 @@ export const getReportsData_ICE = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -73,7 +73,7 @@ export const getSuiteDetailsInExecution_ICE = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -100,7 +100,7 @@ export const reportStatusScenarios_ICE = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -126,7 +126,7 @@ export const viewReport = async(reportId, reportType) => {
             responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -152,7 +152,7 @@ export const getAccessibilityData = async(data) =>{
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }

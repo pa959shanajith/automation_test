@@ -18,7 +18,7 @@ export const getProjectList = async() => {
             data: {"action":"populateProjects"},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -49,7 +49,7 @@ export const getModules = async(props) => {
         });
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
-        }else if(res.status === 401){
+        }else if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -75,7 +75,7 @@ export const getScreens = async(projectId) => {
             data: {projectId:projectId},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -115,7 +115,7 @@ export const saveMindmap = async(props) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -145,7 +145,7 @@ export const exportToExcel = async(props) => {
             credentials: 'include',
             responseType:'arraybuffer'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -176,7 +176,7 @@ export const exportMindmap = async(moduleId) => {
             },
             credentials: 'include',
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -205,7 +205,7 @@ export const populateScenarios = async(moduleID) => {
             data: {"action":"populateScenarios","moduleId":moduleID},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -238,7 +238,7 @@ export const readTestSuite_ICE = async(data) => {
 			},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -267,7 +267,7 @@ export const populateUsers = async(projectId) => {
             data: {"projectId":projectId},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -298,7 +298,7 @@ export const excelToMindmap = async(data) => {
             data: {'data':data},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -333,7 +333,7 @@ export const importMindmap = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -361,7 +361,7 @@ export const pdProcess = async(data) => {
             data: {'data':data},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -389,7 +389,7 @@ export const importGitMindmap = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -429,7 +429,7 @@ export const exportToGit = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }

@@ -19,7 +19,7 @@ export const readTestSuite_ICE = async(readTestSuite) => {
             fromFlag: "scheduling"},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -48,7 +48,7 @@ export const getScheduledDetails_ICE = async() => {
             data: {param : 'getScheduledDetails_ICE'},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -78,7 +78,7 @@ export const testSuitesScheduler_ICE = async(executionData) => {
             executionData: executionData},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -111,7 +111,7 @@ export const cancelScheduledJob_ICE = async(schDetails, host, schedUserid) => {
             schedUserid: schedUserid},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }

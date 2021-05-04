@@ -20,7 +20,7 @@ export const Encrypt_ICE = async(encryptionType ,encryptionValue) => {
             param : 'Encrypt_ICE'
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -47,7 +47,7 @@ export const fetchMetrics = async(arg) => {
                 metrics_data : arg
             }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
