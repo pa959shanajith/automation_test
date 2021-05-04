@@ -29,9 +29,9 @@ const AccStatusPanel = ({arr,selectedScDetails,scDetails}) =>{
                     <div className='ac__panel-head'>Report Data</div>
                     <div className='ac__panel-body'>
                         <div className='left-float'>
-                            <div><span className='title'>Crawl Name</span><span>{scDetails[0].screenname}</span></div>
-                            <div><span className='title'>URL</span><span>{scDetails[0].url}</span></div>
-                            <div><span className='title'>Agent</span><span className='ac__panel_title' >{scDetails[0].agent}</span></div>
+                            <div><span className='title'>Crawl Name</span><span className='content'>{scDetails[0].screenname}</span></div>
+                            <div><span className='title'>URL</span><span className='content'>{scDetails[0].url}</span></div>
+                            <div><span className='title'>Agent</span><span className='content ac__panel_title'>{scDetails[0].agent}</span></div>
                         </div>
                     </div>
                 </div>

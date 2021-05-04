@@ -99,7 +99,7 @@ const ExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,sele
                             <div key={e.execution_id} onClick={onClickRow} name={(sortUp)?i+1:suiteDetails.length-i} value={e.execution_id} className={'rp__row'+(selectedScDetails._id===e.execution_id?" selected-row":"")}>
                                 <div className='rp__col'>E<sub>{(sortUp)?i+1:suiteDetails.length-i}</sub></div>
                                 <div data-test="start_date" className='rp__col'>{formatDate(e.start_time)}</div>
-                                <div data-test="end_date" className='rp__col'>{formatDate(e.end_time)}</div>
+                                <div data-test="end_date" className='rp__col'>{(e.end_time!=="- ")?formatDate(e.end_time):formatDate(e.start_time)}</div>
                             </div>):
                             <div style={{textAlign:'center',padding:'30px',height:'100%'}} className='rp__row'>
                                 No record(s) found
