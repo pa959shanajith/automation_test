@@ -59,6 +59,10 @@ const GitConfig = (props) => {
         domainRef.current.style.outline = "";
         ProjectRef.current.style.outline = "";
         userRef.current.style.outline = "";
+        if(showEdit) {
+            tokenRef.current.value = "";
+            urlRef.current.value = "";
+        }
     } 
 
     const resetFields = () => {
