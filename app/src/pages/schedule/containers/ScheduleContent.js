@@ -120,6 +120,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
     }
 
     const ScheduleTestSuitePopup = () => {
+        if(document.getElementsByClassName('rdtOpen').length>0)return;
         const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction);
         const valid = checkSelectedModules(scheduleTableData, setPopupState);
         const checkDateTime = checkDateTimeValues(scheduleTableData, moduleScheduledate, setModuleScheduledate, setPopupState);
