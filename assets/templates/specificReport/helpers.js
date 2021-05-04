@@ -20,3 +20,7 @@ function getClass(StepDescription) {
     if(StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1) return "collapsible-tc demo1";
     else return "rDstepDes tabCont";
 }
+function checkStatus(overAllStatus) {
+    if(overAllStatus == "Skipped") return true;
+    else false;
+}

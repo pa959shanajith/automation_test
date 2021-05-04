@@ -1061,7 +1061,7 @@
       </div>
       {{/each}}
       <div class='buttonDivBox'>
-         <button class="logintojira" title="Login to Jira">Jira Login</button>
+         <button class="logintojira" title="Login to Jira" disabled={{checkStatus status}}>Jira Login</button>
          <button class="disconnectJira" title="Disconnect from Jira">Disconnect</button>
          <label class="Llogdefect">Log Defect</label>
          <input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5" />
