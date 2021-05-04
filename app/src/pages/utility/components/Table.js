@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import { ScrollBar } from '../../global';
 import { ReactSortable } from 'react-sortablejs';
@@ -13,7 +13,9 @@ import "../styles/Table.scss";
 */
 
 const Table = props => {
-    
+
+    const headerRef = useRef();
+    const rowRef = useRef();
 
     const updateHeaders = (newHeader, headerId) => {
         let newHeaders = [...props.headers];
@@ -66,24 +68,49 @@ const Table = props => {
         props.setCheckList(newCheckList);
     }
 
+    const onScrollY = e =>{
+        rowRef.current.style.top = `-${e.scrollTop}px`
+    }
+
+    const onScrollX = e => {
+        headerRef.current.style.left = `-${e.scrollLeft}px`;
+    }
+
     return (
         <>
         { <div className="dt__table full__dt">
-            <ScrollBar scrollId="dt__outer" hideYbar={true}>
-            <Headers 
-                headers={props.headers} 
-                setHeaders={props.setHeaders}
-                onAdd={props.onAdd}
-                updateHeaders={updateHeaders} 
-                updateCheckList={updateCheckList}
-            />
-            <Rows 
+            <RowNumColumn
                 { ...props }
-                headers={props.headers}
+                rowRef={rowRef}
                 updateCheckList={updateCheckList}
-                updateTableData={updateTableData}
             />
-            </ScrollBar>
+            {/* <ScrollBar scrollId="dt__outer" hideYbar={true}> */}
+            <div style={{display: 'flex', flexDirection: 'column',  width: '100%',height: '100%'}}>
+                <div style={{position: 'relative', height: '31px', width: '100%', overflow: 'hidden', marginBottom: '2px'}}>
+                    <div ref={headerRef} style={{position: 'absolute', right: '0', left: '0', overflow:'hidden'}}>
+                        <Headers 
+                            // headerRef={headerRef}
+                            headers={props.headers} 
+                            setHeaders={props.setHeaders}
+                            onAdd={props.onAdd}
+                            updateHeaders={updateHeaders} 
+                            updateCheckList={updateCheckList}
+                        />
+                    </div>
+                </div>
+                
+                <div className="full__dt" style={{ display: 'flex' }}>
+                    <Rows 
+                        onScrollY={onScrollY}
+                        onScrollX={onScrollX}
+                        { ...props }
+                        headers={props.headers}
+                        updateCheckList={updateCheckList}
+                        updateTableData={updateTableData}
+                    />
+                </div>
+            </div>                        
+            {/* </ScrollBar> */}
         </div> }
         </>
     );
@@ -93,18 +120,19 @@ export default Table;
 
 const Headers = ({headers, setHeaders, updateHeaders, updateCheckList, onAdd}) => {
     return(
-        <div className="dt__table_header">
-        <div className="dt__table_numbered_column_header" />
+        <div className="dt__table_header" >
+        {/* <div className="dt__table_numbered_column_header" /> */}
         <ReactSortable 
             list={headers} 
             setList={setHeaders}
             className="dt__table_header_cells"
             ghostClass="dt__ghost_header"
         >
-            { headers.map(header => {
+            { headers.map((header, headerIndex) => {
                 return (
                     <HeaderCell  
                         key={`header-${header.id}`}
+                        headerIndex={headerIndex}
                         headerName={header.name}
                         headerId={header.id}
                         headers={headers}
@@ -128,43 +156,32 @@ const Headers = ({headers, setHeaders, updateHeaders, updateCheckList, onAdd}) =
     updateHeaders => updates Header State and all headers in data
 */
 const HeaderCell = props => {
-    const [value, setValue] = useState(props.headerName || '');
-    const [edit, setEdit] = useState(false);
+    const [value, setValue] = useState(props.headerIndex || '')
 
     useEffect(() => {
-        setValue(props.headerName)
-    }, [props.headerName]);
+        setValue(props.headerIndex)
+    }, [props.headerIndex]);
 
-    const onChange = e => setValue(e.target.value);
+    // const onBlur = e => {
+    //     let invalidHeader = false;
+    //     props.headers.forEach(header => {
+    //         if (!value.trim() || (header.name === value && header.id!==props.headerId)) invalidHeader = true;
+    //     })
 
-    const checkKeyPress = event => {
-        if (event.keyCode === 13) {
-            if (onBlur()) setEdit(false);
-        }
-    }
-
-    const onBlur = e => {
-        let invalidHeader = false;
-        props.headers.forEach(header => {
-            if (!value.trim() || (header.name === value && header.id!==props.headerId)) invalidHeader = true;
-        })
-
-        if (invalidHeader){
-           console.log("ERROR")
-            return false;
-        }
-        else {
-            props.updateHeaders(value, props.headerId)
-            setEdit(false);
-        }
-        return true;
-    };
+    //     if (invalidHeader){
+    //        console.log("ERROR")
+    //         return false;
+    //     }
+    //     else {
+    //         props.updateHeaders(value, props.headerId)
+    //         setEdit(false);
+    //     }
+    //     return true;
+    // };
 
     return (
         <div className="dt__cell dt__table_header_cell" data-test="dt__header_cell">
-            { edit 
-                ? <ClickAwayListener onClickAway={onBlur}><input value={value || ''} autoFocus onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress}/></ClickAwayListener>
-                : <div onDoubleClick={()=>setEdit(true)}  onClick={(e)=>props.updateCheckList(e, "col", props.headerId)}>{value}</div> }
+            <div onClick={(e)=>props.updateCheckList(e, "col", props.headerId)}>{`C${value+1}`}</div> 
         </div>
     );
 }
@@ -177,8 +194,8 @@ const Rows = props => {
         <div className="dt__ab">
         <div className="dt__min">
         <div className="dt__con" id="dt__tcListId">
-        <ScrollBar scrollId="dt__tcListId" horizontalbarWidth="0px" verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
-            <ReactSortable list={props.data} setList={props.setData} disabled={!props.dnd} key={props.dnd.toString()}>
+        <ScrollBar scrollId="dt__tcListId" horizontalbarWidth="8px" verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" onScrollX={props.onScrollX} onScrollY={props.onScrollY}>
+            {/* <ReactSortable list={props.data} setList={props.setData} disabled={!props.dnd} key={props.dnd.toString()}> */}
             { props.data.map((row, rowIndex)=>{
                 return (
                     <Row 
@@ -193,7 +210,7 @@ const Rows = props => {
                     />
                 )
             }) }
-            </ReactSortable>
+            {/* </ReactSortable> */}
             </ScrollBar>
             </div>
             </div>
@@ -202,17 +219,37 @@ const Rows = props => {
     );
 }
 
+const RowNumColumn = props => {
+    return (
+        <div style={{display: 'flex', flexDirection: 'column', height: '102%'}}>
+            <div className="dt__table_numbered_column_header" style={{minHeight: '29px'}}/>
+            <div style={{position: 'relative',  height: '100%', overflow: 'hidden'}}>
+                <div ref={props.rowRef} style={{position: 'absolute', right: '0', left: '0', overflow:'hidden'}}>
+                <ReactSortable list={props.data} setList={props.setData} disabled={!props.dnd} key={props.dnd.toString()} ghostClass="dt__ghost_header">
+                { props.data.map((row, rowIndex)=>{
+                    return (
+                        <div 
+                            key={`rownum-${row.id}`}
+                            className="dt__table_numbered_column " 
+                            onClick={(e)=>props.updateCheckList(e, "row", row.id)}
+                            data-test="dt__number_cell"
+                            style={{minHeight: '35px'}}
+                        >
+                            {rowIndex+1}
+                        </div>
+                    )
+                }) }
+                </ReactSortable>
+                </div>
+            </div>   
+        </div>
+    );
+}
+
 const Row = props => {
 
     return (
         <div className="dt__table_row" data-test="dt__row">
-            <div 
-                className={ "dt__table_numbered_column "+ (props.checkList.list.includes(`sel||row||${props.row.id}`)?"dt__selected_cell":"")} 
-                onClick={(e)=>props.updateCheckList(e, "row", props.row.id)}
-                data-test="dt__number_cell"
-            >
-                {props.rowIndex+1}
-            </div>
             { props.headers.map(header => {
                 return (
                     <DataCell 
