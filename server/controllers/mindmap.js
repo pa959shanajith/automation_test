@@ -1578,6 +1578,7 @@ exports.importGitMindmap = async (req, res) => {
 			gitfolderpath="avoassuretest_artifacts/"+gitfolderpath
 		}
 		const inputs= {
+			"userid": req.session.userid,
 			"projectid": projectid,
 			"gitbranch": gitbranch,
 			"gitversion":gitversion,
