@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollBar, CalendarComp, TimeComp} from '../../global'
 import {readTestSuite_ICE} from '../api';
 import "../styles/ScheduleSuitesTopSection.scss";
 
 const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, current_task, displayError, setLoading, scheduleTableData, setScheduleTableData}) => {
+
+    const [closeCal, setCloseCal] = useState(false);
     
     useEffect(()=>{
         if (Object.keys(current_task).length!==0){
@@ -139,14 +141,14 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
             <div className="s__ab">
                 <div className="s__min">
                     <div className="s__con" id="schSuiteTable">
-                        <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
+                        <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" onScrollY={()=>setCloseCal(true)}>
                         {scheduleTableData.map((rowData,i)=>(
                             <div key={i} className="batchSuite">
-                                <div className="scheduleSuite" >
+                                <div className="scheduleSuite" id={`ss-id${i}`} >
                                     <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" />
                                     <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span>
                                     <TimeComp time={moduleScheduledate[rowData.testsuiteid]["time"]} setTime={(val)=>{updateDateTime("time",val,rowData.testsuiteid)}} inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropstime"]} classTimer="schedule_timer"/>
-                                    <CalendarComp inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropsdate"]}  date={moduleScheduledate[rowData.testsuiteid]["date"]} setDate={(val)=>{updateDateTime("date",val,rowData.testsuiteid)}} classCalender="schedule_calender"/>
+                                    <CalendarComp idx={i} closeCal={closeCal} setCloseCal={setCloseCal} screen="scheduleSuiteTop" inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropsdate"]}  date={moduleScheduledate[rowData.testsuiteid]["date"]} setDate={(val)=>{updateDateTime("date",val,rowData.testsuiteid)}} classCalender="schedule_calender"/>
                                 </div>
                                 <table className="scenarioSchdCon scenarioSch_' + i + '">
                                     <thead className="scenarioHeaders">

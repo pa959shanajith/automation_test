@@ -12,7 +12,7 @@ const DataTable = props => {
     const [currScreen, setCurrScreen] = useState(props.currScreen);
     const [data, setData] = useState([{id: uuid()}]);
 
-    const [headers, setHeaders] = useState([{id: uuid(), name: 'Header 1'}, {id: uuid(), name: 'Header 2'}]);
+    const [headers, setHeaders] = useState([{id: uuid(), name: 'C1'}, {id: uuid(), name: 'C2'}]);
     const [checkList, setCheckList] = useState({type: 'row', list: []});
     const [dnd, setDnd] = useState(false);
     const [headerCounter, setHeaderCounter] = useState(3);
@@ -49,7 +49,7 @@ const DataTable = props => {
             setDataTables([]);
         }
         else setData([]);
-        setHeaders([{id: uuid(), name: 'Header 1'}, {id: uuid(), name: 'Header 2'}]);
+        setHeaders([{id: uuid(), name: 'C1'}, {id: uuid(), name: 'C2'}]);
         setCheckList({type: 'row', list: []});
         setDnd(false);
         setHeaderCounter(3);
@@ -68,7 +68,7 @@ const DataTable = props => {
             
             newHeaders.push({
                 id: uuid(),
-                name: `Header ${headerCounter}`
+                name: `C${headerCounter}`
             })
 
             setHeaders(newHeaders);
@@ -99,7 +99,7 @@ const DataTable = props => {
                 
                 newHeaders.splice(locToAdd+1, 0, {
                     id: uuid(),
-                    name: `Header ${headerCounter}`
+                    name: `C${headerCounter}`
                 })
 
                 setHeaders(newHeaders);
@@ -210,8 +210,6 @@ const DataTable = props => {
                 dnd={dnd} 
             />}
         </div>
-
-        <ImportExport currScreen={currScreen}/>
     </>;
 }
 
@@ -237,6 +235,7 @@ const TableActionButtons = ({ onAdd, setDnd, onDelete }) => {
 const CreateScreenActionButtons = props => {
     return (
         <div className="dt__taskBtns">
+            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" >Import</button>
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={props.goToEditScreen}>Edit</button>
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={props.displayData}>Create</button>
         </div>
@@ -246,6 +245,7 @@ const CreateScreenActionButtons = props => {
 const EditScreenActionButtons = props => {
     return (
         <div className="dt__taskBtns">
+            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" >Export</button>
             <button className="dt__taskBtn dt__btn">Delete</button>
             <button className="dt__taskBtn dt__btn">Update</button>
         </div>
@@ -301,18 +301,6 @@ const SearchDataTable = props => {
         </ClickAwayListener>
         </>
     )
-}
-
-const ImportExport = props => {
-    return (
-        <div className="dt__taskBtns dt__importexport">
-            {
-                props.currScreen === "Create"
-                ? <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" >Import</button>
-                : <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" >Export</button>
-            }
-        </div>
-    );
 }
 
 const parseTableData = table => {

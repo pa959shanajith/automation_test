@@ -1,6 +1,7 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Datetime from "react-datetime";
+import ClickAwayListener from 'react-click-away-listener';
 import {useSelector} from 'react-redux';
 import moment from "moment";
 import '../styles/CalendarComp.scss'
@@ -8,10 +9,11 @@ import '../styles/CalendarComp.scss'
 
 /*Component CalendarComp
   use: returns Calendar component
-  props : {setDate:state,date:datevalue,disbled:boolean,classCalender:string,error:boolean}
+  props : {setDate:state,date:datevalue,disbled:boolean,classCalender:string,error:boolean,closeCal:boolean,setCloseCal:bool,idx:int(optional),screen:string(optional)}
 */
 
 const CalendarComp = (props) => {
+    const [showCal,setShowCal] = useState(false)
     const dateRef = useRef()
     const setDate = props.setDate
     const disabled = props.disabled
@@ -20,7 +22,13 @@ const CalendarComp = (props) => {
     var dateVal = props.date;
     const classCalender = props.classCalender
     const error = props.error
+    const closeCal = props.closeCal
+    const setCloseCal = props.setCloseCal
+
     const inputProps = props.inputProps
+    useEffect(()=>{
+        if(closeCal)setShowCal(false)
+    },[closeCal])
     const valid = (current) =>{
         var yesterday;
         if(props.execMetrics){
@@ -40,10 +48,23 @@ const CalendarComp = (props) => {
     };
     const openDate = ()=> {
         if(disabled)return;
-        dateRef.current._onInputClick()
+        setShowCal(true);
+        setCloseCal && setCloseCal(false);
+        // (props.dateRef || dateRef).current._onInputClick()
+        if (props.screen === "scheduleSuiteTop"){
+            let suiteHeader = document.getElementById(`ss-id${props.idx}`);
+            if (suiteHeader) {
+                const picker = suiteHeader.getElementsByClassName("rdtPicker");
+                if (picker.length === 2){
+                    let offset = `${suiteHeader.getBoundingClientRect().y + suiteHeader.getBoundingClientRect().height}px`
+                    picker[1].style.top = offset;
+                }
+            }
+        }
     }
     const submit = (event) => {
         setDate(event.format("DD-MM-YYYY"))
+        setShowCal(false);
     }
     const formatDate = (date) => {
         if (!(date.includes("/") || date.includes("-"))) return date;
@@ -72,25 +93,29 @@ const CalendarComp = (props) => {
         }
         return arr.join('-');
     }
+
+
+
     return(
-        <span data-test='calendar-comp' className={"date-container " + (classCalender? " "+classCalender:"")} >
+        <ClickAwayListener onClickAway={()=> setShowCal(false)} data-test='calendar-comp' className={"date-container " + (classCalender? " "+classCalender:"")} as="span">
             <Datetime
-                closeOnClickOutside={true}
                 ref={dateRef} 
                 closeOnSelect={true}
                 isValidDate={valid}
                 value={dateVal} 
+                open={showCal}
                 onChange={submit}
-                dateFormat="DD/MM/YYYY"
+                dateFormat="DD-MM-YYYY"
                 inputProps={inputProps!==undefined?inputProps:inputPropsDefault} 
                 timeFormat={false} 
                 id="data-token"
+                onOpen={openDate}
                 renderInput={(props) => {
-                    return <input {...props} value={ formatDate(dateVal) ? formatDate(props.value) : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
+                    return <input {...props}value={ formatDate(dateVal) ? formatDate(props.value) : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
                 }}
             />
             <img  data-test="datePickerIcon"onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
-        </span>
+        </ClickAwayListener>
     )
 }
 
