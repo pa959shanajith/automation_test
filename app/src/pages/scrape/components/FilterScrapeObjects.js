@@ -55,7 +55,7 @@ export const isSelectedElement = (selectedFilterTag, ScrapeObjectTag) => {
 
     if (
         selectedTag === objectTag
-        || (objectTag.includes(selectedTag) && selectedTag !== "a" && objectTag !== "radio button" && objectTag !== "radiobutton" && objectTag.includes("listview") && objectTag.includes("tablecell"))
+        || (objectTag.includes(selectedTag) && selectedTag !== "a" && objectTag !== "radio button" && !objectTag !== "radiobutton" && !objectTag.includes("listview") && !objectTag.includes("tablecell"))
         || (selectedTag === "input" && (objectTag.includes("edit") || objectTag.inculdes("text")))
         || (selectedTag === "select" && objectTag.includes("combo box"))
         || (selectedTag === "a" && (objectTag.includes("hyperlink"))) 
