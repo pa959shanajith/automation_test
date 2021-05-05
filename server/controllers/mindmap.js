@@ -1509,9 +1509,12 @@ exports.exportToGit = async (req, res) => {
 	try {
 		const data = req.body;
 		const gitVersionName = data.gitVersion;
-		const gitFolderPath = "AvoAssureTest_Artifacts/"+data.gitFolderPath;
+		var gitFolderPath = data.gitFolderPath;
 		const gitBranch = data.gitBranch;
 		const moduleId = data.mindmapId;
+		if(!gitFolderPath.startsWith("avoassuretest_artifacts")){
+			gitFolderPath="avoassuretest_artifacts/"+gitFolderPath
+		}
 		const inputs = {
 			"moduleId":moduleId,
 			"userid":req.session.userid,
@@ -1578,6 +1581,7 @@ exports.importGitMindmap = async (req, res) => {
 			gitfolderpath="avoassuretest_artifacts/"+gitfolderpath
 		}
 		const inputs= {
+			"userid": req.session.userid,
 			"projectid": projectid,
 			"gitbranch": gitbranch,
 			"gitversion":gitversion,
