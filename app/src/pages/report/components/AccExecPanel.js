@@ -100,7 +100,7 @@ const AccExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails})
                     <ScrollBar scrollId='ac__row_content' trackColor='transparent'>
                     {(suiteDetails.length>0)?
                         suiteDetails.map((e,i)=>
-                        <div key={e.execution_id} onClick={onClickRow} name={(sortUp)?i+1:suiteDetails.length-i} value={e._id} className={'ac__row'+(false?" selected-row":"")}>
+                        <div key={`ac-${i}`} onClick={onClickRow} name={(sortUp)?i+1:suiteDetails.length-i} value={e._id} className={'ac__row'+(false?" selected-row":"")}>
                             <div className='ac__col'>E<sub>{(sortUp)?i+1:suiteDetails.length-i}</sub></div>
                             <div data-test="ac_title" className='ac__col'>{e.title}</div>
                             <div data-test="ac_executedtime" className='ac__col'>{formatDate(e.executedtime)}</div>

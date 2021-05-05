@@ -42,11 +42,13 @@ function loadReports() {
             cdict[p[0]] = decodeURIComponent(p[1])
         })
         var secCook = cdict['XSRF-TOKEN'];
+        $('.logintojira').show();
         var overallStatus = $('.overallStatusVal').text();
         if(overallStatus.indexOf('Incomplete') != '-1') {
             $('.toggleIncompleteStatus').hide();
         } else if(overallStatus.indexOf('Skipped') != '-1'){
             $('.toggleIncompleteStatus').show();
+            $('.logintojira').hide();
             unblockUI();
         } else {
             $('.toggleIncompleteStatus').show();

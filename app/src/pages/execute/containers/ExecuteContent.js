@@ -92,10 +92,10 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                 curr_task.accessibilityParameters = accessibilityParameters;
                 dispatch({type: actionTypes.SET_CT, payload: curr_task});
 
-                let tj = {...tasksJson};
-                for(var index in tj){
-                    if(tj[index].uid === curr_task.uid){
-                        tj[index].accessibilityParameters = curr_task.accessibilityParameters;
+                let tj = [...tasksJson];
+                for(var task in tj){
+                    if(task.uid === curr_task.uid){
+                        task.accessibilityParameters = curr_task.accessibilityParameters;
                         break;
                     }
                 }
