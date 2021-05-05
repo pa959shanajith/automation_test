@@ -10,6 +10,7 @@ const PluginSection = ({userInfo}) => {
         "Mindmap": { title: "Mindmaps", show: false },
         "Reports": { title: "Reports", show: false},
         "Utility" : { title: "Utilities", show: false},
+        "Dashboard": {title:"Dashboard", show: false},
         "showList" : false,
     });
 

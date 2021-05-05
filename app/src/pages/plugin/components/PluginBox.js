@@ -9,7 +9,11 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 	const pluginRedirect = () => {
 		pluginName = pluginName.toLowerCase();
 		window.localStorage['navigateScreen'] = pluginName;
-		if (['report', 'performancetesting', 'dashboard'].indexOf(pluginName) > -1) window.location.href = "/"+ pluginName;
+		if(pluginName==='dashboard'){
+			window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
+			window.location.href = "/"+ pluginName;
+		}
+		else if (['report', 'performancetesting'].indexOf(pluginName) > -1) window.location.href = "/"+ pluginName;
 		else {
 			if (pluginName === "integration") window.localStorage['integrationScreenType'] = null
 			setRedirectTo(`/${pluginName}`)
