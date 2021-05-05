@@ -142,11 +142,11 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                             </div>
                             <div>
                                 <label>Git Branch: </label>
-                                <input placeholder={'git branch name'} ref={gitBranchRef}/>
+                                <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Branch name'} ref={gitBranchRef}/>
                             </div>
                             <div>
                                 <label>Version: </label>
-                                <input placeholder={'version name'} ref={gitVerRef}/>
+                                <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version name'} ref={gitVerRef}/>
                             </div>
                             <div>
                                 <label>Folder Path: </label>
