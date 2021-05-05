@@ -210,6 +210,7 @@ const DesignContent = props => {
                                     }
                                     setOverlay("");
                                 }
+                                setDraggable(false);
                                 setTestCaseData(testcaseArray);
                                 setPastedTC([]);
                                 setObjNameList(getObjNameList(props.current_task.appType, scriptData.view));
