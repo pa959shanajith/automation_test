@@ -25,6 +25,7 @@ const TaskBox = (props) => {
     const unassignList = useSelector(state=>state.mindmap.unassignTask)
     const userInfo = useSelector(state=>state.login.userinfo)
     const selectedProj = useSelector(state=>state.mindmap.selectedProj)
+    const [closeCal,setCloseCal] = useState(false)
     const [warning,setWarning]=useState(false)
     const [task,setTask] = useState({arr:[],initVal:undefined})
     const [batchName,setBatchName] = useState({show:false})
@@ -288,6 +289,7 @@ const TaskBox = (props) => {
         clickAddTask({dNodes,nodeDisplay})
     }
     const stopPropagate = (e) => {
+        if(e.target && !e.target.className.includes("rdt"))setCloseCal(true);
         if(e.target && e.target.id === 'task-ok')return;
         e.stopPropagation()
         if(e.nativeEvent){
@@ -348,13 +350,13 @@ const TaskBox = (props) => {
                     {startDate.show?
                         <li data-test="startDate" id='ct-startDate'>
                             <label data-test="startDateLabel">Start Date</label>
-                            <CalendarComp disabled={assignbtn.reassign} date={startDate.value} setDate={(val)=>setStartDate({show:true,value:val})}/>
+                            <CalendarComp setCloseCal={setCloseCal} closeCal={closeCal} disabled={assignbtn.reassign} date={startDate.value} setDate={(val)=>setStartDate({show:true,value:val})}/>
                         </li>
                     :null}
                     {endDate.show?
                         <li data-test="endDate" id='ct-endDate'>
                             <label data-test="endDateLabel" >End Date</label>
-                            <CalendarComp disabled={assignbtn.reassign} date={endDate.value} setDate={(val)=>setEndDate({show:true,value:val})}/>
+                            <CalendarComp setCloseCal={setCloseCal} closeCal={closeCal} disabled={assignbtn.reassign} date={endDate.value} setDate={(val)=>setEndDate({show:true,value:val})}/>
                         </li>
                     :null}
                     {propagate.show?

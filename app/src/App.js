@@ -20,10 +20,12 @@ import SocketFactory from './SocketFactory';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-datetime/css/react-datetime.css';
-
+const { REACT_APP_DEV } = process.env
 /*Component App
   use: defines components for each url
 */
+
+export const url =  REACT_APP_DEV  ? "https://"+window.location.hostname+":8443" : window.location.origin;
 
 const App = () => {
   const [blockui,setBlockui] = useState({show:false})
