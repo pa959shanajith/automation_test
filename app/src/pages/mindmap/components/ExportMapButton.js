@@ -89,12 +89,12 @@ const Container = ({fnameRef,ftypeRef,modName,isAssign,gitBranchRef,gitVerRef,gi
             {(expType === 'git')?
                 <Fragment>
                     <div className='export-row'>
-                        <label>Branch Name: </label>
-                        <input placeholder={'branch name'} ref={gitBranchRef}/>
+                        <label>Git Branch: </label>
+                        <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Branch name'} ref={gitBranchRef}/>
                     </div>
                     <div className='export-row'>
                         <label>Version: </label>
-                        <input placeholder={'version name'} ref={gitVerRef}/>
+                        <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version name'} ref={gitVerRef}/>
                     </div>
                     <div className='export-row'>
                         <label>Folder Path: </label>
