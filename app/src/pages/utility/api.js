@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {RedirectPage} from '../global'
 import {history} from './index'
-const url = "https://"+window.location.hostname+":8443";
+import {url} from '../../App';
 
 /*Component Encrypt_ICE
   use: gets the Encrypted Value of the users Input based on encryption type also given by user only

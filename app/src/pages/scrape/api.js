@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { RedirectPage } from '../global';
 import { history } from './index';
-
-const url = "https://"+window.location.hostname+":8443";
+import {url} from '../../App';
 
 /*Component ActionBarItems (Scrape)
   api returns Invalid Session/Response Body exceeds max. Limit./scheduleModeOn/unavailableLocalServer/fail/Terminate/wrongWindowName/ExecutionOnlyAllowed/{"mirror":"","name":"",scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
