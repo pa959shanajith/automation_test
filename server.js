@@ -93,8 +93,10 @@ if (cluster.isMaster) {
 		};
 		// CORS and security headers
 		app.all('*', function(req, res, next) {
-			res.setHeader('Access-Control-Allow-Origin', req.hostname);
-			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
+			const origin =  req.headers["origin"] || req.hostname;
+			res.setHeader('Access-Control-Allow-Origin', origin);
+			res.setHeader('Access-Control-Allow-Credentials', true);
+			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Accept, Content-Type, Upgrade-Insecure-Requests');
 			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			next();
 		});
