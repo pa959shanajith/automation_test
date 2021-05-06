@@ -156,7 +156,11 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     const ExecuteTestSuitePopup = () => {
         const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction)
         const valid = checkSelectedModules(eachData, setPopupState);
-        if(check && valid) setAllocateICE(true);
+        if(scenarioTaskType === "exclusive" && accessibilityParameters.length === 0){
+            setPopupState({show:true,title:"Accessibility Standards",content:"Please select one or more accessibility testing standard to proceed."});
+            return ;
+        }
+        else if(check && valid) setAllocateICE(true);
     }    
 
     const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
@@ -365,10 +369,6 @@ const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleI
         
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
-                if(scenarioTaskType === "exclusive" && accessibilityParameters.length === 0){
-                    setPopupState({show:true,title:"Accessibility Standards",content:"Please select one or more accessibility testing standard to proceed."});
-                    return false;
-                }
                 selectedRowData.push({
                     condition: eachData[i].condition[j],
                     dataparam: [eachData[i].dataparam[j].trim()],
