@@ -162,7 +162,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                                             <td style={{padding: "2px 0 2px 0"}}><input type="text" value={(rowData.dataparam[j]).trim()} disabled/></td>
                                             <td><select disabled defaultValue={(rowData.condition[j] === 0) ? "0" : "1"} ><option value="1" >True</option><option value="0" >False</option></select></td>
                                             <td>{rowData.projectnames[j]}</td> 
-                                            <td title={rowData.projectnames[j]}>
+                                            <td title={details[rowData.apptypes[j].toLowerCase()]['data']}>
                                                 <img src={"static/imgs/"+details[rowData.apptypes[j].toLowerCase()]['img']+".png"} alt="apptype"/>
                                             </td>
                                         </tr>
