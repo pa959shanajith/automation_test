@@ -1582,6 +1582,7 @@ exports.importGitMindmap = async (req, res) => {
 		}
 		const inputs= {
 			"userid": req.session.userid,
+			"roleid": req.session.activeRoleId,
 			"projectid": projectid,
 			"gitbranch": gitbranch,
 			"gitversion":gitversion,

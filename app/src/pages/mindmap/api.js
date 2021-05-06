@@ -445,6 +445,10 @@ export const exportToGit = async(data) => {
             console.error(res.data)
             return {error:'Git commit already exists'}
         }
+        if(res.data==='Invalid gitbranch'){
+            console.error(res.data)
+            return {error:'Entered branch is not known to Git. Please verify!'}
+        }
         if(res.status===200 && res.data !== "fail"){          
             return res.data;
         }
