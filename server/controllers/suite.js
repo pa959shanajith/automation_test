@@ -732,6 +732,7 @@ exports.importFromGit_ICE = async (req, res) => {
 			const result = await executionRequestToICE(module_data, 'API', userInfo);
 
 			executionResult=[]
+			delete userInfo.inputs.error_message;
 			executionResult.push(userInfo.inputs)
 			var execResponse = executionResult[0]
 			if (result == SOCK_NA) execResponse.error_message = SOCK_NA_MSG;
@@ -755,6 +756,7 @@ exports.importFromGit_ICE = async (req, res) => {
 				}
 				execResponse.batchInfo = execResult;
 			}
+
 			const finalResult = { "executionStatus": executionResult };
 			return res.send(finalResult);
 		}else if(!userInfo.icename){
