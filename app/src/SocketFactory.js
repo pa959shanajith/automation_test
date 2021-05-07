@@ -82,15 +82,18 @@ const SocketFactory = () => {
             setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By User." })
         } 
         else if (data === "unavailableLocalServer") {
-            setPopupState({'title': 'Execute Test Suite', 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
+            setPopupState({show:true, 'title': 'Execute Test Suite', 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
         } 
         else if (data === "success") {
             setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
-           
         } else if(data === "Completed"){
-            setPopupState({'title': 'Scheduled Execution Complete', 'content':msg});
+            setPopupState({show:true,'title': 'Scheduled Execution Complete', 'content':msg});
+        } else if(data === 'accessibilityTestingSuccess') {
+            setPopupState({show:true, 'title': 'Accessibility Testing ', 'content':msg + ": Accessibility Testing completed Successfully."});
+        } else if(data === 'accessibilityTestingTerminate'){
+            setPopupState({show:true, 'title': 'Accessibility Testing ', 'content':"Accessibility Testing Terminated."});
         }
-        else setPopupState({'title': "Execute Test Suite", 'content':"Failed to execute."});
+        else setPopupState({show:true, 'title': "Execute Test Suite", 'content':"Failed to execute."});
     }
     return(
         <Fragment>
