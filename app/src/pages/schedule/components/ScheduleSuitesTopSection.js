@@ -56,9 +56,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                     for (var k = 0; k < tableData[m].scenarioids.length; k++) {
                         if (tableData[m].scenarioids[k] === current_task.assignedTestScenarioIds || tableData[m].scenarioids[k] === current_task.assignedTestScenarioIds[0]) {
                             tableData[m].executestatus[k] = 1;
-                        } else {
-                            tableData[m].executestatus[k] = 0;
-                        }
+                        } else tableData[m].executestatus[k] = 0;
                     }
                 }
             }
