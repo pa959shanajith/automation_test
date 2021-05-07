@@ -700,31 +700,68 @@ exports.importFromGit_ICE = async (req, res) => {
 	const actionName = 'importFromGit'
 	logger.info("Inside API importFromGit_ICE");
 	try {
-		const data = req.body;
-		const gitVersionName = data.gitVersionName;
-		const gitbranch = data.gitbranch;
-		const folderPath = 'AvoAssureTest_Artifacts'+'/'+data.folderPath;
+		// Several client apps do not send TCP Keep-Alive. Hence this is handled in applicaton side.
+		req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +(process.env.KEEP_ALIVE || "30000"));
 		const userInfo = await utils.tokenValidation(req.body.userInfo);
-		const inputs = {
-			"gitbranch":gitbranch,
-			"gitVersionName":gitVersionName,
-			"folderPath":folderPath.toLowerCase(),
-			"createdBy":userInfo.userid,
-			"source":data.source,
-			"exectionMode":data.exectionMode,
-			"executionEnv":data.executionEnv,
-			"browserType":data.browserType,
-			"integration":data.integration
-		};
-		const module_data = await utils.fetchData(inputs, "git/importFromGit_ICE", actionName);
-		if(module_data=="fail") return res.status(500).send("fail")
-		if(module_data=="empty") return res.status(500).send("Module does not exists in git. Please check your inputs!!")
-		userInfo['invokingusername'] = userInfo.username
-		userInfo['invokinguser'] = userInfo.userid;
-		userInfo['invokinguserrole'] = userInfo.role;
-		redisServer.redisSubServer.subscribe('ICE2_' + userInfo.icename);
-		const result = await executionRequestToICE(module_data, 'API', userInfo);
-		return res.send(result)
+		if(userInfo['inputs']['tokenValidation'] =='passed'){
+			const data = req.body;
+			const gitVersionName = data.gitVersionName;
+			const gitbranch = data.gitbranch;
+			var folderPath = data.folderPath;
+			if(!folderPath.startsWith("avoassuretest_artifacts")){
+				folderPath="avoassuretest_artifacts/"+folderPath
+			}
+			const inputs = {
+				"gitbranch":gitbranch,
+				"gitVersionName":gitVersionName,
+				"folderPath":folderPath.toLowerCase(),
+				"createdBy":userInfo.userid,
+				"source":data.source,
+				"exectionMode":data.exectionMode,
+				"executionEnv":data.executionEnv,
+				"browserType":data.browserType,
+				"integration":data.integration
+			};
+			const module_data = await utils.fetchData(inputs, "git/importFromGit_ICE", actionName);
+			if(module_data=="fail") return res.status(500).send({"error":"Failed to import from Git."})
+			if(module_data=="empty") return res.status(500).send({"error":"Module does not exists in Git. Please check your inputs!!"})
+			userInfo['invokingusername'] = userInfo.username
+			userInfo['invokinguser'] = userInfo.userid;
+			userInfo['invokinguserrole'] = userInfo.role;
+			redisServer.redisSubServer.subscribe('ICE2_' + userInfo.icename);
+			const result = await executionRequestToICE(module_data, 'API', userInfo);
+
+			executionResult=[]
+			executionResult.push(userInfo.inputs)
+			var execResponse = executionResult[0]
+			if (result == SOCK_NA) execResponse.error_message = SOCK_NA_MSG;
+			else if (result == SOCK_SCHD) execResponse.error_message = SOCK_SCHD_MSG;
+			else if (result == "NotApproved") execResponse.error_message = "All the dependent tasks (design, scrape) needs to be approved before execution";
+			else if (result == "NoTask") execResponse.error_message = "Task does not exist for child node";
+			else if (result == "Modified") execResponse.error_message = "Task has been modified, Please approve the task";
+			else if (result == "Skipped") execResponse.error_message = "Execution is skipped because another execution is running in ICE";
+			else if (result == "fail") execResponse.error_message = "Internal error occurred during execution";
+			else {
+				execResponse.status = result[1];
+				const execResult = [];
+				for (let tsuid in result[0]) {
+					const tsu = result[0][tsuid];
+					const scenarios = [];
+					tsu.executionId = tsu['testsuiteId'];
+					for (let tscid in tsu.scenarios) scenarios.push(...tsu.scenarios[tscid]);
+					delete tsu.scenarios;
+					tsu.suiteDetails = scenarios;
+					execResult.push(tsu);
+				}
+				execResponse.batchInfo = execResult;
+			}
+			const finalResult = { "executionStatus": executionResult };
+			return res.send(finalResult);
+		}else if(!userInfo.icename){
+			return res.send({"error":"ICE name not provided."})
+		} else{
+			return res.send({"error":userInfo.icename + " not connected to server!"})
+		}
 	} catch (ex) {
 		logger.error("Exception in the service importFromGit: %s", ex);
 		return res.status(500).send("fail");
