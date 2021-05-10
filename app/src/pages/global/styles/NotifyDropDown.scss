@@ -1,0 +1,34 @@
+#notify-dropdown{
+    left: -350px;
+    .message-box{
+        width: 400px;
+        max-height: 295px;
+        .clear{
+            position: absolute;
+            right: 20px;
+            font-size: 12px;
+            color: #764ba2;
+            cursor: pointer;
+        }
+        .clear:hover{
+            color: red;
+        }
+    }
+    .divider {
+        background-color: #eee;
+        width: 100%;
+        margin: 9px 0;
+        height: 1px;
+    }
+    .message{
+        white-space: normal !important;
+        padding: 10px;
+        span{
+            color: #764ba2;
+            font-family: LatoWebBold;
+            font-size: 14px;
+            user-select: none;
+        }
+    }
+
+}

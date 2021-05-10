@@ -1,0 +1,95 @@
+.plugin-blocks{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-gap: 10px 20px;
+}
+
+.plugin-ic{
+    height: 130px;
+    width: 130px;
+}
+
+.plugin-block{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #212529;
+    cursor: pointer;
+}
+
+.plugin-section{
+    display: flex;
+    flex-direction: column;
+}
+
+.avail-plugin-title{
+    font-family: "LatoWebLight";
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1.1;
+    padding-left: 15px;
+    margin-bottom: 30px;
+}
+
+.plugin-text{
+    font-family: "LatoWeb";
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+
+@media screen and (max-width: 1200px){
+    .plugin-blocks{
+        grid-gap: 5px 0%;
+    }
+    .plugin-ic{
+        height: 105px;
+        width: 130px;
+    }
+}
+
+@media screen and (max-width: 1000px){
+    .plugin-blocks{
+        grid-template-columns: auto auto;
+        grid-gap: 10px 20px;
+    }
+}
+
+@media screen and (min-width: 1800px), screen and (min-height: 850px){
+    .plugin-section{
+        justify-content: center;
+    }
+}
+
+@media screen and (max-height: 600px){
+    .plugin-blocks{
+        grid-gap: 7px 10px;
+    }
+    
+    .plugin-ic{
+        height: 105px;
+        width: 130px;
+    }
+    
+    
+    .avail-plugin-title{
+        font-size: 26px;
+        padding-left: 13px;
+        margin-bottom: 23px;
+    }
+    
+    .plugin-text{
+        font-size: 15px;
+        margin-top: 8px;
+    }
+}
+
+// @media screen and (max-height: 580px){
+//     .plugin-ic{
+//         height: 90px;
+//         width: 135px;
+//     }
+// }

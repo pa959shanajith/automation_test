@@ -93,8 +93,10 @@ if (cluster.isMaster) {
 		};
 		// CORS and security headers
 		app.all('*', function(req, res, next) {
-			res.setHeader('Access-Control-Allow-Origin', req.hostname);
-			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
+			const origin =  req.headers["origin"] || req.hostname;
+			res.setHeader('Access-Control-Allow-Origin', origin);
+			res.setHeader('Access-Control-Allow-Credentials', true);
+			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Accept, Content-Type, Upgrade-Insecure-Requests');
 			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			next();
 		});
@@ -110,11 +112,6 @@ if (cluster.isMaster) {
 		app.use(express.static(__dirname + "/public/", { maxage: thirtyDays, index: false }));
 
 		//serve all asset files from necessary directories
-		app.use('/partials', express.static(__dirname + "/public/partials"));
-		app.use("/js", express.static(__dirname + "/public/js"));
-		app.use("/imgs", express.static(__dirname + "/public/imgs"));
-		app.use("/css", express.static(__dirname + "/public/css"));
-		app.use("/fonts", express.static(__dirname + "/public/fonts"));
 		app.use("/neuronGraphs", express.static(__dirname + "/public/neurongraphs"));
 		app.post('/designTestCase', (req, res) => res.sendFile("index.html", { root: __dirname + "/public/" }));
 
@@ -212,6 +209,7 @@ if (cluster.isMaster) {
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
 		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
+		app.post('/importFromGit_ICE', suite.importFromGit_ICE);
 
 		app.use(csrf({
 			cookie: true
@@ -254,19 +252,19 @@ if (cluster.isMaster) {
 		});
 
 		//Only Test Engineer and Test Lead have access
-		app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res) {
+		app.get(/^\/(scrape|design|designTestCase|execute|scheduling)$/, function(req, res) {
 			var roles = ["Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
-		//Test Engineer, Test Lead and Test Manager can access
-		app.get(/^\/(specificreports|mindmap|p_Utility|p_Reports|plugin)$/, function(req, res) {
+		//Test Engineer,Test Lead and Test Manager can access
+		app.get(/^\/(mindmap|utility|reports|plugin)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(p_Webocular|neuronGraphs\/|p_ALM|p_APG|p_Integration|p_qTest|p_Zephyr)$/, function(req, res) {
+		app.get(/^\/(webocular|neuronGraphs\/|integration)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -343,6 +341,8 @@ if (cluster.isMaster) {
 		app.post('/exportMindmap', auth.protect, mindmap.exportMindmap);
 		app.post('/importMindmap', auth.protect, mindmap.importMindmap);
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
+		app.post('/exportToGit', auth.protect, mindmap.exportToGit);
+		app.post('/importGitMindmap', auth.protect, mindmap.importGitMindmap);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
@@ -393,6 +393,8 @@ if (cluster.isMaster) {
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
 		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
 		app.post('/restartService', auth.protect, admin.restartService);
+		app.post('/gitSaveConfig', auth.protect, admin.gitSaveConfig);
+		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);

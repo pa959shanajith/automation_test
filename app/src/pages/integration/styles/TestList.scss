@@ -1,0 +1,103 @@
+
+.test_tree_toggle{
+    height: 16px;
+}
+
+
+.test_tree_leaves{
+    margin-left: 40px;
+    display: flex;
+    align-items: center;
+    width: 88%;
+}
+
+.scenario__listItem {
+    display: flex;
+    align-items: center;
+    width: 88%;
+}
+
+
+.test_tree_toggle {
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.test_tree_leaves, .scenario__listItem{
+    padding: 3px 0 3px 10px!important;
+    border-radius: 5px;
+    label{ 
+        margin: 0!important;
+        flex-grow: 1;
+    }
+    &:hover{
+        background-color: rgb(225, 223, 255); 
+        border-radius: 5px;
+    }
+}
+
+.scenario__listItem{
+    cursor: pointer;
+}
+
+
+.leafId{
+    background: #331d4c;
+    color: #fff;
+    border-radius: 3px;
+    display: inline;
+    padding: 2px;
+    margin-right: 2px;
+}
+
+.test__searchIcon{
+    margin-left: 2px;
+    border-radius: 5px;
+    border: 1px solid #000;
+    position: relative;
+    cursor: pointer;
+    display: none;
+    
+    img{
+        width: 24px;
+    }
+}
+
+.test__rootDiv{
+    margin-bottom: 0px;
+    margin-right: 0px;
+    max-height: 310.391px;
+    padding: 0px;
+    label {
+        // margin: 0 0 10px 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 85%;
+        margin: 0;
+    }
+}
+
+.test__selectedTC, .scenario__selectedTC{
+    background-color:#E1CAFF !important;
+}
+
+.test__syncedTC{
+    background-color: rgb(221, 221, 221)!important;
+}
+
+.test__syncBtns{
+    float: right;
+
+    .test__syncBtn{
+        cursor: pointer;
+    }
+}
+
+.test_tree_branches{
+    display: flex;
+    margin: 0 0 10px 10px;
+}
+
+.int__folderNode, .int__phaseNode, .int__cycleNode{
+    margin: 0 0 10px 10px;
+}

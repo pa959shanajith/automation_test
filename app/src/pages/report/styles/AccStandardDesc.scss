@@ -1,0 +1,72 @@
+#ar__StDesc-panel{
+    .ar__Desc-head{
+        background: #fff;
+        color: #331d4e;
+        padding: 10px 15px;
+        font-size: 18px;
+        font-family: LatowebBold;
+        white-space: nowrap;
+    }
+    .ar__stDesc-table{
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 100%;
+    }
+    .ar__stDesc-head{
+        display: flex;
+        justify-content: space-between;
+        background: #331d4e;
+        color: white;
+        font-size: 14px;
+        font-family: 'LatoWebBold';
+    }
+
+
+    .ar__stDesc-row{
+        display: flex;
+        justify-content: space-between;
+        background: white;
+        color: #212529;
+        font-size: 14px;
+    }
+    .ar__stDesc-row:nth-child(odd){
+        background-color: #e8e6fe;
+    }
+    .ar__stDesc-row:nth-child(even){
+        background-color: #ffffff;
+    }
+    .ar__stDesc-sn{
+        flex: 0 0 7%;
+        overflow: hidden;
+        width: 100%;
+        padding: 14px;
+    }
+    .ar__stDesc-status{
+        flex: 0 0 10%;
+        overflow: hidden;
+        width: 100%;
+        padding: 14px;
+        border-left: 1px solid #D9E4E6;
+    }
+    .ar__stDesc-desc{
+        flex: 0 0 38%;
+        overflow: hidden;
+        width: 100%;
+        padding: 14px;
+        border-left: 1px solid #D9E4E6;
+    }
+    .ar__stDesc-help{
+        flex: 0 0 35%;
+        overflow: hidden;
+        width: 100%;
+        padding: 14px;
+        border-left: 1px solid #D9E4E6;
+    }
+    .ar__stDesc-impact{
+        flex: 0 0 10%;
+        width: 100%;
+        overflow: hidden;
+        padding: 14px;
+        border-left: 1px solid #D9E4E6;
+    }
+}

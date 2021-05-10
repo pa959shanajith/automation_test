@@ -1,0 +1,49 @@
+#search-canvas-icon {
+    width: 27px;
+    height: 25px;
+    left: 2px;
+    top: 2px;
+    position: absolute;
+    display: flex;
+    font-weight: 300;
+    font-size: 14px;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none!important;
+    z-index: 1;
+}
+.searchimg-canvas {
+    border: 1px solid #633690;
+    border-radius: 3px;
+    padding: 2px;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    cursor: pointer;
+    background: white;
+}
+.search-canvas {
+    border: 1px solid #633690;
+    border-radius: 3px;
+    transition: width 0.4s ease-in-out;
+    width: 0px;
+    opacity: 0;
+    outline-style: none;
+    box-shadow: none;
+    cursor: pointer;
+}
+.search-visible {
+    width: 150px;
+    opacity: 1;
+    transition: width 0.4s ease-in-out;
+}
+.inputErrorBorderFull {
+    border: 2px solid #d33c3c ;
+}
+.searched-node {
+    outline: 2px solid green;
+}

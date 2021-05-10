@@ -1,0 +1,24 @@
+.error-msg{
+    font-family: "LatoWebMedium";
+    font-size: 14px;
+    color: #d33c3c;
+    width: 100%;
+    text-align: center;
+    a{
+        color: #d33c3c;
+    }
+}
+
+
+@media screen and (min-width: 1400px) and (min-height: 770px){
+    .error-msg{
+        font-size: 1.2vw;
+    }
+}
+
+.base__redirect, .base__redirect:hover{
+    color: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 700;
+}

@@ -1,0 +1,53 @@
+.d__filter-btn{
+    background-color: #46316c;
+    color: white;
+    padding: 0 15px;
+    font-size: 15px;
+    font-family: "LatoWebLight";
+    border: none;
+    outline: none;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    &:hover{
+        background-color: #9d6ae0;
+    }
+}
+
+.filter_pop__content{
+    padding: 12px 27px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.ss__filterDisable{
+    pointer-events: none;
+}
+
+.d__filter-btnbox{
+    flex: 1 0 50%;
+}
+
+.d__filter-selall{
+    flex: 1 0 100%;
+    margin-bottom: 15px;
+    display: flex;
+    cursor: pointer;
+
+    input[type=checkbox]{
+        height: 15px;
+        width: 15px;    
+    }
+    span{
+        margin-left: 10px;
+    }
+}
+
+.filter_pop{
+    width: 300px;
+}
+
+
+
+.active-filter{
+    background-color: #9d6ae0;
+}

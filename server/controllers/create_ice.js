@@ -2,15 +2,15 @@
  * Dependencies.
  */
 var async = require('async');
+var utils = require('../lib/utils');
+var logger = require('../../logger');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var logger = require('../../logger');
 var epurl = process.env.DAS_URL;
 
 //Create Structure
 exports.saveMindmap = function(req,res) {
 	logger.info("Inside UI service: saveMindmap");
-	var createdthrough = 'Mindmaps Creation';
 	var RequestedJSON = req;
 	if (RequestedJSON.from_version != undefined && RequestedJSON.new_version !=undefined) {
 		versionnumber = RequestedJSON.from_version;
@@ -39,19 +39,11 @@ exports.saveMindmap = function(req,res) {
 			res(null, result.rows);
 		}
 	});
-	var cloneflag = RequestedJSON.action;
-	var suiteflag = false;
 }
 
 exports.saveMindmapE2E = function(req,res) {
 	logger.info("Inside UI service: saveMindmapE2E");
-	var createdthrough = 'Mindmaps Creation';
 	var RequestedJSON = req;
-	if (RequestedJSON.from_version != undefined && RequestedJSON.new_version !=undefined) {
-		versionnumber = RequestedJSON.from_version;
-		newversionnumber = RequestedJSON.new_version;
-	}
-
 	var inputs = {
 		"data": RequestedJSON 
 	};
@@ -61,7 +53,6 @@ exports.saveMindmapE2E = function(req,res) {
 			"Content-Type": "application/json"
 		}
 	};
-
 	client.post(epurl+"create_ice/saveMindmapE2E", args,
 		function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
@@ -76,13 +67,8 @@ exports.saveMindmapE2E = function(req,res) {
 }
 
 // Have to check the result object how it is coming and how we need. 
-exports.getProjectIDs = function (req, res) {
+exports.getProjectIDs =  async(req) => {
 	logger.info("Inside UI service: getProjectIDs");
-	var projectdetails = {
-		projectId: [],
-		projectName: [],
-		appType: []
-	};
 	var user_id = req.userid;
 	var allflag = req.allflag;
 	if (allflag) allflag = "allflag";
@@ -91,33 +77,7 @@ exports.getProjectIDs = function (req, res) {
 		"userid": user_id,
 		"query": allflag
 	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	async.series({
-		function (callback) {
-			logger.info("Calling DAS Service from getProjectIDs: create_ice/getProjectIDs");
-			client.post(epurl+"create_ice/getProjectIDs", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occurred in create_ice/getProjectIDs: getProjectIDs, Error Code : ERRDAS");
-					res(null, result.rows);
-				} else {
-					projectdetails=result.rows;
-					callback();
-				}
-			});
-		}
-	}, function (err, results) {
-		try {
-			res(null, projectdetails);
-		} catch (ex) {
-			logger.info("Exception in the service getProjectIDs: ", ex);
-		}
-	});
+	return await utils.fetchData(inputs, "create_ice/getProjectIDs", "getProjectIDs");
 };
 
 // Have to check the result object how it is coming and how we need. 

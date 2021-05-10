@@ -159,6 +159,7 @@ exports.updateTestCase_ICE = function (req, res) {
 			var requestedversionnumber = req.body.versionnumber;
 			var requestedtestcasesteps = JSON.parse(req.body.testcasesteps);
 			var import_status = req.body.import_status;
+			var copiedTestCases = req.body.copiedTestCases;
 			var userinfo = req.body.userinfo;
 			var inputs = {
 				"screenid": requestedscreenid,
@@ -170,6 +171,7 @@ exports.updateTestCase_ICE = function (req, res) {
 				"testcaseid": requestedtestcaseid,
 				"testcasename": requestedtestcasename,
 				"import_status": import_status,
+				"copiedTestCases": copiedTestCases,
 			};
 			logger.info("Calling function uploadTestCaseData from updateTestCase_ICE");
 			uploadTestCaseData(inputs, function (error, response) {
@@ -218,7 +220,6 @@ exports.debugTestCase_ICE = function (req, res) {
 								var requestedbrowsertypes = req.body.browsertypes;
 								var requestedtestcaseids = req.body.testcaseids;
 								var apptype = req.body.apptype;
-								var responsedata = [];
 								var browsertypeobject = {
 									browsertype: requestedbrowsertypes
 								};
@@ -248,18 +249,16 @@ exports.debugTestCase_ICE = function (req, res) {
 											}
 										} else {
 											var testcases = testcasedataresult.rows;
-											for (i = 0; i < testcases.length; i++){
-												var responseobject = {
+											const tcDict = {};
+											for (let i = 0; i < testcases.length; i++){
+												tcDict[testcases[i]._id] = {
 													template: "",
-													testcasename: "",
-													testcase: [],
-													apptype: ""
+													testcasename: testcases[i].name,
+													testcase: testcases[i].steps,
+													apptype: apptype
 												};
-												responseobject.testcase = testcases[i].steps;
-												responseobject.testcasename = testcases[i].name;
-												responseobject.apptype = apptype;
-												responsedata.push(responseobject);
 											}
+											var responsedata = requestedtestcaseids.map(i=> tcDict[i])
 											responsedata.push(browsertypeobject);
 											logger.info("Sending socket request for debugTestCase to cachedb");
 											dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};

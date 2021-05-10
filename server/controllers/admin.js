@@ -52,7 +52,7 @@ exports.manageUserDetails = async (req, res) => {
 		let inputs = {
 			action: action,
 			createdby: req.session.userid,
-			createdbyrole: reqData.role,
+			createdbyrole: req.session.activeRoleId,
 			name: (reqData.username || "").trim(),
 			auth: {
 				type: reqData.type,
@@ -99,7 +99,8 @@ exports.manageUserDetails = async (req, res) => {
 			if (inputs.auth.password != '') {
 				const salt = bcrypt.genSaltSync(10);
 				inputs.auth.password = bcrypt.hashSync(inputs.auth.password, salt);
-			} else delete inputs.auth.password;
+			}
+			// else delete inputs.auth.password;
 			inputs.firstname = (reqData.firstname || "").trim();
 			inputs.lastname = (reqData.lastname || "").trim();
 			inputs.email = (reqData.email || "").trim();
@@ -1607,6 +1608,40 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 					res.send("success");
 				}
 			});
+			if(updateProjectDetails.newProjectName !== undefined) {
+				try {
+					var newpProjectName = updateProjectDetails.newProjectName;
+					var inputs = {
+						"query": "updateprojectname",
+						"projectid":requestedprojectid,
+						"newprojectname": newpProjectName,
+						"modifiedby":userinfo.user_id,
+						"modifiedbyrole":userinfo.role
+					};
+					var args = {
+						data: inputs,
+						headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					logger.info("Calling DAS Service from updateProjectName : admin/createProject_ICE");
+					client.post(epurl + "admin/updateProject_ICE", args,
+						function (data, response) {
+
+						try {
+							if (response.statusCode != 200 || data.rows == "fail") {
+							logger.error("Error occurred in admin/createProject_ICE from updateProjectName Error Code : ERRDAS");
+							} else {
+								res.send("success")
+							}
+						} catch (exception) {
+						logger.error(exception.message);
+						}
+					});
+				} catch (exception) {
+					logger.error(exception.message);
+				}
+			}
 		} else {
 			res.send('fail');
 		}
@@ -1717,7 +1752,7 @@ exports.createPool_ICE = async(req,res) => {
 	const fnName = "createPools_ICE";
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.data;
+		const poolinfo = req.body;
 		if (regEx.test(poolinfo.poolname)) {
 			logger.error("Error occurred in admin/"+fnName+": Special characters found in poolname");
 			return res.send("invalid_name");
@@ -1742,7 +1777,7 @@ exports.updatePool = async(req,res) => {
 	const fnName = "updatePool"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.data;
+		const poolinfo = req.body;
 		if (regEx.test(poolinfo.poolname)) {
 			logger.error("Error occurred in admin/"+fnName+": Special characters found in poolname");
 			return res.send("invalid_name");
@@ -1770,10 +1805,9 @@ exports.getPools = async(req,res) => {
 	logger.info("Inside UI service: " + fnName)
 	var inputCheck = false;
 	try{
-		const poolinfo = req.body.data;
 		const inputs = {
-			poolid: poolinfo.poolid,
-			projectids: poolinfo.projectids,
+			poolid: req.body.poolid,
+			projectids: req.body.projectids,
 		};
 		inputCheck = true;
 		const result = await utils.fetchData(inputs, "admin/getPools", fnName);
@@ -1789,7 +1823,7 @@ exports.getICEinPools = async(req,res) => {
 	const fnName = "getICEinPools"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.data;
+		const poolinfo = req.body;
 		const inputs = {
 			poolids: poolinfo.poolid,
 		};
@@ -1805,7 +1839,7 @@ exports.deletePools = async(req,res) => {
 	const fnName = "deletePools"
 	logger.info("Inside UI service: " + fnName)
 	try{
-		const poolinfo = req.body.data;
+		const poolinfo = req.body;
 		const inputs = {
 			poolids: poolinfo.poolid,
 		};
@@ -1834,7 +1868,7 @@ exports.getAvailable_ICE = async(req,res) => {
 
 exports.clearQueue = async(req,res) => {
 	try{
-		const poolinfo = req.body.data;
+		const poolinfo = req.body;
 		const result = await queue.Execution_Queue.updatePools("clear_queue",poolinfo);
 		res.send(result)
 	}catch(e){
@@ -2204,6 +2238,58 @@ exports.restartService = async (req, res) => {
 		}
 	} catch (exception) {
 		logger.error(exception.message);
+		return res.status(500).send("fail");
+	}
+};
+
+/*Saving Git configuration */
+exports.gitSaveConfig = async (req, res) => {
+	const actionName = "gitSaveConfig";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const action = data.action;
+		const userId = data.userId;
+		const projectId = data.projectId;
+		const gitAccToken = data.gitAccToken;
+		const gitUrl = data.gitUrl;
+		const inputs = {
+			"action":action,
+			"userId":userId,
+			"projectId":projectId,
+			"gitAccToken": gitAccToken,
+			"gitUrl":gitUrl
+		};
+		const result = await utils.fetchData(inputs, "admin/gitSaveConfig", actionName);
+		return res.send(result);
+	} catch (ex) {
+		logger.error("Exception in the service gitSaveConfig: %s", ex);
+		return res.status(500).send("fail");
+	}
+};
+
+/*Edit Git configuration */
+exports.gitEditConfig = async (req, res) => {
+	const actionName = "gitEditConfig";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = data.userId;
+		const projectId = data.projectId;
+		let inputs = {
+			"userId":userId,
+			"projectId":projectId
+		};
+		const result = await utils.fetchData(inputs, "admin/gitEditConfig", actionName);
+		if (result == "fail") res.status(500).send("fail");
+		else if (result == "empty") res.send("empty");
+		else {
+			let data = [];
+			data.push(result['gitaccesstoken'], result['giturl']);
+			return res.send(data);
+		}
+	} catch (exception){
+		logger.error("Exception in the service gitEditConfig: %s", ex);
 		return res.status(500).send("fail");
 	}
 };

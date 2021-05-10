@@ -4,14 +4,14 @@
    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <title>Avo Assure - Execution Report</title>
-   <link rel="icon" href="../imgs/favicon.ico">
-   <link rel="stylesheet" type="text/css" href="../fonts/latofonts.css" />
-   <link rel="stylesheet" type="text/css" href="../fonts/font-awesome_mindmap/css/font-awesome.css" />
-   <link rel="stylesheet" type="text/css" href="../css/css_reports/datatables/dataTables.css">
-   <script type="text/javascript" src="../js/plugins/jquery.min.js"></script>
-   <script type="text/javascript" src="../js/plugins/jquery-ui.min.js"></script>
-   <script type="text/javascript" src="../js/plugins/jquery.blockUI.js"></script>
-   <script type="text/javascript" src="../js/plugins/reports/datatables/datatables.min.js"></script>
+   <link rel="icon" href="../favicon.ico">
+   <link rel="stylesheet" type="text/css" href="../static/fonts/latofonts.css" />
+   <link rel="stylesheet" type="text/css" href="../static/reports/font-awesome.css" />
+   <link rel="stylesheet" type="text/css" href="../static/reports/dataTables.css">
+   <script type="text/javascript" src="../static/reports/jquery.min.js"></script>
+   <script type="text/javascript" src="../static/reports/jquery-ui.min.js"></script>
+   <script type="text/javascript" src="../static/reports/jquery.blockUI.js"></script>
+   <script type="text/javascript" src="../static/reports/datatables.min.js"></script>
 
    <style>
       .no-disp {
@@ -352,7 +352,7 @@
 
       .jiraWindow .error-msg {
          float: left;
-         margin-left: 28px;
+         margin: 2px 5px;
          font-size: 14px;
          color: red;
       }
@@ -638,10 +638,6 @@
 
          .rightSummaryFunc {
             margin-top: 76px;
-         }
-
-         .mainContainer>div:nth-child(4) {
-            margin-top: 258px !important;
          }
 
          .midContainer {
@@ -979,6 +975,9 @@
          height: 22px;
          margin-left: 10px;
       }
+      .capitalize{
+         text-transform: capitalize;
+      }
    </style>
 </head>
 
@@ -1004,10 +1003,10 @@
          <div class="h2Header" style="left:78%;user-select:none">
             <label for="scrShotChk" title="Include Screenshots in PDF" style="font-size:13px">With Screenshots</label>
             <input id="scrShotChk" type="checkbox" title="Include Screenshots in PDF" style="height:12px;margin:0" checked="true">
-            <img alt="Save PDF" class="export-icons" data-rep="pdf" src="../imgs/ic-pdf.png" title="Save PDF Report">
-            <img alt="Export JSON" class="export-icons" data-rep="json" style="" src="../imgs/ic-export-to-json.png" title="Export to JSON">
+            <img alt="Save PDF" class="export-icons" data-rep="pdf" src="../static/imgs/ic-pdf.png" title="Save PDF Report">
+            <img alt="Export JSON" class="export-icons" data-rep="json" style="" src="../static/imgs/ic-export-to-json.png" title="Export to JSON">
             {{#ifnotEquals video '-'}}
-               <img alt="Download video" class="export-icons" data-rep="mp4" data-path={{video}} style="" src="../imgs/screenrecord.png" title="Download Execution Video">
+               <img alt="Download video" class="export-icons" data-rep="mp4" data-path={{video}} style="" src="../static/imgs/screenrecord.png" title="Download Execution Video">
             {{/ifnotEquals}}
          </div>
       </div>
@@ -1028,7 +1027,7 @@
             <label>Domain</label>
             <span>: {{domainName}}</span>
             <label>Browser Type</label>
-            <span>: {{browserType}}</span>
+            <span class="capitalize">: {{browserType}}</span>
             <label>Browser Version</label>
             <span>: {{browserVersion}}</span>
             <span style='visibility:hidden' class="reportId">{{reportId}}</span>
@@ -1088,7 +1087,12 @@
                {{#each rows}}
                <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
                   <td class="rDid tabCont">{{slno}}</td>
+                  {{#ifEquals status "Skipped"}}
+                     <td class="rDstep tabCont iteration"></td>
+                  {{/ifEquals}}
+                  {{#ifnotEquals status "Skipped"}}
                   <td class="rDstep tabCont iteration">{{Step}}</td>
+                  {{/ifnotEquals}}
                   <td class="{{getClass StepDescription}}"
                      style="display:none;width:0px; padding-left: 10px; font-weight:{{getStyle StepDescription}}">
                      {{StepDescription}}
@@ -1133,6 +1137,9 @@
                   {{/ifnotEquals}} {{/ifEquals}}
                   {{#ifEquals status "Terminate"}}
                      <td class="rDActualRes tabCont">{{StepDescription}}</td>
+                   {{/ifEquals}}
+                   {{#ifEquals status "Skipped"}}
+                     <td class="rDActualRes tabCont">Skipped</td>
                    {{/ifEquals}}
                   <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}};"
                      data-screenshot="{{screenshot_path}}">{{status}}</td>
@@ -1236,7 +1243,7 @@
          <button type="button" class="closeWindow">Ok</button>
       </p>
    </div>
-   <script type="text/javascript" src="../js/plugins/reports/specificReport.js"></script>
+   <script type="text/javascript" src="../static/reports/specificReport.js"></script>
 </body>
 
 </html>

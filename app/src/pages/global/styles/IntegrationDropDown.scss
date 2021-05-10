@@ -1,0 +1,78 @@
+
+.i__modal .modal__content{
+    width: 700px !important; 
+}
+.i__inputErrBor{
+    border-bottom: 2px solid #d33c3c !important;
+}
+.i__popupWrapRow{
+	display: block;
+	width:100%;
+}
+.i__textFieldsContainer{
+	display: block;
+	width:100%;
+}
+
+.i__textFieldsContainer p{
+	margin-bottom: 25px;
+	position: relative;
+}
+
+.i__textFieldsContainer-cust{
+    margin-bottom: 0 !important
+}
+.i__error-msg{
+    font-size: 14px;
+    font-family: 'LatoWeb';
+    float: left;
+    padding: 16px 0 0 12px;
+    color: red;
+}
+.i__btn-md.focus,
+.i__btn-md,
+.i__btn-md:active:focus,
+.i__btn-md:focus,
+.i__btn-md:hover {
+    color: #fff !important;
+    border: 0 !important;
+    border-radius: 20px !important;
+    padding: 2px 15px !important;
+    font-size: 17px !important;
+    background: #643693 ;
+	font-family: 'LatoWebLight' !important;
+    outline: 0 !important;
+}
+.i__input{
+	border: 1px solid #656565 ;
+	border-left:0 !important;
+	border-right:0 !important;
+	border-top:0 !important;
+	border-radius:0;
+	box-shadow: none;
+	color:#333;
+}
+
+.i__input:focus {
+    box-shadow: none !important;
+}
+
+.i__input-cust {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: 0;
+}
+.i__step {
+    margin-left: 2%
+}

@@ -1,0 +1,169 @@
+
+#syncScenario{
+    height: 20px;
+    background: white;
+    color: black;
+    border: 1px solid #7b7c7f !important;
+    border-radius: 3px !important;
+}.e__btn-md.focus,
+.e__btn-md,
+.e__btn-md:active:focus,
+.e__btn-md:focus,
+.e__btn-md:hover {
+    color: #fff !important;
+    border: 0 !important;
+    border-radius: 20px !important;
+    padding: 2px 15px !important;
+    font-size: 17px !important;
+    background: #643693 ;
+	font-family: 'LatoWebLight' !important;
+    outline: 0 !important;
+}
+.e__content{
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 100%;
+    min-width: 0;
+    padding: 20px;
+    margin: 0 5px;
+    background-color: #fff;
+}
+
+.e__task_title{
+    margin-bottom: 10px;
+   max-width: 80%;
+}
+
+.e__task_name{
+    background-color: #331d4e;
+    color: #fff;
+    padding: 1px 14px 0;
+    font-family: "LatoWebLight";
+    font-size: 18px;
+    width: fit-content;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-radius: 5px;
+}
+.e__taskBtn {
+    padding: 0px 12px;
+    margin-right: 7px;
+    background-color: #633693;
+    margin-top: 7px;
+}
+.e__btn {
+    border: none;
+    outline: none;
+    color: #fff;
+    border-radius: 20px;
+    font-size: 14px;
+    // line-height: 19.5px;
+    font-family: 'LatoWebLight';
+}
+#tableActionButtons{
+	float:left;
+	width:100%;
+	margin-bottom: 15px;
+	opacity:1
+}
+.e__btn.disabled, .e__btn[disabled]{
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    background: lightgray !important;
+    box-shadow: none;
+    opacity: .65;
+}
+.submitTaskBtn.focus,
+.submitTaskBtn,
+.submitTaskBtn:active:focus,
+.submitTaskBtn:focus,
+.submitTaskBtn:hover {
+    background:#ff7300;
+    float: right!important;
+}
+.reassignTaskBtn.focus,
+.reassignTaskBtn,
+.reassignTaskBtn:active:focus,
+.reassignTaskBtn:focus,
+.reassignTaskBtn:hover {
+    background:#ff7300;
+    float: right!important;
+}
+.executeBtn{
+    margin-right:10px;
+    float: right!important;
+}
+.parentObject {
+    display: inline-block;
+    width: auto;
+    padding: 0px 0px 0 10px;
+    vertical-align: text-bottom;
+    font-size: 16px;
+    font-family: LatoWeb;
+    position: relative;
+    top: 3px;
+}
+.checkParentBatch
+{
+    outline: 0;
+    width: 17px;
+    height: 17px;
+    position: relative;
+    top: 2px;
+}
+.parentBatchContainer
+{
+    display: inline-block;
+    position: relative;
+    top: 30px;
+}
+.e__btnLeft{
+    left:13%;
+    position: relative;
+}
+.e__btn_display-hide{
+    display:None
+}
+.reassignTaskBtn {
+    margin-right: 5px;
+}
+.e__modal_button{
+    margin-right:10px;
+}
+.popupWrapRow{
+	display: block;
+	width:100%;
+}
+.textFieldsContainer{
+	display: block;
+	width:100%;
+}
+
+.textFieldsContainer p{
+	margin-bottom: 25px;
+	position: relative;
+}
+.e__modal-alm-input{
+    border-radius: 0 !important;
+}
+.halfWrap{
+	width:48%;
+	display: inline-block;
+}
+.halfWrap-margin{
+    margin-right: 3% !important;
+}
+.textFieldsContainer-cust{
+    margin-bottom: 0 !important
+}
+.inputErrBor{
+    border-bottom: 2px solid #d33c3c !important;
+}
+.qtestSteps{
+    margin-top:10px;
+    margin-bottom:20px;
+}
+.e__disableOption{
+    background: lightgrey !important
+}

@@ -1,0 +1,164 @@
+.arrow-circle {
+    color:#a0a0a0;
+    font-size:25px!important;
+}
+
+.ic-holder{
+    display: flex;
+    align-items: center;
+}
+
+.field{
+    font-size: 25px;
+    border: none;
+    box-shadow: none;
+    flex-grow: 1;
+    width: 90%;
+    padding: 0 20px;
+    color: #555;
+    font-family: "LatoWebLight";
+    outline: none;
+}
+
+.password-wrap, .username-wrap{
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #cacaca;
+    margin-bottom: 35px;
+}
+
+.login-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: content-box;
+}
+
+.restart-service-btn, .login-btn{
+    font-family: "LatoWeb";
+    font-size: 32px;
+    border-radius: 22px!important;
+    border: none;
+    background-color: #9f62e1;
+    color: #FFF;
+    padding: 4px 12px;
+    margin-top: 30px!important;
+    cursor: pointer;
+    touch-action: manipulation;
+    outline: none;
+    &:focus{
+        outline: none!important;
+    }
+    &:disabled{
+        background-color: #ca99ff;
+        cursor: auto;
+    }
+}
+
+.login-btn{
+    padding: 0 12px!important; 
+ }
+
+.restart-service-btn{
+    font-size: 24px!important;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.eye-ic{
+    color:#a0a0a0;
+    font-size: 20px;
+}
+
+.no-decor{
+    border: none;
+    outline: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    &:focus{
+        border: none;
+        outline: none;
+    }
+}
+
+.error-msg{
+    font-family: "LatoWebMedium";
+    font-size: 14px;
+    color: #d33c3c;
+    width: 100%;
+    text-align: center;
+    a{
+        color: #d33c3c;
+    }
+}
+
+.error-msg-hyperlink{
+    color:inherit;
+    cursor:pointer;
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 800px){
+    .login-btn{
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+}
+
+@media screen and (min-width: 1400px) and (min-height: 770px){
+
+    .arrow-circle {
+        font-size:1.5vw;
+    }
+
+    .field{
+        font-size: 2vw;
+        padding: 0 1vw;
+    }
+
+    .password-wrap, .username-wrap{
+        border-bottom: .1vw solid #cacaca;
+        margin-bottom: 2.5vw;
+    }
+
+    .error-msg{
+        font-size: 1.1vw;
+    }
+
+    .login-btn{
+        padding: 0 .2px!important; 
+     }
+
+    .login-btn{
+        font-size: 2.5vw;
+        border-radius: 2vw!important;
+        padding: 0 .2vw;
+        margin-top: .2vw;
+    }
+
+    .restart-service-btn{
+        font-size: 1.7vw;
+        border-radius: 2vw;
+        margin: .2vw 0 .9vw 0;
+        padding: .2vw .9vw;
+    }
+
+    .eye-ic {
+        font-size: 1.5vw;
+    }
+    .ic-password, .ic-username{
+        height: 1.5vw;
+    }
+    
+}
+
+.forget-password,
+.forget-password:hover {
+    float: right;
+    color: #9f62e1;
+    font-size: 14px;
+    font-family: 'LatoWeb';
+    text-decoration: underline;
+    cursor: pointer;
+}

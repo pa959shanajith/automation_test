@@ -1,0 +1,150 @@
+.bg-container{
+    display: flex;
+    flex-flow: column;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #edeaff;
+}
+
+.element-holder{
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    align-items: center;
+    // width: 100%;
+    padding: 0 6%;
+    z-index: 1;
+}
+
+.bg-img{
+    z-index: 0;
+    height: 90%;
+    position: absolute;
+    bottom: 0;
+    left: 0;   
+}
+
+
+.login-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.login-block{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-right: 10%;
+    width: 290px;
+    background: #FFF;
+    padding: 5% 4%;
+    border-radius: 50px;
+    box-sizing: content-box;
+}
+
+.logo-img{
+    height: 65px;
+}
+.logo-wrap{
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+.greet-text{
+    z-index: 1;
+    flex-grow: 1;
+    color: #643693;
+    font-family: "LatoWebMedium";
+    
+    h1 {
+        font-family: "LatoWebBlack";
+        font-size: 68px;
+        margin-bottom: 6px;
+    }
+    h2{ 
+        font-weight: 500;
+        font-size: 40px;
+        margin: 0 8px;
+    }
+    h3{
+        font-weight: 500;
+        font-size: 25px;
+        margin: 0 10px
+    }
+}
+
+
+@media screen and (max-width: 800px){
+    .login-block{
+        padding: 6% 4%;
+        margin-top: 20px;
+        margin-right: 0;
+    }
+    .element-holder{
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 6%;
+    }
+    .logo-wrap{
+        margin-bottom: 30px;
+    }
+    .greet-text{
+        flex-grow: 0;
+        h1 {
+            font-size: 58px;
+            margin-bottom: 3px;
+            margin-top: 0;
+        }
+        h2{
+            font-size: 30px;
+            margin: 0 4px;
+        }
+        h3{
+            font-size: 20px;
+        }
+    }
+}
+
+@media screen and (max-height: 680px){
+    .bg-img{
+        width: 42%;
+    }
+}
+
+
+@media screen and (min-width: 1400px) and (min-height: 770px){
+    .greet-text{
+        h1 {
+            font-size: 3.5vw;
+            margin-bottom: 1vw;
+            margin-top: 0;
+        }
+        h2{
+            font-size: 3vw;
+            margin: 0 .5vw;
+        }
+        h3{
+            font-size: 2.5vw;
+        }
+    }
+        
+    .login-block{
+        margin-right: 10%;
+        width: 20vw;
+        padding: 5vw 3vw;
+        border-radius: 3vw;
+    }
+
+    .logo-img{
+        height: 3.5vw;
+    }
+    .logo-wrap{
+        margin-bottom: 4vw;
+    }
+}

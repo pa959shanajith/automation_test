@@ -1,0 +1,40 @@
+.letfnav{
+    position: relative;
+    float: left;
+}
+
+.letfnav h4{
+    text-align: center;
+    font-size: 18px;
+    font-family: 'LatowebMedium' !important;
+    font-weight: normal;
+    color: #eee9ff;
+}
+.letfnav span{
+    list-style-type: none;
+    float: left;
+    width: 80%;
+    color: #fff;
+    line-height: inherit;
+    text-align: center;
+    margin: 16% 10% 10%;
+    font-size: 12px;
+    cursor: pointer;
+
+    img{
+        padding: 8px 10px;
+    }
+    img:hover{
+        background: #523176 !important;
+    }
+   
+}
+
+#selected{
+    background: #331d4c;
+    border-radius: 5px;
+}
+
+.util__execution_ic{
+    padding: 10px;
+}

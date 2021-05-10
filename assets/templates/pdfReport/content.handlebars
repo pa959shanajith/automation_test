@@ -312,6 +312,9 @@
       margin-left:22px !important;
       text-align:center !important;
    }
+   .capitalize{
+      text-transform: capitalize;
+   }
 </style>
 <div class="mainContainer">
    {{#each overallstatus}}
@@ -330,7 +333,7 @@
       <label>Release</label><span>: {{releaseName}}</span><br />
       <label>Project</label><span>: {{projectName}}</span><br />
       <label>Domain</label><span>: {{domainName}}</span><br />
-      <label>Browser Type</label><span>: {{browserType}}</span><br />
+      <label>Browser Type</label><span class="capitalize">: {{browserType}}</span><br />
       <label>Browser Version</label><span>: {{browserVersion}}</span>
    </div>
    <div id="rightSummaryFunc" class="rightSummaryFunc">

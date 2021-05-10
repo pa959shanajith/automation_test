@@ -1,0 +1,47 @@
+.preferencesTbl
+{
+    width: 100%;
+    float: left;
+    margin-top: 2%;
+}
+.preferencesTbl th,.preferencesTbl td
+{
+    text-align: center;
+}
+.preferencesTbl th
+{
+    font-family: latowebbold;
+    font-size: 16px;
+}
+
+.preferencesTbl td
+{
+    font-family: latoweb;
+    font-size: 12px;
+}
+#preferencesTable thead th
+{
+    background: #5e626b;
+    color: #fff;
+    border-right: 1px solid #fff;
+    border-radius: 5px;
+    padding: 0.5%;
+}
+#preferencesTable tbody td
+{
+    padding: 1% !important;
+}
+.module_admin
+{
+    width: 14px;
+    height: 14px;
+}
+#preferencesTable tr:nth-child(odd)
+{
+    background: rgb(232, 230, 254);
+}
+.preferences_container{
+    width: 100%;
+    padding: 20px;
+    height: 100%;
+}

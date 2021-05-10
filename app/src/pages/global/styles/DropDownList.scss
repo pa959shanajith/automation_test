@@ -1,0 +1,37 @@
+.form-inp-dropdown-popup{
+    font-size: 14px;
+    width: 335px;
+    left: 171px;
+    max-height: 123px;
+    box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
+    display: block;
+    background: #ffff;
+    margin-top: 2px;
+    z-index: 1;
+    position: absolute;
+    ul{
+        padding-left: 2px;
+        margin: 4px;
+        width: calc(100% - 14px);
+    }
+    ul:hover{
+        background: #633691;
+        border-radius: 3px;
+        color: #fff;
+        cursor: pointer;
+    }
+}
+.dropdown-list-item{
+    font-weight: 500;
+    display: flex;
+    padding: 3px 12px;
+}
+.selectedCheckBox{
+    background: #633691;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+}
+.dropdownInputError{
+    border: 1px solid red!important;
+}

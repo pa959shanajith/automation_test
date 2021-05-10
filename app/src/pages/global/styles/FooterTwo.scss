@@ -1,0 +1,40 @@
+.main-footer{
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    justify-content: flex-end;
+    color: #643693;
+    background-color: transparent;
+    font-family: "LatoWeb";
+    z-index: 0;
+    padding: 10px;
+}
+
+.main-footer-content{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 0 20px;
+}
+
+.footer-logo_two{
+    margin-left:6px;
+    height: 18px; 
+}
+
+.left-text{
+    width: fit-content;
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    font-size: 14px;
+}
+
+.right-text{
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    flex-grow: 2;
+}
