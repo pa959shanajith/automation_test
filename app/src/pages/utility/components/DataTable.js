@@ -7,6 +7,9 @@ import Table from './Table';
 import * as utilApi from '../api';
 import "../styles/DataTable.scss";
 
+
+let undoStack = [];
+
 const DataTable = props => {
 
     const [currScreen, setCurrScreen] = useState(props.currScreen);
@@ -18,6 +21,12 @@ const DataTable = props => {
     const [headerCounter, setHeaderCounter] = useState(3);
     const [dataTables, setDataTables] = useState([]);
     const [showPop, setShowPop] = useState(false);
+    const [tableName, setTableName] = useState('');
+    /*
+        undoStack: [
+            { row: <row-id>, col: <col-id>, value: old-value }
+        ]
+    */
 
     useEffect(()=>{
         // GET DATA FROM API
@@ -43,12 +52,24 @@ const DataTable = props => {
         resetStates();
     }, [props.currScreen])
 
+
+    const onUndo = () => {
+        if (undoStack.length) {
+            const lastEntry = undoStack.pop();
+            const [newData, found] = undoData(data, headers, lastEntry);
+            if (found) setData(newData);
+            else console.log("Cell Not Found!")
+        }
+        else console.log("Nothing to Undo")
+    }
+
     const resetStates = () => {
         if (props.currScreen === "Create") {
             setData([{id: uuid()}]);
             setDataTables([]);
         }
         else setData([]);
+        undoStack=[];
         setHeaders([{id: uuid(), name: 'C1'}, {id: uuid(), name: 'C2'}]);
         setCheckList({type: 'row', list: []});
         setDnd(false);
@@ -73,6 +94,13 @@ const DataTable = props => {
 
             setHeaders(newHeaders);
             setHeaderCounter(count => count + 1);
+        }
+        else if (type === "row") {
+            let newData = [...data];
+            
+            newData.push({id: uuid()})
+
+            setData(newData);
         }
         else if (checkList.list.length===1){
             if (checkList.type==="row"){
@@ -182,12 +210,14 @@ const DataTable = props => {
                 {currScreen} Data Table
             </span>
         </div>
-
+        
+        <TableName currScreen={currScreen} tableName={tableName} setTableName={setTableName}  />
         <div className="dt__btngroup">
             <TableActionButtons 
                 onAdd={onAdd} 
                 setDnd={setDnd} 
                 onDelete={onDelete} 
+                onUndo={onUndo}
             />
             { currScreen === "Create" 
                 ? <CreateScreenActionButtons goToEditScreen={goToEditScreen} displayData={displayData} />
@@ -197,7 +227,7 @@ const DataTable = props => {
 
         { currScreen==="Edit" && <SearchDataTable dataTables={dataTables} setData={setData} setHeaders={setHeaders} /> }
 
-        <div className="dt__table_container full__dt" id={currScreen==="Create"?"createscreen":"editscreen"}>
+        <div className="dt__table_container full__dt">
             {data.length>0 && 
             <Table 
                 data={data}
@@ -208,17 +238,41 @@ const DataTable = props => {
                 setCheckList={setCheckList}
                 onAdd={onAdd}
                 dnd={dnd} 
+                undoStack={undoStack}
             />}
         </div>
     </>;
 }
 
-const TableActionButtons = ({ onAdd, setDnd, onDelete }) => {
+const TableName = ({currScreen, tableName, setTableName}) => {
+    const [value, setValue] = useState(tableName || '');
+
+    useEffect(()=>{
+        setValue(tableName)
+    }, [tableName]);
+
+    const onChange = e => setValue(e.target.value);
+    const onBlur = () => setTableName(value);
+
+    return (
+        <div className="dt__tableName">
+            DataTable Name:
+            {
+                currScreen === 'Create'
+                ? <input onBlur={onBlur} onChange={onChange} />
+                : <div>{value}</div>
+            }
+        </div>
+    );
+}
+
+const TableActionButtons = ({ onAdd, setDnd, onDelete, onUndo }) => {
 
     const tableActionBtnGroup = [
         {'title': 'Add Selected Row/Column', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add', onClick: ()=>onAdd()},
         {'title': 'Drag & Drop Row', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Row', onClick:  ()=>setDnd(dnd => !dnd)},
-        {'title': 'Remove Selected Row/Column', 'img': 'static/imgs/ic-delete.png', 'alt': 'Remove', onClick:  ()=>onDelete()}
+        {'title': 'Remove Selected Row/Column', 'img': 'static/imgs/ic-delete.png', 'alt': 'Remove', onClick:  ()=>onDelete()},
+        {'title': 'Undo Last Changes', 'img': 'static/imgs/ic-cycle.png', 'alt': 'Remove', onClick:  ()=>onUndo()}
     ]
 
     return (
@@ -320,6 +374,29 @@ const parseTableData = table => {
     }
     
     return [newData, newHeaders]
+}
+
+const undoData = (data, headers, lastEntry) => {
+    let columnName = null;
+    let newData = [...data];
+    let found = false;
+    for (let header of headers) {
+        if (header.id === lastEntry.colId) {
+            columnName = header.name;
+            found = true;
+            break;
+        }
+    }
+
+    for (let row of newData) {
+        if (row.id === lastEntry.rowId && columnName in row) {
+            row[columnName] = lastEntry.value;
+            found = true;
+            break;
+        }
+    }
+
+    return [newData, found];
 }
 
 export default DataTable;
