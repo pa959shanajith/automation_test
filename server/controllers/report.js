@@ -265,12 +265,17 @@ exports.viewReport = async (req, res, next) => {
     const username = req.session.username;
     const userInfo = {username};
     const url = req.url.split('/');
-    const reportId = url[1] || "";
-    const type = (url[2] || 'html').toLowerCase().split('?')[0];
-    const embedImages = (url[2] || '').toLowerCase().split('?')[1] == 'images=true';
+    let reportName = url[1] || "";
+    if (reportName.split('.').length == 1) reportName += ".html";
+    const reportId = reportName.split('.')[0];
+    const typeWithQuery = (reportName.split('.')[1] || 'html').toLowerCase().split('?')
+    const type = typeWithQuery[0];
+    const embedImages = typeWithQuery[1] == 'images=true';
     let report = { overallstatus: [{}], rows: [], remarksLength: 0, commentsLength: 0 };
     logger.info("Requesting report type - " + type);
-    if (!req._passport.instance.verifySession(req)) {
+    if (url.length > 2) {
+        return res.redirect('/404');
+    } else if (!req._passport.instance.verifySession(req) && type == 'html') {
         report.error = {
             ecode: "INVALID_SESSION",
             emsg: "Authentication Failed! No Active Sessions found. Please login and try again.",
@@ -312,12 +317,14 @@ exports.viewReport = async (req, res, next) => {
         return res.send(content);
     } else if (type == "json") {
         const statusCode = report.error && report.error.status || 200;
-        return res.status(statusCode).send(report);
+        res.setHeader("Content-Type", "application/json");
+        return res.status(statusCode).send(JSON.stringify(report, null, 2));
     } else if (type == "pdf") {
         if (report.error) {
             res.setHeader("X-Render-Error", report.error.emsg);
             return res.status(report.error.status || 200).send(report.error);
         }
+        res.setHeader("Content-Type", "application/pdf");
         report.remarksLength = report.remarksLength.length;
         report.commentsLength = report.commentsLength.length;
         if (scrShots && scrShots.paths.length > 0) {

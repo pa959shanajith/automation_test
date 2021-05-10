@@ -537,7 +537,7 @@ function loadReports() {
         $(document).on('click', '.export-icons', function() {
             var repType = $(this).attr("data-rep");
             var filename = $(".scenarioName").text().substr(2) + "." + repType;
-            var url = window.location.href + '/' + repType;
+            var url = window.location.href + '.' + repType;
             if (repType == "json") {
                 $.ajax({
                     type: 'GET',
