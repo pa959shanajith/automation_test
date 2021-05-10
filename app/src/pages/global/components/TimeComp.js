@@ -1,7 +1,6 @@
 
 import React, { useRef } from 'react';
 import Datetime from "react-datetime";
-import moment from "moment";
 import '../styles/TimeComp.scss'
 
 
