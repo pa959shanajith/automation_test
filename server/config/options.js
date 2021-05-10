@@ -15,7 +15,7 @@ try {
 		parsed.socketio.pingTimeout = parseInt(parsed.socketio.pingTimeout);
 		parsed.socketio.pingInterval = parseInt(parsed.socketio.pingInterval);
 	}
-	if(parsed.dateFormat != "DD-MM-YYYY" && parsed.dateFormat != "YYYY-MM-DD" && parsed.dateFormat != "MM-DD-YYYY"){
+	if(!["DD-MM-YYYY", "YYYY-MM-DD", "MM-DD-YYYY"].includes(parsed.dateFormat)) {
 		throw "Invalid date format";
 	}
 } catch (e) {
