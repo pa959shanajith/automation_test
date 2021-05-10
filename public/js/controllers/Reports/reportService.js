@@ -34,7 +34,7 @@ mySPA.factory('reportService', ['$http', '$q', function($http, $q) {
         },
         viewReport: function(reportId, reportType) {
             var responseType = (reportType == 'pdf')? 'arraybuffer':'application/json';
-            var targetURL = '/viewreport/'+reportId+'/'+reportType+((reportType=='pdf')?'?images=true':'');
+            var targetURL = '/viewreport/'+reportId+'.'+reportType+((reportType=='pdf')?'?images=true':'');
             return $http.get(targetURL, {
                 responseType: responseType
             })
