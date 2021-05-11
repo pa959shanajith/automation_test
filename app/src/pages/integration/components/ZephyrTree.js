@@ -89,6 +89,7 @@ const PhaseNode = props => {
                             .map(testCase => <TestCaseNode 
                                                 key={`testCase-${testCase.id}`}       
                                                 testCase={testCase}
+                                                phaseId={phaseid}
                                                 projectId={props.projectId}
                                                 releaseId={props.releaseId}
                                             />)
