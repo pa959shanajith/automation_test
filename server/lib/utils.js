@@ -173,7 +173,7 @@ const fetchData = async (inputs, url, from, all) => {
 		});
 		apiReq.on('error', function(err) {
 			logger.error("Error occurred in " + url + from + query + ", Error Code : ERRDAS, Error: %s", err);
-			if (all) rsv(["fail", response, result]);
+			if (all) rsv(["fail", response, null]);
 			else rsv("fail");
 		});
 	}));

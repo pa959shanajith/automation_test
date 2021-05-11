@@ -348,30 +348,29 @@ module.exports.initListeners = mySocket => {
 		cache.set("ICE_status",pulse_ICE)
 		const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
 		server_pub.publish('ICE_STATUS_' + username, dataToExecute);
-
 	});
 };
 
 function check_pulse(){
-	time = Date()
+	var time = Date()
 	var writeStr = "None"
-	logger.debug("Checking ICE pulse")
-	for (var ice in pulse_ICE){
+	logger.silly("Checking ICE pulse")
+	for (var ice in pulse_ICE) {
 		if(pulse_ICE[ice]["time"]){
-			iceTime = pulse_ICE[ice]["time"]
+			var iceTime = pulse_ICE[ice]["time"]
 			var writeStr = "";
 			if(Date.parse(time) - Date.parse(iceTime) >= 100000){
 				var writeStr = time.toString() + " " + ice + " Disconnected pulse last recieved at: " + iceTime.toString();
-				logger.info(writeStr)
+				logger.silly(writeStr)
 				pulse_ICE[ice]["time"] = null;
 				pulse_ICE[ice]["connected"] = false;
 				cache.set("ICE_status",pulse_ICE)
-				value = pulse_ICE[ice];
+				var value = pulse_ICE[ice];
 				const dataToExecute = JSON.stringify({"username" : ice,"onAction" : "ice_status_change","value":value});
 				server_pub.publish('ICE2_' + ice, dataToExecute);
 			}else{
 				writeStr = time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"]; 
-				logger.debug(writeStr)
+				logger.silly(writeStr)
 			}
 		}
 	}
