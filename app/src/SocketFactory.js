@@ -6,6 +6,7 @@ import { ModalContainer, PopupMsg } from './pages/global';
 import {v4 as uuid} from 'uuid';
 import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
 import * as actionTypes from './pages/login/state/action';
+import {url} from './App'
 
 /*Component SocketFactory
   use: creates/updates socket connection
@@ -19,7 +20,6 @@ const SocketFactory = () => {
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const userInfo = useSelector(state=>state.login.userinfo);
     const socket = useSelector(state=>state.login.socket);
-    const EndPoint = "https://"+window.location.hostname+":8443";
     const dispatch = useDispatch()
     const history = useHistory();
     useEffect(()=>{
@@ -37,7 +37,7 @@ const SocketFactory = () => {
     },[socket])
     useEffect(()=>{
         var userName = Buffer.from((userInfo && userInfo.username)?userInfo.username:uuid()).toString('base64')
-        var socket = socketIOClient(EndPoint, { forceNew: true, reconnect: true, query: {check: 'notify', key: userName}});
+        var socket = socketIOClient(url, { forceNew: true, reconnect: true, query: {check: 'notify', key: userName}});
         dispatch({type:actionTypes.SET_SOCKET,payload:socket})
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[userInfo])
