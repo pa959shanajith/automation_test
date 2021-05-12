@@ -1,5 +1,5 @@
 import axios from 'axios';
-const url = "https://"+window.location.hostname+":8443";
+import {url} from '../../App';
 
 /*Component LoginFields
   api returns String (restart/validCredential/inValidCredential/invalid_username_password/userLogged/inValidLDAPServer/invalidUserConf)

@@ -4,7 +4,6 @@ var create_ice = require('../controllers/create_ice');
 var myserver = require('../lib/socket.js');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
-var suites = require('../controllers/suite')
 var xlsx = require('xlsx');
 var path = require('path');
 var fs = require('fs');
@@ -29,13 +28,19 @@ var xlsToCSV = function (workbook, sheetname) {
 };
 
 exports.populateProjects =  async(req, res) => {
-	logger.info("Inside UI service: populateProjects");
-	var reqData = {
-		"userid": req.session.userid,
-		"allflag": true
-	};
-	const data = await create_ice.getProjectIDs(reqData);
-	res.send(data);
+	const fnName = "populateScenarios";
+	try {
+		logger.info("Inside UI service: " + fnName);
+		var reqData = {
+			"userid": req.session.userid,
+			"allflag": true
+		};
+		const data = await create_ice.getProjectIDs(reqData);
+		res.send(data);
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
 };
 
 exports.populateScenarios = async (req, res) => {
@@ -95,7 +100,6 @@ const getModule = async (d) => {
 	const inputs = {
 		"tab":d.tab,
 		"projectid":d.projectid || null,
-		// "modulename":d.modName,
 		"moduleid":d.moduleid,
 		"cycleid":d.cycId,
 		"name":"getModules"
@@ -104,9 +108,15 @@ const getModule = async (d) => {
 };
 
 exports.getModules = async (req, res) => {
-	logger.info("Inside UI service: getModules");
-	const data = await getModule(req.body);
-	res.send(data);
+	const fnName = "getModules";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const data = await getModule(req.body);
+		res.send(data);
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
 };
 
 exports.reviewTask = async (req, res) => {
@@ -1509,9 +1519,12 @@ exports.exportToGit = async (req, res) => {
 	try {
 		const data = req.body;
 		const gitVersionName = data.gitVersion;
-		const gitFolderPath = "AvoAssureTest_Artifacts/"+data.gitFolderPath;
+		var gitFolderPath = data.gitFolderPath;
 		const gitBranch = data.gitBranch;
 		const moduleId = data.mindmapId;
+		if(!gitFolderPath.startsWith("avoassuretest_artifacts")){
+			gitFolderPath="avoassuretest_artifacts/"+gitFolderPath
+		}
 		const inputs = {
 			"moduleId":moduleId,
 			"userid":req.session.userid,
@@ -1578,6 +1591,8 @@ exports.importGitMindmap = async (req, res) => {
 			gitfolderpath="avoassuretest_artifacts/"+gitfolderpath
 		}
 		const inputs= {
+			"userid": req.session.userid,
+			"roleid": req.session.activeRoleId,
 			"projectid": projectid,
 			"gitbranch": gitbranch,
 			"gitversion":gitversion,

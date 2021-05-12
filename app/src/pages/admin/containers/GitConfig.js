@@ -54,6 +54,15 @@ const GitConfig = (props) => {
             setProjectList([])
             setProjectData({})
         } else if(changeDropDown === "domainChange")  if(document.getElementById("projectGit") !== null) document.getElementById("projectGit").selectedIndex = "0";
+        urlRef.current.style.outline = "";
+        tokenRef.current.style.outline = "";
+        domainRef.current.style.outline = "";
+        ProjectRef.current.style.outline = "";
+        userRef.current.style.outline = "";
+        if(showEdit) {
+            tokenRef.current.value = "";
+            urlRef.current.value = "";
+        }
     } 
 
     const resetFields = () => {
@@ -81,6 +90,9 @@ const GitConfig = (props) => {
 }
 
 const onChangeProject = async (resetFields, displayError, showEdit, urlRef, tokenRef ,userData, userRef, projectData, ProjectRef, setLoading, setPopupState ) =>{
+    urlRef.current.style.outline = "";
+    tokenRef.current.style.outline = "";
+    ProjectRef.current.style.outline = "";
     if(!showEdit) return;
     setLoading("Loading...");
     const data = await gitEditConfig(userData[userRef.current.value], projectData[ProjectRef.current.value]);

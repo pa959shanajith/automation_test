@@ -20,7 +20,7 @@
         box-shadow: 2px 2px #8469a0;
         background: #6e469896;
     }
-    
+
 }
 .allocate-quant-container{
     position: absolute;
@@ -53,5 +53,10 @@
     .ice-count{
         border: 1px solid;
         width: 100px;
+    }
+}
+.allocate_by_ice-container{
+    .assign_opt-container{
+        height: 95% !important;
     }
 }

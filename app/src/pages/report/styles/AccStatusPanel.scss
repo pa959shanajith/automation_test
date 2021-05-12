@@ -15,5 +15,20 @@
             display: inline-block;
             font-weight: bold;
         }
+        .ac__panel_title{
+            text-transform: capitalize
+        }
+    }
+    .left-float{
+        width: 100%;
+        div {
+            display: flex
+        }
+        .content{
+            overflow: hidden;
+            white-space: nowrap!important;
+            text-overflow: ellipsis;
+            width: calc(100% - 150px);
+        }
     }
 }

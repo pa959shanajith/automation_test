@@ -58,7 +58,7 @@ const AccessibilityReport = ({setBlockui,displayError}) =>{
                         <AccStatusPanel selectedScDetails={selectedScDetails} scDetails={scDetails} arr={scStatus} setBlockui={setBlockui} displayError={displayError}/>
                     </div>
                 </div>
-                <div className='ar__bottom-content'>
+                <div>
                     <AccDetailPanel selectedScDetails={selectedScDetails} scDetails={scDetails} setBlockui={setBlockui} displayError={displayError}/>
 				</div>
             </div>

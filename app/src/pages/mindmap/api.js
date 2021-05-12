@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {RedirectPage} from '../global'
 import {history} from './index'
-const url = 'https://'+window.location.hostname+':8443';
+import {url} from '../../App';
 
 /*Component getProjectList
   use: 
@@ -395,7 +395,11 @@ export const importGitMindmap = async(data) => {
         }
         if(res.data === "empty"){
             console.error(res.data)
-            return {error:'Module does not exist in Git repo. Please verify your inputs!!'}
+            return {error:'Project is not Git configured!'}
+        }
+        if(res.data === "Invalid inputs"){
+            console.error(res.data)
+            return {error:'Module does not exists in Git repo. Please verify your inputs!'}
         }
         if (!('testscenarios' in res.data)){
             console.error(res.data)
@@ -435,11 +439,15 @@ export const exportToGit = async(data) => {
         }
         if(res.data==='empty'){
             console.error(res.data)
-            return {error:'Project is not Git configured'}
+            return {error:'Project is not Git configured.'}
         }
         if(res.data==='commit exists'){
             console.error(res.data)
-            return {error:'Git commit already exists'}
+            return {error:'Git commit version already exists.'}
+        }
+        if(res.data==='Invalid gitbranch'){
+            console.error(res.data)
+            return {error:"Input branch doesn't exist in Git. Please verify!"}
         }
         if(res.status===200 && res.data !== "fail"){          
             return res.data;

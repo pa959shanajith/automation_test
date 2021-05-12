@@ -93,8 +93,10 @@ if (cluster.isMaster) {
 		};
 		// CORS and security headers
 		app.all('*', function(req, res, next) {
-			res.setHeader('Access-Control-Allow-Origin', req.hostname);
-			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
+			const origin =  req.headers["origin"] || req.hostname;
+			res.setHeader('Access-Control-Allow-Origin', origin);
+			res.setHeader('Access-Control-Allow-Credentials', true);
+			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Accept, Content-Type, Upgrade-Insecure-Requests');
 			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			next();
 		});
@@ -262,7 +264,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(p_Webocular|neuronGraphs\/|p_ALM|p_APG|integration|p_qTest|p_Zephyr)$/, function(req, res) {
+		app.get(/^\/(webocular|neuronGraphs\/|integration)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -288,10 +290,6 @@ if (cluster.isMaster) {
 				return res.redirect("/error?e=" + ((sessChk) ? "403" : "401"));
 			}
 		}
-
-		// app.post('/designTestCase', function(req, res) {
-		// 	return res.sendFile("index.html", { root: __dirname + "/public/" });
-		// });
 
 		app.get('/AvoAssure_ICE.zip', async (req, res) => {
 			const iceFile = "AvoAssure_ICE.zip";

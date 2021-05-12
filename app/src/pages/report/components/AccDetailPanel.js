@@ -34,7 +34,7 @@ const AccDetailPanel = ({scDetails}) => {
                         <div className="ar__report" >View Standard Report</div>
                     </div>
                     {tableData.map((data,i)=>(
-                        <div key={i} className="ar__standard-row">
+                        <div key={`a-${i}`} className="ar__standard-row">
                             <div data-test="ar_detail-sn" className="ar__sn" >{i+1}</div>
                             <div data-test="ar_detail-stname" className="ar__standard" >{data["name"]} </div>
                             <div data-test="ar_detail-status" className={"ar__status "+(data["pass"]?"pass":"fail")} >{data["pass"]?"Pass":"Fail"}</div>

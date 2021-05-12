@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect, useRef } from 'react';
 import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global'
 import { useSelector } from 'react-redux';
 import {manageCIUsers} from '../api';
@@ -17,10 +17,11 @@ const TokenMgmtList = (props) => {
 	const [searchTasks,setSearchTasks] = useState("")
 	const [allTokensModify,setAllTokensModify] = useState(props.allTokens)
     const [firstStop,setFirstStop] = useState(false)
+    const searchRef =  useRef();
 
     useEffect(()=>{
         if(firstStop) setFirstStop(!firstStop);
-        else setAllTokensModify(props.allTokens);
+        else updateTokenList();
         // eslint-disable-next-line
     },[props.allTokens])
 
@@ -28,8 +29,8 @@ const TokenMgmtList = (props) => {
         setPopupState({show:false,title:"",content:""});
 	}
 	
-	const searchList = (val) =>{
-		const items = props.allTokens.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
+	const updateTokenList = () =>{
+		const items = props.allTokens.filter((e)=>e.name.toUpperCase().indexOf(searchRef.current.value.toUpperCase())!==-1)
         setAllTokensModify(items);
     }
     
@@ -103,7 +104,7 @@ const TokenMgmtList = (props) => {
 							<span className="searchIcon searchIcon-list" >
 								<img src={"static/imgs/ic-search-icon.png"} className="search-img-list" alt={"Search Icon"}/>
 							</span>
-							<input value={searchTasks} autoComplete="off" onChange={(event)=>{ setSearchTasks(event.target.value);searchList(event.target.value)}} type="text" id="searchTasks"  className="searchInput searchInput-list-tkn-mgmt" />
+							<input ref={searchRef} autoComplete="off" onChange={()=>{updateTokenList()}} type="text" id="searchTasks"  className="searchInput searchInput-list-tkn-mgmt" />
 						</div>
 					</div>
                     {props.showList ?

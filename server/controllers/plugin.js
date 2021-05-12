@@ -4,11 +4,17 @@ var utils = require('../lib/utils');
 
 //getProjectIds
 exports.getProjectIDs = async (req, res) =>{
-	logger.info("Inside UI service: getProjectIDs");
-	var obj = req.body;
-	obj.userid = req.session.userid;
-	const data  = await create_ice.getProjectIDs(obj)
-	res.send(data)
+	const fnName = "getModules";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var obj = req.body;
+		obj.userid = req.session.userid;
+		const data  = await create_ice.getProjectIDs(obj)
+		res.send(data)
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
 };
 
 exports.updateAccessibilitySelection = async function(req, res){

@@ -44,7 +44,6 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
 
     const getScheduledDetails = async () => {
         try{
-            setLoading("Loading...");
             const result = await getScheduledDetails_ICE();
             if (result && result.length > 0 && result !== "fail") {
                 for (var k = 0; k < result.length; k++) {
@@ -77,9 +76,8 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                 setScheduledDataOriginal(scheduledDataParsed);
             }
             document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
-            setLoading(false);
         }catch (error) {
-            setLoading(false);
+            setPopupState({show:true,title:"Error",content:"Failed to fetch Scheduled Data."});
             console.log(error)
         }
     }

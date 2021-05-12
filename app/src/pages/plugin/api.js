@@ -1,5 +1,5 @@
 import axios from 'axios';
-const url = "https://"+window.location.hostname+":8443";
+import {url} from '../../App';
 
 /*Component TaskSection
   api returns {"appType":[""],"appTypeName":[""],"cycles":{"":[""]},"domains":[],"projectId":[],"projectName":[],"projecttypes":{},"releases":[[{"cycles":[{"_id":"","name":""}],"name":""}]]}

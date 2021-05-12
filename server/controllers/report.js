@@ -297,12 +297,17 @@ exports.viewReport = async (req, res, next) => {
     const username = req.session.username;
     const userInfo = {username};
     const url = req.url.split('/');
-    const reportId = url[1] || "";
-    const type = (url[2] || 'html').toLowerCase().split('?')[0];
-    const embedImages = (url[2] || '').toLowerCase().split('?')[1] == 'images=true';
+    let reportName = url[1] || "";
+    if (reportName.split('.').length == 1) reportName += ".html";
+    const reportId = reportName.split('.')[0];
+    const typeWithQuery = (reportName.split('.')[1] || 'html').toLowerCase().split('?')
+    const type = typeWithQuery[0];
+    const embedImages = typeWithQuery[1] == 'images=true';
     let report = { overallstatus: [{}], rows: [], remarksLength: 0, commentsLength: 0 };
     logger.info("Requesting report type - " + type);
-    if (!req._passport.instance.verifySession(req)) {
+    if (url.length > 2) {
+        return res.redirect('/404');
+    } else if (!req._passport.instance.verifySession(req) && type == 'html') {
         report.error = {
             ecode: "INVALID_SESSION",
             emsg: "Authentication Failed! No Active Sessions found. Please login and try again.",
@@ -344,12 +349,14 @@ exports.viewReport = async (req, res, next) => {
         return res.send(content);
     } else if (type == "json") {
         const statusCode = report.error && report.error.status || 200;
-        return res.status(statusCode).send(report);
+        res.setHeader("Content-Type", "application/json");
+        return res.status(statusCode).send(JSON.stringify(report, null, 2));
     } else if (type == "pdf") {
         if (report.error) {
             res.setHeader("X-Render-Error", report.error.emsg);
             return res.status(report.error.status || 200).send(report.error);
         }
+        res.setHeader("Content-Type", "application/pdf");
         report.remarksLength = report.remarksLength.length;
         report.commentsLength = report.commentsLength.length;
         if (scrShots && scrShots.paths.length > 0) {
@@ -848,123 +855,67 @@ exports.getReportsData_ICE = async (req, res) => {
 };
 
 //Get report for execution
-exports.getReport_API = async(req, res) => {
-    logger.info("Inside UI service: getReport_API");
+exports.getReport_API = async (req, res) => {
+    const fnName = "getReport_API";
+    logger.info("Inside UI service: " + fnName);
     try {
-		var executionId = req.body.execution_data.executionId || "";
-		var scenarioIds = req.body.execution_data.scenarioIds;
+        const execData = req.body.execution_data || {};
+		var executionId = execData.executionId || "";
+		var scenarioIds = execData.scenarioIds;
 		var finalReport = [];
 		var tempModDict = {};
 		const userInfo = await utils.tokenValidation(req.body.userInfo);
 		const execResponse = userInfo.inputs;
-		if (execResponse.tokenValidation == "passed"){
-            delete execResponse.error_message; 
-            var inputs = {
-                "executionId": executionId,
-                "scenarioIds": scenarioIds
-            };
-            var args = {
-                data: inputs,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            logger.info("Calling DAS Service from getReport_API - getReport_API: reports/getReport_API");
-            client.post(epurl + "reports/getReport_API", args,
-                function(reportResult, response) {
-                    if (response.statusCode != 200 || reportResult.rows == "fail") {
-                        logger.error("Error occurred in the service getReport_API - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRDAS");
-                        if(reportResult.errMsg != ""){
-                            execResponse.error_message=reportResult.errMsg;
-                        }
-                        finalReport.push(execResponse);
-                        res.send(finalReport);
-                    } else {
-                        try{
-                            if(reportResult.errMsg != ""){
-                                execResponse.error_message=reportResult.errMsg;
-                            }
-                            finalReport.push(execResponse);
-                            for(i=0; i<reportResult.rows.length; ++i) {
-                                var reportData = reportResult.rows[i].report;
-                                var reportInfo = reportResult.rows[i];
-                                var pass = fail = terminated = total = 0;
-                                reportData.overallstatus[0].domainName=reportInfo.domainName;
-                                reportData.overallstatus[0].projectName=reportInfo.projectName;
-                                reportData.overallstatus[0].releaseName=reportInfo.releaseName;
-                                reportData.overallstatus[0].cycleName=reportInfo.cycleName;
-                                reportData.overallstatus[0].reportId=reportInfo.reportId;
-                                var getTym = reportData.overallstatus[0].EndTime.split(".")[0];
-                                var getDat = formatDate(getTym) || "N/A ";
-                                reportData.overallstatus[0].EndTime = getDat;
-                                reportData.overallstatus[0].StartTime = formatDate(reportData.overallstatus[0].StartTime.split(".")[0]) || "N/A "
-                                reportData.overallstatus[0].date = getDat.split(" ")[0];
-                                reportData.overallstatus[0].time = getTym.split(" ")[1];
-                                for(j=0;j<reportData.rows.length;++j){
-                                    if (reportData.rows[j].status == "Pass") {
-                                        pass++;
-                                    } else if (reportData.rows[j].status == "Fail") {
-                                        fail++;
-                                    } else if (reportData.rows[j].hasOwnProperty("Step") && reportData.rows[j].Step == "Terminated") {
-                                        terminated++
-                                    }
+        if (execResponse.tokenValidation !== "passed") {
+            finalReport.push(execResponse);
+            return res.send(finalReport);
+        }
 
-                                    if ('testcase_details' in reportData.rows[j]) {
-                                        if (typeof(reportData.rows[j].testcase_details) == "string" && reportData.rows[j].testcase_details != "" && reportData.rows[j].testcase_details != "undefined") {
-                                            reportData.rows[j].testcase_details = JSON.parse(reportData.rows[j].testcase_details);
-                                        } else if (typeof(reportData.rows[j].testcase_details) == "object") {
-                                            reportData.rows[j].testcase_details = reportData.rows[j].testcase_details;
-                                        } else {
-                                            reportData.rows[j].testcase_details = reportData.rows[j].testcase_details;
-                                        }
-
-                                        if (reportData.rows[j].testcase_details == "") {
-                                            reportData.rows[j].testcase_details = {
-                                                "actualResult_pass": "",
-                                                "actualResult_fail": "",
-                                                "testcaseDetails": ""
-                                            }
-                                        }
-                                    }
-                                }
-                                total = pass+fail+terminated;
-                                reportData.overallstatus[0].pass = (parseFloat((pass / total) * 100).toFixed(2)) > 0 ? parseFloat((pass / total) * 100).toFixed(2) : parseInt(0);
-                                reportData.overallstatus[0].fail = (parseFloat((fail / total) * 100).toFixed(2)) > 0 ? parseFloat((fail / total) * 100).toFixed(2) : parseInt(0);
-                                reportData.overallstatus[0].terminate = (parseFloat((terminated / total) * 100).toFixed(2)) > 0 ? parseFloat((terminated / total) * 100).toFixed(2) : parseInt(0);
-                                scenarioReport={};
-                                scenarioReport.scenarioId=reportInfo.scenariodId;
-                                scenarioReport.scenarioName=reportInfo.scenarioName;
-                                scenarioReport.Report=reportData;
-                                if (reportInfo.moduleId in tempModDict) {
-                                    moduleRep=tempModDict[reportInfo.moduleId];
-                                    moduleRep.Scenarios.push(scenarioReport);
-                                    tempModDict[reportInfo.moduleId]=moduleRep;
-                                } else {
-                                    moduleReport={};
-                                    moduleReport.moduleId=reportInfo.moduleId;
-                                    moduleReport.moduleName=reportInfo.moduleName;
-                                    moduleReport.Scenarios=[];
-                                    moduleReport.Scenarios.push(scenarioReport);
-                                    tempModDict[reportInfo.moduleId]=moduleReport;
-                                }
-                            }
-                            for(var k in tempModDict){
-                                finalReport.push(tempModDict[k]);
-                            } 
-                            logger.info("Sending reports in the service getReport_API: final function");
-                            res.send(finalReport);
-                        } catch (exception) {
-                            logger.error("Exception in the service getReport_API - projectsUnderDomain: %s", exception);
-                            res.send("fail");
-                        }            
-                    }
-                });
+        delete execResponse.error_message;
+        const inputs = { executionId, scenarioIds };
+        const data = await utils.fetchData(inputs, "reports/getReport_API", fnName, true);
+        let reportResult = data[0];
+        if (reportResult == "fail") {
+            if(reportResult[2] && reportResult[2].errMsg !== "") execResponse.error_message=reportResult.errMsg;
+            finalReport.push(execResponse);
+            return res.send(finalReport);
+        }
+        if (reportResult.errMsg != "") execResponse.error_message=reportResult.errMsg;
+        finalReport.push(execResponse);
+        for(let i=0; i<reportResult.rows.length; ++i) {
+            const reportInfo = reportResult.rows[i];
+            const report = prepareReportData(reportInfo).report;
+            report.overallstatus[0].reportId = reportInfo.reportid;
+            delete report.overallstatus[0].scenarioName;
+            delete report.overallstatus[0].executionId;
+            delete report.overallstatus[0].moduleName;
+            const suburl = req.originalUrl.endsWith('/')? req.originalUrl.slice(0,-1):req.originalUrl;
+            const downloadUri = req.protocol + '://' + (req.headers["origin"] || req.hostname) + suburl.split('/').slice(0,-1).join('/') + '/viewReport/' + reportInfo.reportid;
+            const scenarioReport = {
+                scenarioId: reportInfo.testscenarioid,
+                scenarioName: reportInfo.testscenarioname,
+                pdf: downloadUri + '.pdf',
+                view: downloadUri + '.html',
+                Report: report
+            };
+            const moduleId = reportInfo.moduleid;
+            if (tempModDict[moduleId]) {
+                tempModDict[moduleId].Scenarios.push(scenarioReport);
             } else {
-                finalReport.push(execResponse);
-                res.send(finalReport);
+                tempModDict[moduleId] = {
+                    moduleId: moduleId,
+                    moduleName: reportInfo.testsuitename,
+                    Scenarios: [scenarioReport]
+                };
             }
+        }
+        for (let modid in tempModDict) {
+            finalReport.push(tempModDict[modid]);
+        } 
+        logger.info("Sending reports in the service %s", fnName);
+        return res.send(finalReport);
     } catch (exception) {
-        logger.error("Exception in the service getReport_API - Error: %s", exception);
+        logger.error("Exception in the service %s - Error: %s", fnName, exception);
         res.send("fail");
     }
 };

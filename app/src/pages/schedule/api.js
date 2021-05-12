@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {RedirectPage} from '../global'
 import {history} from './index'
-const url = "https://"+window.location.hostname+":8443";
+import {url} from '../../App';
 
 /*Component  
   api returns 
