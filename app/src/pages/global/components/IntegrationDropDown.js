@@ -7,7 +7,7 @@ import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE } from '
   use: renders integration popup for ALM/ qTest/ Zypher
 */
 
-const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, setPopupState, setCredentialsExecution, displayError}) => {
+const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integrationCred, setPopupState, setCredentialsExecution, displayError}) => {
     const [credentials,setCredentials] = useState({url: "", userName: "", password: ""});
     const [urlErrBor,setUrlErrBor] = useState(false)
     const [usernameErrBor,setUserNameErrBor] = useState(false)
@@ -46,9 +46,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, setPo
             } else if (data === "invalidurl") {
                 setErrorMsg("Invalid URL");
             } else {
-                var integration = {alm: {url:"",username:"",password:""}, 
-                qtest: {url:"",username:"",password:"",qteststeps:""}, 
-                zephyr: {accountid:"",accesskey:"",secretkey:""}};
+                var integration = {...integrationCred};
                 if(type === "ALM"){
                     integration.alm = {
 						url:credentials.url,

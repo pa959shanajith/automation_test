@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
 import {Provider} from 'react-redux';
 import {store} from './reducer';
-import {ProgressBar} from './pages/global'
+import {ProgressBar, ErrorPage} from './pages/global'
 import Login, {Base} from './pages/login';
 import Admin from './pages/admin';
 import Plugin from './pages/plugin';
@@ -20,10 +20,12 @@ import SocketFactory from './SocketFactory';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-datetime/css/react-datetime.css';
-
+const { REACT_APP_DEV } = process.env
 /*Component App
   use: defines components for each url
 */
+
+export const url =  REACT_APP_DEV  ? "https://"+window.location.hostname+":8443" : window.location.origin;
 
 const App = () => {
   const [blockui,setBlockui] = useState({show:false})
@@ -56,7 +58,7 @@ const RouteApp = () => {
       <Route path = "/reports" component={Report}/>
       <Route path ="/execute" component={Execute}/>
       <Route path ="/scheduling" component={Schedule}/>
-      <Route component={Base} />
+      <Route component={ErrorPage} />
     </Switch>
   </Router>
   )

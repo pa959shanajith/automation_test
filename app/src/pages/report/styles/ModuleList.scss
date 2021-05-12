@@ -1,6 +1,8 @@
 .rp_moduleList{
     height: calc(100% - 35px);
     width: 100%;
+    transition-duration: 2s;
+    z-index: 1;
     .scrollbar-container{
         width: 100%;
     }

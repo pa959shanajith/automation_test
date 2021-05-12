@@ -5,9 +5,9 @@ import '../styles/TaskBox.scss';
 import ClickAwayListener from 'react-click-away-listener';
 import {populateUsers} from '../api';
 import { useSelector } from 'react-redux';
-import {ModalContainer} from '../../global';
+import {ModalContainer, CalendarComp} from '../../global';
 import Complexity, {getComplexityLevel} from './Complexity';
-import CalendarComp from './CalendarComp';
+import PropTypes from 'prop-types'
 
 var unassignTask = []
 var reassignFlag = false
@@ -25,6 +25,7 @@ const TaskBox = (props) => {
     const unassignList = useSelector(state=>state.mindmap.unassignTask)
     const userInfo = useSelector(state=>state.login.userinfo)
     const selectedProj = useSelector(state=>state.mindmap.selectedProj)
+    const [closeCal,setCloseCal] = useState(false)
     const [warning,setWarning]=useState(false)
     const [task,setTask] = useState({arr:[],initVal:undefined})
     const [batchName,setBatchName] = useState({show:false})
@@ -122,17 +123,19 @@ const TaskBox = (props) => {
                     tObj.ac = "Disable"
             }
         }else if(t === 'scenarios'){
-            taskList.task = taskList.task[0]
+            taskList.task = [taskList.task[0]]
         }
         if (tObj.det === null || tObj.det.trim() == "") {
             switch(dNodes[pi].type){
                 case 'endtoend' :
-                    tObj.det = tObj.t + ' End to End ' + dNodes[pi].name
+                    tObj.det = tObj.t + ' End to End ' + dNodes[pi].name;
+                    break;
                 case 'scenarios' :
                     tObj.det = tObj.t + ' ' + dNodes[pi].name
+                    break;
                 default :
                     var type = dNodes[pi].type.slice(0,-1) //remove plural
-                    tObj.det = tObj.t + type + " " + dNodes[pi].name
+                    tObj.det = tObj.t + ' ' + type + ' ' + dNodes[pi].name
             }
         }
         taskDetailsRef.current.value = tObj.det
@@ -286,6 +289,7 @@ const TaskBox = (props) => {
         clickAddTask({dNodes,nodeDisplay})
     }
     const stopPropagate = (e) => {
+        if(e.target && !e.target.className.includes("rdt"))setCloseCal(true);
         if(e.target && e.target.id === 'task-ok')return;
         e.stopPropagation()
         if(e.nativeEvent){
@@ -306,8 +310,8 @@ const TaskBox = (props) => {
                 <ul>
                     {task.arr.length>0?
                         <li>
-                            <label>Task</label>
-                            <select onChange={changeTask}  disabled={assignbtn.reassign || task.disabled}  defaultValue={task.initVal} ref={taskRef}>
+                            <label data-test="taskLabel">Task</label>
+                            <select data-test="taskSelect" onChange={changeTask}  disabled={assignbtn.reassign || task.disabled}  defaultValue={task.initVal} ref={taskRef}>
                                 {task.arr.map((e)=>
                                     <option key={e} value={e}>{e}</option>
                                 )}
@@ -316,15 +320,15 @@ const TaskBox = (props) => {
                     :null}
                     {(batchName.show)?
                         <li>
-                            <label>Batch Name</label>
-                            <input id='ct-batchName' disabled={batchName.disabled || assignbtn.reassign} ref={batchNameRef} defaultValue={batchName.val}></input>
+                            <label data-test="batchLabel">Batch Name</label>
+                            <input data-test="batchInput" id='ct-batchName' disabled={batchName.disabled || assignbtn.reassign} ref={batchNameRef} defaultValue={batchName.val}></input>
                         </li>
                     :null}
                     <li>
-                        <label>Assigned to</label>
+                        <label data-test="assignedtoLabel">Assigned to</label>
                         {userAsgList.loading?
-                        <select key='select_1' disabled={true} value={defaultVal}><option value={defaultVal}>Loading...</option></select>
-                        :<select key='select_2' id='ct-assignedTo' onChange={(e)=>setUserAsgList({...userAsgList,value:e.target.value})} disabled={userAsgList.disabled || assignbtn.reassign} defaultValue={userAsgList.value} >
+                        <select data-test="assignedselect1" key='select_1' disabled={true} value={defaultVal}><option value={defaultVal}>Loading...</option></select>
+                        :<select data-test="assignedselect2" key='select_2' id='ct-assignedTo' onChange={(e)=>setUserAsgList({...userAsgList,value:e.target.value})} disabled={userAsgList.disabled || assignbtn.reassign} defaultValue={userAsgList.value} >
                             <option value={defaultVal}>Select User</option>
                             {userAsgList.arr.map((e)=>
                                 <option key={e._id} value={e._id}>{e.name}</option>
@@ -332,10 +336,10 @@ const TaskBox = (props) => {
                         </select>}
                     </li>
                     <li>
-                        <label>Reviewer</label>
+                        <label data-test="reviewLabel">Reviewer</label>
                         {userRevList.loading?
-                        <select key='selectr_1' disabled={true} value={defaultVal}><option value={defaultVal}>Loading...</option></select>
-                        :<select  key='selectr_2'id='ct-assignRevw' onChange={(e)=>setUserRevList({...userRevList,value:e.target.value})} disabled={assignbtn.reassign} defaultValue={userRevList.value}>
+                        <select data-test="reviewSelect1" key='selectr_1' disabled={true} value={defaultVal}><option value={defaultVal}>Loading...</option></select>
+                        :<select data-test="reviewSelect2" key='selectr_2'id='ct-assignRevw' onChange={(e)=>setUserRevList({...userRevList,value:e.target.value})} disabled={assignbtn.reassign} defaultValue={userRevList.value}>
                             <option value={defaultVal}>Select Reviewer</option>
                             {userRevList.arr.map((e)=>
                                 <option key={e._id} value={e._id}>{e.name}</option>
@@ -344,28 +348,28 @@ const TaskBox = (props) => {
                         }                     
                     </li>
                     {startDate.show?
-                        <li id='ct-startDate'>
-                            <label>Start Date</label>
-                            <CalendarComp disabled={assignbtn.reassign} date={startDate.value} setDate={(val)=>setStartDate({show:true,value:val})}/>
+                        <li data-test="startDate" id='ct-startDate'>
+                            <label data-test="startDateLabel">Start Date</label>
+                            <CalendarComp setCloseCal={setCloseCal} closeCal={closeCal} disabled={assignbtn.reassign} date={startDate.value} setDate={(val)=>setStartDate({show:true,value:val})}/>
                         </li>
                     :null}
                     {endDate.show?
-                        <li id='ct-endDate'>
-                            <label>End Date</label>
-                            <CalendarComp disabled={assignbtn.reassign} date={endDate.value} setDate={(val)=>setEndDate({show:true,value:val})}/>
+                        <li data-test="endDate" id='ct-endDate'>
+                            <label data-test="endDateLabel" >End Date</label>
+                            <CalendarComp setCloseCal={setCloseCal} closeCal={closeCal} disabled={assignbtn.reassign} date={endDate.value} setDate={(val)=>setEndDate({show:true,value:val})}/>
                         </li>
                     :null}
                     {propagate.show?
                         <li>
-                            <label>Propagate</label>
-                            <input onChange={()=>setPropagate({show:true,val:!propagate.val})} type='checkbox'></input>
+                            <label data-test="propogateLabel">Propagate</label>
+                            <input data-test="propogateInput" onChange={()=>setPropagate({show:true,val:!propagate.val})} type='checkbox'></input>
                         </li>
                     :null}
                     {complexity.show?
                         <li>
-                            <label>Complexity</label>
-                            <span>
-                            <label>{complexity.val}</label>
+                            <label data-test="complexityLabel" >Complexity</label>
+                            <span data-test="complexity">
+                            <label data-test="complexityValue" >{complexity.val}</label>
                                 <i className="fa fa-list" aria-hidden="true" onClick={()=>setShowcomplexity(true)}></i>
                             </span>
                         </li>
@@ -373,14 +377,14 @@ const TaskBox = (props) => {
                     {showcomplexity && !assignbtn.reassign?<Complexity setComplexity={setComplexity} complexity={complexity} type={t} setShowcomplexity={setShowcomplexity}/>:null}
                 </ul>
                 <div>
-                    <textarea ref={taskDetailsRef} placeholder={"Enter Task Details"} disabled={assignbtn.reassign} id='ct-assignDetails' ></textarea>
+                    <textarea data-test="taskDetails" ref={taskDetailsRef} placeholder={"Enter Task Details"} disabled={assignbtn.reassign} id='ct-assignDetails' ></textarea>
                 </div>
                 <div id='ct-submitTask'>
                     {(assignbtn.reassign)?
-                    <span id='unassign-btn' tabIndex={'0'}  onKeyPress={()=>unAssign(true)} onClick={()=>unAssign(true)} className={(assignbtn.disable)?'disableButton':''}>Reassign</span>:
-                    <span id='unassign-btn' tabIndex={'0'}  onKeyPress={()=>unAssign(false)} onClick={()=>unAssign(false)} className={(assignbtn.disable)?'disableButton':''}>Unassign</span>
+                    <span data-test="reassign" id='unassign-btn' tabIndex={'0'}  onKeyPress={()=>unAssign(true)} onClick={()=>unAssign(true)} className={(assignbtn.disable)?'disableButton':''}>Reassign</span>:
+                    <span data-test="unassign" id='unassign-btn' tabIndex={'0'}  onKeyPress={()=>unAssign(false)} onClick={()=>unAssign(false)} className={(assignbtn.disable)?'disableButton':''}>Unassign</span>
                     }
-                    <span id='task-ok' tabIndex={'0'} onClick={addTask} onKeyPress={addTask}>Ok</span>
+                    <span data-test="ok" id='task-ok' tabIndex={'0'} onClick={addTask} onKeyPress={addTask}>Ok</span>
                 </div>
             </div>
         </ClickAwayListener>
@@ -415,6 +419,22 @@ function addTask_11(pi, tObj, qid, cycleid,dNodes,nodeDisplay,cTask) {
     }
     if (validate[0]) {
         //var taskflag = true;
+        // if (taskUndef && dNodes[pi].type == "scenarios") {
+        //     switch(tObj.t){
+        //         case "Execute Scenario Accessibility Only": 
+        //             d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/ic-accessibility-enabled.png').attr('x', -14).attr('y', -10).attr('width', '21px').attr('height', '21px');
+        //             break;
+        //         case "Execute Scenario with Accessibility":
+        //             d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/ic-accessibility-enabled.png').attr('x', -14).attr('y', -10).attr('width', '21px').attr('height', '21px');
+        //             d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/ic-functional-enabled.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+        //             break;
+        //         default:
+        //             d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/ic-functional-enabled.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+        //             break;
+        //     }
+        // }else if(taskUndef){
+        //     d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/ic-functional-enabled.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
+        // }
         if (taskUndef) {
             nodeDisplay[pi].task=true;
             //d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'imgs/node-task-assigned.png').attr('x', 29).attr('y', -10).attr('width', '21px').attr('height', '21px');
@@ -783,4 +803,17 @@ const taskAssign = {
         "attributes": ["at", "rw", "sd", "ed", "reestimation", "cx"]
     }
 };
+TaskBox.propTypes={
+    setPopup: PropTypes.func,
+    clickUnassign:PropTypes.func ,
+    nodeDisplay: PropTypes.object,
+    releaseid: PropTypes.string,
+    cycleid: PropTypes.string,
+    ctScale:PropTypes.object ,
+    nid:PropTypes.string,
+    dNodes:PropTypes.array,
+    setTaskBox:PropTypes.func ,
+    clickAddTask:PropTypes.func ,
+    displayError:PropTypes.func 
+}
 export default TaskBox;

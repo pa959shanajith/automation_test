@@ -69,6 +69,14 @@ const reducer = (state=initialState, action) => {
             return {
                 ...state, actionError: action.payload
             }
+        case actionTypes.RESET_COMPARE:
+            return {
+                ...state, 
+                compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
+                compareFlag: false,
+                compareData: {}
+            }
+                
         default:
             return state
     }

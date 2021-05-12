@@ -17,6 +17,7 @@ const MindmapHome = () => {
   const [options,setOptions] = useState(undefined)
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
+    'importmindmap': React.memo(() => (<CreateNew importRedirect={true}/>)),
     'enemindmap': React.memo(() => (<CreateEnE/>)),
     'assignmap': React.memo(() => (<CreateAssign/>))
   }
@@ -43,7 +44,7 @@ const MindmapHome = () => {
           <div className='mp__middle_container'>
             <CreateOptions setOptions={setOptions}/>
           </div>
-          <ReferenceBar taskTop={true} collapsible={true}/>
+          <ReferenceBar taskTop={true} collapsible={true} hideInfo={true}/>
         </Fragment>:
         <Component/>
         }

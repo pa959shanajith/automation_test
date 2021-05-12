@@ -11,8 +11,7 @@ import ValidationExpression from '../../global/components/ValidationExpression';
 
 /*Component CreateUser
   use: defines Admin middle Section for create user
-  ToDo: only ldap code red border class divs USERIDNAME
-        delete modal on delete (currently direct delete happening)
+  ToDo:
 */
 
 const CreateUser = (props) => {
@@ -84,7 +83,7 @@ const CreateUser = (props) => {
         const createdbyrole = userConf.allRoles.filter((e)=> (e[0].toLowerCase() === "admin"));;
         var userObj = {
             userid: userConf.userId,
-            username: userConf.userName.toLowerCase(),
+            username: userConf.userName,
             password: userConf.passWord,
             firstname: userConf.firstname,
             lastname: userConf.lastname,
@@ -540,7 +539,7 @@ const CreateUser = (props) => {
             
             {(props.showEditUser===false)?
                 <CreateLanding firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown} ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap}  ldapDirectoryAddClass={ldapDirectoryAddClass} confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={props.setShowEditUser} ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} />
-                :<EditLanding firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} confServerAddClass={confServerAddClass} ldapGetUser={ldapGetUser} ldapDirectoryAddClass={ldapDirectoryAddClass} clearForm={clearForm} allUserFilList={allUserFilList} manage={manage} searchFunctionUser={searchFunctionUser} click={click} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} getUserData={getUserData} />
+                :<EditLanding firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} confServerAddClass={confServerAddClass} ldapGetUser={ldapGetUser} ldapDirectoryAddClass={ldapDirectoryAddClass} clearForm={clearForm} allUserFilList={allUserFilList} manage={manage} setAllUserFilList={setAllUserFilList} searchFunctionUser={searchFunctionUser} click={click} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} getUserData={getUserData} />
             }    
 
             <div className="col-xs-9 form-group__conv">

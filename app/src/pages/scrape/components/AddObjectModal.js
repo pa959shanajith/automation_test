@@ -63,7 +63,7 @@ const AddObjectModal = props => {
             let type = objects[i].objType;
             let tempId = objects[i].tempId;
             let [tag, value] = type.split("-");
-            let custname = `${name}_${value}`;
+            let custname = `${name.trim()}_${value}`;
 
             for(let object of props.scrapeItems) {
                 if (object.title === custname) {

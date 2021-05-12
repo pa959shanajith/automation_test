@@ -1,4 +1,4 @@
-import React , {useState ,  useRef , Fragment } from 'react';
+import React , {useState ,  useRef , Fragment, useEffect } from 'react';
 import '../styles/ProfJ.scss';
 import {ScrollBar , PopupMsg} from '../../global';
 import {getTopMatches_ProfJ } from '../api';
@@ -7,10 +7,15 @@ const  ChatBot = (props) => {
     const queryref = useRef(); //ref for query input tag to acess the current value of usermessage onClick.
     const uMsgRef = useRef(); //to check the status of last printed user message for auto-scroll enable
     const bMsgRef = useRef(); //to check the status of last printed bot message for auto-scroll enable
+    const lMsgRef = useRef();
     const [chatBox , setChatBox] = useState(false); //State for chat aree open close 
     const [chat , setChat] = useState([])//State stores all the list of chat objects.
     const [linkMsgArr , setLinkMsgArr]= useState([])//stores all the links clicked on the Bot Message
     const [popup ,setPopup]= useState({show:false});
+
+    useEffect(()=>{
+        lMsgRef.current && lMsgRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
+    }, [linkMsgArr])
 
     const displayError = (error) =>{ //the default display error funtion used in each component
         setPopup({
@@ -99,7 +104,9 @@ const  ChatBot = (props) => {
                             {
                                 linkMsgArr  && 
                                 linkMsgArr.map((e,i)=>(
-                                    <><span className="defautMssg">{e}</span><br/></>
+                                    <><span ref={lMsgRef} className="defautMssg">{e}
+                                    </span>
+                                    <br/></>
                                 ))
                             }
                         </div>

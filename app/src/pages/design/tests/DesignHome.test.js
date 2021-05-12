@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as reactRedux  from 'react-redux';
 import { Provider }  from 'react-redux';
 import { createStore } from 'redux';
-import { shallow, mount } from 'enzyme';
+import {  mount } from 'enzyme';
 import { findByTestAtrr } from '../../../setupTests';
 import { BrowserRouter } from 'react-router-dom';
 import reducer from '../state/reducer';

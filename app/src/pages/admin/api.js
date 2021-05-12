@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {RedirectPage} from '../global'
 import {history} from './index'
-const url = "https://"+window.location.hostname+":8443";
+import {url} from '../../App'
 
 /* Component
   api returns [["Admin": ""],["Test Lead": ""],["": ""],["": ""]...]
@@ -16,7 +16,7 @@ export const getUserRoles = async() => {
             },
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -45,7 +45,7 @@ export const manageUserDetails = async(action, userObj) => {
             data: {action: action,user: userObj},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -74,7 +74,7 @@ export const getLDAPConfig = async(action, args, opts) => {
             data: {action: action,args: args,opts: opts},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -109,7 +109,7 @@ export const getSAMLConfig = async(name) => {
             data: {name: name},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -141,7 +141,7 @@ export const manageSAMLConfig = async(action, confObj) => {
             data: {action: action,conf: confObj},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -170,7 +170,7 @@ export const getOIDCConfig = async(name) => {
             data: {name: name},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -202,7 +202,7 @@ export const getUserDetails = async(action, args) => {
             data: {action: action,args: args},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -258,7 +258,7 @@ export const getAvailablePlugins = async() => {
             },
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
@@ -285,7 +285,7 @@ export const getPreferences = async() => {
             },
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -313,7 +313,7 @@ export const getDomains_ICE = async() => {
             },
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
@@ -341,7 +341,7 @@ export const getNames_ICE = async(requestedids, idtype) => {
             data: {requestedids: requestedids,idtype: idtype},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
@@ -369,7 +369,7 @@ export const createProject_ICE = async(createprojectObj) => {
             data: {createProjectObj: createprojectObj},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
@@ -398,7 +398,7 @@ export const getDetails_ICE = async(idtype, requestedids) => {
             data: {idtype: idtype,requestedids: requestedids},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
@@ -427,7 +427,7 @@ export const updateProject_ICE = async(updateProjectObj, userDetails) => {
                 userDetails: userDetails},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
@@ -455,7 +455,7 @@ export const getAssignedProjects_ICE = async(getAssignProj) => {
             data: {getAssignProj: getAssignProj},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
@@ -483,7 +483,7 @@ export const assignProjects_ICE = async(assignProjectsObj) => {
             data: {assignProjectsObj: assignProjectsObj},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
@@ -514,7 +514,7 @@ export const manageSessionData = async(action, user, key, reason) => {
                     reason: reason},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -543,7 +543,7 @@ export const fetchICE = async(args) => {
             data: {user: args},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -575,7 +575,7 @@ export const provisions = async(tokeninfo) => {
             data: {tokeninfo:tokeninfo},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -605,7 +605,7 @@ export const manageOIDCConfig = async(action, confObj) => {
             data: {action: action, conf: confObj},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -635,7 +635,7 @@ export const getCIUsersDetails = async(CIUser) => {
             data: {CIUser: CIUser},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -667,7 +667,7 @@ export const manageCIUsers = async(action,CIUser) => {
             data: {action: action, CIUser: CIUser},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -700,7 +700,7 @@ export const testLDAPConnection = async(auth, urlLDAP, baseDN, bindDN, bindCrede
                     password: bindCredentials},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -726,7 +726,7 @@ export const manageLDAPConfig = async(action, confObj) => {
             data: {action: action, conf: confObj},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -734,10 +734,10 @@ export const manageLDAPConfig = async(action, confObj) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:"Test Connection Failed!"}
+        return {error:"Failed to manage LDAP config!"}
     }catch(err){
         console.error(err)
-        return {error:"Test Connection Failed!"}
+        return {error:"Failed to manage LDAP config!"}
     }
 }
 
@@ -751,7 +751,7 @@ export const updatePool = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -777,7 +777,7 @@ export const deleteICE_pools = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -802,7 +802,7 @@ export const createPool_ICE = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -830,7 +830,7 @@ export const getICEinPools = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -856,7 +856,7 @@ export const getAvailable_ICE = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -882,7 +882,7 @@ export const clearQueue = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -908,7 +908,7 @@ export const getPools = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -935,7 +935,7 @@ export const getNotificationChannels = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -962,7 +962,7 @@ export const manageNotificationChannels = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -988,7 +988,7 @@ export const testNotificationChannels = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session"){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -1021,7 +1021,7 @@ export const fetchLockedUsers = async() => {
             data: {},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
@@ -1049,7 +1049,7 @@ export const unlockUser = async(user) => {
             data: {user: user},
             credentials: 'include'
         });
-        if(res.status === 401 || res.status === "Invalid Session" ){
+        if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:'invalid session'};
         }else if(res.status===200 && res.data !== "fail"){            
@@ -1060,5 +1060,67 @@ export const unlockUser = async(user) => {
     }catch(err){
         console.error(err)
         return {error:"Failed to unlocked users"}
+    }
+}
+
+/* Component 
+  api returns
+*/
+
+export const gitSaveConfig = async(action, userId,projectId,gitAccToken,gitUrl) => { 
+    try{
+        const res = await axios(url+'/gitSaveConfig', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,
+                    userId: userId,
+                    projectId: projectId,
+                    gitAccToken: gitAccToken,
+                    gitUrl: gitUrl},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Error while Git "+action+ " Configuration"}
+    }catch(err){
+        console.error(err)
+        return {error:"Error while Git "+action+ " Configuration"}
+    }
+}
+
+
+/* Component GitConfig
+  api returns
+*/
+
+export const gitEditConfig = async(userId, projectId) => { 
+    try{
+        const res = await axios(url+'/gitEditConfig', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {userId: userId,
+				projectId: projectId},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to fetch git configurations."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to fetch git configurations."}
     }
 }

@@ -16,7 +16,7 @@ const Preferences = (props) => {
     var rows = ["ALM","Mindmap","Reports","Utility"];
 
     useEffect(()=>{
-        setLoading();
+        setLoading("Loading...");
         (async()=>{
             const response = await getPreferences()
             if(response.error){displayError(response.error);return;}

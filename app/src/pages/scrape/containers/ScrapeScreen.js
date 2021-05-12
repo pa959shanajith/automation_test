@@ -52,11 +52,32 @@ const ScrapeScreen = ()=>{
         //eslint-disable-next-line
     }, [current_task])
 
+    useEffect(()=>{
+        if (!showObjModal) {
+            let selected = 0;
+            let selectedObj = null;
+
+            scrapeItems.forEach(item=>{
+                if (!item.hide && item.checked) {
+                    selected++;
+                    selectedObj = item;
+                }
+            })
+
+            if (selected === 1 && selectedObj && selectedObj.editable && selectedObj.tag && selectedObj.tag.substring(0, 4) === "iris") {
+                let localScrapeItems = [...scrapeItems];
+
+                localScrapeItems.forEach(item => { if (!item.hide) {
+                    item.checked = false;
+                }})
+                
+                setScrapeItems(localScrapeItems);
+            }
+        }
+    }, [showObjModal])
+
     const fetchScrapeData = () => {
 		return new Promise((resolve, reject) => {
-            dispatch({type: actionTypes.SET_COMPAREDATA, payload: {}});
-            dispatch({type: actionTypes.SET_COMPAREOBJ, payload: {changedObj: [], notChangedObj: [], notFoundObj: []}});
-            dispatch({type: actionTypes.SET_COMPAREFLAG, payload: false});
             setOverlay("Loading...");
             
             let viewString = scrapeItems;
@@ -70,12 +91,6 @@ const ScrapeScreen = ()=>{
                 else if (typeof data === "object" && current_task.appType!=="Webservice") {
 
                     viewString = data;
-
-                    if(viewString.reuse && current_task.reuse !== viewString.reuse){
-                        let task = { ...current_task }
-                        task.reuse = true;
-                        dispatch({ type: pluginActions.SET_CT, payload: task });
-                    }
                     
                     haveItems = viewString.view.length !== 0;
                     
@@ -101,9 +116,6 @@ const ScrapeScreen = ()=>{
                         setHideSubmit(true);
                         dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                         dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
-                        dispatch({type: actionTypes.SET_COMPAREDATA, payload: {}});
-                        dispatch({type: actionTypes.SET_COMPAREOBJ, payload: {changedObj: [], notChangedObj: [], notFoundObj: []}});
-                        dispatch({type: actionTypes.SET_COMPAREFLAG, payload: false});
                         setOverlay("");
                     }
                 }
@@ -351,7 +363,7 @@ const ScrapeScreen = ()=>{
                     err = { 'title': 'Scrape Screen', 'content': 'Scrape Terminated' };
                 }
                 else if (data === "wrongWindowName")
-                    err = { 'title': 'Scrape', 'content': 'Wrong window name.' };
+                    err = { 'title': 'Scrape', 'content': 'Window not found - Please provide valid window name.' };
                 else if (data === "ExecutionOnlyAllowed")
                     err = { 'title': 'Scrape Screen', 'content': 'Execution Only Allowed' };
 
@@ -624,7 +636,8 @@ function generateScrapeItemList(lastVal, lastIdx, viewString){
             scrapeObject.hiddentag = "No";
             newTag = `iris;${(scrapeObject.objectType || "").toLowerCase()}`;
             scrapeObject.url = "";
-            scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${(scrapeObject.objectType || "")};${(scrapeObject.objectStatus || "0")};${scrapeObject.tag}`;
+            // if (scrapeObject.xpath.split(';').length<2)
+            scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${(scrapeObject.objectType || "").toLowerCase()};${(scrapeObject.objectStatus || "0")};${scrapeObject.tag}`;
         }
 
         let scrapeItem = {  objId: scrapeObject._id,

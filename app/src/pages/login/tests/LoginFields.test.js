@@ -1,7 +1,7 @@
 import React from 'react';
-import { shallow,mount, } from 'enzyme';
+import { shallow } from 'enzyme';
 import {findByTestAtrr,checkProps} from '../../../setupTests';
-import LoginFields,{handleShowPass}  from '../components/LoginFields';
+import LoginFields from '../components/LoginFields';
 import { SetProgressBar as SPB} from '../../global';
 import * as api from '../api'
 

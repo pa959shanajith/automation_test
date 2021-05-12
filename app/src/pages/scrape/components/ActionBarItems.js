@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, useContext } from 'react';
+import React, { useState, useEffect, Fragment, useContext, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import '../styles/ActionBarItems.scss'
@@ -93,12 +93,13 @@ const UpperContent = props => {
 
 const BottomContent = () => {
 
+    const hiddenInput = useRef();
     const { appType, screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
     const disableAction = useSelector(state => state.scrape.disableAction);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
 
-    const { setShowObjModal, scrapeItems, setShowPop, fetchScrapeData } = useContext(ScrapeContext);
+    const { setShowObjModal, scrapeItems, setShowPop, fetchScrapeData, setOverlay } = useContext(ScrapeContext);
     const [customLen, setCustomLen] = useState(0);
     const [scrapeItemsLength, setScrapeLen] = useState(0);
 
@@ -106,10 +107,12 @@ const BottomContent = () => {
     
     useEffect(()=>{
         let customs = 0;
+        let savedObjects = 0;
         for (let scrapeItem of scrapeItems){
-            if (scrapeItem.isCustom) customs++;
+            if ( scrapeItem.objId && scrapeItem.isCustom) customs++;
+            if (scrapeItem.objId) savedObjects++;
         }
-        setScrapeLen(scrapeItems.length);
+        setScrapeLen(savedObjects);
         setCustomLen(customs);
     }, [scrapeItems])
 
@@ -163,7 +166,9 @@ const BottomContent = () => {
         let file = event.target.files[0];
         let reader = new FileReader();
         reader.onload = function (e) {
+            hiddenInput.current.value = '';
             if (file.name.split('.').pop().toLowerCase() === "json") {
+                setOverlay("Loading...")
                 let resultString = JSON.parse(reader.result);
                 if (!('appType' in resultString))
                     setShowPop({title: "Import Error", content: "Incorrect JSON imported. Please check the contents!"});
@@ -172,6 +177,17 @@ const BottomContent = () => {
                 else if (resultString.view.length === 0)
                     setShowPop({title: "No Objects found", content: "The file has no objects to import, please check!"});
                 else {
+                    let objList = {};
+                    if ('body' in resultString) {
+                        let { reuse, appType, screenId, view, versionnumber, ...scrapeinfo } = resultString; 
+                        objList['reuse'] = reuse;
+                        objList['appType'] = appType;
+                        objList['screenId'] = screenId;
+                        objList['view'] = view;
+                        objList['scrapeinfo'] = scrapeinfo;
+                    }
+                    else objList = resultString;
+
                     let arg = {
                         projectId: projectId,
                         screenId: screenId,
@@ -180,24 +196,21 @@ const BottomContent = () => {
                         roleId: role,
                         param: "importScrapeData",
                         appType: appType,
-                        versionnumber: versionnumber,
-                        objList: resultString
+                        objList: objList
                     };
                     scrapeApi.updateScreen_ICE(arg)
                         .then(data => {
-                            // if(appType==="Webservice"){
-                            //     angular.element(document.getElementById("left-nav-section")).scope().getWSData();
-                            // }
-                            // else{
-                                if (data === "Invalid Session") return RedirectPage(history);
-                                else fetchScrapeData().then(response => (
-                                        response === "success" ?
+                            if (data === "Invalid Session") return RedirectPage(history);
+                            else fetchScrapeData().then(response => {
+                                    if (response === "success")
                                         setShowPop({title: "Import Screen", content: "Screen Json imported successfully."}) 
-                                        : false
-                                    ));
-                            // }
+                                    setOverlay("");
+                            });
                         })
-                        .catch(error => console.log(error));
+                        .catch(error => {
+                            setOverlay("");
+                            console.log(error)
+                        });
                 }
             } else setShowPop({'title': "Import Screen", 'content': "Please Check the file format you have uploaded!"});
         }
@@ -212,8 +225,8 @@ const BottomContent = () => {
 		// .then(response => {
 		// 		if (response === "Invalid Session") RedirectPage(history);
         //         if (response.testcase.length === 0 || overWrite) {
-        //             // hiddenInput.current.click();
-                    document.getElementById("importScreenField").click();
+                    hiddenInput.current.click();
+                    // document.getElementById("importScreenField").click();
         //         }
         //         else{
         //             setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue?', 'onClick': ()=>importTestCase(true)});
@@ -234,7 +247,7 @@ const BottomContent = () => {
     return (
         <>
             {lowerList.map((icon, i) => icon.show && <Thumbnail data-test="bottomContent" key={i} title={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
-            <input data-test="fileInput" id="importScreenField" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json"/>
+            <input ref={hiddenInput} data-test="fileInput" id="importScreenField" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json"/>
         </>
     );
 }

@@ -17,6 +17,9 @@ import BrowserFp from './components/BrowserFp';
 import IntegrationDropDown from './components/IntegrationDropDown';
 import ChangePassword from './components/ChangePassword';
 import GenerateTaskList from './components/GenerateTaskList';
+import CalendarComp from './components/CalendarComp'
+import TimeComp from'./components/TimeComp'
+import ErrorPage from './components/ErrorPage';
 
 export { Header, 
         FooterOne, 
@@ -37,5 +40,8 @@ export { Header,
         BrowserFp,
         IntegrationDropDown,
         ChangePassword,
-        GenerateTaskList
+        GenerateTaskList,
+        CalendarComp,
+        TimeComp,
+        ErrorPage
     };

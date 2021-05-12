@@ -145,7 +145,7 @@ const CreateObjectModal = props => {
             let errorObj = {};
             let custname = customObjList[1].custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim();
             for(let object of props.scrapeItems) {
-                if (object.title === custname) {
+                if (object.title === custname && object.val !== props.utils.object.val) {
                     errorObj = { [customObjList[1].tempId]: "objName", dTitle: custname };
                     errorFlag = 'present';
                     break;

@@ -666,7 +666,7 @@ const xml2json = (xml, tab) => {
         },
         escape: function (txt) {
             return txt.replace(/[\\]/g, "\\\\")
-                // .replace(/[\"]/g, '\\"')
+                .replace(/[\"]/g, '\\"')
                 .replace(/[\n]/g, '\\n')
                 .replace(/[\r]/g, '\\r');
         },

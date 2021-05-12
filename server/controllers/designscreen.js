@@ -219,11 +219,17 @@ function fetchScrapedData(inputs, fetchScrapedDatacallback) {
 }
 
 exports.updateScreen_ICE= async (req, res) =>{
-    logger.info("Inside UI service: updateScreen_ICE");
-    var d = req.body;
-    var inputs = d.data;
-    var data = await utils.fetchData(inputs, "design/updateScreen_ICE","updateScreen_ICE");
-    res.send(data)
+	const fnName = "updateScreen_ICE";
+	try {
+		logger.info("Inside UI service: " + fnName);
+		var d = req.body;
+		var inputs = d.data;
+		var data = await utils.fetchData(inputs, "design/updateScreen_ICE", fnName);
+		res.send(data)
+	} catch (exception) {
+		logger.error("Exception in the service %s: %s", fnName, exception);
+		res.status(500).send('fail');
+	}
 };
 
 exports.userObjectElement_ICE = function (req, res) {

@@ -37,8 +37,10 @@ const ZephyrContent = props => {
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ICE not available", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
         else if (releaseData === "scheduleModeOn")
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
-        else if (releaseData === "Invalid Session")
+        else if (releaseData === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             return RedirectPage(history);
+        }
         else if (releaseData === "invalidcredentials")
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Invalid Credentials"}});
         else if (releaseData) {
@@ -59,8 +61,10 @@ const ZephyrContent = props => {
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "ICE not available", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
         else if (testAndScenarioData === "scheduleModeOn")
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
-        else if (testAndScenarioData === "Invalid Session")
+        else if (testAndScenarioData === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             return RedirectPage(history);
+        }
         else if (testAndScenarioData) {
             setProjectDetails(testAndScenarioData.project_dets);
             setAvoProjects(testAndScenarioData.avoassure_projects);  
@@ -76,7 +80,7 @@ const ZephyrContent = props => {
         setScenario_ID(scenarioID);
         setFilteredName(null);
         setSearchIconClicked(false);
-        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []})
+        clearSelections();
     }
 
     const callSaveButton =async()=>{ 
@@ -85,8 +89,14 @@ const ZephyrContent = props => {
         if (response.error){
             dispatch({type: actionTypes.SHOW_POPUP , payload: {title: "Error", content: response.error}});
         } 
+        else if(response === "unavailableLocalServer")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
+        else if(response === "scheduleModeOn")
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
         else if ( response === "success"){
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr", content: "Saved Successfully."}});
+            dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+            clearSelections();
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
@@ -96,20 +106,20 @@ const ZephyrContent = props => {
         setProjectDropdn1("Select Project");
         setScenario_ID("Select Project");
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
-        dispatch({type: actionTypes.MAPPED_PAIR, payload: []})
-        clearSelections();
     }
     
     const clearSelections = () => {
-        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []})
-        dispatch({type: actionTypes.SEL_TC, payload: []})
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+        dispatch({type: actionTypes.SYNCED_TC, payload: []});
+        dispatch({type: actionTypes.SEL_TC, payload: []});
     }
     
     const onSearch=(e)=>{
         var val = e.target.value;
         var filter = [];
         if(scenarioArr){
-            avoProjects[parseInt(scenario_ID)].scenario_details
+            (avoProjects[parseInt(scenario_ID)].scenario_details.length ? 
+            avoProjects[parseInt(scenario_ID)].scenario_details : [])
                 .forEach((e,i)=>{
                     if (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) 
                         filter.push(e);
@@ -130,7 +140,7 @@ const ZephyrContent = props => {
                 leftBoxTitle="Zephyr Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 selectTestProject={
-                    <select value={projectDropdn1} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
+                    <select data-test="intg_Zephyr_project_drpdwn"value={projectDropdn1} onChange={(e)=>callProjectDetails_ICE(e)} className="qcSelectDomain" style={{marginRight : "5px"}}>
                         <option value="Select Project" disabled >Select Project</option>
 
                         {   props.domainDetails ? 
@@ -141,7 +151,7 @@ const ZephyrContent = props => {
                     </select>
                 }
                 selectTestRelease={
-                    <select value={selectedRel} onChange={onReleaseSelect} className="qcSelectDomain" style={{marginRight : "5px"}}>
+                    <select data-test="intg_zephyr_release_drpdwn" value={selectedRel} onChange={onReleaseSelect} className="qcSelectDomain" style={{marginRight : "5px"}}>
                         <option value="Select Release" disabled >Select Release</option>
                         {   releaseArr.length &&
                             releaseArr.map(e => (
@@ -151,12 +161,12 @@ const ZephyrContent = props => {
                     </select>
                 }
                 selectScenarioProject={
-                    <select value={scenario_ID} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
+                    <select data-test="intg_zephyr_scenario_dwpdwn" value={scenario_ID} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
                         <option value="Select Project" disabled >Select Project</option>
                         {
                             avoProjects? 
                             avoProjects.map((e,i)=>(
-                                <option value={i} >{e.project_name}</option>))
+                                <option value={i} key={i+'_proj'} >{e.project_name}</option>))
                                 : null 
                         }
                     </select>
@@ -176,7 +186,7 @@ const ZephyrContent = props => {
                 }
                 testList={ Object.keys(projectDetails).length ? 
                     <Fragment>    
-                        <div className="test__rootDiv">
+                        <div data-test="intg_zephyr_test_list" className="test__rootDiv">
                             <div className="test_tree_branches">
                                 <img alt="collapse"
                                     className="test_tree_toggle" 
@@ -198,7 +208,9 @@ const ZephyrContent = props => {
                 }
                 scenarioList={
                     scenarioArr ? 
-                    (filteredNames ? filteredNames : avoProjects[parseInt(scenario_ID)].scenario_details)
+                    (filteredNames ? filteredNames : 
+                        avoProjects[parseInt(scenario_ID)].scenario_details.length ? 
+                        avoProjects[parseInt(scenario_ID)].scenario_details : [])
                         .map((scenario, i)=>(
                                 <div 
                                     key={i}

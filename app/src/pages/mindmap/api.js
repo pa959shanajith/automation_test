@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {RedirectPage} from '../global'
 import {history} from './index'
-const url = 'https://'+window.location.hostname+':8443';
+import {url} from '../../App';
 
 /*Component getProjectList
   use: 
@@ -18,7 +18,7 @@ export const getProjectList = async() => {
             data: {"action":"populateProjects"},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -49,7 +49,7 @@ export const getModules = async(props) => {
         });
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
-        }else if(res.status === 401){
+        }else if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -75,7 +75,7 @@ export const getScreens = async(projectId) => {
             data: {projectId:projectId},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -115,7 +115,7 @@ export const saveMindmap = async(props) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -145,7 +145,7 @@ export const exportToExcel = async(props) => {
             credentials: 'include',
             responseType:'arraybuffer'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -176,7 +176,7 @@ export const exportMindmap = async(moduleId) => {
             },
             credentials: 'include',
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -205,7 +205,7 @@ export const populateScenarios = async(moduleID) => {
             data: {"action":"populateScenarios","moduleId":moduleID},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -238,7 +238,7 @@ export const readTestSuite_ICE = async(data) => {
 			},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -267,7 +267,7 @@ export const populateUsers = async(projectId) => {
             data: {"projectId":projectId},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -298,7 +298,7 @@ export const excelToMindmap = async(data) => {
             data: {'data':data},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -333,17 +333,17 @@ export const importMindmap = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
     }catch(err){
         console.error(err)
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
     }
 }
 
@@ -361,16 +361,101 @@ export const pdProcess = async(data) => {
             data: {'data':data},
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
     }catch(err){
         console.error(err)
-        return {error:'error fetching data from file'}
+        return {error:'Error fetching data from file'}
+    }
+}
+
+/*Component importGitMindmap
+  api returns {"success":true,"data":[[{"label":"Login_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Order_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Logout_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"}]],"history":"W3siYWN0aW9uIjoiQ3JlYXRlZCIsInJldmlld2VyIjoiSm9obiBTbWl0aCIsImFzc2lnbmVlIjoiQW5keSBSb2dlciIsInRpbWUiOiJNb24gTWFyIDAyIDIwMjAgMTk6MjI6MDUgR01UIn0seyJhY3Rpb24iOiJQZW5kaW5nIEFwcHJvdmFsIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0NzowMyBHTVQifSx7ImFjdGlvbiI6IkFwcHJvdmVkIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0ODowMyBHTVQifSx7ImFjdGlvbiI6ImV4cG9ydCIsImFzc2lnbmVlIjoiVmlrcmFtIFByYWJodSIsInJldmlld2VyIjoiIiwidGltZSI6IjIwMjAtMDMtMzFUMTI6NDE6MTguMjA2WiJ9XQ=="}
+*/
+
+export const importGitMindmap = async(data) => {
+    try{
+        const res = await axios(url+'/importGitMindmap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.data === "empty"){
+            console.error(res.data)
+            return {error:'Project is not Git configured!'}
+        }
+        if(res.data === "Invalid inputs"){
+            console.error(res.data)
+            return {error:'Module does not exists in Git repo. Please verify your inputs!'}
+        }
+        if (!('testscenarios' in res.data)){
+            console.error(res.data)
+            return {error:"Incorrect JSON imported. Please check the contents!!"}
+        }else if(res.data.testscenarios.length === 0){
+            console.error(res.data)
+            return {error:"The file has no node structure to import, please check!!"}
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Error in importing module from Git'}
+    }catch(err){
+        console.error(err)
+        return {error:'Error in importing module from Git'}
+    }
+}
+
+/*Component exportToGit
+  api returns {"success":true,"data":[[{"label":"Login_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Order_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"},{"label":"Logout_c4a74fede3fe4e5eabb70b01f7b72e12","type":"task"}]],"history":"W3siYWN0aW9uIjoiQ3JlYXRlZCIsInJldmlld2VyIjoiSm9obiBTbWl0aCIsImFzc2lnbmVlIjoiQW5keSBSb2dlciIsInRpbWUiOiJNb24gTWFyIDAyIDIwMjAgMTk6MjI6MDUgR01UIn0seyJhY3Rpb24iOiJQZW5kaW5nIEFwcHJvdmFsIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0NzowMyBHTVQifSx7ImFjdGlvbiI6IkFwcHJvdmVkIiwiYXNzaWduZWUiOiJBbmR5IFJvZ2VyIiwicmV2aWV3ZXIiOiJKb2huIFNtaXRoIiwidGltZSI6Ik1vbiBNYXIgMDIgMjAyMCAxOTo0ODowMyBHTVQifSx7ImFjdGlvbiI6ImV4cG9ydCIsImFzc2lnbmVlIjoiVmlrcmFtIFByYWJodSIsInJldmlld2VyIjoiIiwidGltZSI6IjIwMjAtMDMtMzFUMTI6NDE6MTguMjA2WiJ9XQ=="}
+*/
+
+export const exportToGit = async(data) => {
+    try{
+        const res = await axios(url+'/exportToGit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.data==='empty'){
+            console.error(res.data)
+            return {error:'Project is not Git configured.'}
+        }
+        if(res.data==='commit exists'){
+            console.error(res.data)
+            return {error:'Git commit version already exists.'}
+        }
+        if(res.data==='Invalid gitbranch'){
+            console.error(res.data)
+            return {error:"Input branch doesn't exist in Git. Please verify!"}
+        }
+        if(res.status===200 && res.data !== "fail"){          
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Error while exporting to Git'}
+    }catch(err){
+        console.error(err)
+        return {error:'Error while exporting to Git'}
     }
 }

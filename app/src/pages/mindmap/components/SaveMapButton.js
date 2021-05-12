@@ -9,6 +9,7 @@ import '../styles/SaveMapButton.scss'
   use: renders save button below canvas on click trigers save node
   for assingn send isAssign={true}
   for end send isEnE={true}
+  props.createnew is to auto save imported mindmap
 */
 
 const SaveMapButton = (props) => {
@@ -26,7 +27,7 @@ const SaveMapButton = (props) => {
         saveNode(props.setBlockui,props.dNodes,projId,props.cycId,props.setPopup,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj)
     }
     return(
-        <svg className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
+        <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
             <g id="ct-saveAction" className="ct-actionButton">
                 <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                 <text x="23" y="18">Save</text>

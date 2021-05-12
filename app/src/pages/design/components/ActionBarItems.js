@@ -219,6 +219,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
         let file = event.target.files[0];
         let reader = new FileReader();
         reader.onload = function (e) {
+            hiddenInput.current.value = '';
             if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() === "json") {
                 let resultString = JSON.parse(reader.result);
                 for (let i = 0; i < resultString.length; i++) {
@@ -260,8 +261,8 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
 		.then(response => {
 				if (response === "Invalid Session") RedirectPage(history);
                 if (response.testcase.length === 0 || overWrite) {
-                    // hiddenInput.current.click();
-                    document.getElementById("importTestCaseField").click();
+                    hiddenInput.current.click();
+                    // document.getElementById("importTestCaseField").click();
                 }
                 else{
                     setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue?', 'onClick': ()=>importTestCase(true)});

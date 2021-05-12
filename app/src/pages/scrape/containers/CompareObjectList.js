@@ -24,14 +24,17 @@ const CompareObjectList = () => {
     useEffect(()=>{
         let newViewString = {...viewString};
         newViewString = Object.keys(newScrapedData).length ? {...newScrapedData, view: [...mainScrapedData.view, ...newScrapedData.view]} : { ...mainScrapedData };
+        newViewString = {...newViewString, view: newViewString.view.filter(object => object.xpath.substring(0, 4)!=="iris")}
         setViewString(newViewString);
+
+        return ()=>{
+            dispatch({type: actions.RESET_COMPARE, payload: null})
+        }
         //eslint-disable-next-line
     }, [])
 
     const closeCompare = () => {
-        dispatch({type: actions.SET_COMPAREOBJ, payload: {changedObj: [], notChangedObj: [], notFoundObj: []}})
-        dispatch({type: actions.SET_COMPAREFLAG, payload: false});
-        dispatch({type: actions.SET_COMPAREDATA, payload: {}});
+        dispatch({type: actions.RESET_COMPARE, payload: null})
     }
 
     const updateObjects = () => {

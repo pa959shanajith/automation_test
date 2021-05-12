@@ -17,14 +17,8 @@
     label{
         width: 120px;
     }
-    select{
-        text-transform: capitalize;
-    }
     option:disabled{
         background-color: #eee;
-    }
-    option{
-        text-transform: capitalize;
     }
     .conf-radio{
         display: inline-block;

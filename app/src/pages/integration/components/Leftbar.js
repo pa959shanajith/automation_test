@@ -65,8 +65,9 @@ const Leftbar = () => {
                 <h4>Integration</h4>
                     <span onClick={()=>callIconClick("qTest") }>
                         <img alt="qTestIcon"  
-                            id={(screenType === "qTest")? "selectedIcon" : null}  
-                            src='static/imgs/qTest.png'
+                             id={(screenType === "qTest")? "selectedIcon" : null}  
+                             src='static/imgs/qTest.png'
+                             data-test="intg_leftbar_qTestIcon"
                         /> 
                         <div>qTest</div>
                     </span>

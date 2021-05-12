@@ -11,6 +11,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
 
     const nulluser = "5fc137cc72142998e29b5e63";
     const filter_data = useSelector(state=>state.plugin.FD)
+    const dateFormat = useSelector(state=>state.login.dateformat);
     const [loading,setLoading] = useState(false)
     const [pageOfItems,setPageOfItems] = useState([])
     const [scheduledData,setScheduledData] = useState([])
@@ -23,7 +24,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                                                     qtest: {url:"",username:"",password:"",qteststeps:""}, 
                                                     zephyr: {url:"",username:"",password:""}});
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
-    const [moduleSceduledate,setModuleSceduledate] = useState({})
+    const [moduleScheduledate,setModuleScheduledate] = useState({})
     const [sort,setSort] = useState(true)
     const [scheDetails,setScheDetails] = useState(true)
 
@@ -43,7 +44,6 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
 
     const getScheduledDetails = async () => {
         try{
-            setLoading("Loading...");
             const result = await getScheduledDetails_ICE();
             if (result && result.length > 0 && result !== "fail") {
                 for (var k = 0; k < result.length; k++) {
@@ -54,9 +54,9 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                         + ("0" + dt.getDate()).slice(-2) + " " + ("0" + dt.getHours()).slice(-2) + ":" + ("0" + dt.getMinutes()).slice(-2);
                 }
                 var scheduledDataParsed = [];
-                for(var i =0 ; i < result.length ; i++ ) {
+                for(var i =result.length-1 ; i>=0  ; i-- ) {
                     const eachScenarioDetails = result[i].scenariodetails[0];
-                    for(var j =0 ; j < eachScenarioDetails.length ; j++ ) {
+                    for(var j =eachScenarioDetails.length-1 ; j>=0  ; j-- ) {
                         let newScheduledScenario = {};
                         newScheduledScenario["target"] = result[i].target;
                         newScheduledScenario["cycleid"] = eachScenarioDetails[j].cycleid;
@@ -76,9 +76,8 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                 setScheduledDataOriginal(scheduledDataParsed);
             }
             document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
-            setLoading(false);
         }catch (error) {
-            setLoading(false);
+            setPopupState({show:true,title:"Error",content:"Failed to fetch Scheduled Data."});
             console.log(error)
         }
     }
@@ -119,15 +118,16 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
     }
 
     const ScheduleTestSuitePopup = () => {
+        if(document.getElementsByClassName('rdtOpen').length>0)return;
         const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction);
         const valid = checkSelectedModules(scheduleTableData, setPopupState);
-        const checkDateTime = checkDateTimeValues(scheduleTableData, moduleSceduledate, setModuleSceduledate, setPopupState);
+        const checkDateTime = checkDateTimeValues(scheduleTableData, moduleScheduledate, setModuleScheduledate, setPopupState);
         if(check && valid && checkDateTime) setAllocateICE(true);
     } 
 
     const ScheduleTestSuite = async (schedulePoolDetails) => {
         setAllocateICE(false);
-        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleSceduledate, scheduleTableData, current_task, appType, filter_data);
+        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, current_task, appType, filter_data);
         if(!modul_Info){
             return
         }
@@ -150,11 +150,11 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
         else if (data === "success" || data.includes("success")) {
             if (data.includes("Set"))  setPopupState({show:true,title:"Schedule Test Suite",content: data.replace('success', '')}); 
             else setPopupState({show:true,title:"Schedule Test Suite",content:"Successfully scheduled."});
-            updateDateTimeValues(scheduleTableData, setModuleSceduledate);
+            updateDateTimeValues(scheduleTableData, setModuleScheduledate);
             getScheduledDetails();
         } else if (data === "few") {
             setPopupState({show:true,title:"Schedule Test Suite",content:"Failed to schedule few testsuites"});
-            updateDateTimeValues(scheduleTableData, setModuleSceduledate);
+            updateDateTimeValues(scheduleTableData, setModuleScheduledate);
         } else if (data === "fail") {
             setPopupState({show:true,title:"Schedule Test Suite",content:"Failed to schedule few testsuites"});
         } else {
@@ -205,6 +205,39 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
         setScheduledData(data);
     }
 
+    const formatDate = (date) => {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear(),
+            hour = '' + d.getHours(),
+            minute = '' + d.getMinutes();
+            
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+        if (hour.length < 2)
+            hour = '0' + hour
+        if (minute.length < 2)
+            minute = '0' + minute 
+
+        let map = {"MM":month,"YYYY": year, "DD": day};
+        let def = [day,month,year];
+        let format = dateFormat.split("-");
+        let arr = []
+        let used = {}
+        for (let index in format){
+            if (!(format[index] in map) || format[index] in used){
+                return def.join('-') + " " + [hour,minute].join(':');
+            }
+            arr.push(map[format[index]]) 
+            used[format[index]] = 1
+        }
+
+        return arr.join('-') + " " + [hour,minute].join(':');
+    }
+
     return (
         <>
             {loading?<ScreenOverlay content={loading}/>:null}
@@ -237,19 +270,20 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
             
             <div className="s__task_container">
                 <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
-                    <select defaultValue={""} id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className="e__taskBtn e__btn">
-                        <option value="" className="s__disableOption" disabled>Select Integration</option>
-                        <option value="1">ALM</option>
-                        <option value="0">qTest</option>
-                        <option value="2">Zephyr</option>
-                    </select>
+                    
                 </div>
                 <div id="pageContent">
                     <div id="scheduleSuitesTopSection">
-                        <div id="tableActionButtons">
+                        <select defaultValue={""} id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className=" e__btn">
+                            <option value="" className="s__disableOption" disabled>Select Integration</option>
+                            <option value="1">ALM</option>
+                            <option value="0">qTest</option>
+                            <option value="2">Zephyr</option>
+                        </select>
+                        <div id="s__btns">
                             <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}} title="Add">Schedule</button>
                         </div>
-                        <ScheduleSuitesTopSection moduleSceduledate={moduleSceduledate} setModuleSceduledate={setModuleSceduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} />
+                        <ScheduleSuitesTopSection setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} />
                     </div>
 
                 {/* //lower scheduled table Section */}
@@ -289,16 +323,16 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                                                     <div className='scheduleDataBodyRow'>
                                                         {pageOfItems.map((data,index)=>(
                                                             <div key={index} className="scheduleDataBodyRowChild">
-                                                                <div className="s__Table_date s__Table_date-time ">{data.scheduledatetime}</div>
-                                                                <div className="s__Table_host" >{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
-                                                                <div className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
-                                                                <div className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
-                                                                <div className="s__Table_appType">
+                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time ">{formatDate(data.scheduledatetime)}</div>
+                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" >{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                                <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
+                                                                <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
+                                                                <div data-test = "schedule_data_browser_type" className="s__Table_appType">
                                                                     {data.browserlist.map((brow,index)=>(
                                                                         <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
                                                                     ))}
                                                                 </div>
-                                                                <div className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
+                                                                <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
                                                                     {data.status}
                                                                     {(data.status === 'scheduled')?
                                                                         <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,setPopupState)}} ng-click='cancelThisJob($event,"cancelled")' title='Cancel Job'/>
@@ -321,13 +355,13 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
         </>
     );
 }
-const updateDateTimeValues = (scheduleTableData, setModuleSceduledate) => {
+const updateDateTimeValues = (scheduleTableData, setModuleScheduledate) => {
     //setting module date and time props
-    let moduleSceduledateTime = {};
+    let moduleScheduledateTime = {};
     // eslint-disable-next-line
     scheduleTableData.map((rowData)=>{
-        if(moduleSceduledateTime[rowData.testsuiteid] === undefined) {
-            moduleSceduledateTime[rowData.testsuiteid] = {
+        if(moduleScheduledateTime[rowData.testsuiteid] === undefined) {
+            moduleScheduledateTime[rowData.testsuiteid] = {
                 date:"",
                 time:"",
                 inputPropstime: {readOnly:"readonly" ,
@@ -343,7 +377,7 @@ const updateDateTimeValues = (scheduleTableData, setModuleSceduledate) => {
             };
         }
     })
-    setModuleSceduledate(moduleSceduledateTime);
+    setModuleScheduledate(moduleScheduledateTime);
 }
 
 const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,status,getScheduledDetails,setPopupState) => {
@@ -413,26 +447,26 @@ const checkSelectedModules = (scheduleTableData, setPopupState) => {
     return pass
 } 
 
-const checkDateTimeValues = (eachData, moduleSceduledate, setModuleSceduledate, setPopupState) => {
+const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate, setPopupState) => {
     for(var i =0 ;i<eachData.length;i++){
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
                 let doNotSchedule = false
-                let moduleSceduledatetime = {...moduleSceduledate};
-                moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-timePicker";
-                moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker";
+                let moduleScheduledateTime = {...moduleScheduledate};
+                moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-timePicker";
+                moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker";
 
-                var dateValue = moduleSceduledate[eachData[i].testsuiteid]["date"];
-                var timeValue = moduleSceduledate[eachData[i].testsuiteid]["time"];
+                var dateValue = moduleScheduledate[eachData[i].testsuiteid]["date"];
+                var timeValue = moduleScheduledate[eachData[i].testsuiteid]["time"];
                 if (dateValue === "") {  // Check if schedule date is not empty
-                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
+                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
                     doNotSchedule = true;
                 }
                 else if (timeValue === "") {  // Check if schedule time is not empty
-                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
+                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
                     doNotSchedule = true;
                 }
-                setModuleSceduledate(moduleSceduledatetime);
+                setModuleScheduledate(moduleScheduledateTime);
                 if(doNotSchedule) return false
 
                 const sldate_2 = dateValue.split("-");
@@ -440,10 +474,10 @@ const checkDateTimeValues = (eachData, moduleSceduledate, setModuleSceduledate, 
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 const diff = (timestamp - new Date()) / 60000;
                 if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
-                    if (diff < 0) moduleSceduledatetime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
-                    moduleSceduledatetime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
+                    if (diff < 0) moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
+                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
                     setPopupState({show:true,title:"Schedule Test Suite",content:"Schedule time must be 5 mins more than current time."});
-                    setModuleSceduledate(moduleSceduledatetime);
+                    setModuleScheduledate(moduleScheduledateTime);
                     return false
                 }
             } 
@@ -452,7 +486,7 @@ const checkDateTimeValues = (eachData, moduleSceduledate, setModuleSceduledate, 
     return true  
 } 
 
-const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, current_task, appType, projectdata ) => {
+const parseLogicExecute = (schedulePoolDetails, moduleScheduledate, eachData, current_task, appType, projectdata ) => {
     let moduleInfo = [];
     var j;
     for(var i =0 ;i<eachData.length;i++){
@@ -497,8 +531,8 @@ const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, cur
         suiteInfo.iceList = iceList;
         for(j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
-                suiteInfo.date = moduleSceduledate[eachData[i].testsuiteid]["date"];
-                suiteInfo.time = moduleSceduledate[eachData[i].testsuiteid]["time"];
+                suiteInfo.date = moduleScheduledate[eachData[i].testsuiteid]["date"];
+                suiteInfo.time = moduleScheduledate[eachData[i].testsuiteid]["time"];
                 const sldate_2 = suiteInfo.date.split("-");
                 const sltime_2 = suiteInfo.time.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
@@ -509,6 +543,5 @@ const parseLogicExecute = (schedulePoolDetails, moduleSceduledate, eachData, cur
     }
     return moduleInfo;
 }
-
 
 export default ScheduleContent;

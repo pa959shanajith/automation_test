@@ -4,6 +4,7 @@ import { getProjectList, getModules} from '../api';
 import {parseProjList} from '../containers/MindmapUtils';
 import * as actionTypes from '../state/action';
 import '../styles/ToolbarMenuAssign.scss';
+import PropTypes from 'prop-types';
 
 /*Component ToolbarMenuAssign
   use: renders Toolbar header
@@ -85,26 +86,31 @@ const ToolbarMenuAssign = (props) => {
     var projectList = Object.entries(prjList)
     return(
         <div className='asn_toolbar__header'>
-            <label>Project:</label>
-            <select value={selectProj} onChange={e=>changeProject(e.target.value)} >
+            <label data-test="projectLabel">Project:</label>
+            <select data-test="projectSelect" value={selectProj} onChange={e=>changeProject(e.target.value)} >
                 {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
             </select>
-            <label>Release:</label>
-            <select value={relIndex?relIndex:'Select'} ref={releaseRef} onChange={e=>changeRelease(e.target.value)} className={(!relIndex || relIndex==='Select')?'errorClass':''}>
+            <label data-test="releaseLablel">Release:</label>
+            <select data-test="releaseSelect" value={relIndex?relIndex:'Select'} ref={releaseRef} onChange={e=>changeRelease(e.target.value)} className={(!relIndex || relIndex==='Select')?'errorClass':''}>
                 <option value="Select" disabled={true}>Select</option>
                 {relList.map((e,i)=><option value={i} key={i}>{e.name}</option>)}
             </select>
-            <label>Cycle:</label>
-            <select value={cycle} ref={cycleRef} onChange={e=>updateModuleList(e.target.value)} disabled={(!relIndex||relIndex ==='Select')?true:false} className={(relIndex && relIndex !=='Select'&& cycle==='Select')?'errorClass':''}>
+            <label data-test="cycleLabel">Cycle:</label>
+            <select data-test="cycleSelect" value={cycle} ref={cycleRef} onChange={e=>updateModuleList(e.target.value)} disabled={(!relIndex||relIndex ==='Select')?true:false} className={(relIndex && relIndex !=='Select'&& cycle==='Select')?'errorClass':''}>
                 <option value="Select" disabled={true}>Select</option>
                 {relIndex && relList[relIndex].cycles.map((e,i)=><option value={e._id} key={i}>{e.name}</option>)}
             </select>
-            <span className='asn_toolbar__header-searchbox'>
-                <input disabled={(cycle==='Select'||cycle==='')?true:false} placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)} ></input>
+            <span data-test="searchSpan" className='asn_toolbar__header-searchbox'>
+                <input data-test="searchInput" disabled={(cycle==='Select'||cycle==='')?true:false} placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)} ></input>
                 <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
             </span>
         </div>
     )
 }
-
+ToolbarMenuAssign.propTypes={
+    cycleRef: PropTypes.object.isRequired,
+    releaseRef: PropTypes.object.isRequired,
+    setBlockui: PropTypes.func.isRequired,
+    setPopup:PropTypes.func.isRequired,
+}
 export default ToolbarMenuAssign;

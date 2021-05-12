@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {RedirectPage} from '../global';
 import {history} from './index';
-const url = "https://"+window.location.hostname+":8443";
+import {url} from '../../App';
 
 /*Component loginToQTest_ICE
   use: logins to qTets Environment  
@@ -24,7 +24,7 @@ export const loginToQTest_ICE = async(qcPassword ,qcURL , qcUsername) => {
             qcaction : "domain"
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -57,7 +57,7 @@ export const qtestProjectDetails_ICE = async(domain , userid) => {
             qcaction : "project"
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -75,23 +75,23 @@ export const qtestProjectDetails_ICE = async(domain , userid) => {
   use: get Cycle and TestSuite Details of a Particular Release 
   api returns [Cycle:"Cycle Name",testsuites:[0:{id: ,name: , testruns:[0:{id: , name:}]}]]
 */
-export const qtestFolderDetails_ICE = async(projectName ,foldername, domainID , qcaction ,testCasename) => {
+export const qtestFolderDetails_ICE = async(releaseId, foldername, projectId, qcaction, testCasename) => {
     try{
         const res = await axios(url+'/qtestFolderDetails_ICE', {
             method: 'POST',
             headers: {
-            'Content-type': 'application/json',
+                'Content-type': 'application/json',
             },
-           data: {
-            project: projectName,
-            foldername : foldername,
-            domain : domainID, 
-            action : 'qtestFolderDetails_ICE',
-            qcaction : qcaction,
-            testset :testCasename
-           }
+            data: {
+                project: releaseId,
+                foldername : foldername,
+                domain : projectId, 
+                action : 'qtestFolderDetails_ICE',
+                qcaction : qcaction,
+                testset: testCasename
+            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -114,15 +114,14 @@ export const saveQtestDetails_ICE = async(mappedDetails) => {
         const res = await axios(url+'/saveQtestDetails_ICE', {
             method: 'POST',
             headers: {
-            'Content-type': 'application/json',
+                'Content-type': 'application/json',
             },
-           data: {
-            mappedDetails : mappedDetails,
-            action : 'saveQtestDetails_ICE'
-            
-           }
+            data: {
+                mappedDetails : mappedDetails,
+                action : 'saveQtestDetails_ICE'
+            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -153,7 +152,7 @@ export const viewQtestMappedList_ICE = async(userID) => {
             
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -183,7 +182,7 @@ export const loginQCServer_ICE = async(qcPassword , qcURL , qcUsername ) => {
             qcaction : "domain"
         }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -212,7 +211,7 @@ export const qcProjectDetails_ICE = async(domain ,user_id ) => {
             qcaction : "project"
         }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -243,7 +242,7 @@ export const qcFolderDetails_ICE = async(domain ,foldername ,project,qcaction,te
             testset : testset
         }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -275,7 +274,7 @@ export const saveQcDetails_ICE = async(mappedDetails) => {
             
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -306,7 +305,7 @@ export const viewQcMappedList_ICE = async(userID) => {
             
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -335,7 +334,7 @@ export const loginToZephyr_ICE = async(zephyrurl, username, password) => {
 				zephyraction: "project"
             }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -364,7 +363,7 @@ export const zephyrProjectDetails_ICE = async(projectId, user_id) => {
                 user_id : user_id 
             }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -394,7 +393,7 @@ export const zephyrCyclePhase_ICE = async(releaseId, user_id) => {
                 user_id : user_id
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -421,7 +420,7 @@ export const viewZephyrMappedList_ICE = async(userID) => {
                 action : 'viewZephyrMappedList_ICE'
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -449,7 +448,7 @@ export const saveZephyrDetails_ICE = async(mappedDetails) => {
             
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -477,7 +476,7 @@ export const zephyrTestcaseDetails_ICE = async(zephyraction, treeId) => {
                 zephyraction: zephyraction,
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -504,7 +503,7 @@ export const saveUnsyncDetails = async(undoMapList) => {
                 undoMapList : undoMapList, 
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }

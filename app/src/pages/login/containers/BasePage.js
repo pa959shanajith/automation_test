@@ -92,6 +92,7 @@ const BasePage = () => {
 
     const loadProfile = userinfo => {
         window.localStorage.navigateScreen = userinfo.page;
+        dispatch({type:actionTypes.SET_DATEFORMAT, payload: userinfo.dateformat})
         dispatch({type:actionTypes.SET_SR, payload: userinfo.rolename});
         dispatch({type:actionTypes.SET_USERINFO, payload: userinfo});
         SetProgressBar("start");

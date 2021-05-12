@@ -26,6 +26,21 @@ const ALM = props => {
     useEffect(()=>{
         dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
         setMappedFilesRes([]);
+
+        return ()=>{
+            dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+            dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+            dispatch({
+                type: actionTypes.SEL_TC_DETAILS, 
+                payload: {
+                    selectedTCNames: [],
+                    selectedTSNames: [],
+                    selectedFolderPaths: []
+                }
+            });
+            dispatch({type: actionTypes.SYNCED_TC, payload: []});
+            dispatch({type: actionTypes.SEL_TC, payload: []});
+        }
        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
     
@@ -40,7 +55,10 @@ const ALM = props => {
         if (domainDetails.error) dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: domainDetails.error} });
         else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available,Please run the batch file and connect to the Server.");
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-        else if (domainDetails === "Invalid Session") return RedirectPage(history);
+        else if (domainDetails === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            return RedirectPage(history);
+        }
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
         else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
         else if (domainDetails === "fail") setLoginError("Fail to Login");
@@ -52,29 +70,49 @@ const ALM = props => {
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
-    const callViewMappedFiles = async()=>{
-        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Fetching...'});
-        //props.setViewMappedFiles(true)
-        dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "ALM" });
-        const userid = user_id;
-        const response = await viewQcMappedList_ICE(userid);
-        if (response.error){
-            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: response.error}});
-        } else setMappedFilesRes(response);
-        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    const callViewMappedFiles = async(saveFlag)=>{
+        try{
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Fetching...'});
+            //props.setViewMappedFiles(true)
+            const userid = user_id;
+            const response = await viewQcMappedList_ICE(userid);
+            if (response.error){
+                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: response.error}});
+            } 
+            else if (response.length){
+                dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "ALM" });
+                if (saveFlag) 
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Saved successfully"}});
+                setMappedFilesRes(response);
+            }
+            else {
+                if (saveFlag) {
+                    dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Saved successfully"}});
+                }
+                else {
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Mapped Testcase", content: "No mapped details"}});
+                }
+            }
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+
+            return response;
+        }
+        catch(err) {
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Failed to Fetch Data."}});
+        }
     }
     const callExitcenter=()=>{
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });;
-        //props.setAlmClicked(false)
     }
-
     return(
         <>
         { viewMappedFiles === "ALM" ?
             <MappedPage 
                 screenType="ALM"
-                leftBoxTitle="Avo Assure Scenarios"
-                rightBoxTitle="ALM Testcases"
+                leftBoxTitle="ALM Testcases"
+                rightBoxTitle="Avo Assure Scenarios"
                 mappedfilesRes={mappedfilesRes}
                 fetchMappedFiles={callViewMappedFiles}
             /> :

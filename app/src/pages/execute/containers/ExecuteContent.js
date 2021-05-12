@@ -17,7 +17,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const [eachData,setEachData] = useState([])
-    const [eachDataFirst,setEachDataFirst] = useState([])
+    const [update,updateScreen] = useState(true)
     const [updateAfterSave,setupdateAfterSave] = useState(false)
     const [showDeleteModal,setshowDeleteModal] = useState(false)
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
@@ -92,10 +92,10 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                 curr_task.accessibilityParameters = accessibilityParameters;
                 dispatch({type: actionTypes.SET_CT, payload: curr_task});
 
-                let tj = {...tasksJson};
-                for(var index in tj){
-                    if(tj[index].uid === curr_task.uid){
-                        tj[index].accessibilityParameters = curr_task.accessibilityParameters;
+                let tj = [...tasksJson];
+                for(var task in tj){
+                    if(task.uid === curr_task.uid){
+                        task.accessibilityParameters = curr_task.accessibilityParameters;
                         break;
                     }
                 }
@@ -118,8 +118,10 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     }
     
     const submit_task = async () => {
-        let action = "reassign";
-        if(status!=='underReview') action = "approve";
+        let action = "approve";
+        if(modalDetails.task==='approve') action = "approve";
+        else if(modalDetails.task==='submit') action = "submit";
+        if(modalDetails.task==='reassign') action = "reassign";
 		var taskid = current_task.subTaskId;
 		var taskstatus = current_task.status;
 		var version = current_task.versionnumber;
@@ -154,7 +156,11 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     const ExecuteTestSuitePopup = () => {
         const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction)
         const valid = checkSelectedModules(eachData, setPopupState);
-        if(check && valid) setAllocateICE(true);
+        if(scenarioTaskType === "exclusive" && accessibilityParameters.length === 0){
+            setPopupState({show:true,title:"Accessibility Standards",content:"Please select one or more accessibility testing standard to proceed."});
+            return ;
+        }
+        else if(check && valid) setAllocateICE(true);
     }    
 
     const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
@@ -227,9 +233,6 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
     }
 
     const syncScenarioChange = (value) => {
-        setIntegration({alm: {url:"",username:"",password:""}, 
-        qtest: {url:"",username:"",password:"",qteststeps:""}, 
-        zephyr: {url:"",username:"",password:""}})
         if (value === "1") {
             setShowIntegrationModal("ALM")
 		}
@@ -281,7 +284,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                     <button className="e__btn-md executeBtn" onClick={()=>{ExecuteTestSuitePopup()}} title="Execute">Execute</button>
                 </div>
 
-                <ExecuteTable setAccessibilityParameters={setAccessibilityParameters} scenarioTaskType={scenarioTaskType} accessibilityParameters={accessibilityParameters} current_task={current_task} setLoading={setLoading} setPopupState={setPopupState} selectAllBatch={selectAllBatch} filter_data={projectdata} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} eachDataFirst={eachDataFirst} setEachDataFirst={setEachDataFirst} />
+                <ExecuteTable setAccessibilityParameters={setAccessibilityParameters} scenarioTaskType={scenarioTaskType} accessibilityParameters={accessibilityParameters} current_task={current_task} setLoading={setLoading} selectAllBatch={selectAllBatch} updateScreen={updateScreen} updateAfterSave={updateAfterSave} readTestSuite={readTestSuite} eachData={eachData} setEachData={setEachData} update={update} />
                 </div>
 
             {proceedExecution?
@@ -307,6 +310,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
                     appType={appType} 
                     setPopupState={setPopupState} 
                     setCredentialsExecution={setIntegration}
+                    integrationCred={integration}
                     displayError={displayError}
                     browserTypeExe={browserTypeExe}
                 />
@@ -365,10 +369,6 @@ const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleI
         
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
-                if(scenarioTaskType === "exclusive" && accessibilityParameters.length === 0){
-                    setPopupState({show:true,title:"Accessibility Standards",content:"Please select one or more accessibility testing standard to proceed."});
-                    return false;
-                }
                 selectedRowData.push({
                     condition: eachData[i].condition[j],
                     dataparam: [eachData[i].dataparam[j].trim()],

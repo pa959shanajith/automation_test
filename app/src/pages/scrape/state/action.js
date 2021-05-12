@@ -9,3 +9,4 @@ export const SET_CERT = "WS_SET_CERT";
 export const SET_WSDATA = "WS_SET_WSDATA";
 export const SET_WSDLERROR = "WS_SET_WSDLWERROR";
 export const SET_ACTIONERROR = "WS_SET_ACTIONERROR";
+export const RESET_COMPARE = "SS__RESET_COMPARE";

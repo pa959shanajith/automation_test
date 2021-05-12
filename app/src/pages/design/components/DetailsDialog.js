@@ -42,20 +42,20 @@ const DetailsDialog = ({setShow, onSetRowData, TCDetails, idx}) => {
     }
 
     return (
-        <div className="d__details_container">
+        <div className="d__details_container" data-test="d__ddc">
             <ModalContainer 
                 title="Add Test Step Details"
                 content={
                     <div className="d__detail_input_group">
-                    <input className="d__detail_input" placeholder="Enter Expected Result" value={res} onChange={onResChange}/>
-                    <input className="d__detail_input" placeholder="Enter Actual Result for Pass Status" value={pass} onChange={onPassChange}/>
-                    <input className="d__detail_input" placeholder="Enter Actual Result for Fail Status" value={fail} onChange={onFailChange}/>
+                    <input data-test="d__ddinp" className="d__detail_input" placeholder="Enter Expected Result" value={res} onChange={onResChange}/>
+                    <input data-test="d__ddinp" className="d__detail_input" placeholder="Enter Actual Result for Pass Status" value={pass} onChange={onPassChange}/>
+                    <input data-test="d__ddinp" className="d__detail_input" placeholder="Enter Actual Result for Fail Status" value={fail} onChange={onFailChange}/>
                     </div>
                 }
                 footer={
                     <>
-                    <button onClick={onReset}>Reset</button>
-                    <button onClick={onSave}>Save</button>
+                    <button data-test="d__ddbtn" onClick={onReset}>Reset</button>
+                    <button data-test="d__ddbtn" onClick={onSave}>Save</button>
                     </>
                 }
                 close={

@@ -12,8 +12,8 @@ const ReportHome = () =>{
     return(
         <div className='rp__container'>
             <Header/>
-            <div className='rp__body'>
-                <ActionBar collapsible={true} collapse={true}/>
+            <div className='rp__body-main'>
+                <ActionBar collapsible={true} collapse={true} collapsible={false}/>
                 <div className='rp__middle_container'>
                     <ReportContainer/>
                 </div>

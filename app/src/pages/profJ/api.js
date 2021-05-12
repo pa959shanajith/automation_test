@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {RedirectPage} from '../global'
 import {history} from './index'
-const url = "https://"+window.location.hostname+":8443";
+import {url} from '../../App'
 
 /*Component getTopMatches_ProfJ
   use: gets the Reply of ChatBot on Sending UserQuery
@@ -19,7 +19,7 @@ export const getTopMatches_ProfJ = async(userQuery) => {
             param : 'getTopMatches_ProfJ'
            }
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }

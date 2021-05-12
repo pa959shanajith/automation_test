@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
@@ -35,6 +35,8 @@ const DesignContent = props => {
     const copiedContent = useSelector(state=>state.design.copiedTestCases);
     const modified = useSelector(state=>state.design.modified);
     const saveEnable = useSelector(state=>state.design.saveEnable);
+
+    const headerCheckRef = useRef();
 
     const history = useHistory();
     const dispatch = useDispatch();
@@ -102,6 +104,8 @@ const DesignContent = props => {
             .then(data=>{
                 data !== "success" && props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
                 props.setImported(false)
+                setCheckedRows([]);
+                headerCheckRef.current.indeterminate = false;
             })
             .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
         }
@@ -117,6 +121,7 @@ const DesignContent = props => {
                 setEdit(false);
                 setFocusedRow(null);
                 setCheckedRows([]);
+                headerCheckRef.current.indeterminate = false;
                 setDraggable(false);
                 setChanged(false);
                 setHeaderCheck(false);
@@ -205,6 +210,7 @@ const DesignContent = props => {
                                     }
                                     setOverlay("");
                                 }
+                                setDraggable(false);
                                 setTestCaseData(testcaseArray);
                                 setPastedTC([]);
                                 setObjNameList(getObjNameList(props.current_task.appType, scriptData.view));
@@ -358,6 +364,7 @@ const DesignContent = props => {
         }
         setFocusedRow(null);
         setCheckedRows([]);
+        headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
     }
 
@@ -449,6 +456,7 @@ const DesignContent = props => {
         setPastedTC(localPastedTc);
         setTestCaseData(testCases);
         setCheckedRows([]);
+        headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
         setFocusedRow(null);
         props.setShowConfirmPop(false);
@@ -473,7 +481,7 @@ const DesignContent = props => {
         setHeaderCheck(false);
         setFocusedRow(insertedRowIdx);
         setChanged(true);
-        document.getElementById('design__tcCheckbox').indeterminate = false;
+        headerCheckRef.current.indeterminate = false;
         // setEdit(false);
     }
 
@@ -487,7 +495,7 @@ const DesignContent = props => {
         stepList.push(...checkedRows)
         let newChecks = Array.from(new Set(stepList))
         setCheckedRows([...newChecks]);
-        document.getElementById('design__tcCheckbox').indeterminate = newChecks.length!==0 && newChecks.length !== testCaseData.length;
+        headerCheckRef.current.indeterminate = newChecks.length!==0 && newChecks.length !== testCaseData.length;
         setShowSM(false);
     }
 
@@ -505,7 +513,7 @@ const DesignContent = props => {
             setFocusedRow(focus);
             setEdit(true);
             setDraggable(false);
-            document.getElementById('design__tcCheckbox').indeterminate = check.length!==0 && check.length !== testCaseData.length;
+            headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
         }
     }
 
@@ -514,7 +522,7 @@ const DesignContent = props => {
         setFocusedRow(null);
         setHeaderCheck(false);
         setEdit(false);
-        document.getElementById('design__tcCheckbox').indeterminate = false;
+        headerCheckRef.current.indeterminate = false;
 
         if (draggable) setDraggable(false);
         else setDraggable(true);
@@ -547,7 +555,7 @@ const DesignContent = props => {
                 setEdit(false);
             }
             setCheckedRows([]);
-            document.getElementById('design__tcCheckbox').indeterminate = false;
+            headerCheckRef.current.indeterminate = false;
             setHeaderCheck(false);
             setFocusedRow(null);
         }
@@ -604,9 +612,11 @@ const DesignContent = props => {
 
         for(let step of sortedSteps){
             let stepInt = parseInt(step)
+            let testCasesToCopy = JSON.parse(JSON.stringify(copiedContent.testCases));
+            
             stepInt = stepInt+offset
-            if (testCases.length === 1 && !testCases[0].custname) testCases = copiedContent.testCases
-            else testCases.splice(stepInt, 0, ...copiedContent.testCases);
+            if (testCases.length === 1 && !testCases[0].custname) testCases = testCasesToCopy;
+            else testCases.splice(stepInt, 0, ...testCasesToCopy);
             for(let i=0; i<copiedContent.testCases.length; i++){
                 toFocus.push(stepInt+i);
             }
@@ -617,12 +627,13 @@ const DesignContent = props => {
         copiedContent.testCases.forEach(testcase => testcase.objectid ? localPastedTc.push(testcase.objectid) : null)
 
         localPastedTc = [...new Set(localPastedTc)];
+        runClickAway = false;
         setPastedTC(localPastedTc);
         setTestCaseData(testCases);
         setShowPS(false);
         setFocusedRow(toFocus);
         setCheckedRows([]);
-        document.getElementById('design__tcCheckbox').indeterminate = false;
+        headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
         setChanged(true);
     }
@@ -649,8 +660,8 @@ const DesignContent = props => {
             // setEdit(false);
             // setRowChange(!rowChange);
             setChanged(true);
-            setCommentFlag(true);
-            document.getElementById('design__tcCheckbox').indeterminate = false;
+            if(edit) setCommentFlag(true);
+            headerCheckRef.current.indeterminate = false;
         }
     }
 
@@ -685,7 +696,7 @@ const DesignContent = props => {
         setHeaderCheck(headerCheckFlag);
         setFocusedRow(focusIdx); 
         setCheckedRows(check);
-        document.getElementById('design__tcCheckbox').indeterminate = check.length!==0 && check.length !== testCaseData.length;
+        headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
     }
 
     const onAction = (operation) => {
@@ -712,6 +723,7 @@ const DesignContent = props => {
         setFocusedRow(null); 
         setHeaderCheck(event.target.checked);
         setCheckedRows(checkList);
+        headerCheckRef.current.indeterminate = false;
     }
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
@@ -774,7 +786,7 @@ const DesignContent = props => {
             <div className="d__table">
                 <div className="d__table_header">
                     <span className="step_col d__step_head" ></span>
-                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} id="design__tcCheckbox" /></span>
+                    <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Object Name</span>
                     <span className="keyword_col d__key_head" >Keyword</span>
                     <span className="input_col d__inp_head" >Input</span>
@@ -789,7 +801,7 @@ const DesignContent = props => {
                         <div className="con" id="d__tcListId">
                             <ScrollBar scrollId="d__tcListId" verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setFocusedRow(null) : runClickAway=true}} style={{height: "100%"}}>
-                            <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row">
+                            <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row" onEnd={()=>{ if (!changed)setChanged(true)}}>
                                 {
                                 testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row"
                                     key={key++} idx={i} objList={objNameList} testCase={testCase} edit={edit} 

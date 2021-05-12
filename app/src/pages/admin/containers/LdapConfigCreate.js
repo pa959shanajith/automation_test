@@ -31,7 +31,7 @@ const LdapConfigCreate = (props) => {
                         <h4 className='title-ldap' >LDAP Server Details</h4>
                         <div className='adminControl-ldap'><div>
                             <span className="leftControl-ldap" title="Server Name">Server Name</span>
-                            <input type="text" autoComplete="off" id="ldapServerName" name="ldapServerName" value={props.serverName} onChange={(event)=>{updateLdapServerName(event.target.value)}} maxLength="50" className={"form-control-ldap form-control-custom-ldap input_border-ldap"+ (props.ldapServerNameErrBor ? " inputErrorBorder" : "")}  placeholder="Server Name"/>
+                            <input type="text" autoComplete="off" id="ldapServerName" name="ldapServerName" value={props.serverName} onChange={(event)=>{updateLdapServerName(event.target.value)}} maxLength="100" className={"form-control-ldap form-control-custom-ldap input_border-ldap"+ (props.ldapServerNameErrBor ? " inputErrorBorder" : "")}  placeholder="Server Name"/>
                         </div></div>
                     
                         <LdapConfigurationForm {...props}  />

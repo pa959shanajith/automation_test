@@ -838,7 +838,7 @@ const ProjectNew = (props) => {
             
             :<div className='userForm-project adminControl-project display-project' >
                 <div className='domainTxt'>Name</div>
-                <input value={projectName} onChange={(event)=>{updateProjectName(event.target.value)}} type="text" autoComplete="off" id="projectName" name="projectName" maxLength="50" className={projectNameErrorBorder?"inputErrorBorder middle__input__border form-control__conv-project form-control-custom def-margin":"middle__input__border form-control__conv-project form-control-custom def-margin"} placeholder="Project Name"/>
+                <input value={projectName} onChange={(event)=>{updateProjectName(event.target.value)}} type="text" autoComplete="off" id="projectName" name="projectName" maxLength="100" className={projectNameErrorBorder?"inputErrorBorder middle__input__border form-control__conv-project form-control-custom def-margin":"middle__input__border form-control__conv-project form-control-custom def-margin"} placeholder="Project Name"/>
             </div>
             }
             <div className='userForm-project adminControl-project display-project'>
@@ -873,7 +873,7 @@ const ModalContainerMiddleContent = (modalInputErrorBorder,Txt,setTxt, placehold
         setTxt(value);
     }
     return(
-        <p><input autoComplete="off" value={Txt} onChange={(event)=>{updateName(event.target.value)}} maxLength="50" type="text" className={(modalInputErrorBorder)?"middle__input__border form-control__conv form-control-custom inputErrorBorder":"middle__input__border form-control__conv form-control-custom"}  placeholder={placeholder}/></p>
+        <p><input autoComplete="off" value={Txt} onChange={(event)=>{updateName(event.target.value)}} maxLength="100" type="text" className={(modalInputErrorBorder)?"middle__input__border form-control__conv form-control-custom inputErrorBorder":"middle__input__border form-control__conv form-control-custom"}  placeholder={placeholder}/></p>
     )
 }
 
@@ -888,7 +888,7 @@ const ModalButtonsFooter = (saveAction) =>{
 const editModalcontent = (editProjectName, projectEditFunction, modalInputErrorBorder, projectNameErrorBorder) =>{
     return(
         <div>
-            <input value={editProjectName} onChange={(event)=>{projectEditFunction(event.target.value)}} type="text" autoComplete="off" id="editProjectName" name="editProjectName" maxLength="50" className={ (modalInputErrorBorder?"inputErrorBorder ":"") + (projectNameErrorBorder?"inputErrorBorder ":"") + "middle__input__border form-control__conv-project form-control-custom"} placeholder="Project Name"/>
+            <input value={editProjectName} onChange={(event)=>{projectEditFunction(event.target.value)}} type="text" autoComplete="off" id="editProjectName" name="editProjectName" maxLength="100" className={ (modalInputErrorBorder?"inputErrorBorder ":"") + (projectNameErrorBorder?"inputErrorBorder ":"") + "middle__input__border form-control__conv-project form-control-custom"} placeholder="Project Name"/>
         </div>
     )
 } 

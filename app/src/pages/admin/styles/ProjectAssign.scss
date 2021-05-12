@@ -92,6 +92,16 @@
         margin-left: 8%;
     }
 }
+@media screen and (min-width:1500px){
+    .assign-container{
+        height: calc(100% - 190px);
+    }
+}
+@media screen and (min-width:2000px){
+    .assign-container{
+        height: calc(100% - 245px);
+    }
+}
 
 .center-button button {
     font-size: 11px;

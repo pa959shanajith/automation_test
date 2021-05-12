@@ -13,10 +13,11 @@ const EditIrisObject = props => {
     const [selectedStatus, setSelectedStatus] = useState("");
 
     useEffect(()=>{
-        let objType = props.utils.object.tag.split(";").pop()
+        let objType = props.utils.object.xpath.split(";")[6];
+        let objStatus = props.utils.object.xpath.split(";")[7];
         if (objType==='' || objType==='Unable to recognize object type') objType = "unrecognizableobject";
         setSelectedType(objType);
-        setSelectedStatus(0);
+        setSelectedStatus(objStatus);
         //eslint-disable-next-line
     }, [])
 
@@ -29,32 +30,40 @@ const EditIrisObject = props => {
     }
 
     const submitData = () => {
-        let existingType = props.utils.object.tag.split(";").pop() || "unrecognizableobject";
+        let existingType = props.utils.object.xpath.split(";")[6] || "unrecognizableobject";
+        let existingStatus = props.utils.object.xpath.split(";")[7]
+
+        let newXpath = props.utils.object.xpath.split(';');
+        newXpath.splice(6, 1, selectedType);
+        newXpath.splice(7, 1, selectedStatus);
+        newXpath = newXpath.join(';');
         
         let data = {
             "_id": (props.utils.object.objId || ''),
             "cord": props.utils.cord,
             "type": selectedType, 
-            "xpath": props.utils.object.xpath,
-            "status": selectedStatus,
+            "xpath": newXpath,
+            "status": parseInt(selectedStatus),
             ...props.taskDetails
         };
 
         let irisAppType = `saveirisimage_${props.taskDetails.appType}`;
 
-        if (!props.utils.object.objId) props.setShowPop({title: "IRIS Object Details", content: "Please save the object first."});
+        if (!props.utils.object.objId) {
+            props.setShow(false);
+            props.setShowPop({title: "IRIS Object Details", content: "Please save the object first."});
+        }
         else {
             updateIrisDataset(data)
             .then(val => {
-                props.setShow(false);
                 if(val === 'success'){
                     // props.setShowPop({title: "IRIS Object Details", content: "Submitted Successfully."});
-                    if(selectedType !== existingType){
+                    if(selectedType !== existingType || selectedStatus !== existingStatus){
                         props.utils.modifyScrapeItem(props.utils.object.val, {
                             custname: props.utils.object.custname,
                             tag: `iris;${selectedType}`,
                             url: props.utils.object.url,
-                            xpath: props.utils.object.xpath,
+                            xpath: newXpath,
                             editable: true
                         }, true);
                     }
@@ -77,7 +86,10 @@ const EditIrisObject = props => {
                             console.error("ERROR::::", error);
                         });
                 }
-                else props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
+                else {
+                    props.setShow(false);
+                    props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
+                }
             })
             .catch(error => {
                 props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
@@ -106,8 +118,8 @@ const EditIrisObject = props => {
                                 <span data-test="objStatusHeading">Object Status:</span>
                                 <span>
                                     <select data-test="selectobjStatus" className="ss__ei_objType" value={selectedStatus} onChange={onSelectStatus}>
-                                        <option className="ss__ei_options" value={0}>Unchecked</option>
-                                        <option className="ss__ei_options" value={1}>Checked</option>
+                                        <option className="ss__ei_options" value={"0"}>Unchecked</option>
+                                        <option className="ss__ei_options" value={"1"}>Checked</option>
                                     </select>
                                 </span>
                                 </>
@@ -118,7 +130,14 @@ const EditIrisObject = props => {
                         <div className="ss__ei_img_panel">
                             <span>Object Image</span>
                             <div className="ss__ei_img_box">
-                                <img data-test="irirsImage" className="ss__ei_img" alt="iris" src={`data:image/PNG;base64,${props.utils.cord.substring(2, props.utils.cord.length - 1)}`}/>
+                                <img    
+                                    data-test="irirsImage" 
+                                    className="ss__ei_img" 
+                                    alt="iris" 
+                                    src={`data:image/PNG;base64,
+                                        ${getImage(props.utils.cord)}
+                                    `}
+                                />
                             </div>
                         </div>
                     </div>
@@ -137,4 +156,14 @@ EditIrisObject.propTypes={
     setShow:PropTypes.func,
     setShowPop:PropTypes.func
 }
+
+const getImage = base64 => {
+    let newBase64;
+    if (base64.substring(base64.length-2) === "''")
+        newBase64 = base64.substring(3, base64.length - 2);
+    else 
+        newBase64 = base64.substring(2, base64.length - 1)
+    return newBase64;
+}
+
 export default EditIrisObject;

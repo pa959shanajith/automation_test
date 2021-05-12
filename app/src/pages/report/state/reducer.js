@@ -20,6 +20,13 @@ const reducer = (state = initialState , action) => {
                 suiteDetails:action.payload.suiteDetails,
                 suiteSelected:action.payload.suiteID
             }
+        case actionTypes.RESET_DETAILS:
+            return{
+                ...state,
+                suiteDetails:[],
+                moduleList:[],
+                suiteSelected:{_id:undefined,name:""}
+            }
         default: 
             return state
     }

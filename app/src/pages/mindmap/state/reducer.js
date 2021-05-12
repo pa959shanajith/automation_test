@@ -78,11 +78,6 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 scenarioList: action.payload
-            }   
-        case actionTypes.UPDATE_IMPORTDATA:
-            return{
-                ...state,
-                importData: action.payload
             }
         case actionTypes.SAVE_MINDMAP :
             return{
@@ -98,6 +93,16 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 unassignTask: action.payload
+            }
+        case actionTypes.IMPORT_MINDMAP:
+            var res = action.payload
+            return{
+                ...state,
+                selectedProj : res.selectProj,
+                selectedModule : res.selectModule,
+                screenData : res.screenData,
+                moduleList : res.moduleList,
+                importData : res.importData
             }
         default: 
             return state

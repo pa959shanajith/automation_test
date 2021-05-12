@@ -93,8 +93,10 @@ if (cluster.isMaster) {
 		};
 		// CORS and security headers
 		app.all('*', function(req, res, next) {
-			res.setHeader('Access-Control-Allow-Origin', req.hostname);
-			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
+			const origin =  req.headers["origin"] || req.hostname;
+			res.setHeader('Access-Control-Allow-Origin', origin);
+			res.setHeader('Access-Control-Allow-Credentials', true);
+			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Accept, Content-Type, Upgrade-Insecure-Requests');
 			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			next();
 		});
@@ -207,6 +209,7 @@ if (cluster.isMaster) {
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
 		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
+		app.post('/importFromGit_ICE', suite.importFromGit_ICE);
 
 		app.use(csrf({
 			cookie: true
@@ -261,7 +264,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(p_Webocular|neuronGraphs\/|p_ALM|p_APG|integration|p_qTest|p_Zephyr)$/, function(req, res) {
+		app.get(/^\/(webocular|neuronGraphs\/|integration)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -287,10 +290,6 @@ if (cluster.isMaster) {
 				return res.redirect("/error?e=" + ((sessChk) ? "403" : "401"));
 			}
 		}
-
-		// app.post('/designTestCase', function(req, res) {
-		// 	return res.sendFile("index.html", { root: __dirname + "/public/" });
-		// });
 
 		app.get('/AvoAssure_ICE.zip', async (req, res) => {
 			const iceFile = "AvoAssure_ICE.zip";
@@ -342,6 +341,8 @@ if (cluster.isMaster) {
 		app.post('/exportMindmap', auth.protect, mindmap.exportMindmap);
 		app.post('/importMindmap', auth.protect, mindmap.importMindmap);
 		app.post('/pdProcess', auth.protect, mindmap.pdProcess);	// process discovery service
+		app.post('/exportToGit', auth.protect, mindmap.exportToGit);
+		app.post('/importGitMindmap', auth.protect, mindmap.importGitMindmap);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
@@ -392,6 +393,8 @@ if (cluster.isMaster) {
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
 		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
 		app.post('/restartService', auth.protect, admin.restartService);
+		app.post('/gitSaveConfig', auth.protect, admin.gitSaveConfig);
+		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);

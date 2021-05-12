@@ -4,7 +4,6 @@ var create_ice = require('../controllers/create_ice');
 var myserver = require('../lib/socket.js');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
-var suites = require('../controllers/suite')
 var xlsx = require('xlsx');
 var path = require('path');
 var fs = require('fs');
@@ -29,13 +28,19 @@ var xlsToCSV = function (workbook, sheetname) {
 };
 
 exports.populateProjects =  async(req, res) => {
-	logger.info("Inside UI service: populateProjects");
-	var reqData = {
-		"userid": req.session.userid,
-		"allflag": true
-	};
-	const data = await create_ice.getProjectIDs(reqData);
-	res.send(data);
+	const fnName = "populateScenarios";
+	try {
+		logger.info("Inside UI service: " + fnName);
+		var reqData = {
+			"userid": req.session.userid,
+			"allflag": true
+		};
+		const data = await create_ice.getProjectIDs(reqData);
+		res.send(data);
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
 };
 
 exports.populateScenarios = async (req, res) => {
@@ -95,7 +100,6 @@ const getModule = async (d) => {
 	const inputs = {
 		"tab":d.tab,
 		"projectid":d.projectid || null,
-		// "modulename":d.modName,
 		"moduleid":d.moduleid,
 		"cycleid":d.cycId,
 		"name":"getModules"
@@ -104,9 +108,15 @@ const getModule = async (d) => {
 };
 
 exports.getModules = async (req, res) => {
-	logger.info("Inside UI service: getModules");
-	const data = await getModule(req.body);
-	res.send(data);
+	const fnName = "getModules";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const data = await getModule(req.body);
+		res.send(data);
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
 };
 
 exports.reviewTask = async (req, res) => {
@@ -666,8 +676,6 @@ exports.getScreens = async (req, res) => {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
-	var data = await utils.fetchData(inputs, "mindmap/exportMindmap","exportMindmap");
-	res.send(data)
 };
 
 exports.exportToExcel = async (req, res) =>{
@@ -682,54 +690,66 @@ exports.exportToExcel = async (req, res) =>{
 		var excelDirPath = path.join(__dirname, dir);
 		var filePath = path.join(excelDirPath, 'samp234.xlsx');
 
-	try {
-		if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
-		if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
-	} catch (e) {
-		logger.error("Exception in mindmapService: exportToExcel: Create Directory/Remove file", e);
-	}
+		try {
+			if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
+			if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
+		} catch (e) {
+			logger.error("Exception in mindmapService: exportToExcel: Create Directory/Remove file", e);
+		}
 
-	//create a new workbook file in current working directory
-	var wb = new xl.Workbook();
-	var ws = wb.addWorksheet('Sheet1');
+		//create a new workbook file in current working directory
+		var wb = new xl.Workbook();
+		var ws = wb.addWorksheet('Sheet1');
 
-	logger.debug(excelMap.name);
+		logger.debug(excelMap.name);
 
-	//create the new worksheet with 10 coloumns and rows equal to number of testcases
-	var curr = excelMap;
+		//create the new worksheet with 10 coloumns and rows equal to number of testcases
+		var curr = excelMap;
 
-	//Sorting the positions of the child nodes according to their childindex
-	for (i = 0; i < curr.children.length; i++) {
-		for (j = 0; j < curr.children[i].children.length; j++) {
-			//sort the testcases based on childindex
-			curr.children[i].children[j].children.sort(function(a,b){
+		//Sorting the positions of the child nodes according to their childindex
+		for (i = 0; i < curr.children.length; i++) {
+			for (j = 0; j < curr.children[i].children.length; j++) {
+				//sort the testcases based on childindex
+				curr.children[i].children[j].children.sort(function(a,b){
+					return parseInt(a.childIndex)-parseInt(b.childIndex)});
+			}
+			//sort the screens based on childindex
+			curr.children[i].children.sort(function(a,b){
 				return parseInt(a.childIndex)-parseInt(b.childIndex)});
 		}
-		//sort the screens based on childindex
-		curr.children[i].children.sort(function(a,b){
-			return parseInt(a.childIndex)-parseInt(b.childIndex)});
-	}
-	//sort the scenarios based on childindex
-	curr.children.sort(function(a,b){
-	return parseInt(a.childIndex)-parseInt(b.childIndex)});
+		//sort the scenarios based on childindex
+		curr.children.sort(function(a,b){
+		return parseInt(a.childIndex)-parseInt(b.childIndex)});
 
-	//Set some width for first 4 columns
-	ws.column(1).setWidth(40);
-	ws.column(2).setWidth(40);
-	ws.column(3).setWidth(40);
-	ws.column(4).setWidth(40);
+		//Set some width for first 4 columns
+		ws.column(1).setWidth(40);
+		ws.column(2).setWidth(40);
+		ws.column(3).setWidth(40);
+		ws.column(4).setWidth(40);
 
-	var style = wb.createStyle({
-		font: {
-			color: '000000',
-			bold: true,
-				size: 12,
-			}
-			});
+		var style = wb.createStyle({
+			font: {
+				color: '000000',
+				bold: true,
+					size: 12,
+				}
+				});
 
-	ws.cell(1, 1)
-			.string('Module')
-			.style(style);
+		ws.cell(1, 1)
+				.string('Module')
+				.style(style);
+
+		ws.cell(1, 2)
+				.string('Scenario')
+				.style(style);
+
+		ws.cell(1, 3)
+				.string('Screen')
+				.style(style);
+
+		ws.cell(1, 4)
+				.string('Script')
+				.style(style);
 
 		var min_scen_idx = 1;
 		var min_scr_idx = 1;
@@ -1184,7 +1204,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 	var firstScript = false,windowId;
 	var temp_screendata=screendata;
 	var menu_input='';
-	var menu_count=0;
+	var menu_count=step;
 	var mflag=0;
 	if(adjacentItems){
 		// in case is first script
@@ -1203,6 +1223,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				];
 				mflag=1;
 				step = 3;
+				menu_count=step;
 			}
 			else if (item["@label"]=="Start" && screendata[0].apptype=="OEBS"){
 				firstScript = true;
@@ -1296,82 +1317,83 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			}
 				
 			if(menu_flg==0){
-				switch(eachScrapedAction.tag){
-					case "input":
-					case "GuiOkCodeField":
-						if(eachScrapedAction.command[0][1]!=undefined && eachScrapedAction.command[0][1]=='setFocus')
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetFocus',null,null,null,"SAP");
-						else if(eachScrapedAction.command[0][1]!=undefined && eachScrapedAction.command[0][1]=='text' && input[0]=='')
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[eachScrapedAction.command[0][2]],null,null,"SAP");
-						else
+				if(eachScrapedAction.command[0][1]!='sendVKey'){
+					switch(eachScrapedAction.tag){
+						case "input":
+						case "GuiOkCodeField":
+							if(eachScrapedAction.command[0][1]!=undefined && eachScrapedAction.command[0][1]=='setFocus')
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetFocus',null,null,null,"SAP");
+							else if(eachScrapedAction.command[0][1]!=undefined && eachScrapedAction.command[0][1]=='text' && input[0]=='')
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[eachScrapedAction.command[0][2]],null,null,"SAP");
+							else
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
+							break;
+						case "button":
+						case "shell":
+						case "table":
+						case "toolbar":
+						case "calendar":
+						case "gridview":
+						case "GuiLabel":
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+							var custname_split = eachScrapedAction.custname.split('_');
+							if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+							break;
+						case "GuiStatusbar":
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
+							break;
+						case "GuiTab":
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
+							break;
+						case "select":
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
+							break;
+						case "GuiMenubar":
+						case "GuiMenu":
+							testcaseObj = getTestcaseStep(step,null,'@Sap','SelectMenu',[menu_input],null,null,"SAP");
+							break;
+						case "GuiSimpleContainer":
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
+							break;
+						case "radiobutton":
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
+							break;
+						case "checkbox":
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
+							break;
+						case "tree":
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
+							break;
+						case "picture":
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
+							break;
+						case "text":
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
-						break;
-					case "button":
-					case "shell":
-					case "table":
-					case "toolbar":
-					case "calendar":
-					case "gridview":
-					case "GuiLabel":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
-						var custname_split = eachScrapedAction.custname.split('_');
-						if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
-						break;
-					case "GuiStatusbar":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
-						break;
-					case "GuiTab":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
-						break;
-					case "select":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
-						break;
-					case "GuiMenubar":
-					case "GuiMenu":
-						testcaseObj = getTestcaseStep(step,null,'@Sap','SelectMenu',[menu_input],null,null,"SAP");
-						break;
-					case "GuiSimpleContainer":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
-						break;
-					case "radiobutton":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
-						break;
-					case "checkbox":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
-						break;
-					case "tree":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
-						break;
-					case "picture":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
-						break;
-					case "text":
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
-						break;
-					case "GuiModalWindow":
-					case "GuiDialogShell":
-						if(eachScrapedAction.command[0][1]=='close'){
-							testcaseObj = getTestcaseStep(step,null,'@Sap','closedialogwindow',null,null,null,"SAP");
-						}
-						break;
-					default:
-						if(eachScrapedAction.command[0][1]=='sendVKey'){
-							key=eachScrapedAction.command[0][2]
-							keycode_map = {
-								'1': 'F1', '2': 'F2', '3': 'F3', '4': 'F4', '5': 'F5', '6': 'F6', '7': 'F7', '8': 'F8', '9': 'F9', '10': 'F10', '11': 'ctrl+s', '12': 'f12', '13': 'shift+f1',
-								'14': 'shift+f2', '15': 'shift+f3', '16': 'shift+f4', '17': 'shift+f5', '18': 'shift+f6', '19': 'shift+f7', '20': 'shift+f8', '21': 'shift+f9',
-								'22': 'shift+ctrl+0', '23': 'shift+f11', '24': 'shift+f12', '25': 'ctrl+f1', '26': 'ctrl+f2', '27': 'ctrl+f3', '28': 'ctrl+f4', '29': 'ctrl+f5',
-								'30': 'ctrl+f6', '31': 'ctrl+f7', '32': 'ctrl+f8', '33': 'ctrl+f9', '34': 'ctrl+f10', '35': 'ctrl+f11', '36': 'ctrl+f12', '37': 'ctrl+shift+f1',
-								'38': 'ctrl+shift+f2', '39': 'ctrl+shift+f3', '40': 'ctrl+shift+f4', '41': 'ctrl+shift+f5', '42': 'ctrl+shift+f6', '43': 'ctrl+shift+f7', '44': 'ctrl+shift+f8',
-								'45': 'ctrl+shift+f9', '46': 'ctrl+shift+f10', '47': 'ctrl+shift+f11', '48': 'ctrl+shift+f12', '70': 'ctrl+e', '71': 'ctrl+f', '72': 'ctrl+/', '73': 'ctrl+\ ',
-								'74': 'ctrl+n', '75': 'ctrl+o', '76': 'ctrl+x', '77': 'ctrl+c', '78': 'ctrl+v', '79': 'ctrl+z', '80': 'ctrl+pageup', '81': 'pageup', '82': 'pagedown', '83': 'ctrl+pagedown',
-								'84': 'ctrl+g', '85': 'ctrl+r', '86': 'ctrl+p'
+							break;
+						case "GuiModalWindow":
+						case "GuiDialogShell":
+							if(eachScrapedAction.command[0][1]=='close'){
+								testcaseObj = getTestcaseStep(step,null,'@Sap','closedialogwindow',null,null,null,"SAP");
 							}
-							testcaseObj = getTestcaseStep(step,null,'@Generic','sendFunctionKeys',keycode_map[key],null,null,"Generic");
-						} else {
+							break;
+						default:
 							logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
-						}
-						break;
+							break;
+					}
+				}
+				if(eachScrapedAction.command[0][1]=='sendVKey'){
+					key=eachScrapedAction.command[0][2]
+					keycode_map = {
+						'1': 'F1', '2': 'F2', '3': 'F3', '4': 'F4', '5': 'F5', '6': 'F6', '7': 'F7', '8': 'F8', '9': 'F9', '10': 'F10', '11': 'ctrl+s', '12': 'f12', '13': 'shift+f1',
+						'14': 'shift+f2', '15': 'shift+f3', '16': 'shift+f4', '17': 'shift+f5', '18': 'shift+f6', '19': 'shift+f7', '20': 'shift+f8', '21': 'shift+f9',
+						'22': 'shift+ctrl+0', '23': 'shift+f11', '24': 'shift+f12', '25': 'ctrl+f1', '26': 'ctrl+f2', '27': 'ctrl+f3', '28': 'ctrl+f4', '29': 'ctrl+f5',
+						'30': 'ctrl+f6', '31': 'ctrl+f7', '32': 'ctrl+f8', '33': 'ctrl+f9', '34': 'ctrl+f10', '35': 'ctrl+f11', '36': 'ctrl+f12', '37': 'ctrl+shift+f1',
+						'38': 'ctrl+shift+f2', '39': 'ctrl+shift+f3', '40': 'ctrl+shift+f4', '41': 'ctrl+shift+f5', '42': 'ctrl+shift+f6', '43': 'ctrl+shift+f7', '44': 'ctrl+shift+f8',
+						'45': 'ctrl+shift+f9', '46': 'ctrl+shift+f10', '47': 'ctrl+shift+f11', '48': 'ctrl+shift+f12', '70': 'ctrl+e', '71': 'ctrl+f', '72': 'ctrl+/', '73': 'ctrl+\ ',
+						'74': 'ctrl+n', '75': 'ctrl+o', '76': 'ctrl+x', '77': 'ctrl+c', '78': 'ctrl+v', '79': 'ctrl+z', '80': 'ctrl+pageup', '81': 'pageup', '82': 'pagedown', '83': 'ctrl+pagedown',
+						'84': 'ctrl+g', '85': 'ctrl+r', '86': 'ctrl+p'
+					}
+					testcaseObj = getTestcaseStep(step,null,'@Generic','sendFunctionKeys',[keycode_map[key]],null,null,"Generic");
 				}
 				if(testcaseObj){
 					testCaseSteps.push(testcaseObj);
@@ -1490,6 +1512,35 @@ var encrypt = (data) => {
 	return 	encryptedData.toUpperCase();
 }
 
+/* Export data to Git repository. */
+exports.exportToGit = async (req, res) => {
+	const actionName = "exportToGit";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const gitVersionName = data.gitVersion;
+		var gitFolderPath = data.gitFolderPath;
+		const gitBranch = data.gitBranch;
+		const moduleId = data.mindmapId;
+		if(!gitFolderPath.startsWith("avoassuretest_artifacts")){
+			gitFolderPath="avoassuretest_artifacts/"+gitFolderPath
+		}
+		const inputs = {
+			"moduleId":moduleId,
+			"userid":req.session.userid,
+			"action":actionName,
+			"gitBranch":gitBranch,
+			"gitVersionName": gitVersionName,
+			"gitFolderPath": gitFolderPath.toLowerCase()
+		};
+		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
+		return res.send(module_data);
+	} catch (ex) {
+		logger.error("Exception in the service exportToGit: %s", ex);
+		return res.status(500).send("fail");
+	}
+};
+
 exports.exportMindmap = async (req, res) => {
 	const fnName = "exportMindmap";
 	logger.info("Inside UI service: " + fnName);
@@ -1521,11 +1572,34 @@ exports.importMindmap = async (req, res) => {
 			"query":"importMindmap"
 		}
 		const result = await utils.fetchData(inputs, "mindmap/importMindmap", fnName);
-		if (result == "fail") {
-			return res.send("fail");
-		} else {
-			return res.send(result);
+		res.send(result)
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+exports.importGitMindmap = async (req, res) => {
+	const fnName = "importGitMindmap";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const projectid = req.body.projectid;
+		const gitbranch = req.body.gitbranch;
+		const gitversion = req.body.gitversion;
+		var gitfolderpath = req.body.gitfolderpath;
+		if(!gitfolderpath.startsWith("avoassuretest_artifacts")){
+			gitfolderpath="avoassuretest_artifacts/"+gitfolderpath
 		}
+		const inputs= {
+			"userid": req.session.userid,
+			"roleid": req.session.activeRoleId,
+			"projectid": projectid,
+			"gitbranch": gitbranch,
+			"gitversion":gitversion,
+			"gitfolderpath":gitfolderpath.toLowerCase()
+		}
+		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);
+		res.send(result)
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");

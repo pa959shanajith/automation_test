@@ -41,7 +41,7 @@
     "passport-saml": "^1.0.0",
     "randexp": "^0.5.3",
     "redis": "^2.8.0",
-    "socket.io": "^2.2.0",
+    "socket.io": "^3.1.2",
     "uuid-random": "^1.0.6",
     "uuid-token-generator": "^1.0.0",
     "validator": "^9.2.0",

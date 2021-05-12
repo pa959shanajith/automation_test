@@ -170,15 +170,20 @@ module.exports.initListeners = mySocket => {
 	queue.Execution_Queue.register_execution_trigger_ICE(username);
 	mySocket.use((args, cb) => {
 		const ev = args[0];
+		const ack = (typeof  args[args.length-1] === 'function')? args.pop():() => {};
 		const fullPcktId = args.splice(1,1)[0];
 		const pcktId = fullPcktId.split('_')[0];
 		const index = fullPcktId.split('_')[1];
-		mySocket.emit("data_ack", fullPcktId);
-		if (mySocket.pckts.indexOf(pcktId) !== -1) { // Check if packet has already been consumed by server
-			if (index == 'eof') mySocket.emit("data_ack", pcktId); // If this was EOF packet, send 2nd ACK
+
+		// ACK for Paginated Packets will be sent later after processing
+		if (index === undefined) ack(fullPcktId);
+		// Check if packet has already been consumed by server
+		if (mySocket.pckts.indexOf(pcktId) !== -1) {
+			if (index !== undefined) ack(fullPcktId); // If this was Paginated packet, send ACK
 			return null;  // Do nothing as packet has already been consumed
 		}
-		if (index === undefined) {  // Normal packet
+		// Normal packet - Do not apply pagination logic
+		if (index === undefined) {
 			mySocket.pckts.push(pcktId);
 			return cb();
 		}
@@ -189,6 +194,7 @@ module.exports.initListeners = mySocket => {
 		const subPackId = comps.shift();
 		const payload = comps.join(';');
 		if (index == "p@gIn8" && comps.length == 3) {
+			ack(fullPcktId);
 			const d2p = [parseInt(comps[0])].concat(Array.apply(null, Array(parseInt(comps[1]))));
 			mySocket.evdata[ev] = {id: subPackId, data: d2p, jsonify: comps[2] === "True"};
 		} else if (ev_data && ev_data.id == subPackId) {
@@ -196,31 +202,41 @@ module.exports.initListeners = mySocket => {
 				const payloadlength = mySocket.evdata[ev].data.shift();
 				const fpayload = mySocket.evdata[ev].data.join('');
 				if (fpayload.length != payloadlength) {
-					mySocket.emit("data_ack", pcktId, "paginate_fail");
+					ack(fullPcktId, "paginate_fail");
 					const blocks = mySocket.evdata[ev].data.length;
 					delete mySocket.evdata[ev].data;
 					mySocket.evdata[ev].data = [payloadlength].concat(Array.apply(null, Array(blocks)));
 				} else {
+					ack(fullPcktId);
 					mySocket.pckts.push(pcktId);
-					mySocket.emit("data_ack", pcktId);
 					args[1] = ev_data.jsonify? JSON.parse(fpayload):fpayload;
 					delete mySocket.evdata[ev]
 					cb();
 				}
 			} else {
+				ack(fullPcktId);
 				mySocket.evdata[ev].data[parseInt(index)] = payload;
 			}
 		} else if (validator.isUUID(subPackId)) {
+			ack(fullPcktId, "paginate_fail");
 			logger.info("Unknown packet received! Restarting pagination. Event: "+args[0]+", ID: "+fullPcktId);
-			mySocket.emit("data_ack", pcktId, "paginate_fail");
-		} else cb();
+		} else {
+			ack(fullPcktId);
+			cb();
+		}
 	});
 
-	mySocket.on("message", value => {
+	mySocket.on("message", (value) => {
 		if (value == "unavailableLocalServer") {
 			const dataToNode = JSON.stringify({"username": username, "onAction": value, "value": {}});
 			server_pub.publish("ICE2_" + username, dataToNode);
-		} else console.log("\n\nOn Message:", value);
+		} else {
+			console.log("\n\nOn Message:", value);
+		}
+	});
+
+	mySocket.on("test_conn", value => {
+		logger.info("Socket Connection Test Successful. Packet Size: " + (value || "").length);
 	});
 
 	mySocket.on("result_web_crawler", value => {
@@ -332,30 +348,29 @@ module.exports.initListeners = mySocket => {
 		cache.set("ICE_status",pulse_ICE)
 		const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
 		server_pub.publish('ICE_STATUS_' + username, dataToExecute);
-
 	});
 };
 
 function check_pulse(){
-	time = Date()
+	var time = Date()
 	var writeStr = "None"
-	logger.debug("Checking ICE pulse")
-	for (var ice in pulse_ICE){
+	logger.silly("Checking ICE pulse")
+	for (var ice in pulse_ICE) {
 		if(pulse_ICE[ice]["time"]){
-			iceTime = pulse_ICE[ice]["time"]
+			var iceTime = pulse_ICE[ice]["time"]
 			var writeStr = "";
 			if(Date.parse(time) - Date.parse(iceTime) >= 100000){
 				var writeStr = time.toString() + " " + ice + " Disconnected pulse last recieved at: " + iceTime.toString();
-				logger.info(writeStr)
+				logger.silly(writeStr)
 				pulse_ICE[ice]["time"] = null;
 				pulse_ICE[ice]["connected"] = false;
 				cache.set("ICE_status",pulse_ICE)
-				value = pulse_ICE[ice];
+				var value = pulse_ICE[ice];
 				const dataToExecute = JSON.stringify({"username" : ice,"onAction" : "ice_status_change","value":value});
 				server_pub.publish('ICE2_' + ice, dataToExecute);
 			}else{
 				writeStr = time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"]; 
-				logger.debug(writeStr)
+				logger.silly(writeStr)
 			}
 		}
 	}

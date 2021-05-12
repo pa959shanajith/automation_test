@@ -1,16 +1,11 @@
-import React, {useState, useEffect } from 'react';
-import {ScreenOverlay, RedirectPage , ScrollBar} from '../../global' 
-import Datetime from "react-datetime";
-import moment from "moment";
+import React, { useEffect, useState } from 'react';
+import { ScrollBar, CalendarComp, TimeComp} from '../../global'
 import {readTestSuite_ICE} from '../api';
-import { useHistory } from 'react-router-dom';
 import "../styles/ScheduleSuitesTopSection.scss";
 
-const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, current_task, filter_data, scheduleTableData, setScheduleTableData}) => {
-    
-    const history = useHistory();
-    const [loading,setLoading] = useState(false)
-    const [projectAppType,setProjectApptype] = useState({})
+const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, current_task, displayError, setLoading, scheduleTableData, setScheduleTableData}) => {
+
+    const [closeCal, setCloseCal] = useState(false);
     
     useEffect(()=>{
         if (Object.keys(current_task).length!==0){
@@ -27,21 +22,19 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
     const readTestSuiteFunct = async (readTestSuite) => {
         setLoading("Loading in Progress. Please Wait");
         const result = await readTestSuite_ICE(readTestSuite, "schedule")
-        setLoading(false);
-        if (result === "Invalid Session")
-            return RedirectPage(history);
+        if(result.error){displayError(result.error);return;}
         else if (result.testSuiteDetails) {
             var data = result.testSuiteDetails;
             var keys = Object.keys(data);
-            var eachData2 = [];
-            keys.map(itm => eachData2.push({...data[itm]}));
+            var tableData = [];
+            keys.map(itm => tableData.push({...data[itm]}));
 
             //setting module date and time props
-            let moduleSceduledateTime = {};
+            let moduleScheduledateTime = {};
             // eslint-disable-next-line
-            eachData2.map((rowData)=>{
-                if(moduleSceduledateTime[rowData.testsuiteid] === undefined) {
-                    moduleSceduledateTime[rowData.testsuiteid] = {
+            tableData.map((rowData)=>{
+                if(moduleScheduledateTime[rowData.testsuiteid] === undefined) {
+                    moduleScheduledateTime[rowData.testsuiteid] = {
                         date:"",time:"",
                         inputPropstime: {readOnly:"readonly" ,
                             disabled : true,
@@ -56,32 +49,11 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
                     };
                 }
             })
-            setModuleSceduledate(moduleSceduledateTime);
-
-            //finding distinct projects : helpful for apptype column
-            var flags = [], output = [];
-            for(var j=0; j<eachData2.length; j++) {
-                for(var i=0; i<eachData2[j].projectnames.length; i++) {
-                    if( flags[eachData2[j].projectnames[i]]) continue;
-                    flags[eachData2[j].projectnames[i]] = true;
-                    output.push(eachData2[j].projectnames[i]);
-                }
-            }
-            var projectApptype = {};
-            // eslint-disable-next-line
-            keys.map(itm => {
-                for(var i =0 ; i<output.length; i++){
-                    for( const [key,value] of Object.entries(filter_data.projectDict)){
-                        if(output[i] === value){
-                            projectApptype[output[i]]= Object.keys(filter_data.project[key].appType)[0];
-                        } 
-                    }
-                }
-            });
-            setProjectApptype(projectApptype);
-            setScheduleTableData(eachData2);
-            updateScenarioStatus(eachData2);
+            setModuleScheduledate(moduleScheduledateTime);
+            setScheduleTableData(tableData);
+            updateScenarioStatus(tableData);
         }
+        setLoading(false);
     }
     
     const changeSelectALL = (m,id) => {
@@ -108,7 +80,7 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
     const changeExecutestatusInitial = (eachData1,m) => {
         let zeroExist = eachData1[m].executestatus.includes(0);
         let oneExist = eachData1[m].executestatus.includes(1);
-
+        if(!document.getElementById('selectScheduleSuite_' + m)) return;
         if(zeroExist ===true && oneExist === true) document.getElementById('selectScheduleSuite_' + m).indeterminate = true;
         else if (zeroExist ===false && oneExist === true) {
             document.getElementById('selectScheduleSuite_' + m).indeterminate = false;
@@ -142,66 +114,41 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
     }
 
     const updateDateTime = (date_time, value , testsuiteid) => {
-        let moduleSceduledatetime = {...moduleSceduledate}
-        if(moduleSceduledatetime[testsuiteid] === undefined) {
-            moduleSceduledatetime[testsuiteid] = {date:"",time:""};
+        let moduleScheduledateTime = {...moduleScheduledate}
+        if(moduleScheduledateTime[testsuiteid] === undefined) {
+            moduleScheduledateTime[testsuiteid] = {date:"",time:""};
         }
         if(date_time==="date"){
-            moduleSceduledatetime[testsuiteid]["date"] = value;
-            if(moduleSceduledatetime[testsuiteid]["time"] === "") {
+            moduleScheduledateTime[testsuiteid]["date"] = value;
+            if(moduleScheduledateTime[testsuiteid]["time"] === "") {
                 var hr = new Date().getHours();
                 var min = parseInt(new Date().getMinutes());
                 if(new Date().getHours().toString().length === 1) hr = "0"+hr;
                 if(parseInt(new Date().getMinutes()).toString().length === 1) min = "0"+min;
-                moduleSceduledatetime[testsuiteid]["time"] = hr  + ':' + min;
+                moduleScheduledateTime[testsuiteid]["time"] = hr  + ':' + min;
             }
-            moduleSceduledatetime[testsuiteid]["inputPropstime"]["disabled"]=false;
+            moduleScheduledateTime[testsuiteid]["inputPropstime"]["disabled"]=false;
         }
         else if(date_time==="time"){
-            moduleSceduledatetime[testsuiteid]["time"] = value;
+            moduleScheduledateTime[testsuiteid]["time"] = value;
         }
-        setModuleSceduledate(moduleSceduledatetime);
+        setModuleScheduledate(moduleScheduledateTime);
     }
 
     return (
         <>
-        {loading?<ScreenOverlay content={loading}/>:null}
         <div className="scheduleSuiteTable">
             <div className="s__ab">
                 <div className="s__min">
                     <div className="s__con" id="schSuiteTable">
-                        <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
+                        <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" onScrollY={()=>setCloseCal(true)}>
                         {scheduleTableData.map((rowData,i)=>(
                             <div key={i} className="batchSuite">
-                                <div className="scheduleSuite" >
+                                <div className="scheduleSuite" id={`ss-id${i}`} >
                                     <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" />
                                     <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span>
-                                    <span className="timePicContainer">
-                                        <Datetime 
-                                            onChange={(event)=>{updateDateTime("time",event.format("HH:mm" ),rowData.testsuiteid)}} 
-                                            inputProps={moduleSceduledate[rowData.testsuiteid]["inputPropstime"]} 
-                                            dateFormat={false} 
-                                            timeFormat="HH:mm"
-                                            value={moduleSceduledate[rowData.testsuiteid]["time"]}
-                                        /> 
-                                        <img className="timepickerIcon" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
-                                    </span>
-                                    <span className="datePicContainer datePic-cust" >
-                                        <Datetime 
-                                            onChange={(event)=>{updateDateTime("date",event.format("DD-MM-YYYY"),rowData.testsuiteid)}} 
-                                            dateFormat="DD-MM-YYYY" 
-                                            closeOnSelect={true} 
-                                            inputProps={moduleSceduledate[rowData.testsuiteid]["inputPropsdate"]} 
-                                            timeFormat={false}
-                                            isValidDate={valid}
-                                            value={moduleSceduledate[rowData.testsuiteid]["date"]}
-                                            renderInput={(props) => {
-                                                return <input {...props} value={(moduleSceduledate[rowData.testsuiteid]["date"]) ? props.value : ''} />
-                                            }}
-                                        /> 
-                                        <img className="datepickerIcon" src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
-                                    </span>
-                                    
+                                    <TimeComp time={moduleScheduledate[rowData.testsuiteid]["time"]} setTime={(val)=>{updateDateTime("time",val,rowData.testsuiteid)}} inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropstime"]} classTimer="schedule_timer"/>
+                                    <CalendarComp idx={i} closeCal={closeCal} setCloseCal={setCloseCal} screen="scheduleSuiteTop" inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropsdate"]}  date={moduleScheduledate[rowData.testsuiteid]["date"]} setDate={(val)=>{updateDateTime("date",val,rowData.testsuiteid)}} classCalender="schedule_calender"/>
                                 </div>
                                 <table className="scenarioSchdCon scenarioSch_' + i + '">
                                     <thead className="scenarioHeaders">
@@ -215,8 +162,8 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
                                             <td style={{padding: "2px 0 2px 0"}}><input type="text" value={(rowData.dataparam[j]).trim()} disabled/></td>
                                             <td><select disabled defaultValue={(rowData.condition[j] === 0) ? "0" : "1"} ><option value="1" >True</option><option value="0" >False</option></select></td>
                                             <td>{rowData.projectnames[j]}</td> 
-                                            <td title={rowData.projectnames[j]}>
-                                                <img src={"static/imgs/"+details[projectAppType[rowData.projectnames[j]].toLowerCase()]['img']+".png"} alt="apptype"/>
+                                            <td title={details[rowData.apptypes[j].toLowerCase()]['data']}>
+                                                <img src={"static/imgs/"+details[rowData.apptypes[j].toLowerCase()]['img']+".png"} alt="apptype"/>
                                             </td>
                                         </tr>
                                     ))}
@@ -231,11 +178,6 @@ const ScheduleSuitesTopSection = ({setModuleSceduledate, moduleSceduledate, curr
         </div>
         </>
     );
-}
-
-function valid(current) {
-    const yesterday = moment().subtract(1, "day");
-    return current.isAfter(yesterday);
 }
 
 var details = {

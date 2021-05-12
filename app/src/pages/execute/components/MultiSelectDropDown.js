@@ -12,7 +12,7 @@ const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters
     const [dropDown,setDropDown] = useState(false)
     useEffect(()=>{
         inputRef.current.value = (accessibilityParameters.length!==0?accessibilityParameters.length:"") +" Standards Selected";
-    },[])
+    },[accessibilityParameters])
     const selectOption = (value, event) =>{
         let acc_param = [...accessibilityParameters];
         if(acc_param.includes(value)){
@@ -38,7 +38,7 @@ const MultiSelectDropDown = ({accessibilityParameters,setAccessibilityParameters
                     {paradigmDropdown.map((data,index) => (  
                         <ul key={index} role="presentation" >
                             <li value={data.value} onClick={(event)=>{selectOption(data.value,event)}} title={data.title} >
-                                <input id={data.value} checked={accessibilityParameters.includes(data.value)} type="checkbox" style={{ width:"auto"}} onClick={()=>{selectOptionCheckBox(data.value)}} />
+                                <input id={data.value} defaultChecked checked={accessibilityParameters.includes(data.value)} type="checkbox" style={{ width:"auto"}} onClick={()=>{selectOptionCheckBox(data.value)}} />
                                 {"  "}{data.text}
                             </li>
                         </ul>

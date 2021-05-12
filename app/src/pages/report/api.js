@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {RedirectPage} from '../global'
 import {history} from './index'
-const url = 'https://'+window.location.hostname+':8443';
+import {url} from '../../App';
 
 /*Component getAllSuites_ICE
   use:  { userId: userID, readme: 'projects', projectId: projiD ????}
@@ -17,7 +17,7 @@ export const getAllSuites_ICE = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -45,7 +45,7 @@ export const getReportsData_ICE = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -73,7 +73,7 @@ export const getSuiteDetailsInExecution_ICE = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -100,7 +100,7 @@ export const reportStatusScenarios_ICE = async(data) => {
             data: data,
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
         }
@@ -120,15 +120,44 @@ export const reportStatusScenarios_ICE = async(data) => {
 //[{"executedtime":"07-01-2020 10:37:11","browser":"chrome","status":"Fail","reportid":"5e1411ff9b0f1c95c23b2402","testscenarioid":"5de4e572d9cdd57f40624a35","testscenarioname":"Scenario_Generic1"},{"executedtime":"07-01-2020 10:38:40","browser":"chrome","status":"Fail","reportid":"5e1412589b0f1c95c23b2403","testscenarioid":"5de4e572d9cdd57f40624a36","testscenarioname":"Scenario_Generic2"}]
 export const viewReport = async(reportId, reportType) => {
     try{
-        var targetURL = '/viewreport/'+reportId+'/'+reportType+((reportType==='pdf')?'?images=true':'');
+        var targetURL = '/viewreport/'+reportId+'.'+reportType+((reportType==='pdf')?'?images=true':'');
         const res = await axios(url+targetURL, {
             method: 'GET',
             responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
             credentials: 'include'
         });
-        if(res.status === 401){
+        if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
             return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to fetch suite details'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to fetch suite details'}
+    }
+}
+
+
+export const getAccessibilityData = async(data) =>{
+    try{
+        const res = await axios(url+'/getAccessibilityData_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status === 200 && Object.keys(res.data).length < 1){
+            return {error:'No accessibility screen is created yet!'}
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;

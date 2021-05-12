@@ -1,4 +1,4 @@
-import React , {useRef, useState} from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { RedirectPage } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -22,6 +22,22 @@ const Zephyr = () => {
     const [loginError , setLoginError]= useState(null);
     const [mappedfilesRes,setMappedFilesRes]=useState([]);
 
+    useEffect(() => {
+        return ()=>{
+            dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
+            dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
+            dispatch({
+                type: actionTypes.SEL_TC_DETAILS, 
+                payload: {
+                    selectedTCNames: [],
+                    selectedTSNames: [],
+                    selectedFolderPaths: []
+                }
+            });
+            dispatch({type: actionTypes.SYNCED_TC, payload: []});
+            dispatch({type: actionTypes.SEL_TC, payload: []});
+        }
+    }, [])
 
     const callLogin_zephyr = async()=>{
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Logging...'});
@@ -35,7 +51,10 @@ const Zephyr = () => {
         if (domainDetails.error) dispatch({ type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: domainDetails.error}});
         else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-        else if (domainDetails === "Invalid Session") return RedirectPage(history);
+        else if (domainDetails === "Invalid Session"){
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            return RedirectPage(history);
+        }
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
         // else if (domainDetails === "noprojectfound") setLoginError("Invalid credentials or no project found");
         // else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
@@ -50,17 +69,26 @@ const Zephyr = () => {
     }
 
     const callViewMappedFiles=async()=>{
-        dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
-        dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "Zephyr" });
-
-        const response = await viewZephyrMappedList_ICE(user_id);
+        try{
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
         
-        if (response.error){
-            dispatch({type: actionTypes.SHOW_POPUP, payload: { title: "Error", content: response.error }});
+            const response = await viewZephyrMappedList_ICE(user_id);
+            
+            if (response.error){
+                dispatch({type: actionTypes.SHOW_POPUP, payload: { title: "Error", content: response.error }});
+                dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            } 
+            else if (response.length){
+                dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "Zephyr" });
+                setMappedFilesRes(response);
+            }
+            else dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Mapped Testcase", content: "No mapped details"}});
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-        } else setMappedFilesRes(response);
-
-        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+        }
+        catch(err) {
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Failed to Fetch Data."}});
+        }
     }
 
     return(
@@ -68,8 +96,8 @@ const Zephyr = () => {
         {viewMappedFlies === "Zephyr" ? 
             <MappedPage
                 screenType="Zephyr"
-                leftBoxTitle="Avo Assure Scenarios"
-                rightBoxTitle="Zephyr Tests"
+                leftBoxTitle="Zephyr Tests"
+                rightBoxTitle="Avo Assure Scenarios"
                 mappedfilesRes={mappedfilesRes}
             /> :
         <>

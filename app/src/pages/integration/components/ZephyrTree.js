@@ -59,8 +59,10 @@ const PhaseNode = props => {
                 dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr Connection", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
             else if (data === "scheduleModeOn")
                 dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr Connection", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
-            else if (data === "Invalid Session")
+            else if (data === "Invalid Session"){
+                dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
                 return RedirectPage(history);
+            }
             else {
                 setTestCases(data);
                 setCollapse(false);
@@ -87,7 +89,6 @@ const PhaseNode = props => {
                             .map(testCase => <TestCaseNode 
                                                 key={`testCase-${testCase.id}`}       
                                                 testCase={testCase}
-                                                phaseId={phaseid}
                                                 projectId={props.projectId}
                                                 releaseId={props.releaseId}
                                             />)
@@ -105,7 +106,7 @@ const TestCaseNode = props => {
     const syncedTestCases = useSelector(state=>state.integration.syncedTestCases);
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
 
-    let uniqueTCpath = `${props.phaseId}\\${props.testCase.id}`;
+    let uniqueTCpath = `|${props.phaseId}\\${props.testCase.id}|`;
 
     const handleClick = () => {
         dispatch({type: actionTypes.SEL_TC, payload: uniqueTCpath});
@@ -124,11 +125,12 @@ const TestCaseNode = props => {
         else{
             const mappedPair=[
                 {
-                    projectid: props.projectId,			
-                    releaseid: props.releaseId,
-                    treeid: props.phaseId,
-                    testid: props.testCase.id,
+                    projectid: parseInt(props.projectId),			
+                    releaseid: parseInt(props.releaseId),
+                    treeid: String(props.testCase.cyclePhaseId),
+                    testid: String(props.testCase.id),
                     testname: props.testCase.name,
+                    reqdetails: props.testCase.reqdetails, 
                     scenarioId: selectedScIds
                 }
             ]

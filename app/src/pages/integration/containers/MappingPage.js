@@ -23,7 +23,7 @@ const MappingPage = props =>{
     return(
         <>
         <div className="page-taskName" >
-            <span className="taskname">
+            <span data-test="intg_main_title_name" className="taskname">
                 {props.pageTitle}
             </span>
         </div>
@@ -65,7 +65,7 @@ const MappingPage = props =>{
                     <div className="mappingPage__right_tree">
                     <div className="mappingPage_tree_canvas">
                         <div className="mappingPage_tree_inner">
-                            <div className="mappingPage_tree_contents" id="mappingPage_right_tree">
+                            <div data-test="intg_scenarios_list_div" className="mappingPage_tree_contents" id="mappingPage_right_tree">
                             <ScrollBar scrollId="mappingPage_right_tree" hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                 {props.scenarioList}
                             </ScrollBar>

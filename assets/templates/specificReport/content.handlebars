@@ -352,7 +352,7 @@
 
       .jiraWindow .error-msg {
          float: left;
-         margin-left: 28px;
+         margin: 2px 5px;
          font-size: 14px;
          color: red;
       }
@@ -638,10 +638,6 @@
 
          .rightSummaryFunc {
             margin-top: 76px;
-         }
-
-         .mainContainer>div:nth-child(4) {
-            margin-top: 258px !important;
          }
 
          .midContainer {
@@ -1091,7 +1087,12 @@
                {{#each rows}}
                <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
                   <td class="rDid tabCont">{{slno}}</td>
+                  {{#ifEquals status "Skipped"}}
+                     <td class="rDstep tabCont iteration"></td>
+                  {{/ifEquals}}
+                  {{#ifnotEquals status "Skipped"}}
                   <td class="rDstep tabCont iteration">{{Step}}</td>
+                  {{/ifnotEquals}}
                   <td class="{{getClass StepDescription}}"
                      style="display:none;width:0px; padding-left: 10px; font-weight:{{getStyle StepDescription}}">
                      {{StepDescription}}
@@ -1136,6 +1137,9 @@
                   {{/ifnotEquals}} {{/ifEquals}}
                   {{#ifEquals status "Terminate"}}
                      <td class="rDActualRes tabCont">{{StepDescription}}</td>
+                   {{/ifEquals}}
+                   {{#ifEquals status "Skipped"}}
+                     <td class="rDActualRes tabCont">Skipped</td>
                    {{/ifEquals}}
                   <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}};"
                      data-screenshot="{{screenshot_path}}">{{status}}</td>

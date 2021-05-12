@@ -4,7 +4,7 @@ const ValidationExpression = (value,id) =>{
     if (id === 'userName')
         // eslint-disable-next-line
         regex = /[\\\~`|;:"',<>?/%*()+=]/g;
-    else if (['ldapServerName', 'samlServerName', 'oidcServerName', 'poolName'].includes(id))
+    else if (['ldapServerName', 'samlServerName', 'oidcServerName', 'poolName','GitToken'].includes(id))
         regex = /[^a-zA-Z0-9]/g;
     else if (['iceName', 'tokenName', 'emailServerName'].includes(id))
         regex = /[^a-zA-Z0-9 \n]/g;
@@ -13,7 +13,9 @@ const ValidationExpression = (value,id) =>{
     else if (id === "email")
         regex = /[^a-zA-Z0-9@._-]/g;
     else if (['projectName', 'releaseTxt', 'cycleTxt'].includes(id))
-        regex = /[~`%*()+=|:;"'?/><,]/g;
+        regex = /[~`%*()+=|:;"'?><,\/\\]/g;
+    else if(id === "optimazationInput")
+        regex = /[^0-9]/g;
     else
         return value;
     var replacedValue = value.replace(regex, "");
