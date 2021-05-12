@@ -74,53 +74,62 @@ const RefBarItems = props => {
 	useEffect(()=>{
 		// !== null because objValue can be 0
 		if (objValue.val !== null){
-			let objIndex = scrapeItems[objValue.val].objIdx;
-			let ScrapedObject = null;
+			let clickedObj = null;
+
+			for (let scrapeObj of scrapeItems) {
+				if (scrapeObj.val === objValue.val) {
+					clickedObj = scrapeObj;
+					break;
+				}
+			}
 			
-			if (scrapeItems[objValue.val].objId) ScrapedObject = mainScrapedData.view[objIndex];
-			else ScrapedObject = newScrapedData.view[objIndex];
-
-			let top=0; let left=0; let height=0; let width=0;
-
-			if (ScrapedObject.top){
-				top = ScrapedObject.top * dsRatio;
-				left = ScrapedObject.left * dsRatio;
-				height = ScrapedObject.height * dsRatio;
-				width = ScrapedObject.width * dsRatio;
-
-				if (appType === "MobileWeb" && navigator.appVersion.indexOf("Mac") !== -1){
-					top = top + 112;
-					left = left + 15;	
-				} 
-				else if (appType === "SAP" && mainScrapedData.createdthrough !== 'PD'){
-					top = top + 2;
-					left = left + 3;
-				}
-				else if (appType === "OEBS" && mainScrapedData.createdthrough === 'PD'){
-					top = top + 35;
-					left = left-36;
-				}
-				
-				setHighlight({
-					top: `${Math.round(top)}px`, 
-					left: `${Math.round(left)}px`, 
-					height: `${Math.round(height)}px`, 
-					width: `${Math.round(width)}px`, 
-					backgroundColor: "yellow", 
-					border: "1px solid red", 
-					opacity: "0.7"
-				}, ()=>highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'}));
-
-				if(!ScrapedObject.xpath.startsWith('iris')){
-					highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
-						.then(data => {
-							if (data === "Invalid Session") return RedirectPage(history);
-							if (data === "fail") setShowPop({title: "Fail", content: "Failed to highlight"})
-						})
-						.catch(error => console.error("Error while highlighting. ERROR::::", error));
-				}
-
-			} else setHighlight(false);
+			if (clickedObj) {
+				let ScrapedObject = {};
+				if (clickedObj.objId) ScrapedObject = mainScrapedData.view[clickedObj.objIdx];
+				else ScrapedObject = newScrapedData.view[clickedObj.objIdx];
+	
+				let top=0; let left=0; let height=0; let width=0;
+	
+				if (ScrapedObject.top){
+					top = ScrapedObject.top * dsRatio;
+					left = ScrapedObject.left * dsRatio;
+					height = ScrapedObject.height * dsRatio;
+					width = ScrapedObject.width * dsRatio;
+	
+					if (appType === "MobileWeb" && navigator.appVersion.indexOf("Mac") !== -1){
+						top = top + 112;
+						left = left + 15;	
+					} 
+					else if (appType === "SAP" && mainScrapedData.createdthrough !== 'PD'){
+						top = top + 2;
+						left = left + 3;
+					}
+					else if (appType === "OEBS" && mainScrapedData.createdthrough === 'PD'){
+						top = top + 35;
+						left = left-36;
+					}
+					
+					setHighlight({
+						top: `${Math.round(top)}px`, 
+						left: `${Math.round(left)}px`, 
+						height: `${Math.round(height)}px`, 
+						width: `${Math.round(width)}px`, 
+						backgroundColor: "yellow", 
+						border: "1px solid red", 
+						opacity: "0.7"
+					}, ()=>highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'}));
+	
+					if(!ScrapedObject.xpath.startsWith('iris')){
+						highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
+							.then(data => {
+								if (data === "Invalid Session") return RedirectPage(history);
+								if (data === "fail") setShowPop({title: "Fail", content: "Failed to highlight"})
+							})
+							.catch(error => console.error("Error while highlighting. ERROR::::", error));
+					}
+	
+				} else setHighlight(false);
+			}
 		}
 		else setHighlight(false);
 		//eslint-disable-next-line
