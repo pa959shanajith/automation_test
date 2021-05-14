@@ -12,7 +12,7 @@ const logger = require('../../logger');
 const login = require('./login');
 const utils = require('../lib/utils');
 const notifications = require('../notifications');
-const queue = require("../lib/executionQueue")
+const queue = require("../lib/execution/executionQueue")
 const regEx= /[~*+=?^%<>()|\\|\/]/;
 const ldap_url=/^ldap:\/\/[A-Za-z0-9._-]/;
 const char_check=/[<'>"]/;
