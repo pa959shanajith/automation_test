@@ -133,6 +133,51 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 	}
 };
 
+exports.manageDataTable = async(req, res) => {
+	var fnName = "manageDataTable";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var datatablename = req.body.datatablename;
+		var action = req.body.action;
+		var inputs = {
+			datatablename: datatablename,
+			action: action
+		};
+		if (action == "create" || action == "edit") {
+			inputs.datatable = JSON.stringify(req.body.datatable);
+		}
+		const result = await utils.fetchData(inputs, "utility/manageDataTable", fnName);
+		if (result == "fail" || result == "forbidden") res.status(500).send("fail");
+		else res.send(result);
+	} catch (exception) {
+        logger.error("Exception in the service createDataTable - Error: %s", exception);
+        res.status(500).send("fail");
+    }
+};
+
+
+exports.getDatatableDetails = async(req, res) =>{
+	const fnName = "getDatatableNames";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		logger.info("Fetching datatable names");
+		var d = req.body;
+		var dts = await getDatatable({"datatablename":d.datatablename, "action":d.action})
+		res.send(dts);
+	} catch(exception) {
+		logger.error("Error occurred in utility/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+const getDatatable = async (d) => {
+	const inputs = {
+		"datatablename": d.datatablename,
+		"action": d.action
+	}
+	return utils.fetchData(inputs, "utility/fetchDatatable", "fetchDatatable");
+};
+
 /*exports.pairwise_ICE = function (req, res) {
 	if (utils.isSessionActive(req)) {
 		var abc = {}

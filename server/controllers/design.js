@@ -173,6 +173,13 @@ exports.updateTestCase_ICE = function (req, res) {
 				"import_status": import_status,
 				"copiedTestCases": copiedTestCases,
 			};
+			inputs.datatables = [];
+			for(var i=0;i<requestedtestcasesteps.length;++i) {
+				if(requestedtestcasesteps[i].keywordVal=="getParam" && 
+					requestedtestcasesteps[i].inputVal[0].split(';')[0].startsWith("avoassure")) {
+						inputs.datatables.push(requestedtestcasesteps[i].inputVal[0].split(';')[0].split("/")[1]);
+				}
+			}
 			logger.info("Calling function uploadTestCaseData from updateTestCase_ICE");
 			uploadTestCaseData(inputs, function (error, response) {
 				if (error) {
@@ -255,6 +262,7 @@ exports.debugTestCase_ICE = function (req, res) {
 													template: "",
 													testcasename: testcases[i].name,
 													testcase: testcases[i].steps,
+													datatables: testcases[i].datatables,
 													apptype: apptype
 												};
 											}
