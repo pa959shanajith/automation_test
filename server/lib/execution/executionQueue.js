@@ -189,9 +189,11 @@ module.exports.Execution_Queue = class Execution_Queue {
                         } else {
                             this.executionInvoker.executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type);
                         }
+                        response["message"] = "Execution Started on " + targetICE;
+                    } else if (this.ice_list[targetICE]["mode"] && userInfo.userid != userInfo.invokinguser) {
+                        response["message"] = "ICE: " + targetICE + " is on DND mode, please disable from DND to proceed.";
                     }
                     response['status'] = "pass";
-                    response["message"] = "Execution Started on " + targetICE;
                 } else if (targetICE && targetICE != EMPTYUSER) {
                     //the target ice is neither part of a pool nor is connected to server, queuing not possible
                     response['status'] = "pass";
@@ -277,7 +279,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             }
         } catch (e) {
             logger.error("Error in addAPITestSuiteToQueue. Error: %s", e);
-            res.setHeader(constants.X_EXECUTION_MESSAGE,constants.STATUS_CODES["500"])
+            res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["500"])
             return res.status('500').send({ "error": "Error while adding test suite to queue" });
         }
         return;
@@ -472,7 +474,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         return this.ice_list;
     }
-    
+
     /** 
     * @param {string} ice_name
     * Function responsible to connect unallocated ice and add to ice - pool/status data map
