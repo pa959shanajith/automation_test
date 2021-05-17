@@ -161,14 +161,14 @@ const TaskBox = (props) => {
                 case 'rw':
                     return;
                 case 'sd':
-                    if (tObj.sd != '' && tObj.sd.indexOf('/')==-1) {
+                    if (tObj.sd != '' && tObj.sd.indexOf('-')==-1) {
                         var d=new Date(tObj.sd);
                         tObj.sd=d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
                     }
                     setStartDate({show:true,value:tObj.sd})
                     return;
                 case 'ed':
-                    if (tObj.ed != '' && tObj.ed.indexOf('/')==-1) {
+                    if (tObj.ed != '' && tObj.ed.indexOf('-')==-1) {
                         var d1=new Date(tObj.ed);
                         tObj.ed=d1.getDate()+"/"+(d1.getMonth()+1)+"/"+d1.getFullYear();
                     }
@@ -603,8 +603,8 @@ const initTaskObject = ({pi,dNodes,userAsgList,userRevList,batchNameRef,taskRef,
     var estimationCount = 0;
     if (dNodes[pi].task != undefined || dNodes[pi].task != null) {
         if (dNodes[pi].task.enddate != "" || dNodes[pi].task.enddate != undefined || dNodes[pi].task.enddate != " ") {
-            var nodeDateSplit = dNodes[pi].task.enddate.split("/");
-            var modDateSplit = endDate.value.split("/");
+            var nodeDateSplit = dNodes[pi].task.enddate.split("-");
+            var modDateSplit = endDate.value.split("-");
             if (new Date(nodeDateSplit[2], (nodeDateSplit[1] - 1), nodeDateSplit[0]) != new Date(modDateSplit[2], (modDateSplit[1] - 1), modDateSplit[0])) {
                 estimationCount = parseInt(dNodes[pi].task.reestimation) + 1;
             }
@@ -672,8 +672,8 @@ const assignBoxValidator = ({userInfo,userAsgList,userRevList,batchNameRef,start
         d3.select('#ct-endDate .fc-datePicker').classed('errorBorder',true);
         pass = false;
     }
-    var ed = endDate.value.split('/');
-    var sd = startDate.value.split('/');
+    var ed = endDate.value.split('-');
+    var sd = startDate.value.split('-');
     var start_date = new Date(sd[2] + '-' + sd[1] + '-' + sd[0]);
     var end_date = new Date(ed[2] + '-' + ed[1] + '-' + ed[0]);
     if (end_date < start_date) {
