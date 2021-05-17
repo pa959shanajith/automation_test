@@ -5,15 +5,10 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var myserver = require('../socket');
 var logger = require('../../../logger.js');
-var queue = require('./executionQueue')
 var executor = require('./executor')
 var scheduler = require('./scheduler')
+const constants = require('./executionConstants')
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
-const SOCK_NORM = "normalModeOn";
-const SOCK_SCHD = "scheduleModeOn";
-const SOCK_NA = "unavailableLocalServer";
-const SOCK_SCHD_MSG = "ICE is connected in Scheduling mode";
-const SOCK_NA_MSG = "ICE is not Available";
 
 module.exports.ExecutionInvoker = class ExecutionInvoker {
 
@@ -47,9 +42,9 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
         let schedStatus = result;
         if (!["Completed", "Terminate", "Skipped", "fail"].includes(result)) {
             let msg = "This scenario was skipped ";
-            if ([SOCK_NA, SOCK_NORM, "NotApproved", "NoTask", "Modified"].indexOf(result) > -1) {
-                if (result == SOCK_NA) msg += "due to unavailability of ICE";
-                else if (result == SOCK_NORM) msg += "due to unavailability of ICE in schedule mode";
+            if ([constants.SOCK_NA, constants.SOCK_NORM, "NotApproved", "NoTask", "Modified"].indexOf(result) > -1) {
+                if (result == constants.SOCK_NA) msg += "due to unavailability of ICE";
+                else if (result == constants.SOCK_NORM) msg += "due to unavailability of ICE in schedule mode";
                 else if (result == "Skipped") msg = "due to conflicting schedules";
                 else if (result == "NotApproved") msg += "because all the dependent tasks (design, scrape) needs to be approved before execution";
                 else if (result == "NoTask") msg = "because task does not exist for child node";
@@ -103,7 +98,6 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
     executeAPI = async (testSuite) => {
         const req = testSuite.testSuiteRequest;
         const hdrs = req.headers;
-        let reportResult = {}
         let reqFromADO = false;
         if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
             reqFromADO = true;
@@ -112,6 +106,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
         const userRequestMap = {};
         const userInfoList = [];
         const executionResult = [];
+        var statusCode = '500'
 
         for (let i = 0; i < multiBatchExecutionData.length; i++) {
             const executionData = multiBatchExecutionData[i];
@@ -126,10 +121,11 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
                 const icename = userInfo.icename;
                 if (userRequestMap[icename] == undefined) userRequestMap[icename] = [i];
                 else userRequestMap[icename].push(i);
+            }else{
+                statusCode = '401';
             }
             executionResult.push(execResponse);
         }
-        var statusCode = '500'
         const executionIndicesList = Object.values(userRequestMap);
         const batchExecutionPromiseList = executionIndicesList.map(executionIndices => (async () => {
             try {
@@ -147,30 +143,39 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
                     }
 
                     switch (result) {
-                        case SOCK_NA:
-                            if (statusCode == "200" || statusCode == '201' || statusCode == "500") statusCode = '461';
-                            execResponse.error_message = SOCK_NA_MSG;
+                        case constants.SOCK_NA:
+                            if (statusCode != "401" && statusCode == "500") statusCode = '461';
+                            else if(statusCode != "401") statusCode = "261"
+                            execResponse.error_message = constants.SOCK_NA_MSG;
                             break;
                         case "NotApproved":
+                            if (statusCode != "401" && statusCode == "500") statusCode = '463';
+                            else if(statusCode != "401") statusCode = "261"
                             execResponse.error_message = "All the dependent tasks (design, scrape) needs to be approved before execution"
                             break;
                         case "NoTask":
-                            if (statusCode == "200" || statusCode == '201' || statusCode == "500") statusCode = '400';
+                            if (statusCode != "401" && statusCode == "500") statusCode = '463';
+                            else if(statusCode != "401") statusCode = "261"
                             execResponse.error_message = "Task does not exist for child node";
                             break;
                         case "Modified":
-                            if (statusCode == "200" || statusCode == '201' || statusCode == "500") statusCode = '400';
+                            if (statusCode != "401" && statusCode == "500") statusCode = '463';
+                            else if(statusCode != "401") statusCode = "261"
                             execResponse.error_message = "Task has been modified, Please approve the task";
                             break;
                         case "Skipped":
-                            if (statusCode == "200" || statusCode == '201' || statusCode == "500") statusCode = '409'
+                            if (statusCode != "401" && statusCode == "500") statusCode = '409'
+                            else if(statusCode != "401") statusCode = "261"
                             execResponse.error_message = "Execution is skipped because another execution is running in ICE";
                             break;
                         case "fail":
-                            if (statusCode == "200" || statusCode == '201' || statusCode == "500") execResponse.error_message = "Internal error occurred during execution"
+                            if (statusCode != "401" && statusCode == "500") execResponse.error_message = "Internal error occurred during execution"
+                            else if(statusCode != "401") statusCode = "261"
                             break;
                         default:
-                            statusCode = "200"
+                            if (result[1] == "success") statusCode = "200";
+                            else if (result[1] == 'terminate' ) statusCode = "462";
+                            else statusCode = "202"
                             execResponse.status = result[1];
                             const execResult = [];
                             for (let tsuid in result[0]) {
@@ -192,7 +197,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
         await Promise.all(batchExecutionPromiseList)
         const finalResult = { "executionStatus": executionResult };
         const res = testSuite['res'];
-        res.setHeader(statusCode, STATUS_CODES[statusCode]);
+        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode]);
 
         if (!res) {
             logger.error("Error while sending response in executeAPI, response object undefined");

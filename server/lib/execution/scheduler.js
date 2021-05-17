@@ -4,9 +4,8 @@ var smartPartitions = require('../smartPartitions');
 var logger = require('../../../logger.js');
 var queue = require('./executionQueue');
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
+const constants = require('./executionConstants')
 const scheduleJobMap = {};
-const EMPTYPOOL = process.env.nullpool;
-const EMPTYUSER = process.env.nulluser;
 
 exports.prepareSchedulingRequest = async (session, body) => {
     logger.info("Inside UI service testSuitesScheduler_ICE");
@@ -15,7 +14,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
     const multiExecutionData = body.executionData;
     var batchInfo = multiExecutionData.batchInfo;
     let poolid = body.executionData.batchInfo[0].poolid;
-    if (!poolid || poolid === "") poolid = EMPTYPOOL
+    if (!poolid || poolid === "") poolid = constants.EMPTYPOOL
     var invokinguser = {
         invokinguser: session.userid,
         invokingusername: session.username,
@@ -27,7 +26,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
     if (batchInfo[0].targetUser && batchInfo[0].targetUser.includes('Smart')) {
         smart = true;
         const dateTimeUtc = new Date(parseInt(batchInfo[0].timestamp)).toUTCString();
-        if (poolid == EMPTYPOOL) {
+        if (poolid == constants.EMPTYPOOL) {
             let iceList = batchInfo[0].iceList
             batchInfo = await getAvailableICE(batchInfo, batchInfo[0].iceList)
             if (!batchInfo) {
@@ -35,12 +34,12 @@ exports.prepareSchedulingRequest = async (session, body) => {
                 for (let ice in iceList) {
                     msg = msg + "\n" + iceList[ice];
                 }
-                return res.send({ "status": "booked", "user": msg });
+                return { "status": "booked", "user": msg };
             }
         }
-        result = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeUtc, multiExecutionData.browserType.length)
+        result = await smartPartitions.smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeUtc, multiExecutionData.browserType.length)
         if (result["status"] == "fail") {
-            return res.send("fail")
+            return "fail"
         }
         stat = result["status"]
         batchInfo = result["batchInfo"]
@@ -49,7 +48,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
         dateTimeList = batchInfo.map(u => u.timestamp);
     }
     const taskApproval = await utils.approvalStatusCheck(batchInfo);
-    if (taskApproval.res !== "pass") return res.send(taskApproval.res);
+    if (taskApproval.res !== "pass") return taskApproval.res;
     const addressList = batchInfo.map(u => u.targetUser);
     var inputs = {
         "query": "checkscheduleddetails",
@@ -58,7 +57,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
     };
     if (!smart) {
         const chkResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-        if (chkResult != -1) return res.send((chkResult == "fail") ? "fail" : { "status": "booked", "user": addressList[chkResult] });
+        if (chkResult != -1) return (chkResult == "fail") ? "fail" : { "status": "booked", "user": addressList[chkResult] };
     }
 
     /** Add if else for smart schedule below this => NO **/
@@ -103,9 +102,9 @@ exports.prepareSchedulingRequest = async (session, body) => {
             delete suite.time;
             batchObj.batchInfo.push(suite);
         }
-        if (!inputs.targetaddress || inputs.targetaddress === "") inputs.targetaddress = EMPTYUSER;
+        if (!inputs.targetaddress || inputs.targetaddress === "") inputs.targetaddress = constants.EMPTYUSER;
         const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-        if (insResult == "fail") return res.send("fail");
+        if (insResult == "fail") return "fail";
         else batchObj.scheduleId = insResult.id;
         multiBatchExecutionData.push(batchObj);
     }
@@ -152,14 +151,14 @@ scheduleTestSuite = async (multiBatchExecutionData) => {
                 if (profile == "fail" || profile == null) return "fail";
                 userInfoMap[user] = { "userid": profile.userid, "username": profile.name, "role": profile.role, "icename": user };
             } else {
-                userInfoMap[EMPTYUSER] = { "userid": "N/A", "username": "", "role": "", "icename": EMPTYUSER };
+                userInfoMap[constants.EMPTYUSER] = { "userid": "N/A", "username": "", "role": "", "icename": constants.EMPTYUSER };
             }
 
         }
     }
     for (const batchExecutionData of multiBatchExecutionData) {
         let execIds = { "batchid": "generate", "execid": {} };
-        if (batchExecutionData.targetUser === "") batchExecutionData.targetUser = EMPTYUSER
+        if (batchExecutionData.targetUser === "") batchExecutionData.targetUser = constants.EMPTYUSER
         let userInfo = userInfoMap[batchExecutionData.targetUser];
         Object.assign(userInfo, batchExecutionData.scheduledby);
         const scheduleTime = batchExecutionData.timestamp;

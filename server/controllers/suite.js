@@ -14,16 +14,8 @@ var scheduler = require('../lib/execution/scheduler')
 var queue = require('../lib/execution/executionQueue')
 var cache = require('../lib/cache').getClient(2);
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
+const constants = require('../lib/execution/executionConstants');
 const scheduleJobMap = {};
-const SOCK_NORM = "normalModeOn";
-const SOCK_SCHD = "scheduleModeOn";
-const SOCK_NA = "unavailableLocalServer";
-const SOCK_NORM_MSG = "ICE is connected in Non-Scheduling mode";
-const SOCK_SCHD_MSG = "ICE is connected in Scheduling mode";
-const SOCK_NA_MSG = "ICE is not Available";
-const DO_NOT_PROCESS = "do_not_process_response";
-const EMPTYUSER = process.env.nulluser;
-const EMPTYPOOL = process.env.nullpool;
 /** This service reads the testsuite and scenario information for the testsuites */
 exports.readTestSuite_ICE = async (req, res) => {
 	const fnName = "readTestSuite_ICE";
@@ -199,7 +191,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 			var batchInfo =JSON.parse(JSON.stringify(batchExecutionData.batchInfo));
 			batchInfo[0]["iceList"] = targetUser;
 			//Get partitions
-			const partitionResult = await smartSchedule(batchInfo, type, "Now", batchExecutionData.browserType.length)
+			const partitionResult = await smartPartitions.smartSchedule(batchInfo, type, "Now", batchExecutionData.browserType.length)
 			if (partitionResult["status"] == "fail") {
 				result['error'] = "Smart execution Failed";
 			}else{
@@ -243,8 +235,8 @@ async function makeRequestAndAddToQueue(batchExecutionData, targetUser, userInfo
 		var profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
 		profile = {userid:profile.userid,username:profile.name,role:profile.role};
 	}else{
-		userInfo.targetUser = EMPTYUSER
-		var profile = {userid:EMPTYUSER,role:"N/A",username:EMPTYUSER}
+		userInfo.targetUser = constants.EMPTYUSER
+		var profile = {userid:constants.EMPTYUSER,role:"N/A",username:constants.EMPTYUSER}
 	}
 	Object.assign(userInfo,profile);
 	const execIds = { "batchid": "generate", "execid": {} };
@@ -318,8 +310,8 @@ exports.importFromGit_ICE = async (req, res) => {
 			delete userInfo.inputs.error_message;
 			executionResult.push(userInfo.inputs)
 			var execResponse = executionResult[0]
-			if (result == SOCK_NA) execResponse.error_message = SOCK_NA_MSG;
-			else if (result == SOCK_SCHD) execResponse.error_message = SOCK_SCHD_MSG;
+			if (result == constants.SOCK_NA) execResponse.error_message = constants.SOCK_NA_MSG;
+			else if (result == constants.SOCK_SCHD) execResponse.error_message = constants.SOCK_SCHD_MSG;
 			else if (result == "NotApproved") execResponse.error_message = "All the dependent tasks (design, scrape) needs to be approved before execution";
 			else if (result == "NoTask") execResponse.error_message = "Task does not exist for child node";
 			else if (result == "Modified") execResponse.error_message = "Task has been modified, Please approve the task";
@@ -424,7 +416,7 @@ exports.cancelScheduledJob_ICE = async (req, res) => {
 	const schedHost = req.body.host;
 	const schedUserid = JSON.parse(req.body.schedUserid);
 	let inputs = { "icename": schedHost };
-	if(schedHost != EMPTYUSER){
+	if(schedHost != constants.EMPTYUSER){
 		userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
 		if (userprofile == "fail" || userprofile == null) return res.send("fail");
 	}

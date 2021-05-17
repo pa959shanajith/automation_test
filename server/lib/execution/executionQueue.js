@@ -4,21 +4,8 @@ const cache = require("../cache.js").getClient(2);
 var logger = require('../../../logger.js');
 const EMPTYUSER = process.env.nulluser;
 var testSuiteInvoker = require('../execution/executionInvoker')
-const X_EXECUTION_MESSAGE = 'X-EXECUTION-MESSAGE'
-const STATUS_CODES = {
-    "461": 'ICE not available please connect',
-    "462": 'Terminated by user',
-    "463": 'Terminated by program',
-    "409": 'ICE is occupied with other execution',
-    "423": 'ICE is set to "do not disturb"',
-    "401": 'Authorization failed',
-    "401": 'Token validation failed',
-    "400": 'Invalid machine',
-    "400": 'Invalid module details',
-    "200": 'status code for executions that pass',
-    "202": 'status code for executions that fail',
-    '500': 'Internal Server Error'
-}
+const constants = require('./executionConstants')
+
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -245,10 +232,12 @@ module.exports.Execution_Queue = class Execution_Queue {
             }
             // Check if request came from Azure DevOps. If yes, then send the acknowledgement
             if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
-                return res.send("Request Recieved");
+                res.setHeader(constants.X_EXECUTION_MESSAGE, "Request Recieved")
+                return res.status("200").send("Request Recieved");
             }
             if (!multiBatchExecutionData || multiBatchExecutionData.constructor !== Array || multiBatchExecutionData.length === 0) {
-                return res.send({ "error": "Empty or Invalid Batch Data" });
+                res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["400"])
+                return res.status("400").send({ "error": "Empty or Invalid Batch Data" });
             }
             let suiteRequest = { "executionData": testSuiteRequest.body.executionData, "headers": testSuiteRequest.headers }
             let userInfo = testSuiteRequest.body.executionData[0].userInfo;
@@ -274,19 +263,21 @@ module.exports.Execution_Queue = class Execution_Queue {
             } else if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
                 const sockmode = await utils.channelStatus(targetICE);
                 if ((!sockmode.normal && !sockmode.schedule)) {
-                    res.setHeader(X_EXECUTION_MESSAGE, STATUS_CODES['461'])
+                    res.setHeader(constants.X_EXECUTION_MESSAGE, constants.constants.STATUS_CODES['461'])
                     return res.status("461").send({ "error": "Can't establish connection with ICE Re-Connect to server!" })
                 }
                 testSuite['res'] = res;
                 this.executionInvoker.executeAPI(testSuite);
             } else if (targetICE === EMPTYUSER && (!poolid || poolid === "")) {
-                return res.send({ "error": "ICE name and Pool Id not provided." })
+                res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
+                return res.status("400").send({ "error": "ICE name and Pool Id not provided." })
             } else {
-                return res.send({ "error": targetICE + " not connected to server!" })
+                res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["461"])
+                return res.status('461').send({ "error": targetICE + " not connected to server!" })
             }
         } catch (e) {
             logger.error("Error in addAPITestSuiteToQueue. Error: %s", e);
-            res.setHeader("500",STATUS_CODES["500"])
+            res.setHeader(constants.X_EXECUTION_MESSAGE,constants.STATUS_CODES["500"])
             return res.status('500').send({ "error": "Error while adding test suite to queue" });
         }
         return;
