@@ -19,85 +19,26 @@ import ProfJ from '../../profJ';
             popups : to render pop up menus like filter, screenshot 
             closeAllpopups : method to close all passed popups
             scrapeScreenURL : populating the URL field for scrape screen
+            taskInfo: task Information to display in taskInfo popup
     */
 
 const ReferenceBar = (props) => {
 
     const [collapse, setCollapse] = useState(false);
-    const [taskList, setTaskList] = useState([]);
-    const [searchValue, setSearchValue] = useState("");
-    const [searchItems, setSearchItems] = useState([]);
     const [showTask, setShowTask] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
     const [taskPopY, setTaskPopY] = useState(null);
     const [showProfJ , setshowProfJ]= useState(false);
-    const tasksJson = useSelector(state=>state.plugin.tasksJson);
-    const dataDict = useSelector(state=>state.plugin.FD);
-    const [taskInfo, setTaskInfo] = useState(null);
-    const current_task = useSelector(state=>state.plugin.CT);
+    
+    const { uid } = useSelector(state=>state.plugin.CT);
 
-    useEffect(()=>{
-            // if(window.location.pathname != '/mindmap'){
-            //     $("#mindmapCSS1, #mindmapCSS2").remove();
-            // } else if(window.location.pathname != "/neuronGraphs") {
-            //     $("#nGraphsCSS").remove();
-            // }
-            let taskList = GenerateTaskList(tasksJson, "refList");
-            setTaskList(taskList);
-    }, [tasksJson]);
     useEffect(()=>{
         setCollapse(props.collapse)
     },[props.collapse])
 
     useEffect(()=>{
-        if (Object.keys(current_task).length!==0 && Object.keys(dataDict).length!==0){
-            let identify = current_task.taskName.slice(0, 3).toLowerCase();
-            let info = identify === "exe" ?
-            {
-                'Project Name' : dataDict.projectDict[current_task.projectId] || dataDict.projectDict[current_task.testSuiteDetails[0].projectidts],
-                'Release' : current_task.releaseid,
-                'Cycle' : dataDict.cycleDict[current_task.cycleid]
-            }
-            : identify === "des" ? 
-            {
-                'Project Name' : dataDict.projectDict[current_task.projectId],
-                'Screen' : current_task.screenName,
-                'TestCase' : current_task.testCaseName,
-                'Release' : current_task.releaseid,
-                'Cycle' : dataDict.cycleDict[current_task.cycleid]
-            }
-            :
-            {
-                'Project Name' : dataDict.projectDict[current_task.projectId],
-                'Screen' : current_task.screenName,
-                'Release' : current_task.releaseid,
-                'Cycle' : dataDict.cycleDict[current_task.cycleid],
-                'URL': props.scrapeScreenURL || ''
-            }
-            setSearchValue("");
-            setShowTask(false);
-            setTaskInfo(info);
-        }
-        //eslint-disable-next-line
-    }, [current_task, current_task.screenName, props.scrapeScreenURL]);
-
-    const onSearchHandler = event => {
-        searchTask(event.target.value)
-        setSearchValue(event.target.value);
-    };
-
-    const searchTask = (value) => {
-        let items = taskList;
-        let filteredItem = [];
-        let counter = 1;
-        items.forEach(item => {
-            if (item.taskname.toLowerCase().indexOf(value.toLowerCase()) > -1) {
-                item.type_counter = counter++;
-                filteredItem.push(item)
-            }
-        });
-        setSearchItems(filteredItem);
-    }
+        setShowTask(false);
+    }, [uid]);
 
     const closePopups = () => {
         if (props.popups) props.closeAllPopups();
@@ -109,7 +50,6 @@ const ReferenceBar = (props) => {
         closePopups();
         setTaskPopY(event.clientY)
         setShowTask(!showTask)
-        setSearchValue("");
     }
 
     const toggleInfoPop = event => {
@@ -134,46 +74,21 @@ const ReferenceBar = (props) => {
                     { props.popups }
                     {
                         showTask && 
-                        <ClickAwayListener onClickAway={closePopups}>
-                        <div className="ref_pop task_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
-                            <h4 className="pop__header" onClick={()=>setShowTask(false)}><span className="pop__title">My task(s)</span><img className="task_close_arrow" alt="close_task" src="static/imgs/ic-arrow.png"/></h4>
-                            <div className="input_group">
-                                <span className="search_task__ic_box">
-                                    <img className="search_task__ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
-                                </span>
-                                <input className="search_task__input" onChange={onSearchHandler} value={searchValue} placeholder="Seach My task(s)"/>
-                            </div>
-                            <div className="task_pop__list">
-                                <div id='task_pop_scroll' className="task_pop__overflow">
-                                    <ScrollBar scrollId='task_pop_scroll' trackColor={'transparent'} thumbColor={'grey'}>
-                                        <div className="task_pop__content" id="rb__pop_list">
-                                            <TaskContents items={searchValue ? searchItems : taskList} cycleDict={dataDict.cycleDict} taskJson={tasksJson} currUid={current_task.uid} />
-                                        </div>
-                                    </ScrollBar>
-                                </div>
-                            </div>
-                        </div>
-                        </ClickAwayListener>
+                        <SearchPopup 
+                            closePopups={closePopups}
+                            taskPopY={taskPopY}
+                            setShowTask={setShowTask}
+                        />
                     }
-                    {
-                        showInfo && 
-                        <ClickAwayListener onClickAway={closePopups}>
-                        <div className={"ref_pop" + (taskInfo?" info_pop":"")} style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
-                            <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
-                            <div className="info_pop__contents">
-                            {
-                                taskInfo && Object.keys(taskInfo).map(key => 
-                                    <>
-                                        <div className="task_info__title">{key}:</div>
-                                        <div className="task_info__content">{taskInfo[key]}</div>
-                                    </>
-                                )
-                            }
-                            </div>
-                        </div>
-                        </ClickAwayListener>
+                    { showInfo && 
+                        <TaskInfoPopup 
+                            closePopups={closePopups}
+                            taskPopY={taskPopY}
+                            setShowInfo={setShowInfo}
+                            scrapeScreenURL={props.scrapeScreenURL}
+                            providedTaskInfo={props.taskInfo}
+                        />
                     }
-                    
                     {
                         showProfJ && <ProfJ setshowProfJ={setshowProfJ} />
                     }
@@ -199,5 +114,129 @@ const ReferenceBar = (props) => {
         </div>
     );
 }
-export default ReferenceBar;
 
+/* 
+    closePopups
+    taskPopY
+    setShowInfo
+    taskInfo
+    scrapeScreenURL
+*/
+
+const TaskInfoPopup = ({ closePopups, taskPopY, setShowInfo, providedTaskInfo, scrapeScreenURL}) => {
+
+    const dataDict = useSelector(state=>state.plugin.FD);
+    const current_task = useSelector(state=>state.plugin.CT);
+
+    const [taskInfo, setTaskInfo] = useState({});
+
+    useEffect(()=>{
+        let newTaskInfo = {};
+
+        if ('uid' in current_task) {
+            newTaskInfo = {
+                'Project Name': dataDict.projectDict[current_task.projectId] || dataDict.projectDict[current_task.testSuiteDetails[0].projectidts],
+                'Screen': current_task.screenName,
+                'TestCase': current_task.testCaseName,
+                'Release': current_task.releaseid,
+                'Cycle': dataDict.cycleDict[current_task.cycleid],
+                'URL': scrapeScreenURL || '',
+            }
+    
+            let screen = current_task.taskName.slice(0, 3).toLowerCase();
+    
+            if (screen === 'exe') {
+                delete newTaskInfo['Screen'];
+                delete newTaskInfo['TestCase'];
+                delete newTaskInfo['URL'];
+            }
+            else if (screen === 'des') delete newTaskInfo['URL'];
+            else if (screen === 'scr') delete newTaskInfo['TestCase'];
+        }
+
+        setTaskInfo(providedTaskInfo || newTaskInfo);
+    }, [taskPopY, providedTaskInfo])
+
+    return (
+        <ClickAwayListener onClickAway={closePopups}>
+        <div className={"ref_pop" + (taskInfo?" info_pop":"")} style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
+            <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
+            <div className="info_pop__contents">
+            {
+                Object.keys(taskInfo).map(key => <>
+                    <div className="task_info__title">{key}:</div>
+                    <div className="task_info__content">{taskInfo[key]}</div>
+                </>)
+            }
+            </div>
+        </div>
+        </ClickAwayListener> 
+    );
+}
+
+
+/* 
+    closePopups
+    taskPopY
+    setShowTask
+*/
+
+
+const SearchPopup = ({ closePopups, taskPopY, setShowTask }) => {
+
+    const { cycleDict } = useSelector(state=>state.plugin.FD);
+    const tasksJson = useSelector(state=>state.plugin.tasksJson);
+    const { uid } = useSelector(state=>state.plugin.CT);
+
+    const [taskList, setTaskList] = useState([]);
+    const [searchValue, setSearchValue] = useState("");
+    const [searchItems, setSearchItems] = useState([]);
+
+    useEffect(()=>{
+        let taskList = GenerateTaskList(tasksJson, "refList");
+        setTaskList(taskList);
+    }, [tasksJson]);
+
+    const onSearchHandler = event => {
+        searchTask(event.target.value)
+        setSearchValue(event.target.value);
+    };
+
+    const searchTask = (value) => {
+        let items = taskList;
+        let filteredItem = [];
+        let counter = 1;
+        items.forEach(item => {
+            if (item.taskname.toLowerCase().includes(value.toLowerCase())) {
+                item.type_counter = counter++;
+                filteredItem.push(item)
+            }
+        });
+        setSearchItems(filteredItem);
+    }
+
+    return (
+        <ClickAwayListener onClickAway={closePopups}>
+        <div className="ref_pop task_pop" style={{marginTop: `calc(${taskPopY}px - 15vh)`}}>
+            <h4 className="pop__header" onClick={()=>setShowTask(false)}><span className="pop__title">My task(s)</span><img className="task_close_arrow" alt="close_task" src="static/imgs/ic-arrow.png"/></h4>
+            <div className="input_group">
+                <span className="search_task__ic_box">
+                    <img className="search_task__ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
+                </span>
+                <input className="search_task__input" onChange={onSearchHandler} value={searchValue} placeholder="Seach My task(s)"/>
+            </div>
+            <div className="task_pop__list">
+                <div id='task_pop_scroll' className="task_pop__overflow">
+                    <ScrollBar scrollId='task_pop_scroll' trackColor={'transparent'} thumbColor={'grey'}>
+                        <div className="task_pop__content" id="rb__pop_list">
+                            <TaskContents items={searchValue ? searchItems : taskList} cycleDict={cycleDict} taskJson={tasksJson} currUid={uid} />
+                        </div>
+                    </ScrollBar>
+                </div>
+            </div>
+        </div>
+        </ClickAwayListener>
+    );
+}
+
+export default ReferenceBar;

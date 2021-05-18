@@ -144,7 +144,7 @@ const IceProvisionList = (props) => {
                                     <td> {entry.hostname} </td>
                                     {entry.status === 'provisioned'? <td><button className="btn btn-cust-ip" onClick={()=>{reregister(entry,"Reprovision")}} > Reprovision </button></td>
                                     :null}
-                                    {entry.status === 'registered' || entry.status === 'deregistered '?<td ><button className="btn btn-cust-ip" onClick={()=>{reregister(entry,"Reregister")}}> Reregister </button></td>
+                                    {entry.status === 'registered' || entry.status === 'deregistered'?<td ><button className="btn btn-cust-ip" onClick={()=>{reregister(entry,"Reregister")}}> Reregister </button></td>
                                     :null}
                                     {entry.status === 'deregistered'?<td></td>:null}
                                     {entry.status !== 'deregistered'?<td ><button className="btn btn-cust-ip" onClick={()=>{deregister(entry)}}> Deregister </button></td>
