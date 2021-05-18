@@ -12,7 +12,7 @@ var pulse_ICE = {}
 const server_pub = default_pub;
 default_pub.pubsubPromise =  async (cmd, ...channel) => (new Promise((rsv, rej) => default_pub.pubsub(cmd, channel, (e,d) => ((e)? rej(e):rsv(d)))));
 const utils = require("./utils");
-const queue = require("./executionQueue")
+const queue = require("./execution/executionQueue")
 default_sub.on("message", (channel, message) => {
 	logger.debug("In redisSocketHandler: Channel is %s", channel);
 	const data = JSON.parse(message);

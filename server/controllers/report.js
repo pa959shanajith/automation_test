@@ -13,9 +13,20 @@ var fs = require('fs');
 var options = require('../config/options');
 const Readable = require('stream').Readable;
 var path = require('path');
+
 wkhtmltopdf.command = path.join(__dirname, '..', '..', 'assets', 'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
 var templatepdf = '';
 var templateweb = '';
+var constants = {
+    'STATUS_CODES' : {
+        "401": 'Authorization failed',
+        "401": 'Token validation failed',
+        "400": 'Invalid request details',
+        "200": 'Successfull',
+        '500': 'Internal Server Error'
+    },
+    'X_EXECUTION_MESSAGE' : 'X-EXECUTION-MESSAGE'
+}
 
 Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
     return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
@@ -857,6 +868,7 @@ exports.getReportsData_ICE = async (req, res) => {
 //Get report for execution
 exports.getReport_API = async (req, res) => {
     const fnName = "getReport_API";
+    var statusCode = '500';
     logger.info("Inside UI service: " + fnName);
     try {
         const execData = req.body.execution_data || {};
@@ -868,7 +880,8 @@ exports.getReport_API = async (req, res) => {
 		const execResponse = userInfo.inputs;
         if (execResponse.tokenValidation !== "passed") {
             finalReport.push(execResponse);
-            return res.send(finalReport);
+            res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['401'])
+            return res.status('401').send(finalReport);
         }
 
         delete execResponse.error_message;
@@ -878,9 +891,13 @@ exports.getReport_API = async (req, res) => {
         if (reportResult == "fail") {
             if(reportResult[2] && reportResult[2].errMsg !== "") execResponse.error_message=reportResult.errMsg;
             finalReport.push(execResponse);
-            return res.send(finalReport);
+            res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
+            return res.status('400').send(finalReport);
         }
-        if (reportResult.errMsg != "") execResponse.error_message=reportResult.errMsg;
+        if (reportResult.errMsg != ""){
+            statusCode = "400"
+            execResponse.error_message=reportResult.errMsg;
+        } 
         finalReport.push(execResponse);
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
@@ -913,10 +930,13 @@ exports.getReport_API = async (req, res) => {
             finalReport.push(tempModDict[modid]);
         } 
         logger.info("Sending reports in the service %s", fnName);
-        return res.send(finalReport);
+        if (statusCode != "400") statusCode = '200';
+        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode])
+        return res.status(statusCode).send(finalReport);
     } catch (exception) {
         logger.error("Exception in the service %s - Error: %s", fnName, exception);
-        res.send("fail");
+        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['500'])
+        return res.status("500").send("fail");
     }
 };
 
@@ -977,6 +997,7 @@ const fetch_metrics=async (args) => {
 
 exports.getExecution_metrics_API = async(req, res) => {
     logger.info("Inside UI service: getExecution_metrics_API");
+    var statusCode = '500';
     try {
         const userInfo = await utils.tokenValidation(req.body.userInfo);
         var execResponse = userInfo.inputs;
@@ -989,15 +1010,21 @@ exports.getExecution_metrics_API = async(req, res) => {
             logger.info("Calling DAS Service from getExecution_metrics_API: reports/getExecution_metrics_API");
             if(reportResult[0].errMsg != ""){
                 execResponse.error_message=reportResult[0].errMsg;
+                statusCode = "400";
             }
             finalReport.push(reportResult[0]);
+            if (statusCode != "400") statusCode = "200";
+        }else{
+            statusCode = "401";
         }
         finalReport.push(execResponse);
         logger.info("Sending reports in the service getExecution_metrics_API: final function");
-        res.send(finalReport);
+        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES(statusCode));
+        return res.status(statusCode).send(finalReport);
     } catch (exception) {
         logger.error("Exception in the service getExecution_metrics_API - Error: %s", exception);
-        res.send("fail");
+        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES("500"));
+        return res.status("500").send("fail");
     }
 };
 
