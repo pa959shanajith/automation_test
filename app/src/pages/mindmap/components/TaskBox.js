@@ -126,17 +126,7 @@ const TaskBox = (props) => {
             taskList.task = [taskList.task[0]]
         }
         if (tObj.det === null || tObj.det.trim() == "") {
-            switch(dNodes[pi].type){
-                case 'endtoend' :
-                    tObj.det = tObj.t + ' End to End ' + dNodes[pi].name;
-                    break;
-                case 'scenarios' :
-                    tObj.det = tObj.t + ' ' + dNodes[pi].name
-                    break;
-                default :
-                    var type = dNodes[pi].type.slice(0,-1) //remove plural
-                    tObj.det = tObj.t + ' ' + type + ' ' + dNodes[pi].name
-            }
+            tObj.det = taskAssign[t].detail(0,dNodes[pi].name)
         }
         taskDetailsRef.current.value = tObj.det
         // populate task 
@@ -784,23 +774,28 @@ const getReuseDetails = (dNodes) => {
 const taskAssign = {
     "endtoend": {
         "task": ["Execute", "Execute Batch"],
-        "attributes": ["bn", "at", "rw", "sd", "ed", "reestimation"]
+        "attributes": ["bn", "at", "rw", "sd", "ed", "reestimation"],
+        "detail": (i,node)=>taskAssign.endtoend.task[i] +" end to end "+node
     },
     "modules": {
         "task": ["Execute", "Execute Batch"],
-        "attributes": ["bn", "at", "rw", "sd", "ed", "reestimation", "pg"]
+        "attributes": ["bn", "at", "rw", "sd", "ed", "reestimation", "pg"],
+        "detail": (i,node)=>taskAssign.modules.task[i] +" module "+node
     },
     "scenarios": {
         "task": ["Execute Scenario","Execute Scenario with Accessibility", "Execute Scenario Accessibility Only"],
-        "attributes": ["at", "rw", "sd", "ed", "reestimation", "pg", "cx"]
+        "attributes": ["at", "rw", "sd", "ed", "reestimation", "pg", "cx"],
+        "detail": (i,node)=>"Execute scenario "+node +" "+taskAssign.scenarios.task[i].split("Execute Scenario")[1]
     },
     "screens": {
         "task": ["Scrape", "Append", "Compare", "Add", "Map"],
-        "attributes": ["at", "rw", "sd", "ed", "reestimation", "pg", "cx"]
+        "attributes": ["at", "rw", "sd", "ed", "reestimation", "pg", "cx"],
+        "detail": (i,node)=>taskAssign.screens.task[i]+" screen "+node
     },
     "testcases": {
         "task": ["Design", "Update"],
-        "attributes": ["at", "rw", "sd", "ed", "reestimation", "cx"]
+        "attributes": ["at", "rw", "sd", "ed", "reestimation", "cx"],
+        "detail": (i,node)=>taskAssign.testcases.task[i]+" testcase "+node
     }
 };
 TaskBox.propTypes={
