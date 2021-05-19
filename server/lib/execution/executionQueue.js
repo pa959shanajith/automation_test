@@ -1,20 +1,10 @@
-const utils = require('./utils');
-const suite = require('../controllers/suite')
-const redisServer = require('./redisSocketHandler');
-const cache = require("./cache").getClient(2);
-var Client = require("node-rest-client").Client;
-var client = new Client();
-var logger = require('../../logger');
-var myserver = require('./socket');
-const notifications = require('../notifications');
-const SOCK_NORM = "normalModeOn";
-const SOCK_SCHD = "scheduleModeOn";
-const SOCK_NA = "unavailableLocalServer";
-const SOCK_NORM_MSG = "ICE is connected in Non-Scheduling mode";
-const SOCK_SCHD_MSG = "ICE is connected in Scheduling mode";
-const SOCK_NA_MSG = "ICE is not Available";
-const DO_NOT_PROCESS = "do_not_process_response";
+const utils = require('../utils');
+const redisServer = require('../redisSocketHandler');
+const cache = require("../cache.js").getClient(2);
+var logger = require('../../../logger.js');
 const EMPTYUSER = process.env.nulluser;
+var testSuiteInvoker = require('../execution/executionInvoker')
+const constants = require('./executionConstants')
 
 module.exports.Execution_Queue = class Execution_Queue {
     /*
@@ -40,7 +30,8 @@ module.exports.Execution_Queue = class Execution_Queue {
             "projectids": [],
             "poolid": "all"
         }
-        this.setUpPool(inputs)
+        this.setUpPool(inputs);
+        this.executionInvoker = new testSuiteInvoker.ExecutionInvoker();
     }
 
     /** 
@@ -63,14 +54,14 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
     }
 
-    static updatePools = async(action, poolinfo) => {
+    static updatePools = async (action, poolinfo) => {
         let result = "fail"
         let inputs = {
             "projectids": [],
             "poolid": "all"
         }
-        try{
-            switch(action){
+        try {
+            switch (action) {
                 case "delete":
                     delete this.queue_list[poolinfo.poolid];
                     cache.set("execution_queue", this.queue_list);
@@ -87,13 +78,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                     result = "success";
                     break;
                 case "clear_queue":
-                    if(poolinfo.type && poolinfo.type == "all"){
+                    if (poolinfo.type && poolinfo.type == "all") {
                         this.queue_list = {}
                         await cache.set("execution_queue", this.queue_list);
                         this.setUpPool(inputs);
-                    }else{
-                        for(let index in poolinfo.poolids){
-                            if(poolinfo.poolids[index] in this.queue_list){
+                    } else {
+                        for (let index in poolinfo.poolids) {
+                            if (poolinfo.poolids[index] in this.queue_list) {
                                 this.queue_list[poolinfo.poolids[index]]["execution_list"] = []
                             }
                         }
@@ -102,19 +93,19 @@ module.exports.Execution_Queue = class Execution_Queue {
                     result = "success";
                     break;
             }
-        }catch(e){
-            logger.error("Error occured in execution queue, action: " + action + " Error: %s" , e);
+        } catch (e) {
+            logger.error("Error occured in execution queue, action: " + action + " Error: %s", e);
         }
         return result;
     }
 
     static add_pending_notification(execIds, report_result, username) {
         logger.info("Adding pending notification for user: " + username)
-        if (!(username in this.notification_dict)) {
-            this.notification_dict[username] = [];
+        if (!(username in this.executionInvoker.notification_dict)) {
+            this.executionInvoker.notification_dict[username] = [];
         }
-        this.notification_dict[username].push(report_result)
-        cache.set("pending_notification", this.notification_dict)
+        this.executionInvoker.notification_dict[username].push(report_result)
+        cache.set("pending_notification", this.executionInvoker.notification_dict)
     }
 
 
@@ -126,7 +117,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         * Adds normal / scheduling test suites to queue
         * Executes normal / scheduling test suites if the target ICE is in DND mode
     */
-    static addTestSuiteToQueue = async (batchExecutionData, execIds, userInfo, type,poolid) => {
+    static addTestSuiteToQueue = async (batchExecutionData, execIds, userInfo, type, poolid) => {
         let targetICE = EMPTYUSER;
         let projectid = "";
         let response = {}
@@ -150,13 +141,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                 //check if target ICE is in DND mode, if true check wether the ice owner is has invoked execution
                 if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && !this.ice_list[targetICE]["status"]) {
                     if (type == "ACTIVE") {
-                        this.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
+                        this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
                     } else {
-                        this.executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type);
+                        this.executionInvoker.executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type);
                     }
                     response['status'] = "pass";
                     response["message"] = "Execution Started on " + targetICE;
-                }else {
+                } else {
                     //get pool in which the target ICE present
                     let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
                     pool["execution_list"].push(testSuite);
@@ -165,7 +156,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on ICE: " + targetICE);
                     //create response message
                     response['status'] = "pass";
-                    if(this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && this.ice_list[targetICE]["status"]){
+                    if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && this.ice_list[targetICE]["status"]) {
                         response["message"] = "ICE busy, queuing execution" + "\nExecution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
                     } else response["message"] = "Execution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
                 }
@@ -177,35 +168,37 @@ module.exports.Execution_Queue = class Execution_Queue {
                 await cache.set("execution_queue", this.queue_list);
                 response['status'] = "pass";
                 logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on any availble ICE");
-                response["message"] = "Execution queued on pool: " + pool["name"] +"\nQueue Length: " + pool["execution_list"].length.toString();
+                response["message"] = "Execution queued on pool: " + pool["name"] + "\nQueue Length: " + pool["execution_list"].length.toString();
             } else {
                 //check if target ice is connected but not preset in any pool, execute directly if true
                 if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
                     const sockmode = await utils.channelStatus(targetICE);
-                    if((!sockmode.normal && !sockmode.schedule)){
+                    if ((!sockmode.normal && !sockmode.schedule)) {
                         response["status"] = "pass";
                         response["message"] = "Can't establish connection with ICE: " + targetICE + " Re-Connect to server!";
                         return response;
                     }
-                    if(this.ice_list[targetICE]['status']){
+                    if (this.ice_list[targetICE]['status']) {
                         response["status"] = "pass";
                         response["message"] = "Execution or Termination already in progress on ICE: " + targetICE;
                         return response;
                     }
                     if ((this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser) || !this.ice_list[targetICE]["mode"]) {
                         if (type == "ACTIVE") {
-                            this.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
+                            this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
                         } else {
-                            this.executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type);
+                            this.executionInvoker.executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type);
                         }
+                        response["message"] = "Execution Started on " + targetICE;
+                    } else if (this.ice_list[targetICE]["mode"] && userInfo.userid != userInfo.invokinguser) {
+                        response["message"] = "ICE: " + targetICE + " is on DND mode, please disable from DND to proceed.";
                     }
                     response['status'] = "pass";
-                    response["message"] = "Execution Started on " + targetICE;
-                } else if(targetICE && targetICE != EMPTYUSER) {
+                } else if (targetICE && targetICE != EMPTYUSER) {
                     //the target ice is neither part of a pool nor is connected to server, queuing not possible
                     response['status'] = "pass";
                     response["message"] = targetICE + " not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."
-                } else{
+                } else {
                     response['status'] = "pass";
                     response["message"] = "ICE not selected."
                 }
@@ -218,21 +211,21 @@ module.exports.Execution_Queue = class Execution_Queue {
         return response;
     }
 
-    static addAPITestSuiteToQueue = async (testSuiteRequest,res) => {
+    static addAPITestSuiteToQueue = async (testSuiteRequest, res) => {
         let targetICE = EMPTYUSER;
         let request_pool_name = EMPTYUSER;
         let poolid = "";
         const hdrs = testSuiteRequest.headers;
         const multiBatchExecutionData = testSuiteRequest.body.executionData;
         try {
-            if (testSuiteRequest.body && testSuiteRequest.body.executionData && testSuiteRequest.body.executionData[0] && testSuiteRequest.body.executionData[0].userInfo ) {
+            if (testSuiteRequest.body && testSuiteRequest.body.executionData && testSuiteRequest.body.executionData[0] && testSuiteRequest.body.executionData[0].userInfo) {
                 let suite = testSuiteRequest.body.executionData[0].userInfo;
                 //Check wether poolname or icename provided (Execution on pool name not supported in this implementation)
-                if(suite.icename) targetICE = testSuiteRequest.body.executionData[0].userInfo.icename;
-                if(suite.poolname){
+                if (suite.icename) targetICE = testSuiteRequest.body.executionData[0].userInfo.icename;
+                if (suite.poolname) {
                     request_pool_name = suite.poolname;
-                    for(let id in this.queue_list){
-                        if(this.queue_list[id].name ===  request_pool_name){
+                    for (let id in this.queue_list) {
+                        if (this.queue_list[id].name === request_pool_name) {
                             poolid = id;
                             break;
                         }
@@ -241,45 +234,53 @@ module.exports.Execution_Queue = class Execution_Queue {
             }
             // Check if request came from Azure DevOps. If yes, then send the acknowledgement
             if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
-                return res.send("Request Recieved");
+                res.setHeader(constants.X_EXECUTION_MESSAGE, "Request Recieved")
+                return res.status("200").send("Request Recieved");
             }
             if (!multiBatchExecutionData || multiBatchExecutionData.constructor !== Array || multiBatchExecutionData.length === 0) {
-                return res.send({"error":"Empty or Invalid Batch Data"});
+                res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["400"])
+                return res.status("400").send({ "error": "Empty or Invalid Batch Data" });
             }
-            let suiteRequest = {"executionData":testSuiteRequest.body.executionData,"headers":testSuiteRequest.headers}
+            let suiteRequest = { "executionData": testSuiteRequest.body.executionData, "headers": testSuiteRequest.headers }
             let userInfo = testSuiteRequest.body.executionData[0].userInfo;
             let testSuite = { "testSuiteRequest": suiteRequest, "type": "API", "userInfo": userInfo }
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
-                if(this.ice_list[targetICE]["mode"] && !this.ice_list[targetICE]["status"]){
-                    testSuite['res'] = res; 
-                    this.executeAPI(testSuite);
+                if (this.ice_list[targetICE]["mode"] && !this.ice_list[targetICE]["status"]) {
+                    testSuite['res'] = res;
+                    this.executionInvoker.executeAPI(testSuite);
                 }
                 let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
                 pool["execution_list"].push(testSuite);
                 //save execution queue to redis
                 await cache.set("execution_queue", this.queue_list);
                 logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on ICE: " + targetICE);
-                testSuite['res'] = res; 
+                testSuite['res'] = res;
             } else if (poolid && poolid in this.queue_list) {
                 let pool = this.queue_list[poolid];
                 pool["execution_list"].push(testSuite);
                 //save execution queue to redis
                 await cache.set("execution_queue", this.queue_list);
                 logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on any ICE");
-                testSuite['res'] = res; 
-            } else if(this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]){
-                    const sockmode = await utils.channelStatus(targetICE);
-                    if((!sockmode.normal && !sockmode.schedule)) return res.send({"error":"Can't establish connection with ICE Re-Connect to server!"})
-                    testSuite['res'] = res;
-                    this.executeAPI(testSuite);
-            } else if(targetICE === EMPTYUSER && (!poolid || poolid === "")){
-                return res.send({"error":"ICE name and Pool Id not provided."})
-            } else{
-                return res.send({"error":targetICE + " not connected to server!"})
+                testSuite['res'] = res;
+            } else if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
+                const sockmode = await utils.channelStatus(targetICE);
+                if ((!sockmode.normal && !sockmode.schedule)) {
+                    res.setHeader(constants.X_EXECUTION_MESSAGE, constants.constants.STATUS_CODES['461'])
+                    return res.status("461").send({ "error": "Can't establish connection with ICE Re-Connect to server!" })
+                }
+                testSuite['res'] = res;
+                this.executionInvoker.executeAPI(testSuite);
+            } else if (targetICE === EMPTYUSER && (!poolid || poolid === "")) {
+                res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
+                return res.status("400").send({ "error": "ICE name and Pool Id not provided." })
+            } else {
+                res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["461"])
+                return res.status('461').send({ "error": targetICE + " not connected to server!" })
             }
         } catch (e) {
             logger.error("Error in addAPITestSuiteToQueue. Error: %s", e);
-            return res.send({"error":"Error while adding test suite to queue"});
+            res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["500"])
+            return res.status('500').send({ "error": "Error while adding test suite to queue" });
         }
         return;
     }
@@ -305,7 +306,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     * @param {string} channel 
     * @param {dictionary} ice_data
     * Function responsible to update ICE status when it changes and execute a test suite from queue when required
-    */  
+    */
     static triggerExecution = async (channel, ice_data) => {
         let data = JSON.parse(ice_data);
         let result = false;
@@ -318,14 +319,14 @@ module.exports.Execution_Queue = class Execution_Queue {
         if (!ice_name in this.ice_list) {
             return result;
         }
-        if(!this.ice_list[ice_name]) this.ice_list[ice_name] = {"connected": true,"poolid":"","_id":""};
+        if (!this.ice_list[ice_name]) this.ice_list[ice_name] = { "connected": true, "poolid": "", "_id": "" };
         //update ice mode and status in this.ice_list
         this.ice_list[ice_name]["mode"] = data.value.mode;
         this.ice_list[ice_name]["status"] = data.value.status;
         //check if socket connection is available or not
         //if ice is busy or not connected return 
         let poolid = this.ice_list[ice_name]["poolid"];
-        if(!poolid){
+        if (!poolid) {
             logger.debug(ice_name + " does not belong to any pool.")
             return;
         }
@@ -353,13 +354,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                 try {
                     switch (testSuite.type) {
                         case 'ACTIVE':
-                            this.executeActiveTestSuite(testSuite.batchExecutionData, testSuite.execIds, testSuite.userInfo, testSuite.type)
+                            this.executionInvoker.executeActiveTestSuite(testSuite.batchExecutionData, testSuite.execIds, testSuite.userInfo, testSuite.type)
                             break;
                         case 'API':
-                            this.executeAPI(testSuite);
+                            this.executionInvoker.executeAPI(testSuite);
                             break;
                         case 'SCHEDULE':
-                            this.executeScheduleTestSuite(testSuite.batchExecutionData, testSuite.execIds, testSuite.userInfo, testSuite.type);
+                            this.executionInvoker.executeScheduleTestSuite(testSuite.batchExecutionData, testSuite.execIds, testSuite.userInfo, testSuite.type);
                             break;
                     }
                     //remove execution from queue
@@ -378,15 +379,15 @@ module.exports.Execution_Queue = class Execution_Queue {
     /** 
     * @param {dictionary} inputs (which pools to fetch and update)
     * Function responsible to setup/update pool variables in execution queue (queue_list)
-    */ 
+    */
     static async setUpPool(inputs) {
         const fnName = "setUpPool"
         try {
             //get existing queue from redis
             this.queue_list = await cache.get("execution_queue");
-            this.notification_dict = await cache.get("pending_notification");
+            this.executionInvoker.notification_dict = await cache.get("pending_notification");
             //if queue not present in redis initialize a new queue
-            if (!this.notification_dict) this.notification_dict = {}
+            if (!this.executionInvoker.notification_dict) this.executionInvoker.notification_dict = {}
             if (!this.queue_list) this.queue_list = {}
             //get all the pools from DB, iterate and add to queue
             var pools = await utils.fetchData(inputs, "admin/getPools", fnName);
@@ -411,9 +412,9 @@ module.exports.Execution_Queue = class Execution_Queue {
             }
             //Redundant code, DO NOT EDIT, checks if a pool has been deleted from DB but still persists in Redis, deletes such pools if found
             //This code blocks triggers only if "all" the pools were fetched
-            if(inputs["poolid"] === "all" && Array.isArray(pools)){
-                for (let index in this.queue_list){
-                    if(!(index in pools)){
+            if (inputs["poolid"] === "all" && Array.isArray(pools)) {
+                for (let index in this.queue_list) {
+                    if (!(index in pools)) {
                         delete this.queue_list[index]
                     }
                 }
@@ -428,7 +429,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     * @param {string} poolid
     * @param {list} projectids
     * Function responsible to map projectids with poolid for O(1) searching
-    */ 
+    */
     static setUpProjectList(projectids, poolid) {
         if (!projectids || !poolid) {
             return this.project_list;
@@ -447,7 +448,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     * @param {string} poolid
     * @param {dictionary} list_of_ICE
     * Function responsible to map ice with pool and status data 
-    */ 
+    */
     static setUpICEList(list, poolid) {
         if (!list || !poolid) {
             return this.ice_list;
@@ -457,16 +458,16 @@ module.exports.Execution_Queue = class Execution_Queue {
             let ice_name = list[ice]["icename"];
             //If ICE name not in ICE pool mapping, add a new ice and intialise values
             //If ICE is in ICE pool mapping, just change the pool id to current pool and add ice id for good measure (un allocated ice are in ice poolmapping without a poolid and ice id)
-            if(this.ice_list[ice_name]){
+            if (this.ice_list[ice_name]) {
                 this.ice_list[ice_name]["poolid"] = poolid;
                 this.ice_list[ice_name]["_id"] = list[ice]["_id"];
-            } 
-            else this.ice_list[ice_name] = {"poolid":poolid, "mode": false, "status": false, "connected": false, "_id": list[ice]["_id"]};
+            }
+            else this.ice_list[ice_name] = { "poolid": poolid, "mode": false, "status": false, "connected": false, "_id": list[ice]["_id"] };
         }
         //Redundant code DO NOT EDIT, check if there are ice in the map which used to belong to this pool but have been removed and deletes these ICE
-        for(let ice in this.ice_list){
-            if(this.ice_list[ice]["poolid"] === poolid){
-                if(!(this.ice_list[ice]['_id'] in list)){
+        for (let ice in this.ice_list) {
+            if (this.ice_list[ice]["poolid"] === poolid) {
+                if (!(this.ice_list[ice]['_id'] in list)) {
                     this.ice_list[ice]['poolid'] = "";
                 }
             }
@@ -474,213 +475,14 @@ module.exports.Execution_Queue = class Execution_Queue {
         return this.ice_list;
     }
 
-    static async executeActiveTestSuite(batchExecutionData, execIds, userInfo, type) {
-        try {
-            var result = await suite.executionFunction(batchExecutionData, execIds, userInfo, type);
-        } catch (ex) {
-            var result = "fail";
-            logger.error("Error in executeTestSuite. Error: %s", ex)
-        }
-        let reportResult = {};
-        batchExecutionData.batchInfo[0]["testsuitename"] = batchExecutionData.batchInfo[0]["testsuiteName"];
-
-        reportResult["testSuiteIds"] = batchExecutionData.batchInfo;
-        reportResult["status"] = result;
-        let username = userInfo.username;
-        const notifySocMap = myserver.socketMapNotify;
-        if (notifySocMap && notifySocMap[username] && notifySocMap[username].connected) {
-            notifySocMap[username].emit("display_execution_popup", [reportResult]);
-        } else {
-            if (!(username in this.notification_dict)) {
-                this.notification_dict[username] = [];
-            }
-            this.notification_dict[username].push(reportResult)
-            cache.set("pending_notification", this.notification_dict)
-        }
-
-        return result;
-    }
-
-    static async executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type) {
-        const scheduleId = execIds["scheduleId"];
-        const fnName = "executeScheduleTestSuite";
-        try {
-
-            result = await suite.executionFunction(batchExecutionData, execIds, userInfo, "SCHEDULE");
-        } catch (ex) {
-            result = "fail";
-            logger.error("Error in " + fnName + " service. Error: %s", ex)
-        }
-        result = (result == "success") ? "Completed" : ((result == "UserTerminate") ? "Terminate" : result);
-        let schedStatus = result;
-        if (!["Completed", "Terminate", "Skipped", "fail"].includes(result)) {
-            let msg = "This scenario was skipped ";
-            if ([SOCK_NA, SOCK_NORM, "NotApproved", "NoTask", "Modified"].indexOf(result) > -1) {
-                if (result == SOCK_NA) msg += "due to unavailability of ICE";
-                else if (result == SOCK_NORM) msg += "due to unavailability of ICE in schedule mode";
-                else if (result == "Skipped") msg = "due to conflicting schedules";
-                else if (result == "NotApproved") msg += "because all the dependent tasks (design, scrape) needs to be approved before execution";
-                else if (result == "NoTask") msg = "because task does not exist for child node";
-                else if (result == "Modified") msg = "because task has been modified, Please approve the task";
-                schedStatus = result = "Skipped";
-            } else {
-                schedStatus = "Failed";
-                msg = "Scenario execution failed due to an error encountered during execution";
-            }
-            const tsuIds = batchExecutionData.batchInfo.map(u => u.testsuiteId);
-            const currExecIds = await suite.generateExecutionIds(execIds, tsuIds, userInfo.userid);
-            if (currExecIds != "fail") {
-                const batchObj = {
-                    "executionIds": tsuIds.map(i => currExecIds.execids[i]),
-                    "suitedetails": batchExecutionData.batchInfo.map(t => ({
-                        "testsuitename": t.testsuiteName,
-                        "testsuiteid": t.testsuiteId,
-                        "projectname": t.projectName,
-                        "releaseid": t.releaseId,
-                        "cyclename": t.cycleName,
-                        "scenarioIds": t.suiteDetails.map(s => s.scenarioId),
-                        "scenarioNames": t.suiteDetails.map(s => s.scenarioName)
-                    }))
-                };
-                await suite.updateSkippedExecutionStatus(batchObj, userInfo, result, msg);
-            }
-        }
-        await suite.updateScheduleStatus(scheduleId, schedStatus, execIds.batchid);
-        let reportResult = {};
-        batchExecutionData.batchInfo[0]["testsuitename"] = batchExecutionData.batchInfo[0]["testsuiteName"];
-        reportResult["testSuiteIds"] = batchExecutionData.batchInfo;
-        reportResult["status"] = schedStatus;
-        let username = userInfo.invokingusername;
-        const notifySocMap = myserver.socketMapNotify;
-        if (notifySocMap && notifySocMap[username] && notifySocMap[username].connected) {
-            notifySocMap[username].emit("display_execution_popup", [reportResult]);
-        } else {
-            if (!(username in this.notification_dict)) {
-                this.notification_dict[username] = [];
-            }
-            this.notification_dict[username].push(reportResult)
-            cache.set("pending_notification", this.notification_dict)
-        }
-    }
-
-    static async executeAPI(testSuite) {
-        const req = testSuite.testSuiteRequest;
-        const hdrs = req.headers;
-        let reportResult = {}
-        let reqFromADO = false;
-        if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
-            reqFromADO = true;
-        }
-        const multiBatchExecutionData = req.executionData;
-        const userRequestMap = {};
-        const userInfoList = [];
-        const executionResult = [];
-
-        for (let i = 0; i < multiBatchExecutionData.length; i++) {
-            const executionData = multiBatchExecutionData[i];
-            var userInfo = await utils.tokenValidation(executionData.userInfo || {});
-            userInfo.invokinguser = userInfo.userid;
-            userInfo.invokingusername = userInfo.username;
-            userInfo.invokinguserrole = userInfo.role;
-            userInfoList.push(userInfo);
-            const execResponse = userInfo.inputs;
-            if (execResponse.tokenValidation == "passed") {
-                delete execResponse.error_message;
-                const icename = userInfo.icename;
-                if (userRequestMap[icename] == undefined) userRequestMap[icename] = [i];
-                else userRequestMap[icename].push(i);
-            }
-            executionResult.push(execResponse);
-        }
-        const executionIndicesList = Object.values(userRequestMap);
-        const batchExecutionPromiseList = executionIndicesList.map(executionIndices => (async () => {
-            try {
-                for (let exi of executionIndices) {
-                    const batchExecutionData = multiBatchExecutionData[exi];
-                    const execResponse = executionResult[exi];
-                    const userInfo = userInfoList[exi];
-                    const execIds = { "batchid": "generate", "execid": {} };
-                    let result;
-                    try {
-                        result = await suite.executionFunction(batchExecutionData, execIds, userInfo, "API");
-                    } catch (ex) {
-                        result = "fail";
-                        logger.error("Error in ExecuteTestSuite_ICE_API service. Error: %s", ex)
-                    }
-                    if (result == SOCK_NA) execResponse.error_message = SOCK_NA_MSG;
-                    else if (result == SOCK_SCHD) execResponse.error_message = SOCK_SCHD_MSG;
-                    else if (result == "NotApproved") execResponse.error_message = "All the dependent tasks (design, scrape) needs to be approved before execution";
-                    else if (result == "NoTask") execResponse.error_message = "Task does not exist for child node";
-                    else if (result == "Modified") execResponse.error_message = "Task has been modified, Please approve the task";
-                    else if (result == "Skipped") execResponse.error_message = "Execution is skipped because another execution is running in ICE";
-                    else if (result == "fail") execResponse.error_message = "Internal error occurred during execution";
-                    else {
-                        execResponse.status = result[1];
-                        const execResult = [];
-                        for (let tsuid in result[0]) {
-                            const tsu = result[0][tsuid];
-                            const scenarios = [];
-                            tsu.executionId = execIds.execid[tsuid];
-                            for (let tscid in tsu.scenarios) scenarios.push(...tsu.scenarios[tscid]);
-                            delete tsu.scenarios;
-                            tsu.suiteDetails = scenarios;
-                            execResult.push(tsu);
-                        }
-                        execResponse.batchInfo = execResult;
-                    }
-
-                }
-            } catch (e) {
-                return false;
-            }
-        })());
-        await Promise.all(batchExecutionPromiseList)
-        const finalResult = { "executionStatus": executionResult };
-        const res = testSuite['res'];
-        if(!res){
-            logger.error("Error while sending response in executeAPI, response object undefined");
-            return;
-        } else if (!reqFromADO){
-            return res.send(finalResult);
-        }
-        // This code only executes when request comes from Azure DevOps
-        let adoStatus = finalResult.executionStatus.every(e => e.status == "success");
-        const args = {
-            data: { "name": "TaskCompleted", "taskId": hdrs.taskinstanceid, "jobId": hdrs.jobid, "result": (adoStatus ? "succeeded" : "failed") },
-            headers: {
-                "Authorization": 'Basic ' + Buffer.from(':' + hdrs.authtoken).toString('base64'),
-                "Content-Type": "application/json"
-            }
-        };
-        const adourl = hdrs.planurl + '/' + hdrs.projectid + '/_apis/distributedtask/hubs/' + hdrs.hubname + '/plans/' + hdrs.planid + '/events?api-version=2.0-preview.1';
-        logger.info("Sending response to Azure DevOps");
-        const promiseData = (new Promise((rsv, rej) => {
-            const apiReq = client.post(adourl, args, (result, response) => {
-                if (response.statusCode < 200 && response.statusCode >= 400) {
-                    logger.error("Error occurred while sending response to Azure DevOps");
-                    const toLog = ((typeof (result) == "object") && !(result instanceof Buffer)) ? JSON.stringify(result) : result.toString();
-                    logger.debug("Response code is %s and content is %s", response.statusCode, toLog);
-                    rsv("fail");
-                } else {
-                    rsv(result);
-                }
-            });
-            apiReq.on('error', function (err) {
-                logger.error("Error occurred while sending response to Azure DevOps, Error: %s", err);
-                rsv("fail");
-            });
-        }));
-        try { return await promiseData; }
-        catch (e) { logger.error(e); }
-    }
     /** 
     * @param {string} ice_name
     * Function responsible to connect unallocated ice and add to ice - pool/status data map
-    */ 
+    */
     static async connect_ice(ice_name) {
         //Add unallocated ICE to ice pool mapping (the pool id and ice id will be blank for such ICE)
         this.queue_list = await cache.get("execution_queue")
-        this.ice_list[ice_name] = {"connected":true,"status": true,"mode": false,"poolid":"","_id":""};
+        this.ice_list[ice_name] = { "connected": true, "status": true, "mode": false, "poolid": "", "_id": "" };
     }
 
 }
