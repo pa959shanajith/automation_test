@@ -1036,11 +1036,11 @@ exports.getExecution_metrics_API = async(req, res) => {
         }
         finalReport.push(execResponse);
         logger.info("Sending reports in the service getExecution_metrics_API: final function");
-        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES(statusCode));
+        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode]);
         return res.status(statusCode).send(finalReport);
     } catch (exception) {
         logger.error("Exception in the service getExecution_metrics_API - Error: %s", exception);
-        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES("500"));
+        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["500"]);
         return res.status("500").send("fail");
     }
 };
