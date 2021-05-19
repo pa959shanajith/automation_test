@@ -1,13 +1,6 @@
-var uuid = require('uuid-random');
-var schedule = require('node-schedule');
-var Client = require("node-rest-client").Client;
-var client = new Client();
-var myserver = require('../lib/socket');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
-const accessibility_testing = require("./accessibilityTesting")
-const notifications = require('../notifications');
 var smartPartitions = require('../lib/smartPartitions')
 var scheduler = require('../lib/execution/scheduler')
 
@@ -59,8 +52,8 @@ exports.readTestSuite_ICE = async (req, res) => {
 		responsedata[moduleId] = finalSuite;
 	}
 	if (fromFlg == "scheduling") {
-		const ice_status = await getICEList(req.body.readTestSuite[0].projectidts);	
-		const ice_list = Object.keys(ice_status);	
+		const ice_status = await getICEList(req.body.readTestSuite[0].projectidts);
+		const ice_list = Object.keys(ice_status);
 		logger.debug("IP\'s connected : %s", ice_list.join());
 		const schedulingDetails = {
 			"connectedICE": ice_status["ice_list"],
@@ -188,7 +181,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	if(type.toLowerCase().includes('smart')){
 		//Check if users are present in target user
 		if(targetUser && Array.isArray(targetUser) && targetUser.length > 0){
-			var batchInfo =JSON.parse(JSON.stringify(batchExecutionData.batchInfo));
+			var batchInfo = JSON.parse(JSON.stringify(batchExecutionData.batchInfo));
 			batchInfo[0]["iceList"] = targetUser;
 			//Get partitions
 			const partitionResult = await smartPartitions.smartSchedule(batchInfo, type, "Now", batchExecutionData.browserType.length)
@@ -267,9 +260,20 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	// Several client apps do not send TCP Keep-Alive. Hence this is handled in applicaton side.
 	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +(process.env.KEEP_ALIVE || "30000"));
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
-	await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
+	var userInfo = getUserInfoFromHeaders(req.headers);
+	if (!userInfo) {
+		res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
+		return res.status('400').send({ "error": "Invalid or missing user info in request headers." })
+	}
+	await queue.Execution_Queue.addAPITestSuiteToQueue(req, res, userInfo);
 };
 
+const getUserInfoFromHeaders = (headers) => {
+	if (headers['x-token_hash'] && headers['x-token_name'] && headers['x-icename']) {
+		return { 'tokenhash': headers['x-token_hash'], "tokenname": headers['x-token_name'], 'icename': headers['x-icename'], 'poolname': ''}
+	}
+	return false;
+}
 /** this service imports the data from git repo and invoke execution */
 exports.importFromGit_ICE = async (req, res) => {
 	const actionName = 'importFromGit'
@@ -391,7 +395,9 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 		var result = await scheduler.prepareSchedulingRequest(req.session, req.body);
 		return res.send(result);
 	}catch(e){
-		return res.send(result);
+		logger.error("Exception in the service testSuitesScheduler_ICE");
+		logger.debug("Exception occurred in testSuitesScheduler_ICE: %s",e)
+		return res.status('500').send(result);
 	}
 };
 

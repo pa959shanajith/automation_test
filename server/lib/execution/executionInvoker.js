@@ -97,108 +97,83 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
 
     executeAPI = async (testSuite) => {
         const req = testSuite.testSuiteRequest;
+        var headerUserInfo = testSuite.userInfo;
         const hdrs = req.headers;
         let reqFromADO = false;
         if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
             reqFromADO = true;
         }
-        const multiBatchExecutionData = req.executionData;
-        const userRequestMap = {};
-        const userInfoList = [];
-        const executionResult = [];
+        const batchExecutionData = req.executionData;
         var statusCode = '500'
 
-        for (let i = 0; i < multiBatchExecutionData.length; i++) {
-            const executionData = multiBatchExecutionData[i];
-            var userInfo = await utils.tokenValidation(executionData.userInfo || {});
-            userInfo.invokinguser = userInfo.userid;
-            userInfo.invokingusername = userInfo.username;
-            userInfo.invokinguserrole = userInfo.role;
-            userInfoList.push(userInfo);
-            const execResponse = userInfo.inputs;
-            if (execResponse.tokenValidation == "passed") {
-                delete execResponse.error_message;
-                const icename = userInfo.icename;
-                if (userRequestMap[icename] == undefined) userRequestMap[icename] = [i];
-                else userRequestMap[icename].push(i);
-            }else{
-                statusCode = '401';
-            }
-            executionResult.push(execResponse);
-        }
-        const executionIndicesList = Object.values(userRequestMap);
-        const batchExecutionPromiseList = executionIndicesList.map(executionIndices => (async () => {
-            try {
-                for (let exi of executionIndices) {
-                    const batchExecutionData = multiBatchExecutionData[exi];
-                    const execResponse = executionResult[exi];
-                    const userInfo = userInfoList[exi];
-                    const execIds = { "batchid": "generate", "execid": {} };
-                    let result;
-                    try {
-                        result = await executor.execute(batchExecutionData, execIds, userInfo, "API");
-                    } catch (ex) {
-                        result = "fail";
-                        logger.error("Error in ExecuteTestSuite_ICE_API service. Error: %s", ex)
-                    }
 
-                    switch (result) {
-                        case constants.SOCK_NA:
-                            if (statusCode != "401" && statusCode == "500") statusCode = '461';
-                            else if(statusCode != "401") statusCode = "261"
-                            execResponse.error_message = constants.SOCK_NA_MSG;
-                            break;
-                        case "NotApproved":
-                            if (statusCode != "401" && statusCode == "500") statusCode = '463';
-                            else if(statusCode != "401") statusCode = "261"
-                            execResponse.error_message = "All the dependent tasks (design, scrape) needs to be approved before execution"
-                            break;
-                        case "NoTask":
-                            if (statusCode != "401" && statusCode == "500") statusCode = '463';
-                            else if(statusCode != "401") statusCode = "261"
-                            execResponse.error_message = "Task does not exist for child node";
-                            break;
-                        case "Modified":
-                            if (statusCode != "401" && statusCode == "500") statusCode = '463';
-                            else if(statusCode != "401") statusCode = "261"
-                            execResponse.error_message = "Task has been modified, Please approve the task";
-                            break;
-                        case "Skipped":
-                            if (statusCode != "401" && statusCode == "500") statusCode = '409'
-                            else if(statusCode != "401") statusCode = "261"
-                            execResponse.error_message = "Execution is skipped because another execution is running in ICE";
-                            break;
-                        case "fail":
-                            if (statusCode != "401" && statusCode == "500") execResponse.error_message = "Internal error occurred during execution"
-                            else if(statusCode != "401") statusCode = "261"
-                            break;
-                        default:
-                            if (result[1] == "success") statusCode = "200";
-                            else if (result[1] == 'terminate' ) statusCode = "462";
-                            else statusCode = "202"
-                            execResponse.status = result[1];
-                            const execResult = [];
-                            for (let tsuid in result[0]) {
-                                const tsu = result[0][tsuid];
-                                const scenarios = [];
-                                tsu.executionId = execIds.execid[tsuid];
-                                for (let tscid in tsu.scenarios) scenarios.push(...tsu.scenarios[tscid]);
-                                delete tsu.scenarios;
-                                tsu.suiteDetails = scenarios;
-                                execResult.push(tsu);
-                            }
-                            execResponse.batchInfo = execResult;
-                    }
+        var userInfo = await utils.tokenValidation(headerUserInfo);
+        userInfo.invokinguser = userInfo.userid;
+        userInfo.invokingusername = userInfo.username;
+        userInfo.invokinguserrole = userInfo.role;
+        var execResponse = userInfo.inputs;
+        if (execResponse.tokenValidation == "passed") {
+            delete execResponse.error_message;
+            const icename = userInfo.icename;
+        } else {
+            statusCode = '401';
+            res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode]);
+            return res.status(statusCode).send({"error": "Token validation Failed"});
+        }
+
+        const execIds = { "batchid": "generate", "execid": {} };
+        let result;
+        try {
+            result = await executor.execute(batchExecutionData, execIds, userInfo, "API");
+        } catch (ex) {
+            result = "fail";
+            logger.error("Error in ExecuteTestSuite_ICE_API service. Error: %s", ex)
+        }
+
+        switch (result) {
+            case constants.SOCK_NA:
+                statusCode = '461';
+                execResponse.error_message = constants.SOCK_NA_MSG;
+                break;
+            case "NotApproved":
+                statusCode = '463';
+                execResponse.error_message = "All the dependent tasks (design, scrape) needs to be approved before execution"
+                break;
+            case "NoTask":
+                statusCode = '463';
+                execResponse.error_message = "Task does not exist for child node";
+                break;
+            case "Modified":
+                statusCode = '463';
+                execResponse.error_message = "Task has been modified, Please approve the task";
+                break;
+            case "Skipped":
+                statusCode = '409'
+                execResponse.error_message = "Execution is skipped because another execution is running in ICE";
+                break;
+            case "fail":
+                execResponse.error_message = "Internal error occurred during execution"
+                break;
+            default:
+                if (result[1] == "success") statusCode = "200";
+                else if (result[1] == 'Terminate') statusCode = "462";
+                else statusCode = "202"
+                execResponse.status = result[1];
+                const execResult = [];
+                for (let tsuid in result[0]) {
+                    const tsu = result[0][tsuid];
+                    const scenarios = [];
+                    tsu.executionId = execIds.execid[tsuid];
+                    for (let tscid in tsu.scenarios) scenarios.push(...tsu.scenarios[tscid]);
+                    delete tsu.scenarios;
+                    tsu.suiteDetails = scenarios;
+                    execResult.push(tsu);
                 }
-            } catch (e) {
-                return false;
-            }
-        })());
-        await Promise.all(batchExecutionPromiseList)
-        const finalResult = { "executionStatus": executionResult };
+                execResponse.batchInfo = execResult;
+        }
+        const finalResult = { "executionStatus": execResponse };
         const res = testSuite['res'];
         res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode]);
-
         if (!res) {
             logger.error("Error while sending response in executeAPI, response object undefined");
             return;
