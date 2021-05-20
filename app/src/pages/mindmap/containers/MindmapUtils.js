@@ -130,7 +130,7 @@ function closestCord(arr_co, new_one) {
 const checkparenttask = (parentNode,parent_flag)=>{
     if (parent_flag) return parent_flag;
     if(parentNode!=null){
-        if (parentNode.taskexists!=null) {
+        if (parentNode.taskexists!=null && parentNode.taskexists.status !== 'complete') {
             parent_flag=true;
         }
         parentNode=parentNode.parent || null;
@@ -496,7 +496,7 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setP
     var t = s.attr('data-nodetype');
     if (t === 'modules' || t === 'endtoend') return;
     var p = dNodes[sid].parent;
-    if(dNodes[sid]['taskexists']!=null){
+    if(dNodes[sid]['taskexists']!=null && dNodes[sid]['taskexists'].status !== 'complete'){
         setPopup({show:true,title:'Error',content:'Cannot delete node if task is assigned. Please unassign task first.',submitText:'Ok'})
         return; 
     }
