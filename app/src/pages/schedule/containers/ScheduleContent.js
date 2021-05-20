@@ -26,24 +26,14 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [moduleScheduledate,setModuleScheduledate] = useState({})
     const [sort,setSort] = useState(true)
-    const [scheDetails,setScheDetails] = useState(true)
 
     useEffect(()=>{
         getScheduledDetails()
     }, []);
 
-    useEffect(()=>{
-        setTimeout(() => {
-            getScheduledDetails();
-            setScheDetails(!scheDetails)
-            var schFilterData = document.getElementById("scheduledSuitesFilterData");
-            if(schFilterData !== null && schFilterData!==undefined)
-                schFilterData.selectedIndex = "0"; 
-        }, 60000);
-    }, [scheDetails]);
-
     const getScheduledDetails = async () => {
         try{
+            setLoading('Loading...');
             const result = await getScheduledDetails_ICE();
             if (result && result.length > 0 && result !== "fail") {
                 for (var k = 0; k < result.length; k++) {
@@ -75,9 +65,11 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                 setScheduledData(scheduledDataParsed);
                 setScheduledDataOriginal(scheduledDataParsed);
             }
+            setLoading(false);
             document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
         }catch (error) {
             setPopupState({show:true,title:"Error",content:"Failed to fetch Scheduled Data."});
+            setLoading(false);
             console.log(error)
         }
     }
@@ -302,6 +294,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                             <option>Skipped</option>
                             <option>Show All</option>
                         </select>
+                        <div onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
                     </div>
 
                     <div className="scheduleDataTable">
