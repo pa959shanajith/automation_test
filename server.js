@@ -520,7 +520,7 @@ if (cluster.isMaster) {
 					if (response.statusCode != 200 || !data || data.toString() != "pass") {
 						httpsServer.close();
 						logger.error("Please run the Service API and Restart the Server");
-					} else  {
+					} else {
 						scheduler.reScheduleTestsuite();
 						console.info("Avo Assure Server Ready...\n");
 					}
