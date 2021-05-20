@@ -151,16 +151,16 @@ const TaskBox = (props) => {
                 case 'rw':
                     return;
                 case 'sd':
-                    if (tObj.sd != '' && tObj.sd.indexOf('/')==-1) {
+                    if (tObj.sd != '' && tObj.sd.indexOf('-')==-1) {
                         var d=new Date(tObj.sd);
-                        tObj.sd=d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
+                        tObj.sd=d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
                     }
                     setStartDate({show:true,value:tObj.sd})
                     return;
                 case 'ed':
-                    if (tObj.ed != '' && tObj.ed.indexOf('/')==-1) {
+                    if (tObj.ed != '' && tObj.ed.indexOf('-')==-1) {
                         var d1=new Date(tObj.ed);
-                        tObj.ed=d1.getDate()+"/"+(d1.getMonth()+1)+"/"+d1.getFullYear();
+                        tObj.ed=d1.getDate()+"-"+(d1.getMonth()+1)+"-"+d1.getFullYear();
                     }
                     setEndDate({show:true,value:tObj.ed})
                     return;
@@ -496,12 +496,7 @@ function addTask_11(pi, tObj, qid, cycleid,dNodes,nodeDisplay,cTask) {
             dNodes[pi].task.details = '';
         }
         if(!origTask && taskUndef){
-            var type = dNodes[pi].type.slice(0,-1) //remove plural
-            // to avoid phrasing "Execute scenario scenarios" 
-            type = (type)?" "+type.charAt(0).toUpperCase()+type.slice(1):""
-            if(dNodes[pi].task.task == 'Execute Scenario')type = ""
-            dNodes[pi].task.details = dNodes[pi].task.task + type + " " + dNodes[pi].name
-            // dNodes[pi].task.details =  dNodes[pi].task.task + " " + dNodes[pi].type.substring(0,dNodes[pi].type.length-1) + " " + dNodes[pi].name;
+            dNodes[pi].task.details = taskAssign[dNodes[pi].type].detail(0,dNodes[pi].name)
         }                
         if(!taskUndef && !origTask){
             dNodes[pi].task.reviewer = tObj.rw;
@@ -662,8 +657,8 @@ const assignBoxValidator = ({userInfo,userAsgList,userRevList,batchNameRef,start
         d3.select('#ct-endDate .fc-datePicker').classed('errorBorder',true);
         pass = false;
     }
-    var ed = endDate.value.split('/');
-    var sd = startDate.value.split('/');
+    var ed = endDate.value.split('-');
+    var sd = startDate.value.split('-');
     var start_date = new Date(sd[2] + '-' + sd[1] + '-' + sd[0]);
     var end_date = new Date(ed[2] + '-' + ed[1] + '-' + ed[0]);
     if (end_date < start_date) {
