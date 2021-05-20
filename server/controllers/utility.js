@@ -144,6 +144,7 @@ exports.manageDataTable = async(req, res) => {
 			action: action
 		};
 		if (action == "create" || action == "edit") {
+			inputs.dtheaders = req.body.dtheaders;
 			inputs.datatable = JSON.stringify(req.body.datatable);
 		}
 		const result = await utils.fetchData(inputs, "utility/manageDataTable", fnName);
