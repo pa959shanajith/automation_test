@@ -97,6 +97,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
 
     executeAPI = async (testSuite) => {
         const req = testSuite.testSuiteRequest;
+        const res = testSuite.res;
         var headerUserInfo = testSuite.userInfo;
         const hdrs = req.headers;
         let reqFromADO = false;
@@ -172,7 +173,6 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
                 execResponse.batchInfo = execResult;
         }
         const finalResult = { "executionStatus": execResponse };
-        const res = testSuite['res'];
         res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode]);
         if (!res) {
             logger.error("Error while sending response in executeAPI, response object undefined");
