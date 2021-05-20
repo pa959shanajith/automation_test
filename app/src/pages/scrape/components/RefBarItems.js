@@ -26,6 +26,7 @@ const RefBarItems = props => {
 	const [screenshotY, setScreenshotY] = useState(null);
 	const [highlight, setHighlight] = useState(false);
 	const [mirrorHeight, setMirrorHeight] = useState("0px");
+	const [currMobileType, setCurrMobileType]  = useState('Android');
 	const [dsRatio, setDsRatio] = useState(1); //downScale Ratio
 	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, setShowPop } = useContext(ScrapeContext);
 
@@ -43,7 +44,7 @@ const RefBarItems = props => {
 	}, [uid, newScrapedData])
 
 	useEffect(()=>{
-		if (appType === "MobileApp") navigator.appVersion.indexOf("Mac") !== -1 ? setTagList(list.mobileMacFilters) : setTagList(list.mobileFilters);
+		if (appType === "MobileApp") setTagList(list.mobileFilters);
 		else setTagList(list.nonMobileFilters);
 	}, [appType]);
 
@@ -184,9 +185,9 @@ const RefBarItems = props => {
 						}
 					});
 				}
-				else if (tag === "othersAndroid"){
+				else if (tag === "othersMobile"){
 					scrapedItems.forEach(item => {
-						if (ScrapeFilter.otherAndroidObjects(item.tag)){
+						if (ScrapeFilter.otherMobileObjects(item.tag)){
 								item.hide = false;
 							}
 					});
@@ -216,6 +217,22 @@ const RefBarItems = props => {
         setScrapeItems(scrapedItems)
 	}
 
+	const toggleMobileType = event => {
+
+		const selectedType = event.target.value;
+		let newTagList = [];
+		
+		if (selectedType === "iOS") 
+			newTagList = list.mobileMacFilters;
+		else if (selectedType === "Android") 
+			newTagList = list.mobileFilters;
+		
+		setCurrMobileType(selectedType);
+		setTagList(newTagList);
+		setToFilter([]);
+		filter([]);
+	}
+
 	const Popups = () => (
         <>
         {
@@ -242,10 +259,20 @@ const RefBarItems = props => {
             <div  data-test="popupFilter" className="ref_pop filter_pop" style={{marginTop: `calc(${filterY}px - 15vh)`}}>
                 <h4 className="pop__header" onClick={()=>setShowFilterPop(false)}><span className="pop__title">Filter</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                 <div data-test="popupFilterContent" className="filter_pop__content">
+					<div className="scrape__filterActionBtns">
 					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length}/><span>Select All</span></div>
-					{ tagList.map((tag, index)=>(<div key={index} className="d__filter-btnbox">
-						<button data-test="filterButton" className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
-					</div>))}
+					{ appType === "MobileApp" && 
+						<select className="scrape__mobileType" onChange={toggleMobileType} value={currMobileType}>
+							<option value="Android" >Android</option>
+							<option value="iOS" >iOS</option>
+						</select>
+					}
+					</div>
+					<div className="scrape__filterTagBtns">
+					{ tagList.map((tag, index)=>(
+						<button key={index} data-test="filterButton" className={"d__filter-btn" + (toFilter.includes(tag.tag) ? " active-filter" : "")} key={index} onClick={()=>filterMain(tag.tag)}>{tag.label}</button>
+					))}
+					</div>
                 </div>
             </div>
             </ClickAwayListener>

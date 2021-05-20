@@ -12,16 +12,16 @@ const Leftbar=(props)=>{
                     <img src='static/imgs/ic-encryption-utility.png' alt="EncryptIcon" id={(focus==="encryption")? "selected":null}/>
                     <div>Encryption</div>
                 </span>
-                <span onClick={()=>{props.setScreenType("optimization");  setFocus("optimization") ; props.setPairwiseClicked(false)}}>
+                {/* <span onClick={()=>{props.setScreenType("optimization");  setFocus("optimization") ; props.setPairwiseClicked(false)}}>
                     <img src='static/imgs/ic-optimization.png' alt="optimizationIcon" id={(focus==="optimization")? "selected":null}/>
                     <div>Optimization</div>
-                </span>
+                </span> */}
                 <span onClick={()=>{props.setScreenType("execution");  setFocus("execution"); }}>
                     <div className="fa fa-database fa-2x util__execution_ic" id={(focus==="execution")? "selected":""}/>
                     <div>Execution Metrics</div>
                 </span>
                 <span onClick={()=>{props.setScreenType("datatable-Create");  setFocus("datatable"); }}>
-                    <div className="fa fa-database fa-2x util__execution_ic" id={(focus==="datatable")? "selected":""}/>
+                    <div className="fa fa-table fa-2x util__execution_ic" id={(focus==="datatable")? "selected":""}/>
                     <div>Data Table</div>
                 </span>
             </div>
