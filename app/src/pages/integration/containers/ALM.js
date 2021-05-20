@@ -72,7 +72,7 @@ const ALM = props => {
     }
     const callViewMappedFiles = async(saveFlag)=>{
         try{
-            dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Fetching...'});
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: saveFlag?'Updating...':'Fetching...'});
             //props.setViewMappedFiles(true)
             const userid = user_id;
             const response = await viewQcMappedList_ICE(userid);

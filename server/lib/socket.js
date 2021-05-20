@@ -7,7 +7,13 @@ const eula = uiConfig.showEULA;
 const httpsServer = require('./../../server').httpsServer;
 
 //SOCKET CONNECTION USING SOCKET.IO
-const io = require('socket.io').listen(httpsServer, { cookie: false, pingInterval: uiConfig.socketio.pingInterval, pingTimeout: uiConfig.socketio.pingTimeout });
+const io = require('socket.io')(httpsServer, {
+	cookie: false,
+	pingInterval: uiConfig.socketio.pingInterval,
+	pingTimeout: uiConfig.socketio.pingTimeout,
+	allowEIO3: true,
+	maxHttpBufferSize: 1e8  // approx. 100 MB, default is 1 MB
+});
 
 let socketMap = {};
 let userICEMap={};

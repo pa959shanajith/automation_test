@@ -154,7 +154,7 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-			}
+			} 
 			return next();
 		});
 
@@ -173,10 +173,11 @@ if (cluster.isMaster) {
 		const authconf = authlib();
 		const auth = authconf.auth;
 		app.use(authconf.router);
-		var queue = require("./server/lib/executionQueue")
+		var queue = require("./server/lib/execution/executionQueue")
 		queue.Execution_Queue.queue_init()
 		const notf = require("./server/notifications");
 		notf.initalize();
+		var scheduler = require('./server/lib/execution/scheduler')
 
 		//Based on NGINX Config Security Headers are configured
 		if (!nginxEnabled) {
@@ -264,7 +265,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(p_Webocular|neuronGraphs\/|p_ALM|p_APG|integration|p_qTest|p_Zephyr)$/, function(req, res) {
+		app.get(/^\/(webocular|neuronGraphs\/|integration)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -290,10 +291,6 @@ if (cluster.isMaster) {
 				return res.redirect("/error?e=" + ((sessChk) ? "403" : "401"));
 			}
 		}
-
-		// app.post('/designTestCase', function(req, res) {
-		// 	return res.sendFile("index.html", { root: __dirname + "/public/" });
-		// });
 
 		app.get('/AvoAssure_ICE.zip', async (req, res) => {
 			const iceFile = "AvoAssure_ICE.zip";
@@ -524,7 +521,7 @@ if (cluster.isMaster) {
 						httpsServer.close();
 						logger.error("Please run the Service API and Restart the Server");
 					} else {
-						suite.reScheduleTestsuite();
+						scheduler.reScheduleTestsuite();
 						console.info("Avo Assure Server Ready...\n");
 					}
 				} catch (exception) {

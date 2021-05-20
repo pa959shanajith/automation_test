@@ -34,7 +34,7 @@ const GitButtonActions = (props) => {
         setLoading("Loading...");
         const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitAccToken.current.value.trim(),gitUrl.current.value.trim());
         if(data.error){displayError(data.error);return;}
-        else if(data  === 'GitUser Exists')  setPopupState({show:true,title:"Save Git Config",content:"Git user already exists!!"});
+        else if(data  === 'GitUser Exists')  setPopupState({show:true,title:"Save Git Config",content:"Git config already exist for this user."});
         else setPopupState({show:true,title:"Save Git Config",content:"Git user "+action+ "d successfully"});
         setLoading(false);
         resetFields();

@@ -24,9 +24,7 @@ const Header = () => {
 
     const history = useHistory();
     const dispatch = useDispatch();
-    const [userDetails, setUserDetails] = useState(null);
     const [username, setUsername] = useState(null);
-    const [userRole, setUserRole] = useState(null);
     const [showChangePass, setShowChangePass] = useState(false);
     const [showChangeDefaultIce, setShowChangeDefaultIce] = useState(false);
     const [showSuccessPass, setSuccessPass] = useState(false);
@@ -42,6 +40,7 @@ const Header = () => {
     const [clickNotify,setClickNotify] = useState(false)
     const userInfo = useSelector(state=>state.login.userinfo);
     const selectedRole = useSelector(state=>state.login.SR);
+    // const roleSwitched = useSelector(state=>state.progressbar.roleSwitched);
     const notifyCnt = useSelector(state=>state.login.notify.unread)
 
     useEffect(()=>{
@@ -52,25 +51,15 @@ const Header = () => {
     },[])
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0){
-            setUserDetails(userInfo);
-            setUserRole(selectedRole);
-            if (userInfo.rolename === "Admin") setAdminDisable(true); 
+            if ([userInfo.rolename, selectedRole].includes("Admin")) setAdminDisable(true); 
             if (userInfo.firstname === userInfo.lastname) setUsername(userInfo.firstname);
             else setUsername(userInfo.firstname + ' ' + userInfo.lastname);
-            
-            // if(window.localStorage['_SRS']==="success"){
-            //     delete window.localStorage['_SRS']; 
-            //     setShowSR_Pop({'title': 'Switch Role', 'content': `Your role is changed to ${selectedRole}`});
-            // }
         }
     }, [userInfo, selectedRole]);
 
     const naviPg = () => {
-        
-		// if (localStorage.getItem("navigateEnable") === "true") {
-			window.localStorage['navigateScreen'] = "plugin";
-            history.replace('/plugin');
-        // }
+        window.localStorage['navigateScreen'] = "plugin";
+        history.replace('/plugin');
     };
     
     const logout = event => {
@@ -105,7 +94,7 @@ const Header = () => {
                     RedirectPage(history);
 				} else {
                     setRoleList([]);
-                    data[userDetails.role] = userDetails.rolename;
+                    data[userInfo.role] = userInfo.rolename;
                     let tempList = [];
 					for (let rid in data) {
 						if (data[rid] !== selectedRole) tempList.push({'rid': rid, 'data': data[rid]})
@@ -153,7 +142,6 @@ const Header = () => {
 			if (data !== "fail") {
                 dispatch({type: actionTypes.SET_SR, payload: clickedRole.data});
                 dispatch({type: actionTypes.SET_USERINFO, payload: data});
-                // window.localStorage['_SRS'] = "success";
                 dispatch({type: SWITCHED, payload: true});
 				if (clickedRole.data === "Admin") {
 					window.localStorage['navigateScreen'] = "admin";
@@ -258,7 +246,7 @@ const Header = () => {
                             <span><img className = "user-name-icon" alt="user-ic" src="static/imgs/ic-user-nav.png"/></span>
                         </div>
                         <div className={"user-name-menu dropdown-menu dropdown-menu-right " + (showUD && "show")}>
-                            <div><Link className="user-role-item" to="#">{userRole || "Test Manager"}</Link></div>
+                            <div><Link className="user-role-item" to="#">{selectedRole || "Test Manager"}</Link></div>
                             <div className="divider" />
                             {
                                 !adminDisable &&

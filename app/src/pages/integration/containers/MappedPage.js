@@ -63,8 +63,7 @@ const MappedPage = props =>{
                 props.mappedfilesRes.forEach(object => {
                     tempRow.push({
                         "testCaseNames": object.qtestsuite, 
-                        "scenarioNames": object.testscenarioname,
-                        "reqDetails": object.reqdetails
+                        "scenarioNames": object.testscenarioname
                     });
                 })
             }

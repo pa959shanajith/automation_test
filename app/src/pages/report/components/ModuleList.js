@@ -53,7 +53,7 @@ const ModuleList = ({FnReport,displayError,setBlockui,setModDrop,modDrop}) =>{
     const modImage = {
         endtoend : "static/imgs/node-endtoend.png",
         screens : "static/imgs/node-screens.png",
-        modules : "static/imgs/node-modules.png"
+        basic :  "static/imgs/node-modules.png"
     }
     return(
         <div id='rp_module-list' style={{height:modDrop}} className='rp_moduleList'>
@@ -61,7 +61,7 @@ const ModuleList = ({FnReport,displayError,setBlockui,setModDrop,modDrop}) =>{
                 {moduleList.map((e,i)=>{
                     return(
                         <div  name={e.name} onClick={moduleClick} value={e._id} key={i} className={'toolbar__module-box'}>
-                            <img style={{opacity:suiteSelected._id===e._id?0.5:1}} src={modImage[e.type?e.type:'modules']} alt='module'></img>
+                            <img style={{opacity:suiteSelected._id===e._id?0.5:1}} src={modImage[e.type?e.type:'basic']} alt='module'></img>
                             <span value={e._id} >{e.name}</span>
                         </div>
                     )

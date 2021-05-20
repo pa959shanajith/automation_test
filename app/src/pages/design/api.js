@@ -1,5 +1,5 @@
 import axios from 'axios';
-const url = "https://"+window.location.hostname+":8443";
+import {url} from '../../App';
 
 /*Component DesignContent
   api returns {"mirror":"","name":"","reuse":bool,"scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
