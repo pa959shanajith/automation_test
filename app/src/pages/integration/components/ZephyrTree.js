@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
+import { updateScrollBar } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import { RedirectPage } from '../../global';
 import * as actionTypes from '../state/action';
@@ -11,6 +12,7 @@ const CycleNode = props => {
 
     const handleClick = useCallback(()=>{
         setCollapse(!collapse);
+        updateScrollBar();
     }, [collapse, setCollapse])
 
     return <div className="int__cycleNode" style={{paddingLeft: 17}}>
@@ -70,6 +72,7 @@ const PhaseNode = props => {
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         }
         else setCollapse(true);
+        updateScrollBar();
         // eslint-disable-next-line react-hooks/exhaustive-deps        
     }, [collapse, setCollapse])
     

@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, CalendarComp } from '../../global' 
+import {ScreenOverlay, PopupMsg, CalendarComp, updateScrollBar } from '../../global';
 import {getUserDetails, getCIUsersDetails, fetchICE} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import ReactTooltip from 'react-tooltip';
@@ -106,6 +106,7 @@ const TokenMgmtForm = (props) => {
 			}
 		}
 		props.setShowList(true);
+		updateScrollBar();
     }
 
     const verifyName =(name) =>{

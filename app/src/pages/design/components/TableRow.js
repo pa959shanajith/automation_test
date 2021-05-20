@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { updateScrollBar } from '../../global';
 import "../styles/TableRow.scss";
 
 /*
@@ -112,6 +113,7 @@ const TableRow = (props) => {
                     setEscapeFlag(true);
                 }
             }
+            updateScrollBar();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.focusedRow, props.edit]);
