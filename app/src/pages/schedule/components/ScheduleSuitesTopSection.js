@@ -49,6 +49,17 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                     };
                 }
             })
+
+            //CR 2287 - If a scenario is opened and then navigated to it's scheduling then by default that particular scenario must be selected and rest of the scenarios from the module must be unselected.
+            if (current_task.scenarioFlag === 'True') {
+                for (var m = 0; m < keys.length; m++) {
+                    for (var k = 0; k < tableData[m].scenarioids.length; k++) {
+                        if (tableData[m].scenarioids[k] === current_task.assignedTestScenarioIds || tableData[m].scenarioids[k] === current_task.assignedTestScenarioIds[0]) {
+                            tableData[m].executestatus[k] = 1;
+                        } else tableData[m].executestatus[k] = 0;
+                    }
+                }
+            }
             setModuleScheduledate(moduleScheduledateTime);
             setScheduleTableData(tableData);
             updateScenarioStatus(tableData);
