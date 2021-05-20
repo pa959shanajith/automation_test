@@ -45,7 +45,8 @@ function loadReports() {
         $('.logintojira').show();
         var overallStatus = $('.overallStatusVal').text();
         if(overallStatus.indexOf('Incomplete') != '-1') {
-            $('.toggleIncompleteStatus').hide();
+            $('.toggleIncompleteStatus').show();
+            $('.logintojira').hide();
         } else if(overallStatus.indexOf('Skipped') != '-1'){
             $('.toggleIncompleteStatus').show();
             $('.logintojira').hide();
