@@ -145,7 +145,7 @@ exports.manageDataTable = async(req, res) => {
 		};
 		if (action == "create" || action == "edit") {
 			inputs.dtheaders = req.body.dtheaders;
-			inputs.datatable = JSON.stringify(req.body.datatable);
+			inputs.datatable = req.body.datatable;
 		}
 		const result = await utils.fetchData(inputs, "utility/manageDataTable", fnName);
 		if (result == "fail" || result == "forbidden") res.status(500).send("fail");
