@@ -259,7 +259,7 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
     return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}
 }
 
-export const createNewMap = (verticalLayout,types,name) => {
+export const createNewMap = (verticalLayout,types,name,sections) => {
     var nodeDisplay = {}
     var dNodes = []
     var translate
@@ -270,17 +270,18 @@ export const createNewMap = (verticalLayout,types,name) => {
         childIndex: 0,
         name: name?name:'Module_0',
         type: types?types:'modules',
-        y: cSize[1] * 0.4,
-        x: cSize[0] * 0.1 * 0.9,
         children: [],
         parent: null,
         state: 'created',
         _id: null
     };
     if (verticalLayout) {
-        node.y = cSize[1] * 0.1 * (0.9);
         node.x = cSize[0] * 0.4;
-    };
+        node.y = sections[node.type]
+    }else{
+        node.y = cSize[1] * 0.4
+        node.x = sections[node.type]
+    }
     dNodes.push(node);
     nodeDisplay[0] = addNode(dNodes[0]);
     nodeDisplay[0].task = false;
@@ -290,7 +291,7 @@ export const createNewMap = (verticalLayout,types,name) => {
     else{
         translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
     }
-    return{nodes:nodeDisplay,dNodes,translate}
+    return{nodes:nodeDisplay,dNodes,translate,sections}
 }
 
 export const addNode = (n) =>{
