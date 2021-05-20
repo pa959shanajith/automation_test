@@ -211,19 +211,18 @@ module.exports.Execution_Queue = class Execution_Queue {
         return response;
     }
 
-    static addAPITestSuiteToQueue = async (testSuiteRequest, res) => {
+    static addAPITestSuiteToQueue = async (testSuiteRequest, res, userInfo) => {
         let targetICE = EMPTYUSER;
         let request_pool_name = EMPTYUSER;
         let poolid = "";
         const hdrs = testSuiteRequest.headers;
-        const multiBatchExecutionData = testSuiteRequest.body.executionData;
+        const batchExecutionData = testSuiteRequest.body.executionData;
         try {
-            if (testSuiteRequest.body && testSuiteRequest.body.executionData && testSuiteRequest.body.executionData[0] && testSuiteRequest.body.executionData[0].userInfo) {
-                let suite = testSuiteRequest.body.executionData[0].userInfo;
+            if (userInfo) {
                 //Check wether poolname or icename provided (Execution on pool name not supported in this implementation)
-                if (suite.icename) targetICE = testSuiteRequest.body.executionData[0].userInfo.icename;
-                if (suite.poolname) {
-                    request_pool_name = suite.poolname;
+                if (userInfo.icename) targetICE = userInfo.icename;
+                if (userInfo.poolname) {
+                    request_pool_name = userInfo.poolname;
                     for (let id in this.queue_list) {
                         if (this.queue_list[id].name === request_pool_name) {
                             poolid = id;
@@ -237,12 +236,11 @@ module.exports.Execution_Queue = class Execution_Queue {
                 res.setHeader(constants.X_EXECUTION_MESSAGE, "Request Recieved")
                 return res.status("200").send("Request Recieved");
             }
-            if (!multiBatchExecutionData || multiBatchExecutionData.constructor !== Array || multiBatchExecutionData.length === 0) {
+            if (!batchExecutionData) {
                 res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["400"])
                 return res.status("400").send({ "error": "Empty or Invalid Batch Data" });
             }
             let suiteRequest = { "executionData": testSuiteRequest.body.executionData, "headers": testSuiteRequest.headers }
-            let userInfo = testSuiteRequest.body.executionData[0].userInfo;
             let testSuite = { "testSuiteRequest": suiteRequest, "type": "API", "userInfo": userInfo }
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
                 if (this.ice_list[targetICE]["mode"] && !this.ice_list[targetICE]["status"]) {

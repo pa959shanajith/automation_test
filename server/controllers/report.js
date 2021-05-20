@@ -865,6 +865,13 @@ exports.getReportsData_ICE = async (req, res) => {
     }
 };
 
+const getUserInfoFromHeaders = (headers) => {
+	if (headers['x-token_hash'] && headers['x-token_name'] && headers['x-icename']) {
+		return { 'tokenhash': headers['x-token_hash'], "tokenname": headers['x-token_name'], 'icename': headers['x-icename'], 'poolname': ''}
+	}
+	return false;
+}
+
 //Get report for execution
 exports.getReport_API = async (req, res) => {
     const fnName = "getReport_API";
@@ -876,7 +883,12 @@ exports.getReport_API = async (req, res) => {
 		var scenarioIds = execData.scenarioIds;
 		var finalReport = [];
 		var tempModDict = {};
-		const userInfo = await utils.tokenValidation(req.body.userInfo);
+        let headerUserInfo = getUserInfoFromHeaders(req.headers)
+        if (!headerUserInfo){
+            res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
+            return res.status('400').send({'error':"Invalid or missing user info in request headers."})
+        }
+		const userInfo = await utils.tokenValidation(headerUserInfo);
 		const execResponse = userInfo.inputs;
         if (execResponse.tokenValidation !== "passed") {
             finalReport.push(execResponse);
@@ -999,7 +1011,12 @@ exports.getExecution_metrics_API = async(req, res) => {
     logger.info("Inside UI service: getExecution_metrics_API");
     var statusCode = '500';
     try {
-        const userInfo = await utils.tokenValidation(req.body.userInfo);
+        const headerUserInfo = getUserInfoFromHeaders(req.headers);
+        if (!headerUserInfo){
+            res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
+            return res.status('400').send({'error':"Invalid or missing user info in request headers."})
+        }
+		const userInfo = await utils.tokenValidation(headerUserInfo);
         var execResponse = userInfo.inputs;
         var finalReport=[];
         if (execResponse.tokenValidation == "passed"){
@@ -1019,11 +1036,11 @@ exports.getExecution_metrics_API = async(req, res) => {
         }
         finalReport.push(execResponse);
         logger.info("Sending reports in the service getExecution_metrics_API: final function");
-        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES(statusCode));
+        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode]);
         return res.status(statusCode).send(finalReport);
     } catch (exception) {
         logger.error("Exception in the service getExecution_metrics_API - Error: %s", exception);
-        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES("500"));
+        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["500"]);
         return res.status("500").send("fail");
     }
 };
