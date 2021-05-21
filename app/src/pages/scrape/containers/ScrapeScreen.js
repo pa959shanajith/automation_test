@@ -103,9 +103,6 @@ const ScrapeScreen = ()=>{
                         setScrapeItems(newScrapeList);
                         setHideSubmit(false);
                         setSaved(true);
-                        setOverlay("");
-                        dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
-                        dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
                     }
                     else {
                         setScrapeItems([]);
@@ -114,74 +111,49 @@ const ScrapeScreen = ()=>{
                         setMirror(null);
                         setSaved(true);
                         setHideSubmit(true);
-                        dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
-                        dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
-                        setOverlay("");
                     }
+                    setOverlay("");
+                    dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
+                    dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
                 }
                 else if (typeof data === "object" && current_task.appType==="Webservice"){
-                    if (data.endPointURL && data.method) {
-                        dispatch({type: actionTypes.SET_WSDATA, payload: {endPointURL: data.endPointURL}});
-                        dispatch({type: actionTypes.SET_WSDATA, payload: {method : data.method}});
-                        dispatch({type: actionTypes.SET_WSDATA, payload: {opInput : data.operations || ""}});
+                    haveItems = data.endPointURL && data.method;
+                    if (haveItems) {
                         
-                        dispatch({type: actionTypes.SET_WSDATA, payload: {reqHeader : data.header ? data.header.split("##").join("\n"): ""}});
-                        dispatch({type: actionTypes.SET_WSDATA, payload: {paramHeader : data.param ? data.param.split("##").join("\n"): ""}});
+                        let localReqBody = "";
+                        if (data.body) localReqBody = getProcessedBody(data.body, 'fetch');
                         
-                        if (data.body){
-                            let localReqBody;
-                            if (!data.body.indexOf("{") || !data.body.indexOf("[")) {
-                                let jsonObj = JSON.parse(data.body);
-                                let jsonPretty = JSON.stringify(jsonObj, null, '\t');
-                                localReqBody = jsonPretty;
-                            } else {
-                                localReqBody = formatXml(data.body.replace(/>\s+</g, '><'));
-                                if(localReqBody==='\r\n') localReqBody = '';
-                            }
-                            dispatch({type: actionTypes.SET_WSDATA, payload: {reqBody : localReqBody}});
-                        } else dispatch({type: actionTypes.SET_WSDATA, payload: {reqBody : ""}});
+                        let localRespBody = "";
+                        if (data.responseBody) localRespBody = getProcessedBody(data.responseBody, 'fetch');
 
-                        dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader : data.responseHeader ? data.responseHeader.split("##").join("\n") : ""}});
-                        
-                        if (data.responseBody) {
-                            let localRespBody;
-                            if (!data.responseBody.indexOf("{") || !data.responseBody.indexOf("[")) {
-                                let jsonObj = JSON.parse(data.responseBody);
-                                let jsonPretty = JSON.stringify(jsonObj, null, '\t');
-                                localRespBody = jsonPretty;
-                            } else {
-                                localRespBody = formatXml(data.responseBody.replace(/>\s+</g, '><'));
-                                if(localRespBody==='\r\n') localRespBody = '';
+                        dispatch({
+                            type: actionTypes.SET_WSDATA, 
+                            payload: {
+                                endPointURL: data.endPointURL,
+                                method : data.method,
+                                opInput : data.operations || "",
+                                reqHeader : data.header ? data.header.split("##").join("\n"): "",
+                                reqBody : localReqBody,
+                                paramHeader : data.param ? data.param.split("##").join("\n"): "",
+                                respHeader : data.responseHeader ? data.responseHeader.split("##").join("\n") : "",
+                                respBody : localRespBody
                             }
-                            dispatch({type: actionTypes.SET_WSDATA, payload: {respBody : localRespBody}});
-                        } else dispatch({type: actionTypes.SET_WSDATA, payload: {respBody : ""}});
-
-                        dispatch({type: actionTypes.SET_ACTIONERROR, payload: []});
-                        dispatch({type: actionTypes.SET_WSDLERROR, payload: []});
-                        setOverlay("");
+                        });
                         setSaved(true);
                         setHideSubmit(false);
-						dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: false});
-						dispatch({type: actionTypes.SET_DISABLEACTION, payload: true});
 					} else {
                         setSaved(false);
                         setHideSubmit(true);
-                        setOverlay("");
-                        dispatch({type: actionTypes.SET_ACTIONERROR, payload: []});
-                        dispatch({type: actionTypes.SET_WSDLERROR, payload: []});
                         dispatch({type: actionTypes.SET_WSDATA, payload: {
-                            endPointURL: "",
-                            method: "0",
-                            opInput: "",
-                            reqHeader: "",
-                            reqBody: "",
-                            respHeader: "",
-                            respBody: "",
-                            paramHeader: "",
+                            endPointURL: "", method: "0", opInput: "", reqHeader: "",
+                            reqBody: "", respHeader: "", respBody: "", paramHeader: "",
                         }});
-						dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: true});
-						dispatch({type: actionTypes.SET_DISABLEACTION, payload: false});
-					}
+                    }
+                    setOverlay("");
+                    dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
+                    dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
+                    dispatch({type: actionTypes.SET_ACTIONERROR, payload: []});
+                    dispatch({type: actionTypes.SET_WSDLERROR, payload: []});
                 }
                 else{
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
@@ -204,46 +176,28 @@ const ScrapeScreen = ()=>{
     const startScrape = (browserType, compareFlag) => {
         let appType = current_task.appType;
         if (appType === "Webservice") {
-
-            let proceed = false;
-            let authCert = false;
             let arg = {}
             let testCaseWS = []
-            let keywordVal;
-            let wsdlInputs = [ endPointURL, method, opInput ];
-            //eslint-disable-next-line
-            wsdlInputs.push(reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
-            //eslint-disable-next-line
-            wsdlInputs.push(paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"'));
-            //eslint-disable-next-line
-            wsdlInputs.push(reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"'));
-            if (Object.keys(certificateInfo).length!==0){
-                wsdlInputs.push(certificateInfo.certsDetails+";");
-                wsdlInputs.push(certificateInfo.authDetails);
-            }
-            let certURL = endPointURL.indexOf('https')
-            if (certURL===0) arg.res = certificateInfo;
+            let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
+            let wsdlInputs = [ 
+                endPointURL, method, opInput, getFormattedValue(reqHeader), 
+                getFormattedValue(paramHeader), getFormattedValue(reqBody, true) 
+            ];
 
-            if (!wsdlInputs[0]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["endPointURL"]}); // error
-            else if (method==="0") dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["method"]}); // error
-            else if (wsdlInputs[6]){
-                authCert = true;
-                proceed = true;
-            }
-            else {
-                if (wsdlInputs[1] === "POST") {
-                    if (!wsdlInputs[3]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqHeader"]}); // error
-                    else if (!wsdlInputs[5]) dispatch({type: actionTypes.SET_ACTIONERROR, payload: ["reqBody"]}); // error
-                    else proceed = true;
-                } else proceed = true;
-            }
+            if (Object.keys(certificateInfo).length)
+                wsdlInputs.push(...[certificateInfo.certsDetails+";", certificateInfo.authDetails]);
+
+            if (endPointURL.indexOf('https')===0) 
+                arg.res = certificateInfo;
+
+            let [ error, auth, proceed ] = validateWebserviceInputs(wsdlInputs);
+
+            if (error) dispatch({type: actionTypes.SET_ACTIONERROR, payload: error});
+
             if (proceed) {
                 dispatch({type: actionTypes.SET_ACTIONERROR, payload: []});
-                if (authCert){
-                    keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody","addClientCertificate","setBasicAuth"]
-                }else{
-                    keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"]
-                }
+                if (auth)
+                    keywordVal.push(...["addClientCertificate","setBasicAuth"])
 
                 if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
                 else wsdlInputs.splice(4, 1);
@@ -252,34 +206,10 @@ const ScrapeScreen = ()=>{
                 ResetSession.start();
                 for (let i = 0; i < wsdlInputs.length; i++) {
                     if (wsdlInputs[i] !== "") {
-                        testCaseWS.push({
-                            "stepNo": i + 1,
-                            "appType": appType,
-                            "objectName": "",
-                            "inputVal": [wsdlInputs[i]],
-                            "keywordVal": keywordVal[i],
-                            "outputVal": "",
-                            "url": "",
-                            "custname": "",
-                            "remarks": [""],
-                            "addTestCaseDetails": "",
-                            "addTestCaseDetailsInfo": ""
-                        })
+                        testCaseWS.push(getWSTestCase(i, appType, wsdlInputs[i], keywordVal[i]));
                     }
                 }
-                testCaseWS.push({
-                    "stepNo": testCaseWS.length + 1,
-                    "appType": appType,
-                    "objectName": "",
-                    "inputVal": [""],
-                    "keywordVal": "executeRequest",
-                    "outputVal": "",
-                    "url": "",
-                    "custname": "",
-                    "remarks": [""],
-                    "addTestCaseDetails": "",
-                    "addTestCaseDetailsInfo": ""
-                });
+                testCaseWS.push(getWSTestCase(testCaseWS.length, appType, "", "executeRequest"));
                 arg.testcasename = "";
                 arg.apptype = "Webservice";
                 arg.testcase = testCaseWS;
@@ -298,22 +228,9 @@ const ScrapeScreen = ()=>{
                     } else if (typeof data === "object") {
                         setShowPop({title: "Data Retrieve", content: "Web Service response received successfully"});
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader: data.responseHeader[0].split("##").join("\n")}});
-                        let localRespBody;
-                        if (data.responseBody[0].indexOf("{") === 0 || data.responseBody[0].indexOf("[") === 0) {
-                            var jsonObj = JSON.parse(data.responseBody[0]);
-                            var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-                            //eslint-disable-next-line
-                            localRespBody = jsonPretty.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
-                        } else {
-                            localRespBody = formatXml(data.responseBody[0].replace(/>\s+</g, '><'));
-                            //eslint-disable-next-line
-                            localRespBody = localRespBody.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
-                        }
+                        let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respBody: localRespBody}});
-
-                    } else {
-                        setShowPop({title: "Debug Web Service", content: "Debug Terminated."});
-                    }
+                    } else setShowPop({title: "Debug Web Service", content: "Debug Terminated."});
                 })
                 .catch(error => {
                     setOverlay("");
@@ -668,6 +585,56 @@ function generateScrapeItemList(lastVal, lastIdx, viewString){
     return localScrapeList;
 }
 
+
+function getProcessedBody (body, type) {
+    let processedBody = body;
+    if (body.indexOf("{") === 0 || body.indexOf("[") === 0) 
+        processedBody = JSON.stringify(JSON.parse(body), null, '\t');
+    else 
+        processedBody = formatXml(body.replace(/>\s+</g, '><'));
+
+    if (type === 'scrape')
+        processedBody = processedBody.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
+    else if (type === 'fetch' && processedBody === '\r\n')
+        processedBody = '';
+
+    return processedBody;
+}
+
+function getFormattedValue (value, extraspace) {
+    if (extraspace) return value.replace(/[\n\r]/g, '##').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
+    return value.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+}
+
+function validateWebserviceInputs (wsdlInputs) {
+    let error = false;
+    let auth = false;
+    let proceed = false;
+
+    if (!wsdlInputs[0]) error = ["endPointURL"];
+    else if (wsdlInputs[1]==="0") error = ["method"];
+    else if (wsdlInputs[6]){
+        auth = true;
+        proceed = true;
+    }
+    else {
+        if (wsdlInputs[1] === "POST") {
+            if (!wsdlInputs[3]) error = ["reqHeader"];
+            else if (!wsdlInputs[5]) error = ["reqBody"];
+            else proceed = true;
+        } else proceed = true;
+    }
+
+    return [error, auth, proceed];
+}
+
+function getWSTestCase (stepNo, appType, input, keyword) {
+    return {
+        "stepNo": stepNo + 1, "appType": appType, "objectName": "", "inputVal": [input],
+        "keywordVal": keyword, "outputVal": "", "url": "", "custname": "", "remarks": [""],
+        "addTestCaseDetails": "", "addTestCaseDetailsInfo": ""
+    }
+}
 
 function formatXml(xml) {
 	let formatted = '';

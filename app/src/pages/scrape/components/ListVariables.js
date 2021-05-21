@@ -1,24 +1,27 @@
 export const mobileMacFilters = [
     { label: "Button", tag: "Button"},
-    { label: "links", tag: "links"},
-    { label: "statictexts", tag: "statictext"},
-    { label: "image", tag: "image"},
+    { label: "Links", tag: "links"},
+    { label: "Cells", tag: "cell"},
+    { label: "TextField", tag: "iOSEditText"},
+    { label: "StaticTexts", tag: "statictext"},
+    { label: "Image", tag: "image"},
     { label: "RadioButton", tag: "RadioButton"},
-    { label: "Slider", tag: "XCUIElementTypeSlider"},
     { label: "Datepicker", tag: "Datepicker"},
     { label: "SecureTextField", tag: "iOSXCUIElementTypeSecureTextField"},
-    { label: "TextField", tag: "iOSEditText"},
-    { label: "OtherElements", tag: "otherElements"},
+    { label: "Slider", tag: "XCUIElementTypeSlider"},
+    { label: "OtherElements", tag: "othersMobile"},
     { label: "SearchField", tag: "iOSXCUIElementTypeSearchField"},
-    { label: "PickerWheelPickerWheel", tag: "XCUIElementTypePickerWheel"},
-    { label: "textView", tag: "textView"},
-    { label: "cells", tag: "cell"},
+    { label: "PickerWheel", tag: "XCUIElementTypePickerWheel"},
+    { label: "TextView", tag: "textView"},
     { label: "Duplicate Custnames", tag: "duplicateCustnames"}
 ]
 
 export const mobileFilters = [
     { label: "Button", tag: "android.widget.Button"},
+    { label: "Switch", tag: "android.widget.Switch"},
+    { label: "Others", tag: "othersMobile"},
     { label: "Checkbox", tag: "android.widget.CheckBox"},
+    { label: "SeekBar", tag: "android.widget.SeekBar"},
     { label: "NumberPicker", tag: "android.widget.NumberPicker"},
     { label: "TimePicker", tag: "android.widget.TimePicker"},
     { label: "DatePicker", tag: "android.widget.DatePicker"},
@@ -26,10 +29,8 @@ export const mobileFilters = [
     { label: "TextBox", tag: "android.widget.EditText"},
     { label: "ListView", tag: "android.widget.ListView"},
     { label: "Spinner", tag: "android.widget.Spinner"},
-    { label: "Switch", tag: "android.widget.Switch"},
     { label: "ImageButton", tag: "android.widget.ImageButton"},
-    { label: "SeekBar", tag: "android.widget.SeekBar"},
-    { label: "Others", tag: "othersAndroid"},
+    { label: "IRIS", tag: "iris"},
     { label: "Duplicate Custnames", tag: "duplicateCustnames"}
 ]
 

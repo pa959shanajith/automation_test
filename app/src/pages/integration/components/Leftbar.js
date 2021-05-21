@@ -22,7 +22,8 @@ const Leftbar = () => {
     }
 
     const barRender=()=>{
-        switch(viewMappedFiles){
+        let icon = viewMappedFiles || screenType;
+        switch(icon){
             case "qTest": 
             return(
                 <Fragment>

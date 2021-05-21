@@ -95,7 +95,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 console.error("Error::::", error);
             });
         }
-    }, []);
+    }, [userInfo, userRole]);
 
     const resetStates = () => {
         setShowSearch(false);
