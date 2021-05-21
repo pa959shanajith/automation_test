@@ -269,8 +269,8 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 };
 
 const getUserInfoFromHeaders = (headers) => {
-	if (headers['x-token_hash'] && headers['x-token_name'] && headers['x-icename']) {
-		return { 'tokenhash': headers['x-token_hash'], "tokenname": headers['x-token_name'], 'icename': headers['x-icename'], 'poolname': ''}
+	if (headers['x-token-hash'] && headers['x-token-name'] && (headers['x-ice-name'] != null || headers['x-pool-name'] != null)) {
+		return { 'tokenhash': headers['x-token-hash'], "tokenname": headers['x-token-name'], 'icename': headers['x-ice-name'], 'poolname': headers['x-pool-name']}
 	}
 	return false;
 }
