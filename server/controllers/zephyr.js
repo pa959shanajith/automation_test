@@ -6,110 +6,41 @@ var myserver = require('../lib/socket');
 var epurl = process.env.DAS_URL;
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 
 exports.loginToZephyr_ICE = function (req, res) {
-	var name;
 	try {
 		logger.info("Inside UI service: loginToZephyr_ICE");
-		if (utils.isSessionActive(req)) {
-			var username = req.session.username;
-			var name= undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			logger.debug("ICE Socket connecting IP: %s" , ip);
-			logger.debug("ICE Socket requesting Address: %s" , name);
-
-            var check_zephyrURL = !validator.isEmpty(req.body.zephyrURL);
-            var check_zephyrUserName = !validator.isEmpty(req.body.zephyrUserName);
-			var check_zephyrPassword = !validator.isEmpty(req.body.zephyrPassword);
-			if(!check_zephyrURL) {
-				logger.info("Error occurred in loginToZephyr_ICE: Invalid Zephyr URL");
-				return res.send("invalidurl");
-            }
-			if(check_zephyrURL && check_zephyrUserName &&  check_zephyrPassword) {
-				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-					if (redisres[1]>0) {
-						var zephyrURL = req.body.zephyrURL;
-						var zephyrUserName = req.body.zephyrUserName;
-						var zephyrPassword = req.body.zephyrPassword;
-						var integrationType = req.body.integrationType;
-						var zephyraction = req.body.zephyraction;
-						var zephyrDetails = {
-							"zephyrURL": zephyrURL,
-							"zephyrUserName": zephyrUserName,
-							"zephyrPassword": zephyrPassword,
-							"integrationType" : integrationType,
-							"zephyraction": zephyraction
-						};
-						logger.info("Sending socket request for zephyrlogin to redis");
-						dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						function zephyrlogin_listener(channel,message) {
-							var data = JSON.parse(message);
-							if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
-								redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
-								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in loginZephyrServer_ICE: Socket Disconnected");
-									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else if (data.onAction == "qcresponse") {
-									data = data.value;
-									res.send(data);
-								}
-							}
-						}
-						redisServer.redisSubServer.on("message",zephyrlogin_listener);
-					} else {
-						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-							var flag="";
-							if (found) flag = "scheduleModeOn";
-							else {
-								flag = "unavailableLocalServer";
-								logger.info("ICE Socket not Available");
-							}
-							res.send(flag);
-						});
-					}
-				});
-			} else {
-				logger.info("Error occurred in loginZephyrServer_ICE: Invalid Zephyr Credentials");
-				res.send("invalidcredentials");
-			}
-		} else {
-			logger.error("Invalid Session");
-			res.send("Invalid Session");
+		var username = req.session.username;
+		var name = undefined;
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+		redisServer.redisSubServer.subscribe('ICE2_' + name);
+		logger.debug("ICE Socket requesting Address: %s" , name);
+		const reqData = req.body;
+		var check_zephyrURL = !validator.isEmpty(reqData.zephyrURL);
+		var check_zephyrUserName = !validator.isEmpty(reqData.zephyrUserName);
+		var check_zephyrPassword = !validator.isEmpty(reqData.zephyrPassword);
+		if(!check_zephyrURL) {
+			logger.info("Error occurred in loginToZephyr_ICE: Invalid Zephyr URL");
+			return res.send("invalidurl");
 		}
-	} catch (exception) {
-		logger.error("Error occurred in loginZephyrServer_ICE:", exception.message);
-		res.send("fail");
-	}
-};
-
-exports.zephyrProjectDetails_ICE = function (req, res) {
-	logger.info("Inside UI service: zephyrProjectDetails_ICE");
-	var name;
-	try {
-		if (utils.isSessionActive(req)) {
-			var username = req.session.username;
-			var name= undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , name);
+		if(check_zephyrURL && check_zephyrUserName &&  check_zephyrPassword) {
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
-					var userid = req.body.user_id;
+					var zephyrURL = reqData.zephyrURL;
+					var zephyrUserName = reqData.zephyrUserName;
+					var zephyrPassword = reqData.zephyrPassword;
+					var integrationType = reqData.integrationType;
+					var zephyraction = reqData.zephyraction;
 					var zephyrDetails = {
-						"projectId": req.body.projectId,
-						"zephyraction": req.body.zephyraction
+						"zephyrURL": zephyrURL,
+						"zephyrUserName": zephyrUserName,
+						"zephyrPassword": zephyrPassword,
+						"integrationType" : integrationType,
+						"zephyraction": zephyraction
 					};
 					logger.info("Sending socket request for zephyrlogin to redis");
 					dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
@@ -144,82 +75,118 @@ exports.zephyrProjectDetails_ICE = function (req, res) {
 				}
 			});
 		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
+			logger.info("Error occurred in loginZephyrServer_ICE: Invalid Zephyr Credentials");
+			res.send("invalidcredentials");
 		}
 	} catch (exception) {
-		logger.error(exception.message);
-		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-			var flag="";
-			if (found) flag = "scheduleModeOn";
-			else flag = "unavailableLocalServer";
-			res.send(flag);
+		logger.error("Error occurred in loginZephyrServer_ICE:", exception.message);
+		res.send("fail");
+	}
+};
+
+exports.zephyrProjectDetails_ICE = function (req, res) {
+	logger.info("Inside UI service: zephyrProjectDetails_ICE");
+	try {
+		var username = req.session.username;
+		var name= undefined
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+		redisServer.redisSubServer.subscribe('ICE2_' + name);
+		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+		logger.debug("ICE Socket requesting Address: %s" , name);
+		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			if (redisres[1]>0) {
+				var zephyrDetails = {
+					"projectId": req.body.projectId,
+					"zephyraction": req.body.zephyraction
+				};
+				logger.info("Sending socket request for zephyrlogin to redis");
+				dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
+				redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+				function zephyrlogin_listener(channel,message) {
+					var data = JSON.parse(message);
+					if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
+						redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
+						if (data.onAction == "unavailableLocalServer") {
+							logger.error("Error occurred in loginZephyrServer_ICE: Socket Disconnected");
+							if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+								var soc = myserver.socketMapNotify[name];
+								soc.emit("ICEnotAvailable");
+							}
+						} else if (data.onAction == "qcresponse") {
+							data = data.value;
+							res.send(data);
+						}
+					}
+				}
+				redisServer.redisSubServer.on("message",zephyrlogin_listener);
+			} else {
+				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					var flag="";
+					if (found) flag = "scheduleModeOn";
+					else {
+						flag = "unavailableLocalServer";
+						logger.info("ICE Socket not Available");
+					}
+					res.send(flag);
+				});
+			}
 		});
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
 	}
 };
 
 exports.zephyrTestcaseDetails_ICE = function (req, res) {
 	logger.info("Inside UI service: zephyrTestcaseDetails_ICE");
-	var name;
 	try {
-		if (utils.isSessionActive(req)) {
-			var username = req.session.username;
-			var name= undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]>0) {
-					var userid = req.body.user_id;
-					var zephyrDetails = {
-						"treeId": req.body.treeId,
-						"zephyraction": req.body.zephyraction
-					};
-					logger.info("Sending socket request for zephyrlogin to redis");
-					dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					function zephyrlogin_listener(channel,message) {
-						var data = JSON.parse(message);
-						if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
-							redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in zephyrTestcaseDetails_ICE: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
-									soc.emit("ICEnotAvailable");
-								}
-							} else if (data.onAction == "qcresponse") {
-								data = data.value;
-								res.send(data);
+		var username = req.session.username;
+		var name = undefined;
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+		redisServer.redisSubServer.subscribe('ICE2_' + name);
+		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+		logger.debug("ICE Socket requesting Address: %s" , name);
+		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			if (redisres[1]>0) {
+				var zephyrDetails = {
+					"treeId": req.body.treeId,
+					"zephyraction": req.body.zephyraction
+				};
+				logger.info("Sending socket request for zephyrlogin to redis");
+				dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
+				redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+				function zephyrlogin_listener(channel,message) {
+					var data = JSON.parse(message);
+					if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
+						redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
+						if (data.onAction == "unavailableLocalServer") {
+							logger.error("Error occurred in zephyrTestcaseDetails_ICE: Socket Disconnected");
+							if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+								var soc = myserver.socketMapNotify[name];
+								soc.emit("ICEnotAvailable");
 							}
+						} else if (data.onAction == "qcresponse") {
+							data = data.value;
+							res.send(data);
 						}
 					}
-					redisServer.redisSubServer.on("message",zephyrlogin_listener);
-				} else {
-					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-						var flag="";
-						if (found) flag = "scheduleModeOn";
-						else {
-							flag = "unavailableLocalServer";
-							logger.info("ICE Socket not Available");
-						}
-						res.send(flag);
-					});
 				}
-			});
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
-		}
+				redisServer.redisSubServer.on("message",zephyrlogin_listener);
+			} else {
+				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					var flag="";
+					if (found) flag = "scheduleModeOn";
+					else {
+						flag = "unavailableLocalServer";
+						logger.info("ICE Socket not Available");
+					}
+					res.send(flag);
+				});
+			}
+		});
 	} catch (exception) {
 		logger.error(exception.message);
-		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-			var flag="";
-			if (found) flag = "scheduleModeOn";
-			else flag = "unavailableLocalServer";
-			res.send(flag);
-		});
+		res.send("fail");
 	}
 };
 
@@ -229,79 +196,68 @@ exports.zephyrCyclePhase_ICE = function (req, res) {
 		"avoassure_projects": '',
 		"project_dets": ""
 	};
-	var name;
 	try {
-		if (utils.isSessionActive(req)) {
-			var username = req.session.username;
-			var name= undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]>0) {
-					var userid = req.body.user_id;
-					var zephyrDetails = {
-						"releaseId": req.body.releaseId,
-						"zephyraction": req.body.zephyraction
-					};
-					getProjectsForUser(userid, function (projectdata) {
-						logger.info("Sending socket request for zephyrlogin to redis");
-						dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						function zephyrlogin_listener(channel,message) {
-							var data = JSON.parse(message);
-							if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
-								redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
-								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in zephyrCyclePhase_ICE: Socket Disconnected");
-									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else if (data.onAction == "qcresponse") {
-									if (data == "fail")
+		var username = req.session.username;
+		var name = undefined
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+		redisServer.redisSubServer.subscribe('ICE2_' + name);
+		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+		logger.debug("ICE Socket requesting Address: %s" , name);
+		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			if (redisres[1]>0) {
+				var userid = req.session.userid;
+				var zephyrDetails = {
+					"releaseId": req.body.releaseId,
+					"zephyraction": req.body.zephyraction
+				};
+				getProjectsForUser(userid, function (projectdata) {
+					logger.info("Sending socket request for zephyrlogin to redis");
+					dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					function zephyrlogin_listener(channel,message) {
+						var data = JSON.parse(message);
+						if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
+							redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
+							if (data.onAction == "unavailableLocalServer") {
+								logger.error("Error occurred in zephyrCyclePhase_ICE: Socket Disconnected");
+								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
+								}
+							} else if (data.onAction == "qcresponse") {
+								if (data == "fail")
+									res.send("fail");
+								else {
+									dataVal = data.value;
+									try {
+										projectDetailList.avoassure_projects = projectdata;
+										projectDetailList.project_dets = dataVal;
+										res.send(projectDetailList);
+									} catch (ex) {
+										logger.error(ex);
 										res.send("fail");
-									else {
-										dataVal = data.value;
-										try {
-											projectDetailList.avoassure_projects = projectdata;
-											projectDetailList.project_dets = dataVal;
-											res.send(projectDetailList);
-										} catch (ex) {
-											logger.error(ex);
-											res.send("fail");
-										}
 									}
 								}
 							}
 						}
-						redisServer.redisSubServer.on("message",zephyrlogin_listener);
-					});
-				} else {
-					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-						var flag="";
-						if (found) flag = "scheduleModeOn";
-						else {
-							flag = "unavailableLocalServer";
-							logger.info("ICE Socket not Available");
-						}
-						res.send(flag);
-					});
-				}
-			});
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
-		}
+					}
+					redisServer.redisSubServer.on("message",zephyrlogin_listener);
+				});
+			} else {
+				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					var flag="";
+					if (found) flag = "scheduleModeOn";
+					else {
+						flag = "unavailableLocalServer";
+						logger.info("ICE Socket not Available");
+					}
+					res.send(flag);
+				});
+			}
+		});
 	} catch (exception) {
 		logger.error(exception.message);
-		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-			var flag="";
-			if (found) flag = "scheduleModeOn";
-			else flag = "unavailableLocalServer";
-			res.send(flag);
-		});
+		res.send("fail");
 	}
 };
 
@@ -420,76 +376,39 @@ function projectandscenario(projectid, cb) {
 	});
 }
 
-exports.saveZephyrDetails_ICE = function (req, res) {
-	logger.info("Inside UI service: saveZephyrDetails_ICE");
-	var mappedDetails = req.body.mappedDetails;
-	var flag = true;
-	if (mappedDetails.length > 0) {
-		flag = true;
-	} else {
-		flag = false;
-	}
-	async.forEachSeries(mappedDetails, function (itr, callback) {
-		var testscenarioid = itr.scenarioId;
-
-		var projectid = itr.projectid;
-		var releaseid = itr.releaseid;
-		var treeid = itr.treeid;
-		var testid = itr.testid;
-		var testname = itr.testname;
-		var reqdetails = itr.reqdetails;
-		var inputs = {
-			"testscenarioid": testscenarioid,
-			'projectid': projectid,			
-			'releaseid': releaseid,
-			'treeid': treeid,
-			'testid': testid,
-			'testname': testname,
-			'reqdetails': reqdetails,
-			"query": "saveZephyrDetails_ICE"
-		};
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-			logger.info("Calling DAS Service: qualityCenter/saveIntegrationDetails_ICE");
-		client.post(epurl + "qualityCenter/saveIntegrationDetails_ICE", args,
-			function (zephyrdetailsows, response) {
-			if (response.statusCode != 200 || zephyrdetailsows.rows == "fail") {
-					logger.error("Error occurred in saveIntegrationDetails_ICE Error Code : ERRDAS");
-				flag = false;
-			}
-			callback();
-		});
-	}, function () {
-		if (flag) {
-			try {
-				if (utils.isSessionActive(req)) {
-					res.send("success");
-				} else {
-					logger.info("Invalid Session");
-					res.send("Invalid Session");
-				}
-			} catch (exception) {
-				logger.error(exception.message);
-				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-					var flag="";
-					if (found) flag = "scheduleModeOn";
-					else flag = "unavailableLocalServer";
-					res.send(flag);
-				});
-			}
-		} else {
-			res.send("fail");
+exports.saveZephyrDetails_ICE = async (req, res) => {
+	const fnName = "saveZephyrDetails_ICE";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var mappedDetails = req.body.mappedDetails;
+		var flag = mappedDetails.length > 0;
+		if (!flag) return res.send('fail');
+		for (let i=0; i<mappedDetails.length; i++) {
+			let itr = mappedDetails[i];
+			const inputs = {
+				"testscenarioid": itr.scenarioId,
+				'projectid': itr.projectid,			
+				'releaseid': itr.releaseid,
+				'treeid': itr.treeid,
+				'testid': itr.testid,
+				'testname': itr.testname,
+				'reqdetails': itr.reqdetails,
+				"query": "saveZephyrDetails_ICE"
+			};
+			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
+			if (result == "fail") flag = false;
 		}
-	});
+		if (!flag) return res.send('fail');
+		res.send("success");
+	} catch (exception) {
+		logger.error("Error occurred in zephyr/"+fnName+":", exception);
+		res.send("fail");
+	}
 };
 
 exports.viewZephyrMappedList_ICE = function (req, res) {
 	logger.info("Inside UI service: viewZephyrMappedList_ICE");
-	var userid = req.body.user_id;
+	var userid = req.session.userid;
 	getZephyrDetailsForUser(userid, function (responsedata) {
 		res.send(responsedata);
 	});
@@ -618,7 +537,7 @@ function zephyrscenariodetails(projectid, cb) {
 
 exports.manualTestcaseDetails_ICE = function(req,res){
     logger.info("Inside UI service: manualTestcaseDetails_ICE");
-    getProjectsAndModules(req.body.user_id,function(data){
+    getProjectsAndModules(req.session.userid,function(data){
         res.send(data);
     });
 };
