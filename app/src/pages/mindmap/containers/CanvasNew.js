@@ -75,10 +75,9 @@ const CanvasNew = (props) => {
                 //setBlockui({show:true,content:'Creating Nodes...'})
                 props.module.importData.data.forEach((e,i)=>{
                     if (i === 0) {
-                        tree = createNewMap(props.verticalLayout,undefined,e.name)
+                        tree = createNewMap(props.verticalLayout,undefined,e.name,types)
                         tree.links = {}
                         tree.dLinks = []
-                        tree.sections = types
                         count['modules'] = 1
                         typeo = 1;
                     }else {
@@ -106,8 +105,7 @@ const CanvasNew = (props) => {
                 if(props.module.importData.createdby==='pd')setCreateNew('save')
             }else{
                 //create new mindmap
-                tree = createNewMap(props.verticalLayout)
-                tree.sections = types
+                tree = createNewMap(props.verticalLayout,undefined,undefined,types)
                 tree.links = {}
                 tree.dLinks = []
                 if(zoom){

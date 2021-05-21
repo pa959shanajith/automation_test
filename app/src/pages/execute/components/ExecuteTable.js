@@ -100,6 +100,7 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
                                 initialTableData.push({
                                     "executestatus": [rowData.executestatus[k]]
                                 })
+                                break;
                             } 
                         }
                     }
