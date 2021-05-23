@@ -179,6 +179,195 @@ const getDatatable = async (d) => {
 	return utils.fetchData(inputs, "utility/fetchDatatable", "fetchDatatable");
 };
 
+exports.importDtFromExcel = function (req, res) {
+	const fnName = "importDtFromExcel";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
+		if (req.body.data.flag == 'sheetname') {
+			return res.status(200).send(wb1.SheetNames);
+		}
+		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+		var numSheets = myCSV.length / 2;
+		var qObj = {};
+		if (numSheets == 0) {
+			return res.status(200).send("emptySheet");
+		}
+		//If rows > 200 and column > 10 fail
+
+		//else continue
+		for (var k = 0; k < numSheets; k++) {
+			var cSheet = myCSV[k * 2 + 1];
+			var cSheetRow = cSheet.split('\n');
+			rows = [];
+			if (k == 0) {
+				columnNames = cSheetRow[k].split(',');
+			} 
+			if(columnNames.length>10) {
+				//error
+				return res.status(500).send("columnExceeds");
+			}
+			if(cSheetRow.length >200) {
+				//error
+				return res.status(500).send("rowExceeds");
+			}
+			for (var i = 1; i < cSheetRow.length; i++) {
+				var row = cSheetRow[i].split(',');
+				newObj = {};
+				for(var j=0; j<columnNames.length; ++j) {
+					newObj[columnNames[j]] = row[j]
+				}
+				rows.push(newObj);
+			}
+			qObj['datatable'] = rows;
+		}
+		res.status(200).send(qObj);
+	} catch(exception) {
+		logger.error("Error occurred in utility/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+exports.importDtFromCSV = function (req, res) {
+	const fnName = "importDtFromExcel";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var myCSV = req.body.data.content;
+		var qObj = {};
+		//If rows > 200 and column > 10 fail
+
+		//else continue
+		var csvArray = myCSV.split('\n');
+		if (csvArray.length > 200) {
+			return res.status(500).send("rowExceeds");
+		}
+		for (var k = 0; k < csvArray.length; k++) {
+			rows = [];
+			if (k == 0) {
+				columnNames = csvArray[k].split(',');
+			} 
+			var row = csvArray[k].split(',');
+			if(columnNames.length>10) {
+				return res.status(500).send("columnExceeds");
+			}
+			if ( k != 0) {
+				for (var i = 1; i < row.length; i++) {
+					newObj = {};
+					for(var j=0; j<columnNames.length; ++j) {
+						newObj[columnNames[j]] = row[j]
+					}
+					rows.push(newObj);
+				}
+			}
+			qObj['datatable'] = rows;
+		}
+		res.status(200).send(qObj);
+	} catch(exception) {
+		logger.error("Error occurred in utility/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+exports.exportToExcel = async (req, res) => {
+	const fnName = "exportToExcel";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		logger.info("Fetching Module details");
+		var d = req.body;
+		var excelMap = await getDatatable({"datatablename":d.datatablename})
+		dts = excelMap.rows[0];
+		datatable = dts.datatable;
+		logger.info("Writing Datatable structure to Excel");
+		var dir = './../../excel';
+		var excelDirPath = path.join(__dirname, dir);
+		var filePath = path.join(excelDirPath, d.filename+'.xlsx');
+
+		try {
+			if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
+			if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
+		} catch (e) {
+			logger.error("Exception in utilityService: exportToExcel: Create Directory/Remove file", e);
+		}
+
+		//create a new workbook file in current working directory
+		var wb = new xl.Workbook();
+		var ws = wb.addWorksheet('Sheet1');
+
+		logger.debug(d.datatablename);
+
+		//create the new worksheet with coloumns and rows specified in data
+		for (var i=1;i<=datatable.length;i++) {
+			if(i==1) {
+				keys = Object.keys(datatable[0]);
+				col=1;
+				keys.array.forEach(element => {
+					ws.cell(i,col).string(element);
+					col+=1;
+				});
+			} else {
+				for(var j=1;j<=keys.length;++j) {
+					ws.cell(i,j).string(datatable[i-1].keys[j-1]);
+				}
+			}
+		}
+		//save it
+		wb.write('./excel/samp234.xlsx',function (err) {
+			if (err) return res.send('fail');
+			res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+			var rstream = fs.createReadStream(filePath);
+			rstream.pipe(res);
+		});
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+
+};
+
+exports.exportToCSV = async (req, res) => {
+	const fnName = "exportToCSV";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		logger.info("Fetching Datatable details");
+		var d = req.body;
+		var csvMap = await getDatatable({"datatablename":d.datatablename})
+		dts = excelMap.rows[0];
+		datatable = dts.datatable;
+		logger.info("Writing Datatable structure to CSV");
+		var dir = './../../csv';
+		var csvDirPath = path.join(__dirname, dir);
+		var filePath = path.join(csvDirPath, d.filename+'.csv');
+
+		try {
+			if (!fs.existsSync(csvDirPath)) fs.mkdirSync(csvDirPath); // To create directory for storing csv files if DNE.
+			if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
+		} catch (e) {
+			logger.error("Exception in utilityService: exportToExcel: Create Directory/Remove file", e);
+		}
+
+		logger.debug(d.datatablename);
+
+		//create csv value
+		var csv = datatable.map(row => Object.values(row));
+		csv.unshift(Object.keys(data[0]));
+		var finalcsv = csv.join('\n');
+
+		//save it
+		// fs.writeFileSync(filePath, finalcsv, function(err) {});
+		fs.writeFileSync('./csv/'+d.filename+'.csv', finalcsv, function (err) {
+			if (err) return res.send('fail');
+			res.writeHead(200, {'Content-Type': 'text/csv'});
+			var rstream = fs.createReadStream(filePath);
+			rstream.pipe(res);
+		});
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+
+};
+
+
 /*exports.pairwise_ICE = function (req, res) {
 	if (utils.isSessionActive(req)) {
 		var abc = {}
