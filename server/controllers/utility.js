@@ -6,6 +6,10 @@ var client = new Client();
 var epurl = process.env.DAS_URL;
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var validator =  require('validator');
+var xl = require('excel4node');
+var xlsx = require('xlsx');
+var path = require('path');
+var fs = require('fs');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
 
@@ -183,20 +187,20 @@ exports.importDtFromExcel = function (req, res) {
 	const fnName = "importDtFromExcel";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
-		if (req.body.data.flag == 'sheetname') {
+		var wb1 = xlsx.read(req.body.content, {'type': 'binary'});
+		if (req.body.flag == 'sheetname') {
 			return res.status(200).send(wb1.SheetNames);
 		}
-		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+		var myCSV = xlsToCSV(wb1, req.body.sheetname);
 		var numSheets = myCSV.length / 2;
 		var qObj = {};
 		if (numSheets == 0) {
 			return res.status(200).send("emptySheet");
 		}
+		rows = [];
 		for (var k = 0; k < numSheets; k++) {
 			var cSheet = myCSV[k * 2 + 1];
 			var cSheetRow = cSheet.split('\n');
-			rows = [];
 			if (k == 0) {
 				columnNames = cSheetRow[k].split(',');
 			} 
@@ -214,8 +218,9 @@ exports.importDtFromExcel = function (req, res) {
 				}
 				rows.push(newObj);
 			}
-			qObj['datatable'] = rows;
 		}
+		qObj['datatable'] = rows;
+		qObj['dtheaders'] = columnNames;
 		res.status(200).send(qObj);
 	} catch(exception) {
 		logger.error("Error occurred in utility/"+fnName+":", exception);
@@ -227,32 +232,34 @@ exports.importDtFromCSV = function (req, res) {
 	const fnName = "importDtFromExcel";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		var myCSV = req.body.data.content;
+		var myCSV = req.body.content;
 		var qObj = {};
 		var csvArray = myCSV.split('\n');
 		if (csvArray.length > 200) {
 			return res.status(500).send("rowExceeds");
 		}
+		rows = [];
 		for (var k = 0; k < csvArray.length; k++) {
-			rows = [];
 			if (k == 0) {
 				columnNames = csvArray[k].split(',');
-			} 
-			var row = csvArray[k].split(',');
-			if(columnNames.length>10) {
-				return res.status(500).send("columnExceeds");
-			}
-			if ( k != 0) {
-				for (var i = 1; i < row.length; i++) {
-					newObj = {};
-					for(var j=0; j<columnNames.length; ++j) {
-						newObj[columnNames[j]] = row[j]
+				if(columnNames.length>10) {
+					return res.status(500).send("columnExceeds");
+				}
+			} else  { 
+				var row = csvArray[k].split(',');
+				if ( k != 0) {
+					for (var i = 1; i < row.length; i++) {
+						newObj = {};
+						for(var j=0; j<columnNames.length; ++j) {
+							newObj[columnNames[j]] = row[j]
+						}
+						rows.push(newObj);
 					}
-					rows.push(newObj);
 				}
 			}
-			qObj['datatable'] = rows;
 		}
+		qObj['datatable'] = rows;
+		qObj['dtheaders'] = columnNames;
 		res.status(200).send(qObj);
 	} catch(exception) {
 		logger.error("Error occurred in utility/"+fnName+":", exception);
@@ -266,8 +273,8 @@ exports.exportToExcel = async (req, res) => {
 	try {
 		logger.info("Fetching Module details");
 		var d = req.body;
-		var excelMap = await getDatatable({"datatablename":d.datatablename})
-		dts = excelMap.rows[0];
+		var excelMap = await getDatatable({"datatablename":d.datatablename, 'action': 'datatable'})
+		dts = excelMap[0];
 		datatable = dts.datatable;
 		logger.info("Writing Datatable structure to Excel");
 		var dir = './../../excel';
@@ -292,18 +299,19 @@ exports.exportToExcel = async (req, res) => {
 			if(i==1) {
 				keys = Object.keys(datatable[0]);
 				col=1;
-				keys.array.forEach(element => {
+				keys.forEach(element => {
 					ws.cell(i,col).string(element);
 					col+=1;
 				});
 			} else {
 				for(var j=1;j<=keys.length;++j) {
-					ws.cell(i,j).string(datatable[i-1].keys[j-1]);
+					rowVal = datatable[i-1][keys[j-1]]
+					ws.cell(i,j).string(rowVal);
 				}
 			}
 		}
 		//save it
-		wb.write('./excel/samp234.xlsx',function (err) {
+		wb.write('./excel/'+d.filename+'.xlsx',function (err) {
 			if (err) return res.send('fail');
 			res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 			var rstream = fs.createReadStream(filePath);
@@ -322,8 +330,8 @@ exports.exportToCSV = async (req, res) => {
 	try {
 		logger.info("Fetching Datatable details");
 		var d = req.body;
-		var csvMap = await getDatatable({"datatablename":d.datatablename})
-		dts = csvMap.rows[0];
+		var csvMap = await getDatatable({"datatablename":d.datatablename, 'action': "datatable"})
+		dts = csvMap[0];
 		datatable = dts.datatable;
 		logger.info("Writing Datatable structure to CSV");
 		var dir = './../../csv';
@@ -341,7 +349,7 @@ exports.exportToCSV = async (req, res) => {
 
 		//create csv value
 		var csv = datatable.map(row => Object.values(row));
-		csv.unshift(Object.keys(data[0]));
+		csv.unshift(Object.keys(datatable[0]));
 		var finalcsv = csv.join('\n');
 
 		//save it
@@ -358,7 +366,6 @@ exports.exportToCSV = async (req, res) => {
 	}
 
 };
-
 
 /*exports.pairwise_ICE = function (req, res) {
 	if (utils.isSessionActive(req)) {
@@ -384,3 +391,14 @@ exports.exportToCSV = async (req, res) => {
 	}
 }*/
 
+/* Convert excel file to CSV Object. */
+var xlsToCSV = function (workbook, sheetname) {
+	var result = [];
+	var csv = xlsx.utils.sheet_to_csv(workbook.Sheets[sheetname]);
+	if (csv.length > 0) {
+		result.push(sheetname);
+		result.push(csv);
+	}
+	//return result.join("\n");
+	return result;
+};
