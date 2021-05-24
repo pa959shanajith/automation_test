@@ -130,7 +130,7 @@ function closestCord(arr_co, new_one) {
 const checkparenttask = (parentNode,parent_flag)=>{
     if (parent_flag) return parent_flag;
     if(parentNode!=null){
-        if (parentNode.taskexists!=null) {
+        if (parentNode.taskexists!=null && parentNode.taskexists.status !== 'complete') {
             parent_flag=true;
         }
         parentNode=parentNode.parent || null;
@@ -259,7 +259,7 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
     return {nodes:nodeDisplay,links:linkDisplay,translate:translate,dNodes,dLinks,sections,count}
 }
 
-export const createNewMap = (verticalLayout,types,name) => {
+export const createNewMap = (verticalLayout,types,name,sections) => {
     var nodeDisplay = {}
     var dNodes = []
     var translate
@@ -270,17 +270,18 @@ export const createNewMap = (verticalLayout,types,name) => {
         childIndex: 0,
         name: name?name:'Module_0',
         type: types?types:'modules',
-        y: cSize[1] * 0.4,
-        x: cSize[0] * 0.1 * 0.9,
         children: [],
         parent: null,
         state: 'created',
         _id: null
     };
     if (verticalLayout) {
-        node.y = cSize[1] * 0.1 * (0.9);
         node.x = cSize[0] * 0.4;
-    };
+        node.y = sections[node.type]
+    }else{
+        node.y = cSize[1] * 0.4
+        node.x = sections[node.type]
+    }
     dNodes.push(node);
     nodeDisplay[0] = addNode(dNodes[0]);
     nodeDisplay[0].task = false;
@@ -290,7 +291,7 @@ export const createNewMap = (verticalLayout,types,name) => {
     else{
         translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
     }
-    return{nodes:nodeDisplay,dNodes,translate}
+    return{nodes:nodeDisplay,dNodes,translate,sections}
 }
 
 export const addNode = (n) =>{
@@ -495,7 +496,7 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setP
     var t = s.attr('data-nodetype');
     if (t === 'modules' || t === 'endtoend') return;
     var p = dNodes[sid].parent;
-    if(dNodes[sid]['taskexists']!=null){
+    if(dNodes[sid]['taskexists']!=null && dNodes[sid]['taskexists'].status !== 'complete'){
         setPopup({show:true,title:'Error',content:'Cannot delete node if task is assigned. Please unassign task first.',submitText:'Ok'})
         return; 
     }

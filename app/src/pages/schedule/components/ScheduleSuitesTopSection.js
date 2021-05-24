@@ -49,6 +49,17 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                     };
                 }
             })
+
+            //CR 2287 - If a scenario is opened and then navigated to it's scheduling then by default that particular scenario must be selected and rest of the scenarios from the module must be unselected.
+            if (current_task.scenarioFlag === 'True') {
+                for (var m = 0; m < keys.length; m++) {
+                    for (var k = 0; k < tableData[m].scenarioids.length; k++) {
+                        if (tableData[m].scenarioids[k] === current_task.assignedTestScenarioIds || tableData[m].scenarioids[k] === current_task.assignedTestScenarioIds[0]) {
+                            tableData[m].executestatus[k] = 1;
+                        } else tableData[m].executestatus[k] = 0;
+                    }
+                }
+            }
             setModuleScheduledate(moduleScheduledateTime);
             setScheduleTableData(tableData);
             updateScenarioStatus(tableData);
@@ -147,7 +158,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                                 <div className="scheduleSuite" id={`ss-id${i}`} >
                                     <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" />
                                     <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span>
-                                    <TimeComp time={moduleScheduledate[rowData.testsuiteid]["time"]} setTime={(val)=>{updateDateTime("time",val,rowData.testsuiteid)}} inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropstime"]} classTimer="schedule_timer"/>
+                                    <TimeComp idx={i} closeCal={closeCal} setCloseCal={setCloseCal} screen="scheduleSuiteTop" time={moduleScheduledate[rowData.testsuiteid]["time"]} setTime={(val)=>{updateDateTime("time",val,rowData.testsuiteid)}} inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropstime"]} classTimer="schedule_timer"/>
                                     <CalendarComp idx={i} closeCal={closeCal} setCloseCal={setCloseCal} screen="scheduleSuiteTop" inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropsdate"]}  date={moduleScheduledate[rowData.testsuiteid]["date"]} setDate={(val)=>{updateDateTime("date",val,rowData.testsuiteid)}} classCalender="schedule_calender"/>
                                 </div>
                                 <table className="scenarioSchdCon scenarioSch_' + i + '">

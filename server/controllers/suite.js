@@ -1,26 +1,14 @@
-var uuid = require('uuid-random');
-var schedule = require('node-schedule');
-var Client = require("node-rest-client").Client;
-var client = new Client();
-var myserver = require('../lib/socket');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
-const accessibility_testing = require("./accessibilityTesting")
-const notifications = require('../notifications');
-var queue = require('../lib/executionQueue')
+var smartPartitions = require('../lib/smartPartitions')
+var scheduler = require('../lib/execution/scheduler')
+
+var queue = require('../lib/execution/executionQueue')
 var cache = require('../lib/cache').getClient(2);
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
+const constants = require('../lib/execution/executionConstants');
 const scheduleJobMap = {};
-const SOCK_NORM = "normalModeOn";
-const SOCK_SCHD = "scheduleModeOn";
-const SOCK_NA = "unavailableLocalServer";
-const SOCK_NORM_MSG = "ICE is connected in Non-Scheduling mode";
-const SOCK_SCHD_MSG = "ICE is connected in Scheduling mode";
-const SOCK_NA_MSG = "ICE is not Available";
-const DO_NOT_PROCESS = "do_not_process_response";
-const EMPTYUSER = process.env.nulluser;
-const EMPTYPOOL = process.env.nullpool;
 /** This service reads the testsuite and scenario information for the testsuites */
 exports.readTestSuite_ICE = async (req, res) => {
 	const fnName = "readTestSuite_ICE";
@@ -64,8 +52,8 @@ exports.readTestSuite_ICE = async (req, res) => {
 		responsedata[moduleId] = finalSuite;
 	}
 	if (fromFlg == "scheduling") {
-		const ice_status = await getICEList(req.body.readTestSuite[0].projectidts);	
-		const ice_list = Object.keys(ice_status);	
+		const ice_status = await getICEList(req.body.readTestSuite[0].projectidts);
+		const ice_list = Object.keys(ice_status);
 		logger.debug("IP\'s connected : %s", ice_list.join());
 		const schedulingDetails = {
 			"connectedICE": ice_status["ice_list"],
@@ -604,10 +592,10 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	if(type.toLowerCase().includes('smart')){
 		//Check if users are present in target user
 		if(targetUser && Array.isArray(targetUser) && targetUser.length > 0){
-			var batchInfo =JSON.parse(JSON.stringify(batchExecutionData.batchInfo));
+			var batchInfo = JSON.parse(JSON.stringify(batchExecutionData.batchInfo));
 			batchInfo[0]["iceList"] = targetUser;
 			//Get partitions
-			const partitionResult = await smartSchedule(batchInfo, type, "Now", batchExecutionData.browserType.length)
+			const partitionResult = await smartPartitions.smartSchedule(batchInfo, type, "Now", batchExecutionData.browserType.length)
 			if (partitionResult["status"] == "fail") {
 				result['error'] = "Smart execution Failed";
 			}else{
@@ -651,8 +639,8 @@ async function makeRequestAndAddToQueue(batchExecutionData, targetUser, userInfo
 		var profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
 		profile = {userid:profile.userid,username:profile.name,role:profile.role};
 	}else{
-		userInfo.targetUser = EMPTYUSER
-		var profile = {userid:EMPTYUSER,role:"N/A",username:EMPTYUSER}
+		userInfo.targetUser = constants.EMPTYUSER
+		var profile = {userid:constants.EMPTYUSER,role:"N/A",username:constants.EMPTYUSER}
 	}
 	Object.assign(userInfo,profile);
 	const execIds = { "batchid": "generate", "execid": {} };
@@ -683,9 +671,20 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	// Several client apps do not send TCP Keep-Alive. Hence this is handled in applicaton side.
 	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +(process.env.KEEP_ALIVE || "30000"));
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
-	await queue.Execution_Queue.addAPITestSuiteToQueue(req,res);
+	var userInfo = getUserInfoFromHeaders(req.headers);
+	if (!userInfo) {
+		res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
+		return res.status('400').send({ "error": "Invalid or missing user info in request headers." })
+	}
+	await queue.Execution_Queue.addAPITestSuiteToQueue(req, res, userInfo);
 };
 
+const getUserInfoFromHeaders = (headers) => {
+	if (headers['x-token_hash'] && headers['x-token_name'] && headers['x-icename']) {
+		return { 'tokenhash': headers['x-token_hash'], "tokenname": headers['x-token_name'], 'icename': headers['x-icename'], 'poolname': ''}
+	}
+	return false;
+}
 /** this service imports the data from git repo and invoke execution */
 exports.importFromGit_ICE = async (req, res) => {
 	const actionName = 'importFromGit'
@@ -726,8 +725,8 @@ exports.importFromGit_ICE = async (req, res) => {
 			delete userInfo.inputs.error_message;
 			executionResult.push(userInfo.inputs)
 			var execResponse = executionResult[0]
-			if (result == SOCK_NA) execResponse.error_message = SOCK_NA_MSG;
-			else if (result == SOCK_SCHD) execResponse.error_message = SOCK_SCHD_MSG;
+			if (result == constants.SOCK_NA) execResponse.error_message = constants.SOCK_NA_MSG;
+			else if (result == constants.SOCK_SCHD) execResponse.error_message = constants.SOCK_SCHD_MSG;
 			else if (result == "NotApproved") execResponse.error_message = "All the dependent tasks (design, scrape) needs to be approved before execution";
 			else if (result == "NoTask") execResponse.error_message = "Task does not exist for child node";
 			else if (result == "Modified") execResponse.error_message = "Task has been modified, Please approve the task";
@@ -803,267 +802,17 @@ exports.getTestcaseDetailsForScenario_ICE = async (req, res) => {
 exports.testSuitesScheduler_ICE = async (req, res) => {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
 	const fnName = "testSuitesScheduler_ICE";
-	const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
-	const multiExecutionData = req.body.executionData;
-	var batchInfo = multiExecutionData.batchInfo;
-	let poolid = req.body.executionData.batchInfo[0].poolid;
-	if(!poolid || poolid === "") poolid = EMPTYPOOL
-	var invokinguser = {
-		invokinguser: req.session.userid,
-		invokingusername: req.session.username,
-		invokinguserrole: req.session.activeRoleId
+	try{
+		var result = await scheduler.prepareSchedulingRequest(req.session, req.body);
+		return res.send(result);
+	}catch(e){
+		logger.error("Exception in the service testSuitesScheduler_ICE");
+		logger.debug("Exception occurred in testSuitesScheduler_ICE: %s",e)
+		return res.status('500').send(result);
 	}
-	var stat = "none";
-	var dateTimeList = batchInfo.map(u => u.timestamp);
-	var smart = false;
-	if (batchInfo[0].targetUser && batchInfo[0].targetUser.includes('Smart')) {
-		smart = true;
-		const dateTimeUtc = new Date(parseInt(batchInfo[0].timestamp)).toUTCString();
-		result = await smartSchedule(batchInfo, batchInfo[0].targetUser, dateTimeUtc, multiExecutionData.browserType.length)
-		if (result["status"] == "fail") {
-			return res.send("fail")
-		}
-		stat = result["status"]
-		batchInfo = result["batchInfo"]
-		displayString = result["displayString"]
-		if (!batchInfo) batchInfo = []
-		dateTimeList = batchInfo.map(u => u.timestamp);
-	}
-	const taskApproval = await utils.approvalStatusCheck(batchInfo);
-	if (taskApproval.res !== "pass") return res.send(taskApproval.res);
-	const addressList = batchInfo.map(u => u.targetUser);
-	var inputs = {
-		"query": "checkscheduleddetails",
-		"scheduledatetime": dateTimeList,
-		"targetaddress": addressList
-	};
-	if (!smart) {
-		const chkResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-		if (chkResult != -1) return res.send((chkResult == "fail") ? "fail" : { "status": "booked", "user": addressList[chkResult] });
-	}
-
-	/** Add if else for smart schedule below this => NO **/
-	// smartScheduleId = uuid(); Pass it to args as smartid
-	const userTimeMap = {};
-	const multiBatchExecutionData = [];
-	for (let i = 0; i < addressList.length; i++) {
-		let key = addressList[i] + '_' + dateTimeList[i];
-		if (userTimeMap[key] === undefined) userTimeMap[key] = [i];
-		else userTimeMap[key].push(i);
-	}
-	for (const userTime in userTimeMap) {
-		const batchIdx = userTimeMap[userTime]
-		const timestamp = userTime.split('_').pop();
-		const targetUser = batchInfo[batchIdx[0]].targetUser;
-		const batchObj = JSON.parse(JSON.stringify(multiExecutionData));
-		delete batchObj.batchInfo;
-		batchObj.targetUser = targetUser;
-		batchObj.timestamp = timestamp;
-		batchObj.scheduleId = undefined;
-		batchObj.batchInfo = [];
-		batchObj.scheduledby = invokinguser;
-		inputs = {
-			"timestamp": timestamp.toString(),
-			"executeon": multiExecutionData.browserType,
-			"executemode": multiExecutionData.exectionMode,
-			"exec_env" : multiExecutionData.executionEnv,
-			"targetaddress": targetUser,
-			"userid": userInfo.userid,
-			"scenarios": [],
-			"testsuiteIds": [],
-			"query": "insertscheduledata",
-			"poolid":poolid,
-			"scheduledby":invokinguser
-		};
-		for (let i = 0; i < batchIdx.length; i++) {
-			let suite = batchInfo[batchIdx[i]];
-			inputs.testsuiteIds.push(suite.testsuiteId);
-			inputs.scenarios.push(suite.suiteDetails);
-			delete suite.targetUser;
-			delete suite.date;
-			delete suite.time;
-			batchObj.batchInfo.push(suite);
-		}
-		if (!inputs.targetaddress || inputs.targetaddress === "") inputs.targetaddress = EMPTYUSER;
-		const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-		if (insResult == "fail") return res.send("fail");
-		else batchObj.scheduleId = insResult.id;
-		multiBatchExecutionData.push(batchObj);
-	}
-	/** Add if else for smart schedule above this **/
-	var schResult = await scheduleTestSuite(multiBatchExecutionData);
-	if (schResult == "success" && stat != "none") schResult = displayString + " " + "success";
-	return res.send(schResult);
 };
 
-/**
- * Function responsible for creating smart batches
- * @param {*} batchInfo 
- * @param {*} type , sceanriolevel / modulelevel , batch.targetUser
- * @param {*} time , time of schedule
- */
-const smartSchedule = async (batchInfo, type, time, browsers) => {
-	// deep copying batchinfo
-	const result = {}
-	result["displayString"] = "";
-	var partitions = await getMachinePartitions(batchInfo, type, time);
-	if (partitions == "fail") {
-		result["status"] = "fail";
-		return result;
-	} else if (partitions.result == "busy") {
-		result["status"] = "busy"
-		result["displayString"] = "ICE busy, Some modules might skip.\n"
-	} else {
-		result["status"] = "success"
-		result["displayString"] = "Successfully Scheduled.\n\n"
-	}
-	result["batchInfo"] = {}
-	var setCount = 1;
-	//creating batches
-	var partBatchInfo = []
-	var moduleUserMap = {}
-	for (let set in partitions.partitions) {
-		var partitionsString = partitions.partitions[set].toString();
-		result["displayString"] = result["displayString"] + "Set " + setCount.toString() + ": " + set + "\n";
-		setCount++;
-		for (var i = 0; i < batchInfo.length; i++) {
-			var temp = JSON.parse(JSON.stringify(batchInfo[i]));
-			temp.suiteDetails = [];
-			temp.smartScheduleId = uuid();
-			temp.targetUser = set;
-			for (var j = 0; j < batchInfo[i].suiteDetails.length; j++) {
-				if (partitionsString.includes(batchInfo[i].suiteDetails[j].scenarioId)) {
-					partitionsString = partitionsString.replace(batchInfo[i].suiteDetails[j].scenarioId,"");
-					testId = batchInfo[i].testsuiteId;
-					if (moduleUserMap[testId] && moduleUserMap[testId]['user'] == set) {
-						partBatchInfo[moduleUserMap[testId]["index"]].suiteDetails.push(JSON.parse(JSON.stringify(batchInfo[i].suiteDetails[j])));
-						batchInfo[i].suiteDetails[j].scenarioId = "NONE";
-					} else {				
-						temp.suiteDetails.push(JSON.parse(JSON.stringify(batchInfo[i].suiteDetails[j])))
-						batchInfo[i].suiteDetails[j].scenarioId = "NONE";
-						moduleUserMap[testId] = {};
-						moduleUserMap[testId]['index'] = partBatchInfo.length;
-						moduleUserMap[testId]['user'] = set;
-						partBatchInfo.push(temp);
-					}
-				}
-			}
-		}
-	}
-	result["displayString"] = result["displayString"] + "\nEstimated Time: " + secondsToHms(partitions.totalTime * browsers);
-	result["batchInfo"] = partBatchInfo
-	return result;
-}
 
-/**
- * Format Seconds to display string days/hours/minutes
- * @param {*} seconds 
- */
-function secondsToHms(seconds) {
-	var days = Math.floor(seconds / (24 * 60 * 60));
-	seconds -= days * (24 * 60 * 60);
-	var hours = Math.floor(seconds / (60 * 60));
-	seconds -= hours * (60 * 60);
-	var minutes = Math.floor(seconds / (60));
-	seconds -= minutes * (60);
-	return ((0 < days) ? (days + " day, ") : "") + hours + "h, " + minutes + "m and " + seconds.toFixed(2) + "s";
-}
-
-/**
- * 
- * @param {*} mod   BatchInfo
- * @param {*} type  Scenario level / module level
- * @param {*} time  Time of schedule
- */
-const getMachinePartitions = async (mod, type, time) => {
-	let scenarios = [];
-	var activeUsers = []
-	if(mod[0].iceList){
-		activeUsers = mod[0].iceList;
-	}else{
-		return "fail";
-	}
-	for (var i = 0; i < mod.length; i++) {
-		scenarios = scenarios.concat(mod[i].suiteDetails);
-	}
-	const inputs = {
-		"scenarios": scenarios,
-		"activeIce": activeUsers.length,
-		"ipAddressList": activeUsers,
-		"type": type,
-		"modules": mod,
-		"time": time
-	};
-	const result = await utils.fetchData(inputs, "partitons/getPartitions", "getMachineParitions");
-	return result;
-}
-
-/** Function responsible for scheduling Jobs. Returns: success/few/fail */
-const scheduleTestSuite = async (multiBatchExecutionData) => {
-	const fnName = "scheduleTestSuite";
-	logger.info("Inside " + fnName + " function");
-	const userInfoMap = {};
-	const execIdsMap = {};
-	var schedFlag = "success";
-	var inputs = {};
-	const userList = multiBatchExecutionData.map(u => u.targetUser);
-	for (const user of userList) {
-		if (!userInfoMap[user]) {
-			if(user != ""){
-				inputs = { "icename": user };
-				const profile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
-				if (profile == "fail" || profile == null) return "fail";
-				userInfoMap[user] = {"userid": profile.userid, "username": profile.name, "role": profile.role, "icename": user};
-			}else{
-				userInfoMap[EMPTYUSER] = {"userid": "N/A", "username": "", "role": "", "icename": EMPTYUSER};
-			}
-			
-		}
-	}
-	for (const batchExecutionData of multiBatchExecutionData) {
-		let execIds = {"batchid": "generate", "execid": {}};
-		if(batchExecutionData.targetUser === "") batchExecutionData.targetUser = EMPTYUSER
-		let userInfo = userInfoMap[batchExecutionData.targetUser];
-		Object.assign(userInfo, batchExecutionData.scheduledby);
-		const scheduleTime = batchExecutionData.timestamp;
-		const scheduleId = batchExecutionData.scheduleId;
-		const smartId = batchExecutionData.smartScheduleId;
-		if (smartId !== undefined) {
-			if (execIdsMap[smartId] === undefined) execIdsMap[smartId] = execIds;
-			else execIds = execIdsMap[smartId];
-		}
-		try {
-			const scheduledjob = schedule.scheduleJob(scheduleId, parseInt(scheduleTime), async function () {
-				let result;
-				execIds['scheduleId'] = scheduleId;
-				result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData,execIds,userInfo,"SCHEDULE",batchExecutionData.batchInfo[0].poolid);
-				schedFlag = result['message'];
-			});
-			scheduleJobMap[scheduleId] = scheduledjob;
-		} catch (ex) {
-			logger.error("Exception in the function executeScheduling from scheduleTestSuite: reshedule: %s", ex);
-			schedFlag = "few";
-			await updateScheduleStatus(scheduleId, "Failed");
-		}
-	}
-	return schedFlag;
-}
-
-/** Update schedule status of current scheduled job and insert report for the skipped scenarios.
-Possible status options are: "Skipped", "Terminate", "Completed", "Inprogress", "Failed", "Missed", "cancelled", "scheduled" */
-const updateScheduleStatus = async (scheduleid, status, batchid) => {
-	const fnName = "updateScheduleStatus";
-	logger.info("Inside " + fnName + " function");
-	var inputs = {};
-	inputs = {
-		"schedulestatus": status,
-		"scheduleid": scheduleid,
-		"query": "updatescheduledstatus"
-	};
-	if (batchid) inputs.batchid = batchid;
-	const result2 = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-	return result2;
-};
 
 /** This service fetches all the schedule jobs */
 exports.getScheduledDetails_ICE = async (req, res) => {
@@ -1084,7 +833,7 @@ exports.cancelScheduledJob_ICE = async (req, res) => {
 	const schedHost = req.body.host;
 	const schedUserid = JSON.parse(req.body.schedUserid);
 	let inputs = { "icename": schedHost };
-	if(schedHost != EMPTYUSER){
+	if(schedHost != constants.EMPTYUSER){
 		userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
 		if (userprofile == "fail" || userprofile == null) return res.send("fail");
 	}
@@ -1104,95 +853,7 @@ exports.cancelScheduledJob_ICE = async (req, res) => {
 		return res.send("inprogress");
 	}
 	if (scheduleJobMap[scheduleid] && scheduleJobMap[scheduleid].cancel) scheduleJobMap[scheduleid].cancel();
-	const result2 = await updateScheduleStatus(scheduleid, "cancelled");
+	const result2 = await scheduler.updateScheduleStatus(scheduleid, "cancelled");
 	return res.send(result2);
-};
+}
 
-/** This service reschedules the schedule jobs after a server restart */
-exports.reScheduleTestsuite = async () => {
-	const fnName = "reScheduleTestsuite";
-	logger.info("Inside UI service " + fnName);
-	var inputs = {};
-	try {
-		// Mark inprogress schedules as failed since server restarted
-		inputs = {
-			"query": "getscheduledata",
-			"status": "Inprogress"
-		};
-		const eipResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-		if (eipResult != "fail") {
-			for (var i = 0; i < eipResult.length; i++) {
-				const eipSchd = eipResult[i];
-				await updateScheduleStatus(eipSchd._id, "Failed");
-			}
-		}
-
-		// Reschedule pending schedules since server restarted
-		inputs = {
-			"query": "getscheduledata",
-			"status": "scheduled"
-		};
-		const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-		if (result == "fail") return logger.error("Status from the function " + fnName + ": Jobs are not rescheduled");
-		const multiBatchExecutionData = [];
-		for (var i = 0; i < result.length; i++) {
-			const schd = result[i];
-			let poolid = schd.poolid;
-			const scheduleTime = new Date(result[i].scheduledon);
-			if (scheduleTime < new Date()) {
-				await updateScheduleStatus(schd._id, "Missed");
-			} else {
-				// Create entire multiBatchExecutionData object;
-				const tsuIds = schd.testsuiteids;
-				const batchObj = {
-					"exectionMode": schd.executemode,
-					"executionEnv": schd.executeenv,
-					"browserType": schd.executeon,
-					"qccredentials": { "qcurl": "", "qcusername": "", "qcpassword": "" },
-					"targetUser": schd.target,
-					"timestamp": scheduleTime.valueOf(),
-					"scheduleId": schd._id,
-					"batchInfo": [],
-					"poolid":schd.poolid,
-					"scheduledby":schd.scheduledby
-				};
-				inputs = {
-					"query": "gettestsuiteproject",
-					"testsuiteids": tsuIds
-				};
-				const details = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-				if (details == "fail") {
-					await updateScheduleStatus(schd._id, "Failed");
-					continue;
-				}
-				const prjObj = details.project;
-				for (var j = 0; j < tsuIds.length; j++) {
-					const tsuObj = details.suitemap[tsuIds[j]];
-					const suiteObj = {
-						"testsuiteName": tsuObj.name,
-						"testsuiteId": tsuObj._id,
-						"versionNumber": tsuObj.versionnumber,
-						"appType": prjObj.type,
-						"domainName": prjObj.domain,
-						"projectName": prjObj.name,
-						"projectId": prjObj._id,
-						"releaseId": prjObj.releaseid,
-						"cycleName": prjObj.cyclename,
-						"cycleId": prjObj.cycleid,
-						"suiteDetails": schd.scenariodetails[j]
-					};
-					batchObj.batchInfo.push(suiteObj);
-				}
-				multiBatchExecutionData.push(batchObj);
-			}
-		}
-		const status = await scheduleTestSuite(multiBatchExecutionData);
-		if (status == "fail") logger.error("Status from the function " + fnName + ": Jobs are not rescheduled");
-		else if (status == "few") logger.warn("Status from the function " + fnName + ": All except few jobs are rescheduled");
-		else logger.info("Status from the function " + fnName + ": Jobs successfully rescheduled");
-	} catch (ex) {
-		logger.error("Exception in the function " + fnName + ": %s", ex);
-	}
-};
-
-module.exports.updateScheduleStatus = updateScheduleStatus;

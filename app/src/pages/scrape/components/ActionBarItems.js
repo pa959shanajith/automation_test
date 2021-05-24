@@ -212,7 +212,10 @@ const BottomContent = () => {
                             console.log(error)
                         });
                 }
-            } else setShowPop({'title': "Import Screen", 'content': "Please Check the file format you have uploaded!"});
+            } else {
+                setOverlay("");
+                setShowPop({'title': "Import Screen", 'content': "Please Check the file format you have uploaded!"});
+            }
         }
         reader.readAsText(file);
     }

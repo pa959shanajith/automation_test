@@ -98,7 +98,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
     }
 
     const onChangePage = (newPageOfItems) => {
-        // update state with new page of itemss
+        // update state with new page of items
         if(JSON.stringify(pageOfItems) !== JSON.stringify(newPageOfItems))
             setPageOfItems(newPageOfItems);
     }

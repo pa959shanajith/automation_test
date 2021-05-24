@@ -24,7 +24,6 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [dataDictState, setDataDictState] = useState({ 'project' : {}, 'apptypes' : [], 'tasktypes' : [], 'projectDict': {}, 'cycleDict': {}});
     const [searchValue, setSearchValue] = useState("");
     const [overlay, setOverlay] = useState("");
-    const [notManager, setNotManager] = useState(true);
     const [showFltrDlg, setShowFltrDlg] = useState(false);
     const [filterData, setFilterData] = useState({'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}});
     const [filtered, setFiltered] = useState(false);
@@ -32,9 +31,8 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     let dataDict;
     
     useEffect(()=>{
-        if(Object.keys(userInfo).length!==0) {
+        if(Object.keys(userInfo).length!==0 && userRole!=="Admin") {
             resetStates();
-            if(userRole === "Test Manager") setNotManager(false);
             
             setOverlay("Loading Tasks..Please wait...");
             pluginApi.getProjectIDs()
@@ -109,7 +107,6 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         // setTaskJson(null);
         setSearchValue("");
         setOverlay("");
-        setNotManager(true);
         setDataObj(null);
         setFiltered(false);
     }
@@ -230,7 +227,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 <span data-test="task-toDo" className={"task-nav-item " + (activeTab==="todo" && "active-tab")} onClick={onSelectTodo}>To Do</span>
                 <span  data-test="task-toReview" className={"task-nav-item " + (activeTab==="review" && "active-tab")} onClick={onSelectReview}>To Review</span>
             </div>
-            { notManager && <div className="task-overflow" id="plugin__taskScroll">
+            {userRole !== "Test Manager" && <div className="task-overflow" id="plugin__taskScroll">
                 <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                     <div data-test="task-content" className="task-content" id="plugin_page__list">
                         <TaskContents data-test="taskcontent-component" items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} cycleDict={dataDictState.cycleDict} taskJson={taskJson} />

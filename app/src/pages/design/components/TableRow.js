@@ -80,7 +80,7 @@ const TableRow = (props) => {
                 if (!objName || (objName !== "OBJECT_DELETED" && objList.includes(objName))){
                     let obj = !objName ? objList[0] : objName;
                     caseData = props.getKeywords(obj);
-                    let key = (!keyword || !objName) ? caseData.keywords[0] : keyword;
+                    let key = (!caseData.keywords.includes(keyword) || !objName) ? caseData.keywords[0] : keyword;
                     placeholders = props.getRowPlaceholders(caseData.obType, key);
 
                     setKeywordList(caseData.keywords);

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
-import {Provider} from 'react-redux';
+import {Provider, useSelector, useDispatch} from 'react-redux';
 import {store} from './reducer';
-import {ProgressBar, ErrorPage} from './pages/global'
+import {ProgressBar, ErrorPage, PopupMsg} from './pages/global'
+import { SWITCHED } from './pages/global/state/action';
 import Login, {Base} from './pages/login';
 import Admin from './pages/admin';
 import Plugin from './pages/plugin';
@@ -42,8 +43,19 @@ const App = () => {
 }
 
 const RouteApp = () => {
+  const dispatch = useDispatch();
+  const selectedRole = useSelector(state=>state.login.SR);
+  const roleSwitched = useSelector(state=>state.progressbar.roleSwitched);
+  const [role, setRole] = useState(false);
+  useEffect(()=>{
+    if(roleSwitched){
+        dispatch({type: SWITCHED, payload: false});
+        setRole(true);
+    }
+}, [roleSwitched])
   return(
     <Router>
+      { role && <PopupMsg title='Switch Role' content={`Your role is changed to ${selectedRole}`} submitText="OK" close={()=>setRole("")} submit={()=>setRole("")} /> }
     <SocketFactory/>
     <Switch>
       <Route exact path="/" component={Base} />
