@@ -268,6 +268,13 @@ const validateUser = async (icename, userInfo) =>{
 	return userInfo;
 };
 
+exports.getUserInfoFromHeaders = (headers) => {
+	if (headers['x-token-hash'] && headers['x-token-name'] && (headers['x-ice-name'] != null || headers['x-pool-name'] != null)) {
+		return { 'tokenhash': headers['x-token-hash'], "tokenname": headers['x-token-name'], 'icename': headers['x-ice-name'], 'poolname': headers['x-pool-name']}
+	}
+	return false;
+}
+
 // Fetch original requested url without proxy
 exports.originalURL = function(req) {
 	const app = req.app;

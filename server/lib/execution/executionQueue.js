@@ -222,10 +222,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         const hdrs = testSuiteRequest.headers;
         const batchExecutionData = testSuiteRequest.body.executionData;
         try {
-            if (!batchExecutionData) {
-                res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["400"])
-                return res.status("400").send({ "error": "Empty or Invalid Batch Data" });
-            }
             if (headerUserInfo) {
                 //Check wether poolname or icename provided (Execution on pool name not supported in this implementation)
                 var userInfo = await utils.tokenValidation(headerUserInfo);
@@ -240,6 +236,10 @@ module.exports.Execution_Queue = class Execution_Queue {
                 targetICE = headerUserInfo.icename || EMPTYUSER;
                 userInfo.icename = targetICE;
                 poolid = headerUserInfo.poolid;
+            }
+            if (!batchExecutionData) {
+                res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES["400"])
+                return res.status("400").send({ "error": "Empty or Invalid Batch Data" });
             }
             // Check if request came from Azure DevOps. If yes, then send the acknowledgement
             if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {

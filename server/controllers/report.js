@@ -865,12 +865,6 @@ exports.getReportsData_ICE = async (req, res) => {
     }
 };
 
-const getUserInfoFromHeaders = (headers) => {
-	if (headers['x-token-hash'] && headers['x-token-name'] && (headers['x-ice-name'] != null || headers['x-pool-name'] != null)) {
-		return { 'tokenhash': headers['x-token-hash'], "tokenname": headers['x-token-name'], 'icename': headers['x-ice-name'], 'poolname': headers['x-pool-name'] }
-	}
-	return false;
-}
 
 //Get report for execution
 exports.getReport_API = async (req, res) => {
@@ -883,7 +877,7 @@ exports.getReport_API = async (req, res) => {
 		var scenarioIds = execData.scenarioIds;
 		var finalReport = [];
 		var tempModDict = {};
-        let headerUserInfo = getUserInfoFromHeaders(req.headers)
+        let headerUserInfo = utils.getUserInfoFromHeaders(req.headers)
         if (!headerUserInfo){
             res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
             return res.status('400').send({'error':"Invalid or missing user info in request headers."})
@@ -1011,7 +1005,7 @@ exports.getExecution_metrics_API = async(req, res) => {
     logger.info("Inside UI service: getExecution_metrics_API");
     var statusCode = '500';
     try {
-        const headerUserInfo = getUserInfoFromHeaders(req.headers);
+        const headerUserInfo = utils.getUserInfoFromHeaders(req.headers);
         if (!headerUserInfo){
             res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
             return res.status('400').send({'error':"Invalid or missing user info in request headers."})
