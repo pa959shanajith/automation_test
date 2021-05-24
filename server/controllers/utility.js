@@ -193,9 +193,6 @@ exports.importDtFromExcel = function (req, res) {
 		if (numSheets == 0) {
 			return res.status(200).send("emptySheet");
 		}
-		//If rows > 200 and column > 10 fail
-
-		//else continue
 		for (var k = 0; k < numSheets; k++) {
 			var cSheet = myCSV[k * 2 + 1];
 			var cSheetRow = cSheet.split('\n');
@@ -204,11 +201,9 @@ exports.importDtFromExcel = function (req, res) {
 				columnNames = cSheetRow[k].split(',');
 			} 
 			if(columnNames.length>10) {
-				//error
 				return res.status(500).send("columnExceeds");
 			}
 			if(cSheetRow.length >200) {
-				//error
 				return res.status(500).send("rowExceeds");
 			}
 			for (var i = 1; i < cSheetRow.length; i++) {
@@ -234,9 +229,6 @@ exports.importDtFromCSV = function (req, res) {
 	try {
 		var myCSV = req.body.data.content;
 		var qObj = {};
-		//If rows > 200 and column > 10 fail
-
-		//else continue
 		var csvArray = myCSV.split('\n');
 		if (csvArray.length > 200) {
 			return res.status(500).send("rowExceeds");
@@ -331,7 +323,7 @@ exports.exportToCSV = async (req, res) => {
 		logger.info("Fetching Datatable details");
 		var d = req.body;
 		var csvMap = await getDatatable({"datatablename":d.datatablename})
-		dts = excelMap.rows[0];
+		dts = csvMap.rows[0];
 		datatable = dts.datatable;
 		logger.info("Writing Datatable structure to CSV");
 		var dir = './../../csv';
