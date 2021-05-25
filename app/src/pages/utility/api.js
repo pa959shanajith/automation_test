@@ -229,7 +229,13 @@ export const fetchDataTable = async(tableName) => {
 
 export const exportDataTable = async(arg) => {
     try{
-        const apiUrl = arg.exportFormat.toLowerCase() === "csv" ? "exportToDtCSV" : "exportToDtExcel";
+        const apiUrl = "exportToDtCSV";
+        switch(arg.exportFormat.toLowerCase()){
+            case "csv": apiUrl = "exportToDtCSV"; break;
+            case "excel": apiUrl = "exportToDtExcel"; break;
+            case "xml": apiUrl = "exportToDtXML"; break;
+            default: break;
+        }
         const res = await axios(`${url}/${apiUrl}`, {
             method: 'POST',
             headers: {
@@ -258,7 +264,14 @@ export const exportDataTable = async(arg) => {
 
 export const importDataTable = async(arg) => {
     try{
-        const apiUrl = arg.importFormat.toLowerCase() === "csv" ? "importDtFromCSV" : "importDtFromExcel";
+        const apiUrl = "importDtFromCSV";
+        switch(arg.importFormat.toLowerCase()){
+            case "csv": apiUrl = "importDtFromCSV"; break;
+            case "excel": apiUrl = "importDtFromExcel"; break;
+            case "xml": apiUrl = "importDtFromXML"; break;
+            default: break;
+        }
+
         let apiBody =  null;
         if (arg.flag === "")
             apiBody = { content: arg.content };

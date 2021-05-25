@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ModalContainer } from '../../global';
 import { exportDataTable } from '../api';
 import "../styles/ExportDataTable.scss";
@@ -28,6 +28,7 @@ const ExportDataTable = props => {
                         <select value={filetype} onChange={handleFileType}>
                             <option value="csv">CSV</option>
                             <option value="excel">Excel</option>
+                            <option value="xml">XML</option>
                         </select>
                     </div>
                 }

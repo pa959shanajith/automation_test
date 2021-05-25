@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ModalContainer } from '../../global';
 import { importDataTable } from '../api';
+import { parseTableData } from './DtUtils';
 import "../styles/ExportDataTable.scss";
 
 const ImportSheet = props => {
@@ -21,8 +22,22 @@ const ImportSheet = props => {
     const handleSheet = e => setSheet(e.target.value);
 
     const importTable = async() => {
-        const resp = await importDataTable({ content: props.excelContent, flag: "data", sheetname: sheet, importFormat: "excel" });
-        console.log(resp);
+        try{
+            const resp = await importDataTable({ content: props.excelContent, flag: "data", sheetname: sheet, importFormat: "excel" });
+
+            if(resp.error) 
+                props.setShowPop({title: "File Read Error", content: resp.error, type: "message"})
+            else if (typeof resp === "object"){
+                const [, newData, newHeaders] = parseTableData(resp)
+                props.setData(newData);
+                props.setHeaders(newHeaders);
+                props.setSheetList([]);
+            }
+        }
+        catch(error){
+            console.error("ERROR::::", error);
+            props.setShowPop({title: "File Read Error", content: "Failed to Fetch File Data", type: "message"})
+        }
     }
 
     return (
