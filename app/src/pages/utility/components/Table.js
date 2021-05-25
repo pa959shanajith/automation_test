@@ -16,7 +16,12 @@ const Table = props => {
     const headerRef = useRef();
     const rowRef = useRef();
 
-    const updateHeaders = (newHeader, headerId) => {
+    const updateHeaders = (newHeader, headerId, invalidFlag) => {
+
+        if (invalidFlag) {
+            props.setShowPop({title: "Duplicate Header Name", content: "Header name cannot be same", type: "message"})
+            return;
+        }
         let newHeaders = [...props.headers];
         let oldHeaderName;
         newHeaders.forEach(header => {
@@ -294,13 +299,9 @@ const SubHeaderCell  = props => {
             if (!value.trim() || (header.name === value && header.id!==props.headerId)) invalidHeader = true;
         })
 
-        if (invalidHeader){
-           console.log("ERROR")
-            return false;
-        }
-        else {
-            props.updateHeaders(value, props.headerId)
-        }
+        if (invalidHeader) 
+            setValue(props.initialValue||'')
+        props.updateHeaders(value, props.headerId, invalidHeader)
         return true;
     };
 
@@ -330,7 +331,7 @@ const Row = props => {
                         rowId={props.row.id}
                         columnName={header.name}
                         headerId = {header.id}
-                        initialValue={props.row[header.name]}
+                        initialValue={props.row[header.name] || ''}
                         updateTableData={props.updateTableData}
                         selected={
                             props.checkList.list.includes(`sel||row||${props.row.id}`) ||
@@ -350,10 +351,10 @@ const Row = props => {
 */
 
 const DataCell  = props => {
-    const [value, setValue] = useState(props.initialValue || '');
+    const [value, setValue] = useState(props.initialValue);
 
     useEffect(() => {
-        setValue(props.initialValue || '')
+        setValue(props.initialValue)
     }, [props.initialValue]);
 
     const onChange = e => setValue(e.target.value);
@@ -362,7 +363,10 @@ const DataCell  = props => {
         if (event.keyCode === 13) onBlur();
     }
 
-    const onBlur = e => props.updateTableData(value, props.rowId, props.columnName, props.headerId)
+    const onBlur = e => {
+        if (props.initialValue !== value)
+            props.updateTableData(value, props.rowId, props.columnName, props.headerId)
+    }
 
     return (
         <div className={"dt__cell "+(props.selected?"dt__selected_cell":'')} data-test="dt__body_cell">

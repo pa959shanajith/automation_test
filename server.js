@@ -438,6 +438,12 @@ if (cluster.isMaster) {
 		//Utility plugins
 		app.post('/Encrypt_ICE', auth.protect, utility.Encrypt_ICE);
 		app.post('/getExecution_metrics', auth.protect, report.getExecution_metrics);
+		app.post('/manageDataTable', auth.protect, utility.manageDataTable);
+		app.post('/getDatatableDetails', auth.protect, utility.getDatatableDetails);
+		app.post('/importDtFromExcel', auth.protect, utility.importDtFromExcel);
+		app.post('/importDtFromCSV', auth.protect, utility.importDtFromCSV);
+		app.post('/exportToDtExcel', auth.protect, utility.exportToExcel);
+		app.post('/exportToDtCSV', auth.protect, utility.exportToCSV);
 		// Wecoccular Plugin
 		app.post('/crawlResults', auth.protect, webocular.getCrawlResults);
 		app.post('/saveResults', auth.protect, webocular.saveResults);

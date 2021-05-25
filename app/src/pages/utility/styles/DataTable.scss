@@ -53,33 +53,37 @@
     }
 }
 
+.dt__tableNameError{
+    border: 2px solid#d33c3c !important;
+}
+
 // .dt__importexport{
 //     // margin-top: 15px;
 // }
 
 .dt__searchDataTable{
     position: relative;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    margin-bottom: 20px;
-    height: 30px;
-    z-index: 111;
+    z-index: 111;    
+    height: 60%;
+    width: 50%;
 
     input{
         position: absolute;
-        width: 70%;
+        width: 80%;
+        margin-left: 20px;
     }
 
     .dt__form_dropdown{
         position: absolute;
+        margin-left: 20px;
         top: 30px;
         font-size: 14px;
         box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
         display: block;
         max-height: 100px;
-        width: 70%;
+        width: 80%;
         background: #ffff;
+        z-index: 1;
         margin-top: 2px;
         option{
             padding-left: 2px;
@@ -96,13 +100,18 @@
     
 }
 
-.dt__tableName{
+.dt__tableName, .dt__selectTable{
     font-family: "LatoWeb";
     font-size: 14px;
     height: 50px;
     display: flex;
     align-items: center;
-    
+}
+
+.dt__tableName{
+    div{
+        margin-left: 20px;
+    }
     input{
         margin-left: 20px;
         width: 20%;
