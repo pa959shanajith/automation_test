@@ -152,7 +152,13 @@ const CreateScreenActionButtons = props => {
             try{
                 hiddenInput.current.value = '';
                 let importFormat = "excel";
-                if (file.name.split('.').pop().toLowerCase() === "csv") importFormat = "csv";
+                switch(file.name.split('.').pop().toLowerCase()){
+                    case "csv": importFormat = "csv"; break;
+                    case "xml": importFormat = "xml"; break;
+                    case "xlsx": /* FALLTHROUGH  */
+                    case "xls": importFormat = "excel"; break;
+                    default : break;
+                }
 
                 const resp = await utilApi.importDataTable({importFormat: importFormat, content: reader.result, flag: importFormat==="excel"?"sheetname":""});
                 
@@ -178,7 +184,7 @@ const CreateScreenActionButtons = props => {
         <>
         { sheetList.length > 0 && <ImportSheet sheetList={sheetList} setSheetList={setSheetList} excelContent={excelContent} { ...props }  /> }
         <div className="dt__taskBtns">
-            <input ref={hiddenInput} data-test="fileInput" id="importDT" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json, .xlsx, xls, .csv"/>
+            <input ref={hiddenInput} data-test="fileInput" id="importDT" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json, .xlsx, xls, .csv, .xml"/>
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={importDataTable} >Import</button>
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={goToEditScreen}>Edit</button>
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={saveDataTable}>Create</button>

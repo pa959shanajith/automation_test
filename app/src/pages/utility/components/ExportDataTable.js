@@ -28,6 +28,7 @@ const ExportDataTable = props => {
                         <select value={filetype} onChange={handleFileType}>
                             <option value="csv">CSV</option>
                             <option value="excel">Excel</option>
+                            <option value="xml">XML</option>
                         </select>
                     </div>
                 }
