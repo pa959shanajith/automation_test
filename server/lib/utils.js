@@ -8,6 +8,7 @@ const taskflow = require('../config/options').strictTaskWorkflow;
 const epurl = process.env.DAS_URL;
 const Client = require("node-rest-client").Client;
 const client = new Client();
+var queue = require('../lib/execution/executionQueue')
 
 
 const getChannelNum_cb = (channel,cb) => {
@@ -185,18 +186,63 @@ module.exports.fetchData = fetchData;
 module.exports.cache = cache;
 
 module.exports.tokenValidation = async (userInfo) => {
-	var validUser = false;
 	const icename = (userInfo.icename || "").toLowerCase();
-	userInfo.icename = icename;
-	const emsg = "Inside UI service: ExecuteTestSuite_ICE_SVN ";
-	const tokenValidation = {
-		"status": "failed",
-		"msg": "Token authentication failed"
+	const poolname = (userInfo.poolname || "");
+	let iceMap = queue.Execution_Queue.poolname_ice_map;
+	//Directly validate on ice name if the following 2 conditions are true:
+	// 1. ice name is sent
+	// 2. pool name not sent OR pool name is sent but ice does not belong to this pool 
+	if(icename != "" && (poolname == "" || !checkICEinPool(icename, iceMap[poolname]))){
+		userInfo.icename = icename;
+		var userValidation =  await validateUser(icename, userInfo)
+		userValidation['owner'] = true;
+		return userValidation;
 	}
+	let iceList = iceMap[poolname];
+	for(let id in iceList){
+		let poolice = iceList[id].icename
+		var userValidation = await validateUser(poolice, userInfo);
+		userValidation['owner'] = false;
+		//check wether one of the ice in the pool belongs to the user whose token hash was sent 
+		if (userValidation.inputs.tokenValidation == "passed"){
+			//token is valid, append pool id to user info
+			userValidation['poolid'] = queue.Execution_Queue.ice_list[poolice]['poolid']
+			//an ice name was sent, set ice name for execution on this ice
+			if (icename != "") userValidation['icename'] = icename;
+			//ICE is owned bu the user whose token hash was sent, mark as owner  	
+			if (poolice == icename) userValidation['owner'] = true;
+			return userValidation
+		}
+	}
+	userInfo.inputs = {
+		"tokenValidation": {
+			"status": "failed",
+			"msg": "Token authentication failed"
+		}
+	}
+	return userInfo;
+};
+
+const checkICEinPool = (icename, iceMap) => {
+	for (let index in iceMap){
+		if (icename == iceMap[index]['icename']){
+			return true;
+		}
+	}
+	return false;
+}
+
+const validateUser = async (icename, userInfo) =>{
+	var validUser = false;
+	const emsg = "Inside UI service: ExecuteTestSuite_ICE_SVN ";
 	const inputs = {
 		'icename': icename,
 		'tokenname': userInfo.tokenname || ""
 	};
+	const tokenValidation = {
+		"status": "failed",
+		"msg": "Token authentication failed"
+	}
 	const response = await fetchData(inputs, "login/authenticateUser_CI", "tokenValidation");
 	if (response != "fail" && response != "invalid") validUser = bcrypt.compareSync(userInfo.tokenhash || "", response.hash);
 	if (validUser) {
@@ -221,6 +267,13 @@ module.exports.tokenValidation = async (userInfo) => {
 	userInfo.inputs = inputs;
 	return userInfo;
 };
+
+exports.getUserInfoFromHeaders = (headers) => {
+	if (headers['x-token-hash'] && headers['x-token-name'] && (headers['x-ice-name'] != null || headers['x-pool-name'] != null)) {
+		return { 'tokenhash': headers['x-token-hash'], "tokenname": headers['x-token-name'], 'icename': headers['x-ice-name'], 'poolname': headers['x-pool-name']}
+	}
+	return false;
+}
 
 // Fetch original requested url without proxy
 exports.originalURL = function(req) {
