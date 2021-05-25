@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ModalContainer } from '../../global';
 import { exportDataTable } from '../api';
 import "../styles/ExportDataTable.scss";
