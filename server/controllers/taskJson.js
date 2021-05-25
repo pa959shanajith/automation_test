@@ -1,143 +1,39 @@
-var async = require('async');
-var logger = require('../../logger');
-var utils = require('../lib/utils');
-var Client = require("node-rest-client").Client;
-var client = new Client();
-var epurl = process.env.DAS_URL;
+const logger = require('../../logger');
+const utils = require('../lib/utils');
 
-exports.updateTaskstatus_mindmaps = function (req, res) {
-	logger.info("Inside UI service: updateTaskstatus_mindmaps");
-	if (utils.isSessionActive(req)) {
-		try {
-			var taskid=req.body.obj;
-			//Mongo query needs to be written to change the task status
-			var inputs= {
-				"id":taskid,
-				"action":"updatestatus",
-				"status":"inprogress"
-			}
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-
-			client.post(epurl+"mindmap/manageTask", args,
-				function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occurred in mindmap/manageTask: updateTaskstatus_mindmaps, Error Code : ERRDAS");
-						res.send("fail");
-					} else {
-						res.send('inprogress');
-					}
-
-				})
-
-		} catch (error) {
-			logger.error("exception occurred in updateTaskstatus_mindmaps",error);
+exports.updateTaskstatus_mindmaps = async (req, res) => {
+	const fnName = "updateTaskstatus_mindmaps";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var taskid=req.body.obj;
+		var inputs= {
+			"id":taskid,
+			"action":"updatestatus",
+			"status":"inprogress"
 		}
-	} else {
-		res.send("Invalid Session");
+		const result = await utils.fetchData(inputs, "mindmap/manageTask", fnName);
+		if (result == "fail") return res.send("fail");
+		res.send("inprogress");
+	} catch (error) {
+		logger.error("Error occurred in taskJson/"+fnName+":", error);
+		res.send("fail");
 	}
 };
 
 
-// exports.getTaskJson_mindmaps = function (req, res) {
-// 	logger.info("Inside UI service: getTaskJson_mindmaps");
-// 	if (utils.isSessionActive(req)) {
-// 		try {
-// 			//MATCH (b{assignedTo:'60f6ad0b-ce14-4cad-8345-b09c0739f3e2'})<-[r:FNTT]-(a) with b,collect (a) as set return set,b
-// 			var userid = req.session.userid;
-// 			var prjId=req.body.obj;
-// 			var qlist_query = [{'statement': "MATCH (b{assignedTo:'" + userid + "'})<-[r:FNTT]-(a) with b,collect (a) as set return set,b"}];
-// 			neo4jAPI.executeQueries(qlist_query,function(status,result){
-// 				if(status!=200) {
-// 					logger.info(result);
-// 				}
-// 				else {
-// 					var resultobj = {
-// 						"result": result,
-// 						"prjId": prjId
-// 					};
-// 					next_function(resultobj, function (err, data) {
-// 						if (err) {
-// 							logger.error('error occurred in getTaskJson_mindmaps',err);
-// 							res.send('fail');
-// 						} else {
-// 							res.send(data);
-// 						}
-// 					});
-// 				}
-// 			});
-// 		} catch (error) {
-// 			logger.error('exception in getTaskJson_mindmaps',error);
-// 		}
-// 	} else {
-// 		res.send("Invalid Session");
-// 	}
-// };
-
-exports.getTaskJson_mindmaps = function (req, res) {
-	logger.info("Inside UI service: getTaskJson_mindmaps");
-	if (utils.isSessionActive(req)) {
-		try {
-			var userid = req.session.userid;
-			var prjId=req.body.obj;
-
-			var inputs= {
-				"userid":userid
-			}
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-
-			client.post(epurl+"plugins/getTasksJSON", args,
-				function (result, response) {
-					try {
-						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occurred in plugins/getModules: getTasksJSON, Error Code : ERRDAS");
-							res.send("fail");
-						} else {
-							taskJSON=next_function(result.rows,prjId);
-							// console.log("came here");
-							res.send(taskJSON);
-						}
-						// res.send(result.rows);
-
-					} catch (ex) {
-						logger.error("Exception in the service getTasksJSON: %s", ex);
-					}
-				});
-
-			// var qlist_query = [{'statement': "MATCH (b{assignedTo:'" + userid + "'})<-[r:FNTT]-(a) with b,collect (a) as set return set,b"}];
-			// neo4jAPI.executeQueries(qlist_query,function(status,result){
-			// 	if(status!=200) {
-			// 		logger.info(result);
-			// 	}
-			// 	else {
-			// 		var resultobj = {
-			// 			"result": result,
-			// 			"prjId": prjId
-			// 		};
-			// next_function(resultobj, function (err, data) {
-			// 	if (err) {
-			// 		logger.error('error occurred in getTaskJson_mindmaps',err);
-			// 		res.send('fail');
-			// 	} else {
-			// 		res.send(data);
-			// 	}
-			// });
-			// }
-			// });
-		} catch (error) {
-			logger.error('exception in getTaskJson_mindmaps',error);
-		}
-	} else {
-		res.send("Invalid Session");
+exports.getTaskJson_mindmaps = async (req, res) => {
+	const fnName = "getTaskJson_mindmaps";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var userid = req.session.userid;
+		var prjId = req.body.obj;
+		const result = await utils.fetchData({userid}, "plugins/getTasksJSON", fnName);
+		if (result == "fail") return res.send("fail");
+		let taskJSON = next_function(result, prjId);
+		res.send(taskJSON);
+	} catch (error) {
+		logger.error("Error occurred in taskJson/"+fnName+":", error);
+		res.send("fail");
 	}
 };
 
@@ -156,12 +52,6 @@ var tasktypes = {
 	'Add': ['Scrape', 'Design', 'Create Screen'],
 	'Map': ['Scrape', 'Design', 'Create Screen']
 };
-
-//This dict has to be buit run time . Query Projecttypekeywords to build this dict for one time
-var projectTypes = {};
-
-var screen_tasks=['scrape','append','compare','add','map'];
-
 
 function next_function(resultobj,projectid){
 	logger.info("Inside function: next_function ");
@@ -259,10 +149,7 @@ function next_function(resultobj,projectid){
 			if (t.status != undefined) {
 				taskDetails.status = t.status;
 				status_dict[t.status]++;
-				// logger.info(status_dict);
 			}
-			// var parent = t.parent.substring(1, t.parent.length - 1).split(",");
-			// var parent_length = parent.length;
 			task_json.projectId = t.projectid;
 			var index = prjId.indexOf(t.projectid);
 			var apptype = projectTypes[appTypes[index]];
@@ -329,15 +216,8 @@ function next_function(resultobj,projectid){
 					task_json.scenarioTaskType = "exclusive";
 					taskDetails.taskName = "Execute Accessibility Testing for Scenario " + t.name;
 					break;
-					// taskDetails.taskName = t.tasktype + ' ' + m.testScenarioName;
-					// task_json.scenarioName = m.testScenarioName;
-					//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
-					break;
 				default:
 					taskDetails.reuse = reuseflag;
-				// taskDetails.taskName = t.tasktype + ' ' + m.screenName;
-				// task_json.screenName = m.screenName
-
 			}
 			if (t.tasktype.includes("Scenario")){
 					if('accessibilityparameters' in resultobj[ti] && resultobj[ti].accessibilityparameters.length > 0){
@@ -347,7 +227,6 @@ function next_function(resultobj,projectid){
 					task_json.assignedTestScenarioIds = [task_json.scenarioId];
 					t.taskType = 'Execute Scenario';
 			}
-			//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 			if (!batch_flag) {
 				testSuiteDetails_obj.subTaskId = t._id;
 				task_json.testSuiteDetails.push(testSuiteDetails_obj);
@@ -355,13 +234,6 @@ function next_function(resultobj,projectid){
 				task_json.taskDetails.push(taskDetails);
 				user_task_json.push(task_json);
 			}
-			// }	
-			// }	
-			// }
-			// task_json.testSuiteDetails.push(testSuiteDetails_obj);
-			// taskDetails.batchTaskIDs.push(t.taskID);
-			// task_json.taskDetails.push(taskDetails);
-			// user_task_json.push(task_json);
 		}
 		catch (ex) {
 			logger.error("Exception in the next_function: %s", ex);

@@ -106,17 +106,6 @@ module.exports.cloneSession = async (req) => {
 	}));
 };
 
-module.exports.isSessionActive = function (req){
-	/* Session validation is now handled by passport middleware. 
-	   This function is retained until all serives are updated. */
-	return true;
-	var sessionToken = (req.session)? req.session.uniqueId:undefined;
-	var sessionCheck = (sessionToken!==undefined) && (req.sessionID==sessionToken);
-	var cookies = req.signedCookies;
-	var cookieCheck = (cookies["connect.sid"]!==undefined) && (cookies["maintain.sid"]!==undefined);
-	return sessionCheck && cookieCheck;
-};
-
 module.exports.generateDefPassword = function () {
 	let passwordtemp = new randexp(/^([A-Z][a-z][0-9][!#$%&,:;<>@_~])(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!*#$%&@_^])[A-Za-z\d!*#$%&@_^]{4,6}$/).gen();
 	return passwordtemp;
@@ -139,13 +128,12 @@ module.exports.approvalStatusCheck = async executionData => {
 };
 
 const fetchData = async (inputs, url, from, all) => {
-	const args = {
+	let args = (inputs.headers)? inputs : {
 		data: inputs,
 		headers: {
 			"Content-Type": "application/json"
 		}
 	};
-	//from = " from " + ((from)? from : fetchData.caller.name);
 	from = (from)? " from " + from : "";
 	const query = (inputs.query)? " - " + inputs.query:"";
 	logger.info("Calling DAS Service: " + url + from + query);
