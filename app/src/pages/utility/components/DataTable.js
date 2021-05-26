@@ -45,7 +45,7 @@ const DataTable = props => {
                 <button onClick={showPop.onClick}>
                     {showPop.continueText ? showPop.continueText : "Yes"}
                 </button>
-                <button onClick={()=>showPop(false)}>
+                <button onClick={()=>setShowPop(false)}>
                     {showPop.rejectText ? showPop.rejectText : "No"}
                 </button>
                 </>
@@ -98,7 +98,7 @@ const CreateScreen = props => {
                 { 
                     data.length > 0 && 
                     <Table 
-                        { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} 
+                        { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} setHeaderCounter={setHeaderCounter}
                         setCheckList={setCheckList} onAdd={()=>{}} dnd={dnd} undoStack={undoStack} checkList={checkList}
                     /> 
                 }

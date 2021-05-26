@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { v4 as uuid } from 'uuid';
 import { ScrollBar } from '../../global';
 import { ReactSortable } from 'react-sortablejs';
 import "../styles/Table.scss";
@@ -15,6 +16,27 @@ const Table = props => {
 
     const headerRef = useRef();
     const rowRef = useRef();
+
+    const onAdd = type => {
+        if (type==="col") {
+            let newHeaders = [...props.headers];
+            
+            newHeaders.push({
+                id: uuid(),
+                name: `C${props.headerCounter}`
+            })
+
+            props.setHeaders(newHeaders);
+            props.setHeaderCounter(count => count + 1);
+        }
+        else if (type === "row") {
+            let newData = [...props.data];
+            
+            newData.push({id: uuid()})
+
+            props.setData(newData);
+        }
+    }
 
     const updateHeaders = (newHeader, headerId, invalidFlag) => {
 
@@ -91,7 +113,7 @@ const Table = props => {
                 { ...props }
                 rowRef={rowRef}
                 updateCheckList={updateCheckList}
-                onAdd={props.onAdd}
+                onAdd={onAdd}
             />
             {/* <ScrollBar scrollId="dt__outer" hideYbar={true}> */}
             <div className="dt__headersMainContainer full__dt">
@@ -100,8 +122,8 @@ const Table = props => {
                         <Headers
                             headers={props.headers} 
                             setHeaders={props.setHeaders}
-                            onAdd={props.onAdd}
                             updateCheckList={updateCheckList}
+                            onAdd={onAdd}
                         />
                     </div>
                 </div>
