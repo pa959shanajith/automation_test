@@ -73,7 +73,7 @@
 
 .dt__searchDataTable{
     position: relative;
-    z-index: 111;    
+    z-index: 1;
     height: 60%;
     width: 50%;
 
@@ -81,6 +81,7 @@
         position: absolute;
         width: 80%;
         margin-left: 20px;
+        z-index: 1;
     }
 
     .dt__form_dropdown{

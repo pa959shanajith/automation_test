@@ -247,7 +247,7 @@ const EditScreenActionButtons = props => {
 
     return (
         <>
-        { showExportPopup && <ExportDataTable setShowExportPopup={setShowExportPopup} tableName={props.tableName} /> }
+        { showExportPopup && <ExportDataTable setShowExportPopup={setShowExportPopup} tableName={props.tableName} setOverlay={props.setOverlay} setShowPop={props.setShowPop} /> }
         <div className="dt__taskBtns">
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={()=>setShowExportPopup(true)} disabled={!props.tableName} >Export</button>
             <button className="dt__taskBtn dt__btn" onClick={confirmDelete} disabled={!props.tableName}>Delete</button>

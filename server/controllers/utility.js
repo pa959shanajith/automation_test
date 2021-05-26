@@ -355,9 +355,9 @@ exports.exportToDtCSV = async (req, res) => {
 
 		//save it
 		// fs.writeFileSync(filePath, finalcsv, function(err) {});
-		fs.writeFileSync('./csv/'+d.filename+'.csv', finalcsv, function (err) {
+		fs.writeFile('./csv/'+d.filename+'.csv', finalcsv, function (err) {
 			if (err) return res.send('fail');
-			res.writeHead(200, {'Content-Type': 'text/csv'});
+			res.writeHead(200, {'Content-Type': 'application/csv'});
 			var rstream = fs.createReadStream(filePath);
 			rstream.pipe(res);
 		});
@@ -425,7 +425,7 @@ exports.exportToDtXML = async (req, res) => {
 		var doc = OBJtoXML(datatable);
 
 		//save it
-		fs.writeFileSync('./xml/'+d.filename+'.xml', doc, function (err) {
+		fs.writeFile('./xml/'+d.filename+'.xml', doc, function (err) {
 			if (err) return res.send('fail');
 			res.writeHead(200, {'Content-Type': 'text/xml'});
 			var rstream = fs.createReadStream(filePath);

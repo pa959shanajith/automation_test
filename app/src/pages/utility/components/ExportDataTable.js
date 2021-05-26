@@ -12,42 +12,16 @@ const ExportDataTable = props => {
     const handleFileType = e => setFiletype(e.target.value);
 
     const exportTable = async() => {
+        props.setOverlay("Exporting File...")
         const resp = await exportDataTable({ tableName: props.tableName, filename: filename, exportFormat: filetype })
-        // if(resp.error){displayError(resp.error);return;}
-        var extn = ".csv";
-        var type = "text/csv"; 
-        switch(filetype.toLowerCase()) {
-            case "csv": 
-                type = "text/csv"; 
-                extn = ".csv"
-                break;
-            case "excel": 
-                type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; 
-                extn = ".xlsx"
-                break;
-            case "xml": 
-                type = "text/xml"; 
-                extn = ".xml"
-                break;
-            default: break;
+        props.setOverlay("");
+
+        if(resp.error) props.setShowPop({title: "Export File Error", content: resp.error, type: "message"});
+        else {
+            let [extn, type] = getExtAndType(filetype);
+            downloadFile(resp, filename, extn, type);
+            props.setShowPop({title:'Export File', content:'File Exported Successfully.', type: "message" })
         }
-        var file = new Blob([resp], { type: type });
-        var fileURL = URL.createObjectURL(file);
-        var a = document.createElement('a');
-        a.href = fileURL;
-        a.download = filename+extn;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(fileURL);
-        // setBlockui({show:false,content:''})
-        // setPopup({
-        //     title:'Mindmap',
-        //     content:'Data Exported Successfully.',
-        //     submitText:'Ok',
-        //     show:true
-        // })
-        console.log(resp);
     }
 
     return (
@@ -76,6 +50,39 @@ const ExportDataTable = props => {
             />
         </>
     );
+}
+
+function downloadFile (resp, filename, extn, type) {
+    var file = new Blob([resp], { type: type });
+    var fileURL = URL.createObjectURL(file);
+    var a = document.createElement('a');
+    a.href = fileURL;
+    a.download = filename+extn;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(fileURL);
+}
+
+function getExtAndType (filetype) {
+    let extn = ".csv";
+    let type = "text/csv";
+    switch(filetype.toLowerCase()) {
+        case "csv": 
+            type = "text/csv"; 
+            extn = ".csv"
+            break;
+        case "excel": 
+            type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; 
+            extn = ".xlsx"
+            break;
+        case "xml": 
+            type = "text/xml"; 
+            extn = ".xml"
+            break;
+        default: break;
+    }
+    return [extn, type];
 }
 
 export default ExportDataTable;
