@@ -6,6 +6,7 @@ var client = new Client();
 var epurl = process.env.DAS_URL;
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var validator =  require('validator');
+var DOMParser = require('xmldom').DOMParser;
 var xl = require('excel4node');
 var xlsx = require('xlsx');
 var path = require('path');
@@ -200,7 +201,7 @@ exports.importDtFromExcel = function (req, res) {
 		rows = [];
 		for (var k = 0; k < numSheets; k++) {
 			var cSheet = myCSV[k * 2 + 1];
-			var cSheetRow = cSheet.split('\n');
+			var cSheetRow = cSheet.trimEnd().split('\n');
 			if (k == 0) {
 				columnNames = cSheetRow[k].split(',');
 			} 
@@ -267,7 +268,7 @@ exports.importDtFromCSV = function (req, res) {
 	}
 };
 
-exports.exportToExcel = async (req, res) => {
+exports.exportToDtExcel = async (req, res) => {
 	const fnName = "exportToExcel";
 	logger.info("Inside UI service: " + fnName);
 	try {
@@ -303,12 +304,12 @@ exports.exportToExcel = async (req, res) => {
 					ws.cell(i,col).string(element);
 					col+=1;
 				});
-			} else {
-				for(var j=1;j<=keys.length;++j) {
-					rowVal = datatable[i-1][keys[j-1]]
-					ws.cell(i,j).string(rowVal);
-				}
 			}
+			for(var j=1;j<=keys.length;++j) {
+				rowVal = datatable[i-1][keys[j-1]]
+				ws.cell(i+1,j).string(rowVal);
+			}
+			
 		}
 		//save it
 		wb.write('./excel/'+d.filename+'.xlsx',function (err) {
@@ -324,7 +325,7 @@ exports.exportToExcel = async (req, res) => {
 
 };
 
-exports.exportToCSV = async (req, res) => {
+exports.exportToDtCSV = async (req, res) => {
 	const fnName = "exportToCSV";
 	logger.info("Inside UI service: " + fnName);
 	try {
@@ -366,6 +367,91 @@ exports.exportToCSV = async (req, res) => {
 	}
 
 };
+
+exports.importDtFromXML = function (req, res) {
+	const fnName = "importDtFromXML";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var myXML = req.body.content;
+		var myXMLStr = myXML.replace(/\s/g,'');
+		var qObj = {};
+		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
+		var allrows = doc.getElementsByTagName("row");
+		var rows = [];
+		var columnNames = [];
+		for( var i=0;i<allrows.length;++i) {
+			var newObj = {};
+			var alltags = allrows[i].childNodes;
+			for (var j=0;j<alltags.length;++j) {
+				if(i==0) {
+					columnNames.push(alltags[j].nodeName);
+				}
+				newObj[alltags[j].nodeName] = alltags[j].childNodes[0].nodeValue;
+			}
+			rows.push(newObj);
+		}
+		qObj['datatable'] = rows;
+		qObj['dtheaders'] = columnNames;
+		res.status(200).send(qObj);
+	} catch(exception) {
+		logger.error("Error occurred in utility/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+exports.exportToDtXML = async (req, res) => {
+	const fnName = "exportToXML";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		logger.info("Fetching Datatable details");
+		var d = req.body;
+		var xmlMap = await getDatatable({"datatablename":d.datatablename, 'action': "datatable"})
+		dts = xmlMap[0];
+		datatable = dts.datatable;
+		logger.info("Writing Datatable structure to XML");
+		var dir = './../../xml';
+		var excelDirPath = path.join(__dirname, dir);
+		var filePath = path.join(excelDirPath, d.filename+".xml");
+
+		try {
+			if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
+			if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
+		} catch (e) {
+			logger.error("Exception in utilityService: exportToExcel: Create Directory/Remove file", e);
+		}
+
+		logger.debug(d.datatablename);
+
+		var doc = OBJtoXML(datatable);
+
+		//save it
+		fs.writeFileSync('./xml/'+d.filename+'.xml', doc, function (err) {
+			if (err) return res.send('fail');
+			res.writeHead(200, {'Content-Type': 'text/xml'});
+			var rstream = fs.createReadStream(filePath);
+			rstream.pipe(res);
+		});
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+
+};
+
+function OBJtoXML(obj) {
+    var xml = '<?xml version="1.0" encoding="utf-8"?>\n';
+    for (var i=0;i<obj.length;++i) {
+		xml += "<row>\n"
+		if(i==0) {
+			columnNames = Object.keys(obj[i]);
+		}
+		for (var j=0;j<columnNames.length;++j) {
+			xml += "\t<" + columnNames[j] + ">"+ obj[i][columnNames[j]] +"</" + columnNames[j] + ">\n";
+		}
+		xml += "\n</row>\n"
+	}
+    return xml
+}
 
 /*exports.pairwise_ICE = function (req, res) {
 	if (utils.isSessionActive(req)) {

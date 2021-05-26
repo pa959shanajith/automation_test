@@ -443,9 +443,9 @@ if (cluster.isMaster) {
 		app.post('/importDtFromExcel', auth.protect, utility.importDtFromExcel);
 		app.post('/importDtFromCSV', auth.protect, utility.importDtFromCSV);
 		app.post('/importDtFromXML', auth.protect, utility.importDtFromXML);
-		app.post('/exportToDtExcel', auth.protect, utility.exportToExcel);
-		app.post('/exportToDtCSV', auth.protect, utility.exportToCSV);
-		app.post('/exportToDtXML', auth.protect, utility.exportToXML);
+		app.post('/exportToDtExcel', auth.protect, utility.exportToDtExcel);
+		app.post('/exportToDtCSV', auth.protect, utility.exportToDtCSV);
+		app.post('/exportToDtXML', auth.protect, utility.exportToDtXML);
 		// Wecoccular Plugin
 		app.post('/crawlResults', auth.protect, webocular.getCrawlResults);
 		app.post('/saveResults', auth.protect, webocular.saveResults);

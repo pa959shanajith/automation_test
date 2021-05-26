@@ -13,6 +13,40 @@ const ExportDataTable = props => {
 
     const exportTable = async() => {
         const resp = await exportDataTable({ tableName: props.tableName, filename: filename, exportFormat: filetype })
+        // if(resp.error){displayError(resp.error);return;}
+        var extn = ".csv";
+        var type = "text/csv"; 
+        switch(filetype.toLowerCase()) {
+            case "csv": 
+                type = "text/csv"; 
+                extn = ".csv"
+                break;
+            case "excel": 
+                type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; 
+                extn = ".xlsx"
+                break;
+            case "xml": 
+                type = "text/xml"; 
+                extn = ".xml"
+                break;
+            default: break;
+        }
+        var file = new Blob([resp], { type: type });
+        var fileURL = URL.createObjectURL(file);
+        var a = document.createElement('a');
+        a.href = fileURL;
+        a.download = filename+extn;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(fileURL);
+        // setBlockui({show:false,content:''})
+        // setPopup({
+        //     title:'Mindmap',
+        //     content:'Data Exported Successfully.',
+        //     submitText:'Ok',
+        //     show:true
+        // })
         console.log(resp);
     }
 

@@ -229,7 +229,7 @@ export const fetchDataTable = async(tableName) => {
 
 export const exportDataTable = async(arg) => {
     try{
-        const apiUrl = "exportToDtCSV";
+        var apiUrl = "exportToDtCSV";
         switch(arg.exportFormat.toLowerCase()){
             case "csv": apiUrl = "exportToDtCSV"; break;
             case "excel": apiUrl = "exportToDtExcel"; break;
@@ -264,7 +264,7 @@ export const exportDataTable = async(arg) => {
 
 export const importDataTable = async(arg) => {
     try{
-        const apiUrl = "importDtFromCSV";
+        var apiUrl = "importDtFromCSV";
         switch(arg.importFormat.toLowerCase()){
             case "csv": apiUrl = "importDtFromCSV"; break;
             case "excel": apiUrl = "importDtFromExcel"; break;
