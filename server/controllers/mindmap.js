@@ -1049,16 +1049,17 @@ exports.pdProcess = function (req, res) {
 				}
 			});
 			//renaming custname of objects
-			screendatamindmap.forEach(function(eachcustname,ex){
-				custnames.push(eachcustname.custname);
-			});
+			custnames = screendatamindmap.map(ei => ei.custname);
 			custnames.forEach(function(x,i) {
 				if(custnames.indexOf(x) != i) {
 					cust_flag=true;
-					var c = x in custname_count ? custname_count[x] = custname_count[x] + 1 : custname_count[x] = 1;
+					var c = custname_count[x] || 1;
 					var j = c + 1;
 					var k = x + '(' + j + ')';
-					while( custnames.indexOf(k) !== -1 ) k = x + '(' + (++j) + ')';
+					while( custnames.indexOf(k) !== -1 ) {
+						k = x + '(' + (++j) + ')';
+						custname_count[x] = j;
+					}
 					custnames[i] = k;
 				}
 			});
@@ -1256,6 +1257,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 
 	screendata.forEach(function(eachScrapedAction,i){
 		testcaseObj = '';
+		var key, keycode_map;
 		if(eachScrapedAction.apptype=="WEB"){
 			if(eachScrapedAction.action){
 				if(eachScrapedAction.action.windowId){
@@ -1335,6 +1337,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			text = eachScrapedAction.text;
 			input = text.split("  ");
 			var menu_flg=0;
+			var temp_mdata;
 			//To concatinate menu objects into one
 			if(eachScrapedAction.tag=="GuiMenu"){
 				if(mflag==1) temp_mdata=temp_screendata[menu_count-2];
