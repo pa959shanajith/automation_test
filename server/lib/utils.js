@@ -176,7 +176,14 @@ module.exports.cache = cache;
 module.exports.tokenValidation = async (userInfo) => {
 	const icename = (userInfo.icename || "").toLowerCase();
 	const poolname = (userInfo.poolname || "");
+	userInfo.inputs = {
+		"tokenValidation": {
+			"status": "failed",
+			"msg": "Token authentication failed"
+		}
+	}
 	let iceMap = queue.Execution_Queue.poolname_ice_map;
+	if (poolname != "" && !iceMap[poolname]) return userInfo
 	//Directly validate on ice name if the following 2 conditions are true:
 	// 1. ice name is sent
 	// 2. pool name not sent OR pool name is sent but ice does not belong to this pool 
@@ -200,12 +207,6 @@ module.exports.tokenValidation = async (userInfo) => {
 			//ICE is owned bu the user whose token hash was sent, mark as owner  	
 			if (poolice == icename) userValidation['owner'] = true;
 			return userValidation
-		}
-	}
-	userInfo.inputs = {
-		"tokenValidation": {
-			"status": "failed",
-			"msg": "Token authentication failed"
 		}
 	}
 	return userInfo;
@@ -257,8 +258,12 @@ const validateUser = async (icename, userInfo) =>{
 };
 
 exports.getUserInfoFromHeaders = (headers) => {
-	if (headers['x-token-hash'] && headers['x-token-name'] && (headers['x-ice-name'] != null || headers['x-pool-name'] != null)) {
-		return { 'tokenhash': headers['x-token-hash'], "tokenname": headers['x-token-name'], 'icename': headers['x-ice-name'], 'poolname': headers['x-pool-name']}
+	headers['x-ice-name'] = headers['x-ice-name'] || "";
+	headers['x-pool-name'] = headers['x-pool-name'] || ""; 
+	if (headers['x-token-hash'] && headers['x-token-name'] && headers['x-token-name'] != "" && headers['x-token-name'] != "") {
+		if(headers['x-ice-name'] != "" || headers['x-pool-name'] != ""){
+				return { 'tokenhash': headers['x-token-hash'], "tokenname": headers['x-token-name'], 'icename': headers['x-ice-name'], 'poolname': headers['x-pool-name']}                      
+		}
 	}
 	return false;
 }
