@@ -19,7 +19,6 @@ var templatepdf = '';
 var templateweb = '';
 var constants = {
     'STATUS_CODES' : {
-        "401": 'Authorization failed',
         "401": 'Token validation failed',
         "400": 'Invalid request details',
         "200": 'Successfull',
@@ -807,12 +806,13 @@ exports.getReport_API = async (req, res) => {
             return res.status('401').send(finalReport);
         }
 
-        delete execResponse.error_message;
         const inputs = { executionId, scenarioIds };
         const data = await utils.fetchData(inputs, "reports/getReport_API", fnName, true);
         let reportResult = data[0];
+        let reportStatus = data[2];
         if (reportResult == "fail") {
             if(reportResult[2] && reportResult[2].errMsg !== "") execResponse.error_message=reportResult.errMsg;
+            if(reportStatus.errMsg != "") execResponse.error_message = reportStatus.errMsg;
             finalReport.push(execResponse);
             res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
             return res.status('400').send(finalReport);
@@ -854,6 +854,7 @@ exports.getReport_API = async (req, res) => {
         } 
         logger.info("Sending reports in the service %s", fnName);
         if (statusCode != "400") statusCode = '200';
+        delete execResponse.error_message;
         res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode])
         return res.status(statusCode).send(finalReport);
     } catch (exception) {
