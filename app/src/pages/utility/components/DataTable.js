@@ -8,6 +8,7 @@ import "../styles/DataTable.scss";
 
 
 let undoStack = [];
+let redoStack = [];
 
 const DataTable = props => {
 
@@ -23,6 +24,7 @@ const DataTable = props => {
     useEffect(()=>{
         setCurrScreen(props.currScreen)
         undoStack=[];
+        redoStack=[];
     }, [props.currScreen])
 
     const Popup = () => (
@@ -87,7 +89,7 @@ const CreateScreen = props => {
             <TableActionButtons 
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
                 checkList={checkList} headerCounter={headerCounter} undoStack={undoStack} setDnd={setDnd}
-                setHeaderCounter={setHeaderCounter}
+                setHeaderCounter={setHeaderCounter} redoStack={redoStack}
             />
             <CreateScreenActionButtons 
                 { ...props } tableName={tableName}data={data} setData={setData} 
@@ -146,7 +148,7 @@ const EditScreen = props => {
             <TableActionButtons
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
                 checkList={checkList} headerCounter={headerCounter} undoStack={undoStack} setDnd={setDnd}
-                setHeaderCounter={setHeaderCounter}
+                setHeaderCounter={setHeaderCounter} redoStack={redoStack}
             />
             <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} />
             </div>

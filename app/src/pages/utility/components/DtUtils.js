@@ -23,27 +23,35 @@ const parseTableData = table => {
     return [dataTableName, newData, newHeaders]
 }
 
-const undoData = (data, headers, lastEntry) => {
+const updateData = (data, headers, lastEntry) => {
     let columnName = null;
     let newData = [...data];
-    let found = false;
+    let foundCell = false;
+    let foundCol = false;
+    let currValue = {};
+
     for (let header of headers) {
         if (header.id === lastEntry.colId) {
             columnName = header.name;
-            found = true;
+            currValue['colId'] = header.id;
+            foundCol = true;
             break;
         }
     }
 
-    for (let row of newData) {
-        if (row.id === lastEntry.rowId && columnName in row) {
-            row[columnName] = lastEntry.value;
-            found = true;
-            break;
+    if (foundCol) {
+        for (let row of newData) {
+            if (row.id === lastEntry.rowId && columnName in row) {
+                currValue['value'] = row[columnName];
+                currValue['rowId'] = row.id;
+                row[columnName] = lastEntry.value;
+                foundCell = true;
+                break;
+            }
         }
     }
 
-    return [newData, found];
+    return [currValue, newData, foundCell];
 }
 
 
@@ -97,7 +105,7 @@ function deleteData (dataOne, dataTwo, checkList) {
 
 export {
     parseTableData,
-    undoData,
+    updateData,
     prepareSaveData,
     validateData,
     deleteData

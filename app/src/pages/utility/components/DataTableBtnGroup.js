@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import ClickAwayListener from 'react-click-away-listener';
 import { ScrollBar } from '../../global';
-import { undoData, validateData, prepareSaveData, deleteData, parseTableData } from './DtUtils';
+import { updateData, validateData, prepareSaveData, deleteData, parseTableData } from './DtUtils';
 import ExportDataTable from './ExportDataTable';
 import ImportSheet from './ImportSheet';
 import * as utilApi from '../api';
@@ -73,19 +73,35 @@ const TableActionButtons = props => {
     const onUndo = () => {
         if (props.undoStack.length) {
             const lastEntry = props.undoStack.pop();
-            const [newData, found] = undoData(props.data, props.headers, lastEntry);
-            if (found) props.setData(newData);
+            const [prevValue, newData, found] = updateData(props.data, props.headers, lastEntry);
+            if (found) {
+                props.setData(newData);
+                props.redoStack.push(prevValue);
+                if (props.redoStack.length>5) props.redoStack.splice(0, 1);
+            }
             else console.log("Cell Not Found!")
         }
         else console.log("Nothing to Undo")
     }
 
+    const onRedo = () => {
+        if (props.redoStack.length) {
+            const lastEntry = props.redoStack.pop();
+            const [prevValue, newData, found] = updateData(props.data, props.headers, lastEntry);
+            if (found) {
+                props.setData(newData);
+                props.undoStack.push(prevValue);
+            }
+            else console.log("Cell Not Found!")
+        }
+        else console.log("Nothing to Redo")
+    }
 
     const tableActionBtnGroup = [
         {'title': 'Add Selected Row/Column', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add', onClick: ()=>onAdd()},
         {'title': 'Drag & Drop Row', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Row', onClick:  ()=>props.setDnd(dnd => !dnd)},
         {'title': 'Remove Selected Row/Column', 'img': 'static/imgs/ic-delete.png', 'alt': 'Remove', onClick:  ()=>onDelete()},
-        {'title': 'Redo Last Changes', 'class': 'fa fa-repeat', 'alt': 'Redo', onClick:  ()=>{}},
+        {'title': 'Redo Last Changes', 'class': 'fa fa-repeat', 'alt': 'Redo', onClick:  ()=>onRedo()},
         {'title': 'Undo Last Changes', 'class': 'fa fa-undo', 'alt': 'Undo', onClick:  ()=>onUndo()},
     ]
 
