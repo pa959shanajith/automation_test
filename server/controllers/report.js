@@ -19,7 +19,6 @@ var templatepdf = '';
 var templateweb = '';
 var constants = {
     'STATUS_CODES' : {
-        "401": 'Authorization failed',
         "401": 'Token validation failed',
         "400": 'Invalid request details',
         "200": 'Successfull',
