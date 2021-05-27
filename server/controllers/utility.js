@@ -248,15 +248,11 @@ exports.importDtFromCSV = function (req, res) {
 				}
 			} else  { 
 				var row = csvArray[k].split(',');
-				if ( k != 0) {
-					for (var i = 1; i < row.length; i++) {
-						newObj = {};
-						for(var j=0; j<columnNames.length; ++j) {
-							newObj[columnNames[j]] = row[j]
-						}
-						rows.push(newObj);
-					}
+				newObj = {};
+				for (var i = 0; i < row.length; i++) {
+					newObj[columnNames[i]] = row[i];
 				}
+				rows.push(newObj);
 			}
 		}
 		qObj['datatable'] = rows;
@@ -448,7 +444,7 @@ function OBJtoXML(obj) {
 		for (var j=0;j<columnNames.length;++j) {
 			xml += "\t<" + columnNames[j] + ">"+ obj[i][columnNames[j]] +"</" + columnNames[j] + ">\n";
 		}
-		xml += "\n</row>\n"
+		xml += "</row>\n"
 	}
     return xml
 }
