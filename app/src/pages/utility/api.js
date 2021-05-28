@@ -244,7 +244,9 @@ export const exportDataTable = async(arg) => {
             data: {
                 datatablename: arg.tableName,
                 filename: arg.filename
-            }
+            },
+            credentials: 'include',
+            responseType:'arraybuffer'
         });
         if(res.status === 401){
             RedirectPage(history)
