@@ -7,7 +7,7 @@ const parseTableData = table => {
     let newData = JSON.parse(JSON.stringify([...table.datatable]))
     
     newData.forEach(row => {
-        row['id'] = uuid();
+        row['__CELL_ID__'] = uuid();
     })
     
     // SETTING UP COLUMN HEADERS
@@ -15,7 +15,7 @@ const parseTableData = table => {
     let newHeaders = [];
     for(let i=0; i<colHeaders.length; i++) {
         newHeaders.push({
-            id: uuid(),
+            __CELL_ID__: uuid(),
             name: colHeaders[i],
         })
     }
@@ -31,9 +31,9 @@ const updateData = (data, headers, lastEntry) => {
     let currValue = {};
 
     for (let header of headers) {
-        if (header.id === lastEntry.colId) {
+        if (header.__CELL_ID__ === lastEntry.colId) {
             columnName = header.name;
-            currValue['colId'] = header.id;
+            currValue['colId'] = header.__CELL_ID__;
             foundCol = true;
             break;
         }
@@ -41,9 +41,9 @@ const updateData = (data, headers, lastEntry) => {
 
     if (foundCol) {
         for (let row of newData) {
-            if (row.id === lastEntry.rowId && columnName in row) {
+            if (row.__CELL_ID__ === lastEntry.rowId && columnName in row) {
                 currValue['value'] = row[columnName];
-                currValue['rowId'] = row.id;
+                currValue['rowId'] = row.__CELL_ID__;
                 row[columnName] = lastEntry.value;
                 foundCell = true;
                 break;
@@ -75,9 +75,10 @@ function prepareSaveData (tableName, headers, data){
 
 function validateData (tableName) {
     let error = false;
+    let invalidReg = /[\/:^?<>|\\&'"]/g;
 
-    if (!tableName)
-        error = {tableName: !tableName};
+    if (!tableName.trim() || invalidReg.test(tableName))
+        error = {tableName: true};
     return error;
 }
 
@@ -90,7 +91,7 @@ function deleteData (dataOne, dataTwo, checkList) {
         let dataId = listItem.split('||').pop();
         
         for (let i=0; i<arrayOne.length; i++){
-            if (dataId === arrayOne[i].id) {
+            if (dataId === arrayOne[i].__CELL_ID__) {
                 arrayTwo.forEach(row => {
                     delete row[arrayOne[i].name]
                 })

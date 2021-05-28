@@ -18,10 +18,10 @@ const TableActionButtons = props => {
                 let rowId = props.checkList.list[0].split('||').pop();
 
                 newData.forEach((row, rowIndex) => {
-                    if (rowId === row.id) locToAdd = rowIndex;
+                    if (rowId === row.__CELL_ID__) locToAdd = rowIndex;
                 })
                 
-                newData.splice(locToAdd+1, 0, {id: uuid()});
+                newData.splice(locToAdd+1, 0, {__CELL_ID__: uuid()});
 
                 props.setData(newData);
             }
@@ -31,11 +31,11 @@ const TableActionButtons = props => {
                 let headerId = props.checkList.list[0].split('||').pop();
                 
                 props.headers.forEach((header, headerIndex)=>{
-                    if (header.id === headerId) locToAdd = headerIndex;
+                    if (header.__CELL_ID__ === headerId) locToAdd = headerIndex;
                 })
                 
                 newHeaders.splice(locToAdd+1, 0, {
-                    id: uuid(),
+                    __CELL_ID__: uuid(),
                     name: `C${props.headerCounter}`
                 })
 

@@ -22,7 +22,7 @@ const Table = props => {
             let newHeaders = [...props.headers];
             
             newHeaders.push({
-                id: uuid(),
+                __CELL_ID__: uuid(),
                 name: `C${props.headerCounter}`
             })
 
@@ -32,7 +32,7 @@ const Table = props => {
         else if (type === "row") {
             let newData = [...props.data];
             
-            newData.push({id: uuid()})
+            newData.push({__CELL_ID__: uuid()})
 
             props.setData(newData);
         }
@@ -41,13 +41,13 @@ const Table = props => {
     const updateHeaders = (newHeader, headerId, invalidFlag) => {
 
         if (invalidFlag) {
-            props.setShowPop({title: "Duplicate Header Name", content: "Header name cannot be same", type: "message"})
+            props.setShowPop({title: "Duplicate Header Name", content: "Header name is invalid or duplicate", type: "message"})
             return;
         }
         let newHeaders = [...props.headers];
         let oldHeaderName;
         newHeaders.forEach(header => {
-            if (header.id === headerId) {
+            if (header.__CELL_ID__ === headerId) {
                 oldHeaderName = header.name
                 header.name = newHeader;
             }
@@ -66,8 +66,8 @@ const Table = props => {
         let newData = [...props.data];
         
         for (let row of newData) {
-            if (row.id === rowId) {
-                props.undoStack.push({ rowId: row.id, colId: headerId, value: row[columnName]});
+            if (row.__CELL_ID__ === rowId) {
+                props.undoStack.push({ rowId: row.__CELL_ID__, colId: headerId, value: row[columnName]});
                 row[columnName] = value;
                 break;
             }
@@ -160,10 +160,10 @@ const Headers = ({headers, setHeaders, updateCheckList, onAdd}) => {
             { headers.map((header, headerIndex) => {
                 return (
                     <HeaderCell  
-                        key={`header-${header.id}`}
+                        key={`header-${header.__CELL_ID__}`}
                         headerIndex={headerIndex}
                         headerName={header.name}
-                        headerId={header.id}
+                        headerId={header.__CELL_ID__}
                         headers={headers}
                         updateCheckList={updateCheckList}
                     />
@@ -215,7 +215,7 @@ const Rows = props => {
             { props.data.map((row, rowIndex)=>{
                 return (
                     <Row 
-                        key={`row-${row.id}`}
+                        key={`row-${row.__CELL_ID__}`}
                         checkList={props.checkList}
                         setCheckList={props.setCheckList}
                         updateTableData={props.updateTableData}
@@ -253,9 +253,9 @@ const RowNumColumn = props => {
                 { props.data.map((row, rowIndex)=>{
                     return (
                         <div 
-                            key={`rownum-${row.id}`}
+                            key={`rownum-${row.__CELL_ID__}`}
                             className="dt__table_numbered_column " 
-                            onClick={(e)=>props.updateCheckList(e, "row", row.id)}
+                            onClick={(e)=>props.updateCheckList(e, "row", row.__CELL_ID__)}
                             data-test="dt__number_cell"
                         >
                             {rowIndex+2}
@@ -284,13 +284,13 @@ const SubHeaderRow = props => {
             { props.headers.map(header => {
                 return (
                     <SubHeaderCell 
-                        key={`cell-header-${header.id}`}
+                        key={`cell-header-${header.__CELL_ID__}`}
                         columnName={header.name}
                         initialValue={header.name}
                         updateHeaders={props.updateHeaders}
                         headers={props.headers}
-                        headerId={header.id}
-                        selected={props.checkList.list.includes(`sel||col||${header.id}`)}
+                        headerId={header.__CELL_ID__}
+                        selected={props.checkList.list.includes(`sel||col||${header.__CELL_ID__}`)}
                     />
                 )
             }) }
@@ -318,7 +318,7 @@ const SubHeaderCell  = props => {
     const onBlur = e => {
         let invalidHeader = false;
         props.headers.forEach(header => {
-            if (!value.trim() || (header.name === value && header.id!==props.headerId)) invalidHeader = true;
+            if (!value.trim() || (header.name === value && header.__CELL_ID__!==props.headerId) || value === "__CELL_ID__") invalidHeader = true;
         })
 
         if (invalidHeader) 
@@ -349,20 +349,20 @@ const Row = props => {
             { props.headers.map(header => {
                 return (
                     <DataCell 
-                        key={`cell-${props.row.id}-${header.id}`}
-                        rowId={props.row.id}
+                        key={`cell-${props.row.__CELL_ID__}-${header.__CELL_ID__}`}
+                        rowId={props.row.__CELL_ID__}
                         columnName={header.name}
-                        headerId = {header.id}
+                        headerId = {header.__CELL_ID__}
                         initialValue={props.row[header.name] || ''}
                         updateTableData={props.updateTableData}
                         selected={
-                            props.checkList.list.includes(`sel||row||${props.row.id}`) ||
-                            props.checkList.list.includes(`sel||col||${header.id}`)
+                            props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`) ||
+                            props.checkList.list.includes(`sel||col||${header.__CELL_ID__}`)
                         }
                     />
                 )
             }) }
-            <div className={"dt__table_add_column "+ (props.checkList.list.includes(`sel||row||${props.row.id}`)?"dt__selected_cell":"")} />
+            <div className={"dt__table_add_column "+ (props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`)?"dt__selected_cell":"")} />
         </div>
     )
 }

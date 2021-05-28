@@ -41,7 +41,7 @@ const DataTable = props => {
         <ModalContainer 
             title={showPop.title}
             content={showPop.content}
-            close={()=>showPop(false)}
+            close={()=>setShowPop(false)}
             footer={
                 <>
                 <button onClick={showPop.onClick}>
@@ -74,8 +74,8 @@ const DataTable = props => {
 }
 
 const CreateScreen = props => {
-    const [data, setData] = useState([{id: uuid()}]);
-    const [headers, setHeaders] = useState([{id: uuid(), name: 'C1'}, {id: uuid(), name: 'C2'}]);
+    const [data, setData] = useState([{__CELL_ID__: uuid()}]);
+    const [headers, setHeaders] = useState([{__CELL_ID__: uuid(), name: 'C1'}, {__CELL_ID__: uuid(), name: 'C2'}]);
     const [checkList, setCheckList] = useState({type: 'row', list: []});
     const [dnd, setDnd] = useState(false);
     const [headerCounter, setHeaderCounter] = useState(3);
@@ -101,7 +101,7 @@ const CreateScreen = props => {
                     data.length > 0 && 
                     <Table 
                         { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} setHeaderCounter={setHeaderCounter}
-                        setCheckList={setCheckList} onAdd={()=>{}} dnd={dnd} undoStack={undoStack} checkList={checkList}
+                        setCheckList={setCheckList} dnd={dnd} undoStack={undoStack} checkList={checkList}
                     /> 
                 }
             </div>
@@ -158,7 +158,7 @@ const EditScreen = props => {
                     data.length > 0 && 
                     <Table 
                         { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} 
-                        setCheckList={setCheckList} onAdd={()=>{}} dnd={dnd} undoStack={undoStack} checkList={checkList}
+                        setCheckList={setCheckList} dnd={dnd} undoStack={undoStack} checkList={checkList}
                     /> 
                 }
             </div>
@@ -182,31 +182,6 @@ const TableName = ({tableName, setTableName, error}) => {
             <input className={error?"dt__tableNameError":""} onBlur={onBlur} onChange={onChange} placeholder="Enter Data Table Name" />
         </div>
     );
-}
-
-
-
-const undoData = (data, headers, lastEntry) => {
-    let columnName = null;
-    let newData = [...data];
-    let found = false;
-    for (let header of headers) {
-        if (header.id === lastEntry.colId) {
-            columnName = header.name;
-            found = true;
-            break;
-        }
-    }
-
-    for (let row of newData) {
-        if (row.id === lastEntry.rowId && columnName in row) {
-            row[columnName] = lastEntry.value;
-            found = true;
-            break;
-        }
-    }
-
-    return [newData, found];
 }
 
 export default DataTable;
