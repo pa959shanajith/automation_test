@@ -3,7 +3,6 @@ var schedule = require('node-schedule');
 var smartPartitions = require('../smartPartitions');
 var logger = require('../../../logger.js');
 var queue = require('./executionQueue');
-if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const constants = require('./executionConstants')
 const scheduleJobMap = {};
 
@@ -135,7 +134,7 @@ const getAvailableICE = async (batchInfo, iceList) => {
 }
 
 /** Function responsible for scheduling Jobs. Returns: success/few/fail */
-scheduleTestSuite = async (multiBatchExecutionData) => {
+const scheduleTestSuite = async (multiBatchExecutionData) => {
     const fnName = "scheduleTestSuite";
     logger.info("Inside " + fnName + " function");
     const userInfoMap = {};

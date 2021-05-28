@@ -6,12 +6,7 @@ const accessibility_testing = require("../../controllers/accessibilityTesting")
 const notifications = require('../../notifications');
 var queue = require('./executionQueue')
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
-const SOCK_NORM = "normalModeOn";
-const SOCK_SCHD = "scheduleModeOn";
-const SOCK_NA = "unavailableLocalServer";
-const SOCK_SCHD_MSG = "ICE is connected in Scheduling mode";
-const SOCK_NA_MSG = "ICE is not Available";
-const DO_NOT_PROCESS = "do_not_process_response";
+const constants = require('./executionConstants')
 var testSuiteExecutor = undefined;
 class TestSuiteExecutor {
     /** Function responsible for updating execution counter for licensing */
@@ -266,15 +261,15 @@ class TestSuiteExecutor {
                 const resultData = data.value;
                 const batchId = (resultData) ? resultData.batchId : "";
                 const executionid = (resultData) ? resultData.executionId : "";
-                if (!(icename == data.username && (event == SOCK_NA || (event != SOCK_NA && execReq.batchId == batchId)))) return false;
+                if (!(icename == data.username && (event == constants.SOCK_NA || (event != constants.SOCK_NA && execReq.batchId == batchId)))) return false;
                 const status = resultData.status;
-                if (event == SOCK_NA) {
+                if (event == constants.SOCK_NA) {
                     redisServer.redisSubServer.removeListener("message", executeTestSuite_listener);
                     logger.error("Error occurred in " + fnName + ": Socket Disconnected");
                     if (resSent && notifySocMap[invokinguser]) {
                         notifySocMap[invokinguser].emit("ICEnotAvailable");
-                        rsv(DO_NOT_PROCESS);
-                    } else rsv(SOCK_NA);
+                        rsv(constants.DO_NOT_PROCESS);
+                    } else rsv(constants.SOCK_NA);
                 } else if (event == "return_status_executeTestSuite") {
                     if (status === "success") {
                         if (execType == "SCHEDULE") await _this.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
@@ -291,10 +286,10 @@ class TestSuiteExecutor {
                         await _this.updateSkippedExecutionStatus(execReq, userInfo, execStatus, errMsg);
                         if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) {
                             notifySocMap[invokinguser].emit(execStatus);
-                            rsv(DO_NOT_PROCESS);
+                            rsv(constants.DO_NOT_PROCESS);
                         } else if (resSent) {
                             queue.Execution_Queue.add_pending_notification("", report_result, username);
-                            rsv(DO_NOT_PROCESS);
+                            rsv(constants.DO_NOT_PROCESS);
                         } else rsv(execStatus);
                     } else if (status === "started") {
                         await _this.updateExecutionStatus([executionid], { starttime: resultData.startTime });
@@ -366,10 +361,10 @@ class TestSuiteExecutor {
                             if (execType == "API") result = [d2R, status];
                             if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
                                 notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
-                                rsv(DO_NOT_PROCESS);
+                                rsv(constants.DO_NOT_PROCESS);
                             } else if (resSent) {
                                 queue.Execution_Queue.add_pending_notification("", report_result, username);
-                                rsv(DO_NOT_PROCESS);
+                                rsv(constants.DO_NOT_PROCESS);
                             } else {
                                 rsv(result);
                             }
@@ -400,7 +395,7 @@ class TestSuiteExecutor {
         //if (iceStatus != null) return iceStatus;
         const taskApproval = await utils.approvalStatusCheck(batchExecutionData.batchInfo);
         if (taskApproval.res !== "pass") return taskApproval.res;
-	/*const countStatus =*/ await this.counterUpdater(batchExecutionData.batchInfo.length, userInfo.invokinguser);
+        /*const countStatus =*/ await this.counterUpdater(batchExecutionData.batchInfo.length, userInfo.invokinguser);
         // if (countStatus == "fail") return "fail";
         const executionRequest = await this.prepareExecutionRequest(batchExecutionData, userInfo);
         if (executionRequest == "fail") return "fail";
@@ -418,7 +413,7 @@ class TestSuiteExecutor {
 
 module.exports.execute = async (batchExecutionData, execIds, userInfo, execType) =>{
     if (!testSuiteExecutor){
-        testSuiteExecutor = await new TestSuiteExecutor();
+        testSuiteExecutor =  new TestSuiteExecutor();
     }
     var result = await testSuiteExecutor.executionFunction(batchExecutionData, execIds, userInfo, execType)
     return result;
