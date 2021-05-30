@@ -7,7 +7,7 @@ import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import Pagination from '../components/Pagination';
 
-const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
+const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
 
     const nulluser = "5fc137cc72142998e29b5e63";
     const filter_data = useSelector(state=>state.plugin.FD)
@@ -153,6 +153,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
             setPopupState({show:true,title:"Schedule Test Suite",content:"Error in scheduling Testsuite. Scheduling failed"});
         }
         setExecAction("serial");
+        setExecEnv("default");
         setBrowserTypeExe([]);
     }
 
