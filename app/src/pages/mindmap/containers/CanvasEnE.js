@@ -13,6 +13,7 @@ import '../styles/CanvasEnE.scss'
 
 const types = {
     'modules': 112,
+    'endtoend': 112,
     'scenarios': 237,
     'screens': 363,
     'testcases': 488
@@ -70,8 +71,7 @@ const CanvasEnE =(props)=>{
             'testcases': 0
         }
         if(props.module.createnew && verticalLayout===props.verticalLayout){
-            tree = createNewMap(props.verticalLayout,'endtoend')
-            tree.sections = types
+            tree = createNewMap(props.verticalLayout,'endtoend',undefined,types)
             tree.links = {}
             tree.dLinks = []
             if(zoom){

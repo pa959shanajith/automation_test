@@ -23,6 +23,10 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
         if(!selectedProj || !selectedModule || !selectedModule._id){
             return;
         }
+        if(selectedModule.type === "endtoend"){
+            displayError("Exporting End to End module is not supported.")
+            return
+        }
         setExportBox(true)
     }
     const clickExport = () => {

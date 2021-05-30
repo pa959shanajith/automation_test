@@ -19,7 +19,6 @@ var templatepdf = '';
 var templateweb = '';
 var constants = {
     'STATUS_CODES' : {
-        "401": 'Authorization failed',
         "401": 'Token validation failed',
         "400": 'Invalid request details',
         "200": 'Successfull',
@@ -402,131 +401,58 @@ exports.viewReport = async (req, res, next) => {
 };
 
 //To get all the projects and their releases & cycles
-exports.getAllSuites_ICE = function(req, res) {
-    logger.info("Inside UI service: getAllSuites_ICE");
-    if (utils.isSessionActive(req)) {
+exports.getAllSuites_ICE = async (req, res) => {
+    const fnName = "getAllSuites_ICE";
+    logger.info("Inside UI service: " + fnName);
+    try {
         var requestedaction = req.body.readme;
         if (requestedaction == 'projects' || requestedaction == 'reports') {
-            try {
-                var userid = req.body.userId ? req.body.userId : req.session.userid;
-                logger.info("Calling function getprojectdetails from getAllSuites_ICE: Projects");
-                getprojectdetails(userid, function(getprojectdetailserror, getprojectdetailsresponse) {
-                    try {
-                        if (getprojectdetailserror) {
-                            logger.error("Error occurred in the function getprojectdetails: getAllSuites_ICE: Projects");
-                            res.send("fail");
-                        } else {
-                            logger.info("Sending project details from getprojectdetails function of getAllSuites_ICE:Projects");
-                            res.send(getprojectdetailsresponse);
-                        }
-                    } catch (exception) {
-                        logger.error("Exception in the function getprojectdetails: getAllSuites_ICE: Projects: %s", exception);
-                        res.send("fail");
-                    }
-                });
-            } catch (exception) {
-                logger.error("Exception in the service getAllSuites_ICE: Projects: %s", exception);
-                res.send("fail");
-            }
-         }
-        else {
-            logger.error("Invalid input fail");
+            const inputs = {
+                "query": "projects",
+                "userid": req.session.userid
+            };
+            const result = await utils.fetchData(inputs, "reports/getAllSuites_ICE", fnName);
+            if (result == "fail") return res.send("fail");
+            res.send(result);
+        } else {
+            logger.error("Error occurred in report/"+fnName+": Invalid input fail");
             res.send('Invalid input fail');
         }
-    } else {
-        logger.error("Invalid Session");
-        res.send("Invalid Session");
+	} catch (exception) {
+		logger.error("Error occurred in report/"+fnName+":", exception);
+		res.send("fail");
     }
-
-    function getprojectdetails(userid, getprojectdetailscallback) {
-        logger.info("Inside UI function: getprojectdetails");
-        try {
-            var inputs = {
-                "query": "projects",
-                "userid": userid
-            };
-            var args = {
-                data: inputs,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            logger.info("Calling DAS Service from getprojectdetails: reports/getAllSuites_ICE");
-            client.post(epurl + "reports/getAllSuites_ICE", args,
-                function(projectdetails, response) {
-                    if (response.statusCode != 200 || projectdetails.rows == "fail") {
-                        logger.error("Error occurred in reports/getAllSuites_ICE from getprojectdetails Error Code : ERRDAS");
-                        getprojectdetailscallback("fail", null);
-                    } else {                       
-                        try {
-                            var reports = projectdetails.rows
-                        } catch (exception) {
-                            logger.error("Exception in the function getprojectdetails: %s", exception);
-                        }
-                        logger.info("Sending project details from getAllSuites_ICE: projects");
-                        getprojectdetailscallback(null, reports);
-                    }
-                });
-            } catch (exception) {
-                logger.error("Exception in the function getprojectdetails: %s", exception);
-            }
-        }
 };
 
 //To get all the executed suites
-exports.getSuiteDetailsInExecution_ICE = function(req, res) {
-    logger.info("Inside UI service: getSuiteDetailsInExecution_ICE");
+exports.getSuiteDetailsInExecution_ICE = async (req, res) => {
+    const fnName = "getSuiteDetailsInExecution_ICE";
+    logger.info("Inside UI service: " + fnName);
     try {
-        if (utils.isSessionActive(req)) {
-            var req_testsuiteId = req.body.testsuiteid;
-            var startTime, endTime, starttime, endtime;
-            var executionDetailsJSON = [];
-            var inputs = {
-                "suiteid": req_testsuiteId
-            };
-            var args = {
-                data: inputs,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            logger.info("Calling DAS Service from getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE");
-            client.post(epurl + "reports/getSuiteDetailsInExecution_ICE", args,
-                function(executionData, response) {
-                    try {
-                        if (response.statusCode != 200 || executionData.rows == "fail") {
-                            logger.error("Error occurred in the service getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE");
-                            res.send("fail");
-                        } else {
-                            for (var i = 0; i < executionData.rows.length; i++) {
-                                startTime = new Date(executionData.rows[i].starttime);
-                                starttime = startTime.getUTCDate() + "-" + (startTime.getUTCMonth() + 1) + "-" + startTime.getUTCFullYear() + " " + startTime.getUTCHours() + ":" + startTime.getUTCMinutes();
-                                if (executionData.rows[i].endtime === null) endtime = '-';
-                                else {
-                                    endTime = new Date(executionData.rows[i].endtime);
-                                    endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
-                                }
-                                executionDetailsJSON.push({
-                                    execution_id: executionData.rows[i]._id,
-                                    start_time: starttime,
-                                    end_time: endtime
-                                });
-                            }
-                            logger.info("Sending execution details from getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE");
-                            res.send(JSON.stringify(executionDetailsJSON));
-                        }
-                    } catch (exception) {
-                        logger.error("Exception in the service getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE: %s", exception);
-                        res.send("fail");
-                    }
-                });
-        } else {
-            logger.error("Error in the service getSuiteDetailsInExecution_ICE: Invalid Session");
-            res.send("Invalid Session");
+        const inputs = { "suiteid": req.body.testsuiteid };
+        const executionData = await utils.fetchData(inputs, "reports/getSuiteDetailsInExecution_ICE", fnName);
+        if (executionData == "fail") return res.send("fail");
+        var startTime, endTime, starttime, endtime;
+        var executionDetailsJSON = [];
+        for (var i = 0; i < executionData.length; i++) {
+            startTime = new Date(executionData[i].starttime);
+            starttime = startTime.getUTCDate() + "-" + (startTime.getUTCMonth() + 1) + "-" + startTime.getUTCFullYear() + " " + startTime.getUTCHours() + ":" + startTime.getUTCMinutes();
+            if (executionData[i].endtime === null) endtime = '-';
+            else {
+                endTime = new Date(executionData[i].endtime);
+                endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
+            }
+            executionDetailsJSON.push({
+                execution_id: executionData[i]._id,
+                start_time: starttime,
+                end_time: endtime
+            });
         }
-    } catch (exception) {
-        logger.error("Exception in the service getSuiteDetailsInExecution_ICE: %s", exception);
-        res.send("fail");
+        logger.info("Sending execution details from reports/"+fnName);
+        res.send(JSON.stringify(executionDetailsJSON));
+	} catch (exception) {
+		logger.error("Error occurred in report/"+fnName+":", exception);
+		res.send("fail");
     }
 };
 
@@ -534,119 +460,114 @@ exports.getSuiteDetailsInExecution_ICE = function(req, res) {
 exports.reportStatusScenarios_ICE = function(req, res) {
     logger.info("Inside UI service: reportStatusScenarios_ICE");
     try {
-        if (utils.isSessionActive(req)) {
-            var req_executionId = req.body.executionId;
-            var report = [];
-            async.series({
-                    executiondetails: function(callback) {
-                        var inputs = {
-                            "query": "executiondetails",
-                            "executionid": req_executionId,
-                        };
-                        var args = {
-                            data: inputs,
-                            headers: {
-                                "Content-Type": "application/json"
-                            }
-                        };
-                        logger.info("Calling DAS Service from reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
-                        client.post(epurl + "reports/reportStatusScenarios_ICE", args,
-                            function(result, response) {
-                                if (response.statusCode != 200 || result.rows == "fail") {
-                                    logger.error("Error occurred in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
-                                    var flag = "fail";
-                                    res.send(flag);
-                                } else {
-                                    async.forEachSeries(result.rows, function(iterator, callback2) {
-                                        try {
-                                            var executedtimeTemp = new Date(iterator.executedtime);
-                                            if (executedtimeTemp != null) {
-                                                executedtimeTemp = executedtimeTemp.getUTCDate() + "-" + (executedtimeTemp.getUTCMonth() + 1) + "-" + executedtimeTemp.getUTCFullYear() + " " + (executedtimeTemp.getUTCHours()) + ":" + (executedtimeTemp.getUTCMinutes()) + ":" + executedtimeTemp.getSeconds();
-                                            }
-                                            var browserTemp = iterator.executedon;
-                                            var statusTemp = iterator.status;
-                                            var reportidTemp = iterator._id;
-                                            var testscenarioidTemp = iterator.testscenarioid;
-                                            var inputs = {
-                                                "query": "scenarioname",
-                                                "scenarioid": iterator.testscenarioid
-                                            };
-                                            var args = {
-                                                data: inputs,
-                                                headers: {
-                                                    "Content-Type": "application/json"
-                                                }
-                                            };
-                                            logger.info("Calling DAS Service from reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
-                                            client.post(epurl + "reports/reportStatusScenarios_ICE", args,
-                                                function(scenarioNameDetails, response) {
-                                                    if (response.statusCode != 200 || scenarioNameDetails.rows == "fail") {
-                                                        logger.error("Error occurred in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
-                                                        var flag = "fail";
-                                                        res.send(flag);
-                                                    } else {
-                                                        async.forEachSeries(scenarioNameDetails.rows, function(testScenarioNameitr, callback3) {
-                                                            try {
-                                                                report.push({
-                                                                    executedtime: executedtimeTemp,
-                                                                    browser: browserTemp,
-                                                                    status: statusTemp,
-                                                                    reportid: reportidTemp,
-                                                                    testscenarioid: testscenarioidTemp,
-                                                                    testscenarioname: testScenarioNameitr.name
-                                                                });
-                                                                callback3();
-                                                            } catch (exception) {
-                                                                logger.error("Exception in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE: %s", exception);
-                                                                res.send("fail");
-                                                            }
-                                                        }, callback2);
-                                                    }
-                                                });
-                                        } catch (exception) {
-                                            logger.error("Exception in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE: %s", exception);
-                                            res.send("fail");
+        var req_executionId = req.body.executionId;
+        var report = [];
+        async.series({
+                executiondetails: function(callback) {
+                    var inputs = {
+                        "query": "executiondetails",
+                        "executionid": req_executionId,
+                    };
+                    var args = {
+                        data: inputs,
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    };
+                    logger.info("Calling DAS Service from reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
+                    client.post(epurl + "reports/reportStatusScenarios_ICE", args,
+                        function(result, response) {
+                            if (response.statusCode != 200 || result.rows == "fail") {
+                                logger.error("Error occurred in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
+                                var flag = "fail";
+                                res.send(flag);
+                            } else {
+                                async.forEachSeries(result.rows, function(iterator, callback2) {
+                                    try {
+                                        var executedtimeTemp = new Date(iterator.executedtime);
+                                        if (executedtimeTemp != null) {
+                                            executedtimeTemp = executedtimeTemp.getUTCDate() + "-" + (executedtimeTemp.getUTCMonth() + 1) + "-" + executedtimeTemp.getUTCFullYear() + " " + (executedtimeTemp.getUTCHours()) + ":" + (executedtimeTemp.getUTCMinutes()) + ":" + executedtimeTemp.getSeconds();
                                         }
-                                    }, callback);
-                                }
-                            });
-                    }
-                },
-                function(err, results) {
-                    if (err) {
-                        logger.error("Error occurred in the service reportStatusScenarios_ICE: final function: %s", err);
-                        res.send("fail");
-                    } else {
-                        if (report.length > 0) {
-                            for (var i = 0; i < report.length; i++) {
-                                if (report[i].executedtime != "") {
-                                    var dateString = report[i].executedtime,
-                                        dateTimeParts = dateString.split(' '),
-                                        timeParts = dateTimeParts[1].split(':'),
-                                        dateParts = dateTimeParts[0].split('-'),
-                                        date;
-                                    date = new Date(dateParts[2], parseInt(dateParts[1], 10) - 1, dateParts[0], timeParts[0], timeParts[1], timeParts[2]);
-                                    report[i].executedtime = date.getTime();
-                                }
+                                        var browserTemp = iterator.executedon;
+                                        var statusTemp = iterator.status;
+                                        var reportidTemp = iterator._id;
+                                        var testscenarioidTemp = iterator.testscenarioid;
+                                        var inputs = {
+                                            "query": "scenarioname",
+                                            "scenarioid": iterator.testscenarioid
+                                        };
+                                        var args = {
+                                            data: inputs,
+                                            headers: {
+                                                "Content-Type": "application/json"
+                                            }
+                                        };
+                                        logger.info("Calling DAS Service from reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
+                                        client.post(epurl + "reports/reportStatusScenarios_ICE", args,
+                                            function(scenarioNameDetails, response) {
+                                                if (response.statusCode != 200 || scenarioNameDetails.rows == "fail") {
+                                                    logger.error("Error occurred in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
+                                                    var flag = "fail";
+                                                    res.send(flag);
+                                                } else {
+                                                    async.forEachSeries(scenarioNameDetails.rows, function(testScenarioNameitr, callback3) {
+                                                        try {
+                                                            report.push({
+                                                                executedtime: executedtimeTemp,
+                                                                browser: browserTemp,
+                                                                status: statusTemp,
+                                                                reportid: reportidTemp,
+                                                                testscenarioid: testscenarioidTemp,
+                                                                testscenarioname: testScenarioNameitr.name
+                                                            });
+                                                            callback3();
+                                                        } catch (exception) {
+                                                            logger.error("Exception in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE: %s", exception);
+                                                            res.send("fail");
+                                                        }
+                                                    }, callback2);
+                                                }
+                                            });
+                                    } catch (exception) {
+                                        logger.error("Exception in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE: %s", exception);
+                                        res.send("fail");
+                                    }
+                                }, callback);
                             }
-                            report.sort(function(a, b) {
-                                return a.executedtime - b.executedtime;
-                            });
-                            for (var k = 0; k < report.length; k++) {
-                                if (report[k].executedtime != "") {
-                                    report[k].executedtime = new Date(report[k].executedtime);
-                                    report[k].executedtime = ("0" + report[k].executedtime.getDate()).slice(-2) + "-" + ("0" + (report[k].executedtime.getMonth() + 1)).slice(-2) + "-" + (report[k].executedtime.getFullYear()) + " " + ("0" + report[k].executedtime.getHours()).slice(-2) + ":" + ("0" + report[k].executedtime.getMinutes()).slice(-2) + ":" + ("0" + report[k].executedtime.getSeconds()).slice(-2);
-                                }
+                        });
+                }
+            },
+            function(err, results) {
+                if (err) {
+                    logger.error("Error occurred in the service reportStatusScenarios_ICE: final function: %s", err);
+                    res.send("fail");
+                } else {
+                    if (report.length > 0) {
+                        for (var i = 0; i < report.length; i++) {
+                            if (report[i].executedtime != "") {
+                                var dateString = report[i].executedtime,
+                                    dateTimeParts = dateString.split(' '),
+                                    timeParts = dateTimeParts[1].split(':'),
+                                    dateParts = dateTimeParts[0].split('-'),
+                                    date;
+                                date = new Date(dateParts[2], parseInt(dateParts[1], 10) - 1, dateParts[0], timeParts[0], timeParts[1], timeParts[2]);
+                                report[i].executedtime = date.getTime();
                             }
                         }
-                        logger.info("Sending scenario status details from reportStatusScenarios_ICE");
-                        res.send(JSON.stringify(report));
+                        report.sort(function(a, b) {
+                            return a.executedtime - b.executedtime;
+                        });
+                        for (var k = 0; k < report.length; k++) {
+                            if (report[k].executedtime != "") {
+                                report[k].executedtime = new Date(report[k].executedtime);
+                                report[k].executedtime = ("0" + report[k].executedtime.getDate()).slice(-2) + "-" + ("0" + (report[k].executedtime.getMonth() + 1)).slice(-2) + "-" + (report[k].executedtime.getFullYear()) + " " + ("0" + report[k].executedtime.getHours()).slice(-2) + ":" + ("0" + report[k].executedtime.getMinutes()).slice(-2) + ":" + ("0" + report[k].executedtime.getSeconds()).slice(-2);
+                            }
+                        }
                     }
-                });
-        } else {
-            logger.error("Invalid Session: reportStatusScenarios_ICE");
-            res.send("Invalid Session");
-        }
+                    logger.info("Sending scenario status details from reportStatusScenarios_ICE");
+                    res.send(JSON.stringify(report));
+                }
+            });
     } catch (exception) {
         logger.error("Exception in the service reportStatusScenarios_ICE: %s", exception);
         res.send("fail");
@@ -672,148 +593,143 @@ exports.getReport = async (req, res) => {
 exports.connectJira_ICE = function(req, res) {
     logger.info("Inside UI service: connectJira_ICE");
     try {
-        if (utils.isSessionActive(req)) {
-            var username=req.session.username;
-            var icename = undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-            redisServer.redisSubServer.subscribe('ICE2_' + icename);
-            if (req.body.action == 'loginToJira') { //Login to Jira for creating issues
-                var jiraurl = req.body.url;
-                var jirausername = req.body.username;
-                var jirapwd = req.body.password;
-                if (!validateData(jiraurl, "empty") && !validateData(jirausername, "empty") && !validateData(jirapwd, "empty")) {
-                    //var inputs = [jiraurl,jirausername,jirapwd];
-                    var inputs = {
-                        "jira_serverlocation": jiraurl,
-                        "jira_uname": jirausername,
-                        "jira_pwd": jirapwd
-                    };
-                    try {
-                        logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-                        logger.debug("ICE Socket requesting Address: %s", icename);
-                        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                            if (redisres[1] > 0) {
-                                logger.info("Sending socket request for jira_login to cachedb");
-                                var dataToIce = {
-                                    "emitAction": "jiralogin",
-                                    "username": icename,
-                                    "action": req.body.action,
-                                    "inputs": inputs
-                                };
-                                redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
-                                var count = 0;
+        var username=req.session.username;
+        var icename = undefined
+        if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
+        redisServer.redisSubServer.subscribe('ICE2_' + icename);
+        if (req.body.action == 'loginToJira') { //Login to Jira for creating issues
+            var jiraurl = req.body.url;
+            var jirausername = req.body.username;
+            var jirapwd = req.body.password;
+            if (!validateData(jiraurl, "empty") && !validateData(jirausername, "empty") && !validateData(jirapwd, "empty")) {
+                //var inputs = [jiraurl,jirausername,jirapwd];
+                var inputs = {
+                    "jira_serverlocation": jiraurl,
+                    "jira_uname": jirausername,
+                    "jira_pwd": jirapwd
+                };
+                try {
+                    logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                    logger.debug("ICE Socket requesting Address: %s", icename);
+                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+                        if (redisres[1] > 0) {
+                            logger.info("Sending socket request for jira_login to cachedb");
+                            var dataToIce = {
+                                "emitAction": "jiralogin",
+                                "username": icename,
+                                "action": req.body.action,
+                                "inputs": inputs
+                            };
+                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            var count = 0;
 
-                                function jira_login_1_listener(channel, message) {
-                                    var data = JSON.parse(message);
-                                    if (icename == data.username && ["unavailableLocalServer", "auto_populate"].includes(data.onAction)) {
-                                        redisServer.redisSubServer.removeListener("message", jira_login_1_listener);
-                                        if (data.onAction == "unavailableLocalServer") {
-                                            logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
-                                            if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                                var soc = myserver.socketMapNotify[username];
-                                                soc.emit("ICEnotAvailable");
+                            function jira_login_1_listener(channel, message) {
+                                var data = JSON.parse(message);
+                                if (icename == data.username && ["unavailableLocalServer", "auto_populate"].includes(data.onAction)) {
+                                    redisServer.redisSubServer.removeListener("message", jira_login_1_listener);
+                                    if (data.onAction == "unavailableLocalServer") {
+                                        logger.error("Error occurred in connectJira_ICE - loginToJira: Socket Disconnected");
+                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                            var soc = myserver.socketMapNotify[username];
+                                            soc.emit("ICEnotAvailable");
+                                        }
+                                    } else if (data.onAction == "auto_populate") {
+                                        var resultData = data.value;
+                                        if (count == 0) {
+                                            if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                                logger.info('Jira: Login successfully.');
+                                            } else {
+                                                logger.error('Jira: Login Failed.');
                                             }
-                                        } else if (data.onAction == "auto_populate") {
-                                            var resultData = data.value;
-                                            if (count == 0) {
-                                                if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
-                                                    logger.info('Jira: Login successfully.');
-                                                } else {
-                                                    logger.error('Jira: Login Failed.');
-                                                }
-                                                res.send(resultData);
-                                                count++;
-                                            }
+                                            res.send(resultData);
+                                            count++;
                                         }
                                     }
                                 }
-                                redisServer.redisSubServer.on("message", jira_login_1_listener);
-                            } else {
-                                utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                    var flag = "";
-                                    if (found) flag = "scheduleModeOn";
-                                    else {
-                                        flag = "unavailableLocalServer";
-                                        logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
-                                    }
-                                    res.send(flag);
-                                });
                             }
-                        });
-                    } catch (exception) {
-                        logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
-                    }
-                } else {
-                    logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
-                    res.send("Fail");
-                }
-            } else if (req.body.action == 'createIssueInJira') { //Create issues in the Jira
-                var createObj = req.body.issue_dict;
-                if (!validateData(createObj.project, "empty") && !validateData(createObj.issuetype, "empty") && !validateData(createObj.summary, "empty") && !validateData(createObj.priority, "empty")) {
-                    try {
-                        logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-                        logger.debug("ICE Socket requesting Address: %s", icename);
-                        redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
-                            if (redisres[1] > 0) {
-                                logger.info("Sending socket request for jira_login to cachedb");
-                                dataToIce = {
-                                    "emitAction": "jiralogin",
-                                    "username": icename,
-                                    "action": req.body.action,
-                                    "inputs": createObj
-                                };
-                                redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
-                                var count = 0;
-
-                                function jira_login_2_listener(channel, message) {
-                                    var data = JSON.parse(message);
-                                    if (icename == data.username && ["unavailableLocalServer", "issue_id"].includes(data.onAction)) {
-                                        redisServer.redisSubServer.removeListener("message", jira_login_2_listener);
-                                        if (data.onAction == "unavailableLocalServer") {
-                                            logger.error("Error occurred in connectJira_ICE - createIssueInJira: Socket Disconnected");
-                                            if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
-                                                var soc = myserver.socketMapNotify[username];
-                                                soc.emit("ICEnotAvailable");
-                                            }
-                                        } else if (data.onAction == "issue_id") {
-                                            var resultData = data.value;
-                                            if (count == 0) {
-                                                if (resultData != "Fail") {
-                                                    var updateStatus = updateDbReportData(createObj.reportId, createObj.slno, resultData);
-                                                    logger.info('Jira: Issue created successfully.');
-                                                } else {
-                                                    logger.error('Jira: Failed to create issue.');
-                                                }
-                                                res.send(resultData);
-                                                count++;
-                                            }
-                                        }
-                                    }
+                            redisServer.redisSubServer.on("message", jira_login_1_listener);
+                        } else {
+                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
+                                var flag = "";
+                                if (found) flag = "scheduleModeOn";
+                                else {
+                                    flag = "unavailableLocalServer";
+                                    logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
                                 }
-                                redisServer.redisSubServer.on("message", jira_login_2_listener);
-                            } else {
-                                utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
-                                    var flag = "";
-                                    if (found) flag = "scheduleModeOn";
-                                    else {
-                                        flag = "unavailableLocalServer";
-                                        logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Socket not Available");
-                                    }
-                                    res.send(flag);
-                                });
-                            }
-                        });
-                    } catch (exception) {
-                        logger.error("Exception in the service connectJira_ICE - createIssueInJira: %s", exception);
-                    }
-                } else {
-                    logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Invalid inputs");
-                    res.send("Fail");
+                                res.send(flag);
+                            });
+                        }
+                    });
+                } catch (exception) {
+                    logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
                 }
+            } else {
+                logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
+                res.send("Fail");
             }
-        } else {
-            logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Invalid Session");
-            res.send("Invalid Session");
+        } else if (req.body.action == 'createIssueInJira') { //Create issues in the Jira
+            var createObj = req.body.issue_dict;
+            if (!validateData(createObj.project, "empty") && !validateData(createObj.issuetype, "empty") && !validateData(createObj.summary, "empty") && !validateData(createObj.priority, "empty")) {
+                try {
+                    logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                    logger.debug("ICE Socket requesting Address: %s", icename);
+                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+                        if (redisres[1] > 0) {
+                            logger.info("Sending socket request for jira_login to cachedb");
+                            dataToIce = {
+                                "emitAction": "jiralogin",
+                                "username": icename,
+                                "action": req.body.action,
+                                "inputs": createObj
+                            };
+                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+                            var count = 0;
+
+                            function jira_login_2_listener(channel, message) {
+                                var data = JSON.parse(message);
+                                if (icename == data.username && ["unavailableLocalServer", "issue_id"].includes(data.onAction)) {
+                                    redisServer.redisSubServer.removeListener("message", jira_login_2_listener);
+                                    if (data.onAction == "unavailableLocalServer") {
+                                        logger.error("Error occurred in connectJira_ICE - createIssueInJira: Socket Disconnected");
+                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                            var soc = myserver.socketMapNotify[username];
+                                            soc.emit("ICEnotAvailable");
+                                        }
+                                    } else if (data.onAction == "issue_id") {
+                                        var resultData = data.value;
+                                        if (count == 0) {
+                                            if (resultData != "Fail") {
+                                                var updateStatus = updateDbReportData(createObj.reportId, createObj.slno, resultData);
+                                                logger.info('Jira: Issue created successfully.');
+                                            } else {
+                                                logger.error('Jira: Failed to create issue.');
+                                            }
+                                            res.send(resultData);
+                                            count++;
+                                        }
+                                    }
+                                }
+                            }
+                            redisServer.redisSubServer.on("message", jira_login_2_listener);
+                        } else {
+                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
+                                var flag = "";
+                                if (found) flag = "scheduleModeOn";
+                                else {
+                                    flag = "unavailableLocalServer";
+                                    logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Socket not Available");
+                                }
+                                res.send(flag);
+                            });
+                        }
+                    });
+                } catch (exception) {
+                    logger.error("Exception in the service connectJira_ICE - createIssueInJira: %s", exception);
+                }
+            } else {
+                logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Invalid inputs");
+                res.send("Fail");
+            }
         }
     } catch (exception) {
         logger.error("Exception in the service connectJira_ICE: %s", exception);
@@ -865,12 +781,6 @@ exports.getReportsData_ICE = async (req, res) => {
     }
 };
 
-const getUserInfoFromHeaders = (headers) => {
-	if (headers['x-token_hash'] && headers['x-token_name'] && headers['x-icename']) {
-		return { 'tokenhash': headers['x-token_hash'], "tokenname": headers['x-token_name'], 'icename': headers['x-icename'], 'poolname': ''}
-	}
-	return false;
-}
 
 //Get report for execution
 exports.getReport_API = async (req, res) => {
@@ -883,7 +793,7 @@ exports.getReport_API = async (req, res) => {
 		var scenarioIds = execData.scenarioIds;
 		var finalReport = [];
 		var tempModDict = {};
-        let headerUserInfo = getUserInfoFromHeaders(req.headers)
+        let headerUserInfo = utils.getUserInfoFromHeaders(req.headers)
         if (!headerUserInfo){
             res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
             return res.status('400').send({'error':"Invalid or missing user info in request headers."})
@@ -896,12 +806,13 @@ exports.getReport_API = async (req, res) => {
             return res.status('401').send(finalReport);
         }
 
-        delete execResponse.error_message;
         const inputs = { executionId, scenarioIds };
         const data = await utils.fetchData(inputs, "reports/getReport_API", fnName, true);
         let reportResult = data[0];
+        let reportStatus = data[2];
         if (reportResult == "fail") {
             if(reportResult[2] && reportResult[2].errMsg !== "") execResponse.error_message=reportResult.errMsg;
+            if(reportStatus.errMsg != "") execResponse.error_message = reportStatus.errMsg;
             finalReport.push(execResponse);
             res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
             return res.status('400').send(finalReport);
@@ -943,6 +854,7 @@ exports.getReport_API = async (req, res) => {
         } 
         logger.info("Sending reports in the service %s", fnName);
         if (statusCode != "400") statusCode = '200';
+        delete execResponse.error_message;
         res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode])
         return res.status(statusCode).send(finalReport);
     } catch (exception) {
@@ -1011,7 +923,7 @@ exports.getExecution_metrics_API = async(req, res) => {
     logger.info("Inside UI service: getExecution_metrics_API");
     var statusCode = '500';
     try {
-        const headerUserInfo = getUserInfoFromHeaders(req.headers);
+        const headerUserInfo = utils.getUserInfoFromHeaders(req.headers);
         if (!headerUserInfo){
             res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
             return res.status('400').send({'error':"Invalid or missing user info in request headers."})
