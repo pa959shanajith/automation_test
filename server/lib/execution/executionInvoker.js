@@ -140,6 +140,12 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
             case "fail":
                 execResponse.error_message = "Internal error occurred during execution"
                 break;
+            case "gitfail":
+                execResponse.error_message = "Internal error occurred during Git execution"
+                break;
+            case "empty":
+                execResponse.error_message = "Invalid Git details entered. Please check your inputs!"
+                break;
             default:
                 if (result[1] == "success") statusCode = "200";
                 else if (result[1] == 'Terminate') statusCode = "462";
