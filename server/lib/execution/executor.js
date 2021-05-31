@@ -59,7 +59,8 @@ class TestSuiteExecutor {
                 "testcase": allTestcaseObj[tc._id].steps,
                 "testcasename": allTestcaseObj[tc._id].name,
                 "screenid": tc.screenid,
-                "screenname": tc.screenname
+                "screenname": tc.screenname,
+                "datatables": tc.datatables
             });
         });
 
