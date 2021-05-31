@@ -73,56 +73,30 @@ exports.updateTestCase_ICE = async (req, res) => {
 	const fnName = "updateTestCase_ICE";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		logger.info("Inside UI service: updateTestCase_ICE");
-		if (utils.isSessionActive(req)) {
-			//base request elements
-			var requestedscreenid = req.body.screenid;
-			var requestedtestcaseid = req.body.testcaseid;
-			var requestedtestcasename = req.body.testcasename;
-			var requestedversionnumber = req.body.versionnumber;
-			var requestedtestcasesteps = JSON.parse(req.body.testcasesteps);
-			var import_status = req.body.import_status;
-			var copiedTestCases = req.body.copiedTestCases;
-			var userinfo = req.body.userinfo;
-			var inputs = {
-				"screenid": requestedscreenid,
-				"query": "updatetestcasedata",
-				"modifiedby": userinfo.user_id,
-				"modifiedbyrole": userinfo.role,
-				"testcasesteps": requestedtestcasesteps,
-				"versionnumber": requestedversionnumber,
-				"testcaseid": requestedtestcaseid,
-				"testcasename": requestedtestcasename,
-				"import_status": import_status,
-				"copiedTestCases": copiedTestCases,
-			};
-			inputs.datatables = [];
-			for(var i=0;i<requestedtestcasesteps.length;++i) {
-				if(requestedtestcasesteps[i].keywordVal=="getParam" && 
-					requestedtestcasesteps[i].inputVal[0].split(';')[0].startsWith("avoassure")) {
-						inputs.datatables.push(requestedtestcasesteps[i].inputVal[0].split(';')[0].split("/")[1]);
-				}
+		var tcData = req.body;
+		var testcasesteps = JSON.parse(req.body.testcasesteps);
+		const inputs = {
+			"screenid": tcData.screenid,
+			"query": "updatetestcasedata",
+			"modifiedby": req.session.userid,
+			"modifiedbyrole": req.session.activeRoleId,
+			"testcasesteps": testcasesteps,
+			"versionnumber": tcData.versionnumber,
+			"testcaseid": tcData.testcaseid,
+			"testcasename": tcData.testcasename,
+			"import_status": tcData.import_status,
+			"copiedTestCases": tcData.copiedTestCases,
+		};
+		inputs.datatables = [];
+		for(var i=0;i<requestedtestcasesteps.length;++i) {
+			if(requestedtestcasesteps[i].keywordVal=="getParam" && 
+				requestedtestcasesteps[i].inputVal[0].split(';')[0].startsWith("avoassure")) {
+					inputs.datatables.push(requestedtestcasesteps[i].inputVal[0].split(';')[0].split("/")[1]);
 			}
-			logger.info("Calling function uploadTestCaseData from updateTestCase_ICE");
-			uploadTestCaseData(inputs, function (error, response) {
-				if (error) {
-					try {
-						res.send(error);
-					} catch (exception) {
-						logger.error("Exception in the service updateTestCase_ICE - uploadTestCaseData: %s", exception);
-					}
-				} else {
-					try {
-						res.send(response);
-					} catch (exception) {
-						logger.error("Exception in the service updateTestCase_ICE - uploadTestCaseData: %s", exception);
-					}
-				}
-			});
-		} else {
-			logger.error("Error in the service updateTestCase_ICE: Invalid Session");
-			res.send("Invalid Session");
 		}
+		const result = await utils.fetchData(inputs, "design/updateTestCase_ICE", fnName);
+		if (result == "fail") return res.send("Error occurred in updateTestCaseQuery : Fail");
+		res.send("success");
 	} catch (exception) {
 		logger.error("Error occurred in design/"+fnName+":", exception);
         res.status(500).send("fail");
@@ -185,6 +159,7 @@ exports.debugTestCase_ICE = function (req, res) {
 												template: "",
 												testcasename: testcases[i].name,
 												testcase: testcases[i].steps,
+												datatables: testcases[i].datatables,
 												apptype: apptype
 											};
 										}
@@ -212,16 +187,47 @@ exports.debugTestCase_ICE = function (req, res) {
 													}
 												}
 											}
-										} else {
-											var testcases = testcasedataresult.rows;
-											const tcDict = {};
-											for (let i = 0; i < testcases.length; i++){
-												tcDict[testcases[i]._id] = {
-													template: "",
-													testcasename: testcases[i].name,
-													testcase: testcases[i].steps,
-													datatables: testcases[i].datatables,
-													apptype: apptype
+										}
+										redisServer.redisSubServer.on("message",result_debugTestCase_listener);
+									}
+								} catch (exception) {
+									logger.error("Exception in the service debugTestCase_ICE: %s", exception);
+								}
+							});
+						} catch (exception) {
+							logger.error("Exception in the service debugTestCase_ICE: %s", exception);
+						}
+					} else if (action == 'debugTestCaseWS_ICE') {
+						try {
+							var testcaseWS = [];
+							testcaseWS.push(req.body.testCaseWS);
+							logger.info("Sending socket request for debugTestCaseWS_ICE to cachedb");
+							dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":testcaseWS};
+							redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
+							function result_debugTestCaseWS_listener(channel, message) {
+								data = JSON.parse(message);
+								//LB: make sure to send recieved data to corresponding user
+								if (data.username == icename && ["unavailableLocalServer", "result_debugTestCaseWS"].includes(data.onAction)) {
+									redisServer.redisSubServer.removeListener('message', result_debugTestCaseWS_listener);
+									if (data.onAction == "unavailableLocalServer" ) {
+										logger.error("Error occurred in debugTestCase_ICE: Socket Disconnected");
+										if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+											var soc = myserver.socketMapNotify[username];
+											soc.emit("ICEnotAvailable");
+										}
+									} else {
+										var value = data.value;
+										try {
+											if (value.toUpperCase() === 'TERMINATE' || value === 'ExecutionOnlyAllowed') {
+												try {
+													res.send(value);
+												} catch (exception) {
+													logger.error("Exception while sending response in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
+												}
+											} else {
+												var responsedata = {
+													responseHeader: [],
+													responseBody: []
 												};
 												if (value != "fail" && value != undefined && value != "") {
 													var response = value.split('rEsPONseBOdY:');
