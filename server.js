@@ -210,7 +210,6 @@ if (cluster.isMaster) {
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
 		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
-		app.post('/importFromGit_ICE', suite.importFromGit_ICE);
 
 		app.use(csrf({
 			cookie: true

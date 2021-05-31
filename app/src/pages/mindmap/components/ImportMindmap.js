@@ -121,7 +121,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                 <label>Import As: </label>
                 <select className='imp-inp' defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
                     <option value={'def-val'} disabled>Select Export Format</option>
-                    <option value={'pd'}>AvoDisovery (.pd)</option>
+                    <option value={'pd'}>AvoDiscovery (.pd)</option>
                     <option value={'excel'}>Excel Workbook (.xls,.xlsx)</option>
                     <option value={'git'}>Git (.mm)</option>
                     <option value={'json'}>MindMap (.mm)</option>
