@@ -230,9 +230,11 @@ export const fetchDataTable = async(tableName) => {
 export const exportDataTable = async(arg) => {
     try{
         var apiUrl = "exportToDtCSV";
+        let excelType = "";
         switch(arg.exportFormat.toLowerCase()){
             case "csv": apiUrl = "exportToDtCSV"; break;
-            case "excel": apiUrl = "exportToDtExcel"; break;
+            case "xlsx": excelType = "xlsx"; apiUrl = "exportToDtExcel"; break;
+            case "xls": excelType = "xls"; apiUrl = "exportToDtExcel"; break;
             case "xml": apiUrl = "exportToDtXML"; break;
             default: break;
         }
@@ -243,7 +245,8 @@ export const exportDataTable = async(arg) => {
             },
             data: {
                 datatablename: arg.tableName,
-                filename: arg.filename
+                filename: arg.filename,
+                excelType: excelType
             },
             credentials: 'include',
             responseType:'arraybuffer'

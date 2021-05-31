@@ -7,7 +7,7 @@ import "../styles/ExportDataTable.scss";
 const ExportDataTable = props => {
 
     const [filename, setFilename] = useState(props.tableName);
-    const [filetype, setFiletype] = useState('csv');
+    const [filetype, setFiletype] = useState('xlsx');
     const [error, setError] = useState(false);
 
     const handleFilename = e => setFilename(e.target.value);
@@ -41,8 +41,9 @@ const ExportDataTable = props => {
                         <span>File Name:</span><input className={`dt__efileName ${error?"dt__tableNameError":""} `} value={filename} onChange={handleFilename} />
                         <span>Export Format:</span>
                         <select value={filetype} onChange={handleFileType}>
+                            <option value="xlsx">Excel (.xlsx)</option>
+                            <option value="xls">Excel (.xls)</option>
                             <option value="csv">CSV</option>
-                            <option value="excel">Excel</option>
                             <option value="xml">XML</option>
                         </select>
                     </div>
@@ -79,9 +80,13 @@ function getExtAndType (filetype) {
             type = "text/csv"; 
             extn = ".csv"
             break;
-        case "excel": 
+        case "xlsx": 
             type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; 
             extn = ".xlsx"
+            break;
+        case "xls": 
+            type = "application/vnd.ms-excel"; 
+            extn = ".xls"
             break;
         case "xml": 
             type = "text/xml"; 

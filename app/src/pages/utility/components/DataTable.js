@@ -157,8 +157,8 @@ const EditScreen = props => {
                 { 
                     data.length > 0 && 
                     <Table 
-                        { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} 
-                        setCheckList={setCheckList} dnd={dnd} undoStack={undoStack} checkList={checkList}
+                        { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} 
+                        setCheckList={setCheckList} dnd={dnd} undoStack={undoStack} checkList={checkList}  setHeaderCounter={setHeaderCounter}
                     /> 
                 }
             </div>
