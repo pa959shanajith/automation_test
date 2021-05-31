@@ -406,51 +406,23 @@ exports.saveZephyrDetails_ICE = async (req, res) => {
 	}
 };
 
-exports.viewZephyrMappedList_ICE = function (req, res) {
-	logger.info("Inside UI service: viewZephyrMappedList_ICE");
-	var userid = req.session.userid;
-	zephyrmappeddetails(userid, function (responsedata) {
-		res.send(responsedata);
-	});
+exports.viewZephyrMappedList_ICE = async (req, res) => {
+	const fnName = "viewZephyrMappedList_ICE";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var userid = req.session.userid;
+		var inputs = {
+			"userid": userid,
+			"query": "zephyrdetails"
+		};
+		const result = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
+		if (result == "fail") res.send('fail');
+		res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in zephyr/"+fnName+":", exception);
+		res.send("fail");
+	}
 };
-
-function zephyrmappeddetails(userid, cb) {
-	logger.info("Inside function zephyrmappeddetails");
-	var zephyrdetailsList = [];
-	async.series({
-		zephyrdetails: function (callback1) {
-			logger.info("Inside function zephyrdetails");
-			var inputs = {
-				"userid": userid,
-				"query": "zephyrdetails"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling DAS Service from zephyrdetails: qualityCenter/viewIntegrationMappedList_ICE");
-			client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
-				function (zephyrdetailsows, response) {
-				if (response.statusCode != 200 || zephyrdetailsows.rows == "fail") {
-					logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from zephyrdetails Error Code : ERRDAS");
-				} else {
-					if (zephyrdetailsows.rows.length != 0) {
-						zephyrdetailsList = zephyrdetailsows.rows;
-					}
-				}
-				callback1();
-			});
-		},
-		data: function (callback1) {
-			cb(zephyrdetailsList);
-		}
-	}, function (err, data) {
-		cb(zephyrdetailsList);
-	});
-}
-
 
 exports.manualTestcaseDetails_ICE = function(req,res){
     logger.info("Inside UI service: manualTestcaseDetails_ICE");
