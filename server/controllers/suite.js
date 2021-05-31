@@ -671,7 +671,7 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	// Several client apps do not send TCP Keep-Alive. Hence this is handled in applicaton side.
 	req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +(process.env.KEEP_ALIVE || "30000"));
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_API");
-	var userInfo = getUserInfoFromHeaders(req.headers);
+	var userInfo = utils.getUserInfoFromHeaders(req.headers);
 	if (!userInfo) {
 		res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
 		return res.status('400').send({ "error": "Invalid or missing user info in request headers." })
@@ -679,12 +679,7 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	await queue.Execution_Queue.addAPITestSuiteToQueue(req, res, userInfo);
 };
 
-const getUserInfoFromHeaders = (headers) => {
-	if (headers['x-token_hash'] && headers['x-token_name'] && headers['x-icename']) {
-		return { 'tokenhash': headers['x-token_hash'], "tokenname": headers['x-token_name'], 'icename': headers['x-icename'], 'poolname': ''}
-	}
-	return false;
-}
+
 /** this service imports the data from git repo and invoke execution */
 exports.importFromGit_ICE = async (req, res) => {
 	const actionName = 'importFromGit'

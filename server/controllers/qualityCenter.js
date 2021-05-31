@@ -6,146 +6,59 @@ var myserver = require('../lib/socket');
 var epurl = process.env.DAS_URL;
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 
 exports.loginQCServer_ICE = function (req, res) {
-	var name;
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
-		if (utils.isSessionActive(req)) {
-			var username = req.session.username;
-			var name= undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			logger.debug("ICE Socket connecting IP: %s" , ip);
-			logger.debug("ICE Socket requesting Address: %s" , name);
-            var check_qcUrl = !validator.isEmpty(req.body.qcURL);
-            var check_qcUsername = !validator.isEmpty(req.body.qcUsername);
-            var check_qcPassword = !validator.isEmpty(req.body.qcPassword);
-			if(!check_qcUrl) {
-				logger.info("Error occurred in loginQCServer_ICE: Invalid QC Url");
-				return res.send("invalidurl");
-            }
-			if(check_qcUrl && check_qcUsername &&  check_qcPassword) {
-				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-					if (redisres[1]>0) {
-						var username = req.body.qcUsername;
-						var password = req.body.qcPassword;
-						var url = req.body.qcURL;
-						var qcaction = req.body.qcaction;
-						var qcDetails = {
-							"qcUsername": username,
-							"qcPassword": password,
-							"qcURL": url,
-							"qcaction": qcaction
-						};
-						logger.info("Sending socket request for qclogin to cachedb");
-						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						function qclogin_listener(channel,message) {
-							var data = JSON.parse(message);
-							if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
-								redisServer.redisSubServer.removeListener('message',qclogin_listener);
-								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in loginQCServer_ICE: Socket Disconnected");
-									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else if (data.onAction == "qcresponse") {
-									data = data.value;
-									res.send(data);
-								}
-							}
-						}
-						redisServer.redisSubServer.on("message",qclogin_listener);
-					} else {
-						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-							var flag="";
-							if (found) flag = "scheduleModeOn";
-							else {
-								flag = "unavailableLocalServer";
-								logger.info("ICE Socket not Available");
-							}
-							res.send(flag);
-						});
-					}
-				});
-			} else {
-				logger.info("Error occurred in loginQCServer_ICE: Invalid QC Credentials");
-				res.send("invalidcredentials");
-			}
-		} else {
-			logger.error("Invalid Session");
-			res.send("Invalid Session");
+		var username = req.session.username;
+		var name = undefined
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+		redisServer.redisSubServer.subscribe('ICE2_' + name);
+		logger.debug("ICE Socket requesting Address: %s" , name);
+		var check_qcUrl = !validator.isEmpty(req.body.qcURL);
+		var check_qcUsername = !validator.isEmpty(req.body.qcUsername);
+		var check_qcPassword = !validator.isEmpty(req.body.qcPassword);
+		if(!check_qcUrl) {
+			logger.info("Error occurred in loginQCServer_ICE: Invalid QC Url");
+			return res.send("invalidurl");
 		}
-	} catch (exception) {
-		logger.error("Error occurred in loginQCServer_ICE:", exception.message);
-		res.send("fail");
-	}
-};
-
-exports.qcProjectDetails_ICE = function (req, res) {
-	logger.info("Inside UI service: qcProjectDetails_ICE");
-	var projectDetailList = {
-		"avoassure_projects": '',
-		"qc_projects": ""
-	};
-	var name;
-	try {
-		if (utils.isSessionActive(req)) {
-			var username = req.session.username;
-			var name= undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-			redisServer.redisSubServer.subscribe('ICE2_' + name);
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , name);
+		if(check_qcUrl && check_qcUsername &&  check_qcPassword) {
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
-					var userid = req.body.user_id;
+					var username = req.body.qcUsername;
+					var password = req.body.qcPassword;
+					var url = req.body.qcURL;
+					var qcaction = req.body.qcaction;
 					var qcDetails = {
-						"domain": req.body.domain,
-						"qcaction": req.body.qcaction
+						"qcUsername": username,
+						"qcPassword": password,
+						"qcURL": url,
+						"qcaction": qcaction
 					};
-					getProjectsForUser(userid, function (projectdata) {
-						// var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url};
-						logger.info("Sending socket request for qclogin to cachedb");
-						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
-						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						function qclogin_listener(channel,message) {
-							var data = JSON.parse(message);
-							if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
-								redisServer.redisSubServer.removeListener('message',qclogin_listener);
-								if (data.onAction == "unavailableLocalServer") {
-									logger.error("Error occurred in qcProjectDetails_ICE: Socket Disconnected");
-									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								} else if (data.onAction == "qcresponse") {
-									if (data == "fail")
-										res.send("fail");
-									else {
-										data = data.value;
-										try {
-											projectDetailList.avoassure_projects = projectdata;
-											projectDetailList.qc_projects = data.project;
-											res.send(projectDetailList);
-										} catch (ex) {
-											logger.error(ex);
-											res.send("fail");
-										}
-									}
+					logger.info("Sending socket request for qclogin to cachedb");
+					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					function qclogin_listener(channel,message) {
+						var data = JSON.parse(message);
+						if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
+							redisServer.redisSubServer.removeListener('message',qclogin_listener);
+							if (data.onAction == "unavailableLocalServer") {
+								logger.error("Error occurred in loginQCServer_ICE: Socket Disconnected");
+								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
 								}
+							} else if (data.onAction == "qcresponse") {
+								data = data.value;
+								res.send(data);
 							}
 						}
-						redisServer.redisSubServer.on("message",qclogin_listener);
-					});
+					}
+					redisServer.redisSubServer.on("message",qclogin_listener);
 				} else {
 					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 						var flag="";
@@ -159,17 +72,84 @@ exports.qcProjectDetails_ICE = function (req, res) {
 				}
 			});
 		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
+			logger.info("Error occurred in loginQCServer_ICE: Invalid QC Credentials");
+			res.send("invalidcredentials");
 		}
 	} catch (exception) {
-		logger.error(exception.message);
-		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-			var flag="";
-			if (found) flag = "scheduleModeOn";
-			else flag = "unavailableLocalServer";
-			res.send(flag);
+		logger.error("Error occurred in loginQCServer_ICE:", exception.message);
+		res.send("fail");
+	}
+};
+
+exports.qcProjectDetails_ICE = function (req, res) {
+	logger.info("Inside UI service: qcProjectDetails_ICE");
+	var projectDetailList = {
+		"avoassure_projects": '',
+		"qc_projects": ""
+	};
+	try {
+		var username = req.session.username;
+		var name= undefined
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
+		redisServer.redisSubServer.subscribe('ICE2_' + name);
+		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+		logger.debug("ICE Socket requesting Address: %s" , name);
+		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			if (redisres[1]>0) {
+				var userid = req.session.userid;
+				var qcDetails = {
+					"domain": req.body.domain,
+					"qcaction": req.body.qcaction
+				};
+				getProjectsForUser(userid, function (projectdata) {
+					// var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url};
+					logger.info("Sending socket request for qclogin to cachedb");
+					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					function qclogin_listener(channel,message) {
+						var data = JSON.parse(message);
+						if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
+							redisServer.redisSubServer.removeListener('message',qclogin_listener);
+							if (data.onAction == "unavailableLocalServer") {
+								logger.error("Error occurred in qcProjectDetails_ICE: Socket Disconnected");
+								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
+								}
+							} else if (data.onAction == "qcresponse") {
+								if (data == "fail")
+									res.send("fail");
+								else {
+									data = data.value;
+									try {
+										projectDetailList.avoassure_projects = projectdata;
+										projectDetailList.qc_projects = data.project;
+										res.send(projectDetailList);
+									} catch (ex) {
+										logger.error(ex);
+										res.send("fail");
+									}
+								}
+							}
+						}
+					}
+					redisServer.redisSubServer.on("message",qclogin_listener);
+				});
+			} else {
+				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					var flag="";
+					if (found) flag = "scheduleModeOn";
+					else {
+						flag = "unavailableLocalServer";
+						logger.info("ICE Socket not Available");
+					}
+					res.send(flag);
+				});
+			}
 		});
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send('fail');
 	}
 };
 
@@ -290,131 +270,85 @@ function projectandscenario(projectid, cb) {
 
 exports.qcFolderDetails_ICE = function (req, res) {
 	logger.info("Inside UI service: qcFolderDetails_ICE");
-	var icename;
 	try {
-		if (utils.isSessionActive(req)) {
-			var qcDetails = req.body;
-			var username=req.session.username;
-			var icename= undefined
-			if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-			redisServer.redisSubServer.subscribe('ICE2_' + icename);
-			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.debug("ICE Socket requesting Address: %s" , icename);
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
-				if (redisres[1]>0) {
-					logger.info("Sending socket request for qclogin to cachedb");
-					dataToIce = {"emitAction" : "qclogin","username" : icename, "responsedata":qcDetails};
-					redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
-					function qclogin_listener(channel,message) {
-						var data = JSON.parse(message);
-						if(icename == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
-							redisServer.redisSubServer.removeListener('message',qclogin_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in qcFolderDetails_ICE: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[username];
-									soc.emit("ICEnotAvailable");
-								}
-							} else if (data.onAction == "qcresponse") {
-								data = data.value;
-								res.send(data);
+		var qcDetails = req.body;
+		var username=req.session.username;
+		var icename = undefined
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
+		redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+		logger.debug("ICE Socket requesting Address: %s" , icename);
+		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
+			if (redisres[1]>0) {
+				logger.info("Sending socket request for qclogin to cachedb");
+				dataToIce = {"emitAction" : "qclogin","username" : icename, "responsedata":qcDetails};
+				redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
+				function qclogin_listener(channel,message) {
+					var data = JSON.parse(message);
+					if(icename == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
+						redisServer.redisSubServer.removeListener('message',qclogin_listener);
+						if (data.onAction == "unavailableLocalServer") {
+							logger.error("Error occurred in qcFolderDetails_ICE: Socket Disconnected");
+							if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
+								var soc = myserver.socketMapNotify[username];
+								soc.emit("ICEnotAvailable");
 							}
+						} else if (data.onAction == "qcresponse") {
+							data = data.value;
+							res.send(data);
 						}
 					}
-					redisServer.redisSubServer.on("message",qclogin_listener);
-				} else {
-					try {
-						utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
-							var flag="";
-							if (found) flag = "scheduleModeOn";
-							else {
-								flag = "unavailableLocalServer";
-								logger.info("ICE Socket not Available");
-							}
-							res.send(flag);
-						});
-					} catch (exception) {
-						logger.error(exception.message);
-					}
 				}
-			});
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
-		}
+				redisServer.redisSubServer.on("message",qclogin_listener);
+			} else {
+				try {
+					utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
+						var flag="";
+						if (found) flag = "scheduleModeOn";
+						else {
+							flag = "unavailableLocalServer";
+							logger.info("ICE Socket not Available");
+						}
+						res.send(flag);
+					});
+				} catch (exception) {
+					logger.error(exception.message);
+				}
+			}
+		});
 	} catch (exception) {
 		logger.error(exception.message);
-		utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
-			var flag="";
-			if (found) flag = "scheduleModeOn";
-			else flag = "unavailableLocalServer";
-			res.send(flag);
-		});
+		res.send('fail');
 	}
 };
 
-exports.saveQcDetails_ICE = function (req, res) {
-	logger.info("Inside UI service: saveQcDetails_ICE");
-	var mappedDetails = req.body.mappedDetails;
-	var flag = true;
-	if (mappedDetails.length > 0) {
-		flag = true;
-	} else {
-		flag = false;
-	}
-	async.forEachSeries(mappedDetails, function (itr, callback) {
-		var testscenarioid = itr.scenarioId;
-		var qcdomain = itr.domain;
-		var qcproject = itr.project;
-		var qcfolderpath = itr.folderpath;
-		var qctestcase = itr.testcase;
-		var qctestset = itr.testset;
-		var inputs = {
-			"testscenarioid": testscenarioid,
-			"qcdomain": qcdomain,
-			"qcfolderpath": qcfolderpath,
-			"qcproject": qcproject,
-			"qctestcase": qctestcase,
-			"qctestset": qctestset,
-			"query": "saveQcDetails_ICE"
-		};
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-		logger.info("Calling DAS Service: qualityCenter/saveIntegrationDetails_ICE");
-		client.post(epurl + "qualityCenter/saveIntegrationDetails_ICE", args,
-			function (qcdetailsows, response) {
-			if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-				logger.error("Error occurred in saveIntegrationDetails_ICE Error Code : ERRDAS");
-				flag = false;
-			}
-			callback();
-		});
-	}, function () {
-		if (flag) {
-			try {
-				if (utils.isSessionActive(req)) {
-					res.send("success");
-				} else {
-					logger.info("Invalid Session");
-					res.send("Invalid Session");
-				}
-			} catch (exception) {
-				logger.error(exception.message);
-				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-					var flag="";
-					if (found) flag = "scheduleModeOn";
-					else flag = "unavailableLocalServer";
-					res.send(flag);
-				});
-			}
-		} else {
-			res.send("fail");
+exports.saveQcDetails_ICE = async (req, res) => {
+	const fnName = "saveQcDetails_ICE";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var mappedDetails = req.body.mappedDetails;
+		var flag = mappedDetails.length > 0;
+		if (!flag) return res.send('fail');
+		for (let i=0; i<mappedDetails.length; i++) {
+			let itr = mappedDetails[i];
+			const inputs = {
+				"testscenarioid": itr.scenarioId,
+				"qcdomain": itr.domain,
+				"qcfolderpath": itr.folderpath,
+				"qcproject": itr.project,
+				"qctestcase": itr.testcase,
+				"qctestset": itr.testset,
+				"query": "saveQcDetails_ICE"
+			};
+			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);
+			if (result == "fail") flag = false;
 		}
-	});
+		if (!flag) return res.send('fail');
+		res.send("success");
+	} catch (exception) {
+		logger.error("Error occurred in qualitycenter/"+fnName+":", exception);
+		res.send("fail");
+	}
 };
 
 exports.saveUnsyncDetails = async (req, res) => {
@@ -438,7 +372,7 @@ exports.saveUnsyncDetails = async (req, res) => {
 
 exports.viewQcMappedList_ICE = function (req, res) {
 	logger.info("Inside UI service: viewQcMappedList_ICE");
-	var userid = req.body.user_id;
+	var userid = req.session.userid;
 	getQcDetailsForUser(userid, function (responsedata) {
 		res.send(responsedata);
 	});
@@ -594,7 +528,7 @@ function qcscenariodetails(projectid, cb) {
 
 exports.manualTestcaseDetails_ICE = function(req,res){
     logger.info("Inside UI service: manualTestcaseDetails_ICE");
-    getProjectsAndModules(req.body.user_id,function(data){
+    getProjectsAndModules(req.session.userid,function(data){
         res.send(data);
     });
 };

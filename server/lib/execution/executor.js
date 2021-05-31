@@ -395,7 +395,7 @@ class TestSuiteExecutor {
         //if (iceStatus != null) return iceStatus;
         const taskApproval = await utils.approvalStatusCheck(batchExecutionData.batchInfo);
         if (taskApproval.res !== "pass") return taskApproval.res;
-	    /*const countStatus =*/ await this.counterUpdater(batchExecutionData.batchInfo.length, userInfo.invokinguser);
+        /*const countStatus =*/ await this.counterUpdater(batchExecutionData.batchInfo.length, userInfo.invokinguser);
         // if (countStatus == "fail") return "fail";
         const executionRequest = await this.prepareExecutionRequest(batchExecutionData, userInfo);
         if (executionRequest == "fail") return "fail";
