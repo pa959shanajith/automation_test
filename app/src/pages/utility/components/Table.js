@@ -19,22 +19,30 @@ const Table = props => {
 
     const onAdd = type => {
         if (type==="col") {
-            let newHeaders = [...props.headers];
-            
-            newHeaders.push({
-                __CELL_ID__: uuid(),
-                name: `C${props.headerCounter}`
-            })
-
-            props.setHeaders(newHeaders);
-            props.setHeaderCounter(count => count + 1);
+            if (props.headers.length >= 15) 
+                props.setShowPop({title: 'Error', content: 'Table cannot have more than 15 columns', type: 'message'});
+            else {
+                let newHeaders = [...props.headers];
+                
+                newHeaders.push({
+                    __CELL_ID__: uuid(),
+                    name: `C${props.headerCounter}`
+                })
+    
+                props.setHeaders(newHeaders);
+                props.setHeaderCounter(count => count + 1);
+            }
         }
         else if (type === "row") {
-            let newData = [...props.data];
+            if (props.data.length >= 199) 
+                props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
+            else {
+                let newData = [...props.data];
             
-            newData.push({__CELL_ID__: uuid()})
-
-            props.setData(newData);
+                newData.push({__CELL_ID__: uuid()})
+    
+                props.setData(newData);
+            }
         }
     }
 

@@ -13,34 +13,42 @@ const TableActionButtons = props => {
     const onAdd = () => {
         if (props.checkList.list.length===1){
             if (props.checkList.type==="row"){
-                let newData = [...props.data];
-                let locToAdd = null;
-                let rowId = props.checkList.list[0].split('||').pop();
-
-                newData.forEach((row, rowIndex) => {
-                    if (rowId === row.__CELL_ID__) locToAdd = rowIndex;
-                })
-                
-                newData.splice(locToAdd+1, 0, {__CELL_ID__: uuid()});
-
-                props.setData(newData);
+                if (props.data.length >= 199) 
+                    props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
+                else {
+                    let newData = [...props.data];
+                    let locToAdd = null;
+                    let rowId = props.checkList.list[0].split('||').pop();
+    
+                    newData.forEach((row, rowIndex) => {
+                        if (rowId === row.__CELL_ID__) locToAdd = rowIndex;
+                    })
+                    
+                    newData.splice(locToAdd+1, 0, {__CELL_ID__: uuid()});
+    
+                    props.setData(newData);
+                }
             }
             else{
-                let newHeaders = [...props.headers];
-                let locToAdd = null;
-                let headerId = props.checkList.list[0].split('||').pop();
-                
-                props.headers.forEach((header, headerIndex)=>{
-                    if (header.__CELL_ID__ === headerId) locToAdd = headerIndex;
-                })
-                
-                newHeaders.splice(locToAdd+1, 0, {
-                    __CELL_ID__: uuid(),
-                    name: `C${props.headerCounter}`
-                })
-
-                props.setHeaders(newHeaders);
-                props.setHeaderCounter(count => count + 1);
+                if (props.headers.length >= 15) 
+                    props.setShowPop({title: 'Error', content: 'Table cannot have more than 15 columns', type: 'message'});
+                else {
+                    let newHeaders = [...props.headers];
+                    let locToAdd = null;
+                    let headerId = props.checkList.list[0].split('||').pop();
+                    
+                    props.headers.forEach((header, headerIndex)=>{
+                        if (header.__CELL_ID__ === headerId) locToAdd = headerIndex;
+                    })
+                    
+                    newHeaders.splice(locToAdd+1, 0, {
+                        __CELL_ID__: uuid(),
+                        name: `C${props.headerCounter}`
+                    })
+    
+                    props.setHeaders(newHeaders);
+                    props.setHeaderCounter(count => count + 1);
+                }
             }
         }
     }
