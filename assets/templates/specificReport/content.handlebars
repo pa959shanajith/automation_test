@@ -1085,6 +1085,7 @@
             </thead>
             <tbody>
                {{#each rows}}
+               {{#ifnotEquals status "Skipped"}}
                <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
                   <td class="rDid tabCont">{{slno}}</td>
                   {{#ifEquals status "Skipped"}}
@@ -1149,6 +1150,7 @@
                      <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
                   </td>
                </tr>
+                  {{/ifnotEquals}}
                {{/each}}
             </tbody>
          </table>
