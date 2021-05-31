@@ -43,7 +43,10 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
                 setErrorMsg("Invalid Session");
             } else if (data === "invalidcredentials") {
                 setErrorMsg("Invalid Credentials");
-            } else if (data === "invalidurl") {
+            } else if (data === "serverdown") {
+                setErrorMsg("Host not reachable.");
+            }
+            else if (data === "invalidurl") {
                 setErrorMsg("Invalid URL");
             } else {
                 var integration = {...integrationCred};
