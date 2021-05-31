@@ -1596,7 +1596,7 @@ exports.exportToGit = async (req, res) => {
 			"action":actionName,
 			"gitBranch":gitBranch,
 			"gitVersionName": gitVersionName,
-			"gitFolderPath": gitFolderPath.toLowerCase()
+			"gitFolderPath": gitFolderPath
 		};
 		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
 		return res.send(module_data);
@@ -1661,7 +1661,7 @@ exports.importGitMindmap = async (req, res) => {
 			"projectid": projectid,
 			"gitbranch": gitbranch,
 			"gitversion":gitversion,
-			"gitfolderpath":gitfolderpath.toLowerCase()
+			"gitfolderpath":gitfolderpath
 		}
 		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);
 		res.send(result)

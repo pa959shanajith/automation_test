@@ -20,7 +20,23 @@ const CreateEnE = () =>{
     const [blockui,setBlockui] = useState({show:false})
     const [fullScreen,setFullScreen] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(false)
+    const [info,setInfo] = useState(undefined)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
+    const selectProj = useSelector(state=>state.mindmap.selectedProj)
+    const prjList = useSelector(state=>state.mindmap.projectList)
+  
+    useEffect(()=>{
+      if(selectProj){
+          var dict= {
+              "AppType": prjList[selectProj].apptypeName,
+              "Domain": prjList[selectProj].domains,
+              "Project":prjList[selectProj].name
+          }
+          setInfo(dict)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[selectProj])
+
     useEffect(()=>{(async()=>{
         setBlockui({show:true,content:'Loading modules ...'})
         var res = await getProjectList()
@@ -59,7 +75,7 @@ const CreateEnE = () =>{
                 </Fragment>}
             </div>
         </div>
-        <ReferenceBar taskTop={true} collapsible={true} collapse={true}>
+        <ReferenceBar taskTop={true} taskInfo={info} collapsible={true} collapse={true}>
             <div className="ic_box" >
                 <img alt={"Switch Layout"} onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
                 <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
