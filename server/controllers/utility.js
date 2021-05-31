@@ -185,10 +185,11 @@ exports.exportToDtExcel = async (req, res) => {
 		var excelMap = await getDatatable({"datatablename":d.datatablename, 'action': 'datatable'})
 		dts = excelMap[0];
 		datatable = dts.datatable;
+		excelType = d.excelType;
 		logger.info("Writing Datatable structure to Excel");
 		var dir = './../../excel';
 		var excelDirPath = path.join(__dirname, dir);
-		var filePath = path.join(excelDirPath, d.filename+'.xlsx');
+		var filePath = path.join(excelDirPath, d.filename+'.'+excelType);
 
 		try {
 			if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
@@ -220,9 +221,11 @@ exports.exportToDtExcel = async (req, res) => {
 			
 		}
 		//save it
-		wb.write('./excel/'+d.filename+'.xlsx',function (err) {
+		wb.write('./excel/'+d.filename+'.'+excelType,function (err) {
 			if (err) return res.send('fail');
-			res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+			if(excelType == "xlsx") contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+			else contentType = 'application/vnd.ms-excel';
+			res.writeHead(200, {'Content-Type': contentType});
 			var rstream = fs.createReadStream(filePath);
 			rstream.pipe(res);
 		});
