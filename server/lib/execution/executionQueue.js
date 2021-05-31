@@ -374,7 +374,8 @@ module.exports.Execution_Queue = class Execution_Queue {
             if (testSuite.userInfo.icename === ice_name || testSuite.userInfo.icename === EMPTYUSER) {
                 testSuite.userInfo.icename = ice_name;
                 //check if the ice is in dnd or not, if in dnd check wether the ICE asignee and the invoking user are same 
-                if (data.value.mode && testSuite.userInfo.userid != testSuite.userInfo.invokinguser) {
+                if (data.value.mode && ((testSuite.userInfo.userid != testSuite.userInfo.invokinguser) || (testSuite.userInfo.owner != null && !testSuite.userInfo.owner))) {
+                    logger.debug("ICE:" + ice_name + " on DND mode, can not execute.")
                     return result;
                 }
                 //commence execution
