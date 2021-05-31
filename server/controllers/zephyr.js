@@ -409,74 +409,20 @@ exports.saveZephyrDetails_ICE = async (req, res) => {
 exports.viewZephyrMappedList_ICE = function (req, res) {
 	logger.info("Inside UI service: viewZephyrMappedList_ICE");
 	var userid = req.session.userid;
-	getZephyrDetailsForUser(userid, function (responsedata) {
+	zephyrmappeddetails(userid, function (responsedata) {
 		res.send(responsedata);
 	});
 };
 
-function getZephyrDetailsForUser(userid, cb) {
-	logger.info("Inside function getZephyrDetailsForUser");
-	var projectDetailsList = [];
-	var projectidlist = [];
-	async.series({
-		getprojectDetails: function (callback1) {
-			var inputs = {
-				"userid": userid,
-				"query": "getprojectDetails"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-
-			};
-			logger.info("Calling DAS Service :qualityCenter/qcProjectDetails_ICE");
-			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
-				function (projectrows, response) {
-				if (response.statusCode != 200 || projectrows.rows == "fail") {
-					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from getZephyrDetailsForUser Error Code : ERRDAS");
-				} else {
-					if (projectrows.rows.length != 0) {
-						projectidlist = projectrows.rows[0].projects;
-					}
-
-				}
-				callback1();
-			});
-		},
-		scenarioDetails: function (callback1) {
-			logger.info("Inside function scenarioDetails");
-			async.forEachSeries(projectidlist, function (itr, callback2) {
-				zephyrscenariodetails(itr, function (err, projectDetails) {
-					for (i = 0; i < projectDetails.length; i++) {
-						projectDetailsList.push(projectDetails[i]);
-					}
-					callback2();
-				});
-			}, callback1);
-		},
-		data: function (callback1) {
-			cb(projectDetailsList);
-		}
-	});
-}
-
-function zephyrscenariodetails(projectid, cb) {
-	logger.info("Inside function zephyrscenariodetails");
-	var scenarios_list;
-	var projectDetails = {
-		"project_id": '',
-		"project_name": '',
-		"scenario_details": ''
-	};
-	var projectname = '';
+function zephyrmappeddetails(userid, cb) {
+	logger.info("Inside function zephyrmappeddetails");
 	var zephyrdetailsList = [];
 	async.series({
-		scenariodata: function (callback1) {
+		zephyrdetails: function (callback1) {
+			logger.info("Inside function zephyrdetails");
 			var inputs = {
-				"projectid": projectid,
-				"query": "scenariodata"
+				"userid": userid,
+				"query": "zephyrdetails"
 			};
 			var args = {
 				data: inputs,
@@ -484,53 +430,24 @@ function zephyrscenariodetails(projectid, cb) {
 					"Content-Type": "application/json"
 				}
 			};
-			logger.info("Calling DAS Service from zephyrscenariodetails: qualityCenter/qcProjectDetails_ICE");
-			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
-				function (scenariorows, response) {
-				if (response.statusCode != 200 || scenariorows.rows == "fail") {
-					logger.error("Error occurred in qualityCenter/qcProjectDetails_ICE from zephyrscenariodetails Error Code : ERRDAS");
+			logger.info("Calling DAS Service from zephyrdetails: qualityCenter/viewIntegrationMappedList_ICE");
+			client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
+				function (zephyrdetailsows, response) {
+				if (response.statusCode != 200 || zephyrdetailsows.rows == "fail") {
+					logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from zephyrdetails Error Code : ERRDAS");
 				} else {
-					if (scenariorows.rows.length != 0) {
-						scenarios_list = JSON.parse(JSON.stringify(scenariorows.rows));
+					if (zephyrdetailsows.rows.length != 0) {
+						zephyrdetailsList = zephyrdetailsows.rows;
 					}
 				}
 				callback1();
 			});
 		},
-		zephyrdetails: function (callback1) {
-			logger.info("Inside function zephyrdetails");
-			async.forEachSeries(scenarios_list, function (itr, callback2) {
-				var inputs = {
-					"testscenarioid": itr._id,
-					"query": "zephyrdetails"
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling DAS Service from zephyrdetails: qualityCenter/viewIntegrationMappedList_ICE");
-				client.post(epurl + "qualityCenter/viewIntegrationMappedList_ICE", args,
-					function (zephyrdetailsows, response) {
-					if (response.statusCode != 200 || zephyrdetailsows.rows == "fail") {
-						logger.error("Error occurred inqualityCenter/viewIntegrationMappedList_ICE from zephyrdetails Error Code : ERRDAS");
-					} else {
-						if (zephyrdetailsows.rows.length != 0) {
-							zephyrdetails = JSON.parse(JSON.stringify(zephyrdetailsows.rows[0]));
-							zephyrdetails.testscenarioname = itr.name;
-							zephyrdetailsList.push(zephyrdetails);
-						}
-					}
-					callback2();
-				});
-			}, callback1);
-		},
 		data: function (callback1) {
-			cb(null, zephyrdetailsList);
+			cb(zephyrdetailsList);
 		}
 	}, function (err, data) {
-		cb(null, zephyrdetailsList);
+		cb(zephyrdetailsList);
 	});
 }
 
