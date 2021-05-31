@@ -417,7 +417,7 @@ exports.viewZephyrMappedList_ICE = async (req, res) => {
 		};
 		const result = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
 		if (result == "fail") res.send('fail');
-		res.send(result);
+		else res.send(result);
 	} catch (exception) {
 		logger.error("Error occurred in zephyr/"+fnName+":", exception);
 		res.send("fail");
