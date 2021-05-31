@@ -1026,6 +1026,9 @@ exports.pdProcess = function (req, res) {
 		activityJSON["mxGraphModel"]["root"]["Task"].forEach(function(eachActivity,eachActivityIdx){
 			var adjacentItems = getAdjacentItems(activityJSON,eachActivityIdx,'task');
 			screendatamindmap = [];
+			var custname_count = {};
+			var custnames=[]
+			var cust_flag=false
 			try{
 				screenshotdatapertask = JSON.parse(eachActivity["#cdata"]);	// list of objects
 			}
@@ -1045,6 +1048,26 @@ exports.pdProcess = function (req, res) {
 					screendatamindmap.push(a);
 				}
 			});
+			//renaming custname of objects
+			custnames = screendatamindmap.map(ei => ei.custname);
+			custnames.forEach(function(x,i) {
+				if(custnames.indexOf(x) != i) {
+					cust_flag=true;
+					var c = custname_count[x] || 1;
+					var j = c + 1;
+					var k = x + '(' + j + ')';
+					while( custnames.indexOf(k) !== -1 ) {
+						k = x + '(' + (++j) + ')';
+						custname_count[x] = j;
+					}
+					custnames[i] = k;
+				}
+			});
+			if(cust_flag){
+				for(i=0;i<custnames.length;i++){
+					screendatamindmap[i].custname=custnames[i];
+				}
+			}
 			// map data with screenname
 			var tempName = eachActivity["@label"].replace(/ /g,'_')+'_'+sessionID.replace(/-/g,'');		// name id combo
 			screendataobj[tempName] = {};
@@ -1234,12 +1257,14 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 
 	screendata.forEach(function(eachScrapedAction,i){
 		testcaseObj = '';
+		var key, keycode_map;
 		if(eachScrapedAction.apptype=="WEB"){
 			if(eachScrapedAction.action){
 				if(eachScrapedAction.action.windowId){
 					if(windowId && windowId!=eachScrapedAction.action.windowId) {
 						testcaseObj = getTestcaseStep(step,null,'@Browser','switchToWindow',null,null,eachScrapedAction.url,"Web");
 						testCaseSteps.push(testcaseObj);
+						windowId=eachScrapedAction.action.windowId;
 						step++;
 					}
 					else{
@@ -1284,7 +1309,15 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
                     case "inputReadOnly":
 						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
 								'setText',[eachScrapedAction.action.actionData],null,eachScrapedAction.url,"Web")
-						break;						
+						break;
+					case "sendKeys":
+						key=eachScrapedAction.action.actionData;
+						keycode_map = {
+							'0': 'Enter'
+						}
+						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
+							'sendFunctionKeys',[keycode_map[key]],null,eachScrapedAction.url,"Generic")
+						break;		
 					default:
 						break;
 				}
@@ -1304,6 +1337,8 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			text = eachScrapedAction.text;
 			input = text.split("  ");
 			var menu_flg=0;
+			var temp_mdata;
+			//To concatinate menu objects into one
 			if(eachScrapedAction.tag=="GuiMenu"){
 				if(mflag==1) temp_mdata=temp_screendata[menu_count-2];
 				else temp_mdata=temp_screendata[menu_count]
@@ -1311,9 +1346,13 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					menu_flg=1;
 					menu_input=menu_input.concat(input+';');
 				} else{
-					menu_flg=0;
 					menu_input=menu_input.concat(input);
 				}
+			}
+			if(eachScrapedAction.tag=="tree" && eachScrapedAction.command[0][1]=="expandNode"){
+				if(mflag==1) temp_mdata=temp_screendata[menu_count-2];
+				else temp_mdata=temp_screendata[menu_count]
+				if(temp_mdata && temp_mdata.tag=="tree") menu_flg=1;
 			}
 				
 			if(menu_flg==0){
@@ -1328,13 +1367,40 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							else
 								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
 							break;
+						case "table":
+							if(eachScrapedAction.command[0][1]=="getAbsoluteRow"){
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRow',[eachScrapedAction.command[0][2]],null,null,"SAP");
+								if(eachScrapedAction.command[1][1]!="selected") testcaseObj.keywordVal = 'UnselectRow';
+							}
+							else if(eachScrapedAction.command[0][1]=="verticalScrollbar")
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'scrollDown',[eachScrapedAction.command[1][2]],null,null,"SAP");
+							else if(eachScrapedAction.command[0][1]=="columns"){
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumn',[eachScrapedAction.command[1][2]],null,null,"SAP");
+								if(eachScrapedAction.command[2][1]!="selected") testcaseObj.keywordVal = 'UnselectColumn';
+							} else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+							break;
+						case "gridview":
+							if(eachScrapedAction.command[0][1]=="selectColumn")
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumns',null,null,null,"SAP");
+							else if(eachScrapedAction.command[0][1]=="pressToolbarButton")
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'PressToobarButton',null,null,null,"SAP");
+							else if(eachScrapedAction.command[0][1]=="modifyCell")
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetTextInCell',null,null,null,"SAP");
+							else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+							break;
+						case "GuiLabel":
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+							if(eachScrapedAction.command[0][1]=="setFocus") testcaseObj.keywordVal = 'SetFocus';
+							break;
+						case "calendar":
+							if(eachScrapedAction.command[0][1]=="selectionInterval"){
+								cal_range = (eachScrapedAction.command[0][2].split(',')).join(';')
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRange',[cal_range],null,null,"SAP");
+							} else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+							break;
 						case "button":
 						case "shell":
-						case "table":
 						case "toolbar":
-						case "calendar":
-						case "gridview":
-						case "GuiLabel":
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
 							var custname_split = eachScrapedAction.custname.split('_');
 							if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
@@ -1348,7 +1414,6 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						case "select":
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
 							break;
-						case "GuiMenubar":
 						case "GuiMenu":
 							testcaseObj = getTestcaseStep(step,null,'@Sap','SelectMenu',[menu_input],null,null,"SAP");
 							break;
@@ -1360,6 +1425,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							break;
 						case "checkbox":
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
+							if(eachScrapedAction.command[0][1]=='Unselected') testcaseObj.keywordVal = 'UnSelectCheckbox';
 							break;
 						case "tree":
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
@@ -1372,16 +1438,15 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							break;
 						case "GuiModalWindow":
 						case "GuiDialogShell":
-							if(eachScrapedAction.command[0][1]=='close'){
+							if(eachScrapedAction.command[0][1]=='close')
 								testcaseObj = getTestcaseStep(step,null,'@Sap','closedialogwindow',null,null,null,"SAP");
-							}
 							break;
 						default:
 							logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
 							break;
 					}
 				}
-				if(eachScrapedAction.command[0][1]=='sendVKey'){
+				else{
 					key=eachScrapedAction.command[0][2]
 					keycode_map = {
 						'1': 'F1', '2': 'F2', '3': 'F3', '4': 'F4', '5': 'F5', '6': 'F6', '7': 'F7', '8': 'F8', '9': 'F9', '10': 'F10', '11': 'ctrl+s', '12': 'f12', '13': 'shift+f1',
@@ -1391,7 +1456,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						'38': 'ctrl+shift+f2', '39': 'ctrl+shift+f3', '40': 'ctrl+shift+f4', '41': 'ctrl+shift+f5', '42': 'ctrl+shift+f6', '43': 'ctrl+shift+f7', '44': 'ctrl+shift+f8',
 						'45': 'ctrl+shift+f9', '46': 'ctrl+shift+f10', '47': 'ctrl+shift+f11', '48': 'ctrl+shift+f12', '70': 'ctrl+e', '71': 'ctrl+f', '72': 'ctrl+/', '73': 'ctrl+\ ',
 						'74': 'ctrl+n', '75': 'ctrl+o', '76': 'ctrl+x', '77': 'ctrl+c', '78': 'ctrl+v', '79': 'ctrl+z', '80': 'ctrl+pageup', '81': 'pageup', '82': 'pagedown', '83': 'ctrl+pagedown',
-						'84': 'ctrl+g', '85': 'ctrl+r', '86': 'ctrl+p'
+						'84': 'ctrl+g', '85': 'ctrl+r', '86': 'ctrl+p', '0': 'Enter'
 					}
 					testcaseObj = getTestcaseStep(step,null,'@Generic','sendFunctionKeys',[keycode_map[key]],null,null,"Generic");
 				}

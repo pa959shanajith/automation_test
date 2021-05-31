@@ -98,7 +98,8 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
     executeAPI = async (testSuite) => {
         const req = testSuite.testSuiteRequest;
         const res = testSuite.res;
-        var headerUserInfo = testSuite.userInfo;
+        var userInfo = testSuite.userInfo;
+        var execResponse = userInfo.inputs;
         const hdrs = req.headers;
         let reqFromADO = false;
         if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
@@ -106,22 +107,6 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
         }
         const batchExecutionData = req.executionData;
         var statusCode = '500'
-
-
-        var userInfo = await utils.tokenValidation(headerUserInfo);
-        userInfo.invokinguser = userInfo.userid;
-        userInfo.invokingusername = userInfo.username;
-        userInfo.invokinguserrole = userInfo.role;
-        var execResponse = userInfo.inputs;
-        if (execResponse.tokenValidation == "passed") {
-            delete execResponse.error_message;
-            const icename = userInfo.icename;
-        } else {
-            statusCode = '401';
-            res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode]);
-            return res.status(statusCode).send({"error": "Token validation Failed"});
-        }
-
         const execIds = { "batchid": "generate", "execid": {} };
         let result;
         try {
