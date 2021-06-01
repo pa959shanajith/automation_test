@@ -88,10 +88,10 @@ exports.updateTestCase_ICE = async (req, res) => {
 			"copiedTestCases": tcData.copiedTestCases,
 		};
 		inputs.datatables = [];
-		for(var i=0;i<requestedtestcasesteps.length;++i) {
-			if(requestedtestcasesteps[i].keywordVal=="getParam" && 
-				requestedtestcasesteps[i].inputVal[0].split(';')[0].startsWith("avoassure")) {
-					inputs.datatables.push(requestedtestcasesteps[i].inputVal[0].split(';')[0].split("/")[1]);
+		for(var i=0;i<testcasesteps.length;++i) {
+			if(testcasesteps[i].keywordVal=="getParam" && 
+				testcasesteps[i].inputVal[0].split(';')[0].startsWith("avoassure")) {
+					inputs.datatables.push(testcasesteps[i].inputVal[0].split(';')[0].split("/")[1]);
 			}
 		}
 		const result = await utils.fetchData(inputs, "design/updateTestCase_ICE", fnName);
