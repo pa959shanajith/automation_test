@@ -1,10 +1,5 @@
 var crypto = require('crypto');
-var myserver = require('../../server');
 // var PythonShell = require('python-shell');
-var Client = require("node-rest-client").Client;
-var client = new Client();
-var epurl = process.env.DAS_URL;
-var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var validator =  require('validator');
 var DOMParser = require('xmldom').DOMParser;
 var xl = require('excel4node');
