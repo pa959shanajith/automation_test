@@ -10,7 +10,7 @@ import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 
 
-const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
+const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
     const history = useHistory();
     const dispatch = useDispatch();
     const tasksJson = useSelector(state=>state.plugin.tasksJson)
@@ -218,6 +218,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
             setBrowserTypeExe([]);
             setModuleInfo([]);
             setExecAction("serial");
+            setExecEnv("default");
             setupdateAfterSave(!updateAfterSave);
             setSyncScenario(false);
         }catch(error) {
@@ -227,6 +228,7 @@ const ExecuteContent = ({execEnv, setExecAction, taskName, status, readTestSuite
             setBrowserTypeExe([]);
             setModuleInfo([]);
             setExecAction("serial");
+            setExecEnv("default");
             setupdateAfterSave(!updateAfterSave);
             setSyncScenario(false);
         }
