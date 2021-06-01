@@ -23,10 +23,6 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
         if(!selectedProj || !selectedModule || !selectedModule._id){
             return;
         }
-        if(selectedModule.type === "endtoend"){
-            displayError("Exporting End to End module is not supported.")
-            return
-        }
         setExportBox(true)
     }
     const clickExport = () => {
@@ -47,7 +43,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
             title='Export MindMap'
             close={()=>setExportBox(false)}
             footer={<Footer clickExport={clickExport}/>}
-            content={<Container gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={selectedModule.name} isAssign={isAssign}/>} 
+            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={selectedModule.name} isAssign={isAssign}/>} 
             />:null}
             <svg data-test="exportButton" className={"ct-exportBtn"+(selectedModule._id?"":" disableButton")} id="ct-save" onClick={openExport}>
                 <g id="ct-exportAction" className="ct-actionButton">
@@ -73,7 +69,7 @@ const validate = (arr) =>{
     return err
 }
 
-const Container = ({fnameRef,ftypeRef,modName,isAssign,gitBranchRef,gitVerRef,gitPathRef}) =>{
+const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,isAssign,gitBranchRef,gitVerRef,gitPathRef}) =>{
     const [expType,setExpType] = useState(undefined)
     const changeExport = (e) => {
         setExpType(e.target.value)
@@ -85,9 +81,12 @@ const Container = ({fnameRef,ftypeRef,modName,isAssign,gitBranchRef,gitVerRef,gi
                 <select defaultValue={'def-option'} ref={ftypeRef} onChange={changeExport}>
                     <option value={'def-option'} disabled>Select Export Format</option>
                     {isAssign && <option value={'custom'}>Custom (.json)</option>}
+                    {!isEndtoEnd &&
+                    <>
                     <option value={'excel'}>Excel Workbook (.xlx,.xlsx)</option>
                     <option value={'git'}>Git (.mm)</option>
                     <option value={'json'}>MindMap (.mm)</option>
+                    </>}
                 </select>
             </div>
             {(expType === 'git')?
