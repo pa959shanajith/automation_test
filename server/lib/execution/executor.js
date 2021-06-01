@@ -105,7 +105,8 @@ class TestSuiteExecutor {
             "executionIds": [],
             "testsuiteIds": [],
             "suitedetails": [],
-            "reportType": "functionalTesting"
+            "reportType": "functionalTesting",
+            "versionname":"NA"
         };
         const gitInfo = batchData.gitInfo;
         if(gitflag){
@@ -123,6 +124,7 @@ class TestSuiteExecutor {
             if (module_data == "gitfail") return "gitfail";
             if(module_data == "empty") return "empty";
             execReq['apptype']=module_data.batchInfo[0].apptype;
+            execReq['versionname']=gitInfo['gitVersionName'];
             var batchInfo = module_data.batchInfo;
             var suite_details=module_data.suitedetails;
             const gittaskApproval = await utils.approvalStatusCheck(batchInfo);
@@ -187,7 +189,7 @@ class TestSuiteExecutor {
     };
 
     /** Function responsible for generating batchid and executionid dfor given list of testsuiteid */
-    generateExecutionIds = async (execIds, tsuIds, userid) => {
+    generateExecutionIds = async (execIds, tsuIds, userid, versionname) => {
         for (const tsuid of tsuIds) {
             if (execIds.execid[tsuid] == undefined) execIds.execid[tsuid] = null;
         }
@@ -196,7 +198,8 @@ class TestSuiteExecutor {
             "executedby": userid,
             "testsuiteids": tsuIds,
             "executionids": execIds.execid,
-            "batchid": execIds.batchid
+            "batchid": execIds.batchid,
+            "versionname": versionname
         };
         const newExecIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "generateExecutionIds");
         if (newExecIds == "fail") return "fail";
@@ -241,7 +244,7 @@ class TestSuiteExecutor {
         //const currtime = new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().replace('T',' ').replace('Z','');
         const reportData = {
             'rows': [{ 'id': '1', 'Keyword': '', 'parentId': '', 'status': status, 'Step ': '', 'Comments': null, 'StepDescription': msg, "screenshot_path": null, "EllapsedTime": "0:00:00.000000", "Remark": "", "testcase_details": "" }],
-            'overallstatus': [{ 'EllapsedTime': '0:00:00.000000', 'EndTime': currtime, 'browserVersion': 'NA', 'StartTime': currtime, 'overallstatus': status, 'browserType': 'NA' }],
+            'overallstatus': [{ 'EllapsedTime': '0:00:00.000000', 'EndTime': currtime, 'browserVersion': 'NA', 'versionname': 'NA', 'StartTime': currtime, 'overallstatus': status, 'browserType': 'NA' }],
             'commentsLength': []
         }
         const executionIds = batchData.executionIds;
@@ -436,7 +439,7 @@ class TestSuiteExecutor {
         if (executionRequest == "fail") return "fail";
         if (executionRequest == "gitfail") return "gitfail";
         if (executionRequest == "empty") return "empty";
-        const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser);
+        const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser, executionRequest.versionname);
         if (currExecIds == "fail") return "fail";
         executionRequest.batchId = currExecIds.batchid;
         executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
