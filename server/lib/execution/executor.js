@@ -5,6 +5,7 @@ var logger = require('../../../logger.js');
 const accessibility_testing = require("../../controllers/accessibilityTesting")
 const notifications = require('../../notifications');
 var queue = require('./executionQueue')
+var scheduler = require('./scheduler')
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const constants = require('./executionConstants')
 var testSuiteExecutor = undefined;
@@ -303,7 +304,7 @@ class TestSuiteExecutor {
                     } else rsv(constants.SOCK_NA);
                 } else if (event == "return_status_executeTestSuite") {
                     if (status === "success") {
-                        if (execType == "SCHEDULE") await _this.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
+                        if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
                     } else if (status === "skipped") {
                         const execStatus = "Skipped";
                         var errMsg = (execType == "SCHEDULE") ? "due to conflicting schedules" :

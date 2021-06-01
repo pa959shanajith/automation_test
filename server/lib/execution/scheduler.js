@@ -4,7 +4,7 @@ var smartPartitions = require('../smartPartitions');
 var logger = require('../../../logger.js');
 var queue = require('./executionQueue');
 const constants = require('./executionConstants')
-const scheduleJobMap = {};
+var scheduleJobMap = {};
 
 exports.prepareSchedulingRequest = async (session, body) => {
     logger.info("Inside UI service testSuitesScheduler_ICE");
@@ -255,7 +255,7 @@ exports.reScheduleTestsuite = async () => {
                 };
                 const details = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
                 if (details == "fail") {
-                    await updateScheduleStatus(schd._id, "Failed");
+                    await this.updateScheduleStatus(schd._id, "Failed");
                     continue;
                 }
                 const prjObj = details.project;
@@ -287,3 +287,44 @@ exports.reScheduleTestsuite = async () => {
         logger.error("Exception in the function " + fnName + ": %s", ex);
     }
 };
+
+exports.cancelJob = async (req) => {
+    const fnName = "cancelJobMap";
+	logger.info("Inside UI service " + fnName);
+    try{
+        const userid = req.session.userid;
+        const username = req.session.username;
+        const scheduleid = req.body.schDetails.scheduleid;
+        const schedHost = req.body.host;
+        const schedUserid = JSON.parse(req.body.schedUserid);
+        var userprofile = {}
+        let inputs = { "icename": schedHost };
+        if(schedHost != constants.EMPTYUSER){
+            userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
+            if (userprofile == "fail" || userprofile == null) "fail";
+        }
+        if (!(schedUserid["invokinguser"] == userid || userprofile.name == username)) {
+            logger.info("Sending response 'not authorised' from " + fnName + " service");
+            return "not authorised";
+        }
+        inputs = {
+            "query": "getscheduledata",
+            "scheduleid": scheduleid
+        };
+        const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
+        if (result == "fail") return "fail";
+        const status = result[0].status;
+        if (status != "scheduled") {
+            logger.info("Sending response 'inprogress' from " + fnName + " service");
+            return "inprogress";
+        }
+        if (scheduleJobMap[scheduleid] && scheduleJobMap[scheduleid].cancel) scheduleJobMap[scheduleid].cancel();
+        const result2 = await this.updateScheduleStatus(scheduleid, "cancelled");
+        return result2;
+    }catch(e){
+        logger.error("Exception in the function " + fnName)
+        logger.debug("Exception in the function " + fnName + ": %s", ex)
+        return 'fail';
+    }
+	
+}
