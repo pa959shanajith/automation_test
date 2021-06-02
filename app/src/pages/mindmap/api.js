@@ -451,7 +451,7 @@ export const exportToGit = async(data) => {
         }
         if(res.data==='Invalid url'){
             console.error(res.data)
-            return {error:"Error in Git config: Git clone path"}
+            return {error:"Error in Git config: Invalid Git clone path"}
         }
         if(res.data==='Invalid token'){
             console.error(res.data)
