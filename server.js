@@ -168,7 +168,6 @@ if (cluster.isMaster) {
 		});
 
 		// For Selecting Authentication Strategy and adding required routes
-		const utils = require("./server/lib/utils");
 		const authlib = require("./server/lib/auth");
 		const authconf = authlib();
 		const auth = authconf.auth;
