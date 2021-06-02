@@ -71,7 +71,7 @@ export const createDataTable = async(arg) => {
             },
             data: {
                 action: "create",
-                datatablename: arg.tableName,
+                name: arg.tableName,
                 dtheaders: arg.headers,
                 datatable: arg.data,
             }
@@ -100,7 +100,7 @@ export const editDataTable = async(arg) => {
             },
             data: {
                 action: "edit",
-                datatablename: arg.tableName,
+                name: arg.tableName,
                 dtheaders: arg.headers,
                 datatable: arg.data,
             }
@@ -129,7 +129,7 @@ export const confirmDeleteDataTable = async(tableName) => {
             },
             data: {
                 action: "deleteConfirm",
-                datatablename: tableName
+                name: tableName
             }
         });
         if(res.status === 401){
@@ -156,7 +156,7 @@ export const deleteDataTable = async(tableName) => {
             },
             data: {
                 action: "delete",
-                datatablename: tableName
+                name: tableName
             }
         });
         if(res.status === 401){
@@ -209,7 +209,7 @@ export const fetchDataTable = async(tableName) => {
             },
             data: {
                 action: "datatable",
-                datatablename: tableName,
+                name: tableName,
             }
         });
         if(res.status === 401){
@@ -244,7 +244,7 @@ export const exportDataTable = async(arg) => {
                 'Content-type': 'application/json',
             },
             data: {
-                datatablename: arg.tableName,
+                name: arg.tableName,
                 filename: arg.filename,
                 excelType: excelType
             },

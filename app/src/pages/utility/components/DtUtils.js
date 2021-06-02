@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 
 const parseTableData = table => {
     // NAME
-    let dataTableName = table.datatablename;
+    let name = table.name;
 
     let newData = JSON.parse(JSON.stringify([...table.datatable]))
     
@@ -20,7 +20,7 @@ const parseTableData = table => {
         })
     }
     
-    return [dataTableName, newData, newHeaders]
+    return [name, newData, newHeaders]
 }
 
 const updateData = (data, headers, lastEntry) => {
@@ -56,7 +56,7 @@ const updateData = (data, headers, lastEntry) => {
 
 
 function prepareSaveData (tableName, headers, data){
-    const dataTableName = tableName;
+    const name = tableName;
     const headerArray = headers.map(header => header.name);
     const valuesArray = data.map(row => {
         let filteredObject = {};
@@ -67,7 +67,7 @@ function prepareSaveData (tableName, headers, data){
     })
 
     return {
-        tableName: dataTableName,
+        tableName: name,
         headers: headerArray,
         data: valuesArray
     }

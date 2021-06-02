@@ -314,7 +314,7 @@ const SearchDataTable = props => {
         const searchInput = searchRef.current.value;
         let newFilteredList=[];
         if (searchInput) 
-            newFilteredList = list.filter(item => item.datatablename.toLowerCase().includes(searchInput.toLowerCase()));
+            newFilteredList = list.filter(item => item.name.toLowerCase().includes(searchInput.toLowerCase()));
         setFilteredList(newFilteredList);
     }
     const resetField = () => {
@@ -334,7 +334,7 @@ const SearchDataTable = props => {
                 <ScrollBar thumbColor="#929397" >
                 {(filteredList.length ? filteredList : list)
                     .map((e, i) => (  
-                        <option key={e._id} value={e.datatablename} onClick={onTableSelect}>{e.datatablename}</option> 
+                        <option key={e._id} value={e.name} onClick={onTableSelect}>{e.name}</option> 
                     ))}
                 </ScrollBar>
             </div>

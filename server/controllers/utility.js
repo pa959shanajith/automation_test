@@ -1,13 +1,12 @@
-var crypto = require('crypto');
-// var PythonShell = require('python-shell');
-var validator =  require('validator');
-var DOMParser = require('xmldom').DOMParser;
-var xl = require('excel4node');
-var xlsx = require('xlsx');
-var path = require('path');
-var fs = require('fs');
-var logger = require('../../logger');
-var utils = require('../lib/utils');
+const crypto = require('crypto');
+const validator =  require('validator');
+const DOMParser = require('xmldom').DOMParser;
+const xl = require('excel4node');
+const xlsx = require('xlsx');
+const path = require('path');
+const fs = require('fs');
+const logger = require('../../logger');
+const utils = require('../lib/utils');
 
 exports.Encrypt_ICE = async (req, res) => {
 	const fnName = "Encrypt_ICE";
@@ -49,10 +48,10 @@ exports.manageDataTable = async(req, res) => {
 	var fnName = "manageDataTable";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		var datatablename = req.body.datatablename;
+		var name = req.body.name;
 		var action = req.body.action;
 		var inputs = {
-			datatablename: datatablename,
+			name: name,
 			action: action
 		};
 		if (action == "create" || action == "edit") {
@@ -75,7 +74,7 @@ exports.getDatatableDetails = async(req, res) =>{
 	try {
 		logger.info("Fetching datatable names");
 		var d = req.body;
-		var dts = await getDatatable({"datatablename":d.datatablename, "action":d.action})
+		var dts = await getDatatable({"name":d.name, "action":d.action})
 		res.send(dts);
 	} catch(exception) {
 		logger.error("Error occurred in utility/"+fnName+":", exception);
@@ -85,7 +84,7 @@ exports.getDatatableDetails = async(req, res) =>{
 
 const getDatatable = async (d) => {
 	const inputs = {
-		"datatablename": d.datatablename,
+		"name": d.name,
 		"action": d.action
 	}
 	return utils.fetchData(inputs, "utility/fetchDatatable", "fetchDatatable");
@@ -177,12 +176,12 @@ exports.exportToDtExcel = async (req, res) => {
 	try {
 		logger.info("Fetching Module details");
 		var d = req.body;
-		var excelMap = await getDatatable({"datatablename":d.datatablename, 'action': 'datatable'})
+		var excelMap = await getDatatable({"name":d.name, 'action': 'datatable'})
 		dts = excelMap[0];
 		datatable = dts.datatable;
 		excelType = d.excelType;
 		logger.info("Writing Datatable structure to Excel");
-		var dir = './../../excel';
+		var dir = './../../output';
 		var excelDirPath = path.join(__dirname, dir);
 		var filePath = path.join(excelDirPath, d.filename+'.'+excelType);
 
@@ -197,7 +196,7 @@ exports.exportToDtExcel = async (req, res) => {
 		var wb = new xl.Workbook();
 		var ws = wb.addWorksheet('Sheet1');
 
-		logger.debug(d.datatablename);
+		logger.debug(d.name);
 
 		//create the new worksheet with coloumns and rows specified in data
 		for (var i=1;i<=datatable.length;i++) {
@@ -216,7 +215,7 @@ exports.exportToDtExcel = async (req, res) => {
 			
 		}
 		//save it
-		wb.write('./excel/'+d.filename+'.'+excelType,function (err) {
+		wb.write('./output/'+d.filename+'.'+excelType,function (err) {
 			if (err) return res.send('fail');
 			if(excelType == "xlsx") contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 			else contentType = 'application/vnd.ms-excel';
@@ -237,11 +236,11 @@ exports.exportToDtCSV = async (req, res) => {
 	try {
 		logger.info("Fetching Datatable details");
 		var d = req.body;
-		var csvMap = await getDatatable({"datatablename":d.datatablename, 'action': "datatable"})
+		var csvMap = await getDatatable({"name":d.name, 'action': "datatable"})
 		dts = csvMap[0];
 		datatable = dts.datatable;
 		logger.info("Writing Datatable structure to CSV");
-		var dir = './../../csv';
+		var dir = './../../output';
 		var csvDirPath = path.join(__dirname, dir);
 		var filePath = path.join(csvDirPath, d.filename+'.csv');
 
@@ -252,7 +251,7 @@ exports.exportToDtCSV = async (req, res) => {
 			logger.error("Exception in utilityService: exportToExcel: Create Directory/Remove file", e);
 		}
 
-		logger.debug(d.datatablename);
+		logger.debug(d.name);
 
 		//create csv value
 		var csv = datatable.map(row => Object.values(row));
@@ -261,7 +260,7 @@ exports.exportToDtCSV = async (req, res) => {
 
 		//save it
 		// fs.writeFileSync(filePath, finalcsv, function(err) {});
-		fs.writeFile('./csv/'+d.filename+'.csv', finalcsv, function (err) {
+		fs.writeFile('./output/'+d.filename+'.csv', finalcsv, function (err) {
 			if (err) return res.send('fail');
 			res.writeHead(200, {'Content-Type': 'application/csv'});
 			var rstream = fs.createReadStream(filePath);
@@ -311,11 +310,11 @@ exports.exportToDtXML = async (req, res) => {
 	try {
 		logger.info("Fetching Datatable details");
 		var d = req.body;
-		var xmlMap = await getDatatable({"datatablename":d.datatablename, 'action': "datatable"})
+		var xmlMap = await getDatatable({"name":d.name, 'action': "datatable"})
 		dts = xmlMap[0];
 		datatable = dts.datatable;
 		logger.info("Writing Datatable structure to XML");
-		var dir = './../../xml';
+		var dir = './../../output';
 		var excelDirPath = path.join(__dirname, dir);
 		var filePath = path.join(excelDirPath, d.filename+".xml");
 
@@ -326,12 +325,12 @@ exports.exportToDtXML = async (req, res) => {
 			logger.error("Exception in utilityService: exportToExcel: Create Directory/Remove file", e);
 		}
 
-		logger.debug(d.datatablename);
+		logger.debug(d.name);
 
 		var doc = OBJtoXML(datatable);
 
 		//save it
-		fs.writeFile('./xml/'+d.filename+'.xml', doc, function (err) {
+		fs.writeFile('./output/'+d.filename+'.xml', doc, function (err) {
 			if (err) return res.send('fail');
 			res.writeHead(200, {'Content-Type': 'text/xml'});
 			var rstream = fs.createReadStream(filePath);
