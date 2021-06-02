@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { ReactSortable } from 'react-sortablejs';
 import { useHistory } from 'react-router-dom';
 import ScrapeObject from '../components/ScrapeObject';
 import { ScrollBar, RedirectPage } from "../../global"
@@ -16,18 +17,19 @@ const ScrapeObjectList = () => {
     const { user_id, role } = useSelector(state=>state.login.userinfo);
     const history = useHistory();
 
-    const [activeEye, setActiveEye] = useState(null);
-    const [disableBtns, setDisableBtns] = useState({save: true, delete: true, edit: true, search: false, selAll: false});
+    // const [activeEye, setActiveEye] = useState(null);
+    const [disableBtns, setDisableBtns] = useState({save: true, delete: true, edit: true, search: false, selAll: false, dnd: false});
     const [showSearch, setShowSearch] = useState(false);
     const [searchVal, setSearchVal] = useState("");
     const [selAllCheck, setSelAllCheck] = useState(false);
     const [deleted, setDeleted] = useState([]);
     const [modified, setModified] = useState({});
     const [editableObj, setEditableObj] = useState({});
+    const [dnd, setDnd] = useState(false);
     const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems } = useContext(ScrapeContext);
 
     useEffect(()=> {
-        setActiveEye(null);
+        // setActiveEye(null);
         setShowSearch(false);
         setSearchVal("");
         setSelAllCheck(false);
@@ -35,6 +37,7 @@ const ScrapeObjectList = () => {
         setModified({});
         setEditableObj({});
         setSaved(true);
+        setDnd(false);
         //eslint-disable-next-line
     }, [current_task])
 
@@ -63,8 +66,8 @@ const ScrapeObjectList = () => {
         
         if (visible > 0 && selected > 0) disableDelete = false;
 
-        if (disableSelect) disable = { ...disable, selAll: true };
-        else disable = { ...disable, selAll: false }
+        if (disableSelect) disable = { ...disable, selAll: true, dnd: true };
+        else disable = { ...disable, selAll: false, dnd: false }
 
         if (!disableDelete) disable = {...disable, delete: false};
         else disable = {...disable, delete: true};
@@ -77,6 +80,9 @@ const ScrapeObjectList = () => {
             setEditableObj({});
         }
 
+        if (dnd) disable = { ...disable, selAll: true};
+        if (visible < total) disable = { ...disable, dnd: true};
+
         setDisableBtns({...disableBtns, ...disable})
         setSelAllCheck(checkAll);
         //eslint-disable-next-line
@@ -87,8 +93,9 @@ const ScrapeObjectList = () => {
         else {
             setDisableBtns({...disableBtns, save: true});
             setDeleted([]);
+            setDnd(false); 
             setModified({});
-            setActiveEye(null);
+            // setActiveEye(null);
             setShowSearch(false);
             setSearchVal("");
             setSelAllCheck(false);
@@ -300,22 +307,28 @@ const ScrapeObjectList = () => {
     const saveScrapedObjects = () => {
         let scrapeItemsL = [...scrapeItems];
         let added = Object.keys(newScrapedData).length ? { ...newScrapedData } : { ...mainScrapedData };
-        let views = []
+        let views = [];
+        let orderList = [];
+        let modifiedObjects = Object.values(modified);
+
         for (let scrapeItem of scrapeItemsL) {
             if (!scrapeItem.objId) {
-                if (scrapeItem.isCustom) views.push({custname: scrapeItem.title, xpath: scrapeItem.xpath, tag: scrapeItem.tag});
-                else views.push({...newScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title});
+                if (scrapeItem.isCustom) views.push({custname: scrapeItem.title, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId});
+                else views.push({...newScrapedData.view[scrapeItem.objIdx], custname: scrapeItem.title, tempOrderId: scrapeItem.tempOrderId});
+                orderList.push(scrapeItem.tempOrderId);
             }
+            else orderList.push(scrapeItem.objId);
         }
         
         let params = {
             'deletedObj': deleted,
-            'modifiedObj': Object.values(modified),
+            'modifiedObj': modifiedObjects,
             'addedObj': {...added, view: views},
             'screenId': current_task.screenId,
             'userId': user_id,
             'roleId': role,
-            'param': 'saveScrapeData'
+            'param': 'saveScrapeData',
+            'orderList': orderList
         }
 
         scrapeApi.updateScreen_ICE(params)
@@ -345,6 +358,16 @@ const ScrapeObjectList = () => {
         .catch(error => console.error(error))
     }
 
+    const onDrop = () => {
+        setSaved(false);
+    }
+
+    const onRearrange = (e, status) => {
+        if (!status) setDnd(true);
+        else setDnd(false);
+        e.stopPropagation();
+    }
+
     return (
         <ScreenWrapper 
             buttonGroup={
@@ -359,6 +382,7 @@ const ScrapeObjectList = () => {
                         <button data-test="save" className="ss__taskBtn ss__btn" disabled={disableBtns.save} onClick={onSave}>Save</button>
                         <button data-test="delete"className="ss__taskBtn ss__btn" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
                         <button data-test="edit"className="ss__taskBtn ss__btn" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
+                        <button data-test="dnd"className="ss__taskBtn ss__btn" disabled={disableBtns.dnd} onClick={(e)=>onRearrange(e, dnd)}>{dnd?"Stop":"Rearrange"}</button>
                         <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
@@ -375,18 +399,15 @@ const ScrapeObjectList = () => {
                     <div className="sc__min">
                     <div className="sc__con" id="scrapeObjCon">
                     <ScrollBar scrollId="scrapeObjCon" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                    <div data-test="scrapeObjectContainer"className="scrape_object_container">
+                    <ReactSortable data-test="scrapeObjectContainer" className="scrape_object_container" list={scrapeItems} setList={setScrapeItems} onEnd={onDrop} key={dnd.toString()} disabled={!dnd}>
                     {
-                        scrapeItems.map((object, index) => !object.hide && <ScrapeObject key={object.val} 
-                                                                            idx={index}
-                                                                            object={object} 
-                                                                            activeEye={activeEye}
-                                                                            setActiveEye={setActiveEye}
-                                                                            updateChecklist={updateChecklist}
-                                                                            modifyScrapeItem={modifyScrapeItem}
-                                                                        />)
+                        scrapeItems.map((object, index) =><Fragment key={`${object.val}`}> 
+                                                        { !object.hide && 
+                                                            <ScrapeObject idx={index} object={object} updateChecklist={updateChecklist}
+                                                                modifyScrapeItem={modifyScrapeItem} hide={object.hide} dnd={dnd} />}
+                                                        </Fragment>)
                     }
-                    </div>
+                    </ReactSortable>
                     </ScrollBar>
                     </div>
                     </div>
