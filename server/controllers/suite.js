@@ -1,5 +1,4 @@
 var logger = require('../../logger');
-var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var smartPartitions = require('../lib/smartPartitions')
 var scheduler = require('../lib/execution/scheduler')

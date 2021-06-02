@@ -6,6 +6,7 @@ var logger = require('../../../logger.js');
 const EMPTYUSER = process.env.nulluser;
 var testSuiteInvoker = require('../execution/executionInvoker')
 const constants = require('./executionConstants');
+const tokenAuth = require('../tokenAuth')
 
 module.exports.Execution_Queue = class Execution_Queue {
     /*
@@ -224,7 +225,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         try {
             if (headerUserInfo) {
                 //Check wether poolname or icename provided (Execution on pool name not supported in this implementation)
-                var userInfo = await utils.tokenValidation(headerUserInfo);
+                var userInfo = await tokenAuth.tokenValidation(headerUserInfo);
                 userInfo.invokinguser = userInfo.userid;
                 userInfo.invokingusername = userInfo.username;
                 userInfo.invokinguserrole = userInfo.role;
@@ -275,9 +276,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
                     if (this.ice_list[targetICE]['status']) {
                         // ICE is busy
-                        response["status"] = "pass";
-                        response["message"] = "Execution or Termination already in progress on ICE: " + targetICE;
-                        return response;
+                        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['409'])
+                        return res.status("461").send({ "error": "Execution or Termination already in progress on ICE: " + targetICE})
                     } else{
                         // ICE is Free
                         testSuite['res'] = res;
