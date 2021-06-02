@@ -84,16 +84,12 @@ io.on('connection', async socket => {
 			if (result == 'fail') {
 				socket.send('fail', "conn");
 			} else {
-				socket.send('checkConnection', result.ice_check);
+				socket.send('connected', result.ice_check);
 				if (result.node_check === "allow") {
 					socketMap[icename] = socket;
 					if(!userICEMap[result.username]) userICEMap[result.username] = []
 					iceUserMap[icename] = result.username;
 					if(!userICEMap[result.username].includes(icename)) userICEMap[result.username].push(icename);
-					setTimeout(()=> {
-						socket.send('connected', result.ice_check);
-						socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes,pingTimer,objectPredictionPath);
-					}, 300);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
 					redisServer.redisSubClient.unsubscribe('ICE1_normal_' + icename);
@@ -113,6 +109,8 @@ io.on('connection', async socket => {
 	}
 
 	httpsServer.setTimeout();
+
+	socket.on('getconstants', async () => socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes, pingTimer, objectPredictionPath));
 
 	socket.on('disconnect', async reason => {
 		logger.info("Inside Socket disconnect");

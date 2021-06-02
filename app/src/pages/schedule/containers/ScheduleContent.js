@@ -45,20 +45,20 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                 }
                 var scheduledDataParsed = [];
                 for(var i =result.length-1 ; i>=0  ; i-- ) {
-                    const eachScenarioDetails = result[i].scenariodetails[0];
+                    const eachScenarioDetails = result[i].scenariodetails;
                     for(var j =eachScenarioDetails.length-1 ; j>=0  ; j-- ) {
                         let newScheduledScenario = {};
                         newScheduledScenario["target"] = result[i].target;
-                        newScheduledScenario["cycleid"] = eachScenarioDetails[j].cycleid;
+                        newScheduledScenario["cycleid"] = eachScenarioDetails[j][0].cycleid;
                         newScheduledScenario["scheduledby"] = result[i].scheduledby;
                         newScheduledScenario["scheduledatetime"] = result[i].scheduledatetime;
                         newScheduledScenario["testsuitenames"] = result[i].testsuitenames;
                         newScheduledScenario["browserlist"] = result[i].browserlist;
                         newScheduledScenario["_id"] = result[i]._id;
                         newScheduledScenario["status"] = result[i].status;
-                        newScheduledScenario["scenarioname"] = eachScenarioDetails[j]["scenarioname"];
-                        newScheduledScenario["appType"] = eachScenarioDetails[j]["appType"];
-                        newScheduledScenario["poolname"] =  eachScenarioDetails[j]["poolname"];
+                        newScheduledScenario["scenarioname"] = eachScenarioDetails[j][0]["scenarioname"];
+                        newScheduledScenario["appType"] = eachScenarioDetails[j][0]["appType"];
+                        newScheduledScenario["poolname"] =  eachScenarioDetails[j][0]["poolname"];
                         scheduledDataParsed.push(newScheduledScenario);
                     }
                 } 
