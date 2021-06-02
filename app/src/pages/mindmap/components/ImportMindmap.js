@@ -229,7 +229,7 @@ const validate = ({ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPath
     [ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef].forEach((e)=>{
         if(e.current){
             e.current.style.border = '1px solid black';
-            if(e.current.value === 'def-val'){
+            if(e.current.value === 'def-val' || e.current.value === ''){
                 e.current.style.border = '1px solid red';
                 err = true
             }
