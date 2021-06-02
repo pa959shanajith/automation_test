@@ -155,13 +155,13 @@ class TestSuiteExecutor {
             const suiteDetails = suite.suiteDetails;
             for (const tsco of suiteDetails) {
                 var integrationType = [];
-                if (batchData.integration && batchData.integration.alm.url) {
+                if (batchData.integration && batchData.integration.alm && batchData.integration.alm.url) {
                     integrationType.push("ALM");
                 }
-                if (batchData.integration && batchData.integration.qtest.url) {
+                if (batchData.integration && batchData.integration.qtest && batchData.integration.qtest.url) {
                     integrationType.push("qTest");
                 }
-                if (batchData.integration && batchData.integration.zephyr.url) {
+                if (batchData.integration && batchData.integration.zephyr && batchData.integration.zephyr.url) {
                     integrationType.push("Zephyr");
                 }
                 var scenario = await this.fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType, gitflag);
@@ -390,7 +390,7 @@ class TestSuiteExecutor {
                             if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                             report_result["testSuiteDetails"] = execReq["suitedetails"]
                             if (resultData.userTerminated) result = "UserTerminate";
-                            if (execType == "API") result = [d2R, status];
+                            if (execType == "API") result = [d2R, status, resultData.testStatus];
                             if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
                                 notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
                                 rsv(constants.DO_NOT_PROCESS);
@@ -458,4 +458,8 @@ module.exports.execute = async (batchExecutionData, execIds, userInfo, execType)
     }
     var result = await testSuiteExecutor.executionFunction(batchExecutionData, execIds, userInfo, execType)
     return result;
+}
+
+module.exports.generateExecutionId = async (execIds, tsuIds, userid, versionName) => {
+    return await testSuiteExecutor.generateExecutionIds(execIds, tsuIds, userid, versionName);
 }

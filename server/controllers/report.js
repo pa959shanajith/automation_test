@@ -13,6 +13,7 @@ var fs = require('fs');
 var options = require('../config/options');
 const Readable = require('stream').Readable;
 var path = require('path');
+const tokenAuth = require('../lib/tokenAuth')
 
 wkhtmltopdf.command = path.join(__dirname, '..', '..', 'assets', 'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
 var templatepdf = '';
@@ -799,7 +800,7 @@ exports.getReport_API = async (req, res) => {
             res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
             return res.status('400').send({'error':"Invalid or missing user info in request headers."})
         }
-		const userInfo = await utils.tokenValidation(headerUserInfo);
+		const userInfo = await tokenAuth.tokenValidation(headerUserInfo);
 		const execResponse = userInfo.inputs;
         if (execResponse.tokenValidation !== "passed") {
             finalReport.push(execResponse);
@@ -929,7 +930,7 @@ exports.getExecution_metrics_API = async(req, res) => {
             res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['400'])
             return res.status('400').send({'error':"Invalid or missing user info in request headers."})
         }
-		const userInfo = await utils.tokenValidation(headerUserInfo);
+		const userInfo = await tokenAuth.tokenValidation(headerUserInfo);
         var execResponse = userInfo.inputs;
         var finalReport=[];
         if (execResponse.tokenValidation == "passed"){
