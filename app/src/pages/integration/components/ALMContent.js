@@ -58,7 +58,7 @@ const ALMContent = props => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Testcases...'});
         const domain = selectedDomain;
         const project_Name = e.target.value;
-        const folderDetails = await qcFolderDetails_ICE(domain,"root",project_Name,"folder",null)
+        const folderDetails = await qcFolderDetails_ICE(domain,"root",project_Name,"folder",null,0)
         if (folderDetails.error){
             dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: folderDetails.error}});
         }

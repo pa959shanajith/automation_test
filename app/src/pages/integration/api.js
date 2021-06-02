@@ -226,7 +226,7 @@ export const qcProjectDetails_ICE = async(domain ,user_id ) => {
     }
 }
 
-export const qcFolderDetails_ICE = async(domain ,foldername ,project,qcaction,testset) => {
+export const qcFolderDetails_ICE = async(domain ,foldername ,project,qcaction,testset,folderid) => {
     try{
         const res = await axios(url+'/qcFolderDetails_ICE', {
             method: 'POST',
@@ -237,6 +237,7 @@ export const qcFolderDetails_ICE = async(domain ,foldername ,project,qcaction,te
             action : 'qcFolderDetails_ICE',
             domain: domain,
             foldername: foldername,
+            folderid: folderid,
             project : project,
             qcaction : qcaction,
             testset : testset
