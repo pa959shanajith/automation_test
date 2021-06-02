@@ -13,7 +13,9 @@ export const mobileMacFilters = [
     { label: "SearchField", tag: "iOSXCUIElementTypeSearchField"},
     { label: "PickerWheel", tag: "XCUIElementTypePickerWheel"},
     { label: "TextView", tag: "textView"},
-    { label: "Duplicate Custnames", tag: "duplicateCustnames"}
+    { label: "Duplicate Custnames", tag: "duplicateCustnames"},
+    { label: "Unsaved Objects", tag: "unsavedObjects" },
+    { label: "Alphabet Order", tag: "alphabetOrder" },
 ]
 
 export const mobileFilters = [
@@ -31,7 +33,9 @@ export const mobileFilters = [
     { label: "Spinner", tag: "android.widget.Spinner"},
     { label: "ImageButton", tag: "android.widget.ImageButton"},
     { label: "IRIS", tag: "iris"},
-    { label: "Duplicate Custnames", tag: "duplicateCustnames"}
+    { label: "Duplicate Custnames", tag: "duplicateCustnames"},
+    { label: "Unsaved Objects", tag: "unsavedObjects" },
+    { label: "Alphabet Order", tag: "alphabetOrder" },
 ]
 
 export const nonMobileFilters = [
@@ -47,7 +51,9 @@ export const nonMobileFilters = [
     { label: "IRIS", tag: "iris"},
     { label: "Others", tag: "others"},
     { label: "User Created", tag: "userobj"},
-    { label: "Duplicate Custnames", tag: "duplicateCustnames"}
+    { label: "Duplicate Custnames", tag: "duplicateCustnames"},
+    { label: "Unsaved", tag: "unsavedObjects" },
+    { label: "Alphabet Order", tag: "alphabetOrder" },
 ]
 
 export const objectTypes = [

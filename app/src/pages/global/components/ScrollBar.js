@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, Fragment, useEffect } from 'react';
+import React, { useState, useLayoutEffect, Fragment, useEffect, useRef } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
@@ -16,27 +16,45 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
     scrollId : container id
 */
 
-function useWindowSize() {
-    const [size, setSize] = useState([0, 0]);
+let refEvent = new CustomEvent('updateScrollBar');
+
+function updateScrollBar(){
+    dispatchEvent(refEvent);
+}
+
+function useUpdateScrollBar() {
+    const [temp, setTemp] = useState([]);
     useLayoutEffect(() => {
-      function updateSize() {
-        setSize([window.innerWidth, window.innerHeight]);
-      }
-      window.addEventListener('resize', updateSize);
-      updateSize();
-      return () => window.removeEventListener('resize', updateSize);
+        function updateSize() {
+            setTemp([])
+        }
+        window.addEventListener('updateScrollBar', updateSize);
+        updateSize();
+        return () => window.removeEventListener('updateScrollBar', updateSize);
     }, []);
-    return size;
+    return temp;
 }
 
 const ScrollBar = (props) => {
-
-    const [width, height] = useWindowSize();
+    
+    const [temp] = useUpdateScrollBar();
+    const scrollRef = useRef();
 
     useEffect(()=>{
+        if (scrollRef.current) 
+            scrollRef.current.updateScroll();
+    }, [temp])
 
-    }, [width, height])
-
+    useLayoutEffect(() => {
+        function updateSize() {
+          if (scrollRef.current) 
+            scrollRef.current.updateScroll();
+        }
+        window.addEventListener('resize', updateSize);
+        updateSize();
+        return () => window.removeEventListener('resize', updateSize);
+      }, []);
+      
     return(
         <>
          <Fragment>
@@ -100,7 +118,7 @@ const ScrollBar = (props) => {
                 }
                 `}
             </style> 
-            <PerfectScrollbar options={{minScrollbarLength:props.minScrollbarLength,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}} style={{maxHeight:'inherit',height:'inherit'}} onScrollX={props.onScrollX} onScrollY={props.onScrollY} >
+            <PerfectScrollbar ref={scrollRef} options={{minScrollbarLength:props.minScrollbarLength,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}} style={{maxHeight:'inherit',height:'inherit'}} onScrollX={props.onScrollX} onScrollY={props.onScrollY} >
                 {props.children}
             </PerfectScrollbar>
         </Fragment>
@@ -109,3 +127,4 @@ const ScrollBar = (props) => {
 }
 
 export default ScrollBar;
+export { updateScrollBar };

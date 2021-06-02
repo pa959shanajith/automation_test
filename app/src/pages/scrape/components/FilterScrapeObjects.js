@@ -1,4 +1,7 @@
-export const otherObjects = ScrapeObjectTag => {
+/*
+    Other Objects Filter Functions
+*/
+const otherObjects = ScrapeObjectTag => {
     let isOtherObject = true;
     let objectTag = ScrapeObjectTag.toLowerCase();
     let typeArray = [ 
@@ -12,7 +15,20 @@ export const otherObjects = ScrapeObjectTag => {
     return isOtherObject;
 }
 
-export const otherMobileObjects = ScrapeObjectTag => {
+export const getOtherObjects = scrapedItems => {
+    scrapedItems.forEach(item => {
+        if (otherObjects(item.tag)) {
+                item.hide = false;
+        }
+    });
+    return scrapedItems;
+}
+
+
+/*
+    Other Mobile Filters Function
+*/
+const otherMobileObjects = ScrapeObjectTag => {
     let isOtherObject = true;
     let objectTag = ScrapeObjectTag.toLowerCase();
 
@@ -29,6 +45,19 @@ export const otherMobileObjects = ScrapeObjectTag => {
     return isOtherObject;
 }
 
+export const getOtherMobileObjects = scrapedItems => {
+    scrapedItems.forEach(item => {
+        if (otherMobileObjects(item.tag)){
+                item.hide = false;
+            }
+    });
+
+    return scrapedItems;
+}
+
+/*
+    Duplicate Objects Filter
+*/
 export const duplicateObjects = scrapedItems => {
     let newScrapedItems = scrapedItems;
     let reversedScrapeItems = newScrapedItems.reverse();
@@ -50,7 +79,24 @@ export const duplicateObjects = scrapedItems => {
     return newScrapedItems;
 }
 
-export const isSelectedElement = (selectedFilterTag, ScrapeObjectTag) => {
+
+/*
+    Custom Object Filter Function 
+*/
+export const getCustomObjects = scrapedItems => {
+    scrapedItems.forEach(item => {
+        if (item.isCustom) {
+            item.hide = false
+        }
+    });
+
+    return scrapedItems;
+}
+
+/*
+    Filter Selected Objects Functions
+*/
+const isSelectedElement = (selectedFilterTag, ScrapeObjectTag) => {
     let isDesiredElement = false;
     let objectTag = ScrapeObjectTag.toLowerCase();
     let selectedTag = selectedFilterTag.toLowerCase();
@@ -68,6 +114,79 @@ export const isSelectedElement = (selectedFilterTag, ScrapeObjectTag) => {
     return isDesiredElement;
 }
 
+export const getSelectedObjects = (scrapedItems, tag) => {
+    scrapedItems.forEach(item => {
+        if (isSelectedElement(tag, item.tag)) {
+            item.hide = false;
+        }
+    });
+
+    return scrapedItems;
+}
+
+
+/* 
+    Unsaved Objects Filter Functions
+*/
+const isUnsaved = objectId => {
+    const isUnsaved = objectId ? false : true;
+    return isUnsaved;
+}
+
+export const getUnsavedObjects = scrapedItems => {
+    scrapedItems.forEach(item => {
+        if (isUnsaved(item.objId)) {
+            item.hide = false;
+        }
+    });
+
+    return scrapedItems;
+}
+
+
+/*
+    Order The List by Alphabet Order
+*/
+const alphabetOrder = scrapeItems => {
+    let tempScrapeItems = [...scrapeItems];
+
+    tempScrapeItems.sort(compareObjectName);
+    return tempScrapeItems;
+}
+
+export const getListInAlphabetOrder = scrapedItems => {
+    scrapedItems = alphabetOrder(scrapedItems);
+    scrapedItems.forEach(item => item.hide = false);
+
+    return scrapedItems;
+}
+
+export const scrapedOrder = (scrapeItems, orderList) => {
+    let tempScrapeItems = [...scrapeItems];
+    let newScrapeList = [];
+    let orderDict = {};
+
+    for (let scrapeItem of tempScrapeItems){
+        if(scrapeItem.objId) orderDict[scrapeItem.objId] = scrapeItem;
+        else orderDict[scrapeItem.tempOrderId] = scrapeItem;
+    }
+    if (orderList && orderList.length) 
+        orderList.forEach(orderId => newScrapeList.push(orderDict[orderId]))
+
+    return newScrapeList;
+}
+
+export const resetList = (scrapeItems, order, orderList) => {
+    if (order === "val") scrapeItems = scrapedOrder(scrapeItems, orderList);
+
+    scrapeItems.forEach(item => {
+        item.hide = true;
+        item.duplicate = false;
+    })
+
+    return scrapeItems;
+}
+
 function isInArray (array, item) {
     let found = false;
     for (let arrayItem of array){
@@ -77,4 +196,11 @@ function isInArray (array, item) {
         }
     }
     return found;
+}
+
+function compareObjectName (objOne, objTwo) {
+    let titleOne = objOne.title.toLowerCase();
+    let titleTwo = objTwo.title.toLowerCase();
+
+    return (titleOne <= titleTwo) ? -1 : 1;
 }

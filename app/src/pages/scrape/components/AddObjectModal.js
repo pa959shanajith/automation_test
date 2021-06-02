@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ModalContainer, ScrollBar } from '../../global';
 import "../styles/AddObjectModal.scss";
 import PropTypes from 'prop-types';
+import {v4 as uuid} from 'uuid';
 
 const AddObjectModal = props => {
 
@@ -51,12 +52,11 @@ const AddObjectModal = props => {
     const onSubmit = () => {
         let errorObj = {};
         let errorFlag = null;
-        let lastObj = props.scrapeItems[props.scrapeItems.length-1]
-        let lastVal = lastObj ? lastObj.val : 0;
 
         let duplicateDict = {};
         let idArr = [];
         let newObjects = [];
+        let newOrderList = [];
         
         for (let i=0; i<objects.length; i++){
             let name = objects[i].objName;
@@ -87,14 +87,17 @@ const AddObjectModal = props => {
             }
             else duplicateDict[custname] = [tempId];
 
+            let newUUID = uuid();
             newObjects.push({
                 objIdx: i,
                 title: `${name}_${value}`, 
                 tag: tag, 
                 xpath: "", 
-                val: ++lastVal,
-                isCustom: true
+                val: newUUID,
+                isCustom: true,
+                tempOrderId: newUUID,
             });
+            newOrderList.push(newUUID);
         }
 
         if (errorFlag) {
@@ -108,6 +111,7 @@ const AddObjectModal = props => {
         
         if (!errorFlag && newObjects.length > 0) {
             props.setScrapeItems([...props.scrapeItems, ...newObjects]);
+            props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
             props.setShow(false);
             props.setSaved(false);
             props.setShowPop({title: "Add Object", content: "Objects has been added successfully."});
@@ -133,7 +137,7 @@ const AddObjectModal = props => {
                                 { objects.map((object, index) => <div data-test="objModalItem" className="ss__objModal_item" key={index}>
                                         <input data-test="addObjectInput" className={"addObj_name"+(error.type==="input" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
                                         <select  data-test="addObjectTypeSelect" className={"addObj_objType"+(error.type==="type" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
-                                            <option className="addObj_option" disabled selected value="">Select Object Type</option>
+                                            <option className="addObj_option" disabled value="">Select Object Type</option>
                                             { objectTypes.map((objectType, i) =>
                                                 <option key={i} className="addObj_option" value={`${objectType.value}-${objectType.typeOfElement}`}>
                                                     {objectType.name}

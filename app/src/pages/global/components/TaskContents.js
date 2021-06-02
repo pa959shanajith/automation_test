@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { updateScrollBar } from '../../global';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { updateTaskStatus } from '../api';
@@ -132,6 +133,7 @@ const TaskPanel = props => {
         setRel(clktask.releaseid);
         setCyc(props.cycleDict[clktask.cycleid]);
         setAppType(maintask.appType);
+        updateScrollBar();
     }
 
 

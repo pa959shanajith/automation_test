@@ -28,7 +28,7 @@ const RefBarItems = props => {
 	const [mirrorHeight, setMirrorHeight] = useState("0px");
 	const [currMobileType, setCurrMobileType]  = useState('Android');
 	const [dsRatio, setDsRatio] = useState(1); //downScale Ratio
-	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, setShowPop } = useContext(ScrapeContext);
+	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, setShowPop, orderList } = useContext(ScrapeContext);
 
 	useEffect(()=>{
 		return ()=>{
@@ -73,64 +73,51 @@ const RefBarItems = props => {
 	}, [props.mirror])
 
 	useEffect(()=>{
-		// !== null because objValue can be 0
 		if (objValue.val !== null){
-			let clickedObj = null;
-
-			for (let scrapeObj of scrapeItems) {
-				if (scrapeObj.val === objValue.val) {
-					clickedObj = scrapeObj;
-					break;
-				}
-			}
 			
-			if (clickedObj) {
-				let ScrapedObject = {};
-				if (clickedObj.objId) ScrapedObject = mainScrapedData.view[clickedObj.objIdx];
-				else ScrapedObject = newScrapedData.view[clickedObj.objIdx];
-	
-				let top=0; let left=0; let height=0; let width=0;
-	
-				if (ScrapedObject.top){
-					top = ScrapedObject.top * dsRatio;
-					left = ScrapedObject.left * dsRatio;
-					height = ScrapedObject.height * dsRatio;
-					width = ScrapedObject.width * dsRatio;
-	
-					if (appType === "MobileWeb" && navigator.appVersion.indexOf("Mac") !== -1){
-						top = top + 112;
-						left = left + 15;	
-					} 
-					else if (appType === "SAP" && mainScrapedData.createdthrough !== 'PD'){
-						top = top + 2;
-						left = left + 3;
-					}
-					else if (appType === "OEBS" && mainScrapedData.createdthrough === 'PD'){
-						top = top + 35;
-						left = left-36;
-					}
-					
-					setHighlight({
-						top: `${Math.round(top)}px`, 
-						left: `${Math.round(left)}px`, 
-						height: `${Math.round(height)}px`, 
-						width: `${Math.round(width)}px`, 
-						backgroundColor: "yellow", 
-						border: "1px solid red", 
-						opacity: "0.7"
-					}, ()=>highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'}));
-	
-					if(!ScrapedObject.xpath.startsWith('iris')){
-						highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
-							.then(data => {
-								if (data === "Invalid Session") return RedirectPage(history);
-								if (data === "fail") setShowPop({title: "Fail", content: "Failed to highlight"})
-							})
-							.catch(error => console.error("Error while highlighting. ERROR::::", error));
-					}
-	
-				} else setHighlight(false);
-			}
+			let ScrapedObject = objValue;
+
+			let top=0; let left=0; let height=0; let width=0;
+
+			if (ScrapedObject.top){
+				top = ScrapedObject.top * dsRatio;
+				left = ScrapedObject.left * dsRatio;
+				height = ScrapedObject.height * dsRatio;
+				width = ScrapedObject.width * dsRatio;
+
+				if (appType === "MobileWeb" && navigator.appVersion.indexOf("Mac") !== -1){
+					top = top + 112;
+					left = left + 15;	
+				} 
+				else if (appType === "SAP" && mainScrapedData.createdthrough !== 'PD'){
+					top = top + 2;
+					left = left + 3;
+				}
+				else if (appType === "OEBS" && mainScrapedData.createdthrough === 'PD'){
+					top = top + 35;
+					left = left-36;
+				}
+				
+				setHighlight({
+					top: `${Math.round(top)}px`, 
+					left: `${Math.round(left)}px`, 
+					height: `${Math.round(height)}px`, 
+					width: `${Math.round(width)}px`, 
+					backgroundColor: "yellow", 
+					border: "1px solid red", 
+					opacity: "0.7"
+				});
+				// highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
+				if(!ScrapedObject.xpath.startsWith('iris')){
+					highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
+						.then(data => {
+							if (data === "Invalid Session") return RedirectPage(history);
+							if (data === "fail") setShowPop({title: "Fail", content: "Failed to highlight"})
+						})
+						.catch(error => console.error("Error while highlighting. ERROR::::", error));
+				}
+
+			} else setHighlight(false);
 		}
 		else setHighlight(false);
 		//eslint-disable-next-line
@@ -165,50 +152,31 @@ const RefBarItems = props => {
 			}
 		}
         else if (tempToFilterArr.includes(dataTag)) tempToFilterArr.splice(tempToFilterArr.indexOf(dataTag), 1)
-        else tempToFilterArr.push(dataTag);
-		filter(tempToFilterArr);
+		else tempToFilterArr.push(dataTag);
+		
+		const order = checkOrdering(tempToFilterArr, toFilter);
+		filter(tempToFilterArr, order);
         setToFilter(tempToFilterArr)
     }
 
-    const filter = toFilter => {
+    const filter = (toFilter, order) => {
 		let scrapedItems = [...scrapeItems];
-		scrapedItems.forEach(item => {
-			item.hide = true;
-			item.duplicate = false;
-		})
+		
+		scrapedItems = ScrapeFilter.resetList(scrapedItems, order, orderList);
+		
 		if (toFilter.length > 0) {
 			for (let tag of toFilter) {
-				if (tag === "others") {
-					scrapedItems.forEach(item => {
-                        if (ScrapeFilter.otherObjects(item.tag)) {
-								item.hide = false;
-						}
-					});
-				}
-				else if (tag === "othersMobile"){
-					scrapedItems.forEach(item => {
-						if (ScrapeFilter.otherMobileObjects(item.tag)){
-								item.hide = false;
-							}
-					});
-				}
-				/*** Filtering Duplicate Objects ***/
-				else if (tag === "duplicateCustnames") {
-					scrapedItems = ScrapeFilter.duplicateObjects(scrapedItems);
-				}
-				else if(tag === "userobj"){
-					scrapedItems.forEach(item => {
-						if (item.isCustom) {
-							item.hide = false
-						}
-					});
-				}
-				else {
-					scrapedItems.forEach(item => {
-						if (ScrapeFilter.isSelectedElement(tag, item.tag)) {
-							item.hide = false;
-						}
-					});
+				switch (tag) {
+					case "others": scrapedItems = ScrapeFilter.getOtherObjects(scrapedItems); break;
+					case "othersMobile": scrapeItems = ScrapeFilter.getOtherMobileObjects(scrapedItems); break;
+					case "duplicateCustnames": scrapedItems = ScrapeFilter.duplicateObjects(scrapedItems); break;
+					case "userobj": scrapedItems = ScrapeFilter.getCustomObjects(scrapedItems);	break;
+					case "unsavedObjects": scrapedItems = ScrapeFilter.getUnsavedObjects(scrapedItems); break;
+					case "alphabetOrder": {
+						if (order === "alphabet") scrapedItems = ScrapeFilter.getListInAlphabetOrder(scrapedItems);
+						break;
+					}
+					default: scrapedItems = ScrapeFilter.getSelectedObjects(scrapedItems, tag); break;
 				}
 			}
 		} else {
@@ -293,3 +261,15 @@ const RefBarItems = props => {
 }
 
 export default RefBarItems;
+
+function checkOrdering (toFilter, fromFilter) {
+	let reorder = "";
+	const hadAlphabetOrder = fromFilter.includes("alphabetOrder");
+	const needAlphabetOrder = toFilter.includes("alphabetOrder");
+	
+	if (hadAlphabetOrder && needAlphabetOrder) reorder = "";
+	else if (hadAlphabetOrder && !needAlphabetOrder) reorder = "val";
+	else if (!hadAlphabetOrder && needAlphabetOrder) reorder = "alphabet";
+
+	return reorder;
+}

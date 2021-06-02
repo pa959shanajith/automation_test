@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { qcFolderDetails_ICE } from '../api.js';
+import { updateScrollBar } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
 
@@ -41,6 +42,7 @@ const FolderNode = props => {
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         } 
         else setCollapse(true);
+        updateScrollBar();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [collapse, setCollapse])
 
