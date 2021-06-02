@@ -460,6 +460,6 @@ module.exports.execute = async (batchExecutionData, execIds, userInfo, execType)
     return result;
 }
 
-module.exports.generateExecutionId = async (execIds, tsuIds, userid) => {
-    return await testSuiteExecutor.generateExecutionIds(execIds, tsuIds, userid);
+module.exports.generateExecutionId = async (execIds, tsuIds, userid, versionName) => {
+    return await testSuiteExecutor.generateExecutionIds(execIds, tsuIds, userid, versionName);
 }

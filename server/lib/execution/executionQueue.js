@@ -277,7 +277,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     if (this.ice_list[targetICE]['status']) {
                         // ICE is busy
                         res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['409'])
-                        return res.status("461").send({ "error": "Execution or Termination already in progress on ICE: " + targetICE})
+                        return res.status("409").send({ "error": "Execution or Termination already in progress on ICE: " + targetICE})
                     } else{
                         // ICE is Free
                         testSuite['res'] = res;
