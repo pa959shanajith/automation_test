@@ -5,6 +5,7 @@ var logger = require('../../../logger.js');
 const accessibility_testing = require("../../controllers/accessibilityTesting")
 const notifications = require('../../notifications');
 var queue = require('./executionQueue')
+var scheduler = require('./scheduler')
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const constants = require('./executionConstants')
 var testSuiteExecutor = undefined;
@@ -105,7 +106,8 @@ class TestSuiteExecutor {
             "executionIds": [],
             "testsuiteIds": [],
             "suitedetails": [],
-            "reportType": "functionalTesting"
+            "reportType": "functionalTesting",
+            "versionname":"NA"
         };
         const gitInfo = batchData.gitInfo;
         if(gitflag){
@@ -123,6 +125,7 @@ class TestSuiteExecutor {
             if (module_data == "gitfail") return "gitfail";
             if(module_data == "empty") return "empty";
             execReq['apptype']=module_data.batchInfo[0].apptype;
+            execReq['versionname']=gitInfo['gitVersionName'];
             var batchInfo = module_data.batchInfo;
             var suite_details=module_data.suitedetails;
             const gittaskApproval = await utils.approvalStatusCheck(batchInfo);
@@ -152,13 +155,13 @@ class TestSuiteExecutor {
             const suiteDetails = suite.suiteDetails;
             for (const tsco of suiteDetails) {
                 var integrationType = [];
-                if (batchData.integration && batchData.integration.alm.url) {
+                if (batchData.integration && batchData.integration.alm && batchData.integration.alm.url) {
                     integrationType.push("ALM");
                 }
-                if (batchData.integration && batchData.integration.qtest.url) {
+                if (batchData.integration && batchData.integration.qtest && batchData.integration.qtest.url) {
                     integrationType.push("qTest");
                 }
-                if (batchData.integration && batchData.integration.zephyr.url) {
+                if (batchData.integration && batchData.integration.zephyr && batchData.integration.zephyr.url) {
                     integrationType.push("Zephyr");
                 }
                 var scenario = await this.fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType, gitflag);
@@ -187,7 +190,7 @@ class TestSuiteExecutor {
     };
 
     /** Function responsible for generating batchid and executionid dfor given list of testsuiteid */
-    generateExecutionIds = async (execIds, tsuIds, userid) => {
+    generateExecutionIds = async (execIds, tsuIds, userid, versionname) => {
         for (const tsuid of tsuIds) {
             if (execIds.execid[tsuid] == undefined) execIds.execid[tsuid] = null;
         }
@@ -196,7 +199,8 @@ class TestSuiteExecutor {
             "executedby": userid,
             "testsuiteids": tsuIds,
             "executionids": execIds.execid,
-            "batchid": execIds.batchid
+            "batchid": execIds.batchid,
+            "versionname": versionname
         };
         const newExecIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "generateExecutionIds");
         if (newExecIds == "fail") return "fail";
@@ -241,7 +245,7 @@ class TestSuiteExecutor {
         //const currtime = new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().replace('T',' ').replace('Z','');
         const reportData = {
             'rows': [{ 'id': '1', 'Keyword': '', 'parentId': '', 'status': status, 'Step ': '', 'Comments': null, 'StepDescription': msg, "screenshot_path": null, "EllapsedTime": "0:00:00.000000", "Remark": "", "testcase_details": "" }],
-            'overallstatus': [{ 'EllapsedTime': '0:00:00.000000', 'EndTime': currtime, 'browserVersion': 'NA', 'StartTime': currtime, 'overallstatus': status, 'browserType': 'NA' }],
+            'overallstatus': [{ 'EllapsedTime': '0:00:00.000000', 'EndTime': currtime, 'browserVersion': 'NA', 'versionname': 'NA', 'StartTime': currtime, 'overallstatus': status, 'browserType': 'NA' }],
             'commentsLength': []
         }
         const executionIds = batchData.executionIds;
@@ -300,7 +304,7 @@ class TestSuiteExecutor {
                     } else rsv(constants.SOCK_NA);
                 } else if (event == "return_status_executeTestSuite") {
                     if (status === "success") {
-                        if (execType == "SCHEDULE") await _this.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
+                        if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
                     } else if (status === "skipped") {
                         const execStatus = "Skipped";
                         var errMsg = (execType == "SCHEDULE") ? "due to conflicting schedules" :
@@ -386,7 +390,7 @@ class TestSuiteExecutor {
                             if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                             report_result["testSuiteDetails"] = execReq["suitedetails"]
                             if (resultData.userTerminated) result = "UserTerminate";
-                            if (execType == "API") result = [d2R, status];
+                            if (execType == "API") result = [d2R, status, resultData.testStatus];
                             if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
                                 notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
                                 rsv(constants.DO_NOT_PROCESS);
@@ -436,7 +440,7 @@ class TestSuiteExecutor {
         if (executionRequest == "fail") return "fail";
         if (executionRequest == "gitfail") return "gitfail";
         if (executionRequest == "empty") return "empty";
-        const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser);
+        const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser, executionRequest.versionname);
         if (currExecIds == "fail") return "fail";
         executionRequest.batchId = currExecIds.batchid;
         executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
@@ -454,4 +458,8 @@ module.exports.execute = async (batchExecutionData, execIds, userInfo, execType)
     }
     var result = await testSuiteExecutor.executionFunction(batchExecutionData, execIds, userInfo, execType)
     return result;
+}
+
+module.exports.generateExecutionId = async (execIds, tsuIds, userid, versionName) => {
+    return await testSuiteExecutor.generateExecutionIds(execIds, tsuIds, userid, versionName);
 }

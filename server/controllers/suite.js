@@ -1,5 +1,4 @@
 var logger = require('../../logger');
-var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var smartPartitions = require('../lib/smartPartitions')
 var scheduler = require('../lib/execution/scheduler')
@@ -8,7 +7,6 @@ var queue = require('../lib/execution/executionQueue')
 var cache = require('../lib/cache').getClient(2);
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const constants = require('../lib/execution/executionConstants');
-const scheduleJobMap = {};
 /** This service reads the testsuite and scenario information for the testsuites */
 exports.readTestSuite_ICE = async (req, res) => {
 	const fnName = "readTestSuite_ICE";
@@ -332,36 +330,9 @@ exports.getScheduledDetails_ICE = async (req, res) => {
 
 /** This service cancels the specified scheduled job */
 exports.cancelScheduledJob_ICE = async (req, res) => {
-	var userprofile = {}
 	const fnName = "cancelScheduledJob_ICE";
 	logger.info("Inside UI service " + fnName);
-	const userid = req.session.userid;
-	const username = req.session.username;
-	const scheduleid = req.body.schDetails.scheduleid;
-	const schedHost = req.body.host;
-	const schedUserid = JSON.parse(req.body.schedUserid);
-	let inputs = { "icename": schedHost };
-	if(schedHost != constants.EMPTYUSER){
-		userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
-		if (userprofile == "fail" || userprofile == null) return res.send("fail");
-	}
-	if (!(schedUserid["invokinguser"] == userid || userprofile.name == username)) {
-		logger.info("Sending response 'not authorised' from " + fnName + " service");
-		return res.send("not authorised");
-	}
-	inputs = {
-		"query": "getscheduledata",
-		"scheduleid": scheduleid
-	};
-	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-	if (result == "fail") return res.send("fail");
-	const status = result[0].status;
-	if (status != "scheduled") {
-		logger.info("Sending response 'inprogress' from " + fnName + " service");
-		return res.send("inprogress");
-	}
-	if (scheduleJobMap[scheduleid] && scheduleJobMap[scheduleid].cancel) scheduleJobMap[scheduleid].cancel();
-	const result2 = await scheduler.updateScheduleStatus(scheduleid, "cancelled");
-	return res.send(result2);
+	let result = await scheduler.cancelJob(req)
+	return res.send(result);
 }
 
