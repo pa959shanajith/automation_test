@@ -1,5 +1,4 @@
 var logger = require('../../logger');
-var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 var smartPartitions = require('../lib/smartPartitions')
 var scheduler = require('../lib/execution/scheduler')
@@ -8,7 +7,6 @@ var queue = require('../lib/execution/executionQueue')
 var cache = require('../lib/cache').getClient(2);
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const constants = require('../lib/execution/executionConstants');
-const scheduleJobMap = {};
 /** This service reads the testsuite and scenario information for the testsuites */
 exports.readTestSuite_ICE = async (req, res) => {
 	const fnName = "readTestSuite_ICE";
@@ -268,82 +266,6 @@ exports.ExecuteTestSuite_ICE_API = async (req, res) => {
 	await queue.Execution_Queue.addAPITestSuiteToQueue(req, res, userInfo);
 };
 
-
-/** this service imports the data from git repo and invoke execution */
-exports.importFromGit_ICE = async (req, res) => {
-	const actionName = 'importFromGit'
-	logger.info("Inside API importFromGit_ICE");
-	try {
-		// Several client apps do not send TCP Keep-Alive. Hence this is handled in applicaton side.
-		req && req.socket && req.socket.setKeepAlive && req.socket.setKeepAlive(true, +(process.env.KEEP_ALIVE || "30000"));
-		const userInfo = await utils.tokenValidation(req.body.userInfo);
-		if(userInfo['inputs']['tokenValidation'] =='passed'){
-			const data = req.body;
-			const gitVersionName = data.gitVersionName;
-			const gitbranch = data.gitbranch;
-			var folderPath = data.folderPath;
-			if(!folderPath.startsWith("avoassuretest_artifacts")){
-				folderPath="avoassuretest_artifacts/"+folderPath
-			}
-			const inputs = {
-				"gitbranch":gitbranch,
-				"gitVersionName":gitVersionName,
-				"folderPath":folderPath.toLowerCase(),
-				"createdBy":userInfo.userid,
-				"source":data.source,
-				"exectionMode":data.exectionMode,
-				"executionEnv":data.executionEnv,
-				"browserType":data.browserType,
-				"integration":data.integration
-			};
-			const module_data = await utils.fetchData(inputs, "git/importFromGit_ICE", actionName);
-			if(module_data=="fail") return res.status(500).send({"error":"Failed to import from Git."})
-			if(module_data=="empty") return res.status(500).send({"error":"Module does not exists in Git. Please check your inputs!!"})
-			userInfo['invokingusername'] = userInfo.username
-			userInfo['invokinguser'] = userInfo.userid;
-			userInfo['invokinguserrole'] = userInfo.role;
-			redisServer.redisSubServer.subscribe('ICE2_' + userInfo.icename);
-			const result = await executionRequestToICE(module_data, 'API', userInfo);
-
-			executionResult=[]
-			delete userInfo.inputs.error_message;
-			executionResult.push(userInfo.inputs)
-			var execResponse = executionResult[0]
-			if (result == constants.SOCK_NA) execResponse.error_message = constants.SOCK_NA_MSG;
-			else if (result == constants.SOCK_SCHD) execResponse.error_message = constants.SOCK_SCHD_MSG;
-			else if (result == "NotApproved") execResponse.error_message = "All the dependent tasks (design, scrape) needs to be approved before execution";
-			else if (result == "NoTask") execResponse.error_message = "Task does not exist for child node";
-			else if (result == "Modified") execResponse.error_message = "Task has been modified, Please approve the task";
-			else if (result == "Skipped") execResponse.error_message = "Execution is skipped because another execution is running in ICE";
-			else if (result == "fail") execResponse.error_message = "Internal error occurred during execution";
-			else {
-				execResponse.status = result[1];
-				const execResult = [];
-				for (let tsuid in result[0]) {
-					const tsu = result[0][tsuid];
-					const scenarios = [];
-					tsu.executionId = tsu['testsuiteId'];
-					for (let tscid in tsu.scenarios) scenarios.push(...tsu.scenarios[tscid]);
-					delete tsu.scenarios;
-					tsu.suiteDetails = scenarios;
-					execResult.push(tsu);
-				}
-				execResponse.batchInfo = execResult;
-			}
-
-			const finalResult = { "executionStatus": executionResult };
-			return res.send(finalResult);
-		}else if(!userInfo.icename){
-			return res.send({"error":"ICE name not provided."})
-		} else{
-			return res.send({"error":userInfo.icename + " not connected to server!"})
-		}
-	} catch (ex) {
-		logger.error("Exception in the service importFromGit: %s", ex);
-		return res.status(500).send("fail");
-	}
-};
-
 /** Service to fetch all the testcase, screen and project names for provided scenarioid */
 exports.getTestcaseDetailsForScenario_ICE = async (req, res) => {
 	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");
@@ -408,36 +330,9 @@ exports.getScheduledDetails_ICE = async (req, res) => {
 
 /** This service cancels the specified scheduled job */
 exports.cancelScheduledJob_ICE = async (req, res) => {
-	var userprofile = {}
 	const fnName = "cancelScheduledJob_ICE";
 	logger.info("Inside UI service " + fnName);
-	const userid = req.session.userid;
-	const username = req.session.username;
-	const scheduleid = req.body.schDetails.scheduleid;
-	const schedHost = req.body.host;
-	const schedUserid = JSON.parse(req.body.schedUserid);
-	let inputs = { "icename": schedHost };
-	if(schedHost != constants.EMPTYUSER){
-		userprofile = await utils.fetchData(inputs, "login/fetchICEUser", fnName);
-		if (userprofile == "fail" || userprofile == null) return res.send("fail");
-	}
-	if (!(schedUserid["invokinguser"] == userid || userprofile.name == username)) {
-		logger.info("Sending response 'not authorised' from " + fnName + " service");
-		return res.send("not authorised");
-	}
-	inputs = {
-		"query": "getscheduledata",
-		"scheduleid": scheduleid
-	};
-	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-	if (result == "fail") return res.send("fail");
-	const status = result[0].status;
-	if (status != "scheduled") {
-		logger.info("Sending response 'inprogress' from " + fnName + " service");
-		return res.send("inprogress");
-	}
-	if (scheduleJobMap[scheduleid] && scheduleJobMap[scheduleid].cancel) scheduleJobMap[scheduleid].cancel();
-	const result2 = await scheduler.updateScheduleStatus(scheduleid, "cancelled");
-	return res.send(result2);
+	let result = await scheduler.cancelJob(req)
+	return res.send(result);
 }
 

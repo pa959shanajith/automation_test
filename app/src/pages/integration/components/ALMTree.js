@@ -176,6 +176,8 @@ const TestCaseNode = props => {
     const handleUnSync = () => {
         dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
         dispatch({type: actionTypes.SYNCED_TC, payload: []});
+        dispatch({type: actionTypes.SEL_TC, payload: []});
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
     }
 
     return <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(props.testCaseName) ? " test__syncedTC" : "")}>

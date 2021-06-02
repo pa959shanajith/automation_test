@@ -1313,7 +1313,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					case "sendKeys":
 						key=eachScrapedAction.action.actionData;
 						keycode_map = {
-							'0': 'Enter'
+							'13': 'Enter'
 						}
 						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
 							'sendFunctionKeys',[keycode_map[key]],null,eachScrapedAction.url,"Generic")
@@ -1369,13 +1369,13 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							break;
 						case "table":
 							if(eachScrapedAction.command[0][1]=="getAbsoluteRow"){
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRow',[eachScrapedAction.command[0][2]],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRow',[eachScrapedAction.command[0][2]+1],null,null,"SAP");
 								if(eachScrapedAction.command[1][1]!="selected") testcaseObj.keywordVal = 'UnselectRow';
 							}
 							else if(eachScrapedAction.command[0][1]=="verticalScrollbar")
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'scrollDown',[eachScrapedAction.command[1][2]],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'scrollDown',null,null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="columns"){
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumn',[eachScrapedAction.command[1][2]],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumn',[eachScrapedAction.command[1][2]+1],null,null,"SAP");
 								if(eachScrapedAction.command[2][1]!="selected") testcaseObj.keywordVal = 'UnselectColumn';
 							} else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
 							break;
@@ -1383,9 +1383,13 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							if(eachScrapedAction.command[0][1]=="selectColumn")
 								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumns',null,null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="pressToolbarButton")
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'PressToobarButton',null,null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'PressToolbarButton',null,null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="modifyCell")
 								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetTextInCell',null,null,null,"SAP");
+							else if(eachScrapedAction.command[0][1]=="currentCellColumn")
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'cellClick',null,null,null,"SAP");
+							else if(eachScrapedAction.command[0][1]=="pressF4")
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'sendFunctionKeys',['F4'],null,null,"SAP");
 							else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
 							break;
 						case "GuiLabel":
@@ -1596,7 +1600,7 @@ exports.exportToGit = async (req, res) => {
 			"action":actionName,
 			"gitBranch":gitBranch,
 			"gitVersionName": gitVersionName,
-			"gitFolderPath": gitFolderPath.toLowerCase()
+			"gitFolderPath": gitFolderPath
 		};
 		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
 		return res.send(module_data);
@@ -1661,7 +1665,7 @@ exports.importGitMindmap = async (req, res) => {
 			"projectid": projectid,
 			"gitbranch": gitbranch,
 			"gitversion":gitversion,
-			"gitfolderpath":gitfolderpath.toLowerCase()
+			"gitfolderpath":gitfolderpath
 		}
 		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);
 		res.send(result)

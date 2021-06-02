@@ -23,8 +23,22 @@ const CreateNew = ({importRedirect}) => {
   const [fullScreen,setFullScreen] = useState(false)
   const [verticalLayout,setVerticalLayout] = useState(false)
   const [loading,setLoading] = useState(true)
+  const [info,setInfo] = useState(undefined)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
+  const selectProj = useSelector(state=>state.mindmap.selectedProj)
+  const prjList = useSelector(state=>state.mindmap.projectList)
 
+  useEffect(()=>{
+    if(selectProj){
+        var dict= {
+            "AppType": prjList[selectProj].apptypeName,
+            "Domain": prjList[selectProj].domains,
+            "Project":prjList[selectProj].name
+        }
+        setInfo(dict)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[selectProj])
   useEffect(()=>{
     (async()=>{
         setBlockui({show:true,content:'Loading modules ...'})
@@ -79,7 +93,7 @@ const CreateNew = ({importRedirect}) => {
                 </div>
             </div>:null
         }
-        <ReferenceBar taskTop={true} collapsible={true} collapse={true}>
+        <ReferenceBar taskInfo={info} taskTop={true} collapsible={true} collapse={true}>
             <div className="ic_box" >
                 <img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} alt='Switch Layout' style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
                 <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>

@@ -1,5 +1,3 @@
-const utils = require('../utils');
-const suite = require('../../controllers/suite.js')
 const cache = require("../cache.js").getClient(2);
 var Client = require("node-rest-client").Client;
 var client = new Client();
@@ -32,6 +30,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
     executeScheduleTestSuite = async function (batchExecutionData, execIds, userInfo, type) {
         const scheduleId = execIds["scheduleId"];
         const fnName = "executeScheduleTestSuite";
+        var versionname = 'NA';
         try {
             result = await executor.execute(batchExecutionData, execIds, userInfo, type);
         } catch (ex) {
@@ -55,7 +54,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
                 msg = "Scenario execution failed due to an error encountered during execution";
             }
             const tsuIds = batchExecutionData.batchInfo.map(u => u.testsuiteId);
-            const currExecIds = await suite.generateExecutionIds(execIds, tsuIds, userInfo.userid);
+            const currExecIds = await executor.generateExecutionId(execIds, tsuIds, userInfo.userid, versionname);
             if (currExecIds != "fail") {
                 const batchObj = {
                     "executionIds": tsuIds.map(i => currExecIds.execids[i]),
@@ -140,10 +139,27 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
             case "fail":
                 execResponse.error_message = "Internal error occurred during execution"
                 break;
+            case "gitfail":
+                execResponse.error_message = "Internal error occurred during versioning execution"
+                break;
+            case "empty":
+                execResponse.error_message = "Invalid versioning details entered. Please check your inputs!"
+                break;
             default:
-                if (result[1] == "success") statusCode = "200";
-                else if (result[1] == 'Terminate') statusCode = "462";
-                else statusCode = "202"
+                switch(result[2]){
+                    case 'userTerminate':
+                        statusCode = '462';
+                        break;
+                    case 'programTerminate':
+                        statusCode = '463';
+                        break;
+                    case 'pass':
+                        statusCode = '200';
+                        break;
+                    default:
+                        statusCode = '202';
+                        break
+                }
                 execResponse.status = result[1];
                 const execResult = [];
                 for (let tsuid in result[0]) {
@@ -158,11 +174,11 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
                 execResponse.batchInfo = execResult;
         }
         const finalResult = { "executionStatus": execResponse };
-        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode]);
         if (!res) {
             logger.error("Error while sending response in executeAPI, response object undefined");
             return;
         } else if (!reqFromADO) {
+            res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode]);
             return res.status(statusCode).send(finalResult);
         }
         // This code only executes when request comes from Azure DevOps

@@ -164,8 +164,8 @@ const TaskInfoPopup = ({ closePopups, taskPopY, setShowInfo, providedTaskInfo, s
             <div className="info_pop__contents">
             {
                 Object.keys(taskInfo).map(key => <>
-                    <div className="task_info__title">{key}:</div>
-                    <div className="task_info__content">{taskInfo[key]}</div>
+                    <div key={key+"title"} className="task_info__title">{key}:</div>
+                    <div key={key+"value"} className="task_info__content">{taskInfo[key]}</div>
                 </>)
             }
             </div>

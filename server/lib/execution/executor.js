@@ -5,6 +5,7 @@ var logger = require('../../../logger.js');
 const accessibility_testing = require("../../controllers/accessibilityTesting")
 const notifications = require('../../notifications');
 var queue = require('./executionQueue')
+var scheduler = require('./scheduler')
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const constants = require('./executionConstants')
 var testSuiteExecutor = undefined;
@@ -20,7 +21,7 @@ class TestSuiteExecutor {
     };
 
     /** Function responsible for fetching testcase and qcdetails for given scenarioid */
-    fetchScenarioDetails = async (scenarioid, userid, integrationType) => {
+    fetchScenarioDetails = async (scenarioid, userid, integrationType, gitflag) => {
         const fnName = "fetchScenarioDetails";
         const scenario = {};
         const allTestcaseSteps = [];
@@ -28,42 +29,44 @@ class TestSuiteExecutor {
         const allTestcaseObj = {};
         var inputs = null;
 
-        // Step 1: Get Testcase details
-        inputs = {
-            "query": "testcasedetails",
-            "id": scenarioid,
-            "userid": userid
-        };
-        var testcases = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
-        if (testcases == "fail") return "fail";
+        if(!gitflag){
+            // Step 1: Get Testcase details
+            inputs = {
+                "query": "testcasedetails",
+                "id": scenarioid,
+                "userid": userid
+            };
+            var testcases = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
+            if (testcases == "fail") return "fail";
 
-        // Step 2: Get Testcasesteps
-        for (const tc of testcases) {
-            if (allTestcaseObj[tc._id] === undefined) {
-                inputs = {
-                    "testcaseid": tc._id,
-                    "screenid": tc.screenid,
-                    "versionnumber": tc.versionnumber,
-                    "userid": userid,
-                    "query": "readtestcase"
-                };
-                const testcasedata = await utils.fetchData(inputs, "design/readTestCase_ICE", fnName);
-                if (testcasedata == "fail") return "fail";
-                allTestcaseObj[tc._id] = testcasedata[0];
+            // Step 2: Get Testcasesteps
+            for (const tc of testcases) {
+                if (allTestcaseObj[tc._id] === undefined) {
+                    inputs = {
+                        "testcaseid": tc._id,
+                        "screenid": tc.screenid,
+                        "versionnumber": tc.versionnumber,
+                        "userid": userid,
+                        "query": "readtestcase"
+                    };
+                    const testcasedata = await utils.fetchData(inputs, "design/readTestCase_ICE", fnName);
+                    if (testcasedata == "fail") return "fail";
+                    allTestcaseObj[tc._id] = testcasedata[0];
+                }
             }
-        }
 
-        testcases.forEach(async (tc) => {
-            allTestcaseSteps.push({
-                "template": "",
-                "testcase": allTestcaseObj[tc._id].steps,
-                "testcasename": allTestcaseObj[tc._id].name,
-                "screenid": tc.screenid,
-                "screenname": tc.screenname
+            testcases.forEach(async (tc) => {
+                allTestcaseSteps.push({
+                    "template": "",
+                    "testcase": allTestcaseObj[tc._id].steps,
+                    "testcasename": allTestcaseObj[tc._id].name,
+                    "screenid": tc.screenid,
+                    "screenname": tc.screenname
+                });
             });
-        });
 
-        scenario.testcase = JSON.stringify(allTestcaseSteps);
+            scenario.testcase = JSON.stringify(allTestcaseSteps);
+        }
         // Step 3: Get qcdetails
         scenario.qcdetails = [];
         for (var k = 0; k < integrationType.length; ++k) {
@@ -90,7 +93,7 @@ class TestSuiteExecutor {
     };
 
     /** Function responsible for creating execution request json that will be consumed by ICE */
-    prepareExecutionRequest = async (batchData, userInfo) => {
+    prepareExecutionRequest = async (batchData, userInfo, gitflag) => {
         if (!batchData.executionEnv || batchData.executionEnv === "") {
             batchData.executionEnv = "default";
         }
@@ -103,9 +106,33 @@ class TestSuiteExecutor {
             "executionIds": [],
             "testsuiteIds": [],
             "suitedetails": [],
-            "reportType": "functionalTesting"
+            "reportType": "functionalTesting",
+            "versionname":"NA"
         };
-        const batchInfo = batchData.batchInfo;
+        const gitInfo = batchData.gitInfo;
+        if(gitflag){
+            var folderPath = gitInfo['folderPath'];
+            if(!folderPath.startsWith("avoassuretest_artifacts")){
+                folderPath="avoassuretest_artifacts/"+folderPath
+            }
+            const inputs = {
+                "gitbranch":gitInfo['gitbranch'],
+                "gitVersionName":gitInfo['gitVersionName'],
+                "folderPath":folderPath,
+                "userid":userInfo.userid
+            };
+            const module_data = await utils.fetchData(inputs, "git/importFromGit_ICE");
+            if (module_data == "gitfail") return "gitfail";
+            if(module_data == "empty") return "empty";
+            execReq['apptype']=module_data.batchInfo[0].apptype;
+            execReq['versionname']=gitInfo['gitVersionName'];
+            var batchInfo = module_data.batchInfo;
+            var suite_details=module_data.suitedetails;
+            const gittaskApproval = await utils.approvalStatusCheck(batchInfo);
+            if (gittaskApproval.res !== "pass") return taskApproval.res;
+        } else{
+            var batchInfo = batchData.batchInfo;
+        }
         for (const suite of batchInfo) {
             const testsuiteid = suite.testsuiteId;
             const scenarioList = [];
@@ -128,16 +155,16 @@ class TestSuiteExecutor {
             const suiteDetails = suite.suiteDetails;
             for (const tsco of suiteDetails) {
                 var integrationType = [];
-                if (batchData.integration && batchData.integration.alm.url) {
+                if (batchData.integration && batchData.integration.alm && batchData.integration.alm.url) {
                     integrationType.push("ALM");
                 }
-                if (batchData.integration && batchData.integration.qtest.url) {
+                if (batchData.integration && batchData.integration.qtest && batchData.integration.qtest.url) {
                     integrationType.push("qTest");
                 }
-                if (batchData.integration && batchData.integration.zephyr.url) {
+                if (batchData.integration && batchData.integration.zephyr && batchData.integration.zephyr.url) {
                     integrationType.push("Zephyr");
                 }
-                var scenario = await this.fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType);
+                var scenario = await this.fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType, gitflag);
                 if (scenario == "fail") return "fail";
                 scenario = Object.assign(scenario, tsco);
                 suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibilityParameters;
@@ -146,7 +173,11 @@ class TestSuiteExecutor {
                 suiteObj.scenarioNames.push(scenario.scenarioName);
                 suiteObj.scenarioIds.push(scenario.scenarioId);
                 const scenarioObj = {};
-                scenarioObj[scenario.scenarioId] = scenario.testcase;
+                if(gitflag){
+                    scenarioObj[scenario.scenarioId] = suite_details[tsco.scenarioId];
+                } else {
+                    scenarioObj[scenario.scenarioId] = scenario.testcase;
+                }
                 scenarioObj.qcdetails = scenario.qcdetails;
                 scenarioList.push(scenarioObj);
             }
@@ -159,7 +190,7 @@ class TestSuiteExecutor {
     };
 
     /** Function responsible for generating batchid and executionid dfor given list of testsuiteid */
-    generateExecutionIds = async (execIds, tsuIds, userid) => {
+    generateExecutionIds = async (execIds, tsuIds, userid, versionname) => {
         for (const tsuid of tsuIds) {
             if (execIds.execid[tsuid] == undefined) execIds.execid[tsuid] = null;
         }
@@ -168,7 +199,8 @@ class TestSuiteExecutor {
             "executedby": userid,
             "testsuiteids": tsuIds,
             "executionids": execIds.execid,
-            "batchid": execIds.batchid
+            "batchid": execIds.batchid,
+            "versionname": versionname
         };
         const newExecIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "generateExecutionIds");
         if (newExecIds == "fail") return "fail";
@@ -213,7 +245,7 @@ class TestSuiteExecutor {
         //const currtime = new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().replace('T',' ').replace('Z','');
         const reportData = {
             'rows': [{ 'id': '1', 'Keyword': '', 'parentId': '', 'status': status, 'Step ': '', 'Comments': null, 'StepDescription': msg, "screenshot_path": null, "EllapsedTime": "0:00:00.000000", "Remark": "", "testcase_details": "" }],
-            'overallstatus': [{ 'EllapsedTime': '0:00:00.000000', 'EndTime': currtime, 'browserVersion': 'NA', 'StartTime': currtime, 'overallstatus': status, 'browserType': 'NA' }],
+            'overallstatus': [{ 'EllapsedTime': '0:00:00.000000', 'EndTime': currtime, 'browserVersion': 'NA', 'versionname': 'NA', 'StartTime': currtime, 'overallstatus': status, 'browserType': 'NA' }],
             'commentsLength': []
         }
         const executionIds = batchData.executionIds;
@@ -272,7 +304,7 @@ class TestSuiteExecutor {
                     } else rsv(constants.SOCK_NA);
                 } else if (event == "return_status_executeTestSuite") {
                     if (status === "success") {
-                        if (execType == "SCHEDULE") await _this.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
+                        if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
                     } else if (status === "skipped") {
                         const execStatus = "Skipped";
                         var errMsg = (execType == "SCHEDULE") ? "due to conflicting schedules" :
@@ -358,7 +390,7 @@ class TestSuiteExecutor {
                             if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                             report_result["testSuiteDetails"] = execReq["suitedetails"]
                             if (resultData.userTerminated) result = "UserTerminate";
-                            if (execType == "API") result = [d2R, status];
+                            if (execType == "API") result = [d2R, status, resultData.testStatus];
                             if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
                                 notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
                                 rsv(constants.DO_NOT_PROCESS);
@@ -389,17 +421,26 @@ class TestSuiteExecutor {
     executionFunction = async (batchExecutionData, execIds, userInfo, execType) => {
         //const icename = (execType=='API')? userInfo.icename : myserver.allSocketsICEUser[userInfo.username];
         var icename = userInfo.icename;
+        var gitflag = false;
         //userInfo.icename=icename;
         redisServer.redisSubServer.subscribe('ICE2_' + icename);
         //var iceStatus = await checkForICEstatus(icename, execType);
         //if (iceStatus != null) return iceStatus;
-        const taskApproval = await utils.approvalStatusCheck(batchExecutionData.batchInfo);
-        if (taskApproval.res !== "pass") return taskApproval.res;
+        var gitInfo = batchExecutionData.gitInfo;
+        for (let key in gitInfo){
+            if(gitInfo[key]!='') gitflag=true; break;
+        }
+        if(!gitflag){
+            const taskApproval = await utils.approvalStatusCheck(batchExecutionData.batchInfo);
+            if (taskApproval.res !== "pass") return taskApproval.res;
+        }
         /*const countStatus =*/ await this.counterUpdater(batchExecutionData.batchInfo.length, userInfo.invokinguser);
         // if (countStatus == "fail") return "fail";
-        const executionRequest = await this.prepareExecutionRequest(batchExecutionData, userInfo);
+        const executionRequest = await this.prepareExecutionRequest(batchExecutionData, userInfo, gitflag);
         if (executionRequest == "fail") return "fail";
-        const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser);
+        if (executionRequest == "gitfail") return "gitfail";
+        if (executionRequest == "empty") return "empty";
+        const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser, executionRequest.versionname);
         if (currExecIds == "fail") return "fail";
         executionRequest.batchId = currExecIds.batchid;
         executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
@@ -417,4 +458,8 @@ module.exports.execute = async (batchExecutionData, execIds, userInfo, execType)
     }
     var result = await testSuiteExecutor.executionFunction(batchExecutionData, execIds, userInfo, execType)
     return result;
+}
+
+module.exports.generateExecutionId = async (execIds, tsuIds, userid, versionName) => {
+    return await testSuiteExecutor.generateExecutionIds(execIds, tsuIds, userid, versionName);
 }
