@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { v4 as uuid } from 'uuid';
 import { ScrollBar } from '../../global';
 import { ReactSortable } from 'react-sortablejs';
 import "../styles/Table.scss";
@@ -16,11 +17,45 @@ const Table = props => {
     const headerRef = useRef();
     const rowRef = useRef();
 
-    const updateHeaders = (newHeader, headerId) => {
+    const onAdd = type => {
+        if (type==="col") {
+            if (props.headers.length >= 15) 
+                props.setShowPop({title: 'Error', content: 'Table cannot have more than 15 columns', type: 'message'});
+            else {
+                let newHeaders = [...props.headers];
+                
+                newHeaders.push({
+                    __CELL_ID__: uuid(),
+                    name: `C${props.headerCounter}`
+                })
+    
+                props.setHeaders(newHeaders);
+                props.setHeaderCounter(count => count + 1);
+            }
+        }
+        else if (type === "row") {
+            if (props.data.length >= 199) 
+                props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
+            else {
+                let newData = [...props.data];
+            
+                newData.push({__CELL_ID__: uuid()})
+    
+                props.setData(newData);
+            }
+        }
+    }
+
+    const updateHeaders = (newHeader, headerId, invalidFlag) => {
+
+        if (invalidFlag) {
+            props.setShowPop({title: "Duplicate Header Name", content: "Header name is invalid or duplicate", type: "message"})
+            return;
+        }
         let newHeaders = [...props.headers];
         let oldHeaderName;
         newHeaders.forEach(header => {
-            if (header.id === headerId) {
+            if (header.__CELL_ID__ === headerId) {
                 oldHeaderName = header.name
                 header.name = newHeader;
             }
@@ -39,8 +74,8 @@ const Table = props => {
         let newData = [...props.data];
         
         for (let row of newData) {
-            if (row.id === rowId) {
-                props.undoStack.push({ rowId: row.id, colId: headerId, value: row[columnName]});
+            if (row.__CELL_ID__ === rowId) {
+                props.undoStack.push({ rowId: row.__CELL_ID__, colId: headerId, value: row[columnName]});
                 row[columnName] = value;
                 break;
             }
@@ -86,7 +121,7 @@ const Table = props => {
                 { ...props }
                 rowRef={rowRef}
                 updateCheckList={updateCheckList}
-                onAdd={props.onAdd}
+                onAdd={onAdd}
             />
             {/* <ScrollBar scrollId="dt__outer" hideYbar={true}> */}
             <div className="dt__headersMainContainer full__dt">
@@ -95,8 +130,8 @@ const Table = props => {
                         <Headers
                             headers={props.headers} 
                             setHeaders={props.setHeaders}
-                            onAdd={props.onAdd}
                             updateCheckList={updateCheckList}
+                            onAdd={onAdd}
                         />
                     </div>
                 </div>
@@ -133,10 +168,10 @@ const Headers = ({headers, setHeaders, updateCheckList, onAdd}) => {
             { headers.map((header, headerIndex) => {
                 return (
                     <HeaderCell  
-                        key={`header-${header.id}`}
+                        key={`header-${header.__CELL_ID__}`}
                         headerIndex={headerIndex}
                         headerName={header.name}
-                        headerId={header.id}
+                        headerId={header.__CELL_ID__}
                         headers={headers}
                         updateCheckList={updateCheckList}
                     />
@@ -188,7 +223,7 @@ const Rows = props => {
             { props.data.map((row, rowIndex)=>{
                 return (
                     <Row 
-                        key={`row-${row.id}`}
+                        key={`row-${row.__CELL_ID__}`}
                         checkList={props.checkList}
                         setCheckList={props.setCheckList}
                         updateTableData={props.updateTableData}
@@ -226,9 +261,9 @@ const RowNumColumn = props => {
                 { props.data.map((row, rowIndex)=>{
                     return (
                         <div 
-                            key={`rownum-${row.id}`}
+                            key={`rownum-${row.__CELL_ID__}`}
                             className="dt__table_numbered_column " 
-                            onClick={(e)=>props.updateCheckList(e, "row", row.id)}
+                            onClick={(e)=>props.updateCheckList(e, "row", row.__CELL_ID__)}
                             data-test="dt__number_cell"
                         >
                             {rowIndex+2}
@@ -257,13 +292,13 @@ const SubHeaderRow = props => {
             { props.headers.map(header => {
                 return (
                     <SubHeaderCell 
-                        key={`cell-header-${header.id}`}
+                        key={`cell-header-${header.__CELL_ID__}`}
                         columnName={header.name}
                         initialValue={header.name}
                         updateHeaders={props.updateHeaders}
                         headers={props.headers}
-                        headerId={header.id}
-                        selected={props.checkList.list.includes(`sel||col||${header.id}`)}
+                        headerId={header.__CELL_ID__}
+                        selected={props.checkList.list.includes(`sel||col||${header.__CELL_ID__}`)}
                     />
                 )
             }) }
@@ -291,16 +326,12 @@ const SubHeaderCell  = props => {
     const onBlur = e => {
         let invalidHeader = false;
         props.headers.forEach(header => {
-            if (!value.trim() || (header.name === value && header.id!==props.headerId)) invalidHeader = true;
+            if (!value.trim() || (header.name === value && header.__CELL_ID__!==props.headerId) || value === "__CELL_ID__") invalidHeader = true;
         })
 
-        if (invalidHeader){
-           console.log("ERROR")
-            return false;
-        }
-        else {
-            props.updateHeaders(value, props.headerId)
-        }
+        if (invalidHeader) 
+            setValue(props.initialValue||'')
+        props.updateHeaders(value, props.headerId, invalidHeader)
         return true;
     };
 
@@ -326,20 +357,20 @@ const Row = props => {
             { props.headers.map(header => {
                 return (
                     <DataCell 
-                        key={`cell-${props.row.id}-${header.id}`}
-                        rowId={props.row.id}
+                        key={`cell-${props.row.__CELL_ID__}-${header.__CELL_ID__}`}
+                        rowId={props.row.__CELL_ID__}
                         columnName={header.name}
-                        headerId = {header.id}
-                        initialValue={props.row[header.name]}
+                        headerId = {header.__CELL_ID__}
+                        initialValue={props.row[header.name] || ''}
                         updateTableData={props.updateTableData}
                         selected={
-                            props.checkList.list.includes(`sel||row||${props.row.id}`) ||
-                            props.checkList.list.includes(`sel||col||${header.id}`)
+                            props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`) ||
+                            props.checkList.list.includes(`sel||col||${header.__CELL_ID__}`)
                         }
                     />
                 )
             }) }
-            <div className={"dt__table_add_column "+ (props.checkList.list.includes(`sel||row||${props.row.id}`)?"dt__selected_cell":"")} />
+            <div className={"dt__table_add_column "+ (props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`)?"dt__selected_cell":"")} />
         </div>
     )
 }
@@ -350,10 +381,10 @@ const Row = props => {
 */
 
 const DataCell  = props => {
-    const [value, setValue] = useState(props.initialValue || '');
+    const [value, setValue] = useState(props.initialValue);
 
     useEffect(() => {
-        setValue(props.initialValue || '')
+        setValue(props.initialValue)
     }, [props.initialValue]);
 
     const onChange = e => setValue(e.target.value);
@@ -362,7 +393,10 @@ const DataCell  = props => {
         if (event.keyCode === 13) onBlur();
     }
 
-    const onBlur = e => props.updateTableData(value, props.rowId, props.columnName, props.headerId)
+    const onBlur = e => {
+        if (props.initialValue !== value)
+            props.updateTableData(value, props.rowId, props.columnName, props.headerId)
+    }
 
     return (
         <div className={"dt__cell "+(props.selected?"dt__selected_cell":'')} data-test="dt__body_cell">

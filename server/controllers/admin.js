@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const TokenGenerator = require('uuid-token-generator')
 const async = require('async');
 const fs = require('fs');
+const path = require('path');
 const archiver = require('archiver');
 const activeDirectory = require('activedirectory');
 const Client = require("node-rest-client").Client;
@@ -1889,9 +1890,10 @@ exports.exportProject = async (req, res) => {
 		};
 		const proj_data = await utils.fetchData(inputs, "admin/exportProject", fnName);
 		if (proj_data == "fail") return res.send("fail");
-		let projectPath = './assets/projects/'+proj_name;
-		if (!fs.existsSync('./assets/projects')){
-			fs.mkdirSync( './assets/projects');
+		const outputPath = path.join(__dirname, './../../output/projects');
+		let projectPath = path.join(outputPath, proj_name);
+		if (!fs.existsSync(outputPath)){
+			fs.mkdirSync(outputPath);
 		}
 		if (!fs.existsSync(projectPath)) {
 			fs.mkdirSync(projectPath);

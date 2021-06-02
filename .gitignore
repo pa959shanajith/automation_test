@@ -6,3 +6,5 @@ npm.cmd
 assets/wkhtmltox
 *.bat
 server/config/.tokens
+public/*
+output/*
