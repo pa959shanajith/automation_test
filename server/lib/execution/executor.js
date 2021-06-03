@@ -55,15 +55,16 @@ class TestSuiteExecutor {
                 }
             }
 
-            testcases.forEach(async (tc) => {
-                allTestcaseSteps.push({
-                    "template": "",
-                    "testcase": allTestcaseObj[tc._id].steps,
-                    "testcasename": allTestcaseObj[tc._id].name,
-                    "screenid": tc.screenid,
-                    "screenname": tc.screenname
-                });
+        testcases.forEach(async (tc) => {
+            allTestcaseSteps.push({
+                "template": "",
+                "testcase": allTestcaseObj[tc._id].steps,
+                "testcasename": allTestcaseObj[tc._id].name,
+                "screenid": tc.screenid,
+                "screenname": tc.screenname,
+                "datatables": tc.datatables
             });
+        });
 
             scenario.testcase = JSON.stringify(allTestcaseSteps);
         }

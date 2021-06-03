@@ -686,8 +686,7 @@ exports.exportToExcel = async (req, res) =>{
 		var d = req.body;
 		var excelMap = await getModule({modName:null,cycId:null,"tab":"tabCreate","projectid":d.projectid,"moduleid":d.moduleid})
 		logger.info("Writing Module structure to Excel");
-		var dir = './../../excel';
-		var excelDirPath = path.join(__dirname, dir);
+		var excelDirPath = path.join(__dirname, './../../output');
 		var filePath = path.join(excelDirPath, 'samp234.xlsx');
 
 		try {
@@ -769,7 +768,7 @@ exports.exportToExcel = async (req, res) =>{
 			min_scen_idx=tc_count+1;
 		}
 		//save it
-		wb.write('./excel/samp234.xlsx',function (err) {
+		wb.write(filePath,function (err) {
 			if (err) return res.send('fail');
 			res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 			var rstream = fs.createReadStream(filePath);

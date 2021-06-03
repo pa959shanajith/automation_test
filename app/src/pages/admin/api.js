@@ -1067,7 +1067,7 @@ export const unlockUser = async(user) => {
   api returns
 */
 
-export const gitSaveConfig = async(action, userId,projectId,gitAccToken,gitUrl) => { 
+export const gitSaveConfig = async(action, userId,projectId,gitAccToken,gitUrl,gitUsername,gitEmail) => { 
     try{
         const res = await axios(url+'/gitSaveConfig', {
             method: 'POST',
@@ -1078,7 +1078,9 @@ export const gitSaveConfig = async(action, userId,projectId,gitAccToken,gitUrl) 
                     userId: userId,
                     projectId: projectId,
                     gitAccToken: gitAccToken,
-                    gitUrl: gitUrl},
+                    gitUrl: gitUrl,
+                    gitUsername:gitUsername,
+                    gitEmail:gitEmail},
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){

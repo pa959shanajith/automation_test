@@ -338,6 +338,7 @@ exports.saveQcDetails_ICE = async (req, res) => {
 				"qcproject": itr.project,
 				"qctestcase": itr.testcase,
 				"qctestset": itr.testset,
+				"qcfolderid": itr.folderid,
 				"query": "saveQcDetails_ICE"
 			};
 			const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", fnName);

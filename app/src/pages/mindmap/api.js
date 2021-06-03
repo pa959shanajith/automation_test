@@ -449,6 +449,14 @@ export const exportToGit = async(data) => {
             console.error(res.data)
             return {error:"Input branch doesn't exist in Git. Please verify!"}
         }
+        if(res.data==='Invalid url'){
+            console.error(res.data)
+            return {error:"Error in Git config: Invalid Git clone path"}
+        }
+        if(res.data==='Invalid token'){
+            console.error(res.data)
+            return {error:"Error in Git config: Invalid Git access token"}
+        }
         if(res.status===200 && res.data !== "fail"){          
             return res.data;
         }

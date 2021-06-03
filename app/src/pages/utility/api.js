@@ -71,7 +71,7 @@ export const createDataTable = async(arg) => {
             },
             data: {
                 action: "create",
-                datatablename: arg.tableName,
+                name: arg.tableName,
                 dtheaders: arg.headers,
                 datatable: arg.data,
             }
@@ -100,7 +100,7 @@ export const editDataTable = async(arg) => {
             },
             data: {
                 action: "edit",
-                datatablename: arg.tableName,
+                name: arg.tableName,
                 dtheaders: arg.headers,
                 datatable: arg.data,
             }
@@ -120,7 +120,7 @@ export const editDataTable = async(arg) => {
     }
 }
 
-export const confirmDeleteDataTable = async(arg) => {
+export const confirmDeleteDataTable = async(tableName) => {
     try{
         const res = await axios(url+'/manageDataTable', {
             method: 'POST',
@@ -129,7 +129,7 @@ export const confirmDeleteDataTable = async(arg) => {
             },
             data: {
                 action: "deleteConfirm",
-                datatablename: arg.tableName
+                name: tableName
             }
         });
         if(res.status === 401){
@@ -147,7 +147,7 @@ export const confirmDeleteDataTable = async(arg) => {
     }
 }
 
-export const deleteDataTable = async(arg) => {
+export const deleteDataTable = async(tableName) => {
     try{
         const res = await axios(url+'/manageDataTable', {
             method: 'POST',
@@ -156,7 +156,7 @@ export const deleteDataTable = async(arg) => {
             },
             data: {
                 action: "delete",
-                datatablename: arg.tableName
+                name: tableName
             }
         });
         if(res.status === 401){
@@ -200,7 +200,7 @@ export const fetchDataTables = async() => {
     }
 }
 
-export const fetchDataTable = async(arg) => {
+export const fetchDataTable = async(tableName) => {
     try{
         const res = await axios(url+'/getDatatableDetails', {
             method: 'POST',
@@ -209,8 +209,88 @@ export const fetchDataTable = async(arg) => {
             },
             data: {
                 action: "datatable",
-                datatablename: arg.tableName,
+                name: tableName,
             }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return { error: 'invalid session' };
+        }
+        if(res.status === 200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error:'Failed to Fetch DataTables' }
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to Fetch DataTables'}
+    }
+}
+
+export const exportDataTable = async(arg) => {
+    try{
+        var apiUrl = "exportToDtCSV";
+        let excelType = "";
+        switch(arg.exportFormat.toLowerCase()){
+            case "csv": apiUrl = "exportToDtCSV"; break;
+            case "xlsx": excelType = "xlsx"; apiUrl = "exportToDtExcel"; break;
+            case "xls": excelType = "xls"; apiUrl = "exportToDtExcel"; break;
+            case "xml": apiUrl = "exportToDtXML"; break;
+            default: break;
+        }
+        const res = await axios(`${url}/${apiUrl}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                name: arg.tableName,
+                filename: arg.filename,
+                excelType: excelType
+            },
+            credentials: 'include',
+            responseType:'arraybuffer'
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return { error: 'invalid session' };
+        }
+        if(res.status === 200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error:'Failed to Fetch DataTables' }
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to Fetch DataTables'}
+    }
+}
+
+
+export const importDataTable = async(arg) => {
+    try{
+        var apiUrl = "importDtFromCSV";
+        switch(arg.importFormat.toLowerCase()){
+            case "csv": apiUrl = "importDtFromCSV"; break;
+            case "excel": apiUrl = "importDtFromExcel"; break;
+            case "xml": apiUrl = "importDtFromXML"; break;
+            default: break;
+        }
+
+        let apiBody =  null;
+        if (arg.flag === "")
+            apiBody = { content: arg.content };
+        else if(arg.flag === "sheetname")
+            apiBody = { content: arg.content, flag: "sheetname" }
+        else 
+            apiBody = { content: arg.content, flag: arg.flag, sheetname: arg.sheetname };
+
+        const res = await axios(`${url}/${apiUrl}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: apiBody
         });
         if(res.status === 401){
             RedirectPage(history)

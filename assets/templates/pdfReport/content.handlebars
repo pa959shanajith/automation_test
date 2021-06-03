@@ -335,7 +335,9 @@
       <label>Domain</label><span>: {{domainName}}</span><br />
       <label>Browser Type</label><span class="capitalize">: {{browserType}}</span><br />
       <label>Browser Version</label><span>: {{browserVersion}}</span>
+      {{#ifnotEquals versionname undefined}}
       <label>Version Name</label><span>: {{versionname}}</span>
+      {{/ifnotEquals}}
    </div>
    <div id="rightSummaryFunc" class="rightSummaryFunc">
       <div class="reportStatus">

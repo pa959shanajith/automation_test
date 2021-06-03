@@ -1030,8 +1030,9 @@
             <span class="capitalize">: {{browserType}}</span>
             <label>Browser Version</label>
             <span>: {{browserVersion}}</span>
-            <label>Version Name</label>
-            <span>: {{versionname}}</span>
+            {{#ifnotEquals versionname undefined}}
+            <label>Version Name</label><span>: {{versionname}}</span>
+            {{/ifnotEquals}}
             <span style='visibility:hidden' class="reportId">{{reportId}}</span>
             <span style='visibility:hidden' class="executionId">{{executionId}}</span>
          </div>
@@ -1087,10 +1088,14 @@
             </thead>
             <tbody>
                {{#each rows}}
-               {{#ifnotEquals status "Skipped"}}
                <tr style="width: 100%;" class="reportdetailsrow" data-id="{{id}}" data-parentid="{{parentId}}">
                   <td class="rDid tabCont">{{slno}}</td>
+                  {{#ifEquals status "Skipped"}}
+                     <td class="rDstep tabCont iteration"></td>
+                  {{/ifEquals}}
+                  {{#ifnotEquals status "Skipped"}}
                   <td class="rDstep tabCont iteration">{{Step}}</td>
+                  {{/ifnotEquals}}
                   <td class="{{getClass StepDescription}}"
                      style="display:none;width:0px; padding-left: 10px; font-weight:{{getStyle StepDescription}}">
                      {{StepDescription}}
@@ -1136,6 +1141,9 @@
                   {{#ifEquals status "Terminate"}}
                      <td class="rDActualRes tabCont">{{StepDescription}}</td>
                    {{/ifEquals}}
+                   {{#ifEquals status "Skipped"}}
+                     <td class="rDActualRes tabCont">Skipped</td>
+                   {{/ifEquals}}
                   <td class="rDstatus tabCont openscreenshot" style="color:{{getColor status}};"
                      data-screenshot="{{screenshot_path}}">{{status}}</td>
                   <td class="rDellaps tabCont">{{EllapsedTime}}</td>
@@ -1144,7 +1152,6 @@
                      <span class="opendescpopup" title="Create Issue">{{jira_defect_id}}</span>
                   </td>
                </tr>
-               {{/ifnotEquals}}
                {{/each}}
             </tbody>
          </table>
