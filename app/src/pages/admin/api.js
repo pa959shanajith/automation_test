@@ -1124,3 +1124,34 @@ export const gitEditConfig = async(userId, projectId) => {
         return {error:"Failed to fetch git configurations."}
     }
 }
+
+/*Component exportProject
+  props : {projectid,projectName} 
+  api returns downloadable data
+*/
+
+export const exportProject = async(props) => {
+    try{
+        const res = await axios(url+'/exportProject', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include',
+            responseType:'arraybuffer'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:'invalid session'};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:'Failed to export excel'}
+    }catch(err){
+        console.error(err)
+        return {error:'Failed to export excel'}
+    }
+}

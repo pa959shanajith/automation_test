@@ -96,7 +96,8 @@ const  AllocateByIce = ({displayError,setLoading,selectedPool,setSelectedPool,sa
     return(
         <div className='edit_ice-pool'>
             <div className="col-xs-9 form-group assignBox-container allocate_by_ice-container">
-                <AssignOptionBox 
+                <AssignOptionBox
+                    type={'ICE'}
                     FilterComp={<FilterComp clickInp={clickInp} inpRef={inpRef} setFilter={FilterPool} data={poolList}/>}
                     disable={selectedPool?false:true} leftBox={iceData} rightBox={poolIceData} setLeftBox={setIceData} setRightBox={setPoolIceData}
                 />
