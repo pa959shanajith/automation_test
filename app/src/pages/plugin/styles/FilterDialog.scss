@@ -1,7 +1,8 @@
 .filter__pop{
     .modal__body{
-        height: 250px;
+        height: 220px;
         padding-right: 5px;
+        box-sizing: content-box;
     }
     .modal__content{
         width: 130%;
