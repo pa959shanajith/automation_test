@@ -16,7 +16,7 @@ import Design from './pages/design';
 import Utility from './pages/utility';
 import Report from './pages/report';
 import Integration from './pages/integration';
-import {ScreenOverlay} from './pages/global';
+import {ScreenOverlay,ErrorBoundary} from './pages/global';
 import SocketFactory from './SocketFactory';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
@@ -37,7 +37,9 @@ const App = () => {
     <Provider store={store}>
       {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
       <ProgressBar />
-      <RouteApp/>
+      <ErrorBoundary>
+        <RouteApp/>
+      </ErrorBoundary>
     </Provider>
   );
 }
