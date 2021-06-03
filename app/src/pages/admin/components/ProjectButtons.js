@@ -142,9 +142,9 @@ const ProjectButtons = (props) => {
             }
             var result = await exportProject(arg)
             if(result.error){displayError(result.error);return;}
-            var val = downloadFile(result)
+            var val = downloadFile({result,projectName:props.selProject})
             setLoading(false)
-            setPopup({
+            setPopupState({
                 title:'Mindmap',
                 content:val?'Data Exported Successfully.':'Data Export Failed.',
                 show:true
@@ -294,7 +294,7 @@ const ProjectButtons = (props) => {
                 :
                 <>
                     <button className="a__btn pull-right " onClick={()=>{updateProject()}}  title="Update Project">Update</button>
-                    <button className="a__btn pull-right " onClick={()=>{exportProj()}}  title="Export Project">Export</button>
+                    <button className="a__btn pull-right btn-project-cust" onClick={()=>{exportProj()}}  title="Export Project">Export</button>
                 </>
                 }
             </div> 
@@ -307,13 +307,13 @@ function : downloadFile()
 Purpose : download zip file
 */
 
-const downloadFile = ({data}) =>{
+const downloadFile = ({result,projectName}) =>{
     try{
         var file = new Blob([result], { type: 'application/zip' });
         var fileURL = URL.createObjectURL(file);
         var a = document.createElement('a');
         a.href = fileURL;
-        a.download = fname+'.zip';
+        a.download = projectName+'.zip';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
