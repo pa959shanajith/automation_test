@@ -7,7 +7,7 @@ import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import Pagination from '../components/Pagination';
 
-const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
+const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
 
     const nulluser = "5fc137cc72142998e29b5e63";
     const filter_data = useSelector(state=>state.plugin.FD)
@@ -26,24 +26,14 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [moduleScheduledate,setModuleScheduledate] = useState({})
     const [sort,setSort] = useState(true)
-    const [scheDetails,setScheDetails] = useState(true)
 
     useEffect(()=>{
         getScheduledDetails()
     }, []);
 
-    useEffect(()=>{
-        setTimeout(() => {
-            getScheduledDetails();
-            setScheDetails(!scheDetails)
-            var schFilterData = document.getElementById("scheduledSuitesFilterData");
-            if(schFilterData !== null && schFilterData!==undefined)
-                schFilterData.selectedIndex = "0"; 
-        }, 60000);
-    }, [scheDetails]);
-
     const getScheduledDetails = async () => {
         try{
+            setLoading('Loading...');
             const result = await getScheduledDetails_ICE();
             if (result && result.length > 0 && result !== "fail") {
                 for (var k = 0; k < result.length; k++) {
@@ -55,29 +45,31 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                 }
                 var scheduledDataParsed = [];
                 for(var i =result.length-1 ; i>=0  ; i-- ) {
-                    const eachScenarioDetails = result[i].scenariodetails[0];
+                    const eachScenarioDetails = result[i].scenariodetails;
                     for(var j =eachScenarioDetails.length-1 ; j>=0  ; j-- ) {
                         let newScheduledScenario = {};
                         newScheduledScenario["target"] = result[i].target;
-                        newScheduledScenario["cycleid"] = eachScenarioDetails[j].cycleid;
+                        newScheduledScenario["cycleid"] = eachScenarioDetails[j][0].cycleid;
                         newScheduledScenario["scheduledby"] = result[i].scheduledby;
                         newScheduledScenario["scheduledatetime"] = result[i].scheduledatetime;
                         newScheduledScenario["testsuitenames"] = result[i].testsuitenames;
                         newScheduledScenario["browserlist"] = result[i].browserlist;
                         newScheduledScenario["_id"] = result[i]._id;
                         newScheduledScenario["status"] = result[i].status;
-                        newScheduledScenario["scenarioname"] = eachScenarioDetails[j]["scenarioname"];
-                        newScheduledScenario["appType"] = eachScenarioDetails[j]["appType"];
-                        newScheduledScenario["poolname"] =  eachScenarioDetails[j]["poolname"];
+                        newScheduledScenario["scenarioname"] = eachScenarioDetails[j][0]["scenarioname"];
+                        newScheduledScenario["appType"] = eachScenarioDetails[j][0]["appType"];
+                        newScheduledScenario["poolname"] =  eachScenarioDetails[j][0]["poolname"];
                         scheduledDataParsed.push(newScheduledScenario);
                     }
                 } 
                 setScheduledData(scheduledDataParsed);
                 setScheduledDataOriginal(scheduledDataParsed);
             }
+            setLoading(false);
             document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
         }catch (error) {
             setPopupState({show:true,title:"Error",content:"Failed to fetch Scheduled Data."});
+            setLoading(false);
             console.log(error)
         }
     }
@@ -161,6 +153,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
             setPopupState({show:true,title:"Schedule Test Suite",content:"Error in scheduling Testsuite. Scheduling failed"});
         }
         setExecAction("serial");
+        setExecEnv("default");
         setBrowserTypeExe([]);
     }
 
@@ -302,6 +295,7 @@ const ScheduleContent = ({smartMode, execEnv, syncScenario, setBrowserTypeExe,se
                             <option>Skipped</option>
                             <option>Show All</option>
                         </select>
+                        <div onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
                     </div>
 
                     <div className="scheduleDataTable">

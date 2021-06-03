@@ -87,6 +87,13 @@ exports.updateTestCase_ICE = async (req, res) => {
 			"import_status": tcData.import_status,
 			"copiedTestCases": tcData.copiedTestCases,
 		};
+		inputs.datatables = [];
+		for(var i=0;i<testcasesteps.length;++i) {
+			if(testcasesteps[i].keywordVal=="getParam" && 
+				testcasesteps[i].inputVal[0].split(';')[0].startsWith("avoassure")) {
+					inputs.datatables.push(testcasesteps[i].inputVal[0].split(';')[0].split("/")[1]);
+			}
+		}
 		const result = await utils.fetchData(inputs, "design/updateTestCase_ICE", fnName);
 		if (result == "fail") return res.send("Error occurred in updateTestCaseQuery : Fail");
 		res.send("success");
@@ -152,6 +159,7 @@ exports.debugTestCase_ICE = function (req, res) {
 												template: "",
 												testcasename: testcases[i].name,
 												testcase: testcases[i].steps,
+												datatables: testcases[i].datatables,
 												apptype: apptype
 											};
 										}

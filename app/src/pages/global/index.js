@@ -4,7 +4,7 @@ import FooterTwo from './components/FooterTwo';
 import Header from './components/Header';
 import RedirectPage from './components/RedirectPage';
 import ScreenOverlay from './components/ScreenOverlay';
-import ScrollBar from './components/ScrollBar';
+import ScrollBar, { updateScrollBar } from './components/ScrollBar';
 import PopupMsg from './components/PopupMsg';
 import ModalContainer from './components/ModalContainer';
 import ActionBar from './components/ActionBar';
@@ -45,5 +45,6 @@ export { Header,
         CalendarComp,
         TimeComp,
         ErrorPage,
-        ErrorBoundary
+        ErrorBoundary,
+        updateScrollBar
     };

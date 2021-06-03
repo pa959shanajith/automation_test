@@ -1,5 +1,6 @@
 import React, { useState, Fragment} from 'react';
 import "../styles/MappedLabel.scss";
+import { updateScrollBar } from '../../global';
 import InfoPopup from './InfoPopup';
 
 const MappedLabel = props => {
@@ -26,7 +27,7 @@ const MappedLabel = props => {
                     { props.selected.includes(`${props.mapIdx}-0`) && !props.unSynced &&
                         <button><img className="mlalm__syncBtn" alt="s-ic" onClick={props.handleUnSync ? ()=>props.handleUnSync(props.type) : null} src="static/imgs/ic-qcUndoSyncronise.png" /></button>
                     }
-                    { typeof(props.list) === "object" && props.list.length>1 && <button onClick={()=>setShow(!show)}>
+                    { typeof(props.list) === "object" && props.list.length>1 && <button onClick={()=>{setShow(!show); updateScrollBar()}}>
                         <img alt="mappedScrArrow" src={`static/imgs/alm_arrow_${show?"up":"down"}.svg`}/>
                     </button> }
                 </div>

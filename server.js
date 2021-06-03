@@ -168,7 +168,6 @@ if (cluster.isMaster) {
 		});
 
 		// For Selecting Authentication Strategy and adding required routes
-		const utils = require("./server/lib/utils");
 		const authlib = require("./server/lib/auth");
 		const authconf = authlib();
 		const auth = authconf.auth;
@@ -437,6 +436,14 @@ if (cluster.isMaster) {
 		//Utility plugins
 		app.post('/Encrypt_ICE', auth.protect, utility.Encrypt_ICE);
 		app.post('/getExecution_metrics', auth.protect, report.getExecution_metrics);
+		app.post('/manageDataTable', auth.protect, utility.manageDataTable);
+		app.post('/getDatatableDetails', auth.protect, utility.getDatatableDetails);
+		app.post('/importDtFromExcel', auth.protect, utility.importDtFromExcel);
+		app.post('/importDtFromCSV', auth.protect, utility.importDtFromCSV);
+		app.post('/importDtFromXML', auth.protect, utility.importDtFromXML);
+		app.post('/exportToDtExcel', auth.protect, utility.exportToDtExcel);
+		app.post('/exportToDtCSV', auth.protect, utility.exportToDtCSV);
+		app.post('/exportToDtXML', auth.protect, utility.exportToDtXML);
 		// Wecoccular Plugin
 		app.post('/crawlResults', auth.protect, webocular.getCrawlResults);
 		app.post('/saveResults', auth.protect, webocular.saveResults);

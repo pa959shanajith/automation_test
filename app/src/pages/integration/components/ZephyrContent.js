@@ -46,6 +46,7 @@ const ZephyrContent = props => {
         else if (releaseData) {
             setReleaseArr(releaseData);
             setProjectDropdn1(projectId);
+            setSelectedRel("Select Release");
             clearSelections();
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});

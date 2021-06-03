@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { updateScrollBar } from '../../global';
 import * as actionTypes from '../state/action';
 
 const CycleNode = props => {
@@ -8,6 +9,7 @@ const CycleNode = props => {
 
     const handleClick = useCallback(()=>{
         setCollapse(!collapse);
+        updateScrollBar();
     }, [collapse, setCollapse])
 
     return (
@@ -42,6 +44,7 @@ const TestSuiteNode = props => {
 
     const handleClick = useCallback(()=>{
         setCollapse(!collapse);
+        updateScrollBar();
     }, [collapse, setCollapse])
     
 

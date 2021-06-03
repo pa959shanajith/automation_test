@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { qcFolderDetails_ICE } from '../api.js';
+import { updateScrollBar } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
 
@@ -23,8 +24,9 @@ const FolderNode = props => {
             
             const path = props.type === "folder" ? props.folderObject.folderpath : props.testSetObject.testsetpath;
             const testCaseName = props.type === "folder" ? null : props.testSetObject.testset;
+            const folderId = props.type === "folder" ? props.folderObject.folderid : props.testSetObject.folderid;
 
-            const data = await qcFolderDetails_ICE(props.projectName, path, props.releaseName, props.type, testCaseName);
+            const data = await qcFolderDetails_ICE(props.projectName, path, props.releaseName, props.type, testCaseName, folderId);
             if (data.error){
                 dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: data.error}});
             } else if (typeof(data) !== "object") {
@@ -40,6 +42,7 @@ const FolderNode = props => {
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         } 
         else setCollapse(true);
+        updateScrollBar();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [collapse, setCollapse])
 
@@ -113,6 +116,7 @@ const TestCaseNode = props => {
             newSelectedTCDetails.selectedTCNames = [props.testCaseName];
             newSelectedTCDetails.selectedTSNames = [props.testSetObject.testset];
             newSelectedTCDetails.selectedFolderPath = [props.testSetObject.testsetpath];
+            newSelectedTCDetails.selectedFolderId = [props.testSetObject.folderid];
             newSelectedTC = [uniqueTCpath];
 		} else if (e.ctrlKey) { 
             const index = newSelectedTC.indexOf(uniqueTCpath);
@@ -120,11 +124,13 @@ const TestCaseNode = props => {
                 newSelectedTCDetails.selectedTCNames.splice(index, 1);
                 newSelectedTCDetails.selectedTSNames.splice(index, 1);
                 newSelectedTCDetails.selectedFolderPath.splice(index, 1);
+                newSelectedTCDetails.selectedFolderId.splice(index, 1);
                 newSelectedTC.splice(index, 1);
             } else {
                 newSelectedTCDetails.selectedTCNames.push(props.testCaseName);
                 newSelectedTCDetails.selectedTSNames.push(props.testSetObject.testset);
                 newSelectedTCDetails.selectedFolderPath.push(props.testSetObject.testsetpath);
+                newSelectedTCDetails.selectedFolderId.push(props.testSetObject.folderid);
                 newSelectedTC.push(uniqueTCpath)
             } 
         }
@@ -160,6 +166,7 @@ const TestCaseNode = props => {
                 {
                     domain: props.projectName,
                     folderpath: selectedTCDetails.selectedFolderPath,
+                    folderid: selectedTCDetails.selectedFolderId,
                     project: props.releaseName,
                     scenarioId: selectedScIds,
                     testcase: selectedTCDetails.selectedTCNames,

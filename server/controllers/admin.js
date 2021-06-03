@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const TokenGenerator = require('uuid-token-generator')
 const async = require('async');
 const fs = require('fs');
+const path = require('path');
 const archiver = require('archiver');
 const activeDirectory = require('activedirectory');
 const Client = require("node-rest-client").Client;
@@ -1889,9 +1890,10 @@ exports.exportProject = async (req, res) => {
 		};
 		const proj_data = await utils.fetchData(inputs, "admin/exportProject", fnName);
 		if (proj_data == "fail") return res.send("fail");
-		let projectPath = './assets/projects/'+proj_name;
-		if (!fs.existsSync('./assets/projects')){
-			fs.mkdirSync( './assets/projects');
+		const outputPath = path.join(__dirname, './../../output/projects');
+		let projectPath = path.join(outputPath, proj_name);
+		if (!fs.existsSync(outputPath)){
+			fs.mkdirSync(outputPath);
 		}
 		if (!fs.existsSync(projectPath)) {
 			fs.mkdirSync(projectPath);
@@ -2253,12 +2255,16 @@ exports.gitSaveConfig = async (req, res) => {
 		const projectId = data.projectId;
 		const gitAccToken = data.gitAccToken;
 		const gitUrl = data.gitUrl;
+		const gitUsername = data.gitUsername;
+		const gitEmail = data.gitEmail;
 		const inputs = {
 			"action":action,
 			"userId":userId,
 			"projectId":projectId,
 			"gitAccToken": gitAccToken,
-			"gitUrl":gitUrl
+			"gitUrl":gitUrl,
+			"gitUsername":gitUsername,
+			"gitEmail":gitEmail
 		};
 		const result = await utils.fetchData(inputs, "admin/gitSaveConfig", actionName);
 		return res.send(result);
@@ -2285,7 +2291,7 @@ exports.gitEditConfig = async (req, res) => {
 		else if (result == "empty") res.send("empty");
 		else {
 			let data = [];
-			data.push(result['gitaccesstoken'], result['giturl']);
+			data.push(result['gitaccesstoken'], result['giturl'], result['gitusername'], result['gituseremail']);
 			return res.send(data);
 		}
 	} catch (exception){

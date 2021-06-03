@@ -4,6 +4,7 @@ import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
 import { objectTypes } from './ListVariables';
 import { userObjectElement_ICE } from '../api';
 import "../styles/CreateObjectModal.scss";
+import {v4 as uuid} from 'uuid';
 import PropTypes from 'prop-types'
 
 const CreateObjectModal = props => {
@@ -169,8 +170,6 @@ const CreateObjectModal = props => {
         else {
             let localScrapeList = [];
             let viewArray = [];
-            let lastObj = props.scrapeItems[props.scrapeItems.length-1]
-            let lastVal = lastObj ? lastObj.val : 0;
             let lastIdx = props.newScrapedData.view ? props.newScrapedData.view.length : 0;
 
             let duplicateDict = {};
@@ -178,6 +177,7 @@ const CreateObjectModal = props => {
             let duplicateFlag = false;
             let errorFlag = null;
             let errorObj = {};
+            let newOrderList = [];
 
             for (let tempId of Object.keys(customObjList)){
 
@@ -199,16 +199,18 @@ const CreateObjectModal = props => {
                     duplicateFlag = true;
                 } else duplicateDict[custname] = [tempId]
 
+                let newUUID = uuid();
                 localScrapeList.push({
                     objId: undefined,
-                    objIdx: lastIdx++,
-                    val: ++lastVal,
+                    objIdx: lastIdx,
+                    val: newUUID,
                     hide: false,
                     title: custname,
                     url: customObjList[tempId].url,
                     tag: customObjList[tempId].tag,
                     xpath: customObjList[tempId].xpath,
-                    editable: true
+                    editable: true,
+                    tempOrderId: newUUID,
                 });
                 viewArray.push({
                     custname: custname,
@@ -217,6 +219,8 @@ const CreateObjectModal = props => {
                     xpath: customObjList[tempId].xpath,
                     editable: true
                 });  
+                newOrderList.push(newUUID);
+                lastIdx++
             }
             
             if (errorFlag) {
@@ -233,6 +237,7 @@ const CreateObjectModal = props => {
                 else updatedNewScrapeData = { view: [...viewArray] };
                 props.setNewScrapedData(updatedNewScrapeData);
                 props.updateScrapeItems(localScrapeList)
+                props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
                 props.setSaved(false);
                 props.setShow(false);
                 props.setShowPop({title: "Add Object", content: "Objects has been created successfully."});

@@ -1030,6 +1030,9 @@
             <span class="capitalize">: {{browserType}}</span>
             <label>Browser Version</label>
             <span>: {{browserVersion}}</span>
+            {{#ifnotEquals versionname undefined}}
+            <label>Version Name</label><span>: {{versionname}}</span>
+            {{/ifnotEquals}}
             <span style='visibility:hidden' class="reportId">{{reportId}}</span>
             <span style='visibility:hidden' class="executionId">{{executionId}}</span>
          </div>

@@ -1,5 +1,6 @@
 import React ,{ useState, useEffect } from 'react';
 import {useSelector, useDispatch} from "react-redux"
+import {v4 as uuid} from 'uuid';
 import { useHistory } from 'react-router-dom';
 import ScrapeObjectList from './ScrapeObjectList';
 import CompareObjectList from './CompareObjectList';
@@ -17,7 +18,6 @@ import { ScrapeContext } from '../components/ScrapeContext';
 import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, ModalContainer, ResetSession } from '../../global';
 import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
-import * as pluginActions from "../../plugin/state/action";
 import '../styles/ScrapeScreen.scss';
 
 const ScrapeScreen = ()=>{
@@ -42,6 +42,7 @@ const ScrapeScreen = ()=>{
     const [hideSubmit, setHideSubmit] = useState(true);
     const [showObjModal, setShowObjModal] = useState(false);
     const [newScrapedData, setNewScrapedData] = useState({});
+    const [orderList, setOrderList] = useState([]);
 
     useEffect(() => {
         if(Object.keys(current_task).length !== 0) {
@@ -95,7 +96,7 @@ const ScrapeScreen = ()=>{
                     haveItems = viewString.view.length !== 0;
                     
                     if (haveItems) {
-                        let newScrapeList = generateScrapeItemList(-1, 0, viewString);
+                        let [newScrapeList, newOrderList] = generateScrapeItemList(0, viewString);
 
                         setMainScrapedData(viewString);
                         setMirror(viewString.mirror);
@@ -103,6 +104,7 @@ const ScrapeScreen = ()=>{
                         setScrapeItems(newScrapeList);
                         setHideSubmit(false);
                         setSaved(true);
+                        setOrderList(newOrderList);
                     }
                     else {
                         setScrapeItems([]);
@@ -111,6 +113,7 @@ const ScrapeScreen = ()=>{
                         setMirror(null);
                         setSaved(true);
                         setHideSubmit(true);
+                        setOrderList([]);
                     }
                     setOverlay("");
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
@@ -305,11 +308,9 @@ const ScrapeScreen = ()=>{
                     let viewString = data;
 
                     if (viewString.view.length !== 0){
-                        let lastObj = scrapeItems[scrapeItems.length-1];
-                        let lastVal = lastObj ? lastObj.val : 0;
                         let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
 
-                        let scrapeItemList = generateScrapeItemList(lastVal, lastIdx, viewString);
+                        let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
 
                         let updatedNewScrapeData = {...newScrapedData};
                         if (updatedNewScrapeData.view) {
@@ -323,6 +324,7 @@ const ScrapeScreen = ()=>{
                         updateScrapeItems(scrapeItemList);
                         setScrapedURL(updatedNewScrapeData.scrapedurl);
                         setMirror(viewString.mirror);
+                        setOrderList(oldOrderList => [...oldOrderList, ...newOrderList]);
                         
                         if (viewString.view.length > 0) setSaved(false);
                     }                        
@@ -385,9 +387,9 @@ const ScrapeScreen = ()=>{
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
         { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} user_id={user_id} role={role} fetchScrapeData={fetchScrapeData} history={history} /> }
-        { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved}/> }
+        { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved} setOrderList={setOrderList} /> }
         { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} startScrape={startScrape} /> }
-        { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} />}
+        { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} setOrderList={setOrderList} />}
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
         { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: current_task.projectId, screenid: current_task.screenId, screenname: current_task.screenName,versionnumber: current_task.versionnumber, appType: current_task.appType}} />}
@@ -395,7 +397,7 @@ const ScrapeScreen = ()=>{
         <div data-test="ssBody" className="ss__body">
             <Header/>
             <div data-test="ssMidSection" className="ss__mid_section">
-                <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems }}>
+                <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList }}>
                     <ActionBarItems />
                     { current_task.appType === "Webservice" 
                         ? <WebserviceScrape /> 
@@ -495,6 +497,10 @@ function generateCompareObject(data, irisObjects){
                 tag: scrapeObject.tag,
                 title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
                 custname: scrapeObject.custname,
+                top: scrapeObject.top,
+                left: scrapeObject.left,
+                height: scrapeObject.height,
+                width: scrapeObject.width
             }
 
             localList.push(scrapeItem);
@@ -542,8 +548,10 @@ function generateCompareObject(data, irisObjects){
     return compareObj;
 } 
 
-function generateScrapeItemList(lastVal, lastIdx, viewString){
+function generateScrapeItemList(lastIdx, viewString, type="old"){
     let localScrapeList = [];
+    let orderList = viewString.orderlist;
+    let orderDict = {};
     for (let i = 0; i < viewString.view.length; i++) {
                             
         let scrapeObject = viewString.view[i];
@@ -557,9 +565,10 @@ function generateScrapeItemList(lastVal, lastIdx, viewString){
             scrapeObject.xpath = `iris;${scrapeObject.custname};${scrapeObject.left};${scrapeObject.top};${(scrapeObject.width + scrapeObject.left)};${(scrapeObject.height + scrapeObject.top)};${(scrapeObject.objectType || "").toLowerCase()};${(scrapeObject.objectStatus || "0")};${scrapeObject.tag}`;
         }
 
+        let newUUID = uuid();
         let scrapeItem = {  objId: scrapeObject._id,
-                            objIdx: lastIdx++,
-                            val: ++lastVal,
+                            objIdx: lastIdx,
+                            val: newUUID,
                             tag: newTag,
                             hide: false,
                             title: scrapeObject.custname.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;').replace(/[<>]/g, '').trim(),
@@ -568,21 +577,37 @@ function generateScrapeItemList(lastVal, lastIdx, viewString){
                             checked: false,
                             url: scrapeObject.url,
                             xpath: scrapeObject.xpath,
+                            top: scrapeObject.top,
+                            left: scrapeObject.left,
+                            height: scrapeObject.height,
+                            width: scrapeObject.width,
                         }
 
         
+        if (type === "new") scrapeItem.tempOrderId = newUUID;
         if(scrapeObject.hasOwnProperty('editable') || scrapeObject.cord){
             scrapeItem.editable = true;
         } else {
             let isCustom = scrapeObject.xpath === "";
             scrapeItem.isCustom = isCustom;
         };
-    
         
-        localScrapeList.push(scrapeItem);
+        if(scrapeItem.objId) {
+            orderDict[scrapeItem.objId] = scrapeItem;
+        }
+        else orderDict[scrapeItem.tempOrderId] = scrapeItem;
+
+        lastIdx++;
     }
 
-    return localScrapeList;
+    if (orderList && orderList.length) 
+        orderList.forEach(orderId => localScrapeList.push(orderDict[orderId]))
+    else {
+        localScrapeList = Object.values(orderDict);
+        orderList = Object.keys(orderDict);
+    }
+
+    return [localScrapeList, orderList];
 }
 
 

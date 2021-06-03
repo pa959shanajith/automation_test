@@ -524,8 +524,9 @@ const DesignContent = props => {
         setEdit(false);
         headerCheckRef.current.indeterminate = false;
 
-        if (draggable) setDraggable(false);
-        else setDraggable(true);
+        // if (draggable) setDraggable(false);
+        // else
+        setDraggable(true);
     }
 
     const copySteps = () => {
@@ -726,6 +727,15 @@ const DesignContent = props => {
         headerCheckRef.current.indeterminate = false;
     }
 
+    const onDrop = () => {
+        if (!changed)setChanged(true)
+        // setTCDropped(true);
+        setCheckedRows([]);
+        setHeaderCheck(false);
+        setFocusedRow(null);
+        headerCheckRef.current.indeterminate = false;
+    }
+
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
 
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
@@ -801,7 +811,7 @@ const DesignContent = props => {
                         <div className="con" id="d__tcListId">
                             <ScrollBar scrollId="d__tcListId" verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setFocusedRow(null) : runClickAway=true}} style={{height: "100%"}}>
-                            <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row" onEnd={()=>{ if (!changed)setChanged(true)}}>
+                            <ReactSortable disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
                                 {
                                 testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row"
                                     key={key++} idx={i} objList={objNameList} testCase={testCase} edit={edit} 
