@@ -209,7 +209,7 @@ const Header = () => {
         <> 
             { redirectTo && <Redirect to={redirectTo} /> }
             { showChangePass && <ChangePassword setShow={toggleChangePass} setSuccessPass={setSuccessPass} /> }
-            { showChangeDefaultIce && <ChangeDefaultIce /> }
+            { showChangeDefaultIce && <ChangeDefaultIce setShowMainPopup={setShowChangeDefaultIce} /> }
             { showSuccessPass && <PasswordSuccessPopup /> }
             { showConfSR && <ConfSwitchRole />  }
             { showSR_Pop && <SRPopup /> }
