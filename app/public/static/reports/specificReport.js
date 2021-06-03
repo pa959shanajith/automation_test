@@ -445,6 +445,11 @@ function loadReports() {
                             $(".createIssueWindow").hide();
                             $(".statusWindow").show();
                             $("#showStatus").text("Invalid Session. Login again");
+                        } else if(data=="Invalid Path"){
+                            $("#scrnShotPath").css('border-color','red');
+                            $(".createIssueWindow p:nth-child(9)").append("\
+                            <p style='font-size: small;color: red;margin-top: 0px;'>Invalid Attachment Path</p>\
+                            ");
                         } else {
                             getRows[parseInt($("#inputSlno").val()) - 1].children[8].innerText = data;
                             $(".createIssueWindow").hide();
