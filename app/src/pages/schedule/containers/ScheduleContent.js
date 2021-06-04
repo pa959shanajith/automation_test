@@ -46,8 +46,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                 var scheduledDataParsed = [];
                 var eachScenarioDetails;
                 for(var i =result.length-1 ; i>=0  ; i-- ) {
-                    if(result[i].scenariodetails[0].length>1) eachScenarioDetails = result[i].scenariodetails[0];
-                    else eachScenarioDetails = result[i].scenariodetails;
+                    eachScenarioDetails = result[i].scenariodetails[0].length>1 ? result[i].scenariodetails[0] : result[i].scenariodetails;
                     for(var j =eachScenarioDetails.length-1 ; j>=0  ; j-- ) {
                         let newScheduledScenario = {};
                         let coloumnValue = eachScenarioDetails[j][0] ? eachScenarioDetails[j][0] : eachScenarioDetails[j];
