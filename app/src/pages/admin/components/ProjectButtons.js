@@ -1,5 +1,5 @@
 import React ,  { Fragment, useState} from 'react';
-import { getNames_ICE, createProject_ICE, updateProject_ICE, getDomains_ICE} from '../api';
+import { getNames_ICE, createProject_ICE, updateProject_ICE, getDomains_ICE, exportProject} from '../api';
 import {ScreenOverlay, PopupMsg} from '../../global'
 import { useSelector} from 'react-redux'; 
 import '../styles/ProjectButtons.scss';
@@ -116,18 +116,46 @@ const ProjectButtons = (props) => {
         };
         return false;
     }
-    
-    //Update Project Action
-    const updateProject = async () =>{
+
+    const validateSubmit = () =>{
         props.setDomainSelectErrorBorder(false);props.setProjectSelectErrorBorder(false);
-        
         if (props.selDomain === "") {
 			props.setDomainSelectErrorBorder(true);
 		} else if (props.selProject === "") {
 			props.setProjectSelectErrorBorder(true);
 		} else if (props.releaseList.length === 0) {
             setPopupState({show:true,title:"Update Project",content:"Please add atleast one release"});
-		}else {
+        } else{
+            return true
+        }
+        return false 
+    }
+
+    const exportProj = async () => {
+        var pass = validateSubmit()  
+        if(pass){
+            setLoading("Loading...");    
+            props.setFlag(false);
+            var arg = {
+                projectId :  props.selProjectId,
+                projectName : props.selProject
+            }
+            var result = await exportProject(arg)
+            if(result.error){displayError(result.error);return;}
+            var val = downloadFile({result,projectName:props.selProject})
+            setLoading(false)
+            setPopupState({
+                title:'Mindmap',
+                content:val?'Data Exported Successfully.':'Data Export Failed.',
+                show:true
+            })
+        }
+    }
+    
+    //Update Project Action
+    const updateProject = async () =>{
+        var pass = validateSubmit()        
+        if (pass) {
             setLoading("Loading...");
 			props.setFlag(false);
 			//Update project details json with editedProjectDetails, deletedProjectDetails, newProjectDetails
@@ -263,11 +291,38 @@ const ProjectButtons = (props) => {
                         <button className="a__btn pull-right " onClick={()=>props.editProjectTab()}  title="Edit Project">Edit</button>
                         <button id="create_button" onClick={()=>{create_project()}} title="Create Project"  className="a__btn pull-right  btn-project-cust">Create</button>            
                     </Fragment>
-                :<button className="a__btn pull-right " onClick={()=>{updateProject()}}  title="Update Project">Update</button>
+                :
+                <>
+                    <button className="a__btn pull-right " onClick={()=>{updateProject()}}  title="Update Project">Update</button>
+                    <button className="a__btn pull-right btn-project-cust" onClick={()=>{exportProj()}}  title="Export Project">Export</button>
+                </>
                 }
             </div> 
         </Fragment>
     )
+}
+
+/*
+function : downloadFile()
+Purpose : download zip file
+*/
+
+const downloadFile = ({result,projectName}) =>{
+    try{
+        var file = new Blob([result], { type: 'application/zip' });
+        var fileURL = URL.createObjectURL(file);
+        var a = document.createElement('a');
+        a.href = fileURL;
+        a.download = projectName+'.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(fileURL);
+        return true
+    }catch(err){
+        console.log(err)
+        return false
+    }
 }
 
 export default ProjectButtons;

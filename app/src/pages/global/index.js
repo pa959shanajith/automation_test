@@ -20,6 +20,7 @@ import GenerateTaskList from './components/GenerateTaskList';
 import CalendarComp from './components/CalendarComp'
 import TimeComp from'./components/TimeComp'
 import ErrorPage from './components/ErrorPage';
+import ErrorBoundary from './components/ErrorBoundary';
 
 export { Header, 
         FooterOne, 
@@ -44,5 +45,6 @@ export { Header,
         CalendarComp,
         TimeComp,
         ErrorPage,
+        ErrorBoundary,
         updateScrollBar
     };

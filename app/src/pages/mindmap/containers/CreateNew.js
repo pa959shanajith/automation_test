@@ -29,7 +29,7 @@ const CreateNew = ({importRedirect}) => {
   const prjList = useSelector(state=>state.mindmap.projectList)
 
   useEffect(()=>{
-    if(selectProj){
+    if(selectProj && prjList[selectProj]){
         var dict= {
             "AppType": prjList[selectProj].apptypeName,
             "Domain": prjList[selectProj].domains,
@@ -37,8 +37,7 @@ const CreateNew = ({importRedirect}) => {
         }
         setInfo(dict)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[selectProj])
+  },[selectProj,prjList])
   useEffect(()=>{
     (async()=>{
         setBlockui({show:true,content:'Loading modules ...'})
