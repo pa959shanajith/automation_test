@@ -18,6 +18,10 @@
     color: #555;
     font-family: "LatoWebLight";
     outline: none;
+
+    &::-ms-reveal, &::-ms-clear{
+        display: none
+    }
 }
 
 .password-wrap, .username-wrap{

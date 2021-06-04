@@ -10,7 +10,7 @@ import '../styles/ChangeDefaultIce.scss';
 
 */
 
-const ChangeDefaultIce = ({}) => {
+const ChangeDefaultIce = ({setShowMainPopup}) => {
 
     const [chooseDefICE, setChooseDefICE] = useState([])
     const [defICE, setDefICE] = useState("")
@@ -27,18 +27,13 @@ const ChangeDefaultIce = ({}) => {
         try{
             const data = await getUserICE();
             setLoading(false);
-            if(data == 'fail'){
+            if(data == 'fail' || !data.ice_list || data.ice_list.length<1){
                 setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
             }
             else{
-                if(!data.ice_list || data.ice_list.length<1){
-                    setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
-                    return;
-                } else {
-                    setChooseDefICE(data.ice_list);
-                    setDefICE(data.ice_list[0]);
-                    setShowPopup(true);
-                }
+                setChooseDefICE(data.ice_list);
+                setDefICE(data.ice_list[0]);
+                setShowPopup(true);
             }
         }catch(error){
             setLoading(false)
@@ -66,7 +61,6 @@ const ChangeDefaultIce = ({}) => {
 
     const changeDefICEClick = async () =>{
 		setLoading("Setting Default ICE ...")
-        setShowPopup(false);
 		var ice = defICE;
 		try{
             const data = await setDefaultUserICE(ice);
@@ -87,14 +81,14 @@ const ChangeDefaultIce = ({}) => {
         <>
             {showPopup?
                 <ModalContainer
-                    close={()=>{setShowPopup(false);}}
+                    close={()=>{setShowMainPopup(false);}}
                     title={"Change Default ICE"}
                     content={Content()}
                     footer={Footer()}
                     modalClass={" modal-md"}
                 />
             :null}
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>{setPopupState({show:false})}} close={()=>{setPopupState({show:false})}} submitText={"Ok"} />:null}
+            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>{setPopupState({show:false});setShowMainPopup(false);}} close={()=>{setPopupState({show:false});setShowMainPopup(false);}} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
         </>   
     );
