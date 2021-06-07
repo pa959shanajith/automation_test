@@ -1283,8 +1283,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'cellClick',null,null,eachScrapedAction.url,"Web");
 						} else {
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,eachScrapedAction.url,"Web");
-							var custname_split = eachScrapedAction.custname.split('_');
-							if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+							if(eachScrapedAction.custname.indexOf("_elmnt") !== -1) testcaseObj.keywordVal = 'clickElement';
 						}
 						break;
 					case "inputChange":
@@ -1314,8 +1313,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						keycode_map = {
 							'13': 'Enter'
 						}
-						testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,
-							'sendFunctionKeys',[keycode_map[key]],null,eachScrapedAction.url,"Generic")
+						testcaseObj = getTestcaseStep(step,null,'@Generic','sendFunctionKeys',[keycode_map[key]],null,null,"Generic")
 						break;		
 					default:
 						break;
@@ -1388,7 +1386,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							else if(eachScrapedAction.command[0][1]=="currentCellColumn")
 								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'cellClick',null,null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="pressF4")
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'sendFunctionKeys',['F4'],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,null,"@Generic",'sendFunctionKeys',['F4'],null,null,"Generic");
 							else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
 							break;
 						case "GuiLabel":
@@ -1405,8 +1403,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						case "shell":
 						case "toolbar":
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
-							var custname_split = eachScrapedAction.custname.split('_');
-							if(custname_split[custname_split.length-1] == 'elmnt') testcaseObj.keywordVal = 'clickElement';
+							if(eachScrapedAction.custname.indexOf("_elmnt") !== -1) testcaseObj.keywordVal = 'clickElement';
 							break;
 						case "GuiStatusbar":
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
