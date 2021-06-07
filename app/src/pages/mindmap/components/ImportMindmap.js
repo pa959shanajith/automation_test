@@ -82,7 +82,15 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                         gitversion : gitVerRef.current.value,
                         gitfolderpath : gitPathRef.current.value
                     })
-                    if(data.error){setImportPop(false);displayError(data.error);return;}
+                    if(data.error){
+                        if(data.error === 'No entries'){
+                            const projectname = projRef.current[projRef.current.selectedIndex].text;
+                            data.error = 'Module does not belongs to project '+projectname;
+                        }
+                        setImportPop(false);
+                        displayError(data.error);
+                        return;
+                    }
                     var importProj = data.projectid
                     if(!importProj || !projList[importProj]){
                         displayError('This project is not assigned to user')
