@@ -279,12 +279,15 @@ const TaskBox = (props) => {
         clickAddTask({dNodes,nodeDisplay})
     }
     const stopPropagate = (e) => {
-        if(e.target && !e.target.className.includes("rdt"))setCloseCal(true);
-        if(e.target && e.target.id === 'task-ok')return;
         e.stopPropagation()
         if(e.nativeEvent){
             e.nativeEvent.stopImmediatePropagation()
         }
+    }
+    const stopCal = (e) => {
+        if(e.target && !e.target.className.includes("rdt"))setCloseCal(true);
+        if(e.target && e.target.id === 'task-ok')return;
+        stopPropagate(e)   
     }
     return(
         <Fragment>
@@ -296,12 +299,12 @@ const TaskBox = (props) => {
             modalClass='modal-sm'
         />:null}
         <ClickAwayListener onClickAway={()=>{props.setTaskBox(false)}}>
-            <div onClick={stopPropagate} id='ct-assignTable' className='task-box__container hide'>
+            <div onClick={stopCal} id='ct-assignTable' className='task-box__container hide'>
                 <ul>
                     {task.arr.length>0?
                         <li>
                             <label data-test="taskLabel">Task</label>
-                            <select data-test="taskSelect" onChange={changeTask}  disabled={assignbtn.reassign || task.disabled}  defaultValue={task.initVal} ref={taskRef}>
+                            <select onClick={stopPropagate} data-test="taskSelect" onChange={changeTask}  disabled={assignbtn.reassign || task.disabled}  defaultValue={task.initVal} ref={taskRef}>
                                 {task.arr.map((e)=>
                                     <option key={e} value={e}>{e}</option>
                                 )}
@@ -318,8 +321,8 @@ const TaskBox = (props) => {
                         <label data-test="assignedtoLabel">Assigned to</label>
                         {userAsgList.loading?
                         <select data-test="assignedselect1" key='select_1' disabled={true} value={defaultVal}><option value={defaultVal}>Loading...</option></select>
-                        :<select data-test="assignedselect2" key='select_2' id='ct-assignedTo' onChange={(e)=>setUserAsgList({...userAsgList,value:e.target.value})} disabled={userAsgList.disabled || assignbtn.reassign} defaultValue={userAsgList.value} >
-                            <option value={defaultVal}>Select User</option>
+                        :<select  onClick={stopPropagate} data-test="assignedselect2" key='select_2' id='ct-assignedTo' onChange={(e)=>{setUserAsgList({...userAsgList,value:e.target.value})}} disabled={userAsgList.disabled || assignbtn.reassign} defaultValue={userAsgList.value} >
+                            <option  value={defaultVal}>Select User</option>
                             {userAsgList.arr.map((e)=>
                                 <option key={e._id} value={e._id}>{e.name}</option>
                             )}
@@ -329,7 +332,7 @@ const TaskBox = (props) => {
                         <label data-test="reviewLabel">Reviewer</label>
                         {userRevList.loading?
                         <select data-test="reviewSelect1" key='selectr_1' disabled={true} value={defaultVal}><option value={defaultVal}>Loading...</option></select>
-                        :<select data-test="reviewSelect2" key='selectr_2'id='ct-assignRevw' onChange={(e)=>setUserRevList({...userRevList,value:e.target.value})} disabled={assignbtn.reassign} defaultValue={userRevList.value}>
+                        :<select  onClick={stopPropagate} data-test="reviewSelect2" key='selectr_2'id='ct-assignRevw' onChange={(e)=>setUserRevList({...userRevList,value:e.target.value})} disabled={assignbtn.reassign} defaultValue={userRevList.value}>
                             <option value={defaultVal}>Select Reviewer</option>
                             {userRevList.arr.map((e)=>
                                 <option key={e._id} value={e._id}>{e.name}</option>
@@ -340,13 +343,17 @@ const TaskBox = (props) => {
                     {startDate.show?
                         <li data-test="startDate" id='ct-startDate'>
                             <label data-test="startDateLabel">Start Date</label>
-                            <CalendarComp setCloseCal={setCloseCal} closeCal={closeCal} disabled={assignbtn.reassign} date={startDate.value} setDate={(val)=>setStartDate({show:true,value:val})}/>
+                            <span onClick={stopPropagate} style={{width:'145px',display:'flex'}}>
+                                <CalendarComp setCloseCal={setCloseCal} closeCal={closeCal} disabled={assignbtn.reassign} date={startDate.value} setDate={(val)=>setStartDate({show:true,value:val})}/>
+                            </span>
                         </li>
                     :null}
                     {endDate.show?
                         <li data-test="endDate" id='ct-endDate'>
                             <label data-test="endDateLabel" >End Date</label>
-                            <CalendarComp setCloseCal={setCloseCal} closeCal={closeCal} disabled={assignbtn.reassign} date={endDate.value} setDate={(val)=>setEndDate({show:true,value:val})}/>
+                            <span onClick={stopPropagate} style={{width:'145px',display:'flex'}}>
+                                <CalendarComp setCloseCal={setCloseCal} closeCal={closeCal} disabled={assignbtn.reassign} date={endDate.value} setDate={(val)=>setEndDate({show:true,value:val})}/>
+                            </span>
                         </li>
                     :null}
                     {propagate.show?

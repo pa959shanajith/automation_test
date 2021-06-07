@@ -401,6 +401,10 @@ export const importGitMindmap = async(data) => {
             console.error(res.data)
             return {error:'Module does not exists in Git repo. Please verify your inputs!'}
         }
+		if(res.data === "Unassigned project"){
+            console.error(res.data)
+            return {error:'The project is not assigned to the user!'}
+        }
         if (!('testscenarios' in res.data)){
             console.error(res.data)
             return {error:"Incorrect JSON imported. Please check the contents!!"}

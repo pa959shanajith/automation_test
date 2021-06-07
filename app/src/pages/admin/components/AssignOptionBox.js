@@ -5,12 +5,14 @@ import '../styles/AssignOptionBox.scss';
   use: renders 2 Assign Box and buttons to move selection from one to other
   props:rightBox:[],leftBox:[],setRightBox(),setLeftBox(),
   disable:true/false for move buttons,
-  FilterComp: component to filter leftbox
+  FilterComp: component to filter leftbox,
+  type: to change box header accordingly ICE/Projects
 */
     
-const AssignOptionBox = ({rightBox,leftBox,setRightBox,setLeftBox,disable,FilterComp}) => {
+const AssignOptionBox = ({rightBox,leftBox,setRightBox,setLeftBox,disable,FilterComp,type}) => {
     const rightArr = rightBox?rightBox:[]
     const leftArr = leftBox?leftBox:[]
+    const label = type==="ICE"?"ICE":'Projects';
     const moveData = (e) => {
         var action =  e.currentTarget ? e.currentTarget.id : undefined
         if(!action)return;
@@ -20,7 +22,7 @@ const AssignOptionBox = ({rightBox,leftBox,setRightBox,setLeftBox,disable,Filter
         <Fragment>
             <div className='assign_opt-container'>
                 <div className='left-box'>
-                    <div className='left-title'>All Projects</div>
+                    <div className='left-title'>{`All ${label}`}</div>
                     <select multiple id='opt-box-left'>
                         {leftArr.map((prj) => ( 
                             <option key={prj._id} value={prj._id} >{prj.name} </option>
@@ -37,7 +39,7 @@ const AssignOptionBox = ({rightBox,leftBox,setRightBox,setLeftBox,disable,Filter
                 </div>
                 <div className='right-box'>
                     <div>
-                        <span className='right-title'>Assign Projects to Pool</span>
+                        <span className='right-title'>{`Assign ${label} to Pool`}</span>
                         {FilterComp?FilterComp:null}
                     </div>
                     <select multiple id='opt-box-right'>

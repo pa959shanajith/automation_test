@@ -938,13 +938,14 @@ exports.getExecution_metrics_API = async(req, res) => {
             var metrics_data=req.body.metrics_data;
             metrics_data.api=true;
             var reportResult = await fetch_metrics(metrics_data);
-            logger.info("Calling DAS Service from getExecution_metrics_API: reports/getExecution_metrics_API");
-            if(reportResult[0].errMsg != ""){
-                execResponse.error_message=reportResult[0].errMsg;
+            var result = reportResult[0] =='fail' ? reportResult[2]: reportResult[0];
+            if(result.errMsg != ""){
+                execResponse.error_message = result.errMsg;
                 statusCode = "400";
+            }else{
+                finalReport.push(result);
+                statusCode = "200";
             }
-            finalReport.push(reportResult[0]);
-            if (statusCode != "400") statusCode = "200";
         }else{
             statusCode = "401";
         }
