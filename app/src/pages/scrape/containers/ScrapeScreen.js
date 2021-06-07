@@ -488,21 +488,7 @@ function generateCompareObject(data, irisObjects){
     if (data.view[0].changedobject.length > 0) {
         let localList = [];
         for (let i = 0; i < data.view[0].changedobject.length; i++) {
-            let scrapeObject = data.view[0].changedobject[i];
-            
-            let scrapeItem = {
-                ObjId: scrapeObject._id,
-                objIdx: i,
-                val: data.changedobjectskeys[i],
-                tag: scrapeObject.tag,
-                title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
-                custname: scrapeObject.custname,
-                top: scrapeObject.top,
-                left: scrapeObject.left,
-                height: scrapeObject.height,
-                width: scrapeObject.width
-            }
-
+            let scrapeItem = getCompareScrapeItem(data.changedobjectskeys[i], data.view[0].changedobject[i]);
             localList.push(scrapeItem);
         }
         compareObj.changedObj = localList;
@@ -510,17 +496,7 @@ function generateCompareObject(data, irisObjects){
     if (data.view[1].notchangedobject.length > 0) {
         let localList = [];
         for (let i = 0; i < data.view[1].notchangedobject.length; i++) {
-            let scrapeObject = data.view[1].notchangedobject[i];
-            
-            let scrapeItem = {
-                ObjId: scrapeObject._id,
-                objIdx: i,
-                val: i,
-                tag: scrapeObject.tag,
-                title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
-                custname: scrapeObject.custname,
-            }
-
+            let scrapeItem = getCompareScrapeItem(i, data.view[1].notchangedobject[i])
             localList.push(scrapeItem);
         }   
         compareObj.notChangedObj = localList;
@@ -529,17 +505,7 @@ function generateCompareObject(data, irisObjects){
         let localList = [];
         if (data.view[2].notfoundobject.length > 0) {
             for (let i = 0; i < data.view[2].notfoundobject.length; i++) {
-                let scrapeObject = data.view[2].notfoundobject[i];
-                
-                let scrapeItem = {
-                    ObjId: scrapeObject._id,
-                    objIdx: i,
-                    val: i,
-                    tag: scrapeObject.tag,
-                    title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
-                    custname: scrapeObject.custname,
-                }
-    
+                let scrapeItem = getCompareScrapeItem(i, data.view[2].notfoundobject[i])
                 localList.push(scrapeItem);
             }
         }
@@ -547,6 +513,21 @@ function generateCompareObject(data, irisObjects){
     }
     return compareObj;
 } 
+
+function getCompareScrapeItem(numValue, scrapeObject) {
+    return {
+        ObjId: scrapeObject._id,
+        val: numValue,
+        tag: scrapeObject.tag,
+        title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
+        custname: scrapeObject.custname,
+        top: scrapeObject.top,
+        left: scrapeObject.left,
+        height: scrapeObject.height,
+        width: scrapeObject.width,
+        xpath: "",
+    }
+}
 
 function generateScrapeItemList(lastIdx, viewString, type="old"){
     let localScrapeList = [];
