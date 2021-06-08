@@ -93,13 +93,16 @@ const MapObjectModal = props => {
             param: "mapScrapeData",
             appType: appType,
             objList: [],
+            orderList: props.orderList,
             versionnumber: versionnumber
         };
 
         let mapping = {...map};
         for (let val in mapping) {
-            if (mapping[val])
+            if (mapping[val]) {
                 arg.objList.push([mapping[val][0].objId, mapping[val][1].objId, mapping[val][1].custname]);
+                arg.orderList.splice(arg.orderList.indexOf(mapping[val][0].objId), 1)
+            }
         }
 
         updateScreen_ICE(arg)

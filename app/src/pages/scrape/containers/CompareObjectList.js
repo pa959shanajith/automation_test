@@ -15,7 +15,7 @@ const CompareObjectList = () => {
     const { screenId } = useSelector(state=>state.plugin.CT);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
     const compareData = useSelector(state=>state.scrape.compareData);
-    const { setShowPop, fetchScrapeData, mainScrapedData, newScrapedData } = useContext(ScrapeContext);  
+    const { setShowPop, fetchScrapeData, mainScrapedData, newScrapedData, orderList } = useContext(ScrapeContext);  
     const dispatch = useDispatch();
     const history = useHistory();
     const [checkedList, setCheckedList] = useState([]);
@@ -47,13 +47,12 @@ const CompareObjectList = () => {
 		};
 		
 		let arg = {
-            // 'deletedObj': deleted,
             'modifiedObj': updatedObjects,
-            // 'addedObj': {...added, view: views},
             'screenId': screenId,
             'userId': user_id,
             'roleId': role,
-            'param': 'saveScrapeData'
+            'param': 'saveScrapeData',
+            'orderList': orderList
         };
         
 		updateScreen_ICE(arg)

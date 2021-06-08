@@ -319,7 +319,8 @@ const DesignContent = props => {
                                         'userId': userInfo.user_id,
                                         'roleId': userInfo.role,
                                         'versionnumber': versionnumber,
-                                        'param': 'DebugModeScrapeData'
+                                        'param': 'DebugModeScrapeData',
+                                        'orderList': scrape_data.orderlist
                                     }
                                     
                                     DesignApi.updateScreen_ICE(params)
