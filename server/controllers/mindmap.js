@@ -1378,13 +1378,19 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							break;
 						case "gridview":
 							if(eachScrapedAction.command[0][1]=="selectColumn")
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumns',null,null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumns',[eachScrapedAction.command[0][2]],null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="pressToolbarButton")
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'PressToolbarButton',null,null,null,"SAP");
-							else if(eachScrapedAction.command[0][1]=="modifyCell")
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetTextInCell',null,null,null,"SAP");
-							else if(eachScrapedAction.command[0][1]=="currentCellColumn")
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'cellClick',null,null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'PressToolbarButton',[eachScrapedAction.command[0][2]],null,null,"SAP");
+							else if(eachScrapedAction.command[0][1]=="modifyCell"){
+								var data = eachScrapedAction.command[0].slice(-3);
+								var data1 = data.slice(0,2).map(i => 1 + i);
+								data1.push(data[2]);
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetTextInCell',[data1.join(';')],null,null,"SAP");
+							}	
+							else if(eachScrapedAction.command[0][1]=="setCurrentCell"){
+								const cell_inp = eachScrapedAction.command[0].slice(-2).map(i => 1 + i).join(';')
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'ClickCell',[cell_inp],null,null,"SAP");
+							}
 							else if(eachScrapedAction.command[0][1]=="pressF4")
 								testcaseObj = getTestcaseStep(step,null,"@Generic",'sendFunctionKeys',['F4'],null,null,"Generic");
 							else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
