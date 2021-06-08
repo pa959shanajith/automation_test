@@ -51,7 +51,7 @@ class TestSuiteExecutor {
                     };
                     const testcasedata = await utils.fetchData(inputs, "design/readTestCase_ICE", fnName);
                     if (testcasedata == "fail") return "fail";
-                    allTestcaseObj[tc._id] = testcasedata[0];
+                    allTestcaseObj[tc._id] = testcasedata.tc[0];
                 }
             }
 
