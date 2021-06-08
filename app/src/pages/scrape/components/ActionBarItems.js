@@ -201,6 +201,7 @@ const BottomContent = () => {
                     scrapeApi.updateScreen_ICE(arg)
                         .then(data => {
                             if (data === "Invalid Session") return RedirectPage(history);
+                            else if (data === "fail") setShowPop({title: "Import Screen", content: "Failed to import Screen JSON."}) 
                             else fetchScrapeData().then(response => {
                                     if (response === "success")
                                         setShowPop({title: "Import Screen", content: "Screen Json imported successfully."}) 
@@ -209,7 +210,8 @@ const BottomContent = () => {
                         })
                         .catch(error => {
                             setOverlay("");
-                            console.log(error)
+                            setShowPop({title: "Import Screen", content: "Failed to import Screen JSON."}) 
+                            console.error(error)
                         });
                 }
             } else {
