@@ -42,14 +42,14 @@ exports.readTestCase_ICE = async (req, res) => {
 		var testcasename = "";
 		var reuse = false;
 		if (!requestedscreenid){
-			testcasesteps = result[0].steps;
-			testcasename = result[0].name;
-			reuse = result[0].parent > 1;
+			testcasesteps = result.tc[0].steps;
+			testcasename = result.tc[0].name;
+			reuse = result.tc[0].parent > 1;
 		} else {
-			for (var i = 0; i < result.length; i++) {
-				testcasesteps = result[i].steps;
-				testcasename = result[i].name;
-				reuse = result[i] > 1;
+			for (var i = 0; i < result.tc.length; i++) {
+				testcasesteps = result.tc[i].steps;
+				testcasename = result.tc[i].name;
+				reuse = result.tc[i] > 1;
 			}
 		}
 		let responsedata = {
@@ -152,7 +152,7 @@ exports.debugTestCase_ICE = function (req, res) {
 											logger.error("Exception in the service debugTestCase_ICE: %s", exception);
 										}
 									} else {
-										var testcases = testcasedataresult.rows;
+										var testcases = testcasedataresult.rows.tc;
 										const tcDict = {};
 										for (let i = 0; i < testcases.length; i++){
 											tcDict[testcases[i]._id] = {
