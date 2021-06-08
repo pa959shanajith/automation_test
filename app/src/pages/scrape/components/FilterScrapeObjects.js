@@ -15,16 +15,6 @@ const otherObjects = ScrapeObjectTag => {
     return isOtherObject;
 }
 
-export const getOtherObjects = scrapedItems => {
-    scrapedItems.forEach(item => {
-        if (otherObjects(item.tag)) {
-                item.hide = false;
-        }
-    });
-    return scrapedItems;
-}
-
-
 /*
     Other Mobile Filters Function
 */
@@ -45,71 +35,25 @@ const otherMobileObjects = ScrapeObjectTag => {
     return isOtherObject;
 }
 
-export const getOtherMobileObjects = scrapedItems => {
-    scrapedItems.forEach(item => {
-        if (otherMobileObjects(item.tag)){
-                item.hide = false;
-            }
-    });
-
-    return scrapedItems;
-}
-
-/*
-    Duplicate Objects Filter
-*/
-export const duplicateObjects = scrapedItems => {
-    let newScrapedItems = scrapedItems;
-    let reversedScrapeItems = newScrapedItems.reverse();
-    let uniqueBucket = []
-
-    reversedScrapeItems.forEach(item => {
-        let custname = item.title.trim().replace(/[<>]/g, '');
-        if (!uniqueBucket.includes(custname)) {
-            uniqueBucket.push(custname);
-        }
-        else {
-            item.hide = false;
-            item.duplicate = true;
-        }
-    })
-
-    newScrapedItems = reversedScrapeItems.reverse();
-
-    return newScrapedItems;
-}
-
-
-/*
-    Custom Object Filter Function 
-*/
-export const getCustomObjects = scrapedItems => {
-    scrapedItems.forEach(item => {
-        if (item.isCustom) {
-            item.hide = false
-        }
-    });
-
-    return scrapedItems;
-}
-
 /*
     Filter Selected Objects Functions
 */
-const isSelectedElement = (selectedFilterTag, ScrapeObjectTag) => {
+const isSelectedElement = (ScrapeObjectTag, selectedFilters) => {
     let isDesiredElement = false;
     let objectTag = ScrapeObjectTag.toLowerCase();
-    let selectedTag = selectedFilterTag.toLowerCase();
-
-    if (
-        selectedTag === objectTag
-        || (objectTag.includes(selectedTag) && selectedTag !== "a" && objectTag !== "radio button" && objectTag !== "radiobutton" && !objectTag.includes("listview") && !objectTag.includes("tablecell"))
-        || (selectedTag === "input" && (objectTag.includes("edit") || objectTag.includes("text")))
-        || (selectedTag === "select" && objectTag.includes("combo box"))
-        || (selectedTag === "a" && (objectTag.includes("hyperlink"))) 
-        || (selectedTag === "checkbox" && objectTag.includes("check box")) 
-        || (selectedTag === "radiobutton" && objectTag.includes("radio button"))
-    ) isDesiredElement = true;
+    
+    for (let filterTag of selectedFilters) {
+        let selectedTag = filterTag.toLowerCase();
+        if (
+            selectedTag === objectTag
+            || (objectTag.includes(selectedTag) && selectedTag !== "a" && objectTag !== "radio button" && objectTag !== "radiobutton" && !objectTag.includes("listview") && !objectTag.includes("tablecell"))
+            || (selectedTag === "input" && (objectTag.includes("edit") || objectTag.includes("text")))
+            || (selectedTag === "select" && objectTag.includes("combo box"))
+            || (selectedTag === "a" && (objectTag.includes("hyperlink"))) 
+            || (selectedTag === "checkbox" && objectTag.includes("check box")) 
+            || (selectedTag === "radiobutton" && objectTag.includes("radio button"))
+        ) isDesiredElement = true;
+    }    
 
     return isDesiredElement;
 }
@@ -133,17 +77,6 @@ const isUnsaved = objectId => {
     return isUnsaved;
 }
 
-export const getUnsavedObjects = scrapedItems => {
-    scrapedItems.forEach(item => {
-        if (isUnsaved(item.objId)) {
-            item.hide = false;
-        }
-    });
-
-    return scrapedItems;
-}
-
-
 /*
     Order The List by Alphabet Order
 */
@@ -156,7 +89,7 @@ const alphabetOrder = scrapeItems => {
 
 export const getListInAlphabetOrder = scrapedItems => {
     scrapedItems = alphabetOrder(scrapedItems);
-    scrapedItems.forEach(item => item.hide = false);
+    // scrapedItems.forEach(item => item.hide = false);
 
     return scrapedItems;
 }
@@ -180,7 +113,7 @@ export const resetList = (scrapeItems, order, orderList) => {
     if (order === "val") scrapeItems = scrapedOrder(scrapeItems, orderList);
 
     scrapeItems.forEach(item => {
-        item.hide = true;
+        item.hide = false;
         item.duplicate = false;
     })
 
@@ -203,4 +136,65 @@ function compareObjectName (objOne, objTwo) {
     let titleTwo = objTwo.title.toLowerCase();
 
     return (titleOne <= titleTwo) ? -1 : 1;
+}
+
+export const getFilteredScrapeObjects = (scrapeItems, filters, order, orderList) => {
+    let newScrapedItems = scrapeItems;
+    let reversedScrapeItems = newScrapedItems.reverse();
+    let uniqueBucket = [];
+    let flags = getFlags(filters);
+
+    for (let scrapeItem of reversedScrapeItems) {
+        let hide = true;
+        let duplicate = false;
+        if (
+            (flags.others && otherObjects(scrapeItem.tag)) ||
+            (flags.othersMobile && otherMobileObjects(scrapeItem.tag)) ||
+            (flags.userobj && scrapeItem.isCustom) ||
+            (flags.unsavedObjects && isUnsaved(scrapeItem.objId)) ||
+            (flags.elements.length && isSelectedElement(scrapeItem.tag, flags.elements))
+        ) {
+            hide = false;
+        }
+        
+        if (flags.duplicateCustnames) {
+            let custname = scrapeItem.title.trim().replace(/[<>]/g, '');
+            if (!uniqueBucket.includes(custname)) {
+                uniqueBucket.push(custname);
+            }
+            else {
+                hide = false;
+                duplicate = true;
+            }
+        }
+
+        if (filters.length === 1 && filters[0] === "alphabetOrder") hide = false;
+
+        scrapeItem.hide = hide;
+        scrapeItem.duplicate = duplicate;
+    }
+
+    switch(order){
+        case "val": newScrapedItems = scrapedOrder(reversedScrapeItems, orderList); break;
+        case "alphabet": newScrapedItems = getListInAlphabetOrder(reversedScrapeItems); break;
+        default : newScrapedItems = reversedScrapeItems.reverse();
+    }
+
+    return newScrapedItems;
+}
+
+function getFlags(filters) {
+    let flags = { others: false, othersMobile: false, duplicateCustnames: false, userobj: false, unsavedObjects: false, elements: [], order: false };
+    for (let tag of filters) {
+        switch (tag) {
+            case "others": flags.others = true; break;
+            case "othersMobile": flags.othersMobile = true; break;
+            case "duplicateCustnames": flags.duplicateCustnames = true; break;
+            case "userobj": flags.userobj = true; break;
+            case "unsavedObjects": flags.unsavedObjects = true; break;
+            case "alphabetOrder": flags.order = true; break;
+            default: flags.elements.push(tag); break;
+        }
+    }
+    return flags;
 }

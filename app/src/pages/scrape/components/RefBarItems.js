@@ -64,6 +64,9 @@ const RefBarItems = props => {
 			}
 
 			mirrorImg.src = `data:image/PNG;base64,${props.mirror}`;
+		} else {
+			setMirrorHeight("0px");
+			setDsRatio(1);
 		}
 		dispatch({type: actions.SET_OBJVAL, payload: {val: null }});
 		setHighlight(false);
@@ -162,26 +165,10 @@ const RefBarItems = props => {
     const filter = (toFilter, order) => {
 		let scrapedItems = [...scrapeItems];
 		
-		scrapedItems = ScrapeFilter.resetList(scrapedItems, order, orderList);
-		
-		if (toFilter.length > 0) {
-			for (let tag of toFilter) {
-				switch (tag) {
-					case "others": scrapedItems = ScrapeFilter.getOtherObjects(scrapedItems); break;
-					case "othersMobile": scrapeItems = ScrapeFilter.getOtherMobileObjects(scrapedItems); break;
-					case "duplicateCustnames": scrapedItems = ScrapeFilter.duplicateObjects(scrapedItems); break;
-					case "userobj": scrapedItems = ScrapeFilter.getCustomObjects(scrapedItems);	break;
-					case "unsavedObjects": scrapedItems = ScrapeFilter.getUnsavedObjects(scrapedItems); break;
-					case "alphabetOrder": {
-						if (order === "alphabet") scrapedItems = ScrapeFilter.getListInAlphabetOrder(scrapedItems);
-						break;
-					}
-					default: scrapedItems = ScrapeFilter.getSelectedObjects(scrapedItems, tag); break;
-				}
-			}
-		} else {
-			scrapedItems.forEach(item => item.hide = false)
-		}
+		if (toFilter.length > 0) 
+			scrapedItems = ScrapeFilter.getFilteredScrapeObjects(scrapedItems, toFilter, order, orderList)
+		else 
+			scrapedItems = ScrapeFilter.resetList(scrapedItems, order, orderList);
         setScrapeItems(scrapedItems)
 	}
 
