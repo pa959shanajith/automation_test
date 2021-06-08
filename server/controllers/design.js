@@ -152,7 +152,7 @@ exports.debugTestCase_ICE = function (req, res) {
 											logger.error("Exception in the service debugTestCase_ICE: %s", exception);
 										}
 									} else {
-										var testcases = testcasedataresult.rows;
+										var testcases = testcasedataresult.rows.tc;
 										const tcDict = {};
 										for (let i = 0; i < testcases.length; i++){
 											tcDict[testcases[i]._id] = {
