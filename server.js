@@ -31,8 +31,11 @@ if (cluster.isMaster) {
 	cluster.on('disconnect', function(worker) {
 		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
 	});
+	cluster.on('message', function(worker, msg) {
+		if (msg == "noRespawn") worker.noRespawn = true;
+	});
 	cluster.on('exit', function(worker) {
-		if (worker.exitedAfterDisconnect !== true) {
+		if (worker.noRespawn !== true) {
 			logger.error('Worker %d is killed!', worker.id);
 			cluster.fork();
 		}
@@ -63,8 +66,9 @@ if (cluster.isMaster) {
 		var redisSessionClient = redis.createClient(redisConfig);
 		redisSessionClient.on("error", err => {
 			if (err.code == "NOAUTH" || err.message == "ERR invalid password") {
-				logger.error("Invalid Cache Database credentials");
-				cluster.worker.disconnect().kill();
+				logger.error("Invalid Cache Database Credentials");
+				cluster.worker.send("noRespawn");
+				cluster.worker.kill();
 			}
 			else logger.error("Please run the Cache DB");
 			// throw "Invalid Cache Database credentials";
