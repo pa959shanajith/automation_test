@@ -223,11 +223,11 @@ const SearchPopup = ({ closePopups, taskPopY, setShowTask }) => {
                 <span className="search_task__ic_box">
                     <img className="search_task__ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                 </span>
-                <input className="search_task__input" onChange={onSearchHandler} value={searchValue} placeholder="Seach My task(s)"/>
+                <input className="search_task__input" onChange={onSearchHandler} value={searchValue} placeholder="Seach My task(s)" autoFocus />
             </div>
             <div className="task_pop__list">
                 <div id='task_pop_scroll' className="task_pop__overflow">
-                    <ScrollBar scrollId='task_pop_scroll' trackColor={'transparent'} thumbColor={'grey'}>
+                    <ScrollBar scrollId='task_pop_scroll' trackColor={'transparent'} thumbColor={'grey'} minScrollbarLength={30}>
                         <div className="task_pop__content" id="rb__pop_list">
                             <TaskContents items={searchValue ? searchItems : taskList} cycleDict={cycleDict} taskJson={tasksJson} currUid={uid} />
                         </div>

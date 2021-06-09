@@ -202,7 +202,7 @@ const ScrapeObjectList = () => {
     }
 
     const onDelete = () => {
-        let deletedArr = [];
+        let deletedArr = [...deleted];
         let scrapeItemsL = [...scrapeItems];
         let modifiedDict = {...modified}
         let newScrapeList = [];
