@@ -37,18 +37,13 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             else if(type === "qTest") apiIntegration = loginQTestServer_ICE;
 			const data = await apiIntegration(credentials.url, credentials.userName, credentials.password, type);
             if(data.error){displayError(data.error);return;}
-            else if (data === "unavailableLocalServer") {
-                setErrorMsg("Unavailable LocalServer");
-            } else if (data === "Invalid Session") {
-                setErrorMsg("Invalid Session");
-            } else if (data === "invalidcredentials") {
-                setErrorMsg("Invalid Credentials");
-            } else if (data === "serverdown") {
-                setErrorMsg("Host not reachable.");
-            }
-            else if (data === "invalidurl") {
-                setErrorMsg("Invalid URL");
-            } else {
+            else if (data === "unavailableLocalServer") setErrorMsg("Unavailable LocalServer");
+            else if (data === "Invalid Session") setErrorMsg("Invalid Session");
+            else if (data === "invalidcredentials") setErrorMsg("Invalid Credentials");
+            else if (data === "serverdown") setErrorMsg("Host not serviceable.");
+            else if (data === "notreachable") setErrorMsg("Host not reachable.");
+            else if (data === "invalidurl") setErrorMsg("Invalid URL");
+            else {
                 var integration = {...integrationCred};
                 if(type === "ALM"){
                     integration.alm = {

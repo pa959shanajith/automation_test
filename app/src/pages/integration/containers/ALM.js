@@ -61,7 +61,8 @@ const ALM = props => {
         }
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials");
         else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
-        else if (domainDetails === "serverdown") setLoginError("Host not reachable.");
+        else if (domainDetails === "notreachable") setLoginError("Host not reachable.");
+        else if (domainDetails === "serverdown") setLoginError("Host not serviceable.");
         else if (domainDetails === "fail") setLoginError("Fail to Login");
         else if (domainDetails === "Error:Failed in running Qc") setLoginError("Unable to run Qc");
         else if (domainDetails === "Error:Qc Operations") setLoginError("Failed during execution");
