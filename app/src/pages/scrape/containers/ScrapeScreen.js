@@ -35,7 +35,7 @@ const ScrapeScreen = ()=>{
     const [scrapeItems, setScrapeItems] = useState([]);
     const [mainScrapedData, setMainScrapedData] = useState({});
     const [saved, setSaved] = useState(true);
-    const [mirror, setMirror] = useState(null);
+    const [mirror, setMirror] = useState({scrape: null, compare: null});
     const [showAppPop, setShowAppPop] = useState(false);
     const [isUnderReview, setIsUnderReview] = useState(false);
     const [scrapedURL, setScrapedURL] = useState("");
@@ -99,7 +99,7 @@ const ScrapeScreen = ()=>{
                         let [newScrapeList, newOrderList] = generateScrapeItemList(0, viewString);
 
                         setMainScrapedData(viewString);
-                        setMirror(viewString.mirror);
+                        setMirror({scrape: viewString.mirror, compare: null});
                         setNewScrapedData([]);
                         setScrapeItems(newScrapeList);
                         setHideSubmit(false);
@@ -110,7 +110,7 @@ const ScrapeScreen = ()=>{
                         setScrapeItems([]);
                         setMainScrapedData({});
                         setNewScrapedData([]);
-                        setMirror(null);
+                        setMirror({scrape: null, compare: null});
                         setSaved(true);
                         setHideSubmit(true);
                         setOrderList([]);
@@ -295,6 +295,7 @@ const ScrapeScreen = ()=>{
                 if (data.action === "compare") {
                     if (data.status === "SUCCESS") {
                         let compareObj = generateCompareObject(data, scrapeItems.filter(object => object.xpath.substring(0, 4)==="iris"));
+                        setMirror(oldMirror => ({ ...oldMirror, compare: data.mirror}));
                         dispatch({type: actionTypes.SET_COMPAREDATA, payload: data});
                         dispatch({type: actionTypes.SET_COMPAREOBJ, payload: compareObj});
                         dispatch({type: actionTypes.SET_COMPAREFLAG, payload: true});
@@ -323,7 +324,7 @@ const ScrapeScreen = ()=>{
                         setNewScrapedData(updatedNewScrapeData);
                         updateScrapeItems(scrapeItemList);
                         setScrapedURL(updatedNewScrapeData.scrapedurl);
-                        setMirror(viewString.mirror);
+                        setMirror({scrape: viewString.mirror, compare: null});
                         setOrderList(oldOrderList => [...oldOrderList, ...newOrderList]);
                         
                         if (viewString.view.length > 0) setSaved(false);
@@ -488,7 +489,7 @@ function generateCompareObject(data, irisObjects){
     if (data.view[0].changedobject.length > 0) {
         let localList = [];
         for (let i = 0; i < data.view[0].changedobject.length; i++) {
-            let scrapeItem = getCompareScrapeItem(data.changedobjectskeys[i], data.view[0].changedobject[i]);
+            let scrapeItem = getCompareScrapeItem(uuid(), data.view[0].changedobject[i]);
             localList.push(scrapeItem);
         }
         compareObj.changedObj = localList;
@@ -496,7 +497,7 @@ function generateCompareObject(data, irisObjects){
     if (data.view[1].notchangedobject.length > 0) {
         let localList = [];
         for (let i = 0; i < data.view[1].notchangedobject.length; i++) {
-            let scrapeItem = getCompareScrapeItem(i, data.view[1].notchangedobject[i])
+            let scrapeItem = getCompareScrapeItem(uuid(), data.view[1].notchangedobject[i])
             localList.push(scrapeItem);
         }   
         compareObj.notChangedObj = localList;
@@ -505,7 +506,7 @@ function generateCompareObject(data, irisObjects){
         let localList = [];
         if (data.view[2].notfoundobject.length > 0) {
             for (let i = 0; i < data.view[2].notfoundobject.length; i++) {
-                let scrapeItem = getCompareScrapeItem(i, data.view[2].notfoundobject[i])
+                let scrapeItem = getCompareScrapeItem(uuid(), data.view[2].notfoundobject[i])
                 localList.push(scrapeItem);
             }
         }
@@ -525,7 +526,8 @@ function getCompareScrapeItem(numValue, scrapeObject) {
         left: scrapeObject.left,
         height: scrapeObject.height,
         width: scrapeObject.width,
-        xpath: "",
+        xpath: scrapeObject.xpath,
+        url: scrapeObject.url,
     }
 }
 

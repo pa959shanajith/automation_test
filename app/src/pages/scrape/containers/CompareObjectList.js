@@ -29,12 +29,14 @@ const CompareObjectList = () => {
 
         return ()=>{
             dispatch({type: actions.RESET_COMPARE, payload: null})
+            dispatch({type: actions.SET_OBJVAL, payload: {val: null }});
         }
         //eslint-disable-next-line
     }, [])
 
     const closeCompare = () => {
         dispatch({type: actions.RESET_COMPARE, payload: null})
+        dispatch({type: actions.SET_OBJVAL, payload: {val: null }});
     }
 
     const updateObjects = () => {

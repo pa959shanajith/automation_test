@@ -50,7 +50,7 @@ const RefBarItems = props => {
 	}, [appType]);
 
 	useEffect(()=>{
-		if (props.mirror){
+		if (props.mirror.scrape || (props.mirror.compare && compareFlag)){
 			let mirrorImg = new Image();
 
 			mirrorImg.onload = function(){
@@ -64,7 +64,7 @@ const RefBarItems = props => {
 				setDsRatio(ds_ratio);
 			}
 
-			mirrorImg.src = `data:image/PNG;base64,${props.mirror}`;
+			mirrorImg.src = `data:image/PNG;base64,${compareFlag ? props.mirror.compare : props.mirror.scrape}`;
 		} else {
 			setMirrorHeight("0px");
 			setDsRatio(1);
@@ -201,7 +201,7 @@ const RefBarItems = props => {
 				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' hideXbar={true}>
 					<div data-test="ssScroll" className="ss_scrsht_insideScroll">
 					{ highlight && <div ref={highlightRef} style={{display: "flex", position: "absolute", ...highlight}}></div>}
-					{ props.mirror ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
+					{ (props.mirror.scrape || (props.mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? props.mirror.compare : props.mirror.scrape}`} /> : "No Screenshot Available"}
 					</div>
 				</ScrollBar>
 				</div>
