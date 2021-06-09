@@ -40,6 +40,7 @@ const RefBarItems = props => {
 		dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
 		setHighlight(false);
 		setToFilter([]);
+		setShowScreenPop(false);
 		//eslint-disable-next-line
 	}, [uid, newScrapedData])
 
