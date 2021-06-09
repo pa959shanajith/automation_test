@@ -489,7 +489,7 @@ function generateCompareObject(data, irisObjects){
     if (data.view[0].changedobject.length > 0) {
         let localList = [];
         for (let i = 0; i < data.view[0].changedobject.length; i++) {
-            let scrapeItem = getCompareScrapeItem(uuid(), data.view[0].changedobject[i]);
+            let scrapeItem = getCompareScrapeItem(data.view[0].changedobject[i]);
             localList.push(scrapeItem);
         }
         compareObj.changedObj = localList;
@@ -497,7 +497,7 @@ function generateCompareObject(data, irisObjects){
     if (data.view[1].notchangedobject.length > 0) {
         let localList = [];
         for (let i = 0; i < data.view[1].notchangedobject.length; i++) {
-            let scrapeItem = getCompareScrapeItem(uuid(), data.view[1].notchangedobject[i])
+            let scrapeItem = getCompareScrapeItem(data.view[1].notchangedobject[i])
             localList.push(scrapeItem);
         }   
         compareObj.notChangedObj = localList;
@@ -506,7 +506,7 @@ function generateCompareObject(data, irisObjects){
         let localList = [];
         if (data.view[2].notfoundobject.length > 0) {
             for (let i = 0; i < data.view[2].notfoundobject.length; i++) {
-                let scrapeItem = getCompareScrapeItem(uuid(), data.view[2].notfoundobject[i])
+                let scrapeItem = getCompareScrapeItem(data.view[2].notfoundobject[i])
                 localList.push(scrapeItem);
             }
         }
@@ -515,10 +515,10 @@ function generateCompareObject(data, irisObjects){
     return compareObj;
 } 
 
-function getCompareScrapeItem(numValue, scrapeObject) {
+function getCompareScrapeItem(scrapeObject) {
     return {
         ObjId: scrapeObject._id,
-        val: numValue,
+        val: uuid(),
         tag: scrapeObject.tag,
         title: scrapeObject.custname.replace(/[<>]/g, '').trim(),
         custname: scrapeObject.custname,
@@ -528,6 +528,7 @@ function getCompareScrapeItem(numValue, scrapeObject) {
         width: scrapeObject.width,
         xpath: scrapeObject.xpath,
         url: scrapeObject.url,
+        checked: false
     }
 }
 
