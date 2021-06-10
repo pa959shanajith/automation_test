@@ -8,21 +8,23 @@ module.exports.tokenValidation = async (userInfo) => {
 	const icename = (userInfo.icename || "").toLowerCase();
 	const poolname = (userInfo.poolname || "");
 	userInfo.inputs = {
-		"tokenValidation": {
-			"status": "failed",
-			"msg": "Token authentication failed"
-		}
+		"tokenValidation": "failed",
+		"error_message": "Token validation failed"
 	}
 	let iceMap = queue.Execution_Queue.poolname_ice_map;
 	if (poolname != "" && !iceMap[poolname]) return userInfo
 	//Directly validate on ice name if the following 2 conditions are true:
 	// 1. ice name is sent
-	// 2. pool name not sent OR pool name is sent but ice does not belong to this pool 
-	if(icename != "" && (poolname == "" || !checkICEinPool(icename, iceMap[poolname]))){
+	// 2. pool name not sent OR pool name is sent and ice belongs to this pool 
+
+	if(icename != "" && (poolname == "" || checkICEinPool(icename, iceMap[poolname]))){
 		userInfo.icename = icename;
 		var userValidation =  await validateUser(icename, userInfo)
 		userValidation['owner'] = true;
 		return userValidation;
+	}else if(poolname != "" && icename != ""){
+		userInfo.inputs.error_message = "ICE does not belong to provided poolname."
+		return userInfo;
 	}
 	let iceList = iceMap[poolname];
 	for(let id in iceList){
