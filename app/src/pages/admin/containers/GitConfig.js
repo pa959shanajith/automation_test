@@ -14,6 +14,7 @@ const GitConfig = (props) => {
     const userRef =  useRef();
     const domainRef =  useRef();
     const ProjectRef =  useRef();
+    const gitconfigRef = useRef();
     const tokenRef =  useRef();
     const urlRef =  useRef();
     const gituserRef = useRef();
@@ -30,13 +31,13 @@ const GitConfig = (props) => {
     
     useEffect(()=>{
         setShowEdit(false);
-		refreshFields(domainRef, ProjectRef, userRef, tokenRef, urlRef, gituserRef, gitemailRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading);
+		refreshFields(domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading);
         // eslint-disable-next-line
 	},[props.resetMiddleScreen["gitConfigure"],props.MiddleScreen])
 
     const onClickEdit = () => {
         setShowEdit(true);
-        refreshFields(domainRef, ProjectRef, userRef, tokenRef, urlRef, gituserRef, gitemailRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading); 
+        refreshFields(domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading); 
     }
 
     const displayError = (error,header) =>{
@@ -57,6 +58,7 @@ const GitConfig = (props) => {
             setProjectData({})
         } else if(changeDropDown === "domainChange")  if(document.getElementById("projectGit") !== null) document.getElementById("projectGit").selectedIndex = "0";
         urlRef.current.style.outline = "";
+        gitconfigRef.current.style.outline = "";
         tokenRef.current.style.outline = "";
         domainRef.current.style.outline = "";
         ProjectRef.current.style.outline = "";
@@ -64,6 +66,7 @@ const GitConfig = (props) => {
         gituserRef.current.style.outline = "";
         gitemailRef.current.style.outline = "";
         if(showEdit) {
+            gitconfigRef.current.value = "";
             tokenRef.current.value = "";
             urlRef.current.value = "";
             gituserRef.current.value = "";
@@ -72,7 +75,7 @@ const GitConfig = (props) => {
     } 
 
     const resetFields = () => {
-        refreshFields(domainRef, ProjectRef, userRef, tokenRef, urlRef, gituserRef, gitemailRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading); 
+        refreshFields(domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading); 
     }
 
     return (
@@ -82,11 +85,12 @@ const GitConfig = (props) => {
                 {loading?<ScreenOverlay content={loading}/>:null}
 
                 <div id="page-taskName"><span>{(showEdit===false)?"Git Configuration":"Edit Git Configuration"}</span></div>
-                <GitButtonActions resetFields={resetFields} showEdit={showEdit} onClickEdit={onClickEdit} domain={domainRef} user={userRef} Project={ProjectRef} token={tokenRef} url={urlRef} gituser={gituserRef} gitemail={gitemailRef} userData={userData} projectData={projectData} setLoading={setLoading} displayError={displayError} refreshFields={refreshFields} setPopupState={setPopupState} />        
+                <GitButtonActions resetFields={resetFields} showEdit={showEdit} onClickEdit={onClickEdit} domain={domainRef} user={userRef} Project={ProjectRef} gitname={gitconfigRef} token={tokenRef} url={urlRef} gituser={gituserRef} gitemail={gitemailRef} userData={userData} projectData={projectData} setLoading={setLoading} displayError={displayError} refreshFields={refreshFields} setPopupState={setPopupState} />        
                 <div className="git_token" >
                 <FormSelect data-test="user_git" inpId={'userGit'} inpRef={userRef} onChangeFn={()=>fetchDomainList(resetSelectList, setDomainList, displayError, setLoading)} defValue={"Select User"} label={"User"} option={userList}/>
-                <FormSelect data-test="domain_git" inpId={'domainGit'} inpRef={domainRef} onChangeFn={()=>fetchProjectList(resetSelectList, domainRef.current.value, setProjectList, setProjectData, displayError, setLoading)} defValue={"Select Domain"} label={"Domain"} option={domainList}/>
-                <FormSelect data-test="project_git" inpId={'projectGit'} inpRef={ProjectRef} onChangeFn={()=>{onChangeProject(resetFields,displayError, showEdit, urlRef, tokenRef, gituserRef, gitemailRef,userData, userRef, projectData, ProjectRef, setLoading, setPopupState)}} defValue={"Select Project"} label={"Project"} option={projectList}/>
+                <FormSelect data-test="domain_git" inpId={'domainGit'} inpRef={domainRef} onChangeFn={()=>fetchProjectList(resetSelectList, domainRef.current.value, userData, userRef, setProjectList, setProjectData, displayError, setLoading)} defValue={"Select Domain"} label={"Domain"} option={domainList}/>
+                <FormSelect data-test="project_git" inpId={'projectGit'} inpRef={ProjectRef} onChangeFn={()=>{onChangeProject(resetFields,displayError, showEdit, urlRef, gitconfigRef, tokenRef, gituserRef, gitemailRef,userData, userRef, projectData, ProjectRef, setLoading, setPopupState)}} defValue={"Select Project"} label={"Project"} option={projectList}/>
+                    <FormInput data-test="name_git" inpRef={gitconfigRef} label={'Git Configuration'} placeholder={'Enter Git Configuration Name'} />
                     <FormInput data-test="token_git" inpRef={tokenRef} label={'Git Access Token'} placeholder={'Enter Git Access Token'} />
                     <FormInput data-test="url_git" inpRef={urlRef} label={'Git URL'} placeholder={'Enter Git URL'}/>
                     <FormInput data-test="username_git" inpRef={gituserRef} label={'Git User Name'} placeholder={'Enter Git Username'} />
@@ -97,8 +101,9 @@ const GitConfig = (props) => {
     );
 }
 
-const onChangeProject = async (resetFields, displayError, showEdit, urlRef, tokenRef, gituserRef, gitemailRef, userData, userRef, projectData, ProjectRef, setLoading, setPopupState ) =>{
+const onChangeProject = async (resetFields, displayError, showEdit, urlRef, gitconfigRef, tokenRef, gituserRef, gitemailRef, userData, userRef, projectData, ProjectRef, setLoading, setPopupState ) =>{
     urlRef.current.style.outline = "";
+    gitconfigRef.current.style.outline = "";
     tokenRef.current.style.outline = "";
     ProjectRef.current.style.outline = "";
     gituserRef.current.style.outline = "";
@@ -111,20 +116,22 @@ const onChangeProject = async (resetFields, displayError, showEdit, urlRef, toke
         setPopupState({show:true,title:"Edit Git User",content:"No git configuration created yet."})
         resetFields();
     } else {
-        tokenRef.current.value = data[0];
-        urlRef.current.value = data[1]
-        gituserRef.current.value = data[2]
-        gitemailRef.current.value = data[3]
+        gitconfigRef.current.value = data[0]
+        tokenRef.current.value = data[1];
+        urlRef.current.value = data[2]
+        gituserRef.current.value = data[3]
+        gitemailRef.current.value = data[4]
     }
     setLoading(false);
 }
 
-const refreshFields = ( domainRef, ProjectRef, userRef, tokenRef, gituserRef, gitemailRef, urlRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading) => {
+const refreshFields = ( domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, gituserRef, gitemailRef, urlRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading) => {
     fetchUsers(setUserList, setUserData, displayError, setLoading);
     setDomainList([])
     setProjectList([])
     setUserData({})
     setProjectData({})
+    gitconfigRef.current.value = "";
     tokenRef.current.value = "";
     urlRef.current.value = "";
     gituserRef.current.value = "";
@@ -132,6 +139,7 @@ const refreshFields = ( domainRef, ProjectRef, userRef, tokenRef, gituserRef, gi
     if(document.getElementById("userGit") !== null) document.getElementById("userGit").selectedIndex = "0"; 
     if(document.getElementById("domainGit") !== null) document.getElementById("domainGit").selectedIndex = "0"; 
     if(document.getElementById("projectGit") !== null) document.getElementById("projectGit").selectedIndex = "0";
+    gitconfigRef.current.style.outline = "";
     urlRef.current.style.outline = "";
     tokenRef.current.style.outline = "";
     domainRef.current.style.outline = "";
@@ -167,12 +175,13 @@ const fetchUsers = async (setUserList, setUserData, displayError, setLoading)=>{
     setLoading(false); 
 }
 
-const fetchProjectList = async (resetSelectList, domain, setProjectList, setProjectData, displayError, setLoading) => {
+const fetchProjectList = async (resetSelectList, domain, userData, userRef, setProjectList, setProjectData, displayError, setLoading) => {
     setLoading("Loading Projects...")
-    var idtype = ["domaindetails"];
-    var requestedname = [];
-    requestedname.push(domain);
-    const getDetailsResponse = await getDetails_ICE(idtype, requestedname)
+    var idtype = ["gitdomaindetails"];
+    var requestedname = {};
+    requestedname.domainname = domain;
+    requestedname.userid = userData[userRef.current.value];
+    const getDetailsResponse = await getDetails_ICE(idtype, [requestedname])
     if(getDetailsResponse.error){displayError(getDetailsResponse.error);return;}
     const projectOptions=[];
     const projectData = {};

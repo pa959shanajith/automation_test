@@ -961,7 +961,7 @@ exports.getDetails_ICE = function (req, res) {
 					responsedata.projectDetails=queryStringresult.rows.releases
 					res.send(responsedata);
 					}
-					else if(type == "domaindetails"){
+					else if(type == "domaindetails" || type =="gitdomaindetails"){
 						var responsedatadomains = {
 							projectIds: [],
 							projectNames: []
@@ -2253,6 +2253,7 @@ exports.gitSaveConfig = async (req, res) => {
 		const action = data.action;
 		const userId = data.userId;
 		const projectId = data.projectId;
+		const gitConfigName = data.gitConfigName;
 		const gitAccToken = data.gitAccToken;
 		const gitUrl = data.gitUrl;
 		const gitUsername = data.gitUsername;
@@ -2261,6 +2262,7 @@ exports.gitSaveConfig = async (req, res) => {
 			"action":action,
 			"userId":userId,
 			"projectId":projectId,
+			"gitConfigName":gitConfigName,
 			"gitAccToken": gitAccToken,
 			"gitUrl":gitUrl,
 			"gitUsername":gitUsername,
@@ -2291,7 +2293,7 @@ exports.gitEditConfig = async (req, res) => {
 		else if (result == "empty") res.send("empty");
 		else {
 			let data = [];
-			data.push(result['gitaccesstoken'], result['giturl'], result['gitusername'], result['gituseremail']);
+			data.push(result['name'], result['gitaccesstoken'], result['giturl'], result['gitusername'], result['gituseremail']);
 			return res.send(data);
 		}
 	} catch (exception){

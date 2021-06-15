@@ -40,6 +40,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
     const ftypeRef = useRef()
     const uploadFileRef = useRef()
     const projRef = useRef()
+    const gitconfigRef = useRef()
     const gitBranchRef = useRef()
     const gitVerRef = useRef()
     const gitPathRef = useRef()
@@ -69,7 +70,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
         if(submit){
             setSubmit(false)
             setError('')
-            var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
+            var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
             if(err){
                 return;
             }
@@ -78,6 +79,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                 if(importType === 'git'){
                     var data = await importGitMindmap ({
                         projectid : projRef.current.value,
+                        gitname : gitconfigRef.current.value,
                         gitbranch : gitBranchRef.current.value,
                         gitversion : gitVerRef.current.value,
                         gitfolderpath : gitPathRef.current.value
@@ -149,12 +151,16 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                                 </select>
                             </div>
                             <div>
+                                <label>Git Configuration: </label>
+                                <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Git configuration name'} ref={gitconfigRef}/>
+                            </div>
+                            <div>
                                 <label>Git Branch: </label>
                                 <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Branch name'} ref={gitBranchRef}/>
                             </div>
                             <div>
                                 <label>Version: </label>
-                                <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version name'} ref={gitVerRef}/>
+                                <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version'} ref={gitVerRef}/>
                             </div>
                             <div>
                                 <label>Folder Path: </label>
@@ -232,9 +238,9 @@ const Footer = ({error,setSubmit}) =>{
     )
 }
 
-const validate = ({ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef}) =>{
+const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef}) =>{
     var err = false;
-    [ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef].forEach((e)=>{
+    [ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef].forEach((e)=>{
         if(e.current){
             e.current.style.border = '1px solid black';
             if(e.current.value === 'def-val' || e.current.value === ''){

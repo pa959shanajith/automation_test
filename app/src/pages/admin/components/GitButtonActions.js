@@ -13,6 +13,7 @@ const GitButtonActions = (props) => {
     const onClickEdit = props.onClickEdit;
     const user = props.user 
     const Project = props.Project
+    const gitConfigName = props.gitname
     const gitAccToken = props.token
 	const gitUsername = props.gituser
     const gitEmail = props.gitemail
@@ -28,15 +29,16 @@ const GitButtonActions = (props) => {
 
     useEffect(()=>{
         if(updateBtnRef!== undefined && updateBtnRef.current !==undefined )
-        updateBtnRef.current.disabled = (gitAccToken.current.value === 'none' || gitUrl.current.value === "def-opt" || gitUsername.current.value ==='none' || gitEmail.current.value==='none')
-    },[gitAccToken, gitUrl, gitUsername, gitEmail])
+        updateBtnRef.current.disabled = (gitConfigName.current.value === 'none' || gitAccToken.current.value === 'none' || gitUrl.current.value === "def-opt" || gitUsername.current.value ==='none' || gitEmail.current.value==='none')
+    },[gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail])
 
     const gitConfigAction = async (action) => {
-        if (!gitValidate(action, user, domain, Project, gitAccToken, gitUrl, gitUsername, gitEmail, setPopupState)) return;
+        if (!gitValidate(action, user, domain, Project, gitConfigName ,gitAccToken, gitUrl, gitUsername, gitEmail, setPopupState)) return;
         setLoading("Loading...");
-        const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitAccToken.current.value.trim(),gitUrl.current.value.trim(),gitUsername.current.value.trim(),gitEmail.current.value.trim());
+        const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitConfigName.current.value.trim(),gitAccToken.current.value.trim(),gitUrl.current.value.trim(),gitUsername.current.value.trim(),gitEmail.current.value.trim());
         if(data.error){displayError(data.error);return;}
-        else if(data  === 'GitUser Exists')  setPopupState({show:true,title:"Save Git Config",content:"Git config already exist for this user."});
+        else if (data === 'GitConfig exists') setPopupState({show:true,title:"Save Git Config",content:"Git Configration Name already exists."});
+        else if(data  === 'GitUser exists')  setPopupState({show:true,title:"Save Git Config",content:"Git config already exist for this user."});
         else setPopupState({show:true,title:"Save Git Config",content:"Git user "+action+ "d successfully"});
         setLoading(false);
         resetFields();
@@ -73,13 +75,14 @@ const GitButtonActions = (props) => {
     );
 }
 
-const gitValidate = (action, user, domain, Project, gitAccToken, gitUrl, gitUsername, gitEmail, setPopupState) => {
+const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail, setPopupState) => {
     var flag = true;
     const errBorder = '2px solid red';
     var regExUrl = /^https:\/\//g;
     user.current.style.outline = "";
     domain.current.style.outline = "";
     Project.current.style.outline = "";
+    gitConfigName.current.style.outline = "";
     gitAccToken.current.style.outline = "";
     gitUrl.current.style.outline = "";
 	gitUsername.current.style.outline = "";
@@ -95,6 +98,10 @@ const gitValidate = (action, user, domain, Project, gitAccToken, gitUrl, gitUser
     }
     if (Project.current.value === 'def-opt') {
         Project.current.style.outline = errBorder
+        flag = false;
+    }
+    if(gitConfigName.current.value === "" && action!=="delete"){
+        gitConfigName.current.style.outline = errBorder
         flag = false;
     }
     if(gitAccToken.current.value === "" && action!=="delete"){
