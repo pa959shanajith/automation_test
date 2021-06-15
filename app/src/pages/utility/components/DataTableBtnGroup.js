@@ -120,7 +120,7 @@ const TableActionButtons = props => {
                     <button data-test="dt__tblActionBtns" key={i} className="dt__tblBtn" onClick={()=>btn.onClick()}>
                         { btn.img
                             ? <img className="dt__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title} />
-                            : <i className={`dt__faBtn ${btn.class}`} /> }
+                            : <i className={`dt__faBtn ${btn.class}`} title={btn.title} /> }
                     </button>
                 )
             }
