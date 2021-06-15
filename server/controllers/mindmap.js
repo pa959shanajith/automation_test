@@ -1589,7 +1589,8 @@ exports.exportToGit = async (req, res) => {
 	logger.info("Inside UI service: " + actionName);
 	try {
 		const data = req.body;
-		const gitVersionName = data.gitVersion;
+		const gitname = data.gitconfig;
+		const gitVersion = data.gitVersion;
 		var gitFolderPath = data.gitFolderPath;
 		const gitBranch = data.gitBranch;
 		const moduleId = data.mindmapId;
@@ -1600,8 +1601,9 @@ exports.exportToGit = async (req, res) => {
 			"moduleId":moduleId,
 			"userid":req.session.userid,
 			"action":actionName,
+			"gitname":gitname,
 			"gitBranch":gitBranch,
-			"gitVersionName": gitVersionName,
+			"gitVersion": gitVersion,
 			"gitFolderPath": gitFolderPath
 		};
 		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
@@ -1655,6 +1657,7 @@ exports.importGitMindmap = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const projectid = req.body.projectid;
+		const gitname = req.body.gitname;
 		const gitbranch = req.body.gitbranch;
 		const gitversion = req.body.gitversion;
 		var gitfolderpath = req.body.gitfolderpath;
@@ -1665,9 +1668,10 @@ exports.importGitMindmap = async (req, res) => {
 			"userid": req.session.userid,
 			"roleid": req.session.activeRoleId,
 			"projectid": projectid,
+			"gitname": gitname,
 			"gitbranch": gitbranch,
-			"gitversion":gitversion,
-			"gitfolderpath":gitfolderpath
+			"gitversion": gitversion,
+			"gitfolderpath": gitfolderpath
 		}
 		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);
 		res.send(result)

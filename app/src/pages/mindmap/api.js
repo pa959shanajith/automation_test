@@ -395,7 +395,7 @@ export const importGitMindmap = async(data) => {
         }
         if(res.data === "empty"){
             console.error(res.data)
-            return {error:'Project is not Git configured!'}
+            return {error:'Git Configuration does not exist. Please verify your inputs!'}
         }
         if(res.data === "Invalid inputs"){
             console.error(res.data)
@@ -441,27 +441,31 @@ export const exportToGit = async(data) => {
             RedirectPage(history)
             return {error:'invalid session'};
         }
-        if(res.data==='empty'){
+        else if(res.data==='empty'){
             console.error(res.data)
-            return {error:'Project is not Git configured.'}
+            return {error:'Project is not Git configured. Please verify!'}
         }
-        if(res.data==='commit exists'){
+        else if(res.data==='Invalid config name'){
+            console.error(res.data)
+            return {error:'Git configuration does not exists. Please verify!'}
+        }
+        else if(res.data==='commit exists'){
             console.error(res.data)
             return {error:'Git commit version already exists.'}
         }
-        if(res.data==='Invalid gitbranch'){
+        else if(res.data==='Invalid gitbranch'){
             console.error(res.data)
             return {error:"Input branch doesn't exist in Git. Please verify!"}
         }
-        if(res.data==='Invalid url'){
+        else if(res.data==='Invalid url'){
             console.error(res.data)
             return {error:"Error in Git config: Invalid Git clone path"}
         }
-        if(res.data==='Invalid token'){
+        else if(res.data==='Invalid token'){
             console.error(res.data)
             return {error:"Error in Git config: Invalid Git access token"}
         }
-        if(res.status===200 && res.data !== "fail"){          
+        else if(res.status===200 && res.data !== "fail"){          
             return res.data;
         }
         console.error(res.data)

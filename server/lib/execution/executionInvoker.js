@@ -30,7 +30,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
     executeScheduleTestSuite = async function (batchExecutionData, execIds, userInfo, type) {
         const scheduleId = execIds["scheduleId"];
         const fnName = "executeScheduleTestSuite";
-        var versionname = 'NA';
+        var version = '-';
         try {
             result = await executor.execute(batchExecutionData, execIds, userInfo, type);
         } catch (ex) {
@@ -54,7 +54,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
                 msg = "Scenario execution failed due to an error encountered during execution";
             }
             const tsuIds = batchExecutionData.batchInfo.map(u => u.testsuiteId);
-            const currExecIds = await executor.generateExecutionId(execIds, tsuIds, userInfo.userid, versionname);
+            const currExecIds = await executor.generateExecutionId(execIds, tsuIds, userInfo.userid, version);
             if (currExecIds != "fail") {
                 const batchObj = {
                     "executionIds": tsuIds.map(i => currExecIds.execids[i]),
@@ -135,6 +135,9 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
             case "Skipped":
                 statusCode = '409'
                 execResponse.error_message = "Execution is skipped because another execution is running in ICE";
+                break;
+            case "No config":
+                execResponse.error_message = "Git configuration does not exist. Please check your inputs!"
                 break;
             case "fail":
                 execResponse.error_message = "Internal error occurred during execution"

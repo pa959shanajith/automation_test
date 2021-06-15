@@ -12,6 +12,7 @@ import PropTypes from 'prop-types'
 const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,cycleRef}) => {
     const fnameRef = useRef()
     const ftypeRef = useRef()
+    const gitconfigRef = useRef()
     const gitBranchRef =  useRef()
     const gitVerRef =  useRef()
     const gitPathRef =  useRef()
@@ -27,7 +28,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
     }
     const clickExport = () => {
         if(!selectedModule._id)return;
-        var err = validate([fnameRef,ftypeRef,gitBranchRef,gitVerRef])
+        var err = validate([fnameRef,ftypeRef,gitconfigRef,gitBranchRef,gitVerRef])
         if(err)return
         setExportBox(false)
         setBlockui({show:true,content:'Exporting Mindmap ...'})
@@ -35,7 +36,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
         if(ftype === 'json') toJSON(selectedModule,fnameRef.current.value,displayError,setPopup,setBlockui);
         if(ftype === 'excel') toExcel(selectedProj,selectedModule,fnameRef.current.value,displayError,setPopup,setBlockui);
         if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setPopup,setBlockui);
-        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitVerRef,gitPathRef,gitBranchRef,selectedModule,setPopup});
+        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule,setPopup});
     }
     return(
         <Fragment>
@@ -43,7 +44,7 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
             title='Export MindMap'
             close={()=>setExportBox(false)}
             footer={<Footer clickExport={clickExport}/>}
-            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={selectedModule.name} isAssign={isAssign}/>} 
+            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={selectedModule.name} isAssign={isAssign}/>} 
             />:null}
             <svg data-test="exportButton" className={"ct-exportBtn"+(selectedModule._id?"":" disableButton")} id="ct-save" onClick={openExport}>
                 <g id="ct-exportAction" className="ct-actionButton">
@@ -69,7 +70,7 @@ const validate = (arr) =>{
     return err
 }
 
-const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,isAssign,gitBranchRef,gitVerRef,gitPathRef}) =>{
+const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef}) =>{
     const [expType,setExpType] = useState(undefined)
     const changeExport = (e) => {
         setExpType(e.target.value)
@@ -92,16 +93,20 @@ const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,isAssign,gitBranchRef,g
             {(expType === 'git')?
                 <Fragment>
                     <div className='export-row'>
+                        <label>Git Configuration: </label>
+                        <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Git configuration name'} ref={gitconfigRef}/>
+                    </div>
+                    <div className='export-row'>
                         <label>Git Branch: </label>
                         <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Branch name'} ref={gitBranchRef}/>
                     </div>
                     <div className='export-row'>
                         <label>Version: </label>
-                        <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version name'} ref={gitVerRef}/>
+                        <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version'} ref={gitVerRef}/>
                     </div>
                     <div className='export-row'>
                         <label>Folder Path: </label>
-                        <input placeholder={'Ex: Projectname/Modulename(optional)'} ref={gitPathRef}/>
+                        <input placeholder={'Projectname/Modulename (optional)'} ref={gitPathRef}/>
                     </div>
                 </Fragment>:null
             }
@@ -180,12 +185,13 @@ const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
     param :
 */
 
-const toGit = async ({projectList,displayError,setBlockui,setPopup,gitVerRef,gitPathRef,gitBranchRef,selectedModule,selectedProj}) => {
+const toGit = async ({projectList,displayError,setBlockui,setPopup,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule,selectedProj}) => {
     var gitpath=gitPathRef.current.value;
 	if(!gitpath){
         gitpath = 'avoassuretest_artifacts/'+projectList[selectedProj].name+'/'+selectedModule.name;
     }
     var res = await exportToGit({
+        gitconfig: gitconfigRef.current.value,
         gitVersion: gitVerRef.current.value,
 		gitFolderPath:gitpath,
 		gitBranch: gitBranchRef.current.value,
@@ -210,7 +216,7 @@ const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycle
     try{
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
-        var executionData = { "executionData": { "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"url":"","username":"","password":""}}, "gitInfo": {"gitbranch":"","folderPath":"","gitVersionName":""}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))] } };
+        var executionData = { "executionData": { "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"url":"","username":"","password":""}}, "gitInfo": {"gitConfiguration":"","gitbranch":"","folderPath":"","gitVersion":""}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))] } };
         var moduleInfo = { "batchInfo": [] };
         moduleData.appType = projectList[selectedProj].apptypeName;
         moduleData.domainName = projectList[selectedProj].domains;

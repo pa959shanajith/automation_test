@@ -1067,7 +1067,7 @@ export const unlockUser = async(user) => {
   api returns
 */
 
-export const gitSaveConfig = async(action, userId,projectId,gitAccToken,gitUrl,gitUsername,gitEmail) => { 
+export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAccToken,gitUrl,gitUsername,gitEmail) => { 
     try{
         const res = await axios(url+'/gitSaveConfig', {
             method: 'POST',
@@ -1077,6 +1077,7 @@ export const gitSaveConfig = async(action, userId,projectId,gitAccToken,gitUrl,g
             data: {action: action,
                     userId: userId,
                     projectId: projectId,
+                    gitConfigName: gitConfigName,
                     gitAccToken: gitAccToken,
                     gitUrl: gitUrl,
                     gitUsername:gitUsername,

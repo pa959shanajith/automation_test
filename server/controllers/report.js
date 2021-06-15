@@ -238,7 +238,7 @@ const prepareReportData = (reportData, embedImages) => {
     const endTimeStamp = report.overallstatus[0].EndTime.split(".")[0];
     const endDate = endTimeStamp.split(" ")[0].split("-");
     let elapTime = (report.overallstatus[0].EllapsedTime.split(".")[0]).split(":");
-    report.overallstatus[0].versionname = reportData.versionname;
+    report.overallstatus[0].version = reportData.version;
     report.overallstatus[0].domainName = reportData.domainname;
     report.overallstatus[0].projectName = reportData.projectname;
     report.overallstatus[0].releaseName = reportData.releasename;
