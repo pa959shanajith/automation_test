@@ -142,23 +142,27 @@ const CreateScreenActionButtons = props => {
     
     const saveDataTable = async() => {
         try{
-            let error = validateData(props.tableName);
-            
-            if (error) props.setErrors(error);
-            else {
-                let arg = prepareSaveData(props.tableName, props.headers, props.data);
+            let arg = prepareSaveData(props.tableName, props.headers, props.data);
 
-                props.setOverlay('Creating Data Table...');
-                let resp = await utilApi.createDataTable(arg);
-                props.setOverlay('');
+            let validation = validateData(arg.tableName, arg.data);
 
-                switch (resp) {
-                    case "exists": props.setShowPop({title: 'Data Table', content: 'Data Table Already Exist!', type: "message"}); break;
-                    case "fail": props.setShowPop({title: 'Data Table', content: 'Failed to Create Data Table', type: "message"}); break;
-                    case "success": props.setShowPop({title: 'Data Table', content: 'Data Table Saved Successfully!', type: "message"}); break;
-                    default: props.setShowPop({title: 'Data Table Error', content: resp.error || "Failed To Create Data Table", type: "message"}); break;
-                }   
-                props.setErrors({})
+            switch (validation) {
+                case "tableName": props.setErrors({tableName: true}); break;
+                case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
+                case "saveData": 
+                    props.setOverlay('Creating Data Table...');
+                    let resp = await utilApi.createDataTable(arg);
+                    props.setOverlay('');
+
+                    switch (resp) {
+                        case "exists": props.setShowPop({title: 'Data Table', content: 'Data Table Already Exist!', type: "message"}); break;
+                        case "fail": props.setShowPop({title: 'Data Table', content: 'Failed to Create Data Table', type: "message"}); break;
+                        case "success": props.setShowPop({title: 'Data Table', content: 'Data Table Saved Successfully!', type: "message"}); break;
+                        default: props.setShowPop({title: 'Data Table Error', content: resp.error || "Failed To Create Data Table", type: "message"}); break;
+                    }   
+                    props.setErrors({}); 
+                    break;
+                default: props.setShowPop({title: 'Data Table', content: 'Failed to Create Data Table', type: "message"}); break;
             }
         }
         catch(error) {

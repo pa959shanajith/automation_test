@@ -56,12 +56,14 @@ const updateData = (data, headers, lastEntry) => {
 
 
 function prepareSaveData (tableName, headers, data){
+    let hasValue = false;
     const name = tableName;
     const headerArray = headers.map(header => header.name);
     const valuesArray = data.map(row => {
         let filteredObject = {};
         headerArray.forEach(headerName => {
             filteredObject[headerName] = row[headerName] || "";
+            if (!hasValue && filteredObject[headerName].trim()) hasValue = true;
         })
         return filteredObject;
     })
@@ -69,17 +71,20 @@ function prepareSaveData (tableName, headers, data){
     return {
         tableName: name,
         headers: headerArray,
-        data: valuesArray
+        data: hasValue ? valuesArray : "emptyData"
     }
 }
 
-function validateData (tableName) {
-    let error = false;
+function validateData (tableName, tableData) {
+    let validation = "saveData";
     let invalidReg = /[\/:^?<>|\\&'"]/g;
 
     if (!tableName.trim() || invalidReg.test(tableName))
-        error = {tableName: true};
-    return error;
+        validation = "tableName";
+    else if (tableData === "emptyData")
+        validation = "emptyData";
+
+    return validation;
 }
 
 

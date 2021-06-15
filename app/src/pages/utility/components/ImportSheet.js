@@ -15,7 +15,7 @@ const ImportSheet = props => {
         }
     }, [props])
 
-    const [sheet, setSheet] = useState([]);
+    const [sheet, setSheet] = useState("");
     const [sheetList, setSheetList] = useState([]);
 
     // const handleFilename = e => setFilename(e.target.value);
@@ -50,7 +50,7 @@ const ImportSheet = props => {
                         <select value={sheet} onChange={handleSheet}>
                             {
                                 sheetList.map(sheet_ => {
-                                    return <option value={sheet_}>{sheet_}</option>
+                                    return <option key={sheet_} value={sheet_}>{sheet_}</option>
                                 })
                             }
                         </select>
