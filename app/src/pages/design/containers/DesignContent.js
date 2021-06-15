@@ -740,7 +740,7 @@ const DesignContent = props => {
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
 
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
-    let key = 0;
+
     return (
         <>
         { showSM && <SelectMultipleDialog data-test="d__selectMultiple" setShow={setShowSM} selectSteps={selectSteps} upperLimit={testCaseData.length} /> }
@@ -815,13 +815,13 @@ const DesignContent = props => {
                             <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row" onStart={onDrop}>
                                 {
                                 testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row"
-                                    key={key++} idx={i} objList={objNameList} testCase={testCase} edit={edit} 
+                                    key={i} idx={i} objList={objNameList} testCase={testCase} edit={edit} 
                                     getKeywords={getKeywords} getRowPlaceholders={getRowPlaceholders} stepSelect={stepSelect}
                                     updateChecklist={updateChecklist} setStepSelect={setStepSelect}
                                     setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
                                     rowChange={rowChange}
                                                         />)
-                                }
+                                } 
                             </ReactSortable>
                             </ClickAwayListener>
                             </ScrollBar>
