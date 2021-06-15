@@ -99,6 +99,8 @@ const SocketFactory = () => {
         else setPopupState({show:true, 'title': "Execute Test Suite", 'content':"Failed to execute."});
     }
 
+
+
     return(
         <Fragment>
             {popupState.show && <PopupMsg content={popupState.content} title={popupState.title} submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} submitText={"Ok"} />}
@@ -108,6 +110,7 @@ const SocketFactory = () => {
 }
 
 const displayExecutionPopup = (value, setPopupState) =>{
+    var msg = "";
     var val;
     for(val in value){
         var data = value[val].status;
@@ -125,9 +128,10 @@ const displayExecutionPopup = (value, setPopupState) =>{
         else if (data == "API Execution Completed") data = exec + "API Execution Completed"
         else if (data == "API Execution Fail") data = exec + "API Execution Failed"
         else data = exec + "Failed to execute.";
+        msg = msg + "\n" + data;
     }
-    if(data && data.trim() != ""){
-        setPopupState({show:true,'title': 'Execution Result', 'content':data});
+    if(msg && msg.trim() != ""){
+        setPopupState({show:true,'title': 'Execution Result', 'content':msg});
     }
 }
 
