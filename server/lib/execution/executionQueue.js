@@ -231,7 +231,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 userInfo.invokinguserrole = userInfo.role;
                 if (userInfo.inputs.tokenValidation != "passed") {
                     res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['401']);
-                    return res.status('401').send({"error": "Token validation Failed"});
+                    return res.status('401').send({"error": userInfo.inputs.error_message});
                 } 
                 delete userInfo.inputs.error_message;
                 targetICE = headerUserInfo.icename || EMPTYUSER;
