@@ -33,7 +33,7 @@ const ImportSheet = props => {
             }
             else if (resp == "rowExceeds") {
                 props.setSheetList([]);
-                props.setShowPop({title: "File Read Error", content: "Column should not exceed 15", type: "message"});
+                props.setShowPop({title: "File Read Error", content: "Row should not exceed 200", type: "message"});
             }
             else if (typeof resp === "object"){
                 const [, newData, newHeaders] = parseTableData(resp)
