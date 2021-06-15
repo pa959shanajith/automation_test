@@ -105,9 +105,6 @@ function loadReports() {
                     if(screenshot && screenshot.length <= 0 && screenshot.toLowerCase().indexOf(".png") == -1) {
                         $(getRows[i]).children().children().removeClass('openscreenshot');
                     }
-                    if (getRows[i].children[1].innerHTML.indexOf('Start iteration') >= 0) {
-                        getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -110px;"></i>';
-                    }
                 }
                 unblockUI();
                 if (errorMsg) {
@@ -547,6 +544,8 @@ function loadReports() {
             var repType = $(this).attr("data-rep");
             var filename = $(".scenarioName").text().substr(2) + "." + repType;
             var url = window.location.href + '.' + repType;
+            var blockMsg = "Loading Report..."
+            blockUI(blockMsg)
             if (repType == "json") {
                 $.ajax({
                     type: 'GET',
@@ -558,6 +557,7 @@ function loadReports() {
                             type: "text/json;charset=utf-8"
                         });
                         downloadFile(filedata, filename);
+                        unblockUI();
                     },
                     error: function(jqXHR) {
                         unblockUI();
@@ -581,6 +581,7 @@ function loadReports() {
                             type: "application/pdf;charset=utf-8"
                         });
                         downloadFile(filedata, filename);
+                        unblockUI();
                     },
                     error: function(jqXHR) {
                         unblockUI();
