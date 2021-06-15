@@ -105,6 +105,9 @@ function loadReports() {
                     if(screenshot && screenshot.length <= 0 && screenshot.toLowerCase().indexOf(".png") == -1) {
                         $(getRows[i]).children().children().removeClass('openscreenshot');
                     }
+                    if (getRows[i].children[1].innerHTML.indexOf('Start iteration') >= 0) {
+                        getRows[i].children[1].innerHTML += '<i class="arrow-down-sm unexpand" aria-hidden="true" style="position: relative;"></i>';
+                    }
                 }
                 unblockUI();
                 if (errorMsg) {
@@ -508,7 +511,7 @@ function loadReports() {
         $(document).on('click', '.unexpand', function() {
             var getID = $(this).parents('.reportdetailsrow').attr('data-id');
             $(this).removeClass('unexpand').addClass('expand');
-            $(this).removeClass('fa-caret-down').addClass('fa-caret-right');
+            $(this).removeClass('arrow-down-sm').addClass('arrow-up-sm');
             $.each(getRows, function() {
                 if ($(this).attr('data-parentid') == getID) {
                     $(this).hide();
@@ -518,7 +521,7 @@ function loadReports() {
         $(document).on('click', '.expand', function() {
             var getID = $(this).parents('.reportdetailsrow').attr('data-id');
             $(this).removeClass('expand').addClass('unexpand');
-            $(this).removeClass('fa-caret-right').addClass('fa-caret-down');
+            $(this).removeClass('arrow-up-sm').addClass('arrow-down-sm');
             $.each(getRows, function() {
                 if ($(this).attr('data-parentid') == getID) {
                     $(this).show();
