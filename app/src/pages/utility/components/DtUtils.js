@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import { ValidationExpression as validate } from '../../global';
 
 const parseTableData = table => {
     // NAME
@@ -77,9 +78,7 @@ function prepareSaveData (tableName, headers, data){
 
 function validateData (tableName, tableData) {
     let validation = "saveData";
-    let invalidReg = /[\/:^?<>|\\&'"]/g;
-
-    if (!tableName.trim() || invalidReg.test(tableName))
+    if (!tableName.trim() || validate(tableName, "dataTableName"))
         validation = "tableName";
     else if (tableData === "emptyData")
         validation = "emptyData";

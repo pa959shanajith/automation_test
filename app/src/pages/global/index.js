@@ -21,6 +21,7 @@ import CalendarComp from './components/CalendarComp'
 import TimeComp from'./components/TimeComp'
 import ErrorPage from './components/ErrorPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import ValidationExpression from './components/ValidationExpression';
 
 export { Header, 
         FooterOne, 
@@ -46,5 +47,6 @@ export { Header,
         TimeComp,
         ErrorPage,
         ErrorBoundary,
-        updateScrollBar
+        updateScrollBar,
+        ValidationExpression
     };
