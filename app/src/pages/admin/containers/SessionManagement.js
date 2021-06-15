@@ -151,7 +151,7 @@ const SessionManagement = (props) => {
             </div> 
             <div className="content_wrapper-sess-mgmt">
                 <ScrollBar thumbColor="#929397">
-                <div className="col-xs-9 form-group__conv-Sess-mgmt adminForm" style={{height:"88%"}}>
+                <div className="col-xs-9 form-group__conv-Sess-mgmt" style={{height:"88%"}}>
                     <div className="containerWrap sessionItemWrap">
                         <div onClick={()=>{setShowSessions(!showSessions)}} className="sessionHeading" data-toggle="collapse" data-target="#activeUsers-x">
                             <h4>Active Users</h4>

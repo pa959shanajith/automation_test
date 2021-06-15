@@ -32,6 +32,9 @@ const SocketFactory = () => {
         socket.on("result_ExecutionDataInfo",(result)=> {
             executionDATA(result)
         });
+        socket.on('display_execution_popup', (value) => {
+            displayExecutionPopup(value, setPopupState);		
+        });
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },[socket])
@@ -43,22 +46,22 @@ const SocketFactory = () => {
     },[userInfo])
 
     const PostExecution = () =>{
-     return(
-        <div className="afterExecution-modal">
-            <ModalContainer 
-                title={"Execute Test Suite"}
-                content={
-                    <p style={{cursor:'default'}}>{showAfterExecution.content} <br />
-                    <p> Go to <span onClick={()=>{redirectToReports();setShowAfterExecution({show:false})}} style={{color:'#643693',cursor:'pointer',fontWeight:'bold'}}>Reports</span></p></p>
-                }
-                close={()=>setShowAfterExecution({show:false})}
-                footer={
-                    <button onClick={()=>setShowAfterExecution({show:false})}>Ok</button>
-                }
-            />
-        </div>
-    )
-};
+        return(
+            <div className="afterExecution-modal">
+                <ModalContainer 
+                    title={"Execute Test Suite"}
+                    content={
+                        <p style={{cursor:'default'}}>{showAfterExecution.content} <br />
+                        <p> Go to <span onClick={()=>{redirectToReports();setShowAfterExecution({show:false})}} style={{color:'#643693',cursor:'pointer',fontWeight:'bold'}}>Reports</span></p></p>
+                    }
+                    close={()=>setShowAfterExecution({show:false})}
+                    footer={
+                        <button onClick={()=>setShowAfterExecution({show:false})}>Ok</button>
+                    }
+                />
+            </div>
+        )
+    };
     
     const redirectToReports = () =>{
         dispatch({type: UPDATE_REPORTDATA, payload: reportData});
@@ -95,12 +98,41 @@ const SocketFactory = () => {
         }
         else setPopupState({show:true, 'title': "Execute Test Suite", 'content':"Failed to execute."});
     }
+
+
+
     return(
         <Fragment>
             {popupState.show && <PopupMsg content={popupState.content} title={popupState.title} submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} submitText={"Ok"} />}
             { showAfterExecution.show && <PostExecution/> }
         </Fragment>
     )
+}
+
+const displayExecutionPopup = (value, setPopupState) =>{
+    var msg = "";
+    var val;
+    for(val in value){
+        var data = value[val].status;
+        var testSuite = value[val].testSuiteIds;
+        var exec = testSuite[0].testsuitename + ": "
+        if (data == "begin") continue;
+        if (data == "unavailableLocalServer") data = exec + "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
+        else if (data == "NotApproved") data = exec + "All the dependent tasks (design, scrape) needs to be approved before execution";
+        else if (data == "NoTask") data = exec + "Task does not exist for child node";
+        else if (data == "Modified") data = exec +"Task has been modified, Please approve the task";
+        else if (data == "Completed") data = exec +"Execution Complete";
+        else if (data == "Terminate") data = exec + "Terminated";
+        else if (data == "UserTerminate") data = exec +"Terminated by User"
+        else if (data == "success") data = exec +"success"
+        else if (data == "API Execution Completed") data = exec + "API Execution Completed"
+        else if (data == "API Execution Fail") data = exec + "API Execution Failed"
+        else data = exec + "Failed to execute.";
+        msg = msg + "\n" + data;
+    }
+    if(msg && msg.trim() != ""){
+        setPopupState({show:true,'title': 'Execution Result', 'content':msg});
+    }
 }
 
 export default SocketFactory;

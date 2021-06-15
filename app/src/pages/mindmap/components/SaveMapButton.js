@@ -19,12 +19,13 @@ const SaveMapButton = (props) => {
     const projId = useSelector(state=>state.mindmap.selectedProj)
     const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
     const projectList = useSelector(state=>state.mindmap.projectList)
+    const moduledata = useSelector(state=>state.mindmap.moduleList)
     useEffect(()=>{
         if(props.createnew==='save')clickSave()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,props.setPopup,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,props.setPopup,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj,moduledata)
     }
     return(
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -37,7 +38,7 @@ const SaveMapButton = (props) => {
 }
 
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj)=>{
+const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata)=>{
     var tab = "tabCreate"
     var layout_vertical = false;
     var selectedProject;
@@ -144,8 +145,6 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
     }
     var modId = await saveMindmap(data)
     if(modId.error){displayError(modId.error);return}
-    var moduledata = await getModules({modName:null,cycId:cycId?cycId:null,"tab":tab,"projectid":projId,"moduleid":null})
-    if(moduledata.error){displayError(moduledata.error);return}
     var moduleselected = await getModules({modName:null,cycId:cycId?cycId:null,"tab":tab,"projectid":projId,"moduleid":modId})
     if(moduleselected.error){displayError(moduleselected.error);return}
     var screendata = await getScreens(projId)

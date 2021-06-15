@@ -34,8 +34,15 @@ const ExecuteHome = () => {
                 readTestSuiteData[rti].versionnumber = parseFloat(versionnumber);
             }
             setreadTestSuite(readTestSuiteData);
+            reset();
         }
     }, [current_task, filter_data]);
+
+    const reset = () => {
+        setBrowserTypeExe([]);
+        if(document.getElementById('syncScenario') != undefined) document.getElementById('syncScenario').value = '';
+        setSyncScenario(false);
+    }
 
     const UpdateBrowserTypeExe = (browserId) => {
         let browserTypeExecute = [...browserTypeExe];
