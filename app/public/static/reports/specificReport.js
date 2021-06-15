@@ -106,7 +106,7 @@ function loadReports() {
                         $(getRows[i]).children().children().removeClass('openscreenshot');
                     }
                     if (getRows[i].children[1].innerHTML.indexOf('Start iteration') >= 0) {
-                        getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -110px;"></i>';
+                        getRows[i].children[1].innerHTML += '<i class="arrow-down-sm unexpand" aria-hidden="true" style="position: relative;"></i>';
                     }
                 }
                 unblockUI();
@@ -511,7 +511,7 @@ function loadReports() {
         $(document).on('click', '.unexpand', function() {
             var getID = $(this).parents('.reportdetailsrow').attr('data-id');
             $(this).removeClass('unexpand').addClass('expand');
-            $(this).removeClass('fa-caret-down').addClass('fa-caret-right');
+            $(this).removeClass('arrow-down-sm').addClass('arrow-up-sm');
             $.each(getRows, function() {
                 if ($(this).attr('data-parentid') == getID) {
                     $(this).hide();
@@ -521,7 +521,7 @@ function loadReports() {
         $(document).on('click', '.expand', function() {
             var getID = $(this).parents('.reportdetailsrow').attr('data-id');
             $(this).removeClass('expand').addClass('unexpand');
-            $(this).removeClass('fa-caret-right').addClass('fa-caret-down');
+            $(this).removeClass('arrow-up-sm').addClass('arrow-down-sm');
             $.each(getRows, function() {
                 if ($(this).attr('data-parentid') == getID) {
                     $(this).show();
@@ -546,7 +546,10 @@ function loadReports() {
         $(document).on('click', '.export-icons', function() {
             var repType = $(this).attr("data-rep");
             var filename = $(".scenarioName").text().substr(2) + "." + repType;
-            var url = window.location.href + '.' + repType;
+            var url = window.location.href 
+            url = (url.endsWith('.html')?url.slice(0,-5):url) + "." + repType;
+            var blockMsg = "Loading Report..."
+            blockUI(blockMsg)
             if (repType == "json") {
                 $.ajax({
                     type: 'GET',
@@ -558,6 +561,7 @@ function loadReports() {
                             type: "text/json;charset=utf-8"
                         });
                         downloadFile(filedata, filename);
+                        unblockUI();
                     },
                     error: function(jqXHR) {
                         unblockUI();
@@ -581,6 +585,7 @@ function loadReports() {
                             type: "application/pdf;charset=utf-8"
                         });
                         downloadFile(filedata, filename);
+                        unblockUI();
                     },
                     error: function(jqXHR) {
                         unblockUI();
