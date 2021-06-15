@@ -19,13 +19,13 @@ const ExportDataTable = props => {
         else{
             props.setOverlay("Exporting File...")
             setError(false);
-            const resp = await exportDataTable({ tableName: props.tableName, filename: filename, exportFormat: filetype })
+            const resp = await exportDataTable({ tableName: props.tableName, filename: filename.trim(), exportFormat: filetype })
             props.setOverlay("");
 
             if(resp.error) props.setShowPop({title: "Export File Error", content: resp.error, type: "message"});
             else {
                 let [extn, type] = getExtAndType(filetype);
-                downloadFile(resp, filename, extn, type);
+                downloadFile(resp, filename.trim(), extn, type);
                 props.setShowPop({title:'Export File', content:'File Exported Successfully.', type: "message" });
                 props.setShowExportPopup(false);
             }

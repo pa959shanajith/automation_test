@@ -58,7 +58,7 @@ const updateData = (data, headers, lastEntry) => {
 
 function prepareSaveData (tableName, headers, data){
     let hasValue = false;
-    const name = tableName;
+    const name = tableName.trim();
     const headerArray = headers.map(header => header.name);
     const valuesArray = data.map(row => {
         let filteredObject = {};
