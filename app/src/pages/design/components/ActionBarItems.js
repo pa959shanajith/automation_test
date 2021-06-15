@@ -134,7 +134,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
-                setOverlay({'title': "Debug Testcase", 'content': "Failed to debug."});
+                setShowPop({'title': "Debug Testcase", 'content': "Failed to debug."});
                 console.error("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
             });
     };

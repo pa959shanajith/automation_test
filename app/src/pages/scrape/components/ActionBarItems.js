@@ -201,6 +201,7 @@ const BottomContent = () => {
                     scrapeApi.updateScreen_ICE(arg)
                         .then(data => {
                             if (data === "Invalid Session") return RedirectPage(history);
+                            else if (data === "fail") setShowPop({title: "Import Screen", content: "Failed to import Screen JSON."}) 
                             else fetchScrapeData().then(response => {
                                     if (response === "success")
                                         setShowPop({title: "Import Screen", content: "Screen Json imported successfully."}) 
@@ -209,7 +210,8 @@ const BottomContent = () => {
                         })
                         .catch(error => {
                             setOverlay("");
-                            console.log(error)
+                            setShowPop({title: "Import Screen", content: "Failed to import Screen JSON."}) 
+                            console.error(error)
                         });
                 }
             } else {
@@ -220,22 +222,8 @@ const BottomContent = () => {
         reader.readAsText(file);
     }
 
-    const importTestCase = (overWrite) => {
-
-        // if(overWrite) setShowConfirmPop(false);
-        
-        // DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber)
-		// .then(response => {
-		// 		if (response === "Invalid Session") RedirectPage(history);
-        //         if (response.testcase.length === 0 || overWrite) {
-                    hiddenInput.current.click();
-                    // document.getElementById("importScreenField").click();
-        //         }
-        //         else{
-        //             setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue?', 'onClick': ()=>importTestCase(true)});
-        //         }
-        //     })
-        // .catch(error => console.error("ERROR::::", error));
+    const importTestCase = () => {
+        hiddenInput.current.click();
     }
     
     const lowerList = [
@@ -243,7 +231,7 @@ const BottomContent = () => {
         {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
         {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},
-        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(true), show: true, disable: compareFlag && appType!=="Webservice"},
+        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: true, disable: compareFlag && appType!=="Webservice"},
         {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType!=="Webservice", show: true}
     ]
 

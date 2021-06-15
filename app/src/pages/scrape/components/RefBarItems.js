@@ -40,6 +40,7 @@ const RefBarItems = props => {
 		dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
 		setHighlight(false);
 		setToFilter([]);
+		setShowScreenPop(false);
 		//eslint-disable-next-line
 	}, [uid, newScrapedData])
 
@@ -49,7 +50,7 @@ const RefBarItems = props => {
 	}, [appType]);
 
 	useEffect(()=>{
-		if (props.mirror){
+		if (props.mirror.scrape || (props.mirror.compare && compareFlag)){
 			let mirrorImg = new Image();
 
 			mirrorImg.onload = function(){
@@ -63,7 +64,10 @@ const RefBarItems = props => {
 				setDsRatio(ds_ratio);
 			}
 
-			mirrorImg.src = `data:image/PNG;base64,${props.mirror}`;
+			mirrorImg.src = `data:image/PNG;base64,${compareFlag ? props.mirror.compare : props.mirror.scrape}`;
+		} else {
+			setMirrorHeight("0px");
+			setDsRatio(1);
 		}
 		dispatch({type: actions.SET_OBJVAL, payload: {val: null }});
 		setHighlight(false);
@@ -162,26 +166,10 @@ const RefBarItems = props => {
     const filter = (toFilter, order) => {
 		let scrapedItems = [...scrapeItems];
 		
-		scrapedItems = ScrapeFilter.resetList(scrapedItems, order, orderList);
-		
-		if (toFilter.length > 0) {
-			for (let tag of toFilter) {
-				switch (tag) {
-					case "others": scrapedItems = ScrapeFilter.getOtherObjects(scrapedItems); break;
-					case "othersMobile": scrapeItems = ScrapeFilter.getOtherMobileObjects(scrapedItems); break;
-					case "duplicateCustnames": scrapedItems = ScrapeFilter.duplicateObjects(scrapedItems); break;
-					case "userobj": scrapedItems = ScrapeFilter.getCustomObjects(scrapedItems);	break;
-					case "unsavedObjects": scrapedItems = ScrapeFilter.getUnsavedObjects(scrapedItems); break;
-					case "alphabetOrder": {
-						if (order === "alphabet") scrapedItems = ScrapeFilter.getListInAlphabetOrder(scrapedItems);
-						break;
-					}
-					default: scrapedItems = ScrapeFilter.getSelectedObjects(scrapedItems, tag); break;
-				}
-			}
-		} else {
-			scrapedItems.forEach(item => item.hide = false)
-		}
+		if (toFilter.length > 0) 
+			scrapedItems = ScrapeFilter.getFilteredScrapeObjects(scrapedItems, toFilter, order, orderList)
+		else 
+			scrapedItems = ScrapeFilter.resetList(scrapedItems, order, orderList);
         setScrapeItems(scrapedItems)
 	}
 
@@ -213,7 +201,7 @@ const RefBarItems = props => {
 				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' hideXbar={true}>
 					<div data-test="ssScroll" className="ss_scrsht_insideScroll">
 					{ highlight && <div ref={highlightRef} style={{display: "flex", position: "absolute", ...highlight}}></div>}
-					{ props.mirror ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
+					{ (props.mirror.scrape || (props.mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? props.mirror.compare : props.mirror.scrape}`} /> : "No Screenshot Available"}
 					</div>
 				</ScrollBar>
 				</div>

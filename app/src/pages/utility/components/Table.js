@@ -289,6 +289,7 @@ const SubHeaderRow = props => {
 
     return (
         <div className="dt__table_row header_row" data-test="dt__row">
+            <div className="dt__table_header_cells">
             { props.headers.map(header => {
                 return (
                     <SubHeaderCell 
@@ -302,6 +303,7 @@ const SubHeaderRow = props => {
                     />
                 )
             }) }
+            </div>
             <div className="dt__table_add_column " />
         </div>
     )
@@ -354,6 +356,7 @@ const Row = props => {
 
     return (
         <div className="dt__table_row" data-test="dt__row">
+            <div className="dt__table_header_cells">
             { props.headers.map(header => {
                 return (
                     <DataCell 
@@ -370,6 +373,7 @@ const Row = props => {
                     />
                 )
             }) }
+            </div>
             <div className={"dt__table_add_column "+ (props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`)?"dt__selected_cell":"")} />
         </div>
     )

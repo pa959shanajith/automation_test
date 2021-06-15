@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
 import * as actions from '../state/action';
@@ -7,7 +7,6 @@ import "../styles/ScrapeObject.scss";
 const ScrapeObject = props => {
 
     const dispatch = useDispatch();
-    const chkBoxRef = useRef();
     const objValue = useSelector(state=>state.scrape.objValue);
 
     const [objName, setObjName] = useState(props.object.title);
@@ -17,7 +16,6 @@ const ScrapeObject = props => {
 
     const handleObjName = event => setObjName(event.target.value);
     const handleCheckbox = event => {
-        // chkBoxRef.current.checked = event.target.checked;
         props.updateChecklist(props.object.val);
         setChecked(event.target.checked);
     }
@@ -28,12 +26,9 @@ const ScrapeObject = props => {
     }, [objValue])
 
     useEffect(()=>{
-        // if (chkBoxRef && chkBoxRef.current) {
-            setObjName(props.object.title);
-            setChecked(props.object.checked);
-            // chkBoxRef.current.checked = props.object.checked;
-            setEdit(false);
-        // }
+        setObjName(props.object.title);
+        setChecked(props.object.checked);
+        setEdit(false);
     }, [props]);
     
     const handleOutsideClick = () => {
@@ -69,7 +64,7 @@ const ScrapeObject = props => {
                 </ClickAwayListener>
                 : 
                 <div className="ss_obj_label">
-                    {!props.hideCheckbox && <input data-test="checkBox" disabled={props.dnd} className="ss_obj_chkbx" type="checkbox" onChange={handleCheckbox} ref={chkBoxRef} checked={checked}/>}
+                    {!props.hideCheckbox && <input data-test="checkBox" disabled={props.dnd} className="ss_obj_chkbx" type="checkbox" onChange={handleCheckbox} checked={checked}/>}
                     <div  data-test="objectName" className={"ss_obj_name" + (props.object.duplicate ? " ss__red" : "" + (!props.object.objId ? " ss__newObj" : "" )) + (props.object.isCustom ? " ss__customObject": "")} onDoubleClick={!props.notEditable ? ()=>setEdit(true) : null}>{objName}</div> 
                 </div>
             }

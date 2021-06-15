@@ -14,7 +14,7 @@ return(
                 onChange={(e)=>props.onDropChange(e)} 
                 id = "dropdown"
             >
-                <option className="options" selected disabled  value="SelectMethod">Select Method</option>
+                <option className="options" disabled value="SelectMethod">Select Method</option>
                 <option className="options" value="AES">AES</option>
                 <option className="options" value="MD5">MD5</option>
                 <option className="options" value="Base64">Base64</option>

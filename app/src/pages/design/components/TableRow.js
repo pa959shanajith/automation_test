@@ -35,7 +35,6 @@ const TableRow = (props) => {
     const [outputPlaceholder, setOutputPlaceholder] = useState('');
     const [keywordList, setKeywordList] = useState(null);
     const [focused, setFocused] = useState(false);
-    const [highlight, setHighlight] = useState(false);
     const [commented, setCommented] = useState(false);
     const [remarks, setRemarks] = useState([]);
     const [TCDetails, setTCDetails] = useState("");
@@ -65,13 +64,13 @@ const TableRow = (props) => {
     }, [props.rowChange, props.testCase]);
 
     useEffect(()=>{
-        setChecked(props.checkedRows.includes(props.idx));
+        setChecked(props.stepSelect.check.includes(props.idx));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.checkedRows]);
+    }, [props.stepSelect.check]);
 
     useEffect(()=>{
         if (props.edit){
-            if (props.focusedRow === props.idx){
+            if (props.stepSelect.edit && props.stepSelect.highlight.includes(props.idx)){
                 setFocused(true);
                 setEscapeFlag(false);
                 rowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
@@ -116,16 +115,15 @@ const TableRow = (props) => {
             updateScrollBar();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.focusedRow, props.edit]);
+    }, [props.stepSelect.highlight, props.edit]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(()=>{
-        if (props.focusedRow !== props.idx) {
-            setFocused(false);
-            setHighlight(false);
-        }
-        if (props.focusedRow !== null && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) {
+        if (props.stepSelect.highlight.includes(props.idx)) {
             rowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+        }
+        else {
+            setFocused(false);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     });
@@ -138,7 +136,6 @@ const TableRow = (props) => {
 
     const onRowClick = (event, msg) => {
         props.updateChecklist(props.idx, "row", msg);
-        if(!props.edit) setHighlight(true);
         setChecked(true);
     }
 
@@ -169,11 +166,11 @@ const TableRow = (props) => {
     const submitChanges = event => {
         if (event.keyCode === 13){
             props.setRowData({rowIdx: props.idx, operation: "row", objName: objName, keyword: keyword, inputVal: input, outputVal: output, appType: tcAppType});
-            props.setFocusedRow(null);
+            props.setStepSelect(oldState=>({...oldState, highlight: []}));
         }
         else if (event.keyCode === 27) {
             setEscapeFlag(true);
-            props.setFocusedRow(null);
+            props.setStepSelect(oldState=>({...oldState, highlight: []}));
         }
     }
 
@@ -183,7 +180,7 @@ const TableRow = (props) => {
     
     return (
         <>
-        <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + (highlight || (props.focusedRow!== null  && typeof props.focusedRow === "object" && props.focusedRow.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+        <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
                 <span className="step_col">{props.idx + 1}</span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>
             <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>

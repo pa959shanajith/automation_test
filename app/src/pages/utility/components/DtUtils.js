@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import { ValidationExpression as validate } from '../../global';
 
 const parseTableData = table => {
     // NAME
@@ -56,12 +57,14 @@ const updateData = (data, headers, lastEntry) => {
 
 
 function prepareSaveData (tableName, headers, data){
-    const name = tableName;
+    let hasValue = false;
+    const name = tableName.trim();
     const headerArray = headers.map(header => header.name);
     const valuesArray = data.map(row => {
         let filteredObject = {};
         headerArray.forEach(headerName => {
             filteredObject[headerName] = row[headerName] || "";
+            if (!hasValue && filteredObject[headerName].trim()) hasValue = true;
         })
         return filteredObject;
     })
@@ -69,17 +72,18 @@ function prepareSaveData (tableName, headers, data){
     return {
         tableName: name,
         headers: headerArray,
-        data: valuesArray
+        data: hasValue ? valuesArray : "emptyData"
     }
 }
 
-function validateData (tableName) {
-    let error = false;
-    let invalidReg = /[\/:^?<>|\\&'"]/g;
+function validateData (tableName, tableData) {
+    let validation = "saveData";
+    if (!tableName.trim() || validate(tableName, "dataTableName"))
+        validation = "tableName";
+    else if (tableData === "emptyData")
+        validation = "emptyData";
 
-    if (!tableName.trim() || invalidReg.test(tableName))
-        error = {tableName: true};
-    return error;
+    return validation;
 }
 
 
