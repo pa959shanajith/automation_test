@@ -193,6 +193,12 @@ const CreateScreenActionButtons = props => {
                 if(importFormat === "excel") {
                     setSheetList(resp);
                     setExcelContent(reader.result);
+                } 
+                else if (resp == "columnExceeds") {
+                    props.setShowPop({title: "Error File Read", content: "Column should not exceed 15", type: "message"});
+                } 
+                else if (resp == "rowExceeds") {
+                    props.setShowPop({title: "Error File Read", content: "Row should not exceed 200", type: "message"});
                 }
                 else {
                     const [, newData, newHeaders] = parseTableData(resp)

@@ -49,7 +49,7 @@ const Table = props => {
     const updateHeaders = (newHeader, headerId, invalidFlag) => {
 
         if (invalidFlag) {
-            props.setShowPop({title: "Duplicate Header Name", content: "Header name is invalid or duplicate", type: "message"})
+            props.setShowPop({title: "Duplicate Header Name", content: "Header name is empty or duplicate", type: "message"})
             return;
         }
         let newHeaders = [...props.headers];

@@ -110,12 +110,12 @@ exports.importDtFromExcel = function (req, res) {
 			var cSheetRow = cSheet.trimEnd().split('\n');
 			if (k == 0) {
 				columnNames = cSheetRow[k].split(',');
-			} 
-			if(columnNames.length>10) {
-				return res.status(500).send("columnExceeds");
+			}
+			if(columnNames.length>15) {
+				return res.send("columnExceeds");
 			}
 			if(cSheetRow.length >200) {
-				return res.status(500).send("rowExceeds");
+				return res.send("rowExceeds");
 			}
 			for (var i = 1; i < cSheetRow.length; i++) {
 				var row = cSheetRow[i].split(',');
@@ -141,16 +141,16 @@ exports.importDtFromCSV = function (req, res) {
 	try {
 		var myCSV = req.body.content;
 		var qObj = {};
-		var csvArray = myCSV.split('\n');
+		var csvArray = myCSV.replace(/\"|\'/g,'').split('\n');
 		if (csvArray.length > 200) {
-			return res.status(500).send("rowExceeds");
+			return res.send("rowExceeds");
 		}
 		rows = [];
 		for (var k = 0; k < csvArray.length; k++) {
 			if (k == 0) {
 				columnNames = csvArray[k].split(',');
-				if(columnNames.length>10) {
-					return res.status(500).send("columnExceeds");
+				if(columnNames.length>15) {
+					return res.send("columnExceeds");
 				}
 			} else  { 
 				var row = csvArray[k].split(',');
@@ -284,6 +284,9 @@ exports.importDtFromXML = function (req, res) {
 		var allrows = doc.getElementsByTagName("row");
 		var rows = [];
 		var columnNames = [];
+		if(allrows.length >200) {
+			return res.send("rowExceeds");
+		}
 		for( var i=0;i<allrows.length;++i) {
 			var newObj = {};
 			var alltags = allrows[i].childNodes;
@@ -292,6 +295,9 @@ exports.importDtFromXML = function (req, res) {
 					columnNames.push(alltags[j].nodeName);
 				}
 				newObj[alltags[j].nodeName] = alltags[j].childNodes[0].nodeValue;
+			}
+			if(columnNames.length>15) {
+				return res.send("columnExceeds");
 			}
 			rows.push(newObj);
 		}
