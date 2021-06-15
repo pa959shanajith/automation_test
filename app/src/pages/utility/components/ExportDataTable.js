@@ -14,7 +14,7 @@ const ExportDataTable = props => {
     const handleFileType = e => setFiletype(e.target.value);
 
     const exportTable = async() => {
-        if (validateData(filename))
+        if (validateData(filename) === "tableName")
             setError(true);
         else{
             props.setOverlay("Exporting File...")
@@ -26,7 +26,8 @@ const ExportDataTable = props => {
             else {
                 let [extn, type] = getExtAndType(filetype);
                 downloadFile(resp, filename, extn, type);
-                props.setShowPop({title:'Export File', content:'File Exported Successfully.', type: "message" })
+                props.setShowPop({title:'Export File', content:'File Exported Successfully.', type: "message" });
+                props.setShowExportPopup(false);
             }
         }
     }
