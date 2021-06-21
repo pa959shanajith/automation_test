@@ -111,6 +111,7 @@ const DesignContent = props => {
                 data !== "success" && props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
                 props.setImported(false)
                 setStepSelect({edit: false, check: [], highlight: []});
+                setChanged(false);
                 headerCheckRef.current.indeterminate = false;
             })
             .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
