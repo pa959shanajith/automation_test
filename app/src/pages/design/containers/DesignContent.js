@@ -58,6 +58,7 @@ const DesignContent = props => {
     const [isUnderReview, setIsUnderReview] = useState(props.current_task.status === "underReview");
     const [rowChange, setRowChange] = useState(false);
     const [headerCheck, setHeaderCheck] = useState(false);
+    const [draggedFlag, setDraggedFlag] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
     const [pastedTC, setPastedTC] = useState([]);
     let runClickAway = true;
@@ -86,6 +87,13 @@ const DesignContent = props => {
         {'title': 'Paste Test Step', 'img': 'static/imgs/ic-jq-pastestep.png', 'alt': 'Paste Steps', onClick:  ()=>onPasteSteps()},
         {'title': 'Skip Test Step', 'img': 'static/imgs/ic-jq-commentstep.png', 'alt': 'Comment Steps', onClick:  ()=>commentRows()}
     ]
+
+    useEffect(()=>{
+        if (draggedFlag) {
+            setStepSelect({edit: false, check: [], highlight: []});
+            setDraggedFlag(false);
+        }
+    }, [draggedFlag])
 
     useEffect(()=>{
         dispatch({type: designActions.SET_TESTCASES, payload: testCaseData})
@@ -731,8 +739,7 @@ const DesignContent = props => {
 
     const onDrop = () => {
         if (!changed)setChanged(true)
-        // setTCDropped(true);
-        setStepSelect({edit: false, check: [], highlight: []});
+        setDraggedFlag(true);
         setHeaderCheck(false);
         headerCheckRef.current.indeterminate = false;
     }
@@ -812,7 +819,7 @@ const DesignContent = props => {
                         <div className="con" id="d__tcListId">
                             <ScrollBar scrollId="d__tcListId" verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
-                            <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row" onStart={onDrop}>
+                            <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
                                 {
                                 testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row"
                                     key={i} idx={i} objList={objNameList} testCase={testCase} edit={edit} 
