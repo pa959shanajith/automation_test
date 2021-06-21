@@ -1,7 +1,7 @@
 import React, { useState, useEffect }  from 'react';
 import { v4 as uuid } from 'uuid';
 import { TableActionButtons, CreateScreenActionButtons, EditScreenActionButtons, SearchDataTable } from './DataTableBtnGroup';
-import { PopupMsg, ModalContainer, ScreenOverlay } from '../../global';
+import { PopupMsg, ModalContainer, ScreenOverlay, ValidationExpression as validate } from '../../global';
 import Table from './Table';
 import * as utilApi from '../api';
 import "../styles/DataTable.scss";
@@ -173,13 +173,13 @@ const TableName = ({tableName, setTableName, error}) => {
         setValue(tableName)
     }, [tableName]);
 
-    const onChange = e => setValue(e.target.value);
+    const onChange = e => setValue(validate(e.target.value, "dataTableName"));
     const onBlur = () => setTableName(value);
 
     return (
         <div className="dt__tableName">
             Data Table Name:
-            <input className={error?"dt__tableNameError":""} onBlur={onBlur} onChange={onChange} placeholder="Enter Data Table Name" />
+            <input className={error?"dt__tableNameError":""} onBlur={onBlur} onChange={onChange} value={value} placeholder="Enter Data Table Name" />
         </div>
     );
 }

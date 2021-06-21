@@ -7,7 +7,7 @@ const ValidationExpression = (value,id) =>{
         case 'optimazationInput': regex = /[^0-9]/g; break;
         case 'password': regex = /\s/g; break;
         case 'email': regex = /[^a-zA-Z0-9@._-]/g; break;
-        case 'dataTableName': regex = /[a-zA-Z0-9\s_-]/g; break;
+        case 'dataTableName': regex = /[^a-zA-Z0-9\s_-]/g; break;
         case 'ldapServerName':       /* FALLTHROUGH */
         case 'samlServerName':       /* FALLTHROUGH */
         case 'oidcServerName':       /* FALLTHROUGH */
@@ -22,7 +22,7 @@ const ValidationExpression = (value,id) =>{
         default: return value;
     }
         
-    var replacedValue = value.replace(regex, "");
+    var replacedValue = value.replace(regex, ""); 
     return replacedValue;
 }
 
