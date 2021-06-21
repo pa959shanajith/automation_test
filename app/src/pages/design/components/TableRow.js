@@ -77,10 +77,10 @@ const TableRow = (props) => {
                 let caseData = null;
                 let placeholders = null;
 
-                if (!objName || (objName !== "OBJECT_DELETED" && objList.includes(objName))){
-                    let obj = !objName ? objList[0] : objName;
+                if (!props.testCase.custname || (props.testCase.custname !== "OBJECT_DELETED" && objList.includes(props.testCase.custname))){
+                    let obj = !props.testCase.custname ? objList[0] : props.testCase.custname;
                     caseData = props.getKeywords(obj);
-                    let key = (!caseData.keywords.includes(keyword) || !objName) ? caseData.keywords[0] : keyword;
+                    let key = (!caseData.keywords.includes(props.testCase.keywordVal) || !props.testCase.custname) ? caseData.keywords[0] : props.testCase.keywordVal;
                     placeholders = props.getRowPlaceholders(caseData.obType, key);
 
                     setKeywordList(caseData.keywords);
