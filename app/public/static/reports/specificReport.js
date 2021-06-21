@@ -360,6 +360,9 @@ function loadReports() {
         }
         //function to close popup window
         $(document).on('click', '.closeWindow', function() {
+            if ($("#InvalidAttachedPath").length){
+                $("#InvalidAttachedPath").remove();
+            }
             $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color', '#bbb');
             $(".jiraWindow, .createIssueWindow, .statusWindow").hide();
             $('#overlay').css('display', 'none');
@@ -367,6 +370,9 @@ function loadReports() {
         })
 
         $(document).on('click', '.cancelIssues', function() {
+            if ($("#InvalidAttachedPath").length){
+                $("#InvalidAttachedPath").remove();
+            }
             $(".createIssueWindow").hide();
             $('#overlay').css('display', 'none');
         })
@@ -387,6 +393,8 @@ function loadReports() {
             var reportId = $('.reportId').text();
             var executionId = $('.executionId').text();
             var slno = $('#inputSlno').val();
+            var chk_var = false;
+            localStorage.setItem('slno',slno);
             if (!projectid) $("#jProjects").css('border-color', 'red');
             else if (!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color', 'red');
             else if (issuetype == "Sub-task" && !pissue) $("#jpIssueid").css('border-color', 'red');
@@ -446,18 +454,28 @@ function loadReports() {
                             $(".statusWindow").show();
                             $("#showStatus").text("Invalid Session. Login again");
                         } else if(data=="Invalid Path"){
+                            chk_var=true;
                             $("#scrnShotPath").css('border-color','red');
-                            $(".createIssueWindow p:nth-child(9)").append("\
-                            <p style='font-size: small;color: red;margin-top: 0px;'>Invalid Attachment Path</p>\
-                            ");
+                            if (!$("#InvalidAttachedPath").length)
+                            { 
+                                $(".createIssueWindow p:nth-child(9)").append("\
+                                <p id='InvalidAttachedPath' style='font-size: small;color: red;margin-top: 0px;'>Invalid Attachment Path</p>\
+                                ");
+                            }
                         } else {
                             getRows[parseInt($("#inputSlno").val()) - 1].children[8].innerText = data;
                             $(".createIssueWindow").hide();
                             $(".statusWindow").show();
                             $("#showStatus").text("Issue bearing ID " + data + " created successfully.");
                         }
-                        $('#inputSlno').val('');
-                        $("#jpIssueid").val('');
+                        if(chk_var){
+                            var orig_slno=localStorage.getItem('slno');
+                            $('#inputSlno').val(orig_slno);
+                        }
+                        else{
+                            $('#inputSlno').val('');
+                            $("#jpIssueid").val('');
+                        }
                         unblockUI();
                     }
                 });
