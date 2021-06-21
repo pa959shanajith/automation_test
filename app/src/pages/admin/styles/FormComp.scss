@@ -50,3 +50,9 @@
         cursor: pointer;
     }
 }
+.form-inp-dropdown-ldap{
+    width: calc(100% - 130px);
+    position: absolute;
+    left: 130px;
+    z-index: 1000;
+}
