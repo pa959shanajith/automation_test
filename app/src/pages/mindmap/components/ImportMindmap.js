@@ -77,6 +77,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
             var importData = fileUpload;
             (async()=>{
                 if(importType === 'git'){
+                    setBlockui({content:'Importing ...',show:true})
                     var data = await importGitMindmap ({
                         projectid : projRef.current.value,
                         gitname : gitconfigRef.current.value,
@@ -110,6 +111,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     var res = await getModules(req)
                     if(res.error){displayError(res.error);return;}
                     importData = res
+                    setBlockui({show:false})
                 }
                 loadImportData({
                     importType,
