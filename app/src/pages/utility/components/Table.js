@@ -70,13 +70,13 @@ const Table = props => {
         props.setData(newData);
     }
 
-    const updateTableData = (value, rowId, columnName, headerId) => {
+    const updateTableData = (value, rowId, headerId) => {
         let newData = [...props.data];
         
         for (let row of newData) {
             if (row.__CELL_ID__ === rowId) {
-                props.undoStack.push({ rowId: row.__CELL_ID__, colId: headerId, value: row[columnName]});
-                row[columnName] = value;
+                props.undoStack.push({ rowId: row.__CELL_ID__, colId: headerId, value: row[headerId]});
+                row[headerId] = value;
                 break;
             }
         }
@@ -362,9 +362,8 @@ const Row = props => {
                     <DataCell 
                         key={`cell-${props.row.__CELL_ID__}-${header.__CELL_ID__}`}
                         rowId={props.row.__CELL_ID__}
-                        columnName={header.name}
                         headerId = {header.__CELL_ID__}
-                        initialValue={props.row[header.name] || ''}
+                        initialValue={props.row[header.__CELL_ID__] || ''}
                         updateTableData={props.updateTableData}
                         selected={
                             props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`) ||
@@ -399,7 +398,7 @@ const DataCell  = props => {
 
     const onBlur = e => {
         if (props.initialValue !== value)
-            props.updateTableData(value, props.rowId, props.columnName, props.headerId)
+            props.updateTableData(value, props.rowId, props.headerId)
     }
 
     return (

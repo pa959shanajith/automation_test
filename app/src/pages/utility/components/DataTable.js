@@ -89,11 +89,12 @@ const CreateScreen = props => {
             <TableActionButtons 
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
                 checkList={checkList} headerCounter={headerCounter} undoStack={undoStack} setDnd={setDnd}
-                setHeaderCounter={setHeaderCounter} redoStack={redoStack}
+                setHeaderCounter={setHeaderCounter} redoStack={redoStack} setCheckList={setCheckList}
             />
             <CreateScreenActionButtons 
                 { ...props } tableName={tableName}data={data} setData={setData} 
                  setHeaders={setHeaders} setErrors={setErrors} headers={headers}
+                 disableCreate={!tableName}
             />
             </div>
             <div className="dt__table_container full__dt">
