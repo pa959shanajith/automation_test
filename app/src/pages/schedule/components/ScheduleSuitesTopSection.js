@@ -3,7 +3,7 @@ import { ScrollBar, CalendarComp, TimeComp} from '../../global'
 import {readTestSuite_ICE} from '../api';
 import "../styles/ScheduleSuitesTopSection.scss";
 
-const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, current_task, displayError, setLoading, scheduleTableData, setScheduleTableData}) => {
+const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, current_task, displayError, setLoading, scheduleTableData, setScheduleTableData, closePopups, setClosePopups}) => {
 
     const [closeCal, setCloseCal] = useState(false);
     
@@ -18,6 +18,13 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
         }
         // eslint-disable-next-line
     }, [current_task]);
+
+    useEffect(()=>{
+        if (closePopups) {
+            setCloseCal(true);
+            setClosePopups(false);
+        }
+    }, [closePopups])
 
     const readTestSuiteFunct = async (readTestSuite) => {
         setLoading("Loading in Progress. Please Wait");
