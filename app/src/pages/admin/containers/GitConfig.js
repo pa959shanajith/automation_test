@@ -113,7 +113,7 @@ const onChangeProject = async (resetFields, displayError, showEdit, urlRef, gitc
     const data = await gitEditConfig(userData[userRef.current.value], projectData[ProjectRef.current.value]);
     if(data.error){displayError(data.error);return;}
     else if(data == "empty") {
-        setPopupState({show:true,title:"Edit Git User",content:"No git configuration created yet."})
+        setPopupState({show:true,title:"Edit Git configuration",content:"No Git configuration created yet."})
         resetFields();
     } else {
         gitconfigRef.current.value = data[0];
