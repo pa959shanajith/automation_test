@@ -35,6 +35,10 @@ const ImportSheet = props => {
                 props.setSheetList([]);
                 props.setShowPop({title: "File Read Error", content: "Row should not exceed 200", type: "message"});
             }
+            else if (resp == "emptyExcelData") {
+                props.setSheetList([]);
+                props.setShowPop({title: "File Read Error", content: "Empty Data in the sheet", type: "message"});
+            }
             else if (typeof resp === "object"){
                 const [, newData, newHeaders] = parseTableData(resp)
                 props.setData(newData);

@@ -200,6 +200,9 @@ const CreateScreenActionButtons = props => {
                 else if (resp == "rowExceeds") {
                     props.setShowPop({title: "Error File Read", content: "Row should not exceed 200", type: "message"});
                 }
+                else if (resp == "emptyData") {
+                    props.setShowPop({title: "Error File Read", content: "Empty data in the file", type: "message"});
+                }
                 else {
                     const [, newData, newHeaders] = parseTableData(resp)
                     props.setData(newData);

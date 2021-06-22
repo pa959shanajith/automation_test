@@ -98,35 +98,19 @@ exports.importDtFromExcel = function (req, res) {
 		if (req.body.flag == 'sheetname') {
 			return res.status(200).send(wb1.SheetNames);
 		}
-		var myCSV = xlsToCSV(wb1, req.body.sheetname);
-		var numSheets = myCSV.length / 2;
+		var myData = [];
 		var qObj = {};
-		if (numSheets == 0) {
-			return res.status(200).send("emptySheet");
+		var sheetname = req.body.sheetname;
+		var json = xlsx.utils.sheet_to_json(wb1.Sheets[sheetname]);
+		if (json.length > 0) {
+			myData.push(sheetname);
+			myData.push(json);
 		}
-		rows = [];
-		for (var k = 0; k < numSheets; k++) {
-			var cSheet = myCSV[k * 2 + 1];
-			var cSheetRow = cSheet.trimEnd().split('\n');
-			if (k == 0) {
-				columnNames = cSheetRow[k].split(',');
-			}
-			if(columnNames.length>15) {
-				return res.send("columnExceeds");
-			}
-			if(cSheetRow.length >200) {
-				return res.send("rowExceeds");
-			}
-			for (var i = 1; i < cSheetRow.length; i++) {
-				var row = cSheetRow[i].split(',');
-				newObj = {};
-				for(var j=0; j<columnNames.length; ++j) {
-					newObj[columnNames[j]] = row[j]
-				}
-				rows.push(newObj);
-			}
-		}
-		qObj['datatable'] = rows;
+		if(myData.length == 0) return res.send("emptyExcelData");
+		columnNames = Object.keys(myData[1][0]);
+		if(columnNames.length>15) return res.send("columnExceeds");
+		if(myData[1].length>200) return res.send("rowExceeds");
+		qObj['datatable'] = myData[1];
 		qObj['dtheaders'] = columnNames;
 		res.status(200).send(qObj);
 	} catch(exception) {
@@ -142,16 +126,13 @@ exports.importDtFromCSV = function (req, res) {
 		var myCSV = req.body.content;
 		var qObj = {};
 		var csvArray = myCSV.replace(/\"|\'/g,'').split('\n');
-		if (csvArray.length > 200) {
-			return res.send("rowExceeds");
-		}
+		if(validator.isEmpty(myCSV)) return res.send("emptyData");
+		if (csvArray.length > 200) return res.send("rowExceeds");
 		rows = [];
 		for (var k = 0; k < csvArray.length; k++) {
 			if (k == 0) {
 				columnNames = csvArray[k].split(',');
-				if(columnNames.length>15) {
-					return res.send("columnExceeds");
-				}
+				if(columnNames.length>15) return res.send("columnExceeds");
 			} else  { 
 				var row = csvArray[k].split(',');
 				newObj = {};
@@ -279,14 +260,13 @@ exports.importDtFromXML = function (req, res) {
 	try {
 		var myXML = req.body.content;
 		var myXMLStr = myXML.replace(/\s/g,'');
+		if(validator.isEmpty(myXMLStr)) return res.send("emptyData");
 		var qObj = {};
 		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
 		var allrows = doc.getElementsByTagName("row");
 		var rows = [];
 		var columnNames = [];
-		if(allrows.length >200) {
-			return res.send("rowExceeds");
-		}
+		if(allrows.length >200) return res.send("rowExceeds");
 		for( var i=0;i<allrows.length;++i) {
 			var newObj = {};
 			var alltags = allrows[i].childNodes;
@@ -296,9 +276,7 @@ exports.importDtFromXML = function (req, res) {
 				}
 				newObj[alltags[j].nodeName] = alltags[j].childNodes[0].nodeValue;
 			}
-			if(columnNames.length>15) {
-				return res.send("columnExceeds");
-			}
+			if(columnNames.length>15) return res.send("columnExceeds");
 			rows.push(newObj);
 		}
 		qObj['datatable'] = rows;
@@ -385,15 +363,3 @@ function OBJtoXML(obj) {
 		res.send("unavailableLocalServer");
 	}
 }*/
-
-/* Convert excel file to CSV Object. */
-var xlsToCSV = function (workbook, sheetname) {
-	var result = [];
-	var csv = xlsx.utils.sheet_to_csv(workbook.Sheets[sheetname]);
-	if (csv.length > 0) {
-		result.push(sheetname);
-		result.push(csv);
-	}
-	//return result.join("\n");
-	return result;
-};
