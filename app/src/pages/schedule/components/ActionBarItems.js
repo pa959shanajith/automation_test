@@ -33,7 +33,7 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
             if(smartMode==="smartModule") setSmartMode("normal");
             else {
                 setPopupState({
-                    title:'Smart SchedulingR',
+                    title:'Smart Scheduling',
                     content:"All the modules will be executed as batch.\nAll available ICE should be in similar configurations for optimal results.",
                     show:true
                 })
