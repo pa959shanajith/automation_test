@@ -155,6 +155,10 @@
 
 // CELLS CSS
 
+.dt__hdrCell_Sel{
+    background-color: #5f5e5c!important;
+}
+
 .dt__table_numbered_column, .dt__table_add_column {
     display: flex;
     min-width: 40px;
@@ -206,7 +210,7 @@
 
 
 .dt__selected_cell {
-    background-color: rgba(189, 189, 189, .25)!important; 
+    background-color: rgba(237, 235, 233, .50)!important;
 }
 
 .dt__table_numbered_column, .dt__table_numbered_column_header, .dt__table_new_column_header, .dt__table_header_cell{

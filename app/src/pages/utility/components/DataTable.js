@@ -94,7 +94,6 @@ const CreateScreen = props => {
             <CreateScreenActionButtons 
                 { ...props } tableName={tableName}data={data} setData={setData} 
                  setHeaders={setHeaders} setErrors={setErrors} headers={headers}
-                 disableCreate={!tableName}
             />
             </div>
             <div className="dt__table_container full__dt">
