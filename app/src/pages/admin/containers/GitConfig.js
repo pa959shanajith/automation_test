@@ -113,14 +113,15 @@ const onChangeProject = async (resetFields, displayError, showEdit, urlRef, gitc
     const data = await gitEditConfig(userData[userRef.current.value], projectData[ProjectRef.current.value]);
     if(data.error){displayError(data.error);return;}
     else if(data == "empty") {
-        setPopupState({show:true,title:"Edit Git User",content:"No git configuration created yet."})
+        setPopupState({show:true,title:"Edit Git configuration",content:"No Git configuration created yet."})
         resetFields();
     } else {
-        gitconfigRef.current.value = data[0]
+        gitconfigRef.current.value = data[0];
+        gitconfigRef.current.readOnly = true;
         tokenRef.current.value = data[1];
-        urlRef.current.value = data[2]
-        gituserRef.current.value = data[3]
-        gitemailRef.current.value = data[4]
+        urlRef.current.value = data[2];
+        gituserRef.current.value = data[3];
+        gitemailRef.current.value = data[4];
     }
     setLoading(false);
 }
@@ -132,6 +133,7 @@ const refreshFields = ( domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, 
     setUserData({})
     setProjectData({})
     gitconfigRef.current.value = "";
+    gitconfigRef.current.readOnly = false;
     tokenRef.current.value = "";
     urlRef.current.value = "";
     gituserRef.current.value = "";

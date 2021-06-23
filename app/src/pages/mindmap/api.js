@@ -395,11 +395,11 @@ export const importGitMindmap = async(data) => {
         }
         if(res.data === "empty"){
             console.error(res.data)
-            return {error:'Git Configuration does not exist. Please verify your inputs!'}
+            return {error:'Git configuration does not exist. Please verify your inputs!'}
         }
         if(res.data === "Invalid inputs"){
             console.error(res.data)
-            return {error:'Module does not exists in Git repository. Please verify your inputs!'}
+            return {error:'Module does not exist in Git repository. Please verify your inputs!'}
         }
 		if(res.data === "No entries"){
             console.error(res.data)
@@ -447,7 +447,7 @@ export const exportToGit = async(data) => {
         }
         else if(res.data==='Invalid config name'){
             console.error(res.data)
-            return {error:'Git configuration does not exists. Please verify!'}
+            return {error:'Git configuration does not exist. Please verify!'}
         }
         else if(res.data==='commit exists'){
             console.error(res.data)
@@ -455,15 +455,15 @@ export const exportToGit = async(data) => {
         }
         else if(res.data==='Invalid gitbranch'){
             console.error(res.data)
-            return {error:"Input branch doesn't exist in Git. Please verify!"}
+            return {error:"Specified branch doesn't exist in Git. Please verify!"}
         }
         else if(res.data==='Invalid url'){
             console.error(res.data)
-            return {error:"Error in Git config: Invalid Git clone path"}
+            return {error:"Error in Git configuration: Invalid Git clone path"}
         }
         else if(res.data==='Invalid token'){
             console.error(res.data)
-            return {error:"Error in Git config: Invalid Git access token"}
+            return {error:"Error in Git configuration: Invalid Git access token"}
         }
         else if(res.status===200 && res.data !== "fail"){          
             return res.data;

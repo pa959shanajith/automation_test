@@ -136,9 +136,6 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
                 statusCode = '409'
                 execResponse.error_message = "Execution is skipped because another execution is running in ICE";
                 break;
-            case "No config":
-                execResponse.error_message = "Git configuration does not exist. Please check your inputs!"
-                break;
             case "fail":
                 execResponse.error_message = "Internal error occurred during execution"
                 break;

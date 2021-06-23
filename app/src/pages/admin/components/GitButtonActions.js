@@ -37,9 +37,9 @@ const GitButtonActions = (props) => {
         setLoading("Loading...");
         const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitConfigName.current.value.trim(),gitAccToken.current.value.trim(),gitUrl.current.value.trim(),gitUsername.current.value.trim(),gitEmail.current.value.trim());
         if(data.error){displayError(data.error);return;}
-        else if (data === 'GitConfig exists') setPopupState({show:true,title:"Save Git Config",content:"Git Configration Name already exists."});
-        else if(data  === 'GitUser exists')  setPopupState({show:true,title:"Save Git Config",content:"Git config already exist for this user."});
-        else setPopupState({show:true,title:"Save Git Config",content:"Git user "+action+ "d successfully"});
+        else if (data === 'GitConfig exists') setPopupState({show:true,title:"Save Git configuration",content:"Git configration name already exists."});
+        else if(data  === 'GitUser exists')  setPopupState({show:true,title:"Save Git configuration",content:"Project is already Git configured for the specified user."});
+        else setPopupState({show:true,title:"Save Git configuration",content:"Git configuration "+action+ "d successfully"});
         setLoading(false);
         resetFields();
     }
@@ -59,8 +59,8 @@ const GitButtonActions = (props) => {
             </div>  
             {showDeleteModal?
                 <ModalContainer
-                    title="Delete Git Configuration"
-                    content={"Are you sure you want to delete ? Users depending on this configuration will not be able to perform git operation."}
+                    title="Delete Git configuration"
+                    content={"Are you sure you want to delete ? Users depending on this configuration will not be able to perform Git operation."}
                     close={()=>setShowDeleteModal(false)}
                     footer={
                         <>

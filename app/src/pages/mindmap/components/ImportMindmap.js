@@ -87,7 +87,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     if(data.error){
                         if(data.error === 'No entries'){
                             const projectname = projRef.current[projRef.current.selectedIndex].text;
-                            data.error = 'Module does not belongs to project '+projectname;
+                            data.error = 'Module does not belong to project '+projectname;
                         }
                         setImportPop(false);
                         displayError(data.error);
