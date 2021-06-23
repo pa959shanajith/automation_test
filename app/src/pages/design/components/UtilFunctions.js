@@ -229,7 +229,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                         selectedKeywordList = "elementWS";
                         break;
                     } else if (appType === 'Desktop') {
-                        let listType = ob.canselectmultiple;
+                        //let listType = ob.canselectmultiple;
                         switch (obType) {
                             case 'button':      
                                 keywords = Object.keys(keywordList.button);
@@ -245,13 +245,8 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                                 selectedKeywordList = "select";
                                 break;
                             case 'list':
-                                if (listType === 'true') {
-                                    keywords = Object.keys(keywordList.list);
-                                    selectedKeywordList = "list";
-                                } else {
-                                    keywords = Object.keys(keywordList.select);
-                                    selectedKeywordList = "select";
-                                }
+                                keywords = Object.keys(keywordList.list);
+                                selectedKeywordList = "list";
                                 break;
                             case 'list_item':
                                 keywords = Object.keys(keywordList.list);
@@ -323,7 +318,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                         }
                         break;
                     } else if (appType === 'SAP') {
-                        let listType = '';
+                        //let listType = '';
                         switch (obType) {
                             case 'push_button': /* FALL THROUGH */
                             case 'GuiButton': /* FALL THROUGH */
@@ -398,13 +393,8 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                                 selectedKeywordList = "toolbar";
                                 break;
                             case 'list':
-                                if (listType === 'true') {
-                                    keywords = Object.keys(keywordList.list);
-                                    selectedKeywordList = "list";
-                                } else {
-                                    keywords = Object.keys(keywordList.select);
-                                    selectedKeywordList = "select";
-                                }
+                                keywords = Object.keys(keywordList.list);
+                                selectedKeywordList = "list";
                                 break;
                             case 'check_box': /* FALL THROUGH */
                             case 'GuiCheckBox': /* FALL THROUGH */
