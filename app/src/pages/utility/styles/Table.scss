@@ -94,20 +94,19 @@
     min-height: 29px;
 }
 
+
+
 .dt__table_numbered_column_header, .dt__table_new_column_header{
     display: flex;
     flex-basis: 4%;
     min-width: 40px;
     align-items: center;
     justify-content: center;
-    background-color: #5e626b;
     
     &:first-child{
-        border-radius: 6px 0 0 0;
         border-right: 0.25px solid #fff
     }
     &:last-child{
-        border-radius: 0 6px 6px 0;
         border-left: 0.25px solid #fff;
     }
 }
@@ -126,10 +125,6 @@
     min-width: fit-content;
     width: 100%;
 
-    &:first-child{
-        background-color: #9b9b9ba4;
-    }
-
     input{
         width: 100%;
         background: transparent;
@@ -143,11 +138,8 @@
         min-width: 100px;
         padding: 5px 0;
         text-align: center;
-        border: 1px solid rgba(234,98,255,.1);
-    }
-
-    &:nth-child(even){
-        background-color: #e8e6fe;
+        // border: 1px solid rgba(234,98,255,.1);
+        border:  1px solid #EDEBE9;
     }
 }
 
@@ -163,6 +155,10 @@
 
 // CELLS CSS
 
+.dt__hdrCell_Sel{
+    background-color: #5f5e5c!important;
+}
+
 .dt__table_numbered_column, .dt__table_add_column {
     display: flex;
     min-width: 40px;
@@ -171,7 +167,6 @@
 }
 
 .dt__table_numbered_column{
-    background-color: #5e626b;
     color: white;
     min-height: 37px;
     border-top: 1px solid white;
@@ -180,6 +175,8 @@
 
 .dt__table_add_column{
     flex-basis: 4%;
+    border-bottom:  1px solid #EDEBE9;
+    border-top:  1px solid #EDEBE9;
 }
 
 
@@ -191,7 +188,6 @@
 
 .dt__table_header_cell{
     text-align: center;
-    background-color: #5e626b;
     flex-grow: 1;
     flex-basis: 100%;
     min-width: 100px;
@@ -210,10 +206,13 @@
 
 .dt__addRow{
     cursor: pointer;
-    border-radius: 0 0 6px 6px;
 }
 
 
 .dt__selected_cell {
-    background-color: rgba(189, 189, 189, .25)!important; 
+    background-color: rgba(237, 235, 233, .50)!important;
+}
+
+.dt__table_numbered_column, .dt__table_numbered_column_header, .dt__table_new_column_header, .dt__table_header_cell{
+    background-color: #A19F9D;
 }

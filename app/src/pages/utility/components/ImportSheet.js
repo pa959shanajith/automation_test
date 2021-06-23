@@ -36,7 +36,7 @@ const ImportSheet = props => {
                 props.setShowPop({title: "File Read Error", content: "Row should not exceed 200", type: "message"});
             }
             else if (typeof resp === "object"){
-                const [, newData, newHeaders] = parseTableData(resp)
+                const [, newData, newHeaders] = parseTableData(resp, "import")
                 props.setData(newData);
                 props.setHeaders(newHeaders);
                 props.setSheetList([]);

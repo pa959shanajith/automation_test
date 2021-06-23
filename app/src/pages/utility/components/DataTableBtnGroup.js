@@ -74,6 +74,7 @@ const TableActionButtons = props => {
                     props.setData(newData);
                 }
             }
+            props.setCheckList({type: 'row', list: []});
         }
     }
 
@@ -137,7 +138,17 @@ const CreateScreenActionButtons = props => {
 
     
     const goToEditScreen = () => {
-        props.setScreenType('datatable-Edit');
+        let arg = prepareSaveData(props.tableName, props.headers, props.data);
+
+        if (arg.data === "emptyData")
+            props.setScreenType('datatable-Edit');
+        else
+            props.setShowPop({
+                title: "Unsaved Data Found", 
+                content: "Unsaved data will be lost. Are you sure you want to go to Edit Screen?", 
+                type: "confirm", 
+                onClick: ()=>{ props.setScreenType('datatable-Edit'); props.setShowPop(false); }
+            });    
     }
     
     const saveDataTable = async() => {
@@ -149,6 +160,7 @@ const CreateScreenActionButtons = props => {
             switch (validation) {
                 case "tableName": props.setErrors({tableName: true}); break;
                 case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
+                case "duplicateHeaders": props.setShowPop({title: "Duplicate Header Error", content: "Data has duplicate headers", type: "message"}); break;
                 case "saveData": 
                     props.setOverlay('Creating Data Table...');
                     let resp = await utilApi.createDataTable(arg);
@@ -201,7 +213,7 @@ const CreateScreenActionButtons = props => {
                     props.setShowPop({title: "Error File Read", content: "Row should not exceed 200", type: "message"});
                 }
                 else {
-                    const [, newData, newHeaders] = parseTableData(resp)
+                    const [, newData, newHeaders] = parseTableData(resp, "import")
                     props.setData(newData);
                     props.setHeaders(newHeaders);
                 }
@@ -269,14 +281,31 @@ const EditScreenActionButtons = props => {
     }
 
     const updateTable = async() => {
-        props.setOverlay("Updating Data Table");
-        const resp = await utilApi.editDataTable(prepareSaveData(props.tableName, props.headers, props.data));
-        props.setOverlay("");
+        try{
+            let arg = prepareSaveData(props.tableName, props.headers, props.data);
 
-        if (resp === "success") 
-            props.setShowPop({title: "Update Data Table", content: "Data Table Updated Successfully.", type: "message"})
-        else 
-            props.setShowPop({title: "Update Data Table", content: "Failed to Update Data Table.", type: "message"})
+            let validation = validateData(arg.tableName, arg.data);
+
+            switch (validation) {
+                case "tableName": props.setErrors({tableName: true}); break;
+                case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
+                case "duplicateHeaders": props.setShowPop({title: "Duplicate Header Error", content: "Data has duplicate headers", type: "message"}); break;
+                case "saveData": 
+                    props.setOverlay("Updating Data Table");
+                    const resp = await utilApi.editDataTable(arg);
+                    props.setOverlay("");
+                    if (resp === "success") 
+                        props.setShowPop({title: "Update Data Table", content: "Data Table Updated Successfully.", type: "message"})
+                    else 
+                        props.setShowPop({title: "Update Data Table", content: "Failed to Update Data Table.", type: "message"})
+                    break;
+                default: props.setShowPop({title: 'Data Table', content: 'Failed to Update Data Table', type: "message"}); break;
+            }
+        }
+        catch(error) {
+            props.setShowPop({title: 'Data Table', content: 'Failed to Update Data Table', type: "message"})
+            console.error(error);
+        }
     }
 
     return (
@@ -311,7 +340,7 @@ const SearchDataTable = props => {
 
         if (resp.error) props.setShowPop({title: "Data Table Error", content: resp.error, type: "message"});
         else {
-            const [tableName, newData, newHeaders] = parseTableData(resp[0])
+            const [tableName, newData, newHeaders] = parseTableData(resp[0], "edit")
             props.setData(newData);
             props.setHeaders(newHeaders);
             props.setTableName(tableName);

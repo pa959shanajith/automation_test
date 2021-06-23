@@ -1,3 +1,4 @@
+const uuid = require('uuid-random');
 const crypto = require('crypto');
 const validator =  require('validator');
 const DOMParser = require('xmldom').DOMParser;
@@ -101,6 +102,7 @@ exports.importDtFromExcel = function (req, res) {
 		var myCSV = xlsToCSV(wb1, req.body.sheetname);
 		var numSheets = myCSV.length / 2;
 		var qObj = {};
+		var columnNames = [];
 		if (numSheets == 0) {
 			return res.status(200).send("emptySheet");
 		}
@@ -109,19 +111,23 @@ exports.importDtFromExcel = function (req, res) {
 			var cSheet = myCSV[k * 2 + 1];
 			var cSheetRow = cSheet.trimEnd().split('\n');
 			if (k == 0) {
-				columnNames = cSheetRow[k].split(',');
+				columns = cSheetRow[k].split(',');
 			}
-			if(columnNames.length>15) {
+			if(columns.length>15) {
 				return res.send("columnExceeds");
 			}
 			if(cSheetRow.length >200) {
 				return res.send("rowExceeds");
 			}
+			for (var i =0; i<columns.length; ++i) {
+				ob = { id: uuid(), name: columns[i]}
+				columnNames.push(ob)
+			}
 			for (var i = 1; i < cSheetRow.length; i++) {
 				var row = cSheetRow[i].split(',');
 				newObj = {};
 				for(var j=0; j<columnNames.length; ++j) {
-					newObj[columnNames[j]] = row[j]
+					newObj[columnNames[j].id] = row[j]
 				}
 				rows.push(newObj);
 			}
@@ -146,17 +152,23 @@ exports.importDtFromCSV = function (req, res) {
 			return res.send("rowExceeds");
 		}
 		rows = [];
+		var columnNames = [];
 		for (var k = 0; k < csvArray.length; k++) {
 			if (k == 0) {
-				columnNames = csvArray[k].split(',');
-				if(columnNames.length>15) {
+				columns = csvArray[k].split(',');
+				if(columns.length>15) {
 					return res.send("columnExceeds");
+				}
+				for (var i =0; i<columns.length; ++i) {
+					ob = { id: uuid(), name: columns[i]}
+					columnNames.push(ob)
 				}
 			} else  { 
 				var row = csvArray[k].split(',');
 				newObj = {};
 				for (var i = 0; i < row.length; i++) {
-					newObj[columnNames[i]] = row[i];
+					
+					newObj[columnNames[i].id] = row[i];
 				}
 				rows.push(newObj);
 			}
@@ -287,14 +299,21 @@ exports.importDtFromXML = function (req, res) {
 		if(allrows.length >200) {
 			return res.send("rowExceeds");
 		}
+		if(allrows.length>0) {
+			var alltags = allrows[0].childNodes;
+			for (var j=0;j<alltags.length;++j) {
+				ob = {id: uuid(), name: alltags[j].nodeName}
+				columnNames.push(ob);
+			}
+		}
+		if(columnNames.length>15) {
+			return res.send("columnExceeds");
+		}
 		for( var i=0;i<allrows.length;++i) {
 			var newObj = {};
 			var alltags = allrows[i].childNodes;
 			for (var j=0;j<alltags.length;++j) {
-				if(i==0) {
-					columnNames.push(alltags[j].nodeName);
-				}
-				newObj[alltags[j].nodeName] = alltags[j].childNodes[0].nodeValue;
+				newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
 			}
 			if(columnNames.length>15) {
 				return res.send("columnExceeds");

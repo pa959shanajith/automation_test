@@ -112,16 +112,15 @@ const RefBarItems = props => {
 					opacity: "0.7"
 				});
 				// highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
-				if(!ScrapedObject.xpath.startsWith('iris')){
-					highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
-						.then(data => {
-							if (data === "Invalid Session") return RedirectPage(history);
-							if (data === "fail") setShowPop({title: "Fail", content: "Failed to highlight"})
-						})
-						.catch(error => console.error("Error while highlighting. ERROR::::", error));
-				}
-
 			} else setHighlight(false);
+			if(!ScrapedObject.xpath.startsWith('iris')){
+				highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
+					.then(data => {
+						if (data === "Invalid Session") return RedirectPage(history);
+						if (data === "fail") setShowPop({title: "Fail", content: "Failed to highlight"})
+					})
+					.catch(error => console.error("Error while highlighting. ERROR::::", error));
+			}
 		}
 		else setHighlight(false);
 		//eslint-disable-next-line
