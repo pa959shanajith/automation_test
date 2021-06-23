@@ -145,7 +145,7 @@ const ProjectButtons = (props) => {
             var val = downloadFile({result,projectName:props.selProject})
             setLoading(false)
             setPopupState({
-                title:'Mindmap',
+                title:'Project Export',
                 content:val?'Data Exported Successfully.':'Data Export Failed.',
                 show:true
             })
