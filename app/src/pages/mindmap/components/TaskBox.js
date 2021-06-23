@@ -151,17 +151,9 @@ const TaskBox = (props) => {
                 case 'rw':
                     return;
                 case 'sd':
-                    if (tObj.sd != '' && tObj.sd.indexOf('-')==-1) {
-                        var d=new Date(tObj.sd);
-                        tObj.sd=d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
-                    }
                     setStartDate({show:true,value:tObj.sd})
                     return;
                 case 'ed':
-                    if (tObj.ed != '' && tObj.ed.indexOf('-')==-1) {
-                        var d1=new Date(tObj.ed);
-                        tObj.ed=d1.getDate()+"-"+(d1.getMonth()+1)+"-"+d1.getFullYear();
-                    }
                     setEndDate({show:true,value:tObj.ed})
                     return;
                 case 'pg':
