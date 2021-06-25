@@ -245,7 +245,10 @@ const ScrapeObjectList = () => {
                     scrapeItem.duplicate = true;
                     dCusts.push(scrapeItem.title);
                 }
-                else uniqueCusts.push(scrapeItem.title);
+                else {
+                    scrapeItem.duplicate = false;
+                    uniqueCusts.push(scrapeItem.title);
+                }
             }
             if (!dCustname) {
                 for (let scrapeItem of scrapeItemsL) {
@@ -259,7 +262,10 @@ const ScrapeObjectList = () => {
                         scrapeItem.duplicate = true;
                         dCusts2.push(scrapeItem.title);
                     }
-                    else uniqueXPaths.push(xpath);
+                    else {
+                        scrapeItem.duplicate = false;
+                        uniqueXPaths.push(xpath);
+                    }
                 }
             }
 
