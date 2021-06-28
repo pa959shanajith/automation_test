@@ -45,9 +45,9 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
     const Content = () => (
         <div className="defIce_inputs_container">
             <span className="leftControl defIce-span " title="Token Name">Select Default ICE :</span>
-            <select id='chooseDefICE'>
+            <select id='chooseDefICE' onChange={(e)=>{setDefICE(e.target.value)}}>
                 {chooseDefICE.map((e,index)=>(
-                    <option key={index} value={e} onClick={()=>{setDefICE(e)}} >{e}</option>
+                    <option key={index} value={e}>{e}</option>
                 ))}
             </select>
         </div>
@@ -58,10 +58,10 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
             <button onClick={()=>{changeDefICEClick()}}>Submit</button>
         </div>
     );
-
+    
     const changeDefICEClick = async () =>{
 		setLoading("Setting Default ICE ...")
-		var ice = defICE;
+        var ice = defICE;
 		try{
             const data = await setDefaultUserICE(ice);
             setLoading(false);
@@ -76,7 +76,6 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
 			setPopupState({show:true,title:"Change Default ICE",content:"Failed to change default ICE"});
 		}
 	}
-
     return (
         <>
             {showPopup?
