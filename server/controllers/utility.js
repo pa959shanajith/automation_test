@@ -99,40 +99,23 @@ exports.importDtFromExcel = function (req, res) {
 		if (req.body.flag == 'sheetname') {
 			return res.status(200).send(wb1.SheetNames);
 		}
+		var qObj = {};
 		var myCSV = xlsToCSV(wb1, req.body.sheetname);
 		var numSheets = myCSV.length / 2;
-		var qObj = {};
 		var columnNames = [];
-		if (numSheets == 0) {
-			return res.status(200).send("emptySheet");
+		var rows = [];
+		if (myCSV.length == 0) return res.send("emptyExcelData");
+		var columns = myCSV[1].split('\n')[0].split(',');
+		var cs = [];
+		for (var i =0; i<columns.length; ++i) {
+			ob = { id: uuid(), name: columns[i]};
+			cs.push(ob.id);
+			columnNames.push(ob);
 		}
-		rows = [];
-		for (var k = 0; k < numSheets; k++) {
-			var cSheet = myCSV[k * 2 + 1];
-			var cSheetRow = cSheet.trimEnd().split('\n');
-			if (k == 0) {
-				columns = cSheetRow[k].split(',');
-			}
-			if(columns.length>15) {
-				return res.send("columnExceeds");
-			}
-			if(cSheetRow.length >200) {
-				return res.send("rowExceeds");
-			}
-			for (var i =0; i<columns.length; ++i) {
-				ob = { id: uuid(), name: columns[i]}
-				columnNames.push(ob)
-			}
-			for (var i = 1; i < cSheetRow.length; i++) {
-				var row = cSheetRow[i].split(',');
-				newObj = {};
-				for(var j=0; j<columnNames.length; ++j) {
-					newObj[columnNames[j].id] = row[j]
-				}
-				rows.push(newObj);
-			}
-		}
-		qObj['datatable'] = rows;
+		xlsx.utils.sheet_add_aoa(wb1.Sheets[req.body.sheetname], [cs], {origin:'A1'});
+		var myJson = xlsx.utils.sheet_to_json(wb1.Sheets[req.body.sheetname]);
+
+		qObj['datatable'] = myJson;
 		qObj['dtheaders'] = columnNames;
 		res.status(200).send(qObj);
 	} catch(exception) {
@@ -142,23 +125,20 @@ exports.importDtFromExcel = function (req, res) {
 };
 
 exports.importDtFromCSV = function (req, res) {
-	const fnName = "importDtFromExcel";
+	const fnName = "importDtFromCSV";
 	logger.info("Inside UI service: " + fnName);
 	try {
 		var myCSV = req.body.content;
 		var qObj = {};
 		var csvArray = myCSV.replace(/\"|\'/g,'').split('\n');
-		if (csvArray.length > 200) {
-			return res.send("rowExceeds");
-		}
+		if(validator.isEmpty(myCSV)) return res.send("emptyData");
+		if (csvArray.length > 200) return res.send("rowExceeds");
 		rows = [];
 		var columnNames = [];
 		for (var k = 0; k < csvArray.length; k++) {
 			if (k == 0) {
 				columns = csvArray[k].split(',');
-				if(columns.length>15) {
-					return res.send("columnExceeds");
-				}
+				if(columns.length>15) return res.send("columnExceeds"); 
 				for (var i =0; i<columns.length; ++i) {
 					ob = { id: uuid(), name: columns[i]}
 					columnNames.push(ob)
@@ -291,14 +271,13 @@ exports.importDtFromXML = function (req, res) {
 	try {
 		var myXML = req.body.content;
 		var myXMLStr = myXML.replace(/\s/g,'');
+		if(validator.isEmpty(myXMLStr)) return res.send("emptyData");
 		var qObj = {};
 		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
 		var allrows = doc.getElementsByTagName("row");
 		var rows = [];
 		var columnNames = [];
-		if(allrows.length >200) {
-			return res.send("rowExceeds");
-		}
+		if(allrows.length >200) return res.send("rowExceeds");
 		if(allrows.length>0) {
 			var alltags = allrows[0].childNodes;
 			for (var j=0;j<alltags.length;++j) {
@@ -315,9 +294,7 @@ exports.importDtFromXML = function (req, res) {
 			for (var j=0;j<alltags.length;++j) {
 				newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
 			}
-			if(columnNames.length>15) {
-				return res.send("columnExceeds");
-			}
+			if(columnNames.length>15) return res.send("columnExceeds");
 			rows.push(newObj);
 		}
 		qObj['datatable'] = rows;
