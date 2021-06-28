@@ -104,64 +104,18 @@ exports.importDtFromExcel = function (req, res) {
 		var numSheets = myCSV.length / 2;
 		var columnNames = [];
 		var rows = [];
-		var finalCSV = [];
-		for (var k = 0; k < numSheets; k++) {
-			var cSheet = myCSV[k * 2 + 1];
-			var cSheetRow = cSheet.trimEnd().split('"');
-			for (var l=0;l<cSheetRow.length;++l) {
-				if(l%2 != 0) {
-					if(finalCSV[finalCSV.length-1].endsWith(',') || finalCSV[finalCSV.length-1] == "") 
-						finalCSV[finalCSV.length-1] += '"'+cSheetRow[l]+'"';
-					else finalCSV.push('"'+cSheetRow[l]+'"');
-				}
-				else { 
-					if (l>0 && cSheetRow[l].startsWith(',') && l-1>0) {
-						temrow = cSheetRow[l].split('\n');
-						finalCSV[finalCSV.length-1] = finalCSV[finalCSV.length-1] + temrow[0]
-						temrow.shift();
-						finalCSV = finalCSV.concat(temrow);
-					}
-					else if (l>0 && cSheetRow[l].startsWith('\n')) {
-						temrow = cSheetRow[l].split('\n');
-						temrow.shift();
-						finalCSV = finalCSV.concat(temrow);
-					} 
-					else finalCSV = finalCSV.concat(cSheetRow[l].split('\n'));
-				}
-			}
-			if (k == 0) {
-				columns = finalCSV[k].split(',');
-			}
-			if(columns.length>15) {
-				return res.send("columnExceeds");
-			}
-			if(finalCSV.length >200) {
-				return res.send("rowExceeds");
-			}
-			for (var i =0; i<columns.length; ++i) {
-				ob = { id: uuid(), name: columns[i]}
-				columnNames.push(ob)
-			}
-			for (var i = 1; i < finalCSV.length; i++) {
-				var temprow = finalCSV[i].split(/,?",?/);
-				var row = [];
-				if(temprow.length==1) row = row.concat(temprow[0].split(','));
-				else {
-					if (temprow[temprow.length-1] == "") temprow.pop();
-					for (var k=0;k<temprow.length;++k) {
-						if(k%2 != 0) row.push(temprow[k]);
-						else if (temprow[k]=="") continue;
-						else row = row.concat(temprow[k].split(','));
-					}
-				}
-				newObj = {};
-				for(var j=0; j<columnNames.length; ++j) {
-					newObj[columnNames[j].id] = row[j]
-				}
-				rows.push(newObj);
-			}
+		if (myCSV.length == 0) return res.send("emptyExcelData");
+		var columns = myCSV[1].split('\n')[0].split(',');
+		var cs = [];
+		for (var i =0; i<columns.length; ++i) {
+			ob = { id: uuid(), name: columns[i]};
+			cs.push(ob.id);
+			columnNames.push(ob);
 		}
-		qObj['datatable'] = rows;
+		xlsx.utils.sheet_add_aoa(wb1.Sheets[req.body.sheetname], [cs], {origin:'A1'});
+		var myJson = xlsx.utils.sheet_to_json(wb1.Sheets[req.body.sheetname]);
+
+		qObj['datatable'] = myJson;
 		qObj['dtheaders'] = columnNames;
 		res.status(200).send(qObj);
 	} catch(exception) {
