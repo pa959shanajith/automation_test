@@ -58,11 +58,10 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
             <button onClick={()=>{changeDefICEClick()}}>Submit</button>
         </div>
     );
-
+    
     const changeDefICEClick = async () =>{
 		setLoading("Setting Default ICE ...")
         var ice = defICE;
-        // console.log(ice)
 		try{
             const data = await setDefaultUserICE(ice);
             setLoading(false);
@@ -77,7 +76,6 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
 			setPopupState({show:true,title:"Change Default ICE",content:"Failed to change default ICE"});
 		}
 	}
-    console.log(defICE)
     return (
         <>
             {showPopup?
