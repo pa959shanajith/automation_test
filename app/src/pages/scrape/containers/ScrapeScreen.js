@@ -611,7 +611,7 @@ function getProcessedBody (body, type) {
 }
 
 function getFormattedValue (value, extraspace) {
-    if (extraspace) return value.replace(/[\n\r]/g, '##').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
+    if (extraspace) return value.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
     return value.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
 }
 
