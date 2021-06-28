@@ -51,7 +51,7 @@ const Container = ({reqDetails}) =>{
                     </div>
                     <div>
                         <label className='title'>Description </label>
-                        <label><span>:</span> {e.reqdescription}</label>
+                        <label><span>:</span> {e.reqdescription ? e.reqdescription.trim() : ""}</label>
                     </div>
                 </div>
             )}

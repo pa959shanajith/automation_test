@@ -215,7 +215,12 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                         }
                     }
 
-                    if (!(['a', 'select', 'radiobutton', 'checkbox', 'input', 'list', 'tablecell', 'table', 'grid', 'img', 'button', 'iris', 'iristextbox', 'irisradiocheck', 'irisbutton', 'iristable', 'irisgeneric', 'irisscroll'].includes(obType)) && ['Web', 'MobileWeb'].includes(appType) && !ob.tag.startsWith('@PDF')) {
+                    if (!ob.tag && appType === "Webservice" ) {
+                        keywords = Object.keys(keywordList.elementWS);
+                        selectedKeywordList = "elementWS";
+                        break;
+                    }
+                    else if (!(['a', 'select', 'radiobutton', 'checkbox', 'input', 'list', 'tablecell', 'table', 'grid', 'img', 'button', 'iris', 'iristextbox', 'irisradiocheck', 'irisbutton', 'iristable', 'irisgeneric', 'irisscroll'].includes(obType)) && ['Web', 'MobileWeb'].includes(appType) && !ob.tag.startsWith('@PDF')) {
                         keywords = Object.keys(keywordList.element);
                         selectedKeywordList = "element";
                         break;

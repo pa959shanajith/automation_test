@@ -14,31 +14,36 @@ const MapObjectModal = props => {
     const [map, setMap] = useState({});
     const [showName, setShowName] = useState("");
     const [selectedItems, setSelectedItems] = useState([]);
+    const [orderList, setOrderList] = useState([]);
     const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(()=>{
         let tempScrapeList = {};
         let tempCustomList = {};
         let tempNonCustom = [];
+        let tempOrderList = [];
         if (props.scrapeItems.length) {
             props.scrapeItems.forEach(object => {
                 let elementType = object.tag;
                 elementType = tagList.includes(elementType) ? elementType : 'Element';
-                if (!object.objId) {}
-                else if (object.isCustom) {
-                    if (tempCustomList[elementType]) tempCustomList[elementType] = [...tempCustomList[elementType], object];
-                    else tempCustomList[elementType] = [object]
-                    if (!tempScrapeList[elementType]) tempScrapeList[elementType] = []
-                }
-                else {
-                    tempNonCustom.push(object);
-                    if (tempScrapeList[elementType]) tempScrapeList[elementType] = [...tempScrapeList[elementType], object];
-                    else tempScrapeList[elementType] = [object]
+                if (object.objId) {
+                    if (object.isCustom) {
+                        if (tempCustomList[elementType]) tempCustomList[elementType] = [...tempCustomList[elementType], object];
+                        else tempCustomList[elementType] = [object]
+                        if (!tempScrapeList[elementType]) tempScrapeList[elementType] = []
+                    }
+                    else {
+                        tempNonCustom.push(object);
+                        if (tempScrapeList[elementType]) tempScrapeList[elementType] = [...tempScrapeList[elementType], object];
+                        else tempScrapeList[elementType] = [object]
+                    }
+                    tempOrderList.push(object.objId);
                 }
             });
             setScrapedList(tempScrapeList);
             setCustomList(tempCustomList);
             setNonCustomList(tempNonCustom);
+            setOrderList(tempOrderList);
         }
         //eslint-disable-next-line
     }, [])
@@ -93,7 +98,7 @@ const MapObjectModal = props => {
             param: "mapScrapeData",
             appType: appType,
             objList: [],
-            orderList: props.orderList,
+            orderList: orderList,
             versionnumber: versionnumber
         };
 
