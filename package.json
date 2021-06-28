@@ -1,6 +1,6 @@
 {
   "name": "avoassure",
-  "version": "3.0.0",
+  "version": "2.0.0",
   "description": "Test Automation",
   "start": "server.js",
   "scripts": {
