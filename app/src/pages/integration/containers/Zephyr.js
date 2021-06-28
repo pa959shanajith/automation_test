@@ -59,12 +59,13 @@ const Zephyr = () => {
         // else if (domainDetails === "noprojectfound") setLoginError("Invalid credentials or no project found");
         // else if (domainDetails === "invalidurl") setLoginError("Invalid URL");
         else if (domainDetails === "fail") setLoginError("Fail to Login");
-        // else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Unable to run Zephyr");
+        else if (domainDetails === "notreachable") setLoginError("Host not reachable.");
+        //else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Host not reachable");
         // else if (domainDetails === "Error:Zephyr Operations") setLoginError("Failed during execution");
         else if (domainDetails) {
             setDomainDetails(domainDetails);
             setLoginSuccess(true);
-        }
+        } 
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ""});
     }
 
