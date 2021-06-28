@@ -28,6 +28,7 @@ const LdapConfig = (props) => {
     const [fieldMapOpts,setFieldMapOpts] = useState(["None"])
     const [testStatus,setTestStatus] = useState("false")
     const [manageEdit,setManageEdit] = useState(false)
+    const [manageCreate,setManageCreate] = useState(false)
 	const [ldapServerURLErrBor,setLdapServerURLErrBor] = useState(false)
     const [binddnErrBor,setBinddnErrBor] = useState(false)
     const [bindCredentialsErrBor,setBindCredentialsErrBor] = useState(false)
@@ -69,10 +70,11 @@ const LdapConfig = (props) => {
 		setFieldMapOpts(["None"]);
 		if (action!==undefined && action === "edit") setAuth("");
 		setTestStatus("false");
+		setManageCreate(!manageCreate);
 		switchAuthType();
 		switchSecureUrl();
-        setLdapServerURLErrBor(false);setBinddnErrBor(false); setBindCredentialsErrBor(false);setLdapBaseDNErrBor(false)
-        setLdapFMapUnameErrBor(false);setLdapFMapFnameErrBor(false);setLdapFMapLnameErrBor(false)
+        setLdapServerURLErrBor(false);setBinddnErrBor(false); setBindCredentialsErrBor(false);setLdapBaseDNErrBor(false);
+        setLdapFMapUnameErrBor(false);setLdapFMapFnameErrBor(false);setLdapFMapLnameErrBor(false);
         setLdapFMapEmailErrBor(false);setLdapCertErrBor(false);setLdapServerNameErrBor(false);
     }
 
@@ -135,12 +137,6 @@ const LdapConfig = (props) => {
 			fieldmap: fieldmap
 		};
 		setLoading(bAction.slice(0,-1)+"ing configuration...");
-		//Transaction Activity for Create/ Update/ Delete LDAP conf button Action
-		// var labelArr = [];
-		// var infoArr = [];
-		// labelArr.push(txnHistory.codesDict['LdapConfmanage']);
-		// infoArr.push(action);
-		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		try{
 			const data = await manageLDAPConfig(action, confObj);
 			if(data.error){displayError(data.error);return;}
@@ -255,8 +251,8 @@ const LdapConfig = (props) => {
             {loading?<ScreenOverlay content={loading}/>:null}
 
             {ldapEdit===false?
-                <LdapConfigCreate setPopupState={setPopupState} ldapManage={ldapManage} ldapTest={ldapTest} ldapServerNameErrBor={ldapServerNameErrBor} ldapCertErrBor={ldapCertErrBor} ldapFMapEmailErrBor={ldapFMapEmailErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapFnameErrBor={ldapFMapFnameErrBor} ldapFMapUnameErrBor={ldapFMapUnameErrBor} ldapBaseDNErrBor={ldapBaseDNErrBor} bindCredentialsErrBor={bindCredentialsErrBor} binddnErrBor={binddnErrBor} ldapServerURLErrBor={ldapServerURLErrBor} setFieldmap={setFieldmap} cert={cert} setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts} testStatus={testStatus} setCert={setCert} auth={auth} setAuth={setAuth} binddn={binddn} setBinddn={setBinddn} bindCredentials={bindCredentials} setBindCredentials={setBindCredentials} setCertName={setCertName} certName={certName} serverName={serverName} secure={secure} setSecure={setSecure} setServerName={setServerName} setBasedn={setBasedn} basedn={basedn} url={url} setUrl={setUrl} />
-                :<LdapConfigEdit setPopupState={setPopupState} popupState={popupState} manageEdit={manageEdit} ldapManage={ldapManage} ldapTest={ldapTest} ldapServerNameErrBor={ldapServerNameErrBor} ldapCertErrBor={ldapCertErrBor} ldapFMapEmailErrBor={ldapFMapEmailErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapFnameErrBor={ldapFMapFnameErrBor} ldapFMapUnameErrBor={ldapFMapUnameErrBor} ldapBaseDNErrBor={ldapBaseDNErrBor} bindCredentialsErrBor={bindCredentialsErrBor} binddnErrBor={binddnErrBor} ldapServerURLErrBor={ldapServerURLErrBor} setLdapCertErrBor={setLdapCertErrBor} setLdapFMapEmailErrBor={setLdapFMapEmailErrBor} setLdapFMapLnameErrBor={setLdapFMapLnameErrBor} setLdapFMapFnameErrBor={setLdapFMapFnameErrBor} setLdapBaseDNErrBor={setLdapBaseDNErrBor} setBindCredentialsErrBor={setBindCredentialsErrBor} setLdapFMapUnameErrBor={setLdapFMapUnameErrBor} setBinddnErrBor={setBinddnErrBor} setLdapServerURLErrBor={setLdapServerURLErrBor} setTestStatus={setTestStatus} setFieldMapOpts={setFieldMapOpts} setFieldmap={setFieldmap} setSecure={setSecure} setCert={setCert} setBasedn={setBasedn} setBindCredentials={setBindCredentials} setBinddn={setBinddn} setAuth={setAuth} setUrl={setUrl} cert={cert} ldapEdit={ldapEdit} setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts} testStatus={testStatus} auth={auth} binddn={binddn} bindCredentials={bindCredentials} setCertName={setCertName} certName={certName} serverName={serverName} secure={secure} setServerName={setServerName} basedn={basedn} url={url}/>
+                <LdapConfigCreate manageCreate={manageCreate} setPopupState={setPopupState} ldapManage={ldapManage} ldapTest={ldapTest} ldapServerNameErrBor={ldapServerNameErrBor} ldapCertErrBor={ldapCertErrBor} ldapFMapEmailErrBor={ldapFMapEmailErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapFnameErrBor={ldapFMapFnameErrBor} ldapFMapUnameErrBor={ldapFMapUnameErrBor} ldapBaseDNErrBor={ldapBaseDNErrBor} bindCredentialsErrBor={bindCredentialsErrBor} binddnErrBor={binddnErrBor} ldapServerURLErrBor={ldapServerURLErrBor} setFieldmap={setFieldmap} cert={cert} setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts} testStatus={testStatus} setCert={setCert} auth={auth} setAuth={setAuth} binddn={binddn} setBinddn={setBinddn} bindCredentials={bindCredentials} setBindCredentials={setBindCredentials} setCertName={setCertName} certName={certName} serverName={serverName} secure={secure} setSecure={setSecure} setServerName={setServerName} setBasedn={setBasedn} basedn={basedn} url={url} setUrl={setUrl} />
+                :<LdapConfigEdit setLdapServerNameErrBor={setLdapServerNameErrBor} setPopupState={setPopupState} popupState={popupState} manageEdit={manageEdit} ldapManage={ldapManage} ldapTest={ldapTest} ldapServerNameErrBor={ldapServerNameErrBor} ldapCertErrBor={ldapCertErrBor} ldapFMapEmailErrBor={ldapFMapEmailErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapFnameErrBor={ldapFMapFnameErrBor} ldapFMapUnameErrBor={ldapFMapUnameErrBor} ldapBaseDNErrBor={ldapBaseDNErrBor} bindCredentialsErrBor={bindCredentialsErrBor} binddnErrBor={binddnErrBor} ldapServerURLErrBor={ldapServerURLErrBor} setLdapCertErrBor={setLdapCertErrBor} setLdapFMapEmailErrBor={setLdapFMapEmailErrBor} setLdapFMapLnameErrBor={setLdapFMapLnameErrBor} setLdapFMapFnameErrBor={setLdapFMapFnameErrBor} setLdapBaseDNErrBor={setLdapBaseDNErrBor} setBindCredentialsErrBor={setBindCredentialsErrBor} setLdapFMapUnameErrBor={setLdapFMapUnameErrBor} setBinddnErrBor={setBinddnErrBor} setLdapServerURLErrBor={setLdapServerURLErrBor} setTestStatus={setTestStatus} setFieldMapOpts={setFieldMapOpts} setFieldmap={setFieldmap} setSecure={setSecure} setCert={setCert} setBasedn={setBasedn} setBindCredentials={setBindCredentials} setBinddn={setBinddn} setAuth={setAuth} setUrl={setUrl} cert={cert} ldapEdit={ldapEdit} setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts} testStatus={testStatus} auth={auth} binddn={binddn} bindCredentials={bindCredentials} setCertName={setCertName} certName={certName} serverName={serverName} secure={secure} setServerName={setServerName} basedn={basedn} url={url}/>
             }
         </Fragment>
   );

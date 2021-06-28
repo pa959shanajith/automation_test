@@ -20,6 +20,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const current_task = useSelector(state=>state.plugin.CT)
     const [scheduleTableData,setScheduleTableData] = useState([])
+    const [closePopups, setClosePopups] = useState(false);
     const [integration,setIntegration] = useState({alm: {url:"",username:"",password:""}, 
                                                     qtest: {url:"",username:"",password:"",qteststeps:""}, 
                                                     zephyr: {url:"",username:"",password:""}});
@@ -112,7 +113,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     }
 
     const ScheduleTestSuitePopup = () => {
-        if(document.getElementsByClassName('rdtOpen').length>0)return;
+        setClosePopups(true);
         const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction);
         const valid = checkSelectedModules(scheduleTableData, setPopupState);
         const checkDateTime = checkDateTimeValues(scheduleTableData, moduleScheduledate, setModuleScheduledate, setPopupState);
@@ -278,7 +279,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         <div id="s__btns">
                             <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}} title="Add">Schedule</button>
                         </div>
-                        <ScheduleSuitesTopSection setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} />
+                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} />
                     </div>
 
                 {/* //lower scheduled table Section */}
@@ -288,7 +289,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         <select defaultValue={"Select Status"} onChange={(event)=>{selectStatus(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
                             <option disabled={true}>Select Status</option>
                             <option>Completed</option>
-                            <option>In Progress</option>
+                            <option value={"Inprogress"} >In Progress</option>
                             <option>Scheduled</option>
                             <option value={"Terminate"}>Terminated</option>
                             <option>Cancelled</option>

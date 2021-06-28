@@ -222,10 +222,17 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
         nodeDisplay[d.id].hidden = ((d.parent)? (d.parent.revertChild || d.parent.revertChild1):false) || false;
         if(isAssign){
             if (d.task != null) {
+                //[]convert from date string to %d-%m-%y
+                ['startdate','enddate'].forEach((e)=>{
+                    if (d.task[e] != '' && d.task[e].indexOf('-')==-1) {
+                        var t=new Date(d.task[e]);
+                        d.task[e]=t.getDate()+"-"+(t.getMonth()+1)+"-"+t.getFullYear();
+                    }
+                })
                 if (d.task.cycleid == cycleID) {
                     nodeDisplay[d.id].task = true;
                     nodeDisplay[d.id].taskOpacity = 1;
-                }//do not fade for module????????
+                }
                 if(d.type=="screens" || d.type=="testcases"){
                     if (d.task.cycleid !=cycleID) {
                         nodeDisplay[d.id].task = true;

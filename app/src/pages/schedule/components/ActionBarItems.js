@@ -33,7 +33,7 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
             if(smartMode==="smartModule") setSmartMode("normal");
             else {
                 setPopupState({
-                    title:'Smart SchedulingR',
+                    title:'Smart Scheduling',
                     content:"All the modules will be executed as batch.\nAll available ICE should be in similar configurations for optimal results.",
                     show:true
                 })
@@ -62,7 +62,7 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
                 <div className="smartScenario-popup" >
                     <ModalContainer
                         title="Smart Scheduling"
-                        content={"Smart scheduling requires independent scenarios. Are you sure you want to enable smart scheduling the task ?\n All available ICE should be in similar configurations for optimal results."}
+                        content={"Smart scheduling requires independent scenarios. Are you sure you want to enable smart scheduling the task?\n\nAll available ICE should be in similar configurations for optimal results."}
                         close={()=>setSmartScenario(false)}
                         footer={
                             <>

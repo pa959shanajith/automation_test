@@ -40,7 +40,7 @@ const ImportSheet = props => {
                 props.setShowPop({title: "File Read Error", content: "Empty Data in the sheet", type: "message"});
             }
             else if (typeof resp === "object"){
-                const [, newData, newHeaders] = parseTableData(resp)
+                const [, newData, newHeaders] = parseTableData(resp, "import")
                 props.setData(newData);
                 props.setHeaders(newHeaders);
                 props.setSheetList([]);

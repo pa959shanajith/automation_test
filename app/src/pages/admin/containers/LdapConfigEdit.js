@@ -49,7 +49,7 @@ const LdapConfigEdit = (props) => {
 		switchSecureUrl();
         props.setLdapServerURLErrBor(false);props.setBinddnErrBor(false); props.setBindCredentialsErrBor(false);props.setLdapBaseDNErrBor(false)
         props.setLdapFMapUnameErrBor(false);props.setLdapFMapFnameErrBor(false);props.setLdapFMapLnameErrBor(false)
-        props.setLdapFMapEmailErrBor(false);props.setLdapCertErrBor(false)
+        props.setLdapFMapEmailErrBor(false);props.setLdapCertErrBor(false);props.setLdapServerNameErrBor(false);
 		setLoading("Fetching details...");
 		const data = await getLDAPConfig("server");
         if(data.error){displayError(data.error);return;}
@@ -66,6 +66,7 @@ const LdapConfigEdit = (props) => {
             }
             setSelBox(selBoxOptions);
         }
+        document.getElementById("ldapServerName").selectedIndex = "0";  
 	}
 
     const switchSecureUrl = () => {
@@ -154,7 +155,7 @@ const LdapConfigEdit = (props) => {
                     </div></div>
                     
                     <LdapConfigurationForm {...props}  />
-                    <LdapDataMapping setFieldmap={props.setFieldmap} ldapEdit={props.ldapEdit} fieldmap={props.fieldmap} fieldMapOpts={props.fieldMapOpts}  ldapFMapEmailErrBor={props.ldapFMapEmailErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapFnameErrBor={props.ldapFMapFnameErrBor} ldapFMapUnameErrBor={props.ldapFMapUnameErrBor} />
+                    <LdapDataMapping  resetField={props.manageEdit} setFieldmap={props.setFieldmap} ldapEdit={props.ldapEdit} fieldmap={props.fieldmap} fieldMapOpts={props.fieldMapOpts}  ldapFMapEmailErrBor={props.ldapFMapEmailErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapFnameErrBor={props.ldapFMapFnameErrBor} ldapFMapUnameErrBor={props.ldapFMapUnameErrBor} />
                 </div>
                 </ScrollBar>
             </div>

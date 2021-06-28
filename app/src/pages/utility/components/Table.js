@@ -70,13 +70,13 @@ const Table = props => {
         props.setData(newData);
     }
 
-    const updateTableData = (value, rowId, columnName, headerId) => {
+    const updateTableData = (value, rowId, headerId) => {
         let newData = [...props.data];
         
         for (let row of newData) {
             if (row.__CELL_ID__ === rowId) {
-                props.undoStack.push({ rowId: row.__CELL_ID__, colId: headerId, value: row[columnName]});
-                row[columnName] = value;
+                props.undoStack.push({ rowId: row.__CELL_ID__, colId: headerId, value: row[headerId]});
+                row[headerId] = value;
                 break;
             }
         }
@@ -128,6 +128,7 @@ const Table = props => {
                 <div className="dt__headersScrollContainer">
                     <div ref={headerRef} className="dt__Scroller">
                         <Headers
+                            checkList={props.checkList}
                             headers={props.headers} 
                             setHeaders={props.setHeaders}
                             updateCheckList={updateCheckList}
@@ -155,7 +156,7 @@ const Table = props => {
 
 export default Table;
 
-const Headers = ({headers, setHeaders, updateCheckList, onAdd}) => {
+const Headers = ({headers, setHeaders, updateCheckList, onAdd, checkList}) => {
     return(
         <div className="dt__table_header" >
         {/* <div className="dt__table_numbered_column_header" /> */}
@@ -171,6 +172,7 @@ const Headers = ({headers, setHeaders, updateCheckList, onAdd}) => {
                         key={`header-${header.__CELL_ID__}`}
                         headerIndex={headerIndex}
                         headerName={header.name}
+                        selected={checkList.list.includes(`sel||col||${header.__CELL_ID__}`)}
                         headerId={header.__CELL_ID__}
                         headers={headers}
                         updateCheckList={updateCheckList}
@@ -199,7 +201,7 @@ const HeaderCell = props => {
     }, [props.headerIndex]);
 
     return (
-        <div className="dt__cell dt__table_header_cell" data-test="dt__header_cell">
+        <div className={"dt__cell dt__table_header_cell"+(props.selected?" dt__hdrCell_Sel dt__colHeadSel":"")} data-test="dt__header_cell">
             <div onClick={(e)=>props.updateCheckList(e, "col", props.headerId)}>{`C${value+1}`}</div> 
         </div>
     );
@@ -262,7 +264,7 @@ const RowNumColumn = props => {
                     return (
                         <div 
                             key={`rownum-${row.__CELL_ID__}`}
-                            className="dt__table_numbered_column " 
+                            className={"dt__table_numbered_column "+(props.checkList.list.includes(`sel||row||${row.__CELL_ID__}`)?" dt__hdrCell_Sel dt__rowHeadSel":"")} 
                             onClick={(e)=>props.updateCheckList(e, "row", row.__CELL_ID__)}
                             data-test="dt__number_cell"
                         >
@@ -362,9 +364,8 @@ const Row = props => {
                     <DataCell 
                         key={`cell-${props.row.__CELL_ID__}-${header.__CELL_ID__}`}
                         rowId={props.row.__CELL_ID__}
-                        columnName={header.name}
                         headerId = {header.__CELL_ID__}
-                        initialValue={props.row[header.name] || ''}
+                        initialValue={props.row[header.__CELL_ID__] || ''}
                         updateTableData={props.updateTableData}
                         selected={
                             props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`) ||
@@ -399,7 +400,7 @@ const DataCell  = props => {
 
     const onBlur = e => {
         if (props.initialValue !== value)
-            props.updateTableData(value, props.rowId, props.columnName, props.headerId)
+            props.updateTableData(value, props.rowId, props.headerId)
     }
 
     return (

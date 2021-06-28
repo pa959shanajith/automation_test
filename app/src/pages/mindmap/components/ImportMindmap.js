@@ -77,6 +77,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
             var importData = fileUpload;
             (async()=>{
                 if(importType === 'git'){
+                    setBlockui({content:'Importing ...',show:true})
                     var data = await importGitMindmap ({
                         projectid : projRef.current.value,
                         gitname : gitconfigRef.current.value,
@@ -87,7 +88,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     if(data.error){
                         if(data.error === 'No entries'){
                             const projectname = projRef.current[projRef.current.selectedIndex].text;
-                            data.error = 'Module does not belongs to project '+projectname;
+                            data.error = 'Module does not belong to project '+projectname;
                         }
                         setImportPop(false);
                         displayError(data.error);
@@ -110,6 +111,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     var res = await getModules(req)
                     if(res.error){displayError(res.error);return;}
                     importData = res
+                    setBlockui({show:false})
                 }
                 loadImportData({
                     importType,

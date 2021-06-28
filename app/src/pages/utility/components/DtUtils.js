@@ -1,31 +1,60 @@
 import { v4 as uuid } from 'uuid';
-import { ValidationExpression as validate } from '../../global';
 
-const parseTableData = table => {
-    // NAME
+const parseTableData = (table, type) => {
     let name = table.name;
-
-    let newData = JSON.parse(JSON.stringify([...table.datatable]))
-    
-    newData.forEach(row => {
-        row['__CELL_ID__'] = uuid();
-    })
-    
-    // SETTING UP COLUMN HEADERS
+    let newData = [...table.datatable];
     let colHeaders = [...table.dtheaders];
+
+    let [headerData, nameToIdObj] = getHeaders(type, colHeaders);    
+    let rowData = getRowData(type, newData, nameToIdObj);
+    
+    return [name, rowData, headerData]
+}
+
+function getHeaders(type, colHeaders) {
+    let nameToIdObj = {};
     let newHeaders = [];
-    for(let i=0; i<colHeaders.length; i++) {
-        newHeaders.push({
-            __CELL_ID__: uuid(),
-            name: colHeaders[i],
+
+    if (type === "import") {
+        for(let i=0; i<colHeaders.length; i++)
+            newHeaders.push({ __CELL_ID__:  colHeaders[i].id, name:  colHeaders[i].name });
+    }
+    else {
+        for(let i=0; i<colHeaders.length; i++) {
+            let headerId = uuid();
+            let headerName = colHeaders[i];
+            newHeaders.push({ __CELL_ID__: headerId , name: headerName });
+            nameToIdObj[headerName] = headerId;
+        }
+    }
+
+    return [newHeaders, nameToIdObj];
+}
+
+function getRowData(type, rows, nameToIdObj) {
+    let newRows = [...rows];
+    if (type === "import") {
+        newRows.forEach(row => {
+            row['__CELL_ID__'] = uuid();
         })
     }
-    
-    return [name, newData, newHeaders]
+    else {
+        newRows.forEach(row => {
+            Object.keys(nameToIdObj)
+            .forEach(headerName => {
+                let colValue = row[headerName];
+                delete row[headerName];
+                row[nameToIdObj[headerName]] = colValue;
+            })
+            row['__CELL_ID__'] = uuid();
+        })
+    }
+
+    return newRows;
 }
 
 const updateData = (data, headers, lastEntry) => {
-    let columnName = null;
+    let columnId = null;
     let newData = [...data];
     let foundCell = false;
     let foundCol = false;
@@ -33,7 +62,7 @@ const updateData = (data, headers, lastEntry) => {
 
     for (let header of headers) {
         if (header.__CELL_ID__ === lastEntry.colId) {
-            columnName = header.name;
+            columnId = header.__CELL_ID__;
             currValue['colId'] = header.__CELL_ID__;
             foundCol = true;
             break;
@@ -42,10 +71,10 @@ const updateData = (data, headers, lastEntry) => {
 
     if (foundCol) {
         for (let row of newData) {
-            if (row.__CELL_ID__ === lastEntry.rowId && columnName in row) {
-                currValue['value'] = row[columnName];
+            if (row.__CELL_ID__ === lastEntry.rowId && columnId in row) {
+                currValue['value'] = row[columnId];
                 currValue['rowId'] = row.__CELL_ID__;
-                row[columnName] = lastEntry.value;
+                row[columnId] = lastEntry.value;
                 foundCell = true;
                 break;
             }
@@ -57,31 +86,42 @@ const updateData = (data, headers, lastEntry) => {
 
 
 function prepareSaveData (tableName, headers, data){
-    let hasValue = false;
+    let errorFlag = { isTrue: false, value: "" };
     const name = tableName.trim();
     const headerArray = headers.map(header => header.name);
-    const valuesArray = data.map(row => {
-        let filteredObject = {};
-        headerArray.forEach(headerName => {
-            filteredObject[headerName] = row[headerName] || "";
-            if (!hasValue && filteredObject[headerName].trim()) hasValue = true;
+    const uniqueHeaders = [...new Set(headerArray)];
+
+    if (uniqueHeaders.length !== headerArray.length) 
+        errorFlag = { isTrue: true, value: "duplicateHeaders" };
+
+    let valuesArray = [];
+    if (!errorFlag.isTrue) {
+        errorFlag = { isTrue: true, value: "emptyData" };
+        valuesArray = data.map(row => {
+            let filteredObject = {};
+            headers.forEach(header => {
+                filteredObject[header.name] = row[header.__CELL_ID__] || "";
+                if (errorFlag.isTrue && filteredObject[header.name].trim()) errorFlag = { isTrue: false, value: "" };
+            })
+            return filteredObject;
         })
-        return filteredObject;
-    })
+    }
 
     return {
         tableName: name,
         headers: headerArray,
-        data: hasValue ? valuesArray : "emptyData"
+        data: errorFlag.isTrue ? errorFlag.value : valuesArray
     }
 }
 
 function validateData (tableName, tableData) {
     let validation = "saveData";
-    if (!tableName.trim() || validate(tableName, "dataTableName"))
+    if (!tableName.trim())
         validation = "tableName";
     else if (tableData === "emptyData")
         validation = "emptyData";
+    else if (tableData === "duplicateHeaders")
+        validation = "duplicateHeaders";
 
     return validation;
 }
@@ -97,7 +137,7 @@ function deleteData (dataOne, dataTwo, checkList) {
         for (let i=0; i<arrayOne.length; i++){
             if (dataId === arrayOne[i].__CELL_ID__) {
                 arrayTwo.forEach(row => {
-                    delete row[arrayOne[i].name]
+                    delete row[arrayOne[i].__CELL_ID__]
                 })
                 arrayOne.splice(i, 1);
                 if (shouldBreak) break;
