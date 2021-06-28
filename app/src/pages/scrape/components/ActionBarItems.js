@@ -102,17 +102,21 @@ const BottomContent = () => {
     const { setShowObjModal, scrapeItems, setShowPop, fetchScrapeData, setOverlay } = useContext(ScrapeContext);
     const [customLen, setCustomLen] = useState(0);
     const [scrapeItemsLength, setScrapeLen] = useState(0);
+    const [unsavedObjPresent, setUnsavedObjPresent] = useState(0);
 
     const history = useHistory();
     
     useEffect(()=>{
         let customs = 0;
         let savedObjects = 0;
+        let unsavedObjects = 0;
         for (let scrapeItem of scrapeItems){
             if ( scrapeItem.objId && scrapeItem.isCustom) customs++;
             if (scrapeItem.objId) savedObjects++;
+            else unsavedObjects++;
         }
         setScrapeLen(savedObjects);
+        setUnsavedObjPresent(unsavedObjects);
         setCustomLen(customs);
     }, [scrapeItems])
 
@@ -229,7 +233,7 @@ const BottomContent = () => {
     const lowerList = [
         {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable:  compareFlag}, 
         {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
-        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag },
+        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag || unsavedObjPresent },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: true, disable: compareFlag && appType!=="Webservice"},
         {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType!=="Webservice", show: true}
