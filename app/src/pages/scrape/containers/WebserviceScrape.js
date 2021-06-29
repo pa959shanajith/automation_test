@@ -138,7 +138,7 @@ const WebserviceScrape = () => {
                                         if (reqparams.length > 0) viewArray.concat(reqparams);
                                     }
                                     //Parsing Request Body
-                                    let xpaths = parseJsonRequest(rReqBody,"","", []);
+                                    let xpaths = parseJsonRequest(JSON.parse(rReqBody),"","", []);
                                     for (let object of xpaths) {
                                         let scrapedObjectsWS = {};
                                         scrapedObjectsWS.xpath = object;
@@ -149,6 +149,7 @@ const WebserviceScrape = () => {
                                     // if (viewArray.length>0) scrapedObjects.view=viewArray;
                                 }
                                 catch(Exception){
+                                    setShowPop({title: "Error While Saving Template", content: "Request Body Is Invalid!"});
                                     console.error("Invalid Request body.");
                                     callApi = false;
                                 }
@@ -466,12 +467,12 @@ function parseJsonRequest(requestedBody, base_key, cur_key, xpath) {
 				if (base_key!== "")  base_key+='/'+key;
 				else base_key=key;
 				xpaths.push(base_key);
-				xpaths.concat(parseJsonRequest(value,base_key,key,xpaths));
+				parseJsonRequest(value,base_key,key,xpaths);
 				base_key=base_key.slice(0,-key.length-1);
 			 } else if (Array.isArray(value)) {
 				for (var i=0;i<value.length;i++){
 					base_key+=key+"["+i.toString()+"]";
-					xpaths.concat(parseJsonRequest(value[i],base_key,key,xpaths));
+					parseJsonRequest(value[i],base_key,key,xpaths);
 				}
 			 } else {
 				xpaths.push(base_key+'/'+key);
