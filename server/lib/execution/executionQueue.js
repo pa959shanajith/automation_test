@@ -7,7 +7,7 @@ const EMPTYUSER = process.env.nulluser;
 var testSuiteInvoker = require('../execution/executionInvoker')
 const constants = require('./executionConstants');
 const tokenAuth = require('../tokenAuth')
-
+const scheduler = require('./scheduler')
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -186,6 +186,9 @@ module.exports.Execution_Queue = class Execution_Queue {
                     if (this.ice_list[targetICE]['status']) {
                         response["status"] = "pass";
                         response["message"] = "Execution or Termination already in progress on ICE: " + targetICE;
+                        if (type && type == "SCHEDULE"){
+                            scheduler.updateScheduleStatus(batchExecutionData.scheduleId,'Skipped')
+                        }
                         return response;
                     }
                     if ((this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser) || !this.ice_list[targetICE]["mode"]) {

@@ -178,7 +178,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
         } catch (ex) {
             logger.error("Exception in the function executeScheduling from scheduleTestSuite: reshedule: %s", ex);
             schedFlag = "few";
-            await updateScheduleStatus(scheduleId, "Failed");
+            await this.updateScheduleStatus(scheduleId, "Failed");
         }
     }
     return schedFlag;
@@ -216,7 +216,7 @@ exports.reScheduleTestsuite = async () => {
         if (eipResult != "fail") {
             for (var i = 0; i < eipResult.length; i++) {
                 const eipSchd = eipResult[i];
-                await updateScheduleStatus(eipSchd._id, "Failed");
+                await this.updateScheduleStatus(eipSchd._id, "Failed");
             }
         }
 
