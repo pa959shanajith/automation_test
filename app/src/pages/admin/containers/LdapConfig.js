@@ -115,8 +115,8 @@ const LdapConfig = (props) => {
 		if(data === "success") {
 			setPopupState({show:true,title:"Test Connection",content: "Test Connection Successful!"});
 			fields = fields.concat("None");
-			for (let fmo of fieldMapOpts) {
-				if (!fields.includes(fmo)) fields.push(fmo);
+			for (const [key, value] of Object.entries(fieldmap)) {
+				if (!fields.includes(value)) fields.push(value);
 			}
 			setFieldMapOpts(fields.sort());
 		} else ldapTestMessage(data, setPopupState);

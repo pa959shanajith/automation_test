@@ -145,7 +145,8 @@ const FormInpDropDownLdap = ({data,setFilter,clickInp,inpRef,defVal,ldapEdit,err
             setList(items)
         }
         else {
-            setList([...data]);
+            var items = [...data].filter((e)=>e.toUpperCase().indexOf(inputRef.current.value.toUpperCase())!==-1)
+            setList(items)
         }    
     },[defaultValue, data])
 
