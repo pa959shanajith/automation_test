@@ -101,9 +101,7 @@ exports.importDtFromExcel = function (req, res) {
 		}
 		var qObj = {};
 		var myCSV = xlsToCSV(wb1, req.body.sheetname);
-		var numSheets = myCSV.length / 2;
 		var columnNames = [];
-		var rows = [];
 		if (myCSV.length == 0) return res.send("emptyExcelData");
 		var columns = myCSV[1].split('\n')[0].split(',');
 		var cs = [];
