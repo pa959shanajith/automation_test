@@ -134,7 +134,7 @@ const LdapConfigEdit = (props) => {
             {props.popupState.show?<PopupMsg content={props.popupState.content} title={props.popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
-            <div id="page-taskName"><span>Create LDAP Configuration</span></div>
+            <div id="page-taskName"><span>Edit LDAP Configuration</span></div>
             <div className="adminActionBtn">
                 <button className="a__btn ldap-disabled-btn btn-margin-ldap" onClick={()=>{props.ldapTest()}} disabled={props.serverName === ''} title="Test Configuration">Test</button> 
                 <button className="a__btn ldap-disabled-btn btn-margin-ldap" onClick={()=>{setshowDeleteModal(true)}} disabled={props.serverName === ''} title="Delete Configuration">Delete</button>            

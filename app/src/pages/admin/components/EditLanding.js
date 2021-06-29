@@ -68,7 +68,7 @@ const EditLanding = (props) => {
                 </div>
             </div>
             {showDeleteModal?
-                <ModalContainer title="Delete User" footer={submitModalButtons(props.manage, setshowDeleteModal)} close={()=>{setshowDeleteModal(false);}} content= "Are you sure you want to delete ? All task assignment information and ICE provisions will be deleted for this user." modalClass=" modal-sm" />
+                <ModalContainer title="Delete User" footer={submitModalButtons(props.manage, setshowDeleteModal)} close={()=>{setshowDeleteModal(false);}} content= {"Are you sure you want to delete ? \nAll task assignment information and ICE provisions will be deleted for this user."} modalClass=" modal-sm" />
             :null} 
         </Fragment>
     )

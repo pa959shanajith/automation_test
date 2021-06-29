@@ -270,7 +270,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                 </div>
                 <div id="pageContent">
                     <div id="scheduleSuitesTopSection">
-                        <select defaultValue={""} id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className=" e__btn">
+                        <select style={{display:"none"}} defaultValue={""} id='syncScenario-schedule' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className=" e__btn">
                             <option value="" className="s__disableOption" disabled>Select Integration</option>
                             <option value="1">ALM</option>
                             <option value="0">qTest</option>
