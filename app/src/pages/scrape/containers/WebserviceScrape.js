@@ -106,7 +106,7 @@ const WebserviceScrape = () => {
                                     
                                     if (rParamHeader.trim() !== ""){
                                         let reqparams=parseRequestParam(rParamHeader);
-                                        if (reqparams.length>0) viewArray.concat(reqparams);
+                                        if (reqparams.length>0) viewArray = reqparams;
                                     }
                                     try {
                                         parseRequest(parsedReqBody);
@@ -122,9 +122,6 @@ const WebserviceScrape = () => {
                                         scrapedObjectsWS.tag = "elementWS";
                                         viewArray.push(scrapedObjectsWS);
                                     }
-                                    // scrapedObjects.view = viewArray;
-                                    // scrapedObjects = JSON.stringify(scrapedObjects);
-                                    // scrapedObjects = scrapedObjects.replace(/'+/g, "''")
                                 } else {
                                     console.error("Invalid Request header or Request body for XML");
                                     callApi = false;
@@ -135,7 +132,7 @@ const WebserviceScrape = () => {
                                     //Parsing Request Parameters
                                     if (rParamHeader.trim() !== ""){
                                         let reqparams = parseRequestParam(rParamHeader);
-                                        if (reqparams.length > 0) viewArray.concat(reqparams);
+                                        if (reqparams.length > 0) viewArray = reqparams;
                                     }
                                     //Parsing Request Body
                                     let xpaths = parseJsonRequest(JSON.parse(rReqBody),"","", []);
@@ -146,7 +143,6 @@ const WebserviceScrape = () => {
                                         scrapedObjectsWS.tag = "elementWS";
                                         viewArray.push(scrapedObjectsWS);
                                     }
-                                    // if (viewArray.length>0) scrapedObjects.view=viewArray;
                                 }
                                 catch(Exception){
                                     setShowPop({title: "Error While Saving Template", content: "Request Body Is Invalid!"});
