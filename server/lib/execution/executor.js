@@ -21,7 +21,7 @@ class TestSuiteExecutor {
     };
 
     /** Function responsible for fetching testcase and qcdetails for given scenarioid */
-    fetchScenarioDetails = async (scenarioid, userid, integrationType, gitflag) => {
+    fetchScenarioDetails = async (scenarioid, userid, integrationType, gitflag, dtparam) => {
         const fnName = "fetchScenarioDetails";
         const scenario = {};
         const allTestcaseSteps = [];
@@ -34,7 +34,8 @@ class TestSuiteExecutor {
             inputs = {
                 "query": "testcasedetails",
                 "id": scenarioid,
-                "userid": userid
+                "userid": userid,
+                "dtparam": dtparam
             };
             var testcases = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
             if (testcases == "fail") return "fail";
@@ -157,6 +158,7 @@ class TestSuiteExecutor {
             const suiteDetails = suite.suiteDetails;
             for (const tsco of suiteDetails) {
                 var integrationType = [];
+                var dtparam = [];
                 if (batchData.integration && batchData.integration.alm && batchData.integration.alm.url) {
                     integrationType.push("ALM");
                 }
@@ -166,7 +168,11 @@ class TestSuiteExecutor {
                 if (batchData.integration && batchData.integration.zephyr && batchData.integration.zephyr.url) {
                     integrationType.push("Zephyr");
                 }
-                var scenario = await this.fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType, gitflag);
+                if (tsco.dataparam != "") {
+                    var dt = tsco.dataparam[0].split(';')[0].split('/');
+                    if (dt[0] == 'avoassure') dtparam.push(dt[1]);
+                }
+                var scenario = await this.fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType, gitflag, dtparam);
                 if (scenario == "fail") return "fail";
                 scenario = Object.assign(scenario, tsco);
                 suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibilityParameters;

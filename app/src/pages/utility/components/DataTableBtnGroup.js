@@ -261,7 +261,7 @@ const EditScreenActionButtons = props => {
 
             switch(resp){
                 case "success": props.setShowPop({...deleteMsg, content: "Are you sure you want to delete current data table?"});break;
-                case "referenceExists": props.setShowPop({...deleteMsg, content: "Data Table is referenced in Test Cases. Are you sure you want to delete current data table?"})
+                case "referenceExists": props.setShowPop({...deleteMsg, content: "Data Table is referenced in Test Cases. Are you sure you want to delete current data table?"});break;
                 default: props.setShowPop({ title: "Error Data Table", content: "Failed to Delete Data Table", type: "message" });break;
             }
         }
