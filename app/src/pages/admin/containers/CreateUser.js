@@ -34,6 +34,7 @@ const CreateUser = (props) => {
     const [passwordAddClass,setPasswordAddClass] = useState(false)
     const [allUserFilList,setAllUserFilList] = useState(userConf.allUsersList)
     const [ldapUserList,setLdapUserList] = useState([])
+    const [ldapUserListInitial,setLdapUserListInitial] = useState([])
     const [loading,setLoading] = useState(false)
     const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     
@@ -270,6 +271,7 @@ const CreateUser = (props) => {
         setUserIdNameAddClass(false);
         setLdapDirectoryAddClass(false);
 
+        setLdapUserList(ldapUserListInitial);
         dispatch({type:actionTypes.RESET_VALUES,payload:""})
         updateUserRoles();
 
@@ -365,7 +367,8 @@ const CreateUser = (props) => {
             data.sort();
             const ldapAllUserList = data.map(e=>({value:e[1],html:e[0]}));
             dispatch({type:actionTypes.UPDATE_LDAP_ALLUSER_LIST,payload:ldapAllUserList})  
-            setLdapUserList(ldapAllUserList);  
+            setLdapUserList([...ldapAllUserList]);  
+            setLdapUserListInitial([...ldapAllUserList]);
         }
     }
 
@@ -504,7 +507,7 @@ const CreateUser = (props) => {
 
     const searchFunctionLdap = async(val)=>{
         let items = [];
-        if(userConf.ldapAllUserList!=="") items = userConf.ldapAllUserList.filter((e)=>e.html.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        items = ldapUserListInitial.filter((e)=>e.html.toUpperCase().indexOf(val.toUpperCase())!==-1)
         setLdapUserList(items);
     }
     
