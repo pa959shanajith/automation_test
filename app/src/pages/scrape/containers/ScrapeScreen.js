@@ -295,6 +295,9 @@ const ScrapeScreen = ()=>{
                 if (data.action === "compare") {
                     if (data.status === "SUCCESS") {
                         let compareObj = generateCompareObject(data, scrapeItems.filter(object => object.xpath.substring(0, 4)==="iris"));
+                        let [newScrapeList, newOrderList] = generateScrapeItemList(0, mainScrapedData);
+                        setScrapeItems(newScrapeList);
+                        setOrderList(newOrderList);
                         setMirror(oldMirror => ({ ...oldMirror, compare: data.mirror}));
                         dispatch({type: actionTypes.SET_COMPAREDATA, payload: data});
                         dispatch({type: actionTypes.SET_COMPAREOBJ, payload: compareObj});
