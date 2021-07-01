@@ -215,7 +215,7 @@ const RefBarItems = props => {
                 <h4 className="pop__header" onClick={()=>setShowFilterPop(false)}><span className="pop__title">Filter</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                 <div data-test="popupFilterContent" className="filter_pop__content">
 					<div className="scrape__filterActionBtns">
-					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length}/><span>Select All</span></div>
+					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length} readOnly/><span>Select All</span></div>
 					{ appType === "MobileApp" && 
 						<select className="scrape__mobileType" onChange={toggleMobileType} value={currMobileType}>
 							<option value="Android" >Android</option>
