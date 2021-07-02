@@ -8,7 +8,9 @@ import * as list from './ListVariables';
 import { ScrapeContext } from './ScrapeContext';
 import * as actions from '../state/action';
 import { highlightScrapElement_ICE } from '../api';
+import { PopupMsg } from '../../global';
 import "../styles/RefBarItems.scss";
+import ScrapeObject from './ScrapeObject';
 
 const RefBarItems = props => {
 
@@ -27,6 +29,7 @@ const RefBarItems = props => {
 	const [highlight, setHighlight] = useState(false);
 	const [mirrorHeight, setMirrorHeight] = useState("0px");
 	const [currMobileType, setCurrMobileType]  = useState('Android');
+	const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 	const [dsRatio, setDsRatio] = useState(1); //downScale Ratio
 	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, setShowPop, orderList } = useContext(ScrapeContext);
 
@@ -78,12 +81,15 @@ const RefBarItems = props => {
 
 	useEffect(()=>{
 		if (objValue.val !== null){
-			
 			let ScrapedObject = objValue;
 
 			let top=0; let left=0; let height=0; let width=0;
 
-			if (ScrapedObject.top){
+			if (appType === 'OEBS' && ScrapedObject.hiddentag === 'True'){
+				setHighlight(false)
+				setPopupState({show:true,title:"Element Highlight",content:"Element: " + ScrapedObject.custname + " is Hidden."});
+			}
+			else if (ScrapedObject.top){
 				top = ScrapedObject.top * dsRatio;
 				left = ScrapedObject.left * dsRatio;
 				height = ScrapedObject.height * dsRatio;
@@ -101,7 +107,6 @@ const RefBarItems = props => {
 					top = top + 35;
 					left = left-36;
 				}
-				
 				setHighlight({
 					top: `${Math.round(top)}px`, 
 					left: `${Math.round(left)}px`, 
@@ -187,9 +192,13 @@ const RefBarItems = props => {
 		setToFilter([]);
 		filter([]);
 	}
+	const closePopup = () =>{
+        setPopupState({show:false,title:"",content:""});
+	}
 
 	const Popups = () => (
         <>
+		{popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
         {
             showScreenPop && 
             // <ClickAwayListener onClickAway={closeAllPopups}>
