@@ -108,7 +108,10 @@ const DesignContent = props => {
         if (props.imported) {
             fetchTestCases()
             .then(data=>{
-                data !== "success" && props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
+                if (data==="success") 
+                    props.setShowPop({'title': "Import Testcase", 'content': "TestCase Json imported successfully."});
+                else 
+                    props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
                 props.setImported(false)
                 setStepSelect({edit: false, check: [], highlight: []});
                 setChanged(false);

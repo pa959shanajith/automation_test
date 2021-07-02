@@ -242,7 +242,6 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable, set
                             if (data === "Invalid Session") RedirectPage(history);
                             if (data === "success") {
                                 setImported(true);
-                                setShowPop({'title': "Import Testcase", 'content': "TestCase Json imported successfully."});
                             } else setShowPop({'title': "Import Testcase",'content': "Please Check the file format you have uploaded!"});
                         })
                         .catch(error => {
