@@ -224,6 +224,8 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable, set
                 if (file.name.split('.').pop().toLowerCase() === "json") {
                     setOverlay("Loading...");
                     let resultString = JSON.parse(reader.result);
+                    if (!Array.isArray(resultString)) 
+                        throw {'title': "Import Testcase", 'content': "Please Check the file format you have uploaded!"}
                     for (let i = 0; i < resultString.length; i++) {
                         if (!resultString[i].appType)
                             throw {title: 'Import Error', content: "Incorrect JSON imported. Please check the contents!"}
