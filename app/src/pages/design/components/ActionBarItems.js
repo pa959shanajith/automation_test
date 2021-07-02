@@ -238,13 +238,17 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable, set
                     }
                     DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
                         .then(data => {
+                            setOverlay("");
                             if (data === "Invalid Session") RedirectPage(history);
                             if (data === "success") {
                                 setImported(true);
                                 setShowPop({'title': "Import Testcase", 'content': "TestCase Json imported successfully."});
                             } else setShowPop({'title': "Import Testcase",'content': "Please Check the file format you have uploaded!"});
                         })
-                        .catch(error => console.error("ERROR::::", error));
+                        .catch(error => {
+                            setOverlay("");
+                            console.error("ERROR::::", error)
+                        });
                     
                 } else throw {'title': "Import Testcase", 'content': "Please Check the file format you have uploaded!"};
             }
