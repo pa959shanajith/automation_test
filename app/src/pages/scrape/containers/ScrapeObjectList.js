@@ -81,7 +81,7 @@ const ScrapeObjectList = () => {
         }
 
         if (dnd) disable = { ...disable, selAll: true};
-        if (visible < total) disable = { ...disable, dnd: true};
+        if (visible < total || total === 1) disable = { ...disable, dnd: true};
 
         setDisableBtns({...disableBtns, ...disable})
         setSelAllCheck(checkAll);
@@ -201,7 +201,11 @@ const ScrapeObjectList = () => {
         setScrapeItems(scrapeItemsL)
     }
 
-    const onDelete = () => {
+    const onDelete = (e, confirmed) => {
+        if (mainScrapedData.reuse && !confirmed) {
+            setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onDelete(null, true);}})
+            return;
+        }
         let deletedArr = [...deleted];
         let scrapeItemsL = [...scrapeItems];
         let modifiedDict = {...modified}
@@ -222,12 +226,12 @@ const ScrapeObjectList = () => {
         setDisableBtns({...disableBtns, delete: true, save: false})
     }
 
-    const onSave = () => {
+    const onSave = (e, confirmed) => {
         let continueSave = true;
         
-        if (mainScrapedData.reuse === 'True') {
-            setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen is been reused. Are you sure you want to save objects?', 'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();}})
-            continueSave = false;
+        if (mainScrapedData.reuse && !confirmed) {
+            setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen has been reused. Are you sure you want to save scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onSave(null, true);}})
+            return;
         }
 
         let dXpath = false;

@@ -60,6 +60,7 @@ const DesignContent = props => {
     const [headerCheck, setHeaderCheck] = useState(false);
     const [draggedFlag, setDraggedFlag] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
+    const [reusedTC, setReusedTC] = useState(false);
     const [pastedTC, setPastedTC] = useState([]);
     let runClickAway = true;
     const emptyRowData = {
@@ -152,17 +153,11 @@ const DesignContent = props => {
             .then(data => {
                 if (data === "Invalid Session") return RedirectPage(history);
                 
-                let changeFlag = false
                 let taskObj = props.current_task
                 if(data.screenName && data.screenName !== taskObj.screenName){
                     taskObj.screenName = data.screenName;
-                    changeFlag = true
+                    dispatch({type: pluginActions.SET_CT, payload: taskObj});
                 }
-                if(data.reuse && data.reuse !== taskObj.reuse){
-                    taskObj.reuse = "True";
-                    changeFlag = true
-                }
-                if (changeFlag) dispatch({type: pluginActions.SET_CT, payload: taskObj});
 
                 if(data.del_flag){
                     deleteObjectFlag = true; // Flag for DeletedObjects Popup
@@ -171,6 +166,7 @@ const DesignContent = props => {
                 else props.setDisableActionBar(false); //enable left-top-section
                 
                 setHideSubmit(data.testcase.length === 0);
+                setReusedTC(data.reuse);
 
                 DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
                     .then(scriptData => {
@@ -250,8 +246,13 @@ const DesignContent = props => {
         });
     };
     
-    const saveTestCases = () => {
+    const saveTestCases = (e, confirmed) => {
         if (userInfo.role !== "Viewer") {
+            if (reusedTC && !confirmed) {
+                props.setShowConfirmPop({'title': 'Save Testcase', 'content': 'Testcase has been reused. Are you sure you want to save?', 'onClick': ()=>{props.setShowConfirmPop(false);saveTestCases(null, true)}});
+                return;
+            }
+
             let { screenId, testCaseId, testCaseName, versionnumber } = props.current_task;
             let import_status = false;
 
@@ -450,7 +451,7 @@ const DesignContent = props => {
         let testCases = [...testCaseData]
         if (testCases.length === 1 && !testCases[0].custname) props.setShowPop({'title': 'Delete Testcase step', 'content': 'No steps to Delete'});
         else if (stepSelect.check.length <= 0) props.setShowPop({'title': 'Delete Test step', 'content': 'Select steps to delete'});
-        else if (props.current_task.reuse === 'True') props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase is been reused. Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
+        else if (reusedTC) props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': ()=>{props.setShowConfirmPop(false);onDeleteTestStep()}});
         else props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
     }
 
