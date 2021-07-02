@@ -191,7 +191,7 @@ exports.exportToDtExcel = async (req, res) => {
 		//create the new worksheet with coloumns and rows specified in data
 		for (var i=1;i<=datatable.length;i++) {
 			if(i==1) {
-				keys = Object.keys(datatable[0]);
+				keys = dts.dtheaders;
 				col=1;
 				keys.forEach(element => {
 					ws.cell(i,col).string(element);
