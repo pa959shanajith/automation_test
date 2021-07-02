@@ -166,7 +166,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
     return renderComp;
 };
 
-const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) => {
+const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable, setOverlay}) => {
 
     const current_task = useSelector(state=>state.plugin.CT);
     const userInfo = useSelector(state=>state.login.userinfo);
@@ -219,22 +219,21 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
         let file = event.target.files[0];
         let reader = new FileReader();
         reader.onload = function (e) {
-            hiddenInput.current.value = '';
-            if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() === "json") {
-                let resultString = JSON.parse(reader.result);
-                for (let i = 0; i < resultString.length; i++) {
-                    if (resultString[i].appType.toLowerCase() === "generic" || resultString[i].appType.toLowerCase() === "pdf") {
-                        flag = true;
-                    } else if (resultString[i].appType === appType) {
-                        flag = true;
-                        break;
-                    } else {
-                        flag = false;
-                        break;
+            try{
+                hiddenInput.current.value = '';
+                if (file.name.split('.').pop().toLowerCase() === "json") {
+                    setOverlay("Loading...");
+                    let resultString = JSON.parse(reader.result);
+                    for (let i = 0; i < resultString.length; i++) {
+                        if (!resultString[i].appType)
+                            throw {title: 'Import Error', content: "Incorrect JSON imported. Please check the contents!"}
+                        if (
+                            resultString[i].appType.toLowerCase() !== "generic" && 
+                            resultString[i].appType.toLowerCase() !== "pdf" &&
+                            resultString[i].appType !== appType
+                        ) 
+                            throw {'title': "App Type Error", 'content': "Project application type and Imported JSON application type doesn't match, please check!"}
                     }
-                }
-                if (flag === false) setShowPop({'title': "App Type Error", 'content': "Project application type and Imported JSON application type doesn't match, please check!"})
-                else {
                     DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
                         .then(data => {
                             if (data === "Invalid Session") RedirectPage(history);
@@ -244,8 +243,15 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
                             } else setShowPop({'title': "Import Testcase",'content': "Please Check the file format you have uploaded!"});
                         })
                         .catch(error => console.error("ERROR::::", error));
-                }
-            } else setShowPop({'title': "Import Testcase", 'content': "Please Check the file format you have uploaded!"});
+                    
+                } else throw {'title': "Import Testcase", 'content': "Please Check the file format you have uploaded!"};
+            }
+            catch(error){
+                setOverlay("");
+                if (typeof(error)==="object") setShowPop(error);
+                else setShowPop({title: "Import Error", content: "Failed to Import Testcase JSON."})
+                console.error(error);
+            }
         }
         reader.readAsText(file);
     }

@@ -170,57 +170,62 @@ const BottomContent = () => {
         let file = event.target.files[0];
         let reader = new FileReader();
         reader.onload = function (e) {
-            hiddenInput.current.value = '';
-            if (file.name.split('.').pop().toLowerCase() === "json") {
-                setOverlay("Loading...")
-                let resultString = JSON.parse(reader.result);
-                if (!('appType' in resultString))
-                    setShowPop({title: "Import Error", content: "Incorrect JSON imported. Please check the contents!"});
-                else if (resultString.appType !== appType)
-                    setShowPop({title: "App Type Error", content: "Project application type and Imported JSON application type doesn't match, please check!"});
-                else if (resultString.view.length === 0)
-                    setShowPop({title: "No Objects found", content: "The file has no objects to import, please check!"});
-                else {
-                    let objList = {};
-                    if ('body' in resultString) {
-                        let { reuse, appType, screenId, view, versionnumber, ...scrapeinfo } = resultString; 
-                        objList['reuse'] = reuse;
-                        objList['appType'] = appType;
-                        objList['screenId'] = screenId;
-                        objList['view'] = view;
-                        objList['scrapeinfo'] = scrapeinfo;
-                    }
-                    else objList = resultString;
-
-                    let arg = {
-                        projectId: projectId,
-                        screenId: screenId,
-                        screenName: screenName,
-                        userId: user_id,
-                        roleId: role,
-                        param: "importScrapeData",
-                        appType: appType,
-                        objList: objList
-                    };
-                    scrapeApi.updateScreen_ICE(arg)
-                        .then(data => {
-                            if (data === "Invalid Session") return RedirectPage(history);
-                            else if (data === "fail") setShowPop({title: "Import Screen", content: "Failed to import Screen JSON."}) 
-                            else fetchScrapeData().then(response => {
-                                    if (response === "success")
-                                        setShowPop({title: "Import Screen", content: "Screen Json imported successfully."}) 
-                                    setOverlay("");
+            try{
+                hiddenInput.current.value = '';
+                if (file.name.split('.').pop().toLowerCase() === "json") {
+                    setOverlay("Loading...")
+                    let resultString = JSON.parse(reader.result);
+                    if (!('appType' in resultString))
+                        throw {title: "Import Error", content: "Incorrect JSON imported. Please check the contents!"};
+                    else if (resultString.appType !== appType)
+                        throw {title: "App Type Error", content: "Project application type and Imported JSON application type doesn't match, please check!"};
+                    else if (resultString.view.length === 0)
+                        throw {title: "No Objects found", content: "The file has no objects to import, please check!"};
+                    else {
+                        let objList = {};
+                        if ('body' in resultString) {
+                            let { reuse, appType, screenId, view, versionnumber, ...scrapeinfo } = resultString; 
+                            objList['reuse'] = reuse;
+                            objList['appType'] = appType;
+                            objList['screenId'] = screenId;
+                            objList['view'] = view;
+                            objList['scrapeinfo'] = scrapeinfo;
+                        }
+                        else objList = resultString;
+    
+                        let arg = {
+                            projectId: projectId,
+                            screenId: screenId,
+                            screenName: screenName,
+                            userId: user_id,
+                            roleId: role,
+                            param: "importScrapeData",
+                            appType: appType,
+                            objList: objList
+                        };
+                        scrapeApi.updateScreen_ICE(arg)
+                            .then(data => {
+                                if (data === "Invalid Session") return RedirectPage(history);
+                                else if (data === "fail") throw {title: "Import Screen", content: "Failed to import Screen JSON."}; 
+                                else fetchScrapeData().then(response => {
+                                        if (response === "success")
+                                            setShowPop({title: "Import Screen", content: "Screen Json imported successfully."}) 
+                                        setOverlay("");
+                                });
+                            })
+                            .catch(error => {
+                                setOverlay("");
+                                setShowPop({title: "Import Screen", content: "Failed to import Screen JSON."}) 
+                                console.error(error)
                             });
-                        })
-                        .catch(error => {
-                            setOverlay("");
-                            setShowPop({title: "Import Screen", content: "Failed to import Screen JSON."}) 
-                            console.error(error)
-                        });
-                }
-            } else {
+                    }
+                } else throw {'title': "Import Screen", 'content': "Please Check the file format you have uploaded!"};
+            }
+            catch(error){
                 setOverlay("");
-                setShowPop({'title': "Import Screen", 'content': "Please Check the file format you have uploaded!"});
+                if (typeof(error)==="object") setShowPop(error);
+                else setShowPop({title: "Import Error", content: "Failed to Import Screen JSON."})
+                console.error(error);
             }
         }
         reader.readAsText(file);
