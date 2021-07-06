@@ -261,9 +261,10 @@ const RowNumColumn = props => {
             <div className="dt__numberColScrollContainer">
                 <div ref={props.rowRef} className="dt__Scroller">
                 <div 
-                    key={`rownum-header`}
-                    className="dt__table_numbered_column " 
+                    key={"rownum-header"}
+                    className={"dt__table_numbered_column "+(props.checkList.list.includes(`sel||row||subheader`)?" dt__hdrCell_Sel":"")}
                     data-test="dt__number_cell"
+                    onClick={(e)=>props.updateCheckList(e, "row", "subheader")}
                 >
                     1
                 </div>
@@ -272,7 +273,7 @@ const RowNumColumn = props => {
                     return (
                         <div 
                             key={`rownum-${row.__CELL_ID__}`}
-                            className={"dt__table_numbered_column "+(props.checkList.list.includes(`sel||row||${row.__CELL_ID__}`)?" dt__hdrCell_Sel dt__rowHeadSel":"")} 
+                            className={"dt__table_numbered_column "+(props.checkList.list.includes(`sel||row||${row.__CELL_ID__}`)?" dt__hdrCell_Sel":"")} 
                             onClick={(e)=>props.updateCheckList(e, "row", row.__CELL_ID__)}
                             data-test="dt__number_cell"
                         >
@@ -320,12 +321,15 @@ const SubHeaderRow = props => {
                         updateHeaders={props.updateHeaders}
                         headers={props.headers}
                         headerId={header.__CELL_ID__}
-                        selected={props.checkList.list.includes(`sel||col||${header.__CELL_ID__}`)}
+                        selected={
+                            props.checkList.list.includes(`sel||col||${header.__CELL_ID__}`) ||
+                            props.checkList.list.includes(`sel||row||subheader`)
+                        }
                     />
                 )
             }) }
             </div>
-            <div className="dt__table_add_column " ref={addColRef} />
+            <div className={"dt__table_add_column "+(props.checkList.list.includes(`sel||row||subheader`)?"dt__selected_cell":'')} ref={addColRef} />
         </div>
     )
 }

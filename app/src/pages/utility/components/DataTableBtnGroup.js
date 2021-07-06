@@ -17,15 +17,18 @@ const TableActionButtons = props => {
                     props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
                 else {
                     let newData = [...props.data];
-                    let locToAdd = null;
+                    let locToAdd = 0;
                     let rowId = props.checkList.list[0].split('||').pop();
     
-                    newData.forEach((row, rowIndex) => {
-                        if (rowId === row.__CELL_ID__) locToAdd = rowIndex;
-                    })
+                    // For SubHeader Selection, Location To Add (LocToAdd) will always be 0 i.e. start of data
+                    if (rowId !== 'subheader') {
+                        newData.forEach((row, rowIndex) => {
+                            if (rowId === row.__CELL_ID__) locToAdd = rowIndex+1;
+                        })
+                    }
                     
                     let newRowId = uuid();
-                    newData.splice(locToAdd+1, 0, {__CELL_ID__: newRowId});
+                    newData.splice(locToAdd, 0, {__CELL_ID__: newRowId});
                     props.setFocus({type: 'action', id: newRowId});
                     props.setData(newData);
                 }
@@ -35,7 +38,7 @@ const TableActionButtons = props => {
                     props.setShowPop({title: 'Error', content: 'Table cannot have more than 15 columns', type: 'message'});
                 else {
                     let newHeaders = [...props.headers];
-                    let locToAdd = null;
+                    let locToAdd = 0;
                     let headerId = props.checkList.list[0].split('||').pop();
                     
                     props.headers.forEach((header, headerIndex)=>{
@@ -70,8 +73,14 @@ const TableActionButtons = props => {
         // HANDLE CHECKLIST
         if (props.checkList.list.length){
             if (props.checkList.type==="row"){
-                if (props.data.length === props.checkList.list.length)
-                    props.setShowPop({title: 'Error', content: 'Table cannot have 0 rows', type: 'message'});
+                if (props.checkList.list.includes("sel||row||subheader") || props.data.length === props.checkList.list.length)
+                    props.setShowPop({
+                        title: 'Delete Error', 
+                        content: props.checkList.list.includes("sel||row||subheader") 
+                                ? 'Cannot delete SubHeader row.'
+                                : 'Table cannot have 0 rows', 
+                        type: 'message'
+                    });
                 else {
                     let [newData,] = deleteData(props.data, [], props.checkList.list);
                     props.setData(newData);
