@@ -24,11 +24,13 @@ const Table = props => {
             else {
                 let newHeaders = [...props.headers];
                 
+                let newHeaderId = uuid();
                 newHeaders.push({
-                    __CELL_ID__: uuid(),
+                    __CELL_ID__: newHeaderId,
                     name: `C${props.headerCounter}`
                 })
     
+                props.setFocus({type: 'tableCol', id: newHeaderId});
                 props.setHeaders(newHeaders);
                 props.setHeaderCounter(count => count + 1);
             }
@@ -39,8 +41,10 @@ const Table = props => {
             else {
                 let newData = [...props.data];
             
-                newData.push({__CELL_ID__: uuid()})
+                let newRowId =  uuid();
+                newData.push({__CELL_ID__: newRowId})
     
+                props.setFocus({type: 'tableRow', id: newRowId});
                 props.setData(newData);
             }
         }
@@ -218,6 +222,8 @@ const Rows = props => {
         <ScrollBar scrollId="dt__tcListId" horizontalbarWidth="8px" verticalbarWidth="8px" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" onScrollX={props.onScrollX} onScrollY={props.onScrollY}>
             {/* <ReactSortable list={props.data} setList={props.setData} disabled={!props.dnd} key={props.dnd.toString()}> */}
             <SubHeaderRow 
+                focus={props.focus}
+                setFocus={props.setFocus}
                 headers={props.headers}
                 updateHeaders={props.updateHeaders} 
                 checkList={props.checkList}
@@ -226,6 +232,8 @@ const Rows = props => {
                 return (
                     <Row 
                         key={`row-${row.__CELL_ID__}`}
+                        focus={props.focus}
+                        setFocus={props.setFocus}
                         checkList={props.checkList}
                         setCheckList={props.setCheckList}
                         updateTableData={props.updateTableData}
@@ -236,7 +244,7 @@ const Rows = props => {
                     />
                 )
             }) }
-            <AddRow />
+            <AddRow focus={props.focus} setFocus={props.setFocus} />
             {/* </ReactSortable> */}
             </ScrollBar>
             </div>
@@ -289,6 +297,15 @@ const RowNumColumn = props => {
 
 const SubHeaderRow = props => {
 
+    const addColRef = useRef();
+
+    useEffect(()=>{
+        if (props.focus.type==="tableCol" && addColRef.current) {
+            addColRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+            props.setFocus({type: '', id: ''})
+        }
+    }, [props.focus])
+
     return (
         <div className="dt__table_row header_row" data-test="dt__row">
             <div className="dt__table_header_cells">
@@ -296,6 +313,8 @@ const SubHeaderRow = props => {
                 return (
                     <SubHeaderCell 
                         key={`cell-header-${header.__CELL_ID__}`}
+                        focus={props.focus}
+                        setFocus={props.setFocus}
                         columnName={header.name}
                         initialValue={header.name}
                         updateHeaders={props.updateHeaders}
@@ -306,22 +325,38 @@ const SubHeaderRow = props => {
                 )
             }) }
             </div>
-            <div className="dt__table_add_column " />
+            <div className="dt__table_add_column " ref={addColRef} />
         </div>
     )
 }
 
 const AddRow = props => {
+
+    const addRowRef = useRef();
+
+    useEffect(()=>{
+        if (props.focus.type==="tableRow" && addRowRef.current) {
+            addRowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+            props.setFocus({type: '', id: ''})
+        }
+    }, [props.focus])
+
     return (
-        <div className="dt__table_AddRow dt__table_row" data-test="dt__row">
-            
-        </div>
+        <div className="dt__table_AddRow dt__table_row" data-test="dt__row" ref={addRowRef} />
     );
 }
 
 
 const SubHeaderCell  = props => {
     const [value, setValue] = useState(props.initialValue || '');
+    const colRef = useRef();
+
+    useEffect(()=>{
+        if (props.focus.type==="action" && props.focus.id === props.headerId && colRef.current) {
+            colRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+            props.setFocus({type: '', id: ''})
+        }
+    }, [props.focus])
 
     useEffect(() => {
         setValue(props.initialValue || '')
@@ -346,7 +381,13 @@ const SubHeaderCell  = props => {
     }
 
     return (
-        <div className={"dt__cell dt__subHeaderCell "+(props.selected?"dt__selected_cell":'')} data-test="dt__body_cell">
+        <div 
+            ref={colRef}
+            className={
+                "dt__cell dt__subHeaderCell "
+                +(props.selected?"dt__selected_cell":'')} 
+            data-test="dt__body_cell"
+        >
             <input value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress}/>
         </div>
     );
@@ -356,8 +397,17 @@ const SubHeaderCell  = props => {
 
 const Row = props => {
 
+    const rowRef = useRef();
+
+    useEffect(()=>{
+        if (props.focus.type==="action" && props.focus.id === props.row.__CELL_ID__ && rowRef.current) {
+            rowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+            props.setFocus({type: '', id: ''})
+        }
+    }, [props.focus])
+
     return (
-        <div className="dt__table_row" data-test="dt__row">
+        <div className="dt__table_row" data-test="dt__row" ref={rowRef}>
             <div className="dt__table_header_cells">
             { props.headers.map(header => {
                 return (

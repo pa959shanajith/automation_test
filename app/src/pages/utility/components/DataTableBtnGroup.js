@@ -24,8 +24,9 @@ const TableActionButtons = props => {
                         if (rowId === row.__CELL_ID__) locToAdd = rowIndex;
                     })
                     
-                    newData.splice(locToAdd+1, 0, {__CELL_ID__: uuid()});
-    
+                    let newRowId = uuid();
+                    newData.splice(locToAdd+1, 0, {__CELL_ID__: newRowId});
+                    props.setFocus({type: 'action', id: newRowId});
                     props.setData(newData);
                 }
             }
@@ -41,15 +42,26 @@ const TableActionButtons = props => {
                         if (header.__CELL_ID__ === headerId) locToAdd = headerIndex;
                     })
                     
+                    let newHeaderId = uuid();
                     newHeaders.splice(locToAdd+1, 0, {
-                        __CELL_ID__: uuid(),
+                        __CELL_ID__: newHeaderId,
                         name: `C${props.headerCounter}`
                     })
     
+                    props.setFocus({type: "action", id: newHeaderId});
                     props.setHeaders(newHeaders);
                     props.setHeaderCounter(count => count + 1);
                 }
             }
+        }
+        else {
+            props.setShowPop({
+                title: 'Add Error', 
+                content: props.checkList.list.length 
+                        ? `Too many selected ${props.checkList.type === "row" ? "rows" : "columns"}`
+                        : `Please select a row or column to perform add operation.`,
+                type: 'message'
+            });
         }
     }
 
@@ -76,6 +88,13 @@ const TableActionButtons = props => {
             }
             props.setCheckList({type: 'row', list: []});
         }
+        else {
+            props.setShowPop({
+                title: 'Delete Error', 
+                content: `Please select a row or column to delete.`,
+                type: 'message'
+            });
+        }
     }
 
     
@@ -90,7 +109,13 @@ const TableActionButtons = props => {
             }
             else console.log("Cell Not Found!")
         }
-        else console.log("Nothing to Undo")
+        else {
+            props.setShowPop({
+                title: 'Undo Error', 
+                content: "No actions available to undo.",
+                type: 'message'
+            });
+        }
     }
 
     const onRedo = () => {
@@ -103,7 +128,13 @@ const TableActionButtons = props => {
             }
             else console.log("Cell Not Found!")
         }
-        else console.log("Nothing to Redo")
+        else {
+            props.setShowPop({
+                title: 'Redo Error', 
+                content: "No actions available to redo.",
+                type: 'message'
+            });
+        }
     }
 
     const tableActionBtnGroup = [
@@ -136,7 +167,7 @@ const CreateScreenActionButtons = props => {
 
     const hiddenInput = useRef();
 
-    
+
     const goToEditScreen = () => {
         let arg = prepareSaveData(props.tableName, props.headers, props.data);
 
