@@ -357,7 +357,7 @@ const ScrapeObjectList = () => {
                             { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
                         </div> : 'Scraped data saved successfully.'
                     })
-                    setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: false});
+                    setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: false, dnd: true});
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: scrapeItemsL.length !== 0});
                     dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: scrapeItemsL.length === 0});
                     setSaved(true);
