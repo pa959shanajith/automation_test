@@ -1,5 +1,8 @@
 import { v4 as uuid } from 'uuid';
 
+let undoStack = [];
+let redoStack = [];
+
 const parseTableData = (table, type) => {
     let name = table.name;
     let newData = [...table.datatable];
@@ -148,10 +151,52 @@ function deleteData (dataOne, dataTwo, checkList) {
     return [arrayOne, arrayTwo];
 }
 
+function getPreviousData(data) {
+    let result = "EMPTY_STACK";
+    if (undoStack.length){
+        let previousData = undoStack.pop();
+        pushToRedo(data);
+        result = JSON.parse(previousData);
+    }
+    return result;
+}
+
+function getNextData(data) {
+    let result = "EMPTY_STACK";
+    if (redoStack.length){
+        let nextData = redoStack.pop();
+        pushToHistory(data);
+        result = JSON.parse(nextData);
+    }
+    return result;
+}
+
+function pushToHistory(data) {
+    undoStack.push(JSON.stringify(data))
+    if (undoStack.length > 5) undoStack.splice(0, 1);
+    return;
+}
+
+function pushToRedo(data) {
+    redoStack.push(JSON.stringify(data));
+    if (redoStack.length > 5) redoStack.splice(0, 1);
+    return;
+}
+
+function resetHistory () {
+    undoStack = [];
+    redoStack = [];
+    return;
+}
+
 export {
     parseTableData,
     updateData,
     prepareSaveData,
     validateData,
-    deleteData
+    deleteData,
+    getPreviousData,
+    getNextData,
+    resetHistory,
+    pushToHistory
 }

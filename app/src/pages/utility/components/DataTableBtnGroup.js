@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import ClickAwayListener from 'react-click-away-listener';
 import { ScrollBar } from '../../global';
-import { updateData, validateData, prepareSaveData, deleteData, parseTableData } from './DtUtils';
+import { updateData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
 import ExportDataTable from './ExportDataTable';
 import ImportSheet from './ImportSheet';
 import * as utilApi from '../api';
@@ -16,16 +16,21 @@ const TableActionButtons = props => {
                 if (props.data.length >= 199) 
                     props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let newData = [...props.data];
-                    let locToAdd = null;
+                    let locToAdd = 0;
                     let rowId = props.checkList.list[0].split('||').pop();
     
-                    newData.forEach((row, rowIndex) => {
-                        if (rowId === row.__CELL_ID__) locToAdd = rowIndex;
-                    })
+                    // For SubHeader Selection, Location To Add (LocToAdd) will always be 0 i.e. start of data
+                    if (rowId !== 'subheader') {
+                        newData.forEach((row, rowIndex) => {
+                            if (rowId === row.__CELL_ID__) locToAdd = rowIndex+1;
+                        })
+                    }
                     
-                    newData.splice(locToAdd+1, 0, {__CELL_ID__: uuid()});
-    
+                    let newRowId = uuid();
+                    newData.splice(locToAdd, 0, {__CELL_ID__: newRowId});
+                    props.setFocus({type: 'action', id: newRowId});
                     props.setData(newData);
                 }
             }
@@ -33,23 +38,35 @@ const TableActionButtons = props => {
                 if (props.headers.length >= 15) 
                     props.setShowPop({title: 'Error', content: 'Table cannot have more than 15 columns', type: 'message'});
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let newHeaders = [...props.headers];
-                    let locToAdd = null;
+                    let locToAdd = 0;
                     let headerId = props.checkList.list[0].split('||').pop();
                     
                     props.headers.forEach((header, headerIndex)=>{
                         if (header.__CELL_ID__ === headerId) locToAdd = headerIndex;
                     })
                     
+                    let newHeaderId = uuid();
                     newHeaders.splice(locToAdd+1, 0, {
-                        __CELL_ID__: uuid(),
+                        __CELL_ID__: newHeaderId,
                         name: `C${props.headerCounter}`
                     })
     
+                    props.setFocus({type: "action", id: newHeaderId});
                     props.setHeaders(newHeaders);
                     props.setHeaderCounter(count => count + 1);
                 }
             }
+        }
+        else {
+            props.setShowPop({
+                title: 'Add Error', 
+                content: props.checkList.list.length 
+                        ? `Too many selected ${props.checkList.type === "row" ? "rows" : "columns"}`
+                        : `Please select a row or column to perform add operation.`,
+                type: 'message'
+            });
         }
     }
 
@@ -58,9 +75,16 @@ const TableActionButtons = props => {
         // HANDLE CHECKLIST
         if (props.checkList.list.length){
             if (props.checkList.type==="row"){
-                if (props.data.length === props.checkList.list.length)
-                    props.setShowPop({title: 'Error', content: 'Table cannot have 0 rows', type: 'message'});
+                if (props.checkList.list.includes("sel||row||subheader") || props.data.length === props.checkList.list.length)
+                    props.setShowPop({
+                        title: 'Delete Error', 
+                        content: props.checkList.list.includes("sel||row||subheader") 
+                                ? 'Cannot delete SubHeader row.'
+                                : 'Table cannot have 0 rows', 
+                        type: 'message'
+                    });
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let [newData,] = deleteData(props.data, [], props.checkList.list);
                     props.setData(newData);
                 }
@@ -69,6 +93,7 @@ const TableActionButtons = props => {
                 if (props.headers.length === props.checkList.list.length)
                     props.setShowPop({title: 'Error', content: 'Table cannot have 0 columns', type: 'message'});
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let [newHeaders, newData] = deleteData(props.headers, props.data, props.checkList.list);
                     props.setHeaders(newHeaders);
                     props.setData(newData);
@@ -76,34 +101,44 @@ const TableActionButtons = props => {
             }
             props.setCheckList({type: 'row', list: []});
         }
+        else {
+            props.setShowPop({
+                title: 'Delete Error', 
+                content: `Please select a row or column to delete.`,
+                type: 'message'
+            });
+        }
     }
 
     
     const onUndo = () => {
-        if (props.undoStack.length) {
-            const lastEntry = props.undoStack.pop();
-            const [prevValue, newData, found] = updateData(props.data, props.headers, lastEntry);
-            if (found) {
-                props.setData(newData);
-                props.redoStack.push(prevValue);
-                if (props.redoStack.length>5) props.redoStack.splice(0, 1);
-            }
-            else console.log("Cell Not Found!")
+        const resp = getPreviousData({headers: props.headers, data: props.data});
+        if (resp==="EMPTY_STACK") {
+            props.setShowPop({
+                title: 'Undo Error', 
+                content: "No actions available to undo.",
+                type: 'message'
+            });
         }
-        else console.log("Nothing to Undo")
+        else {
+            if (resp.data) props.setData(resp.data);
+            if (resp.headers) props.setHeaders(resp.headers);
+        }
     }
 
     const onRedo = () => {
-        if (props.redoStack.length) {
-            const lastEntry = props.redoStack.pop();
-            const [prevValue, newData, found] = updateData(props.data, props.headers, lastEntry);
-            if (found) {
-                props.setData(newData);
-                props.undoStack.push(prevValue);
-            }
-            else console.log("Cell Not Found!")
+        const resp = getNextData({headers: props.headers, data: props.data});
+        if (resp==="EMPTY_STACK") {
+            props.setShowPop({
+                title: 'Redo Error', 
+                content: "No actions available to redo.",
+                type: 'message'
+            });
         }
-        else console.log("Nothing to Redo")
+        else {
+            if (resp.data) props.setData(resp.data);
+            if (resp.headers) props.setHeaders(resp.headers);
+        }
     }
 
     const tableActionBtnGroup = [
@@ -136,7 +171,7 @@ const CreateScreenActionButtons = props => {
 
     const hiddenInput = useRef();
 
-    
+
     const goToEditScreen = () => {
         let arg = prepareSaveData(props.tableName, props.headers, props.data);
 

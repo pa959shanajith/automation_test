@@ -104,6 +104,7 @@ const DesignHome = () => {
                                     setShowPop={setShowPop} 
                                     disable={disableActionBar}
                                     setImported={setImported} 
+                                    setOverlay={setOverlay}
                                     setShowConfirmPop={setShowConfirmPop}
                                 />
                             }

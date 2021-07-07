@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import {ScrollBar, TaskContents, GenerateTaskList } from '../../global';
 import { useSelector } from 'react-redux';
 import "../styles/ReferenceBar.scss";
@@ -163,10 +163,10 @@ const TaskInfoPopup = ({ closePopups, taskPopY, setShowInfo, providedTaskInfo, s
             <h4 className="pop__header" onClick={()=>setShowInfo(false)}><span className="pop__title">Information</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
             <div className="info_pop__contents">
             {
-                Object.keys(taskInfo).map(key => <>
-                    <div key={key+"title"} className="task_info__title">{key}:</div>
-                    <div key={key+"value"} className="task_info__content">{taskInfo[key]}</div>
-                </>)
+                Object.keys(taskInfo).map(key => <Fragment key={key}>
+                    <div className="task_info__title">{key}:</div>
+                    <div className="task_info__content">{taskInfo[key]}</div>
+                </Fragment>)
             }
             </div>
         </div>
