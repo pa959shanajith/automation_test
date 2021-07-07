@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
 import { ScrollBar } from '../../global';
+import { pushToHistory } from './DtUtils';
 import { ReactSortable } from 'react-sortablejs';
 import "../styles/Table.scss";
 
@@ -22,14 +23,13 @@ const Table = props => {
             if (props.headers.length >= 15) 
                 props.setShowPop({title: 'Error', content: 'Table cannot have more than 15 columns', type: 'message'});
             else {
+                pushToHistory({headers: props.headers, data: props.data});
                 let newHeaders = [...props.headers];
-                
                 let newHeaderId = uuid();
                 newHeaders.push({
                     __CELL_ID__: newHeaderId,
                     name: `C${props.headerCounter}`
                 })
-    
                 props.setFocus({type: 'tableCol', id: newHeaderId});
                 props.setHeaders(newHeaders);
                 props.setHeaderCounter(count => count + 1);
@@ -39,11 +39,10 @@ const Table = props => {
             if (props.data.length >= 199) 
                 props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
             else {
+                pushToHistory({headers: props.headers, data: props.data});
                 let newData = [...props.data];
-            
                 let newRowId =  uuid();
                 newData.push({__CELL_ID__: newRowId})
-    
                 props.setFocus({type: 'tableRow', id: newRowId});
                 props.setData(newData);
             }
@@ -56,6 +55,7 @@ const Table = props => {
             props.setShowPop({title: "Duplicate Header Name", content: "Header name is empty or duplicate", type: "message"})
             return;
         }
+        pushToHistory({headers: props.headers, data: props.data});
         let newHeaders = [...props.headers];
         let oldHeaderName;
         newHeaders.forEach(header => {
@@ -76,18 +76,13 @@ const Table = props => {
 
     const updateTableData = (value, rowId, headerId) => {
         let newData = [...props.data];
-        
+        pushToHistory({headers: props.headers, data: props.data});
         for (let row of newData) {
             if (row.__CELL_ID__ === rowId) {
-                props.undoStack.push({ rowId: row.__CELL_ID__, colId: headerId, value: row[headerId]});
                 row[headerId] = value;
                 break;
             }
         }
-        
-        if (props.undoStack.length>5)
-            props.undoStack.splice(0, 1);
-        
         props.setData(newData);
     }
 
@@ -161,6 +156,9 @@ const Table = props => {
 export default Table;
 
 const Headers = ({headers, setHeaders, updateCheckList, onAdd, checkList}) => {
+    const onStart = () => {
+        pushToHistory({headers: headers});
+    }
     return(
         <div className="dt__table_header" >
         {/* <div className="dt__table_numbered_column_header" /> */}
@@ -169,6 +167,7 @@ const Headers = ({headers, setHeaders, updateCheckList, onAdd, checkList}) => {
             setList={setHeaders}
             className="dt__table_header_cells"
             ghostClass="dt__ghost_header"
+            onStart={onStart}
         >
             { headers.map((header, headerIndex) => {
                 return (
@@ -255,6 +254,11 @@ const Rows = props => {
 }
 
 const RowNumColumn = props => {
+
+    const onStart = () => {
+        pushToHistory({headers: props.headers, data: props.data});
+    }
+
     return (
         <div className="dt__numberColumnContainer">
             <div className="dt__table_numbered_column_header"/>
@@ -268,7 +272,7 @@ const RowNumColumn = props => {
                 >
                     1
                 </div>
-                <ReactSortable list={props.data} setList={props.setData} disabled={!props.dnd} key={props.dnd.toString()} ghostClass="dt__ghost_header">
+                <ReactSortable list={props.data} setList={props.setData} disabled={!props.dnd} key={props.dnd.toString()} ghostClass="dt__ghost_header" onStart={onStart}>
                 { props.data.map((row, rowIndex)=>{
                     return (
                         <div 

@@ -3,28 +3,19 @@ import { v4 as uuid } from 'uuid';
 import { TableActionButtons, CreateScreenActionButtons, EditScreenActionButtons, SearchDataTable } from './DataTableBtnGroup';
 import { PopupMsg, ModalContainer, ScreenOverlay, ValidationExpression as validate } from '../../global';
 import Table from './Table';
+import { resetHistory } from './DtUtils';
 import * as utilApi from '../api';
 import "../styles/DataTable.scss";
-
-
-let undoStack = [];
-let redoStack = [];
 
 const DataTable = props => {
 
     const [currScreen, setCurrScreen] = useState(props.currScreen);
     const [showPop, setShowPop] = useState(false);
     const [overlay, setOverlay] = useState('');
-    /*
-        undoStack: [
-            { row: <row-id>, col: <col-id>, value: old-value }
-        ]
-    */
 
     useEffect(()=>{
         setCurrScreen(props.currScreen)
-        undoStack=[];
-        redoStack=[];
+        resetHistory();
     }, [props.currScreen])
 
     const Popup = () => (
@@ -89,8 +80,8 @@ const CreateScreen = props => {
             <div className="dt__btngroup">
             <TableActionButtons 
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
-                checkList={checkList} headerCounter={headerCounter} undoStack={undoStack} setDnd={setDnd}
-                setHeaderCounter={setHeaderCounter} redoStack={redoStack} setCheckList={setCheckList} setFocus={setFocus}
+                checkList={checkList} headerCounter={headerCounter} setDnd={setDnd}
+                setHeaderCounter={setHeaderCounter} setCheckList={setCheckList} setFocus={setFocus}
             />
             <CreateScreenActionButtons 
                 { ...props } tableName={tableName} data={data} setData={setData} 
@@ -102,7 +93,7 @@ const CreateScreen = props => {
                     data.length > 0 && 
                     <Table 
                         { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} setHeaderCounter={setHeaderCounter}
-                        setCheckList={setCheckList} dnd={dnd} undoStack={undoStack} checkList={checkList}
+                        setCheckList={setCheckList} dnd={dnd} checkList={checkList}
                         focus={focus} setFocus={setFocus}
                     /> 
                 }
@@ -150,8 +141,8 @@ const EditScreen = props => {
             <div className="dt__btngroup">
             <TableActionButtons
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
-                checkList={checkList} headerCounter={headerCounter} undoStack={undoStack} setDnd={setDnd}
-                setHeaderCounter={setHeaderCounter} redoStack={redoStack} setCheckList={setCheckList} setFocus={setFocus}
+                checkList={checkList} headerCounter={headerCounter} setDnd={setDnd}
+                setHeaderCounter={setHeaderCounter} setCheckList={setCheckList} setFocus={setFocus}
             />
             <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} />
             </div>
@@ -161,7 +152,7 @@ const EditScreen = props => {
                     data.length > 0 && 
                     <Table 
                         { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} 
-                        setCheckList={setCheckList} dnd={dnd} undoStack={undoStack} checkList={checkList}  setHeaderCounter={setHeaderCounter}
+                        setCheckList={setCheckList} dnd={dnd} checkList={checkList}  setHeaderCounter={setHeaderCounter}
                         focus={focus} setFocus={setFocus}
                     /> 
                 }

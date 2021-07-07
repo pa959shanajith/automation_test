@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import ClickAwayListener from 'react-click-away-listener';
 import { ScrollBar } from '../../global';
-import { updateData, validateData, prepareSaveData, deleteData, parseTableData } from './DtUtils';
+import { updateData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
 import ExportDataTable from './ExportDataTable';
 import ImportSheet from './ImportSheet';
 import * as utilApi from '../api';
@@ -16,6 +16,7 @@ const TableActionButtons = props => {
                 if (props.data.length >= 199) 
                     props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let newData = [...props.data];
                     let locToAdd = 0;
                     let rowId = props.checkList.list[0].split('||').pop();
@@ -37,6 +38,7 @@ const TableActionButtons = props => {
                 if (props.headers.length >= 15) 
                     props.setShowPop({title: 'Error', content: 'Table cannot have more than 15 columns', type: 'message'});
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let newHeaders = [...props.headers];
                     let locToAdd = 0;
                     let headerId = props.checkList.list[0].split('||').pop();
@@ -82,6 +84,7 @@ const TableActionButtons = props => {
                         type: 'message'
                     });
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let [newData,] = deleteData(props.data, [], props.checkList.list);
                     props.setData(newData);
                 }
@@ -90,6 +93,7 @@ const TableActionButtons = props => {
                 if (props.headers.length === props.checkList.list.length)
                     props.setShowPop({title: 'Error', content: 'Table cannot have 0 columns', type: 'message'});
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let [newHeaders, newData] = deleteData(props.headers, props.data, props.checkList.list);
                     props.setHeaders(newHeaders);
                     props.setData(newData);
@@ -108,41 +112,32 @@ const TableActionButtons = props => {
 
     
     const onUndo = () => {
-        if (props.undoStack.length) {
-            const lastEntry = props.undoStack.pop();
-            const [prevValue, newData, found] = updateData(props.data, props.headers, lastEntry);
-            if (found) {
-                props.setData(newData);
-                props.redoStack.push(prevValue);
-                if (props.redoStack.length>5) props.redoStack.splice(0, 1);
-            }
-            else console.log("Cell Not Found!")
-        }
-        else {
+        const resp = getPreviousData({headers: props.headers, data: props.data});
+        if (resp==="EMPTY_STACK") {
             props.setShowPop({
                 title: 'Undo Error', 
                 content: "No actions available to undo.",
                 type: 'message'
             });
         }
+        else {
+            if (resp.data) props.setData(resp.data);
+            if (resp.headers) props.setHeaders(resp.headers);
+        }
     }
 
     const onRedo = () => {
-        if (props.redoStack.length) {
-            const lastEntry = props.redoStack.pop();
-            const [prevValue, newData, found] = updateData(props.data, props.headers, lastEntry);
-            if (found) {
-                props.setData(newData);
-                props.undoStack.push(prevValue);
-            }
-            else console.log("Cell Not Found!")
-        }
-        else {
+        const resp = getNextData({headers: props.headers, data: props.data});
+        if (resp==="EMPTY_STACK") {
             props.setShowPop({
                 title: 'Redo Error', 
                 content: "No actions available to redo.",
                 type: 'message'
             });
+        }
+        else {
+            if (resp.data) props.setData(resp.data);
+            if (resp.headers) props.setHeaders(resp.headers);
         }
     }
 
