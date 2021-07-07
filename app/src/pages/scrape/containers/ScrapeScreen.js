@@ -537,8 +537,9 @@ function getCompareScrapeItem(scrapeObject) {
 
 function generateScrapeItemList(lastIdx, viewString, type="old"){
     let localScrapeList = [];
-    let orderList = viewString.orderlist;
+    let orderList = viewString.orderlist || [];
     let orderDict = {};
+    let resetOrder = false;
     for (let i = 0; i < viewString.view.length; i++) {
                             
         let scrapeObject = viewString.view[i];
@@ -584,11 +585,13 @@ function generateScrapeItemList(lastIdx, viewString, type="old"){
         }
         else orderDict[scrapeItem.tempOrderId] = scrapeItem;
 
+        if (!orderList.includes(scrapeItem.objId)) resetOrder = true;
+
         lastIdx++;
     }
 
-    if (orderList && orderList.length) 
-        orderList.forEach(orderId => localScrapeList.push(orderDict[orderId]))
+    if (orderList && orderList.length && !resetOrder) 
+        orderList.forEach(orderId => orderDict[orderId] ? localScrapeList.push(orderDict[orderId]): console.error("InConsistent OrderList Found!"))
     else {
         localScrapeList = Object.values(orderDict);
         orderList = Object.keys(orderDict);
