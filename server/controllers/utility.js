@@ -268,40 +268,59 @@ exports.importDtFromXML = function (req, res) {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		var myXML = req.body.content;
+		var cols = [];
+		if(req.body.column.length>0) cols = req.body.column.split(',');
+		var row = req.body.row;
 		var myXMLStr = myXML.replace(/\s/g,'');
 		if(validator.isEmpty(myXMLStr)) return res.send("emptyData");
 		var qObj = {};
 		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
-		var allrows = doc.getElementsByTagName("row");
+		var allrows = doc.getElementsByTagName(row);
 		var rows = [];
 		var columnNames = [];
 		if(allrows.length >200) return res.send("rowExceeds");
-		if(allrows.length>0) {
-			var alltags = allrows[0].childNodes;
-			for (var j=0;j<alltags.length;++j) {
-				ob = {id: uuid(), name: alltags[j].nodeName}
-				columnNames.push(ob);
-			}
-		}
-		if(columnNames.length>15) {
-			return res.send("columnExceeds");
-		}
+		var newcols = [];
 		for( var i=0;i<allrows.length;++i) {
 			var newObj = {};
 			var alltags = allrows[i].childNodes;
 			for (var j=0;j<alltags.length;++j) {
-				newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
+				if(i==0) {
+					if(alltags[j].nodeType ==1 && checkForNesting(alltags[j])) {
+						return res.send("nestedXML");
+					} else {
+						ob = {id: uuid(), name: alltags[j].nodeName}
+						columnNames.push(ob);
+						if(cols.includes(columnNames[j].name)) newcols.push(columnNames[j]);
+					}
+				}
+				if (cols.length>0) {
+					if (cols.includes(columnNames[j].name)) {
+						newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
+					}
+				} else {
+					newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
+				}
 			}
-			if(columnNames.length>15) return res.send("columnExceeds");
 			rows.push(newObj);
 		}
+		if((req.body.column.length>0 && cols.length>50) || columnNames.length>50) {
+			return res.send("columnExceeds");
+		} 
 		qObj['datatable'] = rows;
-		qObj['dtheaders'] = columnNames;
+		qObj['dtheaders'] = newcols;
 		res.status(200).send(qObj);
 	} catch(exception) {
 		logger.error("Error occurred in utility/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
+};
+
+function checkForNesting (elemTag) {
+	var childN = elemTag.childNodes;
+	for (var k=0; k<childN.length; ++k) {
+		if (childN[k].nodeType == 1) return true;
+	}
+	return false;
 };
 
 exports.exportToDtXML = async (req, res) => {

@@ -284,6 +284,11 @@ export const importDataTable = async(arg) => {
             apiBody = { content: arg.content, flag: "sheetname" }
         else 
             apiBody = { content: arg.content, flag: arg.flag, sheetname: arg.sheetname };
+        
+        if(arg.importFormat.toLowerCase() == "xml") {
+            apiBody['row'] = arg.row;
+            apiBody['column'] = arg.column;
+        }
 
         const res = await axios(`${url}/${apiUrl}`, {
             method: 'POST',
