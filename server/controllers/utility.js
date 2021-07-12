@@ -110,9 +110,10 @@ exports.importDtFromExcel = function (req, res) {
 			cs.push(ob.id);
 			columnNames.push(ob);
 		}
+		if (columnNames.length>50) return res.send("columnExceeds");
 		xlsx.utils.sheet_add_aoa(wb1.Sheets[req.body.sheetname], [cs], {origin:'A1'});
 		var myJson = xlsx.utils.sheet_to_json(wb1.Sheets[req.body.sheetname]);
-
+		if (myJson.length>200) return res.send("rowExceeds");
 		qObj['datatable'] = myJson;
 		qObj['dtheaders'] = columnNames;
 		res.status(200).send(qObj);
@@ -136,7 +137,7 @@ exports.importDtFromCSV = function (req, res) {
 		for (var k = 0; k < csvArray.length; k++) {
 			if (k == 0) {
 				columns = csvArray[k].split(',');
-				if(columns.length>15) return res.send("columnExceeds"); 
+				if(columns.length>50) return res.send("columnExceeds"); 
 				for (var i =0; i<columns.length; ++i) {
 					ob = { id: uuid(), name: columns[i]}
 					columnNames.push(ob)
@@ -283,7 +284,7 @@ exports.importDtFromXML = function (req, res) {
 				columnNames.push(ob);
 			}
 		}
-		if(columnNames.length>15) {
+		if(columnNames.length>50) {
 			return res.send("columnExceeds");
 		}
 		for( var i=0;i<allrows.length;++i) {
@@ -292,7 +293,6 @@ exports.importDtFromXML = function (req, res) {
 			for (var j=0;j<alltags.length;++j) {
 				newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
 			}
-			if(columnNames.length>15) return res.send("columnExceeds");
 			rows.push(newObj);
 		}
 		qObj['datatable'] = rows;

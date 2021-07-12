@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import { ScrollBar } from '../../global';
 import { pushToHistory } from './DtUtils';
 import { ReactSortable } from 'react-sortablejs';
+import TextareaAutosize from 'react-textarea-autosize';
 import "../styles/Table.scss";
 
 /* 
@@ -20,8 +21,8 @@ const Table = props => {
 
     const onAdd = type => {
         if (type==="col") {
-            if (props.headers.length >= 15) 
-                props.setShowPop({title: 'Error', content: 'Table cannot have more than 15 columns', type: 'message'});
+            if (props.headers.length >= 50) 
+                props.setShowPop({title: 'Error', content: 'Table cannot have more than 50 columns', type: 'message'});
             else {
                 pushToHistory({headers: props.headers, data: props.data});
                 let newHeaders = [...props.headers];
@@ -280,6 +281,7 @@ const RowNumColumn = props => {
                             className={"dt__table_numbered_column "+(props.checkList.list.includes(`sel||row||${row.__CELL_ID__}`)?" dt__hdrCell_Sel":"")} 
                             onClick={(e)=>props.updateCheckList(e, "row", row.__CELL_ID__)}
                             data-test="dt__number_cell"
+                            id={`rowNum-${rowIndex}`}
                         >
                             {rowIndex+2}
                         </div>
@@ -414,6 +416,14 @@ const Row = props => {
         }
     }, [props.focus])
 
+
+    const updateHeight = () => {
+        let rowNum = document.getElementById(`rowNum-${props.rowIndex}`)
+        if (rowNum && rowRef.current) {
+            document.getElementById(`rowNum-${props.rowIndex}`).style.height=`${rowRef.current.clientHeight}px`;
+        }
+    }
+
     return (
         <div className="dt__table_row" data-test="dt__row" ref={rowRef}>
             <div className="dt__table_header_cells">
@@ -425,6 +435,7 @@ const Row = props => {
                         headerId = {header.__CELL_ID__}
                         initialValue={props.row[header.__CELL_ID__] || ''}
                         updateTableData={props.updateTableData}
+                        updateHeight={updateHeight}
                         selected={
                             props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`) ||
                             props.checkList.list.includes(`sel||col||${header.__CELL_ID__}`)
@@ -445,12 +456,17 @@ const Row = props => {
 
 const DataCell  = props => {
     const [value, setValue] = useState(props.initialValue);
+    const areaRef = useRef();
 
     useEffect(() => {
         setValue(props.initialValue)
     }, [props.initialValue]);
 
     const onChange = e => setValue(e.target.value);
+
+    const onClick = () => {
+        if (areaRef.current) areaRef.current.focus();
+    }
 
     const checkKeyPress = event => {
         if (event.keyCode === 13) onBlur();
@@ -462,8 +478,8 @@ const DataCell  = props => {
     }
 
     return (
-        <div className={"dt__cell "+(props.selected?"dt__selected_cell":'')} data-test="dt__body_cell">
-            <input value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress}/>
+        <div className={"dt__cell "+(props.selected?"dt__selected_cell":'')} data-test="dt__body_cell" onClick={onClick}>
+            <TextareaAutosize ref={(tag)=>areaRef.current=tag} value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress} onHeightChange={props.updateHeight} />
         </div>
     );
 }
