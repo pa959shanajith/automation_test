@@ -248,6 +248,7 @@ const CreateScreenActionButtons = props => {
                 case "tableName": props.setErrors({tableName: true}); break;
                 case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
                 case "duplicateHeaders": props.setShowPop({title: "Duplicate Header Error", content: "Data has duplicate headers", type: "message"}); break;
+                case "emptyHeader":props.setShowPop({title: "Empty Header Error", content: "Cannot save with empty header.", type: "message"}); break;
                 case "saveData": 
                     props.setOverlay('Creating Data Table...');
                     let resp = await utilApi.createDataTable(arg);
@@ -379,6 +380,7 @@ const EditScreenActionButtons = props => {
             switch (validation) {
                 case "tableName": props.setErrors({tableName: true}); break;
                 case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
+                case "emptyHeader":props.setShowPop({title: "Empty Header Error", content: "Cannot save with empty header.", type: "message"}); break;
                 case "duplicateHeaders": props.setShowPop({title: "Duplicate Header Error", content: "Data has duplicate headers", type: "message"}); break;
                 case "saveData": 
                     props.setOverlay("Updating Data Table");

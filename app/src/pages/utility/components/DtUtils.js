@@ -59,10 +59,13 @@ function getRowData(type, rows, nameToIdObj) {
 function prepareSaveData (tableName, headers, data){
     let errorFlag = { isTrue: false, value: "" };
     const name = tableName.trim();
-    const headerArray = headers.map(header => header.name);
+    const headerArray = headers.map(header => {
+        if (!header.name) errorFlag = { isTrue: true, value: "emptyHeader" }
+        return header.name;
+    });
     const uniqueHeaders = [...new Set(headerArray)];
 
-    if (uniqueHeaders.length !== headerArray.length) 
+    if (uniqueHeaders.length !== headerArray.length && !errorFlag.isTrue) 
         errorFlag = { isTrue: true, value: "duplicateHeaders" };
 
     let valuesArray = [];
@@ -263,6 +266,8 @@ function validateData (tableName, tableData) {
         validation = "emptyData";
     else if (tableData === "duplicateHeaders")
         validation = "duplicateHeaders";
+    else if (tableData === "emptyHeader")
+        validation = "emptyHeader";
 
     return validation;
 }
