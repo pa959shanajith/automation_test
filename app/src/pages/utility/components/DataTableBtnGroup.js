@@ -7,6 +7,7 @@ import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData,
 import ExportDataTable from './ExportDataTable';
 import ImportSheet from './ImportSheet';
 import * as actionTypes from '../state/action';
+import ImportXML from './ImportXML';
 import * as utilApi from '../api';
 import DtPasteStepDialog from './DtPasteStepDialog';
 
@@ -220,6 +221,8 @@ const CreateScreenActionButtons = props => {
 
     const [sheetList, setSheetList] = useState([]);
     const [excelContent, setExcelContent] = useState("");
+    const [rowTag, setRowTag] = useState("");
+    const [xmlContent, setXmlContent] = useState([]);
 
     const hiddenInput = useRef();
 
@@ -288,25 +291,31 @@ const CreateScreenActionButtons = props => {
                     default : break;
                 }
 
-                const resp = await utilApi.importDataTable({importFormat: importFormat, content: reader.result, flag: importFormat==="excel"?"sheetname":""});
-                
-                if(importFormat === "excel") {
-                    setSheetList(resp);
-                    setExcelContent(reader.result);
-                } 
-                else if (resp == "columnExceeds") {
-                    props.setShowPop({title: "Error File Read", content: "Column should not exceed 50", type: "message"});
-                } 
-                else if (resp == "rowExceeds") {
-                    props.setShowPop({title: "Error File Read", content: "Row should not exceed 200", type: "message"});
-                }
-                else if (resp == "emptyData") {
-                    props.setShowPop({title: "Error File Read", content: "Empty data in the file", type: "message"});
-                }
-                else {
-                    const [, newData, newHeaders] = parseTableData(resp, "import")
-                    props.setData(newData);
-                    props.setHeaders(newHeaders);
+                if (importFormat === "xml") {
+                    setRowTag("row");
+                    setXmlContent(reader.result);
+                } else {
+
+                    const resp = await utilApi.importDataTable({importFormat: importFormat, content: reader.result, flag: importFormat==="excel"?"sheetname":""});
+                    
+                    if(importFormat === "excel") {
+                        setSheetList(resp);
+                        setExcelContent(reader.result);
+                    } 
+                    else if (resp == "columnExceeds") {
+                        props.setShowPop({title: "Error File Read", content: "Column should not exceed 50", type: "message"});
+                    } 
+                    else if (resp == "rowExceeds") {
+                        props.setShowPop({title: "Error File Read", content: "Row should not exceed 200", type: "message"});
+                    }
+                    else if (resp == "emptyData") {
+                        props.setShowPop({title: "Error File Read", content: "Empty data in the file", type: "message"});
+                    }
+                    else {
+                        const [, newData, newHeaders] = parseTableData(resp, "import")
+                        props.setData(newData);
+                        props.setHeaders(newHeaders);
+                    }
                 }
             }
             catch(error){
@@ -320,6 +329,7 @@ const CreateScreenActionButtons = props => {
     return (
         <>
         { sheetList.length > 0 && <ImportSheet sheetList={sheetList} setSheetList={setSheetList} excelContent={excelContent} { ...props }  /> }
+        { rowTag &&  <ImportXML rowTag={rowTag} setRowTag={setRowTag} xmlContent={xmlContent} { ...props }  />}
         <div className="dt__taskBtns">
             <input ref={hiddenInput} data-test="fileInput" id="importDT" type="file" style={{display: "none"}} onChange={onInputChange} accept=".xlsx, .xls, .csv, .xml"/>
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={importDataTable} >Import</button>

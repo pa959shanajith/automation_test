@@ -192,7 +192,7 @@ exports.exportToDtExcel = async (req, res) => {
 		//create the new worksheet with coloumns and rows specified in data
 		for (var i=1;i<=datatable.length;i++) {
 			if(i==1) {
-				keys = Object.keys(datatable[0]);
+				keys = dts.dtheaders;
 				col=1;
 				keys.forEach(element => {
 					ws.cell(i,col).string(element);
@@ -269,39 +269,67 @@ exports.importDtFromXML = function (req, res) {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		var myXML = req.body.content;
-		var myXMLStr = myXML.replace(/\s/g,'');
-		if(validator.isEmpty(myXMLStr)) return res.send("emptyData");
+		var row = req.body.row;
 		var qObj = {};
-		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
-		var allrows = doc.getElementsByTagName("row");
 		var rows = [];
 		var columnNames = [];
+		var newcols = [];
+		var cols = [];
+
+		var myXMLStr = myXML.replace(/\s/g,'');
+		if(validator.isEmpty(myXMLStr)) return res.send("emptyData");
+		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
+		var allrows = doc.getElementsByTagName(row);
+		if(allrows.length==0) return res.send("emptyRow");
 		if(allrows.length >200) return res.send("rowExceeds");
-		if(allrows.length>0) {
-			var alltags = allrows[0].childNodes;
-			for (var j=0;j<alltags.length;++j) {
-				ob = {id: uuid(), name: alltags[j].nodeName}
-				columnNames.push(ob);
-			}
-		}
-		if(columnNames.length>50) {
-			return res.send("columnExceeds");
-		}
+		if(req.body.column.length>0) cols = req.body.column.split(',');
+
 		for( var i=0;i<allrows.length;++i) {
 			var newObj = {};
 			var alltags = allrows[i].childNodes;
 			for (var j=0;j<alltags.length;++j) {
-				newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
+				if(i==0) {
+					if(alltags[j].nodeType ==1 && checkForNesting(alltags[j])) {
+						return res.send("nestedXML");
+					} else {
+						ob = {id: uuid(), name: alltags[j].nodeName}
+						columnNames.push(ob);
+						if(cols.length>0) {
+							if(cols.includes(columnNames[j].name)) newcols.push(columnNames[j]);
+						}
+						else
+							newcols.push(columnNames[j]);
+					}
+				}
+				if (cols.length>0) {
+					if (cols.includes(columnNames[j].name)) {
+						newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
+					}
+				} else {
+					newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
+				}
 			}
 			rows.push(newObj);
 		}
+		if((req.body.column.length>0 && cols.length>50) || columnNames.length>50) {
+			return res.send("columnExceeds");
+		} 
+		if(cols.length>0 && newcols.length==0) return res.send("invalidcols");
 		qObj['datatable'] = rows;
-		qObj['dtheaders'] = columnNames;
+		qObj['dtheaders'] = newcols;
 		res.status(200).send(qObj);
 	} catch(exception) {
 		logger.error("Error occurred in utility/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
+};
+
+function checkForNesting (elemTag) {
+	var childN = elemTag.childNodes;
+	for (var k=0; k<childN.length; ++k) {
+		if (childN[k].nodeType == 1) return true;
+	}
+	return false;
 };
 
 exports.exportToDtXML = async (req, res) => {
