@@ -1,15 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 import ClickAwayListener from 'react-click-away-listener';
 import { ScrollBar } from '../../global';
-import { updateData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
+import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
 import ExportDataTable from './ExportDataTable';
 import ImportSheet from './ImportSheet';
+import * as actionTypes from '../state/action';
 import ImportXML from './ImportXML';
 import * as utilApi from '../api';
+import DtPasteStepDialog from './DtPasteStepDialog';
 
 
 const TableActionButtons = props => {
+
+    const dispatch = useDispatch();
+    const copiedCells = useSelector(state=>state.utility.copiedCells)
+    const [showPS, setShowPS] = useState(false);
 
     const onAdd = () => {
         if (props.checkList.list.length===1){
@@ -142,16 +149,61 @@ const TableActionButtons = props => {
         }
     }
 
+    const onCopy = () => {
+        if (props.checkList.list.length) {
+            let resp = prepareCopyData(props.headers, props.data, props.checkList);
+            if (resp.isEmpty)
+                props.setShowPop({ title: 'Copy Error', content: 'Empty Row or Column cannot be copied.', type: 'message' });
+            else{
+                dispatch({type: actionTypes.SET_COPY_CELLS, payload: resp.copiedData});
+                props.setCheckList({type: 'row', list: []})
+            }
+        }
+        else 
+            props.setShowPop({ title: 'Copy Error', content: 'Please Select row(s) or column(s) to copy.', type: 'message' });
+    }
+
+    const onPaste = () => {
+        if (copiedCells.cells.length){
+            if (copiedCells.type === 'rows' && props.data.length+copiedCells.cells.length > 199) 
+                props.setShowPop({title: 'Paste Error', content: 'Pasting the copied row(s) will exceed the 200 row limit.', type: 'message'});
+            else if (copiedCells.type === 'cols' && props.headers.length+copiedCells.cells.length > 50) 
+                props.setShowPop({title: 'Paste Error', content: 'Pasting the copied column(s) will exceed the 50 column limit.', type: 'message'});
+            else 
+                setShowPS(true);
+        }
+        else {
+            props.setShowPop({title: 'Paste Error', content: 'No Row or Column to Paste! Please Copy Row(s) or Column(s) before Pasting.', type: 'message'});
+        }
+    }
+
+    const pasteData = (pasteIndex) => {
+        try{
+            const [newHeaders, newData] = pasteCells(copiedCells, props.headers, props.data, Number(pasteIndex))
+            props.setHeaders([...newHeaders]);
+            props.setData([...newData]);
+            props.setCheckList({type: 'row', list: []})
+            setShowPS(false);
+        }
+        catch (error) {
+            setShowPS(false);
+            console.error(error)
+        }
+    }
+
     const tableActionBtnGroup = [
         {'title': 'Add Selected Row/Column', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add', onClick: ()=>onAdd()},
         {'title': 'Drag & Drop Row', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Row', onClick:  ()=>props.setDnd(dnd => !dnd)},
         {'title': 'Remove Selected Row/Column', 'img': 'static/imgs/ic-delete.png', 'alt': 'Remove', onClick:  ()=>onDelete()},
+        {'title': 'Copy Row/Col', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy', onClick: ()=>onCopy()},
+        {'title': 'Paste Row/Col', 'img': 'static/imgs/ic-jq-pastestep.png', 'alt': 'Paste', onClick: ()=>onPaste()},
         {'title': 'Redo Last Changes', 'class': 'fa fa-repeat', 'alt': 'Redo', onClick:  ()=>onRedo()},
         {'title': 'Undo Last Changes', 'class': 'fa fa-undo', 'alt': 'Undo', onClick:  ()=>onUndo()},
     ]
 
     return (
         <div className="dt__table_ac_btn_grp">
+            { showPS && <DtPasteStepDialog setShow={setShowPS} upperLimit={copiedCells.type === "cols" ? props.headers.length : props.data.length+1 } pasteData={pasteData} /> }
             {
                 tableActionBtnGroup.map((btn, i) => 
                     <button data-test="dt__tblActionBtns" key={i} className="dt__tblBtn" onClick={()=>btn.onClick()}>
@@ -199,6 +251,7 @@ const CreateScreenActionButtons = props => {
                 case "tableName": props.setErrors({tableName: true}); break;
                 case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
                 case "duplicateHeaders": props.setShowPop({title: "Duplicate Header Error", content: "Data has duplicate headers", type: "message"}); break;
+                case "emptyHeader":props.setShowPop({title: "Empty Header Error", content: "Cannot save with empty header.", type: "message"}); break;
                 case "saveData": 
                     props.setOverlay('Creating Data Table...');
                     let resp = await utilApi.createDataTable(arg);
@@ -337,6 +390,7 @@ const EditScreenActionButtons = props => {
             switch (validation) {
                 case "tableName": props.setErrors({tableName: true}); break;
                 case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
+                case "emptyHeader":props.setShowPop({title: "Empty Header Error", content: "Cannot save with empty header.", type: "message"}); break;
                 case "duplicateHeaders": props.setShowPop({title: "Duplicate Header Error", content: "Data has duplicate headers", type: "message"}); break;
                 case "saveData": 
                     props.setOverlay("Updating Data Table");
