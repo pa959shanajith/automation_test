@@ -10,6 +10,7 @@ import scrapeReducer from './pages/scrape/state/reducer.js';
 import designReducer from './pages/design/state/reducer.js';
 import reportReducer from './pages/report/state/reducer.js';
 import integrationReducer from './pages/integration/state/reducer.js';
+import utilityReducer from './pages/utility/state/reducer.js';
 
 
 export const JSOGTransform = createTransform(
@@ -37,7 +38,8 @@ export const rootReducer = combineReducers({
     scrape : scrapeReducer,
     design : designReducer,
     report: reportReducer,
-    integration: integrationReducer
+    integration: integrationReducer,
+    utility: utilityReducer
 });
   
 const pReducer = persistReducer(persistConfig, rootReducer);
