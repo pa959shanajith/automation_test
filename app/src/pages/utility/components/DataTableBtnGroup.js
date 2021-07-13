@@ -250,7 +250,7 @@ const CreateScreenActionButtons = props => {
                         setExcelContent(reader.result);
                     } 
                     else if (resp == "columnExceeds") {
-                        props.setShowPop({title: "Error File Read", content: "Column should not exceed 50", type: "messsage"});
+                        props.setShowPop({title: "Error File Read", content: "Column should not exceed 50", type: "message"});
                     } 
                     else if (resp == "rowExceeds") {
                         props.setShowPop({title: "Error File Read", content: "Row should not exceed 200", type: "message"});
