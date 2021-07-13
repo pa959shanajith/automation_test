@@ -268,18 +268,21 @@ exports.importDtFromXML = function (req, res) {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		var myXML = req.body.content;
-		var cols = [];
-		if(req.body.column.length>0) cols = req.body.column.split(',');
 		var row = req.body.row;
-		var myXMLStr = myXML.replace(/\s/g,'');
-		if(validator.isEmpty(myXMLStr)) return res.send("emptyData");
 		var qObj = {};
-		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
-		var allrows = doc.getElementsByTagName(row);
 		var rows = [];
 		var columnNames = [];
-		if(allrows.length >200) return res.send("rowExceeds");
 		var newcols = [];
+		var cols = [];
+
+		var myXMLStr = myXML.replace(/\s/g,'');
+		if(validator.isEmpty(myXMLStr)) return res.send("emptyData");
+		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
+		var allrows = doc.getElementsByTagName(row);
+		if(allrows.length==0) return res.send("emptyRow");
+		if(allrows.length >200) return res.send("rowExceeds");
+		if(req.body.column.length>0) cols = req.body.column.split(',');
+
 		for( var i=0;i<allrows.length;++i) {
 			var newObj = {};
 			var alltags = allrows[i].childNodes;
@@ -290,7 +293,11 @@ exports.importDtFromXML = function (req, res) {
 					} else {
 						ob = {id: uuid(), name: alltags[j].nodeName}
 						columnNames.push(ob);
-						if(cols.includes(columnNames[j].name)) newcols.push(columnNames[j]);
+						if(cols.length>0) {
+							if(cols.includes(columnNames[j].name)) newcols.push(columnNames[j]);
+						}
+						else
+							newcols.push(columnNames[j]);
 					}
 				}
 				if (cols.length>0) {
@@ -306,6 +313,7 @@ exports.importDtFromXML = function (req, res) {
 		if((req.body.column.length>0 && cols.length>50) || columnNames.length>50) {
 			return res.send("columnExceeds");
 		} 
+		if(cols.length>0 && newcols.length==0) return res.send("invalidcols");
 		qObj['datatable'] = rows;
 		qObj['dtheaders'] = newcols;
 		res.status(200).send(qObj);
