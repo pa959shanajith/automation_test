@@ -36,8 +36,8 @@ const TableActionButtons = props => {
                 }
             }
             else{
-                if (props.headers.length >= 15) 
-                    props.setShowPop({title: 'Error', content: 'Table cannot have more than 15 columns', type: 'message'});
+                if (props.headers.length >= 50) 
+                    props.setShowPop({title: 'Error', content: 'Table cannot have more than 50 columns', type: 'message'});
                 else {
                     pushToHistory({headers: props.headers, data: props.data});
                     let newHeaders = [...props.headers];
@@ -250,7 +250,7 @@ const CreateScreenActionButtons = props => {
                         setExcelContent(reader.result);
                     } 
                     else if (resp == "columnExceeds") {
-                        props.setShowPop({title: "Error File Read", content: "Column should not exceed 15", type: "message"});
+                        props.setShowPop({title: "Error File Read", content: "Column should not exceed 50", type: "messsage"});
                     } 
                     else if (resp == "rowExceeds") {
                         props.setShowPop({title: "Error File Read", content: "Row should not exceed 200", type: "message"});

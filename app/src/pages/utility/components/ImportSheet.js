@@ -29,7 +29,7 @@ const ImportSheet = props => {
                 props.setShowPop({title: "File Read Error", content: resp.error, type: "message"})
             else if (resp == "columnExceeds") {
                 props.setSheetList([]);
-                props.setShowPop({title: "File Read Error", content: "Column should not exceed 15", type: "message"});
+                props.setShowPop({title: "File Read Error", content: "Column should not exceed 50", type: "message"});
             }
             else if (resp == "rowExceeds") {
                 props.setSheetList([]);

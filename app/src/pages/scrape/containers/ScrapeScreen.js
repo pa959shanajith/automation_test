@@ -90,31 +90,16 @@ const ScrapeScreen = ()=>{
                 
                 if (data === "Invalid Session") return RedirectPage(history);
                 else if (typeof data === "object" && current_task.appType!=="Webservice") {
+                    haveItems = data.view.length !== 0;
+                    let [newScrapeList, newOrderList] = generateScrapeItemList(0, data);
 
-                    viewString = data;
-                    
-                    haveItems = viewString.view.length !== 0;
-                    
-                    if (haveItems) {
-                        let [newScrapeList, newOrderList] = generateScrapeItemList(0, viewString);
-
-                        setMainScrapedData(viewString);
-                        setMirror({scrape: viewString.mirror, compare: null});
-                        setNewScrapedData([]);
-                        setScrapeItems(newScrapeList);
-                        setHideSubmit(false);
-                        setSaved(true);
-                        setOrderList(newOrderList);
-                    }
-                    else {
-                        setScrapeItems([]);
-                        setMainScrapedData({});
-                        setNewScrapedData([]);
-                        setMirror({scrape: null, compare: null});
-                        setSaved(true);
-                        setHideSubmit(true);
-                        setOrderList([]);
-                    }
+                    setMainScrapedData(data);
+                    setMirror({scrape: data.mirror, compare: null});
+                    setNewScrapedData([]);
+                    setScrapeItems(newScrapeList);
+                    setHideSubmit(!haveItems);
+                    setSaved(true);
+                    setOrderList(newOrderList);
                     setOverlay("");
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
                     dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: !haveItems});
