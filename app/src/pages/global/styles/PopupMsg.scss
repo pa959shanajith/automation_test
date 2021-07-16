@@ -93,8 +93,8 @@ button:focus{
     }
     .messageBar-message{
         width: 100%;
-        background: #311d4e;
-        color: #ffffff;
+        background: $primaryColorDark;
+        color: $whiteColor;
         border-radius: 4px;
         padding: 5px 40px;
         word-break: inherit;
@@ -133,7 +133,7 @@ button:focus{
     }
     .success{
         color: black;
-        background: #28a745;
+        background: $pass;
     }
     .warn{
         color: black;
@@ -141,12 +141,12 @@ button:focus{
     }
     .error{
         color:$whiteColor;
-        background: #D81B1F;
+        background: $redError;
     }
     .black-btn{
         color: black;
     }
     .white-btn{
-        color: white;
+        color: $whiteColor
     }
 }

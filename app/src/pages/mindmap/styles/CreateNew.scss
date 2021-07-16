@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .mp__canvas{
     position: absolute;
     top: 41px;
@@ -14,7 +15,7 @@
     flex: 0 1 100%;
 }
 .mp__toolbar__container{
-    background-color: #e6e7e9;
+    background-color: $borderThree;
     position: relative;
 }
 .loading-bar{

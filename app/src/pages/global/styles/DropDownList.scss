@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .form-inp-dropdown-popup{
     font-size: 14px;
     width: 335px;
@@ -5,7 +6,7 @@
     max-height: 123px;
     box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
     display: block;
-    background: #ffff;
+    background: $whiteColor;
     margin-top: 2px;
     z-index: 1;
     position: absolute;
@@ -15,9 +16,9 @@
         width: calc(100% - 14px);
     }
     ul:hover{
-        background: #633691;
+        background: $primaryColor;
         border-radius: 3px;
-        color: #fff;
+        color: $whiteColor;
         cursor: pointer;
     }
 }
@@ -27,11 +28,11 @@
     padding: 3px 12px;
 }
 .selectedCheckBox{
-    background: #633691;
+    background: $primaryColor;
     border-radius: 3px;
-    color: #fff;
+    color: $whiteColor;
     cursor: pointer;
 }
 .dropdownInputError{
-    border: 1px solid red!important;
+    border: 1px solid $red!important;
 }

@@ -1,7 +1,8 @@
+@import "../../global/styles/ColorVariables.scss"; 
 .login-footer{
     display: flex;
     justify-content: flex-end;
-    color: #643693;
+    color: $primaryColor;
     font-family: "LatoWeb";
     z-index: 0;
     padding: 0 30px 10px 0;
