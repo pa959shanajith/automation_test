@@ -111,7 +111,7 @@ const SocketFactory = () => {
 
 const displayExecutionPopup = (value, setPopupState) =>{
     var msg = "";
-    var val;
+    var val,executionVariant=VARIANT.WARNING;
     for(val in value){
         var data = value[val].status;
         var testSuite = value[val].testSuiteIds;

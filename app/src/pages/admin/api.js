@@ -53,10 +53,10 @@ export const manageUserDetails = async(action, userObj) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to "+action+" user!"}
+        return {error:"Failed to "+action+" user."}
     }catch(err){
         console.error(err)
-        return {error:"Failed to "+action+" user!"}
+        return {error:"Failed to "+action+" user."}
     }
 }
 
