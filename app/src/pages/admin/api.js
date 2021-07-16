@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {RedirectPage} from '../global'
+import {RedirectPage, Messages as MSG} from '../global'
 import {history} from './index'
 import {url} from '../../App'
 
@@ -18,16 +18,16 @@ export const getUserRoles = async() => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch user roles'}
+        return {error:MSG.ADMIN.ERR_FETCH_USERROLES}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch user roles'}
+        return {error:MSG.ADMIN.ERR_FETCH_USERROLES}
     }
 }
 
@@ -47,16 +47,16 @@ export const manageUserDetails = async(action, userObj) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to "+action+" user."}
+        return {error:"Failed to "+action+" user!"}
     }catch(err){
         console.error(err)
-        return {error:"Failed to "+action+" user."}
+        return {error:"Failed to "+action+" user!"}
     }
 }
 
@@ -76,22 +76,22 @@ export const getLDAPConfig = async(action, args, opts) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.status === "fail" ){
-            return {error:"Failed to fetch LDAP server configurations."}
+            return {error:MSG.ADMIN.ERR_FETCH_LDAP}
         }
         else if(res.status === "insufficient_access" ){
-            return {error:"Either Credentials provided in LDAP server configuration does not have required privileges for fetching users or there is no such user"}
+            return {error:MSG.ADMIN.ERR_INSUFFICIENT_ACCESS}
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch LDAP server configurations"}
+        return {error:MSG.ADMIN.ERR_FETCH_LDAP}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch LDAP server configurations"}
+        return {error:MSG.ADMIN.ERR_FETCH_LDAP}
     }
 }
 
@@ -111,19 +111,19 @@ export const getSAMLConfig = async(name) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.status === "fail" ){
-            return {error:"Failed to fetch SAML server configurations."}
+            return {error:MSG.ADMIN.ERR_FETCH_SAML}
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch SAML server configurations"}
+        return {error:MSG.ADMIN.ERR_FETCH_SAML}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch SAML server configurations"}
+        return {error:MSG.ADMIN.ERR_FETCH_SAML}
     }
 }
 
@@ -143,16 +143,16 @@ export const manageSAMLConfig = async(action, confObj) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to manage SAML server configurations"}
+        return {error:MSG.ADMIN.ERR_MANAGE_SAML}
     }catch(err){
         console.error(err)
-        return {error:"Failed to manage SAML server configurations"}
+        return {error:MSG.ADMIN.ERR_MANAGE_SAML}
     }
 }
 
@@ -172,19 +172,19 @@ export const getOIDCConfig = async(name) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.status === "fail" ){
-            return {error:"Failed to fetch OpenID server configurations."}
+            return {error:MSG.ADMIN.ERR_FETCH_OPENID}
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch OpenID server configurations"}
+        return {error:MSG.ADMIN.ERR_FETCH_OPENID}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch OpenID server configurations"}
+        return {error:MSG.ADMIN.ERR_FETCH_OPENID}
     }
 }
 
@@ -204,22 +204,22 @@ export const getUserDetails = async(action, args) => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.status === "fail" ){
-            return {error:"Failed to fetch users."}
+            return {error:MSG.ADMIN.ERR_FETCH_USER}
         }
         else if(res.status === "empty" ){
-            return {error:"There are no users created yet."}
+            return {error:MSG.ADMIN.ERR_EMPTY_USER}
         }
         else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch users."}
+        return {error:MSG.ADMIN.ERR_FETCH_USER}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch users."}
+        return {error:MSG.ADMIN.ERR_FETCH_USER}
     }
 }
 
@@ -260,15 +260,15 @@ export const getAvailablePlugins = async() => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch available plugins."}
+        return {error:MSG.ADMIN.ERR_FETCH_PLUGINS}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch available plugins."}
+        return {error:MSG.ADMIN.ERR_FETCH_PLUGINS}
     }
 }
 
@@ -287,16 +287,16 @@ export const getPreferences = async() => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch Preferences."}
+        return {error:MSG.ADMIN.ERR_FETCH_PREFERENCES}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch Preferences."}
+        return {error:MSG.ADMIN.ERR_FETCH_PREFERENCES}
     }
 }
 
@@ -315,15 +315,15 @@ export const getDomains_ICE = async() => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch domains."}
+        return {error:MSG.ADMIN.ERR_FETCH_DOMAIN}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch domains."}
+        return {error:MSG.ADMIN.ERR_FETCH_DOMAIN}
     }
 }
 
@@ -343,15 +343,15 @@ export const getNames_ICE = async(requestedids, idtype) => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to get names."}
+        return {error:MSG.ADMIN.ERR_FETCH_NAME}
     }catch(err){
         console.error(err)
-        return {error:"Failed to get names."}
+        return {error:MSG.ADMIN.ERR_FETCH_NAME}
     }
 }
 
@@ -371,16 +371,16 @@ export const createProject_ICE = async(createprojectObj) => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
-            if(res.data === 'invalid_name_spl') return {error:"Failed to create project. Special characters found in project/release/cycle name"};
+            if(res.data === 'invalid_name_spl') return {error:MSG.ADMIN.ERR_CREATE_PROJECT_SP_CHAR};
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to create project."}
+        return {error:MSG.ADMIN.ERR_CREATE_PROJECT}
     }catch(err){
         console.error(err)
-        return {error:"Failed to create project."}
+        return {error:MSG.ADMIN.ERR_CREATE_PROJECT}
     }
 }
 
@@ -400,15 +400,15 @@ export const getDetails_ICE = async(idtype, requestedids) => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch domains details."}
+        return {error:MSG.ADMIN.ERR_FETCH_DOMAIN_DETAILS}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch domains details."}
+        return {error:MSG.ADMIN.ERR_FETCH_DOMAIN_DETAILS}
     }
 }
 
@@ -429,15 +429,15 @@ export const updateProject_ICE = async(updateProjectObj, userDetails) => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to update project."}
+        return {error:MSG.ADMIN.ERR_UPDATE_PROJECT}
     }catch(err){
         console.error(err)
-        return {error:"Failed to update project."}
+        return {error:MSG.ADMIN.ERR_UPDATE_PROJECT}
     }
 }
 
@@ -457,15 +457,15 @@ export const getAssignedProjects_ICE = async(getAssignProj) => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch assigned projects."}
+        return {error:MSG.ADMIN.ERR_FETCH_ASSIGNED_PROJECT}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch assigned projects."}
+        return {error:MSG.ADMIN.ERR_FETCH_ASSIGNED_PROJECT}
     }
 }
 
@@ -485,15 +485,15 @@ export const assignProjects_ICE = async(assignProjectsObj) => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to assign projects."}
+        return {error:MSG.ADMIN.ERR_ASSIGN_PROJECT}
     }catch(err){
         console.error(err)
-        return {error:"Failed to assign projects."}
+        return {error:MSG.ADMIN.ERR_ASSIGN_PROJECT}
     }
 }
 
@@ -516,16 +516,16 @@ export const manageSessionData = async(action, user, key, reason) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to manage session Data."}
+        return {error:MSG.ADMIN.ERR_MANAGE_SESSION}
     }catch(err){
         console.error(err)
-        return {error:"Failed to manage session Data."}
+        return {error:MSG.ADMIN.ERR_MANAGE_SESSION}
     }
 }
 
@@ -545,19 +545,19 @@ export const fetchICE = async(args) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if( res.status === "empty"){
-            return {error:"There are no ICE provisioned"};
+            return {error:MSG.ADMIN.ERR_NO_ICE_PROVISION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch ICE Details"}
+        return {error:MSG.ADMIN.ERR_FETCH_ICE_DETAILS}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch ICE Details"}
+        return {error:MSG.ADMIN.ERR_FETCH_ICE_DETAILS}
     }
 }
 
@@ -577,17 +577,17 @@ export const provisions = async(tokeninfo) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 ){    
-            if(res.data === 'DuplicateIceName') return {error:"ICE Provisioned Failed!<br/>ICE name or User already exists"};
-            if(res.data === 'invalid_splname') return {error:"ICE Provisioned Failed!<br/>Special characters found in icename"};
+            if(res.data === 'DuplicateIceName') return {error:MSG.ADMIN.ERR__ICE_EXIST};
+            if(res.data === 'invalid_splname') return {error:MSG.ADMIN.ERR_ICE_SPECHAR};
             return res.data;
         }
         console.error(res.data)
     }catch(err){
         console.error(err)
-        return {error:"ICE Provisioning Failed"}
+        return {error:MSG.ADMIN.ERR_ICE_PROVISION}
     }
 }
 
@@ -607,16 +607,16 @@ export const manageOIDCConfig = async(action, confObj) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to manage OIDC configuration."}
+        return {error:MSG.ADMIN.ERR_MANAGE_OIDC}
     }catch(err){
         console.error(err)
-        return {error:"Failed to manage OIDC configuration."}
+        return {error:MSG.ADMIN.ERR_MANAGE_OIDC}
     }
 } 
 
@@ -637,19 +637,19 @@ export const getCIUsersDetails = async(CIUser) => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.status === "fail" ){
-            return {error:"Failed to fetch user details."}
+            return {error:MSG.ADMIN.ERR_FETCH_USER_DETAILS}
         }
         else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch user details."}
+        return {error:MSG.ADMIN.ERR_FETCH_USER_DETAILS}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch user details."}
+        return {error:MSG.ADMIN.ERR_FETCH_USER_DETAILS}
     }
 } 
 
@@ -669,18 +669,18 @@ export const manageCIUsers = async(action,CIUser) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
-            if(res.data === 'invalid_name_special') return {error:"Failed to generate token, Special characters found in token name"};
-            if(res.data === 'invalid_past_time') return {error:"Expiry time should be 8 hours more than current time"};
+            if(res.data === 'invalid_name_special') return {error:MSG.ADMIN.ERR_SPECHAR_TOKEN};
+            if(res.data === 'invalid_past_time') return {error:MSG.ADMIN.ERR_EXPIRY_TOKEN};
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to manage user"}
+        return {error:MSG.ADMIN.ERR_MANAGE_USER}
     }catch(err){
         console.error(err)
-        return {error:"Failed to manage user"}
+        return {error:MSG.ADMIN.ERR_MANAGE_USER}
     }
 }
 
@@ -702,16 +702,16 @@ export const testLDAPConnection = async(auth, urlLDAP, baseDN, bindDN, bindCrede
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Test Connection Failed!"}
+        return {error:MSG.ADMIN.ERR_TEST_CONNECTION}
     }catch(err){
         console.error(err)
-        return {error:"Test Connection Failed!"}
+        return {error:MSG.ADMIN.ERR_TEST_CONNECTION}
     }
 } 
 
@@ -728,16 +728,16 @@ export const manageLDAPConfig = async(action, confObj) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to manage LDAP config!"}
+        return {error:MSG.ADMIN.ERR_MANAGE_LDAP}
     }catch(err){
         console.error(err)
-        return {error:"Failed to manage LDAP config!"}
+        return {error:MSG.ADMIN.ERR_MANAGE_LDAP}
     }
 }
 
@@ -753,17 +753,17 @@ export const updatePool = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){ 
-            if(res.data === 'invalid_splname') return {error:"Failed to update ICE Pool. Special characters found in poolname."};
+            if(res.data === 'invalid_splname') return {error:MSG.ADMIN.ERR_SPECHAR_POOLNAME};
             if(res.data === 'success')return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to Update ICE pool!"}
+        return {error:MSG.ADMIN.ERR_UPDATE_ICEPOOL}
     }catch(err){
         console.error(err)
-        return {error:"Failed to Update ICE pool!"}
+        return {error:MSG.ADMIN.ERR_UPDATE_ICEPOOL}
     }
 } 
 
@@ -779,16 +779,16 @@ export const deleteICE_pools = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){ 
             if(res.data === 'success')return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to Delete ICE pool!"}
+        return {error:MSG.ADMIN.ERR_DELETE_ICEPOOL}
     }catch(err){
         console.error(err)
-        return {error:"Failed to Delete ICE pool!"}
+        return {error:MSG.ADMIN.ERR_DELETE_ICEPOOL}
     }
 }
 
@@ -804,18 +804,18 @@ export const createPool_ICE = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){ 
-            if(res.data === 'Pool exists') return {error:"Pool name already exist!"};
-            if(res.data === 'invalid_splname') return {error:"Special characters found in poolname."};
+            if(res.data === 'Pool exists') return {error:MSG.ADMIN.ERR_POOL_EXIST};
+            if(res.data === 'invalid_splname') return {error:MSG.ADMIN.ERR_SPECHAR_POOL_NAME};
             if(res.data === 'success')return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to create ICE pool!"}
+        return {error:MSG.ADMIN.ERR_CREATE_ICEPOOL}
     }catch(err){
         console.error(err)
-        return {error:"Failed to create ICE pool!"}
+        return {error:MSG.ADMIN.ERR_CREATE_ICEPOOL}
     }
 }
 
@@ -832,17 +832,17 @@ export const getICEinPools = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){ 
-            if(res.data === "empty") return{error:"No ICE available!"}
+            if(res.data === "empty") return{error:MSG.ADMIN.ERR_NO_ICE}
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch ICE!"}
+        return {error:MSG.GENERIC.ERR_FETCH_ICE}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch ICE!"}
+        return {error:MSG.GENERIC.ERR_FETCH_ICE}
     }
 }
 
@@ -858,17 +858,17 @@ export const getAvailable_ICE = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){ 
-            if(res.data.length<1) return{error:"No active ICE available!"}
+            if(res.data.length<1) return{error:MSG.ADMIN.ERR_NO_ACTIVE_ICE}
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch available ICE!"}
+        return {error:MSG.ADMIN.ERR_AVAILABLE_ICE}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch available ICE!"}
+        return {error:MSG.ADMIN.ERR_AVAILABLE_ICE}
     }
 }
 
@@ -884,17 +884,17 @@ export const clearQueue = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){ 
-            if(res.data === 'empty') return {error:"Queue is already empty."} 
+            if(res.data === 'empty') return {error:MSG.ADMIN.ERR_EMPTY_QUEUE} 
             if(res.data === 'success') return res.data
         }
         console.error(res.data)
-        return {error:"Failed Clear Queue!"}
+        return {error:MSG.ADMIN.ERR_CLEAR_QUEUE}
     }catch(err){
         console.error(err)
-        return {error:"Failed Clear Queue!"}
+        return {error:MSG.ADMIN.ERR_CLEAR_QUEUE}
     }
 } 
 
@@ -910,17 +910,17 @@ export const getPools = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){ 
-            if(res.data === 'empty' || Object.keys(res.data).length<1) return {val:"empty",error:"There are no ICE pools created yet."}           
+            if(res.data === 'empty' || Object.keys(res.data).length<1) return {val:"empty",error:MSG.ADMIN.ERR_NO_ICEPOOL}           
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch pools!"}
+        return {error:MSG.GENERIC.ERR_FETCH_POOLS}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch pools!"}
+        return {error:MSG.GENERIC.ERR_FETCH_POOLS}
     }
 } 
 
@@ -937,7 +937,7 @@ export const getNotificationChannels = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){  
             // if(res.data === 'empty')return {error : "Fail to fetch configured details for selected provider."}          
@@ -945,10 +945,10 @@ export const getNotificationChannels = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:"Fail to fetch configured details for selected provider."}
+        return {error:MSG.ADMIN.ERR_PROVIDER_DETAILS}
     }catch(err){
         console.error(err)
-        return {error:"Fail to fetch configured details for selected provider."}
+        return {error:MSG.ADMIN.ERR_PROVIDER_DETAILS}
     }
 }
 
@@ -964,17 +964,17 @@ export const manageNotificationChannels = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){  
-            if(res.data === 'empty')return {error : "Fail to update configuration for selected provider."}          
+            if(res.data === 'empty')return {error : MSG.ADMIN.ERR_UPDATE_PROVIDER}          
             return res.data;
         }
         console.error(res.data)
-        return {error:"Fail to update configuration for selected provider."}
+        return {error:MSG.ADMIN.ERR_UPDATE_PROVIDER}
     }catch(err){
         console.error(err)
-        return {error:"Fail to update configuration for selected provider."}
+        return {error:MSG.ADMIN.ERR_UPDATE_PROVIDER}
     }
 }
 
@@ -990,19 +990,19 @@ export const testNotificationChannels = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){  
-            if(res.data === 'empty') return "Fail to fetch configured details for selected provider.";
-            else if (res.data === "invalidprovider")  return "Selected Provider is not supported yet!";
-            else if (res.data === "invalidrecipient") return "Recipient address is invalid!";
-            else if (res.data === "success") return "Test Email Sent!";
+            if(res.data === 'empty') return MSG.ADMIN.ERR_UPDATE_PROVIDER;
+            else if (res.data === "invalidprovider")  return MSG.ADMIN.ERR_UNSUPPORTIVE_PROVIDER;
+            else if (res.data === "invalidrecipient") return MSG.ADMIN.ERR_REC_ADDRESS;
+            else if (res.data === "success") return MSG.ADMIN.SUCC_EMAIL_SENT;
         }
         console.error(res.data)
-        return {error:"Failed! Re-check the configuration."}
+        return {error:MSG.ADMIN.ERR_RECHECK_CONFIG}
     }catch(err){
         console.error(err)
-        return {error:"Failed! Re-check the configuration."}
+        return {error:MSG.ADMIN.ERR_RECHECK_CONFIG}
     }
 }
 
@@ -1023,15 +1023,15 @@ export const fetchLockedUsers = async() => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch locked users."}
+        return {error:MSG.ADMIN.ERR_FETCH_LOCKED_USER}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch locked users"}
+        return {error:MSG.ADMIN.ERR_FETCH_LOCKED_USER}
     }
 }
 
@@ -1051,15 +1051,15 @@ export const unlockUser = async(user) => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to unlocked users."}
+        return {error:MSG.ADMIN.ERR_UNLOCK_USER}
     }catch(err){
         console.error(err)
-        return {error:"Failed to unlocked users"}
+        return {error:MSG.ADMIN.ERR_UNLOCK_USER}
     }
 }
 
@@ -1086,7 +1086,7 @@ export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAcc
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
@@ -1116,15 +1116,15 @@ export const gitEditConfig = async(userId, projectId) => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch git configurations."}
+        return {error:MSG.ADMIN.ERR_FETCH_GIT}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch git configurations."}
+        return {error:MSG.ADMIN.ERR_FETCH_GIT}
     }
 }
 
@@ -1146,15 +1146,15 @@ export const exportProject = async(props) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to export excel'}
+        return {error:MSG.ADMIN.ERR_EXPORT}
     }catch(err){
         console.error(err)
-        return {error:'Failed to export excel'}
+        return {error:MSG.ADMIN.ERR_EXPORT}
     }
 }

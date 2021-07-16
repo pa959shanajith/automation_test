@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateScrollBar } from '../../global';
+import { updateScrollBar, Messages as MSG } from '../../global';
 import * as actionTypes from '../state/action';
 
 const CycleNode = props => {
@@ -91,10 +91,7 @@ const TestRunNode = props => {
     const handleSync = () => {
         let popupMsg = false;
         if(selectedScIds.length===0){
-            popupMsg = {
-                title:'Save Mapped Testcase ',
-                content:"Please Select a Scenario"
-            };
+            popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
         }
         if (popupMsg) dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});
         else{

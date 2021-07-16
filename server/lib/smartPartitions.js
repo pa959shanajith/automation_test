@@ -17,7 +17,7 @@ exports.smartSchedule = async (batchInfo, type, time, browsers) => {
 		return result;
 	} else if (partitions.result == "busy") {
 		result["status"] = "busy"
-		result["displayString"] = "ICE busy, Some modules might skip.\n"
+		result["displayString"] = "ICE busy, Some modules might be skipped.\n"
 	} else {
 		result["status"] = "success"
 		result["displayString"] = "Successfully Scheduled.\n\n"

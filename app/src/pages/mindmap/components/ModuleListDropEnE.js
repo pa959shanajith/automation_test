@@ -1,5 +1,5 @@
 import React, { Fragment , useState, useEffect} from 'react';
-import {ScrollBar,ModalContainer} from '../../global';
+import {ScrollBar,ModalContainer, Messages as MSG} from '../../global';
 import { useSelector, useDispatch} from 'react-redux';
 import {getModules,populateScenarios}  from '../api'
 import * as actionTypes from '../state/action';
@@ -36,7 +36,7 @@ const ModuleListDropEnE = (props) =>{
         var type = e.currentTarget.getAttribute("type")
         var name = e.currentTarget.getAttribute("name")
         if(Object.keys(moduleSelect).length===0 && type!=='endtoend'){
-            displayError('First, Please select an end to end module or create a new one!');
+            displayError(MSG.MINDMAP.WARN_SELECT_E2E);
             return;
         }
         if(type!=='endtoend'){
@@ -88,11 +88,11 @@ const ModuleListDropEnE = (props) =>{
         }        
         setSelctedSc(scArr)
     }
-    const displayError = (err) =>{
+    const displayError = (error) =>{
         setBlockui({show:false})
         props.setPopup({
-          title:'ERROR',
-          content:err,
+          variant:error.VARIANT,
+          content:error.CONTENT,
           submitText:'Ok',
           show:true
         })

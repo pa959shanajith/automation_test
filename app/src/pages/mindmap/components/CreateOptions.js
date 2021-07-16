@@ -21,8 +21,8 @@ const CreateOptions = (props) => {
   const displayError = (error) =>{
     setBlockui({show:false})
     setPopup({
-      title:'ERROR',
-      content:error,
+      variant:error.VARIANT,
+      content:error.CONTENT,
       submitText:'Ok',
       show:true
     })
@@ -30,7 +30,7 @@ const CreateOptions = (props) => {
   return (
     <Fragment>
       {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-      {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+      {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content} />:null}
       {importPop?<ImportMindmap setBlockui={setBlockui} setOptions={props.setOptions} displayError={displayError} setImportPop={setImportPop}/>:null}
       <div className='mindmap__option-container'>
         <div>

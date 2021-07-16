@@ -1,5 +1,5 @@
 import React from 'react';
-import {PopupMsg} from '../index';
+import {PopupMsg, VARIANT} from '../index';
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -20,7 +20,7 @@ class ErrorBoundary extends React.Component {
     render() {
 		if (this.state.hasError) {
 			// You can render any custom fallback UI
-			return <PopupMsg content='Something went wrong! Please refresh the page.' title='ERROR' submitText='OK' close={onclose} submit={onclose}/>
+			return <PopupMsg variant={VARIANT.ERROR} content='Something went wrong! Please refresh the page.' close={onclose} />
 		}
 		return this.props.children; 
     }

@@ -1,5 +1,5 @@
 import React ,{Fragment,useEffect,useState } from 'react';
-import {ScrollBar ,PopupMsg} from '../../global';
+import {ScrollBar ,PopupMsg, VARIANT} from '../../global';
 import ValidationExpression from '../../global/components/ValidationExpression';
 
 const Pairwise=(props)=>{
@@ -70,7 +70,7 @@ return(
                         <br/>
                             {props.gererateClick && <PopupMsg 
                                                 content={"Table values cannot be empty"} 
-                                                title={"Pairwise"} 
+                                                variant={VARIANT.WARNING}
                                                 submit={()=>props.setGenerateClick(false) } 
                                                 submitText={"Ok"} 
                                                 close={()=>props.setGenerateClick(false)}

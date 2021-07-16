@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
-import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, PopupMsg, GenerateTaskList } from '../../global';
+import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, PopupMsg, GenerateTaskList, Messages as MSG } from '../../global';
 import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as pluginApi from "../api";
@@ -84,14 +84,14 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                     })
                     .catch(error => {
                         setOverlay("");
-                        setShowPopup({'title': 'Tasks', 'content': "Fail to load tasks!"});
+                        setShowPopup({'variant': MSG.PLUGIN.ERR_LOAD_TASK.VARIANT, 'content': MSG.PLUGIN.ERR_LOAD_TASK.CONTENT});
                         console.error("Error::::", error);
                     });
                 }
             })
             .catch(error => {
                 setOverlay("");
-                setShowPopup({'title': 'Tasks', 'content': "Fail to load tasks!"});
+                setShowPopup({'variant': MSG.PLUGIN.ERR_LOAD_TASK.VARIANT, 'content': MSG.PLUGIN.ERR_LOAD_TASK.CONTENT});
                 console.error("Error::::", error);
             });
         }
@@ -203,11 +203,9 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     
     const Popup = () => (
         <PopupMsg 
-            title={showPopup.title}
+            variant={showPopup.variant}
             content={showPopup.content}
-            submitText="Close"
             close={()=>setShowPopup(false)}
-            submit={()=>setShowPopup(false)}
         />
     )
 

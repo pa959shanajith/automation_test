@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState } from 'react';
-import { RedirectPage} from '../../global';
+import { RedirectPage, Messages as MSG } from '../../global';
 import { useHistory } from 'react-router-dom';
 import * as actionTypes from '../state/action.js';
 import ALMContent from '../components/ALMContent.js';
@@ -52,7 +52,7 @@ const ALM = props => {
         const qcUsername = usernameRef.current.value;
         const domainDetails = await loginQCServer_ICE(qcPassword ,qcURL ,qcUsername);
 
-        if (domainDetails.error) dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: domainDetails.error} });
+        if (domainDetails.error) dispatch({type: actionTypes.SHOW_POPUP, payload: domainDetails.error });
         else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available,Please run the batch file and connect to the Server.");
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
         else if (domainDetails === "Invalid Session"){
@@ -79,21 +79,21 @@ const ALM = props => {
             const userid = user_id;
             const response = await viewQcMappedList_ICE(userid);
             if (response.error){
-                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: response.error}});
+                dispatch({type: actionTypes.SHOW_POPUP, payload: response.error});
             } 
             else if (response.length){
                 dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "ALM" });
                 if (saveFlag) 
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Saved successfully"}});
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.SUCC_SAVE});
                 setMappedFilesRes(response);
             }
             else {
                 if (saveFlag) {
                     dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Saved successfully"}});
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.SUCC_SAVE});
                 }
                 else {
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Mapped Testcase", content: "No mapped details"}});
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.WARN_NO_MAPPED_DETAILS});
                 }
             }
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
@@ -102,7 +102,7 @@ const ALM = props => {
         }
         catch(err) {
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-            dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Failed to Fetch Data."}});
+            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_FETCH_DATA});
         }
     }
     const callExitcenter=()=>{

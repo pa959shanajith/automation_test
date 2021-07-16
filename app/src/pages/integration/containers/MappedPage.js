@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { useDispatch } from 'react-redux';
-import {ScrollBar, PopupMsg} from '../../global';
+import {ScrollBar, PopupMsg, VARIANT, Messages as MSG} from '../../global';
 import MappedLabel from '../components/MappedLabel';
 import { saveUnsyncDetails } from '../api';
 import * as actionTypes from '../state/action';
@@ -167,31 +167,31 @@ const MappedPage = props =>{
 			saveUnsyncDetails(args)
 			.then(data => {
                 if (data.error) 
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: data.error}});
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: data.error});
 				else if(data === "unavailableLocalServer")
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "ICE Engine is not available, Please run the batch file and connect to the Server."}});
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_UNAVAILABLE_ICE});
 				else if(data === "scheduleModeOn")
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.GENERIC.WARN_UNCHECK_SCHEDULE});
 				else if(data === "fail")
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Failed to Save."}});
+                    dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_SAVE});
 				else if(data == "success")
                     props.fetchMappedFiles(true);        
 			})
-			.catch (error => dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Failed to Save."}}))
+			.catch (error => dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_SAVE}))
 		}
-		else dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Save Mapped Testcase", content: "Unmap testcase/scenario before Save"}})
+		else dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.WARN_UNMAP_TC})
     }
     const displayError = (error) =>{
         setPopup({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
     }
     return(
         <Fragment>
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+            {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content} />:null}
             <div  className="integration_middleContent">
                 <div className="viewMap__task_title" >
                     <span className="viewMap__task_name">

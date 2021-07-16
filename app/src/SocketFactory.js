@@ -2,7 +2,7 @@ import React, { useEffect, useState, Fragment} from 'react';
 import socketIOClient from "socket.io-client";
 import {useDispatch, useSelector} from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { ModalContainer, PopupMsg } from './pages/global';
+import { ModalContainer, PopupMsg, VARIANT } from './pages/global';
 import {v4 as uuid} from 'uuid';
 import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
 import * as actionTypes from './pages/login/state/action';
@@ -79,31 +79,31 @@ const SocketFactory = () => {
         setReportData(result)
         
         if (data === "Terminate") {
-            setShowAfterExecution({show:true, title:msg,content: "Execution terminated - By Program." })
+            setShowAfterExecution({show:true, variant:VARIANT.ERROR,content: "Execution terminated - By Program." })
         } 
         else if (data === "UserTerminate") {
-            setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By User." })
+            setShowAfterExecution({show:true, variant:VARIANT.WARNING,content:"Execution terminated - By User." })
         } 
         else if (data === "unavailableLocalServer") {
-            setPopupState({show:true, 'title': 'Execute Test Suite', 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
+            setPopupState({show:true, variant:VARIANT.ERROR, 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
         } 
         else if (data === "success") {
-            setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
+            setShowAfterExecution({show:true, variant:VARIANT.SUCCESS,content:"Execution completed successfully." })
         } else if(data === "Completed"){
-            setPopupState({show:true,'title': 'Scheduled Execution Complete', 'content':msg});
+            setPopupState({show:true, variant:VARIANT.SUCCESS, 'content':msg});
         } else if(data === 'accessibilityTestingSuccess') {
-            setPopupState({show:true, 'title': 'Accessibility Testing ', 'content':msg + ": Accessibility Testing completed Successfully."});
+            setPopupState({show:true, variant:VARIANT.SUCCESS, 'content':msg + ": Accessibility Testing completed Successfully."});
         } else if(data === 'accessibilityTestingTerminate'){
-            setPopupState({show:true, 'title': 'Accessibility Testing ', 'content':"Accessibility Testing Terminated."});
+            setPopupState({show:true, variant:VARIANT.ERROR, 'content':"Accessibility Testing Terminated."});
         }
-        else setPopupState({show:true, 'title': "Execute Test Suite", 'content':"Failed to execute."});
+        else setPopupState({show:true, variant:VARIANT.ERROR, 'content':"Failed to execute."});
     }
 
 
 
     return(
         <Fragment>
-            {popupState.show && <PopupMsg content={popupState.content} title={popupState.title} submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} submitText={"Ok"} />}
+            {popupState.show && <PopupMsg content={popupState.content} variant={popupState.variant} close={()=>setPopupState({show:false})} />}
             { showAfterExecution.show && <PostExecution/> }
         </Fragment>
     )
@@ -117,21 +117,21 @@ const displayExecutionPopup = (value, setPopupState) =>{
         var testSuite = value[val].testSuiteIds;
         var exec = testSuite[0].testsuitename + ": "
         if (data == "begin") continue;
-        if (data == "unavailableLocalServer") data = exec + "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
-        else if (data == "NotApproved") data = exec + "All the dependent tasks (design, scrape) needs to be approved before execution";
-        else if (data == "NoTask") data = exec + "Task does not exist for child node";
-        else if (data == "Modified") data = exec +"Task has been modified, Please approve the task";
-        else if (data == "Completed") data = exec +"Execution Complete";
-        else if (data == "Terminate") data = exec + "Terminated";
-        else if (data == "UserTerminate") data = exec +"Terminated by User"
-        else if (data == "success") data = exec +"success"
-        else if (data == "API Execution Completed") data = exec + "API Execution Completed"
-        else if (data == "API Execution Fail") data = exec + "API Execution Failed"
-        else data = exec + "Failed to execute.";
+        if (data == "unavailableLocalServer"){ data = exec + "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";executionVariant = VARIANT.ERROR;}
+        else if (data == "NotApproved"){ data = exec + "All the dependent tasks (design, scrape) needs to be approved before execution";executionVariant = VARIANT.ERROR;}
+        else if (data == "NoTask"){ data = exec + "Task does not exist for child node";executionVariant = VARIANT.ERROR;}
+        else if (data == "Modified"){ data = exec +"Task has been modified, Please approve the task";executionVariant = VARIANT.ERROR;}
+        else if (data == "Completed"){ data = exec +"Execution Complete";executionVariant = VARIANT.SUCCESS;}
+        else if (data == "Terminate"){ data = exec + "Terminated";executionVariant = VARIANT.ERROR;}
+        else if (data == "UserTerminate"){ data = exec +"Terminated by User";executionVariant = VARIANT.ERROR;}
+        else if (data == "success"){ data = exec +"success";executionVariant = VARIANT.SUCCESS;}
+        else if (data == "API Execution Completed"){ data = exec + "API Execution Completed";executionVariant = VARIANT.SUCCESS;}
+        else if (data == "API Execution Fail"){ data = exec + "API Execution Failed";executionVariant = VARIANT.ERROR;}
+        else{ data = exec + "Failed to execute.";executionVariant = VARIANT.ERROR;}
         msg = msg + "\n" + data;
     }
     if(msg && msg.trim() != ""){
-        setPopupState({show:true,'title': 'Execution Result', 'content':msg});
+        setPopupState({show:true,variant:executionVariant, 'content':msg});
     }
 }
 

@@ -1,6 +1,6 @@
 import React ,  { useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
-import {ScreenOverlay, PopupMsg, ModalContainer, ScrollBar} from '../../global'
+import {ScreenOverlay, ModalContainer, ScrollBar, Messages} from '../../global'
 import { useSelector} from 'react-redux'; 
 import '../styles/ProjectAssign.scss';
 
@@ -25,7 +25,7 @@ const ProjectNew = (props) => {
     const [selectedProject,setSelectedProject] = useState("")
     const [selectedUserId,setSelectedUserId] = useState("")
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
+    const setPopupState=props.setPopupState
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
     // eslint-disable-next-line
     const [showload,setShowload] = useState(false)
@@ -47,8 +47,8 @@ const ProjectNew = (props) => {
     const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -312,16 +312,10 @@ const ProjectNew = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data === 'success') {
-            if (assignedProjects1.length !== 0){
-                setPopupState({show:true,title:"Assign Project",content:"Projects assigned to user successfully"});
-            }
-            else{
-                setPopupState({show:true,title:"Assign Project",content:"Projects unassigned successfully"});
-            } 
+            if (assignedProjects1.length !== 0) displayError(Messages.ADMIN.SUCC_PROJECT_ASSIGN);
+            else displayError(Messages.ADMIN.SUCC_PROJECT_UNASSIGN);
             resetAssignProjectForm();
-        } else {
-            setPopupState({show:true,title:"Assign Project",content:"Failed to assign projects to user"});
-        }
+        } else  displayError(Messages.ADMIN.ERR_PROJECT_ASSIGN)
         fetchUsers();
     }
 
@@ -343,14 +337,9 @@ const ProjectNew = (props) => {
         return diffprjNew
     }
 
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
-    }
-    
     return (
         <ScrollBar thumbColor="#929397">
         <div className="projAssign_container">
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
                 <span>Assign Project</span>

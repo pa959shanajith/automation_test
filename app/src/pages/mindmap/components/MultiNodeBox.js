@@ -13,7 +13,7 @@ const MultiNodeBox = (props) =>{
     const [popup,setPopup] = useState(false)
     return(
         <Fragment>
-            {popup?<PopupMsg submit={()=>setPopup(false)} close={()=>setPopup(false)} title='Error' content='At a time only 10 nodes can be added' submitText='Ok'/>:null}
+            {popup?<PopupMsg variant={popup.variant} close={()=>setPopup(false)} content='At a time only 10 nodes can be added' />:null}
             <ModalContainer 
                 title='Add Node'
                 close={()=>props.setMultipleNode(false)}
