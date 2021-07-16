@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {getAllSuites_ICE , getReportsData_ICE ,getAccessibilityData} from '../api';
+import { updateScrollBar} from '../../global';
 import * as actionTypes from '../state/action';
 import PropTypes from 'prop-types';
 import '../styles/ToolbarMenu.scss';
@@ -145,6 +146,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
         searchRef.current.value = ""
         searchRef.current.disabled = false;
         setModDrop('semi')
+        setTimeout(()=>{updateScrollBar()}, 2001);
     }
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
