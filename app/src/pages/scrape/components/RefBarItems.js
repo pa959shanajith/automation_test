@@ -84,7 +84,7 @@ const RefBarItems = props => {
 			let top=0; let left=0; let height=0; let width=0;
 
 			if (ScrapedObject.top){
-				top = ScrapedObject.top * dsRatio;
+				ScrapedObject.viewTop != undefined ? top = ScrapedObject.viewTop * dsRatio : top = ScrapedObject.top * dsRatio;
 				left = ScrapedObject.left * dsRatio;
 				height = ScrapedObject.height * dsRatio;
 				width = ScrapedObject.width * dsRatio;

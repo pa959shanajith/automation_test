@@ -554,6 +554,9 @@ function generateScrapeItemList(lastIdx, viewString, type="old"){
                             height: scrapeObject.height,
                             width: scrapeObject.width,
                         }
+        if (scrapeObject.fullSS != undefined && !scrapeObject.fullSS && scrapeObject.viewTop!=undefined) {
+            scrapeItem['viewTop'] = scrapeObject.viewTop;
+        }
 
         
         if (type === "new") scrapeItem.tempOrderId = newUUID;
