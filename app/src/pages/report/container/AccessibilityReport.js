@@ -1,10 +1,6 @@
 import React, { useState, Fragment, useEffect } from 'react';
-import ModuleList from '../components/ModuleList';
-import ToolbarMenu from '../components/ToolbarMenu';
-import { ScreenOverlay ,PopupMsg, ScrollBar} from '../../global';
 import { useDispatch } from 'react-redux';
 import AccExecPanel from '../components/AccExecPanel';
-import ScStatusPanel from '../components/ScStatusPanel';
 import AccDetailPanel from '../components/AccDetailPanel';
 import * as actionTypes from '../state/action';
 import '../styles/AccessibilityReport.scss';

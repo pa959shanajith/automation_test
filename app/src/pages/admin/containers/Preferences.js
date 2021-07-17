@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
+import {ScreenOverlay, ScrollBar} from '../../global' 
 import {getPreferences} from '../api';
 import '../styles/Preferences.scss'
 
@@ -12,7 +12,7 @@ import '../styles/Preferences.scss'
 const Preferences = (props) => {
     const [loading,setLoading] = useState(false)
     const [resultList,setResultList] = useState([])
-    const [popup,setPopup] = useState({show:false})
+    const setPopup = props.setPopupState;
     var rows = ["ALM","Mindmap","Reports","Utility"];
 
     useEffect(()=>{
@@ -29,8 +29,8 @@ const Preferences = (props) => {
     const displayError = (error) =>{
         setLoading(false)
         setPopup({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -39,7 +39,6 @@ const Preferences = (props) => {
     return (
         <ScrollBar thumbColor="#929397">
         <div className="preferences_container">
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName"><span>Preferences</span></div>
             

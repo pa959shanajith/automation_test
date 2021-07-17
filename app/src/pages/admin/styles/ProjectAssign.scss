@@ -1,3 +1,5 @@
+@import "../../global/styles/ColorVariables.scss";
+
 #selAssignUser{
     margin-left: 37px;
 }
@@ -14,7 +16,7 @@
 
 .project-left2 {
     float: left;
-    background: #fff;
+    background: $whiteColor;
     width: 100%;
     border-radius: 3px;
     display: flex;
@@ -39,7 +41,7 @@
     padding-bottom: 5%;
 }
  #assignedProjectAP:hover,#allProjectAP:hover {
-    background-color: #fff;
+    background-color: $whiteColor;
 }
  #allProjectAP,#assignedProjectAP {
     width: 100%;
@@ -52,17 +54,17 @@
     font-family: LatoWebMedium;
     height: 30%;
     padding: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid $borderFour;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     -o-border-radius: 3px;
     -ms-border-radius: 3px;
-    box-shadow: inset 0px 1px 6px #ddd;
-    -moz-box-shadow: inset 0px 1px 6px #ddd;
-    -webkit-box-shadow: inset 0px 1px 6px #ddd;
-    -o-box-shadow: inset 0px 1px 6px #ddd;
-    -ms-box-shadow: inset 0px 1px 6px #ddd;
+    box-shadow: inset 0px 1px 6px $borderFour;
+    -moz-box-shadow: inset 0px 1px 6px $borderFour;
+    -webkit-box-shadow: inset 0px 1px 6px $borderFour;
+    -o-box-shadow: inset 0px 1px 6px $borderFour;
+    -ms-box-shadow: inset 0px 1px 6px $borderFour;
 }
 
 @media screen and (min-height: 1000px) and (max-height: 1080px){
@@ -111,9 +113,9 @@
     outline: none;
     margin-bottom: 15px;
     padding: 6px 12px;
-    background: #643693;
+    background: $primaryColor;
     border: none;
-    color: #fff;
+    color: $whiteColor;
     border-radius: 3px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
@@ -137,7 +139,7 @@
     user-select: none;
 }
 select[multiple]:focus option:checked {
-	background: #633691 linear-gradient(0deg, #633691 0%, #633691 100%);
+	background: $primaryColor linear-gradient(0deg, $primaryColor 0%, $primaryColor 100%);
 }
 select[multiple]:-internal-list-box option:checked {
 	background: none;
@@ -150,7 +152,7 @@ select[size] {
   }
 
 .selected-project{
-    background-color: #633691 !important;
+    background-color: $primaryColor !important;
     color:white !important;
 }  
 
@@ -162,7 +164,7 @@ select[size] {
 	margin-left: 4%;
 	margin-top: 3px;
 	line-height: 2;
-    border: 1px solid #656565 !important;
+    border: 1px solid $borderOne !important;
     -webkit-text-stroke: thin;
 }
 .adminSelect-project-assign:focus {
@@ -173,10 +175,10 @@ select[size] {
         width: 8px;
     }
     &::-webkit-scrollbar-thumb {
-        background-color: #929397;
+        background-color: $backgroundTwo;
         border: 1px solid transparent;
-        border-left-color: #e6e7e9;
-        border-right-color: #e6e7e9;
+        border-left-color: $borderThree;
+        border-right-color: $borderThree;
         -webkit-border-radius: 10px;
         -moz-border-radius: 10px;
         border-radius: 10px; 
@@ -191,8 +193,8 @@ select[size] {
     border-top: 1px solid #e5e5e5;
 }
 .modal-footer-edit button {
-    background: #643693;
-    color: #fff;
+    background: $primaryColor;
+    color: $whiteColor;
     border: 0;
     border-radius: 20px;
     padding: 5px 20px;

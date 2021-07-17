@@ -1,5 +1,5 @@
 import React , { useState} from 'react';
-import {ModalContainer} from '../../global' 
+import {ModalContainer, Messages as MSG} from '../../global' 
 import '../styles/IntegrationDropDown.scss'
 import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE } from '../../execute/api';
 
@@ -28,7 +28,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             setErrorMsg("Please "+placeholder[type].password);
 		} else if (appType !== "SAP" && browserTypeExe.length === 0) {
             setshowModal(false);
-            setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
+            displayError(MSG.EXECUTE.WARN_SELECT_BROWSER);
         }
         else {
             setErrorMsg("");

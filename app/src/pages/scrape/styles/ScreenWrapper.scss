@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .ss__content{
     display: flex;
     flex-direction: column;
@@ -5,7 +6,7 @@
     min-width: 0;
     padding: 20px;
     margin: 0 5px;
-    background-color: #fff;
+    background-color: $whiteColor;
 }
 
 .ss__task_title{
@@ -15,8 +16,8 @@
 
 .ss__task_name{
     cursor: pointer;
-    background-color: #331d4e;
-    color: #fff;
+    background-color: $primaryColorDarkest;
+    color: $whiteColor;
     padding: 1px 14px 0;
     font-family: "LatoWebLight";
     font-size: 18px;

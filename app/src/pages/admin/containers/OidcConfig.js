@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, RedirectPage, ModalContainer, ScrollBar} from '../../global' 
+import {ScreenOverlay, RedirectPage, ModalContainer, ScrollBar, VARIANT, Messages as MSG} from '../../global' 
 import {getOIDCConfig, manageOIDCConfig} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import { useHistory } from 'react-router-dom';
@@ -16,7 +16,6 @@ const OidcConfig = (props) => {
     const history = useHistory();
     const [oidcEdit,setOidcEdit] = useState(false)
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     const [name,setName] = useState("")
     const [url,setUrl] = useState("")
     const [clientId,setClientId] = useState("")
@@ -27,6 +26,7 @@ const OidcConfig = (props) => {
     const [secretErrBorder,setSecretErrBorder] = useState(false)
     const [selBox,setSelBox] = useState([])
     const [showDeleteModal,setshowDeleteModal] = useState(false)
+    const setPopupState = props.setPopupState
 
     useEffect(()=>{
         setOidcEdit(false);
@@ -48,8 +48,8 @@ const OidcConfig = (props) => {
     const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -62,7 +62,7 @@ const OidcConfig = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if(data === "empty") {
-            setPopupState({show:true,title:"Edit Configuration",content:"There are no configurations created yet."});
+            displayError(MSG.ADMIN.WARN_EMPTY_CONFIG);
             setSelBox([]);
         } else {
             data.sort();
@@ -78,7 +78,7 @@ const OidcConfig = (props) => {
 		const data = await getOIDCConfig(name);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if(data === "empty") setPopupState({show:true,title:"Edit Configuration",content:failMsg + "No such configuration exists"});
+        if(data === "empty") setPopupState({show:true,variant:VARIANT.ERROR,content:failMsg + "No such configuration exists"});
         else {
             setUrl(data.url);
             setClientId(data.clientid);
@@ -114,17 +114,17 @@ const OidcConfig = (props) => {
         } else if(data === "success") {
             if (action === "create") oidcReset();
             else onClickEditButton();
-            setPopupState({show:true,title:popupTitle,content: "Configuration '"+confObj.name+"' "+action+"d successfully!"});
+            setPopupState({show:true,variant : VARIANT.SUCCESS,content: "Configuration '"+confObj.name+"' "+action+"d successfully!"});
         } else if(data === "exists") {
             setNameErrBorder(true);
-            setPopupState({show:true,title:popupTitle,content: "Configuration '"+confObj.name+"' already Exists!"});
+            setPopupState({show:true,variant : VARIANT.WARNING,content: "Configuration '"+confObj.name+"' already Exists!"});
         } else if(data === "fail") {
             if (action === "create") oidcReset();
             else onClickEditButton();
-            setPopupState({show:true,title:popupTitle,content: "Failed to "+action+" '"+confObj.name+"' configuration."});
+            setPopupState({show:true,variant : VARIANT.ERROR,content: "Failed to "+action+" '"+confObj.name+"' configuration."});
         } else if(/^1[0-3]{4}$/.test(data)) {
             if (JSON.parse(JSON.stringify(data)[1])) {
-                setPopupState({show:true,title:popupTitle,content: failMsg+" Invalid Request!"});
+                setPopupState({show:true,variant : VARIANT.ERROR,content: failMsg+" Invalid Request!"});
                 return;
             }
             let errHints = "<br/>";
@@ -133,7 +133,7 @@ const OidcConfig = (props) => {
             if (JSON.parse(JSON.stringify(data)[3]) === 2) errHints += "Issuer must start with http:// or https://<br/>";
             if (JSON.parse(JSON.stringify(data)[4])) setClientIdErrBorder(true);
             if (JSON.parse(JSON.stringify(data)[5])) setSecretErrBorder(true);
-            setPopupState({show:true,title:popupTitle,content: "Some values are Invalid!" + errHints});
+            setPopupState({show:true,variant : VARIANT.WARNING,content: "Some values are Invalid!" + errHints});
         }
     }
 
@@ -151,8 +151,8 @@ const OidcConfig = (props) => {
 			flag = false;
 		} else if (!regExName.test(name) && action === "create") {
             setNameErrBorder(true);
-            setPopupState({show:true,title:"Error",content:"Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen."});
-			flag = false;
+            displayError(MSG.ADMIN.WARN_INVALID_SERVER_NAME);
+            flag = false;
 			popped = true;
 		}
 		if (url === "") {
@@ -160,7 +160,7 @@ const OidcConfig = (props) => {
 			flag = false;
 		} else if (regExURL.test(url) === false) {
 			setUrlErrBorder(true);
-			if (!popped)setPopupState({show:true,title:"Error",content:"Invalid URL provided! URL must start with http:// or https://"});
+			if (!popped)displayError(MSG.ADMIN.WARN_INVALID_URL);
 			flag = false;
 			popped = true;
 		}
@@ -179,10 +179,6 @@ const OidcConfig = (props) => {
         setshowDeleteModal(true);
     }
 
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
-    }
-
     const closeModal = () =>{
         setshowDeleteModal(false);
     }
@@ -195,7 +191,6 @@ const OidcConfig = (props) => {
     return (
         <ScrollBar thumbColor="#929397">
         <div className="oidc_container">
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <div id="page-taskName"><span>{(oidcEdit===false)?"Create OpenID Connect Configuration":"Edit OpenID Connect Configuration"}</span></div>

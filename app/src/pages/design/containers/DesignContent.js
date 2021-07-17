@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScreenOverlay, RedirectPage, ScrollBar, ModalContainer } from '../../global'
+import { ScreenOverlay, RedirectPage, ScrollBar, ModalContainer, VARIANT, Messages as MSG } from '../../global'
 import { getObjNameList, getKeywordList } from '../components/UtilFunctions';
 import TableRow from '../components/TableRow';
 import DetailsDialog from '../components/DetailsDialog';
@@ -60,6 +60,7 @@ const DesignContent = props => {
     const [headerCheck, setHeaderCheck] = useState(false);
     const [draggedFlag, setDraggedFlag] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
+    const [reusedTC, setReusedTC] = useState(false);
     const [pastedTC, setPastedTC] = useState([]);
     let runClickAway = true;
     const emptyRowData = {
@@ -108,7 +109,10 @@ const DesignContent = props => {
         if (props.imported) {
             fetchTestCases()
             .then(data=>{
-                data !== "success" && props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
+                if (data==="success") 
+                    props.setShowPop(MSG.DESIGN.SUCC_TC_IMPORT);
+                else 
+                props.setShowPop(MSG.DESIGN.WARN_DELETED_TC_FOUND);
                 props.setImported(false)
                 setStepSelect({edit: false, check: [], highlight: []});
                 setChanged(false);
@@ -124,7 +128,7 @@ const DesignContent = props => {
             fetchTestCases()
             .then(data=>{
                 data !== "success" &&
-                props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
+                props.setShowPop(MSG.DESIGN.WARN_DELETED_TC_FOUND);
                 setEdit(false);
                 setStepSelect({edit: false, check: [], highlight: []});
                 headerCheckRef.current.indeterminate = false;
@@ -149,17 +153,11 @@ const DesignContent = props => {
             .then(data => {
                 if (data === "Invalid Session") return RedirectPage(history);
                 
-                let changeFlag = false
                 let taskObj = props.current_task
                 if(data.screenName && data.screenName !== taskObj.screenName){
                     taskObj.screenName = data.screenName;
-                    changeFlag = true
+                    dispatch({type: pluginActions.SET_CT, payload: taskObj});
                 }
-                if(data.reuse && data.reuse !== taskObj.reuse){
-                    taskObj.reuse = "True";
-                    changeFlag = true
-                }
-                if (changeFlag) dispatch({type: pluginActions.SET_CT, payload: taskObj});
 
                 if(data.del_flag){
                     deleteObjectFlag = true; // Flag for DeletedObjects Popup
@@ -168,6 +166,7 @@ const DesignContent = props => {
                 else props.setDisableActionBar(false); //enable left-top-section
                 
                 setHideSubmit(data.testcase.length === 0);
+                setReusedTC(data.reuse);
 
                 DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
                     .then(scriptData => {
@@ -218,7 +217,7 @@ const DesignContent = props => {
                                 setTestScriptData(null);
                                 setKeywordList(null);
                                 setObjNameList(null);
-                                props.setShowPop({'title': 'Fetch Testcases', 'content': 'Failed to Fetch Testcases!'});
+                                props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
                                 console.error("Error getObjectType method! \r\n " + (error.data));
                                 reject("fail");
                             });
@@ -229,7 +228,7 @@ const DesignContent = props => {
                         setTestScriptData(null);
                         setKeywordList(null);
                         setObjNameList(null);
-                        props.setShowPop({'title': 'Fetch Testcases', 'content': 'Failed to Fetch Testcases!'});
+                        props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
                         console.error("Error getObjectType method! \r\n " + (error));
                         reject("fail");
                     });
@@ -240,15 +239,20 @@ const DesignContent = props => {
                 setTestScriptData(null);
                 setKeywordList(null);
                 setObjNameList(null);
-                props.setShowPop({'title': 'Fetch Testcases', 'content': 'Failed to Fetch Testcases!'});
+                props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
                 console.error("Error getTestScriptData method! \r\n " + (error));
                 reject("fail");
             });
         });
     };
     
-    const saveTestCases = () => {
+    const saveTestCases = (e, confirmed) => {
         if (userInfo.role !== "Viewer") {
+            if (reusedTC && !confirmed) {
+                props.setShowConfirmPop({'title': 'Save Testcase', 'content': 'Testcase has been reused. Are you sure you want to save?', 'onClick': ()=>{props.setShowConfirmPop(false);saveTestCases(null, true)}});
+                return;
+            }
+
             let { screenId, testCaseId, testCaseName, versionnumber } = props.current_task;
             let import_status = false;
 
@@ -263,7 +267,7 @@ const DesignContent = props => {
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
                         let col = "Object Name";
                         if (!testCases[i].keywordVal) col = "keyword";
-                        props.setShowPop({'title': 'Save Testcase', 'content': `Please select ${col} Name at Step No. ${step}`});
+                        props.setShowPop({'VARIANT': VARIANT.WARNING, 'CONTENT': `Please select ${col} Name at Step No. ${step}`});
                         errorFlag = true;
                         break;
                     } else {
@@ -330,22 +334,22 @@ const DesignContent = props => {
                                             .then(msg=>{
                                                 setChanged(false);
                                                 msg === "success"
-                                                ? props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'})
-                                                : props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."})
+                                                ? props.setShowPop(MSG.DESIGN.SUCC_TC_SAVE)
+                                                : props.setShowPop(MSG.DESIGN.WARN_DELETED_TC_FOUND)
                                             })
                                             .catch(error => {
-                                                props.setShowPop({'title': 'Fetch Testcases', 'content': 'Failed to Fetch Testcases!'});
+                                                props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
                                                 console.error("Error: Fetch TestCase Failed ::::", error)
                                             });
-                                        } else props.setShowPop({'title': 'Save Testcase', 'content': 'Failed to save Testcase'});
+                                        } else props.setShowPop(MSG.DESIGN.ERR_SAVE_TC);
                                     })
                                     .catch(error => {
-                                        props.setShowPop({'title': 'Save Testcases', 'content': 'Failed to Save Testcases!'});
+                                        props.setShowPop(MSG.DESIGN.ERR_SAVE_TC);
                                         console.error("Error::::", error)
                                     })
                                 })
                                 .catch(error=> {
-                                    props.setShowPop({'title': 'Save Testcases', 'content': 'Failed to Save Testcases!'});
+                                    props.setShowPop(MSG.DESIGN.ERR_SAVE_TC);
                                     console.error("Error:::::", error)
                                 });
                             }
@@ -354,23 +358,23 @@ const DesignContent = props => {
                                 .then(data=>{
                                     setChanged(false);
                                     data === "success" 
-                                    ? props.setShowPop({'title': 'Save Testcase', 'content': 'Testcase saved successfully'}) 
-                                    : props.setShowPop({ "title": "Deleted objects found", "content": "Deleted objects found in some teststeps, Please delete or modify those steps."});
+                                    ? props.setShowPop(MSG.DESIGN.SUCC_TC_SAVE) 
+                                    : props.setShowPop(MSG.DESIGN.WARN_DELETED_TC_FOUND);
                                 })
                                 .catch(error=>{
-                                    props.setShowPop({'title': 'Fetch Testcases', 'content': 'Failed to Fetch Testcases!'});
+                                    props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
                                     console.error("Error: Fetch TestCase Failed ::::", error)
                                 });
                             }
-                        } else props.setShowPop({'title':'Save Testcase', 'content':'Failed to save Testcase'});
+                        } else props.setShowPop(MSG.DESIGN.ERR_SAVE_TC);
                     })
                     .catch(error => { 
-                        props.setShowPop({'title': 'Save Testcases', 'content': 'Failed to Save Testcases!'});
+                        props.setShowPop(MSG.DESIGN.ERR_SAVE_TC);
                         console.error("Error::::", error);
                     });
                     errorFlag = false;
                 }
-            } else props.setShowPop({'title':'Save Testcase', 'content':'ScreenID or TestscriptID is undefined'});
+            } else props.setShowPop(MSG.DESIGN.ERR_UNDEFINED_SID_TID);
         }
         setStepSelect({edit: false, check: [], highlight: []});
         headerCheckRef.current.indeterminate = false;
@@ -430,13 +434,13 @@ const DesignContent = props => {
 
         reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
         .then(result => {
-            if (result === "fail") props.setShowPop({'title': 'Task Submission Error', 'content': 'Reviewer is not assigned !'});
-            else if (taskstatus === 'reassign') props.setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});
-            else if (taskstatus === 'underReview') props.setShowPop({'title': "Task Completion Success", 'content': "Task Approved successfully!", onClick: ()=>redirectToPlugin()});
-            else props.setShowPop({'title': "Task Submission Success", 'content': "Task Submitted successfully!", onClick: ()=>redirectToPlugin()});
+            if (result === "fail") props.setShowPop(MSG.GENERIC.WARN_NO_REVIEWER);
+            else if (taskstatus === 'reassign') props.setShowPop({'VARIANT': VARIANT.SUCCESS, 'CONTENT': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});
+            else if (taskstatus === 'underReview') props.setShowPop({'VARIANT': VARIANT.SUCCESS, 'content': "Task Approved successfully!", onClick: ()=>redirectToPlugin()});
+            else props.setShowPop({'VARIANT': VARIANT.SUCCESS, 'content': "Task Submitted successfully!", onClick: ()=>redirectToPlugin()});
         })
         .catch(error => {
-            props.setShowPop({'title': 'Task Submission Error', 'content': 'Failed to Submit Task!'});
+            props.setShowPop(MSG.DESIGN.ERR_SUBMIT_TASK);
             console.error(error)
         })
         
@@ -445,9 +449,9 @@ const DesignContent = props => {
 
     const deleteTestcase = () => {
         let testCases = [...testCaseData]
-        if (testCases.length === 1 && !testCases[0].custname) props.setShowPop({'title': 'Delete Testcase step', 'content': 'No steps to Delete'});
-        else if (stepSelect.check.length <= 0) props.setShowPop({'title': 'Delete Test step', 'content': 'Select steps to delete'});
-        else if (props.current_task.reuse === 'True') props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase is been reused. Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
+        if (testCases.length === 1 && !testCases[0].custname) props.setShowPop(MSG.DESIGN.WARN_DELETE);
+        else if (stepSelect.check.length <= 0) props.setShowPop(MSG.DESIGN.WARN_SELECT_STEP);
+        else if (reusedTC) props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': ()=>{props.setShowConfirmPop(false);onDeleteTestStep()}});
         else props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
     }
 
@@ -519,7 +523,7 @@ const DesignContent = props => {
         let highlight = [...stepSelect.highlight]
         let focus = [];
         runClickAway = false;
-        if (check.length === 0 && highlight.length === 0) props.setShowPop({'title': 'Edit Step', 'content': 'Select step to edit'});
+        if (check.length === 0 && highlight.length === 0) props.setShowPop(MSG.DESIGN.WARN_SELECT_STEP_DEL);
         else {
             if (check.length === 1) focus = check;
             else if (highlight.length === 1 && !check.length) { focus = highlight; check = highlight }
@@ -549,13 +553,13 @@ const DesignContent = props => {
         let copyTestCases = []
         let copyContent = {}
         let copyErrorFlag = false;
-        if (selectedRows.length === 0) props.setShowPop({'title': 'Copy Test Step', 'content': 'Select step to copy'});
+        if (selectedRows.length === 0) props.setShowPop(MSG.DESIGN.WARN_SELECT_STEP_COPY);
         else{
             let sortedSteps = selectedRows.map(step=>parseInt(step)).sort((a,b)=>a-b)
             for (let idx of sortedSteps) {
                 if (!testCaseData[idx].custname) {
-                    if (selectedRows.length === 1) props.setShowPop({'title': 'Copy Test Step', 'content': 'Empty step can not be copied.'});
-                    else props.setShowPop({'title': 'Copy Test Step', 'content': 'The operation cannot be performed as the steps contains invalid/blank object references'});
+                    if (selectedRows.length === 1) props.setShowPop(MSG.DESIGN.ERR_EMPTY_TC_COPY);
+                    else props.setShowPop(MSG.DESIGN.ERR_INVALID_OBJ_REF);
                     copyErrorFlag = true;
                     break
                 } 
@@ -580,7 +584,7 @@ const DesignContent = props => {
         setStepSelect(oldState => ({...oldState, highlight: []}));
 
         if (!copiedContent.testCaseId){
-            props.setShowPop({'title': 'Paste Test Step', 'content': 'No Testcases to Paste! Please Copy Testcase(s) before Pasting.'});
+            props.setShowPop(MSG.DESIGN.WARN_NO_TC_PASTE);
             return;
         }
 
@@ -593,7 +597,7 @@ const DesignContent = props => {
                 }
             }
             if (copiedContent.appType !== props.current_task.appType && appTypeFlag) {
-                props.setShowPop({'title': 'Paste Test Step', 'content': 'Project Type is not same.'});
+                props.setShowPop(MSG.DESIGN.WARN_DIFF_PROJTYPE);
             }
             else{
                 setShowConfPaste(true);
@@ -657,9 +661,9 @@ const DesignContent = props => {
         let highlighted = [...stepSelect.highlight];
         let testCases = [ ...testCaseData ]
         runClickAway = false;
-        if (highlighted.length === 0 && selectedIndexes.length === 0) props.setShowPop({'title': 'Skip Testcase step', 'content': 'Please select step to skip'});
-        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) props.setShowPop({'title': 'Comment step', 'content': 'Empty step can not be commented.'});
-        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) props.setShowPop({'title': 'Comment step', 'content': 'Empty step can not be commented.'});
+        if (highlighted.length === 0 && selectedIndexes.length === 0) props.setShowPop(MSG.DESIGN.WARN_SELECT_STEP_SKIP);
+        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) props.setShowPop(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
+        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) props.setShowPop(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
         else{
             let toComment = [...new Set([...highlighted, ...selectedIndexes])]; 
             for(let idx of toComment){

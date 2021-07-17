@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .mindmap__option-container{
     position: absolute;
     display: block;
@@ -7,7 +8,7 @@
     -moz-transform: translateX(50%) translateY(50%);
     -webkit-transform: translateX(-50%) translateY(-50%);
     -ms-transform: translateX(-45%) translateY(-45%);
-    background-color: #e6e7e9;
+    background-color: $borderThree;
     min-width: 496px;
     min-height: 200px;
     max-height: 275px;
@@ -28,7 +29,7 @@
 .mindmap__option-box {
     flex-grow: 1;
     text-align: center;
-    border-right: 1px solid #ccc;
+    border-right: 1px solid $borderTwo;
     position: relative;
     min-width: 33%;
 }

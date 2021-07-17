@@ -1,6 +1,6 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
 import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap , pdProcess, importGitMindmap} from '../api';
-import {ModalContainer } from '../../global'
+import {ModalContainer, Messages as MSG } from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
@@ -96,7 +96,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     }
                     var importProj = data.projectid
                     if(!importProj || !projList[importProj]){
-                        displayError('This project is not assigned to user')
+                        displayError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
                         return;
                     }
                     var res = await importMindmap(data)
@@ -272,7 +272,7 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
             if (!validNodeDetails(e.name)) validate = false;
         });
         if(!validate){
-            displayError('Some node names are invalid!');return;
+            displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
         }
         mindmapData = {createnew:true,importData:{createdby:'excel',data:res}} 
     }
@@ -336,7 +336,7 @@ const uploadFile = async({uploadFileRef,setSheetList,setError,setFiledUpload,pro
             }else{
                 var importProj = data.projectid
                 if(!importProj || !projList[importProj]){
-                    setError('This project is not assigned to user')
+                    setError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
                     setBlockui({show:false})
                     return;
                 }

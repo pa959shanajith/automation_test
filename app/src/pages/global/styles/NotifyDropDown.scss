@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 #notify-dropdown{
     left: -350px;
     .message-box{
@@ -7,15 +8,15 @@
             position: absolute;
             right: 20px;
             font-size: 12px;
-            color: #764ba2;
+            color: $primaryColorLight;
             cursor: pointer;
         }
         .clear:hover{
-            color: red;
+            color: $red;
         }
     }
     .divider {
-        background-color: #eee;
+        background-color: $whisper;
         width: 100%;
         margin: 9px 0;
         height: 1px;
@@ -24,7 +25,7 @@
         white-space: normal !important;
         padding: 10px;
         span{
-            color: #764ba2;
+            color: $primaryColorLight;
             font-family: LatoWebBold;
             font-size: 14px;
             user-select: none;

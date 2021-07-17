@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .plugin-bg-container{
     display: flex;
     flex-flow: column;
@@ -57,7 +58,7 @@
     flex-shrink: 0;
     height: 95%;
     width: 2px;
-    background-color: #888;
+    background-color: $pluginGray;
 }
 
 @media screen and (max-width: 1000px){

@@ -19,8 +19,8 @@ const  ChatBot = (props) => {
 
     const displayError = (error) =>{ //the default display error funtion used in each component
         setPopup({
-          title:'ERROR',
-          content:error,
+          variant:error.VARIANT,
+          content:error.CONTENT,
           submitText:'Ok',
           show:true
         })
@@ -63,7 +63,7 @@ const  ChatBot = (props) => {
     }
     return (
         <Fragment>
-        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+        {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content} />:null}
         <div id="assistWrap" className="filter__pop" >
             <h4 className="pop_header">
                 <img className="assist-image" alt="message" src="static/imgs/ic-message.png"/>

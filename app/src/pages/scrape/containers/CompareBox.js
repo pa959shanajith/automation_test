@@ -56,7 +56,7 @@ const CompareBox = props => {
             </div>
             <div data-test="compareList"className="ss__cmprList" id="cmprObjId">
                 <ScrollBar scrollId="cmprObjId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                    {objectList.map( (object, index) => <ScrapeObject key={index} updateChecklist={updateChecklist} hideCheckbox={props.hideCheckbox} notEditable={true} idx={index} object={object}/>)}
+                    {objectList.map( (object, index) => <ScrapeObject key={index} updateChecklist={updateChecklist} hideCheckbox={props.hideCheckbox} notEditable={true} idx={index} object={object} comparedObject={true} />)}
                 </ScrollBar>
             </div>
         </div>

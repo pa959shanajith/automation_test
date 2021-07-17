@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import ThumbnailSchedule from './ThumbnailSchedule';
-import {PopupMsg, ModalContainer} from '../../global';
+import { ModalContainer} from '../../global';
 import "../styles/ActionBarItems.scss"
 
 // todo: after pull add bottomcontent two icons smart scheduling 
@@ -50,12 +50,15 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
     return (
         <>
             {popupState.show?
-                <PopupMsg 
+                <ModalContainer 
                     content={popupState.content} 
                     title={popupState.title} 
-                    submit={()=>{setPopupState({show:false}); setSmartMode("smartModule");}} 
-                    close={()=>setPopupState({show:false})} 
-                    submitText={"Ok"} 
+                    footer={
+                        <>
+                            <button onClick={()=>{setPopupState({show:false}); setSmartMode("smartModule");}}>Ok</button>
+                        </>
+                    }
+                    close={()=>setPopupState({show:false})}
                 />
             :null}
             {smartScenario?

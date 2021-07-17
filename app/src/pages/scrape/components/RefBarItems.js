@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
-import { ReferenceBar, ScrollBar, RedirectPage } from '../../global';
+import { ReferenceBar, ScrollBar, RedirectPage, Messages } from '../../global';
 import  * as ScrapeFilter  from './FilterScrapeObjects';
 import * as list from './ListVariables';
 import { ScrapeContext } from './ScrapeContext';
@@ -88,9 +88,8 @@ const RefBarItems = props => {
 			if (appType === 'OEBS' && ScrapedObject.hiddentag === 'True'){
 				setHighlight(false)
 				setPopupState({show:true,title:"Element Highlight",content:"Element: " + ScrapedObject.custname + " is Hidden."});
-			}
-			else if (ScrapedObject.top){
-				top = ScrapedObject.top * dsRatio;
+			} else if (ScrapedObject.top) {
+				ScrapedObject.viewTop != undefined ? top = ScrapedObject.viewTop * dsRatio : top = ScrapedObject.top * dsRatio;
 				left = ScrapedObject.left * dsRatio;
 				height = ScrapedObject.height * dsRatio;
 				width = ScrapedObject.width * dsRatio;
@@ -122,7 +121,7 @@ const RefBarItems = props => {
 				highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
 					.then(data => {
 						if (data === "Invalid Session") return RedirectPage(history);
-						if (data === "fail") setShowPop({title: "Fail", content: "Failed to highlight"})
+						if (data === "fail") setShowPop(Messages.SCRAPE.ERR_HIGHLIGHT)
 					})
 					.catch(error => console.error("Error while highlighting. ERROR::::", error));
 			}
@@ -224,7 +223,7 @@ const RefBarItems = props => {
                 <h4 className="pop__header" onClick={()=>setShowFilterPop(false)}><span className="pop__title">Filter</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                 <div data-test="popupFilterContent" className="filter_pop__content">
 					<div className="scrape__filterActionBtns">
-					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length}/><span>Select All</span></div>
+					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length} readOnly/><span>Select All</span></div>
 					{ appType === "MobileApp" && 
 						<select className="scrape__mobileType" onChange={toggleMobileType} value={currMobileType}>
 							<option value="Android" >Android</option>

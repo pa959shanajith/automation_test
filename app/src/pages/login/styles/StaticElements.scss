@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .bg-container{
     display: flex;
     flex-flow: column;
@@ -6,7 +7,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: #edeaff;
+    background-color: $whisper;
 }
 
 .element-holder{
@@ -41,7 +42,7 @@
     justify-content: center;
     margin-right: 10%;
     width: 290px;
-    background: #FFF;
+    background: $whiteColor;
     padding: 5% 4%;
     border-radius: 50px;
     box-sizing: content-box;
@@ -59,7 +60,7 @@
 .greet-text{
     z-index: 1;
     flex-grow: 1;
-    color: #643693;
+    color: $primaryColor;
     font-family: "LatoWebMedium";
     
     h1 {

@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .mp__container{
     height: 100vh;
     width: 100%;
@@ -17,7 +18,7 @@
     display: flex;
     flex: auto;
     width: 100%;
-    background-color: #fff;
+    background-color: $whiteColor;
     margin: 0;
     padding: 0;
     /* min-width: 768px; */
@@ -49,10 +50,10 @@
     margin-bottom: 37px;
 }
 .mp__ic_box .ic_box img:hover{
-    background: #523176;
+    background: $hovorIcon;
     border-radius: 5px;
 }
 .selected_rb_thumb{
-    background: #331d4c;
+    background: $primaryColorDarkest;
     border-radius: 5px;
 }

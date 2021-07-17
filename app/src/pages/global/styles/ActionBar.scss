@@ -1,6 +1,7 @@
+@import "../../global/styles/ColorVariables.scss";
 .action__bar{
     // width: 166px;
-    background: #633691;
+    background: $primaryColor;
     position: absolute;
     display: flex;
     flex-direction: column;
@@ -34,7 +35,7 @@
     display: flex;
     height: 100%;
     // width: 6px;
-    color: #fff;
+    color: $whiteColor;
     left: 0;
     float: left;
     flex: 0 0 6px;
@@ -47,7 +48,7 @@
     position: absolute;
     display: flex!important;
     align-items: center;
-    color: #444;
+    color: $primaryText;
     width: 6px;
     height: 25px;
     top: 50%;
@@ -63,7 +64,7 @@
 }
 
 .ab__upper_contents{
-    border-bottom: 2px solid #461F6E;
+    border-bottom: 2px solid $blueViolet;
 }
 
 .ab__contents{
@@ -109,7 +110,7 @@
 //         top: 50%;
 //     }
 //     .ab__upper_contents{
-//         border-bottom: 0.26vh solid #461F6E;
+//         border-bottom: 0.26vh solid $blueViolet;
 //     }
 //     .ab__bottom_contents{
 //         font-size: 2.08vh;

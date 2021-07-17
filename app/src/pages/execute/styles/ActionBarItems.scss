@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 
 .e__thumbnail input[type='checkbox']{
     width: 18px;
@@ -29,11 +30,11 @@
     align-items: center;
     font-family: "LatoWebLight";
     font-size: 12px;
-    color: #eee9ff;
+    color: $whisper;
     margin: 10% 0 5%;
     cursor: pointer;
     &:hover .e__parallel_icon__img, &:hover .e__parallel_icon__svg{
-        background-color: #523176;
+        background-color: $hovorIcon;
     }
 }
 .e__parallel_icon__img{

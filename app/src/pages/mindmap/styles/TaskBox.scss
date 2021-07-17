@@ -1,7 +1,8 @@
+@import "../../global/styles/ColorVariables.scss";
 .task-box__container{
     position: absolute;
     width: 270px;
-    background-color: #fff;
+    background-color: $whiteColor;
     padding: 12.5px;
     border: 1px solid #c8c8c8;
     -webkit-border-radius: 5px;
@@ -28,7 +29,7 @@
     width: 145px;
     i{
         padding: 3px 6px;
-        color: #633690;
+        color: $primaryColor;
         
     } 
 }
@@ -49,9 +50,9 @@
     padding: 2px;
     float: right;
     width: 145px;
-    background:#fff;
-	color:#333;
-	border:1px solid #311d4e;
+    background:$whiteColor;
+	color:$darkGray;
+	border:1px solid $primaryColorDark;
 }
 #ct-assignTable label{
     float: left;
@@ -72,8 +73,8 @@
         padding: 1px 18px;
         text-decoration: none;
         font-size: 15px;
-        color: #fff;
-        background-color: #633690;
+        color: $whiteColor;
+        background-color: $primaryColor;
         -webkit-border-radius: 15px;
         -moz-border-radius: 15px;
         border-radius: 15px;
@@ -96,6 +97,6 @@
     opacity: 0.6;
 }
 .errorBorder {
-    outline: 1px solid red;
-    border: 1px solid red;
+    outline: 1px solid $red;
+    border: 1px solid $red;
 }
