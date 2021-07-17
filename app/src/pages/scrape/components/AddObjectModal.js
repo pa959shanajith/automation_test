@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ModalContainer, ScrollBar } from '../../global';
+import { ModalContainer, ScrollBar, Messages as MSG, VARIANT } from '../../global';
 import "../styles/AddObjectModal.scss";
 import PropTypes from 'prop-types';
 import {v4 as uuid} from 'uuid';
@@ -103,9 +103,9 @@ const AddObjectModal = props => {
         if (errorFlag) {
             if (errorFlag==='duplicate') {
                 errorObj = {type: 'input', tempId: idArr};
-                props.setShowPop({title: 'Add Objects', content: 'Duplicate Object Names Found!'})
+                props.setShowPop(MSG.SCRAPE.ERR_DUPLICATE_OBJ)
             } 
-            else if (errorFlag==='present') props.setShowPop({title: 'Add Objects', content: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`})
+            else if (errorFlag==='present') props.setShowPop({VARIANT: VARIANT.ERROR, CONTENT: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`})
             setError(errorObj);
         };
         
@@ -114,7 +114,7 @@ const AddObjectModal = props => {
             props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
             props.setShow(false);
             props.setSaved(false);
-            props.setShowPop({title: "Add Object", content: "Objects has been added successfully."});
+            props.setShowPop(MSG.SCRAPE.SUCC_OBJ_ADD);
         }
     }
 

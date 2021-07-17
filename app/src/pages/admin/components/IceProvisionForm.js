@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, RedirectPage} from '../../global' 
+import {ScreenOverlay, RedirectPage, Messages, VARIANT} from '../../global' 
 import {getUserDetails, provisions} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import ReactTooltip from 'react-tooltip';
@@ -16,13 +16,13 @@ const IceProvisionForm = (props) => {
 
     const history = useHistory();
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 	const [firstStop,setFirstStop] = useState(false)
 	const [copyToolTip,setCopyToolTip] = useState("Click To Copy")
 	const [downloadToolTip,setDownloadToolTip] = useState("Download Token")
     const [icenameErrBorder,setIcenameErrBorder] = useState(false)
     const [selAssignUser2ErrBorder,setSelAssignUser2ErrBorder] = useState(false)
 	const [users,setUsers] = useState([['Select User',' ','','']])
+	const setPopupState=props.setPopupState
 
     useEffect(()=>{
 		setUsers([['Select User',' ','','']]);
@@ -63,13 +63,13 @@ const IceProvisionForm = (props) => {
 		if(data.error){displayError(data.error);return;}
 		setLoading(false);
 		if (data === "Invalid Session") return RedirectPage(history);
-		else if (data === 'fail') setPopupState({show:true,title:"ICE Provision Error",content:"ICE Provisioned Failed"});
-		else if (data==='DuplicateIceName') setPopupState({show:true,title:"ICE Provision Error",content:"ICE Provisioned Failed!!  ICE name or User already exists"});else {
+		else if (data === 'fail') displayError(Messages.ADMIN.ERR_PROVISION_ICE);
+		else if (data==='DuplicateIceName') displayError(Messages.ADMIN.ERR__ICE_EXIST);else {
 			props.setIcename(props.icename);
 			props.setTokeninfoToken(data);
 			props.setToken(data);
 			props.setRefreshIceList(!props.refreshIceList);
-			setPopupState({show:true,title:"ICE Provision Success",content:"Token generated Successfully for ICE '"+props.icename+"'!!  Copy or Download the token"});
+			setPopupState({show:true,variant:VARIANT.SUCCESS,content:"Token generated Successfully for ICE '"+props.icename+"'!!  Copy or Download the token"});
 		}
     }
 
@@ -87,10 +87,6 @@ const IceProvisionForm = (props) => {
 			setUsers(data.filter((e)=> (e[3] !== "Admin")));
 		}
     }
-
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
-	}
 
 	const updateIceName = (value) => {
 		value = ValidationExpression(value,"iceName")
@@ -152,8 +148,8 @@ const IceProvisionForm = (props) => {
 	const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -161,8 +157,7 @@ const IceProvisionForm = (props) => {
 
     return (
         <Fragment>
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-			{loading?<ScreenOverlay content={loading}/>:null}
+            {loading?<ScreenOverlay content={loading}/>:null}
 			
             <div className="col-xs-9" style={{width: "83%"}}>
 				<div className='adminControl-ip adminControl-ip-cust'><div>

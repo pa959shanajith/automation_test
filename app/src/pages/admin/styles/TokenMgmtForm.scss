@@ -1,3 +1,5 @@
+@import "../../global/styles/ColorVariables.scss";
+
 .adminControl-tkn-mgmt {
 	margin-bottom: 2%;
     padding: 0px 0px;
@@ -30,13 +32,13 @@
 	width: 47%;
 }
 .form-control-custom-tkn-mgmt{
-	border: 1px solid #656565 !important;
+	border: 1px solid $borderOne !important;
 	border-left:0 !important;
 	border-right:0 !important;
 	border-top:0 !important;
 	border-radius:0;
 	box-shadow: none;
-	color:#333;
+	color:$darkGray;
 }
 
 .form-control-custom-tkn-mgmt:focus {
@@ -44,13 +46,13 @@
 }
 
 .form-control-custom-tkn-mgmt.inputErrorBorderBottom{
-    border: 2px solid #d33c3c !important;
+    border: 2px solid $redError !important;
     border-left: 0 !important;
     border-right: 0 !important;
     border-top: 0 !important;
     border-radius: 0  ;
     box-shadow: none;
-    color: #333;
+    color: $darkGray;
 }
 .userForm-tkn-mgmt {
 	float: left;
@@ -63,11 +65,11 @@
     padding: 6px 12px;
     font-size: 14px;
     line-height: 1.42857143;
-    color: #555;
-    background-color: #fff;
+    color: $primaryText;
+    background-color: $whiteColor;
     background-image: none;
     outline: none;
-    border: 1px solid #ccc;
+    border: 1px solid $borderTwo;
     border-radius: 4px;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: 0;
@@ -83,7 +85,7 @@
 	margin-left: 4%;
 	margin-top: 1%;
 	line-height: 2;
-    border: 1px solid #656565 !important;
+    border: 1px solid $borderOne !important;
     -webkit-text-stroke: thin;
 }
 .adminSelect-tkn-mgmt:focus {
@@ -105,7 +107,7 @@
 }
 
 #tokenarea span.fa:hover {
-    background: #ddd;
+    background: $borderFour;
     border-radius: 7px;
     cursor: pointer;
 }
@@ -128,7 +130,7 @@
 	top: -1px;
     position: absolute;
     right: 1px;
-    background: #643693;
+    background: $primaryColor;
     padding: 3px 5px;
     border-radius: 0px 4px 4px 0px;
     -moz-border-radius: 0px 4px 4px 0px;
@@ -140,7 +142,7 @@
 	top: -1px;
     position: absolute;
     right: 1px;
-    background: #643693;
+    background: $primaryColor;
     padding: 4px 5px;
     border-radius: 0px 4px 2px 0px;
     -moz-border-radius: 0px 4px 2px 0px;
@@ -160,10 +162,10 @@
     resize: none;
 }
 .fc-datePicker{
-    background-color: white;
+    background-color: $whiteColor;
     border-width: 1px;
     font-size: 14px;
-    border-color: #ced4da;
+    border-color: $lightGray;
     border-radius: 4px;
     padding-top: 4px;
     padding-left: 7px;
@@ -171,7 +173,7 @@
 .fc-timePicker{
     border-width: 1px;
     font-size: 14px;
-    border-color: #ced4da;
+    border-color: $lightGray;
     border-radius: 4px;
     padding-top: 4px;
     padding-left: 7px;
@@ -214,29 +216,29 @@
 }
 .rdtPicker td.rdtDisabled, .rdtPicker td.rdtDisabled:hover {
     background: none;
-    color: #999999;
+    color: $borderFive;
     cursor: pointer !important;
 }
  .rdtPicker td.rdtToday :hover {
-    color: #000;
+    color: $black;
 }
  .rdtPicker td.rdtToday .active,  .rdtPicker td.rdtToday .disabled,  .rdtPicker td.rdtToday .disabled.active,  .rdtPicker td.rdtToday .disabled.disabled,  .rdtPicker td.rdtToday .disabled:active,  .rdtPicker td.rdtToday .disabled:hover,  .rdtPicker td.rdtToday .disabled:hover.active,  .rdtPicker td.rdtToday .disabled:hover.disabled,  .rdtPicker td.rdtToday .disabled:hover:active,  .rdtPicker td.rdtToday .disabled:hover:hover,  .rdtPicker td.rdtToday .disabled:hover[disabled],  .rdtPicker td.rdtToday .disabled[disabled],  .rdtPicker td.rdtToday :active,  .rdtPicker td.rdtToday :hover,  .rdtPicker td.rdtToday :hover.active,  .rdtPicker td.rdtToday :hover.disabled,  .rdtPicker td.rdtToday :hover:active,  .rdtPicker td.rdtToday :hover:hover,  .rdtPicker td.rdtToday :hover[disabled],  .rdtPicker td.rdtToday [disabled] {
-    background-color: #fdf59a;
+    background-color: $backgroundYellowOne;
 }
  .rdtPicker td.rdtToday ,  .rdtPicker td.rdtToday .disabled,  .rdtPicker td.rdtToday:hover,  .rdtPicker td.rdtToday .disabled:hover,  .rdtPicker td.rdtToday :hover {
-    background-color: #fde19a;
-    background-image: -moz-linear-gradient(to bottom,#fdd49a,#fdf59a);
-    background-image: -ms-linear-gradient(to bottom,#fdd49a,#fdf59a);
-    background-image: -webkit-gradient(linear,0 0,0 100%,from(#fdd49a),to(#fdf59a));
-    background-image: -webkit-linear-gradient(to bottom,#fdd49a,#fdf59a);
-    background-image: -o-linear-gradient(to bottom,#fdd49a,#fdf59a);
-    background-image: linear-gradient(to bottom,#fdd49a,#fdf59a);
+    background-color: $backgroundYellowThree;
+    background-image: -moz-linear-gradient(to bottom,$backgroundYellowTwo,$backgroundYellowOne);
+    background-image: -ms-linear-gradient(to bottom,$backgroundYellowTwo,$backgroundYellowOne);
+    background-image: -webkit-gradient(linear,0 0,0 100%,from($backgroundYellowTwo),to($backgroundYellowOne));
+    background-image: -webkit-linear-gradient(to bottom,$backgroundYellowTwo,$backgroundYellowOne);
+    background-image: -o-linear-gradient(to bottom,$backgroundYellowTwo,$backgroundYellowOne);
+    background-image: linear-gradient(to bottom,$backgroundYellowTwo,$backgroundYellowOne);
     background-repeat: repeat-x;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fdd49a', endColorstr='#fdf59a', GradientType=0);
-    border-color: #fdf59a #fdf59a #fbed50;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='$backgroundYellowTwo', endColorstr='$backgroundYellowOne', GradientType=0);
+    border-color: $backgroundYellowOne $backgroundYellowOne $backgroundYellowFour;
     border-color: rgba(0,0,0,.1) rgba(0,0,0,.1) rgba(0,0,0,.25);
     filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
-    color: #000;
+    color: $black;
 }
 
 
@@ -248,10 +250,10 @@
         width: 8px;
     }
     &::-webkit-scrollbar-thumb {
-        background-color: #929397;
+        background-color: $backgroundTwo;
         border: 1px solid transparent;
-        border-left-color: #e6e7e9;
-        border-right-color: #e6e7e9;
+        border-left-color: $borderThree;
+        border-right-color: $borderThree;
         -webkit-border-radius: 10px;
         -moz-border-radius: 10px;
         border-radius: 10px; 

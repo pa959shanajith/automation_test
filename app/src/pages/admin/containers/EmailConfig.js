@@ -1,5 +1,5 @@
 import React, { useState, useEffect , createRef } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
+import {ScreenOverlay, ScrollBar, Messages as MSG, VARIANT} from '../../global' 
 import {FormInput,FormRadio,FormSelect} from '../components/FormComp'
 import {getNotificationChannels,manageNotificationChannels} from '../api'
 import EmailTest from '../components/EmailTest';
@@ -10,19 +10,18 @@ import '../styles/EmailConfig.scss'
   use: defines Email server config middle Section
 */
 
-const EmailConfig = ({resetMiddleScreen}) => {
+const EmailConfig = ({resetMiddleScreen, setPopupState}) => {
     const [advanceConf,setAdvanceConf] = useState('block');
     const [emailTest,setEmailTest] = useState(false);
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""});
     const [loading,setLoading] = useState(false);
     const [inputRef,setinputRef] =  useState({})
     const [reload,setReload] = useState(false)
     const fn = factoryFn(inputRef)
-    const displayError = (error,header) =>{
+    const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:header?header:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -79,7 +78,6 @@ const EmailConfig = ({resetMiddleScreen}) => {
     }
     return(
         <div className="conf_email_container">
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             <div id="page-taskName">
                 <span>Manage Email Server Configuration</span>
@@ -149,18 +147,18 @@ const update = async(conf,action,setLoading,displayError,onSelectProvider) =>{
     var emsg = "Failed to "+action+" '"+conf.name+"' Configuration.";
     setLoading(action.slice(0,-1) + "ing Configuration...")
     var data = await manageNotificationChannels({'action':action.toLowerCase(), conf})
-    if(data.error){displayError(data.error,action+" Configuration");return;}
+    if(data.error){displayError(data.error);return;}
     else if (data === "exists") {
-        displayError(action+" Configuration", "'"+conf.name+"' configuration already exists");
+        displayError({CONTENT:"'"+conf.name+"' configuration already exists",VARIANT:VARIANT.WARNING});
         return;
     }
     else if (data === "success") {
-        displayError("'"+conf.name+"' Configuration "+action+"d!",action+" Configuration");
+        displayError({CONTENT:"'"+conf.name+"' Configuration "+action+"d!",VARIANT:VARIANT.SUCCESS});
         onSelectProvider()
         return;
     } else if(/^1[0-4]{12}$/.test(data)) {
         if (+data[1]) {
-            displayError(action+" Configuration", emsg+" Invalid Request!");
+            displayError({CONTENT:emsg+" Invalid Request!",VARIANT:VARIANT.WARNING});
             return;
        }
         const errfields = [];
@@ -177,9 +175,9 @@ const update = async(conf,action,setLoading,displayError,onSelectProvider) =>{
         if (+data[12] === 1) errfields.push("Proxy Username");
         else if (+data[12] === 2) errfields.push("Proxy Password");
         else if (+data[12] === 3) errfields.push("Proxy Credentials");
-        displayError(emsg+" Following values are invalid: "+errfields.join(", "),action+" Configuration");
+        displayError({CONTENT:emsg+" Following values are invalid: "+errfields.join(", "),VARIANT:VARIANT.WARNING});
     } else{
-        displayError("Failed to "+ action +" configuration",action+" Configuration");
+        displayError({CONTENT:"Failed to "+ action +" configuration",VARIANT:VARIANT.ERROR});
     }
 }
 
@@ -192,22 +190,22 @@ const clickToggle = async(servername,action,setLoading,displayError,onSelectProv
     }
     setLoading(action.slice(0,-1) + "ing Configuration...")
     var data = await manageNotificationChannels({action : action.toLowerCase(), conf})
-    if(data.error){displayError(data.error,action+" Configuration");return;}
+    if(data.error){displayError(data.error);return;}
     if (data === "success") {
-        displayError("'"+conf.name+"' Configuration "+action+"d!",action+" Configuration");
+        displayError({CONTENT:"'"+conf.name+"' Configuration "+action+"d!",VARIANT:VARIANT.SUCCESS});
         onSelectProvider()
         return;
     } else if(/^1[0-4]{9}$/.test(data)) {
         if (parseInt(data[1])) {
-            displayError(emsg+" Invalid Request!",action+" Configuration");
+            displayError({CONTENT:emsg+" Invalid Request!",VARIANT:VARIANT.ERROR});
             return;
         }
         const errfields = [];
         if (parseInt(data[2])) errfields.push("Server Name");
         if (parseInt(data[3])) errfields.push("Channel");
-        displayError(emsg+" Following values are invalid: "+errfields.join(", "),action+" Configuration");
+        displayError({CONTENT:emsg+" Following values are invalid: "+errfields.join(", "),VARIANT:VARIANT.WARNING});
     } else{
-        displayError("Failed to "+ action +" configuration",action+" Configuration");
+        displayError({CONTENT:"Failed to "+ action +" configuration",VARIANT:VARIANT.ERROR});
     }
 }
 
@@ -272,7 +270,7 @@ const selectProvider = async({inputRef,showPool,showAuth,showAll,showProxCred,sh
         setLoading(false);
     }catch(err){
         console.error(err)
-        displayError('Fail to fetch configured details for selected provider.')
+        displayError(MSG.ADMIN.ERR_PROVIDER_DETAILS)
     }
 }
 
@@ -382,27 +380,27 @@ const validate = (inputRef,displayError)=> {
             flag = false;
         }else if(e === 'servername' && !regExName.test(inputRef[e].current.value)){
             inputRef[e].current.style.outline = errBorder
-            if (!popped) displayError("Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen.");
+            if (!popped) displayError(MSG.ADMIN.WARN_INVALID_SERVER_NAME);
             flag = false;
             popped = true;
         }else if(e === 'port' && !((+inputRef[e].current.value  >= 0) && (+inputRef[e].current.value  < 65536))){
             inputRef[e].current.style.outline = errBorder
-            if (!popped) displayError("Invalid Server Port provided! Value has to be a number between 0 and 65535.");
+            if (!popped) displayError(MSG.ADMIN.WARN_SERVER_PORT);
             flag = false;
             popped = true;
         }else if(e === 'senderaddr' && !emailRegEx.test(inputRef[e].current.value)){
             inputRef[e].current.style.outline = errBorder
-            if (!popped) displayError("Invalid sender Email Address!");
+            if (!popped) displayError(MSG.ADMIN.WARN_EMAIL_ADDRESS);
             flag = false;
             popped = true;
         }else if((e === 'assureurl'||e === 'proxyurl') && !regExURL.test(inputRef[e].current.value)){
             inputRef[e].current.style.outline = errBorder
-            if (!popped) displayError("Invalid "+(e === 'assureurl'?"Avo Assure Application":"Proxy Server")+" URL provided!");
+            if (!popped) displayError({CONTENT:"Invalid "+(e === 'assureurl'?"Avo Assure Application":"Proxy Server")+" URL provided!",VARIANT:VARIANT.WARNING});
             flag = false;
             popped = true;
         }
     })
-    if (!flag && !popped) displayError("Form contains errors!");
+    if (!flag && !popped) displayError(MSG.ADMIN.ERR_FORM);
     return flag;
 };
 

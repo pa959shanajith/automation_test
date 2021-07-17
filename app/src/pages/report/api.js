@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {RedirectPage} from '../global'
+import {RedirectPage, Messages as MSG} from '../global'
 import {history} from './index'
 import {url} from '../../App';
 
@@ -19,21 +19,21 @@ export const getAllSuites_ICE = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch suite list'}
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_LIST}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch suite list'}
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_LIST}
     }
 }
 
 //component getReportsData_ICE
-//data :{"param":"getReportsData_ICE","reportsInputData":{"projectId":"5de4e4aed9cdd57f4061bca8","releaseName":"r1","cycleId":"5de4e4aed9cdd57f4061c368","type":"allmodules"}}
+//data :{"param":"getReportsData_ICE","reportsInputData":{"projectId":"5de4e4aed9cdd57f4061bca8","releaseName":"r1","cycleId":"5de4e4aed9cdd57f4061c368","type":"allmodules"}
 
 export const getReportsData_ICE = async(data) => {
     try{
@@ -47,16 +47,16 @@ export const getReportsData_ICE = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch report data'}
+        return {error:MSG.REPORT.ERR_FETCH_REPORT}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch report data'}
+        return {error:MSG.REPORT.ERR_FETCH_REPORT}
     }
 }
 //
@@ -75,16 +75,16 @@ export const getSuiteDetailsInExecution_ICE = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch suite details'}
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_DETAILS}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch suite details'}
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_DETAILS}
     }
 }
 //reportStatusScenarios_ICE
@@ -102,16 +102,16 @@ export const reportStatusScenarios_ICE = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch suite details'}
+        return {error:MSG.REPORT.ERR_FETCH_REPORT_STATUS}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch suite details'}
+        return {error:MSG.REPORT.ERR_FETCH_REPORT_STATUS}
     }
 }
 
@@ -128,16 +128,16 @@ export const viewReport = async(reportId, reportType) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch suite details'}
+        return {error:MSG.REPORT.ERR_FETCH_REPORT_DETAILS}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch suite details'}
+        return {error:MSG.REPORT.ERR_FETCH_REPORT_DETAILS}
     }
 }
 
@@ -154,18 +154,18 @@ export const getAccessibilityData = async(data) =>{
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status === 200 && Object.keys(res.data).length < 1){
-            return {error:'No accessibility screen is created yet!'}
+            return {error:MSG.REPORT.ERR_NO_ACC_SCREEN}
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch suite details'}
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_DETAILS}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch suite details'}
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_DETAILS}
     }
 }

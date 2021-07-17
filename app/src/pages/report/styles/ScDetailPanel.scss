@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .rp__detail {
     width: 100%;
     height: fit-content;
@@ -21,17 +22,17 @@
             }
         }
         .rp__row{
-            border-top: 1px solid #ddd;
+            border-top: 1px solid $borderFour;
         }
         .rp__row:nth-child(odd){
-            background-color: #f9f9f9
+            background-color: $backgroundFour
         }
         .rp__row:nth-child(even){
-            background-color: #ffffff;
+            background-color: $whiteColor;
         }
         .rp__row:first-child{
             font-size: 14px;
-            color: #331d4e !important;
+            color: $primaryColorDarkest !important;
             font-family: Latoweb !important;
             white-space: nowrap;    
             font-weight: 600;
@@ -39,7 +40,7 @@
             line-height: 1;
         }
         .rp__row.cont-body:hover{
-            background-color: #f0e1ff !important;
+            background-color: $pinkLight!important;
         }
         .browser{
             width: 150px;
@@ -47,19 +48,19 @@
         .status{
             width: 150px;
             &.pass{
-                color: #28a745;
+                color: $pass;
             }
             &.fail{
-                color: #dc3545;
+                color: $red;
             }
             &.terminate{
-                color: #ffc107;
+                color: #efa022;
             }
             &.incomplete{
-                color: #343a40;
+                color: $gunMetal;
             }
             &.skipped{
-                color: #343a40;
+                color: $gunMetal;
             }
         }
         .export{

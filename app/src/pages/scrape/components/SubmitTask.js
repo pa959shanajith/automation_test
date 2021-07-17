@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { ScrapeContext } from './ScrapeContext';
 import { reviewTask } from '../../global/api';
+import { Messages as MSG } from '../../global';
 import "../styles/SubmitTask.scss";
 
 const SubmitTask = () => {
@@ -42,10 +43,19 @@ const SubmitTask = () => {
 
         reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
         .then(result => {
-            if (result === "fail") setShowPop({'title': 'Task Submission Error', 'content': 'Reviewer is not assigned !'});
-            else if (taskstatus === 'reassign') setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});
-            else if (taskstatus === 'underReview') setShowPop({'title': "Task Completion Success", 'content': "Task Approved successfully!", onClick: ()=>redirectToPlugin()});
-            else setShowPop({'title': "Task Submission Success", 'content': "Task Submitted successfully!", onClick: ()=>redirectToPlugin()});
+            if (result === "fail") setShowPop(MSG.SCRAPE.WARN_NO_REVIEWER);
+            else if (taskstatus === 'reassign') {
+                setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!"});
+                redirectToPlugin();
+            }    
+            else if (taskstatus === 'underReview') {
+                setShowPop({'title': "Task Completion Success", 'content': "Task Approved successfully!"});
+                redirectToPlugin();
+            }
+            else {
+                setShowPop({'title': "Task Submission Success", 'content': "Task Submitted successfully!"});
+                redirectToPlugin();
+            }
         })
         .catch(error => {
 			console.error(error);

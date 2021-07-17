@@ -54,8 +54,8 @@ const CreateEnE = () =>{
     const displayError = (error) =>{
         setBlockui({show:false})
         setPopup({
-        title:'ERROR',
-        content:error,
+        variant:error.VARIANT,
+        content:error.CONTENT,
         submitText:'Ok',
         show:true
         })
@@ -63,7 +63,7 @@ const CreateEnE = () =>{
     return(
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+        {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content}/>:null}
         <div id='ene' className='mp__canvas_container'>
             <ToolbarMenuEnE setBlockui={setBlockui} setPopup={setPopup}/>
             <div id='mp__canvas' className='mp__canvas'>

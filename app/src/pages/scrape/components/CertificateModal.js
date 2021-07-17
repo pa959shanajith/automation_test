@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ModalContainer } from '../../global';
+import { ModalContainer, Messages as MSG } from '../../global';
 import { SET_CERT } from '../state/action';
 import "../styles/CertificateModal.scss";
 import PropTypes from 'prop-types';
@@ -50,7 +50,7 @@ const CertificateModal = props => {
                 authDetails: `${authName};${authPass}`
             }
             dispatch({type: SET_CERT, payload: certObj});
-            props.setShowPop({title: "Certificate", content: "Certificate Saved successfully"});
+            props.setShowPop(MSG.SCRAPE.SUCC_CERT_SAVE);
             props.setShow(false);
         }
     }

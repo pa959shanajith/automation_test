@@ -9,6 +9,7 @@ import MultiNodeBox from '../components/MultiNodeBox'
 import RectangleBox from '../components/RectangleBox'
 import SaveMapButton from '../components/SaveMapButton'
 import ExportMapButton from '../components/ExportMapButton'
+import {Messages as MSG} from '../../global'
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import * as actionTypes from '../state/action';
@@ -167,7 +168,7 @@ const CanvasNew = (props) => {
     const createMultipleNode = (e,mnode)=>{
         setMultipleNode(false)
         if (mnode.length === 0){
-            setPopup({show:true,title:'Failure',content:'No nodes to create',submitText:'Ok'})
+            displayError(MSG.MINDMAP.ERR_NO_NODES_CREATE);
             return;
         }
         setBlockui({show:true,content:'Creating Nodes...'})
@@ -189,7 +190,7 @@ const CanvasNew = (props) => {
         setdLinks(cdLinks)
         setdNodes(cdNodes)
         setBlockui({show:false})
-        setPopup({show:true,title:'Success',content:'Nodes created successfully!',submitText:'Ok'})
+        displayError(MSG.MINDMAP.SUCC_NODE_CREATE);
     }
     const clickAddNode=(e)=>{
         var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},undefined,verticalLayout)
@@ -353,16 +354,16 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
     }
     else if (d3.select('.node-selected').attr('data-nodetype') === 'scenarios') {
         setPopup({
-            title:'Error',
-            content: 'Please select a Scenario to paste to..',
+            variant:MSG.MINDMAP.WARN_SELECT_SCENARIO_PASTE.VARIANT,
+            content: MSG.MINDMAP.WARN_SELECT_SCENARIO_PASTE.CONTENT,
             submitText:'Ok',
             show:true
         })
         return false
     } else if(d3.select('.node-selected').attr('data-nodetype') === 'modules') {
         setPopup({
-            title:'Error',
-            content: 'Please select a Module to paste to..',
+            variant:MSG.MINDMAP.WARN_SELECT_MODULE_PASTE.VARIANT,
+            content: MSG.MINDMAP.WARN_SELECT_MODULE_PASTE.CONTENT,
             submitText:'Ok',
             show:true
         })

@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .tr__body{
     &.bottom-content {
         // top: 377px;
@@ -27,11 +28,11 @@
     }
     .panel {
         margin-bottom: 20px;
-        background-color: #fff;
+        background-color: $whiteColor;
         border: 1px solid transparent;
         border-radius: 4px;
         -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
         box-shadow: 0 1px 1px rgba(0,0,0,.05);
-        border-color: #ddd;
+        border-color: $borderFour;
     }
 }

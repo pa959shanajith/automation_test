@@ -1,5 +1,7 @@
+
+@import "../../global/styles/ColorVariables.scss";
 .toolbar__header{
-    background-color: #e6e7e9;
+    background-color: $borderThree;
     height: 30px;
     padding: 0 10px;
     font-size: 14px;
@@ -31,12 +33,12 @@
     margin-left: 11%;
 }
 .toolbar__header button{
-    color: #fff;
+    color: $whiteColor;
     border: 0;
     border-radius: 20px;
     padding: 2px 15px;
     font-size: 17px;
-    background: #643693;
+    background: $primaryColor;
     font-family: 'LatoWebLight';
     outline: 0;
     padding: 0px 13px;
@@ -46,7 +48,7 @@
     margin-right: 30px;
 }
 .toolbar__header button:hover{
-    color: #fff;
+    color: $whiteColor;
 }
 .toolbar__header button:focus{
     outline: 0;
@@ -73,5 +75,5 @@
     box-shadow: none;
 }
 .active-map {
-    color: #983fd3;
+    color: $primaryColorRich;
 }

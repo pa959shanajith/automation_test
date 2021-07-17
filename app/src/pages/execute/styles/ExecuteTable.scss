@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .executionTableDnd{
 	float:left;
 	width:100%;
@@ -50,7 +51,7 @@ input[type="checkbox"] {
 	width: 90%;
 	height: 25px;
 	float: none;
-	border: 1px solid #5e636b;
+	border: 1px solid $borderGray;
 	padding: 0px 5px;
 }
 .executionDataTable select.form-control{
@@ -60,7 +61,7 @@ input[type="checkbox"] {
     appearance: none;
     font-size: 14px;
     font-family: 'LatoWeb';
-    border: 1px solid #7b7c7f !important;
+    border: 1px solid $pluginGray  !important;
     -webkit-appearance: none;
     -moz-appearance: none;
 }
@@ -94,12 +95,12 @@ input[type="checkbox"] {
     outline: none;
     height: 25px;
     float: none;
-    border: 1px solid #5e636b;
+    border: 1px solid $borderGray;
     padding: 0px 5px;
     font-size: 14px;
     line-height: 1.42857143;
-    color: #555;
-    background-color: #fff !important;
+    color: $primaryText;
+    background-color: $whiteColor !important;
     background-image: none !important;
     border-radius: 4px;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
@@ -109,16 +110,16 @@ input[type="checkbox"] {
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 .alertGreen{
-    background: #fff url("/static/imgs/ic-true.png") 90% center no-repeat !important
+    background: $whiteColor url("/static/imgs/ic-true.png") 90% center no-repeat !important
 }
 .alertRed{
-	background: #fff url("/static/imgs/ic-false.png") 90% center no-repeat !important
+	background: $whiteColor url("/static/imgs/ic-false.png") 90% center no-repeat !important
 }
 .projectName{
     width:17%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important
 }
 .e__table_row_status{
-    border-left: 4px solid red !important;
+    border-left: 4px solid $red !important;
 }
 
 .scenarioDetails{
@@ -129,9 +130,9 @@ input[type="checkbox"] {
 }
 
 .scenarioDetailsHeading{
-	background: #311d4e;
+	background: $primaryColorDark;
     padding: 5px 10px;
-    color: #fff;
+    color: $whiteColor;
     font-family: 'LatoWebMedium';
     border-radius: 5px;
     margin-bottom: 8px;
@@ -144,7 +145,7 @@ input[type="checkbox"] {
 }
 
 .sDInnerContentsWrap:nth-child(odd){
-	background: #e8e6fe;
+	background: $backgroundFive;
 }
 
 .sDInnerContents{
@@ -183,15 +184,15 @@ input[type="checkbox"] {
 .e__scenario{
     width: 18%;
     text-align:left !important;
-    border-right: 1px solid #fff
+    border-right: 1px solid $whiteColor;
 }
 .e__param{
     width: 27%;
-    border-right: 1px solid #fff
+    border-right: 1px solid $whiteColor;
 }
 .e__condition{
     width: 18%;
-    border-right: 1px solid #fff
+    border-right: 1px solid $whiteColor;
 }
 .e__projectName{
     width: 17%;
@@ -268,7 +269,7 @@ input[type="checkbox"] {
     width: 100%;
 }
 .e__table-bodyContainer div :nth-child(odd){
-	background: #e8e6fe;
+	background: $backgroundFive;
 }
 .e__table-col{
     font-weight: normal !important;
@@ -285,8 +286,8 @@ input[type="checkbox"] {
     position: relative !important;
     margin: -0.1em;
     z-index: 1;
-    background: #5e626b;
-    color: #fff;
+    background: $tableHeader;
+    color: $whiteColor;
     font-size: 17px;
     font-family: 'LatoWebLight';
     border-radius: 6px;

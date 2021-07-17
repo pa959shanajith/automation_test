@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .scheduleSuiteTable{
 	float:left;
 	width:100%;
@@ -10,7 +11,7 @@
     width: calc(100% - 27px)!important;
 }
 .scheduleSuite{
-    background: #331d4e;
+    background: $primaryColorDarkest;
     width: 100%;
     padding: 2px;
     height: 35px;
@@ -45,7 +46,7 @@
 .selectScheduleSuite{float: left; margin: 10px 6px 0 6px !important;}
 .scheduleSuiteName{
 	float: left;
-	color: white;
+	color: $whiteColor;
     margin-top: 7px;
     width: 25%;
     padding: 0 10px 0 2px;
@@ -60,7 +61,7 @@
 	top: 3px;
     position: absolute;
     right: 1px;
-    background: #643693;
+    background: $primaryColor;
     padding: 3px 5px;
     border-radius: 0px 4px 4px 0px;
     -moz-border-radius: 0px 4px 4px 0px;
@@ -73,7 +74,7 @@
 	top: 3px;
     position: absolute;
     right: 1px;
-	background: #643693;
+	background: $primaryColor;
     padding: 4px;
     border-radius: 0px 4px 2px 0px;
     -moz-border-radius: 0px 4px 2px 0px;
@@ -87,8 +88,8 @@
 	margin-top: 1px;
 }
 .scenarioHeaders,.reportHeaders{
-	background: #5e626b;
-    color: #fff;
+	background: $tableHeader;
+    color: $whiteColor;
     font-size: 15px;
     font-family: 'LatoWebLight';
 }
@@ -96,7 +97,7 @@
 .scenarioHeaders tr{width: 100%;}
 .scenarioHeaders tr td{
 	padding: 0 5px 0 5px;
-	border-right: 1px solid #fff;
+	border-right: 1px solid $whiteColor;
     text-align: center;
     /* float: left;
     overflow: hidden;
@@ -117,14 +118,14 @@
 }
 .scenarioBody tr td input{
 	height: 24px;
-    border: 1px solid #5e636b;
+    border: 1px solid $borderGray;
     border-radius: 4px;
     padding-left: 5px;
  }
 .scenarioBody tr td select{
 	width: 70px;
 	height: 25px;
-	border: 1px solid #5e636b;
+	border: 1px solid $borderGray;
     border-radius: 4px;
 }
 .scenarioBody tr td:first-child{text-align: left; float: left; width: 100%; padding: 5px;}
@@ -150,7 +151,7 @@
     position: fixed !important
 }
 .s__err-Border{
-    border: 2px solid red !important;
+    border: 2px solid $red !important;
 }
 .s__ab{
     position: absolute;

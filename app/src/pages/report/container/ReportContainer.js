@@ -1,14 +1,9 @@
-import React, { useState, Fragment, useEffect } from 'react';
+import React, { useState, Fragment } from 'react';
 import ModuleList from '../components/ModuleList';
 import ToolbarMenu from '../components/ToolbarMenu';
 import { ScreenOverlay ,PopupMsg, ScrollBar} from '../../global';
-import { useDispatch } from 'react-redux';
-import ExecutionPanel from '../components/ExecPanel';
-import ScStatusPanel from '../components/ScStatusPanel';
-import ScDetailPanel from '../components/ScDetailPanel';
 import TestingReport from './TestingReport';
 import AccessibilityReport from './AccessibilityReport';
-import * as actionTypes from '../state/action';
 import '../styles/ReportContainer.scss';
 
 /*Component ReportContainer
@@ -28,8 +23,8 @@ const ReportContainer = () =>{
     const displayError = (error) =>{
         setBlockui(false)
         setPopup({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -37,7 +32,7 @@ const ReportContainer = () =>{
     return(
         <Fragment>
             {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+            {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content} />:null}
             <div id='rp-body-scroll' className='rp__main_container'>
                 <ScrollBar scrollId={'rp-body-scroll'}>
                 <div className='container-padding'>

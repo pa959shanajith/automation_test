@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 
 .admin-container{
     display: flex;
@@ -7,7 +8,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: #eeeeee;
+    background: $whisper;
 }
 #middle-content-section {
      box-sizing: border-box;
@@ -19,13 +20,13 @@
      min-width: 0;
      padding: 20px;
      margin: 0 5px;
-     background-color: #fff;
+     background-color: $whiteColor;
 }
 .admin__mid_section {
     display: flex;
     flex: auto;
     width: 100%;
-    background-color: #eeeeee;
+    background-color: $whisper;
     margin: 0;
     padding: 0;
 }
@@ -60,21 +61,21 @@
 .a__btn:active:focus,
 .a__btn:focus,
 .a__btn:hover {
-    color: #fff;
+    color: $whiteColor;
     border: 0;
     border-radius: 20px;
     padding: 2px 15px;
     font-size: 17px;
-    background: #643693;
+    background: $primaryColor;
 	font-family: 'LatoWebLight';
     outline: 0;
     padding: 2px 25px !important;
 }
   
 .inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
+	border-bottom: 2px solid $redError !important;
 }
 
 .selectErrorBorder{
-	border: 2px solid #d33c3c !important;
+	border: 2px solid $redError !important;
 }
