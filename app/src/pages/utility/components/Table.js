@@ -478,7 +478,7 @@ const DataCell  = props => {
     }
 
     return (
-        <div className={"dt__cell "+(props.selected?"dt__selected_cell":'')} data-test="dt__body_cell" onClick={onClick}>
+        <div className={"dt__cell "+(props.selected?"dt__selected_cell":'')} data-test="dt__data_cell" onClick={onClick}>
             <TextareaAutosize ref={(tag)=>areaRef.current=tag} value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress} onHeightChange={props.updateHeight} />
         </div>
     );
