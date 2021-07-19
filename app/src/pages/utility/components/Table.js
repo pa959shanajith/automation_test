@@ -184,7 +184,7 @@ const Headers = ({headers, setHeaders, updateCheckList, onAdd, checkList}) => {
                 )
             }) }
         </ReactSortable>
-        <div className="dt__table_new_column_header" onClick={()=>onAdd('col')}>
+        <div className="dt__table_new_column_header" data-test="dt__table_add_col" onClick={()=>onAdd('col')}>
             +
         </div>
         </div>
@@ -205,8 +205,8 @@ const HeaderCell = props => {
     }, [props.headerIndex]);
 
     return (
-        <div className={"dt__cell dt__table_header_cell"+(props.selected?" dt__hdrCell_Sel dt__colHeadSel":"")} data-test="dt__header_cell">
-            <div onClick={(e)=>props.updateCheckList(e, "col", props.headerId)}>{`C${value+1}`}</div> 
+        <div className={"dt__cell dt__table_header_cell"+(props.selected?" dt__hdrCell_Sel dt__colHeadSel":"")}>
+            <div onClick={(e)=>props.updateCheckList(e, "col", props.headerId)} data-test="dt__header_cell" >{`C${value+1}`}</div> 
         </div>
     );
 }
@@ -291,7 +291,7 @@ const RowNumColumn = props => {
                 <div 
                     key={`rownum-addRow`}
                     className="dt__table_numbered_column dt__addRow"
-                    data-test="dt__number_cell"
+                    data-test="dt__table_add_row"
                     onClick={()=>props.onAdd('row')}
                 >
                     +
@@ -396,7 +396,7 @@ const SubHeaderCell  = props => {
             className={
                 "dt__cell dt__subHeaderCell "
                 +(props.selected?"dt__selected_cell":'')} 
-            data-test="dt__body_cell"
+            data-test="dt__subHeader_cell"
         >
             <input value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress}/>
         </div>

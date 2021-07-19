@@ -195,8 +195,8 @@ function pasteRows (copiedCells, newHeaders, newData, pasteIndex) {
                 newHeaders.push({__CELL_ID__: uuid(), name: `C${headerlength+j+1}`})
         }
 
-        for (let i=0; i<trimEmptyCells.length; i++){
-            newHeaders[i].name = copiedCells.cells[0][i];
+        for (let i=0; i<newHeaders.length; i++){
+            newHeaders[i].name = copiedCells.cells[0][i] || "";
         }
 
         rowsToPaste = rowsToPaste.slice(1);

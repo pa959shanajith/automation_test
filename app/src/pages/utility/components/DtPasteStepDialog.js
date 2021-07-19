@@ -56,7 +56,7 @@ const DtPasteStepDialog = (props) => {
         title="Paste Test Step"
         content={
         <div className="ps_dialog"> 
-            <div className="ps_lbl" data-test="d__pslbl">Paste after step no:</div>
+            <div className="ps_lbl" data-test="d__pslbl">Paste after {props.pasteType==="rows" ? "Row No." : "Column No."}:</div>
             <input data-test="d__psinp" className="ps_input" placeholder="Enter a value" onChange={PSHandler} value={stepNum}/>
             { pasteError && 
                 <div data-test="d__pserrmsg" className="ps_error">{pasteErrors[pasteError]}</div>
