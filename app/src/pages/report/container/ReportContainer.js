@@ -52,7 +52,7 @@ const ReportContainer = () =>{
                                     if(modDrop==='semi')setModDrop('full');
                                     else if(modDrop==='close')return;
                                     else setModDrop('semi');
-                                    setTimeout(()=>{updateScrollBar()}, 2501);
+                                    setTimeout(()=>{updateScrollBar()}, 2001);
                                     }}>
                                     <i className={(modDrop === 'full')?"fa fa-caret-up":"fa fa-caret-down"} title="Drop down button"></i>
                                 </span>
