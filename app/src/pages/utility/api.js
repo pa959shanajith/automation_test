@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {RedirectPage} from '../global'
+import {RedirectPage, Messages as MSG} from '../global'
 import {history} from './index'
 import {url} from '../../App';
 
@@ -22,16 +22,16 @@ export const Encrypt_ICE = async(encryptionType ,encryptionValue) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to Encrypt'}
+        return {error:MSG.UTILITY.ERR_ENCRYPT}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Encrypt'}
+        return {error:MSG.UTILITY.ERR_ENCRYPT}
     }
 }
 
@@ -49,16 +49,16 @@ export const fetchMetrics = async(arg) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to Fetch'}
+        return {error:MSG.UTILITY.ERR_FAIL_FETCH}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Fetch'}
+        return {error:MSG.UTILITY.ERR_FAIL_FETCH}
     }
 }
 
@@ -78,16 +78,16 @@ export const createDataTable = async(arg) => {
         });
         if(res.status === 401){
             RedirectPage(history)
-            return { error: 'invalid session' };
+            return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return { error:'Failed to create DataTable' }
+        return { error:MSG.UTILITY.ERR_CREATE_TADATABLE}
     }catch(err){
         console.error(err)
-        return {error:'Failed to create DataTable'}
+        return {error:MSG.UTILITY.ERR_CREATE_TADATABLE}
     }
 }
 
@@ -107,16 +107,16 @@ export const editDataTable = async(arg) => {
         });
         if(res.status === 401){
             RedirectPage(history)
-            return { error: 'invalid session' };
+            return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return { error:'Failed to edit DataTable' }
+        return { error:MSG.UTILITY.ERR_EDIT_DATATABLE}
     }catch(err){
         console.error(err)
-        return {error:'Failed to edit DataTable'}
+        return {error:MSG.UTILITY.ERR_EDIT_DATATABLE}
     }
 }
 
@@ -134,16 +134,16 @@ export const confirmDeleteDataTable = async(tableName) => {
         });
         if(res.status === 401){
             RedirectPage(history)
-            return { error: 'invalid session' };
+            return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return { error:'Failed to confirm delete DataTable' }
+        return { error:MSG.UTILITY.ERR_CONFIRM_DATATABLE}
     }catch(err){
         console.error(err)
-        return {error:'Failed to confirm delete DataTable'}
+        return {error:MSG.UTILITY.ERR_CONFIRM_DATATABLE}
     }
 }
 
@@ -161,16 +161,16 @@ export const deleteDataTable = async(tableName) => {
         });
         if(res.status === 401){
             RedirectPage(history)
-            return { error: 'invalid session' };
+            return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return { error:'Failed to delete DataTable' }
+        return { error:MSG.UTILITY.ERR_DELETE_DATATABLE}
     }catch(err){
         console.error(err)
-        return {error:'Failed to delete DataTable'}
+        return {error:MSG.UTILITY.ERR_DELETE_DATATABLE}
     }
 }
 
@@ -187,16 +187,16 @@ export const fetchDataTables = async() => {
         });
         if(res.status === 401){
             RedirectPage(history)
-            return { error: 'invalid session' };
+            return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return { error:'Failed to Fetch DataTables' }
+        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Fetch DataTables'}
+        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }
 }
 
@@ -214,16 +214,16 @@ export const fetchDataTable = async(tableName) => {
         });
         if(res.status === 401){
             RedirectPage(history)
-            return { error: 'invalid session' };
+            return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return { error:'Failed to Fetch DataTables' }
+        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Fetch DataTables'}
+        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }
 }
 
@@ -253,16 +253,16 @@ export const exportDataTable = async(arg) => {
         });
         if(res.status === 401){
             RedirectPage(history)
-            return { error: 'invalid session' };
+            return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return { error:'Failed to Fetch DataTables' }
+        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Fetch DataTables'}
+        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }
 }
 
@@ -299,15 +299,15 @@ export const importDataTable = async(arg) => {
         });
         if(res.status === 401){
             RedirectPage(history)
-            return { error: 'invalid session' };
+            return {error:MSG.GENERIC.INVALID_SESSION}
         }
         if(res.status === 200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return { error:'Failed to Fetch DataTables' }
+        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Fetch DataTables'}
+        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }
 }

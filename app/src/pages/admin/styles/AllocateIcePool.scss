@@ -1,14 +1,16 @@
+@import "../../global/styles/ColorVariables.scss";
+
 .allocate-opt{
     div{
         display: inline-block;
         margin: 20px 0px;
         padding: 0px 20px;
-        color: #fff;
+        color: $whiteColor;
         border: 0;
         border-radius: 8px;
         padding: 2px 15px;
         font-size: 18px;
-        background: #643693;
+        background: $primaryColor;
         font-family: 'LatoWebLight';
         outline: 0;
         cursor: pointer;
@@ -17,8 +19,8 @@
         margin-left: 20px;
     }
     .unactive-opt{
-        box-shadow: 2px 2px #8469a0;
-        background: #6e469896;
+        box-shadow: 2px 2px $PrimaryShadow;
+        background: $primaryColorLight;
     }
 
 }

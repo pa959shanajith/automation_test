@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 #executionType, #chooseICEPool{
     max-width: 200px;
     height: 35px;
@@ -7,16 +8,16 @@
     width: 100%;
     left: 171px;
     max-height: 123px;
-    background: white;
+    background: $whiteColor;
 }
 .status-available{
-    background-color:#95c353
+    background-color: $pistachio;
 }
 .status-unavailable{
-    background-color:#fdc010
+    background-color:$yellowColor;
 }
 .status-dnd{
-    background-color:red
+    background-color:$red
 }
 .popup-content{
     padding: 0px 40px !important;
@@ -52,7 +53,7 @@
     width: 335px;
     left: 171px;
     max-height: 123px;
-    background: white;
+    background: $whiteColor;
 }
 .allocate-ice-Modal{
     .modal-content{

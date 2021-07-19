@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .modal-open .modal {
     overflow-x: hidden;
     overflow-y: auto;
@@ -42,7 +43,7 @@
     right: 15px;
     top: 11px;
     position: absolute;
-    color: #fff;
+    color: $whiteColor;
     opacity: 1;
     text-shadow: none;
     font-family: 'LatoWebThin';
@@ -52,8 +53,8 @@
 .modal-title {
     margin: 0;
     line-height: 1.42857143;
-    background: #311d4e;
-    color: #fff;
+    background: $primaryColorDark;
+    color: $whiteColor;
     border-radius: 6px;
     padding: 5px 40px;
     text-align: center;

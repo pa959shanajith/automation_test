@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { ModalContainer, RedirectPage } from '../../global';
+import { ModalContainer, RedirectPage, Messages as MSG } from '../../global';
 import { irisObjectTypes } from './ListVariables';
 import { updateIrisDataset, userObjectElement_ICE } from '../api';
 import "../styles/EditIrisObject.scss";
@@ -51,13 +51,12 @@ const EditIrisObject = props => {
 
         if (!props.utils.object.objId) {
             props.setShow(false);
-            props.setShowPop({title: "IRIS Object Details", content: "Please save the object first."});
+            props.setShowPop(MSG.SCRAPE.ERR_OBJ_SAVE);
         }
         else {
             updateIrisDataset(data)
             .then(val => {
                 if(val === 'success'){
-                    // props.setShowPop({title: "IRIS Object Details", content: "Submitted Successfully."});
                     if(selectedType !== existingType || selectedStatus !== existingStatus){
                         props.utils.modifyScrapeItem(props.utils.object.val, {
                             custname: props.utils.object.custname,
@@ -73,26 +72,26 @@ const EditIrisObject = props => {
                         .then(datairis => {
                             let msg = null;
                             if (datairis === "Invalid Session") return RedirectPage(history);
-                            else if (datairis === "unavailableLocalServer") msg ={title: "IRIS Object Details", content: "Submitted successfully but failed to save IRIS image, ICE not available."};
-                            else if (datairis === "fail" && selectedType === "unrecognizableobject") msg = {title: "IRIS Object Details", content: "Submitted successfully."};
-                            else if (datairis === "fail") msg = {title: "IRIS Object Details", content: "Submitted successfully but failed to save IRIS image."};
-                            else msg = {title: "IRIS Object Details", content: "Submitted Successfully. IRIS image saved."};
+                            else if (datairis === "unavailableLocalServer") msg =MSG.SCRAPE.WARN_IRIS_SAVE;
+                            else if (datairis === "fail" && selectedType === "unrecognizableobject") msg = MSG.SCRAPE.SUCC_SUBMIT;
+                            else if (datairis === "fail") msg = MSG.SCRAPE.WARN_IRIS_SAVE_FAIL;
+                            else msg = MSG.SCRAPE.SUCC_IRIS_SAVE;
                             if (msg) props.setShowPop(msg);
                             props.setShow(false);
                         })
                         .catch(error => {
-                            props.setShowPop({title: "IRIS Object Details", content: "Submitted successfully but failed to save IRIS image."});
+                            props.setShowPop(MSG.SCRAPE.WARN_IRIS_SAVE_FAIL);
                             props.setShow(false);
                             console.error("ERROR::::", error);
                         });
                 }
                 else {
                     props.setShow(false);
-                    props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
+                    props.setShowPop(MSG.SCRAPE.ERR_UPDATE_IRIS);
                 }
             })
             .catch(error => {
-                props.setShowPop({title: "IRIS Object Details", content: "Failed to updated IRIS Object Details."});
+                props.setShowPop(MSG.SCRAPE.ERR_UPDATE_IRIS);
                 props.setShow(false);
                 console.error("ERROR::::", error);
             });

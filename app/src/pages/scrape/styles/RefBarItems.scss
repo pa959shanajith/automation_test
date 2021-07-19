@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .filter_pop__content{
     padding: 12px 27px;
     display: flex;   
@@ -30,8 +31,8 @@
 
         .d__filter-btn{
             flex-grow: 1;
-            background-color: #46316c;
-            color: white;
+            background-color: $hovorIcon;
+            color: $whiteColor;
             padding: 0 15px;
             font-size: 15px;
             border: none;
@@ -39,7 +40,7 @@
             border-radius: 20px;
             margin: 5px 4px;
             &:hover{
-                background-color: #9d6ae0;
+                background-color: $primaryColorLogin ;
             }
         }
     }
@@ -70,5 +71,5 @@
 }
 
 .active-filter{
-    background-color: #9d6ae0!important;
+    background-color: $primaryColorLogin !important;
 }

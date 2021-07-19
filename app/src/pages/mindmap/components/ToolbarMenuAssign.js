@@ -57,8 +57,8 @@ const ToolbarMenuAssign = (props) => {
     const displayError = (error) =>{
         // SetProgressBar("stop",dispatch)
         setPopup({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })

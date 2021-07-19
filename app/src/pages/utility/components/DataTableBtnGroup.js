@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScrollBar } from '../../global';
 import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
+import { ScrollBar, VARIANT } from '../../global';
 import ExportDataTable from './ExportDataTable';
 import ImportSheet from './ImportSheet';
 import * as actionTypes from '../state/action';
@@ -22,7 +22,7 @@ const TableActionButtons = props => {
         if (props.checkList.list.length===1){
             if (props.checkList.type==="row"){
                 if (props.data.length >= 199) 
-                    props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
+                    props.setShowPop({variant: VARIANT.WARNING, content: 'Table cannot have more than 200 rows', type: 'message'});
                 else {
                     pushToHistory({headers: props.headers, data: props.data});
                     let newData = [...props.data];
@@ -44,7 +44,7 @@ const TableActionButtons = props => {
             }
             else{
                 if (props.headers.length >= 50) 
-                    props.setShowPop({title: 'Error', content: 'Table cannot have more than 50 columns', type: 'message'});
+                    props.setShowPop({variant: VARIANT.WARNING, content: 'Table cannot have more than 50 columns', type: 'message'});
                 else {
                     pushToHistory({headers: props.headers, data: props.data});
                     let newHeaders = [...props.headers];
@@ -85,7 +85,7 @@ const TableActionButtons = props => {
             if (props.checkList.type==="row"){
                 if (props.checkList.list.includes("sel||row||subheader") || props.data.length === props.checkList.list.length)
                     props.setShowPop({
-                        title: 'Delete Error', 
+                        variant: VARIANT.WARNING,
                         content: props.checkList.list.includes("sel||row||subheader") 
                                 ? 'Cannot delete SubHeader row.'
                                 : 'Table cannot have 0 rows', 
@@ -99,7 +99,7 @@ const TableActionButtons = props => {
             }
             else{
                 if (props.headers.length === props.checkList.list.length)
-                    props.setShowPop({title: 'Error', content: 'Table cannot have 0 columns', type: 'message'});
+                    props.setShowPop({variant: VARIANT.WARNING, content: 'Table cannot have 0 columns', type: 'message'});
                 else {
                     pushToHistory({headers: props.headers, data: props.data});
                     let [newHeaders, newData] = deleteData(props.headers, props.data, props.checkList.list);
@@ -250,27 +250,27 @@ const CreateScreenActionButtons = props => {
 
             switch (validation) {
                 case "tableName": props.setErrors({tableName: true}); break;
-                case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
-                case "duplicateHeaders": props.setShowPop({title: "Duplicate Header Error", content: "Data has duplicate headers", type: "message"}); break;
-                case "emptyHeader":props.setShowPop({title: "Empty Header Error", content: "Cannot save with empty header.", type: "message"}); break;
+                case "emptyData": props.setShowPop({variant: VARIANT.ERROR, content: "Cannot Save Empty Data", type: "message"}); break;
+                case "duplicateHeaders": props.setShowPop({variant: VARIANT.WARNING, content: "Data has duplicate headers", type: "message"}); break;
+                case "emptyHeader": props.setShowPop({variant: VARIANT.WARNING, content: "Cannot save with empty header.", type: "message"}); break;
                 case "saveData": 
                     props.setOverlay('Creating Data Table...');
                     let resp = await utilApi.createDataTable(arg);
                     props.setOverlay('');
 
                     switch (resp) {
-                        case "exists": props.setShowPop({title: 'Data Table', content: 'Data Table Already Exist!', type: "message"}); break;
-                        case "fail": props.setShowPop({title: 'Data Table', content: 'Failed to Create Data Table', type: "message"}); break;
-                        case "success": props.setShowPop({title: 'Data Table', content: 'Data Table Saved Successfully!', type: "message"}); break;
-                        default: props.setShowPop({title: 'Data Table Error', content: resp.error || "Failed To Create Data Table", type: "message"}); break;
+                        case "exists": props.setShowPop({variant: VARIANT.ERROR, content: 'Data Table Already Exist!', type: "message"}); break;
+                        case "fail": props.setShowPop({variant: VARIANT.ERROR, content: 'Failed to Create Data Table', type: "message"}); break;
+                        case "success": props.setShowPop({variant: VARIANT.SUCCESS, content: 'Data Table Saved Successfully!', type: "message"}); break;
+                        default: props.setShowPop({variant: VARIANT.ERROR, content: resp.error || "Failed To Create Data Table", type: "message"}); break;
                     }   
                     props.setErrors({}); 
                     break;
-                default: props.setShowPop({title: 'Data Table', content: 'Failed to Create Data Table', type: "message"}); break;
+                default: props.setShowPop({variant: VARIANT.ERROR, content: 'Failed to Create Data Table', type: "message"}); break;
             }
         }
         catch(error) {
-            props.setShowPop({title: 'Data Table', content: 'Failed to Create Data Table', type: "message"})
+            props.setShowPop({variant: VARIANT.ERROR, content: 'Failed to Create Data Table', type: "message"})
             console.error(error);
         }
     }
@@ -298,19 +298,19 @@ const CreateScreenActionButtons = props => {
                 } else {
 
                     const resp = await utilApi.importDataTable({importFormat: importFormat, content: reader.result, flag: importFormat==="excel"?"sheetname":""});
-                    
+                
                     if(importFormat === "excel") {
                         setSheetList(resp);
                         setExcelContent(reader.result);
                     } 
                     else if (resp == "columnExceeds") {
-                        props.setShowPop({title: "Error File Read", content: "Column should not exceed 50", type: "message"});
+                        props.setShowPop({variant: VARIANT.WARNING, content: "Column should not exceed 15", type: "message"});
                     } 
                     else if (resp == "rowExceeds") {
-                        props.setShowPop({title: "Error File Read", content: "Row should not exceed 200", type: "message"});
+                        props.setShowPop({variant: VARIANT.WARNING, content: "Row should not exceed 200", type: "message"});
                     }
                     else if (resp == "emptyData") {
-                        props.setShowPop({title: "Error File Read", content: "Empty data in the file", type: "message"});
+                        props.setShowPop({variant: VARIANT.ERROR, content: "Empty data in the file", type: "message"});
                     }
                     else {
                         const [, newData, newHeaders] = parseTableData(resp, "import")
@@ -321,7 +321,7 @@ const CreateScreenActionButtons = props => {
             }
             catch(error){
                 console.error("ERROR:::", error);
-                props.setShowPop({title: "Error File Read", content: "Failed to Load file", type: "message"})
+                props.setShowPop({variant: VARIANT.ERROR, content: "Failed to Load file", type: "message"})
             }
         }
         reader.readAsBinaryString(file);
@@ -357,15 +357,15 @@ const EditScreenActionButtons = props => {
                 onClick: ()=>deleteDataTable(),
                 type: 'confirm'
             }
-
+            //pppppppppppppppppppppppppppppppppppppppppppppppppppppppppp onclick
             switch(resp){
                 case "success": props.setShowPop({...deleteMsg, content: "Are you sure you want to delete current data table?"});break;
                 case "referenceExists": props.setShowPop({...deleteMsg, content: "Data Table is referenced in Test Cases. Are you sure you want to delete current data table?"});break;
-                default: props.setShowPop({ title: "Error Data Table", content: "Failed to Delete Data Table", type: "message" });break;
+                default: props.setShowPop({ variant: VARIANT.ERROR, content: "Failed to Delete Data Table", type: "message" });break;
             }
         }
         catch(error) {
-            props.setShowPop({ title: "Error Data Table", content: "Failed to Delete Data Table", type: "message" });
+            props.setShowPop({ variant: VARIANT.ERROR, content: "Failed to Delete Data Table", type: "message" });
             console.error(error);
         }
     }
@@ -376,9 +376,9 @@ const EditScreenActionButtons = props => {
         props.setOverlay("");
 
         if (resp === "success")
-            props.setShowPop({title: "Delete Data Table", content: "Data Table Deleted Successfully.", type: "message", onClick:()=>props.setScreenType("datatable-Create")});
+            props.setShowPop({variant: VARIANT.SUCCESS, content: "Data Table Deleted Successfully.", type: "message", onClick:()=>props.setScreenType("datatable-Create")});
         else 
-            props.setShowPop({title: "Delete Data Table", content: "Failed to delete data table", type: "message"});
+            props.setShowPop({variant: VARIANT.ERROR, content: "Failed to delete data table", type: "message"});
 
     }
 
@@ -390,23 +390,23 @@ const EditScreenActionButtons = props => {
 
             switch (validation) {
                 case "tableName": props.setErrors({tableName: true}); break;
-                case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
-                case "emptyHeader":props.setShowPop({title: "Empty Header Error", content: "Cannot save with empty header.", type: "message"}); break;
-                case "duplicateHeaders": props.setShowPop({title: "Duplicate Header Error", content: "Data has duplicate headers", type: "message"}); break;
+                case "emptyData": props.setShowPop({variant: VARIANT.ERROR, content: "Cannot Save Empty Data", type: "message"}); break;
+                case "duplicateHeaders": props.setShowPop({variant: VARIANT.WARNING, content: "Data has duplicate headers", type: "message"}); break;
+                case "duplicateHeaders": props.setShowPop({variant: VARIANT.WARNING, content: "Data has duplicate headers", type: "message"}); break;
                 case "saveData": 
                     props.setOverlay("Updating Data Table");
                     const resp = await utilApi.editDataTable(arg);
                     props.setOverlay("");
                     if (resp === "success") 
-                        props.setShowPop({title: "Update Data Table", content: "Data Table Updated Successfully.", type: "message"})
+                        props.setShowPop({variant: VARIANT.SUCCESS, content: "Data Table Updated Successfully.", type: "message"})
                     else 
-                        props.setShowPop({title: "Update Data Table", content: "Failed to Update Data Table.", type: "message"})
+                        props.setShowPop({variant: VARIANT.ERROR, content: "Failed to Update Data Table.", type: "message"})
                     break;
-                default: props.setShowPop({title: 'Data Table', content: 'Failed to Update Data Table', type: "message"}); break;
+                default: props.setShowPop({variant: VARIANT.ERROR, content: 'Failed to Update Data Table', type: "message"}); break;
             }
         }
         catch(error) {
-            props.setShowPop({title: 'Data Table', content: 'Failed to Update Data Table', type: "message"})
+            props.setShowPop({variant: VARIANT.ERROR, content: 'Failed to Update Data Table', type: "message"})
             console.error(error);
         }
     }
@@ -441,7 +441,7 @@ const SearchDataTable = props => {
         const resp = await utilApi.fetchDataTable(selectedTableName);
         props.setOverlay('');
 
-        if (resp.error) props.setShowPop({title: "Data Table Error", content: resp.error, type: "message"});
+        if (resp.error) props.setShowPop({variant: VARIANT.ERROR, content: resp.error, type: "message"});
         else {
             const [tableName, newData, newHeaders] = parseTableData(resp[0], "edit")
             props.setData(newData);

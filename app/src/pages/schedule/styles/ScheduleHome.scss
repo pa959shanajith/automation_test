@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .s__body{
     display: flex;
     flex-direction: column;
@@ -28,6 +29,6 @@
     min-width: 0;
     padding: 20px;
     margin: 0 5px;
-    background-color: #fff;
+    background-color: $whiteColor;
 }
 

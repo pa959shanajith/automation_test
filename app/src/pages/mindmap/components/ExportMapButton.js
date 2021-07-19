@@ -1,5 +1,5 @@
 import React, { Fragment, useRef, useState } from 'react';
-import {ModalContainer} from '../../global';
+import {ModalContainer, Messages as MSG} from '../../global';
 import {useSelector} from 'react-redux'
 import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit} from '../api';
 import '../styles/ExportMapButton.scss'
@@ -145,14 +145,14 @@ const toExcel = async(projId,modId,fname,displayError,setPopup,setBlockui) => {
         URL.revokeObjectURL(fileURL);
         setBlockui({show:false,content:''})
         setPopup({
-            title:'Mindmap',
-            content:'Data Exported Successfully.',
+            variant:MSG.MINDMAP.SUCC_DATA_EXPORTED.VARIANT,
+            content:MSG.MINDMAP.SUCC_DATA_EXPORTED.CONTENT,
             submitText:'Ok',
             show:true
         })
     }catch(err){
         console.error(err)
-        displayError('Failed to Export Mindmap')
+        displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
     }
 }
 
@@ -168,14 +168,14 @@ const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
         jsonDownload(fname+'.mm', JSON.stringify(result));
         setBlockui({show:false,content:''})
         setPopup({
-            title:'Mindmap',
-            content:'Data Exported Successfully.',
+            variant:MSG.MINDMAP.SUCC_DATA_EXPORTED.VARIANT,
+            content:MSG.MINDMAP.SUCC_DATA_EXPORTED.CONTENT,
             submitText:'Ok',
             show:true
         })
     }catch(err){
         console.error(err)
-        displayError('Failed to Export Mindmap')
+        displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
     }
 }
 
@@ -200,8 +200,8 @@ const toGit = async ({projectList,displayError,setBlockui,setPopup,gitconfigRef,
     if(res.error){displayError(res.error);return;}
     setBlockui({show:false})
     setPopup({
-        title:'Mindmap',
-        content:'Data Exported Successfully.',
+        variant:MSG.MINDMAP.SUCC_DATA_EXPORTED.VARIANT,
+        content:MSG.MINDMAP.SUCC_DATA_EXPORTED.CONTENT,
         submitText:'Ok',
         show:true
     })
@@ -254,16 +254,16 @@ const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycle
             jsonDownload(fname+'_executiondata.json', JSON.stringify(executionData));
             setBlockui({show:false,content:''})
             setPopup({
-                title:'Mindmap',
-                content:'Data Exported Successfully.',
+                variant:MSG.MINDMAP.SUCC_DATA_EXPORTED.VARIANT,
+                content:MSG.MINDMAP.SUCC_DATA_EXPORTED.CONTENT,
                 submitText:'Ok',
                 show:true
             })
         } else {
-            displayError("Failed to export data");
+            displayError(MSG.MINDMAP.ERR_EXPORT_DATA);
         }
     }catch(err){
-        displayError("Failed to export data");
+        displayError(MSG.MINDMAP.ERR_EXPORT_DATA);
         console.error(err);
     } 
 }

@@ -39,9 +39,9 @@ const DesignHome = () => {
     const PopupDialog = () => (
         <PopupMsg 
             data-test="d__popup"
-            title={showPop.title}
+            variant={showPop.VARIANT || showPop.variant}
             close={()=>setShowPop("")}
-            content={showPop.content}
+            content={showPop.CONTENT || showPop.content}
             submitText="OK"
             submit={showPop.onClick ? showPop.onClick : ()=>setShowPop("")}
         />

@@ -1,11 +1,12 @@
+@import "../../global/styles/ColorVariables.scss";
 .time-container{
     position: relative;
     .fc-timePicker {
         width: 100%;
-        background-color: white;
+        background-color: $whiteColor;
         border-width: 1px;
         font-size: 14px;
-        border-color: #ced4da;
+        border-color: $lightGray;
         border-radius: 4px;
         padding-top: 4px;
         padding-left: 7px;
@@ -14,7 +15,7 @@
         top: 1px;
         position: absolute;
         right: 1px;
-        background: #643693;
+        background: $primaryColor;
         padding: 4px;
         border-radius: 0px 4px 4px 0px;
         -moz-border-radius: 0px 4px 4px 0px;
@@ -34,7 +35,7 @@
         opacity: 0.7;
     }
     .inputError{
-        border: 2px solid #d33c3c !important;
+        border: 2px solid $redError !important;
     }
 }
 .admin_timer{

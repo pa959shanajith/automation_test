@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
-import { ScrollBar } from '../../global';
 import { pushToHistory } from './DtUtils';
+import { ScrollBar, VARIANT } from '../../global';
 import { ReactSortable } from 'react-sortablejs';
 import TextareaAutosize from 'react-textarea-autosize';
 import "../styles/Table.scss";
@@ -22,7 +22,7 @@ const Table = props => {
     const onAdd = type => {
         if (type==="col") {
             if (props.headers.length >= 50) 
-                props.setShowPop({title: 'Error', content: 'Table cannot have more than 50 columns', type: 'message'});
+                props.setShowPop({variant: VARIANT.ERROR, content: 'Table cannot have more than 50 columns', type: 'message'});
             else {
                 pushToHistory({headers: props.headers, data: props.data});
                 let newHeaders = [...props.headers];
@@ -38,7 +38,7 @@ const Table = props => {
         }
         else if (type === "row") {
             if (props.data.length >= 199) 
-                props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
+                props.setShowPop({variant: VARIANT.ERROR, content: 'Table cannot have more than 200 rows', type: 'message'});
             else {
                 pushToHistory({headers: props.headers, data: props.data});
                 let newData = [...props.data];
@@ -53,7 +53,7 @@ const Table = props => {
     const updateHeaders = (newHeader, headerId, invalidFlag) => {
 
         if (invalidFlag) {
-            props.setShowPop({title: "Duplicate Header Name", content: "Header name is empty or duplicate", type: "message"})
+            props.setShowPop({variant: VARIANT.WARNING, content: "Header name is empty or duplicate", type: "message"})
             return;
         }
         pushToHistory({headers: props.headers, data: props.data});

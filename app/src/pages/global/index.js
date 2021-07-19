@@ -22,6 +22,7 @@ import TimeComp from'./components/TimeComp'
 import ErrorPage from './components/ErrorPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import ValidationExpression from './components/ValidationExpression';
+import {Messages, VARIANT} from './components/Messages';
 
 export { Header, 
         FooterOne, 
@@ -48,5 +49,7 @@ export { Header,
         ErrorPage,
         ErrorBoundary,
         updateScrollBar,
-        ValidationExpression
+        ValidationExpression,
+        Messages,
+        VARIANT
     };

@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .sm_dialog{
     display: flex;
     flex-direction: column;
@@ -19,9 +20,9 @@
 .sm_input{
     font-family: "LatoWeb";
     border-radius: 4px;
-    color: #555;
-    background-color: #fff;
-    border: 1px solid #311d4e;
+    color: $primaryText;
+    background-color: $whiteColor;
+    border: 1px solid $primaryColorDark;
     height: 34px;
     padding: 6px 12px;
     font-size: 14px;
@@ -32,6 +33,6 @@
 }
 
 .sm_error{
-    color: #cc3300;
+    color: $redError;
     font-size: 11px;
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ModalContainer, ScrollBar} from '../../global' 
+import {ScreenOverlay, PopupMsg, ModalContainer, ScrollBar, Messages as MSG, VARIANT} from '../../global' 
 import {getLDAPConfig} from '../api';
 import '../styles/LdapConfigEdit.scss'
 import LdapConfigurationForm from '../components/LdapConfigurationForm';
@@ -26,8 +26,8 @@ const LdapConfigEdit = (props) => {
     const displayError = (error) =>{
         setLoading(false)
         props.setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -56,7 +56,7 @@ const LdapConfigEdit = (props) => {
         setLoading(false);
         if(data === "empty") {
             if(props.popupState.show === true) setEmptyPopup(true);
-            else props.setPopupState({show:true,title:"Edit Configuration",content: "There are no configurations created yet."});
+            else displayError(MSG.ADMIN.WARN_EMPTY_CONFIG);
             setSelBox([]);
         } else {
             data.sort();
@@ -85,8 +85,8 @@ const LdapConfigEdit = (props) => {
     const closePopup = () => {
         props.setPopupState({show:false,title:"",content:""});
         if(emptyPopup){
-			props.setPopupState({show:true,title:"Edit Configuration",content: "There are no configurations created yet."});
-			setEmptyPopup(false);
+            displayError(MSG.ADMIN.WARN_EMPTY_CONFIG);
+            setEmptyPopup(false);
 		}
     }
 
@@ -121,7 +121,7 @@ const LdapConfigEdit = (props) => {
 			}
 		}catch(error) {
 			setLoading(false);
-			props.setPopupState({show:true,title:"Edit Configuration",content: failMsg});
+			props.setPopupState({show:true,variant:VARIANT.ERROR,content: failMsg});
 		}
     }
 
@@ -131,7 +131,7 @@ const LdapConfigEdit = (props) => {
 
     return (
         <div className="ldap_container-edit">
-            {props.popupState.show?<PopupMsg content={props.popupState.content} title={props.popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
+            {props.popupState.show?<PopupMsg variant={props.popupState.variant} content={props.popupState.content} title={props.popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <div id="page-taskName"><span>Edit LDAP Configuration</span></div>

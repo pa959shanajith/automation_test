@@ -1,11 +1,12 @@
+@import "../../global/styles/ColorVariables.scss";
 .task-header{
     display: flex;
     flex-direction: row;
     padding: 2px 2px 2px 25px;
     align-items: center;
     font-family: "LatoWeb";
-    color: white;
-    background-color: #633693;
+    color: $whiteColor;
+    background-color: $primaryColor;
     border-radius: 8px;
 }
 
@@ -32,7 +33,7 @@
 }
 
 .task-ic-container{
-    background-color: #FFF;
+    background-color: $whiteColor;
     border-radius: 7px;
     padding: 6px;
     margin: 2px;
@@ -47,7 +48,7 @@
 }
 
 .filter-on{
-    background-color: #b875da;
+    background-color: $primaryColorLightest;
 }
 
 .my-task{
@@ -63,12 +64,12 @@
     font-size: 20px;
     font-family: "LatoWebLight";
     border-radius: 7px 0 0 7px;
-    border-right: 1px solid #ccc;
+    border-right: 1px solid $borderTwo;
     margin-right: -2px;
     padding-left: 10px;
     &:focus{
         outline: none;
-        border-right: 1px solid #ccc;
+        border-right: 1px solid $borderTwo;
     }
 }
 
@@ -77,17 +78,17 @@
     margin-top: 10px;
     display: flex;
     flex-direction: row;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid $borderFour;
 }
 
 .task-nav-item{
     border: 1px solid transparent;
-    color: #633693;
+    color: $primaryColor;
     padding: 10px 15px;
     margin-right: 2px;
     margin-bottom: -1px;
     &:hover{
-        background-color: #eee;
+        background-color: $whisper;
         border-radius: 4px 4px 0 0;
         cursor: pointer;
     }
@@ -96,14 +97,14 @@
     border-radius: 0 7px 7px 0!important; 
 }
 .active-tab{
-    border-top: 1px solid #ddd;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    border-bottom: 1px solid #fff;
-    background-color: #fff;
+    border-top: 1px solid $borderFour;
+    border-left: 1px solid $borderFour;
+    border-right: 1px solid $borderFour;
+    border-bottom: 1px solid $whiteColor;
+    background-color: $whiteColor;
     border-radius: 4px 4px 0 0;
     &:hover{
-        background-color: #fff;
+        background-color: $whiteColor;
         cursor: default;
     }
 }
@@ -130,10 +131,10 @@
 
 // @media screen and (min-width: 1400px) and (min-height: 770px){
 //     .active-tab{
-//         border-top: .1vw solid #ddd;
-//         border-left: .1vw solid #ddd;
-//         border-right: .1vw solid #ddd;
-//         border-bottom: .1vw solid #fff;
+//         border-top: .1vw solid $borderFour;
+//         border-left: .1vw solid $borderFour;
+//         border-right: .1vw solid $borderFour;
+//         border-bottom: .1vw solid $whiteColor;
 //         border-radius: .2vw .2vw 0 0;
 //     }
 
@@ -170,7 +171,7 @@
     
 //     .task-nav-bar{
 //         margin-top: .8vw;
-//         border-bottom: .1vw solid #ddd;
+//         border-bottom: .1vw solid $borderFour;
 //     }
     
 //     .task-nav-item{

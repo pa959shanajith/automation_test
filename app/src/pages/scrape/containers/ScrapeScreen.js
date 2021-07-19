@@ -15,7 +15,7 @@ import { CreateObjectModal, EditObjectModal } from '../components/CustomObjectMo
 import ActionBarItems from '../components/ActionBarItems';
 import LaunchApplication from '../components/LaunchApplication';
 import { ScrapeContext } from '../components/ScrapeContext';
-import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, ModalContainer, ResetSession } from '../../global';
+import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, ModalContainer, ResetSession, Messages as MSG } from '../../global';
 import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/ScrapeScreen.scss';
@@ -208,22 +208,22 @@ const ScrapeScreen = ()=>{
                     if (data === "Invalid Session") {
                         return RedirectPage(history);
                     } else if (data === "unavailableLocalServer") {
-                        setShowPop({title: "Web Service Screen", content: "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
+                        setShowPop(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
                     } else if (data === "scheduleModeOn") {
-                        setShowPop({title: "Web Service Screen", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."});
+                        setShowPop(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
                     } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
-                        setShowPop({title: "Web Service Screen", content: "Execution Only Allowed"});
+                        setShowPop(MSG.SCRAPE.WARN_EXECUTION_ONLY);
                     } else if (typeof data === "object") {
-                        setShowPop({title: "Data Retrieve", content: "Web Service response received successfully"});
+                        setShowPop(MSG.SCRAPE.SUCC_WEBSERVICE_RESP);
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader: data.responseHeader[0].split("##").join("\n")}});
                         let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respBody: localRespBody}});
-                    } else setShowPop({title: "Debug Web Service", content: "Debug Terminated."});
+                    } else setShowPop(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
                 })
                 .catch(error => {
                     setOverlay("");
                     ResetSession.end();
-                    setShowPop({title: "Web Service Screen", content: "Error while performing operation."});
+                    setShowPop(MSG.SCRAPE.ERR_OPERATION);
                     console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
                 });
             }
@@ -247,7 +247,7 @@ const ScrapeScreen = ()=>{
                 ResetSession.end();
                 if (data === "Invalid Session") return RedirectPage(history);
                 else if (data === "Response Body exceeds max. Limit.")
-                    err = { 'title': 'Scrape Screen', 'content': 'Scraped data exceeds max. Limit.' };
+                    err = { 'variant': 'Scrape Screen', 'content': 'Scraped data exceeds max. Limit.' };
                 else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
                     let scrapedItemsLength = scrapeItems.length;
 
@@ -256,21 +256,21 @@ const ScrapeScreen = ()=>{
 
                     setSaved(false);
                     err = {
-                        'title': 'Scrape Screen', 'content':
+                        'variant':  data === 'scheduleModeOn'?MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT:MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'content':
                             data === 'scheduleModeOn' ?
-                                "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed." :
-                                "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."
+                                MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
+                                MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
                     };
                 } else if (data === "fail")
-                    err = { 'title': 'Scrape', 'content': 'Failed to scrape.' };
+                    err = MSG.SCRAPE.ERR_SCRAPE;
                 else if (data === "Terminate") {
                     setOverlay("");
-                    err = { 'title': 'Scrape Screen', 'content': 'Scrape Terminated' };
+                    err = MSG.SCRAPE.ERR_SCRAPE_TERMINATE;
                 }
                 else if (data === "wrongWindowName")
-                    err = { 'title': 'Scrape', 'content': 'Window not found - Please provide valid window name.' };
+                    err =MSG.SCRAPE.ERR_WINDOW_NOT_FOUND;
                 else if (data === "ExecutionOnlyAllowed")
-                    err = { 'title': 'Scrape Screen', 'content': 'Execution Only Allowed' };
+                    err = MSG.GENERIC.WARN_EXECUTION_ONLY;
 
                 if (err) {
                     setShowPop(err);
@@ -289,9 +289,9 @@ const ScrapeScreen = ()=>{
                         dispatch({type: actionTypes.SET_COMPAREFLAG, payload: true});
                     } else {
                         if (data.status === "EMPTY_OBJECT")
-                            setShowPop({title: "Compare Objects", content: "Failed to compare objects - Unmapped object(s) found"});
+                            setShowPop(MSG.SCRAPE.ERR_UNMAPPED_OBJ);
                         else
-                            setShowPop({title: "Compare Objects", content: "Failed to compare objects"});
+                            setShowPop(MSG.SCRAPE.ERR_COMPARE_OBJ);
                     }
                 } else {
                     let viewString = data;
@@ -324,7 +324,7 @@ const ScrapeScreen = ()=>{
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
-                setShowPop({'title': "Scrape Screen",'content': "Error while performing Scrape."});
+                setShowPop(MSG.SCRAPE.ERR_SCRAPE);
                 console.error("Fail to Load design_ICE. Cause:", error);
             });
         }
@@ -340,10 +340,9 @@ const ScrapeScreen = ()=>{
             footer={showPop.footer}
         /> :
         <PopupMsg 
-            title={showPop.title}
+            variant={showPop.variant || showPop.VARIANT}
             close={()=>setShowPop("")}
-            content={showPop.content}
-            submitText="OK"
+            content={showPop.content || showPop.CONTENT}
             submit={showPop.onClick ? showPop.onClick : ()=>setShowPop("")}
         />
     );
@@ -555,6 +554,9 @@ function generateScrapeItemList(lastIdx, viewString, type="old"){
                             height: scrapeObject.height,
                             width: scrapeObject.width,
                         }
+        if (scrapeObject.fullSS != undefined && !scrapeObject.fullSS && scrapeObject.viewTop!=undefined) {
+            scrapeItem['viewTop'] = scrapeObject.viewTop;
+        }
 
         
         if (type === "new") scrapeItem.tempOrderId = newUUID;

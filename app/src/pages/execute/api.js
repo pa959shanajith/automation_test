@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {RedirectPage} from '../global'
+import {RedirectPage, Messages as MSG} from '../global'
 import {history} from './index'
 import {url} from '../../App'
 
@@ -19,16 +19,16 @@ export const readTestSuite_ICE = async(readTestSuite) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch test suite data.'}
+        return {error:MSG.EXECUTE.ERR_TESTSUITE_FETCH}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch test suite data.'}
+        return {error:MSG.EXECUTE.ERR_TESTSUITE_FETCH}
     }
 }
 
@@ -48,16 +48,16 @@ export const updateTestSuite_ICE = async(batchDetails) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to update test suit.'}
+        return {error:MSG.EXECUTE.ERR_TESTSUITE_UPDATE}
     }catch(err){
         console.error(err)
-        return {error:'Failed to update test suit.'}
+        return {error:MSG.EXECUTE.ERR_TESTSUITE_UPDATE}
     }
 }
 
@@ -82,16 +82,16 @@ export const reviewTask = async(projectId,taskId,taskstatus,version,batchTaskIDs
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to review task.'}
+        return {error:MSG.EXECUTE.ERR_REVIEW_TASK}
     }catch(err){
         console.error(err)
-        return {error:'Failed to review task.'}
+        return {error:MSG.EXECUTE.ERR_REVIEW_TASK}
     }
 }
 
@@ -111,16 +111,16 @@ export const loadLocationDetails = async(scenarioName, scenarioId) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to load location details.'}
+        return {error:MSG.EXECUTE.ERR_LOCATION_DETAILS}
     }catch(err){
         console.error(err)
-        return {error:'Failed to load location details.'}
+        return {error:MSG.EXECUTE.ERR_LOCATION_DETAILS}
     }
 }
 
@@ -145,16 +145,16 @@ export const readTestCase_ICE = async(userInfo,testCaseId,testCaseName,versionnu
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch test case.'}
+        return {error:MSG.EXECUTE.ERR_FETCH_TC}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch test case.'}
+        return {error:MSG.EXECUTE.ERR_FETCH_TC}
     }
 }
 
@@ -175,16 +175,16 @@ export const ExecuteTestSuite_ICE = async(executionData) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {errorapi:'invalid session'};
+            return {errorapi:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {errorapi:'Failed to execute test suite.'}
+        return {errorapi:MSG.EXECUTE.ERR_EXECUTE_TESTSUITE}
     }catch(err){
         console.error(err)
-        return {errorapi:'Failed to execute test suite.'}
+        return {errorapi:MSG.EXECUTE.ERR_EXECUTE_TESTSUITE}
     }
 }
 
@@ -208,16 +208,16 @@ export const loginQCServer_ICE = async(qcURL,qcUserName,qcPassword) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to login qc server.'}
+        return {error:MSG.EXECUTE.ERR_LOGIN_QC}
     }catch(err){
         console.error(err)
-        return {error:'Failed to login qc server.'}
+        return {error:MSG.EXECUTE.ERR_LOGIN_QC}
     }
 }
 
@@ -242,16 +242,16 @@ export const loginQTestServer_ICE = async(qcURL,qcUserName,qcPassword, qcType) =
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to login qtest server.'}
+        return {error:MSG.EXECUTE.ERR_LOGIN_QTEST}
     }catch(err){
         console.error(err)
-        return {error:'Failed to login qtest server.'}
+        return {error:MSG.EXECUTE.ERR_LOGIN_QTEST}
     }
 }
 
@@ -267,17 +267,17 @@ export const getPools = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){ 
-            if(res.data === 'empty') return {error:"There are no users created yet."}           
+            if(res.data === 'empty') return {error:MSG.EXECUTE.ERR_EMPTY_USER}           
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch pools!"}
+        return {error:MSG.GENERIC.ERR_FETCH_POOLS}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch pools!"}
+        return {error:MSG.GENERIC.ERR_FETCH_POOLS}
     }
 } 
 
@@ -297,16 +297,16 @@ export const getICE_list = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch ICE."}
+        return {error:MSG.GENERIC.ERR_FETCH_ICE}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch ICE."}
+        return {error:MSG.GENERIC.ERR_FETCH_ICE}
     }
 }
 
@@ -333,16 +333,16 @@ export const loginZephyrServer_ICE = async(zephyrURL,zephyrUserName,zephyrPasswo
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to login Zephyr server."}
+        return {error:MSG.EXECUTE.ERR_LOGIN_ZEPHYR}
     }catch(err){
         console.error(err)
-        return {error:"Failed to login Zephyr server."}
+        return {error:MSG.EXECUTE.ERR_LOGIN_ZEPHYR}
     }
 }
 
@@ -364,15 +364,15 @@ export const updateAccessibilitySelection = async(suiteInfo) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to save selected accessibility standards."}
+        return {error:MSG.EXECUTE.ERR_SAVE_ACCESSIBILITY}
     }catch(err){
         console.error(err)
-        return {error:"Failed to save selected accessibility standards."}
+        return {error:MSG.EXECUTE.ERR_SAVE_ACCESSIBILITY}
     }
 }

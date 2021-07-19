@@ -1,6 +1,6 @@
 import React ,  { Fragment, useState} from 'react';
 import { getNames_ICE, createProject_ICE, updateProject_ICE, getDomains_ICE, exportProject} from '../api';
-import {ScreenOverlay, PopupMsg} from '../../global'
+import {ScreenOverlay, Messages, VARIANT} from '../../global'
 import { useSelector} from 'react-redux'; 
 import '../styles/ProjectButtons.scss';
 
@@ -12,7 +12,7 @@ import '../styles/ProjectButtons.scss';
 const ProjectButtons = (props) => {
     const userInfo = useSelector(state=>state.login.userinfo);
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
+    const setPopupState=props.setPopupState
 
     // Create Project Action
     const create_project = async()=>{
@@ -20,9 +20,9 @@ const ProjectButtons = (props) => {
         props.setProjectNameInputErrorBorder(false);
         if (props.projectName.trim() === "") props.setProjectNameInputErrorBorder(true);
         else if (props.projectTypeSelected=== ""){
-            setPopupState({show:true,title:"Create Project",content:"Please select Application Type"});
+            displayError(Messages.ADMIN.WARN_SELECT_APPTYPE);
         } else if (props.releaseList.length === 0) {
-            setPopupState({show:true,title:"Create Project",content:"Please add atleast one release"});
+            displayError(Messages.ADMIN.WARN_ADD_RELEASE);
         }else {
 			var proceedToCreate = true;
 			var relNames = "";
@@ -33,7 +33,7 @@ const ProjectButtons = (props) => {
 				}
 			}
 			if (proceedToCreate === false) {
-                setPopupState({show:true,title:"Update Project",content:"Please add atleast one cycle for release: " + relNames});
+                setPopupState({show:true,variant:VARIANT.WARNING,content:"Please add atleast one cycle for release: " + relNames});
             } 
             else if (proceedToCreate === true) {
 				var requestedids = [];
@@ -53,13 +53,13 @@ const ProjectButtons = (props) => {
                     } else if (response.projectNames.length > 0) {
                         for ( i = 0; i < response.projectNames.length; i++) {
                             if (props.projectName === response.projectNames[i]) {
-                                setPopupState({show:true,title:"Create Project",content:"Project Name already Exists"});
+                                displayError(Messages.ADMIN.WARN_PROJECT_EXIST);
                                 document.getElementById("create_button").disabled = false;
                                 return false;
                             } else proceeed = true;
                         }
                     } else {
-                        setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
+                        displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
                         document.getElementById("create_button").disabled = false;
                         return false;
                     }
@@ -74,12 +74,12 @@ const ProjectButtons = (props) => {
                         const createProjectRes = await createProject_ICE(createprojectObj)
                         if(createProjectRes.error){displayError(createProjectRes.error);document.getElementById("create_button").disabled = false;return;}
                         else if (createProjectRes === 'success') {
-                            setPopupState({show:true,title:"Create Project",content:"Project created successfully"});
+                            displayError(Messages.ADMIN.SUCC_PROJECT_CREATE);
                             props.resetForm();
                             props.setProjectDetails([]);
                             refreshDomainList();
                         } else {
-                            setPopupState({show:true,title:"Create Project",content:"Failed to create project"});
+                            displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
                             props.resetForm();
                         }
                         setLoading(false);
@@ -88,7 +88,7 @@ const ProjectButtons = (props) => {
             }
             else {
 				setLoading(false);
-                setPopupState({show:true,title:"Create Project",content:"Please add atleast one cycle for a release"});
+                displayError(Messages.ADMIN.WARN_ADD_CYCLE);
 			}
         }
         document.getElementById("create_button").disabled = false;
@@ -108,7 +108,7 @@ const ProjectButtons = (props) => {
 			for (var i = 0; i < props.projectDetails.length; i++) {
 				if (props.releaseList[j] === props.projectDetails[i].name) {
 					if (props.projectDetails[i].cycles.length === 0) {
-                        setPopupState({show:true,title:"Create Project",content:"Please add atleast one cycle for a release"});
+                        displayError(Messages.ADMIN.WARN_ADD_CYCLE);
                         return true;
 					}
 				}
@@ -124,7 +124,7 @@ const ProjectButtons = (props) => {
 		} else if (props.selProject === "") {
 			props.setProjectSelectErrorBorder(true);
 		} else if (props.releaseList.length === 0) {
-            setPopupState({show:true,title:"Update Project",content:"Please add atleast one release"});
+            displayError(Messages.ADMIN.WARN_ADD_RELEASE);
         } else{
             return true
         }
@@ -145,7 +145,7 @@ const ProjectButtons = (props) => {
             var val = downloadFile({result,projectName:props.selProject})
             setLoading(false)
             setPopupState({
-                title:'Project Export',
+                variant:val?VARIANT.SUCCESS:VARIANT.ERROR,
                 content:val?'Data Exported Successfully.':'Data Export Failed.',
                 show:true
             })
@@ -219,7 +219,7 @@ const ProjectButtons = (props) => {
 				}
             }
             if (proceedFlag === false) {
-                setPopupState({show:true,title:"Update Project",content:"Please add atleast one cycle for release: " + relName});
+                setPopupState({show:true,variant:VARIANT.WARNING,content:"Please add atleast one cycle for release: " + relName});
                 setLoading(false);
                 return false;
             }
@@ -241,7 +241,7 @@ const ProjectButtons = (props) => {
                     } else if (response.projectNames.length > 0) {
                         for ( i = 0; i < response.projectNames.length; i++) {
                             if (props.editProjectName.trim() === response.projectNames[i]) {
-                                setPopupState({show:true,title:"Create Project",content:"Project Name already Exists"});
+                                displayError(Messages.ADMIN.WARN_PROJECT_EXIST);
                                 proceeed = false;
                                 setLoading(false);
                                 return;
@@ -255,26 +255,18 @@ const ProjectButtons = (props) => {
                 if(updateProjectRes.error){displayError(updateProjectRes.error);return;}
                 props.clearUpdateProjectObjects();
                 props.resetForm();
-                if (updateProjectRes === 'success') {
-                    setPopupState({show:true,title:"Update Project",content:"Project updated successfully"});
-                } else {
-                    setPopupState({show:true,title:"Update Project",content:"Failed to update project"});
-                    // props.resetForm();
-                }
-                setLoading(false);   
+                if (updateProjectRes === 'success') displayError(Messages.ADMIN.SUCC_PROJECT_UPDATE);
+                else  displayError(Messages.ADMIN.ERR_UPDATE_PROJECT)
+                 setLoading(false);   
             }
         }    
-    }
-
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
     }
 
     const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -282,7 +274,6 @@ const ProjectButtons = (props) => {
 
     return(
         <Fragment>
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <div className="adminActionBtn">

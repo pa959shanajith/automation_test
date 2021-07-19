@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .dependentTestCaseContainer{
     display: flex;
     flex-direction: column;
@@ -51,7 +52,7 @@
 }
 
 .dtc_error{
-    color: #d33c3c;
+    color:  $redError;
     font-family: "LatoWebMedium";
     margin-bottom: 10px;
 }

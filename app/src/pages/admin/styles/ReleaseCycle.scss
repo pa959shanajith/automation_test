@@ -1,5 +1,6 @@
+@import "../../global/styles/ColorVariables.scss";
 .relCycContainer{
-	background: #e6e7e9;
+	background: $borderThree;
     padding: 8px;
     clear: both;
     position: relative;
@@ -98,10 +99,10 @@
         width: 8px;
     }
     &::-webkit-scrollbar-thumb {
-        background-color: #929397;
+        background-color: $backgroundTwo;
         border: 1px solid transparent;
-        border-left-color: #e6e7e9;
-        border-right-color: #e6e7e9;
+        border-left-color: $borderThree;
+        border-right-color: $borderThree;
         -webkit-border-radius: 10px;
         -moz-border-radius: 10px;
         border-radius: 10px; 

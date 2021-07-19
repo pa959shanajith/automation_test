@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import { updateScrollBar } from '../../global';
+import { updateScrollBar, Messages as MSG } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import { RedirectPage } from '../../global';
 import * as actionTypes from '../state/action';
@@ -56,11 +56,11 @@ const PhaseNode = props => {
             const data = await api.zephyrTestcaseDetails_ICE("testcase", phaseid);
             
             if (data.error)
-                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: data.error}});
+                dispatch({type: actionTypes.SHOW_POPUP, payload: data.error});
             else if (data === "unavailableLocalServer")
-                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr Connection", content: "ICE Engine is not available,Please run the batch file and connect to the Server."}});
+                dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_UNAVAILABLE_ICE});
             else if (data === "scheduleModeOn")
-                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Zephyr Connection", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."}});
+                dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.GENERIC.WARN_UNCHECK_SCHEDULE});
             else if (data === "Invalid Session"){
                 dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
                 return RedirectPage(history);
@@ -120,10 +120,7 @@ const TestCaseNode = props => {
     const handleSync = () => {
         let popupMsg = false;
         if(selectedScIds.length===0){
-            popupMsg = {
-                title:'Save Mapped Testcase ',
-                content:"Please Select a Scenario"
-            };
+            popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
         }
         if (popupMsg) dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});
         else{

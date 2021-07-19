@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ModalContainer } from '../../global';
+import { ModalContainer, VARIANT, Messages } from '../../global';
 import {gitSaveConfig} from '../api';
 import '../styles/GitConfig.scss'
 
@@ -37,9 +37,9 @@ const GitButtonActions = (props) => {
         setLoading("Loading...");
         const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitConfigName.current.value.trim(),gitAccToken.current.value.trim(),gitUrl.current.value.trim(),gitUsername.current.value.trim(),gitEmail.current.value.trim());
         if(data.error){displayError(data.error);return;}
-        else if (data === 'GitConfig exists') setPopupState({show:true,title:"Save Git configuration",content:"Git configration name already exists."});
-        else if(data  === 'GitUser exists')  setPopupState({show:true,title:"Save Git configuration",content:"Project is already Git configured for the specified user."});
-        else setPopupState({show:true,title:"Save Git configuration",content:"Git configuration "+action+ "d successfully"});
+        else if (data === 'GitConfig exists') setPopupState({show:true,variant:Messages.ADMIN.WARN_GITCONFIG_EXIST.VARIANT,content:Messages.ADMIN.WARN_GITCONFIG_EXIST.CONTENT});
+        else if(data  === 'GitUser exists')  setPopupState({show:true,variant:Messages.ADMIN.WARN_GIT_PROJECT_CONFIGURED.VARIANT,content:Messages.ADMIN.WARN_GIT_PROJECT_CONFIGURED.CONTENT});
+        else setPopupState({show:true,variant:VARIANT.SUCCESS,content:"Git configuration "+action+ "d successfully"});
         setLoading(false);
         resetFields();
     }
@@ -122,7 +122,7 @@ const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, 
     }
     if(!regExUrl.test(gitUrl.current.value.trim())){
         gitUrl.current.style.outline = errBorder;
-        setPopupState({show:true,title:"Error",content:"Invalid URL provided! URL must start with 'https://' !!"});
+        setPopupState({show:true,variant:Messages.ADMIN.WARN_GIT_URL.VARIANT,content:Messages.ADMIN.WARN_GIT_URL.CONTENT});
         flag = false;
     }
     return flag;

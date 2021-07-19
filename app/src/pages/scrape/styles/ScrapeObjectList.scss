@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .ss__btngroup{
     display: flex;
     max-width: 100%;
@@ -8,7 +9,7 @@
 }
 
 .ss__left-btns{
-    border-bottom: 1px solid #707070;
+    border-bottom: 1px solid $borderOne;
     padding-bottom: 10px;
     display: flex;
     align-items: center;
@@ -28,7 +29,7 @@
 .ss__select-all-lbl{
     margin: 0 12px;
     font-family: 'LatoWeb';
-    color: #33363B;
+    color: $darkGray;
     font-size: 16px;
 }
 
@@ -37,9 +38,9 @@
     margin-right: 7px;
     height: 21px;
     font-size: 13px;
-    background-color: #633693;
+    background-color: $primaryColor;
     &:disabled{
-        background-color: #997cb8;
+        background-color: $backgroundThree;
         cursor: not-allowed;
     }
 }
@@ -47,16 +48,16 @@
 .ss__btn{
     border: none;
     outline: none;
-    color: #fff;
+    color: $whiteColor;
     border-radius: 20px;
 }
 
 .ss__search-btn{
     outline: none;
-    color: #fff;
-    background-color: #fff;
+    color: $whiteColor;
+    background-color: $whiteColor;
     display: flex;
-    border: 1px solid #633693;
+    border: 1px solid $primaryColor;
     border-radius: 5px;
     height: 24px;
 }
@@ -68,7 +69,7 @@
 .ss__search_field{
     margin-left: 3px;
     padding: 3px;
-    border: 1px solid #633693;
+    border: 1px solid $primaryColor;
     border-radius: 5px;
     width: 200px;
     height: 24px;

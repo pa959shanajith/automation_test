@@ -303,21 +303,17 @@ const LoginFields = (props) => {
 
     const PopUp = () => (
         <PopupMsg 
-            title={popup.title}
+            variant={popup.variant}
             content={popup.content}
-            submitText="OK"
             close={()=>setPopup("")}
-            submit={()=>setPopup("")}
         />
     );
 
     const PasswordSuccessPopup = () => (
         <PopupMsg 
-            title={"Change Password"}
+            variant={popup.variant}
             close={()=>setSuccessPass(false)}
             content={"Password change successfull! Please login again with new password"}
-            submitText={"OK"}
-            submit={setSuccessPass(false)}
         />
     );
 

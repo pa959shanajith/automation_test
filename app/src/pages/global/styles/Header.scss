@@ -1,8 +1,9 @@
+@import "../../global/styles/ColorVariables.scss";
 .main-header {
     display: flex;
     flex-direction: row;
     padding: 10px 0 10px 30px;
-    color: #333;
+    color: $darkGray;
     align-items: center;
 }
 
@@ -50,7 +51,7 @@
 
 .user-name-menu{
     .divider{
-        background-color: #eee;
+        background-color: $whisper;
         width: 100%;
         margin: 9px 0;
         height: 1px;
@@ -78,13 +79,13 @@
     display: flex;
     flex-direction: row;
     font-family: "LatoWeb";
-    color: #333;
+    color: $darkGray;
     justify-content: space-between;
     align-items: center;
 }
 
 .switch-role-btn{
-    border-right: 1px solid #d2d2d2;
+    border-right: 1px solid $borderTwo;
 }
 
 .switch-role-icon{
@@ -94,7 +95,7 @@
 }
 
 .bell-ic{
-    color: #764ba2;
+    color: $primaryColorLight;
     font-size: 20px!important;
     margin-top: -1px!important;
     &:focus{
@@ -114,7 +115,7 @@
     font-family: "LatoWeb";
     border: 1px solid rgba(0, 0, 0, 0.15);
     box-shadow: 0 6px 12px rgba(0,0,0,.175);
-    background-color: #FFF;
+    background-color: $whiteColor;
     padding: 5px 0;
     border-radius: 4px;
     div{
@@ -127,7 +128,7 @@
     a{
         width: 100%;
         text-decoration: none!important;
-        color: #333;   
+        color: $darkGray;   
         outline: none;
         font-weight: 400;
         line-height: 1.42857143;
@@ -135,8 +136,8 @@
         padding: 3px 20px!important;
         white-space: nowrap;
         &:hover{
-            color: #333!important;
-            background-color: #eee;
+            color: $darkGray!important;
+            background-color: $whisper;
         }
     }
 }
@@ -150,8 +151,8 @@
         height: 15px;
         width: 15px;
         overflow: hidden;
-        background: #321e4f;
-        color: #FFF;
+        background: $primaryColorDark;
+        color: $whiteColor;
         text-align: center;
         border-radius: 100%;
         font-size: 9px;
@@ -193,7 +194,7 @@
 //     .switch-role-menu, .user-name-menu{
 //         z-index: 5;
 //         font-size: 1.2vw;
-//         color: #333;
+//         color: $darkGray;
 //         position: absolute;
 //         margin-right: 1.3vw!important;
 //         margin-top: 1vw!important;
@@ -203,12 +204,12 @@
 //         a{
 //             padding: .1vw 1.2vw!important;
 //             &:hover{
-//                 color: #333!important;
+//                 color: $darkGray!important;
 //             }
 //         }
         
 //         .divider{
-//             background-color: #eee;
+//             background-color: $whisper;
 //             width: 100%;
 //             margin: .8vw 0;
 //             height: .1vw;

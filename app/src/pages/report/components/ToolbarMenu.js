@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {getAllSuites_ICE , getReportsData_ICE ,getAccessibilityData} from '../api';
-import { updateScrollBar} from '../../global';
+import { updateScrollBar, Messages as MSG } from '../../global';
 import * as actionTypes from '../state/action';
 import PropTypes from 'prop-types';
 import '../styles/ToolbarMenu.scss';
@@ -55,7 +55,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
                 setCycList(cyclData.cycles)
                 setAutoReport(true)            
             }catch(err){
-                displayError('Failed to load Reports!')
+                displayError(MSG.REPORT.ERR_LOAD_REPORT)
                 console.error(err)
             }
         }
@@ -143,6 +143,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
         }
         setModList(res)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:res})
+        updateScrollBar();
         searchRef.current.value = ""
         searchRef.current.disabled = false;
         setModDrop('semi')
@@ -151,6 +152,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
+        updateScrollBar();
     }
     return(
         <div className='rp__toolbar'>

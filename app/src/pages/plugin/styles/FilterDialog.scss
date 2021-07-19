@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .filter__pop{
     .modal__body{
         height: 220px;
@@ -33,18 +34,18 @@
 }
 
 .selection-select{
-    color: #fff;
-    background: #311d4e url('/static/imgs/ic-dropdown.png') 95% 10px no-repeat;
+    color: $whiteColor;
+    background: $primaryColorDark url('/static/imgs/ic-dropdown.png') 95% 10px no-repeat;
     margin-bottom: 18px;
     padding: 8px 10px !important;
-    border: 1px solid #311d4e !important;
+    border: 1px solid $primaryColorDark !important;
     border-radius: 5px;
     box-shadow: none;
     appearance: none;
     outline: none;
     &:disabled{
         opacity: 1!important;
-        background: #311d4e url('/static/imgs/ic-dropdown.png') 95% 10px no-repeat;
+        background: $primaryColorDark url('/static/imgs/ic-dropdown.png') 95% 10px no-repeat;
         cursor: not-allowed;
     }
 }
@@ -66,10 +67,10 @@
 }
 
 .select__menu{
-    background-color: #fff;
-    color: #000;
+    background-color: $whiteColor;
+    color: $black;
     &:disabled{
         color: rgb(170, 170, 170);
-        background-color: #ddd;
+        background-color: $borderFour;
     }
 }

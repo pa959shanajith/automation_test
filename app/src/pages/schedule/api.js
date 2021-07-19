@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {RedirectPage} from '../global'
+import {RedirectPage, Messages as MSG} from '../global'
 import {history} from './index'
 import {url} from '../../App';
 
@@ -21,16 +21,16 @@ export const readTestSuite_ICE = async(readTestSuite) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch Testsuite."}
+        return {error:MSG.SCHEDULE.ERR_FETCH_TESTSUITE}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch Testsuite."}
+        return {error:MSG.SCHEDULE.ERR_FETCH_TESTSUITE}
     }
 }
 
@@ -50,16 +50,16 @@ export const getScheduledDetails_ICE = async() => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to fetch schedule Testsuite."}
+        return {error:MSG.SCHEDULE.ERR_FETCH_SCHEDULE}
     }catch(err){
         console.error(err)
-        return {error:"Failed to fetch  schedule Testsuite."}
+        return {error:MSG.SCHEDULE.ERR_FETCH_SCHEDULE}
     }
 }
 
@@ -80,16 +80,16 @@ export const testSuitesScheduler_ICE = async(executionData) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to schedule Testsuite."}
+        return {error:MSG.SCHEDULE.ERR_SCHEDULE}
     }catch(err){
         console.error(err)
-        return {error:"Failed to schedule Testsuite."}
+        return {error:MSG.SCHEDULE.ERR_SCHEDULE}
     }
 }
 
@@ -113,15 +113,15 @@ export const cancelScheduledJob_ICE = async(schDetails, host, schedUserid) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:"Failed to cancel scheduled job."}
+        return {error:MSG.SCHEDULE.ERR_CANCEL_SCHEDULE}
     }catch(err){
         console.error(err)
-        return {error:"Failed to cancel scheduled job."}
+        return {error:MSG.SCHEDULE.ERR_CANCEL_SCHEDULE}
     }
 }

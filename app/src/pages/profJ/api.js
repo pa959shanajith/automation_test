@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {RedirectPage} from '../global'
+import {RedirectPage, Messages as MSG} from '../global'
 import {history} from './index'
 import {url} from '../../App'
 
@@ -21,15 +21,15 @@ export const getTopMatches_ProfJ = async(userQuery) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to Fetch Results'}
+        return {error:MSG.PROFJ.ERR_FETCH_RESULTS}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Fetch Results'}
+        return {error:MSG.PROFJ.ERR_FETCH_RESULTS}
     }
 }
