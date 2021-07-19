@@ -107,7 +107,7 @@ describe('Data Table Positive Scenarios', () => {
     it('Should Retain Input Value', () => {
         const testValue = "TEST_VALUE";
         let secondRow = findByTestAtrr(wrapper, "dt__row").at(1);
-        let secondCell = findByTestAtrr(secondRow, "dt__data_cell").at(1).find('input');
+        let secondCell = findByTestAtrr(secondRow, "dt__data_cell").at(1).find('textarea');
 
         secondCell.simulate('focus');
         secondCell.simulate('change', {
