@@ -150,8 +150,9 @@
         width: 100%;
         min-width: 100px;
         text-align: center;
-        // border: 1px solid rgba(234,98,255,.1);
         border:  1px solid $whisper;
+        display: flex;
+        justify-content: center;
     }
 }
 
@@ -227,4 +228,14 @@
 
 .dt__table_numbered_column, .dt__table_numbered_column_header, .dt__table_new_column_header, .dt__table_header_cell{
     background-color: $borderFive;
+}
+
+.dt__cell_value{
+    width: 98%;
+    height: 98%;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    text-overflow: ellipsis;
+    text-align: left;
+    margin: 2px;
 }

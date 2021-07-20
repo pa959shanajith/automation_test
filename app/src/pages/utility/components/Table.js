@@ -456,16 +456,21 @@ const Row = props => {
 
 const DataCell  = props => {
     const [value, setValue] = useState(props.initialValue);
+    const [edit, setEdit] = useState(false);
     const areaRef = useRef();
 
     useEffect(() => {
         setValue(props.initialValue)
     }, [props.initialValue]);
 
+    useEffect(()=>{
+        if(edit && areaRef.current) areaRef.current.focus();
+    }, [edit])
+
     const onChange = e => setValue(e.target.value);
 
     const onClick = () => {
-        if (areaRef.current) areaRef.current.focus();
+        setEdit(true);
     }
 
     const checkKeyPress = event => {
@@ -475,11 +480,16 @@ const DataCell  = props => {
     const onBlur = e => {
         if (props.initialValue !== value)
             props.updateTableData(value, props.rowId, props.headerId)
+        setEdit(false);
     }
 
+    props.updateHeight();
+
     return (
-        <div className={"dt__cell "+(props.selected?"dt__selected_cell":'')} data-test="dt__data_cell" onClick={onClick}>
-            <TextareaAutosize ref={(tag)=>areaRef.current=tag} value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress} onHeightChange={props.updateHeight} />
+        <div className={"dt__cell "+(props.selected?"dt__selected_cell":'')} data-test="dt__data_cell">
+            {   edit 
+                ? <TextareaAutosize ref={(tag)=>areaRef.current=tag} value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress} onHeightChange={props.updateHeight} />
+                : <div className="dt__cell_value" onClick={onClick}>{value}</div> }
         </div>
     );
 }
