@@ -173,8 +173,6 @@ function pasteCells (copiedCells, headers, data, pasteIndex) {
     else if (copiedCells.type === 'rows') {
         [newHeaders, newData] = pasteRows(copiedCells, headers, data, pasteIndex);
     }
-
-    console.log("Headers:", newHeaders, "\nData:", newData);
     return [newHeaders, newData]
 }
 
