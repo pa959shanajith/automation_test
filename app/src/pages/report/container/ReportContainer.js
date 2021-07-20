@@ -1,7 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import ModuleList from '../components/ModuleList';
 import ToolbarMenu from '../components/ToolbarMenu';
-import { ScreenOverlay ,PopupMsg, ScrollBar} from '../../global';
+import { ScreenOverlay ,PopupMsg, ScrollBar, updateScrollBar } from '../../global';
 import TestingReport from './TestingReport';
 import AccessibilityReport from './AccessibilityReport';
 import '../styles/ReportContainer.scss';
@@ -51,7 +51,9 @@ const ReportContainer = () =>{
                                 <span onClick={()=>{
                                     if(modDrop==='semi')setModDrop('full');
                                     else if(modDrop==='close')return;
-                                    else setModDrop('semi')}}>
+                                    else setModDrop('semi');
+                                    setTimeout(()=>{updateScrollBar()}, 2001);
+                                    }}>
                                     <i className={(modDrop === 'full')?"fa fa-caret-up":"fa fa-caret-down"} title="Drop down button"></i>
                                 </span>
                             </div>

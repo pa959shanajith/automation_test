@@ -179,6 +179,7 @@ const TableActionButtons = props => {
 
     const pasteData = (pasteIndex) => {
         try{
+            pushToHistory({headers: props.headers, data: props.data});
             const [newHeaders, newData] = pasteCells(copiedCells, props.headers, props.data, Number(pasteIndex))
             props.setHeaders([...newHeaders]);
             props.setData([...newData]);
@@ -203,7 +204,7 @@ const TableActionButtons = props => {
 
     return (
         <div className="dt__table_ac_btn_grp">
-            { showPS && <DtPasteStepDialog setShow={setShowPS} upperLimit={copiedCells.type === "cols" ? props.headers.length : props.data.length+1 } pasteData={pasteData} /> }
+            { showPS && <DtPasteStepDialog setShow={setShowPS} upperLimit={copiedCells.type === "cols" ? props.headers.length : props.data.length+1 } pasteData={pasteData} pasteType={copiedCells.type} /> }
             {
                 tableActionBtnGroup.map((btn, i) => 
                     <button data-test="dt__tblActionBtns" key={i} className="dt__tblBtn" onClick={()=>btn.onClick()}>

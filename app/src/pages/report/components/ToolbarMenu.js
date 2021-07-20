@@ -147,6 +147,7 @@ const ToolbarMenu = ({displayError,setBlockui,setModDrop,FnReport}) =>{
         searchRef.current.value = ""
         searchRef.current.disabled = false;
         setModDrop('semi')
+        setTimeout(()=>{updateScrollBar()}, 2001);
     }
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
