@@ -282,7 +282,7 @@ const CreateScreenActionButtons = props => {
         reader.onload = async function (e) {
             try{
                 hiddenInput.current.value = '';
-                let importFormat = "excel";
+                let importFormat = "";
                 switch(file.name.split('.').pop().toLowerCase()){
                     case "csv": importFormat = "csv"; break;
                     case "xml": importFormat = "xml"; break;
@@ -291,7 +291,9 @@ const CreateScreenActionButtons = props => {
                     default : break;
                 }
 
-                if (importFormat === "xml") {
+                if (importFormat == "") 
+                    props.setShowPop({variant: VARIANT.ERROR, content: "File is not supported", type: "message"});
+                else if (importFormat === "xml") {
                     setRowTag("row");
                     setXmlContent(reader.result);
                 } else {
@@ -356,7 +358,7 @@ const EditScreenActionButtons = props => {
                 onClick: ()=>deleteDataTable(),
                 type: 'confirm'
             }
-            //pppppppppppppppppppppppppppppppppppppppppppppppppppppppppp onclick
+            // onclick
             switch(resp){
                 case "success": props.setShowPop({...deleteMsg, content: "Are you sure you want to delete current data table?"});break;
                 case "referenceExists": props.setShowPop({...deleteMsg, content: "Data Table is referenced in Test Cases. Are you sure you want to delete current data table?"});break;
