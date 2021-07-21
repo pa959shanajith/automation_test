@@ -1,9 +1,8 @@
 import React ,  { useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
-import {ScreenOverlay, ModalContainer, ScrollBar, Messages} from '../../global' 
+import {ScreenOverlay, ModalContainer, ScrollBar, Messages, ValidationExpression} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
-import ValidationExpression from '../../global/components/ValidationExpression';
 import '../styles/Project.scss';
 
 /*Component ProjectNew
@@ -836,7 +835,7 @@ const ProjectNew = (props) => {
             </div>
             }
             <div className='userForm-project adminControl-project display-project'>
-                {editProjectName!==selProject && editProjectName!=="" && editProjectName!==false && showProjectEditModal===false? 
+                {editProjectName!==selProject && editProjectName!=="" && editProjectName!==false && showProjectEditModal===false && ValidationExpression(editProjectName, "validName") ? 
                 <div className='edit-project__label'>New Project Name : {editProjectName}. Please click on Update.</div>:null}
             </div>
             

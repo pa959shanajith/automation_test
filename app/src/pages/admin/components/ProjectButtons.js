@@ -1,6 +1,6 @@
 import React ,  { Fragment, useState} from 'react';
 import { getNames_ICE, createProject_ICE, updateProject_ICE, getDomains_ICE, exportProject} from '../api';
-import {ScreenOverlay, Messages, VARIANT} from '../../global'
+import {ScreenOverlay, Messages, VARIANT, ValidationExpression} from '../../global'
 import { useSelector} from 'react-redux'; 
 import '../styles/ProjectButtons.scss';
 
@@ -18,7 +18,7 @@ const ProjectButtons = (props) => {
     const create_project = async()=>{
         document.getElementById("create_button").disabled = true;
         props.setProjectNameInputErrorBorder(false);
-        if (props.projectName.trim() === "") props.setProjectNameInputErrorBorder(true);
+        if (props.projectName.trim() === "" || !ValidationExpression(props.projectName, "validName")) props.setProjectNameInputErrorBorder(true);
         else if (props.projectTypeSelected=== ""){
             displayError(Messages.ADMIN.WARN_SELECT_APPTYPE);
         } else if (props.releaseList.length === 0) {
@@ -228,7 +228,7 @@ const ProjectButtons = (props) => {
 					updateProjectObj.newProjectDetails = props.newProjectDetails;
 				else
 					updateProjectObj.newProjectDetails.push(props.newProjectDetails);
-                if( updateProjectObj.projectName !== props.editProjectName && props.editProjectName !== "" && props.editProjectName!==false){
+                if( updateProjectObj.projectName !== props.editProjectName && props.editProjectName !== "" && props.editProjectName!==false && ValidationExpression(props.editProjectName, "validName")){
                     var requestedids = [];
                     var idtype = [];
                     requestedids.push(props.selDomain);

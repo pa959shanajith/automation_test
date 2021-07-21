@@ -19,6 +19,7 @@ const ValidationExpression = (value,id) =>{
         case 'projectName':         /* FALLTHROUGH */
         case 'releaseTxt':          /* FALLTHROUGH */
         case 'cycleTxt': regex = /[~`%*()+=|:;"'?><,\/\\]/g; break;
+        case 'validName': regex = /[^a-zA-Z0-9]/g; break;
         default: return value;
     }
         

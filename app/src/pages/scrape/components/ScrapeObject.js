@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
 import * as actions from '../state/action';
+import { ValidationExpression } from '../../global';
 import "../styles/ScrapeObject.scss";
 
 const ScrapeObject = props => {
@@ -37,7 +38,7 @@ const ScrapeObject = props => {
     }
 
     const checkKeyPress = event => {
-        if (event.keyCode === 13) {
+        if (event.keyCode === 13 && ValidationExpression(objName, "validName")) {
             setEdit(false);
             props.modifyScrapeItem(props.object.val, {custname: objName})
         }

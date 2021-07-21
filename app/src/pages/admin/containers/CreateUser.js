@@ -1,13 +1,12 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {ScreenOverlay, ScrollBar, VARIANT, Messages as MSG} from '../../global' 
+import {ScreenOverlay, ScrollBar, VARIANT, Messages as MSG, ValidationExpression } from '../../global' 
 import {getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData} from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/CreateUser.scss'
 import CreateLanding from '../components/CreateLanding';
 import EditLanding from '../components/EditLanding';
 import useOnClickOutside from '../components/UseOnClickOutside'
-import ValidationExpression from '../../global/components/ValidationExpression';
 
 /*Component CreateUser
   use: defines Admin middle Section for create user
@@ -164,7 +163,7 @@ const CreateUser = (props) => {
 		var reg = /^[a-zA-Z0-9\.\@\-\_]+$/;
 
         if(userIdNameAddClass);
-        if (userConf.userName === "") {
+        if (userConf.userName === "" || !ValidationExpression(userConf.userName ,"validName")) {
             var nameErrorClass = (action === "update")? "selectErrorBorder":"inputErrorBorder";
             if(nameErrorClass==="selectErrorBorder") setUserNameAddClass("setUserNameAddClass");
             else setUserNameAddClass(true)
