@@ -220,6 +220,7 @@ const BottomContent = () => {
                             });
                     }
                 } else setShowPop(MSG.SCRAPE.ERR_FILE_FORMAT);
+                setOverlay("");
             }
             catch(error){
                 setOverlay("");
