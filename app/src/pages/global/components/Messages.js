@@ -271,6 +271,7 @@ const Messages={
         ERR_NOTHING_PASTE: {"CONTENT":'Nothing to paste.', "VARIANT": VARIANT.ERROR},
         ERR_NOTHING_COPY: {"CONTENT":'Nothing is copied.', "VARIANT": VARIANT.ERROR},
         ERR_DANGLING_SCREEN: {"CONTENT":'dangling screen... validation failed.', "VARIANT": VARIANT.ERROR},
+        ERR_EXCEL_SHEET: {"CONTENT":'Excel sheet is either empty or invalid.', "VARIANT": VARIANT.ERROR},
         
         SUCC_NODE_CREATE: {"CONTENT":"Nodes created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_EXPORTED: {"CONTENT":"Data Exported Successfully.", "VARIANT": VARIANT.SUCCESS},
