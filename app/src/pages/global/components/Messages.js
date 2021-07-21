@@ -124,6 +124,8 @@ const Messages={
         ERR_DEBUG: {"CONTENT":"Failed to debug.", "VARIANT": VARIANT.ERROR},
         ERR_NO_MATCH_APPTYPE: {"CONTENT":"Project application type and Imported JSON application type doesn't match, please check.", "VARIANT": VARIANT.ERROR},
         ERR_FILE_FORMAT: {"CONTENT":"Please Check the file format you have uploaded.", "VARIANT": VARIANT.ERROR},
+        ERR_JSON_IMPORT: {"CONTENT":"Incorrect JSON imported. Please check the contents.", "VARIANT": VARIANT.ERROR},
+        ERR_TC_JSON_IMPORT: {"CONTENT":"Failed to Import Testcase JSON.", "VARIANT": VARIANT.ERROR},
         
         SUCC_TC_SAVE: {"CONTENT":"Testcase saved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DEBUG: {"CONTENT":"Debug completed successfully.", "VARIANT": VARIANT.SUCCESS},
