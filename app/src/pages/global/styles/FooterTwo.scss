@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .main-footer{
     display: flex;
     position: absolute;
@@ -5,7 +6,7 @@
     right: 0;
     left: 0;
     justify-content: flex-end;
-    color: #643693;
+    color: $primaryColor;
     background-color: transparent;
     font-family: "LatoWeb";
     z-index: 0;

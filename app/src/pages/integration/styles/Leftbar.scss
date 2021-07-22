@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .letfnavi{
     position: relative;
     float: left;
@@ -8,13 +9,13 @@
     font-size: 18px;
     font-family: 'LatowebMedium' !important;
     font-weight: normal;
-    color: #eee9ff;
+    color: $whisper;
 }
 .letfnavi span{
     list-style-type: none;
     float: left;
     width: 80%;
-    color: #fff;
+    color: $whiteColor;
     line-height: inherit;
     text-align: center;
     margin: 10% 10% 5%;
@@ -27,14 +28,14 @@
         padding: 8px 10px;
     }
     img:hover{
-        background: #523176 !important;
+        background: $hovorIcon !important;
         border-radius: 5px;
     }
    
 }
 
 #selectedIcon{
-    background: #331d4c;
+    background: $primaryColorDarkest;
     width: 56px;
     height: 52px;
     padding: 8px 10px;

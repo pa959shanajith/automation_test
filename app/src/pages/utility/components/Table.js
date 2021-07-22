@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
-import { ScrollBar } from '../../global';
 import { pushToHistory } from './DtUtils';
+import { ScrollBar, VARIANT } from '../../global';
 import { ReactSortable } from 'react-sortablejs';
 import TextareaAutosize from 'react-textarea-autosize';
 import "../styles/Table.scss";
@@ -22,7 +22,7 @@ const Table = props => {
     const onAdd = type => {
         if (type==="col") {
             if (props.headers.length >= 50) 
-                props.setShowPop({title: 'Error', content: 'Table cannot have more than 50 columns', type: 'message'});
+                props.setShowPop({variant: VARIANT.ERROR, content: 'Table cannot have more than 50 columns', type: 'message'});
             else {
                 pushToHistory({headers: props.headers, data: props.data});
                 let newHeaders = [...props.headers];
@@ -38,7 +38,7 @@ const Table = props => {
         }
         else if (type === "row") {
             if (props.data.length >= 199) 
-                props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
+                props.setShowPop({variant: VARIANT.ERROR, content: 'Table cannot have more than 200 rows', type: 'message'});
             else {
                 pushToHistory({headers: props.headers, data: props.data});
                 let newData = [...props.data];
@@ -53,7 +53,7 @@ const Table = props => {
     const updateHeaders = (newHeader, headerId, invalidFlag) => {
 
         if (invalidFlag) {
-            props.setShowPop({title: "Duplicate Header Name", content: "Header name is empty or duplicate", type: "message"})
+            props.setShowPop({variant: VARIANT.WARNING, content: "Header name is empty or duplicate", type: "message"})
             return;
         }
         pushToHistory({headers: props.headers, data: props.data});
@@ -184,7 +184,7 @@ const Headers = ({headers, setHeaders, updateCheckList, onAdd, checkList}) => {
                 )
             }) }
         </ReactSortable>
-        <div className="dt__table_new_column_header" onClick={()=>onAdd('col')}>
+        <div className="dt__table_new_column_header" data-test="dt__table_add_col" onClick={()=>onAdd('col')}>
             +
         </div>
         </div>
@@ -205,8 +205,8 @@ const HeaderCell = props => {
     }, [props.headerIndex]);
 
     return (
-        <div className={"dt__cell dt__table_header_cell"+(props.selected?" dt__hdrCell_Sel dt__colHeadSel":"")} data-test="dt__header_cell">
-            <div onClick={(e)=>props.updateCheckList(e, "col", props.headerId)}>{`C${value+1}`}</div> 
+        <div className={"dt__cell dt__table_header_cell"+(props.selected?" dt__hdrCell_Sel dt__colHeadSel":"")}>
+            <div onClick={(e)=>props.updateCheckList(e, "col", props.headerId)} data-test="dt__header_cell" >{`C${value+1}`}</div> 
         </div>
     );
 }
@@ -291,7 +291,7 @@ const RowNumColumn = props => {
                 <div 
                     key={`rownum-addRow`}
                     className="dt__table_numbered_column dt__addRow"
-                    data-test="dt__number_cell"
+                    data-test="dt__table_add_row"
                     onClick={()=>props.onAdd('row')}
                 >
                     +
@@ -396,7 +396,7 @@ const SubHeaderCell  = props => {
             className={
                 "dt__cell dt__subHeaderCell "
                 +(props.selected?"dt__selected_cell":'')} 
-            data-test="dt__body_cell"
+            data-test="dt__subHeader_cell"
         >
             <input value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress}/>
         </div>
@@ -456,16 +456,21 @@ const Row = props => {
 
 const DataCell  = props => {
     const [value, setValue] = useState(props.initialValue);
+    const [edit, setEdit] = useState(false);
     const areaRef = useRef();
 
     useEffect(() => {
         setValue(props.initialValue)
     }, [props.initialValue]);
 
+    useEffect(()=>{
+        if(edit && areaRef.current) areaRef.current.focus();
+    }, [edit])
+
     const onChange = e => setValue(e.target.value);
 
     const onClick = () => {
-        if (areaRef.current) areaRef.current.focus();
+        setEdit(true);
     }
 
     const checkKeyPress = event => {
@@ -475,11 +480,16 @@ const DataCell  = props => {
     const onBlur = e => {
         if (props.initialValue !== value)
             props.updateTableData(value, props.rowId, props.headerId)
+        setEdit(false);
     }
 
+    props.updateHeight();
+
     return (
-        <div className={"dt__cell "+(props.selected?"dt__selected_cell":'')} data-test="dt__body_cell" onClick={onClick}>
-            <TextareaAutosize ref={(tag)=>areaRef.current=tag} value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress} onHeightChange={props.updateHeight} />
+        <div className={"dt__cell "+(props.selected?"dt__selected_cell":'')} data-test="dt__data_cell">
+            {   edit 
+                ? <TextareaAutosize ref={(tag)=>areaRef.current=tag} value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress} onHeightChange={props.updateHeight} />
+                : <div className="dt__cell_value" onClick={onClick}>{value}</div> }
         </div>
     );
 }

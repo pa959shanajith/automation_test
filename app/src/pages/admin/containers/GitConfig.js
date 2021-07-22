@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
+import {ScreenOverlay, ScrollBar, Messages as MSG, VARIANT} from '../../global' 
 import {FormInput,FormSelect} from '../components/FormComp'
 import {getUserDetails, getDomains_ICE, getDetails_ICE, gitEditConfig } from '../api';
 import GitButtonActions from '../components/GitButtonActions'
@@ -26,7 +26,7 @@ const GitConfig = (props) => {
     const [showEdit,setShowEdit] = useState(false)
     const [userList,setUserList] = useState([])
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
+    const setPopupState=props.setPopupState;
     
     
     useEffect(()=>{
@@ -40,11 +40,11 @@ const GitConfig = (props) => {
         refreshFields(domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading); 
     }
 
-    const displayError = (error,header) =>{
+    const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:header?header:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -81,7 +81,6 @@ const GitConfig = (props) => {
     return (
         <ScrollBar thumbColor="#929397">
             <div className="git_container">
-                {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>{setPopupState({show:false,title:"",content:""})}} close={()=>{setPopupState({show:false,title:"",content:""})}} submitText={"Ok"} />:null}
                 {loading?<ScreenOverlay content={loading}/>:null}
 
                 <div id="page-taskName"><span>{(showEdit===false)?"Git Configuration":"Edit Git Configuration"}</span></div>
@@ -113,7 +112,7 @@ const onChangeProject = async (resetFields, displayError, showEdit, urlRef, gitc
     const data = await gitEditConfig(userData[userRef.current.value], projectData[ProjectRef.current.value]);
     if(data.error){displayError(data.error);return;}
     else if(data == "empty") {
-        setPopupState({show:true,title:"Edit Git configuration",content:"No Git configuration created yet."})
+        setPopupState({show:true,content:MSG.ADMIN.WARN_NO_CONFIG.CONTENT,variant:VARIANT.WARNING})
         resetFields();
     } else {
         gitconfigRef.current.value = data[0];

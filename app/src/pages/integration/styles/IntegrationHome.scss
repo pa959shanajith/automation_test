@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .parent{
     display: flex;
     flex-direction: column;
@@ -6,7 +7,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: #eeeeee;
+    background: $whisper;
 }
 
 
@@ -14,7 +15,7 @@
     display: flex;
     flex: auto;
     width: 100%;
-    background-color: #eeeeee;
+    background-color: $whisper;
     margin: 0;
     padding: 0;
 }
@@ -29,5 +30,5 @@
     min-width: 0;
     padding: 20px;
     margin: 0 5px;
-    background-color: #fff;
+    background-color: $whiteColor;
 }

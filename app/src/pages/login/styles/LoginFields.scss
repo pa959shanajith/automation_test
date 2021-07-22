@@ -1,5 +1,6 @@
+@import "../../global/styles/ColorVariables.scss";
 .arrow-circle {
-    color:#a0a0a0;
+    color:$medLightGray;
     font-size:25px!important;
 }
 
@@ -15,7 +16,7 @@
     flex-grow: 1;
     width: 90%;
     padding: 0 20px;
-    color: #555;
+    color: $primaryText;
     font-family: "LatoWebLight";
     outline: none;
 
@@ -27,7 +28,7 @@
 .password-wrap, .username-wrap{
     display: flex;
     flex-direction: row;
-    border-bottom: 1px solid #cacaca;
+    border-bottom: 1px solid $borderTwo;
     margin-bottom: 35px;
 }
 
@@ -43,8 +44,8 @@
     font-size: 32px;
     border-radius: 22px!important;
     border: none;
-    background-color: #9f62e1;
-    color: #FFF;
+    background-color: $primaryColorLogin;
+    color: $whiteColor;
     padding: 4px 12px;
     margin-top: 30px!important;
     cursor: pointer;
@@ -54,7 +55,7 @@
         outline: none!important;
     }
     &:disabled{
-        background-color: #ca99ff;
+        background-color: $backgroundLogin;
         cursor: auto;
     }
 }
@@ -70,7 +71,7 @@
 }
 
 .eye-ic{
-    color:#a0a0a0;
+    color:$medLightGray;
     font-size: 20px;
 }
 
@@ -89,11 +90,11 @@
 .error-msg{
     font-family: "LatoWebMedium";
     font-size: 14px;
-    color: #d33c3c;
+    color:  $redError;
     width: 100%;
     text-align: center;
     a{
-        color: #d33c3c;
+        color:  $redError;
     }
 }
 
@@ -122,7 +123,7 @@
     }
 
     .password-wrap, .username-wrap{
-        border-bottom: .1vw solid #cacaca;
+        border-bottom: .1vw solid $borderTwo;
         margin-bottom: 2.5vw;
     }
 
@@ -160,7 +161,7 @@
 .forget-password,
 .forget-password:hover {
     float: right;
-    color: #9f62e1;
+    color: $primaryColorLogin;
     font-size: 14px;
     font-family: 'LatoWeb';
     text-decoration: underline;

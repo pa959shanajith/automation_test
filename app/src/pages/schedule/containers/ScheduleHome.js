@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { UpperContent, BottomContent } from "../components/ActionBarItems";
-import { Header, FooterTwo as Footer, ActionBar, ReferenceBar } from '../../global';
+import { Header, FooterTwo as Footer, PopupMsg, ActionBar, ReferenceBar } from '../../global';
 import "../styles/ScheduleHome.scss";
 import ScheduleContent from './ScheduleContent';
 
@@ -15,6 +15,7 @@ const ScheduleHome = () => {
     const [syncScenario, setSyncScenario] = useState(false);
     const [execEnv,setExecEnv] = useState("default");
     const [smartMode,setSmartMode] = useState('normal')
+    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const isMac = navigator.appVersion.indexOf("Mac") !== -1;
 	
     
@@ -46,6 +47,8 @@ const ScheduleHome = () => {
     }
 
     return ( 
+        <>
+        {popupState.show?<PopupMsg variant={popupState.variant} content={popupState.content} close={()=>setPopupState({show:false})} />:null}
         <div className="s__body">
             <Header />
                 <div className="s__mid_section">
@@ -53,12 +56,13 @@ const ScheduleHome = () => {
                     upperContent={<UpperContent key={666} appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />} 
                     bottomContent={<BottomContent smartMode={smartMode} setSmartMode={setSmartMode} execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
                     <div className="s__content">
-                        <ScheduleContent setExecEnv={setExecEnv} smartMode={smartMode} syncScenario={syncScenario} setSyncScenario={setSyncScenario} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} appType={appType} browserTypeExe={browserTypeExe} execAction={execAction} />
+                        <ScheduleContent setPopupState={setPopupState} setExecEnv={setExecEnv} smartMode={smartMode} syncScenario={syncScenario} setSyncScenario={setSyncScenario} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} appType={appType} browserTypeExe={browserTypeExe} execAction={execAction} />
                     </div>
                     <ReferenceBar /> 
                 </div>
             <div className='s__footer'><Footer/></div>
         </div>
+        </>
     );
 }
 

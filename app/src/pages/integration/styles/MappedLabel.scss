@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .mlalm__container{
     position: relative;
     border-radius: 5px;
@@ -38,7 +39,7 @@
 }
 
 .mlalm__container[data-type="scenario"] {
-    background-color: #E1CAFF;
+    background-color: $lavenderBlue;
 }
 .mlalm__container[data-type="testcase"] {
     background-color: rgba(250, 215, 241, 0.984);

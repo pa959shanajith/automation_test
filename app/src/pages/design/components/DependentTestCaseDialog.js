@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Handlebars from 'handlebars';
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector } from "react-redux";
-import { ModalContainer, ScrollBar, Report, RedirectPage } from '../../global';
+import { ModalContainer, ScrollBar, Report, RedirectPage, Messages as MSG } from '../../global';
 import { readTestCase_ICE, getTestcasesByScenarioId_ICE } from '../api';
 import "../styles/DependentTestCaseDialog.scss";
 
@@ -74,7 +74,7 @@ const DependentTestCaseDialog = props => {
             setError("");
             checkedTestcases['current'] = props.taskId;
             props.setShowDlg(false);
-            props.setShowPop({'title': 'Dependent Test Cases', 'content': 'Dependent Test Cases saved successfully'});
+            props.setShowPop(MSG.DESIGN.SUCC_DEPENDENT_TC_SAVE);
             props.setDTcFlag(true);
             props.setCheckedTc(checkedTestcases);
         }

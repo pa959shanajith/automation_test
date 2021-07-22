@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ModalContainer, ScrollBar} from '../../global' 
+import {ScreenOverlay, ModalContainer, ScrollBar, Messages as MSG, VARIANT} from '../../global' 
 import {getSAMLConfig, manageSAMLConfig} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import '../styles/SamlConfig.scss'
@@ -14,7 +14,6 @@ const SamlConfig = (props) => {
 
     const [samlEdit,setSamlEdit] = useState(false)
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     const [name,setName] = useState("")
     const [url,setUrl] = useState("")
     const [idp,setIdp] = useState("")
@@ -26,6 +25,7 @@ const SamlConfig = (props) => {
     const [certNameErrBorder,setCertNameErrBorder] = useState(false)
     const [selBox,setSelBox] = useState([])
     const [showDeleteModal,setshowDeleteModal] = useState(false)
+    const setPopupState =props.setPopupState;
 
     useEffect(()=>{
         setSamlEdit(false);
@@ -48,8 +48,8 @@ const SamlConfig = (props) => {
     const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -69,8 +69,8 @@ const SamlConfig = (props) => {
 			flag = false;
 		} else if (!regExName.test(name) && action === "create") {
             setNameErrBorder(true);
-            setPopupState({show:true,title:"Error",content:"Invalid Server Name provided! Name cannot contain any special characters other than hyphen. Also name cannot start or end with hyphen."});
-			flag = false;
+            displayError(MSG.ADMIN.WARN_EMPTY_CONFIG);
+            flag = false;
 			popped = true;
 		}
 		if (url === "") {
@@ -78,7 +78,7 @@ const SamlConfig = (props) => {
 			flag = false;
 		} else if (regExURL.test(url) === false) {
 			setUrlErrBorder(true);
-            if (!popped) setPopupState({show:true,title:"Error",content:"Invalid URL provided! URL must start with http:// or https://"})
+            if (!popped) displayError(MSG.ADMIN.WARN_INVALID_URL);
 			flag = false;
 			popped = true;
 		}
@@ -91,10 +91,6 @@ const SamlConfig = (props) => {
 			flag = false;
 		}
 		return flag;
-    }
-
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
     }
 
     const samlConfManage = async (action) =>{
@@ -122,17 +118,17 @@ const SamlConfig = (props) => {
         if(data === "success") {
             if (action === "create") samlReset();
             else samlEditClick();
-            setPopupState({show:true,title:popupTitle,content:"Configuration '"+confObj.name+"' "+action+"d successfully!"});
+            setPopupState({show:true,variant:VARIANT.SUCCESS,content:"Configuration '"+confObj.name+"' "+action+"d successfully!"});
         } else if(data === "exists") {
             setNameErrBorder(true);
-            setPopupState({show:true,title:popupTitle,content:"Configuration '"+confObj.name+"' already Exists!"});
+            setPopupState({show:true,variant:VARIANT.WARNING,content:"Configuration '"+confObj.name+"' already Exists!"});
         } else if(data === "fail") {
             if (action === "create") samlReset();
             else samlEditClick();
-            setPopupState({show:true,title:popupTitle,content:failMsg});
+            setPopupState({show:true,variant:VARIANT.WARNING,content:failMsg});
         } else if(/^1[0-2]{4}$/.test(data)) {
             if (JSON.parse(JSON.stringify(data)[1])) {
-                setPopupState({show:true,title:popupTitle,content: failMsg+" Invalid Request!"});
+                setPopupState({show:true,variant:VARIANT.ERROR,content: failMsg+" Invalid Request!"});
                 return;
             }
             let errHints = "<br/>";
@@ -142,7 +138,7 @@ const SamlConfig = (props) => {
             if (JSON.parse(JSON.stringify(data)[4])) setIdpErrBorder(true);
             if (JSON.parse(JSON.stringify(data)[5])) setCertNameErrBorder(true);
             if (JSON.parse(JSON.stringify(data)[5]) === 2) errHints += "File uploaded is not a valid certificate";
-            setPopupState({show:true,title:popupTitle,content: "Some values are Invalid!" + errHints});
+            setPopupState({show:true,variant:VARIANT.WARNING,content: "Some values are Invalid!" + errHints});
         }
     }
 
@@ -153,7 +149,7 @@ const SamlConfig = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if(data === "empty") {
-            setPopupState({show:true,title:"Edit Configuration",content:"There are no configurations created yet."});
+            displayError(MSG.ADMIN.WARN_EMPTY_CONFIG);
             setSelBox([]);
         } else {
             data.sort();
@@ -173,7 +169,7 @@ const SamlConfig = (props) => {
         const data = await getSAMLConfig(name)
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if(data === "empty") setPopupState({show:true,title:"Edit Configuration",content: failMsg + "No such configuration exists"});
+        if(data === "empty") setPopupState({show:true,variant:VARIANT.WARNING,content: failMsg + "No such configuration exists"});
         else {
             setUrl(data.url);
             setIdp(data.idp);
@@ -226,7 +222,6 @@ const SamlConfig = (props) => {
     return (
         <ScrollBar thumbColor="#929397">
         <div className="saml_container">
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <div id="page-taskName"><span>{(samlEdit===false)?"Create SAML Configuration":"Edit SAML Configuration"}</span></div>

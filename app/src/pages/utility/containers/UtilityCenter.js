@@ -81,8 +81,8 @@ const UtilityCenter=(props)=>{
     }
     const displayError = (error) =>{
         setPopup({
-          title:'ERROR',
-          content:error,
+          variant:error.VARIANT,
+          content:error.CONTENT,
           submitText:'Ok',
           show:true
         })
@@ -126,7 +126,8 @@ const UtilityCenter=(props)=>{
     return (
         <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+        { console.log(popup) }
+        {(popup.show || popup.content || popup.CONTENT )?<PopupMsg variant={popup.VARIANT || popup.variant} close={()=>setPopup({show:false})} content={popup.CONTENT || popup.content} submitText={popup.submitText}/>:null}
         <div className="UtlmiddleContent">
             <div data-test="utility_middle_screen" className="middle_holder">
             {(props.screenType ==="encryption")?

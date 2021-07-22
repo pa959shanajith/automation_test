@@ -5,7 +5,7 @@ import '../styles/ActionBarItems.scss'
 import * as actionTypes from '../state/action';
 import { ScrapeContext } from "../components/ScrapeContext";
 import * as scrapeApi from '../api';
-import { RedirectPage, ActionBar, Thumbnail } from '../../global';
+import { RedirectPage, ActionBar, Thumbnail, Messages as MSG } from '../../global';
 
 /*Component LeftBarItems
   use: renders  6 options in design  in the left of screen
@@ -161,7 +161,7 @@ const BottomContent = () => {
                     a.click();
                     document.body.removeChild(a);
                   } 
-            } else setShowPop({title: "No Objects found", content: "The screen has no objects to export, please check!"});
+            } else setShowPop(MSG.SCRAPE.ERR_NO_OBJ_SCRAPE);
         })
         .catch(error => console.error(error));
     }
@@ -176,11 +176,11 @@ const BottomContent = () => {
                     setOverlay("Loading...")
                     let resultString = JSON.parse(reader.result);
                     if (!('appType' in resultString))
-                        throw {title: "Import Error", content: "Incorrect JSON imported. Please check the contents!"};
+                        setShowPop(MSG.SCRAPE.ERR_JSON_IMPORT);
                     else if (resultString.appType !== appType)
-                        throw {title: "App Type Error", content: "Project application type and Imported JSON application type doesn't match, please check!"};
+                        setShowPop(MSG.SCRAPE.ERR_NO_MATCH_APPTYPE);
                     else if (resultString.view.length === 0)
-                        throw {title: "No Objects found", content: "The file has no objects to import, please check!"};
+                        setShowPop(MSG.SCRAPE.ERR_NO_OBJ_IMPORT);
                     else {
                         let objList = {};
                         if ('body' in resultString) {
@@ -192,7 +192,7 @@ const BottomContent = () => {
                             objList['scrapeinfo'] = scrapeinfo;
                         }
                         else objList = resultString;
-    
+
                         let arg = {
                             projectId: projectId,
                             screenId: screenId,
@@ -206,25 +206,26 @@ const BottomContent = () => {
                         scrapeApi.updateScreen_ICE(arg)
                             .then(data => {
                                 if (data === "Invalid Session") return RedirectPage(history);
-                                else if (data === "fail") throw {title: "Import Screen", content: "Failed to import Screen JSON."}; 
+                                else if (data === "fail") setShowPop(MSG.SCRAPE.ERR_SCREEN_IMPORT) 
                                 else fetchScrapeData().then(response => {
                                         if (response === "success")
-                                            setShowPop({title: "Import Screen", content: "Screen Json imported successfully."}) 
+                                            setShowPop(MSG.SCRAPE.SUCC_SCREEN_JSON_IMPORT) 
                                         setOverlay("");
                                 });
                             })
                             .catch(error => {
                                 setOverlay("");
-                                setShowPop({title: "Import Screen", content: "Failed to import Screen JSON."}) 
+                                setShowPop(MSG.SCRAPE.ERR_SCREEN_IMPORT) 
                                 console.error(error)
                             });
                     }
-                } else throw {'title': "Import Screen", 'content': "Please Check the file format you have uploaded!"};
+                } else setShowPop(MSG.SCRAPE.ERR_FILE_FORMAT);
+                setOverlay("");
             }
             catch(error){
                 setOverlay("");
                 if (typeof(error)==="object") setShowPop(error);
-                else setShowPop({title: "Import Error", content: "Failed to Import Screen JSON."})
+                else setShowPop(MSG.SCRAPE.ERR_SCREEN_IMPORT);
                 console.error(error);
             }
         }

@@ -1,5 +1,5 @@
 import React, {useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar, IntegrationDropDown} from '../../global' 
+import {ScreenOverlay, ScrollBar, IntegrationDropDown, Messages as MSG, VARIANT} from '../../global' 
 import { useSelector } from 'react-redux';
 import {getScheduledDetails_ICE, testSuitesScheduler_ICE, cancelScheduledJob_ICE} from '../api';
 import "../styles/ScheduleContent.scss";
@@ -7,7 +7,7 @@ import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import Pagination from '../components/Pagination';
 
-const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
+const ScheduleContent = ({setPopupState, smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
 
     const nulluser = "5fc137cc72142998e29b5e63";
     const filter_data = useSelector(state=>state.plugin.FD)
@@ -17,7 +17,6 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [scheduledData,setScheduledData] = useState([])
     const [scheduledDataOriginal,setScheduledDataOriginal] = useState([])
     const [allocateICE,setAllocateICE] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const current_task = useSelector(state=>state.plugin.CT)
     const [scheduleTableData,setScheduleTableData] = useState([])
     const [closePopups, setClosePopups] = useState(false);
@@ -71,7 +70,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
             setLoading(false);
             document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
         }catch (error) {
-            setPopupState({show:true,title:"Error",content:"Failed to fetch Scheduled Data."});
+            displayError(MSG.SCHEDULE.ERR_FETCH_SCHEDULED);
             setLoading(false);
             console.log(error)
         }
@@ -81,15 +80,11 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
-    }
-
-    const closePopup = () => {
-        setPopupState({show:false,title:"",content:""});
     }
 
     const onChangePage = (newPageOfItems) => {
@@ -114,9 +109,9 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
 
     const ScheduleTestSuitePopup = () => {
         setClosePopups(true);
-        const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction);
-        const valid = checkSelectedModules(scheduleTableData, setPopupState);
-        const checkDateTime = checkDateTimeValues(scheduleTableData, moduleScheduledate, setModuleScheduledate, setPopupState);
+        const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction,displayError);
+        const valid = checkSelectedModules(scheduleTableData, displayError);
+        const checkDateTime = checkDateTimeValues(scheduleTableData, moduleScheduledate, setModuleScheduledate, displayError);
         if(check && valid && checkDateTime) setAllocateICE(true);
     } 
 
@@ -138,22 +133,22 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         const data = await testSuitesScheduler_ICE(executionData);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if (data === "NotApproved") setPopupState({show:true,title:"Schedule Test Suite",content: "All the dependent tasks (design, scrape) needs to be approved before execution"});
-        else if (data === "NoTask") setPopupState({show:true,title:"Schedule Test Suite",content: "Task does not exist for child node"});
-        else if (data === "Modified") setPopupState({show:true,title:"Schedule Test Suite",content: "Task has been modified, Please approve the task"});
-        else if (data.status === "booked") setPopupState({show:true,title:"Schedule Test Suite",content: "Schedule time is matching for testsuites scheduled for " + data.user});
+        if (data === "NotApproved") displayError(MSG.SCHEDULE.ERR_DEPENDENT_TASK);
+        else if (data === "NoTask") displayError(MSG.SCHEDULE.ERR_CHILD_NODE);
+        else if (data === "Modified") displayError(MSG.SCHEDULE.ERR_TASK_MODIFIED);
+        else if (data.status === "booked") setPopupState({show:true,variant:VARIANT.ERROR,content: "Schedule time is matching for testsuites scheduled for " + data.user});
         else if (data === "success" || data.includes("success")) {
-            if (data.includes("Set"))  setPopupState({show:true,title:"Schedule Test Suite",content: data.replace('success', '')}); 
-            else setPopupState({show:true,title:"Schedule Test Suite",content:"Successfully scheduled."});
+            if (data.includes("Set"))  setPopupState({show:true,variant:VARIANT.SUCCESS,content: data.replace('success', '')}); 
+            else displayError(MSG.SCHEDULE.SUCC_SHEDULE)
             updateDateTimeValues(scheduleTableData, setModuleScheduledate);
             getScheduledDetails();
         } else if (data === "few") {
-            setPopupState({show:true,title:"Schedule Test Suite",content:"Failed to schedule few testsuites"});
+            displayError(MSG.SCHEDULE.ERR_FEW_TESTSUITE_SCHEDULE);
             updateDateTimeValues(scheduleTableData, setModuleScheduledate);
         } else if (data === "fail") {
-            setPopupState({show:true,title:"Schedule Test Suite",content:"Failed to schedule few testsuites"});
+            displayError(MSG.SCHEDULE.ERR_FEW_TESTSUITE_SCHEDULE);
         } else {
-            setPopupState({show:true,title:"Schedule Test Suite",content:"Error in scheduling Testsuite. Scheduling failed"});
+            displayError(MSG.SCHEDULE.ERR_SCEDULE_TESTSUITE);
         }
         setExecAction("serial");
         setExecEnv("default");
@@ -262,7 +257,6 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     browserTypeExe={browserTypeExe}
                 />
             :null} 
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             
             <div className="s__task_container">
                 <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
@@ -332,7 +326,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
                                                                     {data.status}
                                                                     {(data.status === 'scheduled')?
-                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,setPopupState)}} ng-click='cancelThisJob($event,"cancelled")' title='Cancel Job'/>
+                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,setPopupState,displayError)}} title='Cancel Job'/>
                                                                     :null}
                                                                 </div> 
                                                             </div>
@@ -377,7 +371,7 @@ const updateDateTimeValues = (scheduleTableData, setModuleScheduledate) => {
     setModuleScheduledate(moduleScheduledateTime);
 }
 
-const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,status,getScheduledDetails,setPopupState) => {
+const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,status,getScheduledDetails,setPopupState,displayError) => {
     if(cycleid===undefined) cycleid=""
     const schDetails = {
         cycleid:cycleid,
@@ -388,25 +382,25 @@ const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,sta
     const schedUserid = scheduledby;
     const data = await cancelScheduledJob_ICE(schDetails, host, JSON.stringify(schedUserid));
     if (data === "success") {
-        setPopupState({show:true,title:"Scheduled Test Suite",content:"Job is " + status + "."});
+        setPopupState({show:true,variant:VARIANT.SUCCESS,content:"Job is " + status + "."});
         // target.innerText = status;
         getScheduledDetails();
-    } else if (data === "inprogress") setPopupState({show:true,title:"Scheduled Test Suite",content:"Job is in progress.. cannot be cancelled."});
-    else if (data === "not authorised") setPopupState({show:true,title:"Scheduled Test Suite",content:"You are not authorized to cancel this job."});
-    else setPopupState({show:true,title:"Scheduled Test Suite",content:"Failed to cancel Job"});
+    } else if (data === "inprogress") displayError(MSG.SCHEDULE.ERR_JOB_PROGRESS);
+    else if (data === "not authorised") displayError(MSG.SCHEDULE.ERR_JOB_CANCEL_AUTH);
+    else displayError(MSG.SCHEDULE.ERR_JOB_CANCEL);
 }
 
-const SelectBrowserCheck = (appType,browserTypeExe,setPopupState,execAction)=>{
-    if ((appType === "Web") && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select a browser"});
-    else if (appType === "Webservice" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Web Services option"});
-    else if (appType === "MobileApp" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Mobile Apps option"});
-    else if (appType === "Desktop" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Desktop Apps option"});
-    else if (appType === "Mainframe" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select Mainframe option"});
-    else if (appType === "OEBS" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select OEBS Apps option"});
-    else if (appType === "SAP" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select SAP Apps option"});
-    else if (appType === "MobileWeb" && browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content: "Please select Mobile Web option"});
+const SelectBrowserCheck = (appType,browserTypeExe,setPopupState,execAction,displayError)=>{
+    if ((appType === "Web") && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_BROWSER);
+    else if (appType === "Webservice" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_WEBSERVICE);
+    else if (appType === "MobileApp" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_MOBILE_APP);
+    else if (appType === "Desktop" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_DESKTOP);
+    else if (appType === "Mainframe" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_MAINFRAME);
+    else if (appType === "OEBS" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_OEBS);
+    else if (appType === "SAP" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_SAP);
+    else if (appType === "MobileWeb" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_MOBILE);
     else if (browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select " + appType + " option"});
-    else if ((appType === "Web") && browserTypeExe.length === 1 && execAction === "parallel") setPopupState({show:true,title:"Schedule Test Suite",content:"Please select multiple browsers"});
+    else if ((appType === "Web") && browserTypeExe.length === 1 && execAction === "parallel") displayError(MSG.SCHEDULE.WARN_SELECT_MULTI_BROWSER);
     else return true;
     return false;
 }
@@ -429,7 +423,7 @@ const browImg = (brow, appType) => {
     else if (appType === "MobileWeb") return '/imgs/MobileWeb.png';
 }
 
-const checkSelectedModules = (scheduleTableData, setPopupState) => {
+const checkSelectedModules = (scheduleTableData, displayError) => {
     let pass = false;
     // eslint-disable-next-line
     scheduleTableData.map((rowData,m)=>{
@@ -440,11 +434,11 @@ const checkSelectedModules = (scheduleTableData, setPopupState) => {
             return null
         } else {}
     })
-    if (pass===false) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select atleast one scenario(s) to execute"});
+    if (pass===false) displayError(MSG.SCHEDULE.WARN_SELECT_SCENARIO);
     return pass
 } 
 
-const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate, setPopupState) => {
+const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate, displayError) => {
     for(var i =0 ;i<eachData.length;i++){
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
@@ -473,7 +467,7 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
                     if (diff < 0) moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
                     moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
-                    setPopupState({show:true,title:"Schedule Test Suite",content:"Schedule time must be 5 mins more than current time."});
+                    displayError(MSG.SCHEDULE.WARN_SCHEDULE_TIME);
                     setModuleScheduledate(moduleScheduledateTime);
                     return false
                 }

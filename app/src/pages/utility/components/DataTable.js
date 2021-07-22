@@ -1,7 +1,7 @@
 import React, { useState, useEffect }  from 'react';
 import { v4 as uuid } from 'uuid';
 import { TableActionButtons, CreateScreenActionButtons, EditScreenActionButtons, SearchDataTable } from './DataTableBtnGroup';
-import { PopupMsg, ModalContainer, ScreenOverlay, ValidationExpression as validate } from '../../global';
+import { PopupMsg, ModalContainer, ScreenOverlay, ValidationExpression as validate, VARIANT } from '../../global';
 import Table from './Table';
 import { resetHistory } from './DtUtils';
 import * as utilApi from '../api';
@@ -22,10 +22,9 @@ const DataTable = props => {
         <>
         { showPop.type === "message" &&
         <PopupMsg 
-            title={showPop.title}
+            variant={showPop.variant}
             content={showPop.content}
             close={()=>{setShowPop(false); showPop.onClick&&showPop.onClick()}}
-            submitText="OK"
             submit={()=>{setShowPop(false); showPop.onClick&&showPop.onClick()}}
         /> }
         { showPop.type === "confirm" &&
@@ -122,15 +121,15 @@ const EditScreen = props => {
                 props.setOverlay('');
     
                 if (resp.error) 
-                    props.setShowPop({title: 'Data Table Error', content: resp.error, type: "message"});
+                    props.setShowPop({variant: VARIANT.ERROR, content: resp.error, type: "message"});
                 if (resp === 'fail')
-                    props.setShowPop({title: 'Data Table Error', content: 'Failed to Fetch Data Tables', type: "message"});
+                    props.setShowPop({variant: VARIANT.ERROR, content: 'Failed to Fetch Data Tables', type: "message"});
                 if (typeof(resp) === 'object') {
                     setDataTables(resp);
                 }
             }
             catch(error) {
-                props.setShowPop({title: 'Data Table', content: 'Failed To Fetch Data Tables!', type: "message"})
+                props.setShowPop({variant: VARIANT.ERROR, content: 'Failed To Fetch Data Tables!', type: "message"})
                 console.error(error);
             }
         })()

@@ -1,10 +1,10 @@
 import React, { useState } from  'react';
 import { useHistory } from 'react-router-dom';
-import { RedirectPage, CalendarComp } from '../../global';
+import { RedirectPage, CalendarComp, VARIANT, Messages as MSG } from '../../global';
 import { fetchMetrics } from '../api';
 import "../styles/ExecutionMetrics.scss";
 
-const ExecutionMetrics = props => {
+const ExecutionMetrics = ({setBlockui,setPopup}) => {
 
     const history = useHistory();
 
@@ -49,14 +49,14 @@ const ExecutionMetrics = props => {
 
             if (end_date < start_date) setErrors({ fromDate: true, toDate: true });
             else {
-                props.setBlockui({show: true, content: 'Fetching Metrics...'})
+                setBlockui({show: true, content: 'Fetching Metrics...'})
                 fetchMetrics(arg)
                 .then(result => {
-                    props.setBlockui({ show: false })
+                    setBlockui({ show: false })
                     if (result === "Invalid Session") return RedirectPage(history);
-                    else if (result === "fail") props.setPopup({title: "Fail", content: "Error while exporting Execution Metrics", submitText: "OK", show: true });
-                    else if (result === "NoRecords") props.setPopup({title: "Fail", content: "No records found", show: true, submitText: "OK"});
-                    else if (result.error) props.setPopup({title: "Fail", content: result.error, show: true, submitText: "OK"});
+                    else if (result === "fail") setPopup(MSG.UTILITY.ERR_EXPORT_EXE_METRICS);
+                    else if (result === "NoRecords") setPopup(MSG.UTILITY.ERR_NO_RECORDS);
+                    else if (result.error) setPopup(result.error);
                     else {
                         let isIE = false || !!document.documentMode;
                         let file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -72,8 +72,8 @@ const ExecutionMetrics = props => {
                             document.body.removeChild(a);
                             URL.revokeObjectURL(fileURL);
                         }
-                        props.setPopup({
-                            title: "Success", 
+                        setPopup({
+                            variant: VARIANT.SUCCESS,
                             content: "Successfully exported Execution Metrics to CSV",
                             submitText: "OK",
                             show: true
@@ -81,8 +81,8 @@ const ExecutionMetrics = props => {
                     }
                 })
                 .catch(error => {
-                    props.setPopup({
-                        title: "ERROR", 
+                    setPopup({
+                        variant: VARIANT.ERROR, 
                         content: "Failed!",
                         submitText: "OK",
                         show: true

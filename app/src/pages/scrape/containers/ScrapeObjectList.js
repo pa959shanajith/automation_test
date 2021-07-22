@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
 import { useHistory } from 'react-router-dom';
 import ScrapeObject from '../components/ScrapeObject';
-import { ScrollBar, RedirectPage } from "../../global"
+import { ScrollBar, RedirectPage, VARIANT } from "../../global"
 import { ScrapeContext } from '../components/ScrapeContext';
 import * as actionTypes from '../state/action';
 import * as scrapeApi from '../api';
@@ -347,7 +347,7 @@ const ScrapeObjectList = () => {
             else fetchScrapeData().then(resp=>{
                 if (resp === 'success' || typeof(resp) === "object"){
                     setShowPop({
-                        'title': 'Save Scrape data',
+                        'variant': VARIANT.SUCCESS,
                         'content': typeof(resp)==="object" && resp.length>0 ? <div className="ss__dup_labels">
                             Scraped data saved successfully.
                             <br/><br/>
