@@ -199,6 +199,8 @@ const DesignContent = props => {
                                                 }
                                             }
                                             testcase[i].stepNo = (i + 1).toString();
+											let temp=testcase[i].keywordVal  
+											testcase[i].keywordVal=testcase[i].keywordVal[0].toLowerCase()+testcase[i].keywordVal.slice(1,)
                                             testcaseArray.push(testcase[i]);
                                         }
                                     }
