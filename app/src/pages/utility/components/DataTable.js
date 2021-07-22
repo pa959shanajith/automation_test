@@ -161,19 +161,13 @@ const EditScreen = props => {
 }
 
 const TableName = ({tableName, setTableName, error}) => {
-    const [value, setValue] = useState(tableName || '');
 
-    useEffect(()=>{
-        setValue(tableName)
-    }, [tableName]);
-
-    const onChange = e => setValue(validate(e.target.value, "dataTableName"));
-    const onBlur = () => setTableName(value);
+    const onChange = e => setTableName(validate(e.target.value, "dataTableName"));
 
     return (
         <div className="dt__tableName">
             Data Table Name:
-            <input className={error?"dt__tableNameError":""} onBlur={onBlur} onChange={onChange} value={value} placeholder="Enter Data Table Name" />
+            <input className={error?"dt__tableNameError":""} onChange={onChange} value={tableName} placeholder="Enter Data Table Name" />
         </div>
     );
 }
