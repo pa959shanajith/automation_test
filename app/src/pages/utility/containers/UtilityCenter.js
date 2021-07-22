@@ -126,7 +126,6 @@ const UtilityCenter=(props)=>{
     return (
         <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        { console.log(popup) }
         {(popup.show || popup.content || popup.CONTENT )?<PopupMsg variant={popup.VARIANT || popup.variant} close={()=>setPopup({show:false})} content={popup.CONTENT || popup.content} submitText={popup.submitText}/>:null}
         <div className="UtlmiddleContent">
             <div data-test="utility_middle_screen" className="middle_holder">
