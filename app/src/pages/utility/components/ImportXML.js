@@ -27,38 +27,33 @@ const ImportXML = props => {
                 setError(true);
             else {
                 setError(false);
-
+                props.setOverlay("Importing File...");
                 const resp = await importDataTable({ content: props.xmlContent, row: rowTag, column:columnTagList, importFormat: "xml" });
-
-                if(resp.error) 
-                    props.setShowPop({title: "File Read Error", content: resp.error, type: "message"})
-                else if (resp == "columnExceeds") {
-                    props.setShowPop({title: "File Read Error", content: "Column should not exceed 15", type: "message"});
-                }
-                else if (resp == "rowExceeds") {
-                    props.setShowPop({title: "File Read Error", content: "Row should not exceed 200", type: "message"});
-                }
-                else if (resp == "emptyData") {
-                    props.setShowPop({title: "File Read Error", content: "Empty Data in the sheet", type: "message"});
-                } 
-                else if (resp == "emptyRow") {
-                    props.setShowPop({title: "File Read Error", content: "Empty rows for the given row tag name", type: "message"});
-                }
-                else if (resp == "nestedXML") {
-                    props.setShowPop({title: "File Read Error", content: "Invalid XML file. Cannot convert the XML to data table", type: "message"});
-                } else if (resp === "invalidcols") {
-                    props.setShowPop({title: "File Read Error", content: "Invalid column tag names", type: "message"});
-                }
-                else if (typeof resp === "object"){
-                    const [, newData, newHeaders] = parseTableData(resp, "import")
-                    props.setData(newData);
-                    props.setHeaders(newHeaders);
+                let errorMsg = { title: "File Read Error", type: "message" };
+                switch(resp){
+                    case "columnExceeds": props.setShowPop({ content: "Column should not exceed 50", ...errorMsg }); break;
+                    case "rowExceeds": props.setShowPop({ content: "Row should not exceed 200", ...errorMsg}); break;
+                    case "emptyData": props.setShowPop({ content: "Empty Data in the sheet", ...errorMsg}); break;
+                    case "emptyRow": props.setShowPop({ content: "Empty rows for the given row tag name", ...errorMsg}); break;
+                    case "nestedXML": props.setShowPop({ content: "Invalid XML file. Cannot convert the XML to data table", ...errorMsg}); break;
+                    case "invalidcols": props.setShowPop({ content: "Invalid column tag names", ...errorMsg}); break;
+                    default: {
+                        if (resp.error) props.setShowPop({ content: resp.error, ...errorMsg});
+                        else if (typeof resp === "object"){
+                            const [, newData, newHeaders] = parseTableData(resp, "import")
+                            props.setData(newData);
+                            props.setHeaders(newHeaders);
+                        }
+                        break;
+                    }
                 }
                 props.setRowTag("");
+                props.setOverlay("");
             }
         }
         catch(error){
             props.setRowTag("");
+            props.setOverlay("");
             console.error("ERROR::::", error);
             props.setShowPop({title: "File Read Error", content: "Failed to Fetch File Data", type: "message"})
         }

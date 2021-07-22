@@ -296,32 +296,30 @@ const CreateScreenActionButtons = props => {
                     setRowTag("row");
                     setXmlContent(reader.result);
                 } else {
-
+                    props.setOverlay("Importing File...");
                     const resp = await utilApi.importDataTable({importFormat: importFormat, content: reader.result, flag: importFormat==="excel"?"sheetname":""});
-                
                     if(importFormat === "excel") {
                         setSheetList(resp);
                         setExcelContent(reader.result);
                     } 
-                    else if (resp == "columnExceeds") {
+                    else if (resp === "columnExceeds")
                         props.setShowPop({variant: VARIANT.WARNING, content: "Column should not exceed 15", type: "message"});
-                    } 
-                    else if (resp == "rowExceeds") {
+                    else if (resp === "rowExceeds")
                         props.setShowPop({variant: VARIANT.WARNING, content: "Row should not exceed 200", type: "message"});
-                    }
-                    else if (resp == "emptyData") {
+                    else if (resp === "emptyData")
                         props.setShowPop({variant: VARIANT.ERROR, content: "Empty data in the file", type: "message"});
-                    }
                     else {
                         const [, newData, newHeaders] = parseTableData(resp, "import")
                         props.setData(newData);
                         props.setHeaders(newHeaders);
                     }
+                    props.setOverlay("");
                 }
             }
             catch(error){
                 console.error("ERROR:::", error);
                 props.setShowPop({variant: VARIANT.ERROR, content: "Failed to Load file", type: "message"})
+                props.setOverlay("");
             }
         }
         reader.readAsBinaryString(file);
