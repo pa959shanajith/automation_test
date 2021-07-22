@@ -1,7 +1,7 @@
 import React, { useState, useEffect }  from 'react';
 import { v4 as uuid } from 'uuid';
 import { TableActionButtons, CreateScreenActionButtons, EditScreenActionButtons, SearchDataTable } from './DataTableBtnGroup';
-import { PopupMsg, ModalContainer, ScreenOverlay, ValidationExpression as validate, VARIANT } from '../../global';
+import { Messages as MSG, ModalContainer, ScreenOverlay, ValidationExpression as validate, VARIANT } from '../../global';
 import Table from './Table';
 import { resetHistory } from './DtUtils';
 import * as utilApi from '../api';
@@ -10,7 +10,7 @@ import "../styles/DataTable.scss";
 const DataTable = props => {
 
     const [currScreen, setCurrScreen] = useState(props.currScreen);
-    const [showPop, setShowPop] = useState(false);
+    const [showModal,setModal] = useState(false);
     const [overlay, setOverlay] = useState('');
 
     useEffect(()=>{
@@ -18,36 +18,25 @@ const DataTable = props => {
         resetHistory();
     }, [props.currScreen])
 
-    const Popup = () => (
-        <>
-        { showPop.type === "message" &&
-        <PopupMsg 
-            variant={showPop.variant}
-            content={showPop.content}
-            close={()=>{setShowPop(false); showPop.onClick&&showPop.onClick()}}
-            submit={()=>{setShowPop(false); showPop.onClick&&showPop.onClick()}}
-        /> }
-        { showPop.type === "confirm" &&
+    const Modal = () => (
         <ModalContainer 
-            title={showPop.title}
-            content={showPop.content}
-            close={()=>setShowPop(false)}
+            title={showModal.title}
+            content={showModal.content}
+            close={()=>setModal(false)}
             footer={
                 <>
-                <button onClick={showPop.onClick}>
-                    {showPop.continueText ? showPop.continueText : "Yes"}
+                <button onClick={showModal.onClick}>
+                    {showModal.continueText ? showModal.continueText : "Yes"}
                 </button>
-                <button onClick={()=>setShowPop(false)}>
-                    {showPop.rejectText ? showPop.rejectText : "No"}
+                <button onClick={()=>setModal(false)}>
+                    {showModal.rejectText ? showModal.rejectText : "No"}
                 </button>
                 </>
             }
-        /> }
-        </>
+        /> 
     )
-
     return <>
-        { showPop && <Popup /> }
+        { showModal && <Modal/>}
         { overlay && <ScreenOverlay content={overlay} /> }
         <div className="page-taskName" >
             <span className="taskname" data-test="dt__pageTitle">
@@ -57,8 +46,8 @@ const DataTable = props => {
         
         { 
             currScreen === "Create" 
-            ? <CreateScreen setShowPop={setShowPop} setOverlay={setOverlay} setScreenType={props.setScreenType} />
-            : <EditScreen setShowPop={setShowPop} setOverlay={setOverlay} setScreenType={props.setScreenType} />
+            ? <CreateScreen setModal={setModal} setShowPop={props.setShowPop} setOverlay={setOverlay} setScreenType={props.setScreenType} />
+            : <EditScreen setModal={setModal} setShowPop={props.setShowPop} setOverlay={setOverlay} setScreenType={props.setScreenType} />
         }
     </>;
 }
@@ -121,15 +110,15 @@ const EditScreen = props => {
                 props.setOverlay('');
     
                 if (resp.error) 
-                    props.setShowPop({variant: VARIANT.ERROR, content: resp.error, type: "message"});
+                    props.setShowPop(resp.error);
                 if (resp === 'fail')
-                    props.setShowPop({variant: VARIANT.ERROR, content: 'Failed to Fetch Data Tables', type: "message"});
+                    props.setShowPop(MSG.UTILITY.ERR_FETCH_DATATABLES);
                 if (typeof(resp) === 'object') {
                     setDataTables(resp);
                 }
             }
             catch(error) {
-                props.setShowPop({variant: VARIANT.ERROR, content: 'Failed To Fetch Data Tables!', type: "message"})
+                props.setShowPop(MSG.UTILITY.ERR_FETCH_DATATABLES)
                 console.error(error);
             }
         })()

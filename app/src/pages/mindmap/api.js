@@ -306,7 +306,7 @@ export const excelToMindmap = async(data) => {
             return {error : MSG.MINDMAP.ERR_EMPTY_COL}
         } 
         else if (res.data == "emptySheet" || res.data == 'fail') {
-            return {error : 'Excel sheet is either empty or invalid'}
+            return {error : MSG.MINDMAP.ERR_EXCEL_SHEET}
         }
         else if(res.status===200 && res.data !== "fail"){            
             return res.data;

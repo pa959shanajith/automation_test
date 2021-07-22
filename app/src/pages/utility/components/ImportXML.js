@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { validateData } from './DtUtils';
-import { ModalContainer } from '../../global';
+import { ModalContainer, Messages as MSG } from '../../global';
 import { importDataTable } from '../api';
 import { parseTableData } from './DtUtils';
 import "../styles/ExportDataTable.scss";
@@ -29,16 +29,15 @@ const ImportXML = props => {
                 setError(false);
                 props.setOverlay("Importing File...");
                 const resp = await importDataTable({ content: props.xmlContent, row: rowTag, column:columnTagList, importFormat: "xml" });
-                let errorMsg = { title: "File Read Error", type: "message" };
                 switch(resp){
-                    case "columnExceeds": props.setShowPop({ content: "Column should not exceed 50", ...errorMsg }); break;
-                    case "rowExceeds": props.setShowPop({ content: "Row should not exceed 200", ...errorMsg}); break;
-                    case "emptyData": props.setShowPop({ content: "Empty Data in the sheet", ...errorMsg}); break;
-                    case "emptyRow": props.setShowPop({ content: "Empty rows for the given row tag name", ...errorMsg}); break;
-                    case "nestedXML": props.setShowPop({ content: "Invalid XML file. Cannot convert the XML to data table", ...errorMsg}); break;
-                    case "invalidcols": props.setShowPop({ content: "Invalid column tag names", ...errorMsg}); break;
+                    case "columnExceeds": props.setShowPop(MSG.UTILITY.ERR_COL_15); break;
+                    case "rowExceeds": props.setShowPop(MSG.UTILITY.ERR_ROW_200); break;
+                    case "emptyData": props.setShowPop(MSG.UTILITY.ERR_EMPTY_SHEET); break;
+                    case "emptyRow": props.setShowPop(MSG.UTILITY.ERR_EMPTY_ROWS); break;
+                    case "nestedXML": props.setShowPop(MSG.UTILITY.ERR_INVALID_XML); break;
+                    case "invalidcols": props.setShowPop(MSG.UTILITY.ERR_COL_TAGNAME); break;
                     default: {
-                        if (resp.error) props.setShowPop({ content: resp.error, ...errorMsg});
+                        if (resp.error) props.setShowPop(resp.error);
                         else if (typeof resp === "object"){
                             const [, newData, newHeaders] = parseTableData(resp, "import")
                             props.setData(newData);
@@ -55,7 +54,7 @@ const ImportXML = props => {
             props.setRowTag("");
             props.setOverlay("");
             console.error("ERROR::::", error);
-            props.setShowPop({title: "File Read Error", content: "Failed to Fetch File Data", type: "message"})
+            props.setShowPop(MSG.UTILITY.ERR_FETCH_FILE)
         }
     }
 

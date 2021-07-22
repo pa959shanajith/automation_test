@@ -4,7 +4,7 @@ import { RedirectPage, CalendarComp, VARIANT, Messages as MSG } from '../../glob
 import { fetchMetrics } from '../api';
 import "../styles/ExecutionMetrics.scss";
 
-const ExecutionMetrics = ({setBlockui,setPopup}) => {
+const ExecutionMetrics = ({setBlockui,setShowPop}) => {
 
     const history = useHistory();
 
@@ -54,9 +54,9 @@ const ExecutionMetrics = ({setBlockui,setPopup}) => {
                 .then(result => {
                     setBlockui({ show: false })
                     if (result === "Invalid Session") return RedirectPage(history);
-                    else if (result === "fail") setPopup(MSG.UTILITY.ERR_EXPORT_EXE_METRICS);
-                    else if (result === "NoRecords") setPopup(MSG.UTILITY.ERR_NO_RECORDS);
-                    else if (result.error) setPopup(result.error);
+                    else if (result === "fail") setShowPop(MSG.UTILITY.ERR_EXPORT_EXE_METRICS);
+                    else if (result === "NoRecords") setShowPop(MSG.UTILITY.ERR_NO_RECORDS);
+                    else if (result.error) setShowPop(result.error);
                     else {
                         let isIE = false || !!document.documentMode;
                         let file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -72,21 +72,11 @@ const ExecutionMetrics = ({setBlockui,setPopup}) => {
                             document.body.removeChild(a);
                             URL.revokeObjectURL(fileURL);
                         }
-                        setPopup({
-                            variant: VARIANT.SUCCESS,
-                            content: "Successfully exported Execution Metrics to CSV",
-                            submitText: "OK",
-                            show: true
-                        });
+                        setShowPop(MSG.UTILITY.SUCC_EXPORTED);
                     }
                 })
                 .catch(error => {
-                    setPopup({
-                        variant: VARIANT.ERROR, 
-                        content: "Failed!",
-                        submitText: "OK",
-                        show: true
-                    });
+                    setShowPop(MSG.UTILITY.ERR_FAILED);
                     console.error(error);
                 });
             }

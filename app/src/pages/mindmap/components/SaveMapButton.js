@@ -50,7 +50,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
     var counter = {};
     var displayError = (error) => {
         setBlockui({show:false});
-        setPopup({show:true,variant:error.VARIANT,content:((error)?error.CONTENT:MSG.MINDMAP.ERR_SAVE.CONTENT),submitText:'Ok'})
+        setPopup({show:true,variant:error.VARIANT || VARIANT.ERROR ,content:((error)?( error.CONTENT || error ):MSG.MINDMAP.ERR_SAVE.CONTENT)})
         return;
     }
     d3.select('#pasteImg').classed('active-map',false)

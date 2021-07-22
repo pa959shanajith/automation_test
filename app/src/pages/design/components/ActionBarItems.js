@@ -225,16 +225,16 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable, set
                     setOverlay("Loading...");
                     let resultString = JSON.parse(reader.result);
                     if (!Array.isArray(resultString)) 
-                        throw {'title': "Import Testcase", 'content': "Please Check the file format you have uploaded!"}
+                        throw MSG.DESIGN.ERR_FILE_FORMAT
                     for (let i = 0; i < resultString.length; i++) {
                         if (!resultString[i].appType)
-                            throw {title: 'Import Error', content: "Incorrect JSON imported. Please check the contents!"}
+                            throw MSG.DESIGN.ERR_JSON_IMPORT
                         if (
                             resultString[i].appType.toLowerCase() !== "generic" && 
                             resultString[i].appType.toLowerCase() !== "pdf" &&
                             resultString[i].appType !== appType
                         ) 
-                            throw {'title': "App Type Error", 'content': "Project application type and Imported JSON application type doesn't match, please check!"}
+                            throw MSG.DESIGN.ERR_NO_MATCH_APPTYPE
                     }
                     DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
                         .then(data => {
@@ -254,7 +254,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable, set
             catch(error){
                 setOverlay("");
                 if (typeof(error)==="object") setShowPop(error);
-                else setShowPop({title: "Import Error", content: "Failed to Import Testcase JSON."})
+                else setShowPop(MSG.DESIGN.ERR_TC_JSON_IMPORT)
                 console.error(error);
             }
         }
