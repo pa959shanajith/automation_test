@@ -23,8 +23,8 @@ const ImportSheet = props => {
 
     const importTable = async() => {
         try{
+            props.setOverlay("Importing File...");
             const resp = await importDataTable({ content: props.excelContent, flag: "data", sheetname: sheet, importFormat: "excel" });
-
             if(resp.error) 
                 props.setShowPop(resp.error)
             else if (resp == "columnExceeds") {
@@ -49,6 +49,9 @@ const ImportSheet = props => {
         catch(error){
             console.error("ERROR::::", error);
             props.setShowPop(MSG.UTILITY.ERR_FETCH_FILE)
+        }
+        finally {
+            props.setOverlay("");
         }
     }
 

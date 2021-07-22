@@ -131,6 +131,7 @@ const ScrapeObjectList = () => {
         let localScrapeItems = [...scrapeItems];
         let updNewScrapedData = {...newScrapedData};
         let objId = "";
+        let isCustom = false;
         let obj = null;
         for (let scrapeItem of localScrapeItems){
             if (scrapeItem.val === value) {
@@ -142,8 +143,9 @@ const ScrapeObjectList = () => {
                     scrapeItem.editable = true;
                 }
                 objId = scrapeItem.objId;
+                isCustom = scrapeItem.isCustom; 
                 if (objId) obj = {...mainScrapedData.view[scrapeItem.objIdx], ...newProperties};
-                else updNewScrapedData.view[scrapeItem.objIdx] = {...newScrapedData.view[scrapeItem.objIdx], ...newProperties}
+                else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = {...newScrapedData.view[scrapeItem.objIdx], ...newProperties}
                 // else only if customFlag is true
             };
         }
@@ -153,7 +155,7 @@ const ScrapeObjectList = () => {
             modifiedDict[objId] = obj;
             setModified(modifiedDict);
         }
-        else setNewScrapedData(updNewScrapedData);
+        else if (!isCustom) setNewScrapedData(updNewScrapedData);
         if(!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved(false);
         setScrapeItems(localScrapeItems);
     }

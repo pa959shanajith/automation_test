@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import { ValidationExpression } from '../../global';
 
 let undoStack = [];
 let redoStack = [];
@@ -258,7 +259,7 @@ function pasteColumns (copiedCells, newHeaders, newData, pasteIndex) {
 
 function validateData (tableName, tableData) {
     let validation = "saveData";
-    if (!tableName.trim())
+    if (!tableName.trim() || !ValidationExpression(tableName, "validName"))
         validation = "tableName";
     else if (tableData === "emptyData")
         validation = "emptyData";

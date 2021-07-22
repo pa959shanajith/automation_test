@@ -283,31 +283,29 @@ const CreateScreenActionButtons = props => {
                     setRowTag("row");
                     setXmlContent(reader.result);
                 } else {
-
+                    props.setOverlay("Importing File...");
                     const resp = await utilApi.importDataTable({importFormat: importFormat, content: reader.result, flag: importFormat==="excel"?"sheetname":""});
-                
                     if(importFormat === "excel") {
                         setSheetList(resp);
                         setExcelContent(reader.result);
                     } 
-                    else if (resp == "columnExceeds") {
+                    else if (resp == "columnExceeds") 
                         props.setShowPop(MSG.UTILITY.ERR_COL_15);
-                    } 
-                    else if (resp == "rowExceeds") {
+                    else if (resp == "rowExceeds")
                         props.setShowPop(MSG.UTILITY.ERR_ROW_200);
-                    }
-                    else if (resp == "emptyData") {
+                    else if (resp == "emptyData")
                         props.setShowPop(MSG.UTILITY.ERR_EMPTY_DATA);
-                    }
                     else {
                         const [, newData, newHeaders] = parseTableData(resp, "import")
                         props.setData(newData);
                         props.setHeaders(newHeaders);
                     }
+                    props.setOverlay("");
                 }
             }
             catch(error){
                 console.error("ERROR:::", error);
+                props.setOverlay("");
                 props.setShowPop(MSG.UTILITY.ERR_LOAD)
             }
         }

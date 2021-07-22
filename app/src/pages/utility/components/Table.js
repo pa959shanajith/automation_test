@@ -270,6 +270,7 @@ const RowNumColumn = props => {
                     className={"dt__table_numbered_column "+(props.checkList.list.includes(`sel||row||subheader`)?" dt__hdrCell_Sel":"")}
                     data-test="dt__number_cell"
                     onClick={(e)=>props.updateCheckList(e, "row", "subheader")}
+                    id={`rowNum-1`}
                 >
                     1
                 </div>
@@ -281,7 +282,7 @@ const RowNumColumn = props => {
                             className={"dt__table_numbered_column "+(props.checkList.list.includes(`sel||row||${row.__CELL_ID__}`)?" dt__hdrCell_Sel":"")} 
                             onClick={(e)=>props.updateCheckList(e, "row", row.__CELL_ID__)}
                             data-test="dt__number_cell"
-                            id={`rowNum-${rowIndex}`}
+                            id={`rowNum-${rowIndex+2}`}
                         >
                             {rowIndex+2}
                         </div>
@@ -314,7 +315,7 @@ const SubHeaderRow = props => {
     }, [props.focus])
 
     return (
-        <div className="dt__table_row header_row" data-test="dt__row">
+        <div className="dt__table_row" data-test="dt__row">
             <div className="dt__table_header_cells">
             { props.headers.map(header => {
                 return (
@@ -359,7 +360,9 @@ const AddRow = props => {
 
 const SubHeaderCell  = props => {
     const [value, setValue] = useState(props.initialValue || '');
+    const [edit, setEdit] = useState(false);
     const colRef = useRef();
+    const areaRef = useRef();
 
     useEffect(()=>{
         if (props.focus.type==="action" && props.focus.id === props.headerId && colRef.current) {
@@ -372,6 +375,10 @@ const SubHeaderCell  = props => {
         setValue(props.initialValue || '')
     }, [props.initialValue]);
 
+    useEffect(()=>{
+        if(edit && areaRef.current) areaRef.current.focus();
+    }, [edit])
+
     const onBlur = e => {
         let invalidHeader = false;
         props.headers.forEach(header => {
@@ -381,6 +388,7 @@ const SubHeaderCell  = props => {
         if (invalidHeader) 
             setValue(props.initialValue||'')
         props.updateHeaders(value, props.headerId, invalidHeader)
+        setEdit(false);
         return true;
     };
 
@@ -390,15 +398,27 @@ const SubHeaderCell  = props => {
         if (event.keyCode === 13) onBlur();
     }
 
+    const onClick=()=>{
+        setEdit(true);
+    }
+
+    (()=>{
+        let rowNum = document.getElementById(`rowNum-1`)
+        if (rowNum && colRef.current) {
+            document.getElementById(`rowNum-1`).style.height=`${colRef.current.clientHeight}px`;
+    }})()
+
     return (
         <div 
             ref={colRef}
             className={
-                "dt__cell dt__subHeaderCell "
-                +(props.selected?"dt__selected_cell":'')} 
+                "dt__cell dt__subHeader"
+                +(props.selected?" dt__selected_cell":'')} 
             data-test="dt__subHeader_cell"
         >
-            <input value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress}/>
+            { edit ? <TextareaAutosize ref={(tag)=>areaRef.current=tag} value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress}/>
+                    :  <div className="dt__subHeaderCell" onClick={onClick}>{value}</div>
+            }
         </div>
     );
 }
@@ -418,9 +438,9 @@ const Row = props => {
 
 
     const updateHeight = () => {
-        let rowNum = document.getElementById(`rowNum-${props.rowIndex}`)
+        let rowNum = document.getElementById(`rowNum-${props.rowIndex+2}`)
         if (rowNum && rowRef.current) {
-            document.getElementById(`rowNum-${props.rowIndex}`).style.height=`${rowRef.current.clientHeight}px`;
+            document.getElementById(`rowNum-${props.rowIndex+2}`).style.height=`${rowRef.current.clientHeight}px`;
         }
     }
 

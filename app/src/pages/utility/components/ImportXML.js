@@ -27,38 +27,32 @@ const ImportXML = props => {
                 setError(true);
             else {
                 setError(false);
-
+                props.setOverlay("Importing File...");
                 const resp = await importDataTable({ content: props.xmlContent, row: rowTag, column:columnTagList, importFormat: "xml" });
-
-                if(resp.error) 
-                    props.setShowPop(resp.error)
-                else if (resp == "columnExceeds") {
-                    props.setShowPop(MSG.UTILITY.ERR_COL_15);
-                }
-                else if (resp == "rowExceeds") {
-                    props.setShowPop(MSG.UTILITY.ERR_ROW_200);
-                }
-                else if (resp == "emptyData") {
-                    props.setShowPop(MSG.UTILITY.ERR_EMPTY_SHEET);
-                } 
-                else if (resp == "emptyRow") {
-                    props.setShowPop(MSG.UTILITY.ERR_EMPTY_ROWS);
-                }
-                else if (resp == "nestedXML") {
-                    props.setShowPop(MSG.UTILITY.ERR_INVALID_XML);
-                } else if (resp === "invalidcols") {
-                    props.setShowPop(MSG.UTILITY.ERR_COL_TAGNAME);
-                }
-                else if (typeof resp === "object"){
-                    const [, newData, newHeaders] = parseTableData(resp, "import")
-                    props.setData(newData);
-                    props.setHeaders(newHeaders);
+                switch(resp){
+                    case "columnExceeds": props.setShowPop(MSG.UTILITY.ERR_COL_15); break;
+                    case "rowExceeds": props.setShowPop(MSG.UTILITY.ERR_ROW_200); break;
+                    case "emptyData": props.setShowPop(MSG.UTILITY.ERR_EMPTY_SHEET); break;
+                    case "emptyRow": props.setShowPop(MSG.UTILITY.ERR_EMPTY_ROWS); break;
+                    case "nestedXML": props.setShowPop(MSG.UTILITY.ERR_INVALID_XML); break;
+                    case "invalidcols": props.setShowPop(MSG.UTILITY.ERR_COL_TAGNAME); break;
+                    default: {
+                        if (resp.error) props.setShowPop(resp.error);
+                        else if (typeof resp === "object"){
+                            const [, newData, newHeaders] = parseTableData(resp, "import")
+                            props.setData(newData);
+                            props.setHeaders(newHeaders);
+                        }
+                        break;
+                    }
                 }
                 props.setRowTag("");
+                props.setOverlay("");
             }
         }
         catch(error){
             props.setRowTag("");
+            props.setOverlay("");
             console.error("ERROR::::", error);
             props.setShowPop(MSG.UTILITY.ERR_FETCH_FILE)
         }

@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, RedirectPage, Messages, VARIANT} from '../../global' 
+import {ScreenOverlay, RedirectPage, Messages, VARIANT, ValidationExpression} from '../../global' 
 import {getUserDetails, provisions} from '../api';
-import ValidationExpression from '../../global/components/ValidationExpression';
 import ReactTooltip from 'react-tooltip';
 import { useHistory } from 'react-router-dom';
 import '../styles/IceProvisionForm.scss'
@@ -43,7 +42,7 @@ const IceProvisionForm = (props) => {
 		setSelAssignUser2ErrBorder(false);
 		const icetype = props.op;
 		props.setToken("");
-		if (props.icename === "") {
+		if (props.icename.trim() === "") {
 			setIcenameErrBorder(true);
 			return false;
 		}
@@ -54,7 +53,7 @@ const IceProvisionForm = (props) => {
 
 		var tokeninfo = {
 			userid: props.userid,
-			icename: props.icename,
+			icename: props.icename.trim(),
 			icetype: icetype,
 			action: "provision"
 		};
