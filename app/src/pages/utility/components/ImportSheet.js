@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ModalContainer, VARIANT } from '../../global';
+import { ModalContainer, VARIANT, Messages as MSG } from '../../global';
 import { importDataTable } from '../api';
 import { parseTableData } from './DtUtils';
 import "../styles/ExportDataTable.scss";
@@ -26,18 +26,18 @@ const ImportSheet = props => {
             const resp = await importDataTable({ content: props.excelContent, flag: "data", sheetname: sheet, importFormat: "excel" });
 
             if(resp.error) 
-                props.setShowPop({variant: VARIANT.ERROR, content: resp.error, type: "message"})
+                props.setShowPop(resp.error)
             else if (resp == "columnExceeds") {
                 props.setSheetList([]);
-                props.setShowPop({variant: VARIANT.ERROR, content: "Column should not exceed 50", type: "message"});
+                props.setShowPop(MSG.UTILITY.ERR_COL_50);
             }
             else if (resp == "rowExceeds") {
                 props.setSheetList([]);
-                props.setShowPop({variant: VARIANT.ERROR, content: "Row should not exceed 200", type: "message"});
+                props.setShowPop(MSG.UTILITY.ERR_ROW_200);
             }
             else if (resp == "emptyExcelData") {
                 props.setSheetList([]);
-                props.setShowPop({variant: VARIANT.ERROR, content: "Empty Data in the sheet", type: "message"});
+                props.setShowPop(MSG.UTILITY.ERR_EMPTY_SHEET);
             }
             else if (typeof resp === "object"){
                 const [, newData, newHeaders] = parseTableData(resp, "import")
@@ -48,7 +48,7 @@ const ImportSheet = props => {
         }
         catch(error){
             console.error("ERROR::::", error);
-            props.setShowPop({variant: VARIANT.ERROR, content: "Failed to Fetch File Data", type: "message"})
+            props.setShowPop(MSG.UTILITY.ERR_FETCH_FILE)
         }
     }
 

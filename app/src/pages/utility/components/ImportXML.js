@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { validateData } from './DtUtils';
-import { ModalContainer } from '../../global';
+import { ModalContainer, Messages as MSG } from '../../global';
 import { importDataTable } from '../api';
 import { parseTableData } from './DtUtils';
 import "../styles/ExportDataTable.scss";
@@ -31,23 +31,23 @@ const ImportXML = props => {
                 const resp = await importDataTable({ content: props.xmlContent, row: rowTag, column:columnTagList, importFormat: "xml" });
 
                 if(resp.error) 
-                    props.setShowPop({title: "File Read Error", content: resp.error, type: "message"})
+                    props.setShowPop(resp.error)
                 else if (resp == "columnExceeds") {
-                    props.setShowPop({title: "File Read Error", content: "Column should not exceed 15", type: "message"});
+                    props.setShowPop(MSG.UTILITY.ERR_COL_15);
                 }
                 else if (resp == "rowExceeds") {
-                    props.setShowPop({title: "File Read Error", content: "Row should not exceed 200", type: "message"});
+                    props.setShowPop(MSG.UTILITY.ERR_ROW_200);
                 }
                 else if (resp == "emptyData") {
-                    props.setShowPop({title: "File Read Error", content: "Empty Data in the sheet", type: "message"});
+                    props.setShowPop(MSG.UTILITY.ERR_EMPTY_SHEET);
                 } 
                 else if (resp == "emptyRow") {
-                    props.setShowPop({title: "File Read Error", content: "Empty rows for the given row tag name", type: "message"});
+                    props.setShowPop(MSG.UTILITY.ERR_EMPTY_ROWS);
                 }
                 else if (resp == "nestedXML") {
-                    props.setShowPop({title: "File Read Error", content: "Invalid XML file. Cannot convert the XML to data table", type: "message"});
+                    props.setShowPop(MSG.UTILITY.ERR_INVALID_XML);
                 } else if (resp === "invalidcols") {
-                    props.setShowPop({title: "File Read Error", content: "Invalid column tag names", type: "message"});
+                    props.setShowPop(MSG.UTILITY.ERR_COL_TAGNAME);
                 }
                 else if (typeof resp === "object"){
                     const [, newData, newHeaders] = parseTableData(resp, "import")
@@ -60,7 +60,7 @@ const ImportXML = props => {
         catch(error){
             props.setRowTag("");
             console.error("ERROR::::", error);
-            props.setShowPop({title: "File Read Error", content: "Failed to Fetch File Data", type: "message"})
+            props.setShowPop(MSG.UTILITY.ERR_FETCH_FILE)
         }
     }
 
