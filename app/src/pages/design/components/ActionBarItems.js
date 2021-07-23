@@ -240,9 +240,7 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable, set
                         .then(data => {
                             setOverlay("");
                             if (data === "Invalid Session") RedirectPage(history);
-                            if (data === "success") {
-                                setImported(true);
-                            } setShowPop(MSG.DESIGN.ERR_FILE_FORMAT);
+                            if (data === "success") setImported(true);
                         })
                         .catch(error => {
                             setOverlay("");
