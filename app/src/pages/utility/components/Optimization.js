@@ -1,5 +1,5 @@
 import React ,{Fragment,useEffect,useState } from 'react';
-import {ScrollBar ,PopupMsg, Messages as MSG} from '../../global';
+import {ScrollBar , Messages as MSG} from '../../global';
 import ValidationExpression from '../../global/components/ValidationExpression';
 
 const Pairwise=(props)=>{
