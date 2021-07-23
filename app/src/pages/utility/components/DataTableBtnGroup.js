@@ -247,7 +247,7 @@ const CreateScreenActionButtons = props => {
                         case "exists": props.setShowPop(MSG.UTILITY.ERR_TABLE_EXIST); break;
                         case "fail": props.setShowPop(MSG.UTILITY.ERR_CREATE_TADATABLE); break;
                         case "success": props.setShowPop(MSG.UTILITY.SUCC_SAVE_DATATABLE); break;
-                        default: props.setShowPop({variant: VARIANT.ERROR, content: resp.error || MSG.UTILITY.ERR_CREATE_TADATABLE.CONTENT}); break;
+                        default: props.setShowPop(resp.error); break;
                     }   
                     props.setErrors({}); 
                     break;
@@ -339,11 +339,11 @@ const EditScreenActionButtons = props => {
             let deleteMsg = {
                 title: "Confirm Delete Data Table", 
                 content: "",
-                onClick: ()=>deleteDataTable(),
+                onClick: ()=>{deleteDataTable();props.setModal(false);},
                 type: 'confirm'
             }
             // onclick
-            switch(resp){
+            switch(resp){ 
                 case "success": props.setModal({...deleteMsg, content: "Are you sure you want to delete current data table?"});break;
                 case "referenceExists": props.setModal({...deleteMsg, content: "Data Table is referenced in Test Cases. Are you sure you want to delete current data table?"});break;
                 default: props.setShowPop(MSG.UTILITY.ERR_DELETE_DATATABLE);break;
