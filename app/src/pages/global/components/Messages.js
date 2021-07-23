@@ -374,6 +374,8 @@ const Messages={
         ERR_DELETE_DATATABLE: {"CONTENT":"Failed to Delete DataTable.", "VARIANT": VARIANT.ERROR},
         ERR_FETCH_DATATABLES: {"CONTENT":'Failed to Fetch Data Tables.', "VARIANT": VARIANT.ERROR},
         ERR_NO_RECORDS: {"CONTENT":'No records found.', "VARIANT": VARIANT.ERROR},
+        ERR_INVALID_EXEC_ID: {"CONTENT": "Failed to Fetch. Invalid Execution ID Found.", "VARIANT": VARIANT.ERROR},
+        ERR_INVALID_STATUS: {"CONTENT": "Failed to Fetch. Invalid Status Found.", "VARIANT": VARIANT.ERROR},
         ERR_EXPORT_EXE_METRICS: {"CONTENT":"Error while exporting Execution Metrics.", "VARIANT": VARIANT.ERROR},
         ERR_EMPTY_TABLE: {"CONTENT":"Table values cannot be empty.", "VARIANT": VARIANT.ERROR},
         ERR_FAILED: {"CONTENT":'Failed.', "VARIANT": VARIANT.ERROR},

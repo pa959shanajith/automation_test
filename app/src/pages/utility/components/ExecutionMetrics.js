@@ -37,8 +37,8 @@ const ExecutionMetrics = ({setBlockui,setShowPop}) => {
                 toDate: toDate,
                 LOB: lob,
             }
-            if (executionId) arg['executionId'] = executionId;
-            if (status) arg['status'] = status
+            if (executionId.trim()) arg['executionId'] = executionId.trim();
+            if (status.trim()) arg['status'] = status.trim();
         }
 
         if (err) setErrors(err);
@@ -57,6 +57,8 @@ const ExecutionMetrics = ({setBlockui,setShowPop}) => {
                     if (result === "Invalid Session") return RedirectPage(history);
                     else if (result === "fail") setShowPop(MSG.UTILITY.ERR_EXPORT_EXE_METRICS);
                     else if (result === "NoRecords") setShowPop(MSG.UTILITY.ERR_NO_RECORDS);
+                    else if (result === "InvalidExecId") setShowPop(MSG.UTILITY.ERR_INVALID_EXEC_ID);
+                    else if (result === "InvalidStatus") setShowPop(MSG.UTILITY.ERR_INVALID_STATUS);
                     else if (result.error) setShowPop(result.error);
                     else {
                         let isIE = false || !!document.documentMode;
