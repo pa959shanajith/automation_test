@@ -1,5 +1,6 @@
+@import "../../global/styles/ColorVariables.scss";
 .asn_toolbar__header{
-    background-color: #e6e7e9;
+    background-color: $borderThree;
     height: 33px;
     padding: 0 10px;
     font-size: 14px;
@@ -46,7 +47,7 @@
     box-shadow: none;
 }
 .errorClass {
-    border: 1px solid red;
+    border: 1px solid $red;
 }
 @media screen and (max-width:890px){
     .asn_toolbar__header{

@@ -1,7 +1,7 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { useSelector, useDispatch }  from  "react-redux";
 import { useHistory } from 'react-router-dom';
-import { Thumbnail, ResetSession, RedirectPage } from '../../global';
+import { Thumbnail, ResetSession, RedirectPage, Messages as MSG } from '../../global';
 import * as DesignApi from "../api";
 import * as DesignActions from '../state/action';
 import "../styles/ActionBarItems.scss"
@@ -110,13 +110,13 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
                 setOverlay("");
                 ResetSession.end();
                 if (data === "Invalid Session") return RedirectPage(history);
-                else if (data === "unavailableLocalServer")  setShowPop({'title': "Debug Testcase", 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."})
-                else if (data === "success") setShowPop({'title': "Debug Testcase", 'content': "Debug completed successfully."})
-                else if (data === "fail") setShowPop({'title': "Debug Testcase", 'content': "Failed to debug."})
-                else if (data === "Terminate") setShowPop({'title': "Debug Testcase", 'content': "Debug Terminated"})
-                else if (data === "browserUnavailable") setShowPop({'title': "Debug Testcase", 'content': "Browser is not available"})
-                else if (data === "scheduleModeOn") setShowPop({'title': "Debug Testcase", 'content': "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."})
-                else if (data === "ExecutionOnlyAllowed") setShowPop({'title': "Debug Testcase", 'content': "Execution Only Allowed"})
+                else if (data === "unavailableLocalServer")  setShowPop(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER)
+                else if (data === "success") setShowPop(MSG.DESIGN.SUCC_DEBUG)
+                else if (data === "fail") setShowPop(MSG.DESIGN.ERR_DEBUG)
+                else if (data === "Terminate") setShowPop(MSG.DESIGN.WARN_DEBUG_TERMINATE)
+                else if (data === "browserUnavailable") setShowPop(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER)
+                else if (data === "scheduleModeOn") setShowPop(MSG.GENERIC.WARN_UNCHECK_SCHEDULE)
+                else if (data === "ExecutionOnlyAllowed") setShowPop(MSG.GENERIC.WARN_EXECUTION_ONLY)
                 else if (data.status === "success"){
                     let rows={}
                     mainTestCases.forEach((testCase, index) => {
@@ -126,7 +126,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
                     });
                     dispatch({type: DesignActions.SET_MODIFIED, payload: rows});
                     dispatch({type: DesignActions.SET_SAVEENABLE, payload: !saveEnable})
-                    setShowPop({'title': "Debug Testcase", 'content': "Debug completed successfully."});
+                    setShowPop(MSG.DESIGN.SUCC_DEBUG);
                 } else {
                     console.log(data);
                 }										
@@ -134,7 +134,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
-                setShowPop({'title': "Debug Testcase", 'content': "Failed to debug."});
+                setShowPop(MSG.DESIGN.ERR_DEBUG);
                 console.error("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
             });
     };
@@ -166,7 +166,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
     return renderComp;
 };
 
-const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) => {
+const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable, setOverlay}) => {
 
     const current_task = useSelector(state=>state.plugin.CT);
     const userInfo = useSelector(state=>state.login.userinfo);
@@ -219,33 +219,42 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable}) =>
         let file = event.target.files[0];
         let reader = new FileReader();
         reader.onload = function (e) {
-            hiddenInput.current.value = '';
-            if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() === "json") {
-                let resultString = JSON.parse(reader.result);
-                for (let i = 0; i < resultString.length; i++) {
-                    if (resultString[i].appType.toLowerCase() === "generic" || resultString[i].appType.toLowerCase() === "pdf") {
-                        flag = true;
-                    } else if (resultString[i].appType === appType) {
-                        flag = true;
-                        break;
-                    } else {
-                        flag = false;
-                        break;
+            try{
+                hiddenInput.current.value = '';
+                if (file.name.split('.').pop().toLowerCase() === "json") {
+                    setOverlay("Loading...");
+                    let resultString = JSON.parse(reader.result);
+                    if (!Array.isArray(resultString)) 
+                        throw MSG.DESIGN.ERR_FILE_FORMAT
+                    for (let i = 0; i < resultString.length; i++) {
+                        if (!resultString[i].appType)
+                            throw MSG.DESIGN.ERR_JSON_IMPORT
+                        if (
+                            resultString[i].appType.toLowerCase() !== "generic" && 
+                            resultString[i].appType.toLowerCase() !== "pdf" &&
+                            resultString[i].appType !== appType
+                        ) 
+                            throw MSG.DESIGN.ERR_NO_MATCH_APPTYPE
                     }
-                }
-                if (flag === false) setShowPop({'title': "App Type Error", 'content': "Project application type and Imported JSON application type doesn't match, please check!"})
-                else {
                     DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
                         .then(data => {
+                            setOverlay("");
                             if (data === "Invalid Session") RedirectPage(history);
-                            if (data === "success") {
-                                setImported(true);
-                                setShowPop({'title': "Import Testcase", 'content': "TestCase Json imported successfully."});
-                            } else setShowPop({'title': "Import Testcase",'content': "Please Check the file format you have uploaded!"});
+                            if (data === "success") setImported(true);
                         })
-                        .catch(error => console.error("ERROR::::", error));
-                }
-            } else setShowPop({'title': "Import Testcase", 'content': "Please Check the file format you have uploaded!"});
+                        .catch(error => {
+                            setOverlay("");
+                            console.error("ERROR::::", error)
+                        });
+                    
+                } else throw  setShowPop(MSG.DESIGN.ERR_FILE_FORMAT);
+            }
+            catch(error){
+                setOverlay("");
+                if (typeof(error)==="object") setShowPop(error);
+                else setShowPop(MSG.DESIGN.ERR_TC_JSON_IMPORT)
+                console.error(error);
+            }
         }
         reader.readAsText(file);
     }

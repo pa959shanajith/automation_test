@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ModalContainer } from '../../global';
+import { ModalContainer, VARIANT, Messages as MSG } from '../../global';
 import { importDataTable } from '../api';
 import { parseTableData } from './DtUtils';
 import "../styles/ExportDataTable.scss";
@@ -23,21 +23,21 @@ const ImportSheet = props => {
 
     const importTable = async() => {
         try{
+            props.setOverlay("Importing File...");
             const resp = await importDataTable({ content: props.excelContent, flag: "data", sheetname: sheet, importFormat: "excel" });
-
             if(resp.error) 
-                props.setShowPop({title: "File Read Error", content: resp.error, type: "message"})
+                props.setShowPop(resp.error)
             else if (resp == "columnExceeds") {
                 props.setSheetList([]);
-                props.setShowPop({title: "File Read Error", content: "Column should not exceed 15", type: "message"});
+                props.setShowPop(MSG.UTILITY.ERR_COL_50);
             }
             else if (resp == "rowExceeds") {
                 props.setSheetList([]);
-                props.setShowPop({title: "File Read Error", content: "Row should not exceed 200", type: "message"});
+                props.setShowPop(MSG.UTILITY.ERR_ROW_200);
             }
             else if (resp == "emptyExcelData") {
                 props.setSheetList([]);
-                props.setShowPop({title: "File Read Error", content: "Empty Data in the sheet", type: "message"});
+                props.setShowPop(MSG.UTILITY.ERR_EMPTY_SHEET);
             }
             else if (typeof resp === "object"){
                 const [, newData, newHeaders] = parseTableData(resp, "import")
@@ -48,7 +48,10 @@ const ImportSheet = props => {
         }
         catch(error){
             console.error("ERROR::::", error);
-            props.setShowPop({title: "File Read Error", content: "Failed to Fetch File Data", type: "message"})
+            props.setShowPop(MSG.UTILITY.ERR_FETCH_FILE)
+        }
+        finally {
+            props.setOverlay("");
         }
     }
 

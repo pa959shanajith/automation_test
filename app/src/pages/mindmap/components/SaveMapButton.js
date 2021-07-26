@@ -4,6 +4,7 @@ import {saveMindmap,getModules,getScreens} from '../api';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import '../styles/SaveMapButton.scss'
+import { VARIANT, Messages as MSG } from '../../global';
 
 /*Component SaveMapButton
   use: renders save button below canvas on click trigers save node
@@ -49,7 +50,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
     var counter = {};
     var displayError = (error) => {
         setBlockui({show:false});
-        setPopup({show:true,title:'Error',content:((error)?error:'Error while Saving'),submitText:'Ok'})
+        setPopup({show:true,variant:error.VARIANT || VARIANT.ERROR ,content:((error)?( error.CONTENT || error ):MSG.MINDMAP.ERR_SAVE.CONTENT)})
         return;
     }
     d3.select('#pasteImg').classed('active-map',false)
@@ -66,7 +67,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
         } return true;
     })
     if(!duplicateNode){
-        setPopup({show:true,title:'Error',content:'Duplicate screen name found.Create new screen to reuse',submitText:'Ok'})
+        setPopup({show:true,variant:MSG.MINDMAP.WARN_DUPLICATE_SCREEN_NAME.VARIANT,content:MSG.MINDMAP.WARN_DUPLICATE_SCREEN_NAME.CONTENT,submitText:'Ok'})
         return;
     }
     setBlockui({show:true,content:'Saving flow! Please wait...'})
@@ -117,11 +118,11 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
             return false;
         });
         if (selectedProject && selectedProject !== projId) {
-            displayError("Module belongs to project: " +projectList[selectedProject].name+". Please go back to the same project and Save");
+            displayError({VARIANT:VARIANT.WARNING, CONTENT:"Module belongs to project: " +projectList[selectedProject].name+". Please go back to the same project and Save"});
             return;
         }
         if(!selectedProject && initEnEProj !== projId){
-            displayError("Module belongs to project: " +projectList[initEnEProj].name+". Please go back to the same project and Save");
+            displayError({VARIANT:VARIANT.WARNING, CONTENT:"Module belongs to project: " +projectList[initEnEProj].name+". Please go back to the same project and Save"});
             return;
         }
     }
@@ -152,7 +153,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
     dispatch({type:actionTypes.SAVE_MINDMAP,payload:{screendata,moduledata,moduleselected}})
     dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
     setBlockui({show:false});
-    setPopup({show:true,title:'Success',content:isAssign?'Tasks saved successfully':'Data saved successfully',submitText:'Ok'})
+    setPopup({show:true,variant:VARIANT.SUCCESS,content:isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,submitText:'Ok'})
     return;
 }
 

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
 import { useHistory } from 'react-router-dom';
 import ScrapeObject from '../components/ScrapeObject';
-import { ScrollBar, RedirectPage } from "../../global"
+import { ScrollBar, RedirectPage, VARIANT } from "../../global"
 import { ScrapeContext } from '../components/ScrapeContext';
 import * as actionTypes from '../state/action';
 import * as scrapeApi from '../api';
@@ -81,7 +81,7 @@ const ScrapeObjectList = () => {
         }
 
         if (dnd) disable = { ...disable, selAll: true};
-        if (visible < total) disable = { ...disable, dnd: true};
+        if (visible < total || total === 1) disable = { ...disable, dnd: true};
 
         setDisableBtns({...disableBtns, ...disable})
         setSelAllCheck(checkAll);
@@ -131,6 +131,7 @@ const ScrapeObjectList = () => {
         let localScrapeItems = [...scrapeItems];
         let updNewScrapedData = {...newScrapedData};
         let objId = "";
+        let isCustom = false;
         let obj = null;
         for (let scrapeItem of localScrapeItems){
             if (scrapeItem.val === value) {
@@ -142,8 +143,9 @@ const ScrapeObjectList = () => {
                     scrapeItem.editable = true;
                 }
                 objId = scrapeItem.objId;
+                isCustom = scrapeItem.isCustom; 
                 if (objId) obj = {...mainScrapedData.view[scrapeItem.objIdx], ...newProperties};
-                else updNewScrapedData.view[scrapeItem.objIdx] = {...newScrapedData.view[scrapeItem.objIdx], ...newProperties}
+                else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = {...newScrapedData.view[scrapeItem.objIdx], ...newProperties}
                 // else only if customFlag is true
             };
         }
@@ -153,7 +155,7 @@ const ScrapeObjectList = () => {
             modifiedDict[objId] = obj;
             setModified(modifiedDict);
         }
-        else setNewScrapedData(updNewScrapedData);
+        else if (!isCustom) setNewScrapedData(updNewScrapedData);
         if(!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved(false);
         setScrapeItems(localScrapeItems);
     }
@@ -201,7 +203,11 @@ const ScrapeObjectList = () => {
         setScrapeItems(scrapeItemsL)
     }
 
-    const onDelete = () => {
+    const onDelete = (e, confirmed) => {
+        if (mainScrapedData.reuse && !confirmed) {
+            setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onDelete(null, true);}})
+            return;
+        }
         let deletedArr = [...deleted];
         let scrapeItemsL = [...scrapeItems];
         let modifiedDict = {...modified}
@@ -222,12 +228,12 @@ const ScrapeObjectList = () => {
         setDisableBtns({...disableBtns, delete: true, save: false})
     }
 
-    const onSave = () => {
+    const onSave = (e, confirmed) => {
         let continueSave = true;
         
-        if (mainScrapedData.reuse === 'True') {
-            setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen is been reused. Are you sure you want to save objects?', 'onClick': ()=>{setShowConfirmPop(false); saveScrapedObjects();}})
-            continueSave = false;
+        if (mainScrapedData.reuse && !confirmed) {
+            setShowConfirmPop({'title': "Save Scraped data", 'content': 'Screen has been reused. Are you sure you want to save scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onSave(null, true);}})
+            return;
         }
 
         let dXpath = false;
@@ -343,7 +349,7 @@ const ScrapeObjectList = () => {
             else fetchScrapeData().then(resp=>{
                 if (resp === 'success' || typeof(resp) === "object"){
                     setShowPop({
-                        'title': 'Save Scrape data',
+                        'variant': VARIANT.SUCCESS,
                         'content': typeof(resp)==="object" && resp.length>0 ? <div className="ss__dup_labels">
                             Scraped data saved successfully.
                             <br/><br/>
@@ -353,9 +359,10 @@ const ScrapeObjectList = () => {
                             { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
                         </div> : 'Scraped data saved successfully.'
                     })
-                    setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: false});
-                    dispatch({type: actionTypes.SET_DISABLEACTION, payload: scrapeItemsL.length !== 0});
-                    dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: scrapeItemsL.length === 0});
+                    let numOfObj = scrapeItemsL.length;
+                    setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
+                    dispatch({type: actionTypes.SET_DISABLEACTION, payload: numOfObj !== 0});
+                    dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: numOfObj === 0});
                     setSaved(true);
                 } else console.error(resp);
             })

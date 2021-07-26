@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 
 .test_tree_toggle{
     height: 16px;
@@ -42,8 +43,8 @@
 
 
 .leafId{
-    background: #331d4c;
-    color: #fff;
+    background: $primaryColorDarkest;
+    color: $whiteColor;
     border-radius: 3px;
     display: inline;
     padding: 2px;
@@ -53,7 +54,7 @@
 .test__searchIcon{
     margin-left: 2px;
     border-radius: 5px;
-    border: 1px solid #000;
+    border: 1px solid $black;
     position: relative;
     cursor: pointer;
     display: none;
@@ -78,7 +79,7 @@
 }
 
 .test__selectedTC, .scenario__selectedTC{
-    background-color:#E1CAFF !important;
+    background-color:$lavenderBlue !important;
 }
 
 .test__syncedTC{

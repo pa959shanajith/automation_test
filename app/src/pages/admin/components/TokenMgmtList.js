@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global'
+import {ScreenOverlay, ScrollBar, VARIANT} from '../../global'
 import { useSelector } from 'react-redux';
 import {manageCIUsers} from '../api';
 import '../styles/TokenMgmtList.scss'
@@ -13,8 +13,7 @@ import '../styles/TokenMgmtList.scss'
 const TokenMgmtList = (props) => {
     const dateFormat = useSelector(state=>state.login.dateformat);
     const [loading,setLoading] = useState(false)
-	const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
-	const [searchTasks,setSearchTasks] = useState("")
+	const setPopupState = props.setPopupState
 	const [allTokensModify,setAllTokensModify] = useState(props.allTokens)
     const [firstStop,setFirstStop] = useState(false)
     const searchRef =  useRef();
@@ -25,9 +24,6 @@ const TokenMgmtList = (props) => {
         // eslint-disable-next-line
     },[props.allTokens])
 
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
-	}
 	
 	const updateTokenList = () =>{
 		const items = props.allTokens.filter((e)=>e.name.toUpperCase().indexOf(searchRef.current.value.toUpperCase())!==-1)
@@ -42,7 +38,7 @@ const TokenMgmtList = (props) => {
 		const data = await manageCIUsers("deactivate", CIUser);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        setPopupState({show:true,title:"Token Management",content: "Token '"+CIUser.tokenName+"' has been Deactivated"});
+        setPopupState({show:true,variant:VARIANT.SUCCESS,content: "Token '"+CIUser.tokenName+"' has been Deactivated"});
         data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
         data.forEach(e=>e.expiry=new Date(e.expiry).toString().slice(0,-22))
         props.setAllTokens(data);
@@ -51,8 +47,8 @@ const TokenMgmtList = (props) => {
     const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -93,7 +89,6 @@ const TokenMgmtList = (props) => {
 
     return (
         <Fragment>
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <div className="col-xs-9 adminForm-tkn-mgmt" style={{paddingTop:"0",width:"83%"}}>

@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .alm-linkedTestset-box{
     width: 100%;
     float: left;
@@ -42,8 +43,8 @@
 }
 
 .viewMap__scenarioCount{
-    color: #a784d4;
-    border-color: #a784d4;
+    color: $lavenderFlower;
+    border-color: $lavenderFlower;
 }
 
 .viewMap__testCount{
@@ -84,15 +85,15 @@
         font-family: "LatoWebLight";
         border: none;
         outline: none;
-        color: #fff;
+        color: $whiteColor;
         border-radius: 20px;
         padding: 0 19px;
         height: 21px;
         margin: 0 6px 0 60px;
         font-size: 15px;
-        background-color: #633693;
+        background-color: $primaryColor;
         &:disabled{
-            background-color: #997cb8;
+            background-color: $backgroundThree;
             cursor: not-allowed;
         }
     }
@@ -100,8 +101,8 @@
 
 .viewMap__task_name{
     cursor: pointer;
-    background-color: #331d4e;
-    color: #fff;
+    background-color: $primaryColorDarkest;
+    color: $whiteColor;
     padding: 1px 14px 0;
     font-family: "LatoWebLight";
     font-size: 18px;
@@ -140,5 +141,5 @@
 .viewMap__rope{
     height: 3px;
     flex-grow: 1;
-    background-color: #333;
+    background-color: $darkGray;
 }

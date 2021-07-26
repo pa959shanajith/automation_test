@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
-import {ModalContainer, ScrollBar} from '../../global' 
+import {ModalContainer, ScrollBar, Messages as MSG} from '../../global' 
 import {FormInpDropDown, FormInput} from '../components/FormComp';
 import AssignOptionBox from '../components/AssignOptionBox'
 import {clearQueue,deleteICE_pools,updatePool,getPools} from '../api';
@@ -169,7 +169,7 @@ const updateIcePool = async(prop) =>{
     var data = await updatePool(pool)
     if(data.error){prop.displayError(data.error);return;}
     var err = await resetData(prop)
-    if(!err)prop.displayError("ICE Pool saved successfully.","Success")
+    if(!err)prop.displayError(MSG.ADMIN.SUCC_ICEPOOL_SAVED)
 }
 
 const deleteIcePool = async(prop) =>{
@@ -178,7 +178,7 @@ const deleteIcePool = async(prop) =>{
     var data = await deleteICE_pools({'poolid':[id]})
     if(data.error){prop.displayError(data.error);return;}
     var err = await resetData(prop)
-    if(!err)prop.displayError("ICE Pool deleted successfully.","Success")
+    if(!err)prop.displayError(MSG.ADMIN.SUCC_DELETE_ICEPOOL)
 }
 
 const clearIceQueue = async({selectedPool,setLoading,displayError}) =>{
@@ -192,7 +192,7 @@ const clearIceQueue = async({selectedPool,setLoading,displayError}) =>{
     }
     var data = await clearQueue({"poolids":poolids,"type":type});
     if(data.error){displayError(data.error);return;}
-    displayError("Cleared queue successfully.","Success")
+    displayError(MSG.ADMIN.SUCC_CLEAR_QUEUE)
 }
 
 const resetData = async({filterRef,setSelectedPool,poolName,projList,setAllProj,setAssignProj,setPoolDict,setProjList,setPoolList,setLoading,displayError,action}) => {

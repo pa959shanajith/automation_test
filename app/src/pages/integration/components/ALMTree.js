@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { qcFolderDetails_ICE } from '../api.js';
-import { updateScrollBar } from '../../global';
+import { updateScrollBar, Messages as MSG } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
 
@@ -28,9 +28,9 @@ const FolderNode = props => {
 
             const data = await qcFolderDetails_ICE(props.projectName, path, props.releaseName, props.type, testCaseName, folderId);
             if (data.error){
-                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: data.error}});
+                dispatch({type: actionTypes.SHOW_POPUP, payload: data.error});
             } else if (typeof(data) !== "object") {
-                dispatch({type: actionTypes.SHOW_POPUP, payload: {title: "Error", content: "Error in getting list."}});
+                dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_GETTING_LIST});
             } else if (props.type === "folder") {
                 setSubFolders(data[0].testfolder);
                 setSubTestSets(data[0].TestSet);
@@ -142,22 +142,13 @@ const TestCaseNode = props => {
     const handleSync = () => {
         let popupMsg = false;
         if(selectedScIds.length===0){
-            popupMsg = {
-                title:'Save Mapped Testcase ',
-                content:"Please Select a Scenario"
-            };
+            popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
         }
         else if(selectedTCDetails.selectedTCNames.length===0){
-            popupMsg = {
-                title:'Save Mapped Testcase ',
-                content:"Please select Testcase"
-            };
+            popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
         }
         else if(selectedTCDetails.selectedTCNames.length>1 && selectedScIds.length>1) {
-			popupMsg = {
-                title:'Save Mapped Testcase ',
-                content:"Cannot map multiple test cases with multiple scenarios"
-            };
+			popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
         }
 
         if (popupMsg) dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});

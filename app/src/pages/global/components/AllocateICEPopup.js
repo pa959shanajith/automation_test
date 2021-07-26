@@ -117,8 +117,8 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
     const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -126,7 +126,7 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
 
     return (
         <>
-            {(popupState.show)?<PopupMsg submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} title={popupState.title} content={popupState.content} submitText={popupState.submitText}/>:null}
+            {(popupState.show)?<PopupMsg variant={popupState.variant} close={()=>setPopupState({show:false})}/>:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             {allocateICE?
                 <div className="allocate-ice-Modal">

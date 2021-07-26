@@ -1,5 +1,6 @@
+@import "../../global/styles/ColorVariables.scss";
 .mnode__addbutton{
-    color: #333;
+    color: $darkGray;
     font-size: 15px ;
     font-family: 'LatoWebBold';
     padding: 0 10px ;
@@ -21,13 +22,13 @@
     width: 460px;
 }
 .mnode__input input{
-    border: 1px solid #656565 ;
+    border: 1px solid $borderOne ;
     border-left: 0 !important;
     border-right: 0 ;
     border-top: 0 !important;
     border-radius: 0;
     box-shadow: none;
-    color: #333;
+    color: $darkGray;
     outline: none;
     width:100%;
 }
@@ -41,12 +42,12 @@
     margin-right: 0px;
 }
 .err-border{
-    border-bottom: solid 1px red !important;
+    border-bottom: solid 1px $red !important;
 }
 .err-message{
     left: 26px;
     text-align: left;
-    color: red;
+    color: $red;
     font-size: 15px;
     position: absolute;
 }

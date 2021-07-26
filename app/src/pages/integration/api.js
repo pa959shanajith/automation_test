@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {RedirectPage} from '../global';
+import {RedirectPage, Messages as MSG} from '../global';
 import {history} from './index';
 import {url} from '../../App';
 
@@ -26,16 +26,16 @@ export const loginToQTest_ICE = async(qcPassword ,qcURL , qcUsername) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to Login'}
+        return {error:MSG.INTEGRATION.ERR_LOGIN}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Login'}
+        return {error:MSG.INTEGRATION.ERR_LOGIN}
     }
 }
 /*Component qtestProjectDetails_ICE
@@ -59,16 +59,16 @@ export const qtestProjectDetails_ICE = async(domain , userid) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to Project Details'}
+        return {error:MSG.INTEGRATION.ERR_PROJECT_DETAILS}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Project Details'}
+        return {error:MSG.INTEGRATION.ERR_PROJECT_DETAILS}
     }
 }
 /*Component qtestFolderDetails_ICE
@@ -93,16 +93,16 @@ export const qtestFolderDetails_ICE = async(releaseId, foldername, projectId, qc
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to TestSuite Details'}
+        return {error:MSG.INTEGRATION.ERR_TESTSUITE_DETAILS}
     }catch(err){
         console.error(err)
-        return {error:'Failed to TestSuite Details'}
+        return {error:MSG.INTEGRATION.ERR_TESTSUITE_DETAILS}
     }
 }
 /*Component saveQtestDetails_ICE
@@ -123,16 +123,16 @@ export const saveQtestDetails_ICE = async(mappedDetails) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Map Testcases Before Save'}
+        return {error:MSG.INTEGRATION.ERR_MAP_TC}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Save Mapped TestCases'}
+        return {error:MSG.INTEGRATION.ERR_SAVE_MAPPED_TC}
     }
 }
 /*Component viewQtestMappedList_ICE
@@ -154,16 +154,16 @@ export const viewQtestMappedList_ICE = async(userID) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'No Mapped Dataa Found'}
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
     }catch(err){
         console.error(err)
-        return {error:'No Mapped Data Found'}
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
     }
 }
 
@@ -184,16 +184,16 @@ export const loginQCServer_ICE = async(qcPassword , qcURL , qcUsername ) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'No User Details Found ,Please Login Again'}
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
     }catch(err){
         console.error(err)
-        return {error:'No User Details Found ,Please Login Again'}
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
     }
 }
 
@@ -213,16 +213,16 @@ export const qcProjectDetails_ICE = async(domain ,user_id ) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'No Projects Found ,Please add Projects'}
+        return {error:MSG.INTEGRATION.ERR_ADD_PROJECT}
     }catch(err){
         console.error(err)
-        return {error:'No Projects Found ,Please add Projects'}
+        return {error:MSG.INTEGRATION.ERR_ADD_PROJECT}
     }
 }
 
@@ -245,16 +245,16 @@ export const qcFolderDetails_ICE = async(domain ,foldername ,project,qcaction,te
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'No Projects Found ,Please add Projects'}
+        return {error:MSG.INTEGRATION.ERR_ADD_PROJECT}
     }catch(err){
         console.error(err)
-        return {error:'No Projects Found ,Please add Projects'}
+        return {error:MSG.INTEGRATION.ERR_ADD_PROJECT}
     }
 }
 
@@ -277,16 +277,16 @@ export const saveQcDetails_ICE = async(mappedDetails) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Map Testcases Before Save'}
+        return {error:MSG.INTEGRATION.ERR_MAP_TC}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Save Mapped Testcases'}
+        return {error:MSG.INTEGRATION.ERR_SAVE_MAPPED_TC}
     }
 }
 /*Component viewQtestMappedList_ICE
@@ -308,16 +308,16 @@ export const viewQcMappedList_ICE = async(userID) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'No Mapped Data Found'}
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
     }catch(err){
         console.error(err)
-        return {error:'No Mapped Data Found'}
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
     }
 }
 export const loginToZephyr_ICE = async(zephyrurl, username, password) => {
@@ -337,16 +337,16 @@ export const loginToZephyr_ICE = async(zephyrurl, username, password) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to get list.'}
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
     }catch(err){
         console.error(err)
-        return {error:'Failed to get list.'}
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
     }
 }
 
@@ -366,16 +366,16 @@ export const zephyrProjectDetails_ICE = async(projectId, user_id) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'No Projects Found, Please add Projects'}
+        return {error:MSG.INTEGRATION.ERR_ADD_PROJECT}
     }catch(err){
         console.error(err)
-        return {error:'No Projects Found, Please add Projects'}
+        return {error:MSG.INTEGRATION.ERR_ADD_PROJECT}
     }
 }
 
@@ -396,16 +396,16 @@ export const zephyrCyclePhase_ICE = async(releaseId, user_id) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to get list.'}
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
     } catch(err){
         console.error(err)
-        return {error:'Failed to get list.'}
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
     }
 }
 
@@ -423,16 +423,16 @@ export const viewZephyrMappedList_ICE = async(userID) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'No Mapped Data Found'}
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
     }catch(err){
         console.error(err)
-        return {error:'No Mapped Data Found'}
+        return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
     }
 }
 
@@ -451,16 +451,16 @@ export const saveZephyrDetails_ICE = async(mappedDetails) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Map Testcases Before Save'}
+        return {error:MSG.INTEGRATION.ERR_MAP_TC}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Save Mapped Testcases'}
+        return {error:MSG.INTEGRATION.ERR_SAVE_MAPPED_TC}
     }
 }
 
@@ -479,16 +479,16 @@ export const zephyrTestcaseDetails_ICE = async(zephyraction, treeId) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch testcases'}
+        return {error:MSG.INTEGRATION.ERR_FETCH_TESTCASE}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch testcases'}
+        return {error:MSG.INTEGRATION.ERR_FETCH_TESTCASE}
     }
 }
 
@@ -506,15 +506,15 @@ export const saveUnsyncDetails = async(undoMapList) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to Unsync Mapped Files.'}
+        return {error:MSG.INTEGRATION.ERR_UNSYNC}
     }catch(err){
         console.error(err)
-        return {error:'Failed to Unsync Mapped Files.'}
+        return {error:MSG.INTEGRATION.ERR_UNSYNC}
     }
 }

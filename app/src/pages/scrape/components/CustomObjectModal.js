@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
+import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG, VARIANT } from '../../global';
 import { objectTypes } from './ListVariables';
 import { userObjectElement_ICE } from '../api';
 import "../styles/CreateObjectModal.scss";
@@ -25,10 +25,10 @@ const CreateObjectModal = props => {
             userObjectElement_ICE(customFields)
             .then(data => {
                 if (data === "unavailableLocalServer") 
-                    props.setShowPop({title: "Fail", content: "Failed to create object ICE not available"});
+                    props.setShowPop(MSG.SCRAPE.ERR_CREATE_OBJ);
                 else if (data === "invalid session") return RedirectPage(history);
                 else if (data === "fail") 
-                    props.setShowPop({title: "Fail", content: "Failed to create object"});
+                    props.setShowPop(MSG.SCRAPE.ERR_CREATE_OBJ);
                 else{
                     let custname = props.utils.object.title;
                     let newObj = { 
@@ -106,7 +106,7 @@ const CreateObjectModal = props => {
             errorObj = { [object.tempId]: !object.objName ? "objName" : !object.objType ?  "objType" : "url" };
         } else if (object.name === "" && object.relXpath === "" && object.absXpath === "" && object.className === "" && object.id === "" && object.qSelect === ""){
             errorObj = { missingField: true }
-            props.setShowPop({title: 'Warning!', content: "Please enter at least one property"});
+            props.setShowPop(MSG.SCRAPE.WARN_ADD_PROPERTY);
         }
 
         if (!Object.keys(errorObj).length) {
@@ -114,11 +114,11 @@ const CreateObjectModal = props => {
             userObjectElement_ICE(customFields)
 			.then(data => {
 				if (data === "unavailableLocalServer")
-					props.setShowPop({title: "Fail", content: `Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`});
+					props.setShowPop({VARIANT: VARIANT.ERROR, CONTENT: `Failed to ${props.editFlag ? "edit" : "create"} object ICE not available`});
 				else if (data === "Invalid Session")
 					return RedirectPage(history);
 				else if (data === "fail")
-					props.setShowPop({title: "Fail", content: `Failed to ${props.editFlag ? "edit" : "create"} object`});
+					props.setShowPop({VARIANT:VARIANT.ERROR, CONTENT: `Failed to ${props.editFlag ? "edit" : "create"} object`});
 				else{
                     let customObject = { custname: `${object.objName}_${elementType}`,
                                         tag: tag,
@@ -154,7 +154,7 @@ const CreateObjectModal = props => {
             }
             if (errorFlag) {
                 setError(errorObj);
-                props.setShowPop({title: 'Edit Object', content: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`});
+                props.setShowPop({VARIANT: VARIANT.ERROR, CONTENT: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`});
             }
             else {
                 props.utils.modifyScrapeItem(props.utils.object.val, {
@@ -225,12 +225,12 @@ const CreateObjectModal = props => {
             
             if (errorFlag) {
                 setError(errorObj);
-                props.setShowPop({title: 'Create Object', content: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`});
+                props.setShowPop({VARIANT: VARIANT.ERROR, CONTENT: `Object Characteristics are same for ${errorObj.dTitle.split('_')[0]}!`});
             } 
             else if (duplicateFlag) {
                 tempIdArr.forEach(tempId => errorObj[tempId] = "objName");
                 setError(errorObj);
-                props.setShowPop({title: 'Create Object', content: 'Duplicate Object Names Found!'});
+                props.setShowPop(MSG.SCRAPE.ERR_DUPLICATE_OBJ);
             } else {
                 let updatedNewScrapeData = {...props.newScrapedData};
                 if (updatedNewScrapeData.view) updatedNewScrapeData.view.push(...viewArray);
@@ -240,7 +240,7 @@ const CreateObjectModal = props => {
                 props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
                 props.setSaved(false);
                 props.setShow(false);
-                props.setShowPop({title: "Add Object", content: "Objects has been created successfully."});
+                props.setShowPop(MSG.SCRAPE.SUCC_OBJ_CREATE);
             }
         }
     }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
 import * as actions from '../state/action';
+import { ValidationExpression } from '../../global';
 import "../styles/ScrapeObject.scss";
 
 const ScrapeObject = props => {
@@ -37,7 +38,7 @@ const ScrapeObject = props => {
     }
 
     const checkKeyPress = event => {
-        if (event.keyCode === 13) {
+        if (event.keyCode === 13 && ValidationExpression(objName, "validName")) {
             setEdit(false);
             props.modifyScrapeItem(props.object.val, {custname: objName})
         }
@@ -51,7 +52,7 @@ const ScrapeObject = props => {
 
     return (
         <div className="ss__scrape_obj">
-            <img data-test="eyeIcon"className="ss_eye_icon" 
+            <img data-test="eyeIcon" className="ss_eye_icon" 
                 onClick={onHighlight} 
                 src={activeEye ? 
                         "static/imgs/ic-highlight-element-active.png" : 
@@ -60,12 +61,24 @@ const ScrapeObject = props => {
             {
                 edit ? 
                 <ClickAwayListener className="ss_obj_name_e" onClickAway={handleOutsideClick}>
-                    <input  data-test="objectInput"  className="ss_obj_name_input" value={objName} onChange={handleObjName} onKeyDown={checkKeyPress}/>
+                    <input  data-test="objectInput" className="ss_obj_name_input" value={objName} onChange={handleObjName} onKeyDown={checkKeyPress}/>
                 </ClickAwayListener>
                 : 
                 <div className="ss_obj_label">
                     {!props.hideCheckbox && <input data-test="checkBox" disabled={props.dnd} className="ss_obj_chkbx" type="checkbox" onChange={handleCheckbox} checked={checked}/>}
-                    <div  data-test="objectName" className={"ss_obj_name" + (props.object.duplicate ? " ss__red" : "" + (!props.object.objId ? " ss__newObj" : "" )) + (props.object.isCustom ? " ss__customObject": "")} onDoubleClick={!props.notEditable ? ()=>setEdit(true) : null}>{objName}</div> 
+                    <div 
+                        data-test="objectName" 
+                        className={
+                            "ss_obj_name"
+                            + (props.object.duplicate ? " ss__red" : ""
+                            + (!props.object.objId ? " ss__newObj" : "" ))
+                            + (props.object.isCustom ? " ss__customObject": "")
+                            + (props.comparedObject ? " ss__comparedObject": "")
+                        } 
+                        onDoubleClick={!props.notEditable ? ()=>setEdit(true) : null}
+                    >
+                        {objName}
+                    </div> 
                 </div>
             }
         </div>

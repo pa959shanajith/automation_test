@@ -1,25 +1,26 @@
+@import "../../global/styles/ColorVariables.scss";
 .ct-scenarios {
-    background-color: #4299e2;
-    stroke:#4299e2;
-    fill: #4299e2;
+    background-color: $summerSky;
+    stroke:$summerSky;
+    fill: $summerSky;
     stroke-width: 0;
 }
 .ct-modules, .ct-endtoend {
-    background-color: #5c5ce5;
-    stroke:#5c5ce5;
-    fill: #5c5ce5;
+    background-color: $blueColor;
+    stroke:$blueColor;
+    fill: $blueColor;
     stroke-width: 0;
 }
 .ct-screens {
-    background-color: #19baae;
-    stroke:#19baae;
-    fill: #19baae;
+    background-color: $cyanColor;
+    stroke:$cyanColor;
+    fill: $cyanColor;
     stroke-width: 0;
 }
 .ct-testcases {
-    background-color: #efa022;
-    stroke:#efa022;
-    fill: #efa022;
+    background-color: $yellowColor;
+    stroke:$yellowColor;
+    fill: $yellowColor;
     stroke-width: 0;
 }
 .ct-legendBox{

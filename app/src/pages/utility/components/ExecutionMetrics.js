@@ -1,10 +1,10 @@
 import React, { useState } from  'react';
 import { useHistory } from 'react-router-dom';
-import { RedirectPage, CalendarComp } from '../../global';
+import { RedirectPage, CalendarComp, Messages as MSG } from '../../global';
 import { fetchMetrics } from '../api';
 import "../styles/ExecutionMetrics.scss";
 
-const ExecutionMetrics = props => {
+const ExecutionMetrics = ({setBlockui,setShowPop}) => {
 
     const history = useHistory();
 
@@ -21,6 +21,7 @@ const ExecutionMetrics = props => {
         setLob("");
         setStatus("");
         setExecutionId("");
+        setErrors({});
     }
 
     const handleSubmit = () => {
@@ -36,8 +37,8 @@ const ExecutionMetrics = props => {
                 toDate: toDate,
                 LOB: lob,
             }
-            if (executionId) arg['executionId'] = executionId;
-            if (status) arg['status'] = status
+            if (executionId.trim()) arg['executionId'] = executionId.trim();
+            if (status.trim()) arg['status'] = status.trim();
         }
 
         if (err) setErrors(err);
@@ -49,14 +50,16 @@ const ExecutionMetrics = props => {
 
             if (end_date < start_date) setErrors({ fromDate: true, toDate: true });
             else {
-                props.setBlockui({show: true, content: 'Fetching Metrics...'})
+                setBlockui({show: true, content: 'Fetching Metrics...'})
                 fetchMetrics(arg)
                 .then(result => {
-                    props.setBlockui({ show: false })
+                    setBlockui({ show: false })
                     if (result === "Invalid Session") return RedirectPage(history);
-                    else if (result === "fail") props.setPopup({title: "Fail", content: "Error while exporting Execution Metrics", submitText: "OK", show: true });
-                    else if (result === "NoRecords") props.setPopup({title: "Fail", content: "No records found", show: true, submitText: "OK"});
-                    else if (result.error) props.setPopup({title: "Fail", content: result.error, show: true, submitText: "OK"});
+                    else if (result === "fail") setShowPop(MSG.UTILITY.ERR_EXPORT_EXE_METRICS);
+                    else if (result === "NoRecords") setShowPop(MSG.UTILITY.ERR_NO_RECORDS);
+                    else if (result === "InvalidExecId") setShowPop(MSG.UTILITY.ERR_INVALID_EXEC_ID);
+                    else if (result === "InvalidStatus") setShowPop(MSG.UTILITY.ERR_INVALID_STATUS);
+                    else if (result.error) setShowPop(result.error);
                     else {
                         let isIE = false || !!document.documentMode;
                         let file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -72,21 +75,13 @@ const ExecutionMetrics = props => {
                             document.body.removeChild(a);
                             URL.revokeObjectURL(fileURL);
                         }
-                        props.setPopup({
-                            title: "Success", 
-                            content: "Successfully exported Execution Metrics to CSV",
-                            submitText: "OK",
-                            show: true
-                        });
+                        setShowPop(MSG.UTILITY.SUCC_EXPORTED);
                     }
+                    setErrors({});
                 })
                 .catch(error => {
-                    props.setPopup({
-                        title: "ERROR", 
-                        content: "Failed!",
-                        submitText: "OK",
-                        show: true
-                    });
+                    setShowPop(MSG.UTILITY.ERR_FAILED);
+                    setErrors({});
                     console.error(error);
                 });
             }

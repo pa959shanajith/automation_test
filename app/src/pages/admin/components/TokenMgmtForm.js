@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, CalendarComp, updateScrollBar } from '../../global';
+import {ScreenOverlay, CalendarComp, updateScrollBar, Messages } from '../../global';
 import {getUserDetails, getCIUsersDetails, fetchICE} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import ReactTooltip from 'react-tooltip';
@@ -15,12 +15,12 @@ import TimeComp from '../../global/components/TimeComp';
 const TokenMgmtForm = (props) => {
 	const dateVal = props.dateVal;
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     const [allUsers,setAllUsers] = useState([['Select User',' ','','']])
 	const [firstStop,setFirstStop] = useState(false)
 	const [inputProps1Disable,setInputProps1Disable] = useState(true)
     const [copyToolTip,setCopyToolTip] = useState("Click To Copy")
 	const [downloadToolTip,setDownloadToolTip] = useState("Download Token")
+	const setPopupState = props.setPopupState;
 	
     let inputProps1 = {
 		placeholder: "Select Time",
@@ -32,8 +32,8 @@ const TokenMgmtForm = (props) => {
 	const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -80,10 +80,6 @@ const TokenMgmtForm = (props) => {
 		}
     }
 
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
-    }
-
     const loadData = async (targetid,clearFields) => {
         const generatetoken = { 'userId': targetid };
 		if (generatetoken.userId === ' ') return false;
@@ -92,7 +88,7 @@ const TokenMgmtForm = (props) => {
 		if(data.error){displayError(data.error);return;}
 		setLoading(false);
 		if (data.length === 0) {
-			setPopupState({show:true,title:"Token Management",content:"No tokens have been issued"});
+			displayError(Messages.ADMIN.WARN_NO_TOKEN_ISSUED);
 			props.setAllTokens(data);
 		}else {
 			data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
@@ -177,8 +173,7 @@ const TokenMgmtForm = (props) => {
 
     return (
         <Fragment>
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-			{loading?<ScreenOverlay content={loading}/>:null}
+            {loading?<ScreenOverlay content={loading}/>:null}
 			
             <div className="col-xs-9" style={{width:"83%"}}>
                 <div className='adminControl-tkn-mgmt ice-type-tkn-mgmt'><div>

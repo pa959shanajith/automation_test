@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .overlay__container{
     position: fixed;
     background-color: rgba(0, 0, 0, 0.85);
@@ -18,12 +19,12 @@
     transform: translateX(-50%) translateY(-50%);
     -moz-transform: translateX(-50%) translateY(-50%);
     -webkit-transform: translateX(-50%) translateY(-50%);
-    background: #fff;
+    background: $whiteColor;
     padding: 10px 20px;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     cursor: auto;
-    color: #461F6E;
+    color: $blueViolet;
     font-family: LatoWebBold;
 }

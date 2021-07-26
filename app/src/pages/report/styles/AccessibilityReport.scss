@@ -1,12 +1,13 @@
+@import "../../global/styles/ColorVariables.scss";
 .ar__body{
     .panel {
         margin-bottom: 20px;
-        background-color: #fff;
+        background-color: $whiteColor;
         border: 1px solid transparent;
         border-radius: 4px;
         -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
         box-shadow: 0 1px 1px rgba(0,0,0,.05);
-        border-color: #ddd;
+        border-color: $borderFour;
     }
     .rp__content{
         width: 100%;

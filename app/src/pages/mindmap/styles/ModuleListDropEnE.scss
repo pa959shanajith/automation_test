@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .ene_toolbar__dropdown{
     height: 300px;
     width: 100%;
@@ -46,7 +47,7 @@
     text-align: center;
 }
 .ene_toolbar__module-box:hover{
-    background-color: #f4f4f4;
+    background-color: $whisper;
 }
 .ene_toolbar__module-box img{
     display: inline-block;
@@ -65,7 +66,7 @@
     text-overflow: ellipsis;
 }
 .selected{
-    background: #f4f4f4;
+    background: $whisper;
 }
 .dropdown_scenarios{
     display: inline-block;
@@ -83,16 +84,16 @@
     font-size: 13px;
 }
 .dropdown_scenarios:hover{
-    background: #cae0f3;
+    background: $iceColor;
     color: inherit;
 }
 .dropdown_scenarios.selected{
-    background-color: #4299e2;
-    color: #fff;
+    background-color: $summerSky;
+    color: $whiteColor;
 }
 .ene_toolbar__module-footer {
     position: absolute;
-    background: #e6e7e9;
+    background: $borderThree;
     height: 10px;
     bottom: 0;
     left: 50%;
@@ -103,7 +104,7 @@
     top: -3px;
 }
 .ene_toolbar__module-footer div {
-    background: white;
+    background: $whiteColor;
     outline: none;
     border: none;
     display: inline-block;
@@ -120,10 +121,10 @@
     float: right;
 }
 .ene_toolbar__buttons button{
-    color: #fff;
+    color: $whiteColor;
     border: 0;
     border-radius: 20px;
-    background: #643693;
+    background: $primaryColor;
     outline: 0;
     margin-right: 15px;
     font-size: 13px;
@@ -132,7 +133,7 @@
     min-width: 65px;
 }
 .ene_toolbar__buttons button:hover{
-    color: #fff;
+    color: $whiteColor;
 }
 .ene_toolbar__buttons button:focus{
     outline: 0;

@@ -10,7 +10,7 @@ import ChangePassword from './ChangePassword';
 import ChangeDefaultIce from './ChangeDefaultIce';
 import { persistor } from '../../../reducer';
 import NotifyDropDown from './NotifyDropDown';
-import { RedirectPage, PopupMsg, ModalContainer, ScreenOverlay } from '../../global';
+import { RedirectPage, PopupMsg, ModalContainer, ScreenOverlay, Messages as MSG } from '../../global';
 import "../styles/Header.scss";
 
 /*
@@ -77,11 +77,11 @@ const Header = () => {
 			const res = await fetch("/AvoAssure_ICE.zip");
 			const status = await res.text();
 			if (status === "available") window.location.href = window.location.origin+"/AvoAssure_ICE.zip?file=getICE"
-			else setShowSR_Pop({'title': 'Download Avo Assure ICE', 'content': 'Package is not available'})
+			else setShowSR_Pop(MSG.GLOBAL.ERR_PACKAGE);
             setShowOverlay(false)
 		} catch (ex) {
 			console.error("Error while downloading ICE package. Error:", ex);
-			setShowSR_Pop({'title': 'Download Avo Assure ICE', 'content': 'Package is not available'})
+			setShowSR_Pop(MSG.GLOBAL.ERR_PACKAGE);
 		}
 	}
 
@@ -89,7 +89,7 @@ const Header = () => {
 		let roleasarray = userInfo.additionalrole;
 		if (roleasarray.length === 0) {
 			setShowSR(false);
-			setShowSR_Pop({'title': 'Switch Role', 'content': "There are no roles to switch"});
+			setShowSR_Pop(MSG.GLOBAL.ERR_NOROLES_SWITCH);
 		} else {
 			getRoleNameByRoleId(roleasarray)
 			.then(data => {
@@ -109,7 +109,7 @@ const Header = () => {
             .catch(error=>{
                 setShowSR(false);
                 console.error("Failed to Fetch Role Names. ERROR::", error)
-                setShowSR_Pop({'title': 'Switch Role', 'content': "Failed to Fetch Role Names"});
+                setShowSR_Pop(MSG.GLOBAL.ERR_ROLENAMES);
             });
 		}
     };
@@ -155,33 +155,29 @@ const Header = () => {
                 }
 			} else {
                 console.error("Fail to Switch User");
-                setShowSR_Pop({'title': 'Switch Role', 'content': "Fail to Switch User"});
+                setShowSR_Pop(MSG.GLOBAL.ERR_SWITCH_USER);
 			}
         })
         .catch(error=> {
             setShowOverlay("");
             console.error("Fail to Switch User. ERROR::", error);
-            setShowSR_Pop({'title': 'Switch Role', 'content': "Fail to Switch User"});
+            setShowSR_Pop(MSG.GLOBAL.ERR_SWITCH_USER);
 		});
 	};
 
     const PasswordSuccessPopup = () => (
         <PopupMsg 
-            title={"Change Password"}
+            variant={MSG.GLOBAL.SUCC_CHANGE_PASSWORD.VARIANT}
             close={()=>setSuccessPass(false)}
-            content={"Password change successfull! Please login again with new password"}
-            submitText={"OK"}
-            submit={resetSuccess}
+            content={MSG.GLOBAL.SUCC_CHANGE_PASSWORD.CONTENT}
         />
     );
 
     const SRPopup = () => (
         <PopupMsg 
-            title={showSR_Pop.title}
-            content={showSR_Pop.content}
-            submitText="OK"
+            variant={showSR_Pop.VARIANT}
+            content={showSR_Pop.CONTENT}
             close={()=>setShowSR_Pop("")}
-            submit={()=>setShowSR_Pop("")}
         />
     );
 

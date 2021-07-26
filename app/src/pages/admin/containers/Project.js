@@ -1,9 +1,8 @@
 import React ,  { useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
-import {ScreenOverlay,PopupMsg, ModalContainer, ScrollBar} from '../../global' 
+import {ScreenOverlay, ModalContainer, ScrollBar, Messages, ValidationExpression} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
-import ValidationExpression from '../../global/components/ValidationExpression';
 import '../styles/Project.scss';
 
 /*Component ProjectNew
@@ -52,7 +51,7 @@ const ProjectNew = (props) => {
     const [showProjectEditModal,setShowProjectEditModal] = useState(false)
     const [editProjectName,setEditProjectName] = useState(false)
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
+    const setPopupState=props.setPopupState
 
     useEffect(()=>{
         getDomains("Create Project");
@@ -69,8 +68,8 @@ const ProjectNew = (props) => {
     const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -192,7 +191,7 @@ const ProjectNew = (props) => {
             for( var i = 0; i < releaseList.length; i++){
                 if ( releaseList[i] === releaseTxt) {
                     setShowEditModalRelease(false);
-                    setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
+                    displayError(Messages.ADMIN.WARN_RELEASE_EXIST);
                     setFlag(true);
                     setShowEditModalRelease(false);
                     return false;
@@ -253,7 +252,7 @@ const ProjectNew = (props) => {
             setModalInputErrorBorder(false);
             for (var i = 0; i < releaseList.length; i++) {
                 if (releaseList[i] === releaseTxt) {
-                    setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
+                    displayError(Messages.ADMIN.WARN_RELEASE_EXIST);
                     setFlag(true);
                     return false;
                 }
@@ -281,14 +280,13 @@ const ProjectNew = (props) => {
                 for (i = 0; i < updateProjectDetails.length; i++) {
                     if (releaseName.trim() === updateProjectDetails[i].name) {
                         setShowEditNameModalRelease(false);
-                        setPopupState({show:true,title:"Add Release",content:"Release Name already exists"});
+                        displayError(Messages.ADMIN.WARN_RELEASE_EXIST);
                         return false;
                     }
                 }
                 for (i = 0; i < newProjectDetails.length; i++) {
                     if (releaseName.trim() === newProjectDetails[i].name) {
-                        setShowEditNameModalRelease(false);
-                        setPopupState({show:true,title:"Edit Release Name",content:"Release Name already exists"});
+                        displayError(Messages.ADMIN.WARN_RELEASE_EXIST);
                         return false;
                     } else {
                         if (existingReleaseName === newProjectDetails[i].name) {
@@ -391,7 +389,7 @@ const ProjectNew = (props) => {
         
         for (var i = 0; i < cycleList.length; i++) {
             if (cycleList[i] === cycleTxt.trim()) {
-                setPopupState({show:true,title:"Add Cycle",content:"Cycle Name already exists for this release"});
+                displayError(Messages.ADMIN.WARN_CYCLE_EXIST);
                 setFlag(true);
                 return false;
             }
@@ -410,7 +408,7 @@ const ProjectNew = (props) => {
                     for (var j = 0; j < updateProjectDetails[i].cycles.length; j++) {
                         if (cycleTxt.trim() === updateProjectDetails[i].cycles[j].name) {
                             setShowEditNameModalCycle(false);
-                            setPopupState({show:true,title:"Edit Cycle Name",content:"Cycle Name already exists"});
+                            displayError(Messages.ADMIN.WARN_EXIST_CYCLENAME);
                             return false;
                         }
                     }
@@ -566,7 +564,7 @@ const ProjectNew = (props) => {
             for( var i = 0; i < cycleList.length; i++){
                 if ( cycleList[i] === cycleTxt) {
                     setShowEditModalCycle(false);
-                    setPopupState({show:true,title:"Add Cycle",content:"Cycle Name already exists for this release"});
+                    displayError(Messages.ADMIN.WARN_CYCLE_EXIST);
                     setFlag(true);
                     return false;
                 }
@@ -766,10 +764,6 @@ const ProjectNew = (props) => {
         clearUpdateProjectObjects();
     }
 
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
-    }
-
     const closeModal = () =>{
         setShowProjectEditModal(false);
     }
@@ -799,7 +793,6 @@ const ProjectNew = (props) => {
     return (
     <ScrollBar thumbColor="#929397">
     <div className="project_conatiner">
-        {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
         {loading?<ScreenOverlay content={loading}/>:null}
         <div id="page-taskName">
 				{taskName==="Create Project"?
@@ -808,7 +801,7 @@ const ProjectNew = (props) => {
                 }
 		</div>
         
-        <ProjectButtons setSelDomainOptions={setSelDomainOptions} editProjectName={editProjectName} setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
+        <ProjectButtons setPopupState={setPopupState} setSelDomainOptions={setSelDomainOptions} editProjectName={editProjectName} setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
 
         <div className="col-xs-9 form-group" style={{width: "83%"}}>
             <div className='userForm-project projectForm-project display-project' >
@@ -842,7 +835,7 @@ const ProjectNew = (props) => {
             </div>
             }
             <div className='userForm-project adminControl-project display-project'>
-                {editProjectName!==selProject && editProjectName!=="" && editProjectName!==false && showProjectEditModal===false? 
+                {editProjectName!==selProject && editProjectName!=="" && editProjectName!==false && showProjectEditModal===false && ValidationExpression(editProjectName, "validName") ? 
                 <div className='edit-project__label'>New Project Name : {editProjectName}. Please click on Update.</div>:null}
             </div>
             

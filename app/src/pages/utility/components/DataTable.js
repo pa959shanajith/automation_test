@@ -1,63 +1,42 @@
 import React, { useState, useEffect }  from 'react';
 import { v4 as uuid } from 'uuid';
 import { TableActionButtons, CreateScreenActionButtons, EditScreenActionButtons, SearchDataTable } from './DataTableBtnGroup';
-import { PopupMsg, ModalContainer, ScreenOverlay, ValidationExpression as validate } from '../../global';
+import { Messages as MSG, ModalContainer, ScreenOverlay, ValidationExpression as validate, VARIANT } from '../../global';
 import Table from './Table';
+import { resetHistory } from './DtUtils';
 import * as utilApi from '../api';
 import "../styles/DataTable.scss";
-
-
-let undoStack = [];
-let redoStack = [];
 
 const DataTable = props => {
 
     const [currScreen, setCurrScreen] = useState(props.currScreen);
-    const [showPop, setShowPop] = useState(false);
+    const [showModal,setModal] = useState(false);
     const [overlay, setOverlay] = useState('');
-    /*
-        undoStack: [
-            { row: <row-id>, col: <col-id>, value: old-value }
-        ]
-    */
 
     useEffect(()=>{
         setCurrScreen(props.currScreen)
-        undoStack=[];
-        redoStack=[];
+        resetHistory();
     }, [props.currScreen])
 
-    const Popup = () => (
-        <>
-        { showPop.type === "message" &&
-        <PopupMsg 
-            title={showPop.title}
-            content={showPop.content}
-            close={()=>{setShowPop(false); showPop.onClick&&showPop.onClick()}}
-            submitText="OK"
-            submit={()=>{setShowPop(false); showPop.onClick&&showPop.onClick()}}
-        /> }
-        { showPop.type === "confirm" &&
+    const Modal = () => (
         <ModalContainer 
-            title={showPop.title}
-            content={showPop.content}
-            close={()=>setShowPop(false)}
+            title={showModal.title}
+            content={showModal.content}
+            close={()=>setModal(false)}
             footer={
                 <>
-                <button onClick={showPop.onClick}>
-                    {showPop.continueText ? showPop.continueText : "Yes"}
+                <button onClick={showModal.onClick}>
+                    {showModal.continueText ? showModal.continueText : "Yes"}
                 </button>
-                <button onClick={()=>setShowPop(false)}>
-                    {showPop.rejectText ? showPop.rejectText : "No"}
+                <button onClick={()=>setModal(false)}>
+                    {showModal.rejectText ? showModal.rejectText : "No"}
                 </button>
                 </>
             }
-        /> }
-        </>
+        /> 
     )
-
     return <>
-        { showPop && <Popup /> }
+        { showModal && <Modal/>}
         { overlay && <ScreenOverlay content={overlay} /> }
         <div className="page-taskName" >
             <span className="taskname" data-test="dt__pageTitle">
@@ -67,8 +46,8 @@ const DataTable = props => {
         
         { 
             currScreen === "Create" 
-            ? <CreateScreen setShowPop={setShowPop} setOverlay={setOverlay} setScreenType={props.setScreenType} />
-            : <EditScreen setShowPop={setShowPop} setOverlay={setOverlay} setScreenType={props.setScreenType} />
+            ? <CreateScreen setModal={setModal} setShowPop={props.setShowPop} setOverlay={setOverlay} setScreenType={props.setScreenType} />
+            : <EditScreen setModal={setModal} setShowPop={props.setShowPop} setOverlay={setOverlay} setScreenType={props.setScreenType} />
         }
     </>;
 }
@@ -81,6 +60,7 @@ const CreateScreen = props => {
     const [headerCounter, setHeaderCounter] = useState(3);
     const [tableName, setTableName] = useState('');
     const [errors, setErrors] = useState({});
+    const [focus, setFocus] = useState({type: '', id: ''});
 
     return (
         <>
@@ -88,11 +68,11 @@ const CreateScreen = props => {
             <div className="dt__btngroup">
             <TableActionButtons 
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
-                checkList={checkList} headerCounter={headerCounter} undoStack={undoStack} setDnd={setDnd}
-                setHeaderCounter={setHeaderCounter} redoStack={redoStack} setCheckList={setCheckList}
+                checkList={checkList} headerCounter={headerCounter} setDnd={setDnd}
+                setHeaderCounter={setHeaderCounter} setCheckList={setCheckList} setFocus={setFocus}
             />
             <CreateScreenActionButtons 
-                { ...props } tableName={tableName}data={data} setData={setData} 
+                { ...props } tableName={tableName} data={data} setData={setData} 
                  setHeaders={setHeaders} setErrors={setErrors} headers={headers}
             />
             </div>
@@ -101,7 +81,8 @@ const CreateScreen = props => {
                     data.length > 0 && 
                     <Table 
                         { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} setHeaderCounter={setHeaderCounter}
-                        setCheckList={setCheckList} dnd={dnd} undoStack={undoStack} checkList={checkList}
+                        setCheckList={setCheckList} dnd={dnd} checkList={checkList}
+                        focus={focus} setFocus={setFocus}
                     /> 
                 }
             </div>
@@ -117,6 +98,7 @@ const EditScreen = props => {
     const [headerCounter, setHeaderCounter] = useState(3);
     const [dataTables, setDataTables] = useState([]);
     const [tableName, setTableName] = useState('');
+    const [focus, setFocus] = useState({type: '', id: ''});
 
     useEffect(()=>{
         (async()=>{
@@ -128,15 +110,15 @@ const EditScreen = props => {
                 props.setOverlay('');
     
                 if (resp.error) 
-                    props.setShowPop({title: 'Data Table Error', content: resp.error, type: "message"});
+                    props.setShowPop(resp.error);
                 if (resp === 'fail')
-                    props.setShowPop({title: 'Data Table Error', content: 'Failed to Fetch Data Tables', type: "message"});
+                    props.setShowPop(MSG.UTILITY.ERR_FETCH_DATATABLES);
                 if (typeof(resp) === 'object') {
                     setDataTables(resp);
                 }
             }
             catch(error) {
-                props.setShowPop({title: 'Data Table', content: 'Failed To Fetch Data Tables!', type: "message"})
+                props.setShowPop(MSG.UTILITY.ERR_FETCH_DATATABLES)
                 console.error(error);
             }
         })()
@@ -147,8 +129,8 @@ const EditScreen = props => {
             <div className="dt__btngroup">
             <TableActionButtons
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
-                checkList={checkList} headerCounter={headerCounter} undoStack={undoStack} setDnd={setDnd}
-                setHeaderCounter={setHeaderCounter} redoStack={redoStack}
+                checkList={checkList} headerCounter={headerCounter} setDnd={setDnd}
+                setHeaderCounter={setHeaderCounter} setCheckList={setCheckList} setFocus={setFocus}
             />
             <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} />
             </div>
@@ -158,7 +140,8 @@ const EditScreen = props => {
                     data.length > 0 && 
                     <Table 
                         { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} 
-                        setCheckList={setCheckList} dnd={dnd} undoStack={undoStack} checkList={checkList}  setHeaderCounter={setHeaderCounter}
+                        setCheckList={setCheckList} dnd={dnd} checkList={checkList}  setHeaderCounter={setHeaderCounter}
+                        focus={focus} setFocus={setFocus}
                     /> 
                 }
             </div>
@@ -167,19 +150,13 @@ const EditScreen = props => {
 }
 
 const TableName = ({tableName, setTableName, error}) => {
-    const [value, setValue] = useState(tableName || '');
 
-    useEffect(()=>{
-        setValue(tableName)
-    }, [tableName]);
-
-    const onChange = e => setValue(validate(e.target.value, "dataTableName"));
-    const onBlur = () => setTableName(value);
+    const onChange = e => setTableName(validate(e.target.value, "dataTableName"));
 
     return (
         <div className="dt__tableName">
             Data Table Name:
-            <input className={error?"dt__tableNameError":""} onBlur={onBlur} onChange={onChange} value={value} placeholder="Enter Data Table Name" />
+            <input className={error?"dt__tableNameError":""} onChange={onChange} value={tableName} placeholder="Enter Data Table Name" />
         </div>
     );
 }

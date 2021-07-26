@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .d__details_container{
     .modal__body{
         padding-right: 15px;
@@ -23,8 +24,8 @@
     margin-bottom: 5%;
     border: none;
     outline: none;
-    border-bottom: 1px solid #656565;
-    color: #333;
+    border-bottom: 1px solid $borderOne;
+    color: $darkGray;
     height: 34px;
     padding: 6px 12px;
     font-size: 14px;
