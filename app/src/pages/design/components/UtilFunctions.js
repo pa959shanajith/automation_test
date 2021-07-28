@@ -188,7 +188,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                     else objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
 
                     url = ob.url;
-                    let obType = ob.tag;
+                    let obType = ob.tag || "";
                     // let listType = ob.canselectmultiple;
                     let objNameArray = objName.split(';');
                     if (ob.cord) {
@@ -215,16 +215,16 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
                         }
                     }
 
-                    if (!ob.tag && appType === "Webservice" ) {
+                    if (!obType && appType === "Webservice" ) {
                         keywords = Object.keys(keywordList.elementWS);
                         selectedKeywordList = "elementWS";
                         break;
                     }
-                    else if (!(['a', 'select', 'radiobutton', 'checkbox', 'input', 'list', 'tablecell', 'table', 'grid', 'img', 'button', 'iris', 'iristextbox', 'irisradiocheck', 'irisbutton', 'iristable', 'irisgeneric', 'irisscroll'].includes(obType)) && ['Web', 'MobileWeb'].includes(appType) && !ob.tag.startsWith('@PDF')) {
+                    else if (!(['a', 'select', 'radiobutton', 'checkbox', 'input', 'list', 'tablecell', 'table', 'grid', 'img', 'button', 'iris', 'iristextbox', 'irisradiocheck', 'irisbutton', 'iristable', 'irisgeneric', 'irisscroll'].includes(obType)) && ['Web', 'MobileWeb'].includes(appType) && !obType.startsWith('@PDF')) {
                         keywords = Object.keys(keywordList.element);
                         selectedKeywordList = "element";
                         break;
-                    } else if (ob.tag.startsWith("@PDF")) {
+                    } else if (obType.startsWith("@PDF")) {
                         keywords = Object.keys(keywordList.pdfList);
                         selectedKeywordList = "pdfList";
                         tcAppType = "pdf";
