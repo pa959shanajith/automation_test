@@ -40,7 +40,7 @@ const BasePage = () => {
                     case "session": reason = `Your session has been terminated by ${checkLogout.by}`; showLoginAgain = true; break;
                     case "logout":  reason = "You Have Successfully Logged Out!"; break;
                     case "invalidSession": reason = "Your session has expired!"; showLoginAgain = true; break;
-                    case "screenMismatch": reason = "Your session has been terminated due to URL manipulation"; showLoginAgain = true; break;
+                    case "screenMismatch": reason = "You have been logged out due to URL manipulation"; showLoginAgain = true; break;
                     default: break;
                 }
             } 
