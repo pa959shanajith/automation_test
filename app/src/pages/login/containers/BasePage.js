@@ -36,7 +36,7 @@ const BasePage = () => {
 
             if (checkLogout) {
                 switch(checkLogout.reason) {
-                    case "dereg": reason = "Reason: User is deleted from Avo Assure"; break;
+                    case "dereg": reason = `Your session has been terminated by ${checkLogout.by}. Reason: User is deleted from Avo Assure`; break;
                     case "session": reason = `Your session has been terminated by ${checkLogout.by}`; showLoginAgain = true; break;
                     case "logout":  reason = "You Have Successfully Logged Out!"; break;
                     case "invalidSession": reason = "Your session has expired!"; showLoginAgain = true; break;
