@@ -2,7 +2,7 @@ import React, { useEffect, useState, Fragment} from 'react';
 import socketIOClient from "socket.io-client";
 import {useDispatch, useSelector} from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { ModalContainer, PopupMsg, VARIANT } from './pages/global';
+import { ModalContainer, PopupMsg, VARIANT, RedirectPage } from './pages/global';
 import {v4 as uuid} from 'uuid';
 import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
 import * as actionTypes from './pages/login/state/action';
@@ -35,6 +35,9 @@ const SocketFactory = () => {
         socket.on('display_execution_popup', (value) => {
             displayExecutionPopup(value, setPopupState);		
         });
+        socket.on('killSession', (by, reason) => {
+            return RedirectPage(history, { by: by, reason: reason })
+        })
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },[socket])

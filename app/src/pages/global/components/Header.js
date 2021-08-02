@@ -65,9 +65,7 @@ const Header = () => {
     const logout = event => {
         event.preventDefault();
         persistor.purge();
-		window.sessionStorage.clear();
-		window.sessionStorage["checkLoggedOut"] = true;
-        RedirectPage(history);
+        RedirectPage(history, { reason: "logout" });
     };
     
     const getIce = async () => {
@@ -126,9 +124,7 @@ const Header = () => {
 
     const resetSuccess = () => {
         setSuccessPass(false);
-		window.sessionStorage.clear();
-		window.sessionStorage["checkLoggedOut"] = true;
-        RedirectPage(history);
+        RedirectPage(history, { reason: "logout" });
     };
 
     const toggleChangePass = () => setShowChangePass(!showChangePass);

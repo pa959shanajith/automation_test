@@ -10,7 +10,7 @@ const Scrape = ()=>{
 
     useEffect(()=>{
         if(window.localStorage['navigateScreen'] !== "Scrape"){
-            RedirectPage(history);
+            RedirectPage(history, { reason: "screenMismatch" });
         }
     }, []);
 
