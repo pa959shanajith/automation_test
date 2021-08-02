@@ -52,8 +52,8 @@ const CreateAssign = () => {
         setBlockui({show:false})
         SetProgressBar("stop",dispatch)
         setPopup({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -61,7 +61,7 @@ const CreateAssign = () => {
     return(
         <Fragment>
             {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+            {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content}/>:null}
             <div className='mp__canvas_container'>
             <div className='mp__toolbar__container'>
               <ToolbarMenuAssign cycleRef={cycleRef} releaseRef={releaseRef} setBlockui={setBlockui} setPopup={setPopup}/>

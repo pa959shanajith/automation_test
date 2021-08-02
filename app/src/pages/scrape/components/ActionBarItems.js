@@ -5,7 +5,7 @@ import '../styles/ActionBarItems.scss'
 import * as actionTypes from '../state/action';
 import { ScrapeContext } from "../components/ScrapeContext";
 import * as scrapeApi from '../api';
-import { RedirectPage, ActionBar, Thumbnail } from '../../global';
+import { RedirectPage, ActionBar, Thumbnail, Messages as MSG } from '../../global';
 
 /*Component LeftBarItems
   use: renders  6 options in design  in the left of screen
@@ -102,17 +102,21 @@ const BottomContent = () => {
     const { setShowObjModal, scrapeItems, setShowPop, fetchScrapeData, setOverlay } = useContext(ScrapeContext);
     const [customLen, setCustomLen] = useState(0);
     const [scrapeItemsLength, setScrapeLen] = useState(0);
+    const [unsavedObjPresent, setUnsavedObjPresent] = useState(0);
 
     const history = useHistory();
     
     useEffect(()=>{
         let customs = 0;
         let savedObjects = 0;
+        let unsavedObjects = 0;
         for (let scrapeItem of scrapeItems){
             if ( scrapeItem.objId && scrapeItem.isCustom) customs++;
             if (scrapeItem.objId) savedObjects++;
+            else unsavedObjects++;
         }
         setScrapeLen(savedObjects);
+        setUnsavedObjPresent(unsavedObjects);
         setCustomLen(customs);
     }, [scrapeItems])
 
@@ -157,7 +161,7 @@ const BottomContent = () => {
                     a.click();
                     document.body.removeChild(a);
                   } 
-            } else setShowPop({title: "No Objects found", content: "The screen has no objects to export, please check!"});
+            } else setShowPop(MSG.SCRAPE.ERR_NO_OBJ_SCRAPE);
         })
         .catch(error => console.error(error));
     }
@@ -166,84 +170,78 @@ const BottomContent = () => {
         let file = event.target.files[0];
         let reader = new FileReader();
         reader.onload = function (e) {
-            hiddenInput.current.value = '';
-            if (file.name.split('.').pop().toLowerCase() === "json") {
-                setOverlay("Loading...")
-                let resultString = JSON.parse(reader.result);
-                if (!('appType' in resultString))
-                    setShowPop({title: "Import Error", content: "Incorrect JSON imported. Please check the contents!"});
-                else if (resultString.appType !== appType)
-                    setShowPop({title: "App Type Error", content: "Project application type and Imported JSON application type doesn't match, please check!"});
-                else if (resultString.view.length === 0)
-                    setShowPop({title: "No Objects found", content: "The file has no objects to import, please check!"});
-                else {
-                    let objList = {};
-                    if ('body' in resultString) {
-                        let { reuse, appType, screenId, view, versionnumber, ...scrapeinfo } = resultString; 
-                        objList['reuse'] = reuse;
-                        objList['appType'] = appType;
-                        objList['screenId'] = screenId;
-                        objList['view'] = view;
-                        objList['scrapeinfo'] = scrapeinfo;
-                    }
-                    else objList = resultString;
+            try{
+                hiddenInput.current.value = '';
+                if (file.name.split('.').pop().toLowerCase() === "json") {
+                    setOverlay("Loading...")
+                    let resultString = JSON.parse(reader.result);
+                    if (!('appType' in resultString))
+                        setShowPop(MSG.SCRAPE.ERR_JSON_IMPORT);
+                    else if (resultString.appType !== appType)
+                        setShowPop(MSG.SCRAPE.ERR_NO_MATCH_APPTYPE);
+                    else if (resultString.view.length === 0)
+                        setShowPop(MSG.SCRAPE.ERR_NO_OBJ_IMPORT);
+                    else {
+                        let objList = {};
+                        if ('body' in resultString) {
+                            let { reuse, appType, screenId, view, versionnumber, ...scrapeinfo } = resultString; 
+                            objList['reuse'] = reuse;
+                            objList['appType'] = appType;
+                            objList['screenId'] = screenId;
+                            objList['view'] = view;
+                            objList['scrapeinfo'] = scrapeinfo;
+                        }
+                        else objList = resultString;
 
-                    let arg = {
-                        projectId: projectId,
-                        screenId: screenId,
-                        screenName: screenName,
-                        userId: user_id,
-                        roleId: role,
-                        param: "importScrapeData",
-                        appType: appType,
-                        objList: objList
-                    };
-                    scrapeApi.updateScreen_ICE(arg)
-                        .then(data => {
-                            if (data === "Invalid Session") return RedirectPage(history);
-                            else fetchScrapeData().then(response => {
-                                    if (response === "success")
-                                        setShowPop({title: "Import Screen", content: "Screen Json imported successfully."}) 
-                                    setOverlay("");
+                        let arg = {
+                            projectId: projectId,
+                            screenId: screenId,
+                            screenName: screenName,
+                            userId: user_id,
+                            roleId: role,
+                            param: "importScrapeData",
+                            appType: appType,
+                            objList: objList
+                        };
+                        scrapeApi.updateScreen_ICE(arg)
+                            .then(data => {
+                                if (data === "Invalid Session") return RedirectPage(history);
+                                else if (data === "fail") setShowPop(MSG.SCRAPE.ERR_SCREEN_IMPORT) 
+                                else fetchScrapeData().then(response => {
+                                        if (response === "success")
+                                            setShowPop(MSG.SCRAPE.SUCC_SCREEN_JSON_IMPORT) 
+                                        setOverlay("");
+                                });
+                            })
+                            .catch(error => {
+                                setOverlay("");
+                                setShowPop(MSG.SCRAPE.ERR_SCREEN_IMPORT) 
+                                console.error(error)
                             });
-                        })
-                        .catch(error => {
-                            setOverlay("");
-                            console.log(error)
-                        });
-                }
-            } else {
+                    }
+                } else setShowPop(MSG.SCRAPE.ERR_FILE_FORMAT);
                 setOverlay("");
-                setShowPop({'title': "Import Screen", 'content': "Please Check the file format you have uploaded!"});
+            }
+            catch(error){
+                setOverlay("");
+                if (typeof(error)==="object") setShowPop(error);
+                else setShowPop(MSG.SCRAPE.ERR_SCREEN_IMPORT);
+                console.error(error);
             }
         }
         reader.readAsText(file);
     }
 
-    const importTestCase = (overWrite) => {
-
-        // if(overWrite) setShowConfirmPop(false);
-        
-        // DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber)
-		// .then(response => {
-		// 		if (response === "Invalid Session") RedirectPage(history);
-        //         if (response.testcase.length === 0 || overWrite) {
-                    hiddenInput.current.click();
-                    // document.getElementById("importScreenField").click();
-        //         }
-        //         else{
-        //             setShowConfirmPop({'title': 'Table Consists of Data', 'content': 'Import will erase your old data. Do you want to continue?', 'onClick': ()=>importTestCase(true)});
-        //         }
-        //     })
-        // .catch(error => console.error("ERROR::::", error));
+    const importTestCase = () => {
+        hiddenInput.current.click();
     }
     
     const lowerList = [
         {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable:  compareFlag}, 
         {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
-        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag },
+        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag || unsavedObjPresent },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},
-        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(true), show: true, disable: compareFlag && appType!=="Webservice"},
+        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: true, disable: compareFlag && appType!=="Webservice"},
         {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType!=="Webservice", show: true}
     ]
 

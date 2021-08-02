@@ -2,13 +2,15 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
-import { ReferenceBar, ScrollBar, RedirectPage } from '../../global';
+import { ReferenceBar, ScrollBar, RedirectPage, Messages } from '../../global';
 import  * as ScrapeFilter  from './FilterScrapeObjects';
 import * as list from './ListVariables';
 import { ScrapeContext } from './ScrapeContext';
 import * as actions from '../state/action';
 import { highlightScrapElement_ICE } from '../api';
+import { PopupMsg } from '../../global';
 import "../styles/RefBarItems.scss";
+import ScrapeObject from './ScrapeObject';
 
 const RefBarItems = props => {
 
@@ -27,6 +29,7 @@ const RefBarItems = props => {
 	const [highlight, setHighlight] = useState(false);
 	const [mirrorHeight, setMirrorHeight] = useState("0px");
 	const [currMobileType, setCurrMobileType]  = useState('Android');
+	const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 	const [dsRatio, setDsRatio] = useState(1); //downScale Ratio
 	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, setShowPop, orderList } = useContext(ScrapeContext);
 
@@ -40,6 +43,7 @@ const RefBarItems = props => {
 		dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
 		setHighlight(false);
 		setToFilter([]);
+		setShowScreenPop(false);
 		//eslint-disable-next-line
 	}, [uid, newScrapedData])
 
@@ -49,7 +53,7 @@ const RefBarItems = props => {
 	}, [appType]);
 
 	useEffect(()=>{
-		if (props.mirror){
+		if (props.mirror.scrape || (props.mirror.compare && compareFlag)){
 			let mirrorImg = new Image();
 
 			mirrorImg.onload = function(){
@@ -63,7 +67,10 @@ const RefBarItems = props => {
 				setDsRatio(ds_ratio);
 			}
 
-			mirrorImg.src = `data:image/PNG;base64,${props.mirror}`;
+			mirrorImg.src = `data:image/PNG;base64,${compareFlag ? props.mirror.compare : props.mirror.scrape}`;
+		} else {
+			setMirrorHeight("0px");
+			setDsRatio(1);
 		}
 		dispatch({type: actions.SET_OBJVAL, payload: {val: null }});
 		setHighlight(false);
@@ -74,13 +81,15 @@ const RefBarItems = props => {
 
 	useEffect(()=>{
 		if (objValue.val !== null){
-			
 			let ScrapedObject = objValue;
 
 			let top=0; let left=0; let height=0; let width=0;
 
-			if (ScrapedObject.top){
-				top = ScrapedObject.top * dsRatio;
+			if (appType === 'OEBS' && ScrapedObject.hiddentag === 'True'){
+				setHighlight(false)
+				setPopupState({show:true,title:"Element Highlight",content:"Element: " + ScrapedObject.custname + " is Hidden."});
+			} else if (ScrapedObject.top) {
+				ScrapedObject.viewTop != undefined ? top = ScrapedObject.viewTop * dsRatio : top = ScrapedObject.top * dsRatio;
 				left = ScrapedObject.left * dsRatio;
 				height = ScrapedObject.height * dsRatio;
 				width = ScrapedObject.width * dsRatio;
@@ -97,7 +106,6 @@ const RefBarItems = props => {
 					top = top + 35;
 					left = left-36;
 				}
-				
 				setHighlight({
 					top: `${Math.round(top)}px`, 
 					left: `${Math.round(left)}px`, 
@@ -108,16 +116,15 @@ const RefBarItems = props => {
 					opacity: "0.7"
 				});
 				// highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
-				if(!ScrapedObject.xpath.startsWith('iris')){
-					highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
-						.then(data => {
-							if (data === "Invalid Session") return RedirectPage(history);
-							if (data === "fail") setShowPop({title: "Fail", content: "Failed to highlight"})
-						})
-						.catch(error => console.error("Error while highlighting. ERROR::::", error));
-				}
-
 			} else setHighlight(false);
+			if(!ScrapedObject.xpath.startsWith('iris')){
+				highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
+					.then(data => {
+						if (data === "Invalid Session") return RedirectPage(history);
+						if (data === "fail") setShowPop(Messages.SCRAPE.ERR_HIGHLIGHT)
+					})
+					.catch(error => console.error("Error while highlighting. ERROR::::", error));
+			}
 		}
 		else setHighlight(false);
 		//eslint-disable-next-line
@@ -162,26 +169,10 @@ const RefBarItems = props => {
     const filter = (toFilter, order) => {
 		let scrapedItems = [...scrapeItems];
 		
-		scrapedItems = ScrapeFilter.resetList(scrapedItems, order, orderList);
-		
-		if (toFilter.length > 0) {
-			for (let tag of toFilter) {
-				switch (tag) {
-					case "others": scrapedItems = ScrapeFilter.getOtherObjects(scrapedItems); break;
-					case "othersMobile": scrapeItems = ScrapeFilter.getOtherMobileObjects(scrapedItems); break;
-					case "duplicateCustnames": scrapedItems = ScrapeFilter.duplicateObjects(scrapedItems); break;
-					case "userobj": scrapedItems = ScrapeFilter.getCustomObjects(scrapedItems);	break;
-					case "unsavedObjects": scrapedItems = ScrapeFilter.getUnsavedObjects(scrapedItems); break;
-					case "alphabetOrder": {
-						if (order === "alphabet") scrapedItems = ScrapeFilter.getListInAlphabetOrder(scrapedItems);
-						break;
-					}
-					default: scrapedItems = ScrapeFilter.getSelectedObjects(scrapedItems, tag); break;
-				}
-			}
-		} else {
-			scrapedItems.forEach(item => item.hide = false)
-		}
+		if (toFilter.length > 0) 
+			scrapedItems = ScrapeFilter.getFilteredScrapeObjects(scrapedItems, toFilter, order, orderList)
+		else 
+			scrapedItems = ScrapeFilter.resetList(scrapedItems, order, orderList);
         setScrapeItems(scrapedItems)
 	}
 
@@ -200,9 +191,13 @@ const RefBarItems = props => {
 		setToFilter([]);
 		filter([]);
 	}
+	const closePopup = () =>{
+        setPopupState({show:false,title:"",content:""});
+	}
 
 	const Popups = () => (
         <>
+		{popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
         {
             showScreenPop && 
             // <ClickAwayListener onClickAway={closeAllPopups}>
@@ -213,7 +208,7 @@ const RefBarItems = props => {
 				<ScrollBar scrollId="ss_ssId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px' hideXbar={true}>
 					<div data-test="ssScroll" className="ss_scrsht_insideScroll">
 					{ highlight && <div ref={highlightRef} style={{display: "flex", position: "absolute", ...highlight}}></div>}
-					{ props.mirror ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${props.mirror}`} /> : "No Screenshot Available"}
+					{ (props.mirror.scrape || (props.mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? props.mirror.compare : props.mirror.scrape}`} /> : "No Screenshot Available"}
 					</div>
 				</ScrollBar>
 				</div>
@@ -228,7 +223,7 @@ const RefBarItems = props => {
                 <h4 className="pop__header" onClick={()=>setShowFilterPop(false)}><span className="pop__title">Filter</span><img className="task_close_arrow" alt="task_close" src="static/imgs/ic-arrow.png"/></h4>
                 <div data-test="popupFilterContent" className="filter_pop__content">
 					<div className="scrape__filterActionBtns">
-					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length}/><span>Select All</span></div>
+					<div className="d__filter-selall" onClick={()=>filterMain("*selectAll*")}><input type="checkbox" checked={tagList.length === toFilter.length} readOnly/><span>Select All</span></div>
 					{ appType === "MobileApp" && 
 						<select className="scrape__mobileType" onChange={toggleMobileType} value={currMobileType}>
 							<option value="Android" >Android</option>

@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import ThumbnailSchedule from './ThumbnailSchedule';
-import {PopupMsg, ModalContainer} from '../../global';
+import { ModalContainer} from '../../global';
 import "../styles/ActionBarItems.scss"
 
 // todo: after pull add bottomcontent two icons smart scheduling 
@@ -33,7 +33,7 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
             if(smartMode==="smartModule") setSmartMode("normal");
             else {
                 setPopupState({
-                    title:'Smart SchedulingR',
+                    title:'Smart Scheduling',
                     content:"All the modules will be executed as batch.\nAll available ICE should be in similar configurations for optimal results.",
                     show:true
                 })
@@ -50,19 +50,22 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
     return (
         <>
             {popupState.show?
-                <PopupMsg 
+                <ModalContainer 
                     content={popupState.content} 
                     title={popupState.title} 
-                    submit={()=>{setPopupState({show:false}); setSmartMode("smartModule");}} 
-                    close={()=>setPopupState({show:false})} 
-                    submitText={"Ok"} 
+                    footer={
+                        <>
+                            <button onClick={()=>{setPopupState({show:false}); setSmartMode("smartModule");}}>Ok</button>
+                        </>
+                    }
+                    close={()=>setPopupState({show:false})}
                 />
             :null}
             {smartScenario?
                 <div className="smartScenario-popup" >
                     <ModalContainer
                         title="Smart Scheduling"
-                        content={"Smart scheduling requires independent scenarios. Are you sure you want to enable smart scheduling the task ?\n All available ICE should be in similar configurations for optimal results."}
+                        content={"Smart scheduling requires independent scenarios. Are you sure you want to enable smart scheduling the task?\n\nAll available ICE should be in similar configurations for optimal results."}
                         close={()=>setSmartScenario(false)}
                         footer={
                             <>

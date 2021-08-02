@@ -126,5 +126,69 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef}) => {
         </Fragment>
     )
 }
-export {FormInput,FormSelect,FormRadio,FormInpDropDown};
+
+
+/*Component FormInpDropDownLdap
+  use: renders searchable dropdown
+*/
+
+const FormInpDropDownLdap = ({data,setFilter,clickInp,inpRef,defVal,ldapEdit,errBorder,resetVal}) => {
+    const inputRef = inpRef
+    const defaultValue = defVal
+    const [list,setList] =  useState([])
+    const [dropDown,setDropDown] = useState(false)
+
+    useEffect(()=>{
+        if(defaultValue && document.getElementById("ldapServerName").selectedIndex !== 0 && ldapEdit) {
+            inputRef.current.value = defaultValue;
+            var items = [...data].filter((e)=>e.toUpperCase().indexOf(defaultValue.toUpperCase())!==-1)
+            setList(items)
+        }
+        else {
+            var items = [...data].filter((e)=>e.toUpperCase().indexOf(inputRef.current.value.toUpperCase())!==-1)
+            setList(items)
+        }    
+    },[defaultValue, data])
+
+    useEffect(()=>{
+        inputRef.current.value = "";
+        document.getElementById("ldapServerName").selectedIndex = "0";
+        setList([...data]);
+    },[resetVal])
+
+    const inputFilter = (e) =>{
+        setFilter(e);
+        var val = inputRef.current.value
+        var items = [...data].filter((e)=>e.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        setList(items)
+    }
+    const resetField = () => {
+        setDropDown(true)
+        if(clickInp)clickInp()
+    }
+    const selectOption = (e) =>{
+        var text = e.currentTarget.innerText
+        inputRef.current.value = text
+        setDropDown(false)
+        setFilter(e)
+    }
+    return(
+        <Fragment>
+            <ClickAwayListener onClickAway={()=>setDropDown(false)}>
+            <div>
+                <input type={'text'} autoComplete={"off"} ref={inputRef} className={"btn-users edit-user-dropdown-edit"+ (errBorder ? " selectErrorBorder" : "")} onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder="Search Data Fields.."/>
+                <div className="form-inp-dropdown form-inp-dropdown-ldap" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
+                    <ScrollBar thumbColor="#929397" >
+                    {list.map((e) => (  
+                        <option key={e} onClick={selectOption} value={e}> {e}</option> 
+                    ))}
+                    </ScrollBar>
+                </div>
+            </div>
+            </ClickAwayListener>
+        </Fragment>
+    )
+}
+
+export {FormInput,FormSelect,FormRadio,FormInpDropDown,FormInpDropDownLdap};
 

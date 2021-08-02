@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
+import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG } from '../../global';
 import { tagList } from  './ListVariables';
 import { updateScreen_ICE } from '../api';
 import "../styles/MapObjectModal.scss";
@@ -14,31 +14,36 @@ const MapObjectModal = props => {
     const [map, setMap] = useState({});
     const [showName, setShowName] = useState("");
     const [selectedItems, setSelectedItems] = useState([]);
+    const [orderList, setOrderList] = useState([]);
     const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(()=>{
         let tempScrapeList = {};
         let tempCustomList = {};
         let tempNonCustom = [];
+        let tempOrderList = [];
         if (props.scrapeItems.length) {
             props.scrapeItems.forEach(object => {
                 let elementType = object.tag;
                 elementType = tagList.includes(elementType) ? elementType : 'Element';
-                if (!object.objId) {}
-                else if (object.isCustom) {
-                    if (tempCustomList[elementType]) tempCustomList[elementType] = [...tempCustomList[elementType], object];
-                    else tempCustomList[elementType] = [object]
-                    if (!tempScrapeList[elementType]) tempScrapeList[elementType] = []
-                }
-                else {
-                    tempNonCustom.push(object);
-                    if (tempScrapeList[elementType]) tempScrapeList[elementType] = [...tempScrapeList[elementType], object];
-                    else tempScrapeList[elementType] = [object]
+                if (object.objId) {
+                    if (object.isCustom) {
+                        if (tempCustomList[elementType]) tempCustomList[elementType] = [...tempCustomList[elementType], object];
+                        else tempCustomList[elementType] = [object]
+                        if (!tempScrapeList[elementType]) tempScrapeList[elementType] = []
+                    }
+                    else {
+                        tempNonCustom.push(object);
+                        if (tempScrapeList[elementType]) tempScrapeList[elementType] = [...tempScrapeList[elementType], object];
+                        else tempScrapeList[elementType] = [object]
+                    }
+                    tempOrderList.push(object.objId);
                 }
             });
             setScrapedList(tempScrapeList);
             setCustomList(tempCustomList);
             setNonCustomList(tempNonCustom);
+            setOrderList(tempOrderList);
         }
         //eslint-disable-next-line
     }, [])
@@ -93,13 +98,16 @@ const MapObjectModal = props => {
             param: "mapScrapeData",
             appType: appType,
             objList: [],
+            orderList: orderList,
             versionnumber: versionnumber
         };
 
         let mapping = {...map};
         for (let val in mapping) {
-            if (mapping[val])
+            if (mapping[val]) {
                 arg.objList.push([mapping[val][0].objId, mapping[val][1].objId, mapping[val][1].custname]);
+                arg.orderList.splice(arg.orderList.indexOf(mapping[val][0].objId), 1)
+            }
         }
 
         updateScreen_ICE(arg)
@@ -109,17 +117,17 @@ const MapObjectModal = props => {
                     .then(resp => {
                         if (resp === "success") {
                             props.setShow(false);
-                            props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Successfully!'})
+                            props.setShowPop(MSG.SCRAPE.SUCC_MAPPED_SCRAPED)
                         }
-                        else props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+                        else props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
                     })
                     .catch(err => {
-                        props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+                        props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
                         // console.error(err);
                     });
         })
         .catch(error => {
-            props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+            props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
             console.err(error);
         })
     }

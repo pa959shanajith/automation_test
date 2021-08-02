@@ -64,8 +64,8 @@ const CreateNew = ({importRedirect}) => {
     setBlockui({show:false})
     setLoading(false)
     setPopup({
-        title:'ERROR',
-        content:error,
+        variant:error.VARIANT,
+        content:error.CONTENT,
         submitText:'Ok',
         show:true
     })
@@ -74,7 +74,7 @@ const CreateNew = ({importRedirect}) => {
   return (
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+        {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content} />:null}
         {(!loading)?
             <div className='mp__canvas_container'>
                 <div className='mp__toolbar__container'>

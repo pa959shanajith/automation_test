@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, Fragment } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
-import {ScrollBar} from '../../global';
+import {ScrollBar, VARIANT} from '../../global';
 import { useSelector} from 'react-redux';
 import * as d3 from 'd3';
 import '../styles/InputBox.scss'
@@ -27,7 +27,7 @@ const InputBox = (props) => {
             if (t === 'screens') {
                 msg = 'Unassign the task And the corresponding testcases tasks to rename';
             }
-            props.setPopup({show:true,title:'Rename Error',content:msg,submitText:'Ok'})
+            props.setPopup({show:true,variant:t === 'screens'?VARIANT.WARNING:VARIANT.ERROR,content:msg,submitText:'Ok'})
             props.setInpBox(false)
         }
         return () => {

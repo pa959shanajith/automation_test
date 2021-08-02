@@ -55,7 +55,7 @@ const LoginModal = props => {
                     </div>
                 }
                 footer={<>
-                    <span data-test="intg_log_error_span" className="ilm__error_msg">{props.error || error.msg}</span>
+                    <span data-test="intg_log_error_span" className="ilm__error_msg">{error.msg || props.error}</span>
                     <button data-test="intg_log_submit_btn" onClick={onSubmit}>Submit</button>
                 </>}
                 close={()=>dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null })}

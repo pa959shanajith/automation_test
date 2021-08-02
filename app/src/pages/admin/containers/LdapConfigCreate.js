@@ -35,7 +35,7 @@ const LdapConfigCreate = (props) => {
                         </div></div>
                     
                         <LdapConfigurationForm {...props}  />
-                        <LdapDataMapping setFieldmap={props.setFieldmap} fieldmap={props.fieldmap} fieldMapOpts={props.fieldMapOpts} ldapFMapEmailErrBor={props.ldapFMapEmailErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapFnameErrBor={props.ldapFMapFnameErrBor} ldapFMapUnameErrBor={props.ldapFMapUnameErrBor} />
+                        <LdapDataMapping resetField={props.manageCreate} setFieldmap={props.setFieldmap} fieldmap={props.fieldmap} fieldMapOpts={props.fieldMapOpts} ldapFMapEmailErrBor={props.ldapFMapEmailErrBor} ldapFMapLnameErrBor={props.ldapFMapLnameErrBor} ldapFMapFnameErrBor={props.ldapFMapFnameErrBor} ldapFMapUnameErrBor={props.ldapFMapUnameErrBor} />
                     </div>
                 </ScrollBar>
             </div>

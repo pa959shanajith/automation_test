@@ -238,7 +238,7 @@ const prepareReportData = (reportData, embedImages) => {
     const endTimeStamp = report.overallstatus[0].EndTime.split(".")[0];
     const endDate = endTimeStamp.split(" ")[0].split("-");
     let elapTime = (report.overallstatus[0].EllapsedTime.split(".")[0]).split(":");
-    report.overallstatus[0].versionname = reportData.versionname;
+    report.overallstatus[0].version = reportData.version;
     report.overallstatus[0].domainName = reportData.domainname;
     report.overallstatus[0].projectName = reportData.projectname;
     report.overallstatus[0].releaseName = reportData.releasename;
@@ -969,7 +969,14 @@ exports.getExecution_metrics = async(req, res) => {
             logger.info("Calling DAS Service from getExecution_metrics: reports/getExecution_metrics");
 			var reportResult = await fetch_metrics(metrics_data);
 			if (reportResult[0] == 'fail') {
-                return res.send('fail');
+                if (reportResult[2]){
+                    if(reportResult[2].errMsg == "Invalid Execution Id") 
+                        return res.send("InvalidExecId");
+                    else if(reportResult[2].errMsg == "Invalid Status") 
+                        return res.send("InvalidStatus");
+                    else return res.send('fail');
+                }
+                else return res.send('fail');
             } else if(reportResult[0].rows.length==0) {
                 return res.send('NoRecords');
             } else {

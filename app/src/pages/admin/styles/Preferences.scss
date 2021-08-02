@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .preferencesTbl
 {
     width: 100%;
@@ -21,9 +22,9 @@
 }
 #preferencesTable thead th
 {
-    background: #5e626b;
-    color: #fff;
-    border-right: 1px solid #fff;
+    background: $tableHeader;
+    color: $whiteColor;
+    border-right: 1px solid $whiteColor;
     border-radius: 5px;
     padding: 0.5%;
 }

@@ -5,7 +5,7 @@ import '../styles/TaskBox.scss';
 import ClickAwayListener from 'react-click-away-listener';
 import {populateUsers} from '../api';
 import { useSelector } from 'react-redux';
-import {ModalContainer, CalendarComp} from '../../global';
+import {ModalContainer, CalendarComp, Messages as MSG, VARIANT} from '../../global';
 import Complexity, {getComplexityLevel} from './Complexity';
 import PropTypes from 'prop-types'
 
@@ -63,22 +63,22 @@ const TaskBox = (props) => {
     useEffect(()=>{
         if(dNodes[pi].parent && dNodes[pi].parent.type === 'endtoend'){
             setTaskBox(false)
-            setPopup({show:true,title:'MindMap',content:'Can not assign scenarios in end to end module. Please select respective modules to assign scenarios',submitText:'Ok'})
+            setPopup({show:true,variant:MSG.MINDMAP.ERR_E2E_ASSIGN_SCENARIO.VARIANT,content:MSG.MINDMAP.ERR_E2E_ASSIGN_SCENARIO.CONTENT,submitText:'Ok'})
             return;
         }
         if (t == 'screens' && (appType == "System" || appType == "Mainframe")) {
             setTaskBox(false)
-            setPopup({show:true,title:'Error',content:'Task is disabled for '+appType +' screen',submitText:'Ok'})
+            setPopup({show:true,variant:VARIANT.WARNING,content:'Task is disabled for '+appType +' screen',submitText:'Ok'})
             return;
         }
         if (t != 'testcases' && (dNodes[pi]._children != null)) {
             setTaskBox(false)
-            setPopup({show:true,title:'Error',content:'Expand the node',submitText:'Ok'})
+            setPopup({show:true,variant:MSG.MINDMAP.WARN_EXPAND_NODE.VARIANT,content:MSG.MINDMAP.WARN_EXPAND_NODE.CONTENT,submitText:'Ok'})
             return;
         } 
         if (t != 'testcases' && (dNodes[pi].children == null)) {
             setTaskBox(false)
-            setPopup({show:true,title:'Error',content:'Incomplete Flow',submitText:'Ok'})
+            setPopup({show:true,variant:MSG.MINDMAP.ERR_INCOMPLETE_FLOW.VARIANT,content:MSG.MINDMAP.ERR_INCOMPLETE_FLOW.CONTENT,submitText:'Ok'})
             return;
         }
         unassignTask = unassignList
@@ -151,17 +151,9 @@ const TaskBox = (props) => {
                 case 'rw':
                     return;
                 case 'sd':
-                    if (tObj.sd != '' && tObj.sd.indexOf('-')==-1) {
-                        var d=new Date(tObj.sd);
-                        tObj.sd=d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
-                    }
                     setStartDate({show:true,value:tObj.sd})
                     return;
                 case 'ed':
-                    if (tObj.ed != '' && tObj.ed.indexOf('-')==-1) {
-                        var d1=new Date(tObj.ed);
-                        tObj.ed=d1.getDate()+"-"+(d1.getMonth()+1)+"-"+d1.getFullYear();
-                    }
                     setEndDate({show:true,value:tObj.ed})
                     return;
                 case 'pg':

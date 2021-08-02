@@ -2,6 +2,7 @@ import React, { useState, useEffect , useRef } from 'react';
 import {FormInpDropDown} from '../components/FormComp';
 import AssignOptionBox from '../components/AssignOptionBox'
 import {getAvailable_ICE,getPools,updatePool} from '../api';
+import { Messages } from '../../global';
 
 /*Component AllocateByIce
   use: render ICE allocation by choose ICE section
@@ -55,7 +56,7 @@ const  AllocateByIce = ({displayError,setLoading,selectedPool,setSelectedPool,sa
                 var data = await updatePool(pool)
                 if(data.error){displayError(data.error);return;}
                 await reset()
-                displayError("ICE Pool updated successfully.","Success")
+                displayError(Messages.ADMIN.SUCC_ICEPOOL_UPDATE);
             })()
         }
         setSaveAction(false)

@@ -1,6 +1,6 @@
 import React, {useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { PopupMsg, ModalContainer ,ScrollBar, Report} from '../../global' 
+import { PopupMsg, ModalContainer ,ScrollBar, Report, Messages as MSG} from '../../global' 
 import {readTestSuite_ICE, loadLocationDetails, readTestCase_ICE} from '../api';
 import Handlebars from "handlebars"
 import "../styles/ExecuteTable.scss";
@@ -35,8 +35,8 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
     const displayError = (error) =>{
         setLoading(false)
         setPopup({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -122,7 +122,7 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
             }
         }catch(error){
             console.log(error);
-            setPopup({title:'ERROR',content:"Error while fetching Test Suite Data.",submitText:'Ok',show:true})
+            displayError(MSG.EXECUTE.ERR_FETCH_TESTSUITE)
         }
     }
     const changeParamPath = (m,count,value) => {
@@ -150,7 +150,7 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
 
     return (
         <>
-            {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+            {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} />:null}
             
             <div id="middle-content-section">
                 <div className="e__abs-div">

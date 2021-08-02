@@ -1,5 +1,5 @@
 import React ,{useState, useRef, useEffect} from 'react';
-import { RedirectPage } from '../../global';
+import { RedirectPage, VARIANT, Messages as MSG  } from '../../global';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { loginToQTest_ICE, viewQtestMappedList_ICE } from '../api.js';
@@ -47,7 +47,7 @@ const  QTest = props => {
         const qcUsername = usernameRef.current.value;
         const domainDetails = await loginToQTest_ICE(qcPassword, qcURL, qcUsername);
         
-        if(domainDetails.error) dispatch({type: actionTypes.SHOW_POPUP, payload:{title: "Error", content: domainDetails.error}});
+        if(domainDetails.error) dispatch({type: actionTypes.SHOW_POPUP, payload:domainDetails.error});
         else if(domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (domainDetails === "invalidcredentials") setLoginError("Invalid Credentials , Retry Login")
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
@@ -71,11 +71,7 @@ const  QTest = props => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
         const mappedResponse = await viewQtestMappedList_ICE(user_id)
         if(mappedResponse.length === 0){
-            let popupMsg = {
-                title:'Mapped Testcase',
-                content:"No mapped details"
-            };
-            dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});
+            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.WARN_NO_MAPPED_DETAILS});
         }
         else{
             dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "qTest" });

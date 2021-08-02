@@ -6,7 +6,6 @@
    <title>Avo Assure - Execution Report</title>
    <link rel="icon" href="../favicon.ico">
    <link rel="stylesheet" type="text/css" href="../static/fonts/latofonts.css" />
-   <link rel="stylesheet" type="text/css" href="../static/reports/font-awesome.css" />
    <link rel="stylesheet" type="text/css" href="../static/reports/dataTables.css">
    <script type="text/javascript" src="../static/reports/jquery.min.js"></script>
    <script type="text/javascript" src="../static/reports/jquery-ui.min.js"></script>
@@ -1006,7 +1005,7 @@
             <img alt="Save PDF" class="export-icons" data-rep="pdf" src="../static/imgs/ic-pdf.png" title="Save PDF Report">
             <img alt="Export JSON" class="export-icons" data-rep="json" style="" src="../static/imgs/ic-export-to-json.png" title="Export to JSON">
             {{#ifnotEquals video '-'}}
-               <img alt="Download video" class="export-icons" data-rep="mp4" data-path={{video}} style="" src="../static/imgs/screenrecord.png" title="Download Execution Video">
+               <img alt="Download video" class="export-icons" data-rep="mp4" data-path="{{video}}" style="" src="../static/imgs/screenrecord.png" title="Download Execution Video">
             {{/ifnotEquals}}
          </div>
       </div>
@@ -1030,8 +1029,10 @@
             <span class="capitalize">: {{browserType}}</span>
             <label>Browser Version</label>
             <span>: {{browserVersion}}</span>
-            {{#ifnotEquals versionname undefined}}
-            <label>Version Name</label><span>: {{versionname}}</span>
+            {{#ifnotEquals version undefined}}
+               {{#ifnotEquals version '-'}}
+                  <label>Version</label><span>: {{version}}</span>
+               {{/ifnotEquals}}
             {{/ifnotEquals}}
             <span style='visibility:hidden' class="reportId">{{reportId}}</span>
             <span style='visibility:hidden' class="executionId">{{executionId}}</span>

@@ -30,7 +30,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
     executeScheduleTestSuite = async function (batchExecutionData, execIds, userInfo, type) {
         const scheduleId = execIds["scheduleId"];
         const fnName = "executeScheduleTestSuite";
-        var versionname = 'NA';
+        var version = '-';
         try {
             result = await executor.execute(batchExecutionData, execIds, userInfo, type);
         } catch (ex) {
@@ -54,7 +54,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
                 msg = "Scenario execution failed due to an error encountered during execution";
             }
             const tsuIds = batchExecutionData.batchInfo.map(u => u.testsuiteId);
-            const currExecIds = await executor.generateExecutionId(execIds, tsuIds, userInfo.userid, versionname);
+            const currExecIds = await executor.generateExecutionId(execIds, tsuIds, userInfo.userid, version);
             if (currExecIds != "fail") {
                 const batchObj = {
                     "executionIds": tsuIds.map(i => currExecIds.execids[i]),

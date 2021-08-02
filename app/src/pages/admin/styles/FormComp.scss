@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .input-label{
     width: 75%;
     font-size: small;
@@ -9,7 +10,7 @@
         margin-left: 10px;
     }
     input:read-only ,input:disabled{
-        background-color: #eee;
+        background-color: $whisper;
         opacity: 1;
         cursor: not-allowed;
     }
@@ -18,7 +19,7 @@
         width: 120px;
     }
     option:disabled{
-        background-color: #eee;
+        background-color: $whisper;
     }
     .conf-radio{
         display: inline-block;
@@ -36,7 +37,7 @@
     box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
     display: block;
     max-height: 100px;
-    background: #ffff;
+    background: $whiteColor;
     margin-top: 2px;
     option{
         padding-left: 2px;
@@ -44,9 +45,15 @@
         width: calc(100% - 14px);
     }
     option:hover{
-        background: #633691;
+        background: $primaryColor;
         border-radius: 3px;
-        color: #fff;
+        color: $whiteColor;
         cursor: pointer;
     }
+}
+.form-inp-dropdown-ldap{
+    width: calc(100% - 130px);
+    position: absolute;
+    left: 130px;
+    z-index: 1000;
 }

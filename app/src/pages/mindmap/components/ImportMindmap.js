@@ -1,6 +1,6 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
 import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap , pdProcess, importGitMindmap} from '../api';
-import {ModalContainer } from '../../global'
+import {ModalContainer, Messages as MSG } from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
@@ -40,6 +40,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
     const ftypeRef = useRef()
     const uploadFileRef = useRef()
     const projRef = useRef()
+    const gitconfigRef = useRef()
     const gitBranchRef = useRef()
     const gitVerRef = useRef()
     const gitPathRef = useRef()
@@ -69,15 +70,17 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
         if(submit){
             setSubmit(false)
             setError('')
-            var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
+            var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
             if(err){
                 return;
             }
             var importData = fileUpload;
             (async()=>{
                 if(importType === 'git'){
+                    setBlockui({content:'Importing ...',show:true})
                     var data = await importGitMindmap ({
                         projectid : projRef.current.value,
+                        gitname : gitconfigRef.current.value,
                         gitbranch : gitBranchRef.current.value,
                         gitversion : gitVerRef.current.value,
                         gitfolderpath : gitPathRef.current.value
@@ -85,7 +88,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     if(data.error){
                         if(data.error === 'No entries'){
                             const projectname = projRef.current[projRef.current.selectedIndex].text;
-                            data.error = 'Module does not belongs to project '+projectname;
+                            data.error = 'Module does not belong to project '+projectname;
                         }
                         setImportPop(false);
                         displayError(data.error);
@@ -93,7 +96,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     }
                     var importProj = data.projectid
                     if(!importProj || !projList[importProj]){
-                        displayError('This project is not assigned to user')
+                        displayError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
                         return;
                     }
                     var res = await importMindmap(data)
@@ -108,6 +111,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     var res = await getModules(req)
                     if(res.error){displayError(res.error);return;}
                     importData = res
+                    setBlockui({show:false})
                 }
                 loadImportData({
                     importType,
@@ -149,12 +153,16 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                                 </select>
                             </div>
                             <div>
+                                <label>Git Configuration: </label>
+                                <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Git configuration name'} ref={gitconfigRef}/>
+                            </div>
+                            <div>
                                 <label>Git Branch: </label>
                                 <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Branch name'} ref={gitBranchRef}/>
                             </div>
                             <div>
                                 <label>Version: </label>
-                                <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version name'} ref={gitVerRef}/>
+                                <input onChange={(e)=>e.target.value=e.target.value.replaceAll(" ","")} placeholder={'Version'} ref={gitVerRef}/>
                             </div>
                             <div>
                                 <label>Folder Path: </label>
@@ -232,9 +240,9 @@ const Footer = ({error,setSubmit}) =>{
     )
 }
 
-const validate = ({ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef}) =>{
+const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef}) =>{
     var err = false;
-    [ftypeRef,uploadFileRef,projRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef].forEach((e)=>{
+    [ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef].forEach((e)=>{
         if(e.current){
             e.current.style.border = '1px solid black';
             if(e.current.value === 'def-val' || e.current.value === ''){
@@ -264,7 +272,7 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
             if (!validNodeDetails(e.name)) validate = false;
         });
         if(!validate){
-            displayError('Some node names are invalid!');return;
+            displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
         }
         mindmapData = {createnew:true,importData:{createdby:'excel',data:res}} 
     }
@@ -328,7 +336,7 @@ const uploadFile = async({uploadFileRef,setSheetList,setError,setFiledUpload,pro
             }else{
                 var importProj = data.projectid
                 if(!importProj || !projList[importProj]){
-                    setError('This project is not assigned to user')
+                    setError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
                     setBlockui({show:false})
                     return;
                 }

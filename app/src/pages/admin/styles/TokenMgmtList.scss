@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .form-group-tkn-mgmt{
     margin-bottom:15px
 }
@@ -7,14 +8,14 @@
 .sessionHeading-tkn-mgmt{
 	padding-left: 5px;
 	display: flex;
-	background: #eeeeee;
+	background: $whisper;
 	cursor: pointer;
 	width: 100%;
 	margin-bottom: 3px;
 }
 
 .sessionHeading-tkn-mgmt:hover {
-	background: #e0e0e0;
+	background: $backgroundOne;
 }
 
 .sessionHeading-tkn-mgmt h4{
@@ -28,7 +29,7 @@
 }
 .searchIcon{
 	cursor: pointer;
-	background: white;
+	background: $whiteColor;
     padding: 4px;
     border-radius: 7px 7px 7px 7px;
     position: relative;
@@ -52,7 +53,7 @@
     height: calc(100% - 40px);
 }
 .search-tkn-mgmt{
-    background-color: white;
+    background-color: $whiteColor;
     float: right;
     margin-right: 30px;
     height: 30px;

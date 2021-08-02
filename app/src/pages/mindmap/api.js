@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {RedirectPage} from '../global'
+import {RedirectPage, Messages as MSG} from '../global'
 import {history} from './index'
 import {url} from '../../App';
 
@@ -20,16 +20,16 @@ export const getProjectList = async() => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch project list'}
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch project list'}
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
     }
 }
 
@@ -51,13 +51,13 @@ export const getModules = async(props) => {
             return res.data;
         }else if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         console.error(res.data)
-        return {error:'Failed to fetch Module list'}
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch Modules'}
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }
 
@@ -77,16 +77,16 @@ export const getScreens = async(projectId) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch screens'}
+        return {error:MSG.MINDMAP.ERR_FETCH_SCREEN}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch screens'}
+        return {error:MSG.MINDMAP.ERR_FETCH_SCREEN}
     }
 }
 
@@ -117,16 +117,16 @@ export const saveMindmap = async(props) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to save mindmap'}
+        return {error:MSG.MINDMAP.ERR_SAVE_MINDMAP}
     }catch(err){
         console.error(err)
-        return {error:'Failed to save mindmap'}
+        return {error:MSG.MINDMAP.ERR_SAVE_MINDMAP}
     }
 }
 
@@ -147,16 +147,16 @@ export const exportToExcel = async(props) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to export excel'}
+        return {error:MSG.MINDMAP.ERR_EXPORT}
     }catch(err){
         console.error(err)
-        return {error:'Failed to export excel'}
+        return {error:MSG.MINDMAP.ERR_EXPORT}
     }
 }
 
@@ -178,16 +178,16 @@ export const exportMindmap = async(moduleId) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to export mindmap'}
+        return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
     }catch(err){
         console.error(err)
-        return {error:'Failed to export mindmap'}
+        return {error:MSG.MINDMAP.ERR_EXPORT_MINDMAP}
     }
 }
 
@@ -207,16 +207,16 @@ export const populateScenarios = async(moduleID) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch scenarios'}
+        return {error:MSG.MINDMAP.ERR_FETCH_SCENARIO}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch scenarios'}
+        return {error:MSG.MINDMAP.ERR_FETCH_SCENARIO}
     }
 }
 
@@ -240,16 +240,16 @@ export const readTestSuite_ICE = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch testsuites details'}
+        return {error:MSG.MINDMAP.ERR_FETCH_TESTSUITE}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch testsuites details'}
+        return {error:MSG.MINDMAP.ERR_FETCH_TESTSUITE}
     }
 }
 
@@ -269,16 +269,16 @@ export const populateUsers = async(projectId) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail" && res.data.rows.length >0){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Failed to fetch Users'}
+        return {error:MSG.MINDMAP.ERR_FETCH_USER}
     }catch(err){
         console.error(err)
-        return {error:'Failed to fetch Users'}
+        return {error:MSG.MINDMAP.ERR_FETCH_USER}
     }
 }
 
@@ -300,22 +300,22 @@ export const excelToMindmap = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if (res.data == 'valueError') {
-            return {error : 'Empty column values in the sheet'}
+            return {error : MSG.MINDMAP.ERR_EMPTY_COL}
         } 
         else if (res.data == "emptySheet" || res.data == 'fail') {
-            return {error : 'Excel sheet is either empty or invalid'}
+            return {error : MSG.MINDMAP.ERR_EXCEL_SHEET}
         }
         else if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Invalid data in excel, please check!'}
+        return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}
     }catch(err){
         console.error(err)
-        return {error:'Invalid data in excel, please check!'}
+        return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}
     }
 }
 
@@ -335,15 +335,15 @@ export const importMindmap = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
-        return {error:'Error fetching data from file'}
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }catch(err){
         console.error(err)
-        return {error:'Error fetching data from file'}
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }
 }
 
@@ -363,15 +363,15 @@ export const pdProcess = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
-        return {error:'Error fetching data from file'}
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }catch(err){
         console.error(err)
-        return {error:'Error fetching data from file'}
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }
 }
 
@@ -391,15 +391,15 @@ export const importGitMindmap = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.data === "empty"){
             console.error(res.data)
-            return {error:'Project is not Git configured!'}
+            return {error:MSG.MINDMAP.ERR_VERIFY_INPUT}
         }
         if(res.data === "Invalid inputs"){
             console.error(res.data)
-            return {error:'Module does not exists in Git repository. Please verify your inputs!'}
+            return {error:MSG.MINDMAP.ERR_MODULE_EXIST}
         }
 		if(res.data === "No entries"){
             console.error(res.data)
@@ -407,19 +407,19 @@ export const importGitMindmap = async(data) => {
         }
         if (!('testscenarios' in res.data)){
             console.error(res.data)
-            return {error:"Incorrect JSON imported. Please check the contents!!"}
+            return {error:MSG.MINDMAP.ERR_JSON_INCORRECT_IMPORT}
         }else if(res.data.testscenarios.length === 0){
             console.error(res.data)
-            return {error:"The file has no node structure to import, please check!!"}
+            return {error:MSG.MINDMAP.ERR_NODE_STRUCT_IMPORT}
         }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:'Error in importing module from Git'}
+        return {error:MSG.MINDMAP.ERR_IMPORT_MODULE_GIT}
     }catch(err){
         console.error(err)
-        return {error:'Error in importing module from Git'}
+        return {error:MSG.MINDMAP.ERR_IMPORT_MODULE_GIT}
     }
 }
 
@@ -439,35 +439,39 @@ export const exportToGit = async(data) => {
         });
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(history)
-            return {error:'invalid session'};
+            return {error:MSG.GENERIC.INVALID_SESSION};
         }
-        if(res.data==='empty'){
+        else if(res.data==='empty'){
             console.error(res.data)
-            return {error:'Project is not Git configured.'}
+            return {error:MSG.MINDMAP.ERR_PROJECT_GIT_CONGIG}
         }
-        if(res.data==='commit exists'){
+        else if(res.data==='Invalid config name'){
             console.error(res.data)
-            return {error:'Git commit version already exists.'}
+            return {error:MSG.MINDMAP.ERR_GIT_EXIST}
         }
-        if(res.data==='Invalid gitbranch'){
+        else if(res.data==='commit exists'){
             console.error(res.data)
-            return {error:"Input branch doesn't exist in Git. Please verify!"}
+            return {error:MSG.MINDMAP.ERR_GIT_COMMIT_VERSION_EXIST}
         }
-        if(res.data==='Invalid url'){
+        else if(res.data==='Invalid gitbranch'){
             console.error(res.data)
-            return {error:"Error in Git config: Invalid Git clone path"}
+            return {error:MSG.MINDMAP.ERR_GIT_BRANCH_EXIST}
         }
-        if(res.data==='Invalid token'){
+        else if(res.data==='Invalid url'){
             console.error(res.data)
-            return {error:"Error in Git config: Invalid Git access token"}
+            return {error:MSG.MINDMAP.ERR_INVALID_GIT_CLONE_PATH}
         }
-        if(res.status===200 && res.data !== "fail"){          
+        else if(res.data==='Invalid token'){
+            console.error(res.data)
+            return {error:MSG.MINDMAP.ERR_GIT_ACCESS_TOKEN}
+        }
+        else if(res.status===200 && res.data !== "fail"){          
             return res.data;
         }
         console.error(res.data)
-        return {error:'Error while exporting to Git'}
+        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
     }catch(err){
         console.error(err)
-        return {error:'Error while exporting to Git'}
+        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
     }
 }

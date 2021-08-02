@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .modal__container{
     position: fixed;
     width: 100%;
@@ -21,10 +22,10 @@
     transform: translateX(-50%) translateY(-50%);
     -moz-transform: translateX(-50%) translateY(-50%);
     -webkit-transform: translateX(-50%) translateY(-50%);
-    background: #fff;
+    background: $whiteColor;
     padding: 10px 20px;
     cursor: auto;
-    color: #333;
+    color: $darkGray;
     font-family: LatoWeb;
     padding: 8px;
     outline: 0;
@@ -32,7 +33,7 @@
     box-shadow: 0 3px 9px rgba(0,0,0,.5);
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    border: 1px solid #999;
+    border: 1px solid $borderFive;
     border-radius: 6px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -50,7 +51,7 @@
     line-height: 1;
     right: 15px;
     position: absolute;
-    color: #fff;
+    color: $whiteColor;
     opacity: 1;
     text-shadow: none;
     font-family: 'LatoWebThin';
@@ -60,18 +61,22 @@
 }
 .modal__body{
     font-size: 14px;
+    white-space: pre-line;
 }
 .modal__footer{
     padding: 9px!important;
     padding-bottom: 0px!important;
 }
 .modal__footer button{
-    background: #643693;
-    color: #fff;
+    background: $primaryColor;
+    color: $whiteColor;
     border: 0;
     border-radius: 20px;
     padding: 5px 20px;
     font-size: 16px;
+    &:disabled{
+        opacity: .65;
+    }
 }
 button:focus{
     outline: none!important;
@@ -79,8 +84,8 @@ button:focus{
 .modal-title {
     margin: 0;
     line-height: 1.42857143;
-    background: #311d4e;
-    color: #fff;
+    background: $primaryColorDark;
+    color: $whiteColor;
     border-radius: 6px;
     padding: 5px 40px;
     text-align: center;

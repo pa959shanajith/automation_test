@@ -6,8 +6,7 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
   use: Wrapper function extends react-custom-scollbars;
   props: 
     styles for horizontalTrack,horizontalThumb,verticalTrack,verticalThumb,
-    maxThumbSize : number
-    minThumbSize : number
+    minScrollbarLength: number
     trackColor : color
     thumbColor : color
     hideYbar : boolean 
@@ -118,7 +117,7 @@ const ScrollBar = (props) => {
                 }
                 `}
             </style> 
-            <PerfectScrollbar ref={scrollRef} options={{minScrollbarLength:props.minScrollbarLength,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}} style={{maxHeight:'inherit',height:'inherit'}} onScrollX={props.onScrollX} onScrollY={props.onScrollY} >
+            <PerfectScrollbar ref={scrollRef} options={{minScrollbarLength:props.minScrollbarLength || 20,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}} style={{maxHeight:'inherit',height:'inherit'}} onScrollX={props.onScrollX} onScrollY={props.onScrollY} >
                 {props.children}
             </PerfectScrollbar>
         </Fragment>

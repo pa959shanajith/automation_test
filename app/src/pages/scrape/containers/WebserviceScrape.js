@@ -4,7 +4,7 @@ import XMLParser from 'react-xml-parser';
 import { useHistory } from 'react-router-dom';
 import ScreenWrapper from './ScreenWrapper';
 import { ScrapeContext } from '../components/ScrapeContext';
-import { RedirectPage, ResetSession } from '../../global';
+import { RedirectPage, ResetSession, Messages as MSG } from '../../global';
 import SubmitTask from '../components/SubmitTask';
 import ScrapeSettings from "../components/ScrapeSettings/ScrapeSettings";
 import RequestEditor from "../components/UI/RequestEditor";
@@ -205,7 +205,7 @@ const WebserviceScrape = () => {
                                     
                                     if (rParamHeader.trim() !== ""){
                                         let reqparams=parseRequestParam(rParamHeader);
-                                        if (reqparams.length>0) viewArray.concat(reqparams);
+                                        if (reqparams.length>0) viewArray = reqparams;
                                     }
                                     try {
                                         parseRequest(parsedReqBody);
@@ -221,9 +221,6 @@ const WebserviceScrape = () => {
                                         scrapedObjectsWS.tag = "elementWS";
                                         viewArray.push(scrapedObjectsWS);
                                     }
-                                    // scrapedObjects.view = viewArray;
-                                    // scrapedObjects = JSON.stringify(scrapedObjects);
-                                    // scrapedObjects = scrapedObjects.replace(/'+/g, "''")
                                 } else {
                                     console.error("Invalid Request header or Request body for XML");
                                     callApi = false;
@@ -234,10 +231,10 @@ const WebserviceScrape = () => {
                                     //Parsing Request Parameters
                                     if (rParamHeader.trim() !== ""){
                                         let reqparams = parseRequestParam(rParamHeader);
-                                        if (reqparams.length > 0) viewArray.concat(reqparams);
+                                        if (reqparams.length > 0) viewArray = reqparams;
                                     }
                                     //Parsing Request Body
-                                    let xpaths = parseJsonRequest(rReqBody,"","", []);
+                                    let xpaths = parseJsonRequest(JSON.parse(rReqBody),"","", []);
                                     for (let object of xpaths) {
                                         let scrapedObjectsWS = {};
                                         scrapedObjectsWS.xpath = object;
@@ -245,9 +242,9 @@ const WebserviceScrape = () => {
                                         scrapedObjectsWS.tag = "elementWS";
                                         viewArray.push(scrapedObjectsWS);
                                     }
-                                    // if (viewArray.length>0) scrapedObjects.view=viewArray;
                                 }
                                 catch(Exception){
+                                    setShowPop(MSG.SCRAPE.ERR_REQBODY_INVALID);
                                     console.error("Invalid Request body.");
                                     callApi = false;
                                 }
@@ -308,12 +305,12 @@ const WebserviceScrape = () => {
                 if (data === "Success") {
                     // $("#enbledWS").prop("checked", false)
                     fetchScrapeData()
-                    .then(data=>setShowPop({title: "Save WebService Template", content: "WebService Template saved successfully."}))
-                    .catch(error => setShowPop({title: "Save WebService Template", content: "Failed to save WebService Template. Invalid Request Header or Body"}));
+                    .then(data=>setShowPop(MSG.SCRAPE.SUCC_WS_TEMP_SAVE))
+                    .catch(error => setShowPop(MSG.SCRAPE.ERR_WS_TEMP_SAVE));
                 } else if(data === "Invalid Input"){
-                    setShowPop({title: "Save WebService Template", content: "Failed to save WebService Template. Invalid Request Header or Body"});
+                    setShowPop(MSG.SCRAPE.ERR_WS_TEMP_SAVE);
                 } else{
-                    setShowPop({title: "Save WebService Template", content: "Failed to save WebService Template."});
+                    setShowPop(MSG.SCRAPE.ERR_WS_TEMP);
                 }
             })
             .catch(error => {
@@ -355,7 +352,7 @@ const WebserviceScrape = () => {
 
 
     const onGo = () => {
-		if (!wsdlURL) setShowPop({title: "Launch WSDL", content: "Invalid WSDL url."}); 
+		if (!wsdlURL) setShowPop(MSG.SCRAPE.ERR_WSDL_URL); 
 		else {
 			setOverlay('Please Wait...');
 			ResetSession.start();
@@ -364,10 +361,10 @@ const WebserviceScrape = () => {
                 setOverlay("");
                 ResetSession.end();
                 if (data === "Invalid Session") return RedirectPage(history);
-                else if (data === "fail") setShowPop({title: "WSDL-Scrape Screen", content: "Invalid WSDL url."});
-                else if (data === "unavailableLocalServer") setShowPop({title: "WSDL-Scrape Screen", content: "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
-                else if (data === "scheduleModeOn") setShowPop({ title: "WSDL-Scrape Screen", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."})
-                else if (data === "ExecutionOnlyAllowed") setShowPop({title: "WSDL-Scrape Screen", content: "Execution Only Allowed"})
+                else if (data === "fail") setShowPop(MSG.SCRAPE.ERR_WSDL_URL);
+                else if (data === "unavailableLocalServer") setShowPop(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+                else if (data === "scheduleModeOn") setShowPop(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+                else if (data === "ExecutionOnlyAllowed") setShowPop(MSG.GENERIC.WARN_EXECUTION_ONLY)
                 else {
                     let localList = [];
                     for (let i = 0; i < data.listofoperations.length; i++) {
@@ -379,7 +376,7 @@ const WebserviceScrape = () => {
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
-                setShowPop({title: "WSDL-Scrape Screen", content: "Error while performing operation."});
+                setShowPop(MSG.SCRAPE.ERR_OPERATION);
                 console.error("Fail to launch WSDL_GO. ERROR::::", error);
             });
 		}
@@ -399,8 +396,8 @@ const WebserviceScrape = () => {
             .then(data => {
                 setOverlay("");
                 if (data === "Invalid Session") return RedirectPage(history);
-                else if (data === "unavailableLocalServer") setShowPop({title: "WSDL-Scrape Screen", content: "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
-                else if (data === "scheduleModeOn") setShowPop({ title: "WSDL-Scrape Screen", content: "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed."})
+                else if (data === "unavailableLocalServer") setShowPop(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+                else if (data === "scheduleModeOn") setShowPop(MSG.GENERIC.WARN_UNCHECK_SCHEDULE)
                 else if (typeof data === "object") {
                     dispatch({type: actions.SET_WSDATA, payload: {endPointURL : data.endPointURL[0]}});
                     dispatch({type: actions.SET_WSDATA, payload: {method : data.method[0]}});
@@ -425,7 +422,7 @@ const WebserviceScrape = () => {
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
-                setShowPop({title: "WSDL Add-Scrape Screen", content: "Error while performing operation."});
+                setShowPop(MSG.SCRAPE.ERR_OPERATION);
                 console.error("Fail to Add-Scrape. Error::::", error);
             });
 		}
@@ -791,12 +788,12 @@ function parseJsonRequest(requestedBody, base_key, cur_key, xpath) {
 				if (base_key!== "")  base_key+='/'+key;
 				else base_key=key;
 				xpaths.push(base_key);
-				xpaths.concat(parseJsonRequest(value,base_key,key,xpaths));
+				parseJsonRequest(value,base_key,key,xpaths);
 				base_key=base_key.slice(0,-key.length-1);
 			 } else if (Array.isArray(value)) {
 				for (var i=0;i<value.length;i++){
 					base_key+=key+"["+i.toString()+"]";
-					xpaths.concat(parseJsonRequest(value[i],base_key,key,xpaths));
+					parseJsonRequest(value[i],base_key,key,xpaths);
 				}
 			 } else {
 				xpaths.push(base_key+'/'+key);

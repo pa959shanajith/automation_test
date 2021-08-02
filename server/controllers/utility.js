@@ -1,3 +1,4 @@
+const uuid = require('uuid-random');
 const crypto = require('crypto');
 const validator =  require('validator');
 const DOMParser = require('xmldom').DOMParser;
@@ -98,35 +99,22 @@ exports.importDtFromExcel = function (req, res) {
 		if (req.body.flag == 'sheetname') {
 			return res.status(200).send(wb1.SheetNames);
 		}
-		var myCSV = xlsToCSV(wb1, req.body.sheetname);
-		var numSheets = myCSV.length / 2;
 		var qObj = {};
-		if (numSheets == 0) {
-			return res.status(200).send("emptySheet");
+		var myCSV = xlsToCSV(wb1, req.body.sheetname);
+		var columnNames = [];
+		if (myCSV.length == 0) return res.send("emptyExcelData");
+		var columns = myCSV[1].split('\n')[0].split(',');
+		var cs = [];
+		for (var i =0; i<columns.length; ++i) {
+			ob = { id: uuid(), name: columns[i]};
+			cs.push(ob.id);
+			columnNames.push(ob);
 		}
-		rows = [];
-		for (var k = 0; k < numSheets; k++) {
-			var cSheet = myCSV[k * 2 + 1];
-			var cSheetRow = cSheet.trimEnd().split('\n');
-			if (k == 0) {
-				columnNames = cSheetRow[k].split(',');
-			} 
-			if(columnNames.length>10) {
-				return res.status(500).send("columnExceeds");
-			}
-			if(cSheetRow.length >200) {
-				return res.status(500).send("rowExceeds");
-			}
-			for (var i = 1; i < cSheetRow.length; i++) {
-				var row = cSheetRow[i].split(',');
-				newObj = {};
-				for(var j=0; j<columnNames.length; ++j) {
-					newObj[columnNames[j]] = row[j]
-				}
-				rows.push(newObj);
-			}
-		}
-		qObj['datatable'] = rows;
+		if (columnNames.length>50) return res.send("columnExceeds");
+		xlsx.utils.sheet_add_aoa(wb1.Sheets[req.body.sheetname], [cs], {origin:'A1'});
+		var myJson = xlsx.utils.sheet_to_json(wb1.Sheets[req.body.sheetname]);
+		if (myJson.length>200) return res.send("rowExceeds");
+		qObj['datatable'] = myJson;
 		qObj['dtheaders'] = columnNames;
 		res.status(200).send(qObj);
 	} catch(exception) {
@@ -136,27 +124,30 @@ exports.importDtFromExcel = function (req, res) {
 };
 
 exports.importDtFromCSV = function (req, res) {
-	const fnName = "importDtFromExcel";
+	const fnName = "importDtFromCSV";
 	logger.info("Inside UI service: " + fnName);
 	try {
 		var myCSV = req.body.content;
 		var qObj = {};
-		var csvArray = myCSV.split('\n');
-		if (csvArray.length > 200) {
-			return res.status(500).send("rowExceeds");
-		}
+		var csvArray = myCSV.replace(/\"|\'/g,'').split('\n');
+		if(validator.isEmpty(myCSV)) return res.send("emptyData");
+		if (csvArray.length > 200) return res.send("rowExceeds");
 		rows = [];
+		var columnNames = [];
 		for (var k = 0; k < csvArray.length; k++) {
 			if (k == 0) {
-				columnNames = csvArray[k].split(',');
-				if(columnNames.length>10) {
-					return res.status(500).send("columnExceeds");
+				columns = csvArray[k].split(',');
+				if(columns.length>50) return res.send("columnExceeds"); 
+				for (var i =0; i<columns.length; ++i) {
+					ob = { id: uuid(), name: columns[i]}
+					columnNames.push(ob)
 				}
 			} else  { 
 				var row = csvArray[k].split(',');
 				newObj = {};
 				for (var i = 0; i < row.length; i++) {
-					newObj[columnNames[i]] = row[i];
+					
+					newObj[columnNames[i].id] = row[i];
 				}
 				rows.push(newObj);
 			}
@@ -201,7 +192,7 @@ exports.exportToDtExcel = async (req, res) => {
 		//create the new worksheet with coloumns and rows specified in data
 		for (var i=1;i<=datatable.length;i++) {
 			if(i==1) {
-				keys = Object.keys(datatable[0]);
+				keys = dts.dtheaders;
 				col=1;
 				keys.forEach(element => {
 					ws.cell(i,col).string(element);
@@ -278,30 +269,67 @@ exports.importDtFromXML = function (req, res) {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		var myXML = req.body.content;
-		var myXMLStr = myXML.replace(/\s/g,'');
+		var row = req.body.row;
 		var qObj = {};
-		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
-		var allrows = doc.getElementsByTagName("row");
 		var rows = [];
 		var columnNames = [];
+		var newcols = [];
+		var cols = [];
+
+		var myXMLStr = myXML.replace(/\s/g,'');
+		if(validator.isEmpty(myXMLStr)) return res.send("emptyData");
+		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
+		var allrows = doc.getElementsByTagName(row);
+		if(allrows.length==0) return res.send("emptyRow");
+		if(allrows.length >200) return res.send("rowExceeds");
+		if(req.body.column.length>0) cols = req.body.column.split(',');
+
 		for( var i=0;i<allrows.length;++i) {
 			var newObj = {};
 			var alltags = allrows[i].childNodes;
 			for (var j=0;j<alltags.length;++j) {
 				if(i==0) {
-					columnNames.push(alltags[j].nodeName);
+					if(alltags[j].nodeType ==1 && checkForNesting(alltags[j])) {
+						return res.send("nestedXML");
+					} else {
+						ob = {id: uuid(), name: alltags[j].nodeName}
+						columnNames.push(ob);
+						if(cols.length>0) {
+							if(cols.includes(columnNames[j].name)) newcols.push(columnNames[j]);
+						}
+						else
+							newcols.push(columnNames[j]);
+					}
 				}
-				newObj[alltags[j].nodeName] = alltags[j].childNodes[0].nodeValue;
+				if (cols.length>0) {
+					if (cols.includes(columnNames[j].name)) {
+						newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
+					}
+				} else {
+					newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
+				}
 			}
 			rows.push(newObj);
 		}
+		if((req.body.column.length>0 && cols.length>50) || columnNames.length>50) {
+			return res.send("columnExceeds");
+		} 
+		if(cols.length>0 && newcols.length==0) return res.send("invalidcols");
 		qObj['datatable'] = rows;
-		qObj['dtheaders'] = columnNames;
+		qObj['dtheaders'] = newcols;
 		res.status(200).send(qObj);
 	} catch(exception) {
 		logger.error("Error occurred in utility/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
+};
+
+function checkForNesting (elemTag) {
+	var childN = elemTag.childNodes;
+	for (var k=0; k<childN.length; ++k) {
+		if (childN[k].nodeType == 1) return true;
+	}
+	return false;
 };
 
 exports.exportToDtXML = async (req, res) => {

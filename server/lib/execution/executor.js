@@ -21,7 +21,7 @@ class TestSuiteExecutor {
     };
 
     /** Function responsible for fetching testcase and qcdetails for given scenarioid */
-    fetchScenarioDetails = async (scenarioid, userid, integrationType, gitflag) => {
+    fetchScenarioDetails = async (scenarioid, userid, integrationType, gitflag, dtparam) => {
         const fnName = "fetchScenarioDetails";
         const scenario = {};
         const allTestcaseSteps = [];
@@ -34,7 +34,8 @@ class TestSuiteExecutor {
             inputs = {
                 "query": "testcasedetails",
                 "id": scenarioid,
-                "userid": userid
+                "userid": userid,
+                "dtparam": dtparam
             };
             var testcases = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
             if (testcases == "fail") return "fail";
@@ -108,7 +109,7 @@ class TestSuiteExecutor {
             "testsuiteIds": [],
             "suitedetails": [],
             "reportType": "functionalTesting",
-            "versionname":"NA"
+            "version":"-"
         };
         const gitInfo = batchData.gitInfo;
         if(gitflag){
@@ -118,7 +119,8 @@ class TestSuiteExecutor {
             }
             const inputs = {
                 "gitbranch":gitInfo['gitbranch'],
-                "gitVersionName":gitInfo['gitVersionName'],
+                "gitname":gitInfo['gitConfiguration'],
+                "gitVersion":gitInfo['gitVersion'],
                 "folderPath":folderPath,
                 "userid":userInfo.userid
             };
@@ -126,7 +128,7 @@ class TestSuiteExecutor {
             if (module_data == "gitfail") return "gitfail";
             if(module_data == "empty") return "empty";
             execReq['apptype']=module_data.batchInfo[0].apptype;
-            execReq['versionname']=gitInfo['gitVersionName'];
+            execReq['version']=gitInfo['gitVersion'];
             var batchInfo = module_data.batchInfo;
             var suite_details=module_data.suitedetails;
             const gittaskApproval = await utils.approvalStatusCheck(batchInfo);
@@ -156,6 +158,7 @@ class TestSuiteExecutor {
             const suiteDetails = suite.suiteDetails;
             for (const tsco of suiteDetails) {
                 var integrationType = [];
+                var dtparam = [];
                 if (batchData.integration && batchData.integration.alm && batchData.integration.alm.url) {
                     integrationType.push("ALM");
                 }
@@ -165,7 +168,11 @@ class TestSuiteExecutor {
                 if (batchData.integration && batchData.integration.zephyr && batchData.integration.zephyr.url) {
                     integrationType.push("Zephyr");
                 }
-                var scenario = await this.fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType, gitflag);
+                if (tsco.dataparam != "") {
+                    var dt = tsco.dataparam[0].split(';')[0].split('/');
+                    if (dt[0] == 'avoassure') dtparam.push(dt[1]);
+                }
+                var scenario = await this.fetchScenarioDetails(tsco.scenarioId, userInfo.userid, integrationType, gitflag, dtparam);
                 if (scenario == "fail") return "fail";
                 scenario = Object.assign(scenario, tsco);
                 suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibilityParameters;
@@ -191,7 +198,7 @@ class TestSuiteExecutor {
     };
 
     /** Function responsible for generating batchid and executionid dfor given list of testsuiteid */
-    generateExecutionIds = async (execIds, tsuIds, userid, versionname) => {
+    generateExecutionIds = async (execIds, tsuIds, userid, version) => {
         for (const tsuid of tsuIds) {
             if (execIds.execid[tsuid] == undefined) execIds.execid[tsuid] = null;
         }
@@ -201,7 +208,7 @@ class TestSuiteExecutor {
             "testsuiteids": tsuIds,
             "executionids": execIds.execid,
             "batchid": execIds.batchid,
-            "versionname": versionname
+            "version": version
         };
         const newExecIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "generateExecutionIds");
         if (newExecIds == "fail") return "fail";
@@ -246,7 +253,7 @@ class TestSuiteExecutor {
         //const currtime = new Date(dt.getTime()-dt.getTimezoneOffset()*60000).toISOString().replace('T',' ').replace('Z','');
         const reportData = {
             'rows': [{ 'id': '1', 'Keyword': '', 'parentId': '', 'status': status, 'Step ': '', 'Comments': null, 'StepDescription': msg, "screenshot_path": null, "EllapsedTime": "0:00:00.000000", "Remark": "", "testcase_details": "" }],
-            'overallstatus': [{ 'EllapsedTime': '0:00:00.000000', 'EndTime': currtime, 'browserVersion': 'NA', 'versionname': 'NA', 'StartTime': currtime, 'overallstatus': status, 'browserType': 'NA' }],
+            'overallstatus': [{ 'EllapsedTime': '0:00:00.000000', 'EndTime': currtime, 'browserVersion': 'NA', 'version': 'NA', 'StartTime': currtime, 'overallstatus': status, 'browserType': 'NA' }],
             'commentsLength': []
         }
         const executionIds = batchData.executionIds;
@@ -441,7 +448,7 @@ class TestSuiteExecutor {
         if (executionRequest == "fail") return "fail";
         if (executionRequest == "gitfail") return "gitfail";
         if (executionRequest == "empty") return "empty";
-        const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser, executionRequest.versionname);
+        const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser, executionRequest.version);
         if (currExecIds == "fail") return "fail";
         executionRequest.batchId = currExecIds.batchid;
         executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
@@ -461,6 +468,6 @@ module.exports.execute = async (batchExecutionData, execIds, userInfo, execType)
     return result;
 }
 
-module.exports.generateExecutionId = async (execIds, tsuIds, userid, versionName) => {
-    return await testSuiteExecutor.generateExecutionIds(execIds, tsuIds, userid, versionName);
+module.exports.generateExecutionId = async (execIds, tsuIds, userid, version) => {
+    return await testSuiteExecutor.generateExecutionIds(execIds, tsuIds, userid, version);
 }

@@ -1,11 +1,12 @@
+@import "../../global/styles/ColorVariables.scss";
 .error-msg{
     font-family: "LatoWebMedium";
     font-size: 14px;
-    color: #d33c3c;
+    color: $redError;
     width: 100%;
     text-align: center;
     a{
-        color: #d33c3c;
+        color: $redError;
     }
 }
 

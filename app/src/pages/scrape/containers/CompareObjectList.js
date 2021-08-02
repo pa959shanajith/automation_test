@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ScrollBar, RedirectPage } from '../../global'; 
+import { ScrollBar, RedirectPage, Messages as MSG } from '../../global'; 
 import { useHistory } from 'react-router-dom';
 import CompareBox from './CompareBox';
 import ScreenWrapper from './ScreenWrapper';
@@ -15,7 +15,7 @@ const CompareObjectList = () => {
     const { screenId } = useSelector(state=>state.plugin.CT);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
     const compareData = useSelector(state=>state.scrape.compareData);
-    const { setShowPop, fetchScrapeData, mainScrapedData, newScrapedData } = useContext(ScrapeContext);  
+    const { setShowPop, fetchScrapeData, mainScrapedData, newScrapedData, orderList } = useContext(ScrapeContext);  
     const dispatch = useDispatch();
     const history = useHistory();
     const [checkedList, setCheckedList] = useState([]);
@@ -29,12 +29,14 @@ const CompareObjectList = () => {
 
         return ()=>{
             dispatch({type: actions.RESET_COMPARE, payload: null})
+            dispatch({type: actions.SET_OBJVAL, payload: {val: null }});
         }
         //eslint-disable-next-line
     }, [])
 
     const closeCompare = () => {
         dispatch({type: actions.RESET_COMPARE, payload: null})
+        dispatch({type: actions.SET_OBJVAL, payload: {val: null }});
     }
 
     const updateObjects = () => {
@@ -47,13 +49,12 @@ const CompareObjectList = () => {
 		};
 		
 		let arg = {
-            // 'deletedObj': deleted,
             'modifiedObj': updatedObjects,
-            // 'addedObj': {...added, view: views},
             'screenId': screenId,
             'userId': user_id,
             'roleId': role,
-            'param': 'saveScrapeData'
+            'param': 'saveScrapeData',
+            'orderList': orderList
         };
         
 		updateScreen_ICE(arg)
@@ -62,8 +63,9 @@ const CompareObjectList = () => {
             if (data.toLowerCase() === 'success') {
                 setShowPop({
                     title: "Compared Objects", 
+                    type: "modal",
                     content: "Updated Compared Objects Successfully!",
-                    onClick: ()=>{
+                    'footer': <button onClick={()=>{
                         fetchScrapeData().then(resp=>{
                             if(resp==="success") {
                                 closeCompare();
@@ -72,10 +74,10 @@ const CompareObjectList = () => {
                             else console.error(resp)
                         })
                         .catch(err => console.error(err));
-                    }
+                    }}>OK</button>
                 });
             } else {
-                setShowPop({title: "Compared Objects", content: "Failed to update objects"});
+                setShowPop(MSG.SCRAPE.ERR_UPDATE_OBJ);
                 closeCompare();
             }
         })

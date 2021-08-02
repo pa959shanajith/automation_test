@@ -28,10 +28,9 @@ const Integrations = () => {
 
     const PopupDialog = () => (
         <PopupMsg 
-            title={showPop.title}
+            variant={showPop.VARIANT}
             close={()=>dispatch({type: actionTypes.SHOW_POPUP, payload: false})}
-            content={showPop.content}
-            submitText={showPop.submitText || "OK" }
+            content={showPop.CONTENT}
             submit={ showPop.onClick 
                         ? showPop.onClick 
                         : ()=>dispatch({type: actionTypes.SHOW_POPUP, payload: false})

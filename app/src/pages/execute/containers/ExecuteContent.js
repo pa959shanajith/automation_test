@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown} from '../../global' 
+import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown, Messages as MSG, VARIANT} from '../../global' 
 import {updateTestSuite_ICE, updateAccessibilitySelection, reviewTask, ExecuteTestSuite_ICE} from '../api';
 import "../styles/ExecuteContent.scss";
 import * as actionTypes from "../../plugin/state/action";
@@ -50,8 +50,8 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
     const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -86,7 +86,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 			}
             const status = await updateAccessibilitySelection(input);
             if(status.error){displayError(status.error);return;}
-            else if(status !== "success") setPopupState({show:true,title:"Save Test Suite",content:"Failed to save selected accessibility standards."});
+            else if(status !== "success") displayError(MSG.EXECUTE.ERR_SAVE_ACCESSIBILITY);
             else{
                 var curr_task = {...current_task};
                 curr_task.accessibilityParameters = accessibilityParameters;
@@ -107,9 +107,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 		const data = await updateTestSuite_ICE(batchInfo);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if (data !== "fail") {
-            setPopupState({show:true,title:"Save Test Suite",content:"Test suite saved successfully."});
-        }
+        if (data !== "fail") displayError(MSG.EXECUTE.SUCC_SAVE_TESTSUITE);
         setupdateAfterSave(!updateAfterSave);
     }
 
@@ -134,30 +132,30 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 		const result = await reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs);
         if(result.error){displayError(result.error);return;}
         if (result === 'fail') {
-            setPopupState({show:true,title:"Task Submission Error",content:"Reviewer is not assigned !"});
+            displayError(MSG.GENERIC.WARN_NO_REVIEWER);
         }else if(result ==='NotApproved'){
-            setPopupState({show:true,title:"Task Submission Error",content:"All the dependent tasks (design, scrape) needs to be approved before Submission"});
+            displayError(MSG.EXECUTE.ERR_DEPENDENT_TASK);
         } 
         else if (taskstatus === 'reassign') {
-            setPopupState({show:true,title:"Task Reassignment Success",content:"Task Reassigned successfully!"});
+            displayError(MSG.EXECUTE.SUCC_TASK_REASSIGN);
             window.localStorage['navigateScreen'] = "plugin";
             history.replace('/plugin');
         } else if (taskstatus === 'underReview') {
-            setPopupState({show:true,title:"Task Completion Success",content:"Task Approved successfully!"});
+            displayError(MSG.EXECUTE.SUCC_TASK_APPROVED);
             window.localStorage['navigateScreen'] = "plugin";
             history.replace('/plugin');
         } else {
-            setPopupState({show:true,title:"Task Submission Success",content:"Task Submitted successfully!"});
+            displayError(MSG.EXECUTE.SUCC_TASK_SUBMIT);
             window.localStorage['navigateScreen'] = "plugin";
             history.replace('/plugin');
         }
     }
     
     const ExecuteTestSuitePopup = () => {
-        const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction)
+        const check = SelectBrowserCheck(appType,browserTypeExe,displayError,execAction)
         const valid = checkSelectedModules(eachData, setPopupState);
         if(scenarioTaskType === "exclusive" && accessibilityParameters.length === 0){
-            setPopupState({show:true,title:"Accessibility Standards",content:"Please select one or more accessibility testing standard to proceed."});
+            displayError(MSG.EXECUTE.WARN_SELECT_ACC_STANDARD);
             return ;
         }
         else if(check && valid) setAllocateICE(true);
@@ -210,9 +208,9 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
             ResetSession.end();
             if(data.status) {
                 if(data.status === "fail") {
-                    setPopupState({show:true,title:"Queue Test Suite",content:data["error"]});
+                    setPopupState({show:true,variant:data.variant,content:data["error"]});
                 } else {
-                    setPopupState({show:true,title:"Queue Test Suite",content:data["message"]});
+                    setPopupState({show:true,variant:data.variant,content:data["message"]});
                 }
             }
             setBrowserTypeExe([]);
@@ -224,7 +222,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
         }catch(error) {
             setLoading(false);
             ResetSession.end();
-            setPopupState({show:true,title:"Execute Failed",content:"Failed to execute."});
+            displayError(MSG.EXECUTE.ERR_EXECUTE)
             setBrowserTypeExe([]);
             setModuleInfo([]);
             setExecAction("serial");
@@ -254,7 +252,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 
     return (
         <>
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
+            {popupState.show?<PopupMsg variant={popupState.variant} content={popupState.content} close={closePopup} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             {allocateICE?
             <AllocateICEPopup 
@@ -332,21 +330,21 @@ const checkSelectedModules = (data, setPopupState) => {
             return null
         } 
     })
-    if (pass===false) setPopupState({show:true,title:"Execute Test Suite",content:"Please select atleast one scenario(s) to execute"});
+    if (pass===false) setPopupState({show:true,variant:MSG.EXECUTE.WARN_SELECT_SCENARIO.VARIANT,content:MSG.EXECUTE.WARN_SELECT_SCENARIO.CONTENT});
     return pass
 } 
 
-const SelectBrowserCheck = (appType,browserTypeExe,setPopupState,execAction)=>{
-    if ((appType === "Web") && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select a browser"});
-    else if (appType === "Webservice" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Web Services option"});
-    else if (appType === "MobileApp" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Mobile Apps option"});
-    else if (appType === "Desktop" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Desktop Apps option"});
-    else if (appType === "Mainframe" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select Mainframe option"});
-    else if (appType === "OEBS" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select OEBS Apps option"});
-    else if (appType === "SAP" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select SAP Apps option"});
-    else if (appType === "MobileWeb" && browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content: "Please select Mobile Web option"});
-    else if (browserTypeExe.length === 0) setPopupState({show:true,title:"Execute Test Suite",content:"Please select " + appType + " option"});
-    else if ((appType === "Web") && browserTypeExe.length === 1 && execAction === "parallel") setPopupState({show:true,title:"Execute Test Suite",content:"Please select multiple browsers"});
+const SelectBrowserCheck = (appType,browserTypeExe,displayError,execAction)=>{
+    if ((appType === "Web") && browserTypeExe.length === 0) displayError(MSG.EXECUTE.WARN_SELECT_BROWSER);
+    else if (appType === "Webservice" && browserTypeExe.length === 0) displayError(MSG.EXECUTE.WARN_SELECT_WEBSERVICE);
+    else if (appType === "MobileApp" && browserTypeExe.length === 0) displayError(MSG.EXECUTE.WARN_SELECT_MOBILE_APP)
+    else if (appType === "Desktop" && browserTypeExe.length === 0) displayError(MSG.EXECUTE.WARN_SELECT_DESKTOP)
+    else if (appType === "Mainframe" && browserTypeExe.length === 0) displayError(MSG.EXECUTE.WARN_SELECT_MAINFRAME)
+    else if (appType === "OEBS" && browserTypeExe.length === 0) displayError(MSG.EXECUTE.WARN_SELECT_OEBS)
+    else if (appType === "SAP" && browserTypeExe.length === 0) displayError(MSG.EXECUTE.WARN_SELECT_SAP)
+    else if (appType === "MobileWeb" && browserTypeExe.length === 0) displayError(MSG.EXECUTE.WARN_SELECT_MOBILE)
+    else if (browserTypeExe.length === 0) displayError({VARIANT:VARIANT.WARNING,CONTENT:"Please select " + appType + " option"});
+    else if ((appType === "Web") && browserTypeExe.length === 1 && execAction === "parallel") displayError(MSG.EXECUTE.WARN_SELECT_MULTI_BROWSER)
     else return true;
     return false;
 }
@@ -360,7 +358,7 @@ const submitModalButtons = (setshowDeleteModal, submit_task) => {
     )
 }
 
-const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleInfo,accessibilityParameters, scenarioTaskType, setPopupState) => {
+const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleInfo,accessibilityParameters, scenarioTaskType) => {
     for(var i =0 ;i<eachData.length;i++){
         var testsuiteDetails = current_task.testSuiteDetails[i];
         var suiteInfo = {};

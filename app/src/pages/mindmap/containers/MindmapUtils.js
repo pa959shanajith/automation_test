@@ -1,6 +1,7 @@
 /*eslint eqeqeq: "off"*/
 import * as d3 from 'd3';
 import {v4 as uuid} from 'uuid'
+import {Messages as MSG} from '../../global'
 
 function unfoldtree(d){
     // d3.select('#node_' + d.id).classed('no-disp', !1).select('.ct-cRight').classed('ct-nodeBubble', !0); 
@@ -222,10 +223,17 @@ export const generateTree = (tree,sections,count,verticalLayout,isAssign,cycleID
         nodeDisplay[d.id].hidden = ((d.parent)? (d.parent.revertChild || d.parent.revertChild1):false) || false;
         if(isAssign){
             if (d.task != null) {
+                //[]convert from date string to %d-%m-%y
+                ['startdate','enddate'].forEach((e)=>{
+                    if (d.task[e] != '' && d.task[e].indexOf('-')==-1) {
+                        var t=new Date(d.task[e]);
+                        d.task[e]=t.getDate()+"-"+(t.getMonth()+1)+"-"+t.getFullYear();
+                    }
+                })
                 if (d.task.cycleid == cycleID) {
                     nodeDisplay[d.id].task = true;
                     nodeDisplay[d.id].taskOpacity = 1;
-                }//do not fade for module????????
+                }
                 if(d.type=="screens" || d.type=="testcases"){
                     if (d.task.cycleid !=cycleID) {
                         nodeDisplay[d.id].task = true;
@@ -497,17 +505,17 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setP
     if (t === 'modules' || t === 'endtoend') return;
     var p = dNodes[sid].parent;
     if(dNodes[sid]['taskexists']!=null && dNodes[sid]['taskexists'].status !== 'complete'){
-        setPopup({show:true,title:'Error',content:'Cannot delete node if task is assigned. Please unassign task first.',submitText:'Ok'})
+        setPopup({show:true,variant:MSG.MINDMAP.WARN_TASK_ASSIGNED.VARIANT,content:MSG.MINDMAP.WARN_TASK_ASSIGNED.CONTENT,submitText:'Ok'})
         return; 
     }
     var taskCheck=checkparenttask(dNodes[sid],false);
     if(taskCheck){
-        setPopup({show:true,title:'Error',content:'Cannot delete node if parent task is assigned. Please unassign task first.',submitText:'Ok'})
+        setPopup({show:true,variant:MSG.MINDMAP.WARN_PARENT_TASK_ASSIGNED.VARIANT,content:MSG.MINDMAP.WARN_PARENT_TASK_ASSIGNED.CONTENT,submitText:'Ok'})
         return;
     }
     taskCheck=checkchildrentask(dNodes[sid],false);
     if(taskCheck){
-        setPopup({show:true,title:'Error',content:'Cannot delete node if children task is assigned. Please unassign task first.',submitText:'Ok'})
+        setPopup({show:true,variant:MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED.VARIANT,content:MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED.CONTENT,submitText:'Ok'})
         return;
     }
     recurseDelChild(dNodes[sid],linkDisplay, nodeDisplay,dNodes,dLinks,undefined,deletedNodes);
@@ -537,8 +545,8 @@ export const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,
     }
     if(Object.keys(moduleSelect).length<1){
       setPopup({
-        title:'Warning',
-        content:'Please select a module first',
+        variant:MSG.MINDMAP.WARN_SELECT_MODULE_FIRST.VARIANT,
+        content:MSG.MINDMAP.WARN_SELECT_MODULE_FIRST.CONTENT,
         submitText:'Ok',
         show:true
       })
@@ -759,9 +767,8 @@ export const ClickFullScreen = (setFullScreen,setPopup) => {
             elt.webkitRequestFullscreen();
         } else {
             setPopup({
-                title:'ERROR',
-                content:'"Fullscreen not available"',
-                submitText:'Ok',
+                variant:MSG.MINDMAP.WARN_UNAVAILBALE_FULLSCREEN.VARIANT,
+                content:MSG.MINDMAP.WARN_UNAVAILBALE_FULLSCREEN.CONTENT,
                 show:true
             })
             return;

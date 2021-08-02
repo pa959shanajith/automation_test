@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .ws__cert_container{
     .modal__body{
         height: 246px;
@@ -10,11 +11,11 @@
 .cert_input{
     width: 94%;
     height: 34px;
-    color: #555;
+    color: $primaryText;
     border-right: 0;
     border-left: 0;
     border-top: 0;
-    border-bottom: 1px solid #9e9e9e;
+    border-bottom: 1px solid $borderFive;
     box-shadow: none;
     font-family: 'LatoWeb';
     font-size: 15px;
@@ -26,5 +27,5 @@
 }
 
 .cert_error{
-    border-bottom: 1px solid #d33c3c!important;
+    border-bottom: 1px solid  $redError!important;
 }

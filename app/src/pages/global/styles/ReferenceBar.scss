@@ -1,7 +1,8 @@
+@import "../../global/styles/ColorVariables.scss";
 .ref__bar{
-    background: #311d4e;
+    background: $primaryColorDark;
     position: absolute;
-    color: #fff;
+    color: $whiteColor;
     font-family: "LatoWebLight";
     font-size: 12px;
     display: flex;
@@ -62,7 +63,7 @@
     position: relative;
     display: flex;
     height: 100%;
-    color: #fff;
+    color: $whiteColor;
     right: 0;
     float: right;
     flex: 0 0 6px;
@@ -78,7 +79,7 @@
     display: flex!important;
     align-items: center;
     justify-content: center;
-    color: #444;
+    color: $primaryText;
     width: 6px;
     height: 25px;
     left: 0;
@@ -100,7 +101,7 @@
     cursor: pointer;
     
     &:hover .thumb__ic{
-        background-color: #61349b;
+        background-color: $primaryColor;
         border-radius: 5px;
     }
 
@@ -129,7 +130,7 @@
 }
 
 .ref_pop{
-    background-color: #311d4e;
+    background-color: $primaryColorDark;
     z-index: 5;
     display: flex;
     position: absolute;
@@ -142,7 +143,7 @@
     .pop__header{
         cursor: pointer;
         display: flex;
-        border-bottom: 2px solid #604b83;
+        border-bottom: 2px solid $primaryColor;
         padding: 8px 15px;
         margin: 0;
         font-size: 18px;
@@ -199,10 +200,10 @@
 .search_task__ic{
     padding: 6px 12px;
     box-sizing: content-box;
-    color: #555;
+    color: $primaryText;
     text-align: center;
-    background-color: #fafafa;
-    border: 1px solid #ccc;
+    background-color: $whisper;
+    border: 1px solid $borderTwo;
     border-radius: 4px 0 0 4px;
 }
 
@@ -213,11 +214,11 @@
 .search_task__input{
     font-family: "LatoWeb";
     font-size: 13px;
-    border: 1px solid #ccc;
+    border: 1px solid $borderTwo;
     border-left: none;
     padding: 6px 12px;
-    background-color: #fafafa;
-    color: #333;
+    background-color: $whisper;
+    color: $darkGray;
     border-radius: 0 4px 4px 0;
     flex-grow: 1;
     outline: none;
@@ -227,7 +228,7 @@
 }
 
 .active_rb_thumb{
-    background-color: #61349b;
+    background-color: $primaryColor;
     border-radius: 5px;
 }
 
@@ -308,7 +309,7 @@
 //         width: 45.5vh;
         
 //         .pop__header{
-//             border-bottom: 0.26vh solid #604b83;
+//             border-bottom: 0.26vh solid $primaryColor;
 //             padding: 1.04vh 1.95vh;
 //             font-size: 2.34vh;
 //             img{
@@ -336,14 +337,14 @@
     
 //     .search_task__ic{
 //         padding: 0.78vh 1.56vh;
-//         border: 0.13vh solid #ccc;
+//         border: 0.13vh solid $borderTwo;
 //         border-radius: 0.52vh 0 0 0.52vh;
 //     }
     
 //     .search_task__input{
 //         font-size: 1.69vh;
 //         height: 4.2vh;
-//         border: 0.13vh solid #ccc;
+//         border: 0.13vh solid $borderTwo;
 //         padding: 0.78vh 1.69vh;
 //         border-radius: 0 0.52vh 0.52vh 0;
 //     }

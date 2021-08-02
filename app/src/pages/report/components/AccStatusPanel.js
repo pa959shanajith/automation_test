@@ -7,7 +7,7 @@ import '../styles/AccStatusPanel.scss';
   use: renders AccStatusPanel in report landing page
 */
 
-const AccStatusPanel = ({arr,selectedScDetails,scDetails}) =>{
+const AccStatusPanel = ({arr,scDetails}) =>{
     const [data,setData] = useState({P:0,F:0,T:0,I:0})
     useEffect(()=>{
         if(Object.keys(arr).length>0 && arr.total !== 0){

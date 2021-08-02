@@ -1,12 +1,11 @@
+@import "../../global/styles/ColorVariables.scss";
+
 #activeUsers,#clientUsers {
     height: calc(100% - 40px);
 }
 .form-group__conv-Sess-mgmt{
     margin-bottom:15px
 } 
-.adminForm {
-	padding-top: 5%;
-}
 #middle-content-section>.containerWrap {
     overflow: visible;
     float: none;
@@ -24,32 +23,32 @@
 
 .sessionTable.table>tbody>tr>th{
 	vertical-align: middle;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid $borderFour;
     font-size: 14px;
 }
 
 .sessionTable.table>tbody>tr>td{
 	vertical-align: middle;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid $borderFour;
     font-size: 14px;
 }
 
 .sessionTable button{
-	color: #643693;
+	color: $primaryColor;
 	background: none;
-	border-color: #643693;
+	border-color: $primaryColor;
 	border-radius: 20px;
 	visibility: hidden;
 }
 
 .sessionTable button:hover,.sessionTable button:active,.sessionTable button:active:focus,.sessionTable button:focus{
-	color: #643693;
+	color: $primaryColor;
 	outline: none;
 }
 
 .sessionTable button:hover{
-	color: #fff!important;
-	background: #643693;
+	color: $whiteColor!important;
+	background: $primaryColor;
 	font-weight: 400;
 }
 
@@ -59,14 +58,14 @@
 .sessionHeading{
 	padding-left: 5px;
 	display: block;
-	background: #eeeeee;
+	background: $whisper;
 	cursor: pointer;
 	width: 100%;
 	margin-bottom: 3px;
 }
 
 .sessionHeading:hover {
-	background: #e0e0e0;
+	background: $backgroundOne;
 }
 
 .sessionHeading h4{
@@ -87,7 +86,7 @@
     padding: 8px;
     line-height: 1.42857143;
     vertical-align: top;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid $borderFour;
 }
 .wrap-sess-mgmt-cust{
     max-height:320px;

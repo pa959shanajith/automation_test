@@ -35,6 +35,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "react-sortablejs": "^6.0.0",
+    "react-textarea-autosize": "^8.3.3",
     "react-tooltip": "^4.2.11",
     "react-top-loading-bar": "^2.0.1",
     "react-xml-parser": "^1.1.8",
@@ -43,9 +44,9 @@
     "simple-oauth2": "^4.2.0",
     "simplebar-react": "^3.0.0-beta.5",
     "socket.io-client": "^3.1.2",
-    "sortablejs": "1.4.2",
     "tough-cookie": "^4.0.0",
     "tough-cookie-web-storage-store": "^1.0.0",
+    "sortablejs": "^1.13.0",
     "uuid": "^8.3.0"
   },
   "scripts": {

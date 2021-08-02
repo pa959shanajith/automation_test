@@ -1,21 +1,22 @@
+@import "../../global/styles/ColorVariables.scss";
 
 #syncScenario{
     height: 20px;
-    background: white;
+    background: $whiteColor;
     color: black;
-    border: 1px solid #7b7c7f !important;
+    border: 1px solid $pluginGray  !important;
     border-radius: 3px !important;
 }.e__btn-md.focus,
 .e__btn-md,
 .e__btn-md:active:focus,
 .e__btn-md:focus,
 .e__btn-md:hover {
-    color: #fff !important;
+    color: $whiteColor !important;
     border: 0 !important;
     border-radius: 20px !important;
     padding: 2px 15px !important;
     font-size: 17px !important;
-    background: #643693 ;
+    background: $primaryColor ;
 	font-family: 'LatoWebLight' !important;
     outline: 0 !important;
 }
@@ -26,7 +27,7 @@
     min-width: 0;
     padding: 20px;
     margin: 0 5px;
-    background-color: #fff;
+    background-color: $whiteColor;
 }
 
 .e__task_title{
@@ -35,8 +36,8 @@
 }
 
 .e__task_name{
-    background-color: #331d4e;
-    color: #fff;
+    background-color: $primaryColorDarkest;
+    color: $whiteColor;
     padding: 1px 14px 0;
     font-family: "LatoWebLight";
     font-size: 18px;
@@ -48,13 +49,13 @@
 .e__taskBtn {
     padding: 0px 12px;
     margin-right: 7px;
-    background-color: #633693;
+    background-color: $primaryColor;
     margin-top: 7px;
 }
 .e__btn {
     border: none;
     outline: none;
-    color: #fff;
+    color: $whiteColor;
     border-radius: 20px;
     font-size: 14px;
     // line-height: 19.5px;
@@ -79,7 +80,7 @@
 .submitTaskBtn:active:focus,
 .submitTaskBtn:focus,
 .submitTaskBtn:hover {
-    background:#ff7300;
+    background:$submitBtn;
     float: right!important;
 }
 .reassignTaskBtn.focus,
@@ -87,7 +88,7 @@
 .reassignTaskBtn:active:focus,
 .reassignTaskBtn:focus,
 .reassignTaskBtn:hover {
-    background:#ff7300;
+    background:$submitBtn;
     float: right!important;
 }
 .executeBtn{
@@ -158,7 +159,7 @@
     margin-bottom: 0 !important
 }
 .inputErrBor{
-    border-bottom: 2px solid #d33c3c !important;
+    border-bottom: 2px solid  $redError !important;
 }
 .qtestSteps{
     margin-top:10px;

@@ -4,6 +4,7 @@ import {getModules,getScreens} from '../api';
 import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
+import {Messages as MSG, VARIANT} from '../../global';
 import PropTypes from 'prop-types'
 
 
@@ -53,8 +54,8 @@ const Toolbarmenu = ({setPopup,setBlockui,displayError}) => {
     const clickCopyNodes = () =>{
         if (d3.select('#pasteImg').classed('active-map')) {
             setPopup({
-                title:'Error',
-                content: 'Cannot copy when the Paste-map icon is active!',
+                variant:MSG.MINDMAP.ERR_PASTEMAP_ACTIVE_COPY.VARIANT,
+                content: MSG.MINDMAP.ERR_PASTEMAP_ACTIVE_COPY.CONTENT,
                 submitText:'Ok',
                 show:true
             })
@@ -78,8 +79,8 @@ const Toolbarmenu = ({setPopup,setBlockui,displayError}) => {
         }
         if (!d3.select('#copyImg').classed('active-map')){
             setPopup({
-                title:'Error',
-                content: 'Please complete copy step first',
+                variant: MSG.MINDMAP.WARN_COPY_STEP_FIRST.VARIANT,
+                content: MSG.MINDMAP.WARN_COPY_STEP_FIRST.CONTENT,
                 submitText:'Ok',
                 show:true
             })
@@ -117,8 +118,8 @@ const paste = (copyNodes,setPopup) =>{
     var module_check_flag = false
     if(dNodes_c.length === 0){
         setPopup({
-            title:'Error',
-            content:'Nothing to paste',
+            variant:MSG.MINDMAP.ERR_NOTHING_PASTE.VARIANT,
+            content: MSG.MINDMAP.ERR_NOTHING_PASTE.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -147,16 +148,16 @@ const copy = (selectNodes,setPopup,copyNodes) =>{
     if(dNodes_c.length === 0){
         if(copyNodes.nodes.length>0){
             setPopup({
-                title:'Warning',
-                content:'Click on paste-map icon to paste copied nodes',
+                variant:MSG.MINDMAP.WARN_CLICK_PASTEMAP.VARIANT,
+                content:MSG.MINDMAP.WARN_CLICK_PASTEMAP.CONTENT,
                 submitText:'Ok',
                 show:true
             })
             return false
         }
         setPopup({
-            title:'Warning',
-            content:'Nothing is copied',
+            variant:MSG.MINDMAP.ERR_NOTHING_COPY.VARIANT,
+            content:MSG.MINDMAP.ERR_NOTHING_COPY.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -180,8 +181,8 @@ const copy = (selectNodes,setPopup,copyNodes) =>{
     }
     if (dangling_screen_flag) {
         setPopup({
-            title:'Error',
-            content: 'dangling screen!!! validation failed!',
+            variant:MSG.MINDMAP.ERR_DANGLING_SCREEN.VARIANT,
+            content: MSG.MINDMAP.ERR_DANGLING_SCREEN.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -191,8 +192,8 @@ const copy = (selectNodes,setPopup,copyNodes) =>{
         return false;
     }
     setPopup({
-        title:'Success',
-        content: 'Data Copied successfully',
+        variant: MSG.MINDMAP.SUCC_DATA_COPIED.VARIANT,
+        content: MSG.MINDMAP.SUCC_DATA_COPIED.CONTENT,
         submitText:'Ok',
         show:true
     })

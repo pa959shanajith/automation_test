@@ -20,7 +20,7 @@ const UtilityCenter=(props)=>{
     const [emptyCall , setEmptyCall] = useState(false);
     const [gererateClick , setGenerateClick] = useState(false);
     const [blockui,setBlockui] = useState({show:false});
-    const [popup ,setPopup]= useState({show:false});
+    const [showPop, setShowPop] = useState(false);
     const FactorTable = [];
     const LevelTable = [];
     const[emptyCreateCall , setEmptyCreateCall]=useState('')
@@ -80,11 +80,9 @@ const UtilityCenter=(props)=>{
         }
     }
     const displayError = (error) =>{
-        setPopup({
-          title:'ERROR',
-          content:error,
-          submitText:'Ok',
-          show:true
+        setShowPop({
+          variant:error.VARIANT,
+          content:error.CONTENT
         })
       }
     const callReset =()=>{ // Reset button , resets states
@@ -123,10 +121,17 @@ const UtilityCenter=(props)=>{
             setGenerateClick(true);
         }
     }
+    const Popup = () => (
+        <PopupMsg 
+            variant={showPop.VARIANT || showPop.variant}
+            content={showPop.CONTENT || showPop.content}
+            close={()=>{setShowPop(false); showPop.onClick&&showPop.onClick()}}
+        />
+    )
     return (
         <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        {(popup.show)?<PopupMsg submit={()=>setPopup({show:false})} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} submitText={popup.submitText}/>:null}
+        { showPop && <Popup /> }
         <div className="UtlmiddleContent">
             <div data-test="utility_middle_screen" className="middle_holder">
             {(props.screenType ==="encryption")?
@@ -161,20 +166,21 @@ const UtilityCenter=(props)=>{
                     gererateClick={gererateClick}
                     callCreate={callCreate}
                     emptyCreateCall={emptyCreateCall}
+                    setShowPop={setShowPop}
                 />
             : null}
 
             { props.screenType === "execution" 
                 && <ExecutionMetrics 
                         setBlockui={setBlockui} 
-                        setPopup={setPopup}
+                        setShowPop={setShowPop}
                     /> }
                 
             { props.screenType.split('-')[0] === "datatable"
                 && <DataTable 
                         currScreen={props.screenType.split('-').pop()}
                         setBlockui={setBlockui} 
-                        setPopup={setPopup}
+                        setShowPop={setShowPop}
                         setScreenType={props.setScreenType}
                     /> }
                 
