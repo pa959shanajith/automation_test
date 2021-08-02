@@ -403,7 +403,7 @@ const Messages={
         ERR_COL_50: {"CONTENT":'Column should not exceed 50.', "VARIANT": VARIANT.ERROR},
         ERR_EMPTY_SHEET: {"CONTENT":'Empty Data in the sheet.', "VARIANT": VARIANT.ERROR},
         ERR_FETCH_FILE: {"CONTENT":'Failed to Fetch File Data.', "VARIANT": VARIANT.ERROR},
-        ERR_EMPTY_ROWS: {"CONTENT":'Empty rows for the given row tag name', "VARIANT": VARIANT.ERROR},
+        ERR_EMPTY_ROWS: {"CONTENT":'Empty rows for the given row tag name.', "VARIANT": VARIANT.ERROR},
         ERR_INVALID_XML: {"CONTENT":'Invalid XML file. Cannot convert the XML to data table.', "VARIANT": VARIANT.ERROR},
         ERR_COL_TAGNAME: {"CONTENT":'Invalid column tag names.', "VARIANT": VARIANT.ERROR},
         ERR_HEADER: {"CONTENT":'Header name is empty or duplicate.', "VARIANT": VARIANT.ERROR},
@@ -412,6 +412,7 @@ const Messages={
         SUCC_DELETE_DATATABLE: {"CONTENT":'Data Table Deleted Successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_UPDATE_DATATABLE: {"CONTENT":'Data Table Updated Successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_EXPORT_FILE: {"CONTENT":'File Exported Successfully.', "VARIANT": VARIANT.SUCCESS},
+        SUCC_SAVE_DATATABLE: {"CONTENT":'Data Table Saved Successfully.', "VARIANT": VARIANT.SUCCESS},
     }
 }
 

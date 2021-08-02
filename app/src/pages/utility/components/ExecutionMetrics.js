@@ -1,6 +1,6 @@
 import React, { useState } from  'react';
 import { useHistory } from 'react-router-dom';
-import { RedirectPage, CalendarComp, VARIANT, Messages as MSG } from '../../global';
+import { RedirectPage, CalendarComp, Messages as MSG } from '../../global';
 import { fetchMetrics } from '../api';
 import "../styles/ExecutionMetrics.scss";
 
@@ -21,6 +21,7 @@ const ExecutionMetrics = ({setBlockui,setShowPop}) => {
         setLob("");
         setStatus("");
         setExecutionId("");
+        setErrors({});
     }
 
     const handleSubmit = () => {
@@ -76,9 +77,11 @@ const ExecutionMetrics = ({setBlockui,setShowPop}) => {
                         }
                         setShowPop(MSG.UTILITY.SUCC_EXPORTED);
                     }
+                    setErrors({});
                 })
                 .catch(error => {
                     setShowPop(MSG.UTILITY.ERR_FAILED);
+                    setErrors({});
                     console.error(error);
                 });
             }
