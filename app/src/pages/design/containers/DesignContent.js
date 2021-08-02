@@ -223,7 +223,7 @@ const DesignContent = props => {
                                 setTestScriptData(null);
                                 setKeywordList(null);
                                 setObjNameList(null);
-                                console.error("Error getObjectType method! \r\n " + (error.data));
+                                console.error("Error getObjectType method! \r\n ", error);
                                 reject("fail");
                             });
                     })
