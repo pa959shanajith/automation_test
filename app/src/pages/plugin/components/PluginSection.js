@@ -7,9 +7,10 @@ const PluginSection = ({userInfo}) => {
 
     const [pluginList, setPluginList] = useState({
         "Integration": { title: "Integrations", show: false },
-        "Mindmap": { title: "Mindmaps", show: false },
-        "Reports": { title: "Reports", show: false},
         "Utility" : { title: "Utilities", show: false},
+        "Mindmap": { title: "Mindmaps", show: false },
+        "Neurongraphs": {title:"Neuron Graph", show: false},
+        "Reports": { title: "Reports", show: false},
         "Dashboard": {title:"Dashboard", show: false},
         "showList" : false,
     });
