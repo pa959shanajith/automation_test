@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .ss__scrape_obj{
     display: flex;
     align-items: center;
@@ -6,7 +7,7 @@
 }
 
 .ss__red{
-    color: red!important;
+    color: $red!important;
 }
 
 .ss_eye_icon{
@@ -18,7 +19,7 @@
 .ss_obj_name{
     font-family: "LatoWeb";
     font-size: 16px;
-    color: #33363B;
+    color: $darkGray;
     margin-left: 10px;
     width: 85%;
     text-overflow: ellipsis;
@@ -44,7 +45,7 @@
 .ss_obj_name_input{
     padding: 2px 7px;  
     font-family: "LatoWeb";
-    color: #33363B;
+    color: $darkGray;
     margin-left: 2px;
     font-size: 13px;
     width: 300px;
@@ -58,10 +59,10 @@
 }
 
 .ss__customObject{
-    background: linear-gradient(to right, #bb9cda, transparent 12%);
+    background: linear-gradient(to right, $custObj, transparent 12%);
     border-radius: 5px;
 }
 
 .ss__newObj{
-    color: #7508ea;
+    color: $unsavedScrapeObj;
 }

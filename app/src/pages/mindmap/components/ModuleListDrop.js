@@ -1,7 +1,7 @@
 import React, { useState, Fragment} from 'react';
 import { useSelector, useDispatch} from 'react-redux';
 import {getModules}  from '../api'
-import {ScrollBar,ModalContainer} from '../../global';
+import {ScrollBar,ModalContainer,Messages as MSG} from '../../global';
 import {ScreenOverlay} from '../../global'
 import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
@@ -50,17 +50,17 @@ const ModuleListDrop = (props) =>{
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
         if(isAssign && res.completeFlow === false){
-            displayError("Please select a complete flow to assign tasks.")
+            displayError(MSG.MINDMAP.WARN_SELECT_COMPLETE_FLOW)
             return;
         }
         dispatch({type:actionTypes.SELECT_MODULE,payload:res})
         setLoading(false)
     }
-    const displayError = (err) =>{
+    const displayError = (error) =>{
         setLoading(false)
         props.setPopup({
-          title:'ERROR',
-          content:err,
+          variant:error.VARIANT,
+          content:error.CONTENT,
           submitText:'Ok',
           show:true
         })

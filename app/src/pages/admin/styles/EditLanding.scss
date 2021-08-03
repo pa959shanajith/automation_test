@@ -1,10 +1,11 @@
+@import "../../global/styles/ColorVariables.scss";
 .edit-user-dropdown-edit{
     width: 85%;
     background: none;
     height: 30px;
     display: inline-block;
     font-weight: 400;
-    color: #212529;
+    color: $darkestGray;
     text-align: center;
     vertical-align: middle;
     -webkit-user-select: none;
@@ -19,26 +20,26 @@
   
 }
 .form-control-custom-edit{
-	border: 1px solid #656565 !important;
+	border: 1px solid $borderOne !important;
 	border-left:0 !important;
 	border-right:0 !important;
 	border-top:0 !important;
 	border-radius:0;
 	box-shadow: none;
-	color:#333;
+	color:$darkGray;
 }
 
 .form-control-custom-edit:focus {
     box-shadow: none !important;
 }
 .form-control-custom-edit.inputErrorBorderBottom{
-    border: 2px solid #d33c3c !important;
+    border: 2px solid $redError !important;
     border-left: 0 !important;
     border-right: 0 !important;
     border-top: 0 !important;
     border-radius: 0  ;
     box-shadow: none;
-    color: #333;
+    color: $darkGray;
 }
 
 .form-control__conv-edit {
@@ -48,11 +49,11 @@
     padding: 6px 12px;
     font-size: 14px;
     line-height: 1.42857143;
-    color: #555;
-    background-color: #fff;
+    color: $primaryText;
+    background-color: $whiteColor;
     background-image: none;
     outline: none;
-    border: 1px solid #ccc;
+    border: 1px solid $borderTwo;
     border-radius: 4px;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: 0;
@@ -65,7 +66,7 @@
 	margin-left: 4%;
 	margin-top: 1%;
 	line-height: 2;
-    border: 1px solid #656565 !important;
+    border: 1px solid $borderOne !important;
     -webkit-text-stroke: thin;
 }
 .adminSelect-edit:focus {
@@ -79,16 +80,16 @@
     position: absolute;
     top: 100%;
     left: 0;
-    background: white;
+    background: $whiteColor;
     z-index: 1000;
 }
 .dropdown-menu-users-edit>li{
     padding: 3px 12px;
 }
 .dropdown-menu-users-edit>li:hover{
-    background:#633691;
+    background:$primaryColor;
     border-radius: 3px;
-    color:#fff;
+    color:$whiteColor;
     cursor: pointer;
 }  
 @media screen and (min-width:1800px){
@@ -151,8 +152,8 @@
     position: absolute;
     width: 80px;
     z-index: 1;
-    background: #5e636b;
-    color: #fff;
+    background: $borderGray;
+    color: $whiteColor;
     outline: 0;
     border-radius: 20px;
     padding: 0px 12px;
@@ -176,9 +177,9 @@
 	width: 47%;
 }
 .user-select__option:hover{
-    background:#633691;
+    background:$primaryColor;
     border-radius: 3px;
-    color:#fff;
+    color:$whiteColor;
     cursor: pointer;
     width: 97%;
 }

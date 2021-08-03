@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ScrollBar, RedirectPage } from '../../global'; 
+import { ScrollBar, RedirectPage, Messages as MSG } from '../../global'; 
 import { useHistory } from 'react-router-dom';
 import CompareBox from './CompareBox';
 import ScreenWrapper from './ScreenWrapper';
@@ -63,8 +63,9 @@ const CompareObjectList = () => {
             if (data.toLowerCase() === 'success') {
                 setShowPop({
                     title: "Compared Objects", 
+                    type: "modal",
                     content: "Updated Compared Objects Successfully!",
-                    onClick: ()=>{
+                    'footer': <button onClick={()=>{
                         fetchScrapeData().then(resp=>{
                             if(resp==="success") {
                                 closeCompare();
@@ -73,10 +74,10 @@ const CompareObjectList = () => {
                             else console.error(resp)
                         })
                         .catch(err => console.error(err));
-                    }
+                    }}>OK</button>
                 });
             } else {
-                setShowPop({title: "Compared Objects", content: "Failed to update objects"});
+                setShowPop(MSG.SCRAPE.ERR_UPDATE_OBJ);
                 closeCompare();
             }
         })

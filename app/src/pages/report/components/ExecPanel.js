@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from 'react';
+import React, { useState , useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux'
 import { ScrollBar } from '../../global';
 import '../styles/ExecPanel.scss';
@@ -96,11 +96,8 @@ const ExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,sele
                         <ScrollBar scrollId='rp__row_content' trackColor='transparent'>
                         {(suiteDetails.length>0)?
                             suiteDetails.map((e,i)=>
-                            <div key={e.execution_id} onClick={onClickRow} name={(sortUp)?i+1:suiteDetails.length-i} value={e.execution_id} className={'rp__row'+(selectedScDetails._id===e.execution_id?" selected-row":"")}>
-                                <div className='rp__col'>E<sub>{(sortUp)?i+1:suiteDetails.length-i}</sub></div>
-                                <div data-test="start_date" className='rp__col'>{formatDate(e.start_time)}</div>
-                                <div data-test="end_date" className='rp__col'>{(e.end_time!=="- ")?formatDate(e.end_time):formatDate(e.start_time)}</div>
-                            </div>):
+                                <ExecutionList e={e} i={i} formatDate={formatDate} suiteDetails={suiteDetails} sortUp={sortUp} selectedScDetails={selectedScDetails} onClickRow={onClickRow}/>
+                            ):
                             <div style={{textAlign:'center',padding:'30px',height:'100%'}} className='rp__row'>
                                 No record(s) found
                             </div>
@@ -108,6 +105,20 @@ const ExecPanel = ({displayError,setBlockui,setScDetails,setSelectedDetails,sele
                         </ScrollBar>
                     </div>
                 </div>
+        </div>
+    )
+}
+
+const ExecutionList = ({e,i,formatDate,suiteDetails,sortUp,selectedScDetails,onClickRow}) => {
+    const executionRef = useRef();
+    useEffect(()=>{
+        if(i==0) executionRef.current && executionRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    },[suiteDetails])
+    return (
+        <div ref={executionRef} key={e.execution_id} onClick={onClickRow} name={(sortUp)?i+1:suiteDetails.length-i} value={e.execution_id} className={'rp__row'+(selectedScDetails._id===e.execution_id?" selected-row":"")}>
+            <div className='rp__col'>E<sub>{(sortUp)?i+1:suiteDetails.length-i}</sub></div>
+            <div data-test="start_date" className='rp__col'>{formatDate(e.start_time)}</div>
+            <div data-test="end_date" className='rp__col'>{(e.end_time!=="- ")?formatDate(e.end_time):formatDate(e.start_time)}</div>
         </div>
     )
 }

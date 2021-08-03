@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .task-panel{
     display: flex;
     flex-direction: column;
@@ -58,12 +59,12 @@
 #plugin_page__list {
 
     .task-panel{
-        border-bottom: 1px solid #949494;
+        border-bottom: 1px solid $borderFive;
         padding: 0 15px 0 25px;
     }
 
     .active-task{
-        background-color: #dad8d8;
+        background-color: $lightGray;
     }
 
     .panel-content{
@@ -77,7 +78,7 @@
 
     .tasktype-btn{
         width: 75px;
-        background: #efefef;
+        background: $whisper;
     }
 
 
@@ -154,7 +155,7 @@
     
     .task-panel{
         min-height: 50px;
-        border-bottom: 1px solid #643693;
+        border-bottom: 1px solid $primaryColor;
         padding: 10px 0;
     }
     
@@ -174,8 +175,8 @@
     
     .tasktype-btn{
         width: 80px;
-        color: white;
-        background: #a08ab7;
+        color: $whiteColor;
+        background: $glossyGrape;
     }
     
     
@@ -187,7 +188,7 @@
     // @media screen and (min-width: 1400px) and (min-height: 770px){
     //     .task-panel{
     //         min-height: 6.51vh;
-    //         border-bottom: 0.13vh solid #643693;
+    //         border-bottom: 0.13vh solid $primaryColor;
     //         padding: 1.3vh 0;
     //     }
     //     .panel-content{

@@ -1,13 +1,12 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
+import {ScreenOverlay, ScrollBar, VARIANT, Messages as MSG, ValidationExpression } from '../../global' 
 import {getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData} from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/CreateUser.scss'
 import CreateLanding from '../components/CreateLanding';
 import EditLanding from '../components/EditLanding';
 import useOnClickOutside from '../components/UseOnClickOutside'
-import ValidationExpression from '../../global/components/ValidationExpression';
 
 /*Component CreateUser
   use: defines Admin middle Section for create user
@@ -36,8 +35,8 @@ const CreateUser = (props) => {
     const [ldapUserList,setLdapUserList] = useState([])
     const [ldapUserListInitial,setLdapUserListInitial] = useState([])
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
-    
+    // const [popupState,setPopupState] = useState({show:false,title:"",content:""})
+    const setPopupState= props.setPopupState
     useEffect(()=>{
         
         click();
@@ -50,8 +49,8 @@ const CreateUser = (props) => {
     const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -107,7 +106,7 @@ const CreateUser = (props) => {
                 if(data === "success") {
                     if (action === "create") click();
                     else edit();
-                    setPopupState({show:true,title:bAction+" User",content:"User "+action+"d successfully!"});
+                    setPopupState({show:true,content:"User "+action+"d successfully!",variant:VARIANT.SUCCESS});
                     if (action === "delete") {
                         const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
                         if(data0.error){displayError(data0.error);return;}
@@ -119,15 +118,15 @@ const CreateUser = (props) => {
                         if(data2.error){displayError(data2.error);return;}
                     }
                 } else if(data === "exists") {
-                    setPopupState({show:true,title:bAction+" User",content:"User already Exists!"});
+                    setPopupState({show:true,content:MSG.ADMIN.WARN_USER_EXIST.CONTENT,variant:MSG.ADMIN.WARN_USER_EXIST.VARIANT});
                 } else if(data === "fail") {
                     if (action === "create") click();
                     else edit();
-                    setPopupState({show:true,title:bAction+" User",content:"Failed to "+action+" user."});
+                    setPopupState({show:true,content:"Failed to "+action+" user.",variant:VARIANT.ERROR});
                 } 
                 else if(/^2[0-4]{8}$/.test(data)) {
                     if (JSON.parse(JSON.stringify(data)[1])) {
-                        setPopupState({show:true,title:bAction+" User",content:"Failed to "+action+" user. Invalid Request!"});
+                        setPopupState({show:true,content:"Failed to "+action+" user. Invalid Request!",variant:VARIANT.ERROR});
                         return;
                     }
                     var errfields = [];
@@ -141,11 +140,11 @@ const CreateUser = (props) => {
                     if (JSON.parse(JSON.stringify(data)[8])) errfields.push("User Domain Name");
                     if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
 				    if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
-				    setPopupState({show:true,title:bAction+" User",content:"Following values are invalid: "+errfields.join(", ")+" "+hints});
+				    setPopupState({show:true,content:"Following values are invalid: "+errfields.join(", ")+" "+hints,variant:VARIANT.WARNING});
                 }
             }
             catch(error){
-                setPopupState({show:true,title:bAction+" User",content:"Failed to "+action+" user."});
+                setPopupState({show:true,content:"Failed to "+action+" user.",variant:VARIANT.ERROR});
             }
         })()
     }
@@ -164,14 +163,14 @@ const CreateUser = (props) => {
 		var reg = /^[a-zA-Z0-9\.\@\-\_]+$/;
 
         if(userIdNameAddClass);
-        if (userConf.userName === "") {
+        if (userConf.userName === "" || !ValidationExpression(userConf.userName ,"validName")) {
             var nameErrorClass = (action === "update")? "selectErrorBorder":"inputErrorBorder";
             if(nameErrorClass==="selectErrorBorder") setUserNameAddClass("setUserNameAddClass");
             else setUserNameAddClass(true)
 			flag = false;
 		}else if (!reg.test(userConf.userName)) {
 			if (!popupOpen){
-                setPopupState({show:true,title:"Error",content:"Cannot contain special characters other than ._-"});
+                setPopupState({show:true,content:MSG.ADMIN.WARN_USERNAME_SPECHAR.CONTENT,variant:MSG.ADMIN.WARN_USERNAME_SPECHAR.VARIANT});
             }
             popupOpen = true;
 			setUserNameAddClass(true);
@@ -196,7 +195,7 @@ const CreateUser = (props) => {
 			}
 			if (userConf.confExpired && action !== "delete") {
 				if (!popupOpen){
-                    setPopupState({show:true,title:"Error",content:"This configuration is deleted/invalid..."});
+                    setPopupState({show:true,content:MSG.ADMIN.WARN_CONFIG_INVALID.CONTENT,variant:MSG.ADMIN.WARN_CONFIG_INVALID.VARIANT});
                 }
 				popupOpen = true;
                 setConfServerAddClass("selectErrorBorder");
@@ -213,7 +212,7 @@ const CreateUser = (props) => {
 				flag = false;
 			} else if (!regexPassword.test(userConf.passWord)) {
 				if (!popupOpen){
-                    setPopupState({show:true,title:"Error",content:"Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters.."});
+                    setPopupState({show:true,content:MSG.ADMIN.WARN_PASSWORD.CONTENT,variant:MSG.ADMIN.WARN_PASSWORD.VARIANT});
                 }
                 popupOpen = true;
                 setPasswordAddClass(true);
@@ -224,7 +223,7 @@ const CreateUser = (props) => {
 				flag = false;
 			} else if (!regexPassword.test(userConf.confirmPassword)) {
 				if (!popupOpen){
-                    setPopupState({show:true,title:"Error",content:"Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 16 characters.."});
+                    setPopupState({show:true,content:MSG.ADMIN.WARN_PASSWORD.CONTENT,variant:MSG.ADMIN.WARN_PASSWORD.VARIANT});
                 }
                 popupOpen = true;
                 setConfirmPasswordAddClass(true);
@@ -232,7 +231,7 @@ const CreateUser = (props) => {
 			}
 			if (userConf.passWord !== userConf.confirmPassword) {
 				if (!popupOpen){
-                    setPopupState({show:true,title:"Error",content:"Password and Confirm Password did not match"});
+                    setPopupState({show:true,content:MSG.ADMIN.WARN_UNMATCH_PASSWORD.CONTENT,variant:MSG.ADMIN.WARN_UNMATCH_PASSWORD.VARIANT});
                 }
                 popupOpen = true;
                 setConfirmPasswordAddClass(true);
@@ -244,7 +243,7 @@ const CreateUser = (props) => {
 			flag = false;
         } else if (!emailRegEx.test(userConf.email)) {
 			if (!popupOpen){
-                setPopupState({show:true,title:"Error",content:"Email address is not valid"});
+                setPopupState({show:true,content:MSG.ADMIN.WARN_INVALID_EMAIL.CONTENT, variant:MSG.ADMIN.WARN_INVALID_EMAIL.VARIANT});
             }
             popupOpen = true;
 			setEmailAddClass(true);
@@ -304,7 +303,7 @@ const CreateUser = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data === "empty") {
-            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+            setPopupState({show:true,content: MSG.ADMIN.WARN_LDAP_CONFIGURE.CONTENT,variant:MSG.ADMIN.WARN_LDAP_CONFIGURE.VARIANT});
         } else {
             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
             data.sort((a,b)=>a.name.localeCompare(b.name));
@@ -320,7 +319,7 @@ const CreateUser = (props) => {
             if(data.error){displayError(data.error);return;}
             setLoading(false);
             if (data === "empty") {
-                setPopupState({show:true,title:"Edit Configuration",content: "There are no SAML server configured. To proceed create a server configuration in SAML configuration section."});
+                setPopupState({show:true,content: MSG.ADMIN.WARN_SAML_CONFIGURE.CONTENT, variant:MSG.ADMIN.WARN_SAML_CONFIGURE.VARIANT});
             } else {
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
                 data.sort();
@@ -337,7 +336,7 @@ const CreateUser = (props) => {
             if(data.error){displayError(data.error);return;}
             setLoading(false);
             if(data === "empty" ){
-                setPopupState({show:true,title:"Edit Configuration",content: "There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section."});
+                setPopupState({show:true,content: MSG.ADMIN.WARN_OPENID_CONFIGURE.CONTENT, variant:MSG.ADMIN.WARN_OPENID_CONFIGURE.VARIANT});
             } else {
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
                 data.sort((a,b)=>a.name.localeCompare(b.name));
@@ -360,7 +359,7 @@ const CreateUser = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data === "empty") {
-            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+            setPopupState({show:true,content: MSG.ADMIN.WARN_LDAP_CONFIGURE.CONTENT,variant:MSG.ADMIN.WARN_LDAP_CONFIGURE.VARIANT});
         }
         else if(data!==undefined) {
             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
@@ -400,7 +399,7 @@ const CreateUser = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data === "empty") {
-            setPopupState({show:true,title:"Edit Configuration",content: "User not found"});
+            setPopupState({show:true,content: MSG.ADMIN.WARN_NO_USER_FOUND.CONTENT, variant: MSG.ADMIN.WARN_NO_USER_FOUND.VARIANT});
         } else {
             dispatch({type:actionTypes.UPDATE_LDAP_DATA,payload:data})
         }
@@ -450,7 +449,7 @@ const CreateUser = (props) => {
                         if(data1.error){displayError(data1.error);return;}
                         setLoading(false);
                         if (data1 === "empty") {
-                            setPopupState({show:true,title:"Edit Configuration",content: "There are no LDAP server configured. To proceed create a server configuration in LDAP configuration section."});
+                            setPopupState({show:true,content: MSG.ADMIN.WARN_LDAP_CONFIGURE.CONTENT,variant:MSG.ADMIN.WARN_LDAP_CONFIGURE.VARIANT});
                         } else {
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
                             data1.sort((a,b)=>a.name.localeCompare(b.name));
@@ -464,7 +463,7 @@ const CreateUser = (props) => {
                         if(data1.error){displayError(data1.error);return;}
                         setLoading(false);
                         if (data === "empty") {
-                            setPopupState({show:true,title:"Edit Configuration",content: "There are no SAML server configured. To proceed create a server configuration in SAML configuration section."});
+                            setPopupState({show:true,title:"Edit Configuration",content: MSG.ADMIN.WARN_SAML_CINFIGURE.CONTENT, variant:MSG.ADMIN.WARN_SAML_CINFIGURE.VARIANT});
                         } else {
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
                             data1.sort();
@@ -478,7 +477,7 @@ const CreateUser = (props) => {
                         if(data1.error){displayError(data1.error);return;}
                         setLoading(false);
                         if(data1 === "empty" ){
-                            setPopupState({show:true,title:"Edit Configuration",content: "There are no OpenID server configured. To proceed create a server configuration in OpenID configuration section."});
+                            setPopupState({show:true,content: MSG.ADMIN.WARN_OPENID_CONFIGURE.CONTENT, variant:MSG.ADMIN.WARN_OPENID_CONFIGURE.VARIANT});
                         } else {
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
                             data1.sort((a,b)=>a.name.localeCompare(b.name));
@@ -495,7 +494,7 @@ const CreateUser = (props) => {
             }  
         }catch(error){
             setLoading(false);
-            setPopupState({show:true,title:"Edit User",content:"Failed to fetch user details."});
+            setPopupState({show:true,content:MSG.ADMIN.ERR_FETCH_USER_DETAILS.CONTENT,variant:MSG.ADMIN.ERR_FETCH_USER_DETAILS.VARIANT});
         }  
     }
 
@@ -533,7 +532,6 @@ const CreateUser = (props) => {
 
     return (
         <Fragment>
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <ScrollBar thumbColor="#929397">
@@ -541,8 +539,8 @@ const CreateUser = (props) => {
             <div data-test="heading" id="page-taskName"><span>{(props.showEditUser===false)?"Create User":"Edit User"}</span></div>
             
             {(props.showEditUser===false)?
-                <CreateLanding firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown} ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap}  ldapDirectoryAddClass={ldapDirectoryAddClass} confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={props.setShowEditUser} ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} />
-                :<EditLanding firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} confServerAddClass={confServerAddClass} ldapGetUser={ldapGetUser} ldapDirectoryAddClass={ldapDirectoryAddClass} clearForm={clearForm} allUserFilList={allUserFilList} manage={manage} setAllUserFilList={setAllUserFilList} searchFunctionUser={searchFunctionUser} click={click} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} getUserData={getUserData} />
+                <CreateLanding displayError={displayError} setPopupState={setPopupState} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown} ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap}  ldapDirectoryAddClass={ldapDirectoryAddClass} confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={props.setShowEditUser} ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} />
+                :<EditLanding displayError={displayError} setPopupState={setPopupState} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} confServerAddClass={confServerAddClass} ldapGetUser={ldapGetUser} ldapDirectoryAddClass={ldapDirectoryAddClass} clearForm={clearForm} allUserFilList={allUserFilList} manage={manage} setAllUserFilList={setAllUserFilList} searchFunctionUser={searchFunctionUser} click={click} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} getUserData={getUserData} />
             }    
 
             <div className="col-xs-9 form-group__conv">

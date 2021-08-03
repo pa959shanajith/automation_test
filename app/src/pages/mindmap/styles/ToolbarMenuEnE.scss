@@ -1,5 +1,6 @@
+@import "../../global/styles/ColorVariables.scss";
 .ene_toolbar__header{
-    background-color: #e6e7e9;
+    background-color: $borderThree;
     position: absolute;
     width: 100%;
     padding: 0 10px;

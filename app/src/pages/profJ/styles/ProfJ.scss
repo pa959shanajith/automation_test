@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .filter__pop{
     bottom:0px;
 }
@@ -16,7 +17,7 @@
         margin: 0;
         font-size: 18px;
         font-family: "LatoWeb";
-        background: #321E4F;
+        background: $primaryColorDark;
         border-radius: 5px 5px 0px 0px;
         -moz-border-radius: 5px 5px 0px 0px;
         -webkit-border-radius: 5px 5px 0px 0px;
@@ -44,11 +45,11 @@
     padding : 5px 0px;
 }
 #assistContent{
-    background: #fff;
+    background: $whiteColor;
     color: black;
     font-family: 'Latoweb';
     font-size: 15px;
-    border: 1px solid #b7b7b7;
+    border: 1px solid $borderFive;
     padding: 15px 20px !important;
 }
 .chatArea{
@@ -63,7 +64,7 @@
 .defautMssg{
     position: relative;
     padding: 10px 20px !important;
-    background: #E5E5EA !important;
+    background: $whisper !important;
     border-radius: 25px !important;
     color: black !important;
     font-family: 'LatoWeb' !important;
@@ -83,8 +84,8 @@
 .userQuerymessage{
     position: relative;
     padding: 10px 20px;
-    color: white;
-    background: #643693;
+    color: $whiteColor;
+    background: $primaryColor;
     border-radius: 25px;
     float: right; 
     margin-top: 5px;
@@ -98,28 +99,28 @@
     width: 100%;
     border-radius: 5px;
     overflow: none;
-    border: 1px solid #797979 !important;
+    border: 1px solid $borderOne !important;
     margin-bottom: 10px;
     font-family: 'LatoWebMedium';
     resize: none;
-    color: #333;
+    color: $darkGray;
     height: 34px;
     padding: 6px 12px;
     font-size: 14px;
     line-height: 1.42857143;
-    background-color: #fff;
+    background-color: $whiteColor;
     background-image: none;
 }
 .projBtns_container{
     width: 100% !important;
 }
 .projBtns{
-    color: #fff;
+    color: $whiteColor;
     border: 0;
     border-radius: 20px;
     padding: 2px 15px;
     font-size: 17px;
-    background: #643693;
+    background: $primaryColor;
     font-family: 'LatoWebLight';
     outline: 0;
 }

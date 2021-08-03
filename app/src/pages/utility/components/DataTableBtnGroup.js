@@ -1,55 +1,79 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScrollBar } from '../../global';
-import { updateData, validateData, prepareSaveData, deleteData, parseTableData } from './DtUtils';
+import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
+import { ScrollBar, VARIANT, Messages as MSG } from '../../global';
 import ExportDataTable from './ExportDataTable';
 import ImportSheet from './ImportSheet';
+import * as actionTypes from '../state/action';
+import ImportXML from './ImportXML';
 import * as utilApi from '../api';
+import DtPasteStepDialog from './DtPasteStepDialog';
 
 
 const TableActionButtons = props => {
+
+    const dispatch = useDispatch();
+    const copiedCells = useSelector(state=>state.utility.copiedCells)
+    const [showPS, setShowPS] = useState(false);
 
     const onAdd = () => {
         if (props.checkList.list.length===1){
             if (props.checkList.type==="row"){
                 if (props.data.length >= 199) 
-                    props.setShowPop({title: 'Error', content: 'Table cannot have more than 200 rows', type: 'message'});
+                    props.setShowPop(MSG.UTILITY.ERR_ROWS_200);
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let newData = [...props.data];
-                    let locToAdd = null;
+                    let locToAdd = 0;
                     let rowId = props.checkList.list[0].split('||').pop();
     
-                    newData.forEach((row, rowIndex) => {
-                        if (rowId === row.__CELL_ID__) locToAdd = rowIndex;
-                    })
+                    // For SubHeader Selection, Location To Add (LocToAdd) will always be 0 i.e. start of data
+                    if (rowId !== 'subheader') {
+                        newData.forEach((row, rowIndex) => {
+                            if (rowId === row.__CELL_ID__) locToAdd = rowIndex+1;
+                        })
+                    }
                     
-                    newData.splice(locToAdd+1, 0, {__CELL_ID__: uuid()});
-    
+                    let newRowId = uuid();
+                    newData.splice(locToAdd, 0, {__CELL_ID__: newRowId});
+                    props.setFocus({type: 'action', id: newRowId});
                     props.setData(newData);
                 }
             }
             else{
-                if (props.headers.length >= 15) 
-                    props.setShowPop({title: 'Error', content: 'Table cannot have more than 15 columns', type: 'message'});
+                if (props.headers.length >= 50) 
+                    props.setShowPop(MSG.UTILITY.ERR_COLUMN_50);
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let newHeaders = [...props.headers];
-                    let locToAdd = null;
+                    let locToAdd = 0;
                     let headerId = props.checkList.list[0].split('||').pop();
                     
                     props.headers.forEach((header, headerIndex)=>{
                         if (header.__CELL_ID__ === headerId) locToAdd = headerIndex;
                     })
                     
+                    let newHeaderId = uuid();
                     newHeaders.splice(locToAdd+1, 0, {
-                        __CELL_ID__: uuid(),
+                        __CELL_ID__: newHeaderId,
                         name: `C${props.headerCounter}`
                     })
     
+                    props.setFocus({type: "action", id: newHeaderId});
                     props.setHeaders(newHeaders);
                     props.setHeaderCounter(count => count + 1);
                 }
             }
+        }
+        else {
+            props.setShowPop({
+                variant: VARIANT.ERROR, 
+                content: props.checkList.list.length 
+                        ? `Too many selected ${props.checkList.type === "row" ? "rows" : "columns"}`
+                        : `Please select a row or column to perform add operation.`
+            });
         }
     }
 
@@ -58,17 +82,24 @@ const TableActionButtons = props => {
         // HANDLE CHECKLIST
         if (props.checkList.list.length){
             if (props.checkList.type==="row"){
-                if (props.data.length === props.checkList.list.length)
-                    props.setShowPop({title: 'Error', content: 'Table cannot have 0 rows', type: 'message'});
+                if (props.checkList.list.includes("sel||row||subheader") || props.data.length === props.checkList.list.length)
+                    props.setShowPop({
+                        variant: VARIANT.WARNING,
+                        content: props.checkList.list.includes("sel||row||subheader") 
+                                ? 'Cannot delete SubHeader row.'
+                                : 'Table cannot have 0 rows'
+                    });
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let [newData,] = deleteData(props.data, [], props.checkList.list);
                     props.setData(newData);
                 }
             }
             else{
                 if (props.headers.length === props.checkList.list.length)
-                    props.setShowPop({title: 'Error', content: 'Table cannot have 0 columns', type: 'message'});
+                    props.setShowPop(MSG.UTILITY.ERR_COLUMN_0);
                 else {
+                    pushToHistory({headers: props.headers, data: props.data});
                     let [newHeaders, newData] = deleteData(props.headers, props.data, props.checkList.list);
                     props.setHeaders(newHeaders);
                     props.setData(newData);
@@ -76,46 +107,90 @@ const TableActionButtons = props => {
             }
             props.setCheckList({type: 'row', list: []});
         }
+        else {
+            props.setShowPop(MSG.UTILITY.ERR_DELETE);
+        }
     }
 
     
     const onUndo = () => {
-        if (props.undoStack.length) {
-            const lastEntry = props.undoStack.pop();
-            const [prevValue, newData, found] = updateData(props.data, props.headers, lastEntry);
-            if (found) {
-                props.setData(newData);
-                props.redoStack.push(prevValue);
-                if (props.redoStack.length>5) props.redoStack.splice(0, 1);
-            }
-            else console.log("Cell Not Found!")
+        const resp = getPreviousData({headers: props.headers, data: props.data});
+        if (resp==="EMPTY_STACK") {
+            props.setShowPop(MSG.UTILITY.ERR_UNDO);
         }
-        else console.log("Nothing to Undo")
+        else {
+            if (resp.data) props.setData(resp.data);
+            if (resp.headers) props.setHeaders(resp.headers);
+        }
     }
 
     const onRedo = () => {
-        if (props.redoStack.length) {
-            const lastEntry = props.redoStack.pop();
-            const [prevValue, newData, found] = updateData(props.data, props.headers, lastEntry);
-            if (found) {
-                props.setData(newData);
-                props.undoStack.push(prevValue);
-            }
-            else console.log("Cell Not Found!")
+        const resp = getNextData({headers: props.headers, data: props.data});
+        if (resp==="EMPTY_STACK") {
+            props.setShowPop(MSG.UTILITY.ERR_REDO);
         }
-        else console.log("Nothing to Redo")
+        else {
+            if (resp.data) props.setData(resp.data);
+            if (resp.headers) props.setHeaders(resp.headers);
+        }
+    }
+
+    const onCopy = () => {
+        if (props.checkList.list.length) {
+            let resp = prepareCopyData(props.headers, props.data, props.checkList);
+            if (resp.isEmpty)
+                props.setShowPop(MSG.UTILITY.ERR_EMPTY_COPY);
+            else{
+                dispatch({type: actionTypes.SET_COPY_CELLS, payload: resp.copiedData});
+                props.setCheckList({type: 'row', list: []})
+            }
+        }
+        else 
+            props.setShowPop(MSG.UTILITY.ERR_SELECT_COPY);
+    }
+
+    const onPaste = () => {
+        if (copiedCells.cells.length){
+            if (copiedCells.type === 'rows' && props.data.length+copiedCells.cells.length > 199) 
+                props.setShowPop(MSG.UTILITY.ERR_PASTE_200);
+            else if (copiedCells.type === 'cols' && props.headers.length+copiedCells.cells.length > 50) 
+                props.setShowPop(MSG.UTILITY.ERR_PASTE_50);
+            else 
+                setShowPS(true);
+        }
+        else {
+            props.setShowPop(MSG.UTILITY.ERR_NO_DATA_PASTE);
+        }
+    }
+
+    const pasteData = (pasteIndex) => {
+        try{
+            pushToHistory({headers: props.headers, data: props.data});
+            const [newHeaders, newData] = pasteCells(copiedCells, props.headers, props.data, Number(pasteIndex))
+            props.setHeaders([...newHeaders]);
+            props.setData([...newData]);
+            props.setCheckList({type: 'row', list: []})
+            setShowPS(false);
+        }
+        catch (error) {
+            setShowPS(false);
+            console.error(error)
+        }
     }
 
     const tableActionBtnGroup = [
         {'title': 'Add Selected Row/Column', 'img': 'static/imgs/ic-jq-addstep.png', 'alt': 'Add', onClick: ()=>onAdd()},
         {'title': 'Drag & Drop Row', 'img': 'static/imgs/ic-jq-dragstep.png', 'alt': 'Drag Row', onClick:  ()=>props.setDnd(dnd => !dnd)},
         {'title': 'Remove Selected Row/Column', 'img': 'static/imgs/ic-delete.png', 'alt': 'Remove', onClick:  ()=>onDelete()},
+        {'title': 'Copy Row/Col', 'img': 'static/imgs/ic-jq-copystep.png', 'alt': 'Copy', onClick: ()=>onCopy()},
+        {'title': 'Paste Row/Col', 'img': 'static/imgs/ic-jq-pastestep.png', 'alt': 'Paste', onClick: ()=>onPaste()},
         {'title': 'Redo Last Changes', 'class': 'fa fa-repeat', 'alt': 'Redo', onClick:  ()=>onRedo()},
         {'title': 'Undo Last Changes', 'class': 'fa fa-undo', 'alt': 'Undo', onClick:  ()=>onUndo()},
     ]
 
     return (
         <div className="dt__table_ac_btn_grp">
+            { showPS && <DtPasteStepDialog setShow={setShowPS} upperLimit={copiedCells.type === "cols" ? props.headers.length : props.data.length+1 } pasteData={pasteData} pasteType={copiedCells.type} /> }
             {
                 tableActionBtnGroup.map((btn, i) => 
                     <button data-test="dt__tblActionBtns" key={i} className="dt__tblBtn" onClick={()=>btn.onClick()}>
@@ -133,21 +208,22 @@ const CreateScreenActionButtons = props => {
 
     const [sheetList, setSheetList] = useState([]);
     const [excelContent, setExcelContent] = useState("");
+    const [rowTag, setRowTag] = useState("");
+    const [xmlContent, setXmlContent] = useState([]);
 
     const hiddenInput = useRef();
 
-    
+
     const goToEditScreen = () => {
         let arg = prepareSaveData(props.tableName, props.headers, props.data);
 
         if (arg.data === "emptyData")
             props.setScreenType('datatable-Edit');
         else
-            props.setShowPop({
+            props.setModal({
                 title: "Unsaved Data Found", 
                 content: "Unsaved data will be lost. Are you sure you want to go to Edit Screen?", 
-                type: "confirm", 
-                onClick: ()=>{ props.setScreenType('datatable-Edit'); props.setShowPop(false); }
+                onClick: ()=>{ props.setScreenType('datatable-Edit'); props.setModal(false); }
             });    
     }
     
@@ -159,26 +235,27 @@ const CreateScreenActionButtons = props => {
 
             switch (validation) {
                 case "tableName": props.setErrors({tableName: true}); break;
-                case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
-                case "duplicateHeaders": props.setShowPop({title: "Duplicate Header Error", content: "Data has duplicate headers", type: "message"}); break;
+                case "emptyData": props.setShowPop(MSG.UTILITY.ERR_EMPTY_SAVE); break;
+                case "duplicateHeaders": props.setShowPop(MSG.UTILITY.ERR_DUPLICATE_HEADER); break;
+                case "emptyHeader": props.setShowPop(MSG.UTILITY.ERR_SAVE_HEADER); break;
                 case "saveData": 
                     props.setOverlay('Creating Data Table...');
                     let resp = await utilApi.createDataTable(arg);
                     props.setOverlay('');
 
                     switch (resp) {
-                        case "exists": props.setShowPop({title: 'Data Table', content: 'Data Table Already Exist!', type: "message"}); break;
-                        case "fail": props.setShowPop({title: 'Data Table', content: 'Failed to Create Data Table', type: "message"}); break;
-                        case "success": props.setShowPop({title: 'Data Table', content: 'Data Table Saved Successfully!', type: "message"}); break;
-                        default: props.setShowPop({title: 'Data Table Error', content: resp.error || "Failed To Create Data Table", type: "message"}); break;
+                        case "exists": props.setShowPop(MSG.UTILITY.ERR_TABLE_EXIST); break;
+                        case "fail": props.setShowPop(MSG.UTILITY.ERR_CREATE_TADATABLE); break;
+                        case "success": props.setShowPop(MSG.UTILITY.SUCC_SAVE_DATATABLE); break;
+                        default: props.setShowPop(resp.error); break;
                     }   
                     props.setErrors({}); 
                     break;
-                default: props.setShowPop({title: 'Data Table', content: 'Failed to Create Data Table', type: "message"}); break;
+                default: props.setShowPop(MSG.UTILITY.ERR_CREATE_TADATABLE); break;
             }
         }
         catch(error) {
-            props.setShowPop({title: 'Data Table', content: 'Failed to Create Data Table', type: "message"})
+            props.setShowPop(MSG.UTILITY.ERR_CREATE_TADATABLE)
             console.error(error);
         }
     }
@@ -191,7 +268,7 @@ const CreateScreenActionButtons = props => {
         reader.onload = async function (e) {
             try{
                 hiddenInput.current.value = '';
-                let importFormat = "excel";
+                let importFormat = "";
                 switch(file.name.split('.').pop().toLowerCase()){
                     case "csv": importFormat = "csv"; break;
                     case "xml": importFormat = "xml"; break;
@@ -200,30 +277,36 @@ const CreateScreenActionButtons = props => {
                     default : break;
                 }
 
-                const resp = await utilApi.importDataTable({importFormat: importFormat, content: reader.result, flag: importFormat==="excel"?"sheetname":""});
-                
-                if(importFormat === "excel") {
-                    setSheetList(resp);
-                    setExcelContent(reader.result);
-                } 
-                else if (resp == "columnExceeds") {
-                    props.setShowPop({title: "Error File Read", content: "Column should not exceed 15", type: "message"});
-                } 
-                else if (resp == "rowExceeds") {
-                    props.setShowPop({title: "Error File Read", content: "Row should not exceed 200", type: "message"});
-                }
-                else if (resp == "emptyData") {
-                    props.setShowPop({title: "Error File Read", content: "Empty data in the file", type: "message"});
-                }
-                else {
-                    const [, newData, newHeaders] = parseTableData(resp, "import")
-                    props.setData(newData);
-                    props.setHeaders(newHeaders);
+                if (importFormat == "") 
+                    props.setShowPop(MSG.UTILITY.ERR_FILE_UNSUPPORTED);
+                else if (importFormat === "xml") {
+                    setRowTag("row");
+                    setXmlContent(reader.result);
+                } else {
+                    props.setOverlay("Importing File...");
+                    const resp = await utilApi.importDataTable({importFormat: importFormat, content: reader.result, flag: importFormat==="excel"?"sheetname":""});
+                    if(importFormat === "excel") {
+                        setSheetList(resp);
+                        setExcelContent(reader.result);
+                    } 
+                    else if (resp == "columnExceeds") 
+                        props.setShowPop(MSG.UTILITY.ERR_COL_15);
+                    else if (resp == "rowExceeds")
+                        props.setShowPop(MSG.UTILITY.ERR_ROW_200);
+                    else if (resp == "emptyData")
+                        props.setShowPop(MSG.UTILITY.ERR_EMPTY_DATA);
+                    else {
+                        const [, newData, newHeaders] = parseTableData(resp, "import")
+                        props.setData(newData);
+                        props.setHeaders(newHeaders);
+                    }
+                    props.setOverlay("");
                 }
             }
             catch(error){
                 console.error("ERROR:::", error);
-                props.setShowPop({title: "Error File Read", content: "Failed to Load file", type: "message"})
+                props.setOverlay("");
+                props.setShowPop(MSG.UTILITY.ERR_LOAD)
             }
         }
         reader.readAsBinaryString(file);
@@ -232,6 +315,7 @@ const CreateScreenActionButtons = props => {
     return (
         <>
         { sheetList.length > 0 && <ImportSheet sheetList={sheetList} setSheetList={setSheetList} excelContent={excelContent} { ...props }  /> }
+        { rowTag &&  <ImportXML rowTag={rowTag} setRowTag={setRowTag} xmlContent={xmlContent} { ...props }  />}
         <div className="dt__taskBtns">
             <input ref={hiddenInput} data-test="fileInput" id="importDT" type="file" style={{display: "none"}} onChange={onInputChange} accept=".xlsx, .xls, .csv, .xml"/>
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={importDataTable} >Import</button>
@@ -255,18 +339,18 @@ const EditScreenActionButtons = props => {
             let deleteMsg = {
                 title: "Confirm Delete Data Table", 
                 content: "",
-                onClick: ()=>deleteDataTable(),
+                onClick: ()=>{deleteDataTable();props.setModal(false);},
                 type: 'confirm'
             }
-
-            switch(resp){
-                case "success": props.setShowPop({...deleteMsg, content: "Are you sure you want to delete current data table?"});break;
-                case "referenceExists": props.setShowPop({...deleteMsg, content: "Data Table is referenced in Test Cases. Are you sure you want to delete current data table?"});break;
-                default: props.setShowPop({ title: "Error Data Table", content: "Failed to Delete Data Table", type: "message" });break;
+            // onclick
+            switch(resp){ 
+                case "success": props.setModal({...deleteMsg, content: "Are you sure you want to delete current data table?"});break;
+                case "referenceExists": props.setModal({...deleteMsg, content: "Data Table is referenced in Test Cases. Are you sure you want to delete current data table?"});break;
+                default: props.setShowPop(MSG.UTILITY.ERR_DELETE_DATATABLE);break;
             }
         }
         catch(error) {
-            props.setShowPop({ title: "Error Data Table", content: "Failed to Delete Data Table", type: "message" });
+            props.setShowPop(MSG.UTILITY.ERR_DELETE_DATATABLE);
             console.error(error);
         }
     }
@@ -276,11 +360,10 @@ const EditScreenActionButtons = props => {
         const resp = await utilApi.deleteDataTable(props.tableName);
         props.setOverlay("");
 
-        if (resp === "success")
-            props.setShowPop({title: "Delete Data Table", content: "Data Table Deleted Successfully.", type: "message", onClick:()=>props.setScreenType("datatable-Create")});
-        else 
-            props.setShowPop({title: "Delete Data Table", content: "Failed to delete data table", type: "message"});
-
+        if (resp === "success") {
+            props.setScreenType("datatable-Create");
+            props.setShowPop(MSG.UTILITY.SUCC_DELETE_DATATABLE);
+        } else props.setShowPop(MSG.UTILITY.ERR_DELETE_DATATABLE);
     }
 
     const updateTable = async() => {
@@ -291,22 +374,22 @@ const EditScreenActionButtons = props => {
 
             switch (validation) {
                 case "tableName": props.setErrors({tableName: true}); break;
-                case "emptyData": props.setShowPop({title: "Empty Data Error", content: "Cannot Save Empty Data", type: "message"}); break;
-                case "duplicateHeaders": props.setShowPop({title: "Duplicate Header Error", content: "Data has duplicate headers", type: "message"}); break;
+                case "emptyData": props.setShowPop(MSG.UTILITY.ERR_EMPTY_SAVE); break;
+                case "duplicateHeaders": props.setShowPop(MSG.UTILITY.ERR_DUPLICATE_HEADER); break;
                 case "saveData": 
                     props.setOverlay("Updating Data Table");
                     const resp = await utilApi.editDataTable(arg);
                     props.setOverlay("");
                     if (resp === "success") 
-                        props.setShowPop({title: "Update Data Table", content: "Data Table Updated Successfully.", type: "message"})
+                        props.setShowPop(MSG.UTILITY.SUCC_UPDATE_DATATABLE)
                     else 
-                        props.setShowPop({title: "Update Data Table", content: "Failed to Update Data Table.", type: "message"})
+                        props.setShowPop(MSG.UTILITY.ERR_UPDATE_DATATABLE)
                     break;
-                default: props.setShowPop({title: 'Data Table', content: 'Failed to Update Data Table', type: "message"}); break;
+                default: props.setShowPop(MSG.UTILITY.ERR_UPDATE_DATATABLE); break;
             }
         }
         catch(error) {
-            props.setShowPop({title: 'Data Table', content: 'Failed to Update Data Table', type: "message"})
+            props.setShowPop(MSG.UTILITY.ERR_UPDATE_DATATABLE)
             console.error(error);
         }
     }
@@ -341,7 +424,7 @@ const SearchDataTable = props => {
         const resp = await utilApi.fetchDataTable(selectedTableName);
         props.setOverlay('');
 
-        if (resp.error) props.setShowPop({title: "Data Table Error", content: resp.error, type: "message"});
+        if (resp.error) props.setShowPop(resp.error);
         else {
             const [tableName, newData, newHeaders] = parseTableData(resp[0], "edit")
             props.setData(newData);

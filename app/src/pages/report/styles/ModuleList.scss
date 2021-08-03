@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .rp_moduleList{
     height: calc(100% - 35px);
     width: 100%;
@@ -7,7 +8,7 @@
         width: 100%;
     }
     .toolbar__module-box:hover {
-        background-color: white;
+        background-color: $whiteColor;
         cursor: pointer;
     }
 }

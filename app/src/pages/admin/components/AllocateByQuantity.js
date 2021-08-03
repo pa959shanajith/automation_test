@@ -1,6 +1,7 @@
 import React, { useState, useEffect , useRef } from 'react';
 import {FormInpDropDown} from './FormComp';
 import {getAvailable_ICE,getPools,updatePool} from '../api';
+import { Messages } from '../../global';
 
 /*Component AllocateByQuantity
   use: render ICE allocation by Quantity section
@@ -43,7 +44,7 @@ const AllocateByQuantity = ({resetMiddleScreen,selectedPool,setSelectedPool,disp
                 pool.ice_deleted = []
                 pool.ice_added = []
                 var availableIce = iceCount.available
-                if(val > availableIce){displayError("Number of ICE assigned exceeds available ICE");return;}
+                if(val > availableIce){displayError(Messages.ADMIN.WARN_ICE_EXCEEDS);return;}
                 if(val<0){
                     pool.ice_deleted = Object.keys(pool.ice_list).slice(0,Math.abs(val))
                 }else{
@@ -53,7 +54,7 @@ const AllocateByQuantity = ({resetMiddleScreen,selectedPool,setSelectedPool,disp
                 var data = await updatePool(pool)
                 if(data.error){displayError(data.error);return;}
                 await reset()
-                displayError("ICE Pool updated successfully.","Success")
+                displayError(Messages.ADMIN.SUCC_ICEPOOL_UPDATE);
             })()
         }
         setSaveAction(false)

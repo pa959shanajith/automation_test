@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .ct-exportBtn{
     position: absolute;
     height: 25px;
@@ -16,14 +17,14 @@
         font-weight: 600;
     }
     input{
-        border: 1px solid #000;
+        border: 1px solid $black;
         width: 70%;
     }
     input:focus{
         outline: none;
     }
     select{
-        border: 1px solid #000;
+        border: 1px solid $black;
         width: 70%;
         height: 25px;
     }

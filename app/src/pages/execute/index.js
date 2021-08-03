@@ -13,7 +13,7 @@ const Execute = () => {
 
   useEffect(()=>{
       if(window.localStorage['navigateScreen'] !== "TestSuite"){
-          RedirectPage(history);
+          RedirectPage(history, { reason: "screenMismatch" });
       }
   }, []);
   

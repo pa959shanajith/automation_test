@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
+import {ScreenOverlay, ScrollBar, Messages as MSG} from '../../global' 
 import {FormInput} from '../components/FormComp';
 import AssignOptionBox from '../components/AssignOptionBox'
 import {getDetails_ICE,createPool_ICE} from '../api';
@@ -17,13 +17,13 @@ const CreateIcePool = (props) => {
     const [projList,setProjList] = useState([])
     const [allProj,setAllProj] = useState([])
     const [assignProj,setAssignProj] = useState([])
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""});
+    const setPopupState=props.setPopupState
     const [loading,setLoading] = useState(false);
-    const displayError = (error,header) =>{
+    const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:header?header:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -45,7 +45,7 @@ const CreateIcePool = (props) => {
         var data = await createPool_ICE(dataCreate)
         if(data.error){displayError(data.error);return;}
         await resetData({poolName,setAllProj,setAssignProj,setProjList,setLoading,displayError})
-        displayError("ICE Pool created successfully.","success")
+        displayError(MSG.ADMIN.SUCC_CREATE_ICEPOOL)
     }
     useEffect(()=>{
         setEditPool(false)
@@ -54,10 +54,9 @@ const CreateIcePool = (props) => {
     return(
         <ScrollBar thumbColor="#929397">
         <div className="crt_ice-pool_container">
-        {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>setPopupState({show:false})} close={()=>setPopupState({show:false})} submitText={"Ok"} />:null}
         {loading?<ScreenOverlay content={loading}/>:null}
         {editPool?
-            <EditIcePool projList={projList} displayError={displayError} setLoading={setLoading}/>:
+            <EditIcePool setPopupState={setPopupState} projList={projList} displayError={displayError} setLoading={setLoading}/>:
             <Fragment>
                 <div id="page-taskName">
                     <span>Create ICE Pool</span>

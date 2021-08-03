@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
 import {Provider, useSelector, useDispatch} from 'react-redux';
 import {store} from './reducer';
-import {ProgressBar, ErrorPage, PopupMsg} from './pages/global'
+import {ProgressBar, ErrorPage, PopupMsg, VARIANT} from './pages/global'
 import { SWITCHED } from './pages/global/state/action';
 import Login, {Base} from './pages/login';
 import Admin from './pages/admin';
@@ -57,7 +57,7 @@ const RouteApp = () => {
 }, [roleSwitched])
   return(
     <Router>
-      { role && <PopupMsg title='Switch Role' content={`Your role is changed to ${selectedRole}`} submitText="OK" close={()=>setRole("")} submit={()=>setRole("")} /> }
+      { role && <PopupMsg variant={VARIANT.SUCCESS} content={`Your role is changed to ${selectedRole}`} close={()=>setRole("")} /> }
     <SocketFactory/>
     <Switch>
       <Route exact path="/" component={Base} />

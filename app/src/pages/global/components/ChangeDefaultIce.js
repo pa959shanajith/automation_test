@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ModalContainer, ScreenOverlay, PopupMsg } from '../../global';
+import { ModalContainer, ScreenOverlay, PopupMsg, Messages as MSG } from '../../global';
 import { getUserICE,setDefaultUserICE } from '../api';
 import '../styles/ChangeDefaultIce.scss';
 
@@ -16,19 +16,30 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
     const [defICE, setDefICE] = useState("")
     const [loading,setLoading] = useState(false)
     const [showPopup,setShowPopup] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
+    const [popupState,setPopupState] = useState({show:false})
 
     useEffect( ()=>{
         fetchIce();
     }, []);
+
+    const displayError = (error) =>{
+        setLoading(false)
+        setPopupState({
+            variant:error.VARIANT,
+            content:error.CONTENT,
+            submitText:'Ok',
+            show:true
+        })
+    }
    
     const fetchIce = async () => {
         setLoading("Fetching ICE ...");
         try{
             const data = await getUserICE();
+            if(data.error){displayError(data.error);return;}
             setLoading(false);
             if(data == 'fail' || !data.ice_list || data.ice_list.length<1){
-                setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
+                displayError(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER)
             }
             else{
                 setChooseDefICE(data.ice_list);
@@ -38,7 +49,7 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
         }catch(error){
             setLoading(false)
             console.error(error)
-            setPopupState({show:true,title:"Change Default ICE",content:unavailableLocalServer_msg});
+            displayError(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER)
         }
     };
 
@@ -66,14 +77,14 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
             const data = await setDefaultUserICE(ice);
             setLoading(false);
 			if(data == 'success'){
-                setPopupState({show:true,title:"Change Default ICE",content:"Changed default ICE successfully"});
+                displayError(MSG.GLOBAL.SUCC_CHANGE_DEFAULT_ICE);
 			}else{
-                setPopupState({show:true,title:"Change Default ICE",content:"Failed to change default ICE"});
+                displayError(MSG.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
             }
 		}catch(error){
             setLoading(false)
 			console.error(error)
-			setPopupState({show:true,title:"Change Default ICE",content:"Failed to change default ICE"});
+			displayError(MSG.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
 		}
 	}
     return (
@@ -87,12 +98,10 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
                     modalClass={" modal-md"}
                 />
             :null}
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={()=>{setPopupState({show:false});setShowMainPopup(false);}} close={()=>{setPopupState({show:false});setShowMainPopup(false);}} submitText={"Ok"} />:null}
+            {popupState.show?<PopupMsg variant={popupState.variant} content={popupState.content}  close={()=>{setPopupState({show:false});setShowMainPopup(false);}} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
         </>   
     );
 }
-
-const unavailableLocalServer_msg = "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.";
 
 export default ChangeDefaultIce;

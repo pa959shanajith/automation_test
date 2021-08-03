@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
+import {ScreenOverlay, ScrollBar, VARIANT, Messages} from '../../global' 
 import {fetchICE, provisions, manageSessionData} from '../api';
 import '../styles/IceProvisionList.scss'
 
@@ -12,10 +12,10 @@ import '../styles/IceProvisionList.scss'
 const IceProvisionList = (props) => {
 
     const [loading,setLoading] = useState(false)
-	const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 	const [searchTasks,setSearchTasks] = useState("")
 	const [icelistModify,setIcelistModify] = useState(props.icelist)
 	const [showList,setShowList] = useState(false)
+	const setPopupState=props.setPopupState
     
     useEffect(()=>{
 		refreshIceList();
@@ -35,15 +35,11 @@ const IceProvisionList = (props) => {
 		setShowList(true);
     }
 
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
-	}
-
 	const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -68,7 +64,7 @@ const IceProvisionList = (props) => {
 		const data = await provisions(tokeninfo);
 		if(data.error){displayError(data.error);return;}
 		setLoading(false);
-		if (data === 'fail') setPopupState({show:true,title:"ICE Provisions",content:"ICE "+event+" Failed"});
+		if (data === 'fail') setPopupState({show:true,variant:VARIANT.ERROR,content:"ICE "+event+" Failed"});
 		else {
 			const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
 			if(data1.error){displayError(data1.error);return;}
@@ -78,7 +74,7 @@ const IceProvisionList = (props) => {
 			props.setToken(data);
 			props.setOp(provisionDetails.icetype);
 			props.setUserid(provisionDetails.provisionedto || ' ');
-			setPopupState({show:true,title:"ICE Provision Success",content:"ICE "+event+"ed Successfully: '"+icename+"'!!  Copy or Download the token"});
+			setPopupState({show:true,variant:VARIANT.SUCCESS,content:"ICE "+event+"ed Successfully: '"+icename+"'!!  Copy or Download the token"});
 			refreshIceList();
 		}
     }
@@ -96,19 +92,18 @@ const IceProvisionList = (props) => {
 		const data = await provisions(tokeninfo);
 		if(data.error){displayError(data.error);return;}
 		setLoading(false);
-		if (data === 'fail') setPopupState({show:true,title:"ICE Provisions",content:"ICE Deregister Failed"});
+		if (data === 'fail') displayError(Messages.ADMIN.ERR_ICE_DEREGISTER);
 		else {
 			const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
 			if(data1.error){displayError(data1.error);return;}
-			setPopupState({show:true,title:"ICE Provisions",content:"ICE Deregistered Successfully"});
+			displayError(Messages.ADMIN.SUCC_ICE_DEREGISTER);
 			props.setSelectProvisionType(!props.selectProvisionType);
 		}
     }
 
     return (
         <Fragment>
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-			{loading?<ScreenOverlay content={loading}/>:null}
+            {loading?<ScreenOverlay content={loading}/>:null}
 			
             <div className="col-xs-9 form-group-ip adminForm-ip" style={{paddingTop:"0",width:"83%"}}>
                 <div className="containerWrap">

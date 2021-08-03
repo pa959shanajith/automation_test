@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .pagination {
     display: -webkit-inline-box;
     text-align: center;
@@ -28,25 +29,25 @@
     margin-left: -1px;
     border-radius: 0 !important;
     line-height: 1.42857143;
-    color: #212529;
+    color: $darkestGray;
     text-decoration: none;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: $whiteColor;
+    border: 1px solid $borderFour;
     font-size: 14px;
     font-family: 'LatoWeb';
 }
 .pagination>.active>p, .pagination>.active>p:focus, .pagination>.active>p:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
     z-index: 2;
-    color: #fff !important;
+    color: $whiteColor !important;
     cursor: default;
-    background-color: #643693;
-    border-color: #643693;
+    background-color: $primaryColor;
+    border-color: $primaryColor;
 }
 .pagination>.disabled>p, .pagination>.disabled>p:focus, .pagination>.disabled>p:hover, .pagination>.disabled>span, .pagination>.disabled>span:focus, .pagination>.disabled>span:hover {
-    color: #777;
+    color: $borderOne;
     cursor: not-allowed;
-    background-color: #fff;
-    border-color: #ddd;
+    background-color: $whiteColor;
+    border-color: $borderFour;
     pointer-events: none;
 }
 p { cursor: pointer; }

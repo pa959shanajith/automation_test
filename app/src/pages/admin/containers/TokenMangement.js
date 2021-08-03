@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar} from '../../global' 
+import {ScreenOverlay, ScrollBar, Messages} from '../../global' 
 import {manageCIUsers} from '../api';
 import { useSelector } from 'react-redux';
 import TokenMgmtForm from '../components/TokenMgmtForm';
@@ -16,7 +16,6 @@ const TokenManagement = (props) => {
     const userInfo = useSelector(state=>state.login.userinfo);
 
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
     const [op,setOp] = useState("normal")
     const [name,setName] = useState("")
     const [token,setToken] = useState("")
@@ -30,6 +29,7 @@ const TokenManagement = (props) => {
     const [runLoadData,setRunLoadData] = useState(true)
 	const [refresh,setRefresh] = useState(false)
 	const [showList,setShowList] = useState(false)
+	const setPopupState =props.setPopupState;
 
     useEffect(()=>{
 		setOp("normal");
@@ -41,8 +41,8 @@ const TokenManagement = (props) => {
 	const displayError = (error) =>{
         setLoading(false)
         setPopupState({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
@@ -108,10 +108,10 @@ const TokenManagement = (props) => {
 		td = today;
 		td.setHours(today.getHours()+8);
 		if (now < today || (now >= today && now < td)) {
-            setPopupState({show:true,title:"Token Management",content:"Expiry time should be 8 hours more than current time"});
+            displayError(Messages.ADMIN.ERR_EXPIRY_TOKEN);
 			return false;
 		} else if(activeTokens.length>=10){
-            setPopupState({show:true,title:"Token Management",content:"User can have max 10 active tokens. Please Deactivate old tokens"});
+            displayError(Messages.ADMIN.WARN_TOKEN_LIMIT);
             return false;
 		}
 		const CIUser = {
@@ -124,22 +124,17 @@ const TokenManagement = (props) => {
 		const data = await manageCIUsers("create", CIUser);
 		if(data.error){displayError(data.error);return;}
 		setLoading(false);
-		if (data === 'duplicate') setPopupState({show:true,title:"Token Management",content:"Failed to generate token, Token Name already exists"});
+		if (data === 'duplicate') displayError(Messages.ADMIN.WARN_TOKEN_EXIST);
 		else {
 			setToken(data.token);
 			setRunLoadData(!runLoadData);
-			setPopupState({show:true,title:"Token Management",content:"Token generated successfully"});
+			displayError(Messages.ADMIN.SUCC_TOKEN_GENERATE);
 		}
-    }
-
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
     }
 
     return (
         <Fragment>
-            {popupState.show?<PopupMsg content={popupState.content} title={popupState.title} submit={closePopup} close={closePopup} submitText={"Ok"} />:null}
-			{loading?<ScreenOverlay content={loading}/>:null}
+            {loading?<ScreenOverlay content={loading}/>:null}
 			<div className="tkn-mgmt_container">
 				<div id="page-taskName"><span>Token Management</span></div>
 				<div className="adminActionBtn">
@@ -148,8 +143,8 @@ const TokenManagement = (props) => {
 				</div>
 				<div className="content_wrapper-tkn-mgmt">
 					<ScrollBar thumbColor="#929397">
-						<TokenMgmtForm setShowList={setShowList} showList={showList} runLoadData={runLoadData} op={op} setOp={setOp} dateVal={dateVal} setSelAssignUser2ErrBorder={setSelAssignUser2ErrBorder} setNameErrBorder={setNameErrBorder} nameErrBorder={nameErrBorder} refresh={refresh} selAssignUser2ErrBorder={selAssignUser2ErrBorder} timeVal={timeVal} setTimeVal={setTimeVal} setdateVal={setdateVal} setAllTokens={setAllTokens} setTargetid={setTargetid} targetid={targetid} name={name} allICE={allICE} setAllICE={setAllICE} setName={setName} token={token} allTokens={allTokens} setToken={setToken} />
-						<TokenMgmtList showList={showList} setShowList={setShowList} allTokens={allTokens} setAllTokens={setAllTokens} targetid={targetid} />  
+						<TokenMgmtForm setPopupState={setPopupState} setShowList={setShowList} showList={showList} runLoadData={runLoadData} op={op} setOp={setOp} dateVal={dateVal} setSelAssignUser2ErrBorder={setSelAssignUser2ErrBorder} setNameErrBorder={setNameErrBorder} nameErrBorder={nameErrBorder} refresh={refresh} selAssignUser2ErrBorder={selAssignUser2ErrBorder} timeVal={timeVal} setTimeVal={setTimeVal} setdateVal={setdateVal} setAllTokens={setAllTokens} setTargetid={setTargetid} targetid={targetid} name={name} allICE={allICE} setAllICE={setAllICE} setName={setName} token={token} allTokens={allTokens} setToken={setToken} />
+						<TokenMgmtList setPopupState={setPopupState} showList={showList} setShowList={setShowList} allTokens={allTokens} setAllTokens={setAllTokens} targetid={targetid} />  
 					</ScrollBar>
 				</div>
 			</div>

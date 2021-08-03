@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { ModalContainer, ScrollBar, RedirectPage } from '../../global';
+import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG } from '../../global';
 import { tagList } from  './ListVariables';
 import { updateScreen_ICE } from '../api';
 import "../styles/MapObjectModal.scss";
@@ -117,17 +117,17 @@ const MapObjectModal = props => {
                     .then(resp => {
                         if (resp === "success") {
                             props.setShow(false);
-                            props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Successfully!'})
+                            props.setShowPop(MSG.SCRAPE.SUCC_MAPPED_SCRAPED)
                         }
-                        else props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+                        else props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
                     })
                     .catch(err => {
-                        props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+                        props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
                         // console.error(err);
                     });
         })
         .catch(error => {
-            props.setShowPop({title: 'Map Scrape Data', content: 'Mapped Scrape Data Failed!'})
+            props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
             console.err(error);
         })
     }

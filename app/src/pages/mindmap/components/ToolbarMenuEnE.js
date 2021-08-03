@@ -48,8 +48,8 @@ const ToolbarMenuEnE = (props) =>{
     }
     const displayError = (error) =>{
         setPopup({
-            title:'ERROR',
-            content:error,
+            variant:error.VARIANT,
+            content:error.CONTENT,
             submitText:'Ok',
             show:true
         })
