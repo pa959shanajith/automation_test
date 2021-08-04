@@ -269,7 +269,7 @@ exports.importDtFromXML = function (req, res) {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		var myXML = req.body.content;
-		var row = req.body.row;
+		var row = "";
 		var qObj = {};
 		var rows = [];
 		var columnNames = [];
@@ -277,41 +277,58 @@ exports.importDtFromXML = function (req, res) {
 		var cols = [];
 
 		var myXMLStr = myXML.replace(/\s/g,'');
+		myXMLStr = myXMLStr.replace(/\<\?xml.*\?\>/, '');
 		if(validator.isEmpty(myXMLStr)) return res.send("emptyData");
 		const doc = new DOMParser().parseFromString(myXMLStr, "text/xml");
+		if(req.body.row != undefined && req.body.row != "") row = req.body.row;
+		else row = doc.firstChild.nodeName;
 		var allrows = doc.getElementsByTagName(row);
 		if(allrows.length==0) return res.send("emptyRow");
 		if(allrows.length >200) return res.send("rowExceeds");
-		if(req.body.column.length>0) cols = req.body.column.split(',');
+		if(req.body.column!=undefined && req.body.column.length>0) cols = req.body.column.split(';');
 
 		for( var i=0;i<allrows.length;++i) {
 			var newObj = {};
-			var alltags = allrows[i].childNodes;
-			for (var j=0;j<alltags.length;++j) {
-				if(i==0) {
-					if(alltags[j].nodeType ==1 && checkForNesting(alltags[j])) {
-						return res.send("nestedXML");
-					} else {
-						ob = {id: uuid(), name: alltags[j].nodeName}
-						columnNames.push(ob);
-						if(cols.length>0) {
-							if(cols.includes(columnNames[j].name)) newcols.push(columnNames[j]);
-						}
-						else
-							newcols.push(columnNames[j]);
-					}
-				}
-				if (cols.length>0) {
-					if (cols.includes(columnNames[j].name)) {
-						newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
-					}
+			var alltags = allrows[i].childNodes; 
+			for(var j=0;j<alltags.length;++j) {
+				if(alltags[j].nodeType ==1 && checkForNesting(alltags[j])) {
+					return res.send("nestedXML");
 				} else {
-					newObj[columnNames[j].id] = alltags[j].childNodes[0].nodeValue;
+					name = alltags[j].nodeName;
+					if(cols.length>0) {
+						if(cols.includes(name)) {
+							if(columnNames.includes(name))	{
+								for(var k=0;k<columnNames.length;++k) {
+									if(newcols[k].name==name) id=newcols[k].id;
+								}
+								newObj[id] = alltags[j].childNodes[0].nodeValue;
+							}
+							else {
+								ob = {id: uuid(), name: alltags[j].nodeName}
+								columnNames.push(ob.name)
+								newcols.push(ob)
+								newObj[ob.id] = alltags[j].childNodes[0].nodeValue;
+							}
+						}
+					} else {
+						if(columnNames.includes(name))	{
+							for(var k=0;k<columnNames.length;++k) {
+								if(newcols[k].name==name) id=newcols[k].id;
+							}
+							newObj[id] = alltags[j].childNodes[0].nodeValue;
+						}
+						else {
+							ob = {id: uuid(), name: alltags[j].nodeName}
+							columnNames.push(ob.name)
+							newcols.push(ob)
+							newObj[ob.id] = alltags[j].childNodes[0].nodeValue;
+						}
+					}
 				}
 			}
 			rows.push(newObj);
 		}
-		if((req.body.column.length>0 && cols.length>50) || columnNames.length>50) {
+		if((req.body.column!=undefined && req.body.column.length>0 && cols.length>50) || newcols.length>50) {
 			return res.send("columnExceeds");
 		} 
 		if(cols.length>0 && newcols.length==0) return res.send("invalidcols");
