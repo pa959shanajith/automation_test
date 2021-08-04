@@ -9,7 +9,7 @@ const Design = () => {
 
     useEffect(()=>{
         if(window.localStorage['navigateScreen'] !== "TestCase"){
-            RedirectPage(history);
+            RedirectPage(history, { reason: "screenMismatch" });
         }
         //eslint-disable-next-line
     }, []);
