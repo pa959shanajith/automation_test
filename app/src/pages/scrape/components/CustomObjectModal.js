@@ -238,7 +238,7 @@ const CreateObjectModal = props => {
                 props.setNewScrapedData(updatedNewScrapeData);
                 props.updateScrapeItems(localScrapeList)
                 props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
-                props.setSaved(false);
+                props.setSaved({ flag: false });
                 props.setShow(false);
                 props.setShowPop(MSG.SCRAPE.SUCC_OBJ_CREATE);
             }

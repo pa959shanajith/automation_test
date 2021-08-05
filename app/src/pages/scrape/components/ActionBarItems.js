@@ -25,7 +25,7 @@ const UpperContent = props => {
 
     useEffect(() => {
         setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
-        if (saved || disableAction) setAppendCheck(false);
+        if (saved.flag || disableAction) setAppendCheck(false);
         //eslint-disable-next-line
     }, [appType, saved, subTaskId]);
 
@@ -56,7 +56,7 @@ const UpperContent = props => {
         dispatch({ type: actionTypes.SET_DISABLEACTION, payload: !event.target.checked });
         if (event.target.checked) {
             setAppendCheck(true);
-            if (appType==="Webservice") setSaved(false);
+            if (appType==="Webservice") setSaved({ flag: false });
         }
         else setAppendCheck(false);
     }

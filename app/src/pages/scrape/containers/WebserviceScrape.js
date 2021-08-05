@@ -286,7 +286,7 @@ const WebserviceScrape = () => {
                     }
                     
                     dispatch({type: actions.SET_WSDATA, payload: {reqBody : localReqBody}});
-                    setSaved(false);
+                    setSaved({ flag: false });
                 }
             })
             .catch(error => {
@@ -344,7 +344,7 @@ const WebserviceScrape = () => {
                     <button className="ws__cert_btn" onClick={()=>setShowObjModal("addCert")}>
                         <img alt="cert-icon" src="static/imgs/certificate_ws.png"/>
                     </button>
-                    <button className="ws__action_btn ws__bigBtn" disabled={saved && disableAction } onClick={onSave}>Save</button>
+                    <button className="ws__action_btn ws__bigBtn" disabled={saved.flag && disableAction } onClick={onSave}>Save</button>
                     <button className="ws__action_btn ws__bigBtn" disabled={
                         !wsdlURL && opDropdown === "0" && !endPointURL && method === "0" && !opInput && !reqHeader && !reqBody && !respHeader && !respBody && !paramHeader
                     } onClick={clearFields}>Clear</button>

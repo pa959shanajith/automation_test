@@ -34,7 +34,7 @@ const ScrapeScreen = ()=>{
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const [scrapeItems, setScrapeItems] = useState([]);
     const [mainScrapedData, setMainScrapedData] = useState({});
-    const [saved, setSaved] = useState(true);
+    const [saved, setSaved] = useState({flag: true});
     const [mirror, setMirror] = useState({scrape: null, compare: null});
     const [showAppPop, setShowAppPop] = useState(false);
     const [isUnderReview, setIsUnderReview] = useState(false);
@@ -98,7 +98,7 @@ const ScrapeScreen = ()=>{
                     setNewScrapedData([]);
                     setScrapeItems(newScrapeList);
                     setHideSubmit(!haveItems);
-                    setSaved(true);
+                    setSaved({ flag: true });
                     setOrderList(newOrderList);
                     setOverlay("");
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
@@ -127,10 +127,10 @@ const ScrapeScreen = ()=>{
                                 respBody : localRespBody
                             }
                         });
-                        setSaved(true);
+                        setSaved({ flag: true });
                         setHideSubmit(false);
 					} else {
-                        setSaved(false);
+                        setSaved({ flag: false });
                         setHideSubmit(true);
                         dispatch({type: actionTypes.SET_WSDATA, payload: {
                             endPointURL: "", method: "0", opInput: "", reqHeader: "",
@@ -254,7 +254,7 @@ const ScrapeScreen = ()=>{
                     if (scrapedItemsLength > 0) dispatch({ type: actionTypes.SET_DISABLEACTION, payload: true });
                     else dispatch({ type: actionTypes.SET_DISABLEACTION, payload: false });
 
-                    setSaved(false);
+                    setSaved({ flag: false });
                     err = {
                         'variant':  data === 'scheduleModeOn'?MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT:MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'content':
                             data === 'scheduleModeOn' ?
@@ -315,7 +315,7 @@ const ScrapeScreen = ()=>{
                         setMirror({scrape: viewString.mirror, compare: null});
                         setOrderList(oldOrderList => [...oldOrderList, ...newOrderList]);
                         
-                        if (viewString.view.length > 0) setSaved(false);
+                        if (viewString.view.length > 0) setSaved({ flag: false });
                     }                        
                 }
 

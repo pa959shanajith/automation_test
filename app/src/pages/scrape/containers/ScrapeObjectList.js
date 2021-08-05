@@ -36,7 +36,7 @@ const ScrapeObjectList = () => {
         setDeleted([]);
         setModified({});
         setEditableObj({});
-        setSaved(true);
+        setSaved({ flag: true });
         setDnd(false);
         //eslint-disable-next-line
     }, [current_task])
@@ -89,13 +89,12 @@ const ScrapeObjectList = () => {
     }, [scrapeItems])
 
     useEffect(()=>{
-        if (!saved) setDisableBtns({...disableBtns, save: false});
+        if (!saved.flag) setDisableBtns({...disableBtns, save: false});
         else {
             setDisableBtns({...disableBtns, save: true});
             setDeleted([]);
             setDnd(false); 
             setModified({});
-            // setActiveEye(null);
             setShowSearch(false);
             setSearchVal("");
             setSelAllCheck(false);
@@ -156,7 +155,7 @@ const ScrapeObjectList = () => {
             setModified(modifiedDict);
         }
         else if (!isCustom) setNewScrapedData(updNewScrapedData);
-        if(!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved(false);
+        if(!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
         setScrapeItems(localScrapeItems);
     }
 
@@ -363,7 +362,7 @@ const ScrapeObjectList = () => {
                     setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: numOfObj !== 0});
                     dispatch({type: actionTypes.SET_DISABLEAPPEND, payload: numOfObj === 0});
-                    setSaved(true);
+                    setSaved({ flag: true });
                 } else console.error(resp);
             })
             .catch(error => console.error(error));
@@ -372,7 +371,7 @@ const ScrapeObjectList = () => {
     }
 
     const onDrop = () => {
-        setSaved(false);
+        setSaved({ flag: false });
     }
 
     const onRearrange = (e, status) => {
