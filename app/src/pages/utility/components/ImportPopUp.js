@@ -2,7 +2,7 @@ import React, { useRef, useState, Fragment, useEffect } from 'react';
 import { ModalContainer, Messages as MSG } from '../../global';
 import { importDataTable } from '../api';
 import { parseTableData } from './DtUtils';
-import "../styles/ExportDataTable.scss";
+import "../styles/DataTablePopup.scss";
 
 const ImportPopUp = ({setImportPopup,setData,setHeaders,setOverlay,setShowPop}) => {
 
@@ -63,7 +63,6 @@ const Container = ({submit,setSubmit,setData,setHeaders,setImportPopup,setOverla
             if(err){
                 return;
             }
-            var importData = fileUpload;
             (async()=>{
                 setOverlay("Importing File...");
                 const resp = await importDataTable({importFormat: importType, row: rowTag, column:columnTagList, sheetname:sheetRef.current? sheetRef.current.value: undefined,content: fileUpload, flag:"data"});
@@ -91,10 +90,10 @@ const Container = ({submit,setSubmit,setData,setHeaders,setImportPopup,setOverla
         }
     },[submit])
     return (
-        <div data-test='mp__import-popup' className = 'mp__import-popup'>
+        <div data-test='dt__import-popup' className = 'dt__import-popup'>
                 <div>
                     <label>Import Format:</label>
-                    <select className='imp-inp' defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
+                    <select defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
                         <option value={'def-val'} disabled>Select Import Format</option>
                         <option value={'excel'}>Excel Workbook (.xls, .xlsx)</option>
                         <option value={'csv'}>CSV</option>
@@ -190,8 +189,6 @@ const uploadFile = async({importType,uploadFileRef,setFiledUpload,setSheetList,s
             if(res.length>0){
                 setFiledUpload(result)
                 setSheetList(res)
-            }else{
-                setError("File is empty")
             }
         } else if ((importType === 'csv' && extension === 'csv') || (importType === 'xml' && extension === 'xml')) {
             setFiledUpload(result)
@@ -201,11 +198,11 @@ const uploadFile = async({importType,uploadFileRef,setFiledUpload,setSheetList,s
             if(uploadFileRef.current)uploadFileRef.current.value = ''
             setShowPop(MSG.UTILITY.ERR_FILE_UNSUPPORTED)
         }    
-        setOverlay("")
     }catch(err){
-        setOverlay("")
         setError("invalid File!")
         console.error(err)
+    }finally {
+        setOverlay("")
     }
 }
 
