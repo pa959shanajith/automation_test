@@ -15,6 +15,7 @@ const ScrapeObjectList = () => {
     const dispatch = useDispatch();
     const current_task = useSelector(state=>state.plugin.CT);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
+    const isFiltered = useSelector(state=>state.scrape.isFiltered);
     const history = useHistory();
 
     // const [activeEye, setActiveEye] = useState(null);
@@ -81,7 +82,7 @@ const ScrapeObjectList = () => {
         }
 
         if (dnd) disable = { ...disable, selAll: true};
-        if (visible < total || total === 1) disable = { ...disable, dnd: true};
+        if (isFiltered || total === 1) disable = { ...disable, dnd: true};
 
         setDisableBtns({...disableBtns, ...disable})
         setSelAllCheck(checkAll);
