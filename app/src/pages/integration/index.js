@@ -13,7 +13,7 @@ const Integration = ()=>{
     const dispatch = useDispatch();
     useEffect(()=>{
         if(window.localStorage['navigateScreen'] !== "integration"){
-            RedirectPage(history);
+            RedirectPage(history, { reason: "screenMismatch" });
         }
     SetProgressBar("stop", dispatch);
     }, [dispatch]);

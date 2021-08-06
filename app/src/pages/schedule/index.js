@@ -13,7 +13,7 @@ const Schedule = () => {
 
   useEffect(()=>{
     if(window.localStorage['navigateScreen'] !== "scheduling"){
-        RedirectPage(history);
+        RedirectPage(history, { reason: "screenMismatch" });
     }
   }, []);
   

@@ -14,7 +14,7 @@ const Report = () => {
   const dispatch = useDispatch();
   useEffect(()=>{
     if(window.localStorage['navigateScreen'] !== "reports"){
-        RedirectPage(history);
+        RedirectPage(history, { reason: "screenMismatch" });
     }
     SetProgressBar("stop", dispatch);
   }, [dispatch]);

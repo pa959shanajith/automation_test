@@ -27,18 +27,29 @@ const BasePage = () => {
 
     useEffect(()=>{
         (async()=>{
-            const checkLogout = JSON.parse(window.sessionStorage.getItem('checkLoggedOut'));
+            const checkLogout = JSON.parse(window.sessionStorage.getItem('logoutFlag'));
             window.localStorage.clear();
             window.sessionStorage.clear();
+
+            let reason = "";
+            let showLoginAgain = false;
+
             if (checkLogout) {
-                if ((typeof(checkLogout) === "object") && (checkLogout.length === 2)) {
-                    if (checkLogout[1] === "dereg") setLoginValidation("Reason: User is deleted from Avo Assure");
-                    else setLoginValidation("Your session has been terminated by "+checkLogout[0]);
-                } else if ((typeof(checkLogout) === "object") && (checkLogout.length === 1)) {
-                    setLoginValidation(checkLogout[0]);
-                } else setLoginValidation("You Have Successfully Logged Out!");
+                switch(checkLogout.reason) {
+                    case "dereg": reason = `Your session has been terminated by ${checkLogout.by}. Reason: User is deleted from Avo Assure`; break;
+                    case "session": reason = `Your session has been terminated by ${checkLogout.by}`; showLoginAgain = true; break;
+                    case "logout":  reason = "You Have Successfully Logged Out!"; break;
+                    case "invalidSession": reason = "Your session has expired!"; showLoginAgain = true; break;
+                    case "screenMismatch": reason = "You have been logged out due to URL manipulation"; showLoginAgain = true; break;
+                    default: break;
+                }
+            } 
+            
+            if (reason) {    
+                setLoginValidation(reason);
                 SetProgressBar("stop");
-            }
+                setLoginAgain(showLoginAgain);
+            } 
             else {
                 setLoginAgain(false);
                 try{
@@ -119,14 +130,14 @@ const BasePage = () => {
 			} else if (data !== "success") {
                 setLoginValidation("Failed to record user preference. Please Try again!");
                 setShowTCPopup(false);
-                RedirectPage(history);
+                RedirectPage(history, { reason: "userPrefHandle" });
             }
             else {
 				if (action === "Accept") loadProfile(userProfile);
 				else {
                     setLoginValidation("Please accept our terms and conditions to continue to use Avo Assure!");
                     setShowTCPopup(false);
-                    RedirectPage(history);
+                    RedirectPage(history, { reason: "userPrefHandle" });
                 }
 			}
         })
