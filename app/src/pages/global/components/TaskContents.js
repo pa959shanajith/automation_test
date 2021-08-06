@@ -140,7 +140,7 @@ const TaskPanel = props => {
     return (  
         <>
             <div className={"task-panel " + (props.showPanel === props.item.panel_idx ? "active-task " : "")} panel-id={props.item.panel_idx}>
-            <div className="panel-content " id={`panelBlock_${props.item.panel_idx}`}>
+            <div className="panel-content " id={`panelBlock_${props.item.panel_idx}`} title={props.item.taskname} >
                 <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4>
                 <span className={"assign-task" + (props.disableTask ? "  disable-task" : "")} onClick={taskRedirection} >
                     {props.item.taskname.length >= 45 ? props.item.taskname.substr(0, 44)+"..." : props.item.taskname}
@@ -151,10 +151,10 @@ const TaskPanel = props => {
             </div>
             { props.showPanel === props.item.panel_idx &&
             <div className="task-description" description-id={descId}>
-                <div>Description: {desc}</div>
-                <div>Release: {rel}</div>
-                <div>Cycle: {cyc}</div>
-                <div>Apptype: {appType}</div>
+                <div title={desc}>Description: {desc}</div>
+                <div title={rel}>Release: {rel}</div>
+                <div title={cyc}>Cycle: {cyc}</div>
+                <div title={appType}>Apptype: {appType}</div>
             </div>
             }
             </div>
