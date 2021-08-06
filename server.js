@@ -489,7 +489,11 @@ if (cluster.isMaster) {
 		app.post('/APG_createAPGProject', auth.protect, flowGraph.APG_createAPGProject);
 		app.post('/APG_runDeadcodeIdentifier', auth.protect, flowGraph.APG_runDeadcodeIdentifier);
 		app.post('/getUserICE', auth.protect, io.getUserICE)
-		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE)
+		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE);
+
+		app.post('/execRequest', auth.protect, design.executeRequest);
+		app.get('/oauth2/callback', auth.protect, design.oAuth2Callback);
+		app.post('/oauth2', auth.protect, design.oAuth2auth);
 		//-------------Route Mapping-------------//
 
 		// To prevent can't send header response
