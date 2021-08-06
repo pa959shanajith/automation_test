@@ -394,7 +394,7 @@ const Messages={
         ERR_DUPLICATE_HEADER: {"CONTENT":'Data has duplicate headers.', "VARIANT": VARIANT.ERROR},
         ERR_SAVE_HEADER: {"CONTENT":'Cannot save with empty header.', "VARIANT": VARIANT.ERROR},
         ERR_TABLE_EXIST: {"CONTENT":'Data Table Already Exist.', "VARIANT": VARIANT.ERROR},
-        ERR_FILE_UNSUPPORTED: {"CONTENT":'File is not supported or file type does not match with import type.', "VARIANT": VARIANT.ERROR},
+        ERR_FILE_UNSUPPORTED: {"CONTENT":'File is not supported.', "VARIANT": VARIANT.ERROR},
         ERR_COL_15: {"CONTENT":'Column should not exceed 15', "VARIANT": VARIANT.ERROR},
         ERR_ROW_200: {"CONTENT":'Row should not exceed 200', "VARIANT": VARIANT.ERROR},
         ERR_EMPTY_DATA: {"CONTENT":'Empty data in the file.', "VARIANT": VARIANT.ERROR},
