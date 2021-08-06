@@ -295,22 +295,11 @@ exports.importDtFromXML = function (req, res) {
 					return res.send("nestedXML");
 				} else {
 					name = alltags[j].nodeName;
-					if(cols.length>0) {
-						if(cols.includes(name)) {
-							if(columnNames.includes(name))	{
-								for(var k=0;k<columnNames.length;++k) {
-									if(newcols[k].name==name) id=newcols[k].id;
-								}
-								newObj[id] = alltags[j].childNodes[0].nodeValue;
-							}
-							else {
-								ob = {id: uuid(), name: alltags[j].nodeName}
-								columnNames.push(ob.name)
-								newcols.push(ob)
-								newObj[ob.id] = alltags[j].childNodes[0].nodeValue;
-							}
-						}
-					} else {
+					flag = true;
+					if(cols.length>0 && !cols.includes(name)) {
+						flag = false;
+					} 
+					if(flag) {
 						if(columnNames.includes(name))	{
 							for(var k=0;k<columnNames.length;++k) {
 								if(newcols[k].name==name) id=newcols[k].id;
