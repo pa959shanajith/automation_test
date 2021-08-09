@@ -43,6 +43,7 @@ const SamlConfig = (props) => {
         setIdpErrBorder(false);
         setCertNameErrBorder(false);
         setNameErrBorder(false);
+        if(document.getElementById("samlServerName")) document.getElementById("samlServerName").selectedIndex = "0"; 
     }
 
     const displayError = (error) =>{
@@ -106,12 +107,6 @@ const SamlConfig = (props) => {
 		const popupTitle = bAction+" SAML Configuration";
 		const failMsg = "Failed to "+action+" '"+confObj.name+"' configuration.";
         setLoading(bAction.slice(0,-1)+"ing configuration...");
-		//Transaction Activity for Create/ Update/ Delete SAML conf button Action
-		// var labelArr = [];
-		// var infoArr = [];
-		// labelArr.push(txnHistory.codesDict['SamlConfmanage']);
-		// infoArr.push(action);
-		// txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		const data = await manageSAMLConfig(action, confObj);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
@@ -244,7 +239,7 @@ const SamlConfig = (props) => {
                     {(samlEdit===false)?
                     <Fragment>
                         <span className="leftControl-saml" title="Server Name">Server Name</span>
-                        <input type="text" autoComplete="off" id="samlServerName" name="samlServerName" value={name} onChange={(event)=>{updateSamlServerName(event.target.value)}} maxLength="100" className={nameErrBorder?"inputErrorBorder middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create":" middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create"} placeholder="Server Name"/>
+                        <input type="text" autoComplete="off" value={name} onChange={(event)=>{updateSamlServerName(event.target.value)}} maxLength="100" className={nameErrBorder?"inputErrorBorder middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create":" middle__input__border-saml form-control-saml form-control-custom-saml validationKeydown preventSpecialChar create"} placeholder="Server Name"/>
                     </Fragment>
                     :<Fragment>
                         <span className="leftControl-saml" title="Server Name">Server Name</span>

@@ -119,7 +119,7 @@ return(
             <ScrollBar scrollId='toolbar_module-list' trackColor={'transperent'} thumbColor={'grey'}>
             {moduleList.map((e,i)=>{
                 return(
-                    <div data-test="individualModules"name={e.name} value={e._id} type={e.type} onClick={(e)=>selectModule(e)} key={i} className={'ene_toolbar__module-box'+((moduleSelect._id === e._id)?" selected":"")}>
+                    <div data-test="individualModules"name={e.name} value={e._id} type={e.type} onClick={(e)=>selectModule(e)} key={i} className={'ene_toolbar__module-box'+((moduleSelect._id === e._id)?" selected":"")} title={e.name}>
                         <img src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img>
                         <span value={e._id} >{e.name}</span>
                     </div>
