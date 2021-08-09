@@ -290,21 +290,18 @@ exports.importDtFromXML = function (req, res) {
 		for( var i=0;i<allrows.length;++i) {
 			var newObj = {};
 			var alltags = allrows[i].childNodes; 
-			for(var j=0;j<alltags.length;++j) {
-				if(alltags[j].nodeType ==1 && checkForNesting(alltags[j])) {
-					return res.send("nestedXML");
-				} else {
-					name = alltags[j].nodeName;
-					flag = true;
-					if(cols.length>0 && !cols.includes(name)) {
-						flag = false;
-					} 
-					if(flag) {
+			for(var j=0;alltags.length>0 && j<alltags.length;++j) {
+				let name = alltags[j].nodeName;
+				if(alltags[j].nodeType ==1 && checkForNesting(alltags[j]))  return res.send("nestedXML");
+				else {
+					if(!(cols.length>0 && !cols.includes(name))) {
 						if(columnNames.includes(name))	{
 							for(var k=0;k<columnNames.length;++k) {
-								if(newcols[k].name==name) id=newcols[k].id;
+								if(newcols[k].name==name) {
+									newObj[newcols[k].id] = alltags[j].childNodes[0].nodeValue;
+									break;
+								}
 							}
-							newObj[id] = alltags[j].childNodes[0].nodeValue;
 						}
 						else {
 							ob = {id: uuid(), name: alltags[j].nodeName}
@@ -315,11 +312,12 @@ exports.importDtFromXML = function (req, res) {
 					}
 				}
 			}
-			rows.push(newObj);
+			if (alltags.length>0) rows.push(newObj);
 		}
 		if((req.body.column!=undefined && req.body.column.length>0 && cols.length>50) || newcols.length>50) {
 			return res.send("columnExceeds");
 		} 
+		if (rows.length==0) return res.send("emptyRow")
 		if(cols.length>0 && newcols.length==0) return res.send("invalidcols");
 		qObj['datatable'] = rows;
 		qObj['dtheaders'] = newcols;
