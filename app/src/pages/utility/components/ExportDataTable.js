@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { validateData } from './DtUtils';
 import { ModalContainer, Messages as MSG } from '../../global';
 import { exportDataTable } from '../api';
-import "../styles/ExportDataTable.scss";
+import "../styles/DataTablePopup.scss";
 
 const ExportDataTable = props => {
 

@@ -305,9 +305,9 @@ export const importDataTable = async(arg) => {
             return res.data;
         }
         console.error(res.data)
-        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+        return { error:MSG.UTILITY.ERR_IMPORT}
     }catch(err){
         console.error(err)
-        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+        return {error:MSG.UTILITY.ERR_IMPORT}
     }
 }
