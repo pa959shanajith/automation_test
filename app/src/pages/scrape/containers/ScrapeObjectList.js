@@ -27,7 +27,7 @@ const ScrapeObjectList = () => {
     const [modified, setModified] = useState({});
     const [editableObj, setEditableObj] = useState({});
     const [dnd, setDnd] = useState(false);
-    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems } = useContext(ScrapeContext);
+    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, setOrderList } = useContext(ScrapeContext);
 
     useEffect(()=> {
         // setActiveEye(null);
@@ -212,6 +212,7 @@ const ScrapeObjectList = () => {
         let scrapeItemsL = [...scrapeItems];
         let modifiedDict = {...modified}
         let newScrapeList = [];
+        let newOrderList = [];
         newScrapeList = scrapeItemsL.filter( item => {
             if (item.checked){
                 if (item.objId) {
@@ -220,10 +221,14 @@ const ScrapeObjectList = () => {
                         delete modifiedDict[item.objId]
                 }
                 return false;
-            } else return true;
+            } else {
+                newOrderList.push(item.objId || item.tempOrderId)
+                return true;
+            }
         });
         setScrapeItems(newScrapeList)
         setDeleted(deletedArr);
+        setOrderList(newOrderList);
         setModified(modifiedDict);
         setDisableBtns({...disableBtns, delete: true, save: false})
     }

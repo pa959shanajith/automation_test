@@ -385,7 +385,7 @@ const ScrapeScreen = ()=>{
         <div data-test="ssBody" className="ss__body">
             <Header/>
             <div data-test="ssMidSection" className="ss__mid_section">
-                <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList }}>
+                <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList, setOrderList }}>
                     <ActionBarItems />
                     { current_task.appType === "Webservice" 
                         ? <WebserviceScrape /> 
