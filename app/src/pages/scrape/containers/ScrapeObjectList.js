@@ -230,7 +230,8 @@ const ScrapeObjectList = () => {
         setDeleted(deletedArr);
         setOrderList(newOrderList);
         setModified(modifiedDict);
-        setDisableBtns({...disableBtns, delete: true, save: false})
+        setDisableBtns({...disableBtns, delete: true})
+        setSaved({flag: false});
     }
 
     const onSave = (e, confirmed) => {
