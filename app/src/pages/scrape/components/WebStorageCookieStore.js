@@ -134,4 +134,4 @@ class WebStorageCookieStore extends ToughCookie.Store {
   }
 }
 
-module.exports = WebStorageCookieStore;
+export default WebStorageCookieStore;
