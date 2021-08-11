@@ -136,6 +136,47 @@ export const initScrapeWS_ICE = arg => {
     });
 }
 
+export const executeRequest = arg => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/execRequest", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                url: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+
+
+export const getOAuth2Token = arg => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/oauth2", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                payload: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+
 export const launchWSDLGo = wsdlUrl => {
     return new Promise((resolve, reject) => {
         axios(url+"/debugTestCase_ICE", {
@@ -200,3 +241,31 @@ export const updateIrisDataset = data => {
     });
 }
 
+export const readTestCaseFromScreen_ICE = (userInfo, screenId, versionnumber, screenName) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/readTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'readTestCase_ICE',
+                userInfo: userInfo,
+                screenid: screenId,
+                versionnumber: versionnumber,
+                screenName : screenName
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            console.log(res);
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject({error: res.status});
+            }
+        })
+        .catch(err=>reject({error: err}));
+    });
+}

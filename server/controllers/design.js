@@ -8,6 +8,8 @@ const epurl = process.env.DAS_URL;
 const logger = require('../../logger');
 const redisServer = require('../lib/redisSocketHandler');
 const utils = require('../lib/utils');
+const axios = require('axios');
+const ClientOAuth2 = require('client-oauth2');
 
 exports.readTestCase_ICE = async (req, res) => {
 	const fnName = "readTestCase_ICE";
@@ -57,7 +59,8 @@ exports.readTestCase_ICE = async (req, res) => {
 			reuse: reuse,
 			testcase: testcasesteps,
 			testcasename: testcasename,
-			del_flag: result.del_flag
+			del_flag: result.del_flag,
+			testcaseid: result.testcaseid
 		};
 		if (result.screenName) {
 			responsedata.screenName = result.screenName;
@@ -102,6 +105,48 @@ exports.updateTestCase_ICE = async (req, res) => {
         res.status(500).send("fail");
 	}
 };
+
+exports.executeRequest = (req, response) => {
+		axios.get(req.body.url).then(res => response.send(res))
+		.catch(err => {
+			response.send(err.response.headers);
+		});
+}
+let oAuth2Client = null;
+exports.oAuth2auth = (req, response) => {
+	const payload = req.body.payload;
+	oAuth2Client = new ClientOAuth2({
+		clientId: payload['client id'] || '',
+		clientSecret: payload['client secret'] || '',
+		accessTokenUri: payload['access token url'],
+		authorizationUri: payload['auth url'],
+		redirectUri: payload['callback url']
+	});
+	const authUri = oAuth2Client.code.getUri();
+	response.send(authUri);
+}
+
+exports.oAuth2Callback = (req, res) => {
+ 
+	  // We should store the token into a database.
+	const params = req.originalUrl;
+	res.type('html');
+	return res.send(`
+		<html>
+			<body>
+			<script>
+			if(window.opener) {
+				//this might support dev and prod
+				window.opener.postMessage("${params}", "http://"+window.location.hostname+":"+${process.env.SERVER_PORT});
+				window.opener.postMessage("${params}", "https://"+window.location.hostname+":"+${process.env.SERVER_PORT});
+				window.opener.postMessage("${params}", "https://"+window.location.hostname);
+				window.close();
+			}
+			</script>
+			</body>
+		</html>
+	`);
+}
 
 exports.debugTestCase_ICE = function (req, res) {
 	var username,icename;
