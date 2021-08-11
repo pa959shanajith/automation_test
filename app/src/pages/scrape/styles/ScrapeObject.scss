@@ -17,7 +17,7 @@
 }
 
 .ss_obj_name{
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     font-size: 16px;
     color: $darkGray;
     margin-left: 10px;
@@ -44,7 +44,7 @@
 
 .ss_obj_name_input{
     padding: 2px 7px;  
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     color: $darkGray;
     margin-left: 2px;
     font-size: 13px;

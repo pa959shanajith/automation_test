@@ -3,7 +3,7 @@
     background: $primaryColorDark;
     position: absolute;
     color: $whiteColor;
-    font-family: "LatoWebLight";
+    font-family: $avoSecondaryFont;
     font-size: 12px;
     display: flex;
     flex-direction: column;
@@ -147,7 +147,7 @@
         padding: 8px 15px;
         margin: 0;
         font-size: 18px;
-        font-family: "LatoWeb";
+        font-family: $avoFont ;
         
         img{
             width: 8px;
@@ -212,7 +212,7 @@
 }
 
 .search_task__input{
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     font-size: 13px;
     border: 1px solid $borderTwo;
     border-left: none;

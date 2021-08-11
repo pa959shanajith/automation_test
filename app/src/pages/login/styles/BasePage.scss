@@ -1,6 +1,6 @@
 @import "../../global/styles/ColorVariables.scss";
 .error-msg{
-    font-family: "LatoWebMedium";
+    font-family: $avoPrimaryFont;
     font-size: 14px;
     color: $redError;
     width: 100%;

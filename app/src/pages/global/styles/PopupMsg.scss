@@ -25,7 +25,7 @@
     -webkit-border-radius: 5px;
     cursor: auto;
     color: $darkGray;
-    font-family: LatoWeb;
+    font-family: $avoFont;
     padding: 8px;
 }
 .popup__header{
@@ -44,7 +44,7 @@
     color: $whiteColor;
     opacity: 1;
     text-shadow: none;
-    font-family: 'LatoWebThin';
+    font-family: $avoThinFont;
     font-size: 35px;
     border: none;
     background: transparent;
@@ -112,7 +112,7 @@ button:focus{
         color: $whiteColor;
         opacity: 1;
         text-shadow: none;
-        font-family: 'LatoWebThin';
+        font-family: $avoThinFont;
         font-size: 28px;
         border: none;
         background: transparent;

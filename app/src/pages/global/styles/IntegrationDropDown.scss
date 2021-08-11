@@ -24,7 +24,7 @@
 }
 .i__error-msg{
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
     float: left;
     padding: 16px 0 0 12px;
     color: $red;
@@ -40,7 +40,7 @@
     padding: 2px 15px !important;
     font-size: 17px !important;
     background: $primaryColor ;
-	font-family: 'LatoWebLight' !important;
+	font-family: $avoSecondaryFont !important;
     outline: 0 !important;
 }
 .i__input{

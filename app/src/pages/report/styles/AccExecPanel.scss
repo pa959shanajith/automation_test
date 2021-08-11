@@ -8,7 +8,7 @@
     background: $primaryColorDarkest;
     padding: 10px 15px;
     font-size: 15px;
-    font-family: LatowebBold;
+    font-family: $avoBoldFont;
     white-space: nowrap;
 }
 .ac__execution-table{
@@ -40,7 +40,7 @@
     >.ac__row:first-child{
         font-size: 14px;
         color: $primaryColorDarkest !important;
-        font-family: Latoweb !important;
+        font-family: $avoFont !important;
         white-space: nowrap;    
         font-weight: 600;
         background : rgb(225, 221, 228);

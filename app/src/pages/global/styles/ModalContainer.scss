@@ -26,7 +26,7 @@
     padding: 10px 20px;
     cursor: auto;
     color: $darkGray;
-    font-family: LatoWeb;
+    font-family: $avoFont;
     padding: 8px;
     outline: 0;
     -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
@@ -54,7 +54,7 @@
     color: $whiteColor;
     opacity: 1;
     text-shadow: none;
-    font-family: 'LatoWebThin';
+    font-family: $avoThinFont;
     font-size: 35px;
     border: none;
     background: transparent;

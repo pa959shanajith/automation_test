@@ -16,7 +16,7 @@
         padding: 8px 15px;
         margin: 0;
         font-size: 18px;
-        font-family: "LatoWeb";
+        font-family: $avoFont ;
         background: $primaryColorDark;
         border-radius: 5px 5px 0px 0px;
         -moz-border-radius: 5px 5px 0px 0px;
@@ -47,7 +47,7 @@
 #assistContent{
     background: $whiteColor;
     color: black;
-    font-family: 'Latoweb';
+    font-family: $avoFont;
     font-size: 15px;
     border: 1px solid $borderFive;
     padding: 15px 20px !important;
@@ -67,7 +67,7 @@
     background: $whisper !important;
     border-radius: 25px !important;
     color: black !important;
-    font-family: 'LatoWeb' !important;
+    font-family: $avoFont !important;
     font-size: 15px !important;
     //float: left; 
     display: -webkit-inline-box !important;
@@ -90,7 +90,7 @@
     float: right; 
     margin-top: 5px;
     display: -webkit-inline-box;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
     font-size: 15px;
     margin-right: 10px;
 
@@ -101,7 +101,7 @@
     overflow: none;
     border: 1px solid $borderOne !important;
     margin-bottom: 10px;
-    font-family: 'LatoWebMedium';
+    font-family: $avoPrimaryFont;
     resize: none;
     color: $darkGray;
     height: 34px;
@@ -121,7 +121,7 @@
     padding: 2px 15px;
     font-size: 17px;
     background: $primaryColor;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
     outline: 0;
 }
 .projBtns:last-of-type{

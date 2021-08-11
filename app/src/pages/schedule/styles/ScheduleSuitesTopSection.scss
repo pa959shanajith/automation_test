@@ -27,21 +27,21 @@
     width: 196px;
     padding: 0px;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
 }
 .scheduleSuite .datePicContainer{
 	position: relative;
     float: right;
     margin-right: 10px;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
 }
 .scheduleSuite .timePicContainer{
     position: relative; display: inline-block;
     float: right;
     margin-right: 10px;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
 }
 .selectScheduleSuite{float: left; margin: 10px 6px 0 6px !important;}
 .scheduleSuiteName{
@@ -55,7 +55,7 @@
     text-overflow: ellipsis;
     max-width: 350px;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
 }
 .datepickerIcon{
 	top: 3px;
@@ -67,7 +67,7 @@
     -moz-border-radius: 0px 4px 4px 0px;
     -webkit-border-radius: 0px 4px 4px 0px;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
     cursor:pointer;
 }
 .timepickerIcon{
@@ -80,7 +80,7 @@
     -moz-border-radius: 0px 4px 2px 0px;
     -webkit-border-radius: 0px 4px 2px 0px;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
     cursor:pointer;
 }
 .scenarioSchdCon{
@@ -91,7 +91,7 @@
 	background: $tableHeader;
     color: $whiteColor;
     font-size: 15px;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
 }
 
 .scenarioHeaders tr{width: 100%;}
@@ -114,7 +114,7 @@
 	padding: 0 5px 0 5px;
     text-align: center;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
 }
 .scenarioBody tr td input{
 	height: 24px;

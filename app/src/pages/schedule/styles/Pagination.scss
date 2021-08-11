@@ -34,7 +34,7 @@
     background-color: $whiteColor;
     border: 1px solid $borderFour;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
 }
 .pagination>.active>p, .pagination>.active>p:focus, .pagination>.active>p:hover, .pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover {
     z-index: 2;

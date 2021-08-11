@@ -17,7 +17,7 @@
     padding: 2px 15px !important;
     font-size: 17px !important;
     background: $primaryColor ;
-	font-family: 'LatoWebLight' !important;
+	font-family: $avoSecondaryFont !important;
     outline: 0 !important;
 }
 .e__content{
@@ -39,7 +39,7 @@
     background-color: $primaryColorDarkest;
     color: $whiteColor;
     padding: 1px 14px 0;
-    font-family: "LatoWebLight";
+    font-family: $avoSecondaryFont;
     font-size: 18px;
     width: fit-content;
     white-space: nowrap;
@@ -59,7 +59,7 @@
     border-radius: 20px;
     font-size: 14px;
     // line-height: 19.5px;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
 }
 #tableActionButtons{
 	float:left;
@@ -101,7 +101,7 @@
     padding: 0px 0px 0 10px;
     vertical-align: text-bottom;
     font-size: 16px;
-    font-family: LatoWeb;
+    font-family: $avoFont;
     position: relative;
     top: 3px;
 }

@@ -61,10 +61,10 @@
     z-index: 1;
     flex-grow: 1;
     color: $primaryColor;
-    font-family: "LatoWebMedium";
+    font-family: $avoPrimaryFont;
     
     h1 {
-        font-family: "LatoWebBlack";
+        font-family: $avoBlackFont;
         font-size: 68px;
         margin-bottom: 6px;
     }
