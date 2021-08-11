@@ -9,6 +9,7 @@ const initialState = {
     compareData: {},
     compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
     objValue: { val: null },
+    isFiltered: false,
     cert: {},
     WsData: {
         endPointURL: "",
@@ -122,6 +123,11 @@ const reducer = (state=initialState, action) => {
             return {
                 ...state,
                 config: { ...state.config, ...action.payload }
+            }
+        case actionTypes.SET_ISFILTER:
+            return {
+                ...state,
+                isFiltered: action.payload
             }
         default:
             return state

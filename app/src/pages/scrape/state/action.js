@@ -18,3 +18,4 @@ export const SET_REQ_AUTH_HEADER = "SS_SET_AUTH_HEADER";
 export const SET_RES_STATUS = "SS_SET_RES_STATUS";
 export const SET_COOKIES = "SS_SET_COOKIES";
 export const SET_CONFIGURATION = "SS_SET_CONFIG";
+export const SET_ISFILTER = "SS__SET_ISFILTER";
