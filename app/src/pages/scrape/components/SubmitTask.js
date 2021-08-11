@@ -11,7 +11,7 @@ const SubmitTask = () => {
     const { isUnderReview, hideSubmit, setShowConfirmPop, setShowPop } = useContext(ScrapeContext);
     const current_task = useSelector(state=>state.plugin.CT);
     const history = useHistory();
-    
+
 
     const redirectToPlugin = () => {
         window.localStorage['navigateScreen'] = "plugin";
