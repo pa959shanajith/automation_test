@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
-import "../../styles/WebserviceScrape.scss";
+import "../styles/WebserviceScrape.scss";
 import RequestEditor from "./RequestEditor";
 
 const modeOptions = ["none", "form-data", "x-www-form-urlencoded", "raw"];

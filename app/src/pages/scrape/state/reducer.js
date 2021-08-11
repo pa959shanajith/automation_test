@@ -1,5 +1,5 @@
 import * as actionTypes from './action';
-import WSCookieJar from "../../../utils/WSCookieJar";
+import WSCookieJar from "../components/WebServiceUtils";
 
 const initialState = {
     ScrapeData : [],

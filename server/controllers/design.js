@@ -130,25 +130,15 @@ exports.oAuth2Callback = (req, res) => {
  
 	  // We should store the token into a database.
 	const params = req.originalUrl;
-	// res.set({
-	// 	"Content-Type": "text/event-stream",
-	// 	"Cache-Control": "no-cache",
-	// 	"Access-Control-Allow-Origin": "*",
-	// 	"Access-Control-Allow-Headers":
-	// 	"Origin, X-Requested-With, Content-Type, Accept"
-	// });
-	// res.write(`data: ${params}\n\n`);
-	// res.end();
 	res.type('html');
 	return res.send(`
 		<html>
 			<body>
 			<script>
-			console.log(window);
 			if(window.opener) {
 				//this might support dev and prod
-				window.opener.postMessage("${params}", "http://"+window.location.hostname+":"+3000);
-				window.opener.postMessage("${params}", "https://"+window.location.hostname+":"+3000);
+				window.opener.postMessage("${params}", "http://"+window.location.hostname+":"+${process.env.SERVER_PORT});
+				window.opener.postMessage("${params}", "https://"+window.location.hostname+":"+${process.env.SERVER_PORT});
 				window.opener.postMessage("${params}", "https://"+window.location.hostname);
 				window.close();
 			}

@@ -18,9 +18,9 @@ import { ScrapeContext } from '../components/ScrapeContext';
 import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, ModalContainer, ResetSession, Messages as MSG } from '../../global';
 import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
-import * as scrapeUtils from "../../../utils/scrape";
-import WSCookieJar from "../../../utils/WSCookieJar";
-import * as ScrapeSettingsConstants from "../../../constants/ScrapeSettingsConstants";
+import * as scrapeUtils from "../components/WebServiceUtils";
+import WSCookieJar from "../components/WebServiceUtils";
+import * as ScrapeSettingsConstants from "../components/ScrapeSettingsConstants";
 import '../styles/ScrapeScreen.scss';
 
 const ScrapeScreen = ()=>{

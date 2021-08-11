@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import "../../styles/WebserviceScrape.scss";
+import React from "react";
+import "../styles/WebserviceScrape.scss";
 
 const FormInput = (props) => {
   return (

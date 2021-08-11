@@ -57,36 +57,6 @@ export const updateScreen_ICE = arg => {
 /*Component DesignContent
   api returns {"template":"","reuse":bool,"testcase":[{"addTestCaseDetails":"","addTestCaseDetailsInfo":"{\"actualResult_fail\":\"\",\"actualResult_pass\":\"\",\"testcaseDetails\":\"\"}","appType":"","cord":"","custname": "","inputVal":[""],"keywordVal":"","objectName":"","outputVal":"","remarks": "a;b","stepNo":int,"url":""}],"testcasename":"","del_flag":bool}
 */
-export const readTestCaseFromScreen_ICE = (userInfo, screenId, versionnumber, screenName) => {
-    return new Promise((resolve, reject)=> {
-        axios(url+"/readTestCase_ICE", {
-            method: 'POST',
-            headers : {
-                'Content-type' : 'application/json'
-            },
-            data : {
-                param : 'readTestCase_ICE',
-                userInfo: userInfo,
-                screenid: screenId,
-                versionnumber: versionnumber,
-                screenName : screenName
-            },
-            credentials : 'include',
-        })
-        .then(res=>{
-            console.log(res);
-            if (res.status === 200){
-                resolve(res.data);
-            }
-            else{
-                reject({error: res.status});
-            }
-        })
-        .catch(err=>reject({error: err}));
-    });
-}
-
-
 export const readTestCase_ICE = (userInfo, testCaseId, testCaseName, versionnumber, screenName) => {
     return new Promise((resolve, reject)=> {
         axios(url+"/readTestCase_ICE", {

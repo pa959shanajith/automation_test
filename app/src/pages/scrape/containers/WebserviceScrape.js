@@ -6,36 +6,22 @@ import ScreenWrapper from './ScreenWrapper';
 import { ScrapeContext } from '../components/ScrapeContext';
 import { RedirectPage, ResetSession, Messages as MSG } from '../../global';
 import SubmitTask from '../components/SubmitTask';
-import ScrapeSettings from "../components/ScrapeSettings/ScrapeSettings";
-import RequestEditor from "../components/UI/RequestEditor";
+import * as WsTabs from "../components/WsTabs";
 import * as api from '../api';
 import * as designApi from "../../design/api";
 import * as actions from '../state/action';
 import "../styles/WebserviceScrape.scss";
-import * as scrapeUtils from "../../../utils/scrape";
-import RequestBodyEditor from '../components/UI/RequestBodyEditor';
-import AuthEditor from "../components/Authorization/AuthEditor";
-import Tag from "../components/UI/Tag";
+import * as scrapeUtils from "../components/WebServiceUtils";
+import RequestBodyEditor from '../components/RequestBodyEditor';
+import AuthEditor from "../components/AuthEditor";
 import { combineHeaders } from "./ScrapeScreen";
-import Editor from "@monaco-editor/react";
-import * as ScrapeSettingsConstants from "../../../constants/ScrapeSettingsConstants";
+import * as ScrapeSettingsConstants from "../components/ScrapeSettingsConstants";
 
 let allXpaths = [];
 let allCustnames = [];
 let objectLevel = 1;
 let xpath = "";
 const CONTENT_TYPE_HEADER_REGEX = /Content-Type:[A-Za-z\/ \-;=_\?\&]*\n?/;
-// const BODY_MODE_HEADERS = {
-//     "none": "",
-//     "form-data" : "", 
-//     "x-www-form-urlencoded": "application/x-www-form-urlencoded",
-//     "Text": "text/plain",
-//     "JSON": "application/json",
-//     "Javascript": "application/javascript",
-//     "XML": "",
-//     "HTML": "text/html"
-// }
-
 const BODY_MODE_HEADERS = {
     "none": "",
     "form-data" : "", 
@@ -66,20 +52,12 @@ const WebserviceScrape = () => {
     const [activeView, setActiveView] = useState("req");
     const [reqBodyState, setReqBodyState] = useState({mode: "", rawMode: "", form: "", raw: reqBody});
     const reqAuthHeaders = useSelector(state => state.scrape.reqAuthHeaders);
-    const {resCookies, reqCookies, cookieJar, wsCookieJar} = useSelector(state => state.scrape.cookies);
+    const {resCookies, reqCookies, wsCookieJar} = useSelector(state => state.scrape.cookies);
     const config = useSelector(state => state.scrape.config);
     const [cookies, setCookies] = useState([]);
     const history = useHistory();
 
     useEffect(() => {
-        /* function loadCookies() {
-            wsCookieJar.getAll(endPointURL).then(cookies => {
-                console.log(cookies);
-                setCookies(cookies)
-            }).catch(err => console.log(err));
-        }
-        if(activeView === "cookie")
-        loadCookies(); */
         setCookies(wsCookieJar.getAllSync(endPointURL));
     }, [activeView, endPointURL, resCookies])
 
@@ -120,11 +98,6 @@ const WebserviceScrape = () => {
         else if (activeView === "param") dispatch({type: actions.SET_WSDATA, payload: {paramHeader : value}}) //setParamHeader(event.target.value);
         else dispatch({type: actions.SET_WSDATA, payload: {respHeader : value}}) //setRespHeader(event.target.value);
     }
-    const onBodyChange = event => {
-        if (activeView === "req") dispatch({type: actions.SET_WSDATA, payload: {reqBody : event.target.value}})//setReqBody(event.target.value);
-        else dispatch({type: actions.SET_WSDATA, payload: {respBody : event.target.value}})//setRespBody(event.target.value);
-    }
-
     const clearFields = () => {
         setwsdlURL("");
         setOpDropdown("0");
@@ -154,8 +127,7 @@ const WebserviceScrape = () => {
 
         // TODO - reduce checking for cookie jar disable rom 4 places to 2 
 
-        let validatedCookies = !config[ScrapeSettingsConstants.DISABLE_COOKIE_JAR] ? 
-            wsCookieJar.getAllSync(endPointURL) : [];
+        let validatedCookies = !config[ScrapeSettingsConstants.DISABLE_COOKIE_JAR] ? wsCookieJar.getAllSync(endPointURL) : [];
         // process and add external cookies
         let externalCookies = scrapeUtils.removeDisabled(reqCookies);
         externalCookies = externalCookies && externalCookies.split("\n").map(c => c.replace(":", "="));
@@ -317,7 +289,7 @@ const WebserviceScrape = () => {
                 console.error("Error::::", error)
             });
             // get testcase for this screen 
-            designApi.readTestCaseFromScreen_ICE(userInfo, current_task.screenId, current_task.versionnumber, current_task.screenName)
+            api.readTestCaseFromScreen_ICE(userInfo, current_task.screenId, current_task.versionnumber, current_task.screenName)
             .then(data => {
                 // add only keywords
                 let keywordVal = [{key: "setEndPointURL", value: endPointURL}, {key: "setMethods", value: method}];
@@ -343,13 +315,10 @@ const WebserviceScrape = () => {
                 designApi.updateTestCase_ICE(data.testcaseid, data.testcasename, testCases, userInfo, current_task.versionnumber, false, [])
                 .then(res => console.log(res))
                 .catch(err => console.error(err));
-
-                console.log(data,testCases);
             })
             .catch(err => console.error(err));
 		}
     }
-
 
     const onGo = () => {
 		if (!wsdlURL) setShowPop(MSG.SCRAPE.ERR_WSDL_URL); 
@@ -429,13 +398,21 @@ const WebserviceScrape = () => {
     }
     
     const displayTag = (respHeader) => {
-        const status = respHeader.substring(respHeader.indexOf("StatusCode"))
-                                    .split("\n");
-        // StatusCode:200  Reason:OK
+        const status = respHeader.substring(respHeader.indexOf("StatusCode")).split("\n");
         const statusCode = status[0]?.split(":")[1];
         const reason = status[1]?.split(":")[1];
-        const color = statusCode?.startsWith("2") ? 'green' : 'red';
-        return <Tag bold color={color}  text={statusCode + " "+(reason || '')}/>
+        return (
+            <div
+                className="ws__tag"
+                style={{
+                    backgroundColor: 'transparent',
+                    color: statusCode?.startsWith("2") ? 'green' : 'red',
+                    fontWeight: "bold"
+                }}
+            >
+                {`${statusCode} ${reason || ''}`}
+            </div>
+        );
     }
 
 
@@ -512,187 +489,32 @@ const WebserviceScrape = () => {
                     } onClick={clearFields}>Clear</button>
                 </div>
                 <div className="ws__row ws__action_options">
-                    <button className={"ws__action_btn" + (activeView==="req" ? " ws__active": "") + 
-                                        (actionError.includes("reqHeader") ? " ws__action_error" : "")} 
-                        onClick={()=>setActiveView("req")}>
-                        Header
-                        { activeView === "req" && <div className="caret__ws fa fa-caret-down"></div>}
-                    </button>
-                    <button className={"ws__action_btn" + (activeView==="param" ? " ws__active": "")} 
-                            onClick={()=>setActiveView("param")}>
-                        Params
-                        { activeView === "param" && <div className="caret__ws fa fa-caret-down"></div>}
-                    </button>
-                    <button className={"ws__action_btn" + (activeView==="body" ? " ws__active": "") + 
-                                        (actionError.includes("reqBody") ? " ws__action_error" : "")} 
-                            onClick={()=>setActiveView("body")}>
-                        Body
-                        { activeView === "body" && <div className="caret__ws fa fa-caret-down"></div>}
-                    </button>
-                    <button className={"ws__action_btn" + (activeView==="auth" ? " ws__active": "")} 
-                            onClick={()=>setActiveView("auth")}>
-                        Authorization
-                        { activeView === "auth" && <div className="caret__ws fa fa-caret-down"></div>}
-                    </button>
-                    <button className={"ws__action_btn" + (activeView==="cookie" ? " ws__active": "")} 
-                            onClick={()=>setActiveView("cookie")}>
-                        Cookies
-                        { activeView === "cookie" && <div className="caret__ws fa fa-caret-down"></div>}
-                    </button>
-                    <button className={"ws__action_btn" + (activeView==="config" ? " ws__active": "")} 
-                            onClick={()=>setActiveView("config")}>
-                        Settings
-                        { activeView === "config" && <div className="caret__ws fa fa-caret-down"></div>}
-                    </button>
-                    <button className={"ws__action_btn" + (activeView==="resp" ? " ws__active": "")} 
-                            onClick={()=>setActiveView("resp")}>
-                        Response
-                        { activeView === "resp" && <div className="caret__ws fa fa-caret-down"></div>}
-                    </button>
-                </div>
-
-                {activeView === "config" && <ScrapeSettings/>}
-
-                
-                {activeView === "resp" ? <>
-                <div style={{marginBottom: '10px' }}>
-                <div className="ws__heading_grey">
-                      STATUS : {" "}
-                    </div>
-                {displayTag(respHeader)}
-                <button className={"ws__action_btn"} 
-                            onClick={saveResponse}>
-                        Save Response
-                </button>
-                </div>
-                
-                {/* <textarea 
-                    className={"ws__rqst_resp_header"}
-                    value={respHeader} 
-                    placeholder={"Response Header"}
-                    onChange={onHeaderChange}
-                    disabled={activeView === "resp"}
-                />
-                <textarea 
-                    className={"ws__rqst_resp_header"}
-                    value={respBody} 
-                    placeholder={"Response Body"}
-                    onChange={onBodyChange}
-                    disabled={activeView === "resp"}
-                />*/}
-                <div className="ws__heading_grey">
-                      RESPONSE HEADERS: 
-                </div>
-                <Editor
-                    height="200px"
-                    value={respHeader}
-                    options={{
-                        contextmenu: false,
-                        readOnly: true,
-                        lineNumbers: 'off'
-                    }}
-                />
-                <br/><br/>
-                <div className="ws__heading_grey">
-                      RESPONSE BODY: 
-                </div>
-                <Editor
-                    height="200px"
-                    value={respBody}
-                    language={respHeader.includes("xml") ? "xml" : respHeader.includes("json") ? "json" : "text"}
-                    options={{
-                        contextmenu: false,
-                        readOnly: true,
-                        lineNumbers: 'off'
-                    }}
-                />
-                
-                </> : null}
-
-                {/* Display current Auth Headers */}
-                {activeView === "req" && 
-                    <div className="ws__action_options">
-                    <span style={{ fontWeight: "bold", color: "#868686" }}>
-                      AUTO GENERATED HEADERS :-{" "}
-                    </span>
-                    <button className={"ws__action_btn"} 
-                            onClick={()=>  {
-                                dispatch({type: actions.SET_REQ_AUTH_HEADER, payload: []});
-                            }}>
-                                Clear
-                    </button>
-                    <br/>
-                    <h6 style={{ color: "#633693" }}>{reqAuthHeaders.length ? reqAuthHeaders.join("\n") : "None"}</h6>
-                  </div>
-                }
-
-                {activeView === "req" || activeView === "param" ? 
-                <RequestEditor
-                    value={activeView === "req" ? reqHeader : paramHeader}
-                    onChangeHandler={(value) => onHeaderChange(value)} 
-                    activeView={activeView}
-                    disabled={disableAction}
-                    placeholder="key:value"
-                    /> : null}
-                
-                {activeView === "cookie" && 
-                    <>
-                        <div className="ws__action_options" style={{ maxHeight: "200px" }}>
-                            <span style={{ fontWeight: "bold", color: "#868686" }}>
-                                RESPONSE COOKIES :-{" "}
-                            </span>
-                            <button className={"ws__action_btn"} 
-                            onClick={()=>  {
-                                wsCookieJar.clear(endPointURL);
-                                dispatch({type: actions.SET_COOKIES, payload: {resCookies: []}});
-                            }}>
-                                Clear
+                    { [ 
+                        { name: "Header", id: "req", error: "reqHeader" },
+                        { name: "Params", id: "param" },
+                        { name: "Body", id: "body", error: "reqBody" },
+                        { name: "Authorization", id: "auth" },
+                        { name: "Cookies", id: "cookie" },
+                        { name: "Settings", id: "config" },
+                        { name: "Response", id: "resp" }
+                        ].map(tab => (
+                            <button key={tab.id} className={"ws__action_btn" + (activeView===tab.id ? " ws__active": "") + 
+                                (actionError.includes(tab.error) ? " ws__action_error" : "")} 
+                                onClick={()=>setActiveView(tab.id)}>
+                                            {tab.name}
+                                { activeView === tab.id && <div className="caret__ws fa fa-caret-down"></div>}
                             </button>
-                            <br />
-                            {
-                                cookies.map(cookie => {
-                                    return <h6 style={{ color: "#633693" }}>
-                                    {cookie.cookieString()}
-                                </h6>
-                                })
-                            }
-                        </div>
-                        <RequestEditor
-                                value={reqCookies}
-                                onChangeHandler={(value) => onCookieChange(value)}
-                                activeView={activeView}
-                                disabled={disableAction}
-                                placeholder="key:value"
-                            />
-                    </>
-                }
+                        ))   
+                    }
+                </div>
 
-                {activeView === "body" ? 
-                // could manage state on its own??
-                <RequestBodyEditor
-                state={reqBodyState}
-                onStateChange={reqBodyStateChangeHandler}
-                /> : null
-                }
+                {activeView === "config" && <WsTabs.ScrapeSettings/>}
+                {activeView === "resp" && <WsTabs.RespTab displayTag={displayTag} respHeader={respHeader} saveResponse={saveResponse} respBody={respBody} />}
+                {activeView === "req" && <WsTabs.ReqTab reqAuthHeaders={reqAuthHeaders} reqHeader={reqHeader} onChange={onHeaderChange} activeView={activeView} /> }
+                {activeView === "param" && <WsTabs.ReqParamTab value={paramHeader} onChange={onHeaderChange} activeView={activeView} disableAction={disableAction} />}
+                {activeView === "cookie" && <WsTabs.CookieTab endPointURL={endPointURL} cookies={cookies} activeView={activeView} onCookieChange={onCookieChange} reqCookies={reqCookies} disableAction={disableAction} />}
+                {activeView === "body" && <RequestBodyEditor state={reqBodyState} onStateChange={reqBodyStateChangeHandler} />}
                 {activeView === "auth" && <AuthEditor/>}
-                {/* <textarea 
-                    className={"ws__rqst_resp_header"+(actionError.includes("reqHeader")&&activeView==="req"?" ws_eb":"")}
-                    value={activeView === "req" ? reqHeader : activeView === "param" ? paramHeader : respHeader} 
-                    placeholder={activeView === "req" ? "Request Header" : 
-                        activeView === "param" ? "param_name = value" : "Response Header"
-                    }
-                    onChange={onHeaderChange}
-                    disabled={disableAction || activeView === "resp"}
-                />
-                
-                {activeView !== "param" && <textarea 
-                    className={"ws__rqst_resp_body" +(actionError.includes("reqBody")&&activeView==="req"?" ws_eb":"")}
-                    value={activeView === "req" ? reqBody : respBody} 
-                    placeholder={activeView === "req" ? "Request Body" : "Response Body"
-                    }
-                    onChange={onBodyChange}
-                    disabled={disableAction || activeView === "resp"}
-                />} */}
             </div>}
         />
     );

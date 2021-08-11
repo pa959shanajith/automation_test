@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
-import "../../styles/WebserviceScrape.scss";
+import "../styles/WebserviceScrape.scss";
 
 
 // TODO - change value type to object

@@ -241,3 +241,31 @@ export const updateIrisDataset = data => {
     });
 }
 
+export const readTestCaseFromScreen_ICE = (userInfo, screenId, versionnumber, screenName) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/readTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                param : 'readTestCase_ICE',
+                userInfo: userInfo,
+                screenid: screenId,
+                versionnumber: versionnumber,
+                screenName : screenName
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            console.log(res);
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject({error: res.status});
+            }
+        })
+        .catch(err=>reject({error: err}));
+    });
+}
