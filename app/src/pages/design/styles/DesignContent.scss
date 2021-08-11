@@ -20,7 +20,7 @@
     background-color: $primaryColorDarkest;
     color: $whiteColor;
     padding: 1px 14px 0;
-    font-family: "LatoWebLight";
+    font-family: $avoSecondaryFont;
     font-size: 18px;
     width: fit-content;
     white-space: nowrap;
@@ -39,7 +39,7 @@
     display: flex;
     max-width: 100%;
     margin-bottom: 15px;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
 }
 
 @media screen and (max-width: 850px){
@@ -113,7 +113,7 @@
 }
 
 .d__step_head, .d__sel_head, .d__obj_head, .d__key_head, .d__inp_head, .d__out_head, .d__rem_head, .d__det_head{
-    font-family: "LatoWebLight";
+    font-family: $avoSecondaryFont;
     font-size: 17px;
     color: $whiteColor;
     background-color: $tableHeader;

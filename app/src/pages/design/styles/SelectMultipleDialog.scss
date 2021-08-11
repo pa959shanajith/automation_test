@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     font-weight: normal;
-    font-family: "LatoWebMedium";
+    font-family: $avoPrimaryFont;
     color: black;
 }
 
@@ -18,7 +18,7 @@
 }
 
 .sm_input{
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     border-radius: 4px;
     color: $primaryText;
     background-color: $whiteColor;

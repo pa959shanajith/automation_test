@@ -4,7 +4,7 @@
     flex-direction: row;
     padding: 2px 2px 2px 25px;
     align-items: center;
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     color: $whiteColor;
     background-color: $primaryColor;
     border-radius: 8px;
@@ -62,7 +62,7 @@
     width: 50%;
     height: 32px;
     font-size: 20px;
-    font-family: "LatoWebLight";
+    font-family: $avoSecondaryFont;
     border-radius: 7px 0 0 7px;
     border-right: 1px solid $borderTwo;
     margin-right: -2px;
@@ -74,7 +74,7 @@
 }
 
 .task-nav-bar{
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     margin-top: 10px;
     display: flex;
     flex-direction: row;

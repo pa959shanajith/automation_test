@@ -78,7 +78,7 @@
 .user-name-btn, .switch-role-btn {
     display: flex;
     flex-direction: row;
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     color: $darkGray;
     justify-content: space-between;
     align-items: center;
@@ -112,7 +112,7 @@
     margin-right: 20px!important;
     margin-top: 10px!important;
     min-width: 160px;
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     border: 1px solid rgba(0, 0, 0, 0.15);
     box-shadow: 0 6px 12px rgba(0,0,0,.175);
     background-color: $whiteColor;

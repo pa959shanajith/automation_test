@@ -12,7 +12,7 @@
     margin-bottom: 10px;
     
     button{
-        font-family: "LatoWebLight";
+        font-family: $avoSecondaryFont;
         border: none;
         outline: none;
         color: $whiteColor;
@@ -31,7 +31,7 @@
 
 .mappingPage__title_row{
     display: flex;
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     font-size: 14px;
     font-weight: 700;
     justify-content: center;
@@ -50,7 +50,7 @@
 
 .mappingPage__left_tree, .mappingPage__right_tree{
     position: relative;
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     font-size: 14px;
     font-weight: 700;
     float: left;
@@ -69,7 +69,7 @@
 .mappingPage_tree_selection_box {
     
     display: flex;
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     font-size: 14px;
     width: 97%;
     justify-content: space-between;

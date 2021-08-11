@@ -11,13 +11,13 @@
 }
 .preferencesTbl th
 {
-    font-family: latowebbold;
+    font-family: $avoBoldFont;
     font-size: 16px;
 }
 
 .preferencesTbl td
 {
-    font-family: latoweb;
+    font-family: $avoFont;
     font-size: 12px;
 }
 #preferencesTable thead th
