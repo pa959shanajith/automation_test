@@ -41,7 +41,7 @@
 .domainTxt {
     font-weight: 700;
     float: left;
-    font-family: LatoWeb;
+    font-family: $avoFont;
     line-height: 1.428571429;
     font-size: 14px;
     margin-top: 5px;
@@ -209,7 +209,7 @@
 }
 .error-msg-project{
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
     float: left;
     padding: 16px 0 0 12px;
     color: $red;

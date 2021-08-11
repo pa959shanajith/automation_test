@@ -25,7 +25,7 @@
     border-top: 0;
     border-bottom: 1px solid $borderFive;
     box-shadow: none;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
     margin-right: 16px;
     font-size: 15px;
     padding: 0;
@@ -42,7 +42,7 @@
 }
 
 .ilm__error_msg{
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     font-size: 14px;
     color: $red;
     flex-grow: 1;

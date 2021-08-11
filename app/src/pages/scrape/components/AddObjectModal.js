@@ -113,7 +113,7 @@ const AddObjectModal = props => {
             props.setScrapeItems([...props.scrapeItems, ...newObjects]);
             props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
             props.setShow(false);
-            props.setSaved(false);
+            props.setSaved({ flag: false });
             props.setShowPop(MSG.SCRAPE.SUCC_OBJ_ADD);
         }
     }

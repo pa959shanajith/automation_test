@@ -60,7 +60,7 @@ const ModuleList = ({FnReport,displayError,setBlockui,setModDrop,modDrop}) =>{
             <ScrollBar scrollId='rp_module-list' trackColor={'transperent'} thumbColor={'grey'}>
                 {moduleList.map((e,i)=>{
                     return(
-                        <div  name={e.name} onClick={moduleClick} value={e._id} key={i} className={'toolbar__module-box'}>
+                        <div  name={e.name} onClick={moduleClick} value={e._id} key={i} className={'toolbar__module-box'} title={e.name}>
                             <img style={{opacity:suiteSelected._id===e._id?0.5:1}} src={modImage[e.type?e.type:'basic']} alt='module'></img>
                             <span value={e._id} >{e.name}</span>
                         </div>

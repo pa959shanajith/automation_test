@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 
 .d__thumbnail input[type='checkbox']{
     width: 18px;
@@ -18,7 +19,7 @@
 }
 
 .d__debugOn{
-    font-family: "LatoWebMedium";
+    font-family: $avoPrimaryFont;
     font-size: 18px;
     user-select: none;
 }

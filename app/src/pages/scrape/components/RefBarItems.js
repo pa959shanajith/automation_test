@@ -10,7 +10,6 @@ import * as actions from '../state/action';
 import { highlightScrapElement_ICE } from '../api';
 import { PopupMsg } from '../../global';
 import "../styles/RefBarItems.scss";
-import ScrapeObject from './ScrapeObject';
 
 const RefBarItems = props => {
 
@@ -36,12 +35,14 @@ const RefBarItems = props => {
 	useEffect(()=>{
 		return ()=>{
 			dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
+			dispatch({type: actions.SET_ISFILTER, payload: false});
 		}
 	}, [dispatch])
 
 	useEffect(()=>{
 		dispatch({type: actions.SET_OBJVAL, payload: {val: null}});
 		setHighlight(false);
+		dispatch({type: actions.SET_ISFILTER, payload: false});
 		setToFilter([]);
 		setShowScreenPop(false);
 		//eslint-disable-next-line
@@ -163,7 +164,8 @@ const RefBarItems = props => {
 		
 		const order = checkOrdering(tempToFilterArr, toFilter);
 		filter(tempToFilterArr, order);
-        setToFilter(tempToFilterArr)
+		setToFilter(tempToFilterArr)
+		dispatch({type: actions.SET_ISFILTER, payload: tempToFilterArr.length>0});
     }
 
     const filter = (toFilter, order) => {
