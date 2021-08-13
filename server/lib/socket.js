@@ -122,7 +122,7 @@ io.on('connection', async socket => {
 		} else if (socket.request._query.check == "notify") {
 			address = socket.request._query.key && Buffer.from(socket.request._query.key, "base64").toString() || "-";
 			logger.info("Disconnecting from Notification socket: %s", address);
-			redisServer.redisSubClient.unsubscribe('UI_notify_' + address, 1);
+			redisServer.redisSubClient.unsubscribe('UI_notify_' + address);
 			if (socketMapNotify[address]) delete socketMapNotify[address];
 		} else {
 			var connect_flag = false;
