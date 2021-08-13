@@ -1,8 +1,4 @@
-var async = require('async');
 var myserver = require('../lib/socket');
-var Client = require("node-rest-client").Client;
-var client = new Client();
-var epurl = process.env.DAS_URL;
 var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
@@ -459,117 +455,35 @@ exports.getSuiteDetailsInExecution_ICE = async (req, res) => {
 };
 
 //To get status scenarios of executed modules
-exports.reportStatusScenarios_ICE = function(req, res) {
-    logger.info("Inside UI service: reportStatusScenarios_ICE");
+exports.reportStatusScenarios_ICE = async (req, res) => {
+    const fnName = "reportStatusScenarios_ICE";
+    logger.info("Inside UI service: " + fnName);
     try {
-        var req_executionId = req.body.executionId;
+        var executionid = req.body.executionId;
         var report = [];
-        async.series({
-                executiondetails: function(callback) {
-                    var inputs = {
-                        "query": "executiondetails",
-                        "executionid": req_executionId,
-                    };
-                    var args = {
-                        data: inputs,
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    };
-                    logger.info("Calling DAS Service from reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
-                    client.post(epurl + "reports/reportStatusScenarios_ICE", args,
-                        function(result, response) {
-                            if (response.statusCode != 200 || result.rows == "fail") {
-                                logger.error("Error occurred in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
-                                var flag = "fail";
-                                res.send(flag);
-                            } else {
-                                async.forEachSeries(result.rows, function(iterator, callback2) {
-                                    try {
-                                        var executedtimeTemp = new Date(iterator.executedtime);
-                                        if (executedtimeTemp != null) {
-                                            executedtimeTemp = executedtimeTemp.getUTCDate() + "-" + (executedtimeTemp.getUTCMonth() + 1) + "-" + executedtimeTemp.getUTCFullYear() + " " + (executedtimeTemp.getUTCHours()) + ":" + (executedtimeTemp.getUTCMinutes()) + ":" + executedtimeTemp.getSeconds();
-                                        }
-                                        var browserTemp = iterator.executedon;
-                                        var statusTemp = iterator.status;
-                                        var reportidTemp = iterator._id;
-                                        var testscenarioidTemp = iterator.testscenarioid;
-                                        var inputs = {
-                                            "query": "scenarioname",
-                                            "scenarioid": iterator.testscenarioid
-                                        };
-                                        var args = {
-                                            data: inputs,
-                                            headers: {
-                                                "Content-Type": "application/json"
-                                            }
-                                        };
-                                        logger.info("Calling DAS Service from reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
-                                        client.post(epurl + "reports/reportStatusScenarios_ICE", args,
-                                            function(scenarioNameDetails, response) {
-                                                if (response.statusCode != 200 || scenarioNameDetails.rows == "fail") {
-                                                    logger.error("Error occurred in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
-                                                    var flag = "fail";
-                                                    res.send(flag);
-                                                } else {
-                                                    async.forEachSeries(scenarioNameDetails.rows, function(testScenarioNameitr, callback3) {
-                                                        try {
-                                                            report.push({
-                                                                executedtime: executedtimeTemp,
-                                                                browser: browserTemp,
-                                                                status: statusTemp,
-                                                                reportid: reportidTemp,
-                                                                testscenarioid: testscenarioidTemp,
-                                                                testscenarioname: testScenarioNameitr.name
-                                                            });
-                                                            callback3();
-                                                        } catch (exception) {
-                                                            logger.error("Exception in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE: %s", exception);
-                                                            res.send("fail");
-                                                        }
-                                                    }, callback2);
-                                                }
-                                            });
-                                    } catch (exception) {
-                                        logger.error("Exception in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE: %s", exception);
-                                        res.send("fail");
-                                    }
-                                }, callback);
-                            }
-                        });
-                }
-            },
-            function(err, results) {
-                if (err) {
-                    logger.error("Error occurred in the service reportStatusScenarios_ICE: final function: %s", err);
-                    res.send("fail");
-                } else {
-                    if (report.length > 0) {
-                        for (var i = 0; i < report.length; i++) {
-                            if (report[i].executedtime != "") {
-                                var dateString = report[i].executedtime,
-                                    dateTimeParts = dateString.split(' '),
-                                    timeParts = dateTimeParts[1].split(':'),
-                                    dateParts = dateTimeParts[0].split('-'),
-                                    date;
-                                date = new Date(dateParts[2], parseInt(dateParts[1], 10) - 1, dateParts[0], timeParts[0], timeParts[1], timeParts[2]);
-                                report[i].executedtime = date.getTime();
-                            }
-                        }
-                        report.sort(function(a, b) {
-                            return a.executedtime - b.executedtime;
-                        });
-                        for (var k = 0; k < report.length; k++) {
-                            if (report[k].executedtime != "") {
-                                report[k].executedtime = new Date(report[k].executedtime);
-                                report[k].executedtime = ("0" + report[k].executedtime.getDate()).slice(-2) + "-" + ("0" + (report[k].executedtime.getMonth() + 1)).slice(-2) + "-" + (report[k].executedtime.getFullYear()) + " " + ("0" + report[k].executedtime.getHours()).slice(-2) + ":" + ("0" + report[k].executedtime.getMinutes()).slice(-2) + ":" + ("0" + report[k].executedtime.getSeconds()).slice(-2);
-                            }
-                        }
-                    }
-                    logger.info("Sending scenario status details from reportStatusScenarios_ICE");
-                    res.send(JSON.stringify(report));
-                }
+        let inputs = {
+            "query": "executiondetails",
+            "executionid": executionid,
+        };
+        const result = await utils.fetchData(inputs, "reports/reportStatusScenarios_ICE", fnName);
+        if (result == "fail") return res.send("fail");
+        for (let entry of result) {
+            let executedtimeTemp = new Date(entry.executedtime);
+            if (executedtimeTemp !== null && executedtimeTemp != "Invalid Date") {
+                executedtimeTemp = ("0" + executedtimeTemp.getDate()).slice(-2) + "-" + ("0" + (executedtimeTemp.getMonth() + 1)).slice(-2) + "-" + (executedtimeTemp.getFullYear()) + " " + ("0" + executedtimeTemp.getHours()).slice(-2) + ":" + ("0" + executedtimeTemp.getMinutes()).slice(-2) + ":" + ("0" + executedtimeTemp.getSeconds()).slice(-2);
+            }
+            report.push({
+                executedtime: executedtimeTemp,
+                browser: entry.executedon,
+                status: entry.status,
+                reportid: entry._id,
+                testscenarioid: entry.testscenarioid,
+                testscenarioname: entry.testscenarioname
             });
+        }
+        if (report.length > 0) report.sort((a, b) => a.executedtime - b.executedtime);
+        logger.info("Sending scenario status details from reportStatusScenarios_ICE");
+        return res.send(JSON.stringify(report));
     } catch (exception) {
         logger.error("Exception in the service reportStatusScenarios_ICE: %s", exception);
         res.send("fail");
@@ -701,7 +615,7 @@ exports.connectJira_ICE = function(req, res) {
                                         var resultData = data.value;
                                         if (count == 0) {
                                             if (resultData != "Fail") {
-                                                var updateStatus = updateDbReportData(createObj.reportId, createObj.slno, resultData);
+                                                updateDbReportData(createObj.reportId, createObj.slno, resultData);
                                                 logger.info('Jira: Issue created successfully.');
                                             } else {
                                                 logger.error('Jira: Failed to create issue.');
@@ -739,28 +653,14 @@ exports.connectJira_ICE = function(req, res) {
     }
 };
 
-function updateDbReportData(reportId, slno, defectId) {
-    var inputs = {
+const updateDbReportData = async (reportId, slno, defectId) => {
+    const inputs = {
         "reportid": reportId,
         "slno": slno,
         "defectid": defectId
     };
-    var args = {
-        data: inputs,
-        headers: {
-            "Content-Type": "application/json"
-        }
-    };
-    logger.info("Calling DAS Service from connectJira_ICE for updateDbReportData: reports/updateReportData");
-    client.post(epurl + "reports/updateReportData", args,
-        function(reportdata, response) {
-            if (response.statusCode != 200 || reportdata.rows == "fail") {
-                logger.error("Error occurred in reports/updateReportData from updateDbReportData Error Code : ERRDAS");
-                return false;
-            } else {
-                return true;
-            }
-        });
+    const reportUpdateStatus = await utils.fetchData(inputs, "reports/updateReportData", "updateDbReportData");
+    return reportUpdateStatus !== "fail";
 }
 
 //Fetch all modules on change of projects,release & cycle

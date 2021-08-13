@@ -13,7 +13,7 @@
 #middle-content-section {
      box-sizing: border-box;
      position: relative;
-     font-family: LatoWeb;
+     font-family: $avoFont;
      display: flex;
      flex-direction: column;
      flex: 0 1 100%;
@@ -67,7 +67,7 @@
     padding: 2px 15px;
     font-size: 17px;
     background: $primaryColor;
-	font-family: 'LatoWebLight';
+	font-family: $avoSecondaryFont;
     outline: 0;
     padding: 2px 25px !important;
 }

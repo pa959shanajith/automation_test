@@ -413,6 +413,10 @@ if (cluster.isMaster) {
 		app.post('/debugTestCase_ICE', auth.protect, design.debugTestCase_ICE);
 		app.post('/getKeywordDetails_ICE', auth.protect, design.getKeywordDetails_ICE);
 		app.post('/getTestcasesByScenarioId_ICE', auth.protect, design.getTestcasesByScenarioId_ICE);
+		//Webservices APIs
+		app.post('/execRequest', auth.protect, design.executeRequest);
+		app.post('/oauth2', auth.protect, design.oAuth2auth);
+		app.get('/oauth2/callback', auth.protect, design.oAuth2Callback);
 		//Execute Screen Routes
 		app.post('/readTestSuite_ICE', auth.protect, suite.readTestSuite_ICE);
 		app.post('/updateTestSuite_ICE', auth.protect, suite.updateTestSuite_ICE);
@@ -489,7 +493,7 @@ if (cluster.isMaster) {
 		app.post('/APG_createAPGProject', auth.protect, flowGraph.APG_createAPGProject);
 		app.post('/APG_runDeadcodeIdentifier', auth.protect, flowGraph.APG_runDeadcodeIdentifier);
 		app.post('/getUserICE', auth.protect, io.getUserICE)
-		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE)
+		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE);
 		//-------------Route Mapping-------------//
 
 		// To prevent can't send header response

@@ -5,9 +5,8 @@ import ClickAwayListener from 'react-click-away-listener';
 import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
 import { ScrollBar, VARIANT, Messages as MSG } from '../../global';
 import ExportDataTable from './ExportDataTable';
-import ImportSheet from './ImportSheet';
 import * as actionTypes from '../state/action';
-import ImportXML from './ImportXML';
+import ImportPopUp from './ImportPopUp';
 import * as utilApi from '../api';
 import DtPasteStepDialog from './DtPasteStepDialog';
 
@@ -206,13 +205,7 @@ const TableActionButtons = props => {
 
 const CreateScreenActionButtons = props => {
 
-    const [sheetList, setSheetList] = useState([]);
-    const [excelContent, setExcelContent] = useState("");
-    const [rowTag, setRowTag] = useState("");
-    const [xmlContent, setXmlContent] = useState([]);
-
-    const hiddenInput = useRef();
-
+    const [importPopup, setImportPopup] = useState(false);
 
     const goToEditScreen = () => {
         let arg = prepareSaveData(props.tableName, props.headers, props.data);
@@ -260,65 +253,11 @@ const CreateScreenActionButtons = props => {
         }
     }
 
-    const importDataTable = () => hiddenInput.current.click();
-
-    const onInputChange = async(event) => {
-        let file = event.target.files[0];
-        let reader = new FileReader();
-        reader.onload = async function (e) {
-            try{
-                hiddenInput.current.value = '';
-                let importFormat = "";
-                switch(file.name.split('.').pop().toLowerCase()){
-                    case "csv": importFormat = "csv"; break;
-                    case "xml": importFormat = "xml"; break;
-                    case "xlsx": /* FALLTHROUGH  */
-                    case "xls": importFormat = "excel"; break;
-                    default : break;
-                }
-
-                if (importFormat == "") 
-                    props.setShowPop(MSG.UTILITY.ERR_FILE_UNSUPPORTED);
-                else if (importFormat === "xml") {
-                    setRowTag("row");
-                    setXmlContent(reader.result);
-                } else {
-                    props.setOverlay("Importing File...");
-                    const resp = await utilApi.importDataTable({importFormat: importFormat, content: reader.result, flag: importFormat==="excel"?"sheetname":""});
-                    if(importFormat === "excel") {
-                        setSheetList(resp);
-                        setExcelContent(reader.result);
-                    } 
-                    else if (resp == "columnExceeds") 
-                        props.setShowPop(MSG.UTILITY.ERR_COL_15);
-                    else if (resp == "rowExceeds")
-                        props.setShowPop(MSG.UTILITY.ERR_ROW_200);
-                    else if (resp == "emptyData")
-                        props.setShowPop(MSG.UTILITY.ERR_EMPTY_DATA);
-                    else {
-                        const [, newData, newHeaders] = parseTableData(resp, "import")
-                        props.setData(newData);
-                        props.setHeaders(newHeaders);
-                    }
-                    props.setOverlay("");
-                }
-            }
-            catch(error){
-                console.error("ERROR:::", error);
-                props.setOverlay("");
-                props.setShowPop(MSG.UTILITY.ERR_LOAD)
-            }
-        }
-        reader.readAsBinaryString(file);
-    }
-
     return (
         <>
-        { sheetList.length > 0 && <ImportSheet sheetList={sheetList} setSheetList={setSheetList} excelContent={excelContent} { ...props }  /> }
-        { rowTag &&  <ImportXML rowTag={rowTag} setRowTag={setRowTag} xmlContent={xmlContent} { ...props }  />}
+        { importPopup && <ImportPopUp setImportPopup={setImportPopup} setData={props.setData} setHeaders={props.setHeaders} setOverlay={props.setOverlay} setShowPop={props.setShowPop} { ...props } />}
         <div className="dt__taskBtns">
-            <input ref={hiddenInput} data-test="fileInput" id="importDT" type="file" style={{display: "none"}} onChange={onInputChange} accept=".xlsx, .xls, .csv, .xml"/>
-            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={importDataTable} >Import</button>
+            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={() => setImportPopup(true)} >Import</button>
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={goToEditScreen}>Edit</button>
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={saveDataTable}>Create</button>
         </div>

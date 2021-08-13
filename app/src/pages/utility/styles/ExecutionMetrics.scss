@@ -9,7 +9,7 @@
         margin-right: 7px;
         height: max-content;
         font-size: 17px;
-        font-family: "LatoWebLight";
+        font-family: $avoSecondaryFont;
         background-color: $primaryColor;
         border: none;
         outline: none;
@@ -38,7 +38,7 @@
     width: 57%;
     padding: 20px;
     font-size: 14px;
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
 
     .execM__inputLabel{
         display: flex;

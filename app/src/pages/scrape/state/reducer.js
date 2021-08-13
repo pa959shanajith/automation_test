@@ -1,4 +1,5 @@
 import * as actionTypes from './action';
+import WSCookieJar from "../components/WebServiceUtils";
 
 const initialState = {
     ScrapeData : [],
@@ -8,6 +9,7 @@ const initialState = {
     compareData: {},
     compareObj: {changedObj: [], notChangedObj: [], notFoundObj: []},
     objValue: { val: null },
+    isFiltered: false,
     cert: {},
     WsData: {
         endPointURL: "",
@@ -20,7 +22,25 @@ const initialState = {
         paramHeader: "",
     },
     wsdlError: [],
-    actionError: []
+    actionError: [],
+    reqHeaderObj: {},
+    reqBodyHeaders: [],
+    reqAuthHeaders: [],
+    resStatus: {},
+    // making it string to support RequestEditor's value type to string
+    // TODO - change reqHeader, param and cookies to array of objects
+    cookies: {
+        // inconsistency - both must be array
+        reqCookies: "",
+        // received
+        resCookies: [],
+        cookieJar: {},
+        wsCookieJar: new WSCookieJar()
+    },
+    config: {
+        disableCookieJar: false,
+        disableAutoContentTypeHeader: false
+    }
 }
 
 const reducer = (state=initialState, action) => {
@@ -76,7 +96,39 @@ const reducer = (state=initialState, action) => {
                 compareFlag: false,
                 compareData: {}
             }
-                
+        case actionTypes.SET_REQ_BODY_HEADER:
+            return {
+                ...state,
+                reqBodyHeaders: action.payload
+            }
+        case actionTypes.SET_REQ_AUTH_HEADER:
+            return {
+                ...state,
+                reqAuthHeaders: action.payload
+            }
+        case actionTypes.SET_RES_STATUS:
+            return  {
+                ...state,
+                resStatus: action.payload
+            }
+        case actionTypes.SET_COOKIES:
+            return {
+                ...state,
+                cookies: {
+                    ...state.cookies,
+                    ...action.payload
+                }
+            }  
+        case actionTypes.SET_CONFIGURATION:
+            return {
+                ...state,
+                config: { ...state.config, ...action.payload }
+            }
+        case actionTypes.SET_ISFILTER:
+            return {
+                ...state,
+                isFiltered: action.payload
+            }
         default:
             return state
     }

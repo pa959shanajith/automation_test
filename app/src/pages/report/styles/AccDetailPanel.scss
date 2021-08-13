@@ -11,7 +11,7 @@
         background: $grayColor;
         color: $whiteColor;
         font-size: 13px;
-        font-family: 'LatoWebBold';
+        font-family: $avoBoldFont;
     }
     .ar__standard-row{
         display: flex;
@@ -19,7 +19,7 @@
         background: $whiteColor;
         color: $darkestGray;
         font-size: 13px;
-        font-family: 'LatoWebBold';
+        font-family: $avoBoldFont;
     }
     .ar__sn{
         flex: 0 0 10%;

@@ -28,7 +28,7 @@
     background: $primaryColorDarkest;
     font-size: 18px;
     color: $whiteColor;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
     padding: 2px 14px 1px;
     border-radius: 5px;
     -moz-border-radius: 5px;
@@ -67,7 +67,7 @@
     padding: 2px 25px;
     font-size: 17px;
     background: $primaryColor;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
     outline: 0;
     height: 28px;
     margin-right: 10px;
@@ -80,7 +80,7 @@
     padding: 2px 25px;
     font-size: 17px;
     background: $primaryColor;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
     outline: 0;
     height: 28px;
     margin-bottom: 25px;
@@ -165,7 +165,7 @@
     span{
         margin-right: 5px;
         font-size: 14px;
-        font-family: 'Latoweb';
+        font-family: $avoFont;
         margin: 2px;
     }
     span:last-of-type{
@@ -194,7 +194,7 @@
         padding: 3px;
         margin: 0px 6px;
         font-size: 14px;
-        font-family: 'Latoweb';
+        font-family: $avoFont;
         text-align: center;
     }
     
@@ -206,9 +206,9 @@
     border-radius: 20px;
     padding: 0px 12px;
     font-size: 13px;
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     margin-right: 7px;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
     border: 0;
     width: 63.25px;
     height: 21px !important;
@@ -245,7 +245,7 @@
     padding: 3px;
     margin: 0px 6px;
     font-size: 14px;
-    font-family: 'Latoweb';
+    font-family: $avoFont;
     text-align: center;
 }
 .factor__row > input[type="text"]:first-child{
@@ -287,7 +287,7 @@
         padding: 3px;
         margin: 0px 6px;
         font-size: 14px;
-        font-family: 'Latoweb';
+        font-family: $avoFont;
         text-align: center;
 }
 #EmptyCall1{
@@ -300,6 +300,6 @@
         padding: 3px;
         margin: 0px 6px;
         font-size: 14px;
-        font-family: 'Latoweb';
+        font-family: $avoFont;
         text-align: center;
 }

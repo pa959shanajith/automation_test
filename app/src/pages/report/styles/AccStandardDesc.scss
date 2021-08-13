@@ -5,7 +5,7 @@
         color: $primaryColorDarkest;
         padding: 10px 15px;
         font-size: 18px;
-        font-family: LatowebBold;
+        font-family: $avoBoldFont;
         white-space: nowrap;
     }
     .ar__stDesc-table{
@@ -19,7 +19,7 @@
         background: $primaryColorDarkest;
         color: $whiteColor;
         font-size: 14px;
-        font-family: 'LatoWebBold';
+        font-family: $avoBoldFont;
     }
 
 

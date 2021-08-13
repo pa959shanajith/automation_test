@@ -17,7 +17,7 @@
     width: 90%;
     padding: 0 20px;
     color: $primaryText;
-    font-family: "LatoWebLight";
+    font-family: $avoSecondaryFont;
     outline: none;
 
     &::-ms-reveal, &::-ms-clear{
@@ -40,7 +40,7 @@
 }
 
 .restart-service-btn, .login-btn{
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
     font-size: 32px;
     border-radius: 22px!important;
     border: none;
@@ -88,7 +88,7 @@
 }
 
 .error-msg{
-    font-family: "LatoWebMedium";
+    font-family: $avoPrimaryFont;
     font-size: 14px;
     color:  $redError;
     width: 100%;
@@ -163,7 +163,7 @@
     float: right;
     color: $primaryColorLogin;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
     text-decoration: underline;
     cursor: pointer;
 }

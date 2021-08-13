@@ -18,6 +18,9 @@ import { ScrapeContext } from '../components/ScrapeContext';
 import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, ModalContainer, ResetSession, Messages as MSG } from '../../global';
 import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
+import * as scrapeUtils from "../components/WebServiceUtils";
+import WSCookieJar from "../components/WebServiceUtils";
+import * as ScrapeSettingsConstants from "../components/ScrapeSettingsConstants";
 import '../styles/ScrapeScreen.scss';
 
 const ScrapeScreen = ()=>{
@@ -29,12 +32,16 @@ const ScrapeScreen = ()=>{
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const {endPointURL, method, opInput, reqHeader, reqBody, paramHeader} = useSelector(state=>state.scrape.WsData);
 
+    const reqAuthHeaders = useSelector((state) => state.scrape.reqAuthHeaders);
+    const {resCookies, reqCookies, cookieJar, wsCookieJar} = useSelector((state) => state.scrape.cookies);
+    const config = useSelector(state => state.scrape.config);
+
     const [overlay, setOverlay] = useState(null);
     const [showPop, setShowPop] = useState("");
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const [scrapeItems, setScrapeItems] = useState([]);
     const [mainScrapedData, setMainScrapedData] = useState({});
-    const [saved, setSaved] = useState(true);
+    const [saved, setSaved] = useState({flag: true});
     const [mirror, setMirror] = useState({scrape: null, compare: null});
     const [showAppPop, setShowAppPop] = useState(false);
     const [isUnderReview, setIsUnderReview] = useState(false);
@@ -43,6 +50,12 @@ const ScrapeScreen = ()=>{
     const [showObjModal, setShowObjModal] = useState(false);
     const [newScrapedData, setNewScrapedData] = useState({});
     const [orderList, setOrderList] = useState([]);
+
+    useEffect(() => {
+        if(Object.entries(wsCookieJar).length === 0) 
+        dispatch({type: actionTypes.SET_COOKIES, payload: {wsCookieJar: new WSCookieJar()}});
+    }, [])
+
 
     useEffect(() => {
         if(Object.keys(current_task).length !== 0) {
@@ -98,7 +111,7 @@ const ScrapeScreen = ()=>{
                     setNewScrapedData([]);
                     setScrapeItems(newScrapeList);
                     setHideSubmit(!haveItems);
-                    setSaved(true);
+                    setSaved({ flag: true });
                     setOrderList(newOrderList);
                     setOverlay("");
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: haveItems});
@@ -122,15 +135,15 @@ const ScrapeScreen = ()=>{
                                 opInput : data.operations || "",
                                 reqHeader : data.header ? data.header.split("##").join("\n"): "",
                                 reqBody : localReqBody,
-                                paramHeader : data.param ? data.param.split("##").join("\n"): "",
+                                paramHeader : data.param ? data.param.split("##").map(p => p.replace("=", ":")).join("\n"): "",
                                 respHeader : data.responseHeader ? data.responseHeader.split("##").join("\n") : "",
                                 respBody : localRespBody
                             }
                         });
-                        setSaved(true);
+                        setSaved({ flag: true });
                         setHideSubmit(false);
 					} else {
-                        setSaved(false);
+                        setSaved({ flag: false });
                         setHideSubmit(true);
                         dispatch({type: actionTypes.SET_WSDATA, payload: {
                             endPointURL: "", method: "0", opInput: "", reqHeader: "",
@@ -167,10 +180,44 @@ const ScrapeScreen = ()=>{
             let arg = {}
             let testCaseWS = []
             let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
+
+            // process and add external cookies
+            let externalCookies = scrapeUtils.removeDisabled(reqCookies);
+            externalCookies = externalCookies && externalCookies.split("\n").map(c => c.replace(":", "="));
+            if(externalCookies && !config[ScrapeSettingsConstants.DISABLE_COOKIE_JAR])
+                wsCookieJar.setAllSync(endPointURL, externalCookies);
+
+            // pick cookies from cookieJar after adding external cookies if any
+            let validatedCookies = !config[ScrapeSettingsConstants.DISABLE_COOKIE_JAR] ?
+                 wsCookieJar.getAllSync(endPointURL) : [];
+            validatedCookies = validatedCookies?.length ? "Cookie: "+ validatedCookies.map(c => c.cookieString()).join(";") : "";
+
+            const trueReqHeaders = combineHeaders(reqHeader, reqAuthHeaders, validatedCookies);
+            const trueParams = scrapeUtils.removeDisabled(paramHeader);
+            let trueReqBody = reqBody;
+            const isFormEncoded = scrapeUtils.FORM_URL_ENCODE_REGEX.test(reqHeader);
+            if(isFormEncoded)
+            trueReqBody = scrapeUtils.convertToFormData(reqBody, isFormEncoded);            
+    
             let wsdlInputs = [ 
-                endPointURL, method, opInput, getFormattedValue(reqHeader), 
-                getFormattedValue(paramHeader), getFormattedValue(reqBody, true) 
+                endPointURL, method, opInput, getFormattedValue(trueReqHeaders), 
+                getFormattedValue(trueParams), getFormattedValue(trueReqBody, true) 
             ];
+            // work around to convert params from key:value to key=value
+            wsdlInputs[4] = wsdlInputs[4].replace(/:/g, "=");
+            // wsdlInputs[5] = `<?xml version="1.0" encoding="utf-8"?>
+            // <soap-env:Envelope xmlns:ns0="http://tempuri.org/" xmlns:soap-env="http://www.w3.org/2003/05/soap-envelope">
+            //  <soap-env:Body>
+            //   <ns0:Subtract>
+            //    <ns0:intA>
+            //     10
+            //    </ns0:intA>
+            //    <ns0:intB>
+            //     110
+            //    </ns0:intB>
+            //   </ns0:Subtract>
+            //  </soap-env:Body>
+            // </soap-env:Envelope>`
 
             if (Object.keys(certificateInfo).length)
                 wsdlInputs.push(...[certificateInfo.certsDetails+";", certificateInfo.authDetails]);
@@ -214,8 +261,25 @@ const ScrapeScreen = ()=>{
                     } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
                         setShowPop(MSG.SCRAPE.WARN_EXECUTION_ONLY);
                     } else if (typeof data === "object") {
-                        setShowPop(MSG.SCRAPE.SUCC_WEBSERVICE_RESP);
-                        dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader: data.responseHeader[0].split("##").join("\n")}});
+                        setShowPop({title: "Data Retrieve", content: "Web Service response received successfully"});
+                        dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader: data.responseHeader[0].split("  ").join("\n")}});
+                        // get all cookies from response
+                        // all cookies are returned under set-cookie header
+                        let cookiesFromRes;
+                        const setCookies = data.responseHeader[0].match(/set-cookie:(.+)(  |$)/);
+
+                        // if set cookie header exists and cookie jar is not disabled
+                        if(setCookies && !config[ScrapeSettingsConstants.DISABLE_COOKIE_JAR]) {
+                            cookiesFromRes = setCookies[1].split(/,/);
+
+                            //strip the rest of the header
+                            cookiesFromRes[cookiesFromRes.length-1] = cookiesFromRes[cookiesFromRes.length-1].split("  ")[0];
+                            cookiesFromRes = scrapeUtils.parseSetCookieHeader(cookiesFromRes.map(cookie => cookie.trim()));
+                            // add cookies to cookie jar
+                            wsCookieJar.setAllSync(endPointURL, cookiesFromRes);
+                            dispatch({type: actionTypes.SET_COOKIES, payload: {resCookies: cookiesFromRes}});
+                        }
+                        
                         let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respBody: localRespBody}});
                     } else setShowPop(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
@@ -223,8 +287,8 @@ const ScrapeScreen = ()=>{
                 .catch(error => {
                     setOverlay("");
                     ResetSession.end();
-                    setShowPop(MSG.SCRAPE.ERR_OPERATION);
                     console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
+                    setShowPop({title: "Web Service Screen", content: "Error while performing operation."});
                 });
             }
         } else {
@@ -254,7 +318,7 @@ const ScrapeScreen = ()=>{
                     if (scrapedItemsLength > 0) dispatch({ type: actionTypes.SET_DISABLEACTION, payload: true });
                     else dispatch({ type: actionTypes.SET_DISABLEACTION, payload: false });
 
-                    setSaved(false);
+                    setSaved({ flag: false });
                     err = {
                         'variant':  data === 'scheduleModeOn'?MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT:MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'content':
                             data === 'scheduleModeOn' ?
@@ -315,7 +379,7 @@ const ScrapeScreen = ()=>{
                         setMirror({scrape: viewString.mirror, compare: null});
                         setOrderList(oldOrderList => [...oldOrderList, ...newOrderList]);
                         
-                        if (viewString.view.length > 0) setSaved(false);
+                        if (viewString.view.length > 0) setSaved({ flag: false });
                     }                        
                 }
 
@@ -385,7 +449,7 @@ const ScrapeScreen = ()=>{
         <div data-test="ssBody" className="ss__body">
             <Header/>
             <div data-test="ssMidSection" className="ss__mid_section">
-                <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList }}>
+                <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList, setOrderList }}>
                     <ActionBarItems />
                     { current_task.appType === "Webservice" 
                         ? <WebserviceScrape /> 
@@ -603,9 +667,30 @@ function getProcessedBody (body, type) {
     return processedBody;
 }
 
-function getFormattedValue (value, extraspace) {
-    if (extraspace) return value.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
-    return value.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+export function combineHeaders (reqHeader, reqAuthHeaders, validatedCookies) {
+    // convert array to string
+    let reqWauthHeaders = reqAuthHeaders?.length ? reqAuthHeaders[0].trim(): "";
+    let trueReqHeaders = scrapeUtils.removeDisabled(reqHeader);
+    // remove user defined cookie header if validated cookies is present
+    if (scrapeUtils.COOKIE_HEADER_REGEX.test(trueReqHeaders) && validatedCookies) {
+        trueReqHeaders = trueReqHeaders.replace(scrapeUtils.COOKIE_HEADER_REGEX, validatedCookies+"\n");
+        validatedCookies = "";
+    }
+        
+    
+    // remove user defined auth headers if auto auth header is present
+    if (scrapeUtils.AUTH_HEADER_REGEX.test(trueReqHeaders) && reqWauthHeaders) {
+        trueReqHeaders = trueReqHeaders.replace(scrapeUtils.AUTH_HEADER_REGEX, reqWauthHeaders+"\n");
+        reqWauthHeaders = "";
+    }
+    // if no existing cookies or auth headers are found then append
+    trueReqHeaders += (validatedCookies ? validatedCookies+"\n": "") + (reqWauthHeaders ? reqWauthHeaders+"\n" : "");
+
+    return trueReqHeaders;
+}
+
+export function getFormattedValue (value, extraspace) {
+    if (extraspace) return value.replace(/[\n\r]/g, '##').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 }
 
 function validateWebserviceInputs (wsdlInputs) {
@@ -630,6 +715,8 @@ function validateWebserviceInputs (wsdlInputs) {
     return [error, auth, proceed];
 }
 
+
+// port these to utils
 function getWSTestCase (stepNo, appType, input, keyword) {
     return {
         "stepNo": stepNo + 1, "appType": appType, "objectName": "", "inputVal": [input],

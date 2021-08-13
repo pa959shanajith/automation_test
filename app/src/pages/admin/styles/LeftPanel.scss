@@ -55,7 +55,7 @@
     text-decoration: none;
     font-size: 12px;
     font-style: normal!important;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
     color: $whisper;
     word-wrap: break-word;
     font-weight: normal;
@@ -125,7 +125,7 @@
     outline: 0;
 }
 .scrapeOnTxt {
-    font-family: 'LatoWebMedium' !important;
+    font-family: $avoPrimaryFont !important;
     font-size: 18px !important;
     color: $whisper;
     cursor: text !important;

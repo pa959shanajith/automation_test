@@ -219,8 +219,8 @@ const DesignContent = props => {
                                 setTestScriptData(null);
                                 setKeywordList(null);
                                 setObjNameList(null);
+                                console.error("Error getObjectType method! \r\n ", error);
                                 props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
-                                console.error("Error getObjectType method! \r\n " + (error.data));
                                 reject("fail");
                             });
                     })

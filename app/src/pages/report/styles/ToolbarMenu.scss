@@ -1,7 +1,8 @@
+@import "../../global/styles/ColorVariables.scss";
 .rp__toolbar{
     height: 35px;
     font-size: 14px;
-    font-family: Latoweb;
+    font-family: $avoFont;
     label{
         font-weight: 700;
         margin: 10px;

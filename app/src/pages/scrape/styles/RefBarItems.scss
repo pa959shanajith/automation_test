@@ -20,14 +20,14 @@
     .scrape__filterActionBtns{
         display: flex;
         flex-grow: 1;
-        font-family: "LatoWeb";
+        font-family: $avoFont ;
         margin-bottom: 15px;
     }
 
     .scrape__filterTagBtns{
         display: flex;
         flex-wrap: wrap;
-        font-family: "LatoWebLight";
+        font-family: $avoSecondaryFont;
 
         .d__filter-btn{
             flex-grow: 1;

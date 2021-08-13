@@ -60,7 +60,7 @@ input[type="checkbox"] {
     padding: 0px 10px;
     appearance: none;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
     border: 1px solid $pluginGray  !important;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -133,7 +133,7 @@ input[type="checkbox"] {
 	background: $primaryColorDark;
     padding: 5px 10px;
     color: $whiteColor;
-    font-family: 'LatoWebMedium';
+    font-family: $avoPrimaryFont;
     border-radius: 5px;
     margin-bottom: 8px;
 }
@@ -277,7 +277,7 @@ input[type="checkbox"] {
 	display: inline-block;
     text-align: center;
     font-size: 14px;
-    font-family: 'LatoWeb';
+    font-family: $avoFont;
     flex: 0 1 auto;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -289,7 +289,7 @@ input[type="checkbox"] {
     background: $tableHeader;
     color: $whiteColor;
     font-size: 17px;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
     border-radius: 6px;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
@@ -306,7 +306,7 @@ input[type="checkbox"] {
 	display: inline-block;
     text-align: center;
     font-size: 17px;
-    font-family: 'LatoWebLight';
+    font-family: $avoSecondaryFont;
     flex: 0 1 auto;
     overflow: hidden;
     text-overflow: ellipsis;

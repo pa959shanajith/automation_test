@@ -6,7 +6,7 @@
 
 .task-description{
     div{
-        font-family: "LatoWeb";
+        font-family: $avoFont ;
         font-size: 14px;
         padding: 1px 10px;
         text-overflow: ellipsis;
@@ -21,10 +21,10 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    font-family: "LatoWeb";
+    font-family: $avoFont ;
 
     h4{
-        font-family: "LatoWebBold";
+        font-family: $avoBoldFont;
         margin: 0;
         flex-shrink: 0;
     }
@@ -182,7 +182,7 @@
     
     .assign-task{
         font-size: 15px;
-        font-family: "LatoWebLight";
+        font-family: $avoSecondaryFont;
     }
 
     // @media screen and (min-width: 1400px) and (min-height: 770px){
