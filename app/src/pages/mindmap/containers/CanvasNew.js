@@ -33,6 +33,7 @@ var temp = {
     t: ""
 };
 var nodeMoving = false;
+export var readCtScale
 
 const CanvasNew = (props) => {
     const dispatch = useDispatch()
@@ -54,6 +55,8 @@ const CanvasNew = (props) => {
     const setBlockui=props.setBlockui
     const displayError = props.displayError
     const CanvasRef = useRef();
+    readCtScale = () => ctScale
+
     useEffect(()=>{
         //useEffect to clear redux data selected module on unmount
         return ()=>{
@@ -235,7 +238,7 @@ const CanvasNew = (props) => {
         }
         else{
             nodeMoving = true
-            res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale},verticalLayout)
+            res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale},verticalLayout,'createnew')
             setLinks(res.linkDisplay)
             temp={...temp,...res.temp}
         }
@@ -249,7 +252,7 @@ const CanvasNew = (props) => {
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
-            <SaveMapButton createnew={createnew} dNodes={[...dNodes]} setPopup={setPopup} setBlockui={setBlockui}/>
+            <SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setPopup={setPopup} setBlockui={setBlockui}/>
             <ExportMapButton setBlockui={setBlockui} setPopup={setPopup} displayError={displayError}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>
@@ -295,10 +298,10 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
                         cdLinks = res.dLinks
                         count= {...count,...res.count}
                     }
-                    activeNode = cdNodes.length-1
+                    var LinkactiveNode = cdNodes.length-1
                     dLinks_c.forEach((f)=>{
                         if (f.source.id === e.id) {
-                            var res = createNode(activeNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name,verticalLayout)
+                            var res = createNode(LinkactiveNode,cnodes,clinks,cdNodes,cdLinks,csections,count,f.target.name,verticalLayout)
                             if(res){
                                 cnodes = res.nodeDisplay
                                 clinks = res.linkDisplay

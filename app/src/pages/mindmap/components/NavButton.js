@@ -55,6 +55,7 @@ const NavButton = (props) => {
             if (k < extent[0] || k > extent[1]){
                 setMove(false)
             }else{
+                props.setCtScale({x:x,y:y,k:k})
                 interpolateZoom([x, y], k,props.zoom);
             }
         },40)}

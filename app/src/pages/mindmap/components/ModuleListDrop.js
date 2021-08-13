@@ -2,7 +2,8 @@ import React, { useState, Fragment} from 'react';
 import { useSelector, useDispatch} from 'react-redux';
 import {getModules}  from '../api'
 import {ScrollBar,ModalContainer,Messages as MSG} from '../../global';
-import {ScreenOverlay} from '../../global'
+import {ScreenOverlay} from '../../global';
+import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
 
@@ -23,6 +24,9 @@ const ModuleListDrop = (props) =>{
     const isAssign = props.isAssign
     const selectModule = (e) => {
         var modID = e.target.getAttribute("value")
+        d3.select('#pasteImg').classed('active-map',false)
+        d3.select('#copyImg').classed('active-map',false)
+        d3.selectAll('.ct-node').classed('node-selected',false)
         if(Object.keys(moduleSelect).length===0){
             loadModule(modID)
             return;
