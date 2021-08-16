@@ -122,7 +122,8 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     displayError:displayError,
                     setBlockui:setBlockui,
                     setOptions:setOptions,
-                    setImportPop:setImportPop
+                    setImportPop:setImportPop,
+                    changeImportType:changeImportType
                 })
             })()
         }
@@ -262,16 +263,18 @@ const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitV
 // imports all the data to mindmapCanvas by setting moduleData based on type
 // createnew should be true for all import except mm because nodes will be not created it will be revoked from saved data
 
-const loadImportData = async({importData,sheet,importType,importProj,dispatch,displayError,setBlockui,setImportPop,setOptions}) =>{
+const loadImportData = async({importData,sheet,importType,importProj,dispatch,displayError,setBlockui,setImportPop,setOptions,changeImportType}) =>{
     var mindmapData = importData
     setBlockui({content:'Importing ...',show:true})
     if(importType === 'excel'){
+        let validateNode = true;
         var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheet})
         if(res.error){displayError(res.error);return;}
         res.forEach((e, i) =>{
-            if (!validNodeDetails(e.name)) validate = false;
+            if (!validNodeDetails(e.name)) validateNode = false;
         });
-        if(!validate){
+        if(!validateNode){
+            changeImportType({target: {value: "excel"}});
             displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
         }
         mindmapData = {createnew:true,importData:{createdby:'excel',data:res}} 
