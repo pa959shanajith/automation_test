@@ -262,8 +262,8 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			else if(item["@label"]=="Start" && screendata[0].apptype=="SAP"){
 				firstScript = true;
 				testCaseSteps = [
-					getTestcaseStep(1,null,'@Sap','LaunchApplication',null,null,null,"SAP"),
-					getTestcaseStep(2,null,'@Sap','ServerConnect',null,null,null,"SAP")
+					getTestcaseStep(1,null,'@Sap','launchApplication',null,null,null,"SAP"),
+					getTestcaseStep(2,null,'@Sap','serverConnect',null,null,null,"SAP")
 				];
 				mflag=1;
 				step = 3;
@@ -271,7 +271,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			}
 			else if (item["@label"]=="Start" && screendata[0].apptype=="OEBS"){
 				firstScript = true;
-				testCaseSteps = [getTestcaseStep(1,null,'@Oebs','FindWindowAndAttach',screendata[0].url,null,null,"OEBS")],step = 2;
+				testCaseSteps = [getTestcaseStep(1,null,'@Oebs','findWindowAndAttach',screendata[0].url,null,null,"OEBS")],step = 2;
 			}
 		});	
 	}
@@ -380,89 +380,89 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						case "input":
 						case "GuiOkCodeField":
 							if(eachScrapedAction.command[0][1]!=undefined && eachScrapedAction.command[0][1]=='setFocus')
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetFocus',null,null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'setFocus',null,null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]!=undefined && eachScrapedAction.command[0][1]=='text' && input[0]=='')
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[eachScrapedAction.command[0][2]],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'setText',[eachScrapedAction.command[0][2]],null,null,"SAP");
 							else
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'setText',[input[0]],null,null,"SAP");
 							break;
 						case "table":
 							if(eachScrapedAction.command[0][1]=="getAbsoluteRow"){
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRow',[eachScrapedAction.command[0][2]+1],null,null,"SAP");
-								if(eachScrapedAction.command[1][1]!="selected") testcaseObj.keywordVal = 'UnselectRow';
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectRow',[eachScrapedAction.command[0][2]+1],null,null,"SAP");
+								if(eachScrapedAction.command[1][1]!="selected") testcaseObj.keywordVal = 'unselectRow';
 							}
 							else if(eachScrapedAction.command[0][1]=="verticalScrollbar")
 								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'scrollDown',null,null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="columns"){
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumn',[eachScrapedAction.command[1][2]+1],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectColumn',[eachScrapedAction.command[1][2]+1],null,null,"SAP");
 								if(eachScrapedAction.command[2][1]!="selected") testcaseObj.keywordVal = 'UnselectColumn';
-							} else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+							} else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,null,"SAP");
 							break;
 						case "gridview":
 							if(eachScrapedAction.command[0][1]=="selectColumn")
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumns',[eachScrapedAction.command[0][2]],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectColumns',[eachScrapedAction.command[0][2]],null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="pressToolbarButton")
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'PressToolbarButton',[eachScrapedAction.command[0][2]],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'pressToolbarButton',[eachScrapedAction.command[0][2]],null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="modifyCell"){
 								var data = eachScrapedAction.command[0].slice(-3);
 								var data1 = data.slice(0,2).map(i => 1 + i);
 								data1.push(data[2]);
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetTextInCell',[data1.join(';')],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'setTextInCell',[data1.join(';')],null,null,"SAP");
 							}	
 							else if(eachScrapedAction.command[0][1]=="setCurrentCell"){
 								const cell_inp = eachScrapedAction.command[0].slice(-2).map(i => 1 + i).join(';')
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'ClickCell',[cell_inp],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'clickCell',[cell_inp],null,null,"SAP");
 							}
 							else if(eachScrapedAction.command[0][1]=="pressF4")
 								testcaseObj = getTestcaseStep(step,null,"@Generic",'sendFunctionKeys',['F4'],null,null,"Generic");
-							else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+							else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,null,"SAP");
 							break;
 						case "GuiLabel":
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
-							if(eachScrapedAction.command[0][1]=="setFocus") testcaseObj.keywordVal = 'SetFocus';
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,null,"SAP");
+							if(eachScrapedAction.command[0][1]=="setFocus") testcaseObj.keywordVal = 'setFocus';
 							break;
 						case "calendar":
 							if(eachScrapedAction.command[0][1]=="selectionInterval"){
 								cal_range = (eachScrapedAction.command[0][2].split(',')).join(';')
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRange',[cal_range],null,null,"SAP");
-							} else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectRange',[cal_range],null,null,"SAP");
+							} else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,null,"SAP");
 							break;
 						case "button":
 						case "shell":
 						case "toolbar":
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'click',null,null,null,"SAP");
 							if(eachScrapedAction.custname.indexOf("_elmnt") !== -1) testcaseObj.keywordVal = 'clickElement';
 							break;
 						case "GuiStatusbar":
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClickStatusBar',null,null,null,"SAP");
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'doubleClickStatusBar',null,null,null,"SAP");
 							break;
 						case "GuiTab":
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTab',null,null,null,"SAP");
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectTab',null,null,null,"SAP");
 							break;
 						case "select":
 							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'selectValueByText',[input[0]],null,null,"SAP");
 							break;
 						case "GuiMenu":
-							testcaseObj = getTestcaseStep(step,null,'@Sap','SelectMenu',[menu_input],null,null,"SAP");
+							testcaseObj = getTestcaseStep(step,null,'@Sap','selectMenu',[menu_input],null,null,"SAP");
 							break;
 						case "GuiSimpleContainer":
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'DoubleClickOnCell',[input[0]],null,null,"SAP");
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname, 'doubleClickOnCell',[input[0]],null,null,"SAP");
 							break;
 						case "radiobutton":
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"SAP");
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectRadioButton',null,null,null,"SAP");
 							break;
 						case "checkbox":
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"SAP");
-							if(eachScrapedAction.command[0][1]=='Unselected') testcaseObj.keywordVal = 'UnSelectCheckbox';
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectCheckbox',null,null,null,"SAP");
+							if(eachScrapedAction.command[0][1]=='Unselected') testcaseObj.keywordVal = 'unSelectCheckbox';
 							break;
 						case "tree":
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectTreeElement',null,null,null,"SAP");
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectTreeElement',null,null,null,"SAP");
 							break;
 						case "picture":
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'DoubleClick',null,null,null,"SAP");
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'doubleClick',null,null,null,"SAP");
 							break;
 						case "text":
-							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"SAP");
+							testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'setText',[input[0]],null,null,"SAP");
 							break;
 						case "GuiModalWindow":
 						case "GuiDialogShell":
@@ -505,7 +505,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				case "combo box":
 				case "list":
 					if (eachScrapedAction.custname == '') eachScrapedAction.custname=eachScrapedAction.tag.concat("_elmnt");
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectValueByText',[input[0]],null,null,"OEBS");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectValueByText',[input[0]],null,null,"OEBS");
 					break;
 				case "push button":
 				case "page tab":
@@ -514,15 +514,15 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					break;
 				case "radio button":
 					if (eachScrapedAction.custname == '') eachScrapedAction.custname=eachScrapedAction.tag.concat("_elmnt");
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRadioButton',null,null,null,"OEBS");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectRadioButton',null,null,null,"OEBS");
 					break;
 				case "check box":
 					if (eachScrapedAction.custname == '') eachScrapedAction.custname=eachScrapedAction.tag.concat("_elmnt");
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectCheckbox',null,null,null,"OEBS");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'selectCheckbox',null,null,null,"OEBS");
 					break;
 				case "text":
 					if (eachScrapedAction.custname == '') eachScrapedAction.custname=eachScrapedAction.tag.concat("_elmnt");
-					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SetText',[input[0]],null,null,"OEBS");
+					testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'setText',[input[0]],null,null,"OEBS");
 					break;
 				default:
 					logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for OEBS apptype.");
