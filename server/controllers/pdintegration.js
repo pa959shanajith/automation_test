@@ -388,19 +388,19 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 							break;
 						case "table":
 							if(eachScrapedAction.command[0][1]=="getAbsoluteRow"){
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRow',[eachScrapedAction.command[0][2]+1],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectRow',[(eachScrapedAction.command[0][2]+1).toString()],null,null,"SAP");
 								if(eachScrapedAction.command[1][1]!="selected") testcaseObj.keywordVal = 'UnselectRow';
 							}
 							else if(eachScrapedAction.command[0][1]=="verticalScrollbar")
 								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'scrollDown',null,null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="columns"){
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumn',[eachScrapedAction.command[1][2]+1],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumn',[(eachScrapedAction.command[1][2]+1).toString()],null,null,"SAP");
 								if(eachScrapedAction.command[2][1]!="selected") testcaseObj.keywordVal = 'UnselectColumn';
 							} else testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'Click',null,null,null,"SAP");
 							break;
 						case "gridview":
 							if(eachScrapedAction.command[0][1]=="selectColumn")
-								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumns',[eachScrapedAction.command[0][2]],null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'SelectColumns',[(eachScrapedAction.command[0][2]).toString()],null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="pressToolbarButton")
 								testcaseObj = getTestcaseStep(step,eachScrapedAction.xpath,eachScrapedAction.custname,'PressToolbarButton',[eachScrapedAction.command[0][2]],null,null,"SAP");
 							else if(eachScrapedAction.command[0][1]=="modifyCell"){
