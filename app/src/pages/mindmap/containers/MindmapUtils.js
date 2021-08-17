@@ -2,6 +2,9 @@
 import * as d3 from 'd3';
 import {v4 as uuid} from 'uuid'
 import {Messages as MSG} from '../../global'
+import { readCtScale } from './CanvasNew'
+import { readCtScale as readCtScaleAssign } from './CanvasAssign'
+import { readCtScale as readCtScaleEnE } from './CanvasEnE'
 
 function unfoldtree(d){
     // d3.select('#node_' + d.id).classed('no-disp', !1).select('.ct-cRight').classed('ct-nodeBubble', !0); 
@@ -347,7 +350,7 @@ export const addLink = (p, c,verticalLayout) => {
         return { 'd': d }
 }
 
-export const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos,verticalLayout) => {
+export const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos,verticalLayout,CanvasFlag) => {
         dLinks.forEach(function(d, i) {
                 if (d.source.id === parseInt(idx)) {      
                         if(!linkDisplay['link-' + d.source.id + '-' + d.target.id]){
@@ -371,6 +374,9 @@ export const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos,verticalLayout) =>
         svg.on('mousemove.nodemove', ()=>{
                 d3.event.stopImmediatePropagation();
                 var t = {} ;
+                if(CanvasFlag==='createnew')pos=readCtScale();
+                else if(CanvasFlag==='assign')pos=readCtScaleAssign();
+                else if(CanvasFlag==='endtoend')pos=readCtScaleEnE();
                 const cSpan = [pos.x, pos.y];
                 const cScale = pos.k;
                 const svgOff = document.getElementById('mp__canvas_svg').getBoundingClientRect();

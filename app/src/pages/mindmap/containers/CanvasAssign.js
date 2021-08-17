@@ -28,6 +28,7 @@ var temp = {
     deleted:[],
     t: ""
 };
+export var readCtScale
 
 const CanvasAssign =(props)=>{
     const dispatch = useDispatch()
@@ -44,6 +45,7 @@ const CanvasAssign =(props)=>{
     const [ctScale,setCtScale] = useState({})
     const [verticalLayout,setVerticalLayout] = useState(false)
     const [taskbox,setTaskBox] = useState(false)
+    readCtScale = () => ctScale
 
     useEffect(()=>{
         //useEffect to clear redux data selected module on unmount
@@ -104,7 +106,7 @@ const CanvasAssign =(props)=>{
         }
         else{
             nodeMoving = true
-            res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale},verticalLayout)
+            res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale},verticalLayout,'assign')
             setLinks(res.linkDisplay)
             temp={...temp,...res.temp}
         }
@@ -127,7 +129,7 @@ const CanvasAssign =(props)=>{
         <Fragment>
             <Legends/>
             {taskbox?<TaskBox setPopup={setPopup} clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={releaseid} cycleid={cycleid} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
-            <SaveMapButton isAssign={true} dNodes={[...dNodes]} cycId={cycleid} setPopup={setPopup} setBlockui={setBlockui}/>
+            <SaveMapButton isAssign={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} cycId={cycleid} setPopup={setPopup} setBlockui={setBlockui}/>
             <ExportMapButton isAssign={true} setBlockui={setBlockui} setPopup={setPopup} displayError={displayError} releaseRef={props.releaseRef} cycleRef={props.cycleRef}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>

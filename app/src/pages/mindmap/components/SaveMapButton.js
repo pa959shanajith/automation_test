@@ -21,12 +21,13 @@ const SaveMapButton = (props) => {
     const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
     const projectList = useSelector(state=>state.mindmap.projectList)
     const moduledata = useSelector(state=>state.mindmap.moduleList)
+    const verticalLayout= props.verticalLayout
     useEffect(()=>{
         if(props.createnew==='save')clickSave()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,props.setPopup,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj,moduledata)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,props.setPopup,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj,moduledata,verticalLayout)
     }
     return(
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -39,9 +40,8 @@ const SaveMapButton = (props) => {
 }
 
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata)=>{
+const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout)=>{
     var tab = "tabCreate"
-    var layout_vertical = false;
     var selectedProject;
     var error = !1
     var mapData = []
@@ -80,7 +80,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
             type: e.type
         };
     });
-    if (layout_vertical) {
+    if (verticalLayout) {
         temp_data.sort((a, b)=>a.x - b.x);
     } else {
         temp_data.sort((a, b)=>a.y - b.y);

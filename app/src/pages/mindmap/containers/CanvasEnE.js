@@ -27,6 +27,7 @@ var temp = {
     deleted:[],
     t: ""
 };
+export var readCtScale
 
 const CanvasEnE =(props)=>{
     const dispatch = useDispatch()
@@ -45,6 +46,7 @@ const CanvasEnE =(props)=>{
     const [createnew,setCreateNew] = useState(false)
     const scenarioList = useSelector(state=>state.mindmap.scenarioList)
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
+    readCtScale = () => ctScale
 
     const clickDeleteNode=(id)=>{
         var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes},setPopup)
@@ -157,7 +159,7 @@ const CanvasEnE =(props)=>{
         }
         else{
             nodeMoving = true
-            res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale},verticalLayout)
+            res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale},verticalLayout,'endtoend')
             setLinks(res.linkDisplay)
             temp={...temp,...res.temp}
         }
@@ -172,7 +174,7 @@ const CanvasEnE =(props)=>{
             <Legends isEnE={true}/>
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} setPopup={setPopup} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(ctrlBox !== false)?<ControlBox isEnE={true} nid={ctrlBox}  clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            <SaveMapButton isEnE={true} dNodes={[...dNodes]} setPopup={setPopup} setBlockui={setBlockui}/>
+            <SaveMapButton isEnE={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} setPopup={setPopup} setBlockui={setBlockui}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
