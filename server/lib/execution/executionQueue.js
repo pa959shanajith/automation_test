@@ -261,7 +261,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             // Check if request came from Azure DevOps. If yes, then send the acknowledgement
             if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
                 res.setHeader(constants.X_EXECUTION_MESSAGE, "Request Recieved")
-                return res.status("200").send("Request Recieved");
+                res.status("200").send("Request Recieved");
             }
             let suiteRequest = { "executionData": testSuiteRequest.body.executionData, "headers": testSuiteRequest.headers, "resId": uuid()}
             let testSuite = { "testSuiteRequest": suiteRequest, "type": "API", "userInfo": userInfo }

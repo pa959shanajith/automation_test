@@ -96,13 +96,14 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
 
     executeAPI = async (testSuite) => {
         const req = testSuite.testSuiteRequest;
-        const res = testSuite.res;
+        var res = testSuite.res;
         var userInfo = testSuite.userInfo;
         var execResponse = userInfo.inputs;
         const hdrs = req.headers;
         let reqFromADO = false;
         if (hdrs["user-agent"].startsWith("VSTS") && hdrs.planurl && hdrs.projectid) {
             reqFromADO = true;
+            res = null;
         }
         const batchExecutionData = req.executionData;
         var statusCode = '500'
@@ -174,10 +175,11 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
                 execResponse.batchInfo = execResult;
         }
         const finalResult = { "executionStatus": execResponse };
-        if (!res) {
-            logger.error("Error while sending response in executeAPI, response object undefined");
-            return;
-        } else if (!reqFromADO) {
+        if (!reqFromADO) {
+            if (!res) {
+                logger.error("Error while sending response in executeAPI, response object undefined");
+                return;
+            }
             res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES[statusCode]);
             return res.status(statusCode).send(finalResult);
         }
