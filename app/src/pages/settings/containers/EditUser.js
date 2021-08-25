@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import * as actionTypes from '../../login/state/action';
-import { ScreenOverlay, Messages as MSG } from '../../global'
+import { ScrollBar, ScreenOverlay, Messages as MSG } from '../../global'
 import { manageUserDetails } from '../../admin/api'
 import { Header, FormInput } from '../components/AllFormComp'
 
@@ -116,6 +116,11 @@ const EditUser = (props) => {
     return <>
         {loading ? <ScreenOverlay content={loading} /> : null}
         <Header heading="Edit User" />
+        <div className={classes["stng_edit_user"]}>
+        <div className={classes["stng__ab"]}>
+        <div className={classes["stng__min"]}>
+        <div className={classes["stng__con"]} id="stngCon">
+        <ScrollBar thumbColor="#929397" scrollId="stngCon">
         <form data-test="form-test" onSubmit={updateSubmitHandler} className={classes["edit-user-form"]}>
             <div className={classes["action-div"]}>
                 <button data-test="update-test" type="submit" className={classes["action-button"]}>Update</button>
@@ -153,6 +158,8 @@ const EditUser = (props) => {
                 </div>
             </div>
         </form>
+        </ScrollBar>
+        </div></div></div></div>
     </>
 }
 
