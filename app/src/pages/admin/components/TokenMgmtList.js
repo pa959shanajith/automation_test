@@ -13,10 +13,10 @@ import '../styles/TokenMgmtList.scss'
 const TokenMgmtList = (props) => {
     const dateFormat = useSelector(state=>state.login.dateformat);
     const [loading,setLoading] = useState(false)
-	const setPopupState = props.setPopupState
 	const [allTokensModify,setAllTokensModify] = useState(props.allTokens)
     const [firstStop,setFirstStop] = useState(false)
     const searchRef =  useRef();
+    const setPopupState = props.setPopupState
 
     useEffect(()=>{
         if(firstStop) setFirstStop(!firstStop);

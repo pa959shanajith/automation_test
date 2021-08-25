@@ -44,7 +44,7 @@ const FormSelect = (props) => {
     const inpId = props.inpId
     return(
         <Fragment>
-            <div className='col-xs-9 form-group input-label'>
+            <div style={props.style} className='col-xs-9 form-group input-label'>
                 <label>{name}</label>
                 <select data-test="select_comp" onChange={onChangeFn} ref={inpRef} defaultValue={'def-opt'} className={"adminSelect-project-assign form-control__conv-project left-opt"} id={inpId || "selectForm"}>
                     <option key={'def-opt'} value={'def-opt'} disabled={true}>{defValue}</option>

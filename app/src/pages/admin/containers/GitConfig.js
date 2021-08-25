@@ -27,17 +27,32 @@ const GitConfig = (props) => {
     const [userList,setUserList] = useState([])
     const [loading,setLoading] = useState(false)
     const setPopupState=props.setPopupState;
+    const isUsrSetting = props.userConfig //for user settings
     
+    useEffect(() => {
+        if (props.userConfig) {
+            userRef.current.value = props.username;
+            setUserData({ [props.username]: props.userID });
+        }
+    }, [props.userConfig, props.username, props.userID])
     
-    useEffect(()=>{
+    useEffect(() => {
         setShowEdit(false);
+        if (!isUsrSetting) {
 		refreshFields(domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading);
         // eslint-disable-next-line
-	},[props.resetMiddleScreen["gitConfigure"],props.MiddleScreen])
+        } else {
+            fetchDomainList(resetSelectList, setDomainList, displayError, setLoading);
+        }
+    }, [props.resetMiddleScreen["gitConfigure"], props.MiddleScreen])
 
     const onClickEdit = () => {
         setShowEdit(true);
+        if (!isUsrSetting) {
         refreshFields(domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading); 
+        } else {
+            fetchDomainList(resetSelectList, setDomainList, displayError, setLoading);
+    }
     }
 
     const displayError = (error) =>{
@@ -76,6 +91,9 @@ const GitConfig = (props) => {
 
     const resetFields = () => {
         refreshFields(domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading); 
+        if (isUsrSetting) {
+            fetchDomainList(resetSelectList, setDomainList, displayError, setLoading);
+    }
     }
 
     return (
@@ -86,12 +104,13 @@ const GitConfig = (props) => {
                 <div id="page-taskName"><span>{(showEdit===false)?"Git Configuration":"Edit Git Configuration"}</span></div>
                 <GitButtonActions resetFields={resetFields} showEdit={showEdit} onClickEdit={onClickEdit} domain={domainRef} user={userRef} Project={ProjectRef} gitname={gitconfigRef} token={tokenRef} url={urlRef} gituser={gituserRef} gitemail={gitemailRef} userData={userData} projectData={projectData} setLoading={setLoading} displayError={displayError} refreshFields={refreshFields} setPopupState={setPopupState} />        
                 <div className="git_token" >
-                <FormSelect data-test="user_git" inpId={'userGit'} inpRef={userRef} onChangeFn={()=>fetchDomainList(resetSelectList, setDomainList, displayError, setLoading)} defValue={"Select User"} label={"User"} option={userList}/>
-                <FormSelect data-test="domain_git" inpId={'domainGit'} inpRef={domainRef} onChangeFn={()=>fetchProjectList(resetSelectList, domainRef.current.value, userData, userRef, setProjectList, setProjectData, displayError, setLoading)} defValue={"Select Domain"} label={"Domain"} option={domainList}/>
-                <FormSelect data-test="project_git" inpId={'projectGit'} inpRef={ProjectRef} onChangeFn={()=>{onChangeProject(resetFields,displayError, showEdit, urlRef, gitconfigRef, tokenRef, gituserRef, gitemailRef,userData, userRef, projectData, ProjectRef, setLoading, setPopupState)}} defValue={"Select Project"} label={"Project"} option={projectList}/>
+                    {!isUsrSetting && <FormSelect data-test="user_git" inpId={'userGit'} inpRef={userRef} onChangeFn={() => fetchDomainList(resetSelectList, setDomainList, displayError, setLoading)} defValue={"Select User"} label={"User"} option={userList} />}
+                    {isUsrSetting && <span ref={userRef} ></span>}
+                    <FormSelect data-test="domain_git" inpId={'domainGit'} inpRef={domainRef} onChangeFn={() => fetchProjectList(resetSelectList, domainRef.current.value, userData, userRef, setProjectList, setProjectData, displayError, setLoading)} defValue={"Select Domain"} label={"Domain"} option={domainList} />
+                    <FormSelect data-test="project_git" inpId={'projectGit'} inpRef={ProjectRef} onChangeFn={() => { onChangeProject(resetFields, displayError, showEdit, urlRef, gitconfigRef, tokenRef, gituserRef, gitemailRef, userData, userRef, projectData, ProjectRef, setLoading, setPopupState) }} defValue={"Select Project"} label={"Project"} option={projectList} />
                     <FormInput data-test="name_git" inpRef={gitconfigRef} label={'Git Configuration'} placeholder={'Enter Git Configuration Name'} />
                     <FormInput data-test="token_git" inpRef={tokenRef} label={'Git Access Token'} placeholder={'Enter Git Access Token'} />
-                    <FormInput data-test="url_git" inpRef={urlRef} label={'Git URL'} placeholder={'Enter Git URL'}/>
+                    <FormInput data-test="url_git" inpRef={urlRef} label={'Git URL'} placeholder={'Enter Git URL'} />
                     <FormInput data-test="username_git" inpRef={gituserRef} label={'Git User Name'} placeholder={'Enter Git Username'} />
                     <FormInput data-test="email_git" inpRef={gitemailRef} label={'Git User Email'} placeholder={'Enter Git Email Id'} />
                 </div>

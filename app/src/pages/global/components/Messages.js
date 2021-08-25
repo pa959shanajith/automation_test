@@ -68,6 +68,7 @@ const Messages={
         ERR_PROJECT_ASSIGN: {"CONTENT":"Failed to assign projects to user.", "VARIANT": VARIANT.ERROR},
         ERR_PROVISION_ICE: {"CONTENT":"ICE Provisioned Failed.", "VARIANT": VARIANT.ERROR},
         ERR_ICE_DEREGISTER: {"CONTENT":"ICE Deregister Failed.", "VARIANT": VARIANT.ERROR},
+        ERR_SELECTED_ICE_NOT_ACTIVE : {"CONTENT": "Failed to change default ICE as the selected ICE is not active", "VARIANT": VARIANT.ERROR},
         
         SUCC_EMAIL_SENT: {"CONTENT":"Test Email Sent.", "VARIANT": VARIANT.SUCCESS},
         SUCC_ICEPOOL_SAVED: {"CONTENT":"ICE Pool saved successfully.", "VARIANT": VARIANT.SUCCESS},
@@ -160,6 +161,7 @@ const Messages={
         ERR_NOROLES_SWITCH: {"CONTENT":"There are no roles to switch.", "VARIANT": VARIANT.ERROR},
         ERR_PACKAGE: {"CONTENT":"Package is not availabl.e", "VARIANT": VARIANT.ERROR},
         ERR_UNAVAILABLE_LOCAL_SERVER: {"CONTENT":"Unavailable LocalServe.r", "VARIANT": VARIANT.ERROR},
+        ERR_SOMETHING_WRONG: {"CONTENT": "Something went wrong!", "VARIANT": VARIANT.ERROR},
         
         SUCC_CHANGE_DEFAULT_ICE: {"CONTENT":"Changed default ICE successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_CHANGE_PASSWORD: {"CONTENT":"Password change successfull. Please login again with new password.", "VARIANT": VARIANT.SUCCESS},
@@ -408,12 +410,22 @@ const Messages={
         ERR_INVALID_XML: {"CONTENT":'Invalid XML file. Check the file or specify row and column tags.', "VARIANT": VARIANT.ERROR},
         ERR_COL_TAGNAME: {"CONTENT":'Invalid column tag names.', "VARIANT": VARIANT.ERROR},
         ERR_HEADER: {"CONTENT":'Header name is empty or duplicate.', "VARIANT": VARIANT.ERROR},
+        ERR_SEL_API: {"CONTENT": "Select an API before generating request body", "VARIANT": VARIANT.ERROR},
 
         SUCC_EXPORTED: {"CONTENT":'Successfully exported Execution Metrics to CSV.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DELETE_DATATABLE: {"CONTENT":'Data Table Deleted Successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_UPDATE_DATATABLE: {"CONTENT":'Data Table Updated Successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_EXPORT_FILE: {"CONTENT":'File Exported Successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_SAVE_DATATABLE: {"CONTENT":'Data Table Saved Successfully.', "VARIANT": VARIANT.SUCCESS},
+        SUCC_REQ_BODY_GEN: {"CONTEN":"The required request has been generated and is present in the request body.", "VARIANT": VARIANT.SUCCESS},
+    },
+
+    SETTINGS: {
+        ERR_INVALID_INFO: {"CONTENT": "Enter Correct Details", "VARIANT": VARIANT.ERROR},
+        ERR_ENTER_VALID_CRED: {"CONTENT": "Enter Valid Credentials", "VARIANT": VARIANT.ERROR},
+        ERR_JIRA_FETCH: {"CONTENT": "Failed to fetch JIRA details.", "VARIANT": VARIANT.ERROR},
+        
+        SUCC_INFO_UPDATED: {"CONTENT": "User Information updated successfully!", "VARIANT": VARIANT.SUCCESS},
     }
 }
 

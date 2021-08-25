@@ -84,6 +84,20 @@ exports.manageUserDetails = async (req, res) => {
 					flag[5]='1';
 				} else if (action == "update") {
 					const userData = {username, newpass: inputs.auth.password, oldpass: ''};
+					if (reqData.userConfig) {
+
+						let resetFlag = false;
+						const loggedUser = req._passport.instance.verifySession(req);
+						if (!loggedUser && req.user) {
+							username = req.user.username;
+							usertype = req.user.type;
+							resetFlag = true;
+						} else if (!loggedUser) {
+							return res.status(401).send("Invalid Session");
+						}
+						if (resetFlag) userData.currdefpass = reqData.currpassword;
+						else userData.currpass = reqData.currpassword;
+					}
 					const fresh = await login.verifyPasswordHistory(userData);
 					if (fresh == "fail") {
 						logger.error("Error occurred in admin/"+fnName+": Unable to retrive user profile");
@@ -2298,6 +2312,69 @@ exports.gitEditConfig = async (req, res) => {
 		}
 	} catch (exception){
 		logger.error("Exception in the service gitEditConfig: %s", ex);
+		return res.status(500).send("fail");
+	}
+};
+
+// /* get JIRA Details */
+exports.getDetails_JIRA = async (req, res) => {
+	const actionName = "getDetails_JIRA";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const userId = req.session.userid;
+		let inputs = {
+			"userId": userId
+		};
+		const result = await utils.fetchData(inputs, "admin/getDetails_JIRA", actionName);
+
+		if (result === "fail") res.status(500).send("fail");
+		else if (result === "empty") res.send("empty");
+		else {
+			let data = {
+				jiraURL: result['url'],
+				jiraUsername: result['username'],
+				jirakey: result['api']
+			};
+			return res.send(data);
+		}
+	} catch (exception) {
+		logger.error("Exception in the service getDetails_JIRA: %s", exception);
+		return res.status(500).send("fail");
+	}
+
+};
+
+/* manageJiraDetails */
+exports.manageJiraDetails = async (req, res) => {
+	const actionName = "manageJiraDetails";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = req.session.userid;
+		const action = data.action;
+		let result;
+		if(action==='delete'){
+			let inputs = {
+				"userId": userId,
+				"action":action
+			}
+			result = await utils.fetchData(inputs, "admin/manageJiraDetails", actionName);
+		}else{
+			const jiraURL = data.user.jiraURL;
+			const jiraUsername = data.user.jiraUsername;
+			const jiraAPI = data.user.jiraAPI;
+			let inputs = {
+				"userId": userId,
+				"jiraUrl": jiraURL,
+				"jiraUsername": jiraUsername,
+				"jiraAPI": jiraAPI,
+				"action": action
+			};
+			result = await utils.fetchData(inputs, "admin/manageJiraDetails", actionName);
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error("Exception in the service gitSaveConfig: %s", exception);
 		return res.status(500).send("fail");
 	}
 };

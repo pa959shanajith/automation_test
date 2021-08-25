@@ -8,6 +8,7 @@ import '../styles/TokenManagement.scss'
 
 /*Component TokenManagement
   use: defines Admin middle Section for Token Management
+  UserConfig:for User Settings
   ToDo:
 */
 
@@ -30,11 +31,14 @@ const TokenManagement = (props) => {
 	const [refresh,setRefresh] = useState(false)
 	const [showList,setShowList] = useState(false)
 	const setPopupState =props.setPopupState;
+	const userConfig = props.userConfig //User Settings
 
     useEffect(()=>{
 		setOp("normal");
 		setdateVal("");
 		setTimeVal("");
+		setName("");
+		setRefresh((prevState)=>!prevState)
 		// eslint-disable-next-line
     },[props.resetMiddleScreen["tokenTab"],props.MiddleScreen])
 
@@ -138,13 +142,13 @@ const TokenManagement = (props) => {
 			<div className="tkn-mgmt_container">
 				<div id="page-taskName"><span>Token Management</span></div>
 				<div className="adminActionBtn">
-					<button className="a__btn pull-right" onClick={()=>{generateCIusertokens();}}  title="Generate New Token">Generate</button>
-					<button className="a__btn pull-right btn-right-cust-tkn" onClick={()=>{setRefresh(!refresh);setOp("normal")}} title="Refresh">Refresh</button>            
+					<button className="a__btn pull-right" onClick={() => { generateCIusertokens(); }} title="Generate New Token">Generate</button>
+					<button className="a__btn pull-right btn-right-cust-tkn" onClick={() => { setRefresh((prevState)=>(!prevState)); setOp("normal") }} title="Refresh">Refresh</button>
 				</div>
 				<div className="content_wrapper-tkn-mgmt">
 					<ScrollBar thumbColor="#929397">
-						<TokenMgmtForm setPopupState={setPopupState} setShowList={setShowList} showList={showList} runLoadData={runLoadData} op={op} setOp={setOp} dateVal={dateVal} setSelAssignUser2ErrBorder={setSelAssignUser2ErrBorder} setNameErrBorder={setNameErrBorder} nameErrBorder={nameErrBorder} refresh={refresh} selAssignUser2ErrBorder={selAssignUser2ErrBorder} timeVal={timeVal} setTimeVal={setTimeVal} setdateVal={setdateVal} setAllTokens={setAllTokens} setTargetid={setTargetid} targetid={targetid} name={name} allICE={allICE} setAllICE={setAllICE} setName={setName} token={token} allTokens={allTokens} setToken={setToken} />
-						<TokenMgmtList setPopupState={setPopupState} showList={showList} setShowList={setShowList} allTokens={allTokens} setAllTokens={setAllTokens} targetid={targetid} />  
+						<TokenMgmtForm setPopupState={setPopupState} userConfig = {userConfig} userInfo ={props.userInfo} setShowList={setShowList} showList={showList} runLoadData={runLoadData} op={op} setOp={setOp} dateVal={dateVal} setSelAssignUser2ErrBorder={setSelAssignUser2ErrBorder} setNameErrBorder={setNameErrBorder} nameErrBorder={nameErrBorder} refresh={refresh} selAssignUser2ErrBorder={selAssignUser2ErrBorder} timeVal={timeVal} setTimeVal={setTimeVal} setdateVal={setdateVal} setAllTokens={setAllTokens} setTargetid={setTargetid} targetid={targetid} name={name} allICE={allICE} setAllICE={setAllICE} setName={setName} token={token} allTokens={allTokens} setToken={setToken} />
+						<TokenMgmtList setPopupState={setPopupState} showList={showList} setShowList={setShowList} allTokens={allTokens} setAllTokens={setAllTokens} targetid={targetid} />
 					</ScrollBar>
 				</div>
 			</div>

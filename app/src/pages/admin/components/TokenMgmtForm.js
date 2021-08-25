@@ -20,6 +20,8 @@ const TokenMgmtForm = (props) => {
 	const [inputProps1Disable,setInputProps1Disable] = useState(true)
     const [copyToolTip,setCopyToolTip] = useState("Click To Copy")
 	const [downloadToolTip,setDownloadToolTip] = useState("Download Token")
+	const isUsrSetting = props.userConfig //for user settings
+	const userInfo = props.userInfo // User Settings
 	const setPopupState = props.setPopupState;
 	
     let inputProps1 = {
@@ -40,7 +42,9 @@ const TokenMgmtForm = (props) => {
     }
 
     useEffect(()=>{
+		if(!isUsrSetting){
 		repopulateEntries('normal');
+		}
 		// eslint-disable-next-line
     },[props.refresh])
 
@@ -171,27 +175,35 @@ const TokenMgmtForm = (props) => {
 		props.setTimeVal(""+hr+":"+min)
 	}
 
+	useEffect(()=>{
+		if(isUsrSetting){
+			props.setOp("normal");
+			props.setTargetid(userInfo);
+			loadData(userInfo,true);
+		}
+    },[isUsrSetting, userInfo, props.refresh])
+
     return (
         <Fragment>
             {loading?<ScreenOverlay content={loading}/>:null}
 			
             <div className="col-xs-9" style={{width:"83%"}}>
-                <div className='adminControl-tkn-mgmt ice-type-tkn-mgmt'><div>
+			{!isUsrSetting && <div data-test="ice-type-test" className='adminControl-tkn-mgmt ice-type-tkn-mgmt'><div>
                     <span className="leftControl-tkn-mgmt" title="ICE Type">ICE Type</span>
 					<label className="adminFormRadio">
-						<input type="radio" checked={props.op==="normal"} value="normal" name="provisionType" onChange={()=>{props.setOp("normal");repopulateEntries('normal')}} />
+						<input type="radio" checked={props.op==="normal"} value="normal" name="provisionType" onChange={()=>{if(!isUsrSetting){props.setOp("normal");repopulateEntries('normal')}}} />
 						<span>Normal</span>
 					</label>
 					<label className="adminFormRadio">
-						<input type="radio" checked={props.op==="ci-cd"} value="ci-cd" name="provisionType" onChange={()=>{props.setOp("ci-cd");repopulateEntries("ci-cd")}} />
+						<input type="radio" checked={props.op==="ci-cd"} value="ci-cd" name="provisionType" onChange={()=>{if(!isUsrSetting){props.setOp("ci-cd");repopulateEntries("ci-cd")}}} />
 						<span>CI/CD</span>
 					</label>
-				</div></div>
-                <div className='userForm-tkn-mgmt adminControl-tkn-mgmt'>
+				</div></div>}
+                {!isUsrSetting && <div data-test="user-test" className='userForm-tkn-mgmt adminControl-tkn-mgmt' >
 					{props.op==="normal"?
                         <div >
                             <span className="leftControl-tkn-mgmt" title="User">Username</span>
-                            <select  value={props.targetid} id="selAssignUser1" onChange={(event)=>{loadData(event.target.value,true);props.setTargetid(event.target.value);props.setSelAssignUser2ErrBorder(false)}} className={props.selAssignUser2ErrBorder?'selectErrorBorder adminSelect-tkn-mgmt form-control-tkn-mgmt':'adminSelect-tkn-mgmt form-control-tkn-mgmt'}>
+                            <select  value={props.targetid} id="selAssignUser1" onChange={(event)=>{if(!isUsrSetting){loadData(event.target.value,true);props.setTargetid(event.target.value);props.setSelAssignUser2ErrBorder(false)}}} className={props.selAssignUser2ErrBorder?'selectErrorBorder adminSelect-tkn-mgmt form-control-tkn-mgmt':'adminSelect-tkn-mgmt form-control-tkn-mgmt'}>
                                 {allUsers.map((entry,index) => (
 									<option key={index} value={entry[1]} disabled={entry[0]==='Select User'?true:false}>{entry[0]}</option>
                                 ))}
@@ -208,8 +220,8 @@ const TokenMgmtForm = (props) => {
                             </select>
                         </div>
                     :null}
-				</div>
-                <div className='adminControl-tkn-mgmt'><div>
+				</div>}
+                <div data-test="token-test" className='adminControl-tkn-mgmt'><div>
 					<span className="leftControl-tkn-mgmt" title="Token Name">Token Name</span>
 					<input type="text" autoComplete="off" id="tokenName" name="tokenName" onChange={(event)=>{updateTokenName(event.target.value)}} value={props.name} maxLength="100" className={props.nameErrBorder?"inputErrorBorder border_input-tkn-mgmt form-control-tkn-mgmt form-control-custom-tkn-mgmt":"border_input-tkn-mgmt form-control-tkn-mgmt form-control-custom-tkn-mgmt"} placeholder="Token Name"/>
 				</div></div>
@@ -221,14 +233,14 @@ const TokenMgmtForm = (props) => {
 					</div>
                 </div></div>
 
-                <div className='adminControl-tkn-mgmt' id="tokenarea"><div>
+                <div data-test="token-area-test" className='adminControl-tkn-mgmt' id="tokenarea"><div>
 					<span className=" leftControl-tkn-mgmt" title="Generated Token">Token</span>
 					<textarea type="text" className="token-tkn-mgmt token-tkn-mgmt-cust" autoComplete="off" id="ciToken" name="ciToken" value={props.token} placeholder="Click on Generate to generate token" readOnly="readonly" />
                     <label  className='tip-tkn-mgmt'>
 						<ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip },0]} />
 						<ReactTooltip id="download" effect="solid" backgroundColor="black" getContent={[() => { return downloadToolTip },0]} />
-						<span className="fa fa-files-o action-form-mgmt" data-for="copy" data-tip={copyToolTip} onClick={()=>{copyTokenFunc()}} ></span>
-						<span className="fa fa-download action-form-mgmt" data-for="download" data-tip={downloadToolTip} onClick={()=>{downloadToken()}}></span>
+						<span className="fa fa-files-o" data-for="copy" data-tip={copyToolTip} onClick={()=>{copyTokenFunc()}} ></span>
+						<span className="fa fa-download" data-for="download" data-tip={downloadToolTip} onClick={()=>{downloadToken()}}></span>
 					</label>
                 </div></div>
             </div>

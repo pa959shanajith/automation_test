@@ -6,7 +6,6 @@ import { getRoleNameByRoleId } from '../api';
 import * as actionTypes from '../../login/state/action';
 import { SWITCHED } from '../state/action';
 import ClickAwayListener from 'react-click-away-listener';
-import ChangePassword from './ChangePassword';
 import ChangeDefaultIce from './ChangeDefaultIce';
 import { persistor } from '../../../reducer';
 import NotifyDropDown from './NotifyDropDown';
@@ -25,9 +24,7 @@ const Header = () => {
     const history = useHistory();
     const dispatch = useDispatch();
     const [username, setUsername] = useState(null);
-    const [showChangePass, setShowChangePass] = useState(false);
     const [showChangeDefaultIce, setShowChangeDefaultIce] = useState(false);
-    const [showSuccessPass, setSuccessPass] = useState(false);
     const [showUD, setShowUD] = useState(false);
     const [showSR, setShowSR] = useState(false);
     const [roleList, setRoleList] = useState([]);
@@ -111,23 +108,13 @@ const Header = () => {
             });
 		}
     };
+
+    const chngUsrConf = () => {
+        setShowUD(false);
+        window.localStorage['navigateScreen'] = 'settings'
+        setRedirectTo('/settings');
+    }
     
-    const resetPass = () => {
-        setShowUD(false);
-        setShowChangePass(!showChangePass);
-    };
-
-    const chngDftIce = () => {
-        setShowUD(false);
-        setShowChangeDefaultIce(true);
-    };
-
-    const resetSuccess = () => {
-        setSuccessPass(false);
-        RedirectPage(history, { reason: "logout" });
-    };
-
-    const toggleChangePass = () => setShowChangePass(!showChangePass);
     const onClickAwayUD = () => setShowUD(false);
     const onClickAwaySR = () => setShowSR(false);
 
@@ -161,19 +148,12 @@ const Header = () => {
 		});
 	};
 
-    const PasswordSuccessPopup = () => (
-        <PopupMsg 
-            variant={MSG.GLOBAL.SUCC_CHANGE_PASSWORD.VARIANT}
-            close={()=>setSuccessPass(false)}
-            content={MSG.GLOBAL.SUCC_CHANGE_PASSWORD.CONTENT}
-        />
-    );
-
     const SRPopup = () => (
         <PopupMsg 
             variant={showSR_Pop.VARIANT}
             content={showSR_Pop.CONTENT}
             close={()=>setShowSR_Pop("")}
+            submit={()=>setShowSR_Pop("")}
         />
     );
 
@@ -200,9 +180,7 @@ const Header = () => {
     return(
         <> 
             { redirectTo && <Redirect to={redirectTo} /> }
-            { showChangePass && <ChangePassword setShow={toggleChangePass} setSuccessPass={setSuccessPass} /> }
             { showChangeDefaultIce && <ChangeDefaultIce setShowMainPopup={setShowChangeDefaultIce} /> }
-            { showSuccessPass && <PasswordSuccessPopup /> }
             { showConfSR && <ConfSwitchRole />  }
             { showSR_Pop && <SRPopup /> }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
@@ -247,8 +225,7 @@ const Header = () => {
                                 !adminDisable &&
                                 <>
                                 <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
-                                <div onClick={chngDftIce} ><Link to="#">Change Default ICE</Link></div>
-                                <div onClick={resetPass}><Link to="#">Change Password</Link></div>
+                                <div onClick={chngUsrConf} ><Link to="#">Settings</Link></div>
                                 </>
                             }
                             <div onClick={logout}><Link to="#">Logout</Link></div>

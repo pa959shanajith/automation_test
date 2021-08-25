@@ -29,7 +29,7 @@ const AdminHome = () => {
   const [resetMiddleScreen,setResetMiddleScreen] =useState({tokenTab:true,provisionTa:true,Preferences:true,sessionTab:true,gitConfigure:true,ldapConfigTab:true,createUser:true,projectTab:true,assignProjectTab:true,samlConfigTab:true,oidcConfigTab:true})
   return (
     <>
-    {popupState.show?<PopupMsg variant={popupState.variant} content={popupState.content} close={()=>setPopupState({show:false})} />:null}
+    {popupState.show || popupState.content || popupState.CONTENT ?<PopupMsg variant={popupState.variant || popupState.VARIANT } content={popupState.content || popupState.CONTENT} close={()=>setPopupState({show:false})} />:null}
     <div className='admin-container'>
         <Header />
         <div className="admin__mid_section">
