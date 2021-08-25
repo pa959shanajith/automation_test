@@ -30,10 +30,37 @@
     border: 2px solid #d33c3c !important;
 }
 
+.api-ut_contents{
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    margin-left: 5px;
+    height: 100%;
+}
+
+.api-ut__ab{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+}
+.api-ut__min{
+    min-height: 0;
+}
+.api-ut__con{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    height: 100%;
+}
+
 .api-ut__inputGroup{
     display: grid;
     grid-template-columns: 23% 77%;
-    row-gap: 24px;
+    row-gap: 20px;
     width: 83%;
     padding: 20px;
     font-size: 14px;

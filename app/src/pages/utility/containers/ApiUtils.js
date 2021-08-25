@@ -160,8 +160,11 @@ const ApiUtils = props => {
         <div className={classes["api-ut__btnGroup"]}>
             <button data-test="submit-button-test" onClick={handleSubmit} >Generate</button>
         </div>
-        <div style={{ height: "500px", width: "100%", }}>
-            <ScrollBar thumbColor="#929397">
+        <div className={classes["api-ut_contents"]}>
+        <div className={classes["api-ut__ab"]}>
+        <div className={classes["api-ut__min"]}>
+        <div className={classes["api-ut__con"]} id="apiUtilCon">
+            <ScrollBar thumbColor="#929397" scrollId="apiUtilCon">
                 <div className={classes["api-ut__inputGroup"]}>
                     <span className={classes["api-ut__inputLabel"]}>API<span className={classes["api-ut__mandate"]}>*</span></span>
                     <select data-test="api-select-test" value={api} className={classes["api-ut__select"]} onChange={(event) => { setApi(event.target.value) }}>
@@ -187,7 +190,7 @@ const ApiUtils = props => {
                     </span>
                 </div>
             </ScrollBar>
-        </div>
+        </div></div></div></div>
     </>);
 }
 
