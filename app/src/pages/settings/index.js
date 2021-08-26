@@ -13,9 +13,9 @@ const Settings = () => {
   history = useHistory()
   const dispatch = useDispatch();
   useEffect(() => {
-    // if (window.localStorage['navigateScreen'] !== "settings") {
-    //   RedirectPage(history);
-    // }
+    if (window.localStorage['navigateScreen'] !== "settings") {
+      RedirectPage(history, { reason: "screenMismatch" });
+    }
     SetProgressBar("stop", dispatch);
   }, [dispatch]);
   return (
