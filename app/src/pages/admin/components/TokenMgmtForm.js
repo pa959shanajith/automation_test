@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, CalendarComp, updateScrollBar, Messages } from '../../global';
+import {ScreenOverlay, CalendarComp, updateScrollBar, Messages, setMsg } from '../../global';
 import {getUserDetails, getCIUsersDetails, fetchICE} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import ReactTooltip from 'react-tooltip';
@@ -20,7 +20,6 @@ const TokenMgmtForm = (props) => {
 	const [inputProps1Disable,setInputProps1Disable] = useState(true)
     const [copyToolTip,setCopyToolTip] = useState("Click To Copy")
 	const [downloadToolTip,setDownloadToolTip] = useState("Download Token")
-	const setPopupState = props.setPopupState;
 	
     let inputProps1 = {
 		placeholder: "Select Time",
@@ -31,12 +30,7 @@ const TokenMgmtForm = (props) => {
 
 	const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     useEffect(()=>{

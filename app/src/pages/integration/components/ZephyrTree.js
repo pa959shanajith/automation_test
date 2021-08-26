@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import { updateScrollBar, Messages as MSG } from '../../global';
+import { updateScrollBar, Messages as MSG, setMsg } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import { RedirectPage } from '../../global';
 import * as actionTypes from '../state/action';
@@ -56,11 +56,11 @@ const PhaseNode = props => {
             const data = await api.zephyrTestcaseDetails_ICE("testcase", phaseid);
             
             if (data.error)
-                dispatch({type: actionTypes.SHOW_POPUP, payload: data.error});
+                setMsg(data.error);
             else if (data === "unavailableLocalServer")
-                dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_UNAVAILABLE_ICE});
+                setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
             else if (data === "scheduleModeOn")
-                dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.GENERIC.WARN_UNCHECK_SCHEDULE});
+                setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
             else if (data === "Invalid Session"){
                 dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
                 return RedirectPage(history);
@@ -122,7 +122,7 @@ const TestCaseNode = props => {
         if(selectedScIds.length===0){
             popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
         }
-        if (popupMsg) dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});
+        if (popupMsg) setMsg(popupMsg);
         else{
             const mappedPair=[
                 {

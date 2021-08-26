@@ -1,5 +1,5 @@
 import React, { Fragment, useRef, useState } from 'react';
-import {ModalContainer, Messages as MSG} from '../../global';
+import {ModalContainer, Messages as MSG, setMsg} from '../../global';
 import {useSelector} from 'react-redux'
 import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit} from '../api';
 import '../styles/ExportMapButton.scss'
@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
   use: renders ExportMapButton and popups for selection on click 
 */
 
-const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,cycleRef}) => {
+const ExportMapButton = ({setBlockui,displayError,isAssign,releaseRef,cycleRef}) => {
     const fnameRef = useRef()
     const ftypeRef = useRef()
     const gitconfigRef = useRef()
@@ -33,10 +33,10 @@ const ExportMapButton = ({setPopup,setBlockui,displayError,isAssign,releaseRef,c
         setExportBox(false)
         setBlockui({show:true,content:'Exporting Mindmap ...'})
         var ftype = ftypeRef.current.value
-        if(ftype === 'json') toJSON(selectedModule,fnameRef.current.value,displayError,setPopup,setBlockui);
-        if(ftype === 'excel') toExcel(selectedProj,selectedModule,fnameRef.current.value,displayError,setPopup,setBlockui);
-        if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setPopup,setBlockui);
-        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule,setPopup});
+        if(ftype === 'json') toJSON(selectedModule,fnameRef.current.value,displayError,setBlockui);
+        if(ftype === 'excel') toExcel(selectedProj,selectedModule,fnameRef.current.value,displayError,setBlockui);
+        if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
+        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule});
     }
     return(
         <Fragment>
@@ -126,7 +126,7 @@ const Footer = ({clickExport}) => <div><button onClick={clickExport}>Export</but
     Purpose : Exporting Module in json file
     param :
 */
-const toExcel = async(projId,modId,fname,displayError,setPopup,setBlockui) => {
+const toExcel = async(projId,modId,fname,displayError,setBlockui) => {
     try{
         var data = {
             "projectid":projId,
@@ -144,12 +144,7 @@ const toExcel = async(projId,modId,fname,displayError,setPopup,setBlockui) => {
         document.body.removeChild(a);
         URL.revokeObjectURL(fileURL);
         setBlockui({show:false,content:''})
-        setPopup({
-            variant:MSG.MINDMAP.SUCC_DATA_EXPORTED.VARIANT,
-            content:MSG.MINDMAP.SUCC_DATA_EXPORTED.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
     }catch(err){
         console.error(err)
         displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
@@ -161,18 +156,13 @@ const toExcel = async(projId,modId,fname,displayError,setPopup,setBlockui) => {
     Purpose : Exporting Module in json file
     param :
 */
-const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
+const toJSON = async(modId,fname,displayError,setBlockui) => {
     try{
         var result =  await exportMindmap(modId._id)
         if(result.error){displayError(result.error);return;}
         jsonDownload(fname+'.mm', JSON.stringify(result));
         setBlockui({show:false,content:''})
-        setPopup({
-            variant:MSG.MINDMAP.SUCC_DATA_EXPORTED.VARIANT,
-            content:MSG.MINDMAP.SUCC_DATA_EXPORTED.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
     }catch(err){
         console.error(err)
         displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
@@ -185,7 +175,7 @@ const toJSON = async(modId,fname,displayError,setPopup,setBlockui) => {
     param :
 */
 
-const toGit = async ({projectList,displayError,setBlockui,setPopup,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule,selectedProj}) => {
+const toGit = async ({projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule,selectedProj}) => {
     var gitpath=gitPathRef.current.value;
 	if(!gitpath){
         gitpath = 'avoassuretest_artifacts/'+projectList[selectedProj].name+'/'+selectedModule.name;
@@ -199,12 +189,7 @@ const toGit = async ({projectList,displayError,setBlockui,setPopup,gitconfigRef,
     })
     if(res.error){displayError(res.error);return;}
     setBlockui({show:false})
-    setPopup({
-        variant:MSG.MINDMAP.SUCC_DATA_EXPORTED.VARIANT,
-        content:MSG.MINDMAP.SUCC_DATA_EXPORTED.CONTENT,
-        submitText:'Ok',
-        show:true
-    })
+    setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
 }
 
 /*
@@ -212,7 +197,7 @@ const toGit = async ({projectList,displayError,setBlockui,setPopup,gitconfigRef,
     Purpose : Exporting testsuite and executiondata in json file
     param :
 */
-const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycleRef,fname,displayError,setPopup,setBlockui) =>{
+const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycleRef,fname,displayError,setBlockui) =>{
     try{
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
@@ -253,12 +238,7 @@ const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycle
             jsonDownload(fname+'_moduleinfo.json', JSON.stringify(moduleInfo));
             jsonDownload(fname+'_executiondata.json', JSON.stringify(executionData));
             setBlockui({show:false,content:''})
-            setPopup({
-                variant:MSG.MINDMAP.SUCC_DATA_EXPORTED.VARIANT,
-                content:MSG.MINDMAP.SUCC_DATA_EXPORTED.CONTENT,
-                submitText:'Ok',
-                show:true
-            })
+            setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
         } else {
             displayError(MSG.MINDMAP.ERR_EXPORT_DATA);
         }
@@ -287,7 +267,6 @@ function jsonDownload(filename, responseData) {
 ExportMapButton.propTypes={
     isAssign:PropTypes.bool,
     setBlockui:PropTypes.func,
-    setPopup:PropTypes.func,
     displayError:PropTypes.func,
     releaseRef:PropTypes.object,
     cycleRef:PropTypes.object

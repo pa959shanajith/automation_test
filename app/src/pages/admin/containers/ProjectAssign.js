@@ -1,6 +1,6 @@
 import React ,  { useEffect, useState} from 'react';
 import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
-import {ScreenOverlay, ModalContainer, ScrollBar, Messages} from '../../global'
+import {ScreenOverlay, ModalContainer, ScrollBar, Messages, setMsg} from '../../global'
 import { useSelector} from 'react-redux'; 
 import '../styles/ProjectAssign.scss';
 
@@ -25,7 +25,6 @@ const ProjectNew = (props) => {
     const [selectedProject,setSelectedProject] = useState("")
     const [selectedUserId,setSelectedUserId] = useState("")
     const [loading,setLoading] = useState(false)
-    const setPopupState=props.setPopupState
     const [getAssignedProjectsLen,setGetAssignedProjectsLen] = useState(0)
     // eslint-disable-next-line
     const [showload,setShowload] = useState(false)
@@ -46,12 +45,7 @@ const ProjectNew = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     const fetchUsers= async ()=>{

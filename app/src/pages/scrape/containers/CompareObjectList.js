@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ScrollBar, RedirectPage, Messages as MSG } from '../../global'; 
+import { ScrollBar, RedirectPage, Messages as MSG, setMsg } from '../../global'; 
 import { useHistory } from 'react-router-dom';
 import CompareBox from './CompareBox';
 import ScreenWrapper from './ScreenWrapper';
@@ -77,7 +77,7 @@ const CompareObjectList = () => {
                     }}>OK</button>
                 });
             } else {
-                setShowPop(MSG.SCRAPE.ERR_UPDATE_OBJ);
+                setMsg(MSG.SCRAPE.ERR_UPDATE_OBJ);
                 closeCompare();
             }
         })

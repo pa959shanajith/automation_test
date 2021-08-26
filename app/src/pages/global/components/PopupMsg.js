@@ -1,41 +1,35 @@
-import React, {useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/PopupMsg.scss'
-import { VARIANT } from '..';
+import { useDispatch, useSelector } from 'react-redux';
+import * as actionTypes from "../state/action";
+import { motion } from 'framer-motion';
+import {Messagebar} from '@avo/designcomponents';
+import { store } from '../../../reducer';
 
 /*Component PopupMsg
   use: block screen and show popup
   props:
-    content : "content to be shown in the box"
-    variant : "variant of popup ( Success/Warn/Error )"
-    close : "event on close"
+    message : object contains variant and text of message
 */
 
-const PopupMsg = (props) => {
-    const content = typeof(props.content) === "object" ? "Something went wrong. " : props.content
-    const variant = props.variant;
-    let messageType = "warn";
-    let iconType = "fa fa-exclamation-triangle ";
-    let btnType = "black-btn";
-    switch(variant) {
-        case VARIANT.ERROR: messageType = "error";  iconType = "fa fa-exclamation-triangle "; btnType = "white-btn"; break;
-        case VARIANT.SUCCESS: messageType = "success";  iconType = "fa fa-check"; btnType = "white-btn"; break;
-        case VARIANT.WARNING: messageType = "warn";  iconType = "fa fa-info-circle"; btnType = "black-btn"; break;
-        default: messageType = "warn";
-    }
+const popupVariants = {
+    hidden: { y: "150vh" },
+    visible: { y: 0, transition: { delay: 2, type: "spring", duration: 1 } },
+    exit: { y: "150vh"}
+}
 
-    useEffect(() => {
-        setTimeout((e) => props.close(e), 5000);
-    }, []);
-      
+const PopupMsg = ({message}) => {
+    
     return (
-        <div data-test="popup-comp" className='messageBar' >
-            <div className='messageBar-container'>
-                <div className={"message-icon "+iconType}></div>
-                <button className={btnType} onClick={(e)=>props.close(e)}>×</button>
-                <div className={'messageBar-message ' + messageType}>{content}</div>
-            </div>
-        </div>
+        message &&
+            <motion.div variants={popupVariants} initial="hidden" animate="visible" exit="exit" className="popup__message" >
+                <Messagebar text={message.CONTENT} variant={message.VARIANT} width={"auto"} />
+            </motion.div>   
     )
+}
+
+export const setMsg = (message) => {
+    store.dispatch({type: actionTypes.SET_POPUP, payload: message});
 }
 
 export default PopupMsg;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG } from '../../global';
+import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { tagList } from  './ListVariables';
 import { updateScreen_ICE } from '../api';
 import "../styles/MapObjectModal.scss";
@@ -117,17 +117,17 @@ const MapObjectModal = props => {
                     .then(resp => {
                         if (resp === "success") {
                             props.setShow(false);
-                            props.setShowPop(MSG.SCRAPE.SUCC_MAPPED_SCRAPED)
+                            setMsg(MSG.SCRAPE.SUCC_MAPPED_SCRAPED)
                         }
-                        else props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+                        else setMsg(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
                     })
                     .catch(err => {
-                        props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+                        setMsg(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
                         // console.error(err);
                     });
         })
         .catch(error => {
-            props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+            setMsg(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
             console.err(error);
         })
     }
@@ -227,8 +227,7 @@ MapObjectModal.propTypes={
     user_id: PropTypes.string,
     role: PropTypes.string,
     fetchScrapeData:PropTypes.func,
-    setShow:PropTypes.func,
-    setShowPop: PropTypes.func,
+    setShow:PropTypes.func
 }
 export default MapObjectModal;
 

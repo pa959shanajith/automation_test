@@ -15,7 +15,7 @@ import { CreateObjectModal, EditObjectModal } from '../components/CustomObjectMo
 import ActionBarItems from '../components/ActionBarItems';
 import LaunchApplication from '../components/LaunchApplication';
 import { ScrapeContext } from '../components/ScrapeContext';
-import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, ModalContainer, ResetSession, Messages as MSG } from '../../global';
+import { Header, FooterTwo as Footer, ScreenOverlay, RedirectPage, PopupMsg, ModalContainer, ResetSession, Messages as MSG, setMsg } from '../../global';
 import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
 import * as scrapeUtils from "../components/WebServiceUtils";
@@ -255,13 +255,13 @@ const ScrapeScreen = ()=>{
                     if (data === "Invalid Session") {
                         return RedirectPage(history);
                     } else if (data === "unavailableLocalServer") {
-                        setShowPop(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+                        setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
                     } else if (data === "scheduleModeOn") {
-                        setShowPop(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+                        setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
                     } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
-                        setShowPop(MSG.SCRAPE.WARN_EXECUTION_ONLY);
+                        setMsg(MSG.SCRAPE.WARN_EXECUTION_ONLY);
                     } else if (typeof data === "object") {
-                        setShowPop({title: "Data Retrieve", content: "Web Service response received successfully"});
+                        setMsg(MSG.SCRAPESUCC_WEBSERVICE_RESP);
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respHeader: data.responseHeader[0].split("  ").join("\n")}});
                         // get all cookies from response
                         // all cookies are returned under set-cookie header
@@ -282,13 +282,13 @@ const ScrapeScreen = ()=>{
                         
                         let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
                         dispatch({type: actionTypes.SET_WSDATA, payload: {respBody: localRespBody}});
-                    } else setShowPop(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
+                    } else setMsg(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
                 })
                 .catch(error => {
                     setOverlay("");
                     ResetSession.end();
                     console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
-                    setShowPop({title: "Web Service Screen", content: "Error while performing operation."});
+                    setMsg(MSG.SCRAPE.ERR_OPERATION);
                 });
             }
         } else {
@@ -337,7 +337,7 @@ const ScrapeScreen = ()=>{
                     err = MSG.GENERIC.WARN_EXECUTION_ONLY;
 
                 if (err) {
-                    setShowPop(err);
+                    setMsg(err);
                     return false;
                 }
                 //COMPARE & UPDATE SCRAPE OPERATION
@@ -353,9 +353,9 @@ const ScrapeScreen = ()=>{
                         dispatch({type: actionTypes.SET_COMPAREFLAG, payload: true});
                     } else {
                         if (data.status === "EMPTY_OBJECT")
-                            setShowPop(MSG.SCRAPE.ERR_UNMAPPED_OBJ);
+                            setMsg(MSG.SCRAPE.ERR_UNMAPPED_OBJ);
                         else
-                            setShowPop(MSG.SCRAPE.ERR_COMPARE_OBJ);
+                            setMsg(MSG.SCRAPE.ERR_COMPARE_OBJ);
                     }
                 } else {
                     let viewString = data;
@@ -388,27 +388,28 @@ const ScrapeScreen = ()=>{
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
-                setShowPop(MSG.SCRAPE.ERR_SCRAPE);
+                setMsg(MSG.SCRAPE.ERR_SCRAPE);
                 console.error("Fail to Load design_ICE. Cause:", error);
             });
         }
     }
 
     const PopupDialog = () => (
-        showPop.type === "modal" ? 
+        // showPop.type === "modal" ? 
         <ModalContainer 
             title={showPop.title}
             modalClass="modal-sm"
             close={()=>setShowPop("")}
             content={showPop.content}
             footer={showPop.footer}
-        /> :
-        <PopupMsg 
-            variant={showPop.variant || showPop.VARIANT}
-            close={()=>setShowPop("")}
-            content={showPop.content || showPop.CONTENT}
-            submit={showPop.onClick ? showPop.onClick : ()=>setShowPop("")}
         />
+        //  :
+        // <PopupMsg 
+        //     variant={showPop.variant || showPop.VARIANT}
+        //     close={()=>setShowPop("")}
+        //     content={showPop.content || showPop.CONTENT}
+        //     submit={showPop.onClick ? showPop.onClick : ()=>setShowPop("")}
+        // />
     );
 
     const ConfirmPopup = () => (

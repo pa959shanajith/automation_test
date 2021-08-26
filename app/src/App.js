@@ -17,10 +17,13 @@ import Utility from './pages/utility';
 import Report from './pages/report';
 import Integration from './pages/integration';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
+import './pages/global/components/icons.js';
 import SocketFactory from './SocketFactory';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-datetime/css/react-datetime.css';
+import '@avo/designcomponents/lib/assets/styles/avoassure.scss';
+
 const { REACT_APP_DEV } = process.env
 /*Component App
   use: defines components for each url
@@ -48,6 +51,7 @@ const RouteApp = () => {
   const dispatch = useDispatch();
   const selectedRole = useSelector(state=>state.login.SR);
   const roleSwitched = useSelector(state=>state.progressbar.roleSwitched);
+  const popup = useSelector(state=>state.progressbar.popup);
   const [role, setRole] = useState(false);
   useEffect(()=>{
     if(roleSwitched){
@@ -57,7 +61,8 @@ const RouteApp = () => {
 }, [roleSwitched])
   return(
     <Router>
-      { role && <PopupMsg variant={VARIANT.SUCCESS} content={`Your role is changed to ${selectedRole}`} close={()=>setRole("")} /> }
+    <PopupMsg message={popup} />
+    { role && <PopupMsg variant={VARIANT.SUCCESS} content={`Your role is changed to`} close={()=>setRole("")} /> }
     <SocketFactory/>
     <Switch>
       <Route exact path="/" component={Base} />

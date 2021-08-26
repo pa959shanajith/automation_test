@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {ScreenOverlay, ScrollBar} from '../../global' 
+import {ScreenOverlay, ScrollBar, setMsg} from '../../global' 
 import {getPreferences} from '../api';
 import '../styles/Preferences.scss'
 
@@ -12,7 +12,6 @@ import '../styles/Preferences.scss'
 const Preferences = (props) => {
     const [loading,setLoading] = useState(false)
     const [resultList,setResultList] = useState([])
-    const setPopup = props.setPopupState;
     var rows = ["ALM","Mindmap","Reports","Utility"];
 
     useEffect(()=>{
@@ -28,12 +27,7 @@ const Preferences = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopup({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     return (

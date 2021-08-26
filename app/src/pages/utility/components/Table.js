@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
 import { pushToHistory } from './DtUtils';
-import { ScrollBar, Messages as MSG } from '../../global';
+import { ScrollBar, Messages as MSG, setMsg } from '../../global';
 import { ReactSortable } from 'react-sortablejs';
 import TextareaAutosize from 'react-textarea-autosize';
 import "../styles/Table.scss";
@@ -22,7 +22,7 @@ const Table = props => {
     const onAdd = type => {
         if (type==="col") {
             if (props.headers.length >= 50) 
-                props.setShowPop(MSG.UTILITY.ERR_COLUMN_50);
+                setMsg(MSG.UTILITY.ERR_COLUMN_50);
             else {
                 pushToHistory({headers: props.headers, data: props.data});
                 let newHeaders = [...props.headers];
@@ -38,7 +38,7 @@ const Table = props => {
         }
         else if (type === "row") {
             if (props.data.length >= 199) 
-                props.setShowPop(MSG.UTILITY.ERR_ROWS_200);
+                setMsg(MSG.UTILITY.ERR_ROWS_200);
             else {
                 pushToHistory({headers: props.headers, data: props.data});
                 let newData = [...props.data];
@@ -53,7 +53,7 @@ const Table = props => {
     const updateHeaders = (newHeader, headerId, invalidFlag) => {
 
         if (invalidFlag) {
-            props.setShowPop(MSG.UTILITY.ERR_HEADER)
+            setMsg(MSG.UTILITY.ERR_HEADER)
             return;
         }
         pushToHistory({headers: props.headers, data: props.data});

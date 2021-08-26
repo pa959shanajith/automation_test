@@ -34,7 +34,6 @@ const CanvasAssign =(props)=>{
     const dispatch = useDispatch()
     const CanvasRef = useRef();
     const setBlockui=props.setBlockui
-    const setPopup=props.setPopup
     const cycleid = props.cycleRef.current.value;
     const releaseid = props.releaseRef.current.value
     const displayError = props.displayError
@@ -128,9 +127,9 @@ const CanvasAssign =(props)=>{
     return (
         <Fragment>
             <Legends/>
-            {taskbox?<TaskBox setPopup={setPopup} clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={releaseid} cycleid={cycleid} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
-            <SaveMapButton isAssign={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} cycId={cycleid} setPopup={setPopup} setBlockui={setBlockui}/>
-            <ExportMapButton isAssign={true} setBlockui={setBlockui} setPopup={setPopup} displayError={displayError} releaseRef={props.releaseRef} cycleRef={props.cycleRef}/>
+            {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={releaseid} cycleid={cycleid} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
+            <SaveMapButton isAssign={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} cycId={cycleid} setBlockui={setBlockui}/>
+            <ExportMapButton isAssign={true} setBlockui={setBlockui} displayError={displayError} releaseRef={props.releaseRef} cycleRef={props.cycleRef}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>

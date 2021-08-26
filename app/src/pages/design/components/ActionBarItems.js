@@ -1,7 +1,7 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { useSelector, useDispatch }  from  "react-redux";
 import { useHistory } from 'react-router-dom';
-import { Thumbnail, ResetSession, RedirectPage, Messages as MSG } from '../../global';
+import { Thumbnail, ResetSession, RedirectPage, Messages as MSG, setMsg } from '../../global';
 import * as DesignApi from "../api";
 import * as DesignActions from '../state/action';
 import "../styles/ActionBarItems.scss"
@@ -15,20 +15,18 @@ import "../styles/ActionBarItems.scss"
         isMac -> Bool value to check if client is running on Mac
         setOverlay -> overlay msg
         disable -> flag to check if action bar is required to disable
-        setShowPop -> showPopup state
         setShowDlg -> Show Dependent TestCase Dialog State
         dTcFlag -> Dependent TestCase checked/unchecked Flag
         checkedTc -> list of checked test case IDs'
         showDlg -> flag to check if dependenet test Case dialog is visible or not
 
     ---------- bottomContent ---------
-        setShowPop -> showPopup state
         setImported -> state to switch import status flag
         setShowConfirmPop -> confirmation dialog popup
         disable -> flag to check if action bar is required to disable
 */
 
-const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, setShowPop, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
+const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
 
     const userInfo = useSelector(state=>state.login.userinfo);
     const current_task = useSelector(state=>state.plugin.CT);
@@ -110,13 +108,13 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
                 setOverlay("");
                 ResetSession.end();
                 if (data === "Invalid Session") return RedirectPage(history);
-                else if (data === "unavailableLocalServer")  setShowPop(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER)
-                else if (data === "success") setShowPop(MSG.DESIGN.SUCC_DEBUG)
-                else if (data === "fail") setShowPop(MSG.DESIGN.ERR_DEBUG)
-                else if (data === "Terminate") setShowPop(MSG.DESIGN.WARN_DEBUG_TERMINATE)
-                else if (data === "browserUnavailable") setShowPop(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER)
-                else if (data === "scheduleModeOn") setShowPop(MSG.GENERIC.WARN_UNCHECK_SCHEDULE)
-                else if (data === "ExecutionOnlyAllowed") setShowPop(MSG.GENERIC.WARN_EXECUTION_ONLY)
+                else if (data === "unavailableLocalServer")  setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER)
+                else if (data === "success") setMsg(MSG.DESIGN.SUCC_DEBUG)
+                else if (data === "fail") setMsg(MSG.DESIGN.ERR_DEBUG)
+                else if (data === "Terminate") setMsg(MSG.DESIGN.WARN_DEBUG_TERMINATE)
+                else if (data === "browserUnavailable") setMsg(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER)
+                else if (data === "scheduleModeOn") setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE)
+                else if (data === "ExecutionOnlyAllowed") setMsg(MSG.GENERIC.WARN_EXECUTION_ONLY)
                 else if (data.status === "success"){
                     let rows={}
                     mainTestCases.forEach((testCase, index) => {
@@ -126,7 +124,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
                     });
                     dispatch({type: DesignActions.SET_MODIFIED, payload: rows});
                     dispatch({type: DesignActions.SET_SAVEENABLE, payload: !saveEnable})
-                    setShowPop(MSG.DESIGN.SUCC_DEBUG);
+                    setMsg(MSG.DESIGN.SUCC_DEBUG);
                 } else {
                     console.log(data);
                 }										
@@ -134,7 +132,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
-                setShowPop(MSG.DESIGN.ERR_DEBUG);
+                setMsg(MSG.DESIGN.ERR_DEBUG);
                 console.error("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
             });
     };
@@ -166,7 +164,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
     return renderComp;
 };
 
-const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable, setOverlay}) => {
+const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay}) => {
 
     const current_task = useSelector(state=>state.plugin.CT);
     const userInfo = useSelector(state=>state.login.userinfo);
@@ -247,12 +245,12 @@ const BottomContent = ({setShowPop, setImported, setShowConfirmPop, disable, set
                             console.error("ERROR::::", error)
                         });
                     
-                } else throw  setShowPop(MSG.DESIGN.ERR_FILE_FORMAT);
+                } else throw  setMsg(MSG.DESIGN.ERR_FILE_FORMAT);
             }
             catch(error){
                 setOverlay("");
-                if (typeof(error)==="object") setShowPop(error);
-                else setShowPop(MSG.DESIGN.ERR_TC_JSON_IMPORT)
+                if (typeof(error)==="object") setMsg(error);
+                else setMsg(MSG.DESIGN.ERR_TC_JSON_IMPORT)
                 console.error(error);
             }
         }

@@ -1,6 +1,6 @@
 import React, {useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { PopupMsg, ModalContainer, ScreenOverlay } from '..' 
+import { setMsg, ModalContainer, ScreenOverlay } from '..' 
 import DropDownList from './DropDownList'
 import { getPools, getICE_list } from '../../execute/api';
 import "../styles/AllocateICEPopup.scss";
@@ -12,7 +12,6 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
 
     const current_task = useSelector(state=>state.plugin.CT)
 
-    const [popupState,setPopupState] = useState({show:false})
     const [inputErrorBorder,setInputErrorBorder] = useState(false)
     const [loading,setLoading] = useState(false)
     const [smartMode,setSmartMode] = useState('normal')
@@ -116,17 +115,11 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     return (
         <>
-            {(popupState.show)?<PopupMsg variant={popupState.variant} close={()=>setPopupState({show:false})}/>:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             {allocateICE?
                 <div className="allocate-ice-Modal">

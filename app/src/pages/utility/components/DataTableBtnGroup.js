@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 import ClickAwayListener from 'react-click-away-listener';
 import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
-import { ScrollBar, VARIANT, Messages as MSG } from '../../global';
+import { ScrollBar, VARIANT, Messages as MSG, setMsg } from '../../global';
 import ExportDataTable from './ExportDataTable';
 import * as actionTypes from '../state/action';
 import ImportPopUp from './ImportPopUp';
@@ -21,7 +21,7 @@ const TableActionButtons = props => {
         if (props.checkList.list.length===1){
             if (props.checkList.type==="row"){
                 if (props.data.length >= 199) 
-                    props.setShowPop(MSG.UTILITY.ERR_ROWS_200);
+                    setMsg(MSG.UTILITY.ERR_ROWS_200);
                 else {
                     pushToHistory({headers: props.headers, data: props.data});
                     let newData = [...props.data];
@@ -43,7 +43,7 @@ const TableActionButtons = props => {
             }
             else{
                 if (props.headers.length >= 50) 
-                    props.setShowPop(MSG.UTILITY.ERR_COLUMN_50);
+                    setMsg(MSG.UTILITY.ERR_COLUMN_50);
                 else {
                     pushToHistory({headers: props.headers, data: props.data});
                     let newHeaders = [...props.headers];
@@ -67,12 +67,9 @@ const TableActionButtons = props => {
             }
         }
         else {
-            props.setShowPop({
-                variant: VARIANT.ERROR, 
-                content: props.checkList.list.length 
-                        ? `Too many selected ${props.checkList.type === "row" ? "rows" : "columns"}`
-                        : `Please select a row or column to perform add operation.`
-            });
+            setMsg(MSG.CUSTOM(props.checkList.list.length 
+                ? `Too many selected ${props.checkList.type === "row" ? "rows" : "columns"}`
+                : `Please select a row or column to perform add operation.`,VARIANT.ERROR));
         }
     }
 
@@ -82,12 +79,9 @@ const TableActionButtons = props => {
         if (props.checkList.list.length){
             if (props.checkList.type==="row"){
                 if (props.checkList.list.includes("sel||row||subheader") || props.data.length === props.checkList.list.length)
-                    props.setShowPop({
-                        variant: VARIANT.WARNING,
-                        content: props.checkList.list.includes("sel||row||subheader") 
-                                ? 'Cannot delete SubHeader row.'
-                                : 'Table cannot have 0 rows'
-                    });
+                    setMsg(MSG.CUSTOM(props.checkList.list.includes("sel||row||subheader") 
+                    ? 'Cannot delete SubHeader row.'
+                    : 'Table cannot have 0 rows',VARIANT.WARNING));
                 else {
                     pushToHistory({headers: props.headers, data: props.data});
                     let [newData,] = deleteData(props.data, [], props.checkList.list);
@@ -96,7 +90,7 @@ const TableActionButtons = props => {
             }
             else{
                 if (props.headers.length === props.checkList.list.length)
-                    props.setShowPop(MSG.UTILITY.ERR_COLUMN_0);
+                    setMsg(MSG.UTILITY.ERR_COLUMN_0);
                 else {
                     pushToHistory({headers: props.headers, data: props.data});
                     let [newHeaders, newData] = deleteData(props.headers, props.data, props.checkList.list);
@@ -107,7 +101,7 @@ const TableActionButtons = props => {
             props.setCheckList({type: 'row', list: []});
         }
         else {
-            props.setShowPop(MSG.UTILITY.ERR_DELETE);
+            setMsg(MSG.UTILITY.ERR_DELETE);
         }
     }
 
@@ -115,7 +109,7 @@ const TableActionButtons = props => {
     const onUndo = () => {
         const resp = getPreviousData({headers: props.headers, data: props.data});
         if (resp==="EMPTY_STACK") {
-            props.setShowPop(MSG.UTILITY.ERR_UNDO);
+            setMsg(MSG.UTILITY.ERR_UNDO);
         }
         else {
             if (resp.data) props.setData(resp.data);
@@ -126,7 +120,7 @@ const TableActionButtons = props => {
     const onRedo = () => {
         const resp = getNextData({headers: props.headers, data: props.data});
         if (resp==="EMPTY_STACK") {
-            props.setShowPop(MSG.UTILITY.ERR_REDO);
+            setMsg(MSG.UTILITY.ERR_REDO);
         }
         else {
             if (resp.data) props.setData(resp.data);
@@ -138,27 +132,27 @@ const TableActionButtons = props => {
         if (props.checkList.list.length) {
             let resp = prepareCopyData(props.headers, props.data, props.checkList);
             if (resp.isEmpty)
-                props.setShowPop(MSG.UTILITY.ERR_EMPTY_COPY);
+                setMsg(MSG.UTILITY.ERR_EMPTY_COPY);
             else{
                 dispatch({type: actionTypes.SET_COPY_CELLS, payload: resp.copiedData});
                 props.setCheckList({type: 'row', list: []})
             }
         }
         else 
-            props.setShowPop(MSG.UTILITY.ERR_SELECT_COPY);
+            setMsg(MSG.UTILITY.ERR_SELECT_COPY);
     }
 
     const onPaste = () => {
         if (copiedCells.cells.length){
             if (copiedCells.type === 'rows' && props.data.length+copiedCells.cells.length > 199) 
-                props.setShowPop(MSG.UTILITY.ERR_PASTE_200);
+                setMsg(MSG.UTILITY.ERR_PASTE_200);
             else if (copiedCells.type === 'cols' && props.headers.length+copiedCells.cells.length > 50) 
-                props.setShowPop(MSG.UTILITY.ERR_PASTE_50);
+                setMsg(MSG.UTILITY.ERR_PASTE_50);
             else 
                 setShowPS(true);
         }
         else {
-            props.setShowPop(MSG.UTILITY.ERR_NO_DATA_PASTE);
+            setMsg(MSG.UTILITY.ERR_NO_DATA_PASTE);
         }
     }
 
@@ -228,34 +222,34 @@ const CreateScreenActionButtons = props => {
 
             switch (validation) {
                 case "tableName": props.setErrors({tableName: true}); break;
-                case "emptyData": props.setShowPop(MSG.UTILITY.ERR_EMPTY_SAVE); break;
-                case "duplicateHeaders": props.setShowPop(MSG.UTILITY.ERR_DUPLICATE_HEADER); break;
-                case "emptyHeader": props.setShowPop(MSG.UTILITY.ERR_SAVE_HEADER); break;
+                case "emptyData": setMsg(MSG.UTILITY.ERR_EMPTY_SAVE); break;
+                case "duplicateHeaders": setMsg(MSG.UTILITY.ERR_DUPLICATE_HEADER); break;
+                case "emptyHeader": setMsg(MSG.UTILITY.ERR_SAVE_HEADER); break;
                 case "saveData": 
                     props.setOverlay('Creating Data Table...');
                     let resp = await utilApi.createDataTable(arg);
                     props.setOverlay('');
 
                     switch (resp) {
-                        case "exists": props.setShowPop(MSG.UTILITY.ERR_TABLE_EXIST); break;
-                        case "fail": props.setShowPop(MSG.UTILITY.ERR_CREATE_TADATABLE); break;
-                        case "success": props.setShowPop(MSG.UTILITY.SUCC_SAVE_DATATABLE); break;
-                        default: props.setShowPop(resp.error); break;
+                        case "exists": setMsg(MSG.UTILITY.ERR_TABLE_EXIST); break;
+                        case "fail": setMsg(MSG.UTILITY.ERR_CREATE_TADATABLE); break;
+                        case "success": setMsg(MSG.UTILITY.SUCC_SAVE_DATATABLE); break;
+                        default: setMsg(resp.error); break;
                     }   
                     props.setErrors({}); 
                     break;
-                default: props.setShowPop(MSG.UTILITY.ERR_CREATE_TADATABLE); break;
+                default: setMsg(MSG.UTILITY.ERR_CREATE_TADATABLE); break;
             }
         }
         catch(error) {
-            props.setShowPop(MSG.UTILITY.ERR_CREATE_TADATABLE)
+            setMsg(MSG.UTILITY.ERR_CREATE_TADATABLE)
             console.error(error);
         }
     }
 
     return (
         <>
-        { importPopup && <ImportPopUp setImportPopup={setImportPopup} setData={props.setData} setHeaders={props.setHeaders} setOverlay={props.setOverlay} setShowPop={props.setShowPop} { ...props } />}
+        { importPopup && <ImportPopUp setImportPopup={setImportPopup} setData={props.setData} setHeaders={props.setHeaders} setOverlay={props.setOverlay} { ...props } />}
         <div className="dt__taskBtns">
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={() => setImportPopup(true)} >Import</button>
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={goToEditScreen}>Edit</button>
@@ -285,11 +279,11 @@ const EditScreenActionButtons = props => {
             switch(resp){ 
                 case "success": props.setModal({...deleteMsg, content: "Are you sure you want to delete current data table?"});break;
                 case "referenceExists": props.setModal({...deleteMsg, content: "Data Table is referenced in Test Cases. Are you sure you want to delete current data table?"});break;
-                default: props.setShowPop(MSG.UTILITY.ERR_DELETE_DATATABLE);break;
+                default: setMsg(MSG.UTILITY.ERR_DELETE_DATATABLE);break;
             }
         }
         catch(error) {
-            props.setShowPop(MSG.UTILITY.ERR_DELETE_DATATABLE);
+            setMsg(MSG.UTILITY.ERR_DELETE_DATATABLE);
             console.error(error);
         }
     }
@@ -301,8 +295,8 @@ const EditScreenActionButtons = props => {
 
         if (resp === "success") {
             props.setScreenType("datatable-Create");
-            props.setShowPop(MSG.UTILITY.SUCC_DELETE_DATATABLE);
-        } else props.setShowPop(MSG.UTILITY.ERR_DELETE_DATATABLE);
+            setMsg(MSG.UTILITY.SUCC_DELETE_DATATABLE);
+        } else setMsg(MSG.UTILITY.ERR_DELETE_DATATABLE);
     }
 
     const updateTable = async() => {
@@ -313,29 +307,29 @@ const EditScreenActionButtons = props => {
 
             switch (validation) {
                 case "tableName": props.setErrors({tableName: true}); break;
-                case "emptyData": props.setShowPop(MSG.UTILITY.ERR_EMPTY_SAVE); break;
-                case "duplicateHeaders": props.setShowPop(MSG.UTILITY.ERR_DUPLICATE_HEADER); break;
+                case "emptyData": setMsg(MSG.UTILITY.ERR_EMPTY_SAVE); break;
+                case "duplicateHeaders": setMsg(MSG.UTILITY.ERR_DUPLICATE_HEADER); break;
                 case "saveData": 
                     props.setOverlay("Updating Data Table");
                     const resp = await utilApi.editDataTable(arg);
                     props.setOverlay("");
                     if (resp === "success") 
-                        props.setShowPop(MSG.UTILITY.SUCC_UPDATE_DATATABLE)
+                        setMsg(MSG.UTILITY.SUCC_UPDATE_DATATABLE)
                     else 
-                        props.setShowPop(MSG.UTILITY.ERR_UPDATE_DATATABLE)
+                        setMsg(MSG.UTILITY.ERR_UPDATE_DATATABLE)
                     break;
-                default: props.setShowPop(MSG.UTILITY.ERR_UPDATE_DATATABLE); break;
+                default: setMsg(MSG.UTILITY.ERR_UPDATE_DATATABLE); break;
             }
         }
         catch(error) {
-            props.setShowPop(MSG.UTILITY.ERR_UPDATE_DATATABLE)
+            setMsg(MSG.UTILITY.ERR_UPDATE_DATATABLE)
             console.error(error);
         }
     }
 
     return (
         <>
-        { showExportPopup && <ExportDataTable setShowExportPopup={setShowExportPopup} tableName={props.tableName} setOverlay={props.setOverlay} setShowPop={props.setShowPop} /> }
+        { showExportPopup && <ExportDataTable setShowExportPopup={setShowExportPopup} tableName={props.tableName} setOverlay={props.setOverlay} /> }
         <div className="dt__taskBtns">
             <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={()=>setShowExportPopup(true)} disabled={!props.tableName} >Export</button>
             <button className="dt__taskBtn dt__btn" onClick={confirmDelete} disabled={!props.tableName}>Delete</button>
@@ -363,7 +357,7 @@ const SearchDataTable = props => {
         const resp = await utilApi.fetchDataTable(selectedTableName);
         props.setOverlay('');
 
-        if (resp.error) props.setShowPop(resp.error);
+        if (resp.error) setMsg(resp.error);
         else {
             const [tableName, newData, newHeaders] = parseTableData(resp[0], "edit")
             props.setData(newData);

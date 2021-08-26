@@ -3,6 +3,7 @@ import * as actionTypes from './action.js';
 const initialState = {
     progress: 0,
     roleSwitched: false,
+    popup: false
 };
 
 const reducer = (state = initialState , action) => {
@@ -15,6 +16,10 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state, roleSwitched: action.payload,
             }
+        case actionTypes.SET_POPUP:
+            return{
+                ...state, popup: action.payload,
+            }    
         default:
             return state;
     }

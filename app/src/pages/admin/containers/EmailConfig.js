@@ -1,5 +1,5 @@
 import React, { useState, useEffect , createRef } from 'react';
-import {ScreenOverlay, ScrollBar, Messages as MSG, VARIANT} from '../../global' 
+import {ScreenOverlay, ScrollBar, setMsg, Messages as MSG, VARIANT} from '../../global' 
 import {FormInput,FormRadio,FormSelect} from '../components/FormComp'
 import {getNotificationChannels,manageNotificationChannels} from '../api'
 import EmailTest from '../components/EmailTest';
@@ -10,7 +10,7 @@ import '../styles/EmailConfig.scss'
   use: defines Email server config middle Section
 */
 
-const EmailConfig = ({resetMiddleScreen, setPopupState}) => {
+const EmailConfig = ({resetMiddleScreen}) => {
     const [advanceConf,setAdvanceConf] = useState('block');
     const [emailTest,setEmailTest] = useState(false);
     const [loading,setLoading] = useState(false);
@@ -19,12 +19,7 @@ const EmailConfig = ({resetMiddleScreen, setPopupState}) => {
     const fn = factoryFn(inputRef)
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
     useEffect(()=>{
         //on reset dismount component to show loading screen
