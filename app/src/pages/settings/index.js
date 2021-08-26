@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { SetProgressBar } from '../global';
+import { SetProgressBar, RedirectPage } from '../global';
 import SettingsHome from './containers/SettingsHome';
 export var history
 
