@@ -393,12 +393,17 @@ if (cluster.isMaster) {
 		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
 		app.post('/clearQueue', auth.protect, admin.clearQueue);
 		app.post('/exportProject', auth.protect, admin.exportProject);
-		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
-		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
-		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
 		app.post('/restartService', auth.protect, admin.restartService);
 		app.post('/gitSaveConfig', auth.protect, admin.gitSaveConfig);
 		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
+
+		//Notification Routes
+		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
+		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
+		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
+		app.post('/getNotificationRules', auth.protect, admin.getNotificationRules);
+		app.post('/getNotificationGroups', auth.protect, admin.getNotificationGroups);
+		app.post('/updateNotificationGroups', auth.protect, admin.updateNotificationGroups);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);

@@ -2301,3 +2301,50 @@ exports.gitEditConfig = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+exports.getNotificationRules = async(req,res) => {
+	const fnName = "getNotificationRules"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const inputs = {};
+		const result = await utils.fetchData(inputs, "notification/getNotificationRules", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in notifications/getNotificationRules:", exception);
+		res.send("fail");
+	}
+} 
+
+exports.getNotificationGroups = async(req,res) => {
+	const fnName = "getNotificationGroups"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const groupinfo = req.body;
+		const inputs = {
+			groupids: groupinfo.groupids,
+		};
+		const result = await utils.fetchData(inputs, "notification/getNotificationGroups", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in notifications/getNotificationGroups:", exception);
+		res.send("fail");
+	}
+} 
+
+exports.updateNotificationGroups = async(req,res) => {
+	const fnName = "updateNotificationGroups"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const groupinfo = req.body;
+		const inputs = {
+			groupdata: groupinfo.groupdata,
+			modifiedby: req.session.userid,
+			modifiedbyrole: req.session.activeRoleId,
+		};		
+		const result = await utils.fetchData(inputs, "notification/updateNotificationGroups", fnName);
+		res.send(result);
+	}catch (exception){
+		logger.error("Error occurred in notifications/updateNotificationGroups:", exception);
+		res.send("fail");
+	}
+} 
