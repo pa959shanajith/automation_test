@@ -6,7 +6,6 @@ import { getRoleNameByRoleId } from '../api';
 import * as actionTypes from '../../login/state/action';
 import { SWITCHED } from '../state/action';
 import ClickAwayListener from 'react-click-away-listener';
-import ChangeDefaultIce from './ChangeDefaultIce';
 import { persistor } from '../../../reducer';
 import NotifyDropDown from './NotifyDropDown';
 import { RedirectPage, PopupMsg, ModalContainer, ScreenOverlay, Messages as MSG } from '../../global';
@@ -24,7 +23,6 @@ const Header = () => {
     const history = useHistory();
     const dispatch = useDispatch();
     const [username, setUsername] = useState(null);
-    const [showChangeDefaultIce, setShowChangeDefaultIce] = useState(false);
     const [showUD, setShowUD] = useState(false);
     const [showSR, setShowSR] = useState(false);
     const [roleList, setRoleList] = useState([]);
@@ -37,7 +35,6 @@ const Header = () => {
     const [clickNotify,setClickNotify] = useState(false)
     const userInfo = useSelector(state=>state.login.userinfo);
     const selectedRole = useSelector(state=>state.login.SR);
-    // const roleSwitched = useSelector(state=>state.progressbar.roleSwitched);
     const notifyCnt = useSelector(state=>state.login.notify.unread)
 
     useEffect(()=>{
@@ -180,7 +177,6 @@ const Header = () => {
     return(
         <> 
             { redirectTo && <Redirect to={redirectTo} /> }
-            { showChangeDefaultIce && <ChangeDefaultIce setShowMainPopup={setShowChangeDefaultIce} /> }
             { showConfSR && <ConfSwitchRole />  }
             { showSR_Pop && <SRPopup /> }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
