@@ -12,7 +12,7 @@
     "bootstrap": "^4.5.2",
     "check-prop-types": "^1.1.2",
     "client-oauth2": "^4.3.3",
-    "crypto-js": "^4.1.1",
+    "crypto-js": "^4.0.0",
     "d3": "^3.5.17",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
