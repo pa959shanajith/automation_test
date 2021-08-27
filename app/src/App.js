@@ -49,9 +49,7 @@ const App = () => {
 
 const RouteApp = () => {
   const dispatch = useDispatch();
-  const selectedRole = useSelector(state=>state.login.SR);
   const roleSwitched = useSelector(state=>state.progressbar.roleSwitched);
-  const popup = useSelector(state=>state.progressbar.popup);
   const [role, setRole] = useState(false);
   useEffect(()=>{
     if(roleSwitched){
