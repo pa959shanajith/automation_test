@@ -61,7 +61,7 @@ const RouteApp = () => {
 }, [roleSwitched])
   return(
     <Router>
-    <PopupMsg message={popup} />
+    <PopupMsg/>
     { role && <PopupMsg variant={VARIANT.SUCCESS} content={`Your role is changed to`} close={()=>setRole("")} /> }
     <SocketFactory/>
     <Switch>
