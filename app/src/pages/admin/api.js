@@ -1172,7 +1172,7 @@ export const exportProject = async(props) => {
 
 export const updateNotificationGroups = async(props) => {
     try{
-        const res = await axios(url+'/exportProject', {
+        const res = await axios(url+'/updateNotificationGroups', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1203,8 +1203,12 @@ export const updateNotificationGroups = async(props) => {
 
 export const getNotificationGroups = async(props) => {
     try{
-        const res = await axios(url+'/exportProject', {
+        const res = await axios(url+'/getNotificationGroups', {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
             credentials: 'include',
         });
         if(res.status === 401 || res.data === "Invalid Session"){
