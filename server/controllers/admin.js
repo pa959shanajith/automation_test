@@ -2308,10 +2308,10 @@ exports.getNotificationRules = async(req,res) => {
 	try{
 		const inputs = {};
 		const result = await utils.fetchData(inputs, "notification/getNotificationRules", fnName);
-		res.send(result);
+		return res.status("200").send(result);
 	}catch (exception){
 		logger.error("Error occurred in notifications/getNotificationRules:", exception);
-		res.send("fail");
+		return res.status("500").send("fail");
 	}
 } 
 
@@ -2322,12 +2322,13 @@ exports.getNotificationGroups = async(req,res) => {
 		const groupinfo = req.body;
 		const inputs = {
 			groupids: groupinfo.groupids,
+			groupnames: groupinfo.groupnames
 		};
 		const result = await utils.fetchData(inputs, "notification/getNotificationGroups", fnName);
-		res.send(result);
+		return res.status("200").send(result);
 	}catch (exception){
 		logger.error("Error occurred in notifications/getNotificationGroups:", exception);
-		res.send("fail");
+		return res.status("500").send("fail");
 	}
 } 
 
@@ -2338,13 +2339,14 @@ exports.updateNotificationGroups = async(req,res) => {
 		const groupinfo = req.body;
 		const inputs = {
 			groupdata: groupinfo.groupdata,
+			action: groupinfo.action,
 			modifiedby: req.session.userid,
 			modifiedbyrole: req.session.activeRoleId,
 		};		
 		const result = await utils.fetchData(inputs, "notification/updateNotificationGroups", fnName);
-		res.send(result);
+		return res.status('200').send(result);
 	}catch (exception){
 		logger.error("Error occurred in notifications/updateNotificationGroups:", exception);
-		res.send("fail");
+		return res.status('500').send("fail");
 	}
 } 
