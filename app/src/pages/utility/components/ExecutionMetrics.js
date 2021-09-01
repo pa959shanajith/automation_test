@@ -95,8 +95,8 @@ const ExecutionMetrics = ({setBlockui,setShowPop}) => {
             </span>
         </div>
         <div className="execM__btnGroup">
-            <button onClick={handleSubmit} data-test="util__fetch">Fetch</button>
-            <button onClick={handleReset} data-test="util__reset">Reset</button>
+            <button onClick={handleSubmit} data-test="util__fetch" title="Fetch">Fetch</button>
+            <button onClick={handleReset} data-test="util__reset" title="Reset">Reset</button>
         </div>
         <div className="execM__inputGroup">
             <span className="execM__inputLabel" data-test="util__inputLabel">From Date<span className="execM__mandate">*</span></span>

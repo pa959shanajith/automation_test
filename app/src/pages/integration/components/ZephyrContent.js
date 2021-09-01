@@ -147,7 +147,7 @@ const ZephyrContent = props => {
 
                         {   props.domainDetails ? 
                             props.domainDetails.map(e => (
-                                <option key={e.id} value={e.id}>{e.name}</option>
+                                <option key={e.id} value={e.id} title={e.name}>{e.name}</option>
                             )) : null
                         }
                     </select>
@@ -157,7 +157,7 @@ const ZephyrContent = props => {
                         <option value="Select Release" disabled >Select Release</option>
                         {   releaseArr.length &&
                             releaseArr.map(e => (
-                                <option key={e.id} value={e.id}>{e.name}</option>
+                                <option key={e.id} value={e.id} title={e.name}>{e.name}</option>
                             ))
                         }
                     </select>
@@ -168,7 +168,7 @@ const ZephyrContent = props => {
                         {
                             avoProjects? 
                             avoProjects.map((e,i)=>(
-                                <option value={i} key={i+'_proj'} >{e.project_name}</option>))
+                                <option value={i} key={i+'_proj'} title={e.project_name}>{e.project_name}</option>))
                                 : null 
                         }
                     </select>
@@ -216,7 +216,8 @@ const ZephyrContent = props => {
                         .map((scenario, i)=>(
                                 <div 
                                     key={i}
-                                    className={"scenario__listItem" + (selectedScIds == scenario._id ? " scenario__selectedTC" : "")} 
+                                    className={"scenario__listItem" + (selectedScIds == scenario._id ? " scenario__selectedTC" : "")}
+                                    title={scenario.name}
                                     onClick={()=>{dispatch({type: actionTypes.SEL_SCN_IDS, payload: scenario._id})}}
                                 >
                                     {scenario.name}

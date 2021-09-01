@@ -781,24 +781,23 @@ const DesignContent = props => {
                 </div>
 
                 <div className="d__taskBtns">
-                    <button className="d__taskBtn d__btn" data-test="d__saveBtn" onClick={saveTestCases} disabled={!changed}>Save</button>
-                    <button className="d__taskBtn d__btn" data-test="d__deleteBtn" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
+                    <button className="d__taskBtn d__btn" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} disabled={!changed}>Save</button>
+                    <button className="d__taskBtn d__btn" data-test="d__deleteBtn" title="Delete Test Step" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
                 </div>
 
                 <div className="d__submit" data-test="d__actionBtn">
                     { isUnderReview && 
                         <>
-                        <button className="d__reassignBtn d__btn" 
-                                onClick={()=>onAction("reassign")}>
+                        <button className="d__reassignBtn d__btn" title="Reassign Task" onClick={()=>onAction("reassign")}>
                             Reassign
                         </button>
-                        <button className="d__approveBtn d__btn" onClick={()=>onAction("approve")}>
+                        <button className="d__approveBtn d__btn" title="Approve Task" onClick={()=>onAction("approve")}>
                             Approve
                         </button>
                         </>
                     }
                     { !hideSubmit && !isUnderReview &&
-                        <button className="d__submitBtn d__btn" onClick={()=>onAction("submit")}>
+                        <button className="d__submitBtn d__btn" title="Submit Task" onClick={()=>onAction("submit")}>
                             Submit
                         </button>
                     }

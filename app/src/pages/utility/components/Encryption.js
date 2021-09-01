@@ -28,10 +28,10 @@ return(
 
         {props.encyptBtn && 
         <div id="encryption_btns">
-            <button className="btn-utl" data-test="encryption_options_btn" onClick={()=>props.callEncrypt(props.encryptionType ,props.encryptionValue)}>
+            <button className="btn-utl" data-test="encryption_options_btn" title={props.btnName} onClick={()=>props.callEncrypt(props.encryptionType ,props.encryptionValue)}>
                 {props.btnName}
             </button>
-            <button data-test="encryption_reset_btn" onClick={()=>props.callReset()} className="btn-reset">Reset</button>
+            <button data-test="encryption_reset_btn" title="Reset" onClick={()=>props.callReset()} className="btn-reset">Reset</button>
         </div>}
         <div data-test="utility_encrypted_data_div" className="encryptionData-body">
             <textarea data-test="utility_encrypted_data_inp" id="encryptedData" readOnly={true} placeholder="Encrypted Data" value={props.encryptedData}/>

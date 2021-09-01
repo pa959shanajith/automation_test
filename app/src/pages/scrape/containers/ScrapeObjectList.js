@@ -393,15 +393,15 @@ const ScrapeObjectList = () => {
                 <div className="ss__btngroup">
                     <div className="ss__left-btns">
                         <label data-test="selectalllabel" className="ss__select-all">
-                            <input className="ss__select-all-chkbox" type="checkbox" checked={selAllCheck} disabled={disableBtns.selAll} onChange={(e)=>updateChecklist("all", e)}/>
+                            <input className="ss__select-all-chkbox" type="checkbox" title="Select all" checked={selAllCheck} disabled={disableBtns.selAll} onChange={(e)=>updateChecklist("all", e)}/>
                             <span className="ss__select-all-lbl">
                                 Select all
                             </span>
                         </label>
-                        <button data-test="save" className="ss__taskBtn ss__btn" disabled={disableBtns.save} onClick={onSave}>Save</button>
-                        <button data-test="delete"className="ss__taskBtn ss__btn" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
-                        <button data-test="edit"className="ss__taskBtn ss__btn" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
-                        <button data-test="dnd"className="ss__taskBtn ss__btn" disabled={disableBtns.dnd} onClick={(e)=>onRearrange(e, dnd)}>{dnd?"Stop":"Rearrange"}</button>
+                        <button data-test="save" className="ss__taskBtn ss__btn" title="Save Objects" disabled={disableBtns.save} onClick={onSave}>Save</button>
+                        <button data-test="delete"className="ss__taskBtn ss__btn" title="Delete Objects" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
+                        <button data-test="edit"className="ss__taskBtn ss__btn" title="Edit Objects" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
+                        <button data-test="dnd"className="ss__taskBtn ss__btn" title="Rearrange" disabled={disableBtns.dnd} onClick={(e)=>onRearrange(e, dnd)}>{dnd?"Stop":"Rearrange"}</button>
                         <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>

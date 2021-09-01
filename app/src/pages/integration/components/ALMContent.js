@@ -163,7 +163,7 @@ const ALMContent = props => {
                     <option value="Select Project" selected disabled >Select Domain</option>
                     { props.domainDetails && 
                         props.domainDetails.domain.map((e, i) => (
-                            <option id={e.id} key={i} value={e.name}>{e}</option>
+                            <option id={e.id} key={i} value={e.name} title={e}>{e}</option>
                         )) }
                 </select>
             }
@@ -172,7 +172,7 @@ const ALMContent = props => {
                     <option value="Select Release" selected disabled >Select Release</option>
                     { projectDetails &&
                         projectDetails.qc_projects.map((e, i) => (
-                            <option key={i} value={e}>{e}</option>
+                            <option key={i} value={e} title={e}>{e}</option>
                         )) }
                 </select>
             }
@@ -181,7 +181,7 @@ const ALMContent = props => {
                     <option value="Select Project" selected disabled >Select Project</option>
                     { projectDetails && 
                         projectDetails.avoassure_projects.map((e,i)=>(
-                            <option id={i} value={e.project_name} >{e.project_name}</option>
+                            <option id={i} value={e.project_name} title={e.project_name}>{e.project_name}</option>
                         )) }
                 </select>
             }
@@ -223,7 +223,8 @@ const ALMContent = props => {
                     projectDetails.avoassure_projects[parseInt(scenario_ID)].scenario_details :[] )
                     .map(e => (
                         <div 
-                            className={"scenario__listItem "+(selectedScenarioIds.indexOf(e._id)!==-1 ? " scenario__selectedTC" : "")} 
+                            className={"scenario__listItem "+(selectedScenarioIds.indexOf(e._id)!==-1 ? " scenario__selectedTC" : "")}
+                            title={e.name}
                             onClick={(event)=>{selectScenarioMultiple(event, e._id);}}
                         >
                             {e.name}

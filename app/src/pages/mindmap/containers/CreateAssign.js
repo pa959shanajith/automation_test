@@ -77,11 +77,11 @@ const CreateAssign = () => {
             </div>
             </div>
             <ReferenceBar taskTop={true} taskInfo={info} collapsible={true} collapse={true}>
-                <div className="ic_box" >
+                <div className="ic_box" title="SwitchLayout">
                     <img alt={"Switch Layout"} onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
                     <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
                 </div>
-                <div className="ic_box" >
+                <div className="ic_box" title="Full Screen">
                     <img alt={"Full Screen"} onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
                     <span className="rb_box_title">Full Screen</span>
                 </div>

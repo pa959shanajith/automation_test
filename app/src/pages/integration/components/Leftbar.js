@@ -28,7 +28,7 @@ const Leftbar = () => {
             return(
                 <Fragment>
                     <h4>Integration</h4>
-                <span onClick={()=>callIconClick("qTest") }>
+                <span onClick={()=>callIconClick("qTest")} title="qTest">
                     <img alt="qTestIcon" 
                         id={(screenType === "qTest")? "selectedIcon" : null}  
                         src='static/imgs/qTest.png'
@@ -41,7 +41,7 @@ const Leftbar = () => {
                 return(
                 <Fragment>
                     <h4>Integration</h4>
-                    <span onClick={()=>callIconClick("ALM")}>
+                    <span onClick={()=>callIconClick("ALM")} title="ALM">
                         <img alt="ALMIcon" 
                             src='static/imgs/ALM.png'
                         />
@@ -52,7 +52,7 @@ const Leftbar = () => {
                 return(
                 <Fragment>
                     <h4>Integration</h4>
-                   <span onClick={()=>callIconClick("Zephyr")}>
+                   <span onClick={()=>callIconClick("Zephyr")} title="Zephyr">
                         <img alt="ZephyrIcon"  
                             id={(screenType === "Zephyr")? "selectedIcon" : null} 
                             src='static/imgs/Zephyr.png'
@@ -64,7 +64,7 @@ const Leftbar = () => {
             return(
             <Fragment>
                 <h4>Integration</h4>
-                    <span onClick={()=>callIconClick("qTest") }>
+                    <span onClick={()=>callIconClick("qTest")} title="qTest">
                         <img alt="qTestIcon"  
                              id={(screenType === "qTest")? "selectedIcon" : null}  
                              src='static/imgs/qTest.png'
@@ -72,13 +72,13 @@ const Leftbar = () => {
                         /> 
                         <div>qTest</div>
                     </span>
-                    <span onClick={()=>callIconClick("ALM")}>
+                    <span onClick={()=>callIconClick("ALM")} title="ALM">
                         <img alt="AlmIcon" 
                             src='static/imgs/ALM.png'
                         />
                         <div>ALM</div>
                     </span>
-                    <span onClick={()=>callIconClick("Zephyr")}>
+                    <span onClick={()=>callIconClick("Zephyr")} title="Zephyr">
                         <img alt="ZephyrIcon" 
                             id={(screenType === "Zephyr")? "selectedIcon" : null} 
                             src='static/imgs/Zephyr.png'
