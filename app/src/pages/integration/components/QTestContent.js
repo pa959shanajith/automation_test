@@ -142,7 +142,7 @@ const QTestContent = props => {
                     <option value="Select Project" disabled >Select Project</option>
                     { props.domainDetails.length &&
                         props.domainDetails.map(e => (
-                            <option key={e.id} value={`${e.id}||${e.name}`}>{e.name}</option>
+                            <option key={e.id} value={`${e.id}||${e.name}`} title={e.name}>{e.name}</option>
                         ))}
                 </select>
             }
@@ -151,7 +151,7 @@ const QTestContent = props => {
                     <option value="Select Release" disabled >Select Release</option>
                     { projectDetails &&
                         projectDetails.qc_projects.map(e => (
-                            <option key={e.id} value={`${e.id}||${e.name}`}>{e.name}</option>
+                            <option key={e.id} value={`${e.id}||${e.name}`} title={e.name}>{e.name}</option>
                         ))}
                 </select>
             }
@@ -160,7 +160,7 @@ const QTestContent = props => {
                     <option value="Select Project" disabled >Select Project</option>
                     { projectDetails &&
                         projectDetails.avoassure_projects.map((e,i)=>(
-                            <option key={i} value={i}>{e.project_name}</option>
+                            <option key={i} value={i} title={e.project_name}>{e.project_name}</option>
                         ))}
                 </select>
             }
@@ -208,6 +208,7 @@ const QTestContent = props => {
                                     className={"scenario__listItem " +(selectedScIds == e._id ? "scenario__selectedTC" : "")} 
                                     onClick={()=>{dispatch({type: actionTypes.SEL_SCN_IDS, payload: e._id})}}
                                     style={{cursor: "pointer"}}
+                                    title={e.name}
                                 >
                                 { e.name }
                                 </div>

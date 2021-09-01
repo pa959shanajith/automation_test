@@ -54,6 +54,7 @@ const FolderNode = props => {
                         ? `static/imgs/ic-qc${collapse ? "Expand" : "Collapse"}.png` 
                         : `static/imgs/ic-taskType-blue-${collapse ? "plus" : "minus"}.png` }
                 onClick={handleClick}
+                title={`${collapse ? "Expand" : "Collapse"}`}
             />
             <label>{ props.type === "folder" ? props.folderObject.foldername : props.testSetObject.testset}</label>
         </div> }
@@ -183,8 +184,8 @@ const TestCaseNode = props => {
                 </label>
                 { selectedTC.includes(uniqueTCpath)
                         && <><div className="test__syncBtns"> 
-                        { !syncedTestCases.includes(props.testCaseName) && <img className="test__syncBtn" alt="s-ic" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
-                        <img className="test__syncBtn" alt="s-ic" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
+                        { !syncedTestCases.includes(props.testCaseName) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
+                        <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
                         </div></> 
                     }
             </div>

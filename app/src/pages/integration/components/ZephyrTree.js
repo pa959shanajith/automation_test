@@ -21,6 +21,7 @@ const CycleNode = props => {
                     className="test_tree_toggle" 
                     src={ `static/imgs/ic-qc${collapse ? "Expand" : "Collapse"}.png` }
                     onClick={handleClick}
+                    title={`${collapse ? "Expand" : "Collapse"}`}
                 />
                 <label>{ props.cycleName }</label>
             </div> }
@@ -83,6 +84,7 @@ const PhaseNode = props => {
                         className="test_tree_toggle" 
                         src={ `static/imgs/ic-taskType-blue-${collapse ? "plus" : "minus"}.png` }
                         onClick={handleClick}
+                        title={`${collapse ? "Expand" : "Collapse"}`}
                     />
                     <label>{ phasename }</label>
                 </div> }
@@ -154,8 +156,8 @@ const TestCaseNode = props => {
                 </label>
                 { selectedTC.includes(uniqueTCpath)
                         && <><div className="test__syncBtns"> 
-                        { !syncedTestCases.includes(uniqueTCpath) && <img className="test__syncBtn" alt="s-ic" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
-                        <img className="test__syncBtn" alt="s-ic" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
+                        { !syncedTestCases.includes(uniqueTCpath) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
+                        <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
                         </div></> 
                     }
             </div>

@@ -203,7 +203,7 @@ const MappedPage = props =>{
                                 <div>{counts.mappedTests}</div>
                             </div>
                         </div>
-                        <button onClick={onSave}>Save</button> 
+                        <button onClick={onSave} title="Save">Save</button> 
                     </> }
                 </div>
                 <div className="viewMap__mappingsContainer">

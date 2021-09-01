@@ -29,11 +29,11 @@ const MindmapHome = () => {
       <div className='mp__body'>
         <ActionBar collapsible={true} collapse={options}>
           <div className="mp__ic_box">
-            <div className="ic_box" >
+            <div className="ic_box" title="Create">
               <img onClick={()=>setOptions(undefined)} alt='Create Mindmap' className={"thumb__ic"+(options!=='assignmap'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
                 <span className="rb_box_title">Create</span>
             </div>
-            <div className="ic_box" >
+            <div className="ic_box" title="Assign">
               <img onClick={()=>setOptions('assignmap')} alt='Assign Mindmap' className={"thumb__ic"+(options==='assignmap'? " selected_rb_thumb":"")} src="static/imgs/assign.png"/>
               <span className="rb_box_title">Assign</span>
             </div>

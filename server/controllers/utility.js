@@ -298,8 +298,11 @@ exports.importDtFromXML = function (req, res) {
 						if(columnNames.includes(name))	{
 							for(var k=0;k<columnNames.length;++k) {
 								if(newcols[k].name==name) {
-									newObj[newcols[k].id] = alltags[j].childNodes[0].nodeValue;
-									break;
+									newObj[newcols[k].id] = '';
+									if(alltags[j].childNodes.length>0) {
+										newObj[newcols[k].id] = alltags[j].childNodes[0].nodeValue;
+										break;
+									} 
 								}
 							}
 						}
@@ -307,7 +310,8 @@ exports.importDtFromXML = function (req, res) {
 							ob = {id: uuid(), name: alltags[j].nodeName}
 							columnNames.push(ob.name)
 							newcols.push(ob)
-							newObj[ob.id] = alltags[j].childNodes[0].nodeValue;
+							newObj[ob.id] = '';
+							if(alltags[j].childNodes.length>0) newObj[ob.id] = alltags[j].childNodes[0].nodeValue;
 						}
 					}
 				}

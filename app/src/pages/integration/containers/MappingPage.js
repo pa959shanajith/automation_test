@@ -28,9 +28,9 @@ const MappingPage = props =>{
             </span>
         </div>
         <div className="mappingPage__action_row">
-            <button onClick={props.onSave}>Save</button> 
-            <button onClick={props.onViewMap}>View Mapped Files</button> 
-            <button onClick={props.onExit}>Exit</button>
+            <button onClick={props.onSave} title="Save">Save</button> 
+            <button onClick={props.onViewMap} title="View Mapped Files">View Mapped Files</button> 
+            <button onClick={props.onExit} title="Exit">Exit</button>
         </div>
         <div className="mappingPage__tree_containers">
             <div className="mappingPage__tree_container">

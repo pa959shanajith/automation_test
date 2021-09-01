@@ -251,9 +251,9 @@ const CreateScreenActionButtons = props => {
         <>
         { importPopup && <ImportPopUp setImportPopup={setImportPopup} setData={props.setData} setHeaders={props.setHeaders} setOverlay={props.setOverlay} { ...props } />}
         <div className="dt__taskBtns">
-            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={() => setImportPopup(true)} >Import</button>
-            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={goToEditScreen}>Edit</button>
-            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={saveDataTable}>Create</button>
+            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Import" onClick={() => setImportPopup(true)} >Import</button>
+            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Edit" onClick={goToEditScreen}>Edit</button>
+            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Create" onClick={saveDataTable}>Create</button>
         </div>
         </>
     );
@@ -331,9 +331,9 @@ const EditScreenActionButtons = props => {
         <>
         { showExportPopup && <ExportDataTable setShowExportPopup={setShowExportPopup} tableName={props.tableName} setOverlay={props.setOverlay} /> }
         <div className="dt__taskBtns">
-            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" onClick={()=>setShowExportPopup(true)} disabled={!props.tableName} >Export</button>
-            <button className="dt__taskBtn dt__btn" onClick={confirmDelete} disabled={!props.tableName}>Delete</button>
-            <button className="dt__taskBtn dt__btn" onClick={updateTable} disabled={!props.tableName}>Update</button>
+            <button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Export" onClick={()=>setShowExportPopup(true)} disabled={!props.tableName} >Export</button>
+            <button className="dt__taskBtn dt__btn" title="Delete" onClick={confirmDelete} disabled={!props.tableName}>Delete</button>
+            <button className="dt__taskBtn dt__btn" title="Update" onClick={updateTable} disabled={!props.tableName}>Update</button>
         </div>
         </>
     );
