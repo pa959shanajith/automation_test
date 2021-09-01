@@ -475,3 +475,82 @@ export const exportToGit = async(data) => {
         return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
     }
 }
+
+
+/*Component 
+    data={
+            'ruledata':{
+                    "taskid1":{
+                        "actionid1":{
+                            "ruleid1":{
+                                "groupids":[groupid1, groupdid2],
+                                "additionalrecepients": [userid1, userid2, userid3],
+                                "ruletypeid": ruletypeid
+                            },
+                            "ruleid2":{
+                                "groupids":[groupid1, groupdid2],
+                                "additionalrecepients": [userid1, userid2, userid3],
+                                "ruletypeid": ruletypeid
+                            }
+                        },
+                        "actionid2":{
+                            "ruleid2":{
+                                "groupids":[groupid1, groupdid2],
+                                "additionalrecepients": [userid1, userid2, userid3],
+                                "ruletypeid": ruletypeid
+                            }
+                        }
+                    },
+                    "taskid2":{
+                        "actionid3":{
+                            "ruleid1":{
+                                "groupids":[groupid1, groupdid2],
+                                "additionalrecepients": [userid1, userid2, userid3],
+                                "ruletypeid": ruletypeid
+                            },
+                            "ruleid2":{
+                                "groupids":[groupid1, groupdid2],
+                                "additionalrecepients": [userid1, userid2, userid3],
+                                "ruletypeid": ruletypeid
+                            }
+                        },
+                        "actionid4":{
+                            "ruleid2":{
+                                "groupids":[groupid1, groupdid2],
+                                "additionalrecepients": [userid1, userid2, userid3],
+                                "ruletypeid": ruletypeid
+                            }
+                        }
+                    }
+                }
+            
+            'action':  "update" or "deleterule" or 'deleteall'
+        }
+
+*/
+
+export const updateNotificationConfiguration = async(data) => {
+    try{
+        const res = await axios(url+'/updateNotificationConfiguration', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+    }
+}

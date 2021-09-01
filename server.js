@@ -404,6 +404,7 @@ if (cluster.isMaster) {
 		app.post('/getNotificationRules', auth.protect, admin.getNotificationRules);
 		app.post('/getNotificationGroups', auth.protect, admin.getNotificationGroups);
 		app.post('/updateNotificationGroups', auth.protect, admin.updateNotificationGroups);
+		app.post('/updateNotificationConfiguration', auth.protect, mindmap.updateNotificationConfiguration);
 
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);
