@@ -2,6 +2,7 @@ import React, {useEffect, useState, useRef} from 'react';
 import { useDispatch, useSelector} from 'react-redux';
 import { getProjectList, getModules} from '../api';
 import {parseProjList} from '../containers/MindmapUtils';
+import { setMsg } from '../../global'
 import * as actionTypes from '../state/action';
 import '../styles/ToolbarMenuAssign.scss';
 import PropTypes from 'prop-types';
@@ -18,7 +19,6 @@ const ToolbarMenuAssign = (props) => {
     const [relList,setRelList] = useState([])
     const [relIndex,setRelIndex] = useState(undefined)
     const [cycle,setCycle] = useState("")
-    const setPopup = props.setPopup
     const setBlockui = props.setBlockui
     const cycleRef = props.cycleRef
     const releaseRef = props.releaseRef
@@ -56,12 +56,7 @@ const ToolbarMenuAssign = (props) => {
     }
     const displayError = (error) =>{
         // SetProgressBar("stop",dispatch)
-        setPopup({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
     const changeProject = (val) => {
         setBlockui({show:true,content:'Loading...'})
@@ -111,6 +106,5 @@ ToolbarMenuAssign.propTypes={
     cycleRef: PropTypes.object.isRequired,
     releaseRef: PropTypes.object.isRequired,
     setBlockui: PropTypes.func.isRequired,
-    setPopup:PropTypes.func.isRequired,
 }
 export default ToolbarMenuAssign;

@@ -5,7 +5,7 @@ import Header from './components/Header';
 import RedirectPage from './components/RedirectPage';
 import ScreenOverlay from './components/ScreenOverlay';
 import ScrollBar, { updateScrollBar } from './components/ScrollBar';
-import PopupMsg from './components/PopupMsg';
+import PopupMsg, {setMsg} from './components/PopupMsg';
 import ModalContainer from './components/ModalContainer';
 import ActionBar from './components/ActionBar';
 import ReferenceBar from './components/ReferenceBar';
@@ -51,5 +51,6 @@ export { Header,
         updateScrollBar,
         ValidationExpression,
         Messages,
-        VARIANT
+        VARIANT,
+        setMsg
     };

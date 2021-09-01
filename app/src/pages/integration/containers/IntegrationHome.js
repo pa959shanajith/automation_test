@@ -14,7 +14,6 @@ import '../styles/IntegrationHome.scss'
 const Integrations = () => {
     const dispatch = useDispatch();
     const screenType = useSelector(state=>state.integration.screenType);
-    const showPop = useSelector(state => state.integration.showPop);
     const showOverlay = useSelector(state => state.integration.showOverlay);
 
     useEffect(()=>{//persist the screentype of integration (implementation for bug#18796)
@@ -26,21 +25,8 @@ const Integrations = () => {
         dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null });
     }, [dispatch])
 
-    const PopupDialog = () => (
-        <PopupMsg 
-            variant={showPop.VARIANT}
-            close={()=>dispatch({type: actionTypes.SHOW_POPUP, payload: false})}
-            content={showPop.CONTENT}
-            submit={ showPop.onClick 
-                        ? showPop.onClick 
-                        : ()=>dispatch({type: actionTypes.SHOW_POPUP, payload: false})
-                    }
-        />
-    );
-
     return(
         <>
-        { showPop && <PopupDialog /> }
         { showOverlay && <ScreenOverlay content={showOverlay} /> }
         <div className="parent">
             <Header/>

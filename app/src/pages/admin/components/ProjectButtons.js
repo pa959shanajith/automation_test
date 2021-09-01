@@ -1,6 +1,6 @@
 import React ,  { Fragment, useState} from 'react';
 import { getNames_ICE, createProject_ICE, updateProject_ICE, getDomains_ICE, exportProject} from '../api';
-import {ScreenOverlay, Messages, VARIANT, ValidationExpression} from '../../global'
+import {ScreenOverlay, Messages, VARIANT, ValidationExpression, setMsg} from '../../global'
 import { useSelector} from 'react-redux'; 
 import '../styles/ProjectButtons.scss';
 
@@ -12,7 +12,6 @@ import '../styles/ProjectButtons.scss';
 const ProjectButtons = (props) => {
     const userInfo = useSelector(state=>state.login.userinfo);
     const [loading,setLoading] = useState(false)
-    const setPopupState=props.setPopupState
 
     // Create Project Action
     const create_project = async()=>{
@@ -33,7 +32,7 @@ const ProjectButtons = (props) => {
 				}
 			}
 			if (proceedToCreate === false) {
-                setPopupState({show:true,variant:VARIANT.WARNING,content:"Please add atleast one cycle for release: " + relNames});
+                setMsg(Messages.CUSTOM("Please add atleast one cycle for release: " + relNames,VARIANT.WARNING));
             } 
             else if (proceedToCreate === true) {
 				var requestedids = [];
@@ -144,11 +143,7 @@ const ProjectButtons = (props) => {
             if(result.error){displayError(result.error);return;}
             var val = downloadFile({result,projectName:props.selProject})
             setLoading(false)
-            setPopupState({
-                variant:val?VARIANT.SUCCESS:VARIANT.ERROR,
-                content:val?'Data Exported Successfully.':'Data Export Failed.',
-                show:true
-            })
+            setMsg(Messages.CUSTOM(val?'Data Exported Successfully.':'Data Export Failed.',val?VARIANT.SUCCESS:VARIANT.ERROR))
         }
     }
     
@@ -219,7 +214,7 @@ const ProjectButtons = (props) => {
 				}
             }
             if (proceedFlag === false) {
-                setPopupState({show:true,variant:VARIANT.WARNING,content:"Please add atleast one cycle for release: " + relName});
+                setMsg(Messages.CUSTOM("Please add atleast one cycle for release: " + relName,VARIANT.WARNING));
                 setLoading(false);
                 return false;
             }
@@ -264,12 +259,7 @@ const ProjectButtons = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     return(

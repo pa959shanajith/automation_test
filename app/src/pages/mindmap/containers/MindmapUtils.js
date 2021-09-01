@@ -1,7 +1,7 @@
 /*eslint eqeqeq: "off"*/
 import * as d3 from 'd3';
 import {v4 as uuid} from 'uuid'
-import {Messages as MSG} from '../../global'
+import {Messages as MSG, setMsg} from '../../global'
 import { readCtScale } from './CanvasNew'
 import { readCtScale as readCtScaleAssign } from './CanvasAssign'
 import { readCtScale as readCtScaleEnE } from './CanvasEnE'
@@ -502,7 +502,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
         return {nodeDisplay,linkDisplay,dNodes,dLinks,count}
 }
 
-export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setPopup) =>{
+export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
     var deletedNodes = []
     var sid = parseFloat(activeNode.split('node_')[1])
     var s = d3.select('#'+activeNode);
@@ -511,17 +511,17 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setP
     if (t === 'modules' || t === 'endtoend') return;
     var p = dNodes[sid].parent;
     if(dNodes[sid]['taskexists']!=null && dNodes[sid]['taskexists'].status !== 'complete'){
-        setPopup({show:true,variant:MSG.MINDMAP.WARN_TASK_ASSIGNED.VARIANT,content:MSG.MINDMAP.WARN_TASK_ASSIGNED.CONTENT,submitText:'Ok'})
+        setMsg(MSG.MINDMAP.WARN_TASK_ASSIGNED)
         return; 
     }
     var taskCheck=checkparenttask(dNodes[sid],false);
     if(taskCheck){
-        setPopup({show:true,variant:MSG.MINDMAP.WARN_PARENT_TASK_ASSIGNED.VARIANT,content:MSG.MINDMAP.WARN_PARENT_TASK_ASSIGNED.CONTENT,submitText:'Ok'})
+        setMsg(MSG.MINDMAP.WARN_PARENT_TASK_ASSIGNED)
         return;
     }
     taskCheck=checkchildrentask(dNodes[sid],false);
     if(taskCheck){
-        setPopup({show:true,variant:MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED.VARIANT,content:MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED.CONTENT,submitText:'Ok'})
+        setMsg(MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED)
         return;
     }
     recurseDelChild(dNodes[sid],linkDisplay, nodeDisplay,dNodes,dLinks,undefined,deletedNodes);
@@ -542,7 +542,7 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay,setP
     return {dNodes,dLinks,linkDisplay,nodeDisplay,deletedNodes}
 }
 
-export const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch) =>{
+export const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,setBlockui,dispatch) =>{
     if(verticalLayout){
       setBlockui({show:true,content:'Switching Layout...'})
       // dispatch({type:actionTypes.SELECT_MODULE,payload:{switchlayout:true}})
@@ -550,12 +550,7 @@ export const ClickSwitchLayout = (verticalLayout,setVerticalLayout,moduleSelect,
       return;
     }
     if(Object.keys(moduleSelect).length<1){
-      setPopup({
-        variant:MSG.MINDMAP.WARN_SELECT_MODULE_FIRST.VARIANT,
-        content:MSG.MINDMAP.WARN_SELECT_MODULE_FIRST.CONTENT,
-        submitText:'Ok',
-        show:true
-      })
+      setMsg(MSG.MINDMAP.WARN_SELECT_MODULE_FIRST)
       return;
     }
     setBlockui({show:true,content:'Switching Layout...'})
@@ -751,7 +746,7 @@ export const getJsonPd = (orderMatrix) =>{
 }
 
 //reference bar items
-export const ClickFullScreen = (setFullScreen,setPopup) => {
+export const ClickFullScreen = (setFullScreen) => {
     var elt = document.querySelector("html");
     if ((window.fullScreen) || (window.innerWidth == window.screen.width && (window.screen.height - window.innerHeight) <= 1)) {
         if (document.cancelFullScreen) {
@@ -772,11 +767,7 @@ export const ClickFullScreen = (setFullScreen,setPopup) => {
         } else if (elt.webkitRequestFullscreen) {
             elt.webkitRequestFullscreen();
         } else {
-            setPopup({
-                variant:MSG.MINDMAP.WARN_UNAVAILBALE_FULLSCREEN.VARIANT,
-                content:MSG.MINDMAP.WARN_UNAVAILBALE_FULLSCREEN.CONTENT,
-                show:true
-            })
+            setMsg(MSG.MINDMAP.WARN_UNAVAILBALE_FULLSCREEN)
             return;
         }
         setFullScreen(true)

@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
-import {ScreenOverlay, ScrollBar, Messages as MSG} from '../../global' 
+import {ScreenOverlay, ScrollBar, setMsg, Messages as MSG} from '../../global' 
 import {FormInput} from '../components/FormComp';
 import AssignOptionBox from '../components/AssignOptionBox'
 import {getDetails_ICE,createPool_ICE} from '../api';
@@ -17,16 +17,10 @@ const CreateIcePool = (props) => {
     const [projList,setProjList] = useState([])
     const [allProj,setAllProj] = useState([])
     const [assignProj,setAssignProj] = useState([])
-    const setPopupState=props.setPopupState
     const [loading,setLoading] = useState(false);
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
     const ClickCreate = async() => {
         var val =  poolName.current.value
@@ -56,7 +50,7 @@ const CreateIcePool = (props) => {
         <div className="crt_ice-pool_container">
         {loading?<ScreenOverlay content={loading}/>:null}
         {editPool?
-            <EditIcePool setPopupState={setPopupState} projList={projList} displayError={displayError} setLoading={setLoading}/>:
+            <EditIcePool projList={projList} displayError={displayError} setLoading={setLoading}/>:
             <Fragment>
                 <div id="page-taskName">
                     <span>Create ICE Pool</span>

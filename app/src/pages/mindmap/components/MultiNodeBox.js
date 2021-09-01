@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect, useMemo } from 'react';
-import { ModalContainer, ScrollBar, PopupMsg } from '../../global'
+import { ModalContainer, ScrollBar, setMsg, Messages as MSG, VARIANT } from '../../global'
 import '../styles/MultiNodeBox.scss'
 import PropTypes from 'prop-types';
 
@@ -10,15 +10,13 @@ const MultiNodeBox = (props) =>{
     const [reset,setReset] = useState(false)
     const [submit,setSubmit] = useState(false)
     const [errMsg,setErrMsg] = useState('')
-    const [popup,setPopup] = useState(false)
     return(
         <Fragment>
-            {popup?<PopupMsg variant={popup.variant} close={()=>setPopup(false)} content='At a time only 10 nodes can be added' />:null}
             <ModalContainer 
                 title='Add Node'
                 close={()=>props.setMultipleNode(false)}
                 footer={<Footer errMsg={errMsg} setReset={setReset} setSubmit={setSubmit} {...props}/>}
-                content={<AddnodeContainer setPopup={setPopup} setErrMsg={setErrMsg} submit={submit} setSubmit={setSubmit} setReset={setReset} reset={reset} {...props}/>} 
+                content={<AddnodeContainer setErrMsg={setErrMsg} submit={submit} setSubmit={setSubmit} setReset={setReset} reset={reset} {...props}/>} 
             />
         </Fragment>
     )
@@ -107,7 +105,7 @@ const AddnodeContainer = (props) =>{
     const submit = () =>{
         var err = []
         if(mnode.length > 10){
-            props.setPopup(true)
+            setMsg(MSG.CUSTOM('At a time only 10 nodes can be added',VARIANT.ERROR))
             return;
         }
         mnode.forEach((e,i)=>{

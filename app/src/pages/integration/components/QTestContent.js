@@ -1,6 +1,6 @@
 import React,{Fragment, useState} from 'react';
 import { useHistory } from 'react-router-dom';
-import { RedirectPage, Messages as MSG } from '../../global';
+import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { useSelector, useDispatch } from 'react-redux';
 import MappingPage from '../containers/MappingPage';
 import CycleNode from './QTestTree';
@@ -33,11 +33,11 @@ const QTestContent = props => {
         const projectDetails = await qtestProjectDetails_ICE(projectId, user_id);
 
         if (projectDetails.error)
-            dispatch({type: actionTypes.SHOW_POPUP, payload: projectDetails.error});
+            setMsg(projectDetails.error);
         else if(projectDetails === "unavailableLocalServer")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_UNAVAILABLE_ICE});
+            setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
         else if(projectDetails === "scheduleModeOn")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.GENERIC.WARN_UNCHECK_SCHEDULE});
+            setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
         else if(projectDetails === "Invalid Session"){
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             return RedirectPage(history);
@@ -60,7 +60,7 @@ const QTestContent = props => {
         
         const folderDetails = await qtestFolderDetails_ICE(releaseId, "root", projectId, "folder");
         if (folderDetails.error){
-            dispatch({type: actionTypes.SHOW_POPUP, payload: folderDetails.error});
+            setMsg(folderDetails.error);
         } else if (folderDetails) {            
             setFolderDetails(folderDetails);
             clearSelections();
@@ -83,15 +83,15 @@ const QTestContent = props => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Saving...'});
         const response = await saveQtestDetails_ICE(mappedPair);
         if (response.error)
-            dispatch({type: actionTypes.SHOW_POPUP, payload: response.error});
+            setMsg(response.error);
         else if(response === "unavailableLocalServer")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_UNAVAILABLE_ICE});
+            setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
         else if(response === "scheduleModeOn")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.GENERIC.WARN_UNCHECK_SCHEDULE});
+            setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
         else if(response === "fail")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_SAVE});
+            setMsg(MSG.INTEGRATION.ERR_SAVE);
         else if(response === "success"){
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.SUCC_SAVE});
+            setMsg(MSG.INTEGRATION.SUCC_SAVE);
             dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
             clearSelections();
         }

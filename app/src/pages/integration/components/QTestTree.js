@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateScrollBar, Messages as MSG } from '../../global';
+import { updateScrollBar, Messages as MSG, setMsg } from '../../global';
 import * as actionTypes from '../state/action';
 
 const CycleNode = props => {
@@ -95,7 +95,7 @@ const TestRunNode = props => {
         if(selectedScIds.length===0){
             popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
         }
-        if (popupMsg) dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});
+        if (popupMsg) setMsg(popupMsg);
         else{
             const mappedPair=[
                 {

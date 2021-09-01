@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
-import { ReferenceBar, ScrollBar, RedirectPage, Messages } from '../../global';
+import { ReferenceBar, ScrollBar, RedirectPage, Messages , setMsg} from '../../global';
 import  * as ScrapeFilter  from './FilterScrapeObjects';
 import * as list from './ListVariables';
 import { ScrapeContext } from './ScrapeContext';
@@ -122,7 +122,7 @@ const RefBarItems = props => {
 				highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
 					.then(data => {
 						if (data === "Invalid Session") return RedirectPage(history);
-						if (data === "fail") setShowPop(Messages.SCRAPE.ERR_HIGHLIGHT)
+						if (data === "fail") setMsg(Messages.SCRAPE.ERR_HIGHLIGHT)
 					})
 					.catch(error => console.error("Error while highlighting. ERROR::::", error));
 			}

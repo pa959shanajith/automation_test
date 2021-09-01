@@ -10,7 +10,7 @@ import ChangePassword from './ChangePassword';
 import ChangeDefaultIce from './ChangeDefaultIce';
 import { persistor } from '../../../reducer';
 import NotifyDropDown from './NotifyDropDown';
-import { RedirectPage, PopupMsg, ModalContainer, ScreenOverlay, Messages as MSG } from '../../global';
+import { RedirectPage, ModalContainer, ScreenOverlay, Messages as MSG, setMsg } from '../../global';
 import "../styles/Header.scss";
 
 /*
@@ -33,7 +33,6 @@ const Header = () => {
     const [roleList, setRoleList] = useState([]);
     const [adminDisable, setAdminDisable] = useState(false);
     const [showConfSR, setShowConfSR] = useState(false);
-    const [showSR_Pop, setShowSR_Pop] = useState("");
     const [clickedRole, setClickedRole] = useState(null);
     const [showOverlay, setShowOverlay] = useState("");
     const [redirectTo, setRedirectTo] = useState("");
@@ -75,11 +74,11 @@ const Header = () => {
 			const res = await fetch("/AvoAssure_ICE.zip");
 			const status = await res.text();
 			if (status === "available") window.location.href = window.location.origin+"/AvoAssure_ICE.zip?file=getICE"
-			else setShowSR_Pop(MSG.GLOBAL.ERR_PACKAGE);
+			else setMsg(MSG.GLOBAL.ERR_PACKAGE);
             setShowOverlay(false)
 		} catch (ex) {
 			console.error("Error while downloading ICE package. Error:", ex);
-			setShowSR_Pop(MSG.GLOBAL.ERR_PACKAGE);
+			setMsg(MSG.GLOBAL.ERR_PACKAGE);
 		}
 	}
 
@@ -87,7 +86,7 @@ const Header = () => {
 		let roleasarray = userInfo.additionalrole;
 		if (roleasarray.length === 0) {
 			setShowSR(false);
-			setShowSR_Pop(MSG.GLOBAL.ERR_NOROLES_SWITCH);
+			setMsg(MSG.GLOBAL.ERR_NOROLES_SWITCH);
 		} else {
 			getRoleNameByRoleId(roleasarray)
 			.then(data => {
@@ -107,7 +106,7 @@ const Header = () => {
             .catch(error=>{
                 setShowSR(false);
                 console.error("Failed to Fetch Role Names. ERROR::", error)
-                setShowSR_Pop(MSG.GLOBAL.ERR_ROLENAMES);
+                setMsg(MSG.GLOBAL.ERR_ROLENAMES);
             });
 		}
     };
@@ -151,30 +150,18 @@ const Header = () => {
                 }
 			} else {
                 console.error("Fail to Switch User");
-                setShowSR_Pop(MSG.GLOBAL.ERR_SWITCH_USER);
+                setMsg(MSG.GLOBAL.ERR_SWITCH_USER);
 			}
         })
         .catch(error=> {
             setShowOverlay("");
             console.error("Fail to Switch User. ERROR::", error);
-            setShowSR_Pop(MSG.GLOBAL.ERR_SWITCH_USER);
+            setMsg(MSG.GLOBAL.ERR_SWITCH_USER);
 		});
 	};
 
     const PasswordSuccessPopup = () => (
-        <PopupMsg 
-            variant={MSG.GLOBAL.SUCC_CHANGE_PASSWORD.VARIANT}
-            close={()=>setSuccessPass(false)}
-            content={MSG.GLOBAL.SUCC_CHANGE_PASSWORD.CONTENT}
-        />
-    );
-
-    const SRPopup = () => (
-        <PopupMsg 
-            variant={showSR_Pop.VARIANT}
-            content={showSR_Pop.CONTENT}
-            close={()=>setShowSR_Pop("")}
-        />
+        setMsg(MSG.GLOBAL.SUCC_CHANGE_PASSWORD)
     );
 
     const showConfPop = (rid, data) =>{
@@ -204,7 +191,6 @@ const Header = () => {
             { showChangeDefaultIce && <ChangeDefaultIce setShowMainPopup={setShowChangeDefaultIce} /> }
             { showSuccessPass && <PasswordSuccessPopup /> }
             { showConfSR && <ConfSwitchRole />  }
-            { showSR_Pop && <SRPopup /> }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
             <div className = "main-header">
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>

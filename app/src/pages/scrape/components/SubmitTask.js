@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { ScrapeContext } from './ScrapeContext';
 import { reviewTask } from '../../global/api';
-import { Messages as MSG } from '../../global';
+import { Messages as MSG, setMsg } from '../../global';
 import "../styles/SubmitTask.scss";
 
 const SubmitTask = () => {
@@ -43,17 +43,17 @@ const SubmitTask = () => {
 
         reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
         .then(result => {
-            if (result === "fail") setShowPop(MSG.SCRAPE.WARN_NO_REVIEWER);
+            if (result === "fail") setMsg(MSG.SCRAPE.WARN_NO_REVIEWER);
             else if (taskstatus === 'reassign') {
-                setShowPop({'title': "Task Reassignment Success", 'content': "Task Reassigned successfully!"});
+                setMsg(MSG.SCRAPE.SUCC_TASK_REASSIGN);
                 redirectToPlugin();
             }    
             else if (taskstatus === 'underReview') {
-                setShowPop({'title': "Task Completion Success", 'content': "Task Approved successfully!"});
+                setMsg(MSG.SCRAPE.SUCC_TASK_APPROVED);
                 redirectToPlugin();
             }
             else {
-                setShowPop({'title': "Task Submission Success", 'content': "Task Submitted successfully!"});
+                setMsg(MSG.SCRAPE.SUCC_TASK_SUBMIT);
                 redirectToPlugin();
             }
         })

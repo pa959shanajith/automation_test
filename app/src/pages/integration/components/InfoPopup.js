@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ModalContainer, ScrollBar, VARIANT} from '../../global';
+import { ModalContainer, ScrollBar, VARIANT, Messages as MSG, setMsg} from '../../global';
 import PropTypes from 'prop-types';
 import '../styles/InfoPopup.scss'
 
@@ -13,7 +13,7 @@ const InfoPopup = ({reqDetails,setInfo,displayError,screenType}) => {
     const [err,setErr] = useState(true)
     useEffect(()=> {
         if(!reqDetails || reqDetails.length === 0){
-            displayError({VARIANT:VARIANT.ERROR, CONTENT: reqDetails ? "No requirement details found" : `Please re-map the ${screenType} Test Cases and the AvoAssure scenarios to fetch the requirements`})
+            setMsg(MSG.CUSTOM(reqDetails ? "No requirement details found" : `Please re-map the ${screenType} Test Cases and the AvoAssure scenarios to fetch the requirements`,VARIANT.ERROR))
             setInfo(false)
         }else{
             setErr(false)

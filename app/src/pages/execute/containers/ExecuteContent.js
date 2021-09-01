@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown, Messages as MSG, VARIANT} from '../../global' 
+import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown, Messages as MSG, VARIANT, setMsg} from '../../global' 
 import {updateTestSuite_ICE, updateAccessibilitySelection, reviewTask, ExecuteTestSuite_ICE} from '../api';
 import "../styles/ExecuteContent.scss";
 import * as actionTypes from "../../plugin/state/action";
@@ -15,7 +15,6 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
     const dispatch = useDispatch();
     const tasksJson = useSelector(state=>state.plugin.tasksJson)
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const [eachData,setEachData] = useState([])
     const [update,updateScreen] = useState(true)
     const [updateAfterSave,setupdateAfterSave] = useState(false)
@@ -43,18 +42,9 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
         }
     }, [current_task]);
 
-    const closePopup = () => {
-        setPopupState({show:false,title:"",content:""});
-    }
-
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     const updateTestSuite = async () => {
@@ -153,7 +143,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
     
     const ExecuteTestSuitePopup = () => {
         const check = SelectBrowserCheck(appType,browserTypeExe,displayError,execAction)
-        const valid = checkSelectedModules(eachData, setPopupState);
+        const valid = checkSelectedModules(eachData);
         if(scenarioTaskType === "exclusive" && accessibilityParameters.length === 0){
             displayError(MSG.EXECUTE.WARN_SELECT_ACC_STANDARD);
             return ;
@@ -188,7 +178,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
        
         if(executionData === undefined) executionData = dataExecution;
         setAllocateICE(false);
-        const modul_Info = parseLogicExecute(eachData, current_task, appType, projectdata, moduleInfo, accessibilityParameters, scenarioTaskType, setPopupState);
+        const modul_Info = parseLogicExecute(eachData, current_task, appType, projectdata, moduleInfo, accessibilityParameters, scenarioTaskType);
         if(modul_Info === false) return;
         setLoading("Sending Execution Request");
         executionData["source"]="task";
@@ -208,9 +198,9 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
             ResetSession.end();
             if(data.status) {
                 if(data.status === "fail") {
-                    setPopupState({show:true,variant:data.variant,content:data["error"]});
+                    setMsg(MSG.CUSTOM(data["error"],data.variant));
                 } else {
-                    setPopupState({show:true,variant:data.variant,content:data["message"]});
+                    setMsg(MSG.CUSTOM(data["message"],data.variant));
                 }
             }
             setBrowserTypeExe([]);
@@ -252,7 +242,6 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 
     return (
         <>
-            {popupState.show?<PopupMsg variant={popupState.variant} content={popupState.content} close={closePopup} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             {allocateICE?
             <AllocateICEPopup 
@@ -308,7 +297,6 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
                     type={showIntegrationModal} 
                     showIntegrationModal={showIntegrationModal} 
                     appType={appType} 
-                    setPopupState={setPopupState} 
                     setCredentialsExecution={setIntegration}
                     integrationCred={integration}
                     displayError={displayError}
@@ -319,7 +307,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
     );
 }
 
-const checkSelectedModules = (data, setPopupState) => {
+const checkSelectedModules = (data) => {
     let pass = false;
     // eslint-disable-next-line
     data.map((rowData,m)=>{
@@ -330,7 +318,7 @@ const checkSelectedModules = (data, setPopupState) => {
             return null
         } 
     })
-    if (pass===false) setPopupState({show:true,variant:MSG.EXECUTE.WARN_SELECT_SCENARIO.VARIANT,content:MSG.EXECUTE.WARN_SELECT_SCENARIO.CONTENT});
+    if (pass===false) setMsg(MSG.EXECUTE.WARN_SELECT_SCENARIO);
     return pass
 } 
 

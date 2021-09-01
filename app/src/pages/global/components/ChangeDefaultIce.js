@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ModalContainer, ScreenOverlay, PopupMsg, Messages as MSG } from '../../global';
+import { ModalContainer, ScreenOverlay, setMsg, Messages as MSG } from '../../global';
 import { getUserICE,setDefaultUserICE } from '../api';
 import '../styles/ChangeDefaultIce.scss';
 
@@ -16,7 +16,6 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
     const [defICE, setDefICE] = useState("")
     const [loading,setLoading] = useState(false)
     const [showPopup,setShowPopup] = useState(false)
-    const [popupState,setPopupState] = useState({show:false})
 
     useEffect( ()=>{
         fetchIce();
@@ -24,12 +23,7 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
    
     const fetchIce = async () => {
@@ -98,7 +92,6 @@ const ChangeDefaultIce = ({setShowMainPopup}) => {
                     modalClass={" modal-md"}
                 />
             :null}
-            {popupState.show?<PopupMsg variant={popupState.variant} content={popupState.content}  close={()=>{setPopupState({show:false});setShowMainPopup(false);}} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
         </>   
     );

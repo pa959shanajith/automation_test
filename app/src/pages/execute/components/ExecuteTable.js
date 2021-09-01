@@ -1,6 +1,6 @@
 import React, {useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { PopupMsg, ModalContainer ,ScrollBar, Report, Messages as MSG} from '../../global' 
+import { PopupMsg, ModalContainer ,ScrollBar, Report, Messages as MSG, setMsg} from '../../global' 
 import {readTestSuite_ICE, loadLocationDetails, readTestCase_ICE} from '../api';
 import Handlebars from "handlebars"
 import "../styles/ExecuteTable.scss";
@@ -14,7 +14,6 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
     const [scenarioDetails,setScenarioDetails] = useState({})
     const [showModal,setshowModal] = useState(false)
     const [initialTableList,setInitialTableList] = useState([])
-    const [popup,setPopup] = useState({show:false})
     const [arr,setArr] = useState([])
     
     useEffect(()=>{
@@ -34,12 +33,7 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopup({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
         return
     }
 
@@ -150,8 +144,6 @@ const ExecuteTable = ({scenarioTaskType,accessibilityParameters,current_task,rea
 
     return (
         <>
-            {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} title={popup.title} content={popup.content} />:null}
-            
             <div id="middle-content-section">
                 <div className="e__abs-div">
                     <div className="e__min-h">

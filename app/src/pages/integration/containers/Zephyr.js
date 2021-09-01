@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { RedirectPage, VARIANT, Messages as MSG } from '../../global';
+import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import ZephyrContent from '../components/ZephyrContent';
@@ -48,7 +48,7 @@ const Zephyr = () => {
 
         const domainDetails = await loginToZephyr_ICE(zephyrURL, zephyrUsername, zephyrPassword);
 
-        if (domainDetails.error) dispatch({ type: actionTypes.SHOW_POPUP, payload: domainDetails.error});
+        if (domainDetails.error) setMsg( domainDetails.error);
         else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (domainDetails === "scheduleModeOn") setLoginError("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
         else if (domainDetails === "Invalid Session"){
@@ -76,19 +76,19 @@ const Zephyr = () => {
             const response = await viewZephyrMappedList_ICE(user_id);
             
             if (response.error){
-                dispatch({type: actionTypes.SHOW_POPUP, payload: response.error});
+                setMsg(response.error);
                 dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             } 
             else if (response.length){
                 dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "Zephyr" });
                 setMappedFilesRes(response);
             }
-            else dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.WARN_NO_MAPPED_DETAILS});
+            else setMsg(MSG.INTEGRATION.WARN_NO_MAPPED_DETAILS);
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         }
         catch(err) {
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_FETCH_DATA});
+            setMsg(MSG.INTEGRATION.ERR_FETCH_DATA);
         }
     }
 

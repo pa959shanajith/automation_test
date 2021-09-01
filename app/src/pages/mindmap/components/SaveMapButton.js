@@ -4,7 +4,7 @@ import {saveMindmap,getModules,getScreens} from '../api';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import '../styles/SaveMapButton.scss'
-import { VARIANT, Messages as MSG } from '../../global';
+import { VARIANT, Messages as MSG, setMsg } from '../../global';
 
 /*Component SaveMapButton
   use: renders save button below canvas on click trigers save node
@@ -27,7 +27,7 @@ const SaveMapButton = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,props.setPopup,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj,moduledata,verticalLayout)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj,moduledata,verticalLayout)
     }
     return(
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -40,7 +40,7 @@ const SaveMapButton = (props) => {
 }
 
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout)=>{
+const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout)=>{
     var tab = "tabCreate"
     var selectedProject;
     var error = !1
@@ -50,7 +50,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
     var counter = {};
     var displayError = (error) => {
         setBlockui({show:false});
-        setPopup({show:true,variant:error.VARIANT || VARIANT.ERROR ,content:((error)?( error.CONTENT || error ):MSG.MINDMAP.ERR_SAVE.CONTENT)})
+        setMsg(MSG.CUSTOM(((error)?( error.CONTENT || error ):MSG.MINDMAP.ERR_SAVE.CONTENT),error.VARIANT || VARIANT.ERROR))
         return;
     }
     d3.select('#pasteImg').classed('active-map',false)
@@ -67,7 +67,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
         } return true;
     })
     if(!duplicateNode){
-        setPopup({show:true,variant:MSG.MINDMAP.WARN_DUPLICATE_SCREEN_NAME.VARIANT,content:MSG.MINDMAP.WARN_DUPLICATE_SCREEN_NAME.CONTENT,submitText:'Ok'})
+        setMsg(MSG.MINDMAP.WARN_DUPLICATE_SCREEN_NAME)
         return;
     }
     setBlockui({show:true,content:'Saving flow! Please wait...'})
@@ -153,7 +153,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,setPopup,deletedNodes,unas
     dispatch({type:actionTypes.SAVE_MINDMAP,payload:{screendata,moduledata,moduleselected}})
     dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
     setBlockui({show:false});
-    setPopup({show:true,variant:VARIANT.SUCCESS,content:isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,submitText:'Ok'})
+    setMsg(MSG.CUSTOM(isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,VARIANT.SUCCESS))
     return;
 }
 

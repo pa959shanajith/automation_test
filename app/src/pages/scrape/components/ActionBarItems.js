@@ -5,7 +5,7 @@ import '../styles/ActionBarItems.scss'
 import * as actionTypes from '../state/action';
 import { ScrapeContext } from "../components/ScrapeContext";
 import * as scrapeApi from '../api';
-import { RedirectPage, ActionBar, Thumbnail, Messages as MSG } from '../../global';
+import { RedirectPage, ActionBar, Thumbnail, Messages as MSG, setMsg } from '../../global';
 
 /*Component LeftBarItems
   use: renders  6 options in design  in the left of screen
@@ -161,7 +161,7 @@ const BottomContent = () => {
                     a.click();
                     document.body.removeChild(a);
                   } 
-            } else setShowPop(MSG.SCRAPE.ERR_NO_OBJ_SCRAPE);
+            } else setMsg(MSG.SCRAPE.ERR_NO_OBJ_SCRAPE);
         })
         .catch(error => console.error(error));
     }
@@ -176,11 +176,11 @@ const BottomContent = () => {
                     setOverlay("Loading...")
                     let resultString = JSON.parse(reader.result);
                     if (!('appType' in resultString))
-                        setShowPop(MSG.SCRAPE.ERR_JSON_IMPORT);
+                        setMsg(MSG.SCRAPE.ERR_JSON_IMPORT);
                     else if (resultString.appType !== appType)
-                        setShowPop(MSG.SCRAPE.ERR_NO_MATCH_APPTYPE);
+                        setMsg(MSG.SCRAPE.ERR_NO_MATCH_APPTYPE);
                     else if (resultString.view.length === 0)
-                        setShowPop(MSG.SCRAPE.ERR_NO_OBJ_IMPORT);
+                        setMsg(MSG.SCRAPE.ERR_NO_OBJ_IMPORT);
                     else {
                         let objList = {};
                         if ('body' in resultString) {
@@ -206,26 +206,26 @@ const BottomContent = () => {
                         scrapeApi.updateScreen_ICE(arg)
                             .then(data => {
                                 if (data === "Invalid Session") return RedirectPage(history);
-                                else if (data === "fail") setShowPop(MSG.SCRAPE.ERR_SCREEN_IMPORT) 
+                                else if (data === "fail") setMsg(MSG.SCRAPE.ERR_SCREEN_IMPORT) 
                                 else fetchScrapeData().then(response => {
                                         if (response === "success")
-                                            setShowPop(MSG.SCRAPE.SUCC_SCREEN_JSON_IMPORT) 
+                                            setMsg(MSG.SCRAPE.SUCC_SCREEN_JSON_IMPORT) 
                                         setOverlay("");
                                 });
                             })
                             .catch(error => {
                                 setOverlay("");
-                                setShowPop(MSG.SCRAPE.ERR_SCREEN_IMPORT) 
+                                setMsg(MSG.SCRAPE.ERR_SCREEN_IMPORT) 
                                 console.error(error)
                             });
                     }
-                } else setShowPop(MSG.SCRAPE.ERR_FILE_FORMAT);
+                } else setMsg(MSG.SCRAPE.ERR_FILE_FORMAT);
                 setOverlay("");
             }
             catch(error){
                 setOverlay("");
-                if (typeof(error)==="object") setShowPop(error);
-                else setShowPop(MSG.SCRAPE.ERR_SCREEN_IMPORT);
+                if (typeof(error)==="object") setMsg(error);
+                else setMsg(MSG.SCRAPE.ERR_SCREEN_IMPORT);
                 console.error(error);
             }
         }

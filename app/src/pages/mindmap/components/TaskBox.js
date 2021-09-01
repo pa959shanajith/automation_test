@@ -5,7 +5,7 @@ import '../styles/TaskBox.scss';
 import ClickAwayListener from 'react-click-away-listener';
 import {populateUsers} from '../api';
 import { useSelector } from 'react-redux';
-import {ModalContainer, CalendarComp, Messages as MSG, VARIANT} from '../../global';
+import {ModalContainer, CalendarComp, Messages as MSG, VARIANT, setMsg} from '../../global';
 import Complexity, {getComplexityLevel} from './Complexity';
 import PropTypes from 'prop-types'
 
@@ -41,7 +41,6 @@ const TaskBox = (props) => {
     const cycleid = props.cycleid;
     const releaseid = props.releaseid;
     const setTaskBox = props.setTaskBox;
-    const setPopup = props.setPopup;
     const displayError = props.displayError
     var ctScale = props.ctScale;
     var dNodes = props.dNodes;
@@ -63,22 +62,22 @@ const TaskBox = (props) => {
     useEffect(()=>{
         if(dNodes[pi].parent && dNodes[pi].parent.type === 'endtoend'){
             setTaskBox(false)
-            setPopup({show:true,variant:MSG.MINDMAP.ERR_E2E_ASSIGN_SCENARIO.VARIANT,content:MSG.MINDMAP.ERR_E2E_ASSIGN_SCENARIO.CONTENT,submitText:'Ok'})
+            setMsg(MSG.MINDMAP.ERR_E2E_ASSIGN_SCENARIO)
             return;
         }
         if (t == 'screens' && (appType == "System" || appType == "Mainframe")) {
             setTaskBox(false)
-            setPopup({show:true,variant:VARIANT.WARNING,content:'Task is disabled for '+appType +' screen',submitText:'Ok'})
+            setMsg(MSG.CUSTOM('Task is disabled for '+appType +' screen',VARIANT.WARNING))
             return;
         }
         if (t != 'testcases' && (dNodes[pi]._children != null)) {
             setTaskBox(false)
-            setPopup({show:true,variant:MSG.MINDMAP.WARN_EXPAND_NODE.VARIANT,content:MSG.MINDMAP.WARN_EXPAND_NODE.CONTENT,submitText:'Ok'})
+            setMsg(MSG.MINDMAP.WARN_EXPAND_NOD)
             return;
         } 
         if (t != 'testcases' && (dNodes[pi].children == null)) {
             setTaskBox(false)
-            setPopup({show:true,variant:MSG.MINDMAP.ERR_INCOMPLETE_FLOW.VARIANT,content:MSG.MINDMAP.ERR_INCOMPLETE_FLOW.CONTENT,submitText:'Ok'})
+            setMsg(MSG.MINDMAP.ERR_INCOMPLETE_FLOW)
             return;
         }
         unassignTask = unassignList
@@ -793,7 +792,6 @@ const taskAssign = {
     }
 };
 TaskBox.propTypes={
-    setPopup: PropTypes.func,
     clickUnassign:PropTypes.func ,
     nodeDisplay: PropTypes.object,
     releaseid: PropTypes.string,

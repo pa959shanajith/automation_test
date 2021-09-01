@@ -3,7 +3,7 @@ import { useDispatch, useSelector} from 'react-redux';
 import ToolbarMenuAssign from '../components/ToolbarMenuAssign';
 import ModuleListDrop from '../components/ModuleListDrop';
 import CanvasAssign from './CanvasAssign';
-import { ScreenOverlay ,PopupMsg,ReferenceBar,SetProgressBar} from '../../global'
+import { ScreenOverlay ,setMsg ,ReferenceBar,SetProgressBar} from '../../global'
 import {getProjectList} from '../api';
 import { ClickFullScreen , parseProjList, ClickSwitchLayout} from './MindmapUtils';
 import SaveMapButton from '../components/SaveMapButton';
@@ -18,7 +18,6 @@ const CreateAssign = () => {
     const dispatch = useDispatch()
     const cycleRef = useRef()
     const releaseRef = useRef()
-    const [popup,setPopup] = useState({show:false})
     const [blockui,setBlockui] = useState({show:false})
     const [fullScreen,setFullScreen] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(false)
@@ -51,24 +50,18 @@ const CreateAssign = () => {
     const displayError = (error) =>{
         setBlockui({show:false})
         SetProgressBar("stop",dispatch)
-        setPopup({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
     return(
         <Fragment>
             {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-            {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content}/>:null}
             <div className='mp__canvas_container'>
             <div className='mp__toolbar__container'>
-              <ToolbarMenuAssign cycleRef={cycleRef} releaseRef={releaseRef} setBlockui={setBlockui} setPopup={setPopup}/>
-              <ModuleListDrop cycleRef={cycleRef} setPopup={setPopup} isAssign={true}/>
+              <ToolbarMenuAssign cycleRef={cycleRef} releaseRef={releaseRef} setBlockui={setBlockui} />
+              <ModuleListDrop cycleRef={cycleRef} isAssign={true}/>
             </div>
             <div id='mp__canvas' className='mp__canvas'>
-                {(Object.keys(moduleSelect).length>0 && cycleRef.current)?<CanvasAssign displayError={displayError} setBlockui={setBlockui} releaseRef={releaseRef} cycleRef={cycleRef} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>
+                {(Object.keys(moduleSelect).length>0 && cycleRef.current)?<CanvasAssign displayError={displayError} setBlockui={setBlockui} releaseRef={releaseRef} cycleRef={cycleRef} module={moduleSelect} verticalLayout={verticalLayout}/>
                 :<Fragment>
                     <SaveMapButton disabled={true}/>
                     <ExportMapButton/>
@@ -77,12 +70,12 @@ const CreateAssign = () => {
             </div>
             </div>
             <ReferenceBar taskTop={true} taskInfo={info} collapsible={true} collapse={true}>
-                <div className="ic_box" title="SwitchLayout">
-                    <img alt={"Switch Layout"} onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
+                <div className="ic_box" title="SwitchLayout" >
+                    <img alt={"Switch Layout"} onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
                     <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
                 </div>
                 <div className="ic_box" title="Full Screen">
-                    <img alt={"Full Screen"} onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
+                    <img alt={"Full Screen"} onClick={()=>ClickFullScreen(setFullScreen)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
                     <span className="rb_box_title">Full Screen</span>
                 </div>
             </ReferenceBar>

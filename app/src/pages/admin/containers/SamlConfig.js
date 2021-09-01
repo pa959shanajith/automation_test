@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, ModalContainer, ScrollBar, Messages as MSG, VARIANT} from '../../global' 
+import {ScreenOverlay, ModalContainer, ScrollBar, Messages as MSG, VARIANT, setMsg} from '../../global' 
 import {getSAMLConfig, manageSAMLConfig} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import '../styles/SamlConfig.scss'
@@ -25,7 +25,6 @@ const SamlConfig = (props) => {
     const [certNameErrBorder,setCertNameErrBorder] = useState(false)
     const [selBox,setSelBox] = useState([])
     const [showDeleteModal,setshowDeleteModal] = useState(false)
-    const setPopupState =props.setPopupState;
 
     useEffect(()=>{
         setSamlEdit(false);
@@ -48,12 +47,7 @@ const SamlConfig = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     const samlConfValidate = (action) =>{
@@ -113,17 +107,17 @@ const SamlConfig = (props) => {
         if(data === "success") {
             if (action === "create") samlReset();
             else samlEditClick();
-            setPopupState({show:true,variant:VARIANT.SUCCESS,content:"Configuration '"+confObj.name+"' "+action+"d successfully!"});
+            setMsg(MSG.CUSTOM("Configuration '"+confObj.name+"' "+action+"d successfully!",VARIANT.SUCCESS));
         } else if(data === "exists") {
             setNameErrBorder(true);
-            setPopupState({show:true,variant:VARIANT.WARNING,content:"Configuration '"+confObj.name+"' already Exists!"});
+            setMsg(MSG.CUSTOM("Configuration '"+confObj.name+"' already Exists!",VARIANT.WARNING));
         } else if(data === "fail") {
             if (action === "create") samlReset();
             else samlEditClick();
-            setPopupState({show:true,variant:VARIANT.WARNING,content:failMsg});
+            setMsg(MSG.CUSTOM(failMsg,VARIANT.WARNING));
         } else if(/^1[0-2]{4}$/.test(data)) {
             if (JSON.parse(JSON.stringify(data)[1])) {
-                setPopupState({show:true,variant:VARIANT.ERROR,content: failMsg+" Invalid Request!"});
+                setMsg(MSG.CUSTOM(failMsg+" Invalid Request!",VARIANT.ERROR));
                 return;
             }
             let errHints = "<br/>";
@@ -133,7 +127,7 @@ const SamlConfig = (props) => {
             if (JSON.parse(JSON.stringify(data)[4])) setIdpErrBorder(true);
             if (JSON.parse(JSON.stringify(data)[5])) setCertNameErrBorder(true);
             if (JSON.parse(JSON.stringify(data)[5]) === 2) errHints += "File uploaded is not a valid certificate";
-            setPopupState({show:true,variant:VARIANT.WARNING,content: "Some values are Invalid!" + errHints});
+            setMsg(MSG.CUSTOM("Some values are Invalid!" + errHints,VARIANT.WARNING));
         }
     }
 
@@ -164,7 +158,7 @@ const SamlConfig = (props) => {
         const data = await getSAMLConfig(name)
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if(data === "empty") setPopupState({show:true,variant:VARIANT.WARNING,content: failMsg + "No such configuration exists"});
+        if(data === "empty") setMsg(MSG.CUSTOM(failMsg + "No such configuration exists",VARIANT.WARNING));
         else {
             setUrl(data.url);
             setIdp(data.idp);
