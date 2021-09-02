@@ -1,5 +1,5 @@
 import React, { Fragment , useState, useEffect} from 'react';
-import {ScrollBar,ModalContainer, Messages as MSG} from '../../global';
+import {ScrollBar,ModalContainer, Messages as MSG, setMsg} from '../../global';
 import { useSelector, useDispatch} from 'react-redux';
 import {getModules,populateScenarios}  from '../api'
 import * as actionTypes from '../state/action';
@@ -90,12 +90,7 @@ const ModuleListDropEnE = (props) =>{
     }
     const displayError = (error) =>{
         setBlockui({show:false})
-        props.setPopup({
-          variant:error.VARIANT,
-          content:error.CONTENT,
-          submitText:'Ok',
-          show:true
-        })
+        setMsg(error)
     }
     const clickAdd = () =>{
         if(Object.keys(selectedSc).length<1)return;
@@ -165,7 +160,6 @@ const Footer = (props) => (
 )
 ModuleListDropEnE.propTypes={
     setBlockui:PropTypes.func.isRequired,
-    setPopup:PropTypes.func.isRequired,
     filterSc:PropTypes.string.isRequired,
     setModName: PropTypes.func.isRequired
 }

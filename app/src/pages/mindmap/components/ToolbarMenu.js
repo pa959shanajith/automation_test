@@ -4,7 +4,7 @@ import {getModules,getScreens} from '../api';
 import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
-import {Messages as MSG, VARIANT} from '../../global';
+import {Messages as MSG, setMsg} from '../../global';
 import PropTypes from 'prop-types'
 
 
@@ -12,7 +12,7 @@ import PropTypes from 'prop-types'
   use: renders tool bar menus of create new page
 */
 
-const Toolbarmenu = ({setPopup,setBlockui,displayError}) => {
+const Toolbarmenu = ({setBlockui,displayError}) => {
     const dispatch = useDispatch()
     const SearchInp = useRef()
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
@@ -53,15 +53,10 @@ const Toolbarmenu = ({setPopup,setBlockui,displayError}) => {
     }
     const clickCopyNodes = () =>{
         if (d3.select('#pasteImg').classed('active-map')) {
-            setPopup({
-                variant:MSG.MINDMAP.ERR_PASTEMAP_ACTIVE_COPY.VARIANT,
-                content: MSG.MINDMAP.ERR_PASTEMAP_ACTIVE_COPY.CONTENT,
-                submitText:'Ok',
-                show:true
-            })
+            setMsg(MSG.MINDMAP.ERR_PASTEMAP_ACTIVE_COPY)
             return;
         }
-        var val = copy({...selectNodes},setPopup,copyNodes)
+        var val = copy({...selectNodes},copyNodes)
         if(val){
             d3.select('#copyImg').classed('active-map',true)
             dispatch({type:actionTypes.UPDATE_COPYNODES,payload:selectNodes})
@@ -78,16 +73,11 @@ const Toolbarmenu = ({setPopup,setBlockui,displayError}) => {
             return;
         }
         if (!d3.select('#copyImg').classed('active-map')){
-            setPopup({
-                variant: MSG.MINDMAP.WARN_COPY_STEP_FIRST.VARIANT,
-                content: MSG.MINDMAP.WARN_COPY_STEP_FIRST.CONTENT,
-                submitText:'Ok',
-                show:true
-            })
+            setMsg(MSG.MINDMAP.WARN_COPY_STEP_FIRST)
             return;
         }
         d3.select('#copyImg').classed('active-map',false)
-        paste({...copyNodes},setPopup)
+        paste({...copyNodes})
     }
     var projectList = Object.entries(prjList)
     return(
@@ -113,16 +103,11 @@ const Toolbarmenu = ({setPopup,setBlockui,displayError}) => {
 }
 
 //check for paste errors and paste action
-const paste = (copyNodes,setPopup) =>{
+const paste = (copyNodes) =>{
     var dNodes_c = copyNodes.nodes
     var module_check_flag = false
     if(dNodes_c.length === 0){
-        setPopup({
-            variant:MSG.MINDMAP.ERR_NOTHING_PASTE.VARIANT,
-            content: MSG.MINDMAP.ERR_NOTHING_PASTE.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(MSG.MINDMAP.ERR_NOTHING_PASTE)
         return false;
     }
     d3.select('#pasteImg').classed('active-map',true)
@@ -138,7 +123,7 @@ const paste = (copyNodes,setPopup) =>{
 }
 
 //check for dangling errors and and copy action
-const copy = (selectNodes,setPopup,copyNodes) =>{
+const copy = (selectNodes,copyNodes) =>{
     var dNodes_c = selectNodes.nodes
     var dLinks_c = selectNodes.links
     var dangling_screen_check_flag = false
@@ -147,20 +132,10 @@ const copy = (selectNodes,setPopup,copyNodes) =>{
     var ds_list = [];
     if(dNodes_c.length === 0){
         if(copyNodes.nodes.length>0){
-            setPopup({
-                variant:MSG.MINDMAP.WARN_CLICK_PASTEMAP.VARIANT,
-                content:MSG.MINDMAP.WARN_CLICK_PASTEMAP.CONTENT,
-                submitText:'Ok',
-                show:true
-            })
+            setMsg(MSG.MINDMAP.WARN_CLICK_PASTEMAP)
             return false
         }
-        setPopup({
-            variant:MSG.MINDMAP.ERR_NOTHING_COPY.VARIANT,
-            content:MSG.MINDMAP.ERR_NOTHING_COPY.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(MSG.MINDMAP.ERR_NOTHING_COPY)
         return false;
     }
     dangling_screen_check_flag = dNodes_c.some(e => e.type === 'scenarios'); // then check for dangling screen
@@ -180,27 +155,16 @@ const copy = (selectNodes,setPopup,copyNodes) =>{
         })
     }
     if (dangling_screen_flag) {
-        setPopup({
-            variant:MSG.MINDMAP.ERR_DANGLING_SCREEN.VARIANT,
-            content: MSG.MINDMAP.ERR_DANGLING_SCREEN.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(MSG.MINDMAP.ERR_DANGLING_SCREEN)
         ds_list.forEach((e) =>{
             d3.select('#node_' + e.id).classed('node-error',true);
         });
         return false;
     }
-    setPopup({
-        variant: MSG.MINDMAP.SUCC_DATA_COPIED.VARIANT,
-        content: MSG.MINDMAP.SUCC_DATA_COPIED.CONTENT,
-        submitText:'Ok',
-        show:true
-    })
+    setMsg(MSG.MINDMAP.SUCC_DATA_COPIED)
     return true;
 }
 Toolbarmenu.propTypes={
-    setPopup:PropTypes.func,
     setBlockui:PropTypes.func,
     displayError:PropTypes.func
 }

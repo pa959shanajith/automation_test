@@ -152,7 +152,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
                     response['status'] = "pass";
                     response["message"] = "Execution Started on " + targetICE;
-                    response['variant'] = "SUCCESS"
+                    response['variant'] = "success"
                 } else {
                     //get pool in which the target ICE present
                     let pool = this.queue_list[this.ice_list[targetICE]["poolid"]];
@@ -164,10 +164,10 @@ module.exports.Execution_Queue = class Execution_Queue {
                     response['status'] = "pass";
                     if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && this.ice_list[targetICE]["status"]) {
                         response["message"] = "ICE busy, queuing execution" + "\nExecution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
-                        response['variant'] = "WARNING";
+                        response['variant'] = "info";
                     } else {
                         response["message"] = "Execution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
-                        response['variant'] = "SUCCESS";
+                        response['variant'] = "success";
                     }    
                 }
 
@@ -179,7 +179,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 response['status'] = "pass";
                 logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on any availble ICE");
                 response["message"] = "Execution queued on pool: " + pool["name"] + "\nQueue Length: " + pool["execution_list"].length.toString();
-                response['variant'] = "SUCCESS";
+                response['variant'] = "success";
             } else {
                 //check if target ice is connected but not preset in any pool, execute directly if true
                 if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
@@ -187,13 +187,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                     if ((!sockmode.normal && !sockmode.schedule)) {
                         response["status"] = "pass";
                         response["message"] = "Can't establish connection with ICE: " + targetICE + " Re-Connect to server!";
-                        response['variant'] = "ERROR";
+                        response['variant'] = "error";
                         return response;
                     }
                     if (this.ice_list[targetICE]['status']) {
                         response["status"] = "pass";
                         response["message"] = "Execution or Termination already in progress on ICE: " + targetICE;
-                        response['variant'] = "WARNING";
+                        response['variant'] = "info";
                         if (type && type == "SCHEDULE"){
                             scheduler.updateScheduleStatus(batchExecutionData.scheduleId,'Skipped')
                         }
@@ -206,26 +206,26 @@ module.exports.Execution_Queue = class Execution_Queue {
                             this.executionInvoker.executeScheduleTestSuite(batchExecutionData, execIds, userInfo, type);
                         }
                         response["message"] = "Execution Started on " + targetICE;
-                        response['variant'] = "SUCCESS";
+                        response['variant'] = "success";
                     } else if (this.ice_list[targetICE]["mode"] && userInfo.userid != userInfo.invokinguser) {
-                        response['variant'] = "WARNING";
+                        response['variant'] = "info";
                         response["message"] = "ICE: " + targetICE + " is on DND mode, please disable from DND to proceed.";
                     }
                     response['status'] = "pass";
                 } else if (targetICE && targetICE != EMPTYUSER) {
                     //the target ice is neither part of a pool nor is connected to server, queuing not possible
                     response['status'] = "pass";
-                    response['variant'] = "ERROR";
+                    response['variant'] = "error";
                     response["message"] = targetICE + " not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."
                 } else {
                     response['status'] = "pass";
                     response["message"] = "ICE not selected."
-                    response['variant'] = "WARNING";
+                    response['variant'] = "info";
                 }
             }
         } catch (e) {
             response["error"] = "Error while adding test suite to queue";
-            response['variant'] = "ERROR";
+            response['variant'] = "error";
             logger.error("Error in addTestSuiteToQueue. Error: %s", e);
         }
 

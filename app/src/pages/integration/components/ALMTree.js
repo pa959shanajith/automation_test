@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { qcFolderDetails_ICE } from '../api.js';
-import { updateScrollBar, Messages as MSG } from '../../global';
+import { updateScrollBar, Messages as MSG, setMsg } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
 
@@ -28,9 +28,9 @@ const FolderNode = props => {
 
             const data = await qcFolderDetails_ICE(props.projectName, path, props.releaseName, props.type, testCaseName, folderId);
             if (data.error){
-                dispatch({type: actionTypes.SHOW_POPUP, payload: data.error});
+                setMsg(data.error);
             } else if (typeof(data) !== "object") {
-                dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_GETTING_LIST});
+                setMsg(MSG.INTEGRATION.ERR_GETTING_LIST);
             } else if (props.type === "folder") {
                 setSubFolders(data[0].testfolder);
                 setSubTestSets(data[0].TestSet);
@@ -54,6 +54,7 @@ const FolderNode = props => {
                         ? `static/imgs/ic-qc${collapse ? "Expand" : "Collapse"}.png` 
                         : `static/imgs/ic-taskType-blue-${collapse ? "plus" : "minus"}.png` }
                 onClick={handleClick}
+                title={`${collapse ? "Expand" : "Collapse"}`}
             />
             <label>{ props.type === "folder" ? props.folderObject.foldername : props.testSetObject.testset}</label>
         </div> }
@@ -151,7 +152,7 @@ const TestCaseNode = props => {
 			popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
         }
 
-        if (popupMsg) dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});
+        if (popupMsg) setMsg(popupMsg);
         else{
             const mappedPair=[
                 {
@@ -183,8 +184,8 @@ const TestCaseNode = props => {
                 </label>
                 { selectedTC.includes(uniqueTCpath)
                         && <><div className="test__syncBtns"> 
-                        { !syncedTestCases.includes(props.testCaseName) && <img className="test__syncBtn" alt="s-ic" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
-                        <img className="test__syncBtn" alt="s-ic" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
+                        { !syncedTestCases.includes(props.testCaseName) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
+                        <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
                         </div></> 
                     }
             </div>

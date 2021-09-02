@@ -1,6 +1,6 @@
 import React ,  { useEffect, useState } from 'react';
 import {getAvailablePlugins , getDomains_ICE, getDetails_ICE} from '../api';
-import {ScreenOverlay, ModalContainer, ScrollBar, Messages, ValidationExpression} from '../../global' 
+import {ScreenOverlay, ModalContainer, ScrollBar, Messages, ValidationExpression, setMsg} from '../../global' 
 import ProjectButtons from '../components/ProjectButtons';
 import ReleaseCycle from '../components/ReleaseCycle';
 import '../styles/Project.scss';
@@ -45,13 +45,11 @@ const ProjectNew = (props) => {
     const [activeRelease,setActiveRelease] = useState(undefined)
     const [domainSelectErrorBorder,setDomainSelectErrorBorder] = useState(false)
     const [projectSelectErrorBorder,setProjectSelectErrorBorder] = useState(false)
-    // const [editReleaseID,setEditReleaseId] = useState("")
     const [oldCyclename,setOldCyclename] = useState("")
     const [showEditNameModalCycle,setShowEditNameModalCycle] = useState("")
     const [showProjectEditModal,setShowProjectEditModal] = useState(false)
     const [editProjectName,setEditProjectName] = useState(false)
     const [loading,setLoading] = useState(false)
-    const setPopupState=props.setPopupState
 
     useEffect(()=>{
         getDomains("Create Project");
@@ -67,12 +65,7 @@ const ProjectNew = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     const getDomains = (screen) => {
@@ -801,7 +794,7 @@ const ProjectNew = (props) => {
                 }
 		</div>
         
-        <ProjectButtons setPopupState={setPopupState} setSelDomainOptions={setSelDomainOptions} editProjectName={editProjectName} setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
+        <ProjectButtons setSelDomainOptions={setSelDomainOptions} editProjectName={editProjectName} setProjectDetails={setProjectDetails} selDomain={selDomain} resetForm={resetForm} newProjectDetails={newProjectDetails} projectDetails={projectDetails} releaseList={releaseList} selProject={selProject} updateProjectDetails={updateProjectDetails} projectTypeSelected={projectTypeSelected} projectName={projectName} flag={flag} clearUpdateProjectObjects={clearUpdateProjectObjects} setProjectNameInputErrorBorder={setProjectNameInputErrorBorder} taskName={taskName} setFlag={setFlag} editProjectTab={editProjectTab} selProjectId={selProjectId} editedProjectDetails={editedProjectDetails} deletedProjectDetails={deletedProjectDetails} setDomainSelectErrorBorder={setDomainSelectErrorBorder} setProjectSelectErrorBorder={setProjectSelectErrorBorder}/>
 
         <div className="col-xs-9 form-group" style={{width: "83%"}}>
             <div className='userForm-project projectForm-project display-project' >

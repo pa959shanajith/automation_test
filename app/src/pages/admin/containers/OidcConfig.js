@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, RedirectPage, ModalContainer, ScrollBar, VARIANT, Messages as MSG} from '../../global' 
+import {ScreenOverlay, RedirectPage, ModalContainer, ScrollBar, setMsg, VARIANT, Messages as MSG} from '../../global' 
 import {getOIDCConfig, manageOIDCConfig} from '../api';
 import ValidationExpression from '../../global/components/ValidationExpression';
 import { useHistory } from 'react-router-dom';
@@ -26,7 +26,6 @@ const OidcConfig = (props) => {
     const [secretErrBorder,setSecretErrBorder] = useState(false)
     const [selBox,setSelBox] = useState([])
     const [showDeleteModal,setshowDeleteModal] = useState(false)
-    const setPopupState = props.setPopupState
 
     useEffect(()=>{
         setOidcEdit(false);
@@ -48,12 +47,7 @@ const OidcConfig = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     const onClickEditButton = async () =>{
@@ -79,7 +73,7 @@ const OidcConfig = (props) => {
 		const data = await getOIDCConfig(name);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        if(data === "empty") setPopupState({show:true,variant:VARIANT.ERROR,content:failMsg + "No such configuration exists"});
+        if(data === "empty") setMsg(MSG.CUSTOM(failMsg + "No such configuration exists",VARIANT.ERROR));
         else {
             setUrl(data.url);
             setClientId(data.clientid);
@@ -107,17 +101,17 @@ const OidcConfig = (props) => {
         } else if(data === "success") {
             if (action === "create") oidcReset();
             else onClickEditButton();
-            setPopupState({show:true,variant : VARIANT.SUCCESS,content: "Configuration '"+confObj.name+"' "+action+"d successfully!"});
+            setMsg(MSG.CUSTOM("Configuration '"+confObj.name+"' "+action+"d successfully!",VARIANT.SUCCESS));
         } else if(data === "exists") {
             setNameErrBorder(true);
-            setPopupState({show:true,variant : VARIANT.WARNING,content: "Configuration '"+confObj.name+"' already Exists!"});
+            setMsg(MSG.CUSTOM( "Configuration '"+confObj.name+"' already Exists!", VARIANT.WARNING));
         } else if(data === "fail") {
             if (action === "create") oidcReset();
             else onClickEditButton();
-            setPopupState({show:true,variant : VARIANT.ERROR,content: "Failed to "+action+" '"+confObj.name+"' configuration."});
+            setMsg(MSG.CUSTOM( "Failed to "+action+" '"+confObj.name+"' configuration.",VARIANT.ERROR));
         } else if(/^1[0-3]{4}$/.test(data)) {
             if (JSON.parse(JSON.stringify(data)[1])) {
-                setPopupState({show:true,variant : VARIANT.ERROR,content: failMsg+" Invalid Request!"});
+                setMsg(MSG.CUSTOM(failMsg+" Invalid Request!",VARIANT.ERROR));
                 return;
             }
             let errHints = "<br/>";
@@ -126,7 +120,7 @@ const OidcConfig = (props) => {
             if (JSON.parse(JSON.stringify(data)[3]) === 2) errHints += "Issuer must start with http:// or https://<br/>";
             if (JSON.parse(JSON.stringify(data)[4])) setClientIdErrBorder(true);
             if (JSON.parse(JSON.stringify(data)[5])) setSecretErrBorder(true);
-            setPopupState({show:true,variant : VARIANT.WARNING,content: "Some values are Invalid!" + errHints});
+            setMsg(MSG.CUSTOM("Some values are Invalid!" + errHints,VARIANT.WARNING));
         }
     }
 

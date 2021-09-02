@@ -22,13 +22,13 @@ exports.getAccessibilityTestingData_ICE = async function(req, res) {
 				result = await utils.fetchData(inputs, "reports/getAccessibilityTestingData_ICE", fnName);
 				break;
 			default:
-				res.send('fail');
+				return res.send('fail');
 		}
-		if (result == "fail") res.status(500).send("fail");
-		else res.send(result)
+		if (result == "fail") return res.status(500).send("fail");
+		else return res.send(result)
 	} catch(e){
 		logger.error(e.message);
-		res.status(500).send("fail");
+		return res.status(500).send("fail");
 	}
 };
 

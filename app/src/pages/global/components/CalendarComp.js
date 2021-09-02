@@ -44,6 +44,7 @@ const CalendarComp = (props) => {
 		placeholder: "Select Date",
 		readOnly:"readonly" ,
         className:"fc-datePicker",
+        title:"Select Date",
         disabled:disabled
     };
     const openDate = ()=> {

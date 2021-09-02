@@ -75,19 +75,19 @@ const ScDetailPanel = ({scDetails,setBlockui,displayError,selectedScDetails}) =>
                     {(arr.length>0)?
                         arr.map((e,i)=>   
                         <div key={e.reportid} className='rp__row cont-body'>
-                            <div className='rp__col'>{e.testscenarioname}</div>
+                            <div className='rp__col' title={e.testscenarioname}>{e.testscenarioname}</div>
                             <div className='rp__col browser'>
                                 {e.browser.toLowerCase() in imgs?
-                                <img src={"static/imgs/"+imgs[e.browser.toLowerCase()]} alt={e.browser}/>:
+                                <img src={"static/imgs/"+imgs[e.browser.toLowerCase()]} alt={e.browser} title={e.browser}/>:
                                 <div style={{lineHeight:0.3,fontSize:'50px'}}>-</div>
                                 }
                             </div>
                             <div data-test="executed_time" className='rp__col'>{formatDate(e.executedtime)}</div>
                             <div className={'rp__col status '+e.status.toLowerCase()}>{e.status}</div>
                             <div className='rp__col export' scname={e.testscenarioname}>
-                                <img type={'pdf'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-pdf.png"} alt={e.browser}/>
-                                <img type={'html'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-web.png"} alt={e.browser}/>
-                                <img type={'json'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-export-to-json.png"} alt={e.browser}/>
+                                <img type={'pdf'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-pdf.png"} alt={e.browser} title={"PDF Report"}/>
+                                <img type={'html'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-web.png"} alt={e.browser} title={"Browser Report"}/>
+                                <img type={'json'} value={e.reportid} onClick={getReport} src={"static/imgs/ic-export-to-json.png"} alt={e.browser} title={"Export to Json"}/>
                             </div>
                         </div>
                         )

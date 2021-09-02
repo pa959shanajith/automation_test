@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { validateData } from './DtUtils';
-import { ModalContainer, Messages as MSG } from '../../global';
+import { ModalContainer, Messages as MSG, setMsg } from '../../global';
 import { exportDataTable } from '../api';
 import "../styles/DataTablePopup.scss";
 
@@ -22,11 +22,11 @@ const ExportDataTable = props => {
             const resp = await exportDataTable({ tableName: props.tableName, filename: filename.trim(), exportFormat: filetype })
             props.setOverlay("");
 
-            if(resp.error) props.setShowPop(resp.error);
+            if(resp.error) setMsg(resp.error);
             else {
                 let [extn, type] = getExtAndType(filetype);
                 downloadFile(resp, filename.trim(), extn, type);
-                props.setShowPop(MSG.UTILITY.SUCC_EXPORT_FILE);
+                setMsg(MSG.UTILITY.SUCC_EXPORT_FILE);
                 props.setShowExportPopup(false);
             }
         }

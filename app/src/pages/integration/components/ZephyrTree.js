@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import { updateScrollBar, Messages as MSG } from '../../global';
+import { updateScrollBar, Messages as MSG, setMsg } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import { RedirectPage } from '../../global';
 import * as actionTypes from '../state/action';
@@ -21,6 +21,7 @@ const CycleNode = props => {
                     className="test_tree_toggle" 
                     src={ `static/imgs/ic-qc${collapse ? "Expand" : "Collapse"}.png` }
                     onClick={handleClick}
+                    title={`${collapse ? "Expand" : "Collapse"}`}
                 />
                 <label>{ props.cycleName }</label>
             </div> }
@@ -56,11 +57,11 @@ const PhaseNode = props => {
             const data = await api.zephyrTestcaseDetails_ICE("testcase", phaseid);
             
             if (data.error)
-                dispatch({type: actionTypes.SHOW_POPUP, payload: data.error});
+                setMsg(data.error);
             else if (data === "unavailableLocalServer")
-                dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_UNAVAILABLE_ICE});
+                setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
             else if (data === "scheduleModeOn")
-                dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.GENERIC.WARN_UNCHECK_SCHEDULE});
+                setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
             else if (data === "Invalid Session"){
                 dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
                 return RedirectPage(history);
@@ -83,6 +84,7 @@ const PhaseNode = props => {
                         className="test_tree_toggle" 
                         src={ `static/imgs/ic-taskType-blue-${collapse ? "plus" : "minus"}.png` }
                         onClick={handleClick}
+                        title={`${collapse ? "Expand" : "Collapse"}`}
                     />
                     <label>{ phasename }</label>
                 </div> }
@@ -122,7 +124,7 @@ const TestCaseNode = props => {
         if(selectedScIds.length===0){
             popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
         }
-        if (popupMsg) dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});
+        if (popupMsg) setMsg(popupMsg);
         else{
             const mappedPair=[
                 {
@@ -154,8 +156,8 @@ const TestCaseNode = props => {
                 </label>
                 { selectedTC.includes(uniqueTCpath)
                         && <><div className="test__syncBtns"> 
-                        { !syncedTestCases.includes(uniqueTCpath) && <img className="test__syncBtn" alt="s-ic" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
-                        <img className="test__syncBtn" alt="s-ic" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
+                        { !syncedTestCases.includes(uniqueTCpath) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
+                        <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
                         </div></> 
                     }
             </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {ScreenOverlay, PopupMsg, ScrollBar, Messages, VARIANT} from '../../global';
+import {ScreenOverlay, PopupMsg, ScrollBar, Messages, VARIANT, setMsg} from '../../global';
 import { useSelector } from 'react-redux';
 import {manageSessionData, fetchLockedUsers, unlockUser} from '../api';
 import '../styles/SessionManagement.scss'
@@ -12,7 +12,6 @@ import '../styles/SessionManagement.scss'
 const SessionManagement = (props) => {
     const dateFormat = useSelector(state=>state.login.dateformat);
     const [loading,setLoading] = useState(false)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const [sessions,setSessions] = useState([])
     const [clients,setClients] = useState([])
     const [showSessions,setShowSessions] = useState(true)
@@ -27,12 +26,7 @@ const SessionManagement = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     const refreshSessMgmt = async () =>{
@@ -54,10 +48,6 @@ const SessionManagement = (props) => {
         setLockedusers(data);
 	}
 
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
-    }
-
     const unlock = async (event) =>{
         var id = parseInt(event.target.dataset.id);
 		var msg, obj;
@@ -67,7 +57,7 @@ const SessionManagement = (props) => {
 		setLoading(msg+user+"...");
 		const data = await unlockUser(user);
 		if(data.error){displayError(data.error);return;}
-        setPopupState({show:true,variant:VARIANT.SUCCESS,content:msg+"successful!"});
+        setMsg(Messages.CUSTOM(msg+"successful!",VARIANT.SUCCESS));
         let lockedusersData = lockedusers;
         lockedusersData.splice(id,1);
         setLockedusers(lockedusersData);
@@ -98,7 +88,7 @@ const SessionManagement = (props) => {
         const data = await manageSessionData(action,user,key,"session");
         if(data.error){displayError(data.error);return;}
         if (data === "fail") {
-            setPopupState({show:true,variant:VARIANT.ERROR,content:msg+"failed!"});
+            setMsg(Messages.CUSTOM(msg+"failed!",VARIANT.ERROR));
         } else {
             rootObj.splice(id,1);
             if(temp === 1) setSessions(rootObj);
@@ -142,7 +132,6 @@ const SessionManagement = (props) => {
 
     return (
         <div className="sess-mgmt_container">
-            {popupState.show?<PopupMsg variant={popupState.variant} content={popupState.content} title={popupState.title} close={closePopup} />:null}
             {loading?<ScreenOverlay content={loading}/>:null}
             
             <div id="page-taskName"><span>Session Management</span></div>

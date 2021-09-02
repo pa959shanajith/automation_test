@@ -4,7 +4,7 @@ import DesignContent from './DesignContent';
 import { UpperContent, BottomContent } from "../components/ActionBarItems";
 import DependentTestCaseDialog from '../components/DependentTestCaseDialog';
 import { ReferenceContent } from "../components/RefBarItems";
-import { Header, FooterTwo as Footer, ActionBar, ScreenOverlay, PopupMsg, ModalContainer } from '../../global';
+import { Header, FooterTwo as Footer, ActionBar, ScreenOverlay, ModalContainer } from '../../global';
 import "../styles/DesignHome.scss";
 
 /*
@@ -21,7 +21,6 @@ const DesignHome = () => {
     const [isMac, setIsMac] = useState(false);
     const [loading, setLoading] = useState(true);
     const [overlay, setOverlay] = useState("");
-    const [showPop, setShowPop] = useState("");
     const [mirror, setMirror] = useState(null);
     const [disableActionBar, setDisableActionBar ] = useState(false);
     const [imported, setImported] = useState(false);
@@ -35,17 +34,6 @@ const DesignHome = () => {
         setLoading(false);
         setImported(false);
     }, [current_task, filter_data]);
-
-    const PopupDialog = () => (
-        <PopupMsg 
-            data-test="d__popup"
-            variant={showPop.VARIANT || showPop.variant}
-            close={()=>setShowPop("")}
-            content={showPop.CONTENT || showPop.content}
-            submitText="OK"
-            submit={showPop.onClick ? showPop.onClick : ()=>setShowPop("")}
-        />
-    );
 
     const ConfirmPopup = () => (
         <ModalContainer 
@@ -67,7 +55,6 @@ const DesignHome = () => {
         !loading &&
         <>
         { overlay && <ScreenOverlay content={overlay} />}
-        { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
         { showDpndntTcDlg && <DependentTestCaseDialog 
                                 scenarioId = {current_task.scenarioId}
@@ -77,7 +64,6 @@ const DesignHome = () => {
                                 setDTcFlag={setDTcFlag}
                                 taskName={current_task.testCaseName}
                                 taskId={current_task.testCaseId}
-                                setShowPop={setShowPop}
                                 />
         }
         <div className="d__body">
@@ -95,13 +81,11 @@ const DesignHome = () => {
                                     checkedTc={checkedTc} 
                                     isMac={isMac}
                                     disable={disableActionBar} 
-                                    setOverlay={setOverlay} 
-                                    setShowPop={setShowPop}
+                                    setOverlay={setOverlay}
                                 />
                             } 
                             bottomContent={
                                 <BottomContent 
-                                    setShowPop={setShowPop} 
                                     disable={disableActionBar}
                                     setImported={setImported} 
                                     setOverlay={setOverlay}
@@ -113,8 +97,7 @@ const DesignHome = () => {
                                 current_task={current_task} 
                                 imported={imported} 
                                 setImported={setImported} 
-                                setMirror={setMirror} 
-                                setShowPop={setShowPop} 
+                                setMirror={setMirror}
                                 setShowConfirmPop={setShowConfirmPop}
                                 setDisableActionBar={setDisableActionBar}
                                 />

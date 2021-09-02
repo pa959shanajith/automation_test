@@ -74,7 +74,8 @@ const ScrapeObject = props => {
                             + (!props.object.objId ? " ss__newObj" : "" ))
                             + (props.object.isCustom ? " ss__customObject": "")
                             + (props.comparedObject ? " ss__comparedObject": "")
-                        } 
+                        }
+                        title={objName}
                         onDoubleClick={!props.notEditable ? ()=>setEdit(true) : null}
                     >
                         {objName}

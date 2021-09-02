@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScreenOverlay, RedirectPage, ScrollBar, ModalContainer, VARIANT, Messages as MSG } from '../../global'
+import { ScreenOverlay, RedirectPage, ScrollBar, ModalContainer, VARIANT, Messages as MSG, setMsg } from '../../global'
 import { getObjNameList, getKeywordList } from '../components/UtilFunctions';
 import TableRow from '../components/TableRow';
 import DetailsDialog from '../components/DetailsDialog';
@@ -24,7 +24,6 @@ import "../styles/DesignContent.scss";
         imported -> imported flag / changes everytime a testcase is imported
         setImported -> Changes "imported" state
         setMirror -> Changes "mirror" state
-        setShowPop -> Show/Hide MsgPopup,  arguments used - {title:'',content:''}/false
         setShowConfirmPop -> Show/Hide Confirmation Popup,  arguments used - {title:'',content:'',footer:''}/false
         setDisableActionBar -> Manages Disabling/Enabling of ActionBar
 */
@@ -110,9 +109,9 @@ const DesignContent = props => {
             fetchTestCases()
             .then(data=>{
                 if (data==="success") 
-                    props.setShowPop(MSG.DESIGN.SUCC_TC_IMPORT);
+                    setMsg(MSG.DESIGN.SUCC_TC_IMPORT);
                 else 
-                props.setShowPop(MSG.DESIGN.WARN_DELETED_TC_FOUND);
+                setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
                 props.setImported(false)
                 setStepSelect({edit: false, check: [], highlight: []});
                 setChanged(false);
@@ -128,7 +127,7 @@ const DesignContent = props => {
             fetchTestCases()
             .then(data=>{
                 data !== "success" &&
-                props.setShowPop(MSG.DESIGN.WARN_DELETED_TC_FOUND);
+                setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
                 setEdit(false);
                 setStepSelect({edit: false, check: [], highlight: []});
                 headerCheckRef.current.indeterminate = false;
@@ -220,7 +219,7 @@ const DesignContent = props => {
                                 setKeywordList(null);
                                 setObjNameList(null);
                                 console.error("Error getObjectType method! \r\n ", error);
-                                props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
+                                setMsg(MSG.DESIGN.ERR_FETCH_TC);
                                 reject("fail");
                             });
                     })
@@ -230,7 +229,7 @@ const DesignContent = props => {
                         setTestScriptData(null);
                         setKeywordList(null);
                         setObjNameList(null);
-                        props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
+                        setMsg(MSG.DESIGN.ERR_FETCH_TC);
                         console.error("Error getObjectType method! \r\n " + (error));
                         reject("fail");
                     });
@@ -241,7 +240,7 @@ const DesignContent = props => {
                 setTestScriptData(null);
                 setKeywordList(null);
                 setObjNameList(null);
-                props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
+                setMsg(MSG.DESIGN.ERR_FETCH_TC);
                 console.error("Error getTestScriptData method! \r\n " + (error));
                 reject("fail");
             });
@@ -269,7 +268,7 @@ const DesignContent = props => {
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
                         let col = "Object Name";
                         if (!testCases[i].keywordVal) col = "keyword";
-                        props.setShowPop({'VARIANT': VARIANT.WARNING, 'CONTENT': `Please select ${col} Name at Step No. ${step}`});
+                        setMsg(MSG.CUSTOM(`Please select ${col} Name at Step No. ${step}`,VARIANT.WARNING));
                         errorFlag = true;
                         break;
                     } else {
@@ -336,22 +335,22 @@ const DesignContent = props => {
                                             .then(msg=>{
                                                 setChanged(false);
                                                 msg === "success"
-                                                ? props.setShowPop(MSG.DESIGN.SUCC_TC_SAVE)
-                                                : props.setShowPop(MSG.DESIGN.WARN_DELETED_TC_FOUND)
+                                                ? setMsg(MSG.DESIGN.SUCC_TC_SAVE)
+                                                : setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND)
                                             })
                                             .catch(error => {
-                                                props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
+                                                setMsg(MSG.DESIGN.ERR_FETCH_TC);
                                                 console.error("Error: Fetch TestCase Failed ::::", error)
                                             });
-                                        } else props.setShowPop(MSG.DESIGN.ERR_SAVE_TC);
+                                        } else setMsg(MSG.DESIGN.ERR_SAVE_TC);
                                     })
                                     .catch(error => {
-                                        props.setShowPop(MSG.DESIGN.ERR_SAVE_TC);
+                                        setMsg(MSG.DESIGN.ERR_SAVE_TC);
                                         console.error("Error::::", error)
                                     })
                                 })
                                 .catch(error=> {
-                                    props.setShowPop(MSG.DESIGN.ERR_SAVE_TC);
+                                    setMsg(MSG.DESIGN.ERR_SAVE_TC);
                                     console.error("Error:::::", error)
                                 });
                             }
@@ -360,23 +359,23 @@ const DesignContent = props => {
                                 .then(data=>{
                                     setChanged(false);
                                     data === "success" 
-                                    ? props.setShowPop(MSG.DESIGN.SUCC_TC_SAVE) 
-                                    : props.setShowPop(MSG.DESIGN.WARN_DELETED_TC_FOUND);
+                                    ? setMsg(MSG.DESIGN.SUCC_TC_SAVE) 
+                                    : setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
                                 })
                                 .catch(error=>{
-                                    props.setShowPop(MSG.DESIGN.ERR_FETCH_TC);
+                                    setMsg(MSG.DESIGN.ERR_FETCH_TC);
                                     console.error("Error: Fetch TestCase Failed ::::", error)
                                 });
                             }
-                        } else props.setShowPop(MSG.DESIGN.ERR_SAVE_TC);
+                        } else setMsg(MSG.DESIGN.ERR_SAVE_TC);
                     })
                     .catch(error => { 
-                        props.setShowPop(MSG.DESIGN.ERR_SAVE_TC);
+                        setMsg(MSG.DESIGN.ERR_SAVE_TC);
                         console.error("Error::::", error);
                     });
                     errorFlag = false;
                 }
-            } else props.setShowPop(MSG.DESIGN.ERR_UNDEFINED_SID_TID);
+            } else setMsg(MSG.DESIGN.ERR_UNDEFINED_SID_TID);
         }
         setStepSelect({edit: false, check: [], highlight: []});
         headerCheckRef.current.indeterminate = false;
@@ -436,13 +435,13 @@ const DesignContent = props => {
 
         reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
         .then(result => {
-            if (result === "fail") props.setShowPop(MSG.GENERIC.WARN_NO_REVIEWER);
-            else if (taskstatus === 'reassign') props.setShowPop({'VARIANT': VARIANT.SUCCESS, 'CONTENT': "Task Reassigned successfully!", onClick: ()=>redirectToPlugin()});
-            else if (taskstatus === 'underReview') props.setShowPop({'VARIANT': VARIANT.SUCCESS, 'content': "Task Approved successfully!", onClick: ()=>redirectToPlugin()});
-            else props.setShowPop({'VARIANT': VARIANT.SUCCESS, 'content': "Task Submitted successfully!", onClick: ()=>redirectToPlugin()});
+            if (result === "fail") setMsg(MSG.GENERIC.WARN_NO_REVIEWER);
+            else if (taskstatus === 'reassign') {setMsg(MSG.DESIGN.SUCC_TASK_REASSIGN); redirectToPlugin();}
+            else if (taskstatus === 'underReview'){ setMsg(MSG.DESIGN.SUCC_TASK_APPROVED);redirectToPlugin();}
+            else {setMsg(MSG.DESIGN.SUCC_TASK_SUBMIT); redirectToPlugin()}
         })
         .catch(error => {
-            props.setShowPop(MSG.DESIGN.ERR_SUBMIT_TASK);
+            setMsg(MSG.DESIGN.ERR_SUBMIT_TASK);
             console.error(error)
         })
         
@@ -451,8 +450,8 @@ const DesignContent = props => {
 
     const deleteTestcase = () => {
         let testCases = [...testCaseData]
-        if (testCases.length === 1 && !testCases[0].custname) props.setShowPop(MSG.DESIGN.WARN_DELETE);
-        else if (stepSelect.check.length <= 0) props.setShowPop(MSG.DESIGN.WARN_SELECT_STEP);
+        if (testCases.length === 1 && !testCases[0].custname) setMsg(MSG.DESIGN.WARN_DELETE);
+        else if (stepSelect.check.length <= 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP);
         else if (reusedTC) props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': ()=>{props.setShowConfirmPop(false);onDeleteTestStep()}});
         else props.setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
     }
@@ -525,7 +524,7 @@ const DesignContent = props => {
         let highlight = [...stepSelect.highlight]
         let focus = [];
         runClickAway = false;
-        if (check.length === 0 && highlight.length === 0) props.setShowPop(MSG.DESIGN.WARN_SELECT_STEP_DEL);
+        if (check.length === 0 && highlight.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_DEL);
         else {
             if (check.length === 1) focus = check;
             else if (highlight.length === 1 && !check.length) { focus = highlight; check = highlight }
@@ -555,13 +554,13 @@ const DesignContent = props => {
         let copyTestCases = []
         let copyContent = {}
         let copyErrorFlag = false;
-        if (selectedRows.length === 0) props.setShowPop(MSG.DESIGN.WARN_SELECT_STEP_COPY);
+        if (selectedRows.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_COPY);
         else{
             let sortedSteps = selectedRows.map(step=>parseInt(step)).sort((a,b)=>a-b)
             for (let idx of sortedSteps) {
                 if (!testCaseData[idx].custname) {
-                    if (selectedRows.length === 1) props.setShowPop(MSG.DESIGN.ERR_EMPTY_TC_COPY);
-                    else props.setShowPop(MSG.DESIGN.ERR_INVALID_OBJ_REF);
+                    if (selectedRows.length === 1) setMsg(MSG.DESIGN.ERR_EMPTY_TC_COPY);
+                    else setMsg(MSG.DESIGN.ERR_INVALID_OBJ_REF);
                     copyErrorFlag = true;
                     break
                 } 
@@ -586,7 +585,7 @@ const DesignContent = props => {
         setStepSelect(oldState => ({...oldState, highlight: []}));
 
         if (!copiedContent.testCaseId){
-            props.setShowPop(MSG.DESIGN.WARN_NO_TC_PASTE);
+            setMsg(MSG.DESIGN.WARN_NO_TC_PASTE);
             return;
         }
 
@@ -599,7 +598,7 @@ const DesignContent = props => {
                 }
             }
             if (copiedContent.appType !== props.current_task.appType && appTypeFlag) {
-                props.setShowPop(MSG.DESIGN.WARN_DIFF_PROJTYPE);
+                setMsg(MSG.DESIGN.WARN_DIFF_PROJTYPE);
             }
             else{
                 setShowConfPaste(true);
@@ -663,9 +662,9 @@ const DesignContent = props => {
         let highlighted = [...stepSelect.highlight];
         let testCases = [ ...testCaseData ]
         runClickAway = false;
-        if (highlighted.length === 0 && selectedIndexes.length === 0) props.setShowPop(MSG.DESIGN.WARN_SELECT_STEP_SKIP);
-        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) props.setShowPop(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
-        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) props.setShowPop(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
+        if (highlighted.length === 0 && selectedIndexes.length === 0) setMsg(MSG.DESIGN.WARN_SELECT_STEP_SKIP);
+        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) setMsg(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
+        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) setMsg(MSG.DESIGN.WARN_EMP_STEP_COMMENT);
         else{
             let toComment = [...new Set([...highlighted, ...selectedIndexes])]; 
             for(let idx of toComment){
@@ -781,24 +780,23 @@ const DesignContent = props => {
                 </div>
 
                 <div className="d__taskBtns">
-                    <button className="d__taskBtn d__btn" data-test="d__saveBtn" onClick={saveTestCases} disabled={!changed}>Save</button>
-                    <button className="d__taskBtn d__btn" data-test="d__deleteBtn" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
+                    <button className="d__taskBtn d__btn" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} disabled={!changed}>Save</button>
+                    <button className="d__taskBtn d__btn" data-test="d__deleteBtn" title="Delete Test Step" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
                 </div>
 
                 <div className="d__submit" data-test="d__actionBtn">
                     { isUnderReview && 
                         <>
-                        <button className="d__reassignBtn d__btn" 
-                                onClick={()=>onAction("reassign")}>
+                        <button className="d__reassignBtn d__btn" title="Reassign Task" onClick={()=>onAction("reassign")}>
                             Reassign
                         </button>
-                        <button className="d__approveBtn d__btn" onClick={()=>onAction("approve")}>
+                        <button className="d__approveBtn d__btn" title="Approve Task" onClick={()=>onAction("approve")}>
                             Approve
                         </button>
                         </>
                     }
                     { !hideSubmit && !isUnderReview &&
-                        <button className="d__submitBtn d__btn" onClick={()=>onAction("submit")}>
+                        <button className="d__submitBtn d__btn" title="Submit Task" onClick={()=>onAction("submit")}>
                             Submit
                         </button>
                     }

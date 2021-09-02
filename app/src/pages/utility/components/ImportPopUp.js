@@ -1,10 +1,10 @@
 import React, { useRef, useState, Fragment, useEffect } from 'react';
-import { ModalContainer, Messages as MSG } from '../../global';
+import { ModalContainer, Messages as MSG, setMsg } from '../../global';
 import { importDataTable } from '../api';
 import { parseTableData } from './DtUtils';
 import "../styles/DataTablePopup.scss";
 
-const ImportPopUp = ({setImportPopup,setData,setHeaders,setOverlay,setShowPop}) => {
+const ImportPopUp = ({setImportPopup,setData,setHeaders,setOverlay}) => {
 
     const [submit,setSubmit] = useState(false);
 
@@ -13,7 +13,7 @@ const ImportPopUp = ({setImportPopup,setData,setHeaders,setOverlay,setShowPop}) 
         title='Import Data Table'
         content={<Container submit={submit} setSubmit={setSubmit}
         setData={setData} setHeaders={setHeaders} setImportPopup={setImportPopup} setOverlay={setOverlay} 
-        setShowPop={setShowPop}/>} 
+        />} 
         footer={
             <>
             <button onClick={()=>setSubmit(true)}>Import</button>
@@ -24,7 +24,7 @@ const ImportPopUp = ({setImportPopup,setData,setHeaders,setOverlay,setShowPop}) 
     );
 }
 
-const Container = ({submit,setSubmit,setData,setHeaders,setImportPopup,setOverlay,setShowPop}) => {
+const Container = ({submit,setSubmit,setData,setHeaders,setImportPopup,setOverlay}) => {
     const [rowTag, setRowTag] = useState("");
     const [columnTagList, setColumnTagList] = useState([]);
     const [sheetList, setSheetList] = useState([]);
@@ -41,7 +41,7 @@ const Container = ({submit,setSubmit,setData,setHeaders,setImportPopup,setOverla
     const upload = () => {
         setError('')
         setFiledUpload(undefined)
-        uploadFile({importType,uploadFileRef,setFiledUpload,setSheetList,setError,setOverlay,setShowPop})
+        uploadFile({importType,uploadFileRef,setFiledUpload,setSheetList,setError,setOverlay})
     }
     const changeImportType = (e) => {
         setImportType(e.target.value)
@@ -67,15 +67,15 @@ const Container = ({submit,setSubmit,setData,setHeaders,setImportPopup,setOverla
                 setOverlay("Importing File...");
                 const resp = await importDataTable({importFormat: importType, row: rowTag, column:columnTagList, sheetname:sheetRef.current? sheetRef.current.value: undefined,content: fileUpload, flag:"data"});
                 switch(resp){
-                    case "columnExceeds": setShowPop(MSG.UTILITY.ERR_COL_50); break;
-                    case "rowExceeds": setShowPop(MSG.UTILITY.ERR_ROW_200); break;
-                    case "emptyExcelData": setShowPop(MSG.UTILITY.ERR_EMPTY_SHEET); break;
-                    case "emptyData": setShowPop(MSG.UTILITY.ERR_EMPTY_DATA); break;
-                    case "emptyRow": setShowPop(MSG.UTILITY.ERR_EMPTY_ROWS); break;
-                    case "nestedXML": setShowPop(MSG.UTILITY.ERR_INVALID_XML); break;
-                    case "invalidcols": setShowPop(MSG.UTILITY.ERR_COL_TAGNAME); break;
+                    case "columnExceeds": setMsg(MSG.UTILITY.ERR_COL_50); break;
+                    case "rowExceeds": setMsg(MSG.UTILITY.ERR_ROW_200); break;
+                    case "emptyExcelData": setMsg(MSG.UTILITY.ERR_EMPTY_SHEET); break;
+                    case "emptyData": setMsg(MSG.UTILITY.ERR_EMPTY_DATA); break;
+                    case "emptyRow": setMsg(MSG.UTILITY.ERR_EMPTY_ROWS); break;
+                    case "nestedXML": setMsg(MSG.UTILITY.ERR_INVALID_XML); break;
+                    case "invalidcols": setMsg(MSG.UTILITY.ERR_COL_TAGNAME); break;
                     default: {
-                        if (resp.error) setShowPop(resp.error);
+                        if (resp.error) setMsg(resp.error);
                         else if (typeof resp === "object"){
                             const [, newData, newHeaders] = parseTableData(resp, "import")
                             setData(newData);
@@ -176,7 +176,7 @@ function read(file) {
     })
 }
 
-const uploadFile = async({importType,uploadFileRef,setFiledUpload,setSheetList,setError,setOverlay,setShowPop}) =>{
+const uploadFile = async({importType,uploadFileRef,setFiledUpload,setSheetList,setError,setOverlay}) =>{
     var file = uploadFileRef.current.files[0]
     if(!file)return;
     var extension = file.name.substr(file.name.lastIndexOf('.')+1)
@@ -196,7 +196,7 @@ const uploadFile = async({importType,uploadFileRef,setFiledUpload,setSheetList,s
         else {
             setFiledUpload(undefined)
             if(uploadFileRef.current)uploadFileRef.current.value = ''
-            setShowPop(MSG.UTILITY.ERR_FILE_UNSUPPORTED)
+            setMsg(MSG.UTILITY.ERR_FILE_UNSUPPORTED)
         }    
     }catch(err){
         setError("invalid File!")

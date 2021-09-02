@@ -9,7 +9,7 @@ import * as actionTypes from '../state/action';
 import CanvasNew from './CanvasNew';
 import ExportMapButton from '../components/ExportMapButton';
 import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils';
-import {ScreenOverlay, PopupMsg, ReferenceBar} from '../../global';
+import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
 
 /*Component CreateNew
@@ -18,7 +18,6 @@ import '../styles/CreateNew.scss';
     
 const CreateNew = ({importRedirect}) => {
   const dispatch = useDispatch()
-  const [popup,setPopup] = useState({show:false})
   const [blockui,setBlockui] = useState({show:false})
   const [fullScreen,setFullScreen] = useState(false)
   const [verticalLayout,setVerticalLayout] = useState(false)
@@ -63,27 +62,21 @@ const CreateNew = ({importRedirect}) => {
   const displayError = (error) =>{
     setBlockui({show:false})
     setLoading(false)
-    setPopup({
-        variant:error.VARIANT,
-        content:error.CONTENT,
-        submitText:'Ok',
-        show:true
-    })
+    setMsg(error)
   }
   
   return (
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content} />:null}
         {(!loading)?
             <div className='mp__canvas_container'>
                 <div className='mp__toolbar__container'>
-                    <Toolbarmenu setBlockui={setBlockui} setPopup={setPopup} displayError={displayError}/>
+                    <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
                 </div>
-                <ModuleListDrop setPopup={setPopup}/>
+                <ModuleListDrop />
                 <div id='mp__canvas' className='mp__canvas'>
                     {(Object.keys(moduleSelect).length>0)?
-                    <CanvasNew displayError={displayError} setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>
+                    <CanvasNew displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
                     :<Fragment>
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
@@ -93,12 +86,12 @@ const CreateNew = ({importRedirect}) => {
             </div>:null
         }
         <ReferenceBar taskInfo={info} taskTop={true} collapsible={true} collapse={true}>
-            <div className="ic_box" >
-                <img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} alt='Switch Layout' style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
+            <div className="ic_box" title="SwitchLayout" >
+                <img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setBlockui,dispatch)} alt='Switch Layout' style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
                 <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
             </div>
-            <div className="ic_box" >
-                <img onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} alt='Full Screen' className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
+            <div className="ic_box" title="Full Screen" >
+                <img onClick={()=>ClickFullScreen(setFullScreen)} style={{height: '55px'}} alt='Full Screen' className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
                 <span className="rb_box_title">Full Screen</span>
             </div>
         </ReferenceBar>

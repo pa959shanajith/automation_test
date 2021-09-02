@@ -1,5 +1,5 @@
 import React, {useState, useEffect } from 'react';
-import {ScreenOverlay, ScrollBar, IntegrationDropDown, Messages as MSG, VARIANT} from '../../global' 
+import {ScreenOverlay, ScrollBar, IntegrationDropDown, Messages as MSG, VARIANT, setMsg} from '../../global' 
 import { useSelector } from 'react-redux';
 import {getScheduledDetails_ICE, testSuitesScheduler_ICE, cancelScheduledJob_ICE} from '../api';
 import "../styles/ScheduleContent.scss";
@@ -7,7 +7,7 @@ import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import Pagination from '../components/Pagination';
 
-const ScheduleContent = ({setPopupState, smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
+const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
 
     const nulluser = "5fc137cc72142998e29b5e63";
     const filter_data = useSelector(state=>state.plugin.FD)
@@ -79,12 +79,7 @@ const ScheduleContent = ({setPopupState, smartMode, execEnv, setExecEnv, syncSce
     
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     const onChangePage = (newPageOfItems) => {
@@ -109,7 +104,7 @@ const ScheduleContent = ({setPopupState, smartMode, execEnv, setExecEnv, syncSce
 
     const ScheduleTestSuitePopup = () => {
         setClosePopups(true);
-        const check = SelectBrowserCheck(appType,browserTypeExe,setPopupState,execAction,displayError);
+        const check = SelectBrowserCheck(appType,browserTypeExe,execAction,displayError);
         const valid = checkSelectedModules(scheduleTableData, displayError);
         const checkDateTime = checkDateTimeValues(scheduleTableData, moduleScheduledate, setModuleScheduledate, displayError);
         if(check && valid && checkDateTime) setAllocateICE(true);
@@ -136,9 +131,9 @@ const ScheduleContent = ({setPopupState, smartMode, execEnv, setExecEnv, syncSce
         if (data === "NotApproved") displayError(MSG.SCHEDULE.ERR_DEPENDENT_TASK);
         else if (data === "NoTask") displayError(MSG.SCHEDULE.ERR_CHILD_NODE);
         else if (data === "Modified") displayError(MSG.SCHEDULE.ERR_TASK_MODIFIED);
-        else if (data.status === "booked") setPopupState({show:true,variant:VARIANT.ERROR,content: "Schedule time is matching for testsuites scheduled for " + data.user});
+        else if (data.status === "booked") setMsg(MSG.CUSTOM("Schedule time is matching for testsuites scheduled for " + data.user,VARIANT.ERROR));
         else if (data === "success" || data.includes("success")) {
-            if (data.includes("Set"))  setPopupState({show:true,variant:VARIANT.SUCCESS,content: data.replace('success', '')}); 
+            if (data.includes("Set"))  setMsg(MSG.CUSTOM(data.replace('success', ''),VARIANT.SUCCESS)); 
             else displayError(MSG.SCHEDULE.SUCC_SHEDULE)
             updateDateTimeValues(scheduleTableData, setModuleScheduledate);
             getScheduledDetails();
@@ -250,8 +245,7 @@ const ScheduleContent = ({setPopupState, smartMode, execEnv, setExecEnv, syncSce
                     setshowModal={setShowIntegrationModal} 
                     type={showIntegrationModal} 
                     showIntegrationModal={showIntegrationModal} 
-                    appType={appType} 
-                    setPopupState={setPopupState} 
+                    appType={appType}
                     setCredentialsExecution={setIntegration}
                     displayError={displayError}
                     browserTypeExe={browserTypeExe}
@@ -315,7 +309,7 @@ const ScheduleContent = ({setPopupState, smartMode, execEnv, setExecEnv, syncSce
                                                         {pageOfItems.map((data,index)=>(
                                                             <div key={index} className="scheduleDataBodyRowChild">
                                                                 <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time ">{formatDate(data.scheduledatetime)}</div>
-                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" >{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" title={data.target}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
                                                                 <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                                 <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
                                                                 <div data-test = "schedule_data_browser_type" className="s__Table_appType">
@@ -326,7 +320,7 @@ const ScheduleContent = ({setPopupState, smartMode, execEnv, setExecEnv, syncSce
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
                                                                     {data.status}
                                                                     {(data.status === 'scheduled')?
-                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,setPopupState,displayError)}} title='Cancel Job'/>
+                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError)}} title='Cancel Job'/>
                                                                     :null}
                                                                 </div> 
                                                             </div>
@@ -371,7 +365,7 @@ const updateDateTimeValues = (scheduleTableData, setModuleScheduledate) => {
     setModuleScheduledate(moduleScheduledateTime);
 }
 
-const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,status,getScheduledDetails,setPopupState,displayError) => {
+const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,status,getScheduledDetails,displayError) => {
     if(cycleid===undefined) cycleid=""
     const schDetails = {
         cycleid:cycleid,
@@ -382,7 +376,7 @@ const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,sta
     const schedUserid = scheduledby;
     const data = await cancelScheduledJob_ICE(schDetails, host, JSON.stringify(schedUserid));
     if (data === "success") {
-        setPopupState({show:true,variant:VARIANT.SUCCESS,content:"Job is " + status + "."});
+        setMsg(MSG.CUSTOM("Job is " + status + ".",VARIANT.SUCCESS));
         // target.innerText = status;
         getScheduledDetails();
     } else if (data === "inprogress") displayError(MSG.SCHEDULE.ERR_JOB_PROGRESS);
@@ -390,7 +384,7 @@ const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,sta
     else displayError(MSG.SCHEDULE.ERR_JOB_CANCEL);
 }
 
-const SelectBrowserCheck = (appType,browserTypeExe,setPopupState,execAction,displayError)=>{
+const SelectBrowserCheck = (appType,browserTypeExe,execAction,displayError)=>{
     if ((appType === "Web") && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_BROWSER);
     else if (appType === "Webservice" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_WEBSERVICE);
     else if (appType === "MobileApp" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_MOBILE_APP);
@@ -399,7 +393,7 @@ const SelectBrowserCheck = (appType,browserTypeExe,setPopupState,execAction,disp
     else if (appType === "OEBS" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_OEBS);
     else if (appType === "SAP" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_SAP);
     else if (appType === "MobileWeb" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_MOBILE);
-    else if (browserTypeExe.length === 0) setPopupState({show:true,title:"Schedule Test Suite",content:"Please select " + appType + " option"});
+    else if (browserTypeExe.length === 0) displayError(MSG.CUSTOM("Please select " + appType + " option", VARIANT.WARNING));
     else if ((appType === "Web") && browserTypeExe.length === 1 && execAction === "parallel") displayError(MSG.SCHEDULE.WARN_SELECT_MULTI_BROWSER);
     else return true;
     return false;

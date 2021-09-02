@@ -2,7 +2,7 @@ import React, { useEffect, useState, Fragment} from 'react';
 import socketIOClient from "socket.io-client";
 import {useDispatch, useSelector} from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { ModalContainer, PopupMsg, VARIANT, RedirectPage } from './pages/global';
+import { ModalContainer, VARIANT, RedirectPage, Messages as MSG, setMsg } from './pages/global';
 import {v4 as uuid} from 'uuid';
 import { UPDATE_REPORTDATA } from './pages/plugin/state/action';
 import * as actionTypes from './pages/login/state/action';
@@ -17,7 +17,6 @@ import {url} from './App'
 const SocketFactory = () => {
     const [showAfterExecution,setShowAfterExecution] = useState({show:false})
     const [reportData,setReportData] = useState(undefined)
-    const [popupState,setPopupState] = useState({show:false,title:"",content:""})
     const userInfo = useSelector(state=>state.login.userinfo);
     const socket = useSelector(state=>state.login.socket);
     const dispatch = useDispatch()
@@ -33,7 +32,7 @@ const SocketFactory = () => {
             executionDATA(result)
         });
         socket.on('display_execution_popup', (value) => {
-            displayExecutionPopup(value, setPopupState);		
+            displayExecutionPopup(value);		
         });
         socket.on('killSession', (by, reason) => {
             return RedirectPage(history, { by: by, reason: reason })
@@ -68,7 +67,7 @@ const SocketFactory = () => {
     
     const redirectToReports = () =>{
         dispatch({type: UPDATE_REPORTDATA, payload: reportData});
-        setPopupState({show:false})
+        setMsg(false)
         window.localStorage['navigateScreen'] = "reports";
         history.replace("/reports");
     }
@@ -82,37 +81,36 @@ const SocketFactory = () => {
         setReportData(result)
         
         if (data === "Terminate") {
-            setShowAfterExecution({show:true, variant:VARIANT.ERROR,content: "Execution terminated - By Program." })
+            setShowAfterExecution({show:true, title:msg,content: "Execution terminated - By Program." })
         } 
         else if (data === "UserTerminate") {
-            setShowAfterExecution({show:true, variant:VARIANT.WARNING,content:"Execution terminated - By User." })
+            setShowAfterExecution({show:true, title:msg,content:"Execution terminated - By User." })
         } 
         else if (data === "unavailableLocalServer") {
-            setPopupState({show:true, variant:VARIANT.ERROR, 'content': "No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server."});
+            setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
         } 
         else if (data === "success") {
-            setShowAfterExecution({show:true, variant:VARIANT.SUCCESS,content:"Execution completed successfully." })
+            setShowAfterExecution({show:true,title:msg,content:"Execution completed successfully." })
         } else if(data === "Completed"){
-            setPopupState({show:true, variant:VARIANT.SUCCESS, 'content':msg});
+            setMsg(MSG.CUSTOM(msg,VARIANT.SUCCESS));
         } else if(data === 'accessibilityTestingSuccess') {
-            setPopupState({show:true, variant:VARIANT.SUCCESS, 'content':msg + ": Accessibility Testing completed Successfully."});
+            setMsg(MSG.CUSTOM(msg + ": Accessibility Testing completed Successfully.",VARIANT.SUCCESS));
         } else if(data === 'accessibilityTestingTerminate'){
-            setPopupState({show:true, variant:VARIANT.ERROR, 'content':"Accessibility Testing Terminated."});
+            setMsg(MSG.CUSTOM("Accessibility Testing Terminated.",VARIANT.ERROR));
         }
-        else setPopupState({show:true, variant:VARIANT.ERROR, 'content':"Failed to execute."});
+        else setMsg(MSG.CUSTOM("Failed to execute.",VARIANT.ERROR));
     }
 
 
 
     return(
         <Fragment>
-            {popupState.show && <PopupMsg content={popupState.content} variant={popupState.variant} close={()=>setPopupState({show:false})} />}
             { showAfterExecution.show && <PostExecution/> }
         </Fragment>
     )
 }
 
-const displayExecutionPopup = (value, setPopupState) =>{
+const displayExecutionPopup = (value) =>{
     var msg = "";
     var val,executionVariant=VARIANT.WARNING;
     for(val in value){
@@ -134,7 +132,7 @@ const displayExecutionPopup = (value, setPopupState) =>{
         msg = msg + "\n" + data;
     }
     if(msg && msg.trim() != ""){
-        setPopupState({show:true,variant:executionVariant, 'content':msg});
+        setMsg(MSG.CUSTOM(msg,executionVariant));
     }
 }
 

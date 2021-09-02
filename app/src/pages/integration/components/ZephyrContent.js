@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import * as api from '../api.js';
 import MappingPage from '../containers/MappingPage';
-import { Messages as MSG } from '../../global';
+import { Messages as MSG, setMsg } from '../../global';
 import { RedirectPage } from '../../global/index.js';
 import CycleNode from './ZephyrTree';
 import * as actionTypes from '../state/action';
@@ -33,17 +33,17 @@ const ZephyrContent = props => {
         const projectId = e.target.value;
         const releaseData = await api.zephyrProjectDetails_ICE(projectId, user_id);
         if (releaseData.error)
-            dispatch({type: actionTypes.SHOW_POPUP, payload: releaseData.error});
+            setMsg(releaseData.error);
         else if (releaseData === "unavailableLocalServer")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_UNAVAILABLE_ICE});
+            setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
         else if (releaseData === "scheduleModeOn")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.WARN_UNCHECK_SCHEDULE});
+            setMsg(MSG.INTEGRATION.WARN_UNCHECK_SCHEDULE);
         else if (releaseData === "Invalid Session"){
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             return RedirectPage(history);
         }
         else if (releaseData === "invalidcredentials")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_INVALID_CRED});
+            setMsg(MSG.INTEGRATION.ERR_INVALID_CRED);
         else if (releaseData) {
             setReleaseArr(releaseData);
             setProjectDropdn1(projectId);
@@ -58,11 +58,11 @@ const ZephyrContent = props => {
         const releaseId = event.target.value;
         const testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId, user_id);
         if (testAndScenarioData.error)
-            dispatch({type: actionTypes.SHOW_POPUP, payload: testAndScenarioData.error});
+            setMsg(testAndScenarioData.error);
         else if (testAndScenarioData === "unavailableLocalServer")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_UNAVAILABLE_ICE});
+            setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
         else if (testAndScenarioData === "scheduleModeOn")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.GENERIC.WARN_UNCHECK_SCHEDULE});
+            setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
         else if (testAndScenarioData === "Invalid Session"){
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
             return RedirectPage(history);
@@ -89,14 +89,14 @@ const ZephyrContent = props => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Saving...'});
         const response = await api.saveZephyrDetails_ICE(mappedPair);
         if (response.error){
-            dispatch({type: actionTypes.SHOW_POPUP , payload: response.error});
+            setMsg(response.error);
         } 
         else if(response === "unavailableLocalServer")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_UNAVAILABLE_ICE});
+            setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
         else if(response === "scheduleModeOn")
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.GENERIC.WARN_UNCHECK_SCHEDULE});
+            setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
         else if ( response === "success"){
-            dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.SUCC_SAVE});
+            setMsg(MSG.INTEGRATION.SUCC_SAVE);
             dispatch({type: actionTypes.MAPPED_PAIR, payload: []});
             clearSelections();
         }
@@ -147,7 +147,7 @@ const ZephyrContent = props => {
 
                         {   props.domainDetails ? 
                             props.domainDetails.map(e => (
-                                <option key={e.id} value={e.id}>{e.name}</option>
+                                <option key={e.id} value={e.id} title={e.name}>{e.name}</option>
                             )) : null
                         }
                     </select>
@@ -157,7 +157,7 @@ const ZephyrContent = props => {
                         <option value="Select Release" disabled >Select Release</option>
                         {   releaseArr.length &&
                             releaseArr.map(e => (
-                                <option key={e.id} value={e.id}>{e.name}</option>
+                                <option key={e.id} value={e.id} title={e.name}>{e.name}</option>
                             ))
                         }
                     </select>
@@ -168,7 +168,7 @@ const ZephyrContent = props => {
                         {
                             avoProjects? 
                             avoProjects.map((e,i)=>(
-                                <option value={i} key={i+'_proj'} >{e.project_name}</option>))
+                                <option value={i} key={i+'_proj'} title={e.project_name}>{e.project_name}</option>))
                                 : null 
                         }
                     </select>
@@ -216,7 +216,8 @@ const ZephyrContent = props => {
                         .map((scenario, i)=>(
                                 <div 
                                     key={i}
-                                    className={"scenario__listItem" + (selectedScIds == scenario._id ? " scenario__selectedTC" : "")} 
+                                    className={"scenario__listItem" + (selectedScIds == scenario._id ? " scenario__selectedTC" : "")}
+                                    title={scenario.name}
                                     onClick={()=>{dispatch({type: actionTypes.SEL_SCN_IDS, payload: scenario._id})}}
                                 >
                                     {scenario.name}

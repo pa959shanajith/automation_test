@@ -2,6 +2,7 @@ import '../styles/ToolbarMenuEnE.scss'
 import React, { useState, useRef, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {getModules} from '../api';
+import { setMsg } from '../../global';
 import * as actionTypes from '../state/action';
 import ModuleListDropEnE from './ModuleListDropEnE';
 import PropTypes from 'prop-types'
@@ -19,7 +20,6 @@ const ToolbarMenuEnE = (props) =>{
     const [modName,setModName] = useState(false)
     const [modlist,setModList] = useState(undefined)
     const [filterSc,setFilterSc] = useState('')
-    const setPopup = props.setPopup
     const setBlockui = props.setBlockui
 
     const selectProj = async(proj) =>{
@@ -47,12 +47,7 @@ const ToolbarMenuEnE = (props) =>{
         setFilterSc(val)
     }
     const displayError = (error) =>{
-        setPopup({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
     var projectList = Object.entries(prjList)
     return(
@@ -82,6 +77,5 @@ const ToolbarMenuEnE = (props) =>{
 }
 ToolbarMenuEnE.propTypes={
     setBlockui:PropTypes.func.isRequired,
-    setPopup:PropTypes.func.isRequired
 }
 export default ToolbarMenuEnE;

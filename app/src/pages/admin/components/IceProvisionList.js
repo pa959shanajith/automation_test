@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, ScrollBar, VARIANT, Messages} from '../../global' 
+import {ScreenOverlay, ScrollBar, VARIANT, Messages, setMsg} from '../../global' 
 import {fetchICE, provisions, manageSessionData} from '../api';
 import '../styles/IceProvisionList.scss'
 
@@ -15,7 +15,6 @@ const IceProvisionList = (props) => {
 	const [searchTasks,setSearchTasks] = useState("")
 	const [icelistModify,setIcelistModify] = useState(props.icelist)
 	const [showList,setShowList] = useState(false)
-	const setPopupState=props.setPopupState
     
     useEffect(()=>{
 		refreshIceList();
@@ -37,12 +36,7 @@ const IceProvisionList = (props) => {
 
 	const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 	
 	const searchIceList = (val) =>{
@@ -64,7 +58,7 @@ const IceProvisionList = (props) => {
 		const data = await provisions(tokeninfo);
 		if(data.error){displayError(data.error);return;}
 		setLoading(false);
-		if (data === 'fail') setPopupState({show:true,variant:VARIANT.ERROR,content:"ICE "+event+" Failed"});
+		if (data === 'fail') setMsg(Messages.CUSTOM("ICE "+event+" Failed",VARIANT.ERROR));
 		else {
 			const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
 			if(data1.error){displayError(data1.error);return;}
@@ -74,7 +68,7 @@ const IceProvisionList = (props) => {
 			props.setToken(data);
 			props.setOp(provisionDetails.icetype);
 			props.setUserid(provisionDetails.provisionedto || ' ');
-			setPopupState({show:true,variant:VARIANT.SUCCESS,content:"ICE "+event+"ed Successfully: '"+icename+"'!!  Copy or Download the token"});
+			setMsg(Messages.CUSTOM("ICE "+event+"ed Successfully: '"+icename+"'!!  Copy or Download the token",VARIANT.SUCCESS));
 			refreshIceList();
 		}
     }

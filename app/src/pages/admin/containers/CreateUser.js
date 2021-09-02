@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {ScreenOverlay, ScrollBar, VARIANT, Messages as MSG, ValidationExpression } from '../../global' 
+import {ScreenOverlay, ScrollBar, VARIANT, setMsg, Messages as MSG, ValidationExpression } from '../../global' 
 import {getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData} from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/CreateUser.scss'
@@ -35,8 +35,6 @@ const CreateUser = (props) => {
     const [ldapUserList,setLdapUserList] = useState([])
     const [ldapUserListInitial,setLdapUserListInitial] = useState([])
     const [loading,setLoading] = useState(false)
-    // const [popupState,setPopupState] = useState({show:false,title:"",content:""})
-    const setPopupState= props.setPopupState
     useEffect(()=>{
         
         click();
@@ -48,12 +46,7 @@ const CreateUser = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     //Fetch UserRoles
@@ -106,7 +99,7 @@ const CreateUser = (props) => {
                 if(data === "success") {
                     if (action === "create") click();
                     else edit();
-                    setPopupState({show:true,content:"User "+action+"d successfully!",variant:VARIANT.SUCCESS});
+                    setMsg(MSG.CUSTOM("User "+action+"d successfully!",VARIANT.SUCCESS));
                     if (action === "delete") {
                         const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
                         if(data0.error){displayError(data0.error);return;}
@@ -118,15 +111,15 @@ const CreateUser = (props) => {
                         if(data2.error){displayError(data2.error);return;}
                     }
                 } else if(data === "exists") {
-                    setPopupState({show:true,content:MSG.ADMIN.WARN_USER_EXIST.CONTENT,variant:MSG.ADMIN.WARN_USER_EXIST.VARIANT});
+                    setMsg(MSG.ADMIN.WARN_USER_EXIST);
                 } else if(data === "fail") {
                     if (action === "create") click();
                     else edit();
-                    setPopupState({show:true,content:"Failed to "+action+" user.",variant:VARIANT.ERROR});
+                    setMsg(MSG.CUSTOM("Failed to "+action+" user.",VARIANT.ERROR));
                 } 
                 else if(/^2[0-4]{8}$/.test(data)) {
                     if (JSON.parse(JSON.stringify(data)[1])) {
-                        setPopupState({show:true,content:"Failed to "+action+" user. Invalid Request!",variant:VARIANT.ERROR});
+                        setMsg(MSG.CUSTOM("Failed to "+action+" user. Invalid Request!",VARIANT.ERROR));
                         return;
                     }
                     var errfields = [];
@@ -140,11 +133,11 @@ const CreateUser = (props) => {
                     if (JSON.parse(JSON.stringify(data)[8])) errfields.push("User Domain Name");
                     if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
 				    if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
-				    setPopupState({show:true,content:"Following values are invalid: "+errfields.join(", ")+" "+hints,variant:VARIANT.WARNING});
+				    setMsg(MSG.CUSTOM("Following values are invalid: "+errfields.join(", ")+" "+hints,VARIANT.WARNING));
                 }
             }
             catch(error){
-                setPopupState({show:true,content:"Failed to "+action+" user.",variant:VARIANT.ERROR});
+                setMsg(MSG.CUSTOM("Failed to "+action+" user.",VARIANT.ERROR));
             }
         })()
     }
@@ -170,7 +163,7 @@ const CreateUser = (props) => {
 			flag = false;
 		}else if (!reg.test(userConf.userName)) {
 			if (!popupOpen){
-                setPopupState({show:true,content:MSG.ADMIN.WARN_USERNAME_SPECHAR.CONTENT,variant:MSG.ADMIN.WARN_USERNAME_SPECHAR.VARIANT});
+                setMsg(MSG.ADMIN.WARN_USERNAME_SPECHAR);
             }
             popupOpen = true;
 			setUserNameAddClass(true);
@@ -195,7 +188,7 @@ const CreateUser = (props) => {
 			}
 			if (userConf.confExpired && action !== "delete") {
 				if (!popupOpen){
-                    setPopupState({show:true,content:MSG.ADMIN.WARN_CONFIG_INVALID.CONTENT,variant:MSG.ADMIN.WARN_CONFIG_INVALID.VARIANT});
+                    setMsg(MSG.ADMIN.WARN_CONFIG_INVALID);
                 }
 				popupOpen = true;
                 setConfServerAddClass("selectErrorBorder");
@@ -212,7 +205,7 @@ const CreateUser = (props) => {
 				flag = false;
 			} else if (!regexPassword.test(userConf.passWord)) {
 				if (!popupOpen){
-                    setPopupState({show:true,content:MSG.ADMIN.WARN_PASSWORD.CONTENT,variant:MSG.ADMIN.WARN_PASSWORD.VARIANT});
+                    setMsg(MSG.ADMIN.WARN_PASSWORD);
                 }
                 popupOpen = true;
                 setPasswordAddClass(true);
@@ -223,7 +216,7 @@ const CreateUser = (props) => {
 				flag = false;
 			} else if (!regexPassword.test(userConf.confirmPassword)) {
 				if (!popupOpen){
-                    setPopupState({show:true,content:MSG.ADMIN.WARN_PASSWORD.CONTENT,variant:MSG.ADMIN.WARN_PASSWORD.VARIANT});
+                    setMsg(MSG.ADMIN.WARN_PASSWORD);
                 }
                 popupOpen = true;
                 setConfirmPasswordAddClass(true);
@@ -231,7 +224,7 @@ const CreateUser = (props) => {
 			}
 			if (userConf.passWord !== userConf.confirmPassword) {
 				if (!popupOpen){
-                    setPopupState({show:true,content:MSG.ADMIN.WARN_UNMATCH_PASSWORD.CONTENT,variant:MSG.ADMIN.WARN_UNMATCH_PASSWORD.VARIANT});
+                    setMsg(MSG.ADMIN.WARN_UNMATCH_PASSWORD);
                 }
                 popupOpen = true;
                 setConfirmPasswordAddClass(true);
@@ -243,7 +236,7 @@ const CreateUser = (props) => {
 			flag = false;
         } else if (!emailRegEx.test(userConf.email)) {
 			if (!popupOpen){
-                setPopupState({show:true,content:MSG.ADMIN.WARN_INVALID_EMAIL.CONTENT, variant:MSG.ADMIN.WARN_INVALID_EMAIL.VARIANT});
+                setMsg(MSG.ADMIN.WARN_INVALID_EMAIL);
             }
             popupOpen = true;
 			setEmailAddClass(true);
@@ -303,7 +296,7 @@ const CreateUser = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data === "empty") {
-            setPopupState({show:true,content: MSG.ADMIN.WARN_LDAP_CONFIGURE.CONTENT,variant:MSG.ADMIN.WARN_LDAP_CONFIGURE.VARIANT});
+            setMsg(MSG.ADMIN.WARN_LDAP_CONFIGURE);
         } else {
             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
             data.sort((a,b)=>a.name.localeCompare(b.name));
@@ -319,7 +312,7 @@ const CreateUser = (props) => {
             if(data.error){displayError(data.error);return;}
             setLoading(false);
             if (data === "empty") {
-                setPopupState({show:true,content: MSG.ADMIN.WARN_SAML_CONFIGURE.CONTENT, variant:MSG.ADMIN.WARN_SAML_CONFIGURE.VARIANT});
+                setMsg(MSG.ADMIN.WARN_SAML_CONFIGURE);
             } else {
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
                 data.sort();
@@ -336,7 +329,7 @@ const CreateUser = (props) => {
             if(data.error){displayError(data.error);return;}
             setLoading(false);
             if(data === "empty" ){
-                setPopupState({show:true,content: MSG.ADMIN.WARN_OPENID_CONFIGURE.CONTENT, variant:MSG.ADMIN.WARN_OPENID_CONFIGURE.VARIANT});
+                setMsg(MSG.ADMIN.WARN_OPENID_CONFIGURE);
             } else {
                 dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
                 data.sort((a,b)=>a.name.localeCompare(b.name));
@@ -359,7 +352,7 @@ const CreateUser = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data === "empty") {
-            setPopupState({show:true,content: MSG.ADMIN.WARN_LDAP_CONFIGURE.CONTENT,variant:MSG.ADMIN.WARN_LDAP_CONFIGURE.VARIANT});
+            setMsg(MSG.ADMIN.WARN_LDAP_CONFIGURE);
         }
         else if(data!==undefined) {
             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
@@ -399,7 +392,7 @@ const CreateUser = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data === "empty") {
-            setPopupState({show:true,content: MSG.ADMIN.WARN_NO_USER_FOUND.CONTENT, variant: MSG.ADMIN.WARN_NO_USER_FOUND.VARIANT});
+            setMsg(MSG.ADMIN.WARN_NO_USER_FOUND);
         } else {
             dispatch({type:actionTypes.UPDATE_LDAP_DATA,payload:data})
         }
@@ -449,7 +442,7 @@ const CreateUser = (props) => {
                         if(data1.error){displayError(data1.error);return;}
                         setLoading(false);
                         if (data1 === "empty") {
-                            setPopupState({show:true,content: MSG.ADMIN.WARN_LDAP_CONFIGURE.CONTENT,variant:MSG.ADMIN.WARN_LDAP_CONFIGURE.VARIANT});
+                            setMsg(MSG.ADMIN.WARN_LDAP_CONFIGURE);
                         } else {
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
                             data1.sort((a,b)=>a.name.localeCompare(b.name));
@@ -463,7 +456,7 @@ const CreateUser = (props) => {
                         if(data1.error){displayError(data1.error);return;}
                         setLoading(false);
                         if (data === "empty") {
-                            setPopupState({show:true,title:"Edit Configuration",content: MSG.ADMIN.WARN_SAML_CINFIGURE.CONTENT, variant:MSG.ADMIN.WARN_SAML_CINFIGURE.VARIANT});
+                            setMsg(MSG.ADMIN.WARN_SAML_CINFIGURE);
                         } else {
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
                             data1.sort();
@@ -477,7 +470,7 @@ const CreateUser = (props) => {
                         if(data1.error){displayError(data1.error);return;}
                         setLoading(false);
                         if(data1 === "empty" ){
-                            setPopupState({show:true,content: MSG.ADMIN.WARN_OPENID_CONFIGURE.CONTENT, variant:MSG.ADMIN.WARN_OPENID_CONFIGURE.VARIANT});
+                            setMsg(MSG.ADMIN.WARN_OPENID_CONFIGURE);
                         } else {
                             dispatch({type:actionTypes.UPDATE_NO_CREATE,payload:false})
                             data1.sort((a,b)=>a.name.localeCompare(b.name));
@@ -494,7 +487,7 @@ const CreateUser = (props) => {
             }  
         }catch(error){
             setLoading(false);
-            setPopupState({show:true,content:MSG.ADMIN.ERR_FETCH_USER_DETAILS.CONTENT,variant:MSG.ADMIN.ERR_FETCH_USER_DETAILS.VARIANT});
+            setMsg(MSG.ADMIN.ERR_FETCH_USER_DETAILS);
         }  
     }
 
@@ -510,16 +503,11 @@ const CreateUser = (props) => {
         setLdapUserList(items);
     }
     
-    const closePopup = () =>{
-        setPopupState({show:false,title:"",content:""});
-    }
-
     const passwordChange = (value) => {
         value = ValidationExpression(value,"password")
         dispatch({type:actionTypes.UPDATE_INPUT_PASSWORD,payload:value})
     }
 
-    
     const confirmPasswordChange = (value) => {
         value = ValidationExpression(value,"password")
         dispatch({type:actionTypes.UPDATE_INPUT_CONFIRMPASSWORD,payload:value})
@@ -539,8 +527,8 @@ const CreateUser = (props) => {
             <div data-test="heading" id="page-taskName"><span>{(props.showEditUser===false)?"Create User":"Edit User"}</span></div>
             
             {(props.showEditUser===false)?
-                <CreateLanding displayError={displayError} setPopupState={setPopupState} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown} ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap}  ldapDirectoryAddClass={ldapDirectoryAddClass} confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={props.setShowEditUser} ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} />
-                :<EditLanding displayError={displayError} setPopupState={setPopupState} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} confServerAddClass={confServerAddClass} ldapGetUser={ldapGetUser} ldapDirectoryAddClass={ldapDirectoryAddClass} clearForm={clearForm} allUserFilList={allUserFilList} manage={manage} setAllUserFilList={setAllUserFilList} searchFunctionUser={searchFunctionUser} click={click} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} getUserData={getUserData} />
+                <CreateLanding displayError={displayError} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} ldapSwitchFetch={ldapSwitchFetch} userNameAddClass={userNameAddClass} setShowDropdown={setShowDropdown} ldapUserList={ldapUserList} searchFunctionLdap={searchFunctionLdap}  ldapDirectoryAddClass={ldapDirectoryAddClass} confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={props.setShowEditUser} ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} />
+                :<EditLanding displayError={displayError} firstnameAddClass={firstnameAddClass} lastnameAddClass={lastnameAddClass} confServerAddClass={confServerAddClass} ldapGetUser={ldapGetUser} ldapDirectoryAddClass={ldapDirectoryAddClass} clearForm={clearForm} allUserFilList={allUserFilList} manage={manage} setAllUserFilList={setAllUserFilList} searchFunctionUser={searchFunctionUser} click={click} setShowDropdownEdit={setShowDropdownEdit} showDropdownEdit={showDropdownEdit} getUserData={getUserData} />
             }    
 
             <div className="col-xs-9 form-group__conv">

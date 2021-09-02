@@ -1,6 +1,6 @@
 import React , {useState ,  useRef , Fragment, useEffect } from 'react';
 import '../styles/ProfJ.scss';
-import {ScrollBar , PopupMsg} from '../../global';
+import {ScrollBar , setMsg} from '../../global';
 import {getTopMatches_ProfJ } from '../api';
 
 const  ChatBot = (props) => {
@@ -11,19 +11,13 @@ const  ChatBot = (props) => {
     const [chatBox , setChatBox] = useState(false); //State for chat aree open close 
     const [chat , setChat] = useState([])//State stores all the list of chat objects.
     const [linkMsgArr , setLinkMsgArr]= useState([])//stores all the links clicked on the Bot Message
-    const [popup ,setPopup]= useState({show:false});
 
     useEffect(()=>{
         lMsgRef.current && lMsgRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
     }, [linkMsgArr])
 
     const displayError = (error) =>{ //the default display error funtion used in each component
-        setPopup({
-          variant:error.VARIANT,
-          content:error.CONTENT,
-          submitText:'Ok',
-          show:true
-        })
+        setMsg(error)
       }
     const callqueryRaised=(e)=>{ //Function to be hit on enter after entering the userQuery
         if(e.key === 'Enter'){
@@ -63,7 +57,6 @@ const  ChatBot = (props) => {
     }
     return (
         <Fragment>
-        {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content} />:null}
         <div id="assistWrap" className="filter__pop" >
             <h4 className="pop_header">
                 <img className="assist-image" alt="message" src="static/imgs/ic-message.png"/>

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateScrollBar, Messages as MSG } from '../../global';
+import { updateScrollBar, Messages as MSG, setMsg } from '../../global';
 import * as actionTypes from '../state/action';
 
 const CycleNode = props => {
@@ -20,6 +20,7 @@ const CycleNode = props => {
                     className="test_tree_toggle" 
                     src={ `static/imgs/ic-qc${collapse ? "Expand" : "Collapse"}.png` }
                     onClick={handleClick}
+                    title={`${collapse ? "Expand" : "Collapse"}`}
                 />
                 <label>{ props.cycleNode.cycle }</label>
             </div> 
@@ -54,6 +55,7 @@ const TestSuiteNode = props => {
                         className="test_tree_toggle" 
                         src={ `static/imgs/ic-taskType-blue-${collapse ? "plus" : "minus"}.png` }
                         onClick={handleClick}
+                        title={`${collapse ? "Expand" : "Collapse"}`}
                     />
                     <label>{ props.testSuite.name }</label>
                 </div> }
@@ -93,7 +95,7 @@ const TestRunNode = props => {
         if(selectedScIds.length===0){
             popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
         }
-        if (popupMsg) dispatch({type: actionTypes.SHOW_POPUP, payload: popupMsg});
+        if (popupMsg) setMsg(popupMsg);
         else{
             const mappedPair=[
                 {
@@ -116,12 +118,12 @@ const TestRunNode = props => {
 
     return <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(uniqueTCpath) ? " test__syncedTC" : "")}>
                 <label className="test__leaf" title={props.testRun.name} onClick={handleClick}>
-                    <span className="test__tcName">{props.testRun.name}</span>
+                    <span className="test__tcName" title={props.testRun.name}>{props.testRun.name}</span>
                 </label>
                 { selectedTC.includes(uniqueTCpath)
                         && <><div className="test__syncBtns"> 
-                        { !syncedTestCases.includes(uniqueTCpath) && <img className="test__syncBtn" alt="s-ic" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
-                        <img className="test__syncBtn" alt="s-ic" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
+                        { !syncedTestCases.includes(uniqueTCpath) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
+                        <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
                         </div></> 
                     }
             </div>

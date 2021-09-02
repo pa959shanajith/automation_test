@@ -1,7 +1,7 @@
 import React, { useState, Fragment} from 'react';
 import { useSelector, useDispatch} from 'react-redux';
 import {getModules}  from '../api'
-import {ScrollBar,ModalContainer,Messages as MSG} from '../../global';
+import {ScrollBar,ModalContainer,Messages as MSG, setMsg} from '../../global';
 import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
@@ -62,12 +62,7 @@ const ModuleListDrop = (props) =>{
     }
     const displayError = (error) =>{
         setLoading(false)
-        props.setPopup({
-          variant:error.VARIANT,
-          content:error.CONTENT,
-          submitText:'Ok',
-          show:true
-        })
+        setMsg(error)
     }
     return(
         <Fragment>

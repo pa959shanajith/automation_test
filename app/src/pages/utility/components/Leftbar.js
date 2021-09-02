@@ -8,7 +8,7 @@ const Leftbar=(props)=>{
         return(
             <div className="letfnav">
                 <h4>Utilities</h4>
-                <span onClick={()=>{props.setScreenType("encryption") ; setFocus("encryption")}}>
+                <span onClick={()=>{props.setScreenType("encryption") ; setFocus("encryption")}} title="Encryption">
                     <img src='static/imgs/ic-encryption-utility.png' alt="EncryptIcon" id={(focus==="encryption")? "selected":null}/>
                     <div>Encryption</div>
                 </span>
@@ -16,11 +16,11 @@ const Leftbar=(props)=>{
                     <img src='static/imgs/ic-optimization.png' alt="optimizationIcon" id={(focus==="optimization")? "selected":null}/>
                     <div>Optimization</div>
                 </span> */}
-                <span onClick={()=>{props.setScreenType("execution");  setFocus("execution"); }}>
+                <span onClick={()=>{props.setScreenType("execution");  setFocus("execution"); }} title="Execution Metrics">
                     <div className="fa fa-database fa-2x util__execution_ic" id={(focus==="execution")? "selected":""}/>
                     <div>Execution Metrics</div>
                 </span>
-                <span onClick={()=>{props.setScreenType("datatable-Create");  setFocus("datatable"); }}>
+                <span onClick={()=>{props.setScreenType("datatable-Create");  setFocus("datatable"); }} title="Data Table">
                     <div className="fa fa-table fa-2x util__execution_ic" id={(focus==="datatable")? "selected":""}/>
                     <div>Data Table</div>
                 </span>
