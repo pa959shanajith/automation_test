@@ -1,7 +1,6 @@
 import React ,  { Fragment, useEffect, useState} from 'react';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScrollBar } from '../../global';
-import ValidationExpression from '../../global/components/ValidationExpression';
+import { ScrollBar, ValidationExpression } from '../../global';
 
 import '../styles/FormComp.scss'
 

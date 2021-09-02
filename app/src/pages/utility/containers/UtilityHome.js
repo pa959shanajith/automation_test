@@ -1,6 +1,5 @@
 import React ,{useState} from 'react';
-import Header from '../../global/components/Header';
-import Footer from '../../global/components/FooterTwo';
+import {Header, FooterTwo as Footer } from '../../global';
 import Leftbar from '../components/Leftbar';
 import Rightbar from '../components/Rightbar';
 import UtilityCenter from './UtilityCenter'

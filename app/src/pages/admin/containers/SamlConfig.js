@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, ModalContainer, ScrollBar, Messages as MSG, VARIANT, setMsg} from '../../global' 
+import {ScreenOverlay, ModalContainer, ScrollBar, Messages as MSG, VARIANT, setMsg, ValidationExpression} from '../../global' 
 import {getSAMLConfig, manageSAMLConfig} from '../api';
-import ValidationExpression from '../../global/components/ValidationExpression';
 import '../styles/SamlConfig.scss'
 
 
