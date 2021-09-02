@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
-import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, PopupMsg, GenerateTaskList, Messages as MSG } from '../../global';
+import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, GenerateTaskList, Messages as MSG, setMsg } from '../../global';
 import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as pluginApi from "../api";
@@ -27,7 +27,6 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [showFltrDlg, setShowFltrDlg] = useState(false);
     const [filterData, setFilterData] = useState({'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}});
     const [filtered, setFiltered] = useState(false);
-    const [showPopup, setShowPopup] = useState(false);
     let dataDict;
     
     useEffect(()=>{
@@ -84,14 +83,14 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                     })
                     .catch(error => {
                         setOverlay("");
-                        setShowPopup({'variant': MSG.PLUGIN.ERR_LOAD_TASK.VARIANT, 'content': MSG.PLUGIN.ERR_LOAD_TASK.CONTENT});
+                        setMsg(MSG.PLUGIN.ERR_LOAD_TASK);
                         console.error("Error::::", error);
                     });
                 }
             })
             .catch(error => {
                 setOverlay("");
-                setShowPopup({'variant': MSG.PLUGIN.ERR_LOAD_TASK.VARIANT, 'content': MSG.PLUGIN.ERR_LOAD_TASK.CONTENT});
+                setMsg(MSG.PLUGIN.ERR_LOAD_TASK);
                 console.error("Error::::", error);
             });
         }
@@ -201,17 +200,8 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         setShowSearch(!showSearch)
     }
     
-    const Popup = () => (
-        <PopupMsg 
-            variant={showPopup.variant}
-            content={showPopup.content}
-            close={()=>setShowPopup(false)}
-        />
-    )
-
     return (
         <>
-        { showPopup && <Popup data-test="popup" />}
         {overlay && <ScreenOverlay data-test="screenoverlay-component" content={overlay}/>}
         { showFltrDlg && <FilterDialog data-test="filterdialog-component" setShow={setShowFltrDlg} dataDict={dataDictState} filterData={filterData} filterTasks={filterTasks} /> }
         <div  data-test="task-section" className="task-section">

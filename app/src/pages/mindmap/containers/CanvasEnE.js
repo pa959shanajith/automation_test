@@ -33,7 +33,6 @@ const CanvasEnE =(props)=>{
     const dispatch = useDispatch()
     const CanvasRef = useRef();
     const setBlockui=props.setBlockui
-    const setPopup=props.setPopup
     const [ctrlBox,setCtrlBox] = useState(false);
     const [inpBox,setInpBox] = useState(false);
     const [links,setLinks] = useState({})
@@ -49,7 +48,7 @@ const CanvasEnE =(props)=>{
     readCtScale = () => ctScale
 
     const clickDeleteNode=(id)=>{
-        var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes},setPopup)
+        var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes})
         if(res){
             dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
             setNodes(res.nodeDisplay)
@@ -172,9 +171,9 @@ const CanvasEnE =(props)=>{
     return (
         <Fragment>
             <Legends isEnE={true}/>
-            {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} setPopup={setPopup} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
+            {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(ctrlBox !== false)?<ControlBox isEnE={true} nid={ctrlBox}  clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            <SaveMapButton isEnE={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} setPopup={setPopup} setBlockui={setBlockui}/>
+            <SaveMapButton isEnE={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>

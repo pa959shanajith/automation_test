@@ -1,7 +1,7 @@
 import React ,  { Fragment, useEffect, useState } from 'react';
 import { getProjectList, getModules } from '../api';
 import { useDispatch, useSelector} from 'react-redux';
-import { ScreenOverlay, PopupMsg, ReferenceBar} from '../../global';
+import { ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import { ClickFullScreen , parseProjList, ClickSwitchLayout} from './MindmapUtils';
 import  ToolbarMenuEnE from '../components/ToolbarMenuEnE';
 import CanvasEnE from './CanvasEnE';
@@ -16,7 +16,6 @@ import '../styles/CreateEnE.scss';
 */
 const CreateEnE = () =>{
     const dispatch = useDispatch()
-    const [popup,setPopup] = useState({show:false})
     const [blockui,setBlockui] = useState({show:false})
     const [fullScreen,setFullScreen] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(false)
@@ -53,21 +52,15 @@ const CreateEnE = () =>{
     },[])
     const displayError = (error) =>{
         setBlockui({show:false})
-        setPopup({
-        variant:error.VARIANT,
-        content:error.CONTENT,
-        submitText:'Ok',
-        show:true
-        })
+        setMsg(error)
     }
     return(
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content}/>:null}
         <div id='ene' className='mp__canvas_container'>
-            <ToolbarMenuEnE setBlockui={setBlockui} setPopup={setPopup}/>
+            <ToolbarMenuEnE setBlockui={setBlockui} />
             <div id='mp__canvas' className='mp__canvas'>
-                {(Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} setPopup={setPopup} module={moduleSelect} verticalLayout={verticalLayout}/>
+                {(Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
                 :<Fragment>
                     <SaveMapButton disabled={true}/>
                     <Legends isEnE={true}/>
@@ -75,12 +68,12 @@ const CreateEnE = () =>{
             </div>
         </div>
         <ReferenceBar taskTop={true} taskInfo={info} collapsible={true} collapse={true}>
-            <div className="ic_box" >
-                <img alt={"Switch Layout"} onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setPopup,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
+            <div className="ic_box" title="SwitchLayout" >
+                <img alt={"Switch Layout"} onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setBlockui,dispatch)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>
                 <span className="rb_box_title">Switch</span><span className="rb_box_title">Layout</span>
             </div>
-            <div className="ic_box" >
-                <img alt={"Full Screen"} onClick={()=>ClickFullScreen(setFullScreen,setPopup)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
+            <div className="ic_box" title="Full Screen" >
+                <img alt={"Full Screen"} onClick={()=>ClickFullScreen(setFullScreen)} style={{height: '55px'}} className={"rb__ic-task thumb__ic " +(fullScreen?"active_rb_thumb":"")} src="static/imgs/fscr.png"/>
                 <span className="rb_box_title">Full Screen</span>
             </div>
         </ReferenceBar>  

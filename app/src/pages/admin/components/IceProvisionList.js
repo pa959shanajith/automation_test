@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, ScrollBar, VARIANT, Messages} from '../../global'
+import {ScreenOverlay, ScrollBar, VARIANT, Messages, setMsg} from '../../global' 
 import {fetchICE, provisions, manageSessionData} from '../api';
 import { getUserICE, setDefaultUserICE } from '../../global/api';
 import '../styles/IceProvisionList.scss'
@@ -20,7 +20,6 @@ const IceProvisionList = (props) => {
 	const [defaultICE, setDefaultICE] = useState('')
 	const [doFetchICE, setDoFetchICE] = useState(false);
 	const isUsrSetting = props.userConfig //for user settings
-	const setPopupState=props.setPopupState
     
 	useEffect(() => {
 		setDoFetchICE(true);
@@ -35,7 +34,7 @@ const IceProvisionList = (props) => {
 			const data = await getUserICE();
 			setLoading(false);
 			if (data === 'fail') {
-				setPopupState(Messages.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+				setMsg(Messages.GENERIC.UNAVAILABLE_LOCAL_SERVER);
 			}
 			else if (!data.ice_list || data.ice_list.length < 1) {
 				setAllActiveIce([]);
@@ -49,7 +48,7 @@ const IceProvisionList = (props) => {
 		} catch (error) {
 			setLoading(false)
 			console.error(error)
-			setPopupState(Messages.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+			setMsg(Messages.GENERIC.UNAVAILABLE_LOCAL_SERVER);
 		}
 	};
 
@@ -74,12 +73,7 @@ const IceProvisionList = (props) => {
 
 	const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 	
 	const searchIceList = (val) =>{
@@ -102,7 +96,7 @@ const IceProvisionList = (props) => {
 		const data = await provisions(tokeninfo);
 		if(data.error){displayError(data.error);return;}
 		setLoading(false);
-		if (data === 'fail') setPopupState({show:true,variant:VARIANT.ERROR,content:"ICE "+event+" Failed"});
+		if (data === 'fail') setMsg(Messages.CUSTOM("ICE "+event+" Failed",VARIANT.ERROR));
 		else {
 			const data1 = await manageSessionData('disconnect', icename, "?", "dereg");
 			if(data1.error){displayError(data1.error);return;}
@@ -112,13 +106,13 @@ const IceProvisionList = (props) => {
 			props.setToken(data);
 			props.setOp(provisionDetails.icetype);
 			props.setUserid(provisionDetails.provisionedto || ' ');
-			setPopupState({show:true,variant:VARIANT.SUCCESS,content:"ICE "+event+"ed Successfully: '"+icename+"'!!  Copy or Download the token"});
+			setMsg(Messages.CUSTOM("ICE "+event+"ed Successfully: '"+icename+"'!!  Copy or Download the token",VARIANT.SUCCESS));
 			refreshIceList();
 		}
     }
 		catch(e){
 			setLoading(false);
-			setPopupState({ show: true, variant: VARIANT.ERROR, content: "ICE " + event + " Failed" });
+			setMsg(Messages.CUSTOM(`ICE ${event} Failed`, VARIANT.ERROR));
 		}
 	}
 	
@@ -146,7 +140,7 @@ const IceProvisionList = (props) => {
 		}
 		} catch (e) {
 			setLoading(false)
-			setPopupState(Messages.ADMIN.ERR_ICE_DEREGISTER);
+			setMsg(Messages.ADMIN.ERR_ICE_DEREGISTER);
     }
 	}
 
@@ -154,7 +148,7 @@ const IceProvisionList = (props) => {
 		const found = allActiveIce.find((element) => event.target.value === element);
 		if (!found) {//prevent defaut event
 			event.preventDefault();
-			setPopupState(Messages.ADMIN.ERR_SELECTED_ICE_NOT_ACTIVE);
+			setMsg(Messages.ADMIN.ERR_SELECTED_ICE_NOT_ACTIVE);
 			return;
 		}
 		else {
@@ -164,16 +158,16 @@ const IceProvisionList = (props) => {
 				const data = await setDefaultUserICE(ice);
 				setLoading(false);
 				if (data == 'success') {
-					setPopupState(Messages.ADMIN.SUCC_CHANGE_DEFAULT_ICE);
+					setMsg(Messages.ADMIN.SUCC_CHANGE_DEFAULT_ICE);
 				} else {
 					event.preventDefault();
-					setPopupState(Messages.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
+					setMsg(Messages.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
 				}
 			} catch (error) {
 				event.preventDefault();
 				setLoading(false)
 				console.error(error)
-				setPopupState(Messages.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
+				setMsg(Messages.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
 		}
     }
     }

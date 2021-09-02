@@ -1,6 +1,5 @@
 import React ,{Fragment,useEffect,useState } from 'react';
-import {ScrollBar , Messages as MSG} from '../../global';
-import ValidationExpression from '../../global/components/ValidationExpression';
+import {ScrollBar , Messages as MSG, setMsg, ValidationExpression } from '../../global';
 
 const Pairwise=(props)=>{
     const [optimizationType , SetOptimizationType]=useState(null);   
@@ -68,7 +67,7 @@ return(
                             </button>
                         
                         <br/>
-                            {props.gererateClick &&  props.setShowPop(MSG.UTILITY.ERR_EMPTY_TABLE)}                        
+                            {props.gererateClick && setMsg(MSG.UTILITY.ERR_EMPTY_TABLE)}                        
                         </div>
                     <div className="pairsie_array_container">
                     <div className="pw__ab">

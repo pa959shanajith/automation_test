@@ -46,12 +46,14 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                         inputPropstime: {readOnly:"readonly" ,
                             disabled : true,
                             className:"fc-timePicker",
-                            placeholder: "Select Time"
+                            placeholder: "Select Time",
+                            title: "Select Time"
                         },
                         inputPropsdate : {
                             placeholder: "Select Date",
                             readOnly:"readonly" ,
-                            className:"fc-datePicker"
+                            className:"fc-datePicker",
+                            title:"Select Date"
                         }
                     };
                 }

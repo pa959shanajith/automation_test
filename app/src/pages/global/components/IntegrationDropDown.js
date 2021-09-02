@@ -7,7 +7,7 @@ import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE } from '
   use: renders integration popup for ALM/ qTest/ Zypher
 */
 
-const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integrationCred, setPopupState, setCredentialsExecution, displayError}) => {
+const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integrationCred, setCredentialsExecution, displayError}) => {
     const [credentials,setCredentials] = useState({url: "", userName: "", password: ""});
     const [urlErrBor,setUrlErrBor] = useState(false)
     const [usernameErrBor,setUserNameErrBor] = useState(false)

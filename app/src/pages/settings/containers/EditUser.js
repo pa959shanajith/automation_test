@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import * as actionTypes from '../../login/state/action';
-import { ScrollBar, ScreenOverlay, Messages as MSG } from '../../global'
+import { ScrollBar, ScreenOverlay, Messages as MSG, setMsg } from '../../global'
 import { manageUserDetails } from '../../admin/api'
 import { Header, FormInput } from '../components/AllFormComp'
 
@@ -28,7 +28,6 @@ const EditUser = (props) => {
     const [isNewPassword, setIsNewPassword] = useState(true);
     const [isNewConfirmPassword, setIsNewConfirmPassword] = useState(true);
     const [loading, setLoading] = useState(false);
-    const setPopupState=props.setPopupState;
 
     const click = () => {
         setPrevPassword("");
@@ -77,7 +76,7 @@ const EditUser = (props) => {
         }
         if (!check) {
             setLoading(false);
-            setPopupState(MSG.SETTINGS.ERR_INVALID_INFO);
+            setMsg(MSG.SETTINGS.ERR_INVALID_INFO);
             return;
         }
 
@@ -99,15 +98,15 @@ const EditUser = (props) => {
                 setLoading(false);
                 if (data === 'success') {
                     dispatch({type:actionTypes.SET_USERINFO, payload: { ...userInfo, ['email_id']: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname}})
-                    setPopupState(MSG.SETTINGS.SUCC_INFO_UPDATED);
+                    setMsg(MSG.SETTINGS.SUCC_INFO_UPDATED);
                     click();
                 } else {
-                    setPopupState(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                    setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                     click();
                 }
             }
             catch (error) {
-                setPopupState(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                 click();
             }
         })()

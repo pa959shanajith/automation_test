@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip';
 import ReportApi from '../components/ReportApi'
 import ExecMetricsApi from '../components/ExecMetricsApi'
 import ExecutionApi from '../components/ExecutionApi'
-import { ScrollBar, Messages as MSG } from '../../global'
+import { ScrollBar, Messages as MSG, setMsg } from '../../global'
 
 import classes from "../styles/ApiUtils.module.scss";
 
@@ -136,18 +136,18 @@ const ApiUtils = props => {
     const handleSubmit = () => {
         try {
             if (api !== "Execution" && api !== "Report" && api !== "Execution Metrics") {
-                props.setShowPop(MSG.UTILITY.ERR_SEL_API);
+                setMsg(MSG.UTILITY.ERR_SEL_API);
             }
             let obj = validate(request, api);
             setError(obj);
             if (obj.error === true) {
-                props.setShowPop(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                 return;
             }
-            props.setShowPop(MSG.UTILITY.SUCC_REQ_BODY_GEN);
+            setMsg(MSG.UTILITY.SUCC_REQ_BODY_GEN);
             setRequestText(JSON.stringify(request, undefined, 4));
         } catch (e) {
-            props.setShowPop(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+            setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
         }
     }
 

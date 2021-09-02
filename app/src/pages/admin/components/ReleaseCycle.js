@@ -32,7 +32,7 @@ const ReleaseCycle = (props) => {
                 {props.cycleList.map((cycleName,index) => ( 
                     <li key={index} className={props.cycleListClass?'cycleList createCycle':"createCycle"}>
                         <img src={"static/imgs/ic-cycle.png"} alt="Cycle" />
-                        <span title="cycleName" className='cycleName'>{cycleName}</span>
+                        <span title={cycleName} className='cycleName'>{cycleName}</span>
                         <span >
                             <img onClick={()=>{props.clickEditCycle("editReleaseName_" + props.count,cycleName)}} id={"editCycleName_" + props.delCount}  title='Edit Cycle Name' src={"static/imgs/ic-edit-sm.png"} alt='Edit Cycle Name' className='editCycleName'/>
                             {/* <img id={"deleteCycleName_" + delCount } title='Delete Cycle' src={"static/imgs/ic-delete-sm.png"} class='deleteCycle'/> */}

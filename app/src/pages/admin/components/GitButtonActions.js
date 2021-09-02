@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ModalContainer, VARIANT, Messages } from '../../global';
+import { ModalContainer, VARIANT, Messages, setMsg } from '../../global';
 import {gitSaveConfig} from '../api';
 import '../styles/GitConfig.scss'
 
@@ -21,7 +21,6 @@ const GitButtonActions = (props) => {
     const userData = props.userData
     const projectData = props.projectData
     const setLoading = props.setLoading
-    const setPopupState = props.setPopupState
     const resetFields = props.resetFields
     const displayError = props.displayError
     const domain = props.domain
@@ -33,13 +32,13 @@ const GitButtonActions = (props) => {
     },[gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail])
 
     const gitConfigAction = async (action) => {
-        if (!gitValidate(action, user, domain, Project, gitConfigName ,gitAccToken, gitUrl, gitUsername, gitEmail, setPopupState)) return;
+        if (!gitValidate(action, user, domain, Project, gitConfigName ,gitAccToken, gitUrl, gitUsername, gitEmail)) return;
         setLoading("Loading...");
         const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitConfigName.current.value.trim(),gitAccToken.current.value.trim(),gitUrl.current.value.trim(),gitUsername.current.value.trim(),gitEmail.current.value.trim());
         if(data.error){displayError(data.error);return;}
-        else if (data === 'GitConfig exists') setPopupState({show:true,variant:Messages.ADMIN.WARN_GITCONFIG_EXIST.VARIANT,content:Messages.ADMIN.WARN_GITCONFIG_EXIST.CONTENT});
-        else if(data  === 'GitUser exists')  setPopupState({show:true,variant:Messages.ADMIN.WARN_GIT_PROJECT_CONFIGURED.VARIANT,content:Messages.ADMIN.WARN_GIT_PROJECT_CONFIGURED.CONTENT});
-        else setPopupState({show:true,variant:VARIANT.SUCCESS,content:"Git configuration "+action+ "d successfully"});
+        else if (data === 'GitConfig exists') setMsg(Messages.ADMIN.WARN_GITCONFIG_EXIST);
+        else if(data  === 'GitUser exists')  setMsg(Messages.ADMIN.WARN_GIT_PROJECT_CONFIGURED);
+        else setMsg(Messages.CUSTOM("Git configuration "+action+ "d successfully",VARIANT.SUCCESS));
         setLoading(false);
         resetFields();
     }
@@ -75,7 +74,7 @@ const GitButtonActions = (props) => {
     );
 }
 
-const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail, setPopupState) => {
+const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail) => {
     var flag = true;
     const errBorder = '2px solid red';
     var regExUrl = /^https:\/\//g;
@@ -122,7 +121,7 @@ const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, 
     }
     if(!regExUrl.test(gitUrl.current.value.trim())){
         gitUrl.current.style.outline = errBorder;
-        setPopupState({show:true,variant:Messages.ADMIN.WARN_GIT_URL.VARIANT,content:Messages.ADMIN.WARN_GIT_URL.CONTENT});
+        setMsg(Messages.ADMIN.WARN_GIT_URL);
         flag = false;
     }
     return flag;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE } from '../../admin/api'
-import { ScreenOverlay, ScrollBar, Messages  as MSG } from '../../global'
+import { ScreenOverlay, ScrollBar, Messages  as MSG, setMsg } from '../../global'
 import { useSelector } from 'react-redux'
 
 import classes from '../styles/UserProject.module.scss';
@@ -18,7 +18,6 @@ const UserProject = (props) => {
     const [project, setProject] = useState("-1");
     const [selProjectDtls, setSelProjectDtls] = useState();
     const [loading, setLoading] = useState(false);
-    const setPopupState=props.setPopupState;
     
     const getDomainICE =async() => {
         try {
@@ -26,12 +25,12 @@ const UserProject = (props) => {
             const data = await getDomains_ICE();
             setLoading(false);
             if (data.error) {
-                setPopupState(data.error);
+                setMsg(data.error);
                 return;
             }
             setProjects(data);
         } catch (error) {
-            setPopupState(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+            setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
         }
     }
 
@@ -57,7 +56,7 @@ const UserProject = (props) => {
                 let data = await getAssignedProjects_ICE(getAssignProj);
                 setLoading(false);
                 if (data.error) {
-                    setPopupState(data.error);
+                    setMsg(data.error);
                     return;
                 }
                 data = data.map((obj)=>{
@@ -65,7 +64,7 @@ const UserProject = (props) => {
                 })
                 setAssignProj((prevState)=>{ return [...data, ...prevState]});
             } catch (error) {
-                setPopupState(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
             }
         })
     }
@@ -81,14 +80,14 @@ const UserProject = (props) => {
             setLoading(false);
             if (selProjectRes.error) {
                 event.preventDefault();
-                setPopupState(selProjectRes.error);
+                setMsg(selProjectRes.error);
                 return;
             }
             selProjectRes = {...selProjectRes, domain:assignProj[index]['domain']};
             setSelProjectDtls(selProjectRes);
         }
         catch (e) {
-            setPopupState(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+            setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
         }
     }
 

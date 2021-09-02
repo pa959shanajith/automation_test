@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Handlebars from 'handlebars';
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector } from "react-redux";
-import { ModalContainer, ScrollBar, Report, RedirectPage, Messages as MSG } from '../../global';
+import { ModalContainer, ScrollBar, Report, RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { readTestCase_ICE, getTestcasesByScenarioId_ICE } from '../api';
 import "../styles/DependentTestCaseDialog.scss";
 
@@ -17,7 +17,6 @@ import "../styles/DependentTestCaseDialog.scss";
         setDTcFlag -> flag status for dependent test cases / enabled means dependent TC is present
         taskName -> current task's name
         taskId= -> current task's ID
-        setShowPop -> state to display popup msgs
 */
 
 const DependentTestCaseDialog = props => {
@@ -74,7 +73,7 @@ const DependentTestCaseDialog = props => {
             setError("");
             checkedTestcases['current'] = props.taskId;
             props.setShowDlg(false);
-            props.setShowPop(MSG.DESIGN.SUCC_DEPENDENT_TC_SAVE);
+            setMsg(MSG.DESIGN.SUCC_DEPENDENT_TC_SAVE);
             props.setDTcFlag(true);
             props.setCheckedTc(checkedTestcases);
         }
@@ -145,7 +144,7 @@ const TestCaseItem = ({index, testCase, updateChecklist}) => {
     return (
         <div className="testCaseItem" data-test="d__dtc_item">
             <input className="tcCheck" type="checkbox" onChange={handleCheck} disabled={testCase.disableAndBlock} checked={check}/>
-            <label className="tcName" >{testCase.testCaseName}</label>
+            <label className="tcName" title={testCase.testCaseName}>{testCase.testCaseName}</label>
             <Link className="tcView" to="#" onClick={onView}>View</Link>
         </div>
     );

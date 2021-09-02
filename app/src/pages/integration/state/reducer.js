@@ -3,7 +3,6 @@ import * as actionTypes from './action.js';
 const initialState = {
     mappedScreenType : null,
     screenType: null,
-    showPop: false,
     showOverlay: "",
     mappedFiles: [],
     selectedTCDetails: {
@@ -28,11 +27,6 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 screenType: action.payload
-            }
-        case actionTypes.SHOW_POPUP:
-            return{
-                ...state,
-                showPop: action.payload
             }
         case actionTypes.SHOW_OVERLAY:
             return{

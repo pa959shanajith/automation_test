@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import ClickAwayListener from 'react-click-away-listener';
-import { ReferenceBar, ScrollBar, RedirectPage, Messages } from '../../global';
+import { ReferenceBar, ScrollBar, RedirectPage, Messages , setMsg} from '../../global';
 import  * as ScrapeFilter  from './FilterScrapeObjects';
 import * as list from './ListVariables';
 import { ScrapeContext } from './ScrapeContext';
@@ -30,7 +30,7 @@ const RefBarItems = props => {
 	const [currMobileType, setCurrMobileType]  = useState('Android');
 	const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 	const [dsRatio, setDsRatio] = useState(1); //downScale Ratio
-	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, setShowPop, orderList } = useContext(ScrapeContext);
+	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, orderList } = useContext(ScrapeContext);
 
 	useEffect(()=>{
 		return ()=>{
@@ -122,7 +122,7 @@ const RefBarItems = props => {
 				highlightScrapElement_ICE(ScrapedObject.xpath, ScrapedObject.url, appType)
 					.then(data => {
 						if (data === "Invalid Session") return RedirectPage(history);
-						if (data === "fail") setShowPop(Messages.SCRAPE.ERR_HIGHLIGHT)
+						if (data === "fail") setMsg(Messages.SCRAPE.ERR_HIGHLIGHT)
 					})
 					.catch(error => console.error("Error while highlighting. ERROR::::", error));
 			}
@@ -249,8 +249,8 @@ const RefBarItems = props => {
     return (
     
         <ReferenceBar popups={Popups()} closeAllPopups={closeAllPopups} scrapeScreenURL={scrapedURL} >
-			{ appType!=="Webservice" && appType!=="Mainframe" && <div data-test="screenshot" className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title">Screenshot</span></div>}
-            { appType!=="Webservice" && <span data-test="filter" onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter"/></span><span className="rb_box_title">Filter</span></span>}
+			{ appType!=="Webservice" && appType!=="Mainframe" && <div data-test="screenshot" className="ic_box" onClick={toggleScreenshotPop}><img className={"rb__ic-task thumb__ic "} alt="screenshot-ic" title="Screenshot" src="static/imgs/ic-screenshot.png"/><span className="rb_box_title" title="Screenshot">Screenshot</span></div>}
+            { appType!=="Webservice" && <span data-test="filter" onClick={toggleFilterPop} className={"ic_box"+(compareFlag?" ss__filterDisable":"")}  ><span><img className={"rb__ic-info thumb__ic " + (showFilterPop && "active_rb_thumb")} src="static/imgs/ic-filter.png" alt="fliter" title="Filter"/></span><span className="rb_box_title" title="Filter">Filter</span></span>}
         </ReferenceBar>
         
     

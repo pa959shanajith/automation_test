@@ -1,10 +1,10 @@
 import React, { useState } from  'react';
 import { useHistory } from 'react-router-dom';
-import { RedirectPage, CalendarComp, Messages as MSG } from '../../global';
+import { RedirectPage, CalendarComp, Messages as MSG, setMsg } from '../../global';
 import { fetchMetrics } from '../api';
 import "../styles/ExecutionMetrics.scss";
 
-const ExecutionMetrics = ({setBlockui,setShowPop}) => {
+const ExecutionMetrics = ({setBlockui}) => {
 
     const history = useHistory();
 
@@ -55,11 +55,11 @@ const ExecutionMetrics = ({setBlockui,setShowPop}) => {
                 .then(result => {
                     setBlockui({ show: false })
                     if (result === "Invalid Session") return RedirectPage(history);
-                    else if (result === "fail") setShowPop(MSG.UTILITY.ERR_EXPORT_EXE_METRICS);
-                    else if (result === "NoRecords") setShowPop(MSG.UTILITY.ERR_NO_RECORDS);
-                    else if (result === "InvalidExecId") setShowPop(MSG.UTILITY.ERR_INVALID_EXEC_ID);
-                    else if (result === "InvalidStatus") setShowPop(MSG.UTILITY.ERR_INVALID_STATUS);
-                    else if (result.error) setShowPop(result.error);
+                    else if (result === "fail") setMsg(MSG.UTILITY.ERR_EXPORT_EXE_METRICS);
+                    else if (result === "NoRecords") setMsg(MSG.UTILITY.ERR_NO_RECORDS);
+                    else if (result === "InvalidExecId") setMsg(MSG.UTILITY.ERR_INVALID_EXEC_ID);
+                    else if (result === "InvalidStatus") setMsg(MSG.UTILITY.ERR_INVALID_STATUS);
+                    else if (result.error) setMsg(result.error);
                     else {
                         let isIE = false || !!document.documentMode;
                         let file = new Blob([result], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -75,12 +75,12 @@ const ExecutionMetrics = ({setBlockui,setShowPop}) => {
                             document.body.removeChild(a);
                             URL.revokeObjectURL(fileURL);
                         }
-                        setShowPop(MSG.UTILITY.SUCC_EXPORTED);
+                        setMsg(MSG.UTILITY.SUCC_EXPORTED);
                     }
                     setErrors({});
                 })
                 .catch(error => {
-                    setShowPop(MSG.UTILITY.ERR_FAILED);
+                    setMsg(MSG.UTILITY.ERR_FAILED);
                     setErrors({});
                     console.error(error);
                 });
@@ -95,8 +95,8 @@ const ExecutionMetrics = ({setBlockui,setShowPop}) => {
             </span>
         </div>
         <div className="execM__btnGroup">
-            <button onClick={handleSubmit} data-test="util__fetch">Fetch</button>
-            <button onClick={handleReset} data-test="util__reset">Reset</button>
+            <button onClick={handleSubmit} data-test="util__fetch" title="Fetch">Fetch</button>
+            <button onClick={handleReset} data-test="util__reset" title="Reset">Reset</button>
         </div>
         <div className="execM__inputGroup">
             <span className="execM__inputLabel" data-test="util__inputLabel">From Date<span className="execM__mandate">*</span></span>

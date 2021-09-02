@@ -9,7 +9,7 @@ import MultiNodeBox from '../components/MultiNodeBox'
 import RectangleBox from '../components/RectangleBox'
 import SaveMapButton from '../components/SaveMapButton'
 import ExportMapButton from '../components/ExportMapButton'
-import {Messages as MSG} from '../../global'
+import {Messages as MSG, setMsg} from '../../global'
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import * as actionTypes from '../state/action';
@@ -51,7 +51,6 @@ const CanvasNew = (props) => {
     const [dLinks,setdLinks] = useState([])
     const [createnew,setCreateNew] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(false)
-    const setPopup=props.setPopup
     const setBlockui=props.setBlockui
     const displayError = props.displayError
     const CanvasRef = useRef();
@@ -155,7 +154,7 @@ const CanvasNew = (props) => {
     const nodeClick=(e)=>{
         e.stopPropagation()
         if(d3.select('#pasteImg').classed('active-map')){
-            var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},setPopup,verticalLayout)
+            var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},verticalLayout)
             if(res){
                 setNodes(res.cnodes)
                 setLinks(res.clinks)
@@ -205,7 +204,7 @@ const CanvasNew = (props) => {
         count= {...count,...res.count}
     }
     const clickDeleteNode=(id)=>{
-        var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes},setPopup)
+        var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes})
         if(res){
             dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
             setNodes(res.nodeDisplay)
@@ -247,13 +246,13 @@ const CanvasNew = (props) => {
         <Fragment>
             {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
             {(ctrlBox !== false)?<ControlBox nid={ctrlBox} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} setPopup={setPopup} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
+            {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
-            <SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setPopup={setPopup} setBlockui={setBlockui}/>
-            <ExportMapButton setBlockui={setBlockui} setPopup={setPopup} displayError={displayError}/>
+            <SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>
+            <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>
                 {Object.entries(links).map((link)=>{
@@ -281,7 +280,7 @@ const CanvasNew = (props) => {
     );
 }
 
-const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,count,setPopup,verticalLayout) => {
+const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,count,verticalLayout) => {
     var dNodes_c = copyNodes.nodes
     var dLinks_c = copyNodes.links
     var nodetype =  d3.select('.node-selected').attr('data-nodetype');
@@ -356,20 +355,10 @@ const pasteNode = (activeNode,copyNodes,cnodes,clinks,cdNodes,cdLinks,csections,
         }
     }
     else if (d3.select('.node-selected').attr('data-nodetype') === 'scenarios') {
-        setPopup({
-            variant:MSG.MINDMAP.WARN_SELECT_SCENARIO_PASTE.VARIANT,
-            content: MSG.MINDMAP.WARN_SELECT_SCENARIO_PASTE.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(MSG.MINDMAP.WARN_SELECT_SCENARIO_PASTE)
         return false
     } else if(d3.select('.node-selected').attr('data-nodetype') === 'modules') {
-        setPopup({
-            variant:MSG.MINDMAP.WARN_SELECT_MODULE_PASTE.VARIANT,
-            content: MSG.MINDMAP.WARN_SELECT_MODULE_PASTE.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(MSG.MINDMAP.WARN_SELECT_MODULE_PASTE)
         return false
     }
     return {cnodes,clinks,cdNodes,cdLinks,csections,count};

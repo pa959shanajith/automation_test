@@ -11,7 +11,7 @@ const UserTokenMgmt = (props) => {
     const userInfo = useSelector(state => state.login.userinfo);
     return (
         <>
-             <TokenManagement userConfig={true} userInfo={userInfo['user_id']} resetMiddleScreen={props.resetMiddleScreen} setMiddleScreen={props.setMiddleScreen} setPopupState={props.setPopupState} />
+             <TokenManagement userConfig={true} userInfo={userInfo['user_id']} resetMiddleScreen={props.resetMiddleScreen} setMiddleScreen={props.setMiddleScreen} />
         </>
     )
 }

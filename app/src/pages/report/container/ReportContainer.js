@@ -1,7 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import ModuleList from '../components/ModuleList';
 import ToolbarMenu from '../components/ToolbarMenu';
-import { ScreenOverlay ,PopupMsg, ScrollBar, updateScrollBar } from '../../global';
+import { ScreenOverlay ,setMsg, ScrollBar, updateScrollBar } from '../../global';
 import TestingReport from './TestingReport';
 import AccessibilityReport from './AccessibilityReport';
 import '../styles/ReportContainer.scss';
@@ -17,22 +17,15 @@ const dropSize = {
 }
 const ReportContainer = () =>{
     const [modDrop,setModDrop] = useState('close')
-    const [popup,setPopup] = useState({show:false})
     const [blockui,setBlockui] = useState({show:false})
     const [FnReport,setFnReport] =  useState(true)
     const displayError = (error) =>{
         setBlockui(false)
-        setPopup({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
     return(
         <Fragment>
             {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-            {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content} />:null}
             <div id='rp-body-scroll' className='rp__main_container'>
                 <ScrollBar scrollId={'rp-body-scroll'}>
                 <div className='container-padding'>

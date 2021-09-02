@@ -184,9 +184,8 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
             return res.status(statusCode).send(finalResult);
         }
         // This code only executes when request comes from Azure DevOps
-        let adoStatus = finalResult.executionStatus.every(e => e.status == "success");
         const args = {
-            data: { "name": "TaskCompleted", "taskId": hdrs.taskinstanceid, "jobId": hdrs.jobid, "result": (adoStatus ? "succeeded" : "failed") },
+            data: { "name": "TaskCompleted", "taskId": hdrs.taskinstanceid, "jobId": hdrs.jobid, "result": finalResult.executionStatus.status },
             headers: {
                 "Authorization": 'Basic ' + Buffer.from(':' + hdrs.authtoken).toString('base64'),
                 "Content-Type": "application/json"

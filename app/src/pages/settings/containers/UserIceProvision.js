@@ -11,7 +11,7 @@ const UserIceProvision = (props) => {
     const userInfo = useSelector(state => state.login.userinfo);
     return (
         <>
-            <IceProvision userConfig={true} userID={userInfo['user_id']} username = {userInfo.username} resetMiddleScreen={props.resetMiddleScreen} setMiddleScreen={props.setMiddleScreen} setPopupState={props.setPopupState} />
+            <IceProvision userConfig={true} userID={userInfo['user_id']} username = {userInfo.username} resetMiddleScreen={props.resetMiddleScreen} setMiddleScreen={props.setMiddleScreen} />
         </>
     )
 }

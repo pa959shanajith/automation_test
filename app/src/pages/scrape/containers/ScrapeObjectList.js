@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
 import { useHistory } from 'react-router-dom';
 import ScrapeObject from '../components/ScrapeObject';
-import { ScrollBar, RedirectPage, VARIANT } from "../../global"
+import { ScrollBar, RedirectPage, VARIANT, Messages, setMsg } from "../../global"
 import { ScrapeContext } from '../components/ScrapeContext';
 import * as actionTypes from '../state/action';
 import * as scrapeApi from '../api';
@@ -355,16 +355,17 @@ const ScrapeObjectList = () => {
             else fetchScrapeData().then(resp=>{
                 if (resp === 'success' || typeof(resp) === "object"){
                     setShowPop({
-                        'variant': VARIANT.SUCCESS,
-                        'content': typeof(resp)==="object" && resp.length>0 ? <div className="ss__dup_labels">
-                            Scraped data saved successfully.
-                            <br/><br/>
-                            <strong>Warning: Please scrape an IRIS reference object.</strong>
-                            <br/><br/>
-                            Matching objects found for:
-                            { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-                        </div> : 'Scraped data saved successfully.'
-                    })
+                        title: "Saved Scrape Objects",
+                        content: typeof(resp)==="object" && resp.length>0 ? <div className="ss__dup_labels">
+                                    Scraped data saved successfully.
+                                    <br/><br/>
+                                    <strong>Warning: Please scrape an IRIS reference object.</strong>
+                                    <br/><br/>
+                                    Matching objects found for:
+                                    { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
+                                </div> : 'Scraped data saved successfully.',
+                        footer: <button onClick={()=>{setShowPop("")}} >OK</button>       
+                    });
                     let numOfObj = scrapeItemsL.length;
                     setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: numOfObj !== 0});
@@ -393,15 +394,15 @@ const ScrapeObjectList = () => {
                 <div className="ss__btngroup">
                     <div className="ss__left-btns">
                         <label data-test="selectalllabel" className="ss__select-all">
-                            <input className="ss__select-all-chkbox" type="checkbox" checked={selAllCheck} disabled={disableBtns.selAll} onChange={(e)=>updateChecklist("all", e)}/>
+                            <input className="ss__select-all-chkbox" type="checkbox" title="Select all" checked={selAllCheck} disabled={disableBtns.selAll} onChange={(e)=>updateChecklist("all", e)}/>
                             <span className="ss__select-all-lbl">
                                 Select all
                             </span>
                         </label>
-                        <button data-test="save" className="ss__taskBtn ss__btn" disabled={disableBtns.save} onClick={onSave}>Save</button>
-                        <button data-test="delete"className="ss__taskBtn ss__btn" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
-                        <button data-test="edit"className="ss__taskBtn ss__btn" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
-                        <button data-test="dnd"className="ss__taskBtn ss__btn" disabled={disableBtns.dnd} onClick={(e)=>onRearrange(e, dnd)}>{dnd?"Stop":"Rearrange"}</button>
+                        <button data-test="save" className="ss__taskBtn ss__btn" title="Save Objects" disabled={disableBtns.save} onClick={onSave}>Save</button>
+                        <button data-test="delete"className="ss__taskBtn ss__btn" title="Delete Objects" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
+                        <button data-test="edit"className="ss__taskBtn ss__btn" title="Edit Objects" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
+                        <button data-test="dnd"className="ss__taskBtn ss__btn" title="Rearrange" disabled={disableBtns.dnd} onClick={(e)=>onRearrange(e, dnd)}>{dnd?"Stop":"Rearrange"}</button>
                         <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>

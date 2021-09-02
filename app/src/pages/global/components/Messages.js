@@ -1,10 +1,13 @@
 const VARIANT = {
-    ERROR: "ERROR",
-    WARNING: "WARNING",
-    SUCCESS: "SUCCESS"
+    ERROR: "error",
+    WARNING: "info",
+    SUCCESS: "success"
 }
 
 const Messages={
+    CUSTOM: (M,V) => ({
+        "CONTENT":M, "VARIANT":V
+    }),
     ADMIN:{
         ERR_FETCH_USERROLES: {"CONTENT":"Failed to fetch user roles.", "VARIANT": VARIANT.ERROR},
         ERR_FETCH_LDAP: {"CONTENT":"Failed to fetch LDAP server configurations.", "VARIANT": VARIANT.ERROR},
@@ -69,7 +72,15 @@ const Messages={
         ERR_PROVISION_ICE: {"CONTENT":"ICE Provisioned Failed.", "VARIANT": VARIANT.ERROR},
         ERR_ICE_DEREGISTER: {"CONTENT":"ICE Deregister Failed.", "VARIANT": VARIANT.ERROR},
         ERR_SELECTED_ICE_NOT_ACTIVE : {"CONTENT": "Failed to change default ICE as the selected ICE is not active", "VARIANT": VARIANT.ERROR},
-        
+        ERR_TEST_INVALID_URL: {"CONTENT":"Test Connection Failed! Invalid URL. It must start with 'ldap://'", "VARIANT": VARIANT.ERROR},
+        ERR_ANONYMOUS_ACCESS: {"CONTENT":"Test Connection Success! Anonymous access is not allowed for this server.", "VARIANT": VARIANT.ERROR},
+        ERR_INVALID_CRED_TEST: {"CONTENT":"Test Connection Failed! Credentials provided for Authentication are invalid.", "VARIANT": VARIANT.ERROR},
+        ERR_PRIVILEGE_TEST: {"CONTENT":"Test Connection Failed! Credentials provided does not have required privileges for setting up LDAP.", "VARIANT": VARIANT.ERROR},
+        ERR_BASE_DOMAIN_TEST: {"CONTENT":"Test Connection Failed! Base Domain Name is incorrect.", "VARIANT": VARIANT.ERROR},
+        ERR_DIRECTORY_EMPTY: {"CONTENT":"Test Connection Successful but LDAP directory is empty!", "VARIANT": VARIANT.ERROR},
+        ERR_TEST_SPEC_CHAR: {"CONTENT":"Test Connection Failed! Special characters found in LDAP configuration values.", "VARIANT": VARIANT.ERROR},
+        ERR_TEST_CONNECT_UNEXPECTED: {"CONTENT":"Test Connection Failed due to unexpected error!", "VARIANT": VARIANT.ERROR},
+
         SUCC_EMAIL_SENT: {"CONTENT":"Test Email Sent.", "VARIANT": VARIANT.SUCCESS},
         SUCC_ICEPOOL_SAVED: {"CONTENT":"ICE Pool saved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_CREATE_ICEPOOL: {"CONTENT":"ICE Pool created successfully.", "VARIANT": VARIANT.SUCCESS},
@@ -132,6 +143,9 @@ const Messages={
         SUCC_DEBUG: {"CONTENT":"Debug completed successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TC_IMPORT: {"CONTENT":"TestCase Json imported successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DEPENDENT_TC_SAVE: {"CONTENT":"Dependent Test Cases saved successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_TASK_REASSIGN: {"CONTENT":"Task Reassigned successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_TASK_APPROVED: {"CONTENT":"Task Approved successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_TASK_SUBMIT: {"CONTENT":"Task Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_DELETED_TC_FOUND: {"CONTENT":"Deleted objects found in some teststeps, Please delete or modify those steps.", "VARIANT": VARIANT.WARNING},
         WARN_DELETE: {"CONTENT":"No steps to Delete.", "VARIANT": VARIANT.WARNING},

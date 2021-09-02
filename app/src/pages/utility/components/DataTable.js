@@ -1,7 +1,7 @@
 import React, { useState, useEffect }  from 'react';
 import { v4 as uuid } from 'uuid';
 import { TableActionButtons, CreateScreenActionButtons, EditScreenActionButtons, SearchDataTable } from './DataTableBtnGroup';
-import { Messages as MSG, ModalContainer, ScreenOverlay, ValidationExpression as validate, VARIANT } from '../../global';
+import { Messages as MSG, ModalContainer, ScreenOverlay, ValidationExpression as validate, setMsg } from '../../global';
 import Table from './Table';
 import { resetHistory } from './DtUtils';
 import * as utilApi from '../api';
@@ -46,8 +46,8 @@ const DataTable = props => {
         
         { 
             currScreen === "Create" 
-            ? <CreateScreen setModal={setModal} setShowPop={props.setShowPop} setOverlay={setOverlay} setScreenType={props.setScreenType} />
-            : <EditScreen setModal={setModal} setShowPop={props.setShowPop} setOverlay={setOverlay} setScreenType={props.setScreenType} />
+            ? <CreateScreen setModal={setModal} setOverlay={setOverlay} setScreenType={props.setScreenType} />
+            : <EditScreen setModal={setModal} setOverlay={setOverlay} setScreenType={props.setScreenType} />
         }
     </>;
 }
@@ -110,15 +110,15 @@ const EditScreen = props => {
                 props.setOverlay('');
     
                 if (resp.error) 
-                    props.setShowPop(resp.error);
+                    setMsg(resp.error);
                 if (resp === 'fail')
-                    props.setShowPop(MSG.UTILITY.ERR_FETCH_DATATABLES);
+                    setMsg(MSG.UTILITY.ERR_FETCH_DATATABLES);
                 if (typeof(resp) === 'object') {
                     setDataTables(resp);
                 }
             }
             catch(error) {
-                props.setShowPop(MSG.UTILITY.ERR_FETCH_DATATABLES)
+                setMsg(MSG.UTILITY.ERR_FETCH_DATATABLES)
                 console.error(error);
             }
         })()

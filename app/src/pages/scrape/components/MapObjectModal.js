@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG } from '../../global';
+import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { tagList } from  './ListVariables';
 import { updateScreen_ICE } from '../api';
 import "../styles/MapObjectModal.scss";
@@ -117,17 +117,17 @@ const MapObjectModal = props => {
                     .then(resp => {
                         if (resp === "success") {
                             props.setShow(false);
-                            props.setShowPop(MSG.SCRAPE.SUCC_MAPPED_SCRAPED)
+                            setMsg(MSG.SCRAPE.SUCC_MAPPED_SCRAPED)
                         }
-                        else props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+                        else setMsg(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
                     })
                     .catch(err => {
-                        props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+                        setMsg(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
                         // console.error(err);
                     });
         })
         .catch(error => {
-            props.setShowPop(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
+            setMsg(MSG.SCRAPE.ERR_MAPPED_SCRAPE)
             console.err(error);
         })
     }
@@ -162,7 +162,7 @@ const MapObjectModal = props => {
                                             { (()=> selectedTag ? scrapedList[selectedTag] : nonCustomList)()
                                             .map((object, i) => {
                                                 let mapped = object.val in map;
-                                                return (<div data-test="mapObjectListItem" key={i} className={"ss__mo_listItem"+(mapped ? " mo_mapped" : "")} draggable={ mapped ? "false" : "true"} onDragStart={(e)=>onDragStart(e, object)}>
+                                                return (<div data-test="mapObjectListItem" key={i} title={object.title} className={"ss__mo_listItem"+(mapped ? " mo_mapped" : "")} draggable={ mapped ? "false" : "true"} onDragStart={(e)=>onDragStart(e, object)}>
                                                     {object.title}
                                                 </div>)
                                             }) }
@@ -186,7 +186,7 @@ const MapObjectModal = props => {
                                     <Fragment key={i}>
                                     <div data-test="mapObjectTagHead" className="mo_tagHead" onClick={()=>setSelectedTag(elementType === selectedTag ? "" : elementType )}>{elementType}</div>
                                     { selectedTag === elementType && <div className="mo_tagItemList"> 
-                                        {customList[selectedTag].map((object, j) => <div data-test="mapObjectCustomListItem" key={j} className={"mo_tagItems"+(selectedItems.includes(object.val) ? " mo_selectedTag" : "")} onDragOver={onDragOver} onDrop={(e)=>onDrop(e, object)}>
+                                        {customList[selectedTag].map((object, j) => <div data-test="mapObjectCustomListItem" key={j} title={object.title} className={"mo_tagItems"+(selectedItems.includes(object.val) ? " mo_selectedTag" : "")} onDragOver={onDragOver} onDrop={(e)=>onDrop(e, object)}>
                                             { object.val in map ?
                                             <>
                                             <span data-test="mapObjectMappedName" className="mo_mappedName" onClick={()=>onCustomClick("", object.val)}>
@@ -227,8 +227,7 @@ MapObjectModal.propTypes={
     user_id: PropTypes.string,
     role: PropTypes.string,
     fetchScrapeData:PropTypes.func,
-    setShow:PropTypes.func,
-    setShowPop: PropTypes.func,
+    setShow:PropTypes.func
 }
 export default MapObjectModal;
 

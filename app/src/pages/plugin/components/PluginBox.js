@@ -23,7 +23,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
     return (
 		<>
 			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
-            <div data-test="plugin-blocks" className="plugin-block" onClick={pluginRedirect}>
+            <div data-test="plugin-blocks" className="plugin-block" title={pluginName} onClick={pluginRedirect}>
                 <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName}.svg`} />
                 <span data-test="plugin-name" className="plugin-text">{pluginTitle}</span>
         	</div>

@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, ScrollBar, Messages} from '../../global' 
+import {ScreenOverlay, ScrollBar, Messages, setMsg} from '../../global' 
 import {manageCIUsers} from '../api';
 import { useSelector } from 'react-redux';
 import TokenMgmtForm from '../components/TokenMgmtForm';
@@ -30,7 +30,6 @@ const TokenManagement = (props) => {
     const [runLoadData,setRunLoadData] = useState(true)
 	const [refresh,setRefresh] = useState(false)
 	const [showList,setShowList] = useState(false)
-	const setPopupState =props.setPopupState;
 	const userConfig = props.userConfig //User Settings
 
     useEffect(()=>{
@@ -44,12 +43,7 @@ const TokenManagement = (props) => {
 
 	const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     const generateCIusertokens = async () =>{
@@ -147,8 +141,8 @@ const TokenManagement = (props) => {
 				</div>
 				<div className="content_wrapper-tkn-mgmt">
 					<ScrollBar thumbColor="#929397">
-						<TokenMgmtForm setPopupState={setPopupState} userConfig = {userConfig} userInfo ={props.userInfo} setShowList={setShowList} showList={showList} runLoadData={runLoadData} op={op} setOp={setOp} dateVal={dateVal} setSelAssignUser2ErrBorder={setSelAssignUser2ErrBorder} setNameErrBorder={setNameErrBorder} nameErrBorder={nameErrBorder} refresh={refresh} selAssignUser2ErrBorder={selAssignUser2ErrBorder} timeVal={timeVal} setTimeVal={setTimeVal} setdateVal={setdateVal} setAllTokens={setAllTokens} setTargetid={setTargetid} targetid={targetid} name={name} allICE={allICE} setAllICE={setAllICE} setName={setName} token={token} allTokens={allTokens} setToken={setToken} />
-						<TokenMgmtList setPopupState={setPopupState} showList={showList} setShowList={setShowList} allTokens={allTokens} setAllTokens={setAllTokens} targetid={targetid} />
+						<TokenMgmtForm userConfig = {userConfig} userInfo ={props.userInfo} setShowList={setShowList} showList={showList} runLoadData={runLoadData} op={op} setOp={setOp} dateVal={dateVal} setSelAssignUser2ErrBorder={setSelAssignUser2ErrBorder} setNameErrBorder={setNameErrBorder} nameErrBorder={nameErrBorder} refresh={refresh} selAssignUser2ErrBorder={selAssignUser2ErrBorder} timeVal={timeVal} setTimeVal={setTimeVal} setdateVal={setdateVal} setAllTokens={setAllTokens} setTargetid={setTargetid} targetid={targetid} name={name} allICE={allICE} setAllICE={setAllICE} setName={setName} token={token} allTokens={allTokens} setToken={setToken} />
+						<TokenMgmtList showList={showList} setShowList={setShowList} allTokens={allTokens} setAllTokens={setAllTokens} targetid={targetid} />
 					</ScrollBar>
 				</div>
 			</div>

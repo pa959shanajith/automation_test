@@ -1,9 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { useDispatch } from 'react-redux';
-import {ScrollBar, PopupMsg, VARIANT, Messages as MSG} from '../../global';
+import {ScrollBar, Messages as MSG, setMsg} from '../../global';
 import MappedLabel from '../components/MappedLabel';
 import { saveUnsyncDetails } from '../api';
-import * as actionTypes from '../state/action';
 import '../styles/MappedPage.scss';
 
 /* 
@@ -15,9 +13,7 @@ import '../styles/MappedPage.scss';
 
 const MappedPage = props =>{
     
-    const dispatch = useDispatch();
     const [selectedSc, setSelectedSc] = useState([]);
-    const [popup,setPopup] = useState({show:false})
     const [selectedTc, setSelectedTc] = useState([]);
     const [unSynced, setUnSynced] = useState(false);
     const [unSyncMaps, setUnSyncMaps] = useState({
@@ -167,31 +163,25 @@ const MappedPage = props =>{
 			saveUnsyncDetails(args)
 			.then(data => {
                 if (data.error) 
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: data.error});
+                    setMsg(data.error);
 				else if(data === "unavailableLocalServer")
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_UNAVAILABLE_ICE});
+                    setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
 				else if(data === "scheduleModeOn")
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.GENERIC.WARN_UNCHECK_SCHEDULE});
+                    setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
 				else if(data === "fail")
-                    dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_SAVE});
+                    setMsg(MSG.INTEGRATION.ERR_SAVE);
 				else if(data == "success")
                     props.fetchMappedFiles(true);        
 			})
-			.catch (error => dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.ERR_SAVE}))
+			.catch (error => setMsg(MSG.INTEGRATION.ERR_SAVE))
 		}
-		else dispatch({type: actionTypes.SHOW_POPUP, payload: MSG.INTEGRATION.WARN_UNMAP_TC})
+		else setMsg(MSG.INTEGRATION.WARN_UNMAP_TC)
     }
     const displayError = (error) =>{
-        setPopup({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
     return(
         <Fragment>
-            {(popup.show)?<PopupMsg variant={popup.variant} close={()=>setPopup({show:false})} content={popup.content} />:null}
             <div  className="integration_middleContent">
                 <div className="viewMap__task_title" >
                     <span className="viewMap__task_name">
@@ -213,7 +203,7 @@ const MappedPage = props =>{
                                 <div>{counts.mappedTests}</div>
                             </div>
                         </div>
-                        <button onClick={onSave}>Save</button> 
+                        <button onClick={onSave} title="Save">Save</button> 
                     </> }
                 </div>
                 <div className="viewMap__mappingsContainer">

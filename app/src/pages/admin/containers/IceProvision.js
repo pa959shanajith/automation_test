@@ -22,7 +22,6 @@ const IceProvision = (props) => {
     const [userid,setUserid] = useState(" ")
     const [tokeninfoToken,setTokeninfoToken] = useState("")
     const [tokeninfoIcename,setTokeninfoIcename] = useState("")
-    const setPopupState=props.setPopupState
 
     useEffect(()=>{
       setOp('normal');
@@ -54,8 +53,8 @@ const IceProvision = (props) => {
             </div>
             <div className="ip-content_wrapper">
                 <ScrollBar thumbColor="#929397">
-                  <IceProvisionForm setPopupState={setPopupState} userConfig={props.userConfig} refreshIceList={refreshIceList} setRefreshIceList={setRefreshIceList} op={op} setOp={setOp} runProvisionsIce={runProvisionsIce} selectProvisionType={selectProvisionType} setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken} />
-                  <IceProvisionList setPopupState={setPopupState} userConfig={props.userConfig} userID={props.userID} refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp} setSelectProvisionType={setSelectProvisionType}  icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken}/>
+                  <IceProvisionForm userConfig={props.userConfig} refreshIceList={refreshIceList} setRefreshIceList={setRefreshIceList} op={op} setOp={setOp} runProvisionsIce={runProvisionsIce} selectProvisionType={selectProvisionType} setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken} />
+                  <IceProvisionList userConfig={props.userConfig} userID={props.userID} refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp} setSelectProvisionType={setSelectProvisionType}  icelist={icelist} setIcelist={setIcelist} token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid} tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken} setTokeninfoToken={setTokeninfoToken}/>
                 </ScrollBar>
             </div>
         </div>

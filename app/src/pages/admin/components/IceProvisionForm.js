@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, RedirectPage, Messages, VARIANT, ValidationExpression} from '../../global' 
+import {ScreenOverlay, RedirectPage, Messages, VARIANT, ValidationExpression, setMsg} from '../../global' 
 import {getUserDetails, provisions} from '../api';
 import ReactTooltip from 'react-tooltip';
 import { useHistory } from 'react-router-dom';
@@ -22,7 +22,6 @@ const IceProvisionForm = (props) => {
     const [selAssignUser2ErrBorder,setSelAssignUser2ErrBorder] = useState(false)
 	const [users,setUsers] = useState([['Select User',' ','','']])
 	const isUsrSetting = props.userConfig //for user settings
-	const setPopupState=props.setPopupState
 
     useEffect(()=>{
 		setUsers([['Select User',' ','','']]);
@@ -69,7 +68,7 @@ const IceProvisionForm = (props) => {
 			props.setTokeninfoToken(data);
 			props.setToken(data);
 			props.setRefreshIceList(!props.refreshIceList);
-			setPopupState({show:true,variant:VARIANT.SUCCESS,content:"Token generated Successfully for ICE '"+props.icename+"'!!  Copy or Download the token"});
+			setMsg(Messages.CUSTOM("Token generated Successfully for ICE '"+props.icename+"'!!  Copy or Download the token",VARIANT.SUCCESS));
 		}
     }
 
@@ -147,12 +146,7 @@ const IceProvisionForm = (props) => {
 	
 	const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
 
     return (

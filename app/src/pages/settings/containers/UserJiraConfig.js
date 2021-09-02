@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { ScreenOverlay, Messages as MSG, VARIANT } from '../../global'
+import { ScreenOverlay, Messages as MSG, VARIANT, setMsg } from '../../global'
 import JiraDeleteModal from '../components/JiraDeleteModal'
 import { Header, FormInput } from '../components/AllFormComp'
 import { getDetails_JIRA, manageJiraDetails } from '../api'
@@ -21,7 +21,6 @@ const UserJiraConfig = (props) => {
     const [isValidAPI, setIsValidAPI] = useState(true);
     const [loading, setLoading] = useState(false);
     const [showDelete, setShowDelete] = useState(false);
-    const setPopupState=props.setPopupState;
 
     useEffect(() => {
         getJiraDetails();
@@ -32,7 +31,7 @@ const UserJiraConfig = (props) => {
             setLoading("Loading...")
             const data = await getDetails_JIRA()
             setLoading(false);
-            if (data.error) { setPopupState(data.error); return; }
+            if (data.error) { setMsg(data.error); return; }
             if(data==="empty"){
                 setJiraURL('');
                 setJiraUsername('');
@@ -49,7 +48,7 @@ const UserJiraConfig = (props) => {
                 setCreateJira(false);
             }
         } catch (error) {
-            setPopupState(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+            setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
         }
     }
 
@@ -59,17 +58,14 @@ const UserJiraConfig = (props) => {
             var data = await manageJiraDetails(action, jiraObj);
             setLoading(false);
             if(data.error){
-                setPopupState(data.error);
+                setMsg(data.error);
                 return;
             }
             setCreateJira(false);
-            setPopupState({
-                variant: VARIANT.SUCCESS,
-                content: `The JIRA configeration was successfully ${action}d!!`
-            })
+            setMsg(MSG.CUSTOM(`The JIRA configeration was successfully ${action}d!!`, VARIANT.SUCCESS));
            getJiraDetails();
         }catch(e){
-            setPopupState(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
+            setMsg(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
         }
     }
 
@@ -86,7 +82,7 @@ const UserJiraConfig = (props) => {
             isValid = false;
         }
         if (!isValid) {
-           setPopupState(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
+           setMsg(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
             return;
         }
         var action = ""; 

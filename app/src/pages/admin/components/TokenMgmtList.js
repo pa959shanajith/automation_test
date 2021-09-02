@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
-import {ScreenOverlay, ScrollBar, VARIANT} from '../../global'
+import {ScreenOverlay, ScrollBar, VARIANT, Messages as MSG, setMsg } from '../../global'
 import { useSelector } from 'react-redux';
 import {manageCIUsers} from '../api';
 import '../styles/TokenMgmtList.scss'
@@ -38,7 +38,7 @@ const TokenMgmtList = (props) => {
 		const data = await manageCIUsers("deactivate", CIUser);
         if(data.error){displayError(data.error);return;}
         setLoading(false);
-        setPopupState({show:true,variant:VARIANT.SUCCESS,content: "Token '"+CIUser.tokenName+"' has been Deactivated"});
+        setMsg(MSG.CUSTOM("Token '"+CIUser.tokenName+"' has been Deactivated",VARIANT.SUCCESS));
         data.sort((a,b)=>a.deactivated.localeCompare(b.deactivated));
         data.forEach(e=>e.expiry=new Date(e.expiry).toString().slice(0,-22))
         props.setAllTokens(data);
@@ -46,12 +46,7 @@ const TokenMgmtList = (props) => {
 
     const displayError = (error) =>{
         setLoading(false)
-        setPopupState({
-            variant:error.VARIANT,
-            content:error.CONTENT,
-            submitText:'Ok',
-            show:true
-        })
+        setMsg(error)
     }
     const formatDate = (date) => {
         var d = new Date(date),

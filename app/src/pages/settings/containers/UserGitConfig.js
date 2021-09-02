@@ -11,7 +11,7 @@ const UserGitConfig = (props) => {
     const userInfo = useSelector(state => state.login.userinfo);
     return (
         <>
-             <GitConfig userConfig={true} userID={userInfo['user_id']} username={userInfo.username} resetMiddleScreen={props.resetMiddleScreen} setMiddleScreen={props.setMiddleScreen} setPopupState={props.setPopupState} />
+             <GitConfig userConfig={true} userID={userInfo['user_id']} username={userInfo.username} resetMiddleScreen={props.resetMiddleScreen} setMiddleScreen={props.setMiddleScreen} />
         </>
     )
 }

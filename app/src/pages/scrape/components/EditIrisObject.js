@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { ModalContainer, RedirectPage, Messages as MSG } from '../../global';
+import { ModalContainer, RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { irisObjectTypes } from './ListVariables';
 import { updateIrisDataset, userObjectElement_ICE } from '../api';
 import "../styles/EditIrisObject.scss";
@@ -51,7 +51,7 @@ const EditIrisObject = props => {
 
         if (!props.utils.object.objId) {
             props.setShow(false);
-            props.setShowPop(MSG.SCRAPE.ERR_OBJ_SAVE);
+            setMsg(MSG.SCRAPE.ERR_OBJ_SAVE);
         }
         else {
             updateIrisDataset(data)
@@ -76,22 +76,22 @@ const EditIrisObject = props => {
                             else if (datairis === "fail" && selectedType === "unrecognizableobject") msg = MSG.SCRAPE.SUCC_SUBMIT;
                             else if (datairis === "fail") msg = MSG.SCRAPE.WARN_IRIS_SAVE_FAIL;
                             else msg = MSG.SCRAPE.SUCC_IRIS_SAVE;
-                            if (msg) props.setShowPop(msg);
+                            if (msg) setMsg(msg);
                             props.setShow(false);
                         })
                         .catch(error => {
-                            props.setShowPop(MSG.SCRAPE.WARN_IRIS_SAVE_FAIL);
+                            setMsg(MSG.SCRAPE.WARN_IRIS_SAVE_FAIL);
                             props.setShow(false);
                             console.error("ERROR::::", error);
                         });
                 }
                 else {
                     props.setShow(false);
-                    props.setShowPop(MSG.SCRAPE.ERR_UPDATE_IRIS);
+                    setMsg(MSG.SCRAPE.ERR_UPDATE_IRIS);
                 }
             })
             .catch(error => {
-                props.setShowPop(MSG.SCRAPE.ERR_UPDATE_IRIS);
+                setMsg(MSG.SCRAPE.ERR_UPDATE_IRIS);
                 props.setShow(false);
                 console.error("ERROR::::", error);
             });
