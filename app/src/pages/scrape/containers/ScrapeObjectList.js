@@ -354,15 +354,18 @@ const ScrapeObjectList = () => {
             if (response === "Invalid Session") return RedirectPage(history);
             else fetchScrapeData().then(resp=>{
                 if (resp === 'success' || typeof(resp) === "object"){
-                    setMsg(Messages.CUSTOM(
-                        typeof(resp)==="object" && resp.length>0 ? <div className="ss__dup_labels">
-                            Scraped data saved successfully.
-                            <br/><br/>
-                            <strong>Warning: Please scrape an IRIS reference object.</strong>
-                            <br/><br/>
-                            Matching objects found for:
-                            { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-                        </div> : 'Scraped data saved successfully.',VARIANT.SUCCESS))
+                    setShowPop({
+                        title: "Saved Scrape Objects",
+                        content: typeof(resp)==="object" && resp.length>0 ? <div className="ss__dup_labels">
+                                    Scraped data saved successfully.
+                                    <br/><br/>
+                                    <strong>Warning: Please scrape an IRIS reference object.</strong>
+                                    <br/><br/>
+                                    Matching objects found for:
+                                    { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
+                                </div> : 'Scraped data saved successfully.',
+                        footer: <button onClick={()=>{setShowPop("")}} >OK</button>       
+                    });
                     let numOfObj = scrapeItemsL.length;
                     setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: numOfObj !== 0});

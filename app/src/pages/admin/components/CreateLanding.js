@@ -1,10 +1,9 @@
 import React ,  { Fragment,  useRef, useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {ScrollBar} from '../../global' 
+import {ScrollBar, ValidationExpression} from '../../global' 
 import * as actionTypes from '../state/action';
 import '../styles/CreateLanding.scss';
 import useOnClickOutside from './UseOnClickOutside'
-import ValidationExpression from '../../global/components/ValidationExpression';
 
 /*Component CreateLanding
   use: renders create New User Landing page

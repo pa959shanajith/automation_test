@@ -1,6 +1,5 @@
 import React ,{Fragment,useEffect,useState } from 'react';
-import {ScrollBar , Messages as MSG, setMsg} from '../../global';
-import ValidationExpression from '../../global/components/ValidationExpression';
+import {ScrollBar , Messages as MSG, setMsg, ValidationExpression } from '../../global';
 
 const Pairwise=(props)=>{
     const [optimizationType , SetOptimizationType]=useState(null);   

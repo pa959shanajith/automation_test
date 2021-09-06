@@ -7,7 +7,7 @@ import '../styles/IceProvisionForm.scss'
 
 
 /*Component IceProvisionForm
-  use: 
+  use: Form to add ICE Provision
   ToDo:
 */
 
@@ -21,6 +21,7 @@ const IceProvisionForm = (props) => {
     const [icenameErrBorder,setIcenameErrBorder] = useState(false)
     const [selAssignUser2ErrBorder,setSelAssignUser2ErrBorder] = useState(false)
 	const [users,setUsers] = useState([['Select User',' ','','']])
+	const isUsrSetting = props.userConfig //for user settings
 
     useEffect(()=>{
 		setUsers([['Select User',' ','','']]);
@@ -77,7 +78,7 @@ const IceProvisionForm = (props) => {
 		props.setToken("Click on Provision/Reregister to generate token");
 		props.setIcename("");
 		props.setUserid(" ");
-		if (props.op === "normal") {
+		if (props.op === "normal" && !isUsrSetting) {
 			const data = await getUserDetails("user");
 			if(data.error){displayError(data.error);return;}
 			data.sort((a,b)=>a[0].localeCompare(b[0]));
@@ -153,7 +154,8 @@ const IceProvisionForm = (props) => {
             {loading?<ScreenOverlay content={loading}/>:null}
 			
             <div className="col-xs-9" style={{width: "83%"}}>
-				<div className='adminControl-ip adminControl-ip-cust'><div>
+			{!isUsrSetting
+			 && <div data-test="ice-type-test" className={'adminControl-ip adminControl-ip-cust'} ><div>
                 <span className="leftControl-ip" title="ICE Type">ICE Type</span>
 					<label className="adminFormRadio">
 						<input type="radio" checked={props.op==="normal"}  value="normal" name="provisionType" onChange={()=>{props.setOp("normal");props.setSelectProvisionType(!props.selectProvisionType);refreshForm()}} />
@@ -163,20 +165,20 @@ const IceProvisionForm = (props) => {
 						<input type="radio" checked={props.op==="ci-cd"} value="ci-cd" name="provisionType" onChange={()=>{props.setRefreshIceList(!props.refreshIceList);props.setOp("ci-cd");refreshForm()}} />
 						<span>CI/CD</span>
 					</label>
-				</div></div>
+				</div></div>}
                 <div className='adminControl-ip'><div>
 					<span className="leftControl-ip" title="ICE Name">ICE Name</span>
 					<input type="text" autoComplete="off" id="icename" name="icename" value={props.icename} onChange={(event)=>{updateIceName(event.target.value)}} maxLength="100" className={icenameErrBorder?"inputErrorBorder border_input-ip form-control-ip form-control-custom-ip":"border_input-ip form-control-ip form-control-custom-ip"} placeholder="ICE Name"/>
 				</div></div>
-                <div className='userForm adminControl-ip'><div>
+                {!isUsrSetting && <div data-test="user-test" className='userForm adminControl-ip' ><div>
 					<span className="leftControl-ip" title="User">User</span>
-                    <select value={props.userid} onChange={(event)=>props.setUserid(event.target.value)} disabled={props.op!=='normal'}  id="selAssignUser2" className={selAssignUser2ErrBorder?'selectErrorBorder adminSelect-ip form-control-ip':'adminSelect-ip form-control-ip'}>
+                    <select value={props.userid} onChange={(event)=>{props.setUserid(event.target.value)}} disabled={props.op!=='normal'}  id="selAssignUser2" className={selAssignUser2ErrBorder?'selectErrorBorder adminSelect-ip form-control-ip':'adminSelect-ip form-control-ip'}>
                         {users.map((entry,index) => (
                             <option disabled={entry[0]==='Select User'?true:false} key={index} value={entry[1]}>{entry[0]}</option>
                         ))}
                     </select>
-                </div></div>
-                <div className='adminControl-ip' id="icetokenarea"><div>
+                </div></div>}
+                <div data-test="token-test" className='adminControl-ip' id="icetokenarea"><div>
 					<span className="leftControl-ip" title="Token">Token</span>
 					<textarea autoComplete="off" id="iceToken" value={props.token} name="iceToken" readOnly="readonly"></textarea>
 					<label className="lable-cust-ip" >
