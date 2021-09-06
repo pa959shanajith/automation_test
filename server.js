@@ -396,7 +396,9 @@ if (cluster.isMaster) {
 		app.post('/restartService', auth.protect, admin.restartService);
 		app.post('/gitSaveConfig', auth.protect, admin.gitSaveConfig);
 		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
-
+		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
+		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
+		
 		//Notification Routes
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
@@ -406,6 +408,7 @@ if (cluster.isMaster) {
 		app.post('/updateNotificationGroups', auth.protect, admin.updateNotificationGroups);
 		app.post('/updateNotificationConfiguration', auth.protect, mindmap.updateNotificationConfiguration);
 
+		
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);
 		app.post('/highlightScrapElement_ICE', auth.protect, designscreen.highlightScrapElement_ICE);

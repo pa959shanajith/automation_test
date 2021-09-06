@@ -1,7 +1,6 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import {ScreenOverlay, RedirectPage, ModalContainer, ScrollBar, setMsg, VARIANT, Messages as MSG} from '../../global' 
+import {ScreenOverlay, RedirectPage, ModalContainer, ScrollBar, setMsg, VARIANT, Messages as MSG, ValidationExpression} from '../../global' 
 import {getOIDCConfig, manageOIDCConfig} from '../api';
-import ValidationExpression from '../../global/components/ValidationExpression';
 import { useHistory } from 'react-router-dom';
 import '../styles/OidcConfig.scss'
 

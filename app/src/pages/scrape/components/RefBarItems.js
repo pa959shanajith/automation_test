@@ -30,7 +30,7 @@ const RefBarItems = props => {
 	const [currMobileType, setCurrMobileType]  = useState('Android');
 	const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 	const [dsRatio, setDsRatio] = useState(1); //downScale Ratio
-	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, setShowPop, orderList } = useContext(ScrapeContext);
+	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, orderList } = useContext(ScrapeContext);
 
 	useEffect(()=>{
 		return ()=>{

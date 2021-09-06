@@ -1,0 +1,38 @@
+import React, { useState, useEffect } from 'react';
+
+import classes from "../styles/BatchInfo.module.scss";
+
+
+
+const BatchInfo = props => {
+    const [batchInfo, setBatchInfo] = useState("");
+    const setBatch = props.setBatch;
+    const [error, setError] = useState(false);
+    useEffect(() => {
+        setError(false);
+        if(batchInfo.length === 0){
+            return;
+        }
+        try {
+            setBatch({
+                ...JSON.parse(batchInfo)
+            })
+        }
+        catch (err) {
+            setBatch(undefined);
+            setError(true);
+        }
+    }, [batchInfo])
+
+    const onChangeBatchInfo = (e) => {
+        setBatchInfo(e.target.value);
+
+    }
+
+    return (<>
+        <span className={classes["b-info__inputLabel"]} >Batch Info<span className={classes["b-info__mandate"]}>*</span></span>
+        <textarea type="text" className={classes["b-info-text-box"] + " " + (error === true ? classes["b-info__inputError"] : "")} value={batchInfo} placeholder="Enter Batch Info in JSON format" onChange={onChangeBatchInfo} />
+    </>);
+}
+
+export default BatchInfo;

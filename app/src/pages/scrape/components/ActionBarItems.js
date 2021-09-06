@@ -99,7 +99,7 @@ const BottomContent = () => {
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
 
-    const { setShowObjModal, scrapeItems, setShowPop, fetchScrapeData, setOverlay, saved } = useContext(ScrapeContext);
+    const { setShowObjModal, scrapeItems, fetchScrapeData, setOverlay, saved } = useContext(ScrapeContext);
     const [customLen, setCustomLen] = useState(0);
     const [scrapeItemsLength, setScrapeLen] = useState(0);
     const [unsavedObjPresent, setUnsavedObjPresent] = useState(0);

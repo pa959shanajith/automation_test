@@ -37,7 +37,7 @@ const WebserviceScrape = () => {
 
     const dispatch = useDispatch();
 
-    const { setShowObjModal, setShowPop, setOverlay, saved, setSaved, fetchScrapeData } = useContext(ScrapeContext);
+    const { setShowObjModal, setOverlay, saved, setSaved, fetchScrapeData } = useContext(ScrapeContext);
     const disableAction = useSelector(state=>state.scrape.disableAction);
     const current_task = useSelector(state=>state.plugin.CT);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
