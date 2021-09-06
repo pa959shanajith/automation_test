@@ -479,52 +479,31 @@ export const exportToGit = async(data) => {
 
 /*Component 
     data={
-            'ruledata':{
-                    "taskid1":{
-                        "actionid1":{
-                            "ruleid1":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            },
-                            "ruleid2":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            }
-                        },
-                        "actionid2":{
-                            "ruleid2":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            }
-                        }
-                    },
-                    "taskid2":{
-                        "actionid3":{
-                            "ruleid1":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            },
-                            "ruleid2":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            }
-                        },
-                        "actionid4":{
-                            "ruleid2":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            }
-                        }
-                    }
-                }
-            
-            'action':  "update" or "deleterule" or 'deleteall'
+            "action": "update",
+            "mindmapid": "5f50c6fddb5de734c8077f07",
+            "taskdata": {},
+            "newrules": {
+                "ruleid4":{
+                    "groupids":[],
+                    "additionalrecepients":[],
+                    "actiontype":"1",
+                    "targetnode": "all",
+                    "actionon": null,
+                    "targetnodeid": null
+                },
+                "ruleid5":{
+                    "groupids":[],
+                    "additionalrecepients":[],
+                    "actiontype":"2",
+                    "targetnode": "scenarios",
+                    "actionon": "all",
+                    "targetnodeid": null
+                }        
+            },
+            "updatedrules":{
+            },
+            "deletedrules":[""],
+            "otherrules":{ 'ruleid3' : "",'ruleid2':""}
         }
 
 */

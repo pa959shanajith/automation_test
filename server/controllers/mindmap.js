@@ -882,8 +882,12 @@ exports.updateNotificationConfiguration = async(req,res) => {
 	try{
 		const ruleinfo = req.body;
 		const inputs = {
-			ruledata: ruleinfo.ruledata,
-			action: ruleinfo.action,
+			deletedrules: ruleinfo.deletedrules,
+			mindmapid: ruleinfo.mindmapid,
+			taskdata: ruleinfo.taskdata,
+			newrules: ruleinfo.newrules,
+			updatedrules: ruleinfo.updatedrules,
+			otherrules: ruleinfo.otherrules,
 			modifiedby: req.session.userid,
 			modifiedbyrole: req.session.activeRoleId,
 		};		
