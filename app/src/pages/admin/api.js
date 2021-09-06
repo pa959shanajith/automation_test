@@ -1158,3 +1158,70 @@ export const exportProject = async(props) => {
         return {error:MSG.ADMIN.ERR_EXPORT}
     }
 }
+
+/*Component 
+  props : {
+            groupdata:  { 
+                            "groupid1":{"groupname":"name1","internalusers":[userid1,userid2],"otherusers":["emailid1","emailid2"]},
+                            "groupid2":{"groupname":"name2","internalusers":[userid2,userid3],"otherusers":["emailid4","emailid1"]}
+                        },
+			action: "update" or "create" or "delete"
+          }
+  api returns operation status
+*/
+
+export const updateNotificationGroups = async(props) => {
+    try{
+        const res = await axios(url+'/updateNotificationGroups', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_EXPORT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_EXPORT}
+    }
+}
+
+/*Component 
+  props : {groupids:["id1","id2"],groupnames:["name1","name2"]}
+  api returns notifications groups 
+  if groupids and groupnames are both empty then all the groups will be sent
+*/
+
+export const getNotificationGroups = async(props) => {
+    try{
+        const res = await axios(url+'/getNotificationGroups', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_EXPORT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_EXPORT}
+    }
+}

@@ -875,3 +875,22 @@ exports.importGitMindmap = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+exports.updateNotificationConfiguration = async(req,res) => {
+	const fnName = "updateNotificationConfiguration"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const ruleinfo = req.body;
+		const inputs = {
+			ruledata: ruleinfo.ruledata,
+			action: ruleinfo.action,
+			modifiedby: req.session.userid,
+			modifiedbyrole: req.session.activeRoleId,
+		};		
+		const result = await utils.fetchData(inputs, "notification/updateNotificationConfiguration", fnName);
+		return res.status('200').send(result);
+	}catch (exception){
+		logger.error("Error occurred in notifications/updateNotificationConfiguration:", exception);
+		return res.status('500').send("fail");
+	}
+} 
