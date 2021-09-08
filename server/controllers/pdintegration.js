@@ -352,7 +352,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			}
 		}
 		//mapping for SAP objects 
-		else if(eachScrapedAction.apptype=="SAP"){
+		else if(eachScrapedAction.apptype=="SAP" || eachScrapedAction.apptype=="Generic"){
 			text = eachScrapedAction.text;
 			input = text.split("  ");
 			var menu_flg=0;
@@ -375,7 +375,10 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 			}
 				
 			if(menu_flg==0){
-				if(eachScrapedAction.command[0][1]!='sendVKey'){
+				if('keyboardshortcut' in eachScrapedAction && eachScrapedAction.tag==''){
+					testcaseObj = getTestcaseStep(step,null,"@Generic",'sendFunctionKeys',['Alt+F4'],null,null,"Generic");
+				}
+				else if(eachScrapedAction.command[0][1]!='sendVKey'){
 					switch(eachScrapedAction.tag){
 						case "input":
 						case "GuiOkCodeField":
@@ -467,7 +470,7 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 						case "GuiModalWindow":
 						case "GuiDialogShell":
 							if(eachScrapedAction.command[0][1]=='close')
-								testcaseObj = getTestcaseStep(step,null,'@Sap','closedialogwindow',null,null,null,"SAP");
+								testcaseObj = getTestcaseStep(step,null,'@Sap','closeWindow',null,null,null,"SAP");
 							break;
 						default:
 							logger.info("Import PD: No match found for "+eachScrapedAction.tag+" for SAP apptype.");
