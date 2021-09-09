@@ -898,3 +898,20 @@ exports.updateNotificationConfiguration = async(req,res) => {
 		return res.status('500').send("fail");
 	}
 } 
+
+exports.getNotificationConfiguration = async(req,res) => {
+	const fnName = "getNotificationConfiguration"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const info = req.body;
+		const inputs = {
+			fetchby: info.fetchby,
+			id: info.id
+		};		
+		const result = await utils.fetchData(inputs, "notification/getNotificationConfiguration", fnName);
+		return res.status('200').send(result);
+	}catch (exception){
+		logger.error("Error occurred in notifications/getNotificationConfiguration:", exception);
+		return res.status('500').send("fail");
+	}
+} 
