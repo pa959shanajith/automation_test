@@ -32,14 +32,14 @@ const LaunchApplication = props => {
         if (!windowName && !processID) setError({windowName: !windowName, processID: !processID})
         else {
             setError(false);
-            props.appPop.startScrape(scrapeObject);
+            setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
         }
     }
 
     const desktopApp = {
         'content': <div className="ss__desktop_dlg">
-            <input data-test="windowName" className={'ss__dsktp_wndw_name'+(error.windowName ? " la_invalid": "")} placeholder='Enter window name' value={windowName} onChange={windowNameHandler}/>
-            <input data-test="processID" className={"ss__dsktp_prc_id"+(error.processID ? " la_invalid" : "")} placeholder='Enter process ID' value={processID} onChange={processIDHandler}/>
+            <input data-test="windowName" className={'ss__dsktp_wndw_name'+(error.windowName ? " la_invalid": "")} placeholder='Enter window name' value={windowName} onChange={windowNameHandler} name="desktopWindowName" />
+            <input data-test="processID" className={"ss__dsktp_prc_id"+(error.processID ? " la_invalid" : "")} placeholder='Enter process ID' value={processID} onChange={processIDHandler} name="desktopProcessId" />
         </div>,
         'footer': <div className="ss__sdkpt_footer">
             <span className="ss__dskp_footer_span">
@@ -51,9 +51,7 @@ const LaunchApplication = props => {
                     <input data-test="methodB" className="ss__dsktp_method_rad" type="radio" name="method" value="B" checked={selectedMethod === "B"} onChange={onMethodSelect}/>Method B
                 </label>
             </span>
-            <button data-test="desktopLaunch" onClick={onDesktopLaunch} style={{width: "100px"}}>
-                Launch
-            </button>
+            <input type="submit" data-test="desktopLaunch" onClick={onDesktopLaunch} style={{width: "100px"}} value="Launch" />
         </div>
     }
 
@@ -154,13 +152,13 @@ const LaunchApplication = props => {
         if (!winName) setError({winName: !winName})
         else {
             setError(false);
-            props.appPop.startScrape(scrapeObject);
+            setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
         }
     }
 
     const oebsApp = {
-        'content': <input data-test="oebsWinName" className={'ss__oebs_input'+(error.winName ? " la_invalid": "")} placeholder='Enter window name' value={winName} onChange={winNameHandler}/>,
-        'footer': <button data-test="oebsLaunch" onClick={onWinLaunch} style={{width: "100px"}}>Launch</button>
+        'content': <input data-test="oebsWinName" className={'ss__oebs_input'+(error.winName ? " la_invalid": "")} placeholder='Enter window name' value={winName} onChange={winNameHandler} name="oebsWindowName" />,
+        'footer': <input type="submit" data-test="oebsLaunch" onClick={onWinLaunch} style={{width: "100px"}} value="Launch" />
     }
     
     

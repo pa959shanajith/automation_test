@@ -67,7 +67,7 @@
     padding: 9px!important;
     padding-bottom: 0px!important;
 }
-.modal__footer button{
+.modal__footer button, .modal__footer input[type="submit"]{
     background: $primaryColor;
     color: $whiteColor;
     border: 0;
@@ -78,7 +78,7 @@
         opacity: .65;
     }
 }
-button:focus{
+button:focus, input[type="submit"]:focus{
     outline: none!important;
 }
 .modal-title {
