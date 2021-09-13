@@ -1,7 +1,6 @@
 import React ,  { Fragment, useEffect, useState} from 'react';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScrollBar } from '../../global';
-import ValidationExpression from '../../global/components/ValidationExpression';
+import { ScrollBar, ValidationExpression } from '../../global';
 
 import '../styles/FormComp.scss'
 
@@ -44,7 +43,7 @@ const FormSelect = (props) => {
     const inpId = props.inpId
     return(
         <Fragment>
-            <div className='col-xs-9 form-group input-label'>
+            <div style={props.style} className='col-xs-9 form-group input-label'>
                 <label>{name}</label>
                 <select data-test="select_comp" onChange={onChangeFn} ref={inpRef} defaultValue={'def-opt'} className={"adminSelect-project-assign form-control__conv-project left-opt"} id={inpId || "selectForm"}>
                     <option key={'def-opt'} value={'def-opt'} disabled={true}>{defValue}</option>
@@ -116,9 +115,9 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef}) => {
                 <input type={'text'} autoComplete={"off"} ref={inputRef} className="btn-users edit-user-dropdown-edit" onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder="Search ICE Pool.."/>
                 <div className="form-inp-dropdown" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
-                    {list.map((e) => (  
+                            {list.map((e) => (  
                         <option key={e[0]} onClick={selectOption} value={e[0]}> {e[1].poolname}</option> 
-                    ))}
+                            ))}
                     </ScrollBar>
                 </div>
             </div>

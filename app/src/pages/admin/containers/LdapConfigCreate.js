@@ -1,9 +1,8 @@
 import React from 'react';
-import {ScrollBar} from '../../global'
+import {ScrollBar, ValidationExpression} from '../../global'
 import '../styles/LdapConfigCreate.scss'
 import LdapConfigurationForm from '../components/LdapConfigurationForm';
 import LdapDataMapping from '../components/LdapDataMapping';
-import ValidationExpression from '../../global/components/ValidationExpression';
 
 /*Component LdapConfigCreate
   use: defines Admin middle Section for create Ldap Configuration
