@@ -9,6 +9,7 @@ var path = require('path');
 var fs = require('fs');
 var xl = require('excel4node');
 var Client = require("node-rest-client").Client;
+var notification = require('../notifications/index')
 var epurl = process.env.DAS_URL;
 var client = new Client();
 
@@ -126,6 +127,7 @@ exports.reviewTask = async (req, res) => {
 		var userId = req.session.userid;
 		var username = req.session.username;
 		var date = new Date();
+		let inReview = false
 		var status = inputs.status;
 		if (batchIds.indexOf(',') > -1) {
 			taskID=JSON.stringify(batchIds.split(','));
@@ -144,11 +146,19 @@ exports.reviewTask = async (req, res) => {
 			inputs.assignedto = userId;
 		} else if (status == 'underReview') {
 			inputs.reviewer = userId;
+			inReview = true
+		}
+		let notificationData = {
+			taskid: taskID,
+			asignedto: username,
+			asigneeid: userId
 		}
 		const result = await utils.fetchData(inputs, "mindmap/manageTask", fnName);
 		if (result == "fail") {
 			return res.send("fail");
 		} else {
+			if (inReview) notification.notifyEvent("onReview", notificationData, null)
+			else notification.notifyEvent("onSubmit", notificationData, null)
 			return res.send('inprogress');
 		}
 	} catch(exception) {
@@ -195,62 +205,7 @@ exports.saveData = async (req, res) => {
 					}
 				}
 			}
-		}
-		for (var k = 0; k < data.length; k++) {
-			var task = data[k].task;
-			if (task != null) {
-				if ('assignedToName' in task) {
-					var assignedTo = task.assignedToName;
-					if (assignedTo != null && assignedTo != undefined) {
-						if ('status' in task) {
-							assignedObj[task.details] = assignedTo;
-						}
-					}
-				}
-			}
-		}
-		var notify = assignedObj;
-		if (Object.keys(notify).length > 0 && Object.keys(notify).length != undefined) {
-			var assignedToValues = Object.keys(notify).map(function (key) { return notify[key] });
-			for (var i = 0; i < assignedToValues.length; i++) {
-				if (Object.keys(myserver.socketMapNotify).indexOf(assignedToValues[i]) > -1) {
-					var keys = Object.keys(notify);
-					for (var j = 0; j < keys.length; j++) {
-						if (i == j) {
-							var tName = keys[j];
-							var taskAssignment = 'assigned';
-							var taskName = tName;
-							var soc = myserver.socketMapNotify[assignedToValues[i]];
-							var count = 0;
-							var assignedTasksNotification = {};
-							assignedTasksNotification.to = '/plugin';
-							if (removeTask.length > 0) {
-								for (var p = 0; p < removeTask.length; p++) {
-									for (var q = 0; q < data.length; q++) {
-										if (removeTask[p] == data[q].oid) {
-											taskAssignment = "unassigned";
-										}
-										if (taskAssignment == "unassigned") {
-											assignedTasksNotification.notifyMsg = "Task '" + taskName + "' has been unassigned by " + user + "";
-										}
-										assignedTasksNotification.isRead = false;
-										assignedTasksNotification.count = count;
-										soc.emit("notify", assignedTasksNotification);
-									}
-								}
-							}
-
-							if (taskAssignment == "assigned") {
-								assignedTasksNotification.notifyMsg = "New task '" + taskName + "' has been assigned by " + user + "";
-								assignedTasksNotification.isRead = false;
-								assignedTasksNotification.count = count;
-								soc.emit("notify", assignedTasksNotification);
-							}
-						}
-					}
-				}
-			}
-		}
+		}	
 		// This flag is for Save. Save and Create will now be merged.
 		if (flag == 10) 
 		{
@@ -290,11 +245,12 @@ exports.saveData = async (req, res) => {
 			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
 			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
 			
-			create_ice.saveMindmap(qObj, function (err, data) {
+			create_ice.saveMindmap(qObj, function (err, result) {
 				if (err) {
 					res.status(500).send(err);
 				} else {
-					res.status(200).send(data);
+					sendNotification(data)
+					res.status(200).send(result);
 				}
 			});
 		}
@@ -510,16 +466,42 @@ exports.saveData = async (req, res) => {
 						if (data_var.rows == "success"){
 							modid=data[0]._id
 						}
+						if (modid != 'fail') sendNotification(data)
 						res.send(modid);
 					}
 			});
 		}
+
+		
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
 };
 
+function sendNotification(data){
+	visited = {}
+	for(let i = 0; i < data.length; i++){
+		if (!data[i].task || data[i].task.details in visited) continue
+		visited[data[i].task.details] = true
+		var task = data[i].task;
+		let assignedObj = { 
+			mindmapid: data[0]._id,
+			nodeid: data[i]._id,
+			taskid: task._id || "", 
+			asigneeid: task.assignedto, 
+			reviewerid: task.reviewer, 
+			nodetype: data[i].type,  
+			assignedTo: task.assignedToName || ""
+		}
+		var assignedTasksNotification = {user: task.assignedto, to: '/plugin', isRead: false,count: 0}
+		if ('status' in task && task.status == 'assigned' && task._id == null){
+			notification.notifyEvent('onAssign', assignedObj, assignedTasksNotification)
+		}else if('status' in task && task.status == 'unassigned') {
+			notification.notifyEvent('onUnassign', assignedObj, assignedTasksNotification)
+		}
+	}
+}
 
 exports.saveEndtoEndData = function (req, res) {
 	const fnName = "saveEndtoEndData";
@@ -912,6 +894,19 @@ exports.getNotificationConfiguration = async(req,res) => {
 		return res.status('200').send(result);
 	}catch (exception){
 		logger.error("Error occurred in notifications/getNotificationConfiguration:", exception);
+		return res.status('500').send("fail");
+	}
+} 
+
+exports.getNotificationRules = async(req,res) => {
+	const fnName = "getNotificationRules"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const inputs = {};		
+		const result = await utils.fetchData(inputs, "notification/getNotificationRules", fnName);
+		return res.status('200').send(result);
+	}catch (exception){
+		logger.error("Error occurred in notifications/getNotificationRules:", exception);
 		return res.status('500').send("fail");
 	}
 } 

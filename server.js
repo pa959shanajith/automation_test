@@ -399,17 +399,17 @@ if (cluster.isMaster) {
 
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
-		
+
 		//Notification Routes
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
 		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
 		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
-		app.post('/getNotificationRules', auth.protect, admin.getNotificationRules);
 		app.post('/getNotificationGroups', auth.protect, admin.getNotificationGroups);
 		app.post('/updateNotificationGroups', auth.protect, admin.updateNotificationGroups);
 		app.post('/updateNotificationConfiguration', auth.protect, mindmap.updateNotificationConfiguration);
+		app.post('/getNotificationConfiguration', auth.protect, mindmap.getNotificationConfiguration);
+		app.post('/getNotificationRules', auth.protect, mindmap.getNotificationRules);
 
-		
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);
 		app.post('/highlightScrapElement_ICE', auth.protect, designscreen.highlightScrapElement_ICE);
