@@ -129,11 +129,16 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef,type,setNewOption}) => 
         } 
         setDropDown(false)
     }
+    const setPlaceholder = () => {
+        if(type==="Pool") return "Search ICE Pool.."
+        if (type==="Email") return "Add Email.."
+        else if (type==="emailSearch") return "Search Email Group.."
+    }
     return(
         <Fragment>
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
             <div>
-                <input type={'text'} autoComplete={"off"} ref={inputRef} className={"btn-users edit-user-dropdown-edit"+ (errBorder ? " selectErrorBorder" : "")} onChange={inputFilter} onClick = {resetField} onKeyPress={event => event.key === 'Enter' && type==="Email" && selectNewOption(event,true)} id="userIdName" placeholder={type==="Pool"?"Search ICE Pool..":"Add Email.."}/>
+                <input type={'text'} autoComplete={"off"} ref={inputRef} className={"btn-users edit-user-dropdown-edit"+ (errBorder ? " selectErrorBorder" : "")} onChange={inputFilter} onClick = {resetField} onKeyPress={event => event.key === 'Enter' && type==="Email" && selectNewOption(event,true)} id="userIdName" placeholder={setPlaceholder()}/>
                 <div className="form-inp-dropdown" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {type === "Pool" ?  list.map((e) => (  
