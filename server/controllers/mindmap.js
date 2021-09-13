@@ -882,8 +882,12 @@ exports.updateNotificationConfiguration = async(req,res) => {
 	try{
 		const ruleinfo = req.body;
 		const inputs = {
-			ruledata: ruleinfo.ruledata,
-			action: ruleinfo.action,
+			deletedrules: ruleinfo.deletedrules,
+			mindmapid: ruleinfo.mindmapid,
+			taskdata: ruleinfo.taskdata,
+			newrules: ruleinfo.newrules,
+			updatedrules: ruleinfo.updatedrules,
+			otherrules: ruleinfo.otherrules,
 			modifiedby: req.session.userid,
 			modifiedbyrole: req.session.activeRoleId,
 		};		
@@ -891,6 +895,23 @@ exports.updateNotificationConfiguration = async(req,res) => {
 		return res.status('200').send(result);
 	}catch (exception){
 		logger.error("Error occurred in notifications/updateNotificationConfiguration:", exception);
+		return res.status('500').send("fail");
+	}
+} 
+
+exports.getNotificationConfiguration = async(req,res) => {
+	const fnName = "getNotificationConfiguration"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const info = req.body;
+		const inputs = {
+			fetchby: info.fetchby,
+			id: info.id
+		};		
+		const result = await utils.fetchData(inputs, "notification/getNotificationConfiguration", fnName);
+		return res.status('200').send(result);
+	}catch (exception){
+		logger.error("Error occurred in notifications/getNotificationConfiguration:", exception);
 		return res.status('500').send("fail");
 	}
 } 

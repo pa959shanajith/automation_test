@@ -479,52 +479,31 @@ export const exportToGit = async(data) => {
 
 /*Component 
     data={
-            'ruledata':{
-                    "taskid1":{
-                        "actionid1":{
-                            "ruleid1":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            },
-                            "ruleid2":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            }
-                        },
-                        "actionid2":{
-                            "ruleid2":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            }
-                        }
-                    },
-                    "taskid2":{
-                        "actionid3":{
-                            "ruleid1":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            },
-                            "ruleid2":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            }
-                        },
-                        "actionid4":{
-                            "ruleid2":{
-                                "groupids":[groupid1, groupdid2],
-                                "additionalrecepients": [userid1, userid2, userid3],
-                                "ruletypeid": ruletypeid
-                            }
-                        }
-                    }
-                }
-            
-            'action':  "update" or "deleterule" or 'deleteall'
+            "action": "update",
+            "mindmapid": "5f50c6fddb5de734c8077f07",
+            "taskdata": {},
+            "newrules": {
+                "ruleid4":{
+                    "groupids":[],
+                    "additionalrecepients":[],
+                    "actiontype":"1",
+                    "targetnode": "all",
+                    "actionon": null,
+                    "targetnodeid": null
+                },
+                "ruleid5":{
+                    "groupids":[],
+                    "additionalrecepients":[],
+                    "actiontype":"2",
+                    "targetnode": "scenarios",
+                    "actionon": "all",
+                    "targetnodeid": null
+                }        
+            },
+            "updatedrules":{
+            },
+            "deletedrules":[""],
+            "otherrules":{ 'ruleid3' : "",'ruleid2':""}
         }
 
 */
@@ -532,6 +511,40 @@ export const exportToGit = async(data) => {
 export const updateNotificationConfiguration = async(data) => {
     try{
         const res = await axios(url+'/updateNotificationConfiguration', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+    }
+}
+
+/*Component 
+    data={
+            fetchby:"mindmapid",
+            id:"id"
+        }
+
+*/
+
+export const getNotificationConfiguration = async(data) => {
+    try{
+        const res = await axios(url+'/getNotificationConfiguration', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
