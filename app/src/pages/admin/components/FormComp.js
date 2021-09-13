@@ -84,22 +84,29 @@ const FormRadio = (props) => {
   use: renders searchable pool dropdown
 */
 
-const FormInpDropDown = ({data,setFilter,clickInp,inpRef}) => {
+const FormInpDropDown = ({data,setFilter,clickInp,inpRef,type,setNewOption}) => {
     const inputRef = inpRef
     const [list,setList] =  useState([])
     const [dropDown,setDropDown] = useState(false)
+    const [errBorder,setErrBorder] = useState(false);
     useEffect(()=>{
         setList([...data])
     },[data])
     const inputFilter = () =>{
         var val = inputRef.current.value
-        var items = [...data].filter((e)=>e[1].poolname.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        var items;
+        if(type === "Pool") items = [...data].filter((e)=>e[1].poolname.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        if(type === "Email") items = [...data].filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        if(type === "EmailSearch") items = [...data].filter((e)=>e.groupname.toUpperCase().indexOf(val.toUpperCase())!==-1)
         setList(items)
+        setDropDown(true);
     }
     const resetField = () => {
-        inputRef.current.value = ""
+        if(errBorder || type === "Email"){}
+        else inputRef.current.value = ""
         setList([...data])
         setDropDown(true)
+        setErrBorder(false)
         if(clickInp)clickInp()
     }
     const selectOption = (e) =>{
@@ -108,16 +115,43 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef}) => {
         setDropDown(false)
         setFilter(e)
     }
+    const selectNewOption = (e,newEmail) =>{
+        var text = e.currentTarget.innerText===""?inputRef.current.value:e.currentTarget.innerText 
+        if(newEmail) {
+            var invalidEmail = setNewOption(e); 
+            if(invalidEmail) inputRef.current.value = text
+            else inputRef.current.value = ""
+            setErrBorder(invalidEmail);
+        } else {
+            setFilter(e)
+            inputRef.current.value = ""
+            setErrBorder(false);
+        } 
+        setDropDown(false)
+    }
     return(
         <Fragment>
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
             <div>
-                <input type={'text'} autoComplete={"off"} ref={inputRef} className="btn-users edit-user-dropdown-edit" onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder="Search ICE Pool.."/>
+                <input type={'text'} autoComplete={"off"} ref={inputRef} className={"btn-users edit-user-dropdown-edit"+ (errBorder ? " selectErrorBorder" : "")} onChange={inputFilter} onClick = {resetField} onKeyPress={event => event.key === 'Enter' && type==="Email" && selectNewOption(event,true)} id="userIdName" placeholder={type==="Pool"?"Search ICE Pool..":"Add Email.."}/>
                 <div className="form-inp-dropdown" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
-                            {list.map((e) => (  
+                    {type === "Pool" ?  list.map((e) => (  
                         <option key={e[0]} onClick={selectOption} value={e[0]}> {e[1].poolname}</option> 
+                    )):null}
+                    {type === "Email" &&  
+                        <>
+                            { inputRef!==undefined && inputRef.current!==undefined && inputRef.current!==null && inputRef.current.value!=="" && 
+                                <option onClick={(e)=>{selectNewOption(e,true)}} value={inputRef.current.value}> {inputRef.current.value}</option>
+                            }
+                            {list.map((e) => (  
+                                <option key={e[0]} onClick={(e)=>{selectNewOption(e,false)}} value={e._id}> {e.name}</option> 
                             ))}
+                        </>
+                    }
+                    {type === "emailSearch" ?  list.map((e) => (  
+                        <option key={e._id} onClick={selectOption} value={e._id}> {e.groupname}</option> 
+                    )):null}
                     </ScrollBar>
                 </div>
             </div>

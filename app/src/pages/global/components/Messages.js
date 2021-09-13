@@ -80,6 +80,8 @@ const Messages={
         ERR_DIRECTORY_EMPTY: {"CONTENT":"Test Connection Successful but LDAP directory is empty!", "VARIANT": VARIANT.ERROR},
         ERR_TEST_SPEC_CHAR: {"CONTENT":"Test Connection Failed! Special characters found in LDAP configuration values.", "VARIANT": VARIANT.ERROR},
         ERR_TEST_CONNECT_UNEXPECTED: {"CONTENT":"Test Connection Failed due to unexpected error!", "VARIANT": VARIANT.ERROR},
+        ERR_GROUPNAME_EXIST: {"CONTENT":"Group Name already Exists.", "VARIANT": VARIANT.ERROR},
+        ERR_GROUPNAME_FETCH: {"CONTENT":"Failed to fetch email groups.", "VARIANT": VARIANT.ERROR},
 
         SUCC_EMAIL_SENT: {"CONTENT":"Test Email Sent.", "VARIANT": VARIANT.SUCCESS},
         SUCC_ICEPOOL_SAVED: {"CONTENT":"ICE Pool saved successfully.", "VARIANT": VARIANT.SUCCESS},
@@ -91,9 +93,12 @@ const Messages={
         SUCC_PROJECT_UNASSIGN: {"CONTENT":"Projects unassigned successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TOKEN_GENERATE: {"CONTENT":"Token generated successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_ICEPOOL_UPDATE: {"CONTENT":"ICE Pool updated successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_ICE_DEREGISTER: {"CONTENT":"ICE Deregistered Successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_ICE_DEREGISTER: {"CONTENT":"ICE Deregistered successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_PROJECT_CREATE: {"CONTENT":"Project created successfully..", "VARIANT": VARIANT.SUCCESS},
         SUCC_PROJECT_UPDATE: {"CONTENT":"Project updated successfully", "VARIANT": VARIANT.SUCCESS},
+        SUCC_GROUP_CREATE: {"CONTENT":"Email Group created successfully", "VARIANT": VARIANT.SUCCESS},
+        SUCC_DELETE_EMAILGROUP: {"CONTENT":"Email Group Deleted successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_UPDATE_EMAILGROUP: {"CONTENT":"Email Group Updated successfully.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_USER_EXIST: {"CONTENT":"User already Exists.", "VARIANT": VARIANT.WARNING},
         WARN_USERNAME_SPECHAR: {"CONTENT":"Cannot contain special characters other than ._-", "VARIANT": VARIANT.WARNING},

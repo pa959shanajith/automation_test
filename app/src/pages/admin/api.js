@@ -1189,10 +1189,10 @@ export const updateNotificationGroups = async(props) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:MSG.ADMIN.ERR_EXPORT}
+        return {error:MSG.CUSTOM(`Fail to ${props.action} email Groups.`)}
     }catch(err){
         console.error(err)
-        return {error:MSG.ADMIN.ERR_EXPORT}
+        return {error:MSG.CUSTOM(`Fail to ${props.action} email Groups.`)}
     }
 }
 
@@ -1220,9 +1220,9 @@ export const getNotificationGroups = async(props) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:MSG.ADMIN.ERR_EXPORT}
+        return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
     }catch(err){
         console.error(err)
-        return {error:MSG.ADMIN.ERR_EXPORT}
+        return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
     }
 }
