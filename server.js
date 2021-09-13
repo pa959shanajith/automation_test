@@ -396,6 +396,7 @@ if (cluster.isMaster) {
 		app.post('/restartService', auth.protect, admin.restartService);
 		app.post('/gitSaveConfig', auth.protect, admin.gitSaveConfig);
 		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
+
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
 

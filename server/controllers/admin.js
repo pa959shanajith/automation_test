@@ -2316,7 +2316,6 @@ exports.gitEditConfig = async (req, res) => {
 	}
 };
 
-
 // /* get JIRA Details */
 exports.getDetails_JIRA = async (req, res) => {
 	const actionName = "getDetails_JIRA";
