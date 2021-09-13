@@ -150,7 +150,7 @@ module.exports.notifyEvent = async (notifyEvent, data, socMessage) =>{
 							"nodeid": data.nodeid,
 							'ruleids': ruleids
 						}
-						var updateTasks =  await utils.fetchData(inputs, "notification/updatTaskRules", fnName)
+						var updateTasks =  await utils.fetchData(inputs, "notification/updateTaskRules", fnName)
 						if (updateTasks == 'fail'){
 							logger.error("Failed to update tasks with associated rules");
 						}
