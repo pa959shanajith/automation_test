@@ -68,13 +68,13 @@ const LaunchApplication = props => {
         if (!appName) setError({appName: !appName})
         else {
             setError(false);
-            props.appPop.startScrape(scrapeObject);
+            setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
         }
     }
 
     const sapApp = {
-        'content': <input data-test="exePath" className={'ss__sap_input'+(error.appName ? " la_invalid" : "")} placeholder='Enter the .exe path;App Name' value={appName} onChange={appNameHandler}/>,
-        'footer': <button data-test="sapLaunch"onClick={onSapLaunch} style={{width: "100px"}}>Launch</button>
+        'content': <input data-test="exePath" className={'ss__sap_input'+(error.appName ? " la_invalid" : "")} name="sapWindowName" placeholder='Enter the .exe path;App Name' value={appName} onChange={appNameHandler}/>,
+        'footer': <input type="submit" data-test="sapLaunch" onClick={onSapLaunch} style={{width: "100px"}} value="Launch" />
     }
 
     // Mobile App
@@ -114,7 +114,7 @@ const LaunchApplication = props => {
             setError({appPath: !appPath, sNum: !sNum})
         else {
             setError(false);
-            props.appPop.startScrape(scrapeObject);
+            setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
         }
     }
 
@@ -126,18 +126,18 @@ const LaunchApplication = props => {
                     <button data-test="chooseIOS"className={"ss__mblapp_os_b"+(os==="ios" ? " ss__os_active":"")} onClick={()=>{setOS("ios"); setError(false);}}>iOS</button>
                 </div>
                 { os === "ios" && <>
-                    <input data-test="iosApppath" className={"ss__mblapp_input"+(error.appPath2 ? " la_invalid": "")} placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler}/>
-                    <input data-test="iosVersionNumber" className={"ss__mblapp_input"+(error.verNum ? " la_invalid": "")} placeholder='Enter Version Number' value={verNum} onChange={verNumHandler}/>
-                    <input data-test="iosDeviceName" className={"ss__mblapp_input"+(error.deviceName ? " la_invalid": "")} placeholder='Enter Device Name'value={deviceName} onChange={deviceNameHandler}/>
-                    <input data-test="iosUDID" className={"ss__mblapp_input"+(error.uuid ? " la_invalid": "")} placeholder='Enter UDID' value={uuid} onChange={uuidHandler}/>
+                    <input data-test="iosApppath" className={"ss__mblapp_input"+(error.appPath2 ? " la_invalid": "")} placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler} name="appPath2_i" />
+                    <input data-test="iosVersionNumber" className={"ss__mblapp_input"+(error.verNum ? " la_invalid": "")} placeholder='Enter Version Number' value={verNum} onChange={verNumHandler} name="verNum_i" />
+                    <input data-test="iosDeviceName" className={"ss__mblapp_input"+(error.deviceName ? " la_invalid": "")} placeholder='Enter Device Name'value={deviceName} onChange={deviceNameHandler} name="deviceName_i" />
+                    <input data-test="iosUDID" className={"ss__mblapp_input"+(error.uuid ? " la_invalid": "")} placeholder='Enter UUID' value={uuid} onChange={uuidHandler} name="uuidNum_i" />
                 </> }
                 { os === "android" && <>
-                    <input data-test="andriodAppPath" className={"ss__mblapp_input"+(error.appPath ? " la_invalid": "")} placeholder="Enter Application path" value={appPath} onChange={appPathHandler}/> 
-                    <input data-test="andriodSerialNumber" className={"ss__mblapp_input"+(error.sNum ? " la_invalid": "")} placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} />
+                    <input data-test="andriodAppPath" className={"ss__mblapp_input"+(error.appPath ? " la_invalid": "")} placeholder="Enter Application path" value={appPath} onChange={appPathHandler} name="appPath_a" /> 
+                    <input data-test="andriodSerialNumber" className={"ss__mblapp_input"+(error.sNum ? " la_invalid": "")} placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} name="serNum_a" />
                 </> }
         </div>,
 
-        'footer': <button data-test="mobileAppLaunch" onClick={onMobileAppLaunch} style={{width: "100px"}}>Launch</button>
+        'footer': <input type="submit" data-test="mobileAppLaunch" onClick={onMobileAppLaunch} style={{width: "100px"}} value="Launch" />
     }
 
     // OEBS
@@ -178,17 +178,17 @@ const LaunchApplication = props => {
         if (!slNum || !vernNum) setError({slNum: !slNum, vernNum: !vernNum});
         else {
             setError(false);
-            props.appPop.startScrape(scrapeObject);
+            setTimeout(()=>props.appPop.startScrape(scrapeObject), 1);
         }
     }
 
     const mobileWeb = {
         'content': <div className="ss__mblweb_inputs">    
-            <input data-test="MWserdev" className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler}/> 
-            <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} />
+            <input data-test="MWserdev" className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler} name="mobWebInput1" /> 
+            <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} name="mobWebInput2" />
         </div>,
 
-        'footer': <button data-test="MWLaunch" onClick={onMobileWebLaunch} style={{width: "100px"}}>Launch</button>
+        'footer': <input type="submit" data-test="MWLaunch" onClick={onMobileWebLaunch} style={{width: "100px"}} value="Launch" />
     }
 
     const appDict = {'Desktop': desktopApp, "SAP": sapApp, 'MobileApp': mobileApp, 'OEBS': oebsApp, 'MobileWeb': mobileWeb}
