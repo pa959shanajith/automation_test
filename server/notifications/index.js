@@ -100,6 +100,69 @@ module.exports.update = async (action, name, channel, provider) => {
 	}
 };
 
+module.exports.notifyEvent = async (notifyEvent, data, socMessage) =>{
+	const fnName = "notifyEvent";
+	console.log('here',notifyEvent)
+	const ruleactionsids = {'onAssign': "1", "onUnassign": "2", "onReview": "3", "onSubmit": "4", "onExecution": "5"}
+	var action =  ruleactionsids[notifyEvent]
+	var inputs = {}
+	try{
+		switch(notifyEvent){
+			case "onReview": 
+			case "onSubmit": 			
+			case "onUnassign":
+					let taskid = data.taskid
+					inputs = {
+						"fetchby": "task",
+						"id": taskid,
+						"ruleactionid": action
+					}
+			case "default":
+					var emails = {}
+					var ruledata =  await utils.fetchData(inputs, "notification/getNotificationConfiguration", fnName)
+					for (let index in ruledata){
+						let rule = ruledata[index]
+						if (rule.targetnodeid == 0 || (rule.targetnodeid != 0 && data.nodeid ==  rule.targetnodeid)){
+							rule.emails.reduce((map,obj)=>{emails[obj] = 1},{})
+						}
+					}
+				console.log(emails)
+				break
+			case "onAssign": 
+						let mindmapid  = data.mindmapid;
+						inputs = {
+							"fetchby": "mindmapbyrule",
+							"id": mindmapid,
+							"nodetype":data.nodetype 
+						}
+						var emails = {}
+						var ruleids = []
+						var ruledata =  await utils.fetchData(inputs, "notification/getNotificationConfiguration", fnName)
+						for (let index in ruledata){
+							let rule = ruledata[index]
+							if (rule.targetnodeid == 0 || (rule.targetnodeid != 0 && data.nodeid ==  rule.targetnodeid)){
+								rule.emails.reduce((map,obj)=>{emails[obj] = 1},{})
+								ruleids.push(rule._id)
+							}
+						}
+						console.log(emails)
+						inputs = {
+							"nodeid": data.nodeid,
+							'ruleids': ruleids
+						}
+						var updateTasks =  await utils.fetchData(inputs, "notification/updatTaskRules", fnName)
+						if (updateTasks == 'fail'){
+							logger.error("Failed to update tasks with associated rules");
+						}
+						break
+		}
+	}
+	catch(e) {
+		logger.error("Error occured while fetching notification groups, Error: "+e);
+	}
+	
+}
+
 // UI notifications
 module.exports.broadcast = {
 	to: [],

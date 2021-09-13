@@ -496,14 +496,13 @@ export const exportToGit = async(data) => {
                     "additionalrecepients":[],
                     "actiontype":"2",
                     "targetnode": "scenarios",
-                    "actionon": "all",
+                    "actionon": "specific",
                     "targetnodeid": null
                 }        
             },
             "updatedrules":{
             },
-            "deletedrules":[""],
-            "otherrules":{ 'ruleid3' : "",'ruleid2':""}
+            "deletedrules":[""]
         }
 
 */
@@ -550,6 +549,33 @@ export const getNotificationConfiguration = async(data) => {
                 'Content-Type': 'application/json'
             },
             data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+    }
+}
+
+//No payload required
+export const getNotificationRules = async(data) => {
+    try{
+        const res = await axios(url+'/getNotificationRules', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {},
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){

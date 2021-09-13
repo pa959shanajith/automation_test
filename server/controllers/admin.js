@@ -2380,18 +2380,6 @@ exports.manageJiraDetails = async (req, res) => {
 	}
 };
 
-exports.getNotificationRules = async(req,res) => {
-	const fnName = "getNotificationRules"
-	logger.info("Inside UI service: " + fnName)
-	try{
-		const inputs = {};
-		const result = await utils.fetchData(inputs, "notification/getNotificationRules", fnName);
-		return res.status("200").send(result);
-	}catch (exception){
-		logger.error("Error occurred in notifications/getNotificationRules:", exception);
-		return res.status("500").send("fail");
-	}
-} 
 
 exports.getNotificationGroups = async(req,res) => {
 	const fnName = "getNotificationGroups"
