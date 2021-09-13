@@ -61,7 +61,7 @@ const EditEmailGroup = (props) => {
         updateEmailGroup(prop) 
     }
     //on selection of group from dropdown
-    const FflterGroup = async (e) => {
+    const filterGroup = async (e) => {
         groupName.current.style.outline=""
         var val = e.currentTarget.value
         var text = e.currentTarget.innerText
@@ -113,7 +113,7 @@ const EditEmailGroup = (props) => {
                     </div>
                     <div className='edit_email-group'>
                         <div className="col-xs-9 form-group assignBox-container">
-                            <AssignEmailBox FilterComp={<FilterComp clickInp={clickInp} inpRef={filterRef} setFilter={FflterGroup} data={groupList}/>}
+                            <AssignEmailBox FilterComp={<FilterComp clickInp={clickInp} inpRef={filterRef} setFilter={filterGroup} data={groupList}/>}
                              setNewBox={setNewEmail} setDeleteModal={setDeleteModal} setModal={setModal} newEmail={newEmail} setNewEmail={setNewEmail} leftBox={allUsers} rightBox={assignUsers} setLeftBox={setAllUsers} setRightBox={setAssignUsers}/>
                         </div>
                         <FormInput inpRef={groupName} label={'Group Name'} placeholder={'Enter Email Group Name'} validExp={"emailName"}/>
