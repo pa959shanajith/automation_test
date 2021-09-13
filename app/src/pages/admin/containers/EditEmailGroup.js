@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
-import {ModalContainer, ScrollBar, Messages as MSG} from '../../global' 
+import {ModalContainer, ScrollBar, Messages as MSG, setMsg} from '../../global' 
 import {FormInpDropDown, FormInput} from '../components/FormComp';
 import AssignEmailBox from '../components/AssignEmailBox'
 import {getUserDetails,getNotificationGroups,updateNotificationGroups} from '../api';
@@ -147,7 +147,19 @@ const DelFooter = ({setDeleteGroup,clickDeleteGroup}) =>{
 }
 
 const updateEmailGroup = async(prop) =>{
+    prop.groupName.current.style.outline='';
     prop.setLoading('Updating Email Group ...')
+    let proceed = false
+    var data = await getNotificationGroups({'groupids':[],'groupnames':[]});
+    if(data.error){prop.displayError(data.error);return;}
+    data.forEach((e)=>{
+        if(e.groupname===prop.groupName.current.value){
+            setMsg(MSG.ADMIN.ERR_GROUPNAME_EXIST);
+            prop.groupName.current.style.outline='1px solid red';
+            proceed = true
+        } 
+    })
+    if(proceed){prop.setLoading(false); return}
     const internalUsers=[], otherUsers=[], groupdata = {};
     prop.assignUsers.forEach((item)=>{internalUsers.push(item._id)})
     prop.newEmail.forEach((item)=>{otherUsers.push(item.name)})
@@ -172,7 +184,7 @@ const resetData = async({filterRef,setSelectedGroup,groupName,setAllUsers,setAss
     filterRef.current.value = ""
     groupName.current.disabled = true
     groupName.current.value = ""
-
+    groupName.current.style.outline='';
     setLoading("Loading...");
     var data = await getNotificationGroups({'groupids':[],'groupnames':[]});
     if(data.error){
