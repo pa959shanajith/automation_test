@@ -482,6 +482,7 @@ export const exportToGit = async(data) => {
             "action": "update",
             "mindmapid": "5f50c6fddb5de734c8077f07",
             "taskdata": {},
+            "priority": 0,
             "newrules": {
                 "ruleid4":{
                     "groupids":[],

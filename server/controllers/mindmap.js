@@ -868,6 +868,7 @@ exports.updateNotificationConfiguration = async(req,res) => {
 			mindmapid: ruleinfo.mindmapid,
 			taskdata: ruleinfo.taskdata,
 			newrules: ruleinfo.newrules,
+			priority: ruleinfo.priority,
 			updatedrules: ruleinfo.updatedrules,
 			otherrules: ruleinfo.otherrules,
 			modifiedby: req.session.userid,
