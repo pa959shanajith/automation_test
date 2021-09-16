@@ -115,11 +115,13 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 		var version = current_task.versionnumber;
 		var batchTaskIDs = current_task.batchTaskIDs;
 		var projectId = current_task.projectId;
+        var taskname = current_task.taskName
+        var nodeid = (current_task.scenarioId != '') ? current_task.scenarioId : ''
 		if (action !== undefined && action === 'reassign') {
 			taskstatus = action;
 		}
 
-		const result = await reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs);
+		const result = await reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs, nodeid, taskname);
         if(result.error){displayError(result.error);return;}
         if (result === 'fail') {
             displayError(MSG.GENERIC.WARN_NO_REVIEWER);
@@ -187,6 +189,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
         executionData["browserType"]=browserTypeExe;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
+        executionData["scenarioFlag"] = (current_task.scenarioFlag == 'True') ? true : false
         ResetSession.start();
         try{
             setLoading(false);

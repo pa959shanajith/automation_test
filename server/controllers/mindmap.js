@@ -124,6 +124,8 @@ exports.reviewTask = async (req, res) => {
 		var inputs = req.body;
 		var taskID = inputs.taskId;
 		var batchIds = inputs.batchIds;
+		var nodeid = inputs.nodeid;
+		var taskdetails = inputs.taskname;
 		var userId = req.session.userid;
 		var username = req.session.username;
 		var date = new Date();
@@ -148,17 +150,21 @@ exports.reviewTask = async (req, res) => {
 			inputs.reviewer = userId;
 			inReview = true
 		}
+		var notificationEvent = (status == 'reassign' || status == 'underReview') ? 'onReview' : 'onSubmit'
 		let notificationData = {
 			taskid: taskID,
-			asignedto: username,
-			asigneeid: userId
+			assignedto: username,
+			assigneeid: userId,
+			notifyEvent: notificationEvent,
+			status: status,
+			nodeid: nodeid,
+			taskdetails: taskdetails
 		}
 		const result = await utils.fetchData(inputs, "mindmap/manageTask", fnName);
 		if (result == "fail") {
 			return res.send("fail");
 		} else {
-			if (inReview) notification.notifyEvent("onReview", notificationData, null)
-			else notification.notifyEvent("onSubmit", notificationData, null)
+			notification.notify("taskWorkFlow", notificationData,'email')
 			return res.send('inprogress');
 		}
 	} catch(exception) {
@@ -176,6 +182,7 @@ exports.saveData = async (req, res) => {
 		var inputs = req.body;
 		var data = inputs.map;
 		var vn_from="0.0";
+		var assigner = req.session.username
 		var vn_to="0.0";
 		var prjId = inputs.prjId;
 		var deletednodes = inputs.deletednode;
@@ -249,7 +256,7 @@ exports.saveData = async (req, res) => {
 				if (err) {
 					res.status(500).send(err);
 				} else {
-					sendNotification(data)
+					sendNotification(data, assigner)
 					res.status(200).send(result);
 				}
 			});
@@ -466,7 +473,7 @@ exports.saveData = async (req, res) => {
 						if (data_var.rows == "success"){
 							modid=data[0]._id
 						}
-						if (modid != 'fail') sendNotification(data)
+						if (modid != 'fail') sendNotification(data, assigner)
 						res.send(modid);
 					}
 			});
@@ -479,26 +486,40 @@ exports.saveData = async (req, res) => {
 	}
 };
 
-function sendNotification(data){
+function sendNotification(data, assigner){
 	visited = {}
 	for(let i = 0; i < data.length; i++){
 		if (!data[i].task || data[i].task.details in visited) continue
 		visited[data[i].task.details] = true
 		var task = data[i].task;
+		var assignedTasksNotification = {user: task.assignedToName, to: '/plugin', isRead: false,count: 0}
 		let assignedObj = { 
+			taskdetails: task.details,
 			mindmapid: data[0]._id,
 			nodeid: data[i]._id,
 			taskid: task._id || "", 
 			asigneeid: task.assignedto, 
 			reviewerid: task.reviewer, 
 			nodetype: data[i].type,  
-			assignedTo: task.assignedToName || ""
+			assignedto: task.assignedToName || "",
+			assigner: assigner,
+			assignedTasksNotification:assignedTasksNotification,
+			notifyEvent:""
 		}
-		var assignedTasksNotification = {user: task.assignedto, to: '/plugin', isRead: false,count: 0}
+		if (assigner == task.assignedToName) assignedObj.assigner = 'self'
+		
 		if ('status' in task && task.status == 'assigned' && task._id == null){
-			notification.notifyEvent('onAssign', assignedObj, assignedTasksNotification)
+			assignedTasksNotification.notifyMsg = "Task '" + task.details + "' has been assigned by " + assigner + " to " + task.assignedToName + '.';
+			assignedObj.notifyEvent =  'onAssign';
+			notification.notify('taskWorkFlow', assignedObj, 'email')
 		}else if('status' in task && task.status == 'unassigned') {
-			notification.notifyEvent('onUnassign', assignedObj, assignedTasksNotification)
+			assignedTasksNotification.notifyMsg = "Task '" + task.details + "' has been unassigned by " + assigner + ". ";
+			assignedObj.notifyEvent = 'onUnassign';
+			notification.notify('taskWorkFlow', assignedObj, 'email')
+		}
+		if(task.assignedToName in myserver.socketMapNotify){
+			var soc = myserver.socketMapNotify[task.assignedToName];
+			soc.emit("notify", assignedTasksNotification);
 		}
 	}
 }
