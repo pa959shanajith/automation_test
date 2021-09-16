@@ -527,10 +527,10 @@ export const updateNotificationConfiguration = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+        return {error:MSG.MINDMAP.ERR_UPDATE_NOTIFICATION_RULES}
     }catch(err){
         console.error(err)
-        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+        return {error:MSG.MINDMAP.ERR_UPDATE_NOTIFICATION_RULES}
     }
 }
 
@@ -561,10 +561,10 @@ export const getNotificationConfiguration = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+        return {error:MSG.MINDMAP.ERR_NOTIFICATION_CONFIG}
     }catch(err){
         console.error(err)
-        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+        return {error:MSG.MINDMAP.ERR_NOTIFICATION_CONFIG}
     }
 }
 
@@ -588,9 +588,9 @@ export const getNotificationRules = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+        return {error:MSG.MINDMAP.ERR_GET_NOTIFICATION}
     }catch(err){
         console.error(err)
-        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+        return {error:MSG.MINDMAP.ERR_GET_NOTIFICATION}
     }
 }
