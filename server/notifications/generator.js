@@ -2,8 +2,8 @@ const validator = require('validator');
 const logger = require('../../logger');
 const utils = require('../lib/utils');
 
-const companyLogo = "/imgs/avo-logo.png";
-const productLogo = "/imgs/logo.png";
+const companyLogo = "/static/imgs/ftr-avo-logo.png";
+const productLogo = "/static/imgs/logo.png";
 const generateEmailPayload = {};
 
 module.exports.getPayload = async (channel, event, data) => {
