@@ -151,20 +151,22 @@ exports.reviewTask = async (req, res) => {
 			inReview = true
 		}
 		var notificationEvent = (status == 'reassign' || status == 'underReview') ? 'onReview' : 'onSubmit'
-		let notificationData = {
-			taskid: taskID,
-			assignedto: username,
-			assigneeid: userId,
-			notifyEvent: notificationEvent,
-			status: status,
-			nodeid: nodeid,
-			taskdetails: taskdetails
-		}
 		const result = await utils.fetchData(inputs, "mindmap/manageTask", fnName);
 		if (result == "fail") {
 			return res.send("fail");
 		} else {
-			notification.notify("taskWorkFlow", notificationData,'email')
+			for(let index in batchIds){
+				let notificationData = {
+					taskid: batchIds[index],
+					assignedto: username,
+					assigneeid: userId,
+					notifyEvent: notificationEvent,
+					status: status,
+					nodeid: nodeid,
+					taskdetails: taskdetails
+				}
+				notification.notify("taskWorkFlow", notificationData,'email')
+			}
 			return res.send('inprogress');
 		}
 	} catch(exception) {
@@ -910,7 +912,8 @@ exports.getNotificationConfiguration = async(req,res) => {
 		const info = req.body;
 		const inputs = {
 			fetchby: info.fetchby,
-			id: info.id
+			id: info.id,
+			priority: info.priority
 		};		
 		const result = await utils.fetchData(inputs, "notification/getNotificationConfiguration", fnName);
 		return res.status('200').send(result);
