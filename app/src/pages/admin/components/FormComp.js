@@ -97,7 +97,7 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef,type,setNewOption}) => 
         var items;
         if(type === "Pool") items = [...data].filter((e)=>e[1].poolname.toUpperCase().indexOf(val.toUpperCase())!==-1)
         if(type === "Email") items = [...data].filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
-        if(type === "EmailSearch") items = [...data].filter((e)=>e.groupname.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        if(type === "emailSearch") items = [...data].filter((e)=>e.groupname.toUpperCase().indexOf(val.toUpperCase())!==-1)
         setList(items)
         setDropDown(true);
     }
