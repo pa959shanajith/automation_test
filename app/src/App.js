@@ -16,6 +16,7 @@ import Design from './pages/design';
 import Utility from './pages/utility';
 import Report from './pages/report';
 import Integration from './pages/integration';
+import Settings from './pages/settings';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
 import './pages/global/components/icons.js';
 import SocketFactory from './SocketFactory';
@@ -75,6 +76,7 @@ const RouteApp = () => {
       <Route path = "/reports" component={Report}/>
       <Route path ="/execute" component={Execute}/>
       <Route path ="/scheduling" component={Schedule}/>
+      <Route path ='/settings' component={Settings}/>
       <Route component={ErrorPage} />
     </Switch>
   </Router>

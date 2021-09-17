@@ -12,7 +12,7 @@ import '../styles/ChangePassword.scss';
             loginCurrPassword -> email temporary password (forgot password)
 */
 
-const ChangePassword = ({setShow, setSuccessPass,loginPopup,loginCurrPassword}) => {
+const ChangePassword = ({setShow, setSuccessPass,loginCurrPassword}) => {
 
     const [currpassword, setCurrPassword] = useState("");
     const [newpassword, setNewPassword] = useState("");
@@ -112,7 +112,6 @@ const ChangePassword = ({setShow, setSuccessPass,loginPopup,loginCurrPassword}) 
 
     const Content = () => (
         <div className="pass_inputs_container">
-            {loginPopup===undefined?<input className={"reset_pass_inputs " + (currPassError ? "error_reset_field" : "")} placeholder="Current Password" type="password" onChange={currPassHandler} value={currpassword} />:null}
             <input className={"reset_pass_inputs " + (newPassError ? "error_reset_field" : "")} placeholder="New Password" type="password" onChange={newPassHandler} value={newpassword} />
             <input className={"reset_pass_inputs " + (confPassError ? "error_reset_field" : "")} placeholder="Confirm Password" type="password" onChange={confPasshandler} value={confpassword}/>
             <span className={"pass_valid_err " + (passwordValidation ? "" : "hide_pass_valid")}>{passwordValidation ? passwordValidation : "none"}</span>

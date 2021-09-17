@@ -395,7 +395,6 @@ const ScrapeScreen = ()=>{
     }
 
     const PopupDialog = () => (
-        // showPop.type === "modal" ? 
         <ModalContainer 
             title={showPop.title}
             modalClass="modal-sm"
@@ -403,13 +402,6 @@ const ScrapeScreen = ()=>{
             content={showPop.content}
             footer={showPop.footer}
         />
-        //  :
-        // <PopupMsg 
-        //     variant={showPop.variant || showPop.VARIANT}
-        //     close={()=>setShowPop("")}
-        //     content={showPop.content || showPop.CONTENT}
-        //     submit={showPop.onClick ? showPop.onClick : ()=>setShowPop("")}
-        // />
     );
 
     const ConfirmPopup = () => (

@@ -3,8 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import * as api from '../api.js';
 import MappingPage from '../containers/MappingPage';
-import { Messages as MSG, setMsg } from '../../global';
-import { RedirectPage } from '../../global/index.js';
+import { Messages as MSG, setMsg, RedirectPage } from '../../global';
 import CycleNode from './ZephyrTree';
 import * as actionTypes from '../state/action';
 import "../styles/TestList.scss"
