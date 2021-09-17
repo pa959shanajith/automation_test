@@ -60,6 +60,10 @@ generateEmailPayload.report = async data => {
 	if (!recv || Object.keys(recv).length == 0){
 		return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
 	}
+	let prioirtyRecv = Object.fromEntries(Object.entries(recv).filter(([k,v])=> v == '1'))
+	if (Object.keys(prioirtyRecv).length > 0){
+		recv = Object.assign({},prioirtyRecv,Object.fromEntries(Object.entries(recv).filter(([k,v])=> v == '-1')))
+	} 
 	data.reportData.forEach(r => {
 		if (r.reportid.length > 0) r.url = data.url + '/viewreport/' + r.reportid;
 		if (r.status.toLowerCase() == "pass") r.pass = true;
@@ -129,29 +133,32 @@ generateEmailPayload.taskWorkFlow = async data => {
 	var mindmapid = ""
 	switch (data.notifyEvent){
 		case 'onUnassign':
-			taskupdate = data.assigner + " has unassinged task " + data.taskdetails + "."
+			
 			mindmapid  = data.mindmapid;
 			inputs = {
 				"fetchby": "mindmapbyrule",
 				"id": mindmapid,
 				"nodetype":data.nodetype,
-				"extraids":[] 
+				"reviewerid":data.reviewerid, 
+				"assigneeid":data.asigneeid
 			}
 			result = await getReceivers(inputs, data.nodeid, 'onUnassign')
+			taskupdate = data.assigner + " has unassinged " + result.owners.assignee + " from task " + data.taskdetails + "."
 			recv = result['emails']
 			break
 
 		case 'onAssign':
-			taskupdate = 'Task ' + " " + data.taskdetails + " has been assigned to " + data.assignedto + ' by ' + data.assigner + ". " + data.reviewer + " has been marked as the reviewer."
 			mindmapid  = data.mindmapid;
 			inputs = {
 				"fetchby": "mindmapbyrule",
 				"id": mindmapid,
 				"nodetype":data.nodetype,
-				"extraids":[data.reviewerid,data.asigneeid] 
+				"reviewerid":data.reviewerid, 
+				"assigneeid":data.asigneeid
 			}
 			result = await getReceivers(inputs, data.nodeid, 'onAssign')
 			recv = result['emails']
+			taskupdate = 'Task ' + " '" + data.taskdetails + "' has been assigned to " + result.owners.assignee + ' by ' + data.assigner + ". " + result.owners.reviewer + " has been marked as the reviewer."
 			var ruleids = result['ruleids'] || []
 			inputs = {
 				"nodeid": data.nodeid,
@@ -228,27 +235,31 @@ const getReceivers  = async (inputs, nodeid, type) =>{
 			var ruleinfo = ruledata[index].ruleinfo
 			var taskdata = ruledata[index]
 			if (type == 'taskflow' && taskdata.taskowners && taskdata.taskowners.length == 2){
-				owners.assignee = (taskdata.taskowners[0]._id == taskdata.assignedto) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name
-				owners.reviewer = (taskdata.taskowners[0]._id == taskdata.reviewer) ? taskdata.taskowners[0].name : taskdata.taskowners[2].name
-				emails[taskdata.taskowners[1].email] = 1
-				emails[taskdata.taskowners[0].email] = 1
-			}
-			if (type == 'onModulesExecute' || type == 'onScenariosExecute'){
-				emails[taskdata.taskowners[0].email] = 1
-			}
+				owners.assignee = (taskdata.taskowners[0]._id == taskdata.assignedto) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name;
+				owners.reviewer = (taskdata.taskowners[0]._id == taskdata.reviewer) ? taskdata.taskowners[0].name : taskdata.taskowners[2].name;
+				emails[taskdata.taskowners[1].email] = '-1';
+				emails[taskdata.taskowners[0].email] = '-1';
+			} else if (type == 'onModulesExecute' || type == 'onScenariosExecute'){
+				emails[taskdata.taskowners[0].email] = '-1';
+			} else if (type == 'onAssign' || type == 'onUnassign'){
+				owners.assignee = (taskdata.taskowners[0]._id == inputs.assigneeid) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name;
+				owners.reviewer = (taskdata.taskowners[0]._id == inputs.reviewerid) ? taskdata.taskowners[0].name : taskdata.taskowners[2].name;
+				emails[taskdata.taskowners[1].email] = '-1';
+				emails[taskdata.taskowners[0].email] = '-1';
+			} 
 			for(var ruleindex in ruleinfo){
 				var rule = ruleinfo[ruleindex]
 				if (rule && (rule.targetnodeid == 0 || type == 'onModulesExecute' || (rule.targetnodeid != 0 && nodeid ==  rule.targetnodeid ))){
 					switch(type){
 						case 'onAssign':
-							if(rule.actiontype == '1') rule.emails.reduce((map,obj)=>{emails[obj] = 1},{})
-							ruleids.push(rule._id)
+							if(rule.actiontype == '1') rule.emails.reduce((map,obj)=>{emails[obj] = rule.priority},{})
+							ruleids.push(rule._id);
 							break
 						case 'onUnassign':
-							if(rule.actiontype == '2') rule.emails.reduce((map,obj)=>{emails[obj] = 1},{})
+							if(rule.actiontype == '2') rule.emails.reduce((map,obj)=>{emails[obj] = rule.priority},{});
 							break
 						default:
-							rule.emails.reduce((map,obj)=>{emails[obj] = 1},{})
+							rule.emails.reduce((map,obj)=>{emails[obj] = rule.priority},{});
 					}
 				}
 			}
