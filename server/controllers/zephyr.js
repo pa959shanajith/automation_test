@@ -84,66 +84,6 @@ exports.loginToZephyr_ICE = function (req, res) {
 	}
 };
 
-exports.getProjects_ICE = function (req, res) {
-	try {
-		logger.info("Inside UI service: getProjects_ICE");
-		var username = req.session.username;
-		var name = undefined;
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + name);
-		logger.debug("ICE Socket requesting Address: %s" , name);
-		const reqData = req.body;
-		if(reqData.zephyraction) {
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]>0) {
-					var integrationType = reqData.integrationType;
-					var zephyraction = reqData.zephyraction;
-					var zephyrDetails = {
-						"integrationType" : integrationType,
-						"zephyraction": zephyraction
-					};
-					logger.info("Sending socket request for zephyrlogin to redis");
-					dataToIce = {"emitAction" : "zephyrlogin","username" : name, "responsedata":zephyrDetails};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					function zephyrlogin_listener(channel,message) {
-						var data = JSON.parse(message);
-						if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
-							redisServer.redisSubServer.removeListener('message',zephyrlogin_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in loginZephyrServer_ICE: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
-									soc.emit("ICEnotAvailable");
-								}
-							} else if (data.onAction == "qcresponse") {
-								data = data.value;
-								res.send(data);
-							}
-						}
-					}
-					redisServer.redisSubServer.on("message",zephyrlogin_listener);
-				} else {
-					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-						var flag="";
-						if (found) flag = "scheduleModeOn";
-						else {
-							flag = "unavailableLocalServer";
-							logger.info("ICE Socket not Available");
-						}
-						res.send(flag);
-					});
-				}
-			});
-		} else {
-			logger.info("Error occurred in loginZephyrServer_ICE: Invalid Zephyr Credentials");
-			res.send("invalidcredentials");
-		}
-	} catch (exception) {
-		logger.error("Error occurred in loginZephyrServer_ICE:", exception.message);
-		res.send("fail");
-	}
-};
-
 exports.zephyrProjectDetails_ICE = function (req, res) {
 	logger.info("Inside UI service: zephyrProjectDetails_ICE");
 	try {
@@ -323,7 +263,7 @@ exports.zephyrMappedTestcaseDetails_ICE = async (req, res) => {
 	}
 };
 
-exports.updateMapping = async (req, res) => {
+exports.zephyrUpdateMapping = async (req, res) => {
 	logger.info("Inside UI service: zephyrMappedTestcaseDetails_ICE");
 	var mappedTestIds = [];
 	var mappedTestNames = [];
@@ -461,7 +401,7 @@ exports.updateMapping = async (req, res) => {
 									client.post(epurl + "qualityCenter/saveIntegrationDetails_ICE", args,
 										function (result, response) {
 										if (response.statusCode != 200 || result == "fail") {
-											logger.error("Error occurred in updateMapping Error Code : ERRDAS");
+											logger.error("Error occurred in zephyrUpdateMapping Error Code : ERRDAS");
 										} 
 									});
 								} else if(occurences[mappedTestNames[i]] > 1 || occurences2[testNames[i]] > 1) {

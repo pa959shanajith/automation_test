@@ -58,7 +58,7 @@ const ZephyrUpdateContent = props => {
         try{
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
         
-            const response = await api.updateMapping(updateMapPayload);
+            const response = await api.zephyrUpdateMapping(updateMapPayload);
             
             if (response === "unavailableLocalServer")
                 setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);

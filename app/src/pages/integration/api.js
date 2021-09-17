@@ -171,9 +171,9 @@ export const viewQtestMappedList_ICE = async(userID) => {
   use: Gets the Values of the mapped files 
   api returns: [] 
 */
-export const updateMapping = async(updateMapPayload) => {
+export const zephyrUpdateMapping = async(updateMapPayload) => {
     try{
-        const res = await axios(url+'/updateMapping', {
+        const res = await axios(url+'/zephyrUpdateMapping', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
@@ -365,33 +365,6 @@ export const loginToZephyr_ICE = async(zephyrurl, username, password) => {
 				zephyrUserName:	username,
 				zephyrPassword: password,
 				zephyraction: "login"
-            }
-        });
-        if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
-            return {error:MSG.GENERIC.INVALID_SESSION};
-        }
-        if(res.status===200 && res.data !== "fail"){            
-            return res.data;
-        }
-        console.error(res.data)
-        return {error:MSG.INTEGRATION.ERR_GET_LIST}
-    }catch(err){
-        console.error(err)
-        return {error:MSG.INTEGRATION.ERR_GET_LIST}
-    }
-}
-
-export const getProjects_ICE = async() => {
-    try{
-        const res = await axios(url+'/getProjects_ICE', {
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json',
-            },
-            data: {
-                action: "getProjects_ICE",
-				zephyraction: "project"
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
