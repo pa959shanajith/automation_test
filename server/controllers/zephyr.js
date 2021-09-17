@@ -325,10 +325,6 @@ exports.zephyrMappedTestcaseDetails_ICE = async (req, res) => {
 
 exports.updateMapping = async (req, res) => {
 	logger.info("Inside UI service: zephyrMappedTestcaseDetails_ICE");
-	var projectId = parseInt(req.body.updateMapPayload.projectId);
-	var releaseId = parseInt(req.body.updateMapPayload.releaseId);
-	var phaseDets = req.body.updateMapPayload.phaseDets;
-	var selectedPhase = req.body.updateMapPayload.selectedPhase;
 	var mappedTestIds = [];
 	var mappedTestNames = [];
 	var mappedList = {};
@@ -338,7 +334,11 @@ exports.updateMapping = async (req, res) => {
 	var errorList = [];
 	var warningList = [];
 	try {
-	//get mapped details
+		var projectId = parseInt(req.body.updateMapPayload.projectId);
+		var releaseId = parseInt(req.body.updateMapPayload.releaseId);
+		var phaseDets = req.body.updateMapPayload.phaseDets;
+		var selectedPhase = req.body.updateMapPayload.selectedPhase;
+		//get mapped details
 		try {
 			if(phaseDets.length != 0) {
 				var userid = req.session.userid;
@@ -489,7 +489,6 @@ exports.updateMapping = async (req, res) => {
 				});
 			}
 		});
-		//Update the payload in DAS
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send("fail");
