@@ -174,7 +174,9 @@ generateEmailPayload.taskWorkFlow = async data => {
 			inputs = {
 				"fetchby": "task",
 				"id": taskid,
-				"ruleactionid": action
+				"ruleactionid": action,
+				"extragroups": data.extragroups || [],
+				"extrausers": data.extrausers || []
 			}
 			result = await getReceivers(inputs, data.nodeid, 'taskflow')
 			recv = result['emails']
