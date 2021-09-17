@@ -430,10 +430,11 @@ const DesignContent = props => {
 
     const submitTask = submitOperation => {
         let { subTaskId: taskid, status: taskstatus, versionnumber: version, batchTaskIDs, projectId } = props.current_task;
-        
+        let taskname = props.current_task.taskName
+        let nodeid = props.current_task.testCaseId
 		if (submitOperation === 'reassign') taskstatus = 'reassign';
 
-        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
+        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs, nodeid, taskname)
         .then(result => {
             if (result === "fail") setMsg(MSG.GENERIC.WARN_NO_REVIEWER);
             else if (taskstatus === 'reassign') {setMsg(MSG.DESIGN.SUCC_TASK_REASSIGN); redirectToPlugin();}

@@ -36,12 +36,13 @@ const SubmitTask = () => {
 		let version = current_task.versionnumber;
 		let batchTaskIDs = current_task.batchTaskIDs;
         let projectId = current_task.projectId;
-        
+        let nodeid = current_task.screenId;
+        let taskname = current_task.taskName
 		if (submitOperation === 'reassign') {
 			taskstatus = 'reassign';
         }
 
-        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
+        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs, nodeid, taskname)
         .then(result => {
             if (result === "fail") setMsg(MSG.SCRAPE.WARN_NO_REVIEWER);
             else if (taskstatus === 'reassign') {

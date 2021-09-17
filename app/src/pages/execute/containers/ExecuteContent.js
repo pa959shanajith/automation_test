@@ -8,7 +8,7 @@ import "../styles/ExecuteContent.scss";
 import * as actionTypes from "../../plugin/state/action";
 import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
-
+import AdvancedOptions from '../../mindmap/components/AdvancedOptions'
 
 const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
     const history = useHistory();
@@ -31,6 +31,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
     const [proceedExecution, setProceedExecution] = useState(false);
     const [dataExecution, setDataExecution] = useState({});
     const [allocateICE,setAllocateICE] = useState(false)
+    const [showAdvOption,setShowAdvOption] = useState(false)
     const [accessibilityParameters,setAccessibilityParameters] = useState(current_task.accessibilityParameters)
     const [scenarioTaskType,setScenarioTaskType] = useState(current_task.scenarioTaskType);
     var batch_name= taskName ==="Batch Execution"?": "+current_task.taskName.slice(13):""
@@ -115,11 +116,13 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 		var version = current_task.versionnumber;
 		var batchTaskIDs = current_task.batchTaskIDs;
 		var projectId = current_task.projectId;
+        var taskname = current_task.taskName
+        var nodeid = (current_task.scenarioId != '') ? current_task.scenarioId : ''
 		if (action !== undefined && action === 'reassign') {
 			taskstatus = action;
 		}
 
-		const result = await reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs);
+		const result = await reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs, nodeid, taskname);
         if(result.error){displayError(result.error);return;}
         if (result === 'fail') {
             displayError(MSG.GENERIC.WARN_NO_REVIEWER);
@@ -187,6 +190,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
         executionData["browserType"]=browserTypeExe;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
+        executionData["scenarioFlag"] = (current_task.scenarioFlag == 'True') ? true : false
         ResetSession.start();
         try{
             setLoading(false);
@@ -255,13 +259,13 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
                 exeIceLabel={"Execute on ICE"}
                 ExeScreen={true}
             />:null}
-            
+            {showAdvOption && <AdvancedOptions scenarioid={current_task.scenarioId} scenarioExec={current_task.scenarioFlag} mindmapid={current_task.testSuiteDetails?current_task.testSuiteDetails[0].testsuiteid:""} setShowAdvOption={setShowAdvOption} priority={1} setBlockui={setLoading} displayError={displayError} executionScreen={true} />}
             <div className="e__content">
                 <div className="e__task_title"> <div className="e__task_name">{taskName || "Execute"}{batch_name}</div></div>
                 <div id="tableActionButtons">
                     {taskName==="Batch Execution"?<div><span className='parentBatchContainer'><input id="selectAllBatch" onClick={()=>{setSelectAllBatchClick()}} title='Select Batch' type='checkbox' className='checkParentBatch' /><span className='parentObject'>Select All</span></span></div>:null}
                     <button id="excSaveBtn" onClick={()=>{updateTestSuite()}} title="Save" className={"e__taskBtn e__btn "+ ((taskName==="Batch Execution") ? "e__btnLeft" : "")}>Save</button>
-                    <button disabled={true} title="Configure" className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>Configure</button>
+                    <button onClick={()=>{setShowAdvOption(true)}} style={{display:taskName ==="Batch Execution"?"none":""}} title="Configure" className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>Configure</button>
                     <select defaultValue={""} id='syncScenario' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>
                         <option value="" disabled className="e__disableOption">Select Integration</option>
                         <option value="1">ALM</option>

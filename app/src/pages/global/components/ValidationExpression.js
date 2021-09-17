@@ -12,6 +12,7 @@ const ValidationExpression = (value,id) =>{
         case 'samlServerName':       /* FALLTHROUGH */
         case 'oidcServerName':       /* FALLTHROUGH */
         case 'poolName':             /* FALLTHROUGH */
+        case 'emailName':             /* FALLTHROUGH */
         case 'GitToken': regex = /[^a-zA-Z0-9]/g; break;
         case 'iceName':             /* FALLTHROUGH */
         case 'tokenName':           /* FALLTHROUGH */
