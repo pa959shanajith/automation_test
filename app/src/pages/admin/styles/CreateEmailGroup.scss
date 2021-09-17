@@ -1,0 +1,42 @@
+.adminActionBtn{
+    .btn-edit{
+        margin-right: 10px;
+    }
+}
+.crt_email-group{
+    height: calc( 100% - 15px);
+    .assignBox-container{
+        width: 100%;
+        height: calc( 100% - 125px);
+    }
+    .input-label{
+        width: 75%;
+        font-size: small;
+        font-weight: 700;
+        margin-top: 25px;
+        label{
+            width: 80px;
+        }
+        input{
+            display: inline-block;
+            width: 75%;
+        }
+
+    }
+}
+.crt_email-group_container{
+    width: 100%;
+    padding: 20px;
+    height: 100%;
+}
+.email-group_forminp{
+    .edit-user-dropdown-edit{
+        width: 100%;
+        outline: none;
+    }
+    .form-inp-dropdown{
+        max-height: 200px;
+        position: absolute;
+        width: 90%
+    }
+}

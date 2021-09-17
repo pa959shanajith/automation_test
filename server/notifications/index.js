@@ -2,7 +2,7 @@ const utils = require('../lib/utils');
 const generator = require('./generator');
 const email = require('./email');
 const logger = require('../../logger');
-const notfEvents = ["test", "report", "userUpdate", "schedule", "iceAssign", "projectAssign", "forgotPassword", "unlockAccount"];
+const notfEvents = ["test", "report", "userUpdate", "schedule", "iceAssign", "projectAssign", "forgotPassword", "unlockAccount", "taskWorkFlow"];
 const channels = {};
 const preferences = {};
 
@@ -99,6 +99,7 @@ module.exports.update = async (action, name, channel, provider) => {
 		//else if (channel == "otherChannelType") channels[channel] = otherChannelType;
 	}
 };
+
 
 // UI notifications
 module.exports.broadcast = {
