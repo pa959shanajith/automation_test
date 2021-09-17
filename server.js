@@ -158,7 +158,7 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-			} 
+			}
 			return next();
 		});
 
@@ -481,11 +481,15 @@ if (cluster.isMaster) {
 		app.post('/viewQtestMappedList_ICE', auth.protect, qtest.viewQtestMappedList_ICE);	
 		//Zephyr Plugin
 		app.post('/loginToZephyr_ICE', auth.protect, zephyr.loginToZephyr_ICE);
+		app.post('/getProjects_ICE', auth.protect, zephyr.getProjects_ICE);
 		app.post('/zephyrProjectDetails_ICE', auth.protect, zephyr.zephyrProjectDetails_ICE);
 		app.post('/zephyrCyclePhase_ICE', auth.protect, zephyr.zephyrCyclePhase_ICE);
+		app.post('/zephyrMappedCyclePhase', auth.protect, zephyr.zephyrMappedCyclePhase);
 		app.post('/zephyrTestcaseDetails_ICE', auth.protect, zephyr.zephyrTestcaseDetails_ICE);
+		app.post('/zephyrMappedTestcaseDetails_ICE', auth.protect, zephyr.zephyrMappedTestcaseDetails_ICE);
 		app.post('/saveZephyrDetails_ICE', auth.protect, zephyr.saveZephyrDetails_ICE);
 		app.post('/viewZephyrMappedList_ICE', auth.protect, zephyr.viewZephyrMappedList_ICE);	
+		app.post('/updateMapping', auth.protect, zephyr.updateMapping);	
 		//app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', auth.protect, flowGraph.flowGraphResults);

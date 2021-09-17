@@ -7,6 +7,7 @@ import { Messages as MSG, setMsg } from '../../global';
 import { RedirectPage } from '../../global/index.js';
 import CycleNode from './ZephyrTree';
 import * as actionTypes from '../state/action';
+import "../styles/TestList.scss"
 
 
 const ZephyrContent = props => {
@@ -138,6 +139,7 @@ const ZephyrContent = props => {
                 pageTitle="Zephyr Integration"
                 onSave={()=>callSaveButton()}
                 onViewMap={()=>props.callViewMappedFiles()}
+                onUpdateMap={()=>props.callUpdateMappedFiles()}
                 onExit={()=>callExit()}
                 leftBoxTitle="Zephyr Tests"
                 rightBoxTitle="Avo Assure Scenarios"
