@@ -74,7 +74,9 @@ export const AdvancedOptionPopup = (prop) => {
     )
 } 
 
-const applyRules = async ({scenarioid,scenarioExec,executionScreen,setShowAdvOption,priority,setModal,setError,deleteRules,updateRules,newRules,mindmapid,displayError}) => {
+const applyRules = async ({oldRules,scenarioid,scenarioExec,executionScreen,inputOptions,setShowAdvOption,priority,setModal,setError,deleteRules,updateRules,newRules,mindmapid,displayError}) => {
+    
+    
     let newRuleObj = {};
     let updateRuleObj = {};
     let stop = false;
@@ -96,16 +98,12 @@ const applyRules = async ({scenarioid,scenarioExec,executionScreen,setShowAdvOpt
         newRuleObj[`rule-${i}`] = obj;
     })
     if(stop) return;
+    const taskData = executionScreen?[]: formTaskData(oldRules,newRules,deleteRules,inputOptions);
     const payload ={
 		"priority":priority,
         "mindmapid": mindmapid,
         "taskdata": {},
-		// "taskdata": {
-		// 	"612debb31b84be5b94dc9cb9": [
-		// 		"6135eebb6d693d6148b20092",
-		// 		"6135eebb6d693d6148b20091"
-		// 	]
-		// },
+		"taskdata": taskData,
 		"newrules": newRuleObj,
 		"updatedrules": updateRuleObj,
 		"deletedrules": deleteRules
@@ -291,7 +289,7 @@ const fetchData = async ({setNewRules,executionScreen,scenarioExec,setOldRules,s
         if(rule.targetnode==="all" && rule.actionon===0 && rule.targetnodeid===0){
             inputType["_id"]="all_nodes";
             inputType["value"]="All Nodes";
-        } else if(rule.targetnode==="module" && rule.actionon==="all" && rule.targetnodeid===0){
+        } else if(rule.targetnode==="modules" && rule.actionon==="all" && rule.targetnodeid===0){
             inputType["_id"]="All Modules";
             inputType["value"]=`new-${mindmapid}`;
         } 
@@ -345,11 +343,72 @@ const formExecutionRule = (rule,scenarioid,scenarioExec) => {
         obj.actionon= "specific";
         obj.targetnodeid= scenarioid;
     } else if (scenarioExec!=="True") {
-        obj.targetnode= "module";
+        obj.targetnode= "modules";
         obj.actionon= "all";
         obj.targetnodeid= null;
     }
     return obj
+}
+
+const formTaskData = (oldRules,newRules,deleteRules,inputOptions) => {
+    let taskData = {}; 
+    const insertRule = (rule) => {
+        if(deleteRules.includes(rule.ruleid)) return
+        var obj = formRule(rule)
+        //For all assigned node add ruleids
+        if(obj.targetnodeid!==null) {
+            var add = true;
+            for(let i =0 ; i< inputOptions.length ; i++) {
+                if(inputOptions[i]._id === obj.targetnodeid && inputOptions[i].task===null) {
+                    add = false;break;
+                }
+            }
+            if(add){ if(taskData[obj.targetnodeid]===undefined) taskData[obj.targetnodeid] = [rule.ruleid];
+            else taskData[obj.targetnodeid].push(rule.ruleid)}
+        } else if (obj.targetnode==="all" && obj.targetnodeid===null && obj.actionon===null ) {
+            for(let i =0 ; i< inputOptions.length ; i++) {
+                if(inputOptions[i].task !== null) {
+                    if(taskData[inputOptions[i]._id]===undefined) taskData[inputOptions[i]._id] = [rule.ruleid];
+                    else taskData[inputOptions[i]._id].push(rule.ruleid)
+                }
+            }
+        } else if (obj.targetnode==="modules" && obj.targetnodeid===null && obj.actionon==="all") {
+            if(inputOptions[0].task !== null) {
+                if(taskData[inputOptions[0]._id]===undefined) taskData[inputOptions[0]._id] = [rule.ruleid];
+                else taskData[inputOptions[0]._id].push(rule.ruleid)
+            }    
+        } 
+        
+        else {
+            ["scenarios","screens","testcases"].map((nodeType)=>{
+                if ((obj.targetnode===nodeType) && obj.targetnodeid===null && obj.actionon==="all") {
+                    for(let i =0 ; i< inputOptions.length ; i++) {
+                        if(inputOptions[i].task !== null && inputOptions[i].type === nodeType){
+                            if(taskData[inputOptions[i]._id]===undefined) taskData[inputOptions[i]._id] = [rule.ruleid];
+                            else taskData[inputOptions[i]._id].push(rule.ruleid)
+                        }
+                    }
+                } 
+            })
+        }
+    }
+
+    [...newRules].forEach((rule,i)=>{
+        rule.ruleid=`rule-${i}`;
+        insertRule(rule)
+    });
+
+    [...oldRules].forEach((rule)=>{
+        insertRule(rule)
+    })
+    
+    //create empty ruledict if no rule created 
+    for(let i =0 ; i< inputOptions.length ; i++) {
+        if(inputOptions[i].task !== null) {
+            if(taskData[inputOptions[i]._id]===undefined) taskData[inputOptions[i]._id] = [];
+        }
+    }
+    return taskData;
 }
 
 const formRule = (rule) => {
@@ -367,7 +426,7 @@ const formRule = (rule) => {
         obj.targetnodeid= rule.inputType.value.slice(4);
         //if input type is module
         if(rule.inputType._id.slice(0,11)==="new-modules"){
-            obj.targetnode= "module";
+            obj.targetnode= "modules";
             obj.actionon= "all";
             obj.targetnodeid= null;
         }
