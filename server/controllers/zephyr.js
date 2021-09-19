@@ -193,6 +193,7 @@ exports.zephyrTestcaseDetails_ICE = function (req, res) {
 exports.zephyrMappedTestcaseDetails_ICE = async (req, res) => {
 	logger.info("Inside UI service: zephyrMappedTestcaseDetails_ICE");
 	var mappedTests = [];
+	var mappedDets = [];
 	try {
 		//get mapped details
 		try {
@@ -278,41 +279,34 @@ exports.zephyrUpdateMapping = async (req, res) => {
 		var releaseId = parseInt(req.body.updateMapPayload.releaseId);
 		var phaseDets = req.body.updateMapPayload.phaseDets;
 		var selectedPhase = req.body.updateMapPayload.selectedPhase;
+		var rootCheck = req.body.rootCheck;
+		var mappedDets = [];
 		//get mapped details
 		try {
-			if(phaseDets.length != 0) {
+			if(!rootCheck) {
 				var userid = req.session.userid;
 				for(var i=0;i<Object.keys(phaseDets).length;++i) {
-					if(phaseDets[Object.keys(phaseDets)[i]].length>0 && phaseDets[Object.keys(phaseDets)[i]][0] == "all") {
-						var inputs = {
-							"userid": userid,
-							"treeid": Object.keys(phaseDets)[i],
-							"query": "zephyrdetails"
-						};
-						var mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrMappedCyclePhase");
-						if (mappedDets == "fail") res.send('fail');
-						for(var i=0;i<mappedDets.length;++i) {
-							mappedTestIds.push(parseInt(mappedDets[i].testid));
-							mappedTestNames.push(mappedDets[i].testname);
-							mappedList[parseInt(mappedDets[i].testid)] = mappedDets[i];
-						}
-						// phaseDets[Object.keys(phaseDets)[i]] = mappedTestIds;
-					} else {
-						if(phaseDets[Object.keys(phaseDets)[i]].length>0) {
+					if(phaseDets[Object.keys(phaseDets)[i]].length>0) {
+						if(phaseDets[Object.keys(phaseDets)[i]][0] == "all") {
+							var inputs = {
+								"userid": userid,
+								"treeid": Object.keys(phaseDets)[i],
+								"query": "zephyrdetails"
+							};
+						} else {
 							var inputs = {
 								"userid": userid,
 								"treeid": Object.keys(phaseDets)[i],
 								"testcaseids": phaseDets[Object.keys(phaseDets)[i]],
 								"query": "zephyrdetails"
 							};
-							var mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrMappedCyclePhase");
-							if (mappedDets == "fail") res.send('fail');
-							for(var i=0;i<mappedDets.length;++i) {
-								mappedTestIds.push(parseInt(mappedDets[i].testid));
-								mappedTestNames.push(mappedDets[i].testname);
-								mappedList[parseInt(mappedDets[i].testid)] = mappedDets[i];
-							}
-							// phaseDets[Object.keys(phaseDets)[i]] = mappedTestIds;
+						}
+						mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrMappedCyclePhase");
+						if (mappedDets == "fail") res.send('fail');
+						for(var j=0;j<mappedDets.length;++j) {
+							mappedTestIds.push(parseInt(mappedDets[j].testid));
+							mappedTestNames.push(mappedDets[j].testname);
+							mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
 						}
 					}
 				}
@@ -322,7 +316,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 					"releaseId": releaseId,
 					"query": "zephyrdetails"
 				};
-				var mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrMappedCyclePhase");
+				mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrMappedCyclePhase");
 				if (mappedDets == "fail") res.send('fail');
 				for(var i=0;i<mappedDets.length;++i) {
 					mappedTestIds.push(parseInt(mappedDets[i].testid));
@@ -331,7 +325,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 				}
 			}
 		}  catch (exception) {
-			logger.error("Error occurred in zephyr/"+zephyrMappedCyclePhase+":", exception);
+			logger.error("Error occurred in zephyr/zephyrMappedCyclePhase:", exception);
 			res.send("fail");
 		}
 		var username = req.session.username;
@@ -376,7 +370,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 							//acc[curr] = (acc[curr] || 0) + 1
 							//match testcase names
 							for(var i=0;i<mappedTestNames.length;++i) {
-								if(occurences[mappedTestNames[i]] == 1 && occurences2[testNames[i]] == 1 && testNames.includes(mappedTestNames[i])) {
+								if(occurences[mappedTestNames[i]] == 1 && testNames.includes(mappedTestNames[i]) && occurences2[testNames[testNames.indexOf(mappedTestNames[i])]] == 1) {
 									var oldMap = mappedList[mappedTestIds[i]];
 									var index = testNames.indexOf(mappedTestNames[i]);
 									var newMap = testList[testIds[index]];

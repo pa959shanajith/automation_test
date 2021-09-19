@@ -1,4 +1,4 @@
-import React,{Fragment, useState } from 'react';
+import React,{Fragment, useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import * as api from '../api.js';
@@ -55,23 +55,37 @@ const ZephyrUpdateContent = props => {
     }
 
     const callUpdate=async()=>{
+        var tcFlag = false;
         try{
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+
+            for (let value of Object.values(updateMapPayload['phaseDets'])) {
+                if (value.length>0) {
+                    tcFlag = true;
+                    break;
+                }
+            }
+            if(!rootCheck && (Object.keys(updateMapPayload['phaseDets']).length === 0 || !tcFlag)) { 
+                setMsg(MSG.INTEGRATION.ERR_EMPTY_TCS);
+            } else if (updateMapPayload['selectedPhase'] === undefined) {
+                setMsg(MSG.INTEGRATION.ERR_EMPTY_PH);
+            } else {
         
-            const response = await api.zephyrUpdateMapping(updateMapPayload);
-            
-            if (response === "unavailableLocalServer")
-                setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
-            else if(response.error.length>0 || response.warning.length>0) {
-                setShowErrorModal(true); 
-                setErrorList(response.error);
-                setWarningList(response.warning);
+                const response = await api.zephyrUpdateMapping(updateMapPayload, rootCheck);
+                
+                if (response === "unavailableLocalServer")
+                    setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+                else if(response.error.length>0 || response.warning.length>0) {
+                    setShowErrorModal(true); 
+                    setErrorList(response.error);
+                    setWarningList(response.warning);
+                }
+                else if(response.error.length===0 && response.warning.length===0) {
+                    setMsg(MSG.INTEGRATION.UPDATE_SAVE)
+                    clearSelections();
+                }
+                else setMsg(MSG.INTEGRATION.ERR_UPDATE_MAP);
             }
-            else if(response.error.length===0 && response.warning.length===0) {
-                setMsg(MSG.INTEGRATION.UPDATE_SAVE)
-                clearSelections();
-            }
-            else setMsg(MSG.INTEGRATION.ERR_UPDATE_MAP);
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         }
         catch(err) {
@@ -203,8 +217,8 @@ const ZephyrUpdateContent = props => {
             <MappingPage 
                 pageTitle="Update Mapping"
                 onUpdate={()=>callUpdate()}
-                leftBoxTitle="Mapped Zephyr Tests"
-                rightBoxTitle="Zephyr Test Cases"
+                leftBoxTitle="Mapped Zephyr Test Cases"
+                rightBoxTitle="Zephyr Folder Structure"
                 selectTestProject={
                     <select data-test="intg_Zephyr_project_drpdwn" value={projectDropdn1} onChange={(e)=>callProjectDetails_ICE(e,"1")}  className="qcSelectDomain" style={{marginRight : "5px"}}>
                         <option value="Select Project" disabled >Select Project</option>

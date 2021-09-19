@@ -32,9 +32,9 @@ const CycleNode = props => {
             } else {
                 phaseDetsVal = updateMapPayload["phaseDets"]
                 for(var i=0;i<props.phaseList.length;++i) {
-                    var phaseId = Object.keys(props.phaseList[i])[0]
+                    var phaseId = props.phaseList[i]["phaseid"];//Object.keys(props.phaseList[i])[0]
                     if(!Object.keys(phaseDetsVal).includes(phaseId)) {
-                        phaseDetsVal[phaseId]=[]
+                        phaseDetsVal[phaseId]=[];
                     }
                 }
                 dispatch({
@@ -81,9 +81,9 @@ const CycleNode = props => {
             props.setCycleCount({check:checkVal,cycles:cycleVal});
             setHeaderCheck(true);
             for(var i=0;i<props.phaseList.length;++i) {
-                var phaseId = Object.keys(props.phaseList[i])[0]
+                var phaseId = String(props.phaseList[i]["phaseid"]);//Object.keys(props.phaseList[i])[0]
                 if(Object.keys(phaseDetsVal).includes(phaseId)) {
-                    phaseDetsVal[phaseId] = ["all"]
+                    phaseDetsVal[phaseId] = ["all"];
                 }
             }
         } else {
@@ -108,9 +108,9 @@ const CycleNode = props => {
             setHeaderCheck(false);
             
             for(var i=0;i<props.phaseList.length;++i) {
-                var phaseId = Object.keys(props.phaseList[i])[0]
+                var phaseId = String(props.phaseList[i]["phaseid"]);//Object.keys(props.phaseList[i])[0]
                 if(Object.keys(phaseDetsVal).includes(phaseId)) {
-                    phaseDetsVal[phaseId] = []
+                    phaseDetsVal[phaseId] = [];
                 }
             }
         }
@@ -129,7 +129,7 @@ const CycleNode = props => {
 
     return <div className="int__cycleNode" style={{paddingLeft: 17}}>
             { <div className="test_tree_branches">
-                {props.section !== "right" && props.section != undefined && <span className="sel_up sel_head"><input checked={props.rootCheck?true:phaseCount.check.length==phaseCount.phases.length} onChange={(e)=>onCheckAll(e)} className="sel_up" type="checkbox"/></span>}
+                {props.section !== "right" && props.section != undefined && <span className="sel_up sel_head"><input onChange={(e)=>onCheckAll(e)} className="sel_up" type="checkbox"/></span>}
                 <span>
                 <img alt="ce-ic"
                     className="test_tree_toggle" 
@@ -332,6 +332,7 @@ const PhaseNode = props => {
                                                 key={`testCase-${testCase.id}`}       
                                                 testCase={testCase}
                                                 phaseId={phaseid}
+                                                cyclephaseid={cyclephaseid}
                                                 projectId={props.projectId}
                                                 releaseId={props.releaseId}
                                                 tests={tests}
@@ -347,6 +348,7 @@ const PhaseNode = props => {
                                                 setCycleCount={props.setCycleCount}
                                                 phaseDets={props.phaseDets}
                                                 setPhaseDets={props.setPhaseDets}
+                                                selectedPhase={props.selectedPhase}
                                             />)
                     } </div>
                     : null
@@ -418,7 +420,7 @@ const TestCaseNode = props => {
                 props.setPhaseCount({check:checkVal,phases:phaseVal});
                 
             }
-            phaseDetsVal[props.phaseId].push(testid);
+            phaseDetsVal[props.cyclephaseid].push(testid);
         } else {
             var index = checkList.indexOf(testid);
             if (index > -1) checkList.splice(index, 1);
@@ -426,7 +428,7 @@ const TestCaseNode = props => {
             props.setPhaseCheck(false);
             checkVal = checkVal - 1;
             props.setPhaseCount({check:checkVal,phases:phaseVal});
-            phaseDetsVal[props.phaseId] = checkList;
+            phaseDetsVal[props.cyclephaseid] = checkList;
         }
         if(checkVal == phaseVal.length) {
             props.setHeaderCheck(true);
