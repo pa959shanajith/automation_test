@@ -80,8 +80,8 @@ export const reviewTask = async(projectId,taskId,taskstatus,version,batchTaskIDs
 				batchIds:batchTaskIDs,
                 nodeid:nodeid,
                 taskname: taskname,
-                groupids:groupids,
-                additionalrecepients:additionalrecepients
+                extragroups:groupids,
+                extrausers:additionalrecepients
             },
             credentials: 'include'
         });
