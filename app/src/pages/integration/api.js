@@ -171,7 +171,7 @@ export const viewQtestMappedList_ICE = async(userID) => {
   use: Gets the Values of the mapped files 
   api returns: [] 
 */
-export const zephyrUpdateMapping = async(updateMapPayload) => {
+export const zephyrUpdateMapping = async(updateMapPayload, rootCheck) => {
     try{
         const res = await axios(url+'/zephyrUpdateMapping', {
             method: 'POST',
@@ -180,6 +180,7 @@ export const zephyrUpdateMapping = async(updateMapPayload) => {
             },
            data: {
             updateMapPayload : updateMapPayload,
+            rootCheck: rootCheck,
             zephyraction : 'testcase'
             
            }
