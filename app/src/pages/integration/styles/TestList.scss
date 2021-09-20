@@ -97,8 +97,63 @@
 .test_tree_branches{
     display: flex;
     margin: 0 0 10px 10px;
+    align-items: center;
+    .sp_label{
+        padding-top: 10px;
+    }
+    .test_label{
+        width: 100%;
+    }
 }
 
 .int__folderNode, .int__phaseNode, .int__cycleNode{
     margin: 0 0 10px 10px;
+}
+
+.sel_up{
+    display: flex;
+    align-items: center;
+    padding: 0 1%;
+    .sel_up{
+        height: 16px;
+        width: 16px;
+    }
+}
+
+.sel_head{
+    font-family: $avoSecondaryFont;
+    font-size: 17px;
+    color: $whiteColor;
+    cursor: pointer;
+    margin: 0 0.5px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    margin: 0 0;
+    padding-right: 1%;
+}
+
+.ss__dup_labels{
+    display: flex;
+    flex-direction: column;
+    font-family: $avoFont ;
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+    max-height: 250px;
+}
+
+.ss__dup_scroll{
+    display: flex;
+    flex-direction: column;
+}
+
+.ss__err_li{
+    font-weight: normal;
+    color: red;
+}
+
+.ss__warning_li{
+    font-weight: normal;
+    color: yellow;
 }

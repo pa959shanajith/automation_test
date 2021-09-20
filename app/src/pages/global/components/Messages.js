@@ -250,8 +250,12 @@ const Messages={
         ERR_SAVE: {"CONTENT":"Failed to Save.", "VARIANT": VARIANT.ERROR},
         ERR_GETTING_LIST: {"CONTENT":"Error in getting list.", "VARIANT": VARIANT.ERROR},
         ERR_INVALID_CRED: {"CONTENT":"Invalid Credentials.", "VARIANT": VARIANT.ERROR},
+        ERR_UPDATE_MAP: {"CONTENT":"Error Updating mappings.", "VARIANT": VARIANT.ERROR},
+        ERR_EMPTY_TCS: {"CONTENT":"Please select Test Cases from Mapped Zephyr Test Cases.", "VARIANT": VARIANT.ERROR},
+        ERR_EMPTY_PH: {"CONTENT":"Please select Phase from Zephyr Folder Structure.", "VARIANT": VARIANT.ERROR},
         
         SUCC_SAVE: {"CONTENT":"Saved successfully.", "VARIANT": VARIANT.SUCCESS},
+        UPDATE_SAVE: {"CONTENT":"Updated successfully.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_NO_MAPPED_DETAILS: {"CONTENT":"No mapped details.", "VARIANT": VARIANT.WARNING},
         WARN_UNMAP_TC: {"CONTENT":"Unmap test case/Scenario before saving.", "VARIANT": VARIANT.WARNING},

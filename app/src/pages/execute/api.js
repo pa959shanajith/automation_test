@@ -332,7 +332,7 @@ export const loginZephyrServer_ICE = async(zephyrURL,zephyrUserName,zephyrPasswo
                 zephyrUserName: zephyrUserName,
                 zephyrPassword : zephyrPassword,
                 integrationType : integrationType,
-                zephyraction: "project"
+                zephyraction: "login"
             },
             credentials: 'include'
         });
