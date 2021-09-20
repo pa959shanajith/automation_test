@@ -102,7 +102,6 @@ const applyRules = async ({oldRules,scenarioid,scenarioExec,executionScreen,inpu
     const payload ={
 		"priority":priority,
         "mindmapid": mindmapid,
-        "taskdata": {},
 		"taskdata": taskData,
 		"newrules": newRuleObj,
 		"updatedrules": updateRuleObj,
