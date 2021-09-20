@@ -398,7 +398,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 											logger.error("Error occurred in zephyrUpdateMapping Error Code : ERRDAS");
 										} 
 									});
-								} else if(occurences[mappedTestNames[i]] > 1 || occurences2[testNames[i]] > 1) {
+								} else if(occurences[mappedTestNames[i]] > 1 || occurences2[mappedTestNames[i]] > 1) {
 									//Warning or error
 									warningList.push(mappedTestNames[i]);
 								} else {

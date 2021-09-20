@@ -288,6 +288,7 @@ const ZephyrUpdateContent = props => {
                                         setCycleCount={setCycleCount}
                                         phaseDets={phaseDets}
                                         setPhaseDets={setPhaseDets}
+                                        selectedPhase={selectedPhase}
                                 />) }
                         </div>   
                     </Fragment>
@@ -333,7 +334,7 @@ const ZephyrUpdateContent = props => {
                         { errorList.map((custname, i) => <span key={i} className="ss__err_li">{custname}</span>) }
                         </div>
                     </ScrollBar></> }
-                    {warningList.length>0 && <><span>Multiple matches exists for following testcases:</span> &&
+                    {warningList.length>0 && <><span>Multiple matches exists for following testcases:</span>
                        <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
                         <div className="ss__dup_scroll">
                         { warningList.map((custname, i) => <span key={i} className="ss__warning_li">{custname}</span>) }
