@@ -278,8 +278,10 @@ const fetchData = async ({priority,setNewRules,executionScreen,scenarioExec,setO
         data = [{actionid:"5","description": "Notification group will be notified when execution of test suite is completed",action:"notify on execution"}]
     }
     setRules(data)
+    setBlockui(false);
 
     //fetch all Users
+    setBlockui("Loading ...")
     data = await getUserDetails("user");
     if(data.error){displayError(data.error);return;}
     var userOptions = [];
@@ -287,8 +289,10 @@ const fetchData = async ({priority,setNewRules,executionScreen,scenarioExec,setO
         if(data[i][3] !== "Admin") userOptions.push({_id:data[i][1],name:data[i][0]}); 
     }
     setAllUsers(userOptions.sort()); 
+    setBlockui(false);
 
     //fetch all Notification group
+    setBlockui("Loading ...")
     data = await getNotificationGroups({'groupids':[],'groupnames':[]});
     if(data.error){
         if(data.val === 'empty'){
@@ -300,13 +304,16 @@ const fetchData = async ({priority,setNewRules,executionScreen,scenarioExec,setO
         }
     }
     setGroupList(data.sort())
+    setBlockui(false);
 
     
     //fetch all old defined rules
+    setBlockui("Loading ...")
     data = await getNotificationConfiguration({fetchby:"mindmapid", id:mindmapid, priority:priority})
     if(data.error){displayError(data.error);return;}
     if(executionScreen && data.length!==0 ) setNewRules([])
     let preDefinedRules = [];
+    setBlockui(false);
     
     data.forEach((rule)=>{
         if(executionScreen && scenarioExec==="True" && rule.targetnode!=="scenarios") return

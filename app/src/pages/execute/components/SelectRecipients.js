@@ -15,9 +15,14 @@ const SelectRecipients = ({ recipients,setRecipients,groupList,allUsers}) => {
     useEffect(()=>{
         setList1([...groupList])
         setList2([...allUsers])
-        inputRef.current.value = ""
+        inputRef.current.value = " Recipient Selected"
         // eslint-disable-next-line
     },[allUsers,groupList])
+    useEffect(()=>{
+        inputRef.current.value = " Recipient Selected"
+        if((recipients.groupids).length>0 || (recipients.additionalrecepients).length>0 )
+        inputRef.current.value = recipients.groupids.length + recipients.additionalrecepients.length +" Recipient Selected";
+    },[])
     const inputFilter = () =>{
         var val = inputRef.current.value
         var itemsList1 = [...list1].filter((e)=>e.groupname.toUpperCase().indexOf(val.toUpperCase())!==-1)
@@ -45,6 +50,9 @@ const SelectRecipients = ({ recipients,setRecipients,groupList,allUsers}) => {
         let recipientsData = {...recipients}
         recipientsData.groupids = selectedGroupIds;
         setRecipients(recipientsData);
+        inputRef.current.value = " Recipient Selected"
+        if((recipientsData.groupids).length>0 || (recipientsData.additionalrecepients).length>0 )
+        inputRef.current.value = recipientsData.groupids.length + recipientsData.additionalrecepients.length +" Recipient Selected";
     }
 
     const selectList2Option = (value, event) =>{
@@ -60,17 +68,26 @@ const SelectRecipients = ({ recipients,setRecipients,groupList,allUsers}) => {
         let recipientsData = {...recipients}
         recipientsData.additionalrecepients = selectedAddRecepients;
         setRecipients(recipientsData);
+        inputRef.current.value = " Recipient Selected"
+        if((recipientsData.groupids).length>0 || (recipientsData.additionalrecepients).length>0 )
+        inputRef.current.value = recipientsData.groupids.length + recipientsData.additionalrecepients.length +" Recipient Selected";
     }
 
     const selectOptionCheckBox = (value) => {
         document.getElementById(value).checked = !document.getElementById(value).checked
     }
 
+    const setPlaceholder = () => {
+        inputRef.current.value = " Recipient Selected"
+        if((recipients.groupids).length>0 || (recipients.additionalrecepients).length>0 )
+        inputRef.current.value = recipients.groupids.length + recipients.additionalrecepients.length +" Recipient Selected";
+    } 
+
     return(
         <Fragment>
-            <ClickAwayListener onClickAway={()=>setDropDown(false)}>
+            <ClickAwayListener onClickAway={()=>{setPlaceholder();setDropDown(false)}}>
             <div>
-                <input autoComplete={"off"} ref={inputRef} className={" sr__input"} onChange={inputFilter} onClick = {resetField} placeholder={"Select Recipients"}/>
+                <input autoComplete={"off"} ref={inputRef} className={" sr__input"} onChange={inputFilter} onClick = {resetField} placeholder={"Search Recipients.."}/>
                 <div className="sr__dropdown" role="menu" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list1.map((item,i) => (  

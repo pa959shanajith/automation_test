@@ -15,9 +15,14 @@ const ComboBox = ({ errId,updateErrorBorder,errorBorder,index,rules,setRules,gro
     useEffect(()=>{
         setList1([...groupList])
         setList2([...allUsers])
-        inputRef.current.value = ""
+        inputRef.current.value = " Recipient Selected"
         // eslint-disable-next-line
     },[allUsers,groupList])
+    useEffect(()=>{
+        inputRef.current.value = " Recipient Selected"
+        if((rules[index].groupids).length>0 || (rules[index].additionalrecepients).length>0 )
+        inputRef.current.value = rules[index].groupids.length + rules[index].additionalrecepients.length +" Recipient Selected";
+    },[])
     const inputFilter = () =>{
         var val = inputRef.current.value
         var itemsList1 = [...list1].filter((e)=>e.groupname.toUpperCase().indexOf(val.toUpperCase())!==-1)
@@ -49,6 +54,9 @@ const ComboBox = ({ errId,updateErrorBorder,errorBorder,index,rules,setRules,gro
         if(updateRules!==undefined){
             updateOldRules(ruleList[index]);
         }
+        inputRef.current.value = " Recipient Selected"
+        if((ruleList[index].groupids).length>0 || (ruleList[index].additionalrecepients).length>0 )
+        inputRef.current.value = ruleList[index].groupids.length + ruleList[index].additionalrecepients.length +" Recipient Selected";
     }
 
     const updateOldRules = (data) => {
@@ -75,17 +83,25 @@ const ComboBox = ({ errId,updateErrorBorder,errorBorder,index,rules,setRules,gro
         if(updateRules!==undefined && ruleid!==undefined){
             updateOldRules(ruleList[index]);
         }
+        inputRef.current.value = " Recipient Selected"
+        if((ruleList[index].groupids).length>0 || (ruleList[index].additionalrecepients).length>0 )
+        inputRef.current.value = ruleList[index].groupids.length + ruleList[index].additionalrecepients.length +" Recipient Selected";
     }
 
     const selectOptionCheckBox = (value) => {
         document.getElementById(value).checked = !document.getElementById(value).checked
     }
+    const setPlaceholder = () => {
+        inputRef.current.value = " Recipient Selected"
+        if((rules[index].groupids).length>0 || (rules[index].additionalrecepients).length>0 )
+        inputRef.current.value = rules[index].groupids.length + rules[index].additionalrecepients.length +" Recipient Selected";
+    } 
 
     return(
         <Fragment>
-            <ClickAwayListener onClickAway={()=>setDropDown(false)}>
+            <ClickAwayListener onClickAway={()=>{setPlaceholder();setDropDown(false)}}>
             <div>
-                <input autoComplete={"off"} ref={inputRef} className={" cb__input"+(errorBorder?" advOption__error_field":"")} onChange={inputFilter} onClick = {resetField} placeholder={"Select Recipients"}/>
+                <input autoComplete={"off"} ref={inputRef} className={" cb__input"+(errorBorder?" advOption__error_field":"")} placeholder={"Search Recipients.."} onChange={inputFilter} onClick = {resetField} />
                 <div className="cb__dropdown" role="menu" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list1.map((item,i) => (  
