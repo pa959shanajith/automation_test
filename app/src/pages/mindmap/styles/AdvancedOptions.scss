@@ -6,12 +6,22 @@
     top: calc(100% - 63px);
     right: 7px;
 }
-
+.AdvOptn__container-exe{
+    .modal__body{
+        height: 200px !important;
+    }
+    .modal__content{
+        width: 90% !important
+    }
+    .cb__dropdown{
+        width: 40% !important
+    }
+}
 .AdvOptn__container{
     
-.advOption__error_field{
-    border: 2px solid $redError !important;
-}
+    .advOption__error_field{
+        border: 2px solid $redError !important;
+    }
     .modal__content{
         width: 140%
     }

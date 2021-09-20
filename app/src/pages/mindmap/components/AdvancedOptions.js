@@ -22,7 +22,7 @@ const AdvancedOptions = (props) => {
     const scenarioExec = props.scenarioExec
     const scenarioid = props.scenarioid
     const [modal,setModal] = useState(false)
-    const [error,setError] = useState(false)
+    const [error,setError] = useState([])
     const [rules,setRules] = useState([])
     const [allUsers,setAllUsers] = useState([])
     const [groupList,setGroupList] = useState([])
@@ -63,41 +63,57 @@ export const AdvancedOptionPopup = (prop) => {
         if(prop.setShowAdvOption!==undefined) prop.setShowAdvOption(false)
     }
     return(
-        <div className="AdvOptn__container">
+        <div className={"AdvOptn__container"+(prop.executionScreen?" AdvOptn__container-exe":"")}>
             <ModalContainer
                 title={"Advanced Options"}
                 content={MiddleContent(prop)}
                 close={()=>{closeModal()}}
-                footer={<button onClick={()=>{applyRules(prop);}}>Apply</button>}
+                footer={
+                <>
+                    {prop.executionScreen && <button onClick={()=>{clearRules(prop);}}>Clear</button>}
+                    <button onClick={()=>{applyRules(prop);}}>Apply</button>
+                </>}
             />
         </div>
     )
 } 
 
+const clearRules = ({setError,setOldRules,oldRules,deleteRules,setNewRules,setUpdateRules,setDeleteRules}) => {
+    for (const [key, value] of Object.entries(oldRules)) {
+        let delRules = [...deleteRules];setUpdateRules({});
+        delRules.push(value.ruleid);
+        setDeleteRules(delRules);
+    }   
+    setUpdateRules({})        
+    setOldRules([]);
+    setNewRules([{ruleType: "", inputType: "", groupids:[], additionalrecepients:[] }])
+    setError([])
+}
+
 const applyRules = async ({oldRules,scenarioid,scenarioExec,executionScreen,inputOptions,setShowAdvOption,priority,setModal,setError,deleteRules,updateRules,newRules,mindmapid,displayError}) => {
-    
-    
+    let errorData = [];
     let newRuleObj = {};
     let updateRuleObj = {};
     let stop = false;
     for (const [key, value] of Object.entries(updateRules)) {
         var obj;
-        stop = checkError(value,setError,key,executionScreen);
-        if (stop) return
+        stop = checkError(errorData,value,key,executionScreen);
         if (executionScreen) obj = formExecutionRule(value,scenarioid,scenarioExec)
         else if(!executionScreen) obj = formRule(value)
         updateRuleObj[key] = obj;
     }
     newRules.forEach((rule,i)=>{
         var obj;
-        if(stop) return;
-        stop = checkError(rule,setError,i,executionScreen);
-        if(stop) return;
+        stop = checkError(errorData,rule,i,executionScreen);
         if (executionScreen) obj = formExecutionRule(rule,scenarioid,scenarioExec)
         else if(!executionScreen) obj = formRule(rule)
         newRuleObj[`rule-${i}`] = obj;
     })
-    if(stop) return;
+    if(executionScreen && oldRules.length===0 && newRules.length===1 && newRules[0].ruleType==="" && newRules[0].inputType==="" && (newRules[0].groupids).length===0 && (newRules[0].additionalrecepients).length===0 ) stop=false;
+    if(stop){
+        setError(errorData)
+        return;
+    } 
     const taskData = executionScreen?[]: formTaskData(oldRules,newRules,deleteRules,inputOptions);
     const payload ={
 		"priority":priority,
@@ -127,7 +143,7 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
         let updatedNewRules = [...newRules];
         updatedNewRules.splice(index, 1);
         setNewRules(updatedNewRules);
-        setError(false)
+        setError([])
     }
     const onChangeSubmit = (event, index , arg) =>{
         let updatedNewRules = [...newRules];
@@ -140,7 +156,7 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
         updatedOldRules.splice(index, 1);
         setOldRules(updatedOldRules);
         setDeleteRules([...deleteRules,id])
-        setError(false)
+        setError([])
     }
     const onChangeSubmitOldRule = (event, index , arg, ruleid) =>{
         let updatedOldRules = [...oldRules];
@@ -152,6 +168,24 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
         if(updateRulesData[ruleid]===undefined) updateRulesData[ruleid] = {};
         updateRulesData[ruleid] = updatedOldRules[index];
         setUpdateRules(updateRulesData);
+    }
+
+    const updateError = (errorId,event) => {
+        let err = [...error];
+        if(event.target.value!==""){
+            const index = err.indexOf(errorId);
+            if (index > -1)  err.splice(index, 1); 
+            setError(err);
+        }
+    }
+
+    const updateErrorBorder = (ruleData,errId) => {
+        let err = [...error];
+        if((ruleData.additionalrecepients).length>0 || (ruleData.groupids).length>0){
+            const index = err.indexOf(errId);
+            if (index > -1)  err.splice(index, 1); 
+            setError(err);
+        }
     }
     
     return(
@@ -166,7 +200,7 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
                     }
                     { oldRules.map((object, index) => 
                         <div className="advOptn_item" key={index}>
-                            <select key={`ruletype-${object.ruleid}`} className={"advOptn__selectRule"+(error && error=== `ruletype-${object.ruleid}`? " advOption__error_field" : "")} value={object.ruleType} onChange={(e)=>onChangeSubmitOldRule(e, index,"ruleType", object.ruleid)}>
+                            <select key={`ruletype-${object.ruleid}`} className={"advOptn__selectRule"+(error.includes(`ruletype-${object.ruleid}`)? " advOption__error_field" : "")} value={object.ruleType} onChange={(e)=>{onChangeSubmitOldRule(e, index,"ruleType", object.ruleid);updateError(`ruletype-${object.ruleid}`,e)}}>
                                 <option value="">Select Rule</option>
                                 { rules.map((ruleType, i) =>
                                     <option key={i} value={ruleType.actionid} >
@@ -175,7 +209,7 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
                                 ) }
                             </select>
                             {!executionScreen &&
-                            <select key={`inp-${object.ruleid}`} className={"advOptn__selectInput"+(error && error=== `inp-${object.ruleid}`? " advOption__error_field" : "")} value={object.inputType.value} onChange={(e)=>onChangeSubmitOldRule(e, index,"inputType", object.ruleid)}>
+                            <select key={`inp-${object.ruleid}`} className={"advOptn__selectInput"+(error.includes(`inp-${object.ruleid}`)? " advOption__error_field" : "")} value={object.inputType.value} onChange={(e)=>{updateError(`inp-${object.ruleid}`,e);onChangeSubmitOldRule(e, index,"inputType", object.ruleid)}}>
                                 <option value="">Select Input</option>
                                 { defaultInputOptions.map((inpOptn, i) =>
                                     <option key={`${inpOptn._id}-${i}`} id={`${inpOptn._id}-${i}`} value={inpOptn.name}>
@@ -188,14 +222,14 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
                                     </option>
                                 ) }
                             </select>}
-                            <ComboBox errorBorder={error===`addrec-${object.ruleid}`?true:false} ruleid={object.ruleid} updateRules={updateRules} setUpdateRules={setUpdateRules} index={index} rules={oldRules} setRules={setOldRules} groupList={groupList} allUsers={allUsers}/>        
+                            <ComboBox updateErrorBorder={updateErrorBorder} errId={`addrec-${object.ruleid}`} errorBorder={error.includes(`addrec-${object.ruleid}`)?true:false} ruleid={object.ruleid} updateRules={updateRules} setUpdateRules={setUpdateRules} index={index} rules={oldRules} setRules={setOldRules} groupList={groupList} allUsers={allUsers}/>        
                                 {!executionScreen && <button className="rule_btn" onClick={()=>deleteRule(index,object.ruleid)} ><img alt="delete-ic" src="static/imgs/ic-delete.png" /></button> }
                             <button title={info(object.ruleType===""?0:object.ruleType,rules)} className="rule_btn fa fa-info-circle" ></button>
                         </div>
                     ) }
                     { newRules.map((object, index) => 
                         <div className="advOptn_item" key={index}>
-                            <select key={`ruletype-${index}`} className={"advOptn__selectRule"+(error && error=== `ruletype-${index}`? " advOption__error_field" : "")} value={object.ruleType} onChange={(e)=>onChangeSubmit(e, index,"ruleType")}>
+                            <select key={`ruletype-${index}`} className={"advOptn__selectRule"+(error.includes(`ruletype-${index}`)? " advOption__error_field" : "")} value={object.ruleType} onChange={(e)=>{onChangeSubmit(e, index,"ruleType");updateError(`ruletype-${index}`,e);}}>
                                 <option value="">Select Rule</option>
                                 { rules.map((ruleType, i) =>
                                     <option key={i} value={ruleType.actionid}>
@@ -204,7 +238,7 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
                                 ) }
                             </select>
                             {!executionScreen &&
-                            <select key={`inp-${index}`} className={"advOptn__selectInput"+(error && error=== `inp-${index}`? " advOption__error_field" : "")} value={object.inputType.value} onChange={(e)=>onChangeSubmit(e, index,"inputType")}>
+                            <select key={`inp-${index}`} className={"advOptn__selectInput"+(error.includes(`inp-${index}`)? " advOption__error_field" : "")} value={object.inputType.value} onChange={(e)=>{onChangeSubmit(e, index,"inputType");updateError(`inp-${index}`,e)}}>
                                 <option value="">Select Input</option>
                                 { defaultInputOptions.map((inpOptn, i) =>
                                     <option key={`${inpOptn._id}-${i}`} id={`${inpOptn._id}-${i}`} value={inpOptn.name}>
@@ -217,7 +251,7 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
                                     </option>
                                 ) }
                             </select>}
-                            <ComboBox errorBorder={error===`addrec-${index}`?true:false} index={index} rules={newRules} setRules={setNewRules} groupList={groupList} allUsers={allUsers}/>        
+                            <ComboBox updateErrorBorder={updateErrorBorder} errId={`addrec-${index}`} errorBorder={error.includes(`addrec-${index}`)?true:false} index={index} rules={newRules} setRules={setNewRules} groupList={groupList} allUsers={allUsers}/>        
                             {!executionScreen && <button className="rule_btn" onClick={()=>deleteNewField(index)} ><img alt="delete-ic" src="static/imgs/ic-delete.png" /></button>}
                             <button title={info(object.ruleType===""?0:object.ruleType,rules)} className="rule_btn fa fa-info-circle" ></button>
                         </div>
@@ -235,7 +269,7 @@ const info = (ruletype,rules) => {
     }
 }
 
-const fetchData = async ({setNewRules,executionScreen,scenarioExec,setOldRules,setRules,setGroupList,setAllUsers,displayError,setBlockui,mindmapid}) => {
+const fetchData = async ({priority,setNewRules,executionScreen,scenarioExec,setOldRules,setRules,setGroupList,setAllUsers,displayError,setBlockui,mindmapid}) => {
     setBlockui("Loading ...")
     //fetch all Notification Rules
     let data  = await getNotificationRules();
@@ -269,7 +303,7 @@ const fetchData = async ({setNewRules,executionScreen,scenarioExec,setOldRules,s
 
     
     //fetch all old defined rules
-    data = await getNotificationConfiguration({fetchby:"mindmapid", id:mindmapid})
+    data = await getNotificationConfiguration({fetchby:"mindmapid", id:mindmapid, priority:priority})
     if(data.error){displayError(data.error);return;}
     if(executionScreen && data.length!==0 ) setNewRules([])
     let preDefinedRules = [];
@@ -323,13 +357,16 @@ const resetData = ({setError,setOldRules,setRules,setGroupList,setAllUsers,setNe
     setNewRules([{ruleType: "", inputType: "", groupids:[], additionalrecepients:[] }])
     setUpdateRules({})
     setDeleteRules([])
-    setError(false)
+    setError([])
 }
 
-const checkError = (rule,setError,id,executionScreen) => {
-    if(rule.ruleType===""){ setError(`ruletype-${id}`); return true}
-    else if (executionScreen!==true && rule.inputType==="" || (rule.inputType._id==="" && rule.inputType.value==="")) {setError(`inp-${id}`); return true}
-    else if (rule.groupids.length===0 && rule.additionalrecepients.length===0 ){ setError(`addrec-${id}`); return true}
+const checkError = (errorData,rule,id,executionScreen) => {
+    let err = errorData
+    if(rule.ruleType==="" && !err.includes(`ruletype-${id}`)) err.push(`ruletype-${id}`); 
+    if (executionScreen!==true && rule.inputType==="" || (rule.inputType._id==="" && rule.inputType.value==="")) if(!err.includes(`inp-${id}`))err.push(`inp-${id}`); 
+    if (rule.groupids.length===0 && rule.additionalrecepients.length===0 && !err.includes(`addrec-${id}`) ) err.push(`addrec-${id}`); 
+    if(err.length===0) return false
+    else return true 
 }
 
 const formExecutionRule = (rule,scenarioid,scenarioExec) => {
