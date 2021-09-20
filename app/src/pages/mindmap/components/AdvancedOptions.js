@@ -222,7 +222,9 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
                                     </option>
                                 ) }
                             </select>}
+                            <div className="advOptn__selectRecipient">
                             <ComboBox updateErrorBorder={updateErrorBorder} errId={`addrec-${object.ruleid}`} errorBorder={error.includes(`addrec-${object.ruleid}`)?true:false} ruleid={object.ruleid} updateRules={updateRules} setUpdateRules={setUpdateRules} index={index} rules={oldRules} setRules={setOldRules} groupList={groupList} allUsers={allUsers}/>        
+                            </div>
                                 {!executionScreen && <button className="rule_btn" onClick={()=>deleteRule(index,object.ruleid)} ><img alt="delete-ic" src="static/imgs/ic-delete.png" /></button> }
                             <button title={info(object.ruleType===""?0:object.ruleType,rules)} className="rule_btn fa fa-info-circle" ></button>
                         </div>
