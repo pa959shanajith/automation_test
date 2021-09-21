@@ -6,17 +6,6 @@
     top: calc(100% - 63px);
     right: 7px;
 }
-.AdvOptn__container-exe{
-    .modal__body{
-        height: 200px !important;
-    }
-    .modal__content{
-        width: 90% !important
-    }
-    .cb__dropdown{
-        width: 40% !important
-    }
-}
 .AdvOptn__container{
     
     .advOption__error_field{
@@ -79,5 +68,22 @@
         img{
             margin-right: 10px
         }
+    }
+}
+.AdvOptn__container-exe{
+    .modal__body{
+        height: 200px !important;
+    }
+    .modal__content{
+        width: 90% !important
+    }
+    .cb__dropdown{
+        width: 40% !important
+    }
+    .advOptn__selectRule{
+        width: 38% !important;
+    }
+    .advOptn__selectRecipient{
+        width: 43% !important;
     }
 }
