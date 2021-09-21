@@ -139,7 +139,7 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef,type,setNewOption}) => 
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
             <div>
                 <input type={'text'} autoComplete={"off"} ref={inputRef} className={"btn-users edit-user-dropdown-edit"+ (errBorder ? " selectErrorBorder" : "")} onChange={inputFilter} onClick = {resetField} onKeyPress={event => event.key === 'Enter' && type==="Email" && selectNewOption(event,true)} id="userIdName" placeholder={setPlaceholder()}/>
-                <div className="form-inp-dropdown" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
+                {type!=="Email" && <div className="form-inp-dropdown" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {type === "Pool" ?  list.map((e) => (  
                         <option key={e[0]} onClick={selectOption} value={e[0]}> {e[1].poolname}</option> 
@@ -158,7 +158,7 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef,type,setNewOption}) => 
                         <option key={e._id} onClick={selectOption} value={e._id}> {e.groupname}</option> 
                     )):null}
                     </ScrollBar>
-                </div>
+                </div>}
             </div>
             </ClickAwayListener>
         </Fragment>
