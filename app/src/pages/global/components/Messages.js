@@ -253,6 +253,7 @@ const Messages={
         ERR_UPDATE_MAP: {"CONTENT":"Error Updating mappings.", "VARIANT": VARIANT.ERROR},
         ERR_EMPTY_TCS: {"CONTENT":"Please select Test Cases from Mapped Zephyr Test Cases.", "VARIANT": VARIANT.ERROR},
         ERR_EMPTY_PH: {"CONTENT":"Please select Phase from Zephyr Folder Structure.", "VARIANT": VARIANT.ERROR},
+        ERR_UPDATE_NOT_FOUND: {"CONTENT":"Failed to Update .", "VARIANT": VARIANT.ERROR},
         
         SUCC_SAVE: {"CONTENT":"Saved successfully.", "VARIANT": VARIANT.SUCCESS},
         UPDATE_SAVE: {"CONTENT":"Updated successfully.", "VARIANT": VARIANT.SUCCESS},
@@ -262,6 +263,7 @@ const Messages={
         WARN_SELECT_SCENARIO: {"CONTENT":"Please Select a Scenario.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_TESTCASE: {"CONTENT":"Please select Testcase.", "VARIANT": VARIANT.WARNING},
         WARN_MULTI_TC_SCENARIO: {"CONTENT":"Cannot map multiple test cases with multiple scenarios.", "VARIANT": VARIANT.WARNING},
+        WARN_UPDATE_MULTI_MATCH: {"CONTENT":"Partially Updated.", "VARIANT": VARIANT.WARNING}
     },
     MINDMAP:{
         ERR_FETCH_PROJECT: {"CONTENT":"Failed to fetch project list.", "VARIANT": VARIANT.ERROR},
