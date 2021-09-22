@@ -6,12 +6,11 @@
     top: calc(100% - 63px);
     right: 7px;
 }
-
 .AdvOptn__container{
     
-.advOption__error_field{
-    border: 2px solid $redError !important;
-}
+    .advOption__error_field{
+        border: 2px solid $redError !important;
+    }
     .modal__content{
         width: 140%
     }
@@ -31,7 +30,7 @@
         width: 100%;
     }
     .advOptn__selectRule{
-        flex: 0 0 27%;
+        width: 27% !important;
         height: 20px;
         margin-left: 10px;
         margin-right: 20px;
@@ -41,7 +40,7 @@
         outline: none;
     }
     .advOptn__selectInput{
-        flex: 0 0 20%;
+        width: 20% !important;
         height: 20px;
         margin-left: 10px;
         margin-right: 20px;
@@ -50,15 +49,8 @@
         box-shadow: none;
         outline: none;
     }
-    .advOptn__selectRecipients{
-        flex: 0 0 27%;
-        height: 20px;
-        margin-left: 10px;
-        margin-right: 20px;
-        border: 1px solid #321e4f;
-        border-radius: 5px;
-        box-shadow: none;
-        outline: none;
+    .advOptn__selectRecipient{
+        width: 27% !important;
     }
     .rule_btn {
         border: none;
@@ -66,7 +58,7 @@
         background-color: transparent;
         padding: 0;
         margin: 0;
-        flex: 0 0 6%;
+        width: 6%;
         img{
             height: 20px;
         }
@@ -76,5 +68,22 @@
         img{
             margin-right: 10px
         }
+    }
+}
+.AdvOptn__container-exe{
+    .modal__body{
+        height: 200px !important;
+    }
+    .modal__content{
+        width: 90% !important
+    }
+    .cb__dropdown{
+        width: 40% !important
+    }
+    .advOptn__selectRule{
+        width: 38% !important;
+    }
+    .advOptn__selectRecipient{
+        width: 43% !important;
     }
 }

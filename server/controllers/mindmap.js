@@ -125,54 +125,56 @@ exports.reviewTask = async (req, res) => {
 		var taskID = inputs.taskId;
 		var batchIds = inputs.batchIds;
 		var nodeid = inputs.nodeid;
+		var extraidsNotification = inputs.extrausers || []
+		var extragroupsNotification = inputs.extragroups || []
 		var taskdetails = inputs.taskname;
 		var userId = req.session.userid;
 		var username = req.session.username;
 		var date = new Date();
 		let inReview = false
 		var status = inputs.status;
-		if (batchIds.indexOf(',') > -1) {
-			taskID=JSON.stringify(batchIds.split(','));
-		} else {
-			taskID=batchIds[0];
-		}
 		var cur_date = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + ',' +date.toLocaleTimeString();
-		var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
-		var inputs= {
-			"id" : taskID,
-			"action" : "updatetaskstatus",
-			"status" : status,
-			"history" : taskHistory
-		};
-		if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
-			inputs.assignedto = userId;
-		} else if (status == 'underReview') {
-			inputs.reviewer = userId;
-			inReview = true
-		}
-		var notificationEvent = (status == 'reassign' || status == 'underReview') ? 'onReview' : 'onSubmit'
-		const result = await utils.fetchData(inputs, "mindmap/manageTask", fnName);
-		if (result == "fail") {
-			return res.send("fail");
-		} else {
-			for(let index in batchIds){
+		var queryResult = 'pass'
+		for (let index in batchIds){
+			taskID = batchIds[index]
+			var taskHistory = { "userid": userId, "status": "", "modifiedBy": username, "modifiedOn": cur_date };
+			var inputs= {
+				"id" : taskID,
+				"action" : "updatetaskstatus",
+				"status" : status,
+				"history" : taskHistory
+			};
+			if (status == 'inprogress' || status == 'assigned' || status == 'reassigned' || status == 'reassign') {
+				inputs.assignedto = userId;
+			} else if (status == 'underReview') {
+				inputs.reviewer = userId;
+				inReview = true
+			}
+			var notificationEvent = (status == 'reassign' || status == 'underReview') ? 'onReview' : 'onSubmit'
+			const result = await utils.fetchData(inputs, "mindmap/manageTask", fnName);
+			if (result == "fail") {
+				queryResult = 'fail'
+			} else {
 				let notificationData = {
-					taskid: batchIds[index],
+					taskid: taskID,
 					assignedto: username,
 					assigneeid: userId,
 					notifyEvent: notificationEvent,
 					status: status,
 					nodeid: nodeid,
-					taskdetails: taskdetails
+					taskdetails: taskdetails,
+					extrausers: extraidsNotification,
+					extragroups: extragroupsNotification	
 				}
 				notification.notify("taskWorkFlow", notificationData,'email')
 			}
-			return res.send('inprogress');
 		}
+		if (queryResult != 'fail') return res.status(200).send('inprogress')	
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
+	return res.status(500).send("fail");
 };
 
 exports.saveData = async (req, res) => {

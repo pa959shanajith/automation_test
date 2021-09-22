@@ -1,5 +1,5 @@
 import React, { Fragment, useState, useEffect , useRef } from 'react';
-import {ModalContainer, ScrollBar, Messages as MSG, setMsg} from '../../global' 
+import {ModalContainer, ValidationExpression, ScrollBar, Messages as MSG, setMsg} from '../../global' 
 import {FormInpDropDown, FormInput} from '../components/FormComp';
 import AssignEmailBox from '../components/AssignEmailBox'
 import {getUserDetails,getNotificationGroups,updateNotificationGroups} from '../api';
@@ -20,14 +20,17 @@ const EditEmailGroup = (props) => {
     const setNewEmail = props.setNewEmail
     const newEmail = props.newEmail
     const setDeleteModal = props.setDeleteModal
-    const groupName = useRef()
     const updateBtn = useRef()
     const deleteBtn = useRef()
     const filterRef = useRef()
+    const [editGroupName,setEditGroupName] = useState("")
     const [groupList,setGroupList] =  useState([])
     const [deletePop,setDeleteGroup] = useState(false)
+    const [showEditGroupName,setShowEditGroupName] = useState(false)
+    const [inputErr,setInputErr] = useState(false)
+    const [groupName,setGroupName] = useState("");
     const [selectedGroup,setSelectedGroup] = useState(undefined)
-    const prop = {newEmail,setNewEmail,filterRef,selectedGroup,setSelectedGroup,groupName,setAllUsers,assignUsers,setAssignUsers,setGroupList,setLoading,displayError}
+    const prop = {setInputErr,setEditGroupName,setGroupName,groupName,newEmail,setNewEmail,filterRef,selectedGroup,setSelectedGroup,editGroupName,setAllUsers,assignUsers,setAssignUsers,setGroupList,setLoading,displayError}
     useEffect(()=>{
         (async()=>{
             setLoading('Loading ...')
@@ -44,8 +47,9 @@ const EditEmailGroup = (props) => {
         setAssignUsers([])
         setNewEmail([])
         setSelectedGroup(undefined)
-        groupName.current.disabled = true
-        groupName.current.value = ''
+        setGroupName("");
+        setEditGroupName("");
+        setInputErr(false);
     }
     const clickDeleteGroup = () =>{
         if(!selectedGroup)return;
@@ -53,20 +57,14 @@ const EditEmailGroup = (props) => {
     }
     const clickUpdateGroup = () =>{
         if(!selectedGroup)return;
-        if(!groupName.current.value){
-            groupName.current.style.outline = '1px solid red';
-            return;
-        }
-        groupName.current.style.outline=""
         updateEmailGroup(prop) 
     }
     //on selection of group from dropdown
     const filterGroup = async (e) => {
-        groupName.current.style.outline=""
         var val = e.currentTarget.value
         var text = e.currentTarget.innerText
-        groupName.current.disabled = false
-        groupName.current.value = text
+        setEditGroupName(text);
+        setGroupName(text);
         setSelectedGroup({_id:val,name:text})
         var data = await getNotificationGroups({'groupids':[val],'groupnames':[]});
         if(data.error){
@@ -102,21 +100,24 @@ const EditEmailGroup = (props) => {
                 footer={<DelFooter clickDeleteGroup={clickDeleteGroup} setDeleteGroup={setDeleteGroup}/>}
                 content={<DelContainer selectedGroup={selectedGroup} />}
             />:null}
+            {showEditGroupName && EditNameModal(setInputErr,editGroupName,setEditGroupName,setShowEditGroupName,onChangeEditGroupName,inputErr,groupName)}
+                
             <ScrollBar thumbColor="#929397">
                 <div className="edit_email-group_container">
                     <div id="page-taskName">
                         <span>Edit Email Group Configuration</span>
                     </div>
+                    <FilterComp clickInp={clickInp} inpRef={filterRef} setFilter={filterGroup} data={groupList} showModal={setShowEditGroupName} />
                     <div className="adminActionBtn">
-                        <button disabled={!selectedGroup?true:false} ref={deleteBtn} className="a__btn btn-edit" onClick={()=>setDeleteGroup(true)}  title="Edit">Delete</button>
-                        <button disabled={!selectedGroup?true:false} ref={updateBtn} className="a__btn btn-edit" onClick={clickUpdateGroup}  title="Save">Update</button>
+                        <button disabled={!selectedGroup?true:false} ref={deleteBtn} className="a__btn btn-edit" onClick={()=>setDeleteGroup(true)}  title="Delete">Delete</button>
+                        <button disabled={!selectedGroup?true:false} ref={updateBtn} className="a__btn btn-edit" onClick={clickUpdateGroup}  title="Update">Update</button>
                     </div>
+                    {showEditGroupName===false && editGroupName!==groupName && editGroupName!=="" && ValidationExpression(editGroupName, "emailName") ? 
+                    <div className='edit__email-label'>New Group Name : {editGroupName}. Please click on Update.</div>:null}
                     <div className='edit_email-group'>
                         <div className="col-xs-9 form-group assignBox-container">
-                            <AssignEmailBox FilterComp={<FilterComp clickInp={clickInp} inpRef={filterRef} setFilter={filterGroup} data={groupList}/>}
-                             setNewBox={setNewEmail} setDeleteModal={setDeleteModal} setModal={setModal} newEmail={newEmail} setNewEmail={setNewEmail} leftBox={allUsers} rightBox={assignUsers} setLeftBox={setAllUsers} setRightBox={setAssignUsers}/>
+                            <AssignEmailBox setNewBox={setNewEmail} setDeleteModal={setDeleteModal} setModal={setModal} newEmail={newEmail} setNewEmail={setNewEmail} leftBox={allUsers} rightBox={assignUsers} setLeftBox={setAllUsers} setRightBox={setAssignUsers}/>
                         </div>
-                        <FormInput inpRef={groupName} label={'Group Name'} placeholder={'Enter Email Group Name'} validExp={"emailName"}/>
                     </div>
                 </div>
             </ScrollBar>        
@@ -124,12 +125,37 @@ const EditEmailGroup = (props) => {
     )
 }
 
-//choose email group section from assignoptionbox
-const FilterComp = ({setFilter,data,clickInp,inpRef}) =>{
+const EditNameModal = (setInputErr,editGroupName,setEditGroupName,setShowEditGroupName,onChangeEditGroupName,inputErr,groupName) => {
     return(
+        <ModalContainer 
+            title="Edit Group Name" 
+            footer={<button type="button" onClick={()=>{setShowEditGroupName(false);}} >Save</button>} 
+            close={()=>{setShowEditGroupName(false);}} 
+            content={<input value={editGroupName} onChange={(event)=>{onChangeEditGroupName(event.target.value,setEditGroupName, setInputErr)}} type="text" autoComplete="off" id="editGroupName" name="editGroupName" maxLength="100" className={ (inputErr?"inputErrorBorder ":"") + "middle__input__border form-control__conv-project form-control-custom"} placeholder="Edit Group Name"/>} 
+            modalClass=" modal-sm" 
+        /> 
+    )
+}
+
+const onChangeEditGroupName = (newName,setEditGroupName,setInputErr) =>{
+    newName = ValidationExpression(newName,"emailName");
+    setEditGroupName(newName);
+    setInputErr(false);
+    if(newName.trim() === ""){
+        setInputErr(true);
+    } 
+} 
+//choose email group section from assignoptionbox
+const FilterComp = ({setFilter,data,clickInp,inpRef,showModal}) =>{
+    return(
+        <>
         <span className='label-select'>
             <FormInpDropDown clickInp={clickInp} inpRef={inpRef} setFilter={setFilter} data={data} type={"emailSearch"}/>
         </span>
+        <span  className={"edit-group "+(inpRef.current!==undefined && inpRef.current.value===""?" disable__edit-span":"")} >
+            <img onClick={()=>{showModal(true)}} title='Edit Group Name' src={"static/imgs/ic-edit-sm.png"} alt="Edit Group Name" className={'editProjectName'+(inpRef.current!==undefined && inpRef.current.value===""?" disable__edit":"")}/>
+        </span>
+        </>
     )
 }
 const DelContainer = ({selectedGroup}) => (
@@ -147,23 +173,14 @@ const DelFooter = ({setDeleteGroup,clickDeleteGroup}) =>{
 }
 
 const updateEmailGroup = async(prop) =>{
-    prop.groupName.current.style.outline='';
     prop.setLoading('Updating Email Group ...')
-    let proceed = false
-    var data = await getNotificationGroups({'groupids':[],'groupnames':[]});
-    if(data.error){prop.displayError(data.error);return;}
-    data.forEach((e)=>{
-        if(e.groupname===prop.groupName.current.value){
-            setMsg(MSG.ADMIN.ERR_GROUPNAME_EXIST);
-            prop.groupName.current.style.outline='1px solid red';
-            proceed = true
-        } 
-    })
-    if(proceed){prop.setLoading(false); return}
     const internalUsers=[], otherUsers=[], groupdata = {};
     prop.assignUsers.forEach((item)=>{internalUsers.push(item._id)})
     prop.newEmail.forEach((item)=>{otherUsers.push(item.name)})
-    groupdata[prop.selectedGroup._id]={"groupname":prop.groupName.current.value,"internalusers":internalUsers,"otherusers":otherUsers};
+    //proper logic khali hua to ye verna vo 
+    let name = prop.groupName;
+    if(prop.editGroupName!==prop.groupName && prop.editGroupName!=="" && ValidationExpression(prop.editGroupName, "emailName")) name=prop.editGroupName;
+    groupdata[prop.selectedGroup._id]={"groupname":name,"internalusers":internalUsers,"otherusers":otherUsers};
     var data = await updateNotificationGroups({'groupdata': groupdata,'action':  "update"})
     if(data.error){prop.displayError(data.error);return;}
     var err = await resetData(prop)
@@ -180,11 +197,8 @@ const deleteEmailGroup = async(prop) =>{
     if(!err)prop.displayError(MSG.ADMIN.SUCC_DELETE_EMAILGROUP)
 }
 
-const resetData = async({filterRef,setSelectedGroup,groupName,setAllUsers,setAssignUsers,setNewEmail,setGroupList,setLoading,displayError,action}) => {
+const resetData = async({setInputErr,setEditGroupName,setGroupName,filterRef,setSelectedGroup,setAllUsers,setAssignUsers,setNewEmail,setGroupList,setLoading,displayError,action}) => {
     filterRef.current.value = ""
-    groupName.current.disabled = true
-    groupName.current.value = ""
-    groupName.current.style.outline='';
     setLoading("Loading...");
     var data = await getNotificationGroups({'groupids':[],'groupnames':[]});
     if(data.error){
@@ -207,6 +221,9 @@ const resetData = async({filterRef,setSelectedGroup,groupName,setAllUsers,setAss
     setLoading(false);
     setAssignUsers([])
     setNewEmail([])
+    setEditGroupName("");
+    setGroupName("");
+    setInputErr(false);
     setSelectedGroup(undefined)
 }
 

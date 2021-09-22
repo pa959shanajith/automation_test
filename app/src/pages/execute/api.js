@@ -65,7 +65,7 @@ export const updateTestSuite_ICE = async(batchDetails) => {
   api returns string ex. "inprogress"
 */
 
-export const reviewTask = async(projectId,taskId,taskstatus,version,batchTaskIDs, nodeid, taskname) => { 
+export const reviewTask = async(projectId,taskId,taskstatus,version,batchTaskIDs, nodeid, taskname, groupids, additionalrecepients) => { 
     try{
         const res = await axios(url+'/reviewTask', {
             method: 'POST',
@@ -79,7 +79,9 @@ export const reviewTask = async(projectId,taskId,taskstatus,version,batchTaskIDs
 				versionnumber:version,
 				batchIds:batchTaskIDs,
                 nodeid:nodeid,
-                taskname: taskname
+                taskname: taskname,
+                extragroups:groupids,
+                extrausers:additionalrecepients
             },
             credentials: 'include'
         });

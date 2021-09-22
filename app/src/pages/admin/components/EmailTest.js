@@ -45,8 +45,8 @@ const Container = ({emailRef}) => {
             setErrMsg('Sending...')
             const arg = {channel:confObj.channel, provider:confObj.provider, recipient:emailRef.current.value, conf:confObj}
             var data = await testNotificationChannels(arg)
-            if(data.error){setErrMsg(data.error);return;}
-            else setErrMsg(data);
+            if(data.error){setErrMsg(data.error.CONTENT);return;}
+            else setErrMsg(data.CONTENT);
       }
       return(
           <Fragment>
