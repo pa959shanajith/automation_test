@@ -103,7 +103,7 @@ const ComboBox = ({ errId,updateErrorBorder,errorBorder,index,rules,setRules,gro
             <ClickAwayListener onClickAway={()=>{setPlaceholder();setDropDown(false)}}>
             <div>
                 <input autoComplete={"off"} ref={inputRef} className={" cb__input"+(errorBorder?" advOption__error_field":"")} placeholder={"Search Recipients.."} onChange={inputFilter} onClick = {resetField} />
-                <div className="cb__dropdown" role="menu" style={{display: (dropDown?"block":"none")}}>
+                {dropDown && <div className="cb__dropdown" role="menu" >
                     <ScrollBar thumbColor="#929397" >
                     {list1.map((item,i) => (  
                         <ul key={i} role="presentation" className={(rules[index].groupids.includes(item._id)?" cb__selectedCheckBox":"")}  onClick={()=>{selectOptionCheckBox(item._id)}} >
@@ -122,7 +122,7 @@ const ComboBox = ({ errId,updateErrorBorder,errorBorder,index,rules,setRules,gro
                         </ul>
                     ))}
                     </ScrollBar>
-                </div>
+                </div>}
             </div>
             </ClickAwayListener>
         </Fragment>
