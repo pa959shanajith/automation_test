@@ -1,6 +1,6 @@
 import React ,  { Fragment, useEffect, useState, useRef} from 'react';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScrollBar } from '../../global';
+import { ScrollBar, updateScrollBar } from '../../global';
 import '../styles/ComboBox.scss'
 
 /*Component ComboBox
@@ -15,11 +15,12 @@ const ComboBox = ({ errId,updateErrorBorder,errorBorder,index,rules,setRules,gro
     useEffect(()=>{
         setList1([...groupList])
         setList2([...allUsers])
-        inputRef.current.value = " Recipient Selected"
+        inputRef.current.value = " Select Recipient"
+        updateScrollBar();
         // eslint-disable-next-line
     },[allUsers,groupList])
     useEffect(()=>{
-        inputRef.current.value = " Recipient Selected"
+        inputRef.current.value = " Select Recipient"
         if((rules[index].groupids).length>0 || (rules[index].additionalrecepients).length>0 )
         inputRef.current.value = rules[index].groupids.length + rules[index].additionalrecepients.length +" Recipient Selected";
     },[])
@@ -54,7 +55,7 @@ const ComboBox = ({ errId,updateErrorBorder,errorBorder,index,rules,setRules,gro
         if(updateRules!==undefined){
             updateOldRules(ruleList[index]);
         }
-        inputRef.current.value = " Recipient Selected"
+        inputRef.current.value = " Select Recipient"
         if((ruleList[index].groupids).length>0 || (ruleList[index].additionalrecepients).length>0 )
         inputRef.current.value = ruleList[index].groupids.length + ruleList[index].additionalrecepients.length +" Recipient Selected";
     }
@@ -83,7 +84,7 @@ const ComboBox = ({ errId,updateErrorBorder,errorBorder,index,rules,setRules,gro
         if(updateRules!==undefined && ruleid!==undefined){
             updateOldRules(ruleList[index]);
         }
-        inputRef.current.value = " Recipient Selected"
+        inputRef.current.value = " Select Recipient"
         if((ruleList[index].groupids).length>0 || (ruleList[index].additionalrecepients).length>0 )
         inputRef.current.value = ruleList[index].groupids.length + ruleList[index].additionalrecepients.length +" Recipient Selected";
     }
@@ -92,7 +93,7 @@ const ComboBox = ({ errId,updateErrorBorder,errorBorder,index,rules,setRules,gro
         document.getElementById(value).checked = !document.getElementById(value).checked
     }
     const setPlaceholder = () => {
-        inputRef.current.value = " Recipient Selected"
+        inputRef.current.value = " Select Recipient"
         if((rules[index].groupids).length>0 || (rules[index].additionalrecepients).length>0 )
         inputRef.current.value = rules[index].groupids.length + rules[index].additionalrecepients.length +" Recipient Selected";
     } 

@@ -15,11 +15,11 @@ const SelectRecipients = ({ recipients,setRecipients,groupList,allUsers}) => {
     useEffect(()=>{
         setList1([...groupList])
         setList2([...allUsers])
-        inputRef.current.value = " Recipient Selected"
+        inputRef.current.value = " Select Recipient"
         // eslint-disable-next-line
     },[allUsers,groupList])
     useEffect(()=>{
-        inputRef.current.value = " Recipient Selected"
+        inputRef.current.value = " Select Recipient"
         if((recipients.groupids).length>0 || (recipients.additionalrecepients).length>0 )
         inputRef.current.value = recipients.groupids.length + recipients.additionalrecepients.length +" Recipient Selected";
     },[])
@@ -50,7 +50,7 @@ const SelectRecipients = ({ recipients,setRecipients,groupList,allUsers}) => {
         let recipientsData = {...recipients}
         recipientsData.groupids = selectedGroupIds;
         setRecipients(recipientsData);
-        inputRef.current.value = " Recipient Selected"
+        inputRef.current.value = " Select Recipient"
         if((recipientsData.groupids).length>0 || (recipientsData.additionalrecepients).length>0 )
         inputRef.current.value = recipientsData.groupids.length + recipientsData.additionalrecepients.length +" Recipient Selected";
     }
@@ -68,7 +68,7 @@ const SelectRecipients = ({ recipients,setRecipients,groupList,allUsers}) => {
         let recipientsData = {...recipients}
         recipientsData.additionalrecepients = selectedAddRecepients;
         setRecipients(recipientsData);
-        inputRef.current.value = " Recipient Selected"
+        inputRef.current.value = " Select Recipient"
         if((recipientsData.groupids).length>0 || (recipientsData.additionalrecepients).length>0 )
         inputRef.current.value = recipientsData.groupids.length + recipientsData.additionalrecepients.length +" Recipient Selected";
     }
@@ -78,7 +78,7 @@ const SelectRecipients = ({ recipients,setRecipients,groupList,allUsers}) => {
     }
 
     const setPlaceholder = () => {
-        inputRef.current.value = " Recipient Selected"
+        inputRef.current.value = " Select Recipient"
         if((recipients.groupids).length>0 || (recipients.additionalrecepients).length>0 )
         inputRef.current.value = recipients.groupids.length + recipients.additionalrecepients.length +" Recipient Selected";
     } 
