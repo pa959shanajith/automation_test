@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import {ScreenOverlay, ResetSession, ModalContainer , IntegrationDropDown, Messages as MSG, VARIANT, setMsg} from '../../global' 
+import {ScreenOverlay, ResetSession, ModalContainer , IntegrationDropDown, Messages as MSG, VARIANT, setMsg, SelectRecipients} from '../../global' 
 import {updateTestSuite_ICE, updateAccessibilitySelection, reviewTask, ExecuteTestSuite_ICE} from '../api';
 import {getUserDetails,getNotificationGroups} from '../../admin/api';
 import "../styles/ExecuteContent.scss";
@@ -10,7 +10,6 @@ import * as actionTypes from "../../plugin/state/action";
 import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import AdvancedOptions from '../../mindmap/components/AdvancedOptions'
-import SelectRecipients from '../components/SelectRecipients';
 
 const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
     const history = useHistory();

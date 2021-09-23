@@ -1,6 +1,6 @@
 import React ,  { Fragment, useEffect, useState, useRef} from 'react';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScrollBar } from '../../global';
+import { ScrollBar } from '..';
 import '../styles/SelectRecipients.scss'
 
 /*Component SelectRecipients
