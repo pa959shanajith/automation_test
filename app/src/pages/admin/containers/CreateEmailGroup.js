@@ -52,7 +52,7 @@ const CreateEmailGroup = (props) => {
         if(closePopup) email = emailRef.current.value 
         else email = e.currentTarget.innerText===""?emailRef.current.value:e.currentTarget.innerText;
         const emailRegex = /\S+@\S+\.\S+/;
-        if(newEmails.some((item)=>{return item.name===email})) {
+        if(newEmails.some((item)=>{return (item.name).toUpperCase()===email.toUpperCase()})) {
             setMsg(MSG.ADMIN.WARN_EMAIL_EXIST)   
             return true
         }
@@ -90,8 +90,8 @@ const CreateEmailGroup = (props) => {
         data = await updateNotificationGroups(payload);
         if(data.error){displayError(data.error);return;}
         if(data==="success") {
-            setMsg(MSG.ADMIN.SUCC_GROUP_CREATE)
             resetData({displayError,setAllUsers,setLoading,groupName,setAssignUsers,setNewEmail})
+            setMsg(MSG.ADMIN.SUCC_GROUP_CREATE)
         } 
         setLoading(false);
     }
