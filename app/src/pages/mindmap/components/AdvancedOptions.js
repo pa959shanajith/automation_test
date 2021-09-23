@@ -70,8 +70,8 @@ export const AdvancedOptionPopup = (prop) => {
                 close={()=>{closeModal()}}
                 footer={
                 <>
-                    {prop.executionScreen && <button onClick={()=>{clearRules(prop);}}>Clear</button>}
-                    <button onClick={()=>{applyRules(prop);}}>Apply</button>
+                    {prop.executionScreen && <button onClick={()=>{clearRules(prop);}}>Reset</button>}
+                    <button onClick={()=>{applyRules(prop);}}>{prop.executionScreen?"Save":"Apply"}</button>
                 </>}
             />
         </div>
@@ -217,8 +217,8 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
                                     </option>
                                 ) }
                                 { inputOptions.map((inpOptn, i) =>
-                                    <option key={`newRule-${i}`} id={`new-${inpOptn.type}-${i}`} value={`new-${inpOptn._id}`}>
-                                        {inpOptn.name}
+                                    <option key={`newRule-${i}`} id={`new-${inpOptn.type}-${i}`} value={`new-${inpOptn._id}`} title={setInputPrefix(inpOptn.type)+inpOptn.name}>
+                                        {setInputPrefix(inpOptn.type)}{inpOptn.name}
                                     </option>
                                 ) }
                             </select>}
@@ -248,8 +248,8 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
                                     </option>
                                 ) }
                                 { inputOptions.map((inpOptn, i) =>
-                                    <option key={`newRule-${i}`} id={`new-${inpOptn.type}-${i}`} value={`new-${inpOptn._id}`}>
-                                        {inpOptn.name}
+                                    <option key={`newRule-${i}`} id={`new-${inpOptn.type}-${i}`} value={`new-${inpOptn._id}`} title={setInputPrefix(inpOptn.type)+inpOptn.name}>
+                                    {setInputPrefix(inpOptn.type)}{inpOptn.name}
                                     </option>
                                 ) }
                             </select>}
@@ -264,6 +264,16 @@ const MiddleContent = ({executionScreen,setError,error,updateRules,setUpdateRule
             </div>
         </>
     )
+}
+
+const setInputPrefix = (type) => {
+    switch(type) {
+        case "scenarios" : return "Scenario ";
+        case "modules" : return "Module "
+        case "screens" : return "Screen "
+        case "testcases" : return "Testcase "
+        default : return ""
+    }
 }
 
 const info = (ruletype,rules) => {
