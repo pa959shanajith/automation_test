@@ -21,6 +21,7 @@ const CreateEmailGroup = (props) => {
     const [loading,setLoading] = useState(false)
     const [modal,setModal] = useState(false)
     const [deleteModal,setDeleteModal] = useState(false)
+    const [errBorder,setErrBorder] = useState(false);
     const displayError = (error) =>{
         setLoading(false)
         setMsg(error)
@@ -45,16 +46,26 @@ const CreateEmailGroup = (props) => {
             }
         })
     }
-    const addNewEmail = (e) => {
+    const addNewEmail = (e,closePopup) => {
         const newEmails = [...newEmail];
-        const email = e.currentTarget.innerText===""?emailRef.current.value:e.currentTarget.innerText;
+        let email = "";
+        if(closePopup) email = emailRef.current.value 
+        else email = e.currentTarget.innerText===""?emailRef.current.value:e.currentTarget.innerText;
         const emailRegex = /\S+@\S+\.\S+/;
+        if(newEmails.some((item)=>{return item.name===email})) {
+            setMsg(MSG.ADMIN.WARN_EMAIL_EXIST)   
+            return true
+        }
         if(emailRegex.test(email)){
             newEmails.push({_id:`email-${newEmails.length}`,name:email}) 
             setNewEmail(newEmails);
+            if(closePopup) setModal(false)
             return false;
         }
-        else return true;
+        else {
+            if(closePopup) setErrBorder(true)
+            return true;
+        }
     }
 
     const createGroup = async (action) => {
@@ -114,10 +125,10 @@ const CreateEmailGroup = (props) => {
             modalClass = 'modal-sm'
             title={"ADD EMAIL"}
             content={<div className="email-group_forminp">
-                        <FormInpDropDown setNewOption={addNewEmail} inpRef={emailRef} setFilter={selectUser} data={allUsers} type={"Email"}/>
+                        <FormInpDropDown errBorder={errBorder} setErrBorder={setErrBorder} setNewOption={addNewEmail} inpRef={emailRef} setFilter={selectUser} data={allUsers} type={"Email"}/>
                     </div>}
             close={()=>setModal(false)}
-            footer={<button onClick={()=>setModal(false)}>Ok</button>}
+            footer={<button onClick={()=>addNewEmail(undefined,true)}>Ok</button>}
         />}
         {deleteModal && DelModal()}
         {edit?
