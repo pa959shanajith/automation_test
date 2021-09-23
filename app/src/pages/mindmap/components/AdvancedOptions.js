@@ -289,7 +289,7 @@ const fetchData = async ({priority,setNewRules,executionScreen,scenarioExec,setO
     let data  = await getNotificationRules();
     if(data.error){displayError(data.error);return;}
     if(executionScreen){
-        data = [{actionid:"5","description": "Notification group will be notified when execution of test suite is completed",action:"notify on execution"}]
+        data = [{actionid:"5","description": "Notification group will be notified when execution of test suite is completed",action:"notify on execution completion"}]
     }
     setRules(data)
     setBlockui(false);
