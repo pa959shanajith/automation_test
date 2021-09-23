@@ -414,25 +414,22 @@ const formTaskData = (oldRules,newRules,deleteRules,inputOptions) => {
         var obj = formRule(rule)
         //For all assigned node add ruleids
         if(obj.targetnodeid!==null) {
-            var add = true;
             for(let i =0 ; i< inputOptions.length ; i++) {
-                if(inputOptions[i]._id === obj.targetnodeid && inputOptions[i].task===null) {
-                    add = false;break;
+                if(inputOptions[i]._id === obj.targetnodeid) {
+                    if(inputOptions[i].task!==null){
+                        pushTaskData(inputOptions[i].task._id, rule.ruleid)
+                    }
+                    break;
                 }
             }
-            if(add){ if(taskData[obj.targetnodeid]===undefined) taskData[obj.targetnodeid] = [rule.ruleid];
-            else taskData[obj.targetnodeid].push(rule.ruleid)}
+            
         } else if (obj.targetnode==="all" && obj.targetnodeid===null && obj.actionon===null ) {
             for(let i =0 ; i< inputOptions.length ; i++) {
-                if(inputOptions[i].task !== null) {
-                    if(taskData[inputOptions[i]._id]===undefined) taskData[inputOptions[i]._id] = [rule.ruleid];
-                    else taskData[inputOptions[i]._id].push(rule.ruleid)
-                }
+                if(inputOptions[i].task !== null) pushTaskData(inputOptions[i].task._id, rule.ruleid)
             }
         } else if (obj.targetnode==="modules" && obj.targetnodeid===null && obj.actionon==="all") {
-            if(inputOptions[0].task !== null) {
-                if(taskData[inputOptions[0]._id]===undefined) taskData[inputOptions[0]._id] = [rule.ruleid];
-                else taskData[inputOptions[0]._id].push(rule.ruleid)
+            if(inputOptions[0].task !== null && taskData[inputOptions[0].task._id]===undefined) {
+                pushTaskData(inputOptions[0].task._id, rule.ruleid)
             }    
         } 
         
@@ -441,13 +438,17 @@ const formTaskData = (oldRules,newRules,deleteRules,inputOptions) => {
                 if ((obj.targetnode===nodeType) && obj.targetnodeid===null && obj.actionon==="all") {
                     for(let i =0 ; i< inputOptions.length ; i++) {
                         if(inputOptions[i].task !== null && inputOptions[i].type === nodeType){
-                            if(taskData[inputOptions[i]._id]===undefined) taskData[inputOptions[i]._id] = [rule.ruleid];
-                            else taskData[inputOptions[i]._id].push(rule.ruleid)
+                            pushTaskData(inputOptions[i].task._id, rule.ruleid)
                         }
                     }
                 } 
             })
         }
+    }
+
+    const pushTaskData = (nodeTaskId,ruleID) => {
+        if(taskData[nodeTaskId]===undefined) taskData[nodeTaskId] = [ruleID];
+        else taskData[nodeTaskId].push(ruleID)
     }
 
     [...newRules].forEach((rule,i)=>{
@@ -462,7 +463,7 @@ const formTaskData = (oldRules,newRules,deleteRules,inputOptions) => {
     //create empty ruledict if no rule created 
     for(let i =0 ; i< inputOptions.length ; i++) {
         if(inputOptions[i].task !== null) {
-            if(taskData[inputOptions[i]._id]===undefined) taskData[inputOptions[i]._id] = [];
+            if(taskData[inputOptions[i].task._id]===undefined) taskData[inputOptions[i]._id] = [];
         }
     }
     return taskData;
