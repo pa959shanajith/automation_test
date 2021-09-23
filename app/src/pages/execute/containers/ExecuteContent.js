@@ -109,6 +109,8 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 
     const closeModal = () => {
         setshowDeleteModal(false);
+        resetData();
+        setCheckAddUsers(false);
     }
     
     const submit_task = async () => {
@@ -251,9 +253,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
     const fetchSelectRecipientsData = async () => {
         setCheckAddUsers(!checkAddUsers);
         if(checkAddUsers) {
-            setAllUsers([]);
-            setGroupList([]);
-            setRecipients({groupids:[],additionalrecepients:[]});
+            resetData();
         } else {
             let data = await getUserDetails("user");
             if(data.error){displayError(data.error);return;}
@@ -276,6 +276,12 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
             }
             setGroupList(data.sort())
         }
+    }
+
+    const resetData = () => {
+        setAllUsers([]);
+        setGroupList([]);
+        setRecipients({groupids:[],additionalrecepients:[]});
     }
 
     return (
@@ -331,7 +337,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
             {showDeleteModal?
                 <ModalContainer 
                     title={modalDetails.title} 
-                    footer={submitModalButtons(setshowDeleteModal, submit_task)} 
+                    footer={submitModalButtons(setshowDeleteModal, submit_task, resetData, setCheckAddUsers)} 
                     close={closeModal} 
                     content={
                         <div>
@@ -397,11 +403,11 @@ const SelectBrowserCheck = (appType,browserTypeExe,displayError,execAction)=>{
     return false;
 }
 
-const submitModalButtons = (setshowDeleteModal, submit_task) => {
+const submitModalButtons = (setshowDeleteModal, submit_task, resetData, setCheckAddUsers) => {
     return(
         <div>
-            <button onClick={()=>{setshowDeleteModal(false);submit_task()}} type="button" className="e__modal_button" >Yes</button>
-            <button type="button" onClick={()=>{setshowDeleteModal(false);}} >No</button>
+            <button onClick={()=>{setshowDeleteModal(false);submit_task();setCheckAddUsers(false)}} type="button" className="e__modal_button" >Yes</button>
+            <button type="button" onClick={()=>{setshowDeleteModal(false);resetData()}} >No</button>
         </div>
     )
 }
