@@ -236,18 +236,38 @@ const getReceivers  = async (inputs, nodeid, type) =>{
 		for (let index in ruledata){
 			var ruleinfo = ruledata[index].ruleinfo
 			var taskdata = ruledata[index]
-			if (type == 'taskflow' && taskdata.taskowners && taskdata.taskowners.length == 2){
-				owners.assignee = (taskdata.taskowners[0]._id == taskdata.assignedto) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name;
-				owners.reviewer = (taskdata.taskowners[0]._id == taskdata.reviewer) ? taskdata.taskowners[0].name : taskdata.taskowners[2].name;
-				emails[taskdata.taskowners[1].email] = '-1';
-				emails[taskdata.taskowners[0].email] = '-1';
+			if (type == 'taskflow' && taskdata.taskowners){
+				if (taskdata.taskowners.length  == 1){
+					owners.assignee =  taskdata.taskowners[0].name ;
+					owners.reviewer =  taskdata.taskowners[0].name ;
+					emails[taskdata.taskowners[0].email] = '-1';
+
+				}else if(taskdata.taskowners.length == 2){
+					owners.assignee = (taskdata.taskowners[0]._id == taskdata.assignedto) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name;
+					owners.reviewer = (taskdata.taskowners[0]._id == taskdata.reviewer) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name;
+					emails[taskdata.taskowners[1].email] = '-1';
+					emails[taskdata.taskowners[0].email] = '-1';
+				}
+				else{
+					logger.error("Task Owners not found")
+				}
 			} else if (type == 'onModulesExecute' || type == 'onScenariosExecute'){
 				emails[taskdata.taskowners[0].email] = '-1';
-			} else if (type == 'onAssign' || type == 'onUnassign'){
-				owners.assignee = (taskdata.taskowners[0]._id == inputs.assigneeid) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name;
-				owners.reviewer = (taskdata.taskowners[0]._id == inputs.reviewerid) ? taskdata.taskowners[0].name : taskdata.taskowners[2].name;
-				emails[taskdata.taskowners[1].email] = '-1';
-				emails[taskdata.taskowners[0].email] = '-1';
+			} else if (type == 'onAssign' || type == 'onUnassign' && taskdata.taskowners){
+				if (taskdata.taskowners.length  == 1){
+					owners.assignee =  taskdata.taskowners[0].name 
+					owners.reviewer =  taskdata.taskowners[0].name 
+					emails[taskdata.taskowners[0].email] = '-1';
+
+				}else if(taskdata.taskowners.length == 2){
+					owners.assignee = (taskdata.taskowners[0]._id == inputs.assigneeid) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name;
+					owners.reviewer = (taskdata.taskowners[0]._id == inputs.reviewerid) ? taskdata.taskowners[0].name : taskdata.taskowners[2].name;
+					emails[taskdata.taskowners[1].email] = '-1';
+					emails[taskdata.taskowners[0].email] = '-1';
+				}
+				else{
+					logger.error("Task Owners not found")
+				}	
 			} 
 			for(var ruleindex in ruleinfo){
 				var rule = ruleinfo[ruleindex]

@@ -82,6 +82,7 @@ const Messages={
         ERR_TEST_CONNECT_UNEXPECTED: {"CONTENT":"Test Connection Failed due to unexpected error!", "VARIANT": VARIANT.ERROR},
         ERR_GROUPNAME_EXIST: {"CONTENT":"Group Name already Exists.", "VARIANT": VARIANT.ERROR},
         ERR_GROUPNAME_FETCH: {"CONTENT":"Failed to fetch email groups.", "VARIANT": VARIANT.ERROR},
+        WARN_EMAIL_EXIST: {"CONTENT":"Email Already Added.", "VARIANT": VARIANT.ERROR},
 
         SUCC_EMAIL_SENT: {"CONTENT":"Test Email Sent.", "VARIANT": VARIANT.SUCCESS},
         SUCC_ICEPOOL_SAVED: {"CONTENT":"ICE Pool saved successfully.", "VARIANT": VARIANT.SUCCESS},

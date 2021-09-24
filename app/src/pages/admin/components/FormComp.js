@@ -84,13 +84,13 @@ const FormRadio = (props) => {
   use: renders searchable pool dropdown
 */
 
-const FormInpDropDown = ({data,setFilter,clickInp,inpRef,type,setNewOption}) => {
+const FormInpDropDown = ({data,setFilter,clickInp,inpRef,type,setNewOption,errBorder,setErrBorder}) => {
     const inputRef = inpRef
     const [list,setList] =  useState([])
     const [dropDown,setDropDown] = useState(false)
-    const [errBorder,setErrBorder] = useState(false);
     useEffect(()=>{
         setList([...data])
+        if(setErrBorder) setErrBorder(false)
     },[data])
     const inputFilter = () =>{
         var val = inputRef.current.value
@@ -106,7 +106,7 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef,type,setNewOption}) => 
         else inputRef.current.value = ""
         setList([...data])
         setDropDown(true)
-        setErrBorder(false)
+        if(setErrBorder) setErrBorder(false)
         if(clickInp)clickInp()
     }
     const selectOption = (e) =>{
@@ -121,11 +121,11 @@ const FormInpDropDown = ({data,setFilter,clickInp,inpRef,type,setNewOption}) => 
             var invalidEmail = setNewOption(e); 
             if(invalidEmail) inputRef.current.value = text
             else inputRef.current.value = ""
-            setErrBorder(invalidEmail);
+            if(setErrBorder) setErrBorder(invalidEmail);
         } else {
             setFilter(e)
             inputRef.current.value = ""
-            setErrBorder(false);
+            if(setErrBorder) setErrBorder(false);
         } 
         setDropDown(false)
     }
