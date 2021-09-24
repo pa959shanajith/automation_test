@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import {ScreenOverlay, ResetSession, ModalContainer , IntegrationDropDown, Messages as MSG, VARIANT, setMsg} from '../../global' 
+import {ScreenOverlay, ResetSession, ModalContainer , IntegrationDropDown, Messages as MSG, VARIANT, setMsg, SelectRecipients} from '../../global' 
 import {updateTestSuite_ICE, updateAccessibilitySelection, reviewTask, ExecuteTestSuite_ICE} from '../api';
 import {getUserDetails,getNotificationGroups} from '../../admin/api';
 import "../styles/ExecuteContent.scss";
@@ -10,7 +10,6 @@ import * as actionTypes from "../../plugin/state/action";
 import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import AdvancedOptions from '../../mindmap/components/AdvancedOptions'
-import SelectRecipients from '../components/SelectRecipients';
 
 const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
     const history = useHistory();
@@ -110,6 +109,8 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 
     const closeModal = () => {
         setshowDeleteModal(false);
+        resetData();
+        setCheckAddUsers(false);
     }
     
     const submit_task = async () => {
@@ -252,9 +253,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
     const fetchSelectRecipientsData = async () => {
         setCheckAddUsers(!checkAddUsers);
         if(checkAddUsers) {
-            setAllUsers([]);
-            setGroupList([]);
-            setRecipients({groupids:[],additionalrecepients:[]});
+            resetData();
         } else {
             let data = await getUserDetails("user");
             if(data.error){displayError(data.error);return;}
@@ -277,6 +276,12 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
             }
             setGroupList(data.sort())
         }
+    }
+
+    const resetData = () => {
+        setAllUsers([]);
+        setGroupList([]);
+        setRecipients({groupids:[],additionalrecepients:[]});
     }
 
     return (
@@ -332,7 +337,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
             {showDeleteModal?
                 <ModalContainer 
                     title={modalDetails.title} 
-                    footer={submitModalButtons(setshowDeleteModal, submit_task)} 
+                    footer={submitModalButtons(setshowDeleteModal, submit_task, resetData, setCheckAddUsers)} 
                     close={closeModal} 
                     content={
                         <div>
@@ -398,11 +403,11 @@ const SelectBrowserCheck = (appType,browserTypeExe,displayError,execAction)=>{
     return false;
 }
 
-const submitModalButtons = (setshowDeleteModal, submit_task) => {
+const submitModalButtons = (setshowDeleteModal, submit_task, resetData, setCheckAddUsers) => {
     return(
         <div>
-            <button onClick={()=>{setshowDeleteModal(false);submit_task()}} type="button" className="e__modal_button" >Yes</button>
-            <button type="button" onClick={()=>{setshowDeleteModal(false);}} >No</button>
+            <button onClick={()=>{setshowDeleteModal(false);submit_task();setCheckAddUsers(false)}} type="button" className="e__modal_button" >Yes</button>
+            <button type="button" onClick={()=>{setshowDeleteModal(false);resetData()}} >No</button>
         </div>
     )
 }

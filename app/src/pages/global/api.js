@@ -159,7 +159,7 @@ export const getUserICE = async() => {
 /*Component DesignContent
   api returns fail/inprogress
 */ 
-export const reviewTask = (projectId, taskid, taskstatus, version, batchTaskIDs, nodeid, taskname) => {
+export const reviewTask = (projectId, taskid, taskstatus, version, batchTaskIDs, nodeid, taskname, groupids, additionalrecepients) => {
     return new Promise((resolve, reject)=>{
         axios(url+"/reviewTask", {
             method : 'POST',
@@ -173,7 +173,9 @@ export const reviewTask = (projectId, taskid, taskstatus, version, batchTaskIDs,
                     versionnumber: version,
                     batchIds: batchTaskIDs,
                     nodeid: nodeid,
-                    taskname, taskname
+                    taskname, taskname,
+                    extragroups:groupids,
+                    extrausers:additionalrecepients
                 },
             credentials : 'include'
         })
