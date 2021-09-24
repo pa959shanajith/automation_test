@@ -45,6 +45,7 @@ const ZephyrUpdateContent = props => {
         setSelectedRel("Select Release");
         setProjectDetails({});
         setProjectDetails1({});
+        setRootCheck(false);
         dispatch({
             type: actionTypes.UPDATE_MAP_PAYLOAD, 
             payload: {
@@ -72,9 +73,7 @@ const ZephyrUpdateContent = props => {
             } else if (updateMapPayload['selectedPhase'] === undefined) {
                 setMsg(MSG.INTEGRATION.ERR_EMPTY_PH);
             } else {
-        
                 const response = await api.zephyrUpdateMapping(updateMapPayload, rootCheck);
-                
                 if (response === "unavailableLocalServer")
                     setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
                 else if(response.error.length>0 || response.warning.length>0 || response.update.length>0) {
@@ -126,7 +125,6 @@ const ZephyrUpdateContent = props => {
                 setSelectedRel1("Select Release");
                 setReleaseArr1(releaseData);
             }
-            //clearSelections();
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
@@ -155,13 +153,12 @@ const ZephyrUpdateContent = props => {
             if(dropdn === "1") { 
                 setSelectedRel(releaseId); 
                 setProjectDetails(testAndScenarioData.project_dets);
+                setCycleCount({check:0,cycles:testAndScenarioData.project_dets});
             }
             if(dropdn === "2") { 
                 setSelectedRel1(releaseId); 
                 setProjectDetails1(testAndScenarioData.project_dets);
             }
-            setCycleCount({check:0,cycles:testAndScenarioData.project_dets});
-            // clearSelections();
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
@@ -170,45 +167,40 @@ const ZephyrUpdateContent = props => {
         var checkVal = cycleCount.check;
         var cycleVal = cycleCount.cycles;
         var cycles = event.target.parentNode.parentNode.parentNode.children
-        if(rootCheck === false) {
+        cycles = document.querySelectorAll('.mp-cycles');
+        if(!rootCheck) {
             setRootCheck(true);
             //cycles- 1 to end
-            for (var i=1; i<cycles.length; ++i) {
+            for (var i=0; i<cycles.length; ++i) {
                 //cycle
-                cycles[i].children[0].children[0].children[0].checked = true
+                cycles[i].checked = true;
                 checkVal += 1;
                 //phases
-                if(cycles[i].children.length>1) {
-                    var phases = cycles[i].children[1].children
-                    for(var j=0;j<phases.length;++j) {
-                        phases[j].children[0].children[0].children[0].checked = true
-                        if(phases[j].children.length > 1) {
-                            var testcases = phases[j].children[1].children
-                            for(var k=0;k<testcases.length;++k) {
-                                testcases[k].children[0].children[0].checked = true;
-                            }
-                        }
+                var phases = cycles[i].closest('.int__cycleNode').querySelectorAll('.mp-phases');
+                for(var j=0;j<phases.length;++j) {
+                    phases[j].checked = true;
+                    //tcs
+                    var testcases = phases[j].closest('.int__phaseNode').querySelectorAll('.mp-tcs');
+                    for(var k=0;k<testcases.length;++k) {
+                        testcases[k].checked = true;
                     }
                 }
             }
         } else {
             setRootCheck(false);
             //cycles- 1 to end
-            for (var i=1; i<cycles.length; ++i) {
+            for (var i=0; i<cycles.length; ++i) {
                 //cycle
-                cycles[i].children[0].children[0].children[0].checked = false
+                cycles[i].checked = false;
                 checkVal -= 1;
                 //phases
-                if(cycles[i].children.length>1) {
-                    var phases = cycles[i].children[1].children
-                    for(var j=0;j<phases.length;++j) {
-                        phases[j].children[0].children[0].children[0].checked = false
-                        if(phases[j].children.length > 1) {
-                            var testcases = phases[j].children[1].children
-                            for(var k=0;k<testcases.length;++k) {
-                                testcases[k].children[0].children[0].checked = false;
-                            }
-                        }
+                var phases = cycles[i].closest('.int__cycleNode').querySelectorAll('.mp-phases');
+                for(var j=0;j<phases.length;++j) {
+                    phases[j].checked = false;
+                    //tcs
+                    var testcases = phases[j].closest('.int__phaseNode').querySelectorAll('.mp-tcs');
+                    for(var k=0;k<testcases.length;++k) {
+                        testcases[k].checked = false;
                     }
                 }
             }
@@ -280,8 +272,9 @@ const ZephyrUpdateContent = props => {
                                 <span className="sp_label"><label className="test_label">Root</label></span>
                             </div>
                             { Object.keys(projectDetails)
-                                .map( cycleName => <CycleNode 
-                                        key={cycleName}
+                                .map( (cycleName, idx) => <CycleNode 
+                                        key={`${cycleName}-${idx}`}
+                                        id={idx}
                                         phaseList={projectDetails[cycleName]} 
                                         cycleName={cycleName}
                                         projectId={projectDropdn1}
