@@ -301,7 +301,7 @@ const PhaseNode = props => {
     }
 
     return <div className="int__phaseNode" style={{paddingLeft: 17}}>
-                { <div className="test_tree_branches">
+                { <div className={"test_tree_branches"+(props.section === "right" && props.selectedPhase.includes(phaseid) ? " test__selectedPh": "")}>
                     {props.section !== "right" && props.section != undefined && 
                     <span className="sel_up sel_head"><input className="sel_up" type="checkbox" onChange={(e)=>onCheckAll(e)}/></span>}
                     {props.section === "right" &&
@@ -311,7 +311,7 @@ const PhaseNode = props => {
                         src={ `static/imgs/ic-taskType-blue.png` }
                     />
                     </span>
-                    <span className={"sp_label" + (props.selectedPhase.includes(phaseid) ? " test__selectedTC": "")}><label className="test_label" onClick={selectPhase}>{ phasename }</label></span>
+                    <span className="sp_label"><label className="test_label" onClick={selectPhase}>{ phasename }</label></span>
                     </>}
                     {props.section !== "right" &&
                     <><span>

@@ -82,6 +82,12 @@
     background-color:$lavenderBlue !important;
 }
 
+.test__selectedPh{
+    background-color:$lavenderBlue !important;
+    border-radius: 5px;
+    width: 95%;
+}
+
 .test__syncedTC{
     background-color: rgb(221, 221, 221)!important;
 }
@@ -98,6 +104,7 @@
     display: flex;
     margin: 0 0 10px 10px;
     align-items: center;
+    height: 21px;
     .sp_label{
         padding-top: 10px;
     }
@@ -131,29 +138,4 @@
     align-items: center;
     margin: 0 0;
     padding-right: 1%;
-}
-
-.ss__dup_labels{
-    display: flex;
-    flex-direction: column;
-    font-family: $avoFont ;
-    font-size: 14px;
-    font-weight: bold;
-    color: black;
-    max-height: 250px;
-}
-
-.ss__dup_scroll{
-    display: flex;
-    flex-direction: column;
-}
-
-.ss__err_li{
-    font-weight: normal;
-    color: red;
-}
-
-.ss__warning_li{
-    font-weight: normal;
-    color: yellow;
 }

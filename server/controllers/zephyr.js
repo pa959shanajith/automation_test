@@ -274,6 +274,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 	var testList = {};
 	var errorList = [];
 	var warningList = [];
+	var updateList = [];
 	try {
 		var projectId = parseInt(req.body.updateMapPayload.projectId);
 		var releaseId = parseInt(req.body.updateMapPayload.releaseId);
@@ -391,13 +392,14 @@ exports.zephyrUpdateMapping = async (req, res) => {
 											"Content-Type": "application/json"
 										}
 									};
-										logger.info("Calling DAS Service :qualityCenter/saveIntegrationDetails_ICE");
+									logger.info("Calling DAS Service :qualityCenter/saveIntegrationDetails_ICE");
 									client.post(epurl + "qualityCenter/saveIntegrationDetails_ICE", args,
-										function (result, response) {
+									function (result, response) {
 										if (response.statusCode != 200 || result == "fail") {
 											logger.error("Error occurred in zephyrUpdateMapping Error Code : ERRDAS");
-										} 
+										}
 									});
+									updateList.push(mappedTestNames[i]);
 								} else if(occurences[mappedTestNames[i]] > 1 || occurences2[mappedTestNames[i]] > 1) {
 									//Warning or error
 									warningList.push(mappedTestNames[i]);
@@ -405,7 +407,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 									errorList.push(mappedTestNames[i]);
 								}
 							}
-							var finalList = {warning:warningList,error:errorList}
+							var finalList = {warning:warningList,error:errorList,update:updateList}
 							res.send(finalList)
 						}
 					}

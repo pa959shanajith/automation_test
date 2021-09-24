@@ -1,11 +1,12 @@
-import React,{Fragment, useState, useCallback } from 'react';
+import React,{Fragment, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import * as api from '../api.js';
 import MappingPage from '../containers/MappingPage';
-import { Messages as MSG, setMsg, ScrollBar, ModalContainer } from '../../global';
+import { Messages as MSG, setMsg } from '../../global';
 import { RedirectPage } from '../../global/index.js';
 import CycleNode from './ZephyrTree';
+import UpdateMapPopup from './UpdateMapPopup';
 import * as actionTypes from '../state/action';
 import "../styles/TestList.scss"
 
@@ -18,6 +19,7 @@ const ZephyrUpdateContent = props => {
     const viewMappedFlies = useSelector(state=>state.integration.mappedScreenType);
 
     const [showErrorModal,setShowErrorModal]=useState(false);
+    const [updateList, setUpdateList]=useState([]);
     const [errorList,setErrorList]=useState([]);
     const [warningList,setWarningList]=useState([]);
     const [projectDropdn1 , setProjectDropdn1]= useState("Select Project");
@@ -75,14 +77,17 @@ const ZephyrUpdateContent = props => {
                 
                 if (response === "unavailableLocalServer")
                     setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
-                else if(response.error.length>0 || response.warning.length>0) {
-                    setShowErrorModal(true); 
+                else if(response.error.length>0 || response.warning.length>0 || response.update.length>0) {
+                    setUpdateList(response.update);
                     setErrorList(response.error);
                     setWarningList(response.warning);
-                }
-                else if(response.error.length===0 && response.warning.length===0) {
-                    setMsg(MSG.INTEGRATION.UPDATE_SAVE)
-                    clearSelections();
+                    if(response.update.length>0) {
+                        if(response.error.length>0 || response.warning.length>0) setMsg(MSG.INTEGRATION.WARN_UPDATE_MULTI_MATCH);
+                        else setMsg(MSG.INTEGRATION.UPDATE_SAVE);
+                    } else if(response.error.length>0 || response.warning.length>0) {
+                        setMsg(MSG.INTEGRATION.ERR_UPDATE_NOT_FOUND);
+                    }
+                    setShowErrorModal(true); 
                 }
                 else setMsg(MSG.INTEGRATION.ERR_UPDATE_MAP);
             }
@@ -324,24 +329,12 @@ const ZephyrUpdateContent = props => {
             />
         }
         {showErrorModal?
-                <ModalContainer 
-                title="Update Mapping"  
-                close={()=>{clearSelections()}} 
-                content= {<><div className="ss__dup_labels">
-                    {errorList.length>0 && <><span>No match found for following test cases:</span>
-                    <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
-                        <div className="ss__dup_scroll">
-                        { errorList.map((custname, i) => <span key={i} className="ss__err_li">{custname}</span>) }
-                        </div>
-                    </ScrollBar></> }
-                    {warningList.length>0 && <><span>Multiple matches exists for following testcases:</span>
-                       <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
-                        <div className="ss__dup_scroll">
-                        { warningList.map((custname, i) => <span key={i} className="ss__warning_li">{custname}</span>) }
-                        </div>
-                    </ScrollBar></>}
-                </div> </>}
-                modalClass=" modal-sm" />
+            <UpdateMapPopup
+                updateList={updateList}
+                errorList={errorList}
+                warningList={warningList}
+                clearSelections={clearSelections}
+            />
             :null} 
         </>
     )
