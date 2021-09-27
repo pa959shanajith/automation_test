@@ -11,7 +11,6 @@ const CycleNode = props => {
 
     const dispatch = useDispatch();
     const [collapse, setCollapse] = useState(true);
-    const [headerCheck, setHeaderCheck] = useState(false);
     const [phaseCount, setPhaseCount] = useState({check:0,phases:props.phaseList});
     const viewMappedFlies = useSelector(state=>state.integration.mappedScreenType);
     const updateMapPayload = useSelector(state=>state.integration.updateMapPayload);
@@ -60,58 +59,37 @@ const CycleNode = props => {
         var checkVal = props.cycleCount.check;
         var cycleVal = props.cycleCount.cycles;
         var phaseDetsVal = props.phaseDets;
-        if(headerCheck == false) {
+        var phases = event.target.closest('.int__cycleNode').querySelectorAll('.mp-phases');
+        var tempPhaseVal = [];
+        if(event.target.checked) {
             //phases - 4 divs
-            event.target.checked = true
-            checkVal += 1
-            if(event.target.parentNode.parentNode.nextSibling != null) {
-                var phases = event.target.parentNode.parentNode.nextSibling.children
-                //loop through phases
-                for(var i=0; i<phases.length; ++i) {
-                    phases[i].children[0].children[0].children[0].checked = true
-                    phaseCount.check += 1;
-                    if(phases[i].children.length>1) {
-                        var testcases = phases[i].children[1].children
-                        for(var j=0;j<testcases.length;++j) {
-                            testcases[j].children[0].children[0].checked = true
-                        }
-                    }
+            checkVal += 1;
+            for(var i=0; i<phases.length; ++i) {
+                phases[i].checked = true;
+                phaseCount.check += 1;
+                var testcases = phases[i].closest('.int__phaseNode').querySelectorAll('.mp-tcs');
+                for(var j=0;j<testcases.length;++j) {
+                    testcases[j].checked = true;
                 }
             }
-            props.setCycleCount({check:checkVal,cycles:cycleVal});
-            setHeaderCheck(true);
-            for(var i=0;i<props.phaseList.length;++i) {
-                var phaseId = String(props.phaseList[i]["phaseid"]);//Object.keys(props.phaseList[i])[0]
-                if(Object.keys(phaseDetsVal).includes(phaseId)) {
-                    phaseDetsVal[phaseId] = ["all"];
-                }
-            }
+            tempPhaseVal = ["all"];
         } else {
             //phases - 4 divs
-            event.target.checked = false
-            checkVal -= 1
-            if(event.target.parentNode.parentNode.nextSibling != null) {
-                var phases = event.target.parentNode.parentNode.nextSibling.children
-                //loop through phases
-                for(var i=0; i<phases.length; ++i) {
-                    phases[i].children[0].children[0].children[0].checked = false 
-                    phaseCount.check -= 1;
-                    if(phases[i].children.length>1) {
-                        var testcases = phases[i].children[1].children
-                        for(var j=0;j<testcases.length;++j) {
-                            testcases[j].children[0].children[0].checked = false
-                        }
-                    }
+            checkVal -= 1;
+            for(var i=0; i<phases.length; ++i) {
+                phases[i].checked = false;
+                phaseCount.check -= 1;
+                var testcases = phases[i].closest('.int__phaseNode').querySelectorAll('.mp-tcs');
+                for(var j=0;j<testcases.length;++j) {
+                    testcases[j].checked = false;
                 }
             }
-            props.setCycleCount({check:checkVal,cycles:cycleVal});
-            setHeaderCheck(false);
-            
-            for(var i=0;i<props.phaseList.length;++i) {
-                var phaseId = String(props.phaseList[i]["phaseid"]);//Object.keys(props.phaseList[i])[0]
-                if(Object.keys(phaseDetsVal).includes(phaseId)) {
-                    phaseDetsVal[phaseId] = [];
-                }
+        }
+        props.setCycleCount({check:checkVal,cycles:cycleVal});  
+        for(var i=0;i<props.phaseList.length;++i) {
+            var phaseId = String(props.phaseList[i]["phaseid"]);//Object.keys(props.phaseList[i])[0]
+            if(Object.keys(phaseDetsVal).includes(phaseId)) {
+                phaseDetsVal[phaseId] = tempPhaseVal;
             }
         }
         dispatch({
@@ -123,13 +101,19 @@ const CycleNode = props => {
                 selectPhase: props.selectedPhase
             }
         });
-        if(checkVal == cycleVal.length) props.setRootCheck(true);
+        if(checkVal == Object.keys(cycleVal).length) props.setRootCheck(true);
         else props.setRootCheck(false);
+    }
+
+    const checkCycle=()=>{
+        var doc = document.getElementById('cycl-'+props.id);
+        return props.rootCheck || (props.cycleCount.check!=0 && doc.checked);
     }
 
     return <div className="int__cycleNode" style={{paddingLeft: 17}}>
             { <div className="test_tree_branches">
-                {props.section !== "right" && props.section != undefined && <span className="sel_up sel_head"><input onChange={(e)=>onCheckAll(e)} className="sel_up" type="checkbox"/></span>}
+                {props.section !== "right" && props.section != undefined && 
+                    <span className="sel_up sel_head"><input id={`cycl-${props.id}`} checked={checkCycle()} onChange={(e)=>onCheckAll(e)} className="sel_up mp-cycles" type="checkbox"/></span>}
                 <span>
                 <img alt="ce-ic"
                     className="test_tree_toggle" 
@@ -147,13 +131,12 @@ const CycleNode = props => {
                     props.phaseList
                         .map((phase, idx) => <PhaseNode 
                                                 key={`phase-${idx}`}
+                                                cycleid={props.id}
                                                 phase={phase}
                                                 projectId={props.projectId}
                                                 releaseId={props.releaseId}
                                                 section={props.section}
                                                 viewMappedFlies={viewMappedFlies}
-                                                headerCheck={headerCheck}
-                                                setHeaderCheck={setHeaderCheck}
                                                 phaseCount={phaseCount}
                                                 setPhaseCount={setPhaseCount}
                                                 setRootCheck={props.setRootCheck}
@@ -176,7 +159,6 @@ const PhaseNode = props => {
     const history = useHistory();
     const [collapse, setCollapse] = useState(true);
     const [testCases, setTestCases] = useState([]);
-    const [phaseCheck, setPhaseCheck] = useState(false);
     const [tests, setTests] = useState({check:[],tests:[]});
 
     let phaseid = Object.keys(props.phase)[0];
@@ -185,9 +167,6 @@ const PhaseNode = props => {
     let updateMapPayload = useSelector(state=>state.integration.updateMapPayload);
 
     useEffect(()=>{
-        if (props.headerCheck) {
-            setPhaseCheck(true);
-        }
     },[])
 
     const handleClick = useCallback(async()=>{
@@ -232,49 +211,40 @@ const PhaseNode = props => {
         var cycleCheckVal = props.cycleCount.check;
         var cycleCycleVal = props.cycleCount.cycles;
         var phaseDetsVal = props.phaseDets;
-        if(phaseCheck == true) {
+        var cy = document.getElementById('cycl-'+props.cycleid);
+        var testcases = event.target.closest('.int__phaseNode').querySelectorAll('.mp-tcs');
+        if(!event.target.checked) {
             //testcases - 4 divs
-            event.target.checked = false
-            if(event.target.parentNode.parentNode.nextSibling != null) {
-                var testcases = event.target.parentNode.parentNode.nextSibling.children
-                //loop through testcases
-                for(var i=0; i<testcases.length; ++i) {
-                    testcases[i].children[0].children[0].checked = false;
-                }
+            for(var i=0; i<testcases.length; ++i) {
+                testcases[i].checked = false;
             }
-            setPhaseCheck(false);
             checkVal = checkVal - 1;
             props.setPhaseCount({check:checkVal,phases:phaseVal});
             setTests({check:[], tests:testCases});
-            if (props.headerCheck == true) {
-                props.setHeaderCheck(false);
+            if (cy.checked) {
+                cy.checked=false
                 props.setRootCheck(false);
                 cycleCheckVal -= 1
+                props.setCycleCount({check:cycleCheckVal,cycles:cycleCycleVal});
             }
             phaseDetsVal[cyclephaseid] = []
         } else {
             //testcases - 4 divs
-            event.target.checked = true
-            if(event.target.parentNode.parentNode.nextSibling != null) {
-                var testcases = event.target.parentNode.parentNode.nextSibling.children
-                //loop through testcases
-                for(var i=0; i<testcases.length; ++i) {
-                    testcases[i].children[0].children[0].checked = true;
-                    checkList.push(testcases[i].children[1].children[0].innerText);
-                }
+            for(var i=0; i<testcases.length; ++i) {
+                testcases[i].checked = true;
+                checkList.push(testcases[i].closest('.test_tree_leaves').querySelector('.leafId').innerText);
             }
             setTests({check:checkList, tests:testCases});
-            setPhaseCheck(true);
             checkVal = checkVal + 1;
             props.setPhaseCount({check:checkVal,phases:phaseVal});
             phaseDetsVal[cyclephaseid] = ["all"]
         }
-        if (checkVal == phaseVal.length) {
-            props.setHeaderCheck(true);
-            cycleCheckVal += 1
+        if (checkVal == Object.keys(phaseVal).length) {
+            cy.checked=true
+            cycleCheckVal += 1;
             props.setCycleCount({check:cycleCheckVal,cycles:cycleCycleVal});
         }
-        if (cycleCheckVal ==cycleCycleVal.length) props.setRootCheck(true);
+        if (cycleCheckVal == Object.keys(cycleCycleVal).length) props.setRootCheck(true);
         dispatch({
             type: actionTypes.UPDATE_MAP_PAYLOAD, 
             payload: {
@@ -300,10 +270,16 @@ const PhaseNode = props => {
         });
     }
 
+    const checkPhase = () => {
+        var ph = document.getElementById('ph-'+phaseid);
+        var cy = document.getElementById('cycl-'+props.cycleid);
+        return cy.checked || (ph!=null&&ph.checked);
+    }
+
     return <div className="int__phaseNode" style={{paddingLeft: 17}}>
                 { <div className={"test_tree_branches"+(props.section === "right" && props.selectedPhase.includes(phaseid) ? " test__selectedPh": "")}>
                     {props.section !== "right" && props.section != undefined && 
-                    <span className="sel_up sel_head"><input className="sel_up" type="checkbox" onChange={(e)=>onCheckAll(e)}/></span>}
+                    <span className="sel_up sel_head"><input id={`ph-${phaseid}`} checked={checkPhase()} className="sel_up mp-phases" type="checkbox" onChange={(e)=>onCheckAll(e)}/></span>}
                     {props.section === "right" &&
                     <><span>
                     <img alt="ce-ic"
@@ -335,11 +311,9 @@ const PhaseNode = props => {
                                                 cyclephaseid={cyclephaseid}
                                                 projectId={props.projectId}
                                                 releaseId={props.releaseId}
+                                                cycleid={props.cycleid}
                                                 tests={tests}
                                                 setTests={setTests}
-                                                phaseCheck={phaseCheck}
-                                                setHeaderCheck={props.setHeaderCheck}
-                                                setPhaseCheck={setPhaseCheck}
                                                 phaseCount={props.phaseCount}
                                                 setPhaseCount={props.setPhaseCount}
                                                 section={props.section}
@@ -402,7 +376,7 @@ const TestCaseNode = props => {
     }
 
     const onCheckAll = (event) => {
-        var checkList = props.tests.check;
+        var checkList = new Set(props.tests.check);
         var testcases = props.tests.tests;
         var checkVal = props.phaseCount.check;
         var phaseVal = props.phaseCount.phases;
@@ -410,37 +384,38 @@ const TestCaseNode = props => {
         var cycleCycleVal = props.cycleCount.cycles;
         var testid  = event.target.parentNode.parentNode.children[1].children[0].innerText;
         var phaseDetsVal = props.phaseDets;
-
+        var cy = document.getElementById('cycl-'+props.cycleid);
+        var ph = document.getElementById('ph-'+props.phaseId);
         if(event.target.checked) {
-            checkList.push(testid);
-            if(checkList.length == testcases.length) {
-                event.target.parentNode.parentNode.parentNode.parentNode.children[0].children[0].children[0].checked = true;
-                props.setPhaseCheck(true);
+            checkList.add(testid);
+            if(checkList.size == testcases.length) {
+                ph.checked=true;
                 checkVal = checkVal + 1;
                 props.setPhaseCount({check:checkVal,phases:phaseVal});
-                
             }
             phaseDetsVal[props.cyclephaseid].push(testid);
+            if(checkVal == Object.keys(phaseVal).length) {
+                cy.checked=true;
+                cycleCheckVal += 1
+                props.setCycleCount({check:cycleCheckVal,cycles:cycleCycleVal});
+            }
         } else {
-            var index = checkList.indexOf(testid);
-            if (index > -1) checkList.splice(index, 1);
-            event.target.parentNode.parentNode.parentNode.parentNode.children[0].children[0].children[0].checked = false;
-            props.setPhaseCheck(false);
-            checkVal = checkVal - 1;
-            props.setPhaseCount({check:checkVal,phases:phaseVal});
-            phaseDetsVal[props.cyclephaseid] = checkList;
+            checkList.delete(testid);
+            if(ph.checked) { 
+                ph.checked=false;
+                checkVal = checkVal - 1;
+                props.setPhaseCount({check:checkVal,phases:phaseVal});
+                if(cy.checked) {
+                    cy.checked=false;
+                    props.setRootCheck(false);
+                    cycleCheckVal -= 1;
+                    props.setCycleCount({check:cycleCheckVal,cycles:cycleCycleVal});
+                }
+            }
+            phaseDetsVal[props.cyclephaseid] = Array.from(checkList);
         }
-        if(checkVal == phaseVal.length) {
-            props.setHeaderCheck(true);
-            cycleCheckVal += 1
-        }
-        else {
-            props.setHeaderCheck(false);
-            cycleCheckVal -= 1
-        }
-        props.setCycleCount({check:cycleCheckVal,cycles:cycleCycleVal});
-        props.setTests({check:checkList,tests:testcases});
-        if(cycleCheckVal == cycleCycleVal.length) props.setRootCheck(true);
+        props.setTests({check:Array.from(checkList),tests:testcases});
+        if(cycleCheckVal == Object.keys(cycleCycleVal).length) props.setRootCheck(true);
         dispatch({
             type: actionTypes.UPDATE_MAP_PAYLOAD, 
             payload: {
@@ -452,9 +427,16 @@ const TestCaseNode = props => {
         });
     }
 
+    const checkTC = () => {
+        var ph = document.getElementById('ph-'+props.phaseId);
+        var tc = document.getElementById('test-'+props.testCase.id);
+        return ph.checked || (tc!=null&&tc.checked);
+    }
+
     return (props.section !== "right" && props.section != undefined)? 
             <div className={"test_tree_leaves"}>
-                <span className="sel_up"><input className="sel_up" type="checkbox" onChange={(e)=>onCheckAll(e)}></input></span>
+                <span className="sel_up">
+                    <input id={`test-${props.testCase.id}`} checked={checkTC()} className="sel_up mp-tcs" type="checkbox" onChange={(e)=>onCheckAll(e)}></input></span>
                 <label className="test__leaf" title={props.testCase.name} onClick={handleClick}>
                     <span className="leafId">{props.testCase.id}</span>
                     <span className="test__tcName">{props.testCase.name}</span>
