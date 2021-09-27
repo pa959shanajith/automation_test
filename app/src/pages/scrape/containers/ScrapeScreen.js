@@ -320,7 +320,7 @@ const ScrapeScreen = ()=>{
 
                     setSaved({ flag: false });
                     err = {
-                        'variant':  data === 'scheduleModeOn'?MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT:MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'content':
+                        'VARIANT':  data === 'scheduleModeOn'?MSG.GENERIC.WARN_UNCHECK_SCHEDULE.VARIANT:MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.VARIANT, 'CONTENT':
                             data === 'scheduleModeOn' ?
                                 MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
                                 MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
