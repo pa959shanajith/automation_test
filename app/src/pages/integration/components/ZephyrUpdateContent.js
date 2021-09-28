@@ -151,9 +151,9 @@ const ZephyrUpdateContent = props => {
         }
         else if (testAndScenarioData) {
             if(dropdn === "1") { 
+                setCycleCount({check:0,cycles:testAndScenarioData.project_dets});
                 setSelectedRel(releaseId); 
                 setProjectDetails(testAndScenarioData.project_dets);
-                setCycleCount({check:0,cycles:testAndScenarioData.project_dets});
             }
             if(dropdn === "2") { 
                 setSelectedRel1(releaseId); 
