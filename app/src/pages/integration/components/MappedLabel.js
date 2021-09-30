@@ -22,7 +22,7 @@ const MappedLabel = props => {
                         {typeof(props.list) === "object" ? props.list[0] : props.list}
                     </div>
                     {(type==='testcase' && screenType==='Zephyr')?
-                        <i onClick={()=>setInfo(true)} className="fa fa-info" aria-hidden="true" style={{fontSize:'15px',margin:'3px',color:'#633691',cursor:'pointer'}}/>:null
+                        <i onClick={()=>setInfo(true)} className="fa fa-info" title="Requirement mapping info" aria-hidden="true" style={{fontSize:'15px',margin:'3px',color:'#633691',cursor:'pointer'}}/>:null
                     }
                     { props.selected.includes(`${props.mapIdx}-0`) && !props.unSynced &&
                         <button><img className="mlalm__syncBtn" alt="s-ic" title="Undo" onClick={props.handleUnSync ? ()=>props.handleUnSync(props.type) : null} src="static/imgs/ic-qcUndoSyncronise.png" /></button>

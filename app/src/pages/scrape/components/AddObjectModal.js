@@ -112,7 +112,7 @@ const AddObjectModal = props => {
         if (!errorFlag && newObjects.length > 0) {
             props.setScrapeItems([...props.scrapeItems, ...newObjects]);
             props.setOrderList(oldOrderList => [...oldOrderList, ...newOrderList])
-            props.setShow(false);
+            setTimeout(()=>props.setShow(false), 1);
             props.setSaved({ flag: false });
             setMsg(MSG.SCRAPE.SUCC_OBJ_ADD);
         }
@@ -135,7 +135,7 @@ const AddObjectModal = props => {
                     <div data-test="ssObjModalContent" className="ss__objModal_content" id="ss__objModalListId">
                         <ScrollBar scrollId="ss__objModalListId" thumbColor="#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                 { objects.map((object, index) => <div data-test="objModalItem" className="ss__objModal_item" key={index}>
-                                        <input data-test="addObjectInput" className={"addObj_name"+(error.type==="input" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" />
+                                        <input data-test="addObjectInput" className={"addObj_name"+(error.type==="input" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objName} onChange={(e)=>handleInput(e, index)} placeholder="Enter Object Name" name="addObjName" />
                                         <select  data-test="addObjectTypeSelect" className={"addObj_objType"+(error.type==="type" && error.tempId.includes(object.tempId) ? " ss__error_field" : "")} value={object.objType} onChange={(e)=>handleType(e, index)}>
                                             <option className="addObj_option" disabled value="">Select Object Type</option>
                                             { objectTypes.map((objectType, i) =>
@@ -154,7 +154,7 @@ const AddObjectModal = props => {
                 close={()=>props.setShow(false)}
                 footer={<>
                     <button  data-test="reset" onClick={resetFields}>Reset</button>
-                    <button  data-test="submit" onClick={onSubmit}>Submit</button>
+                    <input type="submit" data-test="submit" onClick={onSubmit} value="Submit" />
                 </>}
             />
         </div>
