@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import * as actionTypes from '../../login/state/action';
-import { ScrollBar, ScreenOverlay, Messages as MSG, setMsg } from '../../global'
+import { ScrollBar, ScreenOverlay, Messages as MSG, setMsg, VARIANT } from '../../global'
 import { manageUserDetails } from '../../admin/api'
 import { Header, FormInput } from '../components/AllFormComp'
 
@@ -100,6 +100,28 @@ const EditUser = (props) => {
                     dispatch({type:actionTypes.SET_USERINFO, payload: { ...userInfo, ['email_id']: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname}})
                     setMsg(MSG.SETTINGS.SUCC_INFO_UPDATED);
                     click();
+                } else if(data === "exists") {
+                    setMsg(MSG.ADMIN.WARN_USER_EXIST);
+                } else if(data === "fail") {
+                    setMsg(MSG.CUSTOM("Failed to update user.",VARIANT.ERROR));
+                } 
+                else if(/^2[0-4]{8}$/.test(data)) {
+                    if (JSON.parse(JSON.stringify(data)[1])) {
+                        setMsg(MSG.CUSTOM("Failed to update user. Invalid Request!",VARIANT.ERROR));
+                        return;
+                    }
+                    var errfields = [];
+                    let hints = 'Hint:';
+                    if (JSON.parse(JSON.stringify(data)[2])) errfields.push("User Name");
+                    if (JSON.parse(JSON.stringify(data)[3])) errfields.push("First Name");
+                    if (JSON.parse(JSON.stringify(data)[4])) errfields.push("Last Name");
+                    if (JSON.parse(JSON.stringify(data)[5])) errfields.push("Password");
+                    if (JSON.parse(JSON.stringify(data)[6])) errfields.push("Email");
+                    if (JSON.parse(JSON.stringify(data)[7])) errfields.push("Authentication Server");
+                    if (JSON.parse(JSON.stringify(data)[8])) errfields.push("User Domain Name");
+                    if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+				    if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
+				    setMsg(MSG.CUSTOM("Following values are invalid: "+errfields.join(", ")+" "+hints,VARIANT.WARNING));
                 } else {
                     setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                     click();

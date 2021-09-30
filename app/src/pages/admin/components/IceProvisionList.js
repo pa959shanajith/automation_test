@@ -158,7 +158,8 @@ const IceProvisionList = (props) => {
 				const data = await setDefaultUserICE(ice);
 				setLoading(false);
 				if (data == 'success') {
-					setMsg(Messages.ADMIN.SUCC_CHANGE_DEFAULT_ICE);
+					setDefaultICE(ice);
+					setMsg(Messages.GLOBAL.SUCC_CHANGE_DEFAULT_ICE);
 				} else {
 					event.preventDefault();
 					setMsg(Messages.GLOBAL.ERR_CHANGE_DEFAULT_ICE);
@@ -193,7 +194,7 @@ const IceProvisionList = (props) => {
                     	<table className = "table table-hover sessionTable" id="tokensDetail">
                             <tbody >
                             <tr>
-								{isUsrSetting === true && <th data-test="table-heading-test">Default</th>}
+								{isUsrSetting === true && <th data-test="table-heading-test">Default ICE</th>}
 								<th> ICE Name </th>
 								<th> ICE Type</th>
 								<th> Status </th>
@@ -204,7 +205,7 @@ const IceProvisionList = (props) => {
 							</tr>
                             {icelistModify.map((entry,index)=>(
                                 <tr key={index} className='provisionTokens'>
-												{isUsrSetting === true && <td data-test="radio-token-test"><input name="default" type="radio" value={entry.icename} checked={entry.icename === defaultICE ? true : false} onChange={defaultChangeHandler} /></td>}
+									{isUsrSetting === true && <td data-test="radio-token-test"><input name="default" type="radio" value={entry.icename} checked={entry.icename === defaultICE ? true : false} onChange={defaultChangeHandler} /></td>}
                                     <td> {entry.icename} </td>
                                     <td> {entry.icetype} </td>
                                     <td> {entry.status} </td>
