@@ -214,6 +214,27 @@
     height: 100%;
 }
 
+.dc__checkbox-addRecp{
+    margin: 10px;
+    span{
+        margin: 10px;
+    }
+}
+.dc__select-recpients{
+    padding: 0px 10px !important;
+    margin-top: 15px;
+    div span {
+        display: inline-block;
+        font-size: small;
+        width: 34%;
+        font-weight: 700;
+        margin-top: 5px;
+    }
+    .checkAddUsers, .sr__input {
+        width: 63%;
+        margin-bottom: 80px
+    }
+}
 
 // @media screen and (min-width: 1400px) and (min-height: 770px){
 //     .d__content{

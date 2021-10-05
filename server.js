@@ -158,7 +158,7 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-			} 
+			}
 			return next();
 		});
 
@@ -393,14 +393,22 @@ if (cluster.isMaster) {
 		app.post('/createPool_ICE', auth.protect, admin.createPool_ICE);
 		app.post('/clearQueue', auth.protect, admin.clearQueue);
 		app.post('/exportProject', auth.protect, admin.exportProject);
-		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
-		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
-		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
 		app.post('/restartService', auth.protect, admin.restartService);
 		app.post('/gitSaveConfig', auth.protect, admin.gitSaveConfig);
 		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
+
+		//Notification Routes
+		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
+		app.post('/manageNotificationChannels', auth.protect, admin.manageNotificationChannels);
+		app.post('/getNotificationChannels', auth.protect, admin.getNotificationChannels);
+		app.post('/getNotificationGroups', auth.protect, admin.getNotificationGroups);
+		app.post('/updateNotificationGroups', auth.protect, admin.updateNotificationGroups);
+		app.post('/updateNotificationConfiguration', auth.protect, mindmap.updateNotificationConfiguration);
+		app.post('/getNotificationConfiguration', auth.protect, mindmap.getNotificationConfiguration);
+		app.post('/getNotificationRules', auth.protect, mindmap.getNotificationRules);
+
 		//Design Screen Routes
 		app.post('/initScraping_ICE', auth.protect, designscreen.initScraping_ICE);
 		app.post('/highlightScrapElement_ICE', auth.protect, designscreen.highlightScrapElement_ICE);
@@ -484,9 +492,12 @@ if (cluster.isMaster) {
 		app.post('/loginToZephyr_ICE', auth.protect, zephyr.loginToZephyr_ICE);
 		app.post('/zephyrProjectDetails_ICE', auth.protect, zephyr.zephyrProjectDetails_ICE);
 		app.post('/zephyrCyclePhase_ICE', auth.protect, zephyr.zephyrCyclePhase_ICE);
+		app.post('/zephyrMappedCyclePhase', auth.protect, zephyr.zephyrMappedCyclePhase);
 		app.post('/zephyrTestcaseDetails_ICE', auth.protect, zephyr.zephyrTestcaseDetails_ICE);
+		app.post('/zephyrMappedTestcaseDetails_ICE', auth.protect, zephyr.zephyrMappedTestcaseDetails_ICE);
 		app.post('/saveZephyrDetails_ICE', auth.protect, zephyr.saveZephyrDetails_ICE);
 		app.post('/viewZephyrMappedList_ICE', auth.protect, zephyr.viewZephyrMappedList_ICE);	
+		app.post('/zephyrUpdateMapping', auth.protect, zephyr.zephyrUpdateMapping);	
 		//app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', auth.protect, flowGraph.flowGraphResults);

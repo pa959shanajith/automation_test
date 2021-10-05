@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import {ScreenOverlay, PopupMsg, ResetSession, ModalContainer , IntegrationDropDown, Messages as MSG, VARIANT, setMsg} from '../../global' 
+import {ScreenOverlay, ResetSession, ModalContainer , IntegrationDropDown, Messages as MSG, VARIANT, setMsg, SelectRecipients} from '../../global' 
 import {updateTestSuite_ICE, updateAccessibilitySelection, reviewTask, ExecuteTestSuite_ICE} from '../api';
+import {getUserDetails,getNotificationGroups} from '../../admin/api';
 import "../styles/ExecuteContent.scss";
 import * as actionTypes from "../../plugin/state/action";
 import ExecuteTable from '../components/ExecuteTable';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
-
+import AdvancedOptions from '../../mindmap/components/AdvancedOptions'
 
 const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, readTestSuite, setSyncScenario, setBrowserTypeExe, current_task, syncScenario, appType, browserTypeExe, projectdata, execAction}) => {
     const history = useHistory();
@@ -31,6 +32,11 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
     const [proceedExecution, setProceedExecution] = useState(false);
     const [dataExecution, setDataExecution] = useState({});
     const [allocateICE,setAllocateICE] = useState(false)
+    const [showAdvOption,setShowAdvOption] = useState(false)
+    const [recipients,setRecipients] =useState({groupids:[],additionalrecepients:[]})
+    const [allUsers,setAllUsers] = useState([])
+    const [groupList,setGroupList] = useState([])
+    const [checkAddUsers,setCheckAddUsers] =useState(false)
     const [accessibilityParameters,setAccessibilityParameters] = useState(current_task.accessibilityParameters)
     const [scenarioTaskType,setScenarioTaskType] = useState(current_task.scenarioTaskType);
     var batch_name= taskName ==="Batch Execution"?": "+current_task.taskName.slice(13):""
@@ -103,6 +109,8 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 
     const closeModal = () => {
         setshowDeleteModal(false);
+        resetData();
+        setCheckAddUsers(false);
     }
     
     const submit_task = async () => {
@@ -115,11 +123,12 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
 		var version = current_task.versionnumber;
 		var batchTaskIDs = current_task.batchTaskIDs;
 		var projectId = current_task.projectId;
+        var taskname = current_task.taskName
+        var nodeid = (current_task.scenarioId != '') ? current_task.scenarioId : ''
 		if (action !== undefined && action === 'reassign') {
 			taskstatus = action;
 		}
-
-		const result = await reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs);
+		const result = await reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs, nodeid, taskname, recipients.groupids, recipients.additionalrecepients);
         if(result.error){displayError(result.error);return;}
         if (result === 'fail') {
             displayError(MSG.GENERIC.WARN_NO_REVIEWER);
@@ -187,6 +196,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
         executionData["browserType"]=browserTypeExe;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
+        executionData["scenarioFlag"] = (current_task.scenarioFlag == 'True') ? true : false
         ResetSession.start();
         try{
             setLoading(false);
@@ -240,6 +250,40 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
         setSelectAllBatch(temp);
     }
 
+    const fetchSelectRecipientsData = async () => {
+        setCheckAddUsers(!checkAddUsers);
+        if(checkAddUsers) {
+            resetData();
+        } else {
+            let data = await getUserDetails("user");
+            if(data.error){displayError(data.error);return;}
+            var userOptions = [];
+            for(var i=0; i<data.length; i++){
+                if(data[i][3] !== "Admin") userOptions.push({_id:data[i][1],name:data[i][0]}); 
+            }
+            setAllUsers(userOptions.sort()); 
+
+            //fetch all Notification group
+            data = await getNotificationGroups({'groupids':[],'groupnames':[]});
+            if(data.error){
+                if(data.val === 'empty'){
+                    displayError(data.error);
+                    data = {};
+                }else{
+                    displayError(data.error);
+                    return true;
+                }
+            }
+            setGroupList(data.sort())
+        }
+    }
+
+    const resetData = () => {
+        setAllUsers([]);
+        setGroupList([]);
+        setRecipients({groupids:[],additionalrecepients:[]});
+    }
+
     return (
         <>
             {loading?<ScreenOverlay content={loading}/>:null}
@@ -255,13 +299,13 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
                 exeIceLabel={"Execute on ICE"}
                 ExeScreen={true}
             />:null}
-            
+            {showAdvOption && <AdvancedOptions scenarioid={current_task.scenarioId} scenarioExec={current_task.scenarioFlag} mindmapid={current_task.testSuiteDetails?current_task.testSuiteDetails[0].testsuiteid:""} setShowAdvOption={setShowAdvOption} priority={1} setBlockui={setLoading} displayError={displayError} executionScreen={true} />}
             <div className="e__content">
                 <div className="e__task_title"> <div className="e__task_name">{taskName || "Execute"}{batch_name}</div></div>
                 <div id="tableActionButtons">
                     {taskName==="Batch Execution"?<div><span className='parentBatchContainer'><input id="selectAllBatch" onClick={()=>{setSelectAllBatchClick()}} title='Select Batch' type='checkbox' className='checkParentBatch' /><span className='parentObject'>Select All</span></span></div>:null}
                     <button id="excSaveBtn" onClick={()=>{updateTestSuite()}} title="Save" className={"e__taskBtn e__btn "+ ((taskName==="Batch Execution") ? "e__btnLeft" : "")}>Save</button>
-                    <button disabled={true} title="Configure" className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>Configure</button>
+                    <button onClick={()=>{setShowAdvOption(true)}} style={{display:taskName ==="Batch Execution"?"none":""}} title="Configure" className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>Configure</button>
                     <select defaultValue={""} id='syncScenario' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>
                         <option value="" disabled className="e__disableOption">Select Integration</option>
                         <option value="1">ALM</option>
@@ -290,7 +334,29 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
                     modalClass=" modal-sm" 
                 />
             :null} 
-            {showDeleteModal?<ModalContainer title={modalDetails.title} footer={submitModalButtons(setshowDeleteModal, submit_task)} close={closeModal} content={"Are you sure you want to "+ modalDetails.task+" the task ?"} modalClass=" modal-sm" />:null} 
+            {showDeleteModal?
+                <ModalContainer 
+                    title={modalDetails.title} 
+                    footer={submitModalButtons(setshowDeleteModal, submit_task, resetData, setCheckAddUsers)} 
+                    close={closeModal} 
+                    content={
+                        <div>
+                            <span>Are you sure you want to {modalDetails.task} the task ?</span>
+                            <p className="checkbox-addRecp" >
+                                <input value={checkAddUsers}  onChange={()=>{fetchSelectRecipientsData()}} type="checkbox" title="Notify Additional Users" className="checkAddUsers"/>
+                                <span >Notify Additional Users</span>
+                            </p>
+                            <div className='exe-select-recpients'>
+                                <div>
+                                    <span className="leftControl" title="Token Name">Select Recipients</span>
+                                    <SelectRecipients recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
+                                </div>
+                            </div>
+                        </div>
+                    } 
+                    /
+                >
+            :null} 
             { showIntegrationModal ? 
                 <IntegrationDropDown
                     setshowModal={setShowIntegrationModal} 
@@ -337,11 +403,11 @@ const SelectBrowserCheck = (appType,browserTypeExe,displayError,execAction)=>{
     return false;
 }
 
-const submitModalButtons = (setshowDeleteModal, submit_task) => {
+const submitModalButtons = (setshowDeleteModal, submit_task, resetData, setCheckAddUsers) => {
     return(
         <div>
-            <button onClick={()=>{setshowDeleteModal(false);submit_task()}} type="button" className="e__modal_button" >Yes</button>
-            <button type="button" onClick={()=>{setshowDeleteModal(false);}} >No</button>
+            <button onClick={()=>{setshowDeleteModal(false);submit_task();setCheckAddUsers(false)}} type="button" className="e__modal_button" >Yes</button>
+            <button type="button" onClick={()=>{setshowDeleteModal(false);resetData()}} >No</button>
         </div>
     )
 }

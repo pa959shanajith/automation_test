@@ -65,7 +65,7 @@ export const updateTestSuite_ICE = async(batchDetails) => {
   api returns string ex. "inprogress"
 */
 
-export const reviewTask = async(projectId,taskId,taskstatus,version,batchTaskIDs) => { 
+export const reviewTask = async(projectId,taskId,taskstatus,version,batchTaskIDs, nodeid, taskname, groupids, additionalrecepients) => { 
     try{
         const res = await axios(url+'/reviewTask', {
             method: 'POST',
@@ -77,7 +77,12 @@ export const reviewTask = async(projectId,taskId,taskstatus,version,batchTaskIDs
 				taskId:taskId,
 				status:taskstatus,
 				versionnumber:version,
-				batchIds:batchTaskIDs},
+				batchIds:batchTaskIDs,
+                nodeid:nodeid,
+                taskname: taskname,
+                extragroups:groupids,
+                extrausers:additionalrecepients
+            },
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -327,7 +332,7 @@ export const loginZephyrServer_ICE = async(zephyrURL,zephyrUserName,zephyrPasswo
                 zephyrUserName: zephyrUserName,
                 zephyrPassword : zephyrPassword,
                 integrationType : integrationType,
-                zephyraction: "project"
+                zephyraction: "login"
             },
             credentials: 'include'
         });
