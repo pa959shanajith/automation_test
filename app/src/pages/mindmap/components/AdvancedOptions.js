@@ -29,11 +29,14 @@ const AdvancedOptions = (props) => {
     const [oldRules,setOldRules] = useState([])
     const [deleteRules, setDeleteRules] = useState([])
     const [updateRules, setUpdateRules] = useState({})
-    const [newRules, setNewRules] = useState([{ruleType: "", inputType: "", groupids:[], additionalrecepients:[] }]);
+    const [newRules, setNewRules] = useState([]);
     const prop ={scenarioid,scenarioExec,setShowAdvOption,priority,error,setError,updateRules,setUpdateRules,deleteRules,setDeleteRules,mindmapid,newRules,setNewRules,oldRules,setOldRules,setModal,rules,setRules,inputOptions,groupList,setGroupList,allUsers,setAllUsers,executionScreen,displayError,setBlockui}
     
     useEffect(()=>{
-        if(executionScreen)clickAdvancedOption()
+        if(executionScreen){
+            clickAdvancedOption();
+            setNewRules([{ruleType: "", inputType: "", groupids:[], additionalrecepients:[] }])
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[executionScreen])
 
@@ -375,7 +378,7 @@ const resetData = ({setError,setOldRules,setRules,setGroupList,setAllUsers,setNe
     setRules([])
     setGroupList([])
     setAllUsers([])
-    setNewRules([{ruleType: "", inputType: "", groupids:[], additionalrecepients:[] }])
+    setNewRules([])
     setUpdateRules({})
     setDeleteRules([])
     setError([])
