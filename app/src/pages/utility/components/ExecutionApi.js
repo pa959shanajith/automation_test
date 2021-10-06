@@ -4,13 +4,14 @@ import GitInfo from './GitInfo';
 import BatchInfo from './BatchInfo'
 
 import classes from '../styles/ExecutionApi.module.scss';
+import MultiSelectDropdown from '../../global/components/MultiSelectDropdown';
 
 const source = "api";
 const ExecutionApi = props => {
     const [execMod, setExecMod] = useState("serial");
     const [execEnv, setExecEnv] = useState("default");
     const [info, setInfo] = useState("batchInfo");
-    const [browser, setBrowser] = useState(1);
+    const [browser, setBrowser] = useState([]);
     const [integration, setIntegration] = useState(-1);
     const [gitInfo, setGitInfo] = useState({});
     const [batchInfo, setBatchInfo] = useState(undefined);
@@ -67,13 +68,7 @@ const ExecutionApi = props => {
             </label>
         </div>
         <span  className={classes["exec-api__inputLabel"]}>Select Browser</span>
-        <select data-test="browser-test" className={classes["exec-api__select"]} value={browser} onChange={(event) => { setBrowser(event.target.value) }}>
-            <option key={0} value="1">Google Chrome</option>
-            <option key={1} value="2">Mozilla Firefox</option>
-            <option key={2} value="3">Internet Explorer</option>
-            <option  key={3} value="7">Microsoft Edge</option>
-            <option  key={4} value="8">Edge Chromium</option>
-        </select>
+        <MultiSelectDropdown data={browser} setData={setBrowser} inputPlaceholder={"Browser Selected"} dropdownOptions={dropdownOptions} />
         <span className={classes["exec-api__inputLabel"]}>Integration</span>
         <select data-test="integ-test" className={classes["exec-api__select"]} value={integration} onChange={(event) => { setIntegration(event.target.value) }}>
             <option disabled={true} key={-1} value="-1">Select Integration</option>
@@ -100,5 +95,13 @@ const ExecutionApi = props => {
         {info === "batchInfo" ? <BatchInfo setBatch = {setBatchInfo} /> : null}
     </>);
 }
+
+const dropdownOptions = [{title:"Google Chrome", value:"1", text:"Google Chrome"},
+                          {title:"Mozilla Firefox", value:"2", text:"Mozilla Firefox"},
+                          {title:"Internet Explorer", value:"3", text:"Internet Explorer"},
+                          {title:"Microsoft Edge", value:"7", text:"Microsoft Edge"},
+                          {title:"Edge Chromium", value:"8", text:"Edge Chromium"}
+                        ]
+
 
 export default ExecutionApi;
