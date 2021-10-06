@@ -1,11 +1,12 @@
-import React,{Fragment, useState, useCallback } from 'react';
+import React,{Fragment, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import * as api from '../api.js';
 import MappingPage from '../containers/MappingPage';
-import { Messages as MSG, setMsg, ScrollBar, ModalContainer } from '../../global';
+import { Messages as MSG, setMsg } from '../../global';
 import { RedirectPage } from '../../global/index.js';
 import CycleNode from './ZephyrTree';
+import UpdateMapPopup from './UpdateMapPopup';
 import * as actionTypes from '../state/action';
 import "../styles/TestList.scss"
 
@@ -18,6 +19,7 @@ const ZephyrUpdateContent = props => {
     const viewMappedFlies = useSelector(state=>state.integration.mappedScreenType);
 
     const [showErrorModal,setShowErrorModal]=useState(false);
+    const [updateList, setUpdateList]=useState([]);
     const [errorList,setErrorList]=useState([]);
     const [warningList,setWarningList]=useState([]);
     const [projectDropdn1 , setProjectDropdn1]= useState("Select Project");
@@ -43,6 +45,7 @@ const ZephyrUpdateContent = props => {
         setSelectedRel("Select Release");
         setProjectDetails({});
         setProjectDetails1({});
+        setRootCheck(false);
         dispatch({
             type: actionTypes.UPDATE_MAP_PAYLOAD, 
             payload: {
@@ -70,19 +73,20 @@ const ZephyrUpdateContent = props => {
             } else if (updateMapPayload['selectedPhase'] === undefined) {
                 setMsg(MSG.INTEGRATION.ERR_EMPTY_PH);
             } else {
-        
                 const response = await api.zephyrUpdateMapping(updateMapPayload, rootCheck);
-                
                 if (response === "unavailableLocalServer")
                     setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
-                else if(response.error.length>0 || response.warning.length>0) {
-                    setShowErrorModal(true); 
+                else if(response.error.length>0 || response.warning.length>0 || response.update.length>0) {
+                    setUpdateList(response.update);
                     setErrorList(response.error);
                     setWarningList(response.warning);
-                }
-                else if(response.error.length===0 && response.warning.length===0) {
-                    setMsg(MSG.INTEGRATION.UPDATE_SAVE)
-                    clearSelections();
+                    if(response.update.length>0) {
+                        if(response.error.length>0 || response.warning.length>0) setMsg(MSG.INTEGRATION.WARN_UPDATE_MULTI_MATCH);
+                        else setMsg(MSG.INTEGRATION.UPDATE_SAVE);
+                    } else if(response.error.length>0 || response.warning.length>0) {
+                        setMsg(MSG.INTEGRATION.ERR_UPDATE_NOT_FOUND);
+                    }
+                    setShowErrorModal(true); 
                 }
                 else setMsg(MSG.INTEGRATION.ERR_UPDATE_MAP);
             }
@@ -121,7 +125,6 @@ const ZephyrUpdateContent = props => {
                 setSelectedRel1("Select Release");
                 setReleaseArr1(releaseData);
             }
-            //clearSelections();
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
@@ -150,13 +153,12 @@ const ZephyrUpdateContent = props => {
             if(dropdn === "1") { 
                 setSelectedRel(releaseId); 
                 setProjectDetails(testAndScenarioData.project_dets);
+                setCycleCount({check:0,cycles:testAndScenarioData.project_dets});
             }
             if(dropdn === "2") { 
                 setSelectedRel1(releaseId); 
                 setProjectDetails1(testAndScenarioData.project_dets);
             }
-            setCycleCount({check:0,cycles:testAndScenarioData.project_dets});
-            // clearSelections();
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
@@ -165,45 +167,40 @@ const ZephyrUpdateContent = props => {
         var checkVal = cycleCount.check;
         var cycleVal = cycleCount.cycles;
         var cycles = event.target.parentNode.parentNode.parentNode.children
-        if(rootCheck === false) {
+        cycles = document.querySelectorAll('.mp-cycles');
+        if(!rootCheck) {
             setRootCheck(true);
             //cycles- 1 to end
-            for (var i=1; i<cycles.length; ++i) {
+            for (var i=0; i<cycles.length; ++i) {
                 //cycle
-                cycles[i].children[0].children[0].children[0].checked = true
+                cycles[i].checked = true;
                 checkVal += 1;
                 //phases
-                if(cycles[i].children.length>1) {
-                    var phases = cycles[i].children[1].children
-                    for(var j=0;j<phases.length;++j) {
-                        phases[j].children[0].children[0].children[0].checked = true
-                        if(phases[j].children.length > 1) {
-                            var testcases = phases[j].children[1].children
-                            for(var k=0;k<testcases.length;++k) {
-                                testcases[k].children[0].children[0].checked = true;
-                            }
-                        }
+                var phases = cycles[i].closest('.int__cycleNode').querySelectorAll('.mp-phases');
+                for(var j=0;j<phases.length;++j) {
+                    phases[j].checked = true;
+                    //tcs
+                    var testcases = phases[j].closest('.int__phaseNode').querySelectorAll('.mp-tcs');
+                    for(var k=0;k<testcases.length;++k) {
+                        testcases[k].checked = true;
                     }
                 }
             }
         } else {
             setRootCheck(false);
             //cycles- 1 to end
-            for (var i=1; i<cycles.length; ++i) {
+            for (var i=0; i<cycles.length; ++i) {
                 //cycle
-                cycles[i].children[0].children[0].children[0].checked = false
+                cycles[i].checked = false;
                 checkVal -= 1;
                 //phases
-                if(cycles[i].children.length>1) {
-                    var phases = cycles[i].children[1].children
-                    for(var j=0;j<phases.length;++j) {
-                        phases[j].children[0].children[0].children[0].checked = false
-                        if(phases[j].children.length > 1) {
-                            var testcases = phases[j].children[1].children
-                            for(var k=0;k<testcases.length;++k) {
-                                testcases[k].children[0].children[0].checked = false;
-                            }
-                        }
+                var phases = cycles[i].closest('.int__cycleNode').querySelectorAll('.mp-phases');
+                for(var j=0;j<phases.length;++j) {
+                    phases[j].checked = false;
+                    //tcs
+                    var testcases = phases[j].closest('.int__phaseNode').querySelectorAll('.mp-tcs');
+                    for(var k=0;k<testcases.length;++k) {
+                        testcases[k].checked = false;
                     }
                 }
             }
@@ -275,8 +272,9 @@ const ZephyrUpdateContent = props => {
                                 <span className="sp_label"><label className="test_label">Root</label></span>
                             </div>
                             { Object.keys(projectDetails)
-                                .map( cycleName => <CycleNode 
-                                        key={cycleName}
+                                .map( (cycleName, idx) => <CycleNode 
+                                        key={`${cycleName}-${idx}`}
+                                        id={idx}
                                         phaseList={projectDetails[cycleName]} 
                                         cycleName={cycleName}
                                         projectId={projectDropdn1}
@@ -324,24 +322,12 @@ const ZephyrUpdateContent = props => {
             />
         }
         {showErrorModal?
-                <ModalContainer 
-                title="Update Mapping"  
-                close={()=>{clearSelections()}} 
-                content= {<><div className="ss__dup_labels">
-                    {errorList.length>0 && <><span>No match found for following test cases:</span>
-                    <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
-                        <div className="ss__dup_scroll">
-                        { errorList.map((custname, i) => <span key={i} className="ss__err_li">{custname}</span>) }
-                        </div>
-                    </ScrollBar></> }
-                    {warningList.length>0 && <><span>Multiple matches exists for following testcases:</span>
-                       <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
-                        <div className="ss__dup_scroll">
-                        { warningList.map((custname, i) => <span key={i} className="ss__warning_li">{custname}</span>) }
-                        </div>
-                    </ScrollBar></>}
-                </div> </>}
-                modalClass=" modal-sm" />
+            <UpdateMapPopup
+                updateList={updateList}
+                errorList={errorList}
+                warningList={warningList}
+                clearSelections={clearSelections}
+            />
             :null} 
         </>
     )
