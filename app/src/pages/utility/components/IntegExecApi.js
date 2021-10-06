@@ -46,7 +46,7 @@ const IntegExecApi = props => {
         <input type="password" className={classes["r-api__input"] + " " + (error.password === true ? classes["r-api__inputError"] : "")} placeholder="Enter Password" value={password} onChange={(e) => { setPassword(e.target.value) }} />
         { props.type === "qtest" ?
             <>
-                <span className={classes["r-api__inputLabel"]} >Q Test Steps<span className={classes["r-api__mandate"]}>*</span></span>
+                <span className={classes["r-api__inputLabel"]} >Q Test Steps</span>
                 <input className={classes["r-api__input"] + " " + (error.qteststeps === true ? classes["r-api__inputError"] : "")} placeholder="Enter Q Test Steps" value={testSteps} onChange={(e) => { setTestSteps(e.target.value) }} />
             </>
             : null}

@@ -154,7 +154,7 @@ const ApiUtils = props => {
     return (<>
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-                Api Utils
+                API Util
             </span>
         </div>
         <div className={classes["api-ut__btnGroup"]}>
@@ -166,11 +166,11 @@ const ApiUtils = props => {
         <div className={classes["api-ut__con"]} id="apiUtilCon">
             <ScrollBar thumbColor="#929397" scrollId="apiUtilCon">
                 <div className={classes["api-ut__inputGroup"]}>
-                    <span className={classes["api-ut__inputLabel"]}>API<span className={classes["api-ut__mandate"]}>*</span></span>
+                    <span className={classes["api-ut__inputLabel"]}>API Names<span className={classes["api-ut__mandate"]}>*</span></span>
                     <select data-test="api-select-test" value={api} className={classes["api-ut__select"]} onChange={(event) => { setApi(event.target.value) }}>
-                        <option key={0} value="Execution">/Execution</option>
-                        <option key={1} value="Report">/Report</option>
-                        <option key={2} value="Execution Metrics">/Execution Metrics</option>
+                        <option key={0} value="Execution">/ExecuteTestSuite_ICE_SVN</option>
+                        <option key={1} value="Report">/getReport_API</option>
+                        <option key={2} value="Execution Metrics">/getExecution_metrics_API</option>
                     </select>
                     {api === "Execution" ? <ExecutionApi setResult={setRequest} error={error} /> : null}
                     {api === "Report" ? <ReportApi setResult={setRequest} error={error} /> : null}

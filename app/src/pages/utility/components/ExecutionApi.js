@@ -9,7 +9,7 @@ const source = "api";
 const ExecutionApi = props => {
     const [execMod, setExecMod] = useState("serial");
     const [execEnv, setExecEnv] = useState("default");
-    const [info, setInfo] = useState("gitInfo");
+    const [info, setInfo] = useState("batchInfo");
     const [browser, setBrowser] = useState(1);
     const [integration, setIntegration] = useState(-1);
     const [gitInfo, setGitInfo] = useState({});
@@ -44,7 +44,7 @@ const ExecutionApi = props => {
         }
     }, [execMod, execEnv, browser, gitInfo, integInfo, integration, batchInfo, info, setResult])
     return (<>
-        <span className={classes["exec-api__inputLabel"]} >Execution Mode<span className={classes["exec-api__mandate"]}>*</span></span>
+        <span className={classes["exec-api__inputLabel"]} >Execution Mode</span>
         <div className={classes["exec-api__FormGroup"]}>
             <label className="exec-api__FormRadio">
                 <input data-test="exec-mode-test" type="radio" value="serial" checked={execMod === "serial"} name="ExecutionMode" onChange={(event)=>{setExecMod(event.target.value)}} />
@@ -55,7 +55,7 @@ const ExecutionApi = props => {
                 <span>Parallel</span>
             </label>
         </div>
-        <span className={classes["exec-api__inputLabel"]} >Execution Environment<span className={classes["exec-api__mandate"]}>*</span></span>
+        <span className={classes["exec-api__inputLabel"]} >Execution Environment</span>
         <div className={classes["exec-api__FormGroup"]}>
             <label>
                 <input type="radio" value="default" data-test="exec-env-test" name="ExecutionEnv" checked={execEnv === "default"} onChange={(event)=>{setExecEnv(event.target.value)}}/>
@@ -66,7 +66,7 @@ const ExecutionApi = props => {
                 <span>Sauce Lab</span>
             </label>
         </div>
-        <span  className={classes["exec-api__inputLabel"]}>Select Browser<span className={classes["exec-api__mandate"]}>*</span></span>
+        <span  className={classes["exec-api__inputLabel"]}>Select Browser</span>
         <select data-test="browser-test" className={classes["exec-api__select"]} value={browser} onChange={(event) => { setBrowser(event.target.value) }}>
             <option key={0} value="1">Google Chrome</option>
             <option key={1} value="2">Mozilla Firefox</option>
@@ -85,15 +85,15 @@ const ExecutionApi = props => {
         {integration === "alm" ? <IntegExecApi error={error.integration} setInteg = {setIntegInfo} type = {integration} /> : null}
         {integration === "qtest" ? <IntegExecApi error={error.integration} setInteg = {setIntegInfo} type = {integration} /> : null}
         {integration === "zephyr" ? <IntegExecApi error={error.integration} setInteg = {setIntegInfo} type = {integration} /> : null}
-        <span className={classes["exec-api__inputLabel"]} >Info<span className={classes["exec-api__mandate"]}>*</span></span>
+        <span className={classes["exec-api__inputLabel"]} >Info</span>
         <div className={classes["exec-api__FormGroup"]}>
-            <label>
-                <input data-test="info-test" type="radio" value="gitInfo" name="gitInfo" checked={info === "gitInfo"} onChange={(event)=>{setInfo(event.target.value)}}/>
-                <span>Git Info</span>
-            </label>
             <label>
                 <input type="radio" data-test="info-test" value="batchInfo" name="batchInfo" checked={info === "batchInfo"} onChange={(event)=>{setInfo(event.target.value)}} />
                 <span>Batch Info</span>
+            </label>
+            <label>
+                <input data-test="info-test" type="radio" value="gitInfo" name="gitInfo" checked={info === "gitInfo"} onChange={(event)=>{setInfo(event.target.value)}}/>
+                <span>Git Info</span>
             </label>
         </div>
         {info === "gitInfo" ? <GitInfo setGit = {setGitInfo} error = {error.gitInfo} /> : null}
