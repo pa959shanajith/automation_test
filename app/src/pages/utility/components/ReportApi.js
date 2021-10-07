@@ -9,7 +9,13 @@ const ReportApi = props => {
     const [scenarioID, setScenarioID] = useState([]);
     const error = props.error;
     const resetReqData = props.resetReqData;
+    const reset = props.reset;
 
+    useEffect(() => {
+        setExecutionID("");
+        setScenario("");
+        setScenarioID([]);
+    }, [reset])
     useEffect(() => {
         props.setResult(() => {
             return {

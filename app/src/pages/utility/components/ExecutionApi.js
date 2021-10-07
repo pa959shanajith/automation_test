@@ -124,8 +124,8 @@ const ExecutionApi = props => {
                 <span>Git Info</span>
             </label>
         </div>
-        {info === "gitInfo" ? <GitInfo setGit = {setGitInfo} error = {error.gitInfo} resetReqData={resetReqData} /> : null}
-        {info === "batchInfo" ? <BatchInfo setBatch = {setBatchInfo} resetReqData={resetReqData}  error = {error.batchInfo}/> : null}
+        {info === "gitInfo" ? <GitInfo reset={reset} setGit = {setGitInfo} error = {error.gitInfo} resetReqData={resetReqData} /> : null}
+        {info === "batchInfo" ? <BatchInfo reset={reset} setBatch = {setBatchInfo} resetReqData={resetReqData}  error = {error.batchInfo}/> : null}
     </>);
 }
 

@@ -11,6 +11,11 @@ const GitInfo = props => {
     const setGit = props.setGit
     const error = props.error;
     const resetReqData = props.resetReqData;
+    const reset = props.reset;
+    useEffect(()=>{
+        setGit({})
+    }, [reset])
+
     useEffect(()=>{
         setGit({
             gitConfiguration: config.trim(),
@@ -18,7 +23,7 @@ const GitInfo = props => {
             folderPath: path.trim(),
             gitVersion: version.trim()
         })
-    }, [config, branch, path, version])
+    }, [reset])
 
 
     return (<>

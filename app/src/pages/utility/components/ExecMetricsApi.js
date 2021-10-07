@@ -10,7 +10,14 @@ const ExecMetricsApi = props => {
     const [executionId, setExecutionId] = useState("");
     const error = props.error;
     const resetReqData = props.resetReqData;
-    
+    const reset = props.reset
+    useEffect(()=>{
+        setFromDate("");
+        setToDate("");
+        setLob("");
+        setStatus("");
+        setExecutionId("");
+    }, [reset])
     useEffect(()=>{
         props.setResult({
             metrics_data:{

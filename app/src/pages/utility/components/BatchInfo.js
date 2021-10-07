@@ -8,6 +8,7 @@ const BatchInfo = props => {
     const [batchInfo, setBatchInfo] = useState("");
     const setBatch = props.setBatch;
     const resetReqData = props.resetReqData;
+    const reset = props.reset;
     const [error, setError] = useState(false);
     useEffect(() => {
         setError(false);
@@ -25,6 +26,10 @@ const BatchInfo = props => {
             setError(true);
         }
     }, [batchInfo])
+
+    useEffect(() => {
+        setBatchInfo("")
+    }, [reset])
 
     const onChangeBatchInfo = (e) => {
         setBatchInfo(e.target.value);
