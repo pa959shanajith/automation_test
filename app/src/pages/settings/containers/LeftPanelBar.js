@@ -27,7 +27,7 @@ const LeftPanelBar = (props) => {
 						<span><span className={`${classes.fa} fa fa-tags ${props.middleScreen === "tokenTab" ? classes["selected-icon"] : ""}`} ></span></span><div>Tokens</div></i></li>
 					<li><i id='provisionTab' title="Manage Provision" onClick={() => { props.setMiddleScreen("provisionTa"); resetScreen("provisionTa") }} className={classes["selectBrowser"]}>
 						<span><span className={`${classes.fa} fa fa-cogs ${props.middleScreen === "provisionTa" ? classes["selected-icon"] : ""}`} ></span></span><div>ICE Provision</div></i></li>
-					<li><i id='projectTab' title="Create/Update Project" onClick={() => { props.setMiddleScreen("projectTab"); resetScreen("projectTab") }} className={classes["selectBrowser"]}>
+					<li><i id='projectTab' title="View Assigned Project" onClick={() => { props.setMiddleScreen("projectTab"); resetScreen("projectTab") }} className={classes["selectBrowser"]}>
 						<span><span className={`${classes.fa} fa fa-briefcase ${props.middleScreen === "projectTab" ? classes["selected-icon"] : ""}`} ></span></span><div>Project</div></i></li>
 					<li><i id='gitConfigure' title="Manage Git Configuration" onClick={() => { props.setMiddleScreen("gitConfigure"); resetScreen("gitConfigure") }} className={classes["selectBrowser"]} >
 						<span><img style={{ height: '47px' }} src={"static/imgs/GitIcon.png"} alt={"Create Git Configuration"} className={((props.middleScreen === "gitConfigure") ? ` ${classes["selected-icon"]}` : "")} ></img></span><div>Git Configuration</div></i></li>

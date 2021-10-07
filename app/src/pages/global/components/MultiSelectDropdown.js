@@ -9,9 +9,10 @@ import '../styles/MultiSelectDropdown.scss'
         setData: function, 
         inputPlaceholder: string for input field,
         dropdownOptions: options of dropdown (array of objects) 
+        reset: function to reset
 */
 
-const MultiSelectDropdown = ({data,setData,inputPlaceholder,dropdownOptions}) => {
+const MultiSelectDropdown = ({data,setData,inputPlaceholder,dropdownOptions,reset}) => {
     const inputRef = useRef()
     const [dropDown,setDropDown] = useState(false)
     useEffect(()=>{
@@ -29,6 +30,7 @@ const MultiSelectDropdown = ({data,setData,inputPlaceholder,dropdownOptions}) =>
         inputRef.current.value = ((updateData.length!==0)?updateData.length+" ":"") + inputPlaceholder
         event.currentTarget.getElementsByTagName('input')[0].checked = !event.currentTarget.getElementsByTagName('input')[0].checked
         setData(updateData);
+        if (reset) reset();
     }
 
     const selectOptionCheckBox = (value) => document.getElementById(value).checked = !document.getElementById(value).checked
