@@ -17,9 +17,10 @@ const IceProvisionList = (props) => {
 	const [icelistModify, setIcelistModify] = useState(props.icelist)
 	const [showList, setShowList] = useState(false)
 	const [allActiveIce, setAllActiveIce] = useState([])
-	const [defaultICE, setDefaultICE] = useState('')
 	const [doFetchICE, setDoFetchICE] = useState(false);
 	const isUsrSetting = props.userConfig //for user settings
+	const defaultICE = props.defaultICE
+	const setDefaultICE = props.setDefaultICE
     
 	useEffect(() => {
 		setDoFetchICE(true);
