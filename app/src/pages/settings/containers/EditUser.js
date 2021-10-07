@@ -166,8 +166,8 @@ const EditUser = (props) => {
                         onChange={(event) => { setEmail(event.target.value) }} />
                 </div>
                 <div className={`col-xs-9 ${classes["form-group"]}`}>
-                    <label htmlFor="email">Change Password</label>
                     <input onChange={()=>{setChangePass(!changePass)}} value={changePass} type='checkbox' className={`${classes["changePass__checkbox"]}  `}></input>
+                    <label htmlFor="email">Change Password</label>
                 </div>
                 <div className={`col-xs-9 ${classes["form-group"]}`} >
                     <label htmlFor="present_password">Old Password</label>

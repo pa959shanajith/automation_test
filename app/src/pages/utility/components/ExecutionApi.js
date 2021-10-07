@@ -113,7 +113,7 @@ const ExecutionApi = props => {
         {integration === "alm" ? <IntegExecApi error={error.integration} setInteg = {setIntegInfo} type = {integration} resetReqData={resetReqData} /> : null}
         {integration === "qtest" ? <IntegExecApi error={error.integration} setInteg = {setIntegInfo} type = {integration} resetReqData={resetReqData} /> : null}
         {integration === "zephyr" ? <IntegExecApi error={error.integration} setInteg = {setIntegInfo} type = {integration} resetReqData={resetReqData} /> : null}
-        <span className={classes["exec-api__inputLabel"]} >Info</span>
+        <span className={classes["exec-api__inputLabel"]} >Data Source</span>
         <div className={classes["exec-api__FormGroup"]}>
             <label>
                 <input type="radio" data-test="info-test" value="batchInfo" name="batchInfo" checked={info === "batchInfo"} onChange={(event)=>{setGitInfo({});setInfo(event.target.value);resetReqData();}} />
