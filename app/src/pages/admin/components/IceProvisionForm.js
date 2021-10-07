@@ -76,6 +76,7 @@ const IceProvisionForm = (props) => {
         setIcenameErrBorder(false);
         setSelAssignUser2ErrBorder(false);
 		props.setToken("Click on Provision/Reregister to generate token");
+		if(props.userConfig) props.setToken("Click on Reprovision/Reregister to generate token");
 		props.setIcename("");
 		props.setUserid(" ");
 		if (props.op === "normal" && !isUsrSetting) {

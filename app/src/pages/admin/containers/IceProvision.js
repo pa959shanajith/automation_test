@@ -34,6 +34,7 @@ const IceProvision = (props) => {
       if(props.userConfig){
         setOp("normal");
         setUserid(props.userID);
+        setToken("Click on Reprovision/Reregister to generate token")
       }
     },[props.userConfig,props.userID])
 
