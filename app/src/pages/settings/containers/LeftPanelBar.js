@@ -21,6 +21,7 @@ const LeftPanelBar = (props) => {
 		<ActionBar  >
 			<div id="left-section-settings" className={classes['left-section-div']}>
 				<ul>
+					<li><span><i id='managePanel' className='scrapeOnTxt'>Manage</i></span></li>
 					<li><i id='userTab' title="Edit User Data" onClick={() => { props.setMiddleScreen("editUser"); resetScreen("editUser") }} className={classes["selectBrowser"]}>
 						<span><span className={`${classes.fa} fa fa-user ${props.middleScreen === "editUser" ? classes["selected-icon"] : ""}`}  ></span></span><div>Edit User</div></i></li>
 					<li><i id='tokenTab' title="Manage Tokens" onClick={() => { props.setMiddleScreen("tokenTab"); resetScreen("tokenTab") }} className="selectBrowser" >
