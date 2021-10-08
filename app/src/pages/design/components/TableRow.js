@@ -42,6 +42,7 @@ const TableRow = (props) => {
     const [tcAppType, setTcAppType] = useState("");
     const [disableStep, setDisableStep] = useState(false);
     let objList = props.objList;
+    let draggable = props.draggable;
     
     
     useEffect(()=>{
@@ -205,7 +206,7 @@ const TableRow = (props) => {
                     { focused ? ['getBody', 'setHeader', 'setWholeBody', 'setHeaderTemplate'].includes(keyword) ? 
                                     <textarea className="col_inp col_inp_area" value={input} onChange={onInputChange} title={inputPlaceholder} disabled={disableStep}/> : 
                                     <input className="col_inp" value={input} placeholder={inputPlaceholder} onChange={onInputChange} onKeyDown={submitChanges} title={inputPlaceholder} disabled={disableStep}/> :
-                        <div className="d__row_text" title={input}>{input}</div> }
+                        <div className="d__row_text" title={input}>{draggable ? (input.length > 40 ? input.substr(0, 34) + "......" : input) : input}</div> }
                 </span>
                 <span className="output_col" >
                     { focused ? <input className="col_inp" value={output} placeholder={outputPlaceholder} onChange={onOutputChange} onKeyDown={submitChanges} title={outputPlaceholder} disabled={disableStep}/> :

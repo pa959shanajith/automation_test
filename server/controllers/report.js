@@ -290,10 +290,10 @@ const prepareReportData = (reportData, embedImages) => {
     const passPercent = parseFloat(100 * pass / total).toFixed(2);
     const failPercent = parseFloat(100 * fail / total).toFixed(2);
     const termPercent = parseFloat(100 * terminated / total).toFixed(2);
-    report.overallstatus[0].pass = passPercent > 0 ? passPercent : 0;
-    report.overallstatus[0].fail = failPercent > 0 ? failPercent : 0;
+    report.overallstatus[0].pass = passPercent > 0 ? passPercent : "0.00";
+    report.overallstatus[0].fail = failPercent > 0 ? failPercent : "0.00";
     if(pass > 0 && fail > 0) report.overallstatus[0].terminate = (100 - failPercent - passPercent).toFixed(2);
-    else report.overallstatus[0].terminate = termPercent > 0 ? termPercent : 0;
+    else report.overallstatus[0].terminate = termPercent > 0 ? termPercent : "0.00";
     report.remarksLength = remarksLength;
     report.commentsLength = commentsLength;
     return { report, scrShots };
@@ -881,7 +881,7 @@ exports.getExecution_metrics = async(req, res) => {
                 return res.send('NoRecords');
             } else {
                 var data=reportResult[0].rows;
-                var dir = './../../excel';
+                var dir = './../../output';
                 var excelDirPath = path.join(__dirname, dir);
                 const filePath = path.join(excelDirPath, 'samp234.csv');
                 try {

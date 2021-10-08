@@ -265,7 +265,7 @@ exports.zephyrMappedTestcaseDetails_ICE = async (req, res) => {
 };
 
 exports.zephyrUpdateMapping = async (req, res) => {
-	logger.info("Inside UI service: zephyrMappedTestcaseDetails_ICE");
+	logger.info("Inside UI service: zephyrUpdateMapping");
 	var mappedTestIds = [];
 	var mappedTestNames = [];
 	var mappedList = {};
@@ -302,7 +302,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 								"query": "zephyrdetails"
 							};
 						}
-						mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrMappedCyclePhase");
+						mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrUpdateMapping");
 						if (mappedDets == "fail") res.send('fail');
 						for(var j=0;j<mappedDets.length;++j) {
 							mappedTestIds.push(parseInt(mappedDets[j].testid));
@@ -317,7 +317,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 					"releaseId": releaseId,
 					"query": "zephyrdetails"
 				};
-				mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrMappedCyclePhase");
+				mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrUpdateMapping");
 				if (mappedDets == "fail") res.send('fail');
 				for(var i=0;i<mappedDets.length;++i) {
 					mappedTestIds.push(parseInt(mappedDets[i].testid));
@@ -326,7 +326,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 				}
 			}
 		}  catch (exception) {
-			logger.error("Error occurred in zephyr/zephyrMappedCyclePhase:", exception);
+			logger.error("Error occurred in zephyr/zephyrUpdateMapping:", exception);
 			res.send("fail");
 		}
 		var username = req.session.username;
@@ -364,9 +364,9 @@ exports.zephyrUpdateMapping = async (req, res) => {
 							}
 							const occurences = mappedTestNames.reduce(function (acc, curr) {
 								return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
-							  }, {});
+							}, {});
 							const occurences2 = testNames.reduce(function (acc, curr) {
-							return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+								return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
 							}, {});
 							//acc[curr] = (acc[curr] || 0) + 1
 							//match testcase names
@@ -408,7 +408,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 								}
 							}
 							var finalList = {warning:warningList,error:errorList,update:updateList}
-							res.send(finalList)
+							return res.send(finalList)
 						}
 					}
 				}
@@ -421,13 +421,13 @@ exports.zephyrUpdateMapping = async (req, res) => {
 						flag = "unavailableLocalServer";
 						logger.info("ICE Socket not Available");
 					}
-					res.send(flag);
+					return res.send(flag);
 				});
 			}
 		});
 	} catch (exception) {
 		logger.error(exception.message);
-		res.send("fail");
+		return res.send("fail");
 	}
 };
 
