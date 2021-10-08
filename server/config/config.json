@@ -15,7 +15,8 @@
     },
     "screenShotPath": {
         "default": "",
-        "mac": ""
+        "mac": "",
+        "linux": ""
     },
     "objectPredictionPath": {
         "default": "",
