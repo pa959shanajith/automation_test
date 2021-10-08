@@ -6,6 +6,7 @@ var utils = require('../lib/utils');
 var Handlebars = require('../lib/handlebar.js');
 var wkhtmltopdf = require('wkhtmltopdf');
 var fs = require('fs');
+var os = require('os');
 var options = require('../config/options');
 const Readable = require('stream').Readable;
 var path = require('path');
@@ -934,9 +935,24 @@ function validateData(content, type) {
 
 exports.downloadVideo = async (req, res) => {
     const fnName = "downloadVideo";
+    const osPf = os.platform();
+    const videoPathLinux = options.screenShotPath.linux;
+    logger.info("os platform is '%s'", osPf);
     logger.info("Inside UI service: " + fnName);
     try {
-        const videoPath = req.body.videoPath;
+        var videoPath = req.body.videoPath;
+        if (osPf == 'linux') {
+            if (videoPathLinux != ""){
+                /*Below logic is to manipulate or change the Video Path from windows to linux specific*/
+                logger.info("Requested video file path is '%s'", videoPath);
+                var ss_path = videoPath.split("Screenshots")[1];
+                var temp_videoPath = videoPathLinux.concat(ss_path);
+                videoPath = temp_videoPath.replace(/\\/g,"/");
+                logger.info("Final video file path is '%s'", videoPath);
+            } else {
+                logger.error("Please enter the value of linux for screenShotPath in config");
+            }
+        }
         if (fs.existsSync(videoPath)) {
             res.writeHead(200, {
                 'Content-Type': 'video/mp4',
