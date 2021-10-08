@@ -52,12 +52,12 @@ const CreateEmailGroup = (props) => {
         if(closePopup) email = emailRef.current.value 
         else email = e.currentTarget.innerText===""?emailRef.current.value:e.currentTarget.innerText;
         const emailRegex = /\S+@\S+\.\S+/;
-        if(newEmails.some((item)=>{return (item.name).toUpperCase()===email.toUpperCase()})) {
+        if(newEmails.some((item)=>{return (item.name).toUpperCase()===(email.trim()).toUpperCase()})) {
             setMsg(MSG.ADMIN.WARN_EMAIL_EXIST)   
             return true
         }
         if(emailRegex.test(email)){
-            newEmails.push({_id:`email-${newEmails.length}`,name:email}) 
+            newEmails.push({_id:`email-${newEmails.length}`,name:email.trim()}) 
             setNewEmail(newEmails);
             if(closePopup) setModal(false)
             return false;

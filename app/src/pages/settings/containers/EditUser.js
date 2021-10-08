@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import * as actionTypes from '../../login/state/action';
-import { ScrollBar, ScreenOverlay, Messages as MSG, setMsg } from '../../global'
+import { ScrollBar, ScreenOverlay, Messages as MSG, setMsg, VARIANT } from '../../global'
 import { manageUserDetails } from '../../admin/api'
 import { Header, FormInput } from '../components/AllFormComp'
 
@@ -28,6 +28,7 @@ const EditUser = (props) => {
     const [isNewPassword, setIsNewPassword] = useState(true);
     const [isNewConfirmPassword, setIsNewConfirmPassword] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [changePass,setChangePass] = useState(false);
 
     const click = () => {
         setPrevPassword("");
@@ -57,19 +58,19 @@ const EditUser = (props) => {
         if (!validate(lastName, "name", setIsLastName)) {
             check = false;
         }
-        if (!validate(newPassword, "password", setIsNewPassword)) {
+        if (changePass && !validate(newPassword, "password", setIsNewPassword)) {
             check = false;
         }
-        if (!validate(prevPassword, "password", setIsPrevPassword)) {
+        if (changePass && !validate(prevPassword, "password", setIsPrevPassword)) {
             check = false;
         }
-        if (!validate(newConfirmPassword, "password", setIsNewConfirmPassword)) {
+        if (changePass && !validate(newConfirmPassword, "password", setIsNewConfirmPassword)) {
             check = false;
         }
         if (!validate(email, "email", setIsEmail)) {
             check = false;
         }
-        if (check && newPassword !== newConfirmPassword) {
+        if (changePass && check && newPassword !== newConfirmPassword) {
             check = false;
             setIsNewPassword(false);
             setIsNewConfirmPassword(false);
@@ -83,8 +84,6 @@ const EditUser = (props) => {
         let userObj = {
             userid: userInfo['user_id'],
             username: userInfo.username,
-            password: newPassword,
-            currpassword: prevPassword,
             firstname: firstName,
             lastname: lastName,
             email: email,
@@ -92,6 +91,10 @@ const EditUser = (props) => {
             userConfig: true,//hardcoded only for inhouse
             type: 'inhouse' //hardcoded only for inhouse
         };
+        if(changePass) {
+            userObj.password = newPassword;
+            userObj.currpassword = prevPassword;
+        }
         (async () => {
             try {
                 var data = await manageUserDetails("update", userObj);
@@ -99,7 +102,29 @@ const EditUser = (props) => {
                 if (data === 'success') {
                     dispatch({type:actionTypes.SET_USERINFO, payload: { ...userInfo, ['email_id']: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname}})
                     setMsg(MSG.SETTINGS.SUCC_INFO_UPDATED);
-                    click();
+                    // click();
+                } else if(data === "exists") {
+                    setMsg(MSG.ADMIN.WARN_USER_EXIST);
+                } else if(data === "fail") {
+                    setMsg(MSG.CUSTOM("Failed to update user.",VARIANT.ERROR));
+                } 
+                else if(/^2[0-4]{8}$/.test(data)) {
+                    if (JSON.parse(JSON.stringify(data)[1])) {
+                        setMsg(MSG.CUSTOM("Failed to update user. Invalid Request!",VARIANT.ERROR));
+                        return;
+                    }
+                    var errfields = [];
+                    let hints = 'Hint:';
+                    if (JSON.parse(JSON.stringify(data)[2])) errfields.push("User Name");
+                    if (JSON.parse(JSON.stringify(data)[3])) errfields.push("First Name");
+                    if (JSON.parse(JSON.stringify(data)[4])) errfields.push("Last Name");
+                    if (JSON.parse(JSON.stringify(data)[5])) errfields.push("Password");
+                    if (JSON.parse(JSON.stringify(data)[6])) errfields.push("Email");
+                    if (JSON.parse(JSON.stringify(data)[7])) errfields.push("Authentication Server");
+                    if (JSON.parse(JSON.stringify(data)[8])) errfields.push("User Domain Name");
+                    if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+				    if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
+				    setMsg(MSG.CUSTOM("Following values are invalid: "+errfields.join(", ")+" "+hints,VARIANT.WARNING));
                 } else {
                     setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
                     click();
@@ -135,25 +160,29 @@ const EditUser = (props) => {
                     <FormInput data-test="last-name-test" type="text" className={`${classes["all-inputs"]} ${!isLastName ? classes["invalid"] : ""}`} placeholder="Last Name" value={lastName}
                         onChange={(event) => { setLastName(event.target.value) }} />
                 </div>
-                <div className={`col-xs-9 ${classes["form-group"]}`} >
-                    <label htmlFor="present_password">Old Password</label>
-                    <FormInput data-test="password-1-test" type="password" className={`${classes["all-inputs"]}   ${!isPrevPassword ? classes["invalid"] : ""}`} placeholder="Old Password" value={prevPassword}
-                        onChange={(event) => { setPrevPassword(event.target.value) }} />
-                </div>
-                <div className={`col-xs-9 ${classes["form-group"]}`} >
-                    <label htmlFor="new_password">New Password</label>
-                    <FormInput data-test="password-2-test" type="password" className={`${classes["all-inputs"]} ${!isNewPassword ? classes["invalid"] : ""}`} placeholder="New Password" value={newPassword}
-                        onChange={(event) => { setNewPassword(event.target.value) }} />
-                </div>
-                <div className={`col-xs-9 ${classes["form-group"]}`} >
-                    <label htmlFor="confirm_new_password">Confirm New Password</label>
-                    <FormInput data-test="password-3-test" type="password" className={`${classes['all-inputs']} ${!isNewConfirmPassword ? classes["invalid"] : ""}`} placeholder="Confirm New Password" value={newConfirmPassword}
-                        onChange={(event) => { setNewConfirmPassword(event.target.value) }} />
-                </div>
                 <div className={`col-xs-9 ${classes["form-group"]}`}>
                     <label htmlFor="email">Email</label>
                     <FormInput data-test="email-test" type="email" className={`${classes["all-inputs"]} ${!isEmail ? classes["invalid"] : ""}`} placeholder="Email Id" value={email}
                         onChange={(event) => { setEmail(event.target.value) }} />
+                </div>
+                <div className={`col-xs-9 ${classes["form-group"]}`}>
+                    <input onChange={()=>{setChangePass(!changePass)}} value={changePass} type='checkbox' className={`${classes["changePass__checkbox"]}  `}></input>
+                    <label htmlFor="email">Change Password</label>
+                </div>
+                <div className={`col-xs-9 ${classes["form-group"]}`} >
+                    <label htmlFor="present_password">Old Password</label>
+                    <FormInput data-test="password-1-test" type="password" className={`${classes["all-inputs"]} ${!changePass ? classes["disable-input"] : ""}  ${!isPrevPassword ? classes["invalid"] : ""}`} placeholder="Old Password" value={prevPassword}
+                        onChange={(event) => { setPrevPassword(event.target.value) }} />
+                </div>
+                <div className={`col-xs-9 ${classes["form-group"]}`} >
+                    <label htmlFor="new_password">New Password</label>
+                    <FormInput data-test="password-2-test" type="password" className={`${classes["all-inputs"]} ${!changePass ? classes["disable-input"] : ""} ${!isNewPassword ? classes["invalid"] : ""}`} placeholder="New Password" value={newPassword}
+                        onChange={(event) => { setNewPassword(event.target.value) }} />
+                </div>
+                <div className={`col-xs-9 ${classes["form-group"]}`} >
+                    <label htmlFor="confirm_new_password">Confirm New Password</label>
+                    <FormInput data-test="password-3-test" type="password" className={`${classes['all-inputs']} ${!changePass ? classes["disable-input"] : ""} ${!isNewConfirmPassword ? classes["invalid"] : ""}`} placeholder="Confirm New Password" value={newConfirmPassword}
+                        onChange={(event) => { setNewConfirmPassword(event.target.value) }} />
                 </div>
             </div>
         </form>

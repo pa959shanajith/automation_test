@@ -76,6 +76,7 @@ const IceProvisionForm = (props) => {
         setIcenameErrBorder(false);
         setSelAssignUser2ErrBorder(false);
 		props.setToken("Click on Provision/Reregister to generate token");
+		if(props.userConfig) props.setToken("Click on Reprovision/Reregister to generate token");
 		props.setIcename("");
 		props.setUserid(" ");
 		if (props.op === "normal" && !isUsrSetting) {
@@ -167,8 +168,11 @@ const IceProvisionForm = (props) => {
 					</label>
 				</div></div>}
                 <div className='adminControl-ip'><div>
-					<span className="leftControl-ip" title="ICE Name">ICE Name</span>
-					<input type="text" autoComplete="off" id="icename" name="icename" value={props.icename} onChange={(event)=>{updateIceName(event.target.value)}} maxLength="100" className={icenameErrBorder?"inputErrorBorder border_input-ip form-control-ip form-control-custom-ip":"border_input-ip form-control-ip form-control-custom-ip"} placeholder="ICE Name"/>
+					<span className="leftControl-ip" title={isUsrSetting?"Default ICE" :"ICE Name"}>{isUsrSetting?"Default ICE" :"ICE Name"}</span>
+					{!isUsrSetting?
+						<input type="text" autoComplete="off" id="icename" name="icename" value={props.icename} onChange={(event)=>{updateIceName(event.target.value)}} maxLength="100" className={icenameErrBorder?"inputErrorBorder border_input-ip form-control-ip form-control-custom-ip":"border_input-ip form-control-ip form-control-custom-ip"} placeholder="ICE Name"/>
+						:<span>{props.defaultICE!==""?props.defaultICE:"No Default Ice"}</span>
+					}
 				</div></div>
                 {!isUsrSetting && <div data-test="user-test" className='userForm adminControl-ip' ><div>
 					<span className="leftControl-ip" title="User">User</span>

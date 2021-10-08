@@ -13,6 +13,7 @@ const ApiUtils = props => {
     const [downloadToolTip, setDownloadToolTip] = useState("Download Token");
     const [request, setRequest] = useState({});
     const [requestText, setRequestText] = useState("");
+    const [resetFields, setResetFields] = useState(true);
     const [error, setError] = useState({
         error: false,
         toDate: false,
@@ -21,7 +22,7 @@ const ApiUtils = props => {
         executionId: false,
         scenarioIds: false,
         source: false,
-        executionMode: false,
+        exectionMode: false,
         executionEnv: false,
         browserType: false,
         integration: {
@@ -49,6 +50,7 @@ const ApiUtils = props => {
             cycleId: false
         }
     });
+    const [integration, setIntegration] = useState(-1);
 
     useEffect(() => {
         setRequestText("");
@@ -60,7 +62,7 @@ const ApiUtils = props => {
             executionId: false,
             scenarioIds: false,
             source: false,
-            executionMode: false,
+            exectionMode: false,
             executionEnv: false,
             browserType: false,
             integration: {
@@ -133,48 +135,91 @@ const ApiUtils = props => {
         }, 1500);
     }
 
+    const resetReqData = () => {
+        setRequestText("");
+    }
+
     const handleSubmit = () => {
         try {
             if (api !== "Execution" && api !== "Report" && api !== "Execution Metrics") {
                 setMsg(MSG.UTILITY.ERR_SEL_API);
             }
-            let obj = validate(request, api);
+            let obj = validate(request, api, integration);
             setError(obj);
-            if (obj.error === true) {
-                setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
-                return;
-            }
+            if (obj.error === true)  return;
             setMsg(MSG.UTILITY.SUCC_REQ_BODY_GEN);
             setRequestText(JSON.stringify(request, undefined, 4));
         } catch (e) {
-            setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+            setMsg(MSG.UTILITY.ERR_GENERATE_RB);
         }
+    }
+
+    const handleSubmitReset = () => {
+        setResetFields(!resetFields);
+        setError({
+            error: false,
+            toDate: false,
+            fromDate: false,
+            LOB: false,
+            executionId: false,
+            scenarioIds: false,
+            source: false,
+            exectionMode: false,
+            executionEnv: false,
+            browserType: false,
+            integration: {
+                url: false,
+                username: false,
+                password: false,
+                qteststeps: false
+            },
+            gitInfo: {
+                gitConfiguration: false,
+                gitbranch: false,
+                folderPath: false,
+                gitVersion: false
+            },
+            batchInfo: {
+                testsuiteName: false,
+                testsuiteId: false,
+                versionNumber: false,
+                appType: false,
+                domainName: false,
+                projectName: false,
+                projectId: false,
+                releaseId: false,
+                cycleName: false,
+                cycleId: false
+            }
+        });
     }
 
     return (<>
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-                Api Utils
+                Request Body Generator
             </span>
         </div>
         <div className={classes["api-ut__btnGroup"]}>
+            <button data-test="submit-button-test" onClick={handleSubmitReset} >Reset</button>
             <button data-test="submit-button-test" onClick={handleSubmit} >Generate</button>
         </div>
+        
         <div className={classes["api-ut_contents"]}>
         <div className={classes["api-ut__ab"]}>
         <div className={classes["api-ut__min"]}>
         <div className={classes["api-ut__con"]} id="apiUtilCon">
             <ScrollBar thumbColor="#929397" scrollId="apiUtilCon">
                 <div className={classes["api-ut__inputGroup"]}>
-                    <span className={classes["api-ut__inputLabel"]}>API<span className={classes["api-ut__mandate"]}>*</span></span>
-                    <select data-test="api-select-test" value={api} className={classes["api-ut__select"]} onChange={(event) => { setApi(event.target.value) }}>
-                        <option key={0} value="Execution">/Execution</option>
-                        <option key={1} value="Report">/Report</option>
-                        <option key={2} value="Execution Metrics">/Execution Metrics</option>
+                    <span className={classes["api-ut__inputLabel"]}>API Names<span className={classes["api-ut__mandate"]}>*</span></span>
+                    <select data-test="api-select-test" value={api} className={classes["api-ut__select"]} onChange={(event) => { setApi(event.target.value); resetReqData(); }}>
+                        <option key={0} value="Execution">/ExecuteTestSuite_ICE_SVN</option>
+                        <option key={1} value="Report">/getReport_API</option>
+                        <option key={2} value="Execution Metrics">/getExecution_metrics_API</option>
                     </select>
-                    {api === "Execution" ? <ExecutionApi setResult={setRequest} error={error} /> : null}
-                    {api === "Report" ? <ReportApi setResult={setRequest} error={error} /> : null}
-                    {api === "Execution Metrics" ? <ExecMetricsApi setResult={setRequest} error={error} /> : null}
+                    {api === "Execution" ? <ExecutionApi integration={integration} setIntegration={setIntegration} reset={resetFields} setResult={setRequest} error={error} resetReqData={resetReqData} /> : null}
+                    {api === "Report" ? <ReportApi reset={resetFields} setResult={setRequest} error={error} resetReqData={resetReqData} /> : null}
+                    {api === "Execution Metrics" ? <ExecMetricsApi reset={resetFields} setResult={setRequest} error={error} resetReqData={resetReqData} /> : null}
                     <span className={classes["api-ut__inputLabel"]}>Request Body</span>
                     <span className={classes["api-ut__inputLabel"]}><textarea type="text" data-test="req-body-test" className={classes["req-body"]} autoComplete="off" id="request-body" name="request-body" value={requestText} onChange={(e)=>{setRequestText(e.target.value)}} style={{height:"100px"}} placeholder="Click on Generate to generate request body"  />
                         <label>
@@ -194,7 +239,7 @@ const ApiUtils = props => {
     </>);
 }
 
-const validate = (request, api) => {
+const validate = (request, api, integration) => {
     let check = {
         error: false,
         toDate: false,
@@ -203,7 +248,7 @@ const validate = (request, api) => {
         executionId: false,
         scenarioIds: false,
         source: false,
-        executionMode: false,
+        exectionMode: false,
         executionEnv: false,
         browserType: false,
         integration: {
@@ -259,8 +304,8 @@ const validate = (request, api) => {
             check.source = true;
             check.error = true;
         }
-        if (request["executionData"].executionMode !== "serial" && request["executionData"].executionMode !== "parallel") {
-            check.executionMode = true;
+        if (request["executionData"].exectionMode !== "serial" && request["executionData"].exectionMode !== "parallel") {
+            check.exectionMode = true;
             check.error = true;
         }
         if (request["executionData"].executionEnv !== "default" && request["executionData"].executionEnv !== "saucelab") {
@@ -272,42 +317,20 @@ const validate = (request, api) => {
             check.error = true;
         }
 
-        if (request["executionData"].integration !== undefined) {
-            if (request["executionData"].integration.alm !== undefined || request["executionData"].integration.zephyr !== undefined) {
-                const subrequest = request["executionData"].integration.alm !== undefined ? request["executionData"].integration.alm : request["executionData"].integration.qtest;
-                const regex = /^https:\/\//g;
-                if (!regex.test(subrequest['url'])) {
-                    check.integration.url = true;
-                    check.error = true;
-                }
-                if (subrequest.username.length === 0) {
-                    check.integration.username = true;
-                    check.error = true;
-                }
-                if (subrequest.password.length === 0) {
-                    check.integration.password = true;
-                    check.error = true;
-                }
+        if (integration !== -1 && integration !== "-1") {
+            const subrequest = request["executionData"].integration[integration];
+            const regex = /^https:\/\//g;
+            if (!regex.test(subrequest['url'])) {
+                check.integration.url = true;
+                check.error = true;
             }
-            else {
-                const subrequest = request["executionData"].integration.qtest;
-                const regex = /^https:\/\//g;
-                if (!regex.test(subrequest['url'])) {
-                    check.integration.url = true;
-                    check.error = true;
-                }
-                if (subrequest.username.length === 0) {
-                    check.integration.username = true;
-                    check.error = true;
-                }
-                if (subrequest.password.length === 0) {
-                    check.integration.password = true;
-                    check.error = true;
-                }
-                if (subrequest.qteststeps.length === 0) {
-                    check.integration.qteststeps = true;
-                    check.error = true;
-                }
+            if (subrequest.username.length === 0) {
+                check.integration.username = true;
+                check.error = true;
+            }
+            if (subrequest.password.length === 0) {
+                check.integration.password = true;
+                check.error = true;
             }
         }
         if (request["executionData"].gitInfo !== undefined) {
@@ -330,6 +353,7 @@ const validate = (request, api) => {
         } else {
             if (!request["executionData"].batchInfo) {
                 check.error = true;
+                check.batchInfo = true;
             }
         }
     }

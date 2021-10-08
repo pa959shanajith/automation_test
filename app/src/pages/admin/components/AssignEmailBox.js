@@ -23,7 +23,7 @@ const AssignEmailBox = ({rightBox,leftBox,setRightBox,setLeftBox,setNewBox,disab
             modalClass='modal-sm'
             title={"Delete Email"}
             content={"Delete following email ID(s) from the group:"+ delNewSelected.newEmails}
-            close={()=>setDeleteModal(false)}
+            close={()=>setDelNewSelected(false)}
             footer={
                 <>
                     <button onClick={()=>{moveLeft(true);setDelNewSelected(false);}}>Yes</button>

@@ -236,7 +236,7 @@ const Messages={
     },
     INTEGRATION:{
         ERR_LOGIN: {"CONTENT":"Failed to Login.", "VARIANT": VARIANT.ERROR},
-        ERR_PROJECT_DETAILS: {"CONTENT":"'Failed to Project Details.", "VARIANT": VARIANT.ERROR},
+        ERR_PROJECT_DETAILS: {"CONTENT":"Failed to Project Details.", "VARIANT": VARIANT.ERROR},
         ERR_TESTSUITE_DETAILS: {"CONTENT":"Failed to TestSuite Details.", "VARIANT": VARIANT.ERROR},
         ERR_MAP_TC: {"CONTENT":"Map test cases before saving.", "VARIANT": VARIANT.ERROR},
         ERR_SAVE_MAPPED_TC: {"CONTENT":"Failed to Save Mapped TestCases.", "VARIANT": VARIANT.ERROR},
@@ -398,7 +398,7 @@ const Messages={
         WARN_SELECT_MULTI_BROWSER: {"CONTENT":"Please select multiple browsers.", "VARIANT": VARIANT.WARNING},
     },
     UTILITY:{
-        ERR_ENCRYPT: {"CONTENT":"'Failed to Encrypt.", "VARIANT": VARIANT.ERROR},
+        ERR_ENCRYPT: {"CONTENT":"Failed to Encrypt.", "VARIANT": VARIANT.ERROR},
         ERR_FAIL_FETCH: {"CONTENT":"Failed to Fetch.", "VARIANT": VARIANT.ERROR},
         ERR_CREATE_TADATABLE: {"CONTENT":"Failed to create DataTable.", "VARIANT": VARIANT.ERROR},
         ERR_EDIT_DATATABLE: {"CONTENT":"Failed to edit DataTable.", "VARIANT": VARIANT.ERROR},
@@ -441,13 +441,15 @@ const Messages={
         ERR_COL_TAGNAME: {"CONTENT":'Invalid column tag names.', "VARIANT": VARIANT.ERROR},
         ERR_HEADER: {"CONTENT":'Header name is empty or duplicate.', "VARIANT": VARIANT.ERROR},
         ERR_SEL_API: {"CONTENT": "Select an API before generating request body", "VARIANT": VARIANT.ERROR},
+        ERR_EMPTY_BATCHINFO: {"CONTENT": "Please Enter Batch Info.", "VARIANT": VARIANT.ERROR},
+        ERR_GENERATE_RB: {"CONTENT":"Failed to Generate Request Body.", "VARIANT": VARIANT.ERROR},
 
         SUCC_EXPORTED: {"CONTENT":'Successfully exported Execution Metrics to CSV.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DELETE_DATATABLE: {"CONTENT":'Data Table Deleted Successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_UPDATE_DATATABLE: {"CONTENT":'Data Table Updated Successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_EXPORT_FILE: {"CONTENT":'File Exported Successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_SAVE_DATATABLE: {"CONTENT":'Data Table Saved Successfully.', "VARIANT": VARIANT.SUCCESS},
-        SUCC_REQ_BODY_GEN: {"CONTEN":"The required request has been generated and is present in the request body.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_REQ_BODY_GEN: {"CONTENT":"The required request has been generated and is present in the request body.", "VARIANT": VARIANT.SUCCESS},
     },
 
     SETTINGS: {
