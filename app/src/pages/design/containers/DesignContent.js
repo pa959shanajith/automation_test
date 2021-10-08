@@ -886,7 +886,7 @@ const DesignContent = props => {
                             <ClickAwayListener onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
                             <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={testCaseData} setList={setTestCaseData} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
                                 {
-                                testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row"
+                                testCaseData.map((testCase, i) => <TableRow data-test="d__tc_row" draggable={draggable}
                                     key={i} idx={i} objList={objNameList} testCase={testCase} edit={edit} 
                                     getKeywords={getKeywords} getRowPlaceholders={getRowPlaceholders} stepSelect={stepSelect}
                                     updateChecklist={updateChecklist} setStepSelect={setStepSelect}
