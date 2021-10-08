@@ -2378,3 +2378,40 @@ exports.manageJiraDetails = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+
+exports.getNotificationGroups = async(req,res) => {
+	const fnName = "getNotificationGroups"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const groupinfo = req.body;
+		const inputs = {
+			groupids: groupinfo.groupids,
+			groupnames: groupinfo.groupnames
+		};
+		const result = await utils.fetchData(inputs, "notification/getNotificationGroups", fnName);
+		return res.status("200").send(result);
+	}catch (exception){
+		logger.error("Error occurred in notifications/getNotificationGroups:", exception);
+		return res.status("500").send("fail");
+	}
+} 
+
+exports.updateNotificationGroups = async(req,res) => {
+	const fnName = "updateNotificationGroups"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const groupinfo = req.body;
+		const inputs = {
+			groupdata: groupinfo.groupdata,
+			action: groupinfo.action,
+			modifiedby: req.session.userid,
+			modifiedbyrole: req.session.activeRoleId,
+		};		
+		const result = await utils.fetchData(inputs, "notification/updateNotificationGroups", fnName);
+		return res.status('200').send(result);
+	}catch (exception){
+		logger.error("Error occurred in notifications/updateNotificationGroups:", exception);
+		return res.status('500').send("fail");
+	}
+} 

@@ -80,6 +80,9 @@ const Messages={
         ERR_DIRECTORY_EMPTY: {"CONTENT":"Test Connection Successful but LDAP directory is empty!", "VARIANT": VARIANT.ERROR},
         ERR_TEST_SPEC_CHAR: {"CONTENT":"Test Connection Failed! Special characters found in LDAP configuration values.", "VARIANT": VARIANT.ERROR},
         ERR_TEST_CONNECT_UNEXPECTED: {"CONTENT":"Test Connection Failed due to unexpected error!", "VARIANT": VARIANT.ERROR},
+        ERR_GROUPNAME_EXIST: {"CONTENT":"Group Name already Exists.", "VARIANT": VARIANT.ERROR},
+        ERR_GROUPNAME_FETCH: {"CONTENT":"Failed to fetch email groups.", "VARIANT": VARIANT.ERROR},
+        WARN_EMAIL_EXIST: {"CONTENT":"Email Already Added.", "VARIANT": VARIANT.ERROR},
 
         SUCC_EMAIL_SENT: {"CONTENT":"Test Email Sent.", "VARIANT": VARIANT.SUCCESS},
         SUCC_ICEPOOL_SAVED: {"CONTENT":"ICE Pool saved successfully.", "VARIANT": VARIANT.SUCCESS},
@@ -91,9 +94,12 @@ const Messages={
         SUCC_PROJECT_UNASSIGN: {"CONTENT":"Projects unassigned successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TOKEN_GENERATE: {"CONTENT":"Token generated successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_ICEPOOL_UPDATE: {"CONTENT":"ICE Pool updated successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_ICE_DEREGISTER: {"CONTENT":"ICE Deregistered Successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_ICE_DEREGISTER: {"CONTENT":"ICE Deregistered successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_PROJECT_CREATE: {"CONTENT":"Project created successfully..", "VARIANT": VARIANT.SUCCESS},
         SUCC_PROJECT_UPDATE: {"CONTENT":"Project updated successfully", "VARIANT": VARIANT.SUCCESS},
+        SUCC_GROUP_CREATE: {"CONTENT":"Email Group created successfully", "VARIANT": VARIANT.SUCCESS},
+        SUCC_DELETE_EMAILGROUP: {"CONTENT":"Email Group Deleted successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_UPDATE_EMAILGROUP: {"CONTENT":"Email Group Updated successfully.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_USER_EXIST: {"CONTENT":"User already Exists.", "VARIANT": VARIANT.WARNING},
         WARN_USERNAME_SPECHAR: {"CONTENT":"Cannot contain special characters other than ._-", "VARIANT": VARIANT.WARNING},
@@ -245,14 +251,20 @@ const Messages={
         ERR_SAVE: {"CONTENT":"Failed to Save.", "VARIANT": VARIANT.ERROR},
         ERR_GETTING_LIST: {"CONTENT":"Error in getting list.", "VARIANT": VARIANT.ERROR},
         ERR_INVALID_CRED: {"CONTENT":"Invalid Credentials.", "VARIANT": VARIANT.ERROR},
+        ERR_UPDATE_MAP: {"CONTENT":"Error Updating mappings.", "VARIANT": VARIANT.ERROR},
+        ERR_EMPTY_TCS: {"CONTENT":"Please select Test Cases from Mapped Zephyr Test Cases.", "VARIANT": VARIANT.ERROR},
+        ERR_EMPTY_PH: {"CONTENT":"Please select Phase from Zephyr Folder Structure.", "VARIANT": VARIANT.ERROR},
+        ERR_UPDATE_NOT_FOUND: {"CONTENT":"Failed to Update .", "VARIANT": VARIANT.ERROR},
         
         SUCC_SAVE: {"CONTENT":"Saved successfully.", "VARIANT": VARIANT.SUCCESS},
+        UPDATE_SAVE: {"CONTENT":"Updated successfully.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_NO_MAPPED_DETAILS: {"CONTENT":"No mapped details.", "VARIANT": VARIANT.WARNING},
         WARN_UNMAP_TC: {"CONTENT":"Unmap test case/Scenario before saving.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_SCENARIO: {"CONTENT":"Please Select a Scenario.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_TESTCASE: {"CONTENT":"Please select Testcase.", "VARIANT": VARIANT.WARNING},
         WARN_MULTI_TC_SCENARIO: {"CONTENT":"Cannot map multiple test cases with multiple scenarios.", "VARIANT": VARIANT.WARNING},
+        WARN_UPDATE_MULTI_MATCH: {"CONTENT":"Partially Updated.", "VARIANT": VARIANT.WARNING}
     },
     MINDMAP:{
         ERR_FETCH_PROJECT: {"CONTENT":"Failed to fetch project list.", "VARIANT": VARIANT.ERROR},
@@ -290,12 +302,16 @@ const Messages={
         ERR_NOTHING_COPY: {"CONTENT":'Nothing is copied.', "VARIANT": VARIANT.ERROR},
         ERR_DANGLING_SCREEN: {"CONTENT":'dangling screen... validation failed.', "VARIANT": VARIANT.ERROR},
         ERR_EXCEL_SHEET: {"CONTENT":'Excel sheet is either empty or invalid.', "VARIANT": VARIANT.ERROR},
+        ERR_GET_NOTIFICATION: {"CONTENT":'Failed to fetch Notification Rules.', "VARIANT": VARIANT.ERROR},
+        ERR_NOTIFICATION_CONFIG: {"CONTENT":'Failed to fetch Notification Configuration.', "VARIANT": VARIANT.ERROR},
+        ERR_UPDATE_NOTIFICATION_RULES: {"CONTENT":'Failed to Update Notification Rules.', "VARIANT": VARIANT.ERROR},
         
         SUCC_NODE_CREATE: {"CONTENT":"Nodes created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_EXPORTED: {"CONTENT":"Data Exported Successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_SAVE: {"CONTENT":'Tasks saved successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_SAVE: {"CONTENT":'Data saved successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_COPIED : {"CONTENT":"Data Copied successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_RULES_UPDATE : {"CONTENT":"Rules updated successfully.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_PROJECT_ASSIGN_USER: {"CONTENT":'This project is not assigned to user.', "VARIANT": VARIANT.WARNING},
         WARN_SELECT_COMPLETE_FLOW: {"CONTENT":"Please select a complete flow to assign tasks.", "VARIANT": VARIANT.WARNING},

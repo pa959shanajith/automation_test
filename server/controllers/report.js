@@ -881,7 +881,7 @@ exports.getExecution_metrics = async(req, res) => {
                 return res.send('NoRecords');
             } else {
                 var data=reportResult[0].rows;
-                var dir = './../../excel';
+                var dir = './../../output';
                 var excelDirPath = path.join(__dirname, dir);
                 const filePath = path.join(excelDirPath, 'samp234.csv');
                 try {

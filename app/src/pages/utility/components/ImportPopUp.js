@@ -152,7 +152,7 @@ const validate = ({ftypeRef,uploadFileRef,sheetRef,rowRef,colRef}) =>{
             }
         }
     })
-    if(colRef.current != undefined && colRef.current.value != '' && rowRef.current.value==''){
+    if(colRef.current !== undefined && colRef.current.value !== '' && rowRef.current.value===''){
         rowRef.current.style.border = '1px solid red';
         err = true
     }

@@ -157,19 +157,19 @@ const update = async(conf,action,setLoading,displayError,onSelectProvider) =>{
             return;
        }
         const errfields = [];
-        if (+data[2]) errfields.push("Server Name");
-        if (+data[3]) errfields.push("Channel");
-        if (+data[4]) errfields.push("Provider");
-        if (+data[5]) errfields.push("Server Host");
-        if (+data[6]) errfields.push("Server Port");
-        if (+data[7]) errfields.push("Sender Email");
-        if (+data[8]) errfields.push("Secure Connection");
-        if (+data[9]) errfields.push("Authentication");
-        if (+data[10]) errfields.push("Avo Assure Application URL");
-        if (+data[11]) errfields.push("Proxy URL");
-        if (+data[12] === 1) errfields.push("Proxy Username");
-        else if (+data[12] === 2) errfields.push("Proxy Password");
-        else if (+data[12] === 3) errfields.push("Proxy Credentials");
+        if (+JSON.stringify(data)[2]) errfields.push("Server Name");
+        if (+JSON.stringify(data)[3]) errfields.push("Channel");
+        if (+JSON.stringify(data)[4]) errfields.push("Provider");
+        if (+JSON.stringify(data)[5]) errfields.push("Server Host");
+        if (+JSON.stringify(data)[6]) errfields.push("Server Port");
+        if (+JSON.stringify(data)[7]) errfields.push("Sender Email");
+        if (+JSON.stringify(data)[8]) errfields.push("Secure Connection");
+        if (+JSON.stringify(data)[9]) errfields.push("Authentication");
+        if (+JSON.stringify(data)[10]) errfields.push("Avo Assure Application URL");
+        if (+JSON.stringify(data)[11]) errfields.push("Proxy URL");
+        if (+JSON.stringify(data)[12] === 1) errfields.push("Proxy Username");
+        else if (+JSON.stringify(data)[12] === 2) errfields.push("Proxy Password");
+        else if (+JSON.stringify(data)[12] === 3) errfields.push("Proxy Credentials");
         displayError({CONTENT:emsg+" Following values are invalid: "+errfields.join(", "),VARIANT:VARIANT.WARNING});
     } else{
         displayError({CONTENT:"Failed to "+ action +" configuration",VARIANT:VARIANT.ERROR});
@@ -366,8 +366,10 @@ const validate = (inputRef,displayError)=> {
     const emailRegEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     
     var arr = ['selectprovider','selectauth','host','servername','port','sendername','senderaddr','assureurl']
-    if(inputRef.checkproxyurl.current.value === 'true')arr.push('proxyurl')
-    if(inputRef.checkproxycred.current.value === 'true')arr.push('proxyuser','proxypass')
+    if(inputRef.checkproxyurl.current.value === 'true'){
+        arr.push('proxyurl')
+        if(inputRef.checkproxycred.current.value === 'true')arr.push('proxyuser','proxypass')
+    }
     arr.forEach((e)=>{
         inputRef[e].current.style.outline = ''
         if(inputRef[e].current.value === ""){

@@ -6,6 +6,7 @@ import Legends from '../components/Legends'
 import TaskBox from '../components/TaskBox'
 import ExportMapButton from '../components/ExportMapButton'
 import SaveMapButton from '../components/SaveMapButton'
+import AdvancedOptions from '../components/AdvancedOptions';
 import { useDispatch } from 'react-redux';
 import {generateTree,toggleNode,moveNodeEnd,moveNodeBegin} from './MindmapUtils'
 import * as actionTypes from '../state/action';
@@ -130,6 +131,7 @@ const CanvasAssign =(props)=>{
             {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={releaseid} cycleid={cycleid} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
             <SaveMapButton isAssign={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} cycId={cycleid} setBlockui={setBlockui}/>
             <ExportMapButton isAssign={true} setBlockui={setBlockui} displayError={displayError} releaseRef={props.releaseRef} cycleRef={props.cycleRef}/>
+            <AdvancedOptions executionScreen={false} priority={0} dNodes={[...dNodes]} setBlockui={setBlockui} displayError={displayError}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>

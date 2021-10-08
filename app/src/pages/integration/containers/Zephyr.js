@@ -1,12 +1,14 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, Fragment } from 'react';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import ZephyrContent from '../components/ZephyrContent';
 import MappedPage from '../containers/MappedPage';
 import LoginModal from '../components/LoginModal';
-import {loginToZephyr_ICE,viewZephyrMappedList_ICE} from '../api.js';
+import ZephyrUpdateContent from '../components/ZephyrUpdateContent';
+import * as api from '../api.js';
 import * as actionTypes from '../state/action.js';
+import "../styles/TestList.scss"
 
 const Zephyr = () => {
     const history = useHistory();
@@ -46,7 +48,7 @@ const Zephyr = () => {
         const zephyrUsername = zephyrUsernameRef.current.value;
         const zephyrPassword = zephyrPasswordRef.current.value;
 
-        const domainDetails = await loginToZephyr_ICE(zephyrURL, zephyrUsername, zephyrPassword);
+        const domainDetails = await api.loginToZephyr_ICE(zephyrURL, zephyrUsername, zephyrPassword);
 
         if (domainDetails.error) setMsg( domainDetails.error);
         else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
@@ -73,7 +75,7 @@ const Zephyr = () => {
         try{
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
         
-            const response = await viewZephyrMappedList_ICE(user_id);
+            const response = await api.viewZephyrMappedList_ICE(user_id);
             
             if (response.error){
                 setMsg(response.error);
@@ -92,17 +94,26 @@ const Zephyr = () => {
         }
     }
 
+    const callUpdateMappedFiles=async()=>{
+        dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "ZephyrUpdate" });
+    }
     return(
         <>
-        {viewMappedFlies === "Zephyr" ? 
+        {viewMappedFlies === "ZephyrUpdate" &&
+            <ZephyrUpdateContent 
+                domainDetails={domainDetails}
+                setDomainDetails={setDomainDetails}
+            />
+        }
+        {viewMappedFlies === "Zephyr" && 
             <MappedPage
                 screenType="Zephyr"
                 leftBoxTitle="Zephyr Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 mappedfilesRes={mappedfilesRes}
-            /> :
-        <>
-        { !loginSuccess && 
+            /> 
+        }
+        { viewMappedFlies ===null && !loginSuccess && 
             <LoginModal 
                 urlRef={zephyrUrlRef}
                 usernameRef={zephyrUsernameRef}
@@ -111,13 +122,12 @@ const Zephyr = () => {
                 error={loginError}
                 login={callLogin_zephyr}
             /> }
-        { screenType=== "Zephyr" &&
+        { viewMappedFlies ===null && screenType=== "Zephyr" &&
             <ZephyrContent
                 domainDetails={domainDetails}
                 callViewMappedFiles={callViewMappedFiles}
+                callUpdateMappedFiles={callUpdateMappedFiles}
             /> }
-        </>
-        }
         </> 
     )
 }

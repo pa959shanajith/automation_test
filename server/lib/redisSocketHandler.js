@@ -345,7 +345,6 @@ module.exports.initListeners = mySocket => {
 	});
 	mySocket.on('ICE_status_change', async value => {
 		pulse_ICE[username] = value;
-		cache.set("ICE_status",pulse_ICE)
 		if (value.connected){
 			const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
 			server_pub.publish('ICE_STATUS_' + username, dataToExecute);
@@ -353,18 +352,18 @@ module.exports.initListeners = mySocket => {
 			logger.info("ICE: " + username + " disconnected, deleting callbacks")
 			pulse_ICE[username]["time"] = null;
 			pulse_ICE[username]["connected"] = false;
-			cache.set("ICE_status",pulse_ICE)
 			delete queue.Execution_Queue.registred_ICE[username]
 			queue.Execution_Queue.ice_list[username]["connected"] = false
 			server_sub.unsubscribe('ICE_STATUS_' + username);
 		}
-		
+		cache.set("ICE_status",pulse_ICE)
 	});
 };
 
-function check_pulse(){
+async function check_pulse(){
 	var time = Date()
 	var writeStr = "None"
+	var pulse_ICE = await cache.get("ICE_status")
 	logger.silly("Checking ICE pulse")
 	for (var ice in pulse_ICE) {
 		if(pulse_ICE[ice]["time"]){
@@ -380,7 +379,7 @@ function check_pulse(){
 				const dataToExecute = JSON.stringify({"username" : ice,"onAction" : "ice_status_change","value":value});
 				server_pub.publish('ICE2_' + ice, dataToExecute);
 				delete queue.Execution_Queue.registred_ICE[ice]
-				queue.Execution_Queue.ice_list[ice]['connected'] = false
+				if (queue.Execution_Queue.ice_list[ice]) queue.Execution_Queue.ice_list[ice]['connected'] = false
 				server_sub.unsubscribe('ICE_STATUS_' + ice);
 			}else{
 				writeStr = time.toString() + " " + ice + " status: " + pulse_ICE[ice]["status"] + " ICE mode: " + pulse_ICE[ice]["mode"]; 

@@ -104,6 +104,7 @@ class TestSuiteExecutor {
             "exec_env": batchData.executionEnv,
             "apptype": batchData.batchInfo[0].appType,
             "integration": batchData.integration,
+            "scenarioFlag": batchData.scenarioFlag,
             "batchId": "",
             "executionIds": [],
             "testsuiteIds": [],
@@ -287,6 +288,7 @@ class TestSuiteExecutor {
         const invokinguser = userInfo.invokingusername;
         const icename = userInfo.icename;
         const _this = this;
+        const scenarioFlag = execReq.scenarioFlag;
         const channel = "normal";
         var reportType = "accessiblityTestingOnly";
         logger.info("Sending request to ICE for executeTestSuite");
@@ -339,7 +341,7 @@ class TestSuiteExecutor {
                         const exeStatus = resultData.executionStatus ? "pass" : "fail";
                         await _this.updateExecutionStatus([executionid], { endtime: resultData.endTime, status: exeStatus });
                         if (reportType != "accessiblityTestingOnly")
-                            notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus });
+                            notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag});
                     }
                 } else if (event == "result_executeTestSuite") {
                     if (!status) { // This block is for report data
@@ -385,7 +387,7 @@ class TestSuiteExecutor {
                             }
                         } catch (ex) {
                             logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
-                            if (reportType != "accessiblityTestingOnly") notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: "fail" });
+                            if (reportType != "accessiblityTestingOnly") notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag});
                             await this.updateExecutionStatus([executionid], { status: "fail" });
                         }
                     } else { // This block will trigger when resultData.status has "success or "Terminate"

@@ -167,6 +167,39 @@ export const viewQtestMappedList_ICE = async(userID) => {
     }
 }
 
+/*Component viewQtestMappedList_ICE
+  use: Gets the Values of the mapped files 
+  api returns: [] 
+*/
+export const zephyrUpdateMapping = async(updateMapPayload, rootCheck) => {
+    try{
+        const res = await axios(url+'/zephyrUpdateMapping', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+            updateMapPayload : updateMapPayload,
+            rootCheck: rootCheck,
+            zephyraction : 'testcase'
+            
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_UPDATE_MAP}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_UPDATE_MAP}
+    }
+}
+
 export const loginQCServer_ICE = async(qcPassword , qcURL , qcUsername ) => {
     try{
         const res = await axios(url+'/loginQCServer_ICE', {
@@ -332,7 +365,7 @@ export const loginToZephyr_ICE = async(zephyrurl, username, password) => {
 				zephyrURL: zephyrurl,
 				zephyrUserName:	username,
 				zephyrPassword: password,
-				zephyraction: "project"
+				zephyraction: "login"
             }
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -391,6 +424,35 @@ export const zephyrCyclePhase_ICE = async(releaseId, user_id) => {
                 action: 'zephyrCyclePhase_ICE',
                 releaseId:	releaseId,
                 zephyraction: "cyclephase",
+                user_id : user_id
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    } catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    }
+}
+
+export const zephyrMappedCyclePhase = async(releaseId, user_id) => {
+    try{
+        const res = await axios(url+'/zephyrMappedCyclePhase', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                action: 'zephyrMappedCyclePhase',
+                releaseId:	releaseId,
+                zephyraction: "mapcyclephase",
                 user_id : user_id
            }
         });
@@ -474,6 +536,35 @@ export const zephyrTestcaseDetails_ICE = async(zephyraction, treeId) => {
             data: {
                 action : 'zephyrTestcaseDetails_ICE',
                 treeId: treeId,
+                zephyraction: zephyraction,
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_FETCH_TESTCASE}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_FETCH_TESTCASE}
+    }
+}
+
+export const zephyrMappedTestcaseDetails_ICE = async(zephyraction, treeId, cyclephaseid) => {
+    try{
+        const res = await axios(url+'/zephyrMappedTestcaseDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                action : 'zephyrMappedTestcaseDetails_ICE',
+                treeId: treeId,
+                cyclephaseid: cyclephaseid,
                 zephyraction: zephyraction,
            }
         });

@@ -2,8 +2,8 @@ const validator = require('validator');
 const logger = require('../../logger');
 const utils = require('../lib/utils');
 
-const companyLogo = "/imgs/avo-logo.png";
-const productLogo = "/imgs/logo.png";
+const companyLogo = "/static/imgs/ftr-avo-logo.png";
+const productLogo = "/static/imgs/logo.png";
 const generateEmailPayload = {};
 
 module.exports.getPayload = async (channel, event, data) => {
@@ -36,15 +36,34 @@ generateEmailPayload.test = async data => {
 };
 
 generateEmailPayload.report = async data => {
-	let recv = "";
-	const username = data.user && data.user.invokingusername || '';
-	if (username == "ci_cd") { // Todo?
-	} else if (username) {
-		const userProfile = await utils.fetchData({ username }, "login/loadUser", "generateEmailPayload_report");
-		if (userProfile) recv = userProfile.email || "";
+	const fnName = 'generateEmailPayload'
+	let recv = {};
+	const username = data.user && data.user.invokingusername || '';	
+	const execNode = (data.scenarioFlag) ? "scenarios" : "modules"
+	const apiType = (data.scenarioFlag) ? "onScenariosExecute" : "onModulesExecute"
+	var inputs = {
+		"fetchby": "testsuiteid",
+		"id": data.testsuiteid,
+		"nodetype": execNode,
+		"actiontype": '5',
+		"invokerid": data.user.invokinguser
 	}
-	if (!validator.isEmail(recv)) return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
+	result = await getReceivers(inputs, data.scenarioIds[0], apiType)
+	recv = result['emails']
 
+	for(var email in recv){
+		if (!validator.isEmail(email)){
+			delete recv[email]
+			logger.error(email + ' is not a valid email, notification can not be sent to this address')
+		}
+	}
+	if (!recv || Object.keys(recv).length == 0){
+		return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
+	}
+	let prioirtyRecv = Object.fromEntries(Object.entries(recv).filter(([k,v])=> v == '1'))
+	if (Object.keys(prioirtyRecv).length > 0){
+		recv = Object.assign({},prioirtyRecv,Object.fromEntries(Object.entries(recv).filter(([k,v])=> v == '-1')))
+	} 
 	data.reportData.forEach(r => {
 		if (r.reportid.length > 0) r.url = data.url + '/viewreport/' + r.reportid;
 		if (r.status.toLowerCase() == "pass") r.pass = true;
@@ -99,9 +118,181 @@ generateEmailPayload.report = async data => {
 	return {
 		error: null,
 		msg,
-		receivers: [recv]
+		receivers: Object.keys(recv)
 	};
 };
+
+generateEmailPayload.taskWorkFlow = async data => {
+	const fnName = 'taskWorkFlow'
+	const ruleactionsids = {'onAssign': "1", "onUnassign": "2", "onReview": "3", "onSubmit": "4"}
+	var action =  ruleactionsids[data.notifyEvent]
+	var inputs = {}
+	var recv = {}
+	var taskupdate = ""
+	var result = {}
+	var mindmapid = ""
+	switch (data.notifyEvent){
+		case 'onUnassign':
+			
+			mindmapid  = data.mindmapid;
+			inputs = {
+				"fetchby": "mindmapbyrule",
+				"id": mindmapid,
+				"nodetype":data.nodetype,
+				"reviewerid":data.reviewerid, 
+				"assigneeid":data.asigneeid
+			}
+			result = await getReceivers(inputs, data.nodeid, 'onUnassign')
+			taskupdate = data.assigner + " has unassinged " + result.owners.assignee + " from task " + data.taskdetails + "."
+			recv = result['emails']
+			break
+
+		case 'onAssign':
+			mindmapid  = data.mindmapid;
+			inputs = {
+				"fetchby": "mindmapbyrule",
+				"id": mindmapid,
+				"nodetype":data.nodetype,
+				"reviewerid":data.reviewerid, 
+				"assigneeid":data.asigneeid
+			}
+			result = await getReceivers(inputs, data.nodeid, 'onAssign')
+			recv = result['emails']
+			taskupdate = 'Task ' + " '" + data.taskdetails + "' has been assigned to " + result.owners.assignee + ' by ' + data.assigner + ". " + result.owners.reviewer + " has been marked as the reviewer."
+			var ruleids = result['ruleids'] || []
+			inputs = {
+				"nodeid": data.nodeid,
+				'ruleids': ruleids
+			}
+			var updateTasks =  await utils.fetchData(inputs, "notification/updateTaskRules", fnName)
+			if (updateTasks == 'fail'){
+				logger.error("Failed to update tasks with associated rules");
+			}
+			break
+		default:
+			let taskid = data.taskid
+			inputs = {
+				"fetchby": "task",
+				"id": taskid,
+				"ruleactionid": action,
+				"extragroups": data.extragroups || [],
+				"extrausers": data.extrausers || []
+			}
+			result = await getReceivers(inputs, data.nodeid, 'taskflow')
+			recv = result['emails']
+			switch(data.notifyEvent){
+				case "onReview": 
+					if (data.status == 'underReview') data.status = 'approoved'
+					else data.status = 'reassigned'
+					taskupdate = 'Task ' +  data.taskdetails + " has been reviewed and " + data.status + " by " + data.assignedto + "."		
+					break
+				case "onSubmit":
+					taskupdate = 'Task ' +  data.taskdetails + " has been submitted by " + result.owners.assignee + " to " + result.owners.reviewer + " for approval."
+					break
+				
+			}
+			break
+	}
+	for(var email in recv){
+		if (!validator.isEmail(email)){
+			delete recv[email]
+			logger.error(email + ' is not a valid email, notification can not be sent to this address')
+		}
+	}
+	if (!recv || Object.keys(recv).length == 0){
+		return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
+	}
+	let subj = "Task Update"
+	const msg = {
+		'subject': subj,
+		'template': 'task-workflow',
+		'context': {
+			'companyLogo': data.url + companyLogo,
+			'productLogo': data.url + productLogo,
+			'taskupdate': taskupdate
+		}
+	};
+	return {
+		error: null,
+		msg,
+		receivers: Object.keys(recv)
+	};
+};
+
+const getReceivers  = async (inputs, nodeid, type) =>{
+	const fnName = 'getReceivers'
+	var emails = {}
+	var ruleids = []
+	var owners = {'assignee':'','reviewer':''}
+	try{
+		var ruledata =  await utils.fetchData(inputs, "notification/getNotificationConfiguration", fnName)
+		if (ruledata == 'fail'){
+			logger.error("Error occured while fetching notification groups")
+			return {'emails':{},'ruleids':[],'owners':owners}
+		}else if (ruledata.length == 0){
+			logger.debug("No applicable rules found")
+			return {'emails':{},'ruleids':[],'owners':owners}
+		}
+		for (let index in ruledata){
+			var ruleinfo = ruledata[index].ruleinfo
+			var taskdata = ruledata[index]
+			if (type == 'taskflow' && taskdata.taskowners){
+				if (taskdata.taskowners.length  == 1){
+					owners.assignee =  taskdata.taskowners[0].name ;
+					owners.reviewer =  taskdata.taskowners[0].name ;
+					emails[taskdata.taskowners[0].email] = '-1';
+
+				}else if(taskdata.taskowners.length == 2){
+					owners.assignee = (taskdata.taskowners[0]._id == taskdata.assignedto) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name;
+					owners.reviewer = (taskdata.taskowners[0]._id == taskdata.reviewer) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name;
+					emails[taskdata.taskowners[1].email] = '-1';
+					emails[taskdata.taskowners[0].email] = '-1';
+				}
+				else{
+					logger.error("Task Owners not found")
+				}
+			} else if (type == 'onModulesExecute' || type == 'onScenariosExecute'){
+				emails[taskdata.taskowners[0].email] = '-1';
+			} else if (type == 'onAssign' || type == 'onUnassign' && taskdata.taskowners){
+				if (taskdata.taskowners.length  == 1){
+					owners.assignee =  taskdata.taskowners[0].name 
+					owners.reviewer =  taskdata.taskowners[0].name 
+					emails[taskdata.taskowners[0].email] = '-1';
+
+				}else if(taskdata.taskowners.length == 2){
+					owners.assignee = (taskdata.taskowners[0]._id == inputs.assigneeid) ? taskdata.taskowners[0].name : taskdata.taskowners[1].name;
+					owners.reviewer = (taskdata.taskowners[0]._id == inputs.reviewerid) ? taskdata.taskowners[0].name : taskdata.taskowners[2].name;
+					emails[taskdata.taskowners[1].email] = '-1';
+					emails[taskdata.taskowners[0].email] = '-1';
+				}
+				else{
+					logger.error("Task Owners not found")
+				}	
+			} 
+			for(var ruleindex in ruleinfo){
+				var rule = ruleinfo[ruleindex]
+				if (rule && (rule.targetnodeid == 0 || type == 'onModulesExecute' || (rule.targetnodeid != 0 && nodeid ==  rule.targetnodeid ))){
+					switch(type){
+						case 'onAssign':
+							if(rule.actiontype == '1') rule.emails.reduce((map,obj)=>{emails[obj] = rule.priority},{})
+							ruleids.push(rule._id);
+							break
+						case 'onUnassign':
+							if(rule.actiontype == '2') rule.emails.reduce((map,obj)=>{emails[obj] = rule.priority},{});
+							break
+						default:
+							rule.emails.reduce((map,obj)=>{emails[obj] = rule.priority},{});
+					}
+				}
+			}
+				
+		}
+	}catch(e){
+		logger.error("Error occured while fetching notification groups, Error: "+e);
+		return {'emails':{},'ruleids':[],'owners':{'assignee':'','reviewer':''}}
+	}
+	return {'emails':emails,'ruleids':ruleids,'owners':owners}
+}
 
 generateEmailPayload.userUpdate = async data => {
 	const user = data.user;

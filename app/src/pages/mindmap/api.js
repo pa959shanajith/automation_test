@@ -475,3 +475,122 @@ export const exportToGit = async(data) => {
         return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
     }
 }
+
+
+/*Component 
+    data={
+            "action": "update",
+            "mindmapid": "5f50c6fddb5de734c8077f07",
+            "taskdata": {},
+            "priority": 0,
+            "newrules": {
+                "ruleid4":{
+                    "groupids":[],
+                    "additionalrecepients":[],
+                    "actiontype":"1",
+                    "targetnode": "all",
+                    "actionon": null,
+                    "targetnodeid": null
+                },
+                "ruleid5":{
+                    "groupids":[],
+                    "additionalrecepients":[],
+                    "actiontype":"2",
+                    "targetnode": "scenarios",
+                    "actionon": "specific",
+                    "targetnodeid": null
+                }        
+            },
+            "updatedrules":{
+            },
+            "deletedrules":[""]
+        }
+
+*/
+
+export const updateNotificationConfiguration = async(data) => {
+    try{
+        const res = await axios(url+'/updateNotificationConfiguration', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_UPDATE_NOTIFICATION_RULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_UPDATE_NOTIFICATION_RULES}
+    }
+}
+
+/*Component 
+    data={
+            fetchby:"mindmapid",
+            id:"id"
+        }
+
+*/
+
+export const getNotificationConfiguration = async(data) => {
+    try{
+        const res = await axios(url+'/getNotificationConfiguration', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_NOTIFICATION_CONFIG}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_NOTIFICATION_CONFIG}
+    }
+}
+
+//No payload required
+export const getNotificationRules = async(data) => {
+    try{
+        const res = await axios(url+'/getNotificationRules', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_GET_NOTIFICATION}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_GET_NOTIFICATION}
+    }
+}

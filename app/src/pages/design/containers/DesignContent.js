@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScreenOverlay, RedirectPage, ScrollBar, ModalContainer, VARIANT, Messages as MSG, setMsg } from '../../global'
+import { ScreenOverlay, RedirectPage, ScrollBar, ModalContainer, VARIANT, Messages as MSG, setMsg, SelectRecipients } from '../../global'
 import { getObjNameList, getKeywordList } from '../components/UtilFunctions';
 import TableRow from '../components/TableRow';
 import DetailsDialog from '../components/DetailsDialog';
@@ -12,6 +12,7 @@ import PasteStepDialog from '../components/PasteStepDialog';
 import SelectMultipleDialog from '../components/SelectMultipleDialog';
 import * as DesignApi from "../api";
 import { reviewTask } from '../../global/api';
+import {getUserDetails,getNotificationGroups} from '../../admin/api';
 import * as pluginActions from "../../plugin/state/action";
 import * as designActions from '../state/action';
 import "../styles/DesignContent.scss";
@@ -61,6 +62,10 @@ const DesignContent = props => {
     const [commentFlag, setCommentFlag] = useState(false);
     const [reusedTC, setReusedTC] = useState(false);
     const [pastedTC, setPastedTC] = useState([]);
+    const [recipients,setRecipients] =useState({groupids:[],additionalrecepients:[]})
+    const [allUsers,setAllUsers] = useState([])
+    const [groupList,setGroupList] = useState([])
+    const [showPopup, setShow] = useState(false);
     let runClickAway = true;
     const emptyRowData = {
         "objectName": "",
@@ -430,10 +435,11 @@ const DesignContent = props => {
 
     const submitTask = submitOperation => {
         let { subTaskId: taskid, status: taskstatus, versionnumber: version, batchTaskIDs, projectId } = props.current_task;
-        
+        let taskname = props.current_task.taskName
+        let nodeid = props.current_task.testCaseId
 		if (submitOperation === 'reassign') taskstatus = 'reassign';
 
-        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs)
+        reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs, nodeid, taskname, recipients.groupids, recipients.additionalrecepients)
         .then(result => {
             if (result === "fail") setMsg(MSG.GENERIC.WARN_NO_REVIEWER);
             else if (taskstatus === 'reassign') {setMsg(MSG.DESIGN.SUCC_TASK_REASSIGN); redirectToPlugin();}
@@ -717,14 +723,11 @@ const DesignContent = props => {
         headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
     }
 
-    const onAction = (operation) => {
+    const onAction = operation => {
         switch(operation){
-            case "submit": props.setShowConfirmPop({'title':'Submit Task', 'content': 'Are you sure you want to submit the task ?', 'onClick': ()=>submitTask(operation)});
-                           break;
-            case "reassign": props.setShowConfirmPop({'title':'Reassign Task', 'content': 'Are you sure you want to reassign the task ?', 'onClick': ()=>submitTask(operation)});
-                             break;
-            case "approve": props.setShowConfirmPop({'title':'Approve Task', 'content': 'Are you sure you want to approve the task ?', 'onClick': ()=>submitTask(operation)});
-                            break;
+            case "submit": setShow({'title':'Submit Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+            case "reassign": setShow({'title':'Reassign Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+            case "approve": setShow({'title':'Approve Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
             default: break;
         }                       
     }
@@ -750,12 +753,69 @@ const DesignContent = props => {
         headerCheckRef.current.indeterminate = false;
     }
 
+    const resetData = () => {
+        setAllUsers([]);
+        setGroupList([]);
+        setRecipients({groupids:[],additionalrecepients:[]});
+    }
+
+    const ConfirmPopup = () => (
+        <ModalContainer 
+            title={showPopup.title}
+            content={<div>
+                <span>Are you sure you want to {showPopup.content} the task ?</span>
+                <p className="dc__checkbox-addRecp" >
+                    <input  id="dc__checkbox" onChange={()=>{fetchSelectRecipientsData()}} type="checkbox" title="Notify Additional Users" className="checkAddUsers"/>
+                    <span >Notify Additional Users</span>
+                </p>
+                <div className='dc__select-recpients'>
+                    <div>
+                        <span className="leftControl" title="Token Name">Select Recipients</span>
+                        <SelectRecipients recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
+                    </div>
+                </div>
+            </div>}
+            close={()=>{setShow(false);resetData();}}
+            footer={
+                <>
+                <button onClick={()=>{submitTask(showPopup.content)}}>
+                    {showPopup.continueText ? showPopup.continueText : "Yes"}
+                </button>
+                <button onClick={()=>{setShow(false);resetData()}}>
+                    {showPopup.rejectText ? showPopup.rejectText : "No"}
+                </button>
+                </>
+            }
+        /> 
+    )
+
+    const fetchSelectRecipientsData = async () => {
+        let checkAddUsers = document.getElementById("dc__checkbox").checked
+        if(!checkAddUsers) resetData()
+        else {
+            var userOptions = [];
+            let data = await getUserDetails("user");
+            if(data.error){setMsg(data.error);return;}
+            for(var i=0; i<data.length; i++) if(data[i][3] !== "Admin") userOptions.push({_id:data[i][1],name:data[i][0]}); 
+            setAllUsers(userOptions.sort()); 
+            data = await getNotificationGroups({'groupids':[],'groupnames':[]});
+            if(data.error){
+                if(data.val === 'empty'){
+                    setMsg(data.error);
+                    data = {};
+                } else{ setMsg(data.error); return true; }
+            }
+            setGroupList(data.sort())
+        }
+    }
+
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
 
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
 
     return (
         <>
+        { showPopup && ConfirmPopup()}
         { showSM && <SelectMultipleDialog data-test="d__selectMultiple" setShow={setShowSM} selectSteps={selectSteps} upperLimit={testCaseData.length} /> }
         { showPS && <PasteStepDialog setShow={setShowPS} pasteSteps={pasteSteps} upperLimit={testCaseData.length}/> }
         { showRemarkDlg && <RemarkDialog remarks={testCaseData[parseInt(showRemarkDlg)].remarks} setShow={setShowRemarkDlg} onSetRowData={setRowData} idx={showRemarkDlg} firstname={userInfo.firstname} lastname={userInfo.lastname}/> }

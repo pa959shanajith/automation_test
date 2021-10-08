@@ -38,6 +38,11 @@
     font-size: 17px;
     fill: $whiteColor;
 }
+#ct-advanceOptionAction>rect{
+    fill: $primaryColor;
+    height: 25px;
+    width: 170px;
+}
 .show-box{
     display: block!important;
 }

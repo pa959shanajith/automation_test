@@ -49,6 +49,7 @@ const Leftbar = () => {
                     </span>
                 </Fragment>)
             case "Zephyr":
+            case "ZephyrUpdate":
                 return(
                 <Fragment>
                     <h4>Integration</h4>

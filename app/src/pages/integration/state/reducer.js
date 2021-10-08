@@ -14,6 +14,12 @@ const initialState = {
     selectedScenarioIds: [],
     syncedTestCases: [],
     mappedPair: [],
+    updateMapPayload: {
+        projectId: "",
+        releaseId: "",
+        phaseDets: {},
+        selectedPhase: []
+    }
 };
 
 const reducer = (state = initialState , action) => {
@@ -62,6 +68,11 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 selectedTestCase: action.payload
+            }
+        case actionTypes.UPDATE_MAP_PAYLOAD:
+            return{
+                ...state,
+                updateMapPayload: action.payload
             }
         default: 
             return state

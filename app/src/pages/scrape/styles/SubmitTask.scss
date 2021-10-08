@@ -9,3 +9,24 @@
     color: $whiteColor;
     border-radius: 20px;
 }
+.ss__checkbox-addRecp{
+    margin: 10px;
+    span{
+        margin: 10px;
+    }
+}
+.ss__select-recpients{
+    padding: 0px 10px !important;
+    margin-top: 15px;
+    div span {
+        display: inline-block;
+        font-size: small;
+        width: 34%;
+        font-weight: 700;
+        margin-top: 5px;
+    }
+    .checkAddUsers, .sr__input {
+        width: 63%;
+        margin-bottom: 80px
+    }
+}

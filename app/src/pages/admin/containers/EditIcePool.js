@@ -123,7 +123,7 @@ const EditIcePool = ({projList,displayError,setLoading}) => {
 const FilterComp = ({setFilter,data,clickInp,inpRef}) =>{
     return(
         <span className='label-select'>
-            <FormInpDropDown clickInp={clickInp} inpRef={inpRef} setFilter={setFilter} data={data}/>
+            <FormInpDropDown clickInp={clickInp} inpRef={inpRef} setFilter={setFilter} data={data} type={"Pool"}/>
         </span>
     )
 }
