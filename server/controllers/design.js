@@ -59,8 +59,7 @@ exports.readTestCase_ICE = async (req, res) => {
 			reuse: reuse,
 			testcase: testcasesteps,
 			testcasename: testcasename,
-			del_flag: result.del_flag,
-			testcaseid: result.testcaseid
+			del_flag: result.del_flag
 		};
 		if (result.screenName) {
 			responsedata.screenName = result.screenName;
