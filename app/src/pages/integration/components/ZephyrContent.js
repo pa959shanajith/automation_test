@@ -45,6 +45,7 @@ const ZephyrContent = props => {
         else if (releaseData === "invalidcredentials")
             setMsg(MSG.INTEGRATION.ERR_INVALID_CRED);
         else if (releaseData) {
+            setProjectDetails({});
             setReleaseArr(releaseData);
             setProjectDropdn1(projectId);
             setSelectedRel("Select Release");
