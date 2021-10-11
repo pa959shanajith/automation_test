@@ -98,7 +98,7 @@ const CycleNode = props => {
                 projectId: props.projectId,
                 releaseId: props.releaseId,
                 phaseDets: phaseDetsVal,
-                selectPhase: props.selectedPhase
+                selectedPhase: props.selectedPhase
             }
         });
         if(checkVal == Object.keys(cycleVal).length) props.setRootCheck(true);
