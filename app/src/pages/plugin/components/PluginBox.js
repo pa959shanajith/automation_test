@@ -9,7 +9,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 	const pluginRedirect = () => {
 		pluginName = pluginName.toLowerCase();
 		window.localStorage['navigateScreen'] = pluginName;
-		if(pluginName==='dashboard' || pluginName==='neurongraphs'){
+		if(pluginName==='dashboard' || pluginName==='neurongraphs'||pluginName==='seleniumtoavo'){
 			window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
 			window.location.href = "/"+ pluginName;
 		}
@@ -24,7 +24,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 		<>
 			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
             <div data-test="plugin-blocks" className="plugin-block" title={pluginName} onClick={pluginRedirect}>
-                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName}.svg`} />
+                <img data-test="plugin-image" className={(pluginName=='Seleniumtoavo') ? "plugin-seltoavo-ic":"plugin-ic"} alt="plugin-ic" src={`static/imgs/${pluginName}.svg`} />
                 <span data-test="plugin-name" className="plugin-text">{pluginTitle}</span>
         	</div>
 		</>

@@ -12,6 +12,7 @@ const PluginSection = ({userInfo}) => {
         "Neurongraphs": {title:"Neuron Graph", show: false},
         "Reports": { title: "Reports", show: false},
         "Dashboard": {title:"Dashboard", show: false},
+        "Seleniumtoavo": {title:"Seleniumtoavo", show: false},
         "showList" : false,
     });
 
