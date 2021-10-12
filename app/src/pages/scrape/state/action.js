@@ -10,12 +10,4 @@ export const SET_WSDATA = "WS_SET_WSDATA";
 export const SET_WSDLERROR = "WS_SET_WSDLWERROR";
 export const SET_ACTIONERROR = "WS_SET_ACTIONERROR";
 export const RESET_COMPARE = "SS__RESET_COMPARE";
-export const SET_REQ_HEADER = "SS_SET_REQ_HEADER_OBJ";
-export const SET_REQ_BODY_HEADER = "SS_SET_REQ_BODY_HEADER";
-export const SET_REQ_AUTH_HEADER = "SS_SET_AUTH_HEADER";
-
-// @TODO - into wsData
-export const SET_RES_STATUS = "SS_SET_RES_STATUS";
-export const SET_COOKIES = "SS_SET_COOKIES";
-export const SET_CONFIGURATION = "SS_SET_CONFIG";
 export const SET_ISFILTER = "SS__SET_ISFILTER";
