@@ -2416,34 +2416,41 @@ exports.updateNotificationGroups = async(req,res) => {
 	}
 } 
 
-exports.adminPreviledgeCheck =  async (req,res,next) =>{
+exports.adminPrivilegeCheck =  async (req,res,next) =>{
 	try{
 		const userid = req.session.userid;
 		const activeRole = req.session.activeRole;
 		const roleId = req.session.activeRoleId;
-		if(roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin"){
-			return next()
-		}
+		if (roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin") return next();
 		switch (req.path) {
-			case "/manageUserDetails" : if(req.body.user.userid == userid) return next()
-			case "/manageCIUsers" : if(req.body.CIUser.userId == userid) return next()
-			case "/provisionIce" : if(req.body.tokeninfo.userid == userid) return next()
-			case "/gitSaveConfig" : if(req.body.userId == userid) return next()
-			case "/manageSessionData" : {
-				try{
+			case "/manageUserDetails":
+				if (req.body.user.userid == userid) return next();
+				break;
+			case "/manageCIUsers":
+				if (req.body.CIUser.userId == userid) return next();
+				break;
+			case "/provisionIce":
+				if (req.body.tokeninfo.userid == userid) return next();
+				break;
+			case "/gitSaveConfig":
+				if (req.body.userId == userid) return next();
+				break;
+			case "/manageSessionData": {
+				try {
 					const iceName = req.body.user;
-					const inputs = { user: req.session.userid };
+					const inputs = { user: userid };
 					const result = await utils.fetchData(inputs, "admin/fetchICE", "fetchICE");
-					if(result.some(x => x.icename === iceName)) return next()
-				}catch (exception){
-					logger.error("Error occurred in adminPreviledgeCheck:", exception);
+					if (result.some(x => x.icename === iceName)) return next()
+				} catch (exception) {
+					logger.error("Error occurred in adminPrivilegeCheck:", exception);
 					return res.status("500").send("fail");
 				}
+				break;
 			};
 		}
 		return res.status(403).send("Permission Denied");
-	}catch (exception){
-		logger.error("Error occurred in adminPreviledgeCheck:", exception);
+	} catch (exception) {
+		logger.error("Error occurred in adminPrivilegeCheck:", exception);
 		return res.status("500").send("fail");
 	}
 }
