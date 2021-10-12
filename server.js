@@ -26,7 +26,7 @@ process.env.nullpool = "5fc13ea772142998e29b5e64";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
-if (!cluster.isMaster) {
+if (cluster.isMaster) {
 	cluster.fork();
 	cluster.on('disconnect', function(worker) {
 		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
@@ -101,10 +101,7 @@ if (!cluster.isMaster) {
 			res.setHeader('Access-Control-Allow-Origin', origin);
 			res.setHeader('Access-Control-Allow-Credentials', true);
 			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Accept, Content-Type, Upgrade-Insecure-Requests');
-			// next();
-			// res.setHeader('Access-Control-Allow-Origin', req.hostname);
-			// res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
-			// res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			next();
 		});
 		var httpsServer = require('https').createServer(credentials, app);
@@ -119,11 +116,6 @@ if (!cluster.isMaster) {
 		app.use(express.static(__dirname + "/public/", { maxage: thirtyDays, index: false }));
 
 		//serve all asset files from necessary directories
-		// app.use('/partials', express.static(__dirname + "/public/partials"));
-		// app.use("/js", express.static(__dirname + "/public/js"));
-		// app.use("/imgs", express.static(__dirname + "/public/imgs"));
-		// app.use("/css", express.static(__dirname + "/public/css"));
-		// app.use("/fonts", express.static(__dirname + "/public/fonts"));
 		app.use("/neuronGraphs", express.static(__dirname + "/public/neurongraphs"));
 		app.post('/designTestCase', (req, res) => res.sendFile("index.html", { root: __dirname + "/public/" }));
 
@@ -167,51 +159,6 @@ if (!cluster.isMaster) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
 			}
-			//anvesh below
-			// if (!req.session.username) {
-			// 	req.session.username = "anvesh.sharma";
-			// 	req.session.uniqueId = "vm-eH5lLa-76Ka-F2Y6aTZJsqW_KmHAo";
-			// 	req.session.usertype = "inhouse";
-			// 	//req.session.logged = true;
-			// 	// req.session.userid = "60f8f9abc963ba2b1ab6ace1"; //99
-			// 	req.session.userid = "605b21ecc523a854a62af85c"; // local
-			// 	req.session.ip = "0.0.0.0";
-			// 	req.session.loggedin = "2020-08-10T15:21:03.472Z";
-			// 	// req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
-			// 	// req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
-			// 	req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
-			// 	req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
-			// 	// req.session.defaultRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
-			// 	// req.session.activeRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
-			// 	req.session.emailid = "batman@dc.com";
-			// 	req.session.additionalroles = [];
-			// 	req.session.firstname = "Bat";
-			// 	req.session.lastname = "Man";
-			// 	req.session.activeRole = req.session.defaultRole = "Test Lead";
-			// 	// req.session.activeRole = req.session.defaultRole = "Admin";
-			// }
-			// if (!req.session.username) {
-			// 	req.session.username = "anvesh.sharma";
-			// 	req.session.uniqueId = "vm-eH5lLa-76Ka-F2Y6aTZJsqW_KmHAo";
-			// 	req.session.usertype = "inhouse";
-			// 	//req.session.logged = true;
-			// 	// req.session.userid = "60f8f9abc963ba2b1ab6ace1"; //99
-			// 	req.session.userid = "614aae9771863ad57882e676"; // local
-			// 	req.session.ip = "0.0.0.0";
-			// 	req.session.loggedin = "2020-08-10T15:21:03.472Z";
-			// 	// req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
-			// 	// req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
-			// 	req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
-			// 	req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
-			// 	// req.session.defaultRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
-			// 	// req.session.activeRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
-			// 	req.session.emailid = "batman@dc.com";
-			// 	req.session.additionalroles = [];
-			// 	req.session.firstname = "Demo";
-			// 	req.session.lastname = "User";
-			// 	req.session.activeRole = req.session.defaultRole = "Test Lead";
-			// 	// req.session.activeRole = req.session.defaultRole = "Admin";
-			// }
 			return next();
 		});
 
@@ -267,14 +214,13 @@ if (!cluster.isMaster) {
 		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
 
-		// app.use(csrf({
-		// 	cookie: true
-		// }));
+		app.use(csrf({
+			cookie: true
+		}));
 
 		app.all('*', function(req, res, next) {
+			res.cookie('XSRF-TOKEN', req.csrfToken(), {httpOnly: false, sameSite:true, secure: true})
 			next();
-			// res.cookie('XSRF-TOKEN', req.csrfToken(), {httpOnly: false, sameSite:true, secure: true})
-			// next();
 		});
 
 		app.get('/error', function(req, res, next) {
