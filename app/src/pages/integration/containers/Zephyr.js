@@ -19,10 +19,12 @@ const Zephyr = () => {
     const zephyrUrlRef = useRef();
     const zephyrUsernameRef = useRef();
     const zephyrPasswordRef = useRef();
+    const zephyrAuthTokenRef = useRef();
     const [domainDetails , setDomainDetails] = useState(null);
     const [loginSuccess , setLoginSuccess]=useState(false);
     const [loginError , setLoginError]= useState(null);
     const [mappedfilesRes,setMappedFilesRes]=useState([]);
+    const [authType, setAuthType]=useState("basic");
 
     useEffect(() => {
         return ()=>{
@@ -44,11 +46,17 @@ const Zephyr = () => {
     const callLogin_zephyr = async()=>{
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Logging...'});
 
-        const zephyrURL = zephyrUrlRef.current.value;
-        const zephyrUsername = zephyrUsernameRef.current.value;
-        const zephyrPassword = zephyrPasswordRef.current.value;
+        var zephyrPayload = {};
+        zephyrPayload.authtype = authType;
+        zephyrPayload.zephyrURL = zephyrUrlRef.current.value;
+        if(authType==="basic") {
+            zephyrPayload.zephyrUserName = zephyrUsernameRef.current.value;
+            zephyrPayload.zephyrPassword = zephyrPasswordRef.current.value;
+        } else {
+            zephyrPayload.zephyrApiToken = zephyrAuthTokenRef.current.value;
+        }
 
-        const domainDetails = await api.loginToZephyr_ICE(zephyrURL, zephyrUsername, zephyrPassword);
+        const domainDetails = await api.loginToZephyr_ICE(zephyrPayload);
 
         if (domainDetails.error) setMsg( domainDetails.error);
         else if (domainDetails === "unavailableLocalServer") setLoginError("ICE Engine is not available, Please run the batch file and connect to the Server.");
@@ -118,8 +126,12 @@ const Zephyr = () => {
                 urlRef={zephyrUrlRef}
                 usernameRef={zephyrUsernameRef}
                 passwordRef={zephyrPasswordRef}
+                authtokenRef={zephyrAuthTokenRef}
+                authType={authType}
+                setAuthType={setAuthType}
                 screenType={screenType}
                 error={loginError}
+                setLoginError={setLoginError}
                 login={callLogin_zephyr}
             /> }
         { viewMappedFlies ===null && screenType=== "Zephyr" &&

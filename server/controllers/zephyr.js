@@ -20,25 +20,20 @@ exports.loginToZephyr_ICE = function (req, res) {
 		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		logger.debug("ICE Socket requesting Address: %s" , name);
 		const reqData = req.body;
-		var check_zephyrURL = !validator.isEmpty(reqData.zephyrURL);
-		var check_zephyrUserName = !validator.isEmpty(reqData.zephyrUserName);
-		var check_zephyrPassword = !validator.isEmpty(reqData.zephyrPassword);
+		var check_zephyrURL = !validator.isEmpty(req.body.zephyrPayload.zephyrURL);
+		var check_zephyrauthtype = !validator.isEmpty(req.body.zephyrPayload.authtype);
 		if(!check_zephyrURL) {
 			logger.info("Error occurred in loginToZephyr_ICE: Invalid Zephyr URL");
 			return res.send("invalidurl");
 		}
-		if(check_zephyrURL && check_zephyrUserName &&  check_zephyrPassword) {
+		if(check_zephyrURL && check_zephyrauthtype) {
 			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
-					var zephyrURL = reqData.zephyrURL;
-					var zephyrUserName = reqData.zephyrUserName;
-					var zephyrPassword = reqData.zephyrPassword;
+					var zephyrPayload = req.body.zephyrPayload;
 					var integrationType = reqData.integrationType;
 					var zephyraction = reqData.zephyraction;
 					var zephyrDetails = {
-						"zephyrURL": zephyrURL,
-						"zephyrUserName": zephyrUserName,
-						"zephyrPassword": zephyrPassword,
+						"zephyrPayload": zephyrPayload,
 						"integrationType" : integrationType,
 						"zephyraction": zephyraction
 					};

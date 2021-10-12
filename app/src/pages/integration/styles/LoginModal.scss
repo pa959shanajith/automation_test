@@ -47,3 +47,32 @@
     color: $red;
     flex-grow: 1;
 }
+
+.ilm__authtype_cont{
+    margin-top: 2%;
+	padding: 0px 0px;
+    position: relative;
+    float: left;
+    width: 100%;
+}
+
+.ilm__auth{
+    margin-left: 20px;
+	float: left;
+    width: 30%;
+}
+
+.ilm__leftauth{
+    margin-right: 50px;
+}
+
+.authTypeRadio input{
+    position: absolute;
+    width: auto!important;
+    margin-top: 3px;
+}
+
+.authTypeRadio span {
+    padding-left: 18px;
+    width: fit-content;
+}
