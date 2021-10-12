@@ -210,7 +210,7 @@ const Header = () => {
                                 !adminDisable &&
                                 <>
                                 <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
-                                <div onClick={chngUsrConf} ><Link to="#">Settings</Link></div>
+                                { window.localStorage['navigateScreen'] !== 'settings' && <div onClick={chngUsrConf} ><Link to="#">Settings</Link></div>}
                                 </>
                             }
                             <div onClick={logout}><Link to="#">Logout</Link></div>
