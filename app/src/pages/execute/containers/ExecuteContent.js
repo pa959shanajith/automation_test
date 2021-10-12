@@ -349,7 +349,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
                             <div className='exe-select-recpients'>
                                 <div>
                                     <span className="leftControl" title="Token Name">Select Recipients</span>
-                                    <SelectRecipients recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
+                                    <SelectRecipients disabled={checkAddUsers?false:true} recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
                                 </div>
                             </div>
                         </div>

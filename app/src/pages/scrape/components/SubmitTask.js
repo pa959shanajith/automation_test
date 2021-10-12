@@ -37,6 +37,12 @@ const SubmitTask = () => {
         setRecipients({groupids:[],additionalrecepients:[]});
     }
 
+    const checkAddUsers = () => {
+        if(document.getElementById("ss__checkbox") === null) return true
+        let checked = document.getElementById("ss__checkbox").checked
+        return !checked
+    }
+
     const fetchSelectRecipientsData = async () => {
         let checkAddUsers = document.getElementById("ss__checkbox").checked
         if(!checkAddUsers) resetData()
@@ -103,7 +109,7 @@ const SubmitTask = () => {
                 <div className='ss__select-recpients'>
                     <div>
                         <span className="leftControl" title="Token Name">Select Recipients</span>
-                        <SelectRecipients recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
+                        <SelectRecipients disabled={checkAddUsers()} recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
                     </div>
                 </div>
             </div>}
