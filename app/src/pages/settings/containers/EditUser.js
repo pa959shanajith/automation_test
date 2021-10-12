@@ -172,17 +172,17 @@ const EditUser = (props) => {
                 <div className={`col-xs-9 ${classes["form-group"]}`} >
                     <label htmlFor="present_password">Old Password</label>
                     <FormInput data-test="password-1-test" type="password" className={`${classes["all-inputs"]} ${!changePass ? classes["disable-input"] : ""}  ${!isPrevPassword ? classes["invalid"] : ""}`} placeholder="Old Password" value={prevPassword}
-                        onChange={(event) => { setPrevPassword(event.target.value) }} />
+                        onChange={(event) => { setPrevPassword(event.target.value) }} disabled={!changePass?true:false} />
                 </div>
                 <div className={`col-xs-9 ${classes["form-group"]}`} >
                     <label htmlFor="new_password">New Password</label>
                     <FormInput data-test="password-2-test" type="password" className={`${classes["all-inputs"]} ${!changePass ? classes["disable-input"] : ""} ${!isNewPassword ? classes["invalid"] : ""}`} placeholder="New Password" value={newPassword}
-                        onChange={(event) => { setNewPassword(event.target.value) }} />
+                        onChange={(event) => { setNewPassword(event.target.value) }} disabled={!changePass?true:false} />
                 </div>
                 <div className={`col-xs-9 ${classes["form-group"]}`} >
                     <label htmlFor="confirm_new_password">Confirm New Password</label>
                     <FormInput data-test="password-3-test" type="password" className={`${classes['all-inputs']} ${!changePass ? classes["disable-input"] : ""} ${!isNewConfirmPassword ? classes["invalid"] : ""}`} placeholder="Confirm New Password" value={newConfirmPassword}
-                        onChange={(event) => { setNewConfirmPassword(event.target.value) }} />
+                        onChange={(event) => { setNewConfirmPassword(event.target.value) }} disabled={!changePass?true:false}/>
                 </div>
             </div>
         </form>

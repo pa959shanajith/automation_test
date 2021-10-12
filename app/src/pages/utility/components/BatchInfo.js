@@ -16,10 +16,17 @@ const BatchInfo = props => {
             setBatch(undefined);
             return;
         }
+        //ensuring batch info format : {"batchInfo":[]}
+        if(!(batchInfo.replace(/[ \n]/g,"").startsWith("{\"batchInfo\":[") || batchInfo.replace(/[ \n]/g,"").startsWith("{'batchInfo':[")) ||
+        !batchInfo.replace(/[ \n]/g,"").endsWith("]}")){
+            setBatch(undefined);
+            setError(true);
+            return;
+        }
         try {
-            setBatch({
-                ...JSON.parse(batchInfo)
-            })
+            setBatch([
+                ...JSON.parse(batchInfo)["batchInfo"]
+            ])
         }
         catch (err) {
             setBatch(undefined);

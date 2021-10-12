@@ -57,7 +57,7 @@ const ExecutionApi = props => {
             setResult({
                 executionData:{
                     source,
-                    exectionMode: execMod,
+                    ExecutionMode: execMod,
                     executionEnv: execEnv,
                     browserType: browser,
                     [info]: info === 'gitInfo' ? gitInfo : batchInfo,
@@ -69,7 +69,7 @@ const ExecutionApi = props => {
             setResult({
                 executionData:{
                     source,
-                    exectionMode: execMod,
+                    ExecutionMode: execMod,
                     executionEnv: execEnv,
                     browserType: browser,
                     [info]: info === 'gitInfo' ? gitInfo : batchInfo,

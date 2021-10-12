@@ -18,7 +18,7 @@ const Header = (props)=>{
 const FormInput = (props) => {
     return(
         <>
-                <input type={props.type} className={props.className} placeholder={props.placeholder} value = {props.value} onChange = {props.onChange}/>
+                <input disabled={props.disabled} type={props.type} className={props.className} placeholder={props.placeholder} value = {props.value} onChange = {props.onChange}/>
         </>
     )
 }
