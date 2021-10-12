@@ -69,6 +69,9 @@
             margin-right: 10px
         }
     }
+    .__react_component_tooltip.show{
+        opacity: 1 !important;
+    }
 }
 .AdvOptn__container-exe{
     .modal__body{
@@ -85,5 +88,8 @@
     }
     .advOptn__selectRecipient{
         width: 43% !important;
+    }
+    .__react_component_tooltip.show{
+        opacity: 1 !important;
     }
 }
