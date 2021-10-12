@@ -105,7 +105,7 @@ const CanvasNew = (props) => {
                         typeo = typen;
                     }
                 })
-                if(props.module.importData.createdby==='pd')setCreateNew('save')
+                if(props.module.importData.createdby==='pd'|| props.module.importData.createdby==='sel')setCreateNew('save')
             }else{
                 //create new mindmap
                 tree = createNewMap(props.verticalLayout,undefined,undefined,types)

@@ -9,9 +9,10 @@ const PluginSection = ({userInfo}) => {
         "Integration": { title: "Integrations", show: false },
         "Utility" : { title: "Utilities", show: false},
         "Mindmap": { title: "Mindmaps", show: false },
-        "Neurongraphs": {title:"Neuron Graph", show: false},
+        "Neuron Graphs": {title:"Neuron Graphs", show: false},
         "Reports": { title: "Reports", show: false},
         "Dashboard": {title:"Dashboard", show: false},
+        "Selenium To Avo": {title:"Selenium To Avo", show: false},
         "showList" : false,
     });
 
