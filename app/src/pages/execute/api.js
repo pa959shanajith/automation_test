@@ -319,8 +319,14 @@ export const getICE_list = async(data) => {
   api returns object=> 
 */
 
-export const loginZephyrServer_ICE = async(zephyrURL,zephyrUserName,zephyrPassword, integrationType) => { 
+export const loginZephyrServer_ICE = async(zephyrURL, zephyrUserName, zephyrPassword, zephyrApiToken, zephyrAuthType, integrationType) => { 
     try{
+        var zephyrPayload = {};
+        zephyrPayload.authtype = zephyrAuthType;
+        zephyrPayload.zephyrURL = zephyrURL;
+        zephyrPayload.zephyrUserName = zephyrUserName;
+        zephyrPayload.zephyrPassword = zephyrPassword;
+        zephyrPayload.zephyrApiToken = zephyrApiToken;
         const res = await axios(url+'/loginToZephyr_ICE', {
             method: 'POST',
             headers: {
@@ -328,9 +334,7 @@ export const loginZephyrServer_ICE = async(zephyrURL,zephyrUserName,zephyrPasswo
             },
             data: { action: "loginToZephyr_ICE",
                 action: "loginToZephyr_ICE",
-                zephyrURL: zephyrURL,
-                zephyrUserName: zephyrUserName,
-                zephyrPassword : zephyrPassword,
+                zephyrPayload: zephyrPayload,
                 integrationType : integrationType,
                 zephyraction: "login"
             },
