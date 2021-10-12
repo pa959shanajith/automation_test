@@ -66,24 +66,24 @@ const CycleNode = props => {
             checkVal += 1;
             for(var i=0; i<phases.length; ++i) {
                 phases[i].checked = true;
-                phaseCount.check += 1;
                 var testcases = phases[i].closest('.int__phaseNode').querySelectorAll('.mp-tcs');
                 for(var j=0;j<testcases.length;++j) {
                     testcases[j].checked = true;
                 }
             }
             tempPhaseVal = ["all"];
+            setPhaseCount({check:props.phaseList.length, phases:props.phaseList});
         } else {
             //phases - 4 divs
             checkVal -= 1;
             for(var i=0; i<phases.length; ++i) {
                 phases[i].checked = false;
-                phaseCount.check -= 1;
                 var testcases = phases[i].closest('.int__phaseNode').querySelectorAll('.mp-tcs');
                 for(var j=0;j<testcases.length;++j) {
                     testcases[j].checked = false;
                 }
             }
+            setPhaseCount({check:0, phases:props.phaseList});
         }
         props.setCycleCount({check:checkVal,cycles:cycleVal});  
         for(var i=0;i<props.phaseList.length;++i) {
@@ -98,7 +98,7 @@ const CycleNode = props => {
                 projectId: props.projectId,
                 releaseId: props.releaseId,
                 phaseDets: phaseDetsVal,
-                selectPhase: props.selectedPhase
+                selectedPhase: props.selectedPhase
             }
         });
         if(checkVal == Object.keys(cycleVal).length) props.setRootCheck(true);
@@ -170,6 +170,7 @@ const PhaseNode = props => {
     },[])
 
     const handleClick = useCallback(async()=>{
+        var checkList = [];
         if (collapse) {
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Testcases...'});
 
@@ -195,7 +196,9 @@ const PhaseNode = props => {
             else {
                 setTestCases(data);
                 setCollapse(false);
-                setTests({check:[],tests:data});
+                var ph = document.getElementById('ph-'+phaseid);
+                if(ph!=undefined && ph.checked) data.forEach(t => checkList.push(String(t.id)));
+                setTests({check:checkList,tests:data});
             }
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         }
@@ -210,6 +213,7 @@ const PhaseNode = props => {
         var phaseVal = props.phaseCount.phases;
         var cycleCheckVal = props.cycleCount.check;
         var cycleCycleVal = props.cycleCount.cycles;
+        var test = tests.tests;
         var phaseDetsVal = props.phaseDets;
         var cy = document.getElementById('cycl-'+props.cycleid);
         var testcases = event.target.closest('.int__phaseNode').querySelectorAll('.mp-tcs');
@@ -220,7 +224,7 @@ const PhaseNode = props => {
             }
             checkVal = checkVal - 1;
             props.setPhaseCount({check:checkVal,phases:phaseVal});
-            setTests({check:[], tests:testCases});
+            setTests({check:[], tests:test});
             if (cy.checked) {
                 cy.checked=false
                 props.setRootCheck(false);
@@ -234,17 +238,17 @@ const PhaseNode = props => {
                 testcases[i].checked = true;
                 checkList.push(testcases[i].closest('.test_tree_leaves').querySelector('.leafId').innerText);
             }
-            setTests({check:checkList, tests:testCases});
+            setTests({check:checkList, tests:test});
             checkVal = checkVal + 1;
             props.setPhaseCount({check:checkVal,phases:phaseVal});
             phaseDetsVal[cyclephaseid] = ["all"]
+            if (checkVal == Object.keys(phaseVal).length) {
+                cy.checked=true
+                cycleCheckVal += 1;
+                props.setCycleCount({check:cycleCheckVal,cycles:cycleCycleVal});
+            }
+            if (cycleCheckVal == Object.keys(cycleCycleVal).length) props.setRootCheck(true);
         }
-        if (checkVal == Object.keys(phaseVal).length) {
-            cy.checked=true
-            cycleCheckVal += 1;
-            props.setCycleCount({check:cycleCheckVal,cycles:cycleCycleVal});
-        }
-        if (cycleCheckVal == Object.keys(cycleCycleVal).length) props.setRootCheck(true);
         dispatch({
             type: actionTypes.UPDATE_MAP_PAYLOAD, 
             payload: {
@@ -387,13 +391,15 @@ const TestCaseNode = props => {
         var cy = document.getElementById('cycl-'+props.cycleid);
         var ph = document.getElementById('ph-'+props.phaseId);
         if(event.target.checked) {
-            checkList.add(testid);
-            if(checkList.size == testcases.length) {
-                ph.checked=true;
-                checkVal = checkVal + 1;
-                props.setPhaseCount({check:checkVal,phases:phaseVal});
+            if(!checkList.has(testid)) {
+                checkList.add(testid);
+                if(checkList.size == testcases.length) {
+                    ph.checked=true;
+                    checkVal = checkVal + 1;
+                    props.setPhaseCount({check:checkVal,phases:phaseVal});
+                }
+                phaseDetsVal[props.cyclephaseid].push(testid);
             }
-            phaseDetsVal[props.cyclephaseid].push(testid);
             if(checkVal == Object.keys(phaseVal).length) {
                 cy.checked=true;
                 cycleCheckVal += 1
