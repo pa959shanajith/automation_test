@@ -285,7 +285,7 @@ const prepareReportData = (reportData, embedImages) => {
         else if (row.status == "Fail") fail++;
         else if (row.Step && row.Step == "Terminated") terminated++
         if (row.Remark && row.Remark !== " ") remarksLength.push(row.Remark)
-        if (row.Comments && row.Comments !== " ") commentsLength.push(row.Remark)
+        if (row.Comments && row.Comments !== " ") commentsLength.push(row.Comments)
     });
     const total = pass+fail+terminated;
     const passPercent = parseFloat(100 * pass / total).toFixed(2);

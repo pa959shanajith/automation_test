@@ -44,6 +44,9 @@ const SocketFactory = () => {
         var userName = Buffer.from((userInfo && userInfo.username)?userInfo.username:uuid()).toString('base64')
         var socket = socketIOClient(url, { forceNew: true, reconnect: true, query: {check: 'notify', key: userName}});
         dispatch({type:actionTypes.SET_SOCKET,payload:socket})
+        return(() => {
+            socket.close();
+        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[userInfo])
 
