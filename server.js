@@ -26,7 +26,7 @@ process.env.nullpool = "5fc13ea772142998e29b5e64";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
-if (cluster.isMaster) {
+if (!cluster.isMaster) {
 	cluster.fork();
 	cluster.on('disconnect', function(worker) {
 		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
@@ -101,7 +101,10 @@ if (cluster.isMaster) {
 			res.setHeader('Access-Control-Allow-Origin', origin);
 			res.setHeader('Access-Control-Allow-Credentials', true);
 			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Accept, Content-Type, Upgrade-Insecure-Requests');
-			res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+			// next();
+			// res.setHeader('Access-Control-Allow-Origin', req.hostname);
+			// res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With');
+			// res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 			next();
 		});
 		var httpsServer = require('https').createServer(credentials, app);
@@ -116,6 +119,11 @@ if (cluster.isMaster) {
 		app.use(express.static(__dirname + "/public/", { maxage: thirtyDays, index: false }));
 
 		//serve all asset files from necessary directories
+		// app.use('/partials', express.static(__dirname + "/public/partials"));
+		// app.use("/js", express.static(__dirname + "/public/js"));
+		// app.use("/imgs", express.static(__dirname + "/public/imgs"));
+		// app.use("/css", express.static(__dirname + "/public/css"));
+		// app.use("/fonts", express.static(__dirname + "/public/fonts"));
 		app.use("/neuronGraphs", express.static(__dirname + "/public/neurongraphs"));
 		app.post('/designTestCase', (req, res) => res.sendFile("index.html", { root: __dirname + "/public/" }));
 
@@ -159,6 +167,51 @@ if (cluster.isMaster) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
 			}
+			//anvesh below
+			// if (!req.session.username) {
+			// 	req.session.username = "anvesh.sharma";
+			// 	req.session.uniqueId = "vm-eH5lLa-76Ka-F2Y6aTZJsqW_KmHAo";
+			// 	req.session.usertype = "inhouse";
+			// 	//req.session.logged = true;
+			// 	// req.session.userid = "60f8f9abc963ba2b1ab6ace1"; //99
+			// 	req.session.userid = "605b21ecc523a854a62af85c"; // local
+			// 	req.session.ip = "0.0.0.0";
+			// 	req.session.loggedin = "2020-08-10T15:21:03.472Z";
+			// 	// req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
+			// 	// req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
+			// 	req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
+			// 	req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
+			// 	// req.session.defaultRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
+			// 	// req.session.activeRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
+			// 	req.session.emailid = "batman@dc.com";
+			// 	req.session.additionalroles = [];
+			// 	req.session.firstname = "Bat";
+			// 	req.session.lastname = "Man";
+			// 	req.session.activeRole = req.session.defaultRole = "Test Lead";
+			// 	// req.session.activeRole = req.session.defaultRole = "Admin";
+			// }
+			// if (!req.session.username) {
+			// 	req.session.username = "anvesh.sharma";
+			// 	req.session.uniqueId = "vm-eH5lLa-76Ka-F2Y6aTZJsqW_KmHAo";
+			// 	req.session.usertype = "inhouse";
+			// 	//req.session.logged = true;
+			// 	// req.session.userid = "60f8f9abc963ba2b1ab6ace1"; //99
+			// 	req.session.userid = "614aae9771863ad57882e676"; // local
+			// 	req.session.ip = "0.0.0.0";
+			// 	req.session.loggedin = "2020-08-10T15:21:03.472Z";
+			// 	// req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
+			// 	// req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
+			// 	req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
+			// 	req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
+			// 	// req.session.defaultRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
+			// 	// req.session.activeRoleId = "FETCH FROM DB.permissions(for admin) AND POPULATE";
+			// 	req.session.emailid = "batman@dc.com";
+			// 	req.session.additionalroles = [];
+			// 	req.session.firstname = "Demo";
+			// 	req.session.lastname = "User";
+			// 	req.session.activeRole = req.session.defaultRole = "Test Lead";
+			// 	// req.session.activeRole = req.session.defaultRole = "Admin";
+			// }
 			return next();
 		});
 
@@ -214,13 +267,14 @@ if (cluster.isMaster) {
 		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
 
-		app.use(csrf({
-			cookie: true
-		}));
+		// app.use(csrf({
+		// 	cookie: true
+		// }));
 
 		app.all('*', function(req, res, next) {
-			res.cookie('XSRF-TOKEN', req.csrfToken(), {httpOnly: false, sameSite:true, secure: true})
 			next();
+			// res.cookie('XSRF-TOKEN', req.csrfToken(), {httpOnly: false, sameSite:true, secure: true})
+			// next();
 		});
 
 		app.get('/error', function(req, res, next) {
@@ -368,9 +422,9 @@ if (cluster.isMaster) {
 		app.post('/assignProjects_ICE', auth.protect, admin.assignProjects_ICE);
 		app.post('/getAssignedProjects_ICE', auth.protect, admin.getAssignedProjects_ICE);
 		app.post('/getAvailablePlugins', auth.protect, admin.getAvailablePlugins);
-		app.post('/manageSessionData', auth.protect, admin.manageSessionData);
+		app.post('/manageSessionData', auth.protect, admin.adminPreviledgeCheck, admin.manageSessionData);
 		app.post('/unlockUser', auth.protect, admin.unlockUser);
-		app.post('/manageUserDetails', auth.protect, admin.manageUserDetails);
+		app.post('/manageUserDetails', auth.protect, admin.adminPreviledgeCheck, admin.manageUserDetails);
 		app.post('/getUserDetails', auth.protect, admin.getUserDetails);
 		app.post('/fetchLockedUsers', auth.protect, admin.fetchLockedUsers);
 		app.post('/testLDAPConnection', auth.protect, admin.testLDAPConnection);
@@ -381,9 +435,9 @@ if (cluster.isMaster) {
 		app.post('/getOIDCConfig', auth.protect, admin.getOIDCConfig);
 		app.post('/manageOIDCConfig', auth.protect, admin.manageOIDCConfig);
 		app.post('/getCIUsersDetails', auth.protect, admin.getCIUsersDetails);
-		app.post('/manageCIUsers', auth.protect, admin.manageCIUsers);
+		app.post('/manageCIUsers', auth.protect, admin.adminPreviledgeCheck, admin.manageCIUsers);
 		app.post('/getPreferences', auth.protect, admin.getPreferences);
-		app.post('/provisionIce', auth.protect, admin.provisionICE);
+		app.post('/provisionIce', auth.protect, admin.adminPreviledgeCheck, admin.provisionICE);
 		app.post('/fetchICE', auth.protect, admin.fetchICE);
 		app.post('/getAvailable_ICE', auth.protect, admin.getAvailable_ICE);
 		app.post('/getICEinPools', auth.protect, admin.getICEinPools);
@@ -394,7 +448,7 @@ if (cluster.isMaster) {
 		app.post('/clearQueue', auth.protect, admin.clearQueue);
 		app.post('/exportProject', auth.protect, admin.exportProject);
 		app.post('/restartService', auth.protect, admin.restartService);
-		app.post('/gitSaveConfig', auth.protect, admin.gitSaveConfig);
+		app.post('/gitSaveConfig', auth.protect, admin.adminPreviledgeCheck, admin.gitSaveConfig);
 		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
