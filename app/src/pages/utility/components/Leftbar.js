@@ -9,7 +9,7 @@ const Leftbar=(props)=>{
             <div className="letfnav">
                 <h4>Utilities</h4>
                 <span onClick={()=>{props.setScreenType("encryption") ; setFocus("encryption")}} title="Encryption">
-                    <img src='static/imgs/ic-encryption-utility.png' alt="EncryptIcon" id={(focus==="encryption")? "selected":null}/>
+                    <img className="util__execution_ic" src='static/imgs/ic-encryption-utility.png' alt="EncryptIcon" id={(focus==="encryption")? "selected":null}/>
                     <div>Encryption</div>
                 </span>
                 {/* <span onClick={()=>{props.setScreenType("optimization");  setFocus("optimization") ; props.setPairwiseClicked(false)}}>
@@ -25,7 +25,7 @@ const Leftbar=(props)=>{
                     <div>Data Table</div>
                 </span>
                 <span onClick={()=>{props.setScreenType("api-utils");  setFocus("api-utils"); }} title="Request Body Generator">
-                    <div className="fa fa-table fa-2x util__execution_ic" id={(focus==="api-utils")? "selected":""}/>
+                    <img className="util__execution_ic" src={"static/imgs/RequestBodyGenerator.svg"} id={(focus==="api-utils")? "selected":""}/>
                     <div>Request Body<br/>Generator</div>
                 </span>
             </div>
