@@ -19,14 +19,15 @@ const ExecMetricsApi = props => {
         setExecutionId("");
     }, [reset])
     useEffect(()=>{
+        let metricsData = {
+            fromDate,
+            toDate,
+            LOB: lob
+        }
+        if(status!=="") metricsData["status"] = status;
+        if(executionId!=="") metricsData["executionId"] = executionId;
         props.setResult({
-            metrics_data:{
-                fromDate,
-                toDate,
-                LOB: lob,
-                status,
-                executionId
-            }
+            metrics_data:metricsData
         })
     }, [fromDate, toDate, lob, status, executionId])
 
