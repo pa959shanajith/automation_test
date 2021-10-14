@@ -22,7 +22,7 @@ const ApiUtils = props => {
         executionId: false,
         scenarioIds: false,
         source: false,
-        ExecutionMode: false,
+        exectionMode: false,
         executionEnv: false,
         browserType: false,
         integration: {
@@ -62,7 +62,7 @@ const ApiUtils = props => {
             executionId: false,
             scenarioIds: false,
             source: false,
-            ExecutionMode: false,
+            exectionMode: false,
             executionEnv: false,
             browserType: false,
             integration: {
@@ -164,7 +164,7 @@ const ApiUtils = props => {
             executionId: false,
             scenarioIds: false,
             source: false,
-            ExecutionMode: false,
+            exectionMode: false,
             executionEnv: false,
             browserType: false,
             integration: {
@@ -248,7 +248,7 @@ const validate = (request, api, integration) => {
         executionId: false,
         scenarioIds: false,
         source: false,
-        ExecutionMode: false,
+        exectionMode: false,
         executionEnv: false,
         browserType: false,
         integration: {
@@ -304,8 +304,8 @@ const validate = (request, api, integration) => {
             check.source = true;
             check.error = true;
         }
-        if (request["executionData"].ExecutionMode !== "serial" && request["executionData"].ExecutionMode !== "parallel") {
-            check.ExecutionMode = true;
+        if (request["executionData"].exectionMode !== "serial" && request["executionData"].exectionMode !== "parallel") {
+            check.exectionMode = true;
             check.error = true;
         }
         if (request["executionData"].executionEnv !== "default" && request["executionData"].executionEnv !== "saucelab") {
