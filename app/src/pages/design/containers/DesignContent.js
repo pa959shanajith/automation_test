@@ -759,6 +759,12 @@ const DesignContent = props => {
         setRecipients({groupids:[],additionalrecepients:[]});
     }
 
+    const checkAddUsers = () => {
+        if(document.getElementById("dc__checkbox") === null) return true
+        let checked = document.getElementById("dc__checkbox").checked
+        return !checked
+    }
+
     const ConfirmPopup = () => (
         <ModalContainer 
             title={showPopup.title}
@@ -771,7 +777,7 @@ const DesignContent = props => {
                 <div className='dc__select-recpients'>
                     <div>
                         <span className="leftControl" title="Token Name">Select Recipients</span>
-                        <SelectRecipients recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
+                        <SelectRecipients disabled={checkAddUsers()} recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
                     </div>
                 </div>
             </div>}

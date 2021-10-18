@@ -7,7 +7,7 @@ import '../styles/SelectRecipients.scss'
   use: renders searchable available Select Recipients
 */
 
-const SelectRecipients = ({ recipients,setRecipients,groupList,allUsers}) => {
+const SelectRecipients = ({ recipients,setRecipients,groupList,allUsers,disabled}) => {
     const inputRef = useRef()
     const [list1,setList1] =  useState([])
     const [list2,setList2] =  useState([])
@@ -87,7 +87,7 @@ const SelectRecipients = ({ recipients,setRecipients,groupList,allUsers}) => {
         <Fragment>
             <ClickAwayListener onClickAway={()=>{setPlaceholder();setDropDown(false)}}>
             <div>
-                <input autoComplete={"off"} ref={inputRef} className={" sr__input"} onChange={inputFilter} onClick = {resetField} placeholder={"Search Recipients.."}/>
+                <input disabled={disabled} autoComplete={"off"} ref={inputRef} className={" sr__input"} onChange={inputFilter} onClick = {resetField} placeholder={"Search Recipients.."}/>
                 {dropDown && <div className="sr__dropdown" role="menu">
                     <ScrollBar thumbColor="#929397" >
                     {list1.map((item,i) => (  

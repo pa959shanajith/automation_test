@@ -119,11 +119,13 @@ const ZephyrUpdateContent = props => {
                 setProjectDropdn1(projectId); 
                 setSelectedRel("Select Release");
                 setReleaseArr(releaseData);
+                setProjectDetails({});
             }
             if(dropdn === "2") { 
                 setProjectDropdn2(projectId); 
                 setSelectedRel1("Select Release");
                 setReleaseArr1(releaseData);
+                setProjectDetails1({});
             }
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});

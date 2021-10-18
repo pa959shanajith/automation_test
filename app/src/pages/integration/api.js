@@ -353,7 +353,7 @@ export const viewQcMappedList_ICE = async(userID) => {
         return {error:MSG.INTEGRATION.ERR_EMPTY_MAPPED_DATA}
     }
 }
-export const loginToZephyr_ICE = async(zephyrurl, username, password) => {
+export const loginToZephyr_ICE = async(zephyrPayload) => {
     try{
         const res = await axios(url+'/loginToZephyr_ICE', {
             method: 'POST',
@@ -362,9 +362,7 @@ export const loginToZephyr_ICE = async(zephyrurl, username, password) => {
             },
             data: {
                 action: "loginToZephyr_ICE",
-				zephyrURL: zephyrurl,
-				zephyrUserName:	username,
-				zephyrPassword: password,
+                zephyrPayload: zephyrPayload,
 				zephyraction: "login"
             }
         });

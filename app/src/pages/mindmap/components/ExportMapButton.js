@@ -201,7 +201,7 @@ const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycle
     try{
         var suiteDetailsTemplate = { "condition": 0, "dataparam": [" "], "scenarioId": "", "scenarioName": "" };
         var moduleData = { "testsuiteName": "", "testsuiteId": "", "versionNumber": "", "appType": "", "domainName": "", "projectName": "", "projectId": "", "releaseId": "", "cycleName": "", "cycleId": "", "suiteDetails": [suiteDetailsTemplate] };
-        var executionData = { "executionData": { "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"url":"","username":"","password":""}}, "gitInfo": {"gitConfiguration":"","gitbranch":"","folderPath":"","gitVersion":""}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))] } };
+        var executionData = { "executionData": { "source": "api", "exectionMode": "serial", "executionEnv": "default", "browserType": ["1"], "integration":{"alm": {"url":"","username":"","password":""}, "qtest": {"url":"","username":"","password":"","qteststeps":""}, "zephyr": {"url":"","username":"","password":"","apitoken":"","authtype":""}}, "gitInfo": {"gitConfiguration":"","gitbranch":"","folderPath":"","gitVersion":""}, "batchInfo": [JSON.parse(JSON.stringify(moduleData))] } };
         var moduleInfo = { "batchInfo": [] };
         moduleData.appType = projectList[selectedProj].apptypeName;
         moduleData.domainName = projectList[selectedProj].domains;

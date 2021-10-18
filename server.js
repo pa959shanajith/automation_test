@@ -261,7 +261,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|reports|plugin)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|reports|plugin|seleniumtoavo)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -368,9 +368,9 @@ if (cluster.isMaster) {
 		app.post('/assignProjects_ICE', auth.protect, admin.assignProjects_ICE);
 		app.post('/getAssignedProjects_ICE', auth.protect, admin.getAssignedProjects_ICE);
 		app.post('/getAvailablePlugins', auth.protect, admin.getAvailablePlugins);
-		app.post('/manageSessionData', auth.protect, admin.manageSessionData);
+		app.post('/manageSessionData', auth.protect, admin.adminPrivilegeCheck, admin.manageSessionData);
 		app.post('/unlockUser', auth.protect, admin.unlockUser);
-		app.post('/manageUserDetails', auth.protect, admin.manageUserDetails);
+		app.post('/manageUserDetails', auth.protect, admin.adminPrivilegeCheck, admin.manageUserDetails);
 		app.post('/getUserDetails', auth.protect, admin.getUserDetails);
 		app.post('/fetchLockedUsers', auth.protect, admin.fetchLockedUsers);
 		app.post('/testLDAPConnection', auth.protect, admin.testLDAPConnection);
@@ -381,9 +381,9 @@ if (cluster.isMaster) {
 		app.post('/getOIDCConfig', auth.protect, admin.getOIDCConfig);
 		app.post('/manageOIDCConfig', auth.protect, admin.manageOIDCConfig);
 		app.post('/getCIUsersDetails', auth.protect, admin.getCIUsersDetails);
-		app.post('/manageCIUsers', auth.protect, admin.manageCIUsers);
+		app.post('/manageCIUsers', auth.protect, admin.adminPrivilegeCheck, admin.manageCIUsers);
 		app.post('/getPreferences', auth.protect, admin.getPreferences);
-		app.post('/provisionIce', auth.protect, admin.provisionICE);
+		app.post('/provisionIce', auth.protect, admin.adminPrivilegeCheck, admin.provisionICE);
 		app.post('/fetchICE', auth.protect, admin.fetchICE);
 		app.post('/getAvailable_ICE', auth.protect, admin.getAvailable_ICE);
 		app.post('/getICEinPools', auth.protect, admin.getICEinPools);
@@ -394,7 +394,7 @@ if (cluster.isMaster) {
 		app.post('/clearQueue', auth.protect, admin.clearQueue);
 		app.post('/exportProject', auth.protect, admin.exportProject);
 		app.post('/restartService', auth.protect, admin.restartService);
-		app.post('/gitSaveConfig', auth.protect, admin.gitSaveConfig);
+		app.post('/gitSaveConfig', auth.protect, admin.adminPrivilegeCheck, admin.gitSaveConfig);
 		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);

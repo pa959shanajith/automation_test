@@ -64,7 +64,8 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
         pd:".pd",
         excel:".xls,.xlsx",
         git:".mm",
-        json:".mm"
+        json:".mm",
+		sel:".sel"
     }
     useEffect(()=>{
         if(submit){
@@ -133,11 +134,12 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
             <div>
                 <label>Import As: </label>
                 <select className='imp-inp' defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
-                    <option value={'def-val'} disabled>Select Export Format</option>
+                    <option value={'def-val'} disabled>Select Import Format</option>
                     <option value={'pd'}>AvoDiscovery (.pd)</option>
                     <option value={'excel'}>Excel Workbook (.xls,.xlsx)</option>
                     <option value={'git'}>Git (.mm)</option>
                     <option value={'json'}>MindMap (.mm)</option>
+					<option value={'sel'}>Selenium to AVO (.sel)</option>
                 </select>
             </div>
             {importType &&
@@ -194,6 +196,23 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                             <option value={'def-val'} disabled>Select Project</option>
                             {(()=>{
                                 var appType = getApptypePD(fileUpload)
+                                return Object.entries(projList).map((e)=>{
+                                    if(appType === e[1].apptypeName.toLowerCase()){
+                                        return <option value={e[1].id} key={e[0]}>{e[1].name}</option>
+                                    }
+                                })
+                            })()       
+                            }
+                        </select>
+                    </div>:null
+                    }
+					{(importType==='sel')?
+                    <div>
+                        <label>Project: </label>
+                        <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
+                            <option value={'def-val'} disabled>Select Project</option>
+                            {(()=>{
+                                var appType = 'web';
                                 return Object.entries(projList).map((e)=>{
                                     if(appType === e[1].apptypeName.toLowerCase()){
                                         return <option value={e[1].id} key={e[0]}>{e[1].name}</option>
@@ -285,6 +304,12 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
         var data = getJsonPd(res.data)
         mindmapData = {createnew:true,importData:{createdby:'pd',data:data}}
     }
+	if(importType === 'sel'){
+        var res =  await pdProcess({'projectid':importProj,'file':importData})
+        if(res.error){displayError(res.error);return;}
+        var data = getJsonPd(res.data)
+        mindmapData = {createnew:true,importData:{createdby:'sel',data:data}}
+    }
     var moduledata = await getModules({"tab":"tabCreate","projectid":importProj,"moduleid":null})
     if(moduledata.error){displayError(moduledata.error);return;}
     var screendata = await getScreens(importProj)
@@ -320,7 +345,22 @@ const uploadFile = async({uploadFileRef,setSheetList,setError,setFiledUpload,pro
             }else{
                 setError("no project of same apptype is assigned to the user")
             }
-        }else if(extension === 'xls' || extension === 'xlsx'){
+        }
+		else if(extension === 'sel'){
+            var appType = 'web';
+            var projFlag = false
+            Object.keys(projList).map((e)=>{
+                if(appType === projList[e].apptypeName.toLowerCase()){
+                    projFlag = true ;
+                }
+            })
+            if(projFlag){
+                setFiledUpload(result)
+            }else{
+                setError("no project of same apptype is assigned to the user")
+            }
+        }
+		else if(extension === 'xls' || extension === 'xlsx'){
             var res = await excelToMindmap({'content':result,'flag':"sheetname"})
             setBlockui({show:false})
             if(res.error){setError(res.error);return;}

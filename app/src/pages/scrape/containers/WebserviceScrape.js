@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import XMLParser from 'react-xml-parser';
 import { useHistory } from 'react-router-dom';
@@ -6,32 +6,14 @@ import ScreenWrapper from './ScreenWrapper';
 import { ScrapeContext } from '../components/ScrapeContext';
 import { RedirectPage, ResetSession, Messages as MSG, setMsg } from '../../global';
 import SubmitTask from '../components/SubmitTask';
-import * as WsTabs from "../components/WsTabs";
 import * as api from '../api';
-import * as designApi from "../../design/api";
 import * as actions from '../state/action';
 import "../styles/WebserviceScrape.scss";
-import * as scrapeUtils from "../components/WebServiceUtils";
-import RequestBodyEditor from '../components/RequestBodyEditor';
-import AuthEditor from "../components/AuthEditor";
-import { combineHeaders } from "./ScrapeScreen";
-import * as ScrapeSettingsConstants from "../components/ScrapeSettingsConstants";
 
 let allXpaths = [];
 let allCustnames = [];
 let objectLevel = 1;
 let xpath = "";
-const CONTENT_TYPE_HEADER_REGEX = /Content-Type:[A-Za-z\/ \-;=_\?\&]*\n?/;
-const BODY_MODE_HEADERS = {
-    "none": "",
-    "form-data" : "", 
-    "x-www-form-urlencoded": "application/x-www-form-urlencoded",
-    "Text": "text/plain",
-    "JSON": "application/json",
-    "Javascript": "application/javascript",
-    "XML": "application/xml",
-    "HTML": "text/html"
-}
 
 const WebserviceScrape = () => {
 
@@ -41,7 +23,6 @@ const WebserviceScrape = () => {
     const disableAction = useSelector(state=>state.scrape.disableAction);
     const current_task = useSelector(state=>state.plugin.CT);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
-    const userInfo = useSelector(state=>state.login.userinfo);
     const certificateInfo = useSelector(state=>state.scrape.cert);
     const {endPointURL, method, opInput, reqHeader, reqBody, respHeader, respBody, paramHeader} = useSelector(state=>state.scrape.WsData);
     const actionError = useSelector(state=>state.scrape.actionError);
@@ -50,54 +31,23 @@ const WebserviceScrape = () => {
     const [opDropdown, setOpDropdown] = useState("0");
     const [opList, setOpList] = useState([]);
     const [activeView, setActiveView] = useState("req");
-    const [reqBodyState, setReqBodyState] = useState({mode: "", rawMode: "", form: "", raw: reqBody});
-    const reqAuthHeaders = useSelector(state => state.scrape.reqAuthHeaders);
-    const {resCookies, reqCookies, wsCookieJar} = useSelector(state => state.scrape.cookies);
-    const config = useSelector(state => state.scrape.config);
-    const [cookies, setCookies] = useState([]);
     const history = useHistory();
 
-    useEffect(() => {
-        setCookies(wsCookieJar.getAllSync(endPointURL));
-    }, [activeView, endPointURL, resCookies])
-
-    const reqBodyStateChangeHandler = (state) => {
-        if(!config[ScrapeSettingsConstants.DISABLE_AUTO_CONTENT_TYPE_HEADER] 
-            && (reqBodyState.mode !== state.mode || reqBodyState.rawMode !== state.rawMode)) {
-            // replace content-type header or add one if not present
-            const newContentTypeHeader = state.mode === "raw" ? 
-                                        BODY_MODE_HEADERS[state.rawMode] : 
-                                        BODY_MODE_HEADERS[state.mode];
-            const newHeader = newContentTypeHeader ? `Content-Type:${newContentTypeHeader}\n`: ``;
-            let newReqHeader;
-            if(CONTENT_TYPE_HEADER_REGEX.test(reqHeader)) {
-                newReqHeader = newHeader && reqHeader.replace(CONTENT_TYPE_HEADER_REGEX, newHeader);
-            } else {
-                newReqHeader = newHeader && reqHeader.concat(newHeader);
-            }
-            newReqHeader = newReqHeader || reqHeader;
-            dispatch({type: actions.SET_WSDATA, payload: {reqHeader : newReqHeader}});
-        }
-        const newReqBody = state.mode === "raw" ? state.raw : state.form;
-        setReqBodyState(state);
-        dispatch({type: actions.SET_WSDATA, payload: {reqBody : newReqBody}});
-    }
     const wsdlURLHandler = event => setwsdlURL(event.target.value);
     const opDropdownHandler = event => setOpDropdown(event.target.value);
     const endpointURLHandler = event => dispatch({type: actions.SET_WSDATA, payload: {endPointURL : event.target.value}}) //setEndpoinURL(event.target.value);
     const methodHandler = event => dispatch({type: actions.SET_WSDATA, payload: {method : event.target.value}}) //setMethod(event.target.value);
     const opInputHandler = event => dispatch({type: actions.SET_WSDATA, payload: {opInput : event.target.value}}) //setOpInput(event.target.value);
     const onHeaderChange = event => {
-        let value = "";
-        if (typeof event === 'string') {
-            value = event;
-        } else {
-            value = event.target.value;
-        }
-        if (activeView === "req") dispatch({type: actions.SET_WSDATA, payload: {reqHeader : value}}) // setReqHeader(event.target.value);
-        else if (activeView === "param") dispatch({type: actions.SET_WSDATA, payload: {paramHeader : value}}) //setParamHeader(event.target.value);
-        else dispatch({type: actions.SET_WSDATA, payload: {respHeader : value}}) //setRespHeader(event.target.value);
+        if (activeView === "req") dispatch({type: actions.SET_WSDATA, payload: {reqHeader : event.target.value}}) // setReqHeader(event.target.value);
+        else if (activeView === "param") dispatch({type: actions.SET_WSDATA, payload: {paramHeader : event.target.value}}) //setParamHeader(event.target.value);
+        else dispatch({type: actions.SET_WSDATA, payload: {respHeader : event.target.value}}) //setRespHeader(event.target.value);
     }
+    const onBodyChange = event => {
+        if (activeView === "req") dispatch({type: actions.SET_WSDATA, payload: {reqBody : event.target.value}})//setReqBody(event.target.value);
+        else dispatch({type: actions.SET_WSDATA, payload: {respBody : event.target.value}})//setRespBody(event.target.value);
+    }
+
     const clearFields = () => {
         setwsdlURL("");
         setOpDropdown("0");
@@ -124,33 +74,12 @@ const WebserviceScrape = () => {
     const onSave = () => {
         let arg = {};
         let callApi = true;
-
-        // TODO - reduce checking for cookie jar disable rom 4 places to 2 
-
-        let validatedCookies = !config[ScrapeSettingsConstants.DISABLE_COOKIE_JAR] ? wsCookieJar.getAllSync(endPointURL) : [];
-        // process and add external cookies
-        let externalCookies = scrapeUtils.removeDisabled(reqCookies);
-        externalCookies = externalCookies && externalCookies.split("\n").map(c => c.replace(":", "="));
-        if(externalCookies && !config[ScrapeSettingsConstants.DISABLE_COOKIE_JAR])
-            wsCookieJar.setAllSync(endPointURL, externalCookies);
-        validatedCookies = validatedCookies?.length ? "Cookie: "+ validatedCookies.map(c => c.cookieString()).join(";") : "";
-
-        // process reqBody, headers and params
-        let rReqHeader = combineHeaders(reqHeader, reqAuthHeaders, validatedCookies);
-        let rParamHeader = scrapeUtils.removeDisabled(paramHeader);
-        // convert : to =
-        rParamHeader = rParamHeader.replace(/:/g, "=");
-        let rReqBody = reqBody;
-        const isFormEncoded = scrapeUtils.FORM_URL_ENCODE_REGEX.test(reqHeader);
-        if(isFormEncoded)
-            rReqBody = scrapeUtils.convertToFormData(reqBody, isFormEncoded);
-
         //eslint-disable-next-line
-        rReqHeader = rReqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        let rReqHeader = reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
         //eslint-disable-next-line
-        rParamHeader = rParamHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        let rParamHeader = paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
         //eslint-disable-next-line
-        rReqBody = rReqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"').replace(/'+/g, "\"");
+        let rReqBody = reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"').replace(/'+/g, "\"");
         //eslint-disable-next-line
         let rRespHeader = respHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
         //eslint-disable-next-line
@@ -287,38 +216,10 @@ const WebserviceScrape = () => {
             })
             .catch(error => {
                 console.error("Error::::", error)
-            });
-            // get testcase for this screen 
-            api.readTestCaseFromScreen_ICE(userInfo, current_task.screenId, current_task.versionnumber, current_task.screenName)
-            .then(data => {
-                // add only keywords
-                let keywordVal = [{key: "setEndPointURL", value: endPointURL}, {key: "setMethods", value: method}];
-                if(opInput) keywordVal.push({key: "setOperations", value: opInput});
-                if(rReqHeader) keywordVal.push({key: "setHeader", value: rReqHeader});
-                if(rParamHeader) keywordVal.push({key: "setParam", value: rParamHeader});
-                if(rReqBody) keywordVal.push({key: "setWholeBody", value: rReqBody});
-                // todo params
-                keywordVal.push({key: "executeRequest", value: ""});
-                const keywords = keywordVal.map(k =>k.key);
-                let testCases = keywordVal.map((k,i) => {
-                    return {
-                        "stepNo": i + 1, "appType": current_task.appType, "objectName": "", "inputVal": [k.value],
-                        "keywordVal": k.key, "outputVal": "", "url": "", "custname": "WebService List", "remarks": "",
-                        "addTestCaseDetails": "", "addTestCaseDetailsInfo": ""
-                    }
-                });
-                testCases = testCases.concat(
-                    data.testcase.filter(el => !keywords.includes(el.keywordVal))
-                    );
-                // update step numbers
-                testCases.forEach((el, i) => el.stepNo = i + 1);
-                designApi.updateTestCase_ICE(data.testcaseid, data.testcasename, testCases, userInfo, current_task.versionnumber, false, [])
-                .then(res => console.log(res))
-                .catch(err => console.error(err));
             })
-            .catch(err => console.error(err));
 		}
     }
+
 
     const onGo = () => {
 		if (!wsdlURL) setMsg(MSG.SCRAPE.ERR_WSDL_URL); 
@@ -396,46 +297,6 @@ const WebserviceScrape = () => {
             });
 		}
     }
-    
-    const displayTag = (respHeader) => {
-        const status = respHeader.substring(respHeader.indexOf("StatusCode")).split("\n");
-        const statusCode = status[0]?.split(":")[1];
-        const reason = status[1]?.split(":")[1];
-        return (
-            <div
-                className="ws__tag"
-                style={{
-                    backgroundColor: 'transparent',
-                    color: statusCode?.startsWith("2") ? 'green' : 'red',
-                    fontWeight: "bold"
-                }}
-            >
-                {`${statusCode} ${reason || ''}`}
-            </div>
-        );
-    }
-
-
-    const onCookieChange = (value) => {
-        //prevent dispatching null
-        if(value)
-        dispatch({type: actions.SET_COOKIES, payload: {reqCookies: value}});
-    }
-
-    const saveResponse = () => {
-        const ext = respHeader.includes("json") ? "json" :
-            respHeader.includes("xml") ? "xml" : "txt";
-        const response = respBody;
-        const filename = current_task.screenName + "." + ext;
-        const responseBlob = new Blob([response], {type: 'text/json'});
-        const a = document.createElement('a');
-        a.download = filename;
-        a.href = window.URL.createObjectURL(responseBlob);
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
 
     return (
         <ScreenWrapper
@@ -458,7 +319,19 @@ const WebserviceScrape = () => {
                 </div>
                 
                 <div className="ws__row ws__action_wrapper">
-                    
+                <button className={"ws__action_btn" + (activeView==="req" ? " ws__active": "")} onClick={()=>setActiveView("req")}>
+                        Request
+                        { activeView === "req" && <div className="caret__ws fa fa-caret-down"></div>}
+                    </button>
+                    <button className={"ws__action_btn" + (activeView==="param" ? " ws__active": "")} onClick={()=>setActiveView("param")}>
+                        Params
+                        { activeView === "param" && <div className="caret__ws fa fa-caret-down"></div>}
+                    </button>
+                    <button className={"ws__action_btn" + (activeView==="resp" ? " ws__active": "")} onClick={()=>setActiveView("resp")}>
+                        Response
+                        { activeView === "resp" && <div className="caret__ws fa fa-caret-down"></div>}
+                    </button>
+                    <input className={"ws__input"+(actionError.includes("endPointURL")?" ws_eb":"")} type='text' placeholder='End Point URL' onChange={endpointURLHandler} value={endPointURL} disabled={disableAction}/>
                     <select className={"ws__select"+(actionError.includes("method")?" ws_eb":"")} onChange={methodHandler} value={method} disabled={disableAction} >
                         <option disabled value="0">Select Method</option>
                         <option value="GET">GET</option>
@@ -466,19 +339,7 @@ const WebserviceScrape = () => {
                         <option value="HEAD">HEAD</option>
                         <option value="PUT">PUT</option>
                         <option value="DELETE">DELETE</option>
-                        <option value="PATCH">PATCH</option>
-                        <option value="OPTIONS">OPTIONS</option>
-                        <option value="COPY">COPY</option>
-                        <option value="LINK">LINK</option>
-                        <option value="UNLINK">UNLINK</option>
-                        <option value="PURGE">PURGE</option>
-                        <option value="LOCK">LOCK</option>
-                        <option value="UNLOCK">UNLOCK</option>
-                        <option value="PROPFIND">PROPFIND</option>
-                        <option value="VIEW">VIEW</option>
                     </select>
-                    <input className={"ws__input"+(actionError.includes("endPointURL")?" ws_eb":"")} type='text' placeholder='End Point URL' onChange={endpointURLHandler} value={endPointURL} disabled={disableAction}/>
-                    
                     <input className={"ws__input ws__op_input"+(actionError.includes("opInput")?" ws_eb":"")} type="text" placeholder="Operation" onChange={opInputHandler} value={opInput} disabled={disableAction} />
                     <button className="ws__cert_btn" onClick={()=>setShowObjModal("addCert")}>
                         <img alt="cert-icon" src="static/imgs/certificate_ws.png"/>
@@ -488,33 +349,25 @@ const WebserviceScrape = () => {
                         !wsdlURL && opDropdown === "0" && !endPointURL && method === "0" && !opInput && !reqHeader && !reqBody && !respHeader && !respBody && !paramHeader
                     } onClick={clearFields}>Clear</button>
                 </div>
-                <div className="ws__row ws__action_options">
-                    { [ 
-                        { name: "Header", id: "req", error: "reqHeader" },
-                        { name: "Params", id: "param" },
-                        { name: "Body", id: "body", error: "reqBody" },
-                        { name: "Authorization", id: "auth" },
-                        { name: "Cookies", id: "cookie" },
-                        { name: "Settings", id: "config" },
-                        { name: "Response", id: "resp" }
-                        ].map(tab => (
-                            <button key={tab.id} className={"ws__action_btn" + (activeView===tab.id ? " ws__active": "") + 
-                                (actionError.includes(tab.error) ? " ws__action_error" : "")} 
-                                onClick={()=>setActiveView(tab.id)}>
-                                            {tab.name}
-                                { activeView === tab.id && <div className="caret__ws fa fa-caret-down"></div>}
-                            </button>
-                        ))   
+                
+                <textarea 
+                    className={"ws__rqst_resp_header"+(actionError.includes("reqHeader")&&activeView==="req"?" ws_eb":"")}
+                    value={activeView === "req" ? reqHeader : activeView === "param" ? paramHeader : respHeader} 
+                    placeholder={activeView === "req" ? "Request Header" : 
+                        activeView === "param" ? "param_name = value" : "Response Header"
                     }
-                </div>
-
-                {activeView === "config" && <WsTabs.ScrapeSettings/>}
-                {activeView === "resp" && <WsTabs.RespTab displayTag={displayTag} respHeader={respHeader} saveResponse={saveResponse} respBody={respBody} />}
-                {activeView === "req" && <WsTabs.ReqTab reqAuthHeaders={reqAuthHeaders} reqHeader={reqHeader} onChange={onHeaderChange} activeView={activeView} /> }
-                {activeView === "param" && <WsTabs.ReqParamTab value={paramHeader} onChange={onHeaderChange} activeView={activeView} disableAction={disableAction} />}
-                {activeView === "cookie" && <WsTabs.CookieTab endPointURL={endPointURL} cookies={cookies} activeView={activeView} onCookieChange={onCookieChange} reqCookies={reqCookies} disableAction={disableAction} />}
-                {activeView === "body" && <RequestBodyEditor state={reqBodyState} onStateChange={reqBodyStateChangeHandler} />}
-                {activeView === "auth" && <AuthEditor/>}
+                    onChange={onHeaderChange}
+                    disabled={disableAction || activeView === "resp"}
+                />
+                
+                {activeView !== "param" && <textarea 
+                    className={"ws__rqst_resp_body" +(actionError.includes("reqBody")&&activeView==="req"?" ws_eb":"")}
+                    value={activeView === "req" ? reqBody : respBody} 
+                    placeholder={activeView === "req" ? "Request Body" : "Response Body"
+                    }
+                    onChange={onBodyChange}
+                    disabled={disableAction || activeView === "resp"}
+                />}
             </div>}
         />
     );
