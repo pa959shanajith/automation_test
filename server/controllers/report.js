@@ -256,16 +256,16 @@ const prepareReportData = (reportData, embedImages) => {
     report.rows.forEach((row, i) => {
         row.slno = i + 1;
         if (row["Step "]) row.Step = row["Step "];
-        if (row.EllapsedTime && row.EllapsedTime.trim() != "") {
-            const eT = row.EllapsedTime.split(".");
-            elapTime = eT[0].split(":")
-            if (!eT[1]) eT[1] = ((eT[1] || "") + "000").slice(0, 3);
-            if (eT.length < 3 && eT[0].indexOf(":") === -1) { // Time is x.x not xx:xx:xx.xx
-                row.EllapsedTime = "00:00:" + ("0" + elapTime[0]).slice(-2) + ":" + eT[1];
-            } else {
-                row.EllapsedTime = ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2) + ":" + eT[1];
-            }
-        }
+        // if (row.EllapsedTime && row.EllapsedTime.trim() != "") {
+        //     const eT = row.EllapsedTime.split(".");
+        //     elapTime = eT[0].split(":")
+        //     if (!eT[1]) eT[1] = ((eT[1] || "") + "000").slice(0, 3);
+        //     if (eT.length < 3 && eT[0].indexOf(":") === -1) { // Time is x.x not xx:xx:xx.xx
+        //         row.EllapsedTime = "00:00:" + ("0" + elapTime[0]).slice(-2) + ":" + eT[1];
+        //     } else {
+        //         row.EllapsedTime = ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2) + ":" + eT[1];
+        //     }
+        // }
         if (embedImages && row.screenshot_path) {
             scrShots.idx.push(i);
             scrShots.paths.push(row.screenshot_path);
