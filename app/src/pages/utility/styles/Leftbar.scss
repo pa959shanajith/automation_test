@@ -25,10 +25,6 @@
     img{
         padding: 8px 10px;
     }
-    img:hover{
-        background: $hovorIcon !important;
-    }
-   
 }
 
 #selected{
@@ -38,4 +34,7 @@
 
 .util__execution_ic{
     padding: 10px;
+}
+.util__execution_ic:hover{
+    background: $hovorIcon !important;
 }
