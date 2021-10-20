@@ -139,7 +139,7 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     <option value={'excel'}>Excel Workbook (.xls,.xlsx)</option>
                     <option value={'git'}>Git (.mm)</option>
                     <option value={'json'}>MindMap (.mm)</option>
-					<option value={'sel'}>Selenium to AVO (.sel)</option>
+					<option value={'sel'}>Selenium To Avo (.sel)</option>
                 </select>
             </div>
             {importType &&
