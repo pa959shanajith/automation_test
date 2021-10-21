@@ -293,8 +293,7 @@ const prepareReportData = (reportData, embedImages) => {
     const termPercent = parseFloat(100 * terminated / total).toFixed(2);
     report.overallstatus[0].pass = passPercent > 0 ? passPercent : "0.00";
     report.overallstatus[0].fail = failPercent > 0 ? failPercent : "0.00";
-    if(pass > 0 && fail > 0) report.overallstatus[0].terminate = (100 - failPercent - passPercent).toFixed(2);
-    else report.overallstatus[0].terminate = termPercent > 0 ? termPercent : "0.00";
+    report.overallstatus[0].terminate = termPercent > 0 ? termPercent : "0.00";
     report.remarksLength = remarksLength;
     report.commentsLength = commentsLength;
     return { report, scrShots };
