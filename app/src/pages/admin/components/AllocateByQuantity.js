@@ -100,7 +100,7 @@ const AllocateByQuantity = ({resetMiddleScreen,selectedPool,setSelectedPool,disp
             <div style={{zIndex:1}} className='col-xs-9 form-group input-label'>
                 <label>Pool Name</label>
                 <span className='filter-pool'>
-                    <FormInpDropDown clickInp={clickInp} inpRef={inpRef} data={poolList} setFilter={FilterPool}/>
+                    <FormInpDropDown type={'Pool'} clickInp={clickInp} inpRef={inpRef} data={poolList} setFilter={FilterPool}/>
                 </span>
             </div>
             <div className='col-xs-9 form-group input-label'>
