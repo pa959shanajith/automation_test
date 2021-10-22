@@ -123,6 +123,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         executionData["browserType"]=browserTypeExe;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
+        executionData["scenarioFlag"] = (current_task.scenarioFlag == 'True') ? true : false
         
         setLoading("Scheduling...");
         const data = await testSuitesScheduler_ICE(executionData);
