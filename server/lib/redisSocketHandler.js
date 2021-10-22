@@ -344,6 +344,7 @@ module.exports.initListeners = mySocket => {
 		if (result == "fail") logger.error("Error occurred in storing benchmark");
 	});
 	mySocket.on('ICE_status_change', async value => {
+		pulse_ICE = await cache.get("ICE_status")
 		pulse_ICE[username] = value;
 		if (value.connected){
 			const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
