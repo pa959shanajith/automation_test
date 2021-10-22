@@ -15,7 +15,7 @@ const utils = require('../lib/utils');
 const notifications = require('../notifications');
 const queue = require("../lib/execution/executionQueue")
 const regEx= /[~*+=?^%<>()|\\|\/]/;
-const ldap_url=/^ldap:\/\/[A-Za-z0-9._-]/;
+const ldap_url=/^ldap[s]?:\/\/[A-Za-z0-9._-]/;
 const char_check=/[<'>"]/;
 const regExURL = /^http[s]?:\/\/[A-Za-z0-9._-].*$/i;
 const regEx_email=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -505,7 +505,8 @@ const parseLDAPErrors = (err, authType, fnName) => {
 			logger.error("Error occurred in admin/"+fnName+": Insufficient Access");
 		} else if (authType == "simple") {
 			if ((errm.indexOf("DSID-0C0903A9") > -1) || (errm.indexOf("DSID-0C090400") > -1) ||
-				(errm.indexOf("DSID-0C090442") > -1) || (errm.indexOf("DSID-0C090453") > -1)) {
+				(errm.indexOf("DSID-0C090442") > -1) || (errm.indexOf("DSID-0C090453") > -1) ||
+				(errm.indexOf("DSID-0C090447") > -1)) {
 				flag = "invalid_credentials";
 				logger.error("Error occurred in admin/"+fnName+": Invalid Credentials");
 			}
