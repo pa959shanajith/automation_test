@@ -171,7 +171,7 @@ const IceProvisionForm = (props) => {
 					<span className="leftControl-ip" title={isUsrSetting?"Default ICE" :"ICE Name"}>{isUsrSetting?"Default ICE" :"ICE Name"}</span>
 					{!isUsrSetting?
 						<input type="text" autoComplete="off" id="icename" name="icename" value={props.icename} onChange={(event)=>{updateIceName(event.target.value)}} maxLength="100" className={icenameErrBorder?"inputErrorBorder border_input-ip form-control-ip form-control-custom-ip":"border_input-ip form-control-ip form-control-custom-ip"} placeholder="ICE Name"/>
-						:<span>{props.defaultICE!==""?props.defaultICE:"No Default Ice"}</span>
+						:<span>{props.defaultICE!==""?props.defaultICE:"No Default ICE"}</span>
 					}
 				</div></div>
                 {!isUsrSetting && <div data-test="user-test" className='userForm adminControl-ip' ><div>

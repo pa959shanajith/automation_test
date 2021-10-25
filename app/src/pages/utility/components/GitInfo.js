@@ -23,7 +23,7 @@ const GitInfo = props => {
             folderPath: path.trim(),
             gitVersion: version.trim()
         })
-    }, [reset])
+    }, [config, branch, path, version])
 
 
     return (<>

@@ -320,7 +320,8 @@ const validate = (request, api, integration) => {
         if (integration !== -1 && integration !== "-1") {
             const subrequest = request["executionData"].integration[integration];
             const regex = /^https:\/\//g;
-            if (!regex.test(subrequest['url'])) {
+            const regexUrl = /^http:\/\//g;
+            if (!(regex.test(subrequest['url']) || regexUrl.test(subrequest['url']))) {
                 check.integration.url = true;
                 check.error = true;
             }
