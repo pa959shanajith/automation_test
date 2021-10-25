@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
 import { useHistory } from 'react-router-dom';
 import ScrapeObject from '../components/ScrapeObject';
-import { ScrollBar, RedirectPage, VARIANT, Messages, setMsg } from "../../global"
+import { ScrollBar, RedirectPage, Messages, setMsg } from "../../global"
 import { ScrapeContext } from '../components/ScrapeContext';
 import * as actionTypes from '../state/action';
 import * as scrapeApi from '../api';
@@ -354,18 +354,24 @@ const ScrapeObjectList = () => {
             if (response === "Invalid Session") return RedirectPage(history);
             else fetchScrapeData().then(resp=>{
                 if (resp === 'success' || typeof(resp) === "object"){
-                    setShowPop({
+                    typeof(resp)==="object" && resp.length>0 
+                    ? setShowPop({
                         title: "Saved Scrape Objects",
-                        content: typeof(resp)==="object" && resp.length>0 ? <div className="ss__dup_labels">
+                        content: <div className="ss__dup_labels">
                                     Scraped data saved successfully.
                                     <br/><br/>
                                     <strong>Warning: Please scrape an IRIS reference object.</strong>
                                     <br/><br/>
                                     Matching objects found for:
+                                    <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
+                                    <div className="ss__dup_scroll">
                                     { resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
-                                </div> : 'Scraped data saved successfully.',
+                                    </div>
+                                    </ScrollBar>
+                                </div>,
                         footer: <button onClick={()=>{setShowPop("")}} >OK</button>       
-                    });
+                    })
+                    : setMsg(Messages.SCRAPE.SUCC_OBJ_SAVE);
                     let numOfObj = scrapeItemsL.length;
                     setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
                     dispatch({type: actionTypes.SET_DISABLEACTION, payload: numOfObj !== 0});

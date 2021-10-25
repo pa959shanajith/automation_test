@@ -21,7 +21,7 @@ const PopupMsg = () => {
     const message = useSelector(state=>state.progressbar.popup);
 
     useEffect(() => {
-        if(message) setTimeout(() =>store.dispatch({type: actionTypes.SET_POPUP, payload: false}), 3000);
+        if(message) setTimeout(() =>store.dispatch({type: actionTypes.SET_POPUP, payload: false}), 5000);
     }, [message]);
       
     return (

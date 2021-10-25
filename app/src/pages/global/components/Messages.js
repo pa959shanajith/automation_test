@@ -364,6 +364,7 @@ const Messages={
         SUCC_SUBMIT: {"CONTENT":"Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_IRIS_SAVE: {"CONTENT":"Submitted Successfully. IRIS image saved.", "VARIANT": VARIANT.SUCCESS},
         SUCC_MAPPED_SCRAPED: {"CONTENT":"Mapped Scrape Data Successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_OBJ_SAVE: { "CONTENT": 'Scraped data saved successfully.', "VARIANT": VARIANT.SUCCESS },
         
         WARN_ADD_PROPERTY: {"CONTENT":"Please enter at least one property", "VARIANT": VARIANT.WARNING},
         WARN_IRIS_SAVE: {"CONTENT":"Submitted successfully but failed to save IRIS image, ICE not available.", "VARIANT": VARIANT.WARNING},
