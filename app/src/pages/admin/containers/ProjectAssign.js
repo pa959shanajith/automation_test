@@ -110,12 +110,10 @@ const ProjectNew = (props) => {
             if(data1.error){displayError(data1.error);return;}
             setGetAssignedProjectsLen(data1.length);
             assignProj.assignedProjectAP = [];
-            setAssignProj(assignProj);
             if (data1.length > 0) {
                 for (var i = 0; i < data1.length; i++) {
                     assignProj.assignedProjectAP.push({'projectid':data1[i]._id,'projectname':data1[i].name});
                 }
-                setAssignProj(assignProj);
                 setAssignedProjectInitial(assignProj.assignedProjectAP);
                 for (var j = 0; j < data1.length; j++) {
                     assignedProjectsArr.push(data1[j]._id);
@@ -124,7 +122,6 @@ const ProjectNew = (props) => {
                 const detResponse = await getDetails_ICE(idtype, requestedids);
                 if(detResponse.error){displayError(detResponse.error);return;}
                 assignProj.allProjectAP = [];
-                setAssignProj(assignProj);
                 if (detResponse.projectIds.length > 0) {
                     for (var k = 0; k < detResponse.projectIds.length; k++) {
                         if (!eleContainsInArray(assignedProjectsArr, detResponse.projectIds[k])) {
@@ -143,7 +140,6 @@ const ProjectNew = (props) => {
                     for (var m = 0; m < unAssignedProjects1.projectIds.length; m++) {
                         assignProj.allProjectAP.push({'projectname':unAssignedProjects1.projectNames[m],'projectid':unAssignedProjects1.projectIds[m]});
                     }
-                    setAssignProj(assignProj);
                     if (selectedUserName === '') {
                         setAssignProj({allProjectAP:[],assignedProjectAP:[]});
                     }
@@ -158,10 +154,10 @@ const ProjectNew = (props) => {
                     for (var n = 0; n < res.projectIds.length; n++) {
                         assignProj.allProjectAP.push({'projectname':res.projectNames[n],'projectid':res.projectIds[n]});
                     }
-                    setAssignProj(assignProj);
                 }
                 setShowload(false);
-            }  
+            }
+            setAssignProj(assignProj)
         }catch(error){
             console.log("Error:::::::::::::", error);
         } 
