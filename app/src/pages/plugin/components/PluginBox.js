@@ -24,7 +24,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 		<>
 			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
             <div data-test="plugin-blocks" className="plugin-block" title={pluginTitle} onClick={pluginRedirect}>
-                <img data-test="plugin-image" className={(pluginName=='Selenium To Avo') ? "plugin-seltoavo-ic":"plugin-ic"} alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}.svg`} />
+                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}.svg`} />
                 <span data-test="plugin-name" className="plugin-text">{pluginTitle}</span>
         	</div>
 		</>
