@@ -62,12 +62,15 @@ const ZephyrUpdateContent = props => {
         try{
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
 
-            for (let value of Object.values(updateMapPayload['phaseDets'])) {
-                if (value.length>0) {
-                    tcFlag = true;
-                    break;
+            Object.entries(updateMapPayload['phaseDets']).forEach((k)=>{  
+                if(Object.keys(k[1]).length > 0) {
+                    Object.values(k[1]).forEach(v => {
+                        if (v.length>0) {
+                            tcFlag = true;
+                        }
+                    });
                 }
-            }
+            });
             if(!rootCheck && (Object.keys(updateMapPayload['phaseDets']).length === 0 || !tcFlag)) { 
                 setMsg(MSG.INTEGRATION.ERR_EMPTY_TCS);
             } else if (updateMapPayload['selectedPhase'] === undefined) {
@@ -163,6 +166,85 @@ const ZephyrUpdateContent = props => {
             }
         }
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+    }
+
+    /** Cycle, Phase, Module and testcase level
+        a. when a cycle is 'checked', see for sibling cycles 'checks' and if all selected, then 'check' the root
+        b. when phase is 'checked', 
+            i. see for sibling phases 'checks' and if all selected, then 'check' the cycle
+            ii. see for sibling cycles 'checks' and if all selected, then 'check' the root
+        c. when module/testcase is 'checked',
+            i. see for siblings(modules/testcases) 'checks' and if all selected, then 'check' the parent
+            ii. Go on till you reach the root node
+    **/
+   const checkParent = (parentVal, checkVal, classname) => {
+        var siblings = [];
+        var testcases = [];
+        var numSiblings = 0;
+        var numtc = 0;
+        var tcs = [];
+        while (parentVal) {
+            if(parentVal.classList.contains("int__cycleNode")) {
+                var divEl = parentVal.children;
+                if(divEl.length>1) {
+                    siblings = divEl[1].children;
+                    numSiblings = siblings.length;
+                }
+                Array.from(siblings).forEach(s => {
+                    if(s.children[0].querySelectorAll("input[type=checkbox]")[0].checked) {numSiblings = numSiblings - 1;}
+                });
+            } else if(parentVal.classList.contains("int__phaseNode")) {
+                var divEl = parentVal.children;
+                if(divEl.length==2) {
+                    siblings = divEl[1].children;
+                    numSiblings = siblings.length;
+                    Array.from(siblings).forEach(s => {
+                        if(s.children[0].querySelectorAll("input[type=checkbox]")[0].checked) {
+                            numSiblings = numSiblings - 1;
+                        }
+                    });
+                }
+                if(divEl.length==3) {
+                    siblings = divEl[1].children;
+                    numSiblings = siblings.length;
+                    testcases = divEl[2].children;
+                    numtc = testcases.length;
+                    Array.from(testcases).forEach(tc => {
+                        if(tc.children[0].querySelectorAll("input[type=checkbox]")[0].checked) {numtc = numtc - 1;}
+                    });
+                    Array.from(siblings).forEach(s => {
+                        if(s.children[0].querySelectorAll("input[type=checkbox]")[0].checked) {numSiblings = numSiblings - 1;}
+                    });
+                }
+               
+            } else {
+                siblings = parentVal.querySelectorAll(classname);
+                numSiblings = siblings.length;
+                siblings.forEach(s => {
+                    if(s.checked) {numSiblings = numSiblings - 1;}
+                });
+            }
+            if(numSiblings == 0 && numtc == 0) {
+                parentVal.children[0].children[0].children[0].checked = true;
+            }
+            else if(parentVal.children[0].children[0].children[0].checked==true) {
+                parentVal.children[0].children[0].children[0].checked = false;
+            }
+            if(parentVal.classList.contains("test__rootDiv")) {
+                if (numSiblings == 0) setRootCheck(true);
+                else setRootCheck(false);
+                parentVal = null;
+            } else {
+                parentVal = parentVal.parentElement;
+                if(parentVal.classList.length == 0) parentVal = parentVal.parentElement;
+                if(parentVal.classList.contains("test__rootDiv") || parentVal.classList.contains("int__cycleNode")) classname=".mp-cycles"
+                else classname=".mp-phases"
+            }
+        }
+    }
+
+    const checkChildren = (allcheckbox, checkVal) => {
+        allcheckbox.forEach((chk,i)=>{if(i!=0) chk.checked=checkVal});
     }
 
     const onCheckAll = (event) => {
@@ -264,7 +346,7 @@ const ZephyrUpdateContent = props => {
                     <Fragment>    
                         <div data-test="intg_zephyr_test_list" className="test__rootDiv">
                             <div className="test_tree_branches">
-                                <span className="sel_up sel_head"><input checked={rootCheck} onChange={(e)=>onCheckAll(e)} className="sel_up" type="checkbox"/></span>
+                                <span className="sel_up sel_head"><input checked={rootCheck} onChange={(e)=>onCheckAll(e)} className="sel_up groot" type="checkbox"/></span>
                                 <span>
                                 <img alt="collapse"
                                     className="test_tree_toggle" 
@@ -277,6 +359,8 @@ const ZephyrUpdateContent = props => {
                                 .map( (cycleName, idx) => <CycleNode 
                                         key={`${cycleName}-${idx}`}
                                         id={idx}
+                                        checkParent={checkParent}
+                                        checkChildren={checkChildren}
                                         phaseList={projectDetails[cycleName]} 
                                         cycleName={cycleName}
                                         projectId={projectDropdn1}

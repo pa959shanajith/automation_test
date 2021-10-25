@@ -181,6 +181,7 @@ export const zephyrUpdateMapping = async(updateMapPayload, rootCheck) => {
            data: {
             updateMapPayload : updateMapPayload,
             rootCheck: rootCheck,
+            updateFlag: true,
             zephyraction : 'testcase'
             
            }

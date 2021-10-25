@@ -270,6 +270,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 	var errorList = [];
 	var warningList = [];
 	var updateList = [];
+	var treeidParentIdMap = {};
 	try {
 		var projectId = parseInt(req.body.updateMapPayload.projectId);
 		var releaseId = parseInt(req.body.updateMapPayload.releaseId);
@@ -277,35 +278,61 @@ exports.zephyrUpdateMapping = async (req, res) => {
 		var selectedPhase = req.body.updateMapPayload.selectedPhase;
 		var rootCheck = req.body.rootCheck;
 		var mappedDets = [];
+		var parentids = [];
 		//get mapped details
 		try {
 			if(!rootCheck) {
 				var userid = req.session.userid;
-				for(var i=0;i<Object.keys(phaseDets).length;++i) {
-					if(phaseDets[Object.keys(phaseDets)[i]].length>0) {
-						if(phaseDets[Object.keys(phaseDets)[i]][0] == "all") {
+				var cyps  = Object.keys(phaseDets);
+				for(var i=0;i<cyps.length;++i) {
+					var treeid = cyps[i];
+					if(Object.keys(phaseDets[treeid]).length>0) {
+						if(Object.keys(phaseDets[treeid])[0]=="all") {
 							var inputs = {
 								"userid": userid,
-								"treeid": Object.keys(phaseDets)[i],
+								"treeid": treeid,
 								"query": "zephyrdetails"
 							};
+							mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrUpdateMapping");
+							if (mappedDets == "fail") res.send('fail');
+							// else if(mappedDets.length==0) res.send('notfound');
+							for(var j=0;j<mappedDets.length;++j) {
+								mappedTestIds.push(parseInt(mappedDets[j].testid));
+								mappedTestNames.push(mappedDets[j].testname);
+								mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
+							}
 						} else {
-							var inputs = {
-								"userid": userid,
-								"treeid": Object.keys(phaseDets)[i],
-								"testcaseids": phaseDets[Object.keys(phaseDets)[i]],
-								"query": "zephyrdetails"
+							var testcases = [];
+							var pars = Object.keys(phaseDets[treeid]);
+							for(var k=0;k<pars.length;++k) {
+								testcases = phaseDets[treeid][pars[k]];
+								if(testcases.length>0 && testcases[0]==="all") {
+									treeidParentIdMap[pars[k]] = treeid;
+								}
+								var inputs = {
+									"userid": userid,
+									"treeid": treeid,
+									"query": "zephyrdetails"
+								};
+								if(pars[k] != '-1') {
+									inputs.parentid = pars[k];
+								}
+								if(testcases.length>0 && testcases[0]!="all") {
+									inputs.testcaseids = testcases;
+								}
+								mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrUpdateMapping");
+								if (mappedDets == "fail") res.send('fail');
+								// else if(mappedDets.length==0) res.send('notfound');
+								for(var j=0;j<mappedDets.length;++j) {
+									mappedTestIds.push(parseInt(mappedDets[j].testid));
+									mappedTestNames.push(mappedDets[j].testname);
+									mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
+								}
 							};
 						}
-						mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrUpdateMapping");
-						if (mappedDets == "fail") res.send('fail');
-						for(var j=0;j<mappedDets.length;++j) {
-							mappedTestIds.push(parseInt(mappedDets[j].testid));
-							mappedTestNames.push(mappedDets[j].testname);
-							mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
-						}
+						
 					}
-				}
+				};
 			} else {
 				var inputs = {
 					"userid": userid,
@@ -314,6 +341,7 @@ exports.zephyrUpdateMapping = async (req, res) => {
 				};
 				mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrUpdateMapping");
 				if (mappedDets == "fail") res.send('fail');
+				// else if(mappedDets.length==0) res.send('notfound');
 				for(var i=0;i<mappedDets.length;++i) {
 					mappedTestIds.push(parseInt(mappedDets[i].testid));
 					mappedTestNames.push(mappedDets[i].testname);
@@ -335,6 +363,8 @@ exports.zephyrUpdateMapping = async (req, res) => {
 			if (redisres[1]>0) {
 				var zephyrDetails = {
 					"treeId": selectedPhase[0],
+					"parentFetchList":treeidParentIdMap,
+					"updateflag": req.body.updateFlag,
 					"zephyraction": req.body.zephyraction
 				};
 				logger.info("Sending socket request for zephyrlogin to redis");
@@ -352,58 +382,121 @@ exports.zephyrUpdateMapping = async (req, res) => {
 							}
 						} else if (data.onAction == "qcresponse") {
 							data = data.value;
-							for(var i=0;i<data.length;++i) {
-								testIds.push(parseInt(data[i].id));
-								testNames.push(data[i].name);
-								testList[parseInt(data[i].id)] = data[i];
+							for(var i=0;i<data.testcases.length;++i) {
+								testIds.push(parseInt(data.testcases[i].id));
+								testNames.push(data.testcases[i].name);
+								testList[parseInt(data.testcases[i].id)] = data.testcases[i];
 							}
-							const occurences = mappedTestNames.reduce(function (acc, curr) {
-								return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
-							}, {});
-							const occurences2 = testNames.reduce(function (acc, curr) {
-								return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
-							}, {});
-							//acc[curr] = (acc[curr] || 0) + 1
-							//match testcase names
-							for(var i=0;i<mappedTestNames.length;++i) {
-								if(occurences[mappedTestNames[i]] == 1 && testNames.includes(mappedTestNames[i]) && occurences2[testNames[testNames.indexOf(mappedTestNames[i])]] == 1) {
-									var oldMap = mappedList[mappedTestIds[i]];
-									var index = testNames.indexOf(mappedTestNames[i]);
-									var newMap = testList[testIds[index]];
-									const inputs = {
-										"testscenarioid": oldMap.testscenarioid,
-										'projectid': parseInt(selectedPhase[1]),			
-										'releaseid': parseInt(selectedPhase[2]),
-										'treeid': String(newMap.cyclePhaseId),
-										'testid': String(newMap.id),
-										'testname': newMap.name,
-										'reqdetails': newMap.reqdetails,
-										'oldtestid': mappedTestIds[i],
-										"query": "saveZephyrDetails_ICE"
-									};
-									var args = {
-										data: inputs,
-										headers: {
-											"Content-Type": "application/json"
+							if(data.parentids != undefined && data.parentids.length!=0) {
+								for(var i=0;i<data.parentids.length;++i) {
+									fetchParentIds(userid, data.parentids[i].treeid, data.parentids[i].parid, function(mappedDets) {
+										if (mappedDets == "fail") res.send('fail');
+										// if(mappedDets.length==0) res.send('notfound');
+										for(var j=0;j<mappedDets.length;++j) {
+											mappedTestIds.push(parseInt(mappedDets[j].testid));
+											mappedTestNames.push(mappedDets[j].testname);
+											mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
 										}
-									};
-									logger.info("Calling DAS Service :qualityCenter/saveIntegrationDetails_ICE");
-									client.post(epurl + "qualityCenter/saveIntegrationDetails_ICE", args,
-									function (result, response) {
-										if (response.statusCode != 200 || result == "fail") {
-											logger.error("Error occurred in zephyrUpdateMapping Error Code : ERRDAS");
+										const occurences = mappedTestNames.reduce(function (acc, curr) {
+											return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+										}, {});
+										const occurences2 = testNames.reduce(function (acc, curr) {
+											return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+										}, {});
+										//acc[curr] = (acc[curr] || 0) + 1
+										//match testcase names
+										for(var i=0;i<mappedTestNames.length;++i) {
+											if(occurences[mappedTestNames[i]] == 1 && testNames.includes(mappedTestNames[i]) && occurences2[testNames[testNames.indexOf(mappedTestNames[i])]] == 1) {
+												var oldMap = mappedList[mappedTestIds[i]];
+												var index = testNames.indexOf(mappedTestNames[i]);
+												var newMap = testList[testIds[index]];
+												const inputs = {
+													"testscenarioid": oldMap.testscenarioid,
+													'projectid': parseInt(selectedPhase[1]),			
+													'releaseid': parseInt(selectedPhase[2]),
+													'treeid': String(newMap.cyclePhaseId),
+													'testid': String(newMap.id),
+													'parentid': oldMap.parentid,
+													'testname': newMap.name,
+													'reqdetails': newMap.reqdetails,
+													'oldtestid': mappedTestIds[i],
+													"query": "saveZephyrDetails_ICE"
+												};
+												var args = {
+													data: inputs,
+													headers: {
+														"Content-Type": "application/json"
+													}
+												};
+												logger.info("Calling DAS Service :qualityCenter/saveIntegrationDetails_ICE");
+												client.post(epurl + "qualityCenter/saveIntegrationDetails_ICE", args,
+												function (result, response) {
+													if (response.statusCode != 200 || result == "fail") {
+														logger.error("Error occurred in zephyrUpdateMapping Error Code : ERRDAS");
+													}
+												});
+												updateList.push(mappedTestNames[i]);
+											} else if(occurences[mappedTestNames[i]] > 1 || occurences2[mappedTestNames[i]] > 1) {
+												//Warning or error
+												warningList.push(mappedTestNames[i]);
+											} else {
+												errorList.push(mappedTestNames[i]);
+											}
 										}
+										var finalList = {warning:warningList,error:errorList,update:updateList}
+										return res.send(finalList)
 									});
-									updateList.push(mappedTestNames[i]);
-								} else if(occurences[mappedTestNames[i]] > 1 || occurences2[mappedTestNames[i]] > 1) {
-									//Warning or error
-									warningList.push(mappedTestNames[i]);
-								} else {
-									errorList.push(mappedTestNames[i]);
 								}
+							} else {
+								const occurences = mappedTestNames.reduce(function (acc, curr) {
+									return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+								}, {});
+								const occurences2 = testNames.reduce(function (acc, curr) {
+									return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+								}, {});
+								//acc[curr] = (acc[curr] || 0) + 1
+								//match testcase names
+								for(var i=0;i<mappedTestNames.length;++i) {
+									if(occurences[mappedTestNames[i]] == 1 && testNames.includes(mappedTestNames[i]) && occurences2[testNames[testNames.indexOf(mappedTestNames[i])]] == 1) {
+										var oldMap = mappedList[mappedTestIds[i]];
+										var index = testNames.indexOf(mappedTestNames[i]);
+										var newMap = testList[testIds[index]];
+										const inputs = {
+											"testscenarioid": oldMap.testscenarioid,
+											'projectid': parseInt(selectedPhase[1]),			
+											'releaseid': parseInt(selectedPhase[2]),
+											'treeid': String(newMap.cyclePhaseId),
+											'testid': String(newMap.id),
+											'parentid': oldMap.parentid,
+											'testname': newMap.name,
+											'reqdetails': newMap.reqdetails,
+											'oldtestid': mappedTestIds[i],
+											"query": "saveZephyrDetails_ICE"
+										};
+										var args = {
+											data: inputs,
+											headers: {
+												"Content-Type": "application/json"
+											}
+										};
+										logger.info("Calling DAS Service :qualityCenter/saveIntegrationDetails_ICE");
+										client.post(epurl + "qualityCenter/saveIntegrationDetails_ICE", args,
+										function (result, response) {
+											if (response.statusCode != 200 || result == "fail") {
+												logger.error("Error occurred in zephyrUpdateMapping Error Code : ERRDAS");
+											}
+										});
+										updateList.push(mappedTestNames[i]);
+									} else if(occurences[mappedTestNames[i]] > 1 || occurences2[mappedTestNames[i]] > 1) {
+										//Warning or error
+										warningList.push(mappedTestNames[i]);
+									} else {
+										errorList.push(mappedTestNames[i]);
+									}
+								}
+								var finalList = {warning:warningList,error:errorList,update:updateList}
+								return res.send(finalList)
 							}
-							var finalList = {warning:warningList,error:errorList,update:updateList}
-							return res.send(finalList)
 						}
 					}
 				}
@@ -425,6 +518,42 @@ exports.zephyrUpdateMapping = async (req, res) => {
 		return res.send("fail");
 	}
 };
+
+function fetchParentIds(userid, treeid, parentid, cb){
+	logger.info("Inside function getProjectsForUser");
+	var parentIds = [];
+	async.series({
+		getParentIds: function (callback1) {
+			var inputs = {
+				"userid": userid,
+				"treeid": treeid,
+				"parentid": parentid,
+				"query": "zephyrdetails"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling DAS Service :qualityCenter/getMappedDetails");
+			client.post(epurl + "qualityCenter/getMappedDetails", args,
+			function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occurred in fetchParentIds Error Code : ERRDAS");
+				} else {
+					if (result.rows.length != 0) {
+						parentIds = result.rows;
+					}
+				}
+				callback1();
+			});
+		},
+		data: function (callback1) {
+			cb(parentIds);
+		}
+	});
+}
 
 exports.zephyrCyclePhase_ICE = function (req, res) {
 	logger.info("Inside UI service: zephyrCyclePhase_ICE");
@@ -716,6 +845,7 @@ exports.saveZephyrDetails_ICE = async (req, res) => {
 				'projectid': itr.projectid,			
 				'releaseid': itr.releaseid,
 				'treeid': itr.treeid,
+				'parentid': itr.parentid,
 				'testid': itr.testid,
 				'testname': itr.testname,
 				'reqdetails': itr.reqdetails,
