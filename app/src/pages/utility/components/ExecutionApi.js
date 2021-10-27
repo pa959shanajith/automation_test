@@ -60,6 +60,7 @@ const ExecutionApi = props => {
                     exectionMode: execMod,
                     executionEnv: execEnv,
                     browserType: browser,
+                    batchInfo,
                     [info]: info === 'gitInfo' ? gitInfo : batchInfo,
                     "integration": integrationInfo
                 }
@@ -72,6 +73,7 @@ const ExecutionApi = props => {
                     exectionMode: execMod,
                     executionEnv: execEnv,
                     browserType: browser,
+                    batchInfo,
                     [info]: info === 'gitInfo' ? gitInfo : batchInfo,
                     "integration": integrationInfo
                 }
@@ -120,7 +122,7 @@ const ExecutionApi = props => {
                 <span>Batch Info</span>
             </label>
             <label>
-                <input data-test="info-test" type="radio" value="gitInfo" name="gitInfo" checked={info === "gitInfo"} onChange={(event)=>{setBatchInfo(undefined);setInfo(event.target.value);resetReqData();}}/>
+                <input data-test="info-test" type="radio" value="gitInfo" name="gitInfo" checked={info === "gitInfo"} onChange={(event)=>{setBatchInfo([]);setInfo(event.target.value);resetReqData();}}/>
                 <span>Git Info</span>
             </label>
         </div>
