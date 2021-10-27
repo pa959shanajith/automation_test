@@ -470,7 +470,7 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
         for (let entry of result) {
             let executedtimeTemp = new Date(entry.executedtime);
             if (executedtimeTemp !== null && executedtimeTemp != "Invalid Date") {
-                executedtimeTemp = ("0" + executedtimeTemp.getDate()).slice(-2) + "-" + ("0" + (executedtimeTemp.getMonth() + 1)).slice(-2) + "-" + (executedtimeTemp.getFullYear()) + " " + ("0" + executedtimeTemp.getHours()).slice(-2) + ":" + ("0" + executedtimeTemp.getMinutes()).slice(-2) + ":" + ("0" + executedtimeTemp.getSeconds()).slice(-2);
+                executedtimeTemp = (executedtimeTemp.getUTCFullYear()) + "-" + ("0" + (executedtimeTemp.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + executedtimeTemp.getUTCDate()).slice(-2) + " " + ("0" + executedtimeTemp.getUTCHours()).slice(-2) + ":" + ("0" + executedtimeTemp.getUTCMinutes()).slice(-2) + ":" + ("0" + executedtimeTemp.getUTCSeconds()).slice(-2);
             }
             report.push({
                 executedtime: executedtimeTemp,
