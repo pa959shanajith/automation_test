@@ -289,8 +289,10 @@ const prepareReportData = (reportData, embedImages) => {
     });
     const total = pass+fail+terminated;
     const passPercent = parseFloat(100 * pass / total).toFixed(2);
-    const failPercent = parseFloat(100 * fail / total).toFixed(2);
-    const termPercent = parseFloat(100 * terminated / total).toFixed(2);
+    const otherPercent = (100-passPercent).toFixed(2);
+    const totalRemaining = fail+terminated;
+    const failPercent = parseFloat(otherPercent * fail / totalRemaining).toFixed(2);
+    const termPercent = (otherPercent - failPercent).toFixed(2);;
     report.overallstatus[0].pass = passPercent > 0 ? passPercent : "0.00";
     report.overallstatus[0].fail = failPercent > 0 ? failPercent : "0.00";
     report.overallstatus[0].terminate = termPercent > 0 ? termPercent : "0.00";
