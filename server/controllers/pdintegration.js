@@ -293,6 +293,9 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					}
 				}            
 				switch(eachScrapedAction.action.actionName){
+					case "openBrowser":
+						testcaseObj = getTestcaseStep(step,null,'@Browser','openBrowser',null,null,null,"Web");
+						break;
 					case "navigate":
 						testcaseObj = getTestcaseStep(step,null,'@Browser','navigateToURL',[eachScrapedAction.action.actionData],null,null,"Web");
 						break;
@@ -350,7 +353,14 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 				testCaseSteps.push(testcaseObj);
 				step++;
 			}
+			
 		}
+		//SeleniumToAvo for browser actins
+		else if(eachScrapedAction.transitionType  == "reload" || eachScrapedAction.transitionType =="link" || eachScrapedAction.transitionType =="typed"){
+            testcaseObj = getTestcaseStep(step,null,"@Browser",'navigateToURL',[eachScrapedAction.url],null,null,"Web");
+			testCaseSteps.push(testcaseObj);
+			step++;
+        }
 		//mapping for SAP objects 
 		else if(eachScrapedAction.apptype=="SAP" || eachScrapedAction.apptype=="Generic"){
 			text = eachScrapedAction.text;
