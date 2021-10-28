@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ModalContainer } from "../../global";
 import "../styles/DetailsDialog.scss";
 
@@ -14,9 +14,19 @@ import "../styles/DetailsDialog.scss";
 
 const DetailsDialog = ({setShow, onSetRowData, TCDetails, idx}) => {
 
-    const [res, setRes] = useState(TCDetails.testcaseDetails || "" );
-    const [pass, setPass] = useState(TCDetails.actualResult_pass || "");
-    const [fail, setFail] = useState(TCDetails.actualResult_fail || "");
+    const [res, setRes] = useState("");
+    const [pass, setPass] = useState("");
+    const [fail, setFail] = useState("");
+
+    useEffect(()=>{
+        let newTCDetails = TCDetails;
+        if (typeof TCDetails !== "object" && TCDetails !== "") newTCDetails = JSON.parse(TCDetails);
+        else if (TCDetails === "") newTCDetails = { testcaseDetails: "", actualResult_pass: "", actualResult_fail: "" };
+
+        setRes(newTCDetails.testcaseDetails || "");
+        setPass(newTCDetails.actualResult_pass || "");
+        setFail(newTCDetails.actualResult_fail || "");
+    }, [])
 
     const onResChange = event => setRes(event.target.value);
     const onPassChange = event => setPass(event.target.value);

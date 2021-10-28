@@ -60,7 +60,10 @@ const TableRow = (props) => {
             objList = props.objList;
             setRemarks(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
             setCommented(props.testCase.outputVal.slice(-2) === "##");
-            setTCDetails(props.testCase.addTestCaseDetailsInfo === "" ? "" : JSON.parse(props.testCase.addTestCaseDetailsInfo));
+            
+            let newTcDetails = props.testCase.addTestCaseDetailsInfo;
+            if (typeof newTcDetails !== "object" && newTcDetails !== "") newTcDetails = JSON.parse(newTcDetails);
+            setTCDetails(newTcDetails);
         }
     }, [props.rowChange, props.testCase]);
 

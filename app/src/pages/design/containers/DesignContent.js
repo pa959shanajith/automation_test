@@ -825,7 +825,7 @@ const DesignContent = props => {
         { showSM && <SelectMultipleDialog data-test="d__selectMultiple" setShow={setShowSM} selectSteps={selectSteps} upperLimit={testCaseData.length} /> }
         { showPS && <PasteStepDialog setShow={setShowPS} pasteSteps={pasteSteps} upperLimit={testCaseData.length}/> }
         { showRemarkDlg && <RemarkDialog remarks={testCaseData[parseInt(showRemarkDlg)].remarks} setShow={setShowRemarkDlg} onSetRowData={setRowData} idx={showRemarkDlg} firstname={userInfo.firstname} lastname={userInfo.lastname}/> }
-        { showDetailDlg && <DetailsDialog TCDetails={testCaseData[showDetailDlg].addTestCaseDetailsInfo && JSON.parse(testCaseData[showDetailDlg].addTestCaseDetailsInfo)} setShow={setShowDetailDlg} onSetRowData={setRowData} idx={showDetailDlg} /> }
+        { showDetailDlg && <DetailsDialog TCDetails={testCaseData[showDetailDlg].addTestCaseDetailsInfo} setShow={setShowDetailDlg} onSetRowData={setRowData} idx={showDetailDlg} /> }
         { overlay && <ScreenOverlay content={overlay} /> }
         { showConfPaste && <ConfPasteStep />}
         <div className="d__content">
