@@ -231,7 +231,7 @@ const PhaseNode = props => {
 
     const selectPhase = (event) => {
         var selectedP = [phaseid,props.projectId,props.releaseId];
-        props.setSelectedPhase([phaseid]);
+        props.setSelectedPhase(selectedP);
         dispatch({
             type: actionTypes.UPDATE_MAP_PAYLOAD, 
             payload: {
