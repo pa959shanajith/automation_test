@@ -102,7 +102,7 @@ class TestSuiteExecutor {
         const execReq = {
             "exec_mode": batchData.exectionMode,
             "exec_env": batchData.executionEnv,
-            "apptype": batchData.batchInfo[0].appType,
+            "apptype": batchData.batchInfo == undefined? '' : batchData.batchInfo[0].appType,
             "integration": batchData.integration,
             "scenarioFlag": batchData.scenarioFlag,
             "batchId": "",
@@ -437,14 +437,17 @@ class TestSuiteExecutor {
         //var iceStatus = await checkForICEstatus(icename, execType);
         //if (iceStatus != null) return iceStatus;
         var gitInfo = batchExecutionData.gitInfo;
+        var batchCounter;
         for (let key in gitInfo){
             if(gitInfo[key]!='') gitflag=true; break;
         }
         if(!gitflag){
+            batchCounter = batchExecutionData.batchInfo.length
             const taskApproval = await utils.approvalStatusCheck(batchExecutionData.batchInfo);
             if (taskApproval.res !== "pass") return taskApproval.res;
         }
-        /*const countStatus =*/ await this.counterUpdater(batchExecutionData.batchInfo.length, userInfo.invokinguser);
+        else batchCounter = 1;
+        /*const countStatus =*/ await this.counterUpdater(batchCounter, userInfo.invokinguser);
         // if (countStatus == "fail") return "fail";
         const executionRequest = await this.prepareExecutionRequest(batchExecutionData, userInfo, gitflag);
         if (executionRequest == "fail") return "fail";
