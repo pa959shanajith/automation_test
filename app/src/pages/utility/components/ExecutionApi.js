@@ -44,7 +44,9 @@ const ExecutionApi = props => {
             "zephyr": {
                 url: "",
                 username: "",
-                password: ""
+                password: "",
+                apitoken:"",
+                authtype:""
             },
             "qtest": {
                 url: "",

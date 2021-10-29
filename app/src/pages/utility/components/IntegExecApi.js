@@ -26,6 +26,18 @@ const IntegExecApi = props => {
                     }
                 }
             })
+        } else if (type === "zephyr") {
+            setInteg({
+                integration: {
+                    [type]: {
+                        url: url.trim(),
+                        username: username.trim(),
+                        password: password.trim(),
+                        apitoken:"",
+                        authtype:""
+                    }
+                }
+            })
         } else {
             setInteg({
                 integration: {
