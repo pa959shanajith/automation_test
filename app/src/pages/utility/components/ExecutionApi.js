@@ -99,7 +99,7 @@ const ExecutionApi = props => {
                 <span>Default</span>
             </label>
             <label>
-                <input type="radio" data-test="exec-env-test" value="saucelab" name="ExecutionEnv" checked={execEnv === "saucelab"} onChange={(event)=>{setExecEnv(event.target.value);resetReqData();}} />
+                <input type="radio" data-test="exec-env-test" value="saucelabs" name="ExecutionEnv" checked={execEnv === "saucelabs"} onChange={(event)=>{setExecEnv(event.target.value);resetReqData();}} />
                 <span>Sauce Lab</span>
             </label>
         </div>
