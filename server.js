@@ -261,7 +261,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|reports|plugin|seleniumtoavo)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|reports|plugin|seleniumtoavo|settings)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
