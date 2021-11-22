@@ -368,7 +368,7 @@ async function check_pulse(){
 	logger.silly("Checking ICE pulse")
 	for (var ice in pulse_ICE) {
 		if(pulse_ICE[ice]["time"]){
-			var iceTime = pulse_ICE[ice]["time"]
+			var iceTime = pulse_ICE[ice]["time"] + "+0"
 			var writeStr = "";
 			if(Math.abs(Date.parse(time) - Date.parse(iceTime)) >= 100000){
 				var writeStr = time.toString() + " " + ice + " Disconnected pulse last recieved at: " + iceTime.toString();
