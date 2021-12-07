@@ -389,3 +389,5 @@ async function check_pulse(){
 		}
 	}
 }
+
+check_pulse()
