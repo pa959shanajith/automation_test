@@ -353,7 +353,8 @@ const Messages={
         ERR_HIGHLIGHT: {"CONTENT":"Failed to highlight.", "VARIANT": VARIANT.ERROR},
         ERR_SCRAPE: {"CONTENT":"Failed to scrape.", "VARIANT": VARIANT.ERROR},
         ERR_SCRAPE_TERMINATE: {"CONTENT":"Scrape Terminated.", "VARIANT": VARIANT.ERROR},
-        ERR_WINDOW_NOT_FOUND: {"CONTENT":"Window not found - Please provide valid window name.", "VARIANT": VARIANT.ERROR},
+        ERR_WINDOW_NOT_FOUND: { "CONTENT": "Window not found - Please provide valid window name.", "VARIANT": VARIANT.ERROR },
+        ERR_HIGHLIGHT_OUT_OF_RANGE:{"CONTENT": "Scraped object's co-ordinates not found within the captured screenshot", "VARIANT": VARIANT.ERROR},
         
         SUCC_WEBSERVICE_RESP: {"CONTENT":"Web Service response received successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_WS_TEMP_SAVE: {"CONTENT":"WebService Template saved successfully.", "VARIANT": VARIANT.SUCCESS},
