@@ -418,19 +418,13 @@ function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData,
             screenViewObject.apkPath = browserType.appPath;
             screenViewObject.mobileSerial = browserType.sNum;
         } 
-        else if (browserType.appPath.toLowerCase().indexOf(".ios") >= 0) {
+        else {
             screenViewObject.appType = appType;
             screenViewObject.deviceName = browserType.appPath2;
             screenViewObject.versionNumber = browserType.verNum;
             screenViewObject.bundleId = browserType.deviceName;
             screenViewObject.ipAddress =  browserType.uuid;
             screenViewObject.param = 'ios';
-        }
-        else {
-            screenViewObject.appType = appType;
-            screenViewObject.apkPath = browserType.appPath;
-            screenViewObject.mobileDeviceName = browserType.deviceName;
-            screenViewObject.mobileUDID = browserType.uuid;
         }
     }
     //For Mobility Web
