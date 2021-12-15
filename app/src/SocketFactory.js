@@ -72,7 +72,10 @@ const SocketFactory = () => {
         dispatch({type: UPDATE_REPORTDATA, payload: reportData});
         setMsg(false)
         window.localStorage['navigateScreen'] = "reports";
-        history.replace("/reports");
+        window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+        window.localStorage['popupRedirect'] = "true";
+        window.localStorage['reportData'] = JSON.stringify(reportData);
+        window.location.href = "/reports";
     }
 
     const executionDATA = (result) => {

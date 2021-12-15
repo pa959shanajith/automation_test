@@ -255,13 +255,13 @@ if (cluster.isMaster) {
 		});
 
 		//Only Test Engineer and Test Lead have access
-		app.get(/^\/(scrape|design|designTestCase|execute|scheduling)$/, function(req, res) {
+		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
 			var roles = ["Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|reports|plugin|seleniumtoavo)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|reports|plugin|seleniumtoavo|settings)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
