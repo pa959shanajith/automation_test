@@ -65,7 +65,7 @@ generateEmailPayload.report = async data => {
 		recv = Object.assign({},prioirtyRecv,Object.fromEntries(Object.entries(recv).filter(([k,v])=> v == '-1')))
 	} 
 	data.reportData.forEach(r => {
-		if (r.reportid.length > 0) r.url = 'https://avoassure.com/reports/?executionid=' + r.reportid;
+		if (r.reportid.length > 0) r.url = data.url + '/reports/?executionid=' + r.reportid;
 		if (r.status.toLowerCase() == "pass") r.pass = true;
 		else if (r.status.toLowerCase() == "fail") r.fail = true;
 		else if (r.status.toLowerCase() == "terminate") r.terminate = true;
