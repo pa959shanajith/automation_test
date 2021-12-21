@@ -241,8 +241,10 @@ const BottomContent = () => {
         {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
         {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag || unsavedObjPresent || !saved.flag },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},
-        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: true, disable: compareFlag && appType!=="Webservice"},
-        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType!=="Webservice", show: true}
+        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: (appType!=="Web"), disable: compareFlag && appType!=="Webservice"},
+        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>setShowObjModal("importObject"), show: (appType==="Web"), disable: compareFlag && appType==="Web"},
+        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType!=="Webservice", show: (appType!=="Web")},
+        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>setShowObjModal("exportObject"), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType==="Web", show: (appType==="Web")}
     ]
 
     return (
