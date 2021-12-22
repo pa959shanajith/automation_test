@@ -5,6 +5,22 @@ const myserver = require('../lib/socket');
 const logger = require('../../logger');
 const redisServer = require('../lib/redisSocketHandler');
 const utils = require('../lib/utils');
+var path = require('path');
+var fs = require('fs');
+var xlsx = require('xlsx');
+var xl = require('excel4node');
+
+/* Convert excel file to CSV Object. */
+var xlsToCSV = function (workbook, sheetname) {
+	var result = [];
+	var csv = xlsx.utils.sheet_to_csv(workbook.Sheets[sheetname]);
+	if (csv.length > 0) {
+		result.push(sheetname);
+		result.push(csv);
+	}
+	//return result.join("\n");
+	return result;
+};
 
 exports.initScraping_ICE = function (req, res) {
 	var icename,value,username;
@@ -324,3 +340,237 @@ exports.updateIrisDataset = async(req, res) => {
 		res.send("fail");
 	}
 }
+
+exports.exportScreenToExcel = async (req, res) =>{
+	const fnName = "exportScreenToExcel";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		logger.info("Fetching Module details");
+		const inputs = {
+			"screenid": req.body.screenId,
+			"projectid": req.body.projectId,
+			"query": "getscrapedata"
+		};
+		const result = await utils.fetchData(inputs, "design/getScrapeDataScreenLevel_ICE", fnName);
+		if (result == "fail") return res.send("fail");
+		logger.info("Scraped Data sent successfully from designscreen/"+fnName+" service");
+		logger.info("Writing Module structure to Excel");
+		var excelDirPath = path.join(__dirname, './../../output');
+		var filePath = path.join(excelDirPath, 'samp234.xlsx');
+
+		try {
+			if (!fs.existsSync(excelDirPath)) fs.mkdirSync(excelDirPath); // To create directory for storing excel files if DNE.
+			if (fs.existsSync(filePath)) fs.unlinkSync(path.join(filePath)); // To remove the created files
+		} catch (e) {
+			logger.error("Exception in mindmapService: exportScreenToExcel: Create Directory/Remove file", e);
+		}
+
+		//create a new workbook file in current working directory
+		var wb = new xl.Workbook();
+		var ws = wb.addWorksheet('Sheet1');
+
+		logger.debug(req.body.testCaseId.name);
+
+		//create the new worksheet with 10 coloumns and rows equal to number of testcases
+		var curr = result;
+
+		//Set some width for columns
+		ws.column(1).setWidth(40);
+		ws.column(2).setWidth(15);
+		ws.column(3).setWidth(15);
+		ws.column(4).setWidth(15);
+		ws.column(5).setWidth(15);
+		ws.column(6).setWidth(15);
+		ws.column(7).setWidth(15);
+		ws.column(8).setWidth(15);
+		ws.column(9).setWidth(15);
+		ws.column(10).setWidth(15);
+		ws.column(11).setWidth(15);
+		ws.column(12).setWidth(15);
+		ws.column(13).setWidth(15);
+		ws.column(14).setWidth(15);
+		ws.column(15).setWidth(15);
+
+		var style = wb.createStyle({
+			font: {
+				color: '000000',
+				bold: true,
+					size: 12,
+				}
+				});
+
+		ws.cell(1, 1)
+				.string('ObjectName')
+				.style(style);
+
+		ws.cell(1, 2)
+				.string('Update')
+				.style(style);
+
+		ws.cell(1, 3)
+				.string('URL')
+				.style(style);
+
+		ws.cell(1, 4)		
+				.string('RelativeXpath')
+				.style(style);
+
+		ws.cell(1, 5)
+				.string('Id')
+				.style(style);
+
+		ws.cell(1, 6)
+				.string('AbsoluteXpath')
+				.style(style);
+
+		ws.cell(1, 7)
+				.string('Name')
+				.style(style);
+
+		ws.cell(1, 8)
+				.string('TagName')
+				.style(style);
+
+		ws.cell(1, 9)
+				.string('ClassName')
+				.style(style);
+
+		ws.cell(1, 10)
+				.string('Left')
+				.style(style);
+
+		ws.cell(1, 11)
+				.string('Top')
+				.style(style);
+
+		ws.cell(1, 12)
+				.string('Height')
+				.style(style);
+
+		ws.cell(1, 13)
+				.string('Width')
+				.style(style);
+
+		ws.cell(1, 14)
+				.string('CssSelector')
+				.style(style);
+
+		ws.cell(1, 15)
+				.string('ObjectType')
+				.style(style);
+
+		var obj_count=1;
+		for (i = 0; i < curr.view.length; i++) {
+			ws.cell(2+i,1).string(curr.view[i].custname);
+		}
+
+		//save it
+		wb.write(filePath,function (err) {
+			if (err) return res.send('fail');
+			res.writeHead(200, {'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+			var rstream = fs.createReadStream(filePath);
+			rstream.pipe(res);
+		});
+	} catch(exception) {
+		logger.error("Error occurred in designscreen/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+
+};
+
+exports.importScreenfromExcel = async (req, res) =>{
+	const fnName = "importScreenfromExcel";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
+		if (req.body.data.flag == 'sheetname') {
+			return res.status(200).send(wb1.SheetNames);
+		}
+		else if (req.body.data.flag == 'data') {
+			var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+			var numSheets = myCSV.length / 2;
+			var qObj = [];
+			var objlst = [];
+			var err;
+			if (numSheets == 0) {
+				return res.status(200).send("emptySheet");
+			}
+			for (var k = 0; k < numSheets; k++) {
+				var cSheet = myCSV[k * 2 + 1];
+				var cSheetRow = cSheet.split('\n');
+				var objIdx = -1, updIdx = -1, rxpathIdx = -1, idIdx = -1, axpathIdx = -1, nameIdx = -1, tagIdx = -1, classIdx = -1;
+				var leftIdx = -1, topIdx = -1, hIdx = -1, wIdx = -1, cssIdx = -1, objtypeIdx = -1;
+				var uniqueIndex = 0;
+				cSheetRow[0].split(',').forEach(function (e, i) {
+					if(i== 0 && e.toLowerCase()=="objectname") objIdx = i;
+					if(i== 1 && e.toLowerCase()=="update") updIdx = i;
+					if(i== 2 && e.toLowerCase()=="url") urlIdx = i;
+					if(i== 3 && e.toLowerCase()=="relativexpath") rxpathIdx = i;
+					if(i== 4 && e.toLowerCase()=="id") idIdx = i;
+					if(i== 5 && e.toLowerCase()=="absolutexpath") axpathIdx = i;
+					if(i== 6 && e.toLowerCase()=="name") nameIdx = i;
+					if(i== 7 && e.toLowerCase()=="tagname") tagIdx = i;
+					if(i== 8 && e.toLowerCase()=="classname") classIdx = i;
+					if(i== 9 && e.toLowerCase()=="left") leftIdx = i;
+					if(i== 10 && e.toLowerCase()=="top") topIdx = i;
+					if(i== 11 && e.toLowerCase()=="height") hIdx = i;
+					if(i== 12 && e.toLowerCase()=="width") wIdx = i;
+					if(i== 13 && e.toLowerCase()=="cssselector") cssIdx = i;
+					if(i== 14 && e.toLowerCase()=="objecttype") objtypeIdx = i;
+				});
+				if (objIdx == -1 || updIdx == -1 || urlIdx == -1 || rxpathIdx == -1 || idIdx == -1 || axpathIdx == -1 || nameIdx == -1 || tagIdx == -1 || classIdx == -1 ||
+					leftIdx == -1 || topIdx == -1 || hIdx == -1 || wIdx == -1 || cssIdx == -1 || objtypeIdx == -1|| cSheetRow.length < 2) {
+					err = true;
+					break;
+				}
+				var objprop = [];
+				for (var i = 1; i < cSheetRow.length; i++) {
+					var e={}
+					var row = cSheetRow[i].split(',');
+					if (i==1 && (row[0]=="" || row[1]=="")){
+						if (row[1].toLowerCase() == "yes" && (row[2]!="" ||row[3]!="" ||row[4]!="" ||row[5]!="" ||row[6]!="" ||row[7]!="" ||row[8]!="" ||row[9]!="" ||
+						row[10]!="" || row[11]!="" ||row[12]!="" || row[13]!="" || row[14]!="" )){
+							return res.status(200).send('valueError');
+						}
+					}
+					if (row.length < 15) continue;
+					if (row[objIdx] !== '') {
+						e.name = row[objIdx];
+					}
+					if (row[updIdx] !== '') {
+						e.update = row[updIdx];
+					}
+					if (row[urlIdx] !== '') {
+						e.url = row[urlIdx];
+					}
+					if (row[objtypeIdx] !== '') {
+						e.objtype = row[objtypeIdx];
+					}
+					a={}
+					for (var j = 3; j < row.length; j++) {
+						if(row[j] != ""){
+							a[j-3] = row[j]
+						}
+					}
+					e.modify = a
+					objlst.push(e)
+				}
+			}
+			if (err) res.status(200).send('fail');
+			else{
+				const inputs = {
+					"screenid": req.body.data.screenid,
+					"projectid": req.body.data.projectid,
+					"data": objlst
+				};
+				const result = await utils.fetchData(inputs, "design/updateImportObject", fnName);
+				if (result == "fail") return res.send("fail");
+				else res.send(JSON.stringify(result))
+			}
+		}
+	} catch(exception) {
+		logger.error("Error occurred in designscreen/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+
+}; 
