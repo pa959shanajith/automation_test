@@ -144,7 +144,10 @@ module.exports.Execution_Queue = class Execution_Queue {
             //check if target ICE is present in any pool 
             if (targetICE && targetICE in this.ice_list && this.ice_list[targetICE]["poolid"] in this.queue_list) {
                 //check if target ICE is in DND mode, if true check wether the ice owner is has invoked execution
-                if (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser && !this.ice_list[targetICE]["status"]) {
+                let iceStatus = this.ice_list[targetICE]
+                let queueLenght = this.queue_list[iceStatus.poolid].execution_list.length
+                //if ICE is connected and available execute directly if queue lenght is 0 or ice in dnd and owner is the invoker
+                if (iceStatus.connected && !iceStatus.status && ((queueLenght == 0) || (this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser))){               
                     if (type == "ACTIVE") {
                         this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
                     } else {
@@ -328,23 +331,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         return;
     }
-    /** 
-        * @param {list} batchExecutionData 
-        * Of all the pools avialble for a project returns the one with the smallest queue
-    */
-    getLeastLoadedICE(poolQueues) {
-        //increase the value of min if number of execution request in queue exceed 9007199254740991
-        let min = Number.MAX_SAFE_INTEGER
-        let index = "";
-        for (let poolid in poolQueues) {
-            if (this.queue_list[poolQueues[poolid]]["execution_list"].size() < min) {
-                min = this.queue_list[poolQueues[poolid]]["execution_list"].size();
-                index = poolid;
-            }
-        }
-        return index;
-    }
-
 
     /** 
     * @param {string} channel 
@@ -373,6 +359,10 @@ module.exports.Execution_Queue = class Execution_Queue {
         if (!poolid) {
             logger.debug(ice_name + " does not belong to any pool.")
             return;
+        }
+        if (!this.queue_list[poolid]){
+            this.ice_list[ice_name]["poolid"] = ''
+            return
         }
         let pool = this.queue_list[poolid];
         var queue = pool["execution_list"];
