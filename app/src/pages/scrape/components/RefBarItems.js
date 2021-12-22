@@ -91,7 +91,7 @@ const RefBarItems = props => {
 			if (appType === 'OEBS' && ScrapedObject.hiddentag === 'True'){
 				setHighlight(false)
 				setPopupState({show:true,title:"Element Highlight",content:"Element: " + ScrapedObject.custname + " is Hidden."});
-			} else if (ScrapedObject.top) {
+			} else if (ScrapedObject.height && ScrapedObject.width) {
 				if (ScrapedObject.viewTop != undefined) {
 					if (ScrapedObject.viewTop < imageHeight) {
 						// perform highlight
