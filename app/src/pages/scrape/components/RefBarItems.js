@@ -30,6 +30,7 @@ const RefBarItems = props => {
 	const [currMobileType, setCurrMobileType]  = useState('Android');
 	const [popupState,setPopupState] = useState({show:false,title:"",content:""}) 
 	const [dsRatio, setDsRatio] = useState(1); //downScale Ratio
+	const [imageHeight,setImageHeight]=useState(0)
 	const { scrapeItems, setScrapeItems, scrapedURL, mainScrapedData, newScrapedData, orderList } = useContext(ScrapeContext);
 
 	useEffect(()=>{
@@ -65,6 +66,7 @@ const RefBarItems = props => {
 				if (ds_height > 300) ds_height = 300;
 				ds_height += 45; // popup header size included
 				setMirrorHeight(ds_height);
+				setImageHeight(mirrorImg.height)
 				setDsRatio(ds_ratio);
 			}
 
@@ -85,12 +87,32 @@ const RefBarItems = props => {
 			let ScrapedObject = objValue;
 
 			let top=0; let left=0; let height=0; let width=0;
-
+			let displayHighlight = true;
 			if (appType === 'OEBS' && ScrapedObject.hiddentag === 'True'){
 				setHighlight(false)
 				setPopupState({show:true,title:"Element Highlight",content:"Element: " + ScrapedObject.custname + " is Hidden."});
 			} else if (ScrapedObject.top) {
-				ScrapedObject.viewTop != undefined ? top = ScrapedObject.viewTop * dsRatio : top = ScrapedObject.top * dsRatio;
+				if (ScrapedObject.viewTop != undefined) {
+					if (ScrapedObject.viewTop < imageHeight) {
+						// perform highlight
+						top = ScrapedObject.viewTop * dsRatio
+					}
+					else {
+						// popup error message
+						displayHighlight=false
+					}
+				}
+				else {
+					if (ScrapedObject.top < imageHeight) {
+						// perform highlight
+						top = ScrapedObject.top * dsRatio;
+					}
+					else {
+						// popup error message
+						displayHighlight=false
+					}
+				}
+				// ScrapedObject.viewTop != undefined ? top = ScrapedObject.viewTop * dsRatio : top = ScrapedObject.top * dsRatio;
 				left = ScrapedObject.left * dsRatio;
 				height = ScrapedObject.height * dsRatio;
 				width = ScrapedObject.width * dsRatio;
@@ -107,15 +129,22 @@ const RefBarItems = props => {
 					top = top + 35;
 					left = left-36;
 				}
-				setHighlight({
-					top: `${Math.round(top)}px`, 
-					left: `${Math.round(left)}px`, 
-					height: `${Math.round(height)}px`, 
-					width: `${Math.round(width)}px`, 
-					backgroundColor: "yellow", 
-					border: "1px solid red", 
-					opacity: "0.7"
-				});
+				// if (highlight){setHighlight} else{setHighlight(false)}
+				if(displayHighlight){
+					setHighlight({
+						top: `${Math.round(top)}px`, 
+						left: `${Math.round(left)}px`, 
+						height: `${Math.round(height)}px`, 
+						width: `${Math.round(width)}px`, 
+						backgroundColor: "yellow", 
+						border: "1px solid red", 
+						opacity: "0.7"
+					});
+				}
+				else {
+					setHighlight(false);
+					setMsg(Messages.SCRAPE.ERR_HIGHLIGHT_OUT_OF_RANGE);
+				}
 				// highlightRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'})
 			} else setHighlight(false);
 			if(!ScrapedObject.xpath.startsWith('iris')){
