@@ -269,3 +269,46 @@ export const readTestCaseFromScreen_ICE = (userInfo, screenId, versionnumber, sc
         .catch(err=>reject({error: err}));
     });
 }
+
+export const exportScreenToExcel = (type, screenId, projectId, testCaseId) =>	{
+    return new Promise((resolve, reject)=>{
+        const res = axios(url+"/exportScreenToExcel", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json',
+            },
+            data : {
+                param: 'exportScreenToExcel',
+                screenId: screenId,
+                projectId: projectId,
+                type: type,
+                testCaseId: testCaseId
+            },
+            credentials : 'include',
+            responseType:'arraybuffer'
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error))
+    })
+}
+
+export const excelToScreen = (data) =>	{
+    return new Promise((resolve, reject)=>{
+        const res = axios(url+"/importScreenfromExcel", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {'data':data},
+            credentials: 'include'
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error))
+    })
+}
