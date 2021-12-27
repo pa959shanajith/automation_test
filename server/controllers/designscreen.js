@@ -369,8 +369,6 @@ exports.exportScreenToExcel = async (req, res) =>{
 		var wb = new xl.Workbook();
 		var ws = wb.addWorksheet('Sheet1');
 
-		logger.debug(req.body.testCaseId.name);
-
 		//create the new worksheet with 10 coloumns and rows equal to number of testcases
 		var curr = result;
 
