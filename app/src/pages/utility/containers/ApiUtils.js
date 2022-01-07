@@ -308,7 +308,7 @@ const validate = (request, api, integration) => {
             check.exectionMode = true;
             check.error = true;
         }
-        if (request["executionData"].executionEnv !== "default" && request["executionData"].executionEnv !== "saucelab") {
+        if (request["executionData"].executionEnv !== "default" && request["executionData"].executionEnv !== "saucelabs") {
             check.executionEnv = true;
             check.error = true;
         }

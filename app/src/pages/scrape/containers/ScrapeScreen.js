@@ -11,6 +11,8 @@ import CompareObjectModal from '../components/CompareObjectModal';
 import MapObjectModal from '../components/MapObjectModal';
 import CertificateModal from '../components/CertificateModal';
 import EditIrisObject from '../components/EditIrisObject';
+import ExportObjectModal from '../components/ExportObjectModal';
+import ImportObjectModal from '../components/ImportObjectModal';
 import { CreateObjectModal, EditObjectModal } from '../components/CustomObjectModal';
 import ActionBarItems from '../components/ActionBarItems';
 import LaunchApplication from '../components/LaunchApplication';
@@ -365,6 +367,8 @@ const ScrapeScreen = ()=>{
         { overlay && <ScreenOverlay content={overlay} />}
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
+        { showObjModal === "exportObject" && <ExportObjectModal  setOverlay={setOverlay} setShow={setShowObjModal} />}
+        { showObjModal === "importObject" && <ImportObjectModal user_id={user_id} role={role} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} />}
         { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} user_id={user_id} role={role} fetchScrapeData={fetchScrapeData} history={history} /> }
         { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved} setOrderList={setOrderList} /> }
         { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} startScrape={startScrape} /> }
@@ -418,19 +422,13 @@ function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData,
             screenViewObject.apkPath = browserType.appPath;
             screenViewObject.mobileSerial = browserType.sNum;
         } 
-        else if (browserType.appPath.toLowerCase().indexOf(".ios") >= 0) {
+        else {
             screenViewObject.appType = appType;
             screenViewObject.deviceName = browserType.appPath2;
             screenViewObject.versionNumber = browserType.verNum;
             screenViewObject.bundleId = browserType.deviceName;
             screenViewObject.ipAddress =  browserType.uuid;
             screenViewObject.param = 'ios';
-        }
-        else {
-            screenViewObject.appType = appType;
-            screenViewObject.apkPath = browserType.appPath;
-            screenViewObject.mobileDeviceName = browserType.deviceName;
-            screenViewObject.mobileUDID = browserType.uuid;
         }
     }
     //For Mobility Web

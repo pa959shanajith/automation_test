@@ -416,6 +416,9 @@ if (cluster.isMaster) {
 		app.post('/updateScreen_ICE', auth.protect, designscreen.updateScreen_ICE);
 		app.post('/updateIrisDataset', auth.protect, designscreen.updateIrisDataset);
 		app.post('/userObjectElement_ICE', auth.protect, designscreen.userObjectElement_ICE);
+		app.post('/exportScreenToExcel', auth.protect, designscreen.exportScreenToExcel);
+		app.post('/importScreenfromExcel', auth.protect, designscreen.importScreenfromExcel);
+		
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', auth.protect, design.readTestCase_ICE);
 		app.post('/updateTestCase_ICE', auth.protect, design.updateTestCase_ICE);

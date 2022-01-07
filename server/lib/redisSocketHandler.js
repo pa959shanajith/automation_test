@@ -362,17 +362,17 @@ module.exports.initListeners = mySocket => {
 };
 
 async function check_pulse(){
-	var time = Date()
+	var time = new Date().toUTCString()
 	var writeStr = "None"
 	var pulse_ICE = await cache.get("ICE_status")
 	logger.silly("Checking ICE pulse")
 	for (var ice in pulse_ICE) {
 		if(pulse_ICE[ice]["time"]){
-			var iceTime = pulse_ICE[ice]["time"]
+			var iceTime = pulse_ICE[ice]["time"] + "+0"
 			var writeStr = "";
-			if(Date.parse(time) - Date.parse(iceTime) >= 100000){
+			if(Math.abs(Date.parse(time) - Date.parse(iceTime)) >= 100000){
 				var writeStr = time.toString() + " " + ice + " Disconnected pulse last recieved at: " + iceTime.toString();
-				logger.silly(writeStr)
+				logger.info(writeStr)
 				pulse_ICE[ice]["time"] = null;
 				pulse_ICE[ice]["connected"] = false;
 				cache.set("ICE_status",pulse_ICE)
@@ -389,3 +389,5 @@ async function check_pulse(){
 		}
 	}
 }
+
+check_pulse()
