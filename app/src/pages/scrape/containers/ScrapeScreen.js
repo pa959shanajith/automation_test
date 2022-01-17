@@ -308,6 +308,8 @@ const ScrapeScreen = ()=>{
                         let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
                         setNewScrapedData(scrapeItemList);
                         setShowObjModal("replaceObject");
+                    } else {
+                        setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
                     }
                 } else {
                     let viewString = data;
