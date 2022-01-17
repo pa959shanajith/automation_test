@@ -8,6 +8,8 @@ import WebserviceScrape from './WebserviceScrape';
 import RefBarItems from '../components/RefBarItems.js';
 import AddObjectModal from '../components/AddObjectModal';
 import CompareObjectModal from '../components/CompareObjectModal';
+import ReplaceObjectSelBrModal from '../components/ReplaceObjectSelBrModal';
+import ReplaceObjectModal from '../components/ReplaceObjectModal';
 import MapObjectModal from '../components/MapObjectModal';
 import CertificateModal from '../components/CertificateModal';
 import EditIrisObject from '../components/EditIrisObject';
@@ -162,7 +164,7 @@ const ScrapeScreen = ()=>{
         });
     }
 
-    const startScrape = (browserType, compareFlag) => {
+    const startScrape = (browserType, compareFlag, replaceFlag) => {
         let appType = current_task.appType;
         if (appType === "Webservice") {
             let arg = {}
@@ -234,8 +236,12 @@ const ScrapeScreen = ()=>{
                 blockMsg = 'Comparing objects in progress...';
                 setShowObjModal(false);
             };
+            if(replaceFlag) {
+                blockMsg = 'Scrape and Replace Object in progress...';
+                setShowObjModal(false);
+            };
 
-            screenViewObject = getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData, newScrapedData);
+            screenViewObject = getScrapeViewObject(appType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
             setShowAppPop(false);
             setOverlay(blockMsg);
 
@@ -292,6 +298,16 @@ const ScrapeScreen = ()=>{
                             setMsg(MSG.SCRAPE.ERR_UNMAPPED_OBJ);
                         else
                             setMsg(MSG.SCRAPE.ERR_COMPARE_OBJ);
+                    }
+                } else if (data.action === "replace") {
+                   let viewString = data;
+
+                    if (viewString.view.length !== 0){
+                        let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+
+                        let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
+                        setNewScrapedData(scrapeItemList);
+                        setShowObjModal("replaceObject");
                     }
                 } else {
                     let viewString = data;
@@ -372,6 +388,8 @@ const ScrapeScreen = ()=>{
         { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} user_id={user_id} role={role} fetchScrapeData={fetchScrapeData} history={history} /> }
         { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved} setOrderList={setOrderList} /> }
         { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} startScrape={startScrape} /> }
+        { showObjModal === "replaceObjectSelBr" && <ReplaceObjectSelBrModal setShow={setShowObjModal} startScrape={startScrape} /> }
+        { showObjModal === "replaceObject" && <ReplaceObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} user_id={user_id} role={role} fetchScrapeData={fetchScrapeData} history={history} newScrapedData={newScrapedData} /> }
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} setOrderList={setOrderList} />}
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
@@ -397,7 +415,7 @@ const ScrapeScreen = ()=>{
 export default ScrapeScreen;
 
 
-function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData, newScrapedData) {
+function getScrapeViewObject(appType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData) {
     let screenViewObject = {};
     //For PDF
     if (browserType === "pdf"){
@@ -437,8 +455,9 @@ function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData,
         screenViewObject.mobileSerial = browserType.slNum;
         screenViewObject.androidVersion = browserType.vernNum;
         if (compareFlag) {
-            // screenViewObject.viewString = viewString;
             screenViewObject.action = "compare";
+        } else if(replaceFlag) {
+            screenViewObject.action = "replace";
         }
         screenViewObject.browserType = browserType;
     }
@@ -453,6 +472,8 @@ function getScrapeViewObject(appType, browserType, compareFlag, mainScrapedData,
             let viewString = Object.keys(newScrapedData).length ? {...newScrapedData, view: [...mainScrapedData.view, ...newScrapedData.view]} : { ...mainScrapedData };
             screenViewObject.viewString = {...viewString, view: viewString.view.filter(object => object.xpath.substring(0, 4)!=="iris")};
             screenViewObject.action = "compare";
+        } else if (replaceFlag) {
+            screenViewObject.action = "replace";
         }
         screenViewObject.browserType = browserType;
     }
