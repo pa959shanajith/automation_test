@@ -89,8 +89,6 @@ const ReplaceObjectModal = props => {
             projectId: projectId,
             screenId: screenId,
             screenName: screenName,
-            userId: props.user_id,
-            roleId: props.role,
             param: "replaceScrapeData",
             appType: appType,
             objList: [],
@@ -207,7 +205,7 @@ const ReplaceObjectModal = props => {
                 footer={<>
                     { errorMsg && <span  data-test="errorMessage" className="ro_errorMsg">{errorMsg}</span>}
                     <button data-test="showAll" onClick={onShowAllObjects}>Show All Objects</button>
-                    <button data-test="unLink" onClick={onUnlink} disabled={!selectedItems.length}>Un-Link</button>
+                    <button data-test="unLink" onClick={onUnlink} disabled={!selectedItems.length}>Un-Map</button>
                     <button data-test="submit" onClick={submitReplace}>Replace Objects</button>
                 </>}
             />
@@ -217,8 +215,6 @@ const ReplaceObjectModal = props => {
 ReplaceObjectModal.propTypes={
     scrapeItems: PropTypes.arrayOf(PropTypes.object),
     current_task:PropTypes.object,
-    user_id: PropTypes.string,
-    role: PropTypes.string,
     fetchScrapeData:PropTypes.func,
     setShow:PropTypes.func,
     newScrapedData:PropTypes.arrayOf(PropTypes.object)

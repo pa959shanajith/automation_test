@@ -13,8 +13,6 @@ const ImportObjectModal = props => {
     const [importType,setImportType] = useState("def-val")
     const setOverlay = props.setOverlay
     const fetchScrapeData = props.fetchScrapeData
-    const user_id=props.user_id
-    const role=props.role
     const history = useHistory();
     const { appType, screenId, screenName, projectId } = useSelector(state => state.plugin.CT);
     const onImport = async() => {
@@ -78,8 +76,6 @@ const ImportObjectModal = props => {
                                 projectId: projectId,
                                 screenId: screenId,
                                 screenName: screenName,
-                                userId: user_id,
-                                roleId: role,
                                 param: "importScrapeData",
                                 appType: appType,
                                 objList: objList

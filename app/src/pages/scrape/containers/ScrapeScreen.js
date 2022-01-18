@@ -29,7 +29,6 @@ const ScrapeScreen = ()=>{
     const history = useHistory();
     const current_task = useSelector(state=>state.plugin.CT);
     const certificateInfo = useSelector(state=>state.scrape.cert);
-    const  { user_id, role } = useSelector(state=>state.login.userinfo);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const {endPointURL, method, opInput, reqHeader, reqBody, paramHeader} = useSelector(state=>state.scrape.WsData);
     const [overlay, setOverlay] = useState(null);
@@ -386,12 +385,12 @@ const ScrapeScreen = ()=>{
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
         { showObjModal === "exportObject" && <ExportObjectModal  setOverlay={setOverlay} setShow={setShowObjModal} />}
-        { showObjModal === "importObject" && <ImportObjectModal user_id={user_id} role={role} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} />}
-        { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} user_id={user_id} role={role} fetchScrapeData={fetchScrapeData} history={history} /> }
+        { showObjModal === "importObject" && <ImportObjectModal fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} />}
+        { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} /> }
         { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved} setOrderList={setOrderList} /> }
         { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} startScrape={startScrape} /> }
         { showObjModal === "replaceObjectSelBr" && <ReplaceObjectSelBrModal setShow={setShowObjModal} startScrape={startScrape} /> }
-        { showObjModal === "replaceObject" && <ReplaceObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} user_id={user_id} role={role} fetchScrapeData={fetchScrapeData} history={history} newScrapedData={newScrapedData} /> }
+        { showObjModal === "replaceObject" && <ReplaceObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} newScrapedData={newScrapedData} /> }
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} setOrderList={setOrderList} />}
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}
