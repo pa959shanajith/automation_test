@@ -232,26 +232,25 @@ const prepareReportData = (reportData, embedImages) => {
     const scrShots = { "idx": [], "paths": [] };
 
     const report = reportData.report;
-    const endTimeStamp = report.overallstatus[0].EndTime.split(".")[0];
-    const endDate = endTimeStamp.split(" ")[0].split("-");
-    let elapTime = (report.overallstatus[0].EllapsedTime.split(".")[0]).split(":");
-    report.overallstatus[0].version = reportData.version;
-    report.overallstatus[0].domainName = reportData.domainname;
-    report.overallstatus[0].projectName = reportData.projectname;
-    report.overallstatus[0].releaseName = reportData.releasename;
-    report.overallstatus[0].cycleName = reportData.cyclename;
-    report.overallstatus[0].scenarioName = reportData.testscenarioname;
-    report.overallstatus[0].reportId = reportData.reportId;
-    report.overallstatus[0].executionId = reportData.executionid;
-    report.overallstatus[0].moduleName = reportData.testsuitename;
-    report.overallstatus[0].browserVersion = report.overallstatus[0].browserVersion || '-';
-    report.overallstatus[0].browserType = report.overallstatus[0].browserType || '-';
-    report.overallstatus[0].StartTime = formatDate(report.overallstatus[0].StartTime.split(".")[0]) || '-';
-    report.overallstatus[0].EndTime = formatDate(endTimeStamp) || '-';
-    report.overallstatus[0].date = report.overallstatus[0].EndTime && report.overallstatus[0].EndTime.split(" ")[0]  || '-';
-    report.overallstatus[0].time = endTimeStamp.split(" ")[1] || '-';
-    report.overallstatus[0].EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
-    report.overallstatus[0].video = report.overallstatus[0].video || '-'
+    const endTimeStamp = report.overallstatus.EndTime.split(".")[0];
+    let elapTime = (report.overallstatus.EllapsedTime.split(".")[0]).split(":");
+    report.overallstatus.version = reportData.version;
+    report.overallstatus.domainName = reportData.domainname;
+    report.overallstatus.projectName = reportData.projectname;
+    report.overallstatus.releaseName = reportData.releasename;
+    report.overallstatus.cycleName = reportData.cyclename;
+    report.overallstatus.scenarioName = reportData.testscenarioname;
+    report.overallstatus.reportId = reportData.reportId;
+    report.overallstatus.executionId = reportData.executionid;
+    report.overallstatus.moduleName = reportData.testsuitename;
+    report.overallstatus.browserVersion = report.overallstatus.browserVersion || '-';
+    report.overallstatus.browserType = report.overallstatus.browserType || '-';
+    report.overallstatus.StartTime = formatDate(report.overallstatus.StartTime.split(".")[0]) || '-';
+    report.overallstatus.EndTime = formatDate(endTimeStamp) || '-';
+    report.overallstatus.date = report.overallstatus.EndTime && report.overallstatus.EndTime.split(" ")[0]  || '-';
+    report.overallstatus.time = endTimeStamp.split(" ")[1] || '-';
+    report.overallstatus.EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
+    report.overallstatus.video = report.overallstatus.video || '-'
 
     report.rows.forEach((row, i) => {
         row.slno = i + 1;
@@ -285,7 +284,7 @@ const prepareReportData = (reportData, embedImages) => {
         else if (row.status == "Fail") fail++;
         else if (row.Step && row.Step == "Terminated") terminated++
         if (row.Remark && row.Remark !== " ") remarksLength.push(row.Remark)
-        if (row.Comments && row.Comments !== " ") commentsLength.push(row.Comments)
+        if (row.Comments && row.Comments !== " ") commentsLength.push(row.Remark)
     });
     const total = pass+fail+terminated;
     const passPercent = parseFloat(100 * pass / total).toFixed(2);
@@ -293,9 +292,9 @@ const prepareReportData = (reportData, embedImages) => {
     const totalRemaining = (fail+terminated) || 1;
     const failPercent = parseFloat(otherPercent * fail / totalRemaining).toFixed(2);
     const termPercent = (otherPercent - failPercent).toFixed(2);
-    report.overallstatus[0].pass = passPercent > 0 ? passPercent : "0.00";
-    report.overallstatus[0].fail = failPercent > 0 ? failPercent : "0.00";
-    report.overallstatus[0].terminate = termPercent > 0 ? termPercent : "0.00";
+    report.overallstatus.pass = passPercent > 0 ? passPercent : "0.00";
+    report.overallstatus.fail = failPercent > 0 ? failPercent : "0.00";
+    report.overallstatus.terminate = termPercent > 0 ? termPercent : "0.00";
     report.remarksLength = remarksLength;
     report.commentsLength = commentsLength;
     return { report, scrShots };
@@ -729,10 +728,10 @@ exports.getReport_API = async (req, res) => {
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
             const report = prepareReportData(reportInfo).report;
-            report.overallstatus[0].reportId = reportInfo.reportid;
-            delete report.overallstatus[0].scenarioName;
-            delete report.overallstatus[0].executionId;
-            delete report.overallstatus[0].moduleName;
+            report.overallstatus.reportId = reportInfo.reportid;
+            delete report.overallstatus.scenarioName;
+            delete report.overallstatus.executionId;
+            delete report.overallstatus.moduleName;
             const suburl = req.originalUrl.endsWith('/')? req.originalUrl.slice(0,-1):req.originalUrl;
             const downloadUri = req.protocol + '://' + (req.headers["origin"] || req.hostname) + suburl.split('/').slice(0,-1).join('/') + '/viewReport/' + reportInfo.reportid;
             const scenarioReport = {
