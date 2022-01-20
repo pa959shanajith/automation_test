@@ -49,7 +49,6 @@
     "validator": "^9.2.0",
     "winston": "^2.4.0",
     "winston-daily-rotate-file": "^1.7.2",
-    "wkhtmltopdf": "^0.3.4",
     "xlsx": "^0.12.6",
     "xml-parser": "^1.2.1",
     "xmldom": "^0.1.27"

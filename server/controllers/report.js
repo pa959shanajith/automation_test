@@ -114,22 +114,6 @@ const prepareReportData = (reportData, embedImages) => {
     return { report, scrShots };
 };
 
-
-//To render reports
-exports.getReport = async (req, res) => {
-    const fnName = "getReport";
-    logger.info("Inside UI service: " + fnName);
-    try {
-        const reportid = req.body.reportId;
-        const result = await utils.fetchData({ reportid }, "reports/getReport", fnName);
-        if (result == "fail") return res.send("fail");
-        else res.send(result);
-    } catch (exception) {
-        logger.error("Error occurred in "+fnName+". Error: " + exception.message);
-        res.status(500).send("fail");
-    }
-};
-
 //Connect to Jira
 exports.connectJira_ICE = function(req, res) {
     logger.info("Inside UI service: connectJira_ICE");

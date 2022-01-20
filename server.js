@@ -440,7 +440,6 @@ if (cluster.isMaster) {
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);
 		app.post('/cancelScheduledJob_ICE', auth.protect, suite.cancelScheduledJob_ICE);
 		//Report Screen Routes
-		app.post('/getReport', auth.protect, report.getReport);
 		app.post('/connectJira_ICE', auth.protect, report.connectJira_ICE);
 		//Plugin Routes
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);
