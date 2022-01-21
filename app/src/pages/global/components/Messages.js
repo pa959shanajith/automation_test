@@ -200,6 +200,8 @@ const Messages={
     },
     PLUGIN:{
         ERR_LOAD_TASK: {"CONTENT":"Fail to load tasks.", "VARIANT": VARIANT.ERROR},
+        ERR_UNMAPPED_DISCOVER_USER: {"CONTENT":"The user is not mapped to Avo Discover.", "VARIANT": VARIANT.ERROR},
+        ERR_FETCHING_DISCOVER_USER: {"CONTENT":"Error fetching Avo Discover users.", "VARIANT": VARIANT.ERROR}
     },
     EXECUTE:{
         ERR_FETCH_TESTSUITE: {"CONTENT":"Error while fetching Test Suite Data.", "VARIANT": VARIANT.ERROR},

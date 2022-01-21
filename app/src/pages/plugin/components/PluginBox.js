@@ -1,6 +1,19 @@
 import React, { useState} from 'react';
 import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types';
+import { getMappedDiscoverUser } from '../api';
+import { setMsg } from '../../global' 
+
+const displayError = (error) =>{
+	setMsg(error)
+}
+
+const openDiscover = async() =>{
+	var res = await getMappedDiscoverUser();
+	if(res.error){ displayError(res.error);return;}
+	// window.open(res.url+'?jwt='+res.token , '_blank');
+	window.open("https://dev.process-discovery.dl.slksoft.com:8088"+'?jwt='+res.token , '_blank');
+}
 
 const PluginBox = ({pluginName, pluginTitle}) => {
 
@@ -14,6 +27,10 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 			window.location.href = "/"+ pluginName;
 		}
 		else if (['report', 'performancetesting'].indexOf(pluginName) > -1) window.location.href = "/"+ pluginName;
+		else if(pluginName === "avodiscover"){
+			//calling a function to redirect to Avo Discover
+			openDiscover();
+		}
 		else {
 			if (pluginName === "integration") window.localStorage['integrationScreenType'] = null
 			setRedirectTo(`/${pluginName}`)

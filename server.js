@@ -327,6 +327,7 @@ if (cluster.isMaster) {
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
+		var avoDiscoverPlugin = require('./server/controllers/avoDiscoverPlugin');
 
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
@@ -454,6 +455,8 @@ if (cluster.isMaster) {
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', auth.protect, taskbuilder.getTaskJson_mindmaps);
 		app.post('/updateTaskstatus_mindmaps', auth.protect, taskbuilder.updateTaskstatus_mindmaps);
+		//Discover Plugin Routes
+		app.get('/getMappedDiscoverUser', auth.protect, avoDiscoverPlugin.getMappedDiscoverUser);
 		//Utility plugins
 		app.post('/Encrypt_ICE', auth.protect, utility.Encrypt_ICE);
 		app.post('/getExecution_metrics', auth.protect, report.getExecution_metrics);
