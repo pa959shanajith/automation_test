@@ -1,0 +1,48 @@
+.discover_container{
+    width: 100%;
+    padding: 20px;
+    height: 100%;
+
+    .discover_containerwrap{
+        height: 70%;
+    }
+
+    .col-xs-9{
+        width: 83%;
+    }
+    .adminActionBtn{
+        padding-bottom: 5%;
+    }
+    .input-label {
+        margin-top: 0;
+    }
+    .discover_input{
+        label{
+            width: 120px;
+        }
+    }
+    .adminActionBtn .a__btn:disabled {
+        opacity: 0.5;
+    }
+    .avoDiscover_UserForm{
+        float: left;
+        width: 100%;
+    }
+    .map{    
+        float: right;
+        margin-right: 274px;
+        margin-top: -51px;
+        z-index: 2;
+        position: relative;
+    }
+    .refresh{
+        float: right;
+        margin-right: 168px;
+        margin-top: -50px;
+        position: relative;
+    }
+}
+.refresh_avodiscover{
+    visibility: visible;
+    float : left;
+}

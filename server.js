@@ -398,6 +398,9 @@ if (cluster.isMaster) {
 		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
+		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
+		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
+		app.post('/fetchAvoDiscoverMap', auth.protect, admin.fetchAvoDiscoverMap);
 
 		//Notification Routes
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);

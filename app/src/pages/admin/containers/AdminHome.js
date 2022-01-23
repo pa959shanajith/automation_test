@@ -5,6 +5,7 @@ import Project from './Project';
 import ProjectAssign from './ProjectAssign';
 import OidcConfig from './OidcConfig'
 import GitConfig from './GitConfig'
+import AvoDiscoverConfig from './AvoDiscoverConfig';
 import SamlConfig from './SamlConfig';
 import Preferences from './Preferences';
 import SessionManagement from './SessionManagement';
@@ -45,6 +46,7 @@ const AdminHome = () => {
                                 {(middleScreen==="assignProjectTab")?<ProjectAssign resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
                                 {(middleScreen==="CreateIcePool")?<CreateIcePool resetMiddleScreen={resetMiddleScreen}/>:null}
                                 {(middleScreen==="AllocateIcePool")?<AllocateIcePool resetMiddleScreen={resetMiddleScreen}/>:null}
+                                {(middleScreen==="avoDiscoverConfigTab")?<AvoDiscoverConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
                                 {(middleScreen==="gitConfigure")?<GitConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
                                 {(middleScreen==="ldapConfigTab")?<LdapConfig resetMiddleScreen={resetMiddleScreen} setMiddleScreen={setMiddleScreen}/>:null}
                                 {(middleScreen==="samlConfigTab")?<SamlConfig resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}

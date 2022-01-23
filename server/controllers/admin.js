@@ -2455,3 +2455,51 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 		return res.status("500").send("fail");
 	}
 }
+
+exports.avoDiscoverMap = async(req, res) =>{
+	try{
+		const fnName = "avoDiscoverMap"
+		logger.info("Inside UI service: " + fnName)
+		const inputs = {
+			userid: req.session.userid,
+			action: req.body.action,
+			avodiscoveruser: req.body.avoDiscoverUsrRef,
+			avodiscoverpwsrd: req.body.avoDiscoverPswdRef,
+			avodiscoverurl: req.body.avoDiscoverUrlRef,
+			avodiscoverauthurl: req.body.avodiscoverauthurl
+		};
+		const result = await utils.fetchData(inputs, "admin/avoDiscoverMap", fnName);
+		return res.status('200').send(result);
+	}catch(exception){
+		logger.error("Error occurred in avoDiscoverMap:", exception);
+		return res.status("500").send("fail");
+	}
+}
+
+exports.avoDiscoverReset = async(req, res) =>{
+	try{
+		const fnName = "avoDiscoverReset"
+		logger.info("Inside UI service: " + fnName)
+		const inputs = {
+			"action": req.body.action,
+			"targetid": req.body.userid,
+			"avodiscoverurl": req.body.avodiscoverurl
+		};
+		const result = await utils.fetchData(inputs, "admin/avoDiscoverReset", fnName);
+		return res.status('200').send(result);
+	}catch(exception){
+		logger.error("Error occurred in avoDiscoverMap:", exception);
+		return res.status("500").send("fail");
+	}
+}
+
+exports.fetchAvoDiscoverMap = async (req, res) => {
+	logger.info("Inside UI service: fetchAvoDiscoverMap");
+	try {
+		const result = await utils.fetchData({}, "admin/fetchAvoDiscoverMap", "fetchAvoDiscoverMap");
+		res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in admin/fetchAvoDiscoverMap:", exception);
+		res.send("fail");
+	}
+};
