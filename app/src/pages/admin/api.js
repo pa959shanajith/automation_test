@@ -1229,95 +1229,13 @@ export const getNotificationGroups = async(props) => {
 
 export const avoDiscoverSaveConfig = async(inputs) => { 
     try{
-        var input_url=inputs['url']+'/keycloak.json';
-        //check for valid discover url
-        const valid_url = await axios(input_url, {
-            method: 'GET',
-            headers: {},
-            data: {},
-            credentials: 'include'
-        });
-        if(valid_url.status === 401 || valid_url.data === "Invalid Session" ){
-            RedirectPage(history)
-            return {error:MSG.ADMIN.AVODISCOVER_URL_ERR};
-        }else if(valid_url.status===200 && valid_url.data !== "fail"){
-            //get the bearer token
-            try{
-                var discoverTokenUrl = valid_url.data["auth-server-url"]+'/realms/pd-realm/protocol/openid-connect/token';
-                var data = {
-                    "grant_type": "password",
-                    "client_id": valid_url.data.resource,
-                    "username": "assure.user",
-                    "password": "Avo@1234"
-                };
-                if(inputs['action'] == 'map'){
-                    data['username'] = inputs['avodiscoveruser'];
-                    data['password'] = inputs['avodiscoverpassword'];
-                }
-                var input = new URLSearchParams(Object.entries(data)).toString();
-                const res = await axios(discoverTokenUrl, {
-                    method: 'POST',
-                    headers: {
-                    'Content-type': "application/x-www-form-urlencoded",
-                    },
-                    data: input,
-                    credentials: 'include'
-                });
-                if(res.status === 401 || res.data === "Invalid Session" ){
-                    RedirectPage(history)
-                    return {error:MSG.ADMIN.AVODISCOVER_AUTH_ERR};
-                }else if(res.status===200 && res.data !== "fail"){
-                    if(['save','refresh','fetch'].includes(inputs['action'])){var data = avoDiscoverSaveAction(inputs['url'],res.data.access_token);}
-                    else if(inputs['action']=='map'){var data = avoDiscoverMap(valid_url.data['auth-server-url'],inputs);}
-                    return data;      
-                }
-            }catch(err){
-                console.error(err)
-                return {error:MSG.ADMIN.AVODISCOVER_AUTH_ERR}
-            }
-        }
-    }catch(err){
-        console.error(err)
-        return {error:MSG.ADMIN.AVODISCOVER_URL_ERR}
-    }
-}
-
-var avoDiscoverSaveAction = async(inp_url,b_token) => {
-    try{
-        var url=inp_url+'/api/users'
-        const res1 = await axios(url, {
-        method: 'GET',
-        headers: {
-            'Authorization':'Bearer '+b_token
-        },
-        credentials: 'include'
-        });
-        if(res1.status === 401 || res1.data === "Invalid Session" ){
-            RedirectPage(history)
-            return {error:MSG.GENERIC.INVALID_SESSION};
-        }else if(res1.status===200 && res1.data !== "fail"){
-            var result =  (res1.data.filter(v => v.role == 'business_user')).map(({username})=>({username}))
-            return result;
-        }
-    } catch(err){
-        console.error(err)
-        return {error:MSG.ADMIN.AVODISCOVER_USER_ERR}
-    }
-}
-
-var avoDiscoverMap = async(inp_url,data) => {
-    try{
         const res = await axios(url+'/avoDiscoverMap', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             data: {
-                "action":data['action'],
-                "avoDiscoverPswdRef":data['avodiscoverpassword'],
-                "avoDiscoverUsrRef":data['avodiscoveruser'],
-                "avoDiscoverUrlRef":data['url'],
-                "avodiscoverauthurl":inp_url
+                "inputs":inputs
             },
             credentials: 'include',
         });
@@ -1325,14 +1243,20 @@ var avoDiscoverMap = async(inp_url,data) => {
             RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
+        if(res.data === 'Unauthorized'){
+            return {error:MSG.ADMIN.AVODISCOVER_AUTH_ERR}
+        }
+        if(res.data === 'ECONNREFUSED'){
+            return {error:MSG.ADMIN.AVODISCOVER_URL_ERR}
+        }
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
-        return {error:MSG.CUSTOM(`Fail to ${data['action']}  Avo Discover users.`)}
+        return {error:MSG.ADMIN.AVODISCOVER_CONFIG_ERR}
     }catch(err){
         console.error(err)
-        return {error:MSG.ADMIN.AVODISCOVER_AUTH_ERR}
+        return {error:MSG.ADMIN.AVODISCOVER_CONFIG_ERR}
     }
 }
 
@@ -1350,7 +1274,6 @@ export const avoDiscoverReset = async(action, id, avodiscoverurl) => {
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){return res.data;}
     }catch(err){

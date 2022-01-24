@@ -50,7 +50,7 @@ const AvoDiscoverConfig = (props) => {
             "url":data['avodiscoverurl']
         }
         const data1 = await avoDiscoverSaveConfig(inputs);
-        if (data1.error) {return; }
+        if (data1.error) {setLoading(false);return;}
         for(var i=0; i<data1.length; i++){
             users.push(data1[i]['username']);
         }
@@ -69,7 +69,7 @@ const AvoDiscoverConfig = (props) => {
 
     const avoDiscoverConfigActions = async (action) => {
         setLoading("Loading...");
-        var regExUrl = /^https:\/\//g;
+        var regExUrl = /^http[s]?:\/\/[A-Za-z0-9.-]+:\d+$/;
         var url = avoDiscoverUrlRef.current.value.trim();
         var inputs={
             "action":action,
@@ -77,10 +77,7 @@ const AvoDiscoverConfig = (props) => {
             "avodiscoveruser": avoDiscoverUsrRef.current != undefined ? avoDiscoverUsrRef.current.value: null ,
             "avodiscoverpassword": avoDiscoverPswdRef.current != undefined ? avoDiscoverPswdRef.current.value: null
         }
-        if(action=='save' && !regExUrl.test(url)){
-            displayError(Messages.ADMIN.AVODISCOVER_URL_ERR)
-            return;
-        }
+        if(action=='save' && !regExUrl.test(url)){displayError(Messages.ADMIN.AVODISCOVER_URL_ERR);return;}
         else{
             const getAvoDiscoverData = await avoDiscoverSaveConfig(inputs);
             if(getAvoDiscoverData.error){displayError(getAvoDiscoverData.error);return;}
