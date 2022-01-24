@@ -13,11 +13,6 @@
         "pingTimeout": "15000",
         "pingInterval": "25000"
     },
-    "screenShotPath": {
-        "default": "",
-        "mac": "",
-        "linux": ""
-    },
     "objectPredictionPath": {
         "default": "",
         "mac": ""
