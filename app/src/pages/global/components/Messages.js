@@ -131,6 +131,13 @@ const Messages={
         WARN_PROJECT_EXIST: {"CONTENT":"Project Name already Exists.", "VARIANT": VARIANT.WARNING},
         WARN_ADD_CYCLE: {"CONTENT":"Please add atleast one cycle for a release.", "VARIANT": VARIANT.WARNING},
         WARN_NO_TOKEN_ISSUED: {"CONTENT":"No tokens have been issued.", "VARIANT": VARIANT.WARNING},
+        AVODISCOVER_URL_ERR: {"CONTENT":"Invalid Avo Discover URL", "VARIENT": VARIANT.WARNING},
+        AVODISCOVER_USER_ERR:{"CONTENT":"Failed to fetch Avo Discover users", "VARIENT": VARIANT.WARNING},
+        AVODISCOVER_AUTH_ERR:{"CONTENT":"Avo Discover user authentication failed. Please check your password", "VARIENT": VARIANT.WARNING},
+        WARN_AVODISCOVER_EXIST: {"CONTENT":"Selected Avo Assure user is already configured", "VARIANT": VARIANT.WARNING},
+        AVODISCOVER_RESET_FAIL: {"CONTENT":"Failed to reset the Avo Discover configuration", "VARIANT": VARIANT.WARNING},
+        ERR_FETCH_AVODISCOVER_MAP: {"CONTENT":"Failed to fetch Avo Discover configuration", "VARIANT": VARIANT.ERROR},
+        AVODISCOVER_CONFIG_ERR: {"CONTENT":"Failed to perform Avo Discover configuration", "VARIANT": VARIANT.ERROR},
     },
     DESIGN:{
         ERR_FETCH_TC: {"CONTENT":"Failed to Fetch Testcases.", "VARIANT": VARIANT.ERROR},
