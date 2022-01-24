@@ -322,7 +322,6 @@ if (cluster.isMaster) {
 		var qtest = require('./server/controllers/qtest');
 		var zephyr = require('./server/controllers/zephyr');
 		var webocular = require('./server/controllers/webocular');
-		var accessibilityTesting = require('./server/controllers/accessibilityTesting');
 		var chatbot = require('./server/controllers/chatbot');
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
