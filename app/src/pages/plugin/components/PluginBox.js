@@ -11,8 +11,7 @@ const displayError = (error) =>{
 const openDiscover = async() =>{
 	var res = await getMappedDiscoverUser();
 	if(res.error){ displayError(res.error);return;}
-	// window.open(res.url+'?jwt='+res.token , '_blank');
-	window.open("https://dev.process-discovery.dl.slksoft.com:8088"+'?jwt='+res.token , '_blank');
+	window.open(res.url+'?jwt='+res.token , '_blank');
 }
 
 const PluginBox = ({pluginName, pluginTitle}) => {
