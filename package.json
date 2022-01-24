@@ -30,6 +30,7 @@
     "express-session": "^1.15.6",
     "express-winston": "^2.4.0",
     "helmet": "^3.9.0",
+    "jsonwebtoken": "^8.5.1",
     "lusca": "^1.5.2",
     "node-env-file": "^0.1.8",
     "node-rest-client": "^3.1.0",

@@ -6,6 +6,8 @@ var logger = require('../../logger');
 var Client = require("node-rest-client").Client;
 var epurl = process.env.DAS_URL;
 var client = new Client();
+var jwt = require('jsonwebtoken')
+var utils = require('../lib/utils');
 
 //PD import
 exports.pdProcess = function (req, res) {
@@ -820,5 +822,32 @@ var getAdjacentItems = function(activityJSON,taskidx,type){
 			return nextLinksList.indexOf(eachShape["@id"]) != -1;
 		});		
 		return {"sources":previousNodes,"targets":filteredTask.concat(filteredShapes)};
+	}
+}
+
+exports.getMappedDiscoverUser = async(req,res)=>{
+	const fnName = "getMappedDiscoverUser";
+	logger.info("Inside UI service " + fnName);
+    const userid = req.session.userid;
+    try{
+        const data = await utils.fetchData({userid: userid}, "plugins/getMappedDiscoverUser", fnName);
+        if (data === "fail") return res.status(500).send('fail');
+        else if (data.result === 'fail') return res.send('fail');
+        else {
+            const payload = { 
+                username: data.username,
+				password: data.password
+            }
+            const encrptionKey = 'Nineeteen68@SecureDiscovDataPath';
+            const cipher = crypto.createCipheriv('aes-256-cbc',encrptionKey , "0000000000000000");
+            const encryptedData = cipher.update(JSON.stringify(payload), 'utf8', 'hex') + cipher.final('hex');
+            const signatureKey = 'Nineeteen68to@DiscoverySecureAuthToken';
+            // creating a json web token and given expiry of token as 5 minutes
+            var token = jwt.sign({"encryptToken" : encryptedData.toUpperCase()}, signatureKey,{ expiresIn: 300});
+            return res.send({"url" : data.url, "token" :token});
+        }
+	} catch(exception) {
+		logger.error("Error occurred in plugins/getMappedDiscoverUser:", exception);
+		return res.status(500).send("fail");
 	}
 }
