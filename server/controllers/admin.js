@@ -2478,7 +2478,7 @@ exports.avoDiscoverMap = async(req, res) =>{
 		};
 		if(req.body.inputs.action == 'map'){
 			data1['username'] = req.body.inputs.avodiscoveruser;
-			data1['password'] = Buffer.from(req.body.inputs.avodiscoverpassword, "base64").toString()
+			data1['password'] = (req.body.inputs.avodiscoverpassword !== null)? Buffer.from(req.body.inputs.avodiscoverpassword, "base64").toString(): null
 		}
 		var input = new URLSearchParams(Object.entries(data1)).toString();
 		var args = {
