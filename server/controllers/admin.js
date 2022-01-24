@@ -2458,18 +2458,86 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 
 exports.avoDiscoverMap = async(req, res) =>{
 	try{
-		const fnName = "avoDiscoverMap"
-		logger.info("Inside UI service: " + fnName)
-		const inputs = {
-			userid: req.session.userid,
-			action: req.body.action,
-			avodiscoveruser: req.body.avoDiscoverUsrRef,
-			avodiscoverpwsrd: req.body.avoDiscoverPswdRef,
-			avodiscoverurl: req.body.avoDiscoverUrlRef,
-			avodiscoverauthurl: req.body.avodiscoverauthurl
+		var input_url=req.body.inputs.url+'/keycloak.json';
+        //check for valid discover url
+		var input_body={
+			method: 'GET',
+            headers: {},
+            data: {},
+            credentials: 'include'
+		}
+		const valid_url = await utils.fetchDiscoverData(input_url,input_body);
+		if(valid_url.code){return res.send(valid_url.code);}
+		//get the bearer token
+		var discoverTokenUrl = valid_url["auth-server-url"]+'/realms/pd-realm/protocol/openid-connect/token';
+		var data1 = {
+			"grant_type": "password",
+			"client_id": valid_url.resource,
+			"username": "assure.user",
+			"password": "Avo@1234"
 		};
-		const result = await utils.fetchData(inputs, "admin/avoDiscoverMap", fnName);
-		return res.status('200').send(result);
+		if(req.body.inputs.action == 'map'){
+			data1['username'] = req.body.inputs.avodiscoveruser;
+			data1['password'] = req.body.inputs.avodiscoverpassword;
+		}
+		var input = new URLSearchParams(Object.entries(data1)).toString();
+		var args = {
+			method: 'POST',
+			headers: {
+			'Content-type': "application/x-www-form-urlencoded",
+			},
+			data: input,
+			credentials: 'include'
+		}
+		const res1 = await utils.fetchDiscoverData(discoverTokenUrl,args);
+		if(res1.response && res1.response.statusText === 'Unauthorized'){return res.send(res1.response.statusText);}
+		if(res1 !== "fail"){
+			if(['save','refresh','fetch'].includes(req.body.inputs.action)){var data = await avoDiscoverSaveAction(req.body.inputs.url,res1.access_token);}
+			else if(req.body.inputs.action=='map'){var data = await avoDiscoverMap(req.session.userid,valid_url['auth-server-url'],req.body.inputs);}
+			return res.send(data);     
+		}
+	}catch(err){
+		console.error(err)
+		return res.status("500").send("fail");
+	}
+
+}
+
+const avoDiscoverSaveAction = async(inp_url,b_token) => {
+	try{
+        var url=inp_url+'/api/users'
+		var args={
+			method: 'GET',
+			headers: {
+				'Authorization':'Bearer '+b_token
+			},
+			credentials: 'include'
+		}
+		const res1 = await utils.fetchDiscoverData(url,args);
+        if(res1!= "fail"){
+            var result =  (res1.filter(v => v.role == 'business_user')).map(({username})=>({username}))
+            return result;
+        }
+    } catch(err){
+        console.error(err)
+		return res.status("500").send("fail");
+    }
+}
+
+const avoDiscoverMap = async(userid,inp_url,data) =>{
+	try{
+		const fnName = "avoDiscoverMap";
+		logger.info("Inside UI service: " + fnName);
+		const inputs = {
+			"action":data['action'],
+			"userid":userid,
+			"avodiscoverpwsrd":Buffer.from(data['avodiscoverpassword']).toString("base64"),
+			"avodiscoveruser":data['avodiscoveruser'],
+			"avodiscoverurl":data['url'],
+			"avodiscoverauthurl":inp_url
+		}
+		const res = await utils.fetchData(inputs, "admin/avoDiscoverMap", fnName);
+		return res;
 	}catch(exception){
 		logger.error("Error occurred in avoDiscoverMap:", exception);
 		return res.status("500").send("fail");

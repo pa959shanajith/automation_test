@@ -137,6 +137,7 @@ const Messages={
         WARN_AVODISCOVER_EXIST: {"CONTENT":"Selected Avo Assure user is already configured", "VARIANT": VARIANT.WARNING},
         AVODISCOVER_RESET_FAIL: {"CONTENT":"Failed to reset the Avo Discover configuration", "VARIANT": VARIANT.WARNING},
         ERR_FETCH_AVODISCOVER_MAP: {"CONTENT":"Failed to fetch Avo Discover configuration", "VARIANT": VARIANT.ERROR},
+        AVODISCOVER_CONFIG_ERR: {"CONTENT":"Failed to perform Avo Discover configuration", "VARIANT": VARIANT.ERROR},
     },
     DESIGN:{
         ERR_FETCH_TC: {"CONTENT":"Failed to Fetch Testcases.", "VARIANT": VARIANT.ERROR},
