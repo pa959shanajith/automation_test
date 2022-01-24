@@ -25,23 +25,26 @@ const ReplaceObjectModal = props => {
                 let elementType = object.tag;
                 elementType = tagList.includes(elementType) ? elementType : 'Element';
                 if (object.objId) {
-                    tempAllScraped.push(object);
-                    if (tempScrapeList[elementType]) tempScrapeList[elementType] = [...tempScrapeList[elementType], object];
-                    else tempScrapeList[elementType] = [object]
+                    if(!(object.xpath && object.xpath.split(";")[0]==="iris")) {
+                        tempAllScraped.push(object);
+                        if (tempScrapeList[elementType]) tempScrapeList[elementType] = [...tempScrapeList[elementType], object];
+                        else tempScrapeList[elementType] = [object]
+                    }
                 }
             });
-            setScrapedList(tempScrapeList);
             setAllScraped(tempAllScraped);
-        }
+        } 
         if(props.newScrapedData.length) {
             props.newScrapedData.forEach(newObj => {
                 let elementType = newObj.tag;
                 elementType = tagList.includes(elementType) ? elementType : 'Element';
                 if(tempNewScrapedList[elementType]) tempNewScrapedList[elementType] = [...tempNewScrapedList[elementType], newObj];
                 else tempNewScrapedList[elementType] = [newObj];
+                if(!tempScrapeList[elementType]) tempScrapeList[elementType] = [];
             });
             setNewScrapedList(tempNewScrapedList);
         }
+        setScrapedList(tempScrapeList);
     }, [])
 
     const onDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))
@@ -203,7 +206,9 @@ const ReplaceObjectModal = props => {
                 }
                 close={()=>props.setShow(false)}
                 footer={<>
-                    { errorMsg && <span  data-test="errorMessage" className="ro_errorMsg">{errorMsg}</span>}
+                    <div className="ro_errorMsgContainer">
+                        { errorMsg && <span  data-test="errorMessage" className="ro_errorMsg">{errorMsg}</span>}
+                    </div>
                     <button data-test="showAll" onClick={onShowAllObjects}>Show All Objects</button>
                     <button data-test="unLink" onClick={onUnlink} disabled={!selectedItems.length}>Un-Map</button>
                     <button data-test="submit" onClick={submitReplace}>Replace Objects</button>
