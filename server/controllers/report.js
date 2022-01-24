@@ -3,196 +3,10 @@ var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
-var Handlebars = require('../lib/handlebar.js');
-var wkhtmltopdf = require('wkhtmltopdf');
 var fs = require('fs');
-var os = require('os');
 var options = require('../config/options');
-const Readable = require('stream').Readable;
 var path = require('path');
 const tokenAuth = require('../lib/tokenAuth')
-
-wkhtmltopdf.command = path.join(__dirname, '..', '..', 'assets', 'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
-var templatepdf = '';
-var templateweb = '';
-var constants = {
-    'STATUS_CODES' : {
-        "401": 'Token validation failed',
-        "400": 'Invalid request details',
-        "200": 'Successfull',
-        '500': 'Internal Server Error'
-    },
-    'X_EXECUTION_MESSAGE' : 'X-EXECUTION-MESSAGE'
-}
-
-Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
-    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
-});
-
-Handlebars.registerHelper('ifnotEquals', function(arg1, arg2, options) {
-    return (arg1 != arg2) ? options.fn(this) : options.inverse(this);
-});
-
-Handlebars.registerHelper('getStyle', function(StepDescription) {
-    if (StepDescription && (StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1)) return "bold";
-    else return;
-});
-
-Handlebars.registerHelper('getClass', function(StepDescription) {
-    if (StepDescription && (StepDescription.indexOf("Testscriptname") !== -1 || StepDescription.indexOf("TestCase Name") !== -1)) return "collapsible-tc demo1 txtStepDescription";
-    else return "rDstepDes tabCont";
-});
-
-Handlebars.registerHelper('getColor', function(overAllStatus) {
-    if (overAllStatus == "Pass") return "green";
-    else if (overAllStatus == "Fail") return "red";
-    else if (overAllStatus == "Terminate") return "#faa536";
-});
-
-Handlebars.registerHelper('validateImageID', function(path, slno) {
-    return path? ("#img-" + slno) : '';
-});
-
-Handlebars.registerHelper('validateImagePath', function(path) {
-    return path? 'block' : 'none';
-});
-
-Handlebars.registerHelper('getDataURI', function(uri) {
-    var f = "data:image/PNG;base64,";
-    if (!uri || uri == "fail" || uri == "unavailableLocalServer") return f;
-    else return f + uri;
-});
-
-fs.readFile('assets/templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
-    templatepdf = Handlebars.compile(data);
-});
-
-fs.readFile('assets/templates/specificReport/content.handlebars', 'utf8', function(err, data) {
-    templateweb = Handlebars.compile(data);
-});
-
-
-/** Function responsible for returning ICE connection status */
-const checkForICEstatus = async (icename, fnName) => {
-    logger.debug("ICE Socket requesting Address: %s", icename);
-	const err = "Error occurred in the function "+fnName+": ";
-    const sockmode = await utils.channelStatus(icename);
-    if (!sockmode.schedule && !sockmode.normal) {
-        logger.error(err + "ICE is not available");
-        return "unavailableLocalServer";
-    } else if (sockmode.schedule) {
-        logger.error(err + "ICE is connected in Scheduling mode");
-        return "scheduleModeOn";
-    } else {
-		return null;
-	}
-};
-
-// To load screenshot from ICE
-const openScreenShot = async (username, path) => {
-    const fnName = "openScreenShot";
-    try {
-        var icename = undefined
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-        const iceStatus = await checkForICEstatus(icename, fnName);
-        if (iceStatus !== null) return iceStatus;
-        redisServer.redisSubServer.subscribe('ICE2_' + icename);
-        logger.info("Sending socket request for render_screenshot to cachedb");
-        const dataToIce = { "emitAction": "render_screenshot", "username": icename, "path": path };
-        redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
-
-        return (new Promise((rsv, rej) => {
-            let scrShotData = [];
-            function render_screenshot_listener(channel, message) {
-                const data = JSON.parse(message);
-                if (icename == data.username && ["unavailableLocalServer", "render_screenshot_finished","render_screenshot"].includes(data.onAction)) {
-                    const resultData = data.value;
-                    if (data.onAction == "unavailableLocalServer") {
-                        redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
-                        logger.error("Error occurred in " + fnName + ": Socket Disconnected");
-                        rsv(data.onAction);
-                    } else if (data.onAction == "render_screenshot_finished") {
-                        redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
-                        if (resultData === "fail") {
-                            logger.error("Screenshots processing failed!");
-                            rsv("fail");
-                        } else {
-                            logger.debug("Screenshots processed successfully");
-                            rsv(scrShotData);
-                        }
-                    } else if (data.onAction == "render_screenshot") {
-                        scrShotData = scrShotData.concat(resultData);
-                    }
-                }
-            }
-            redisServer.redisSubServer.on("message", render_screenshot_listener);
-        }));
-    } catch (exception) {
-        logger.error("Exception in openScreenShot when trying to open screenshot: %s", exception);
-        cb('fail');
-    }
-};
-
-// Render screenshots for html reports
-exports.openScreenShot = async (req, res) => {
-    try {
-        const username = req.session.username;
-        const result = await openScreenShot(username, req.body.absPath);
-        res.send(result);
-    } catch (exception) {
-        logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
-        res.send("fail");
-    }
-};
-
-//Render HTML/PDF reports for download
-exports.renderReport_ICE = async (req, res) => {
-    logger.info("Inside UI service: renderReport_ICE");
-    try {
-        const finalReports = req.body.finalreports;
-        const reportType = req.body.reporttype;
-        const username = req.session.username;
-        const data = {
-            "overallstatus": finalReports.overallstatus,
-            "rows": finalReports.rows,
-            "remarksLength": finalReports.remarksLength.length,
-            'commentsLength': finalReports.commentsLength.length
-        };
-        //PDF Reports
-        if (reportType != "html") {
-            const scrShot = req.body.absPath;
-            const result = await openScreenShot(username, scrShot.paths);
-            if (["fail", "unavailableLocalServer", "scheduleModeOn"].includes(result)) {
-                scrShot.paths.forEach((d, i) => data.rows[scrShot.idx[i]].screenshot_dataURI = result);
-            } else {
-                result.forEach((d, i) => data.rows[scrShot.idx[i]].screenshot_dataURI = d);
-            }
-            try {
-                const pdf = new Readable({read: ()=>{}});
-                pdf.push(templatepdf(data));
-                pdf.push(null);
-                wkhtmltopdf(pdf).pipe(res);
-            } catch (exception) {
-                const emsg = exception.message;
-                const flag = "fail";
-                if ((exception instanceof RangeError) && emsg === "Invalid string length") {
-                    emsg = "Report Size too large";
-                    flag = "limitExceeded";
-                }
-                logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", emsg);
-                return res.send(flag);
-            }
-        }
-        //HTML Reports
-        else {
-            const htmlReport = templateweb(data);
-            return res.send(htmlReport);
-        }
-    } catch (exception) {
-        logger.error("Exception occurred in renderReport_ICE when trying to render report: %s", exception);
-        res.send("fail");
-    }
-};
 
 const formatDate = (date) => {
     if (!date || date == ""){
@@ -232,26 +46,25 @@ const prepareReportData = (reportData, embedImages) => {
     const scrShots = { "idx": [], "paths": [] };
 
     const report = reportData.report;
-    const endTimeStamp = report.overallstatus[0].EndTime.split(".")[0];
-    const endDate = endTimeStamp.split(" ")[0].split("-");
-    let elapTime = (report.overallstatus[0].EllapsedTime.split(".")[0]).split(":");
-    report.overallstatus[0].version = reportData.version;
-    report.overallstatus[0].domainName = reportData.domainname;
-    report.overallstatus[0].projectName = reportData.projectname;
-    report.overallstatus[0].releaseName = reportData.releasename;
-    report.overallstatus[0].cycleName = reportData.cyclename;
-    report.overallstatus[0].scenarioName = reportData.testscenarioname;
-    report.overallstatus[0].reportId = reportData.reportId;
-    report.overallstatus[0].executionId = reportData.executionid;
-    report.overallstatus[0].moduleName = reportData.testsuitename;
-    report.overallstatus[0].browserVersion = report.overallstatus[0].browserVersion || '-';
-    report.overallstatus[0].browserType = report.overallstatus[0].browserType || '-';
-    report.overallstatus[0].StartTime = formatDate(report.overallstatus[0].StartTime.split(".")[0]) || '-';
-    report.overallstatus[0].EndTime = formatDate(endTimeStamp) || '-';
-    report.overallstatus[0].date = report.overallstatus[0].EndTime && report.overallstatus[0].EndTime.split(" ")[0]  || '-';
-    report.overallstatus[0].time = endTimeStamp.split(" ")[1] || '-';
-    report.overallstatus[0].EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
-    report.overallstatus[0].video = report.overallstatus[0].video || '-'
+    const endTimeStamp = report.overallstatus.EndTime.split(".")[0];
+    let elapTime = (report.overallstatus.EllapsedTime.split(".")[0]).split(":");
+    report.overallstatus.version = reportData.version;
+    report.overallstatus.domainName = reportData.domainname;
+    report.overallstatus.projectName = reportData.projectname;
+    report.overallstatus.releaseName = reportData.releasename;
+    report.overallstatus.cycleName = reportData.cyclename;
+    report.overallstatus.scenarioName = reportData.testscenarioname;
+    report.overallstatus.reportId = reportData.reportId;
+    report.overallstatus.executionId = reportData.executionid;
+    report.overallstatus.moduleName = reportData.testsuitename;
+    report.overallstatus.browserVersion = report.overallstatus.browserVersion || '-';
+    report.overallstatus.browserType = report.overallstatus.browserType || '-';
+    report.overallstatus.StartTime = formatDate(report.overallstatus.StartTime.split(".")[0]) || '-';
+    report.overallstatus.EndTime = formatDate(endTimeStamp) || '-';
+    report.overallstatus.date = report.overallstatus.EndTime && report.overallstatus.EndTime.split(" ")[0]  || '-';
+    report.overallstatus.time = endTimeStamp.split(" ")[1] || '-';
+    report.overallstatus.EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
+    report.overallstatus.video = report.overallstatus.video || '-'
 
     report.rows.forEach((row, i) => {
         row.slno = i + 1;
@@ -285,7 +98,7 @@ const prepareReportData = (reportData, embedImages) => {
         else if (row.status == "Fail") fail++;
         else if (row.Step && row.Step == "Terminated") terminated++
         if (row.Remark && row.Remark !== " ") remarksLength.push(row.Remark)
-        if (row.Comments && row.Comments !== " ") commentsLength.push(row.Comments)
+        if (row.Comments && row.Comments !== " ") commentsLength.push(row.Remark)
     });
     const total = pass+fail+terminated;
     const passPercent = parseFloat(100 * pass / total).toFixed(2);
@@ -293,218 +106,12 @@ const prepareReportData = (reportData, embedImages) => {
     const totalRemaining = (fail+terminated) || 1;
     const failPercent = parseFloat(otherPercent * fail / totalRemaining).toFixed(2);
     const termPercent = (otherPercent - failPercent).toFixed(2);
-    report.overallstatus[0].pass = passPercent > 0 ? passPercent : "0.00";
-    report.overallstatus[0].fail = failPercent > 0 ? failPercent : "0.00";
-    report.overallstatus[0].terminate = termPercent > 0 ? termPercent : "0.00";
+    report.overallstatus.pass = passPercent > 0 ? passPercent : "0.00";
+    report.overallstatus.fail = failPercent > 0 ? failPercent : "0.00";
+    report.overallstatus.terminate = termPercent > 0 ? termPercent : "0.00";
     report.remarksLength = remarksLength;
     report.commentsLength = commentsLength;
     return { report, scrShots };
-};
-
-exports.viewReport = async (req, res, next) => {
-    const fnName = "viewReport";
-    logger.info("Inside UI function: " + fnName);
-    const username = req.session.username;
-    const userInfo = {username};
-    const url = req.url.split('/');
-    let reportName = url[1] || "";
-    if (reportName.split('.').length == 1) reportName += ".html";
-    const reportId = reportName.split('.')[0];
-    const typeWithQuery = (reportName.split('.')[1] || 'html').toLowerCase().split('?')
-    const type = typeWithQuery[0];
-    const embedImages = typeWithQuery[1] == 'images=true';
-    let report = { overallstatus: [{}], rows: [], remarksLength: 0, commentsLength: 0 };
-    logger.info("Requesting report type - " + type);
-    if (url.length > 2) {
-        return res.redirect('/404');
-    } else if (!req._passport.instance.verifySession(req) && type == 'html') {
-        report.error = {
-            ecode: "INVALID_SESSION",
-            emsg: "Authentication Failed! No Active Sessions found. Please login and try again.",
-            status: 401
-        }
-    } else if (!['html', 'pdf', 'json'].includes(type)) {
-        report.error = {
-            ecode: "BAD_REQUEST",
-            emsg: "Requested Report Type is not Available",
-            status: 400
-        }
-    } else {
-        const inputs = { reportid: reportId };
-        const reportData = await utils.fetchData(inputs, "reports/getReport", fnName);
-        if (reportData == "fail") {
-            report.error = {
-                ecode: "SERVER_ERROR",
-                emsg: "Error while loading Report due to an internal error. Try again later!",
-                status: 500
-            }
-        } else if (reportData.length == 0) {
-            report.error = {
-                ecode: "NOT_FOUND",
-                emsg: "Requested Report is not Available!",
-                status: 404
-            }
-        } else {
-            reportData.reportId = reportId;
-            const newData = prepareReportData(reportData, embedImages);
-            var scrShots = newData.scrShots;
-            report = newData.report;
-        }
-    }
-
-    if (type == "html") {
-        report.remarksLength = report.remarksLength.length;
-        report.commentsLength = report.commentsLength.length;
-        const content = templateweb(report);
-        return res.send(content);
-    } else if (type == "json") {
-        const statusCode = report.error && report.error.status || 200;
-        res.setHeader("Content-Type", "application/json");
-        return res.status(statusCode).send(JSON.stringify(report, null, 2));
-    } else if (type == "pdf") {
-        if (report.error) {
-            res.setHeader("X-Render-Error", report.error.emsg);
-            return res.status(report.error.status || 200).send(report.error);
-        }
-        res.setHeader("Content-Type", "application/pdf");
-        report.remarksLength = report.remarksLength.length;
-        report.commentsLength = report.commentsLength.length;
-        if (scrShots && scrShots.paths.length > 0) {
-            const dataURIs = await openScreenShot(userInfo.username, scrShots.paths);
-            if (["fail", "unavailableLocalServer", "scheduleModeOn"].includes(dataURIs)) {
-                scrShots.paths.forEach((d, i) => report.rows[scrShots.idx[i]].screenshot_dataURI = '');
-            } else {
-                dataURIs.forEach((d, i) => report.rows[scrShots.idx[i]].screenshot_dataURI = d);
-            }
-        }
-        try {
-            const pdf = new Readable({read: ()=>{}});
-            pdf.push(templatepdf(report));
-            pdf.push(null);
-            wkhtmltopdf(pdf).pipe(res);
-        } catch (exception) {
-            report.error = {
-                ecode: "SERVER_ERROR",
-                emsg: "Error while generating report due to an internal error. Try again later!",
-                status: 500
-            };
-            const emsg = exception.message;
-            if ((exception instanceof RangeError) && emsg === "Invalid string length") {
-                report.error.emsg = emsg = "Error while generating report. Report size too large";
-                report.error.ecode = "LIMIT_EXCEEDED";
-            }
-            logger.error("Exception occurred in " + fnName + " when trying to render report: %s", emsg);
-            const statusCode = report.error && report.error.status || 200;
-            return res.status(statusCode).send(report.error);
-        }
-    }
-};
-
-//To get all the projects and their releases & cycles
-exports.getAllSuites_ICE = async (req, res) => {
-    const fnName = "getAllSuites_ICE";
-    logger.info("Inside UI service: " + fnName);
-    try {
-        var requestedaction = req.body.readme;
-        if (requestedaction == 'projects' || requestedaction == 'reports') {
-            const inputs = {
-                "query": "projects",
-                "userid": req.session.userid
-            };
-            const result = await utils.fetchData(inputs, "reports/getAllSuites_ICE", fnName);
-            if (result == "fail") return res.send("fail");
-            res.send(result);
-        } else {
-            logger.error("Error occurred in report/"+fnName+": Invalid input fail");
-            res.send('Invalid input fail');
-        }
-	} catch (exception) {
-		logger.error("Error occurred in report/"+fnName+":", exception);
-		res.send("fail");
-    }
-};
-
-//To get all the executed suites
-exports.getSuiteDetailsInExecution_ICE = async (req, res) => {
-    const fnName = "getSuiteDetailsInExecution_ICE";
-    logger.info("Inside UI service: " + fnName);
-    try {
-        const inputs = { "suiteid": req.body.testsuiteid };
-        const executionData = await utils.fetchData(inputs, "reports/getSuiteDetailsInExecution_ICE", fnName);
-        if (executionData == "fail") return res.send("fail");
-        var startTime, endTime, starttime, endtime;
-        var executionDetailsJSON = [];
-        for (var i = 0; i < executionData.length; i++) {
-            startTime = new Date(executionData[i].starttime);
-            starttime = startTime.getUTCDate() + "-" + (startTime.getUTCMonth() + 1) + "-" + startTime.getUTCFullYear() + " " + startTime.getUTCHours() + ":" + startTime.getUTCMinutes();
-            if (executionData[i].endtime === null) endtime = '-';
-            else {
-                endTime = new Date(executionData[i].endtime);
-                endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
-            }
-            executionDetailsJSON.push({
-                execution_id: executionData[i]._id,
-                start_time: starttime,
-                end_time: endtime
-            });
-        }
-        logger.info("Sending execution details from reports/"+fnName);
-        res.send(JSON.stringify(executionDetailsJSON));
-	} catch (exception) {
-		logger.error("Error occurred in report/"+fnName+":", exception);
-		res.send("fail");
-    }
-};
-
-//To get status scenarios of executed modules
-exports.reportStatusScenarios_ICE = async (req, res) => {
-    const fnName = "reportStatusScenarios_ICE";
-    logger.info("Inside UI service: " + fnName);
-    try {
-        var executionid = req.body.executionId;
-        var report = [];
-        let inputs = {
-            "query": "executiondetails",
-            "executionid": executionid,
-        };
-        const result = await utils.fetchData(inputs, "reports/reportStatusScenarios_ICE", fnName);
-        if (result == "fail") return res.send("fail");
-        for (let entry of result) {
-            let executedtimeTemp = new Date(entry.executedtime);
-            if (executedtimeTemp !== null && executedtimeTemp != "Invalid Date") {
-                executedtimeTemp = (executedtimeTemp.getUTCFullYear()) + "-" + ("0" + (executedtimeTemp.getUTCMonth() + 1)).slice(-2) + "-" + ("0" + executedtimeTemp.getUTCDate()).slice(-2) + " " + ("0" + executedtimeTemp.getUTCHours()).slice(-2) + ":" + ("0" + executedtimeTemp.getUTCMinutes()).slice(-2) + ":" + ("0" + executedtimeTemp.getUTCSeconds()).slice(-2);
-            }
-            report.push({
-                executedtime: executedtimeTemp,
-                browser: entry.executedon,
-                status: entry.status,
-                reportid: entry._id,
-                testscenarioid: entry.testscenarioid,
-                testscenarioname: entry.testscenarioname
-            });
-        }
-        if (report.length > 0) report.sort((a, b) => a.executedtime - b.executedtime);
-        logger.info("Sending scenario status details from reportStatusScenarios_ICE");
-        return res.send(JSON.stringify(report));
-    } catch (exception) {
-        logger.error("Exception in the service reportStatusScenarios_ICE: %s", exception);
-        res.send("fail");
-    }
-};
-
-//To render reports
-exports.getReport = async (req, res) => {
-    const fnName = "getReport";
-    logger.info("Inside UI service: " + fnName);
-    try {
-        const reportid = req.body.reportId;
-        const result = await utils.fetchData({ reportid }, "reports/getReport", fnName);
-        if (result == "fail") return res.send("fail");
-        else res.send(result);
-    } catch (exception) {
-        logger.error("Error occurred in "+fnName+". Error: " + exception.message);
-        res.status(500).send("fail");
-    }
 };
 
 //Connect to Jira
@@ -665,26 +272,6 @@ const updateDbReportData = async (reportId, slno, defectId) => {
     return reportUpdateStatus !== "fail";
 }
 
-//Fetch all modules on change of projects,release & cycle
-exports.getReportsData_ICE = async (req, res) => {
-    const fnName = "getReportsData_ICE";
-    try {
-        if (req.body.reportsInputData.type == 'allmodules') {
-            logger.info("Inside UI service: " + fnName + " - allmodules");
-            const inputs = {
-                "query": "getAlltestSuites",
-                "id": req.body.reportsInputData.cycleId
-            };
-            const result1 = await utils.fetchData(inputs, "reports/getAllSuites_ICE", fnName)
-            if (result1 == "fail") return res.send("fail");
-            return res.send({ rows: result1 });
-        }
-    } catch (exception) {
-        logger.error("Error occurred in "+fnName+". Error: " + exception.message);
-        res.status(500).send("fail");
-    }
-};
-
 
 //Get report for execution
 exports.getReport_API = async (req, res) => {
@@ -729,10 +316,10 @@ exports.getReport_API = async (req, res) => {
         for(let i=0; i<reportResult.rows.length; ++i) {
             const reportInfo = reportResult.rows[i];
             const report = prepareReportData(reportInfo).report;
-            report.overallstatus[0].reportId = reportInfo.reportid;
-            delete report.overallstatus[0].scenarioName;
-            delete report.overallstatus[0].executionId;
-            delete report.overallstatus[0].moduleName;
+            report.overallstatus.reportId = reportInfo.reportid;
+            delete report.overallstatus.scenarioName;
+            delete report.overallstatus.executionId;
+            delete report.overallstatus.moduleName;
             const suburl = req.originalUrl.endsWith('/')? req.originalUrl.slice(0,-1):req.originalUrl;
             const downloadUri = req.protocol + '://' + (req.headers["origin"] || req.hostname) + suburl.split('/').slice(0,-1).join('/') + '/viewReport/' + reportInfo.reportid;
             const scenarioReport = {
@@ -931,41 +518,5 @@ function validateData(content, type) {
             return validator.isEmail(content);
         case "json":
             return validator.isJSON(content);
-    }
-}
-
-exports.downloadVideo = async (req, res) => {
-    const fnName = "downloadVideo";
-    const osPf = os.platform();
-    const videoPathLinux = options.screenShotPath.linux;
-    logger.info("os platform is '%s'", osPf);
-    logger.info("Inside UI service: " + fnName);
-    try {
-        var videoPath = req.body.videoPath;
-        if (osPf == 'linux') {
-            if (videoPathLinux != ""){
-                /*Below logic is to manipulate or change the Video Path from windows to linux specific*/
-                logger.info("Requested video file path is '%s'", videoPath);
-                var ss_path = videoPath.split("Screenshots")[1];
-                var temp_videoPath = videoPathLinux.concat(ss_path);
-                videoPath = temp_videoPath.replace(/\\/g,"/");
-                logger.info("Final video file path is '%s'", videoPath);
-            } else {
-                logger.error("Please enter the value of linux for screenShotPath in config");
-            }
-        }
-        if (fs.existsSync(videoPath)) {
-            res.writeHead(200, {
-                'Content-Type': 'video/mp4',
-            });
-            const filestream = fs.createReadStream(videoPath);
-            filestream.pipe(res);
-        } else {
-            logger.error("Requested video file '%s' is not available", videoPath);
-            return res.status(404).send("fail");
-        }
-    } catch (exception) {
-        logger.error("Exception in the service %s - Error: %s", fnName, exception);
-        res.send("fail");
     }
 }

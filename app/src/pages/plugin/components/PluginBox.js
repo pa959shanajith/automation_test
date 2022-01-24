@@ -9,7 +9,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 	const pluginRedirect = () => {
 		pluginName = pluginName.split(' ').join('').toLowerCase();
 		window.localStorage['navigateScreen'] = pluginName;
-		if(pluginName==='dashboard' || pluginName==='neurongraphs' || pluginName==='seleniumtoavo'){
+		if(['dashboard', 'neurongraphs', 'seleniumtoavo', "reports"].includes(pluginName)){
 			window.localStorage['Reduxbackup'] = window.localStorage['persist:login']
 			window.location.href = "/"+ pluginName;
 		}

@@ -255,13 +255,13 @@ if (cluster.isMaster) {
 		});
 
 		//Only Test Engineer and Test Lead have access
-		app.get(/^\/(scrape|design|designTestCase|execute|scheduling)$/, function(req, res) {
+		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
 			var roles = ["Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|reports|plugin|seleniumtoavo|settings)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|plugin|seleniumtoavo|settings)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -440,16 +440,7 @@ if (cluster.isMaster) {
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);
 		app.post('/cancelScheduledJob_ICE', auth.protect, suite.cancelScheduledJob_ICE);
 		//Report Screen Routes
-		app.post('/getAllSuites_ICE', auth.protect, report.getAllSuites_ICE);
-		app.post('/getSuiteDetailsInExecution_ICE', auth.protect, report.getSuiteDetailsInExecution_ICE);
-		app.post('/reportStatusScenarios_ICE', auth.protect, report.reportStatusScenarios_ICE);
-		app.post('/renderReport_ICE', auth.protect, report.renderReport_ICE);
-		app.post('/getReport', auth.protect, report.getReport);
-		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		app.post('/connectJira_ICE', auth.protect, report.connectJira_ICE);
-		app.post('/downloadVideo', auth.protect, report.downloadVideo);
-		app.post('/getReportsData_ICE', auth.protect, report.getReportsData_ICE);
-		app.use('/viewReport', report.viewReport);
 		//Plugin Routes
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', auth.protect, taskbuilder.getTaskJson_mindmaps);
@@ -469,7 +460,6 @@ if (cluster.isMaster) {
 		app.post('/crawlResults', auth.protect, webocular.getCrawlResults);
 		app.post('/saveResults', auth.protect, webocular.saveResults);
 		//Accessibility Testing routes
-		app.post('/getAccessibilityData_ICE', auth.protect, accessibilityTesting.getAccessibilityTestingData_ICE);
 		app.post('/updateAccessibilitySelection', auth.protect, plugin.updateAccessibilitySelection);	
 		//Chatbot Routes
 		app.post('/getTopMatches_ProfJ', auth.protect, chatbot.getTopMatches_ProfJ);

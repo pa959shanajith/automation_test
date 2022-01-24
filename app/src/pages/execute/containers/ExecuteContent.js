@@ -436,6 +436,7 @@ const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleI
         suiteInfo.scenarioTaskType = scenarioTaskType;
         suiteInfo.testsuiteName = eachData[i].testsuitename;
         suiteInfo.testsuiteId = eachData[i].testsuiteid;
+        suiteInfo.batchname = eachData[i].batchname;
         suiteInfo.versionNumber = testsuiteDetails.versionnumber;
         suiteInfo.appType = appType;
         suiteInfo.domainName = projectdata.project[projectid].domain;

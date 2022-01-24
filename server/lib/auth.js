@@ -162,7 +162,7 @@ const strategyUtil = {
 		opts.cert = opts.cert.replace(BEGIN_CERT,'').replace(END_CERT,'').replace('\r','');
 		const samlStrategy = new SamlStrategy({
 			issuer: opts.idp || "Avo Assure Webserver",
-			callbackUrl: opts.callbackPath,
+			callbackUrl: opts.hostUri + opts.callbackPath,
 			entryPoint: opts.url,
 			cert: opts.cert, //privateCert, decryptionPvk,
 			acceptedClockSkewMs: 120
@@ -301,7 +301,7 @@ module.exports.checkUser = async (req, res) => {
 	const fnName = "checkUser";
 	try {
 		logger.info("Inside UI Service: " + fnName);
-		const inputs = 	{ "username": req.body.username };
+		const inputs = 	{ "username": req.body.username.toLowerCase() };
 		const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
 		let result = { "proceed": true };
 		if (userInfo == "fail") return res.send("fail");
