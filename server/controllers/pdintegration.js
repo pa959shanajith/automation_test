@@ -844,8 +844,7 @@ exports.getMappedDiscoverUser = async(req,res)=>{
             const signatureKey = 'Nineeteen68to@DiscoverySecureAuthToken';
             // creating a json web token and given expiry of token as 5 minutes
             var token = jwt.sign({"encryptToken" : encryptedData.toUpperCase()}, signatureKey,{ expiresIn: 300});
-            // return res.send({"url" : data.url, "token" :token});  
-			return res.send({"url" : "https://dev.process-discovery.dl.slksoft.com:8088" , "token" :token});
+            return res.send({"url" : data.url, "token" :token});
         }
 	} catch(exception) {
 		logger.error("Error occurred in plugins/getMappedDiscoverUser:", exception);
