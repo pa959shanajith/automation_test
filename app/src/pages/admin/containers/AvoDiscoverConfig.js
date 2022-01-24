@@ -75,7 +75,7 @@ const AvoDiscoverConfig = (props) => {
             "action":action,
             "url": url,
             "avodiscoveruser": avoDiscoverUsrRef.current != undefined ? avoDiscoverUsrRef.current.value: null ,
-            "avodiscoverpassword": avoDiscoverPswdRef.current != undefined ? avoDiscoverPswdRef.current.value: null
+            "avodiscoverpassword": avoDiscoverPswdRef.current != undefined ? Buffer.from(avoDiscoverPswdRef.current.value).toString('base64'): null
         }
         if(action=='save' && !regExUrl.test(url)){displayError(Messages.ADMIN.AVODISCOVER_URL_ERR);return;}
         else{
