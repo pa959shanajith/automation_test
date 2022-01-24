@@ -2,7 +2,7 @@ const utils = require('../utils');
 const redisServer = require('../redisSocketHandler');
 var myserver = require('../socket');
 var logger = require('../../../logger.js');
-const accessibility_testing = require("../../controllers/accessibilityTesting")
+const reports = require("../../controllers/report")
 const notifications = require('../../notifications');
 var queue = require('./executionQueue')
 var scheduler = require('./scheduler')
@@ -352,7 +352,7 @@ class TestSuiteExecutor {
                     if (!status) { // This block is for report data
                         if ("accessibility_reports" in resultData) {
                             const accessibility_reports = resultData.accessibility_reports
-                            accessibility_testing.saveAccessibilityReports(accessibility_reports);
+                            reports.saveAccessibilityReports(accessibility_reports);
                         }
                         if (resultData.report_type != "accessiblityTestingOnly") reportType = "functionalTesting";
                         const scenarioid = resultData.scenarioId;
