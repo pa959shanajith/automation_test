@@ -7,6 +7,9 @@
     .modal__content{
         width: 140%;
     }
+    .modal__container{
+        z-index: 1;
+    }
 }
 
 .ss__replaceObjBody, .ss__ro_scrapeObjectList, .ss__ro_customObjectList{

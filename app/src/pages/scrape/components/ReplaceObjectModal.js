@@ -15,11 +15,13 @@ const ReplaceObjectModal = props => {
     const [showName, setShowName] = useState("");
     const [selectedItems, setSelectedItems] = useState([]);
     const [errorMsg, setErrorMsg] = useState("");
+    const [custNames, setCustNames] = useState([]);
 
     useEffect(()=>{
         let tempScrapeList = {};
         let tempNewScrapedList = {};
         let tempAllScraped = [];
+        let tempCustNames = [];
         if (props.scrapeItems.length) {
             props.scrapeItems.forEach(object => {
                 let elementType = object.tag;
@@ -31,8 +33,10 @@ const ReplaceObjectModal = props => {
                         else tempScrapeList[elementType] = [object]
                     }
                 }
+                tempCustNames.push(object.custname);
             });
             setAllScraped(tempAllScraped);
+            setCustNames(tempCustNames);
         } 
         if(props.newScrapedData.length) {
             props.newScrapedData.forEach(newObj => {
@@ -81,6 +85,9 @@ const ReplaceObjectModal = props => {
 
     const submitReplace = () => {
 
+        let duplicateItm = false;
+        let duplicateCusts = [];
+
         if (!Object.keys(replace).length) {
             setErrorMsg("Please select atleast one object to Replace");
             return;
@@ -102,28 +109,50 @@ const ReplaceObjectModal = props => {
         for (let val in replacing) {
             if (replacing[val]) {
                 arg.objList.push([replacing[val][0].objId, replacing[val][1]]);
+                if(custNames.length && replacing[val][0].custname !== replacing[val][1].custname && custNames.includes(replacing[val][1].custname)) {
+                    duplicateItm = true;
+                    duplicateCusts.push(replacing[val][1].custname);
+                }
             }
         }
 
-        updateScreen_ICE(arg)
-        .then(response => {
-            if (response === "Invalid Session") return RedirectPage(props.history);
-            else props.fetchScrapeData()
-                    .then(resp => {
-                        if (resp === "success") {
-                            props.setShow(false);
-                            setMsg(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
-                        }
-                        else setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                    })
-                    .catch(err => {
-                        setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                    });
-        })
-        .catch(error => {
-            setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-            console.err(error);
-        })
+        if(duplicateItm) {
+            props.setShowPop({
+                'type': 'modal',
+                'title': 'Replace Scrape data',
+                'content': <div className="ss__dup_labels">
+                    Please rename/delete duplicate scraped objects
+                    <br/><br/>
+                    Object characterstics are same for:
+                    <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
+                        <div className="ss__dup_scroll">
+                        { duplicateCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
+                        </div>
+                    </ScrollBar>
+                </div>,
+                'footer': <button onClick={()=>props.setShowPop("")}>OK</button>
+            })
+        } else {
+            updateScreen_ICE(arg)
+            .then(response => {
+                if (response === "Invalid Session") return RedirectPage(props.history);
+                else props.fetchScrapeData()
+                        .then(resp => {
+                            if (resp === "success") {
+                                props.setShow(false);
+                                setMsg(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
+                            }
+                            else setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                        })
+                        .catch(err => {
+                            setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                        });
+            })
+            .catch(error => {
+                setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                console.err(error);
+            })
+        }
     }
 
     const onCustomClick = (showName, id) => {
@@ -222,6 +251,7 @@ ReplaceObjectModal.propTypes={
     current_task:PropTypes.object,
     fetchScrapeData:PropTypes.func,
     setShow:PropTypes.func,
+    setShowPop:PropTypes.func,
     newScrapedData:PropTypes.arrayOf(PropTypes.object)
 }
 export default ReplaceObjectModal;
