@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG, setMsg } from '../../global';
-import { tagList } from  './ListVariables';
+import { tagListToReplace } from  './ListVariables';
 import { updateScreen_ICE } from '../api';
 import "../styles/ReplaceObjectModal.scss";
 import PropTypes from 'prop-types'
@@ -16,6 +16,7 @@ const ReplaceObjectModal = props => {
     const [selectedItems, setSelectedItems] = useState([]);
     const [errorMsg, setErrorMsg] = useState("");
     const [custNames, setCustNames] = useState([]);
+    const [replacingCustNm, setReplacingCustNm] = useState([]);
 
     useEffect(()=>{
         let tempScrapeList = {};
@@ -25,7 +26,7 @@ const ReplaceObjectModal = props => {
         if (props.scrapeItems.length) {
             props.scrapeItems.forEach(object => {
                 let elementType = object.tag;
-                elementType = tagList.includes(elementType) ? elementType : 'Element';
+                elementType = tagListToReplace.includes(elementType) ? elementType : 'Element';
                 if (object.objId) {
                     if(!(object.xpath && object.xpath.split(";")[0]==="iris")) {
                         tempAllScraped.push(object);
@@ -41,7 +42,7 @@ const ReplaceObjectModal = props => {
         if(props.newScrapedData.length) {
             props.newScrapedData.forEach(newObj => {
                 let elementType = newObj.tag;
-                elementType = tagList.includes(elementType) ? elementType : 'Element';
+                elementType = tagListToReplace.includes(elementType) ? elementType : 'Element';
                 if(tempNewScrapedList[elementType]) tempNewScrapedList[elementType] = [...tempNewScrapedList[elementType], newObj];
                 else tempNewScrapedList[elementType] = [newObj];
                 if(!tempScrapeList[elementType]) tempScrapeList[elementType] = [];
@@ -56,6 +57,7 @@ const ReplaceObjectModal = props => {
     const onDragOver = event => event.preventDefault();
 
     const onDrop = (event, currObject) => {
+        let replacingCusts = [ ...replacingCustNm ];
         if (replace[currObject.val]) setErrorMsg("Object already merged");
         else {
             let draggedObject = JSON.parse(event.dataTransfer.getData("object"));
@@ -64,6 +66,8 @@ const ReplaceObjectModal = props => {
                 [currObject.val]: [draggedObject, currObject],
                 [draggedObject.val]: null            
             }
+            replacingCusts.push(draggedObject.custname);
+            setReplacingCustNm(replacingCusts);
             setReplace(replacing);
             setErrorMsg("");
         }
@@ -71,11 +75,16 @@ const ReplaceObjectModal = props => {
 
     const onUnlink = () => {
         let replacing = { ...replace };
+        let replacingCusts = [ ...replacingCustNm ];
         for (let customObjVal of selectedItems) {
-            let scrapeObjVal = replacing[customObjVal][0].val
+            let scrapeObjVal = replacing[customObjVal][0].val;
+            let replNm = replacing[customObjVal][0].custname;
+            let indexOfItem = replacingCusts.indexOf(replNm);
+            if (indexOfItem>-1) replacingCusts.splice(indexOfItem, 1);
             delete replacing[customObjVal];
             delete replacing[scrapeObjVal];
         }
+        setReplacingCustNm(replacingCusts);
         setReplace(replacing);
         setSelectedItems([]);
         setShowName("");
@@ -109,7 +118,7 @@ const ReplaceObjectModal = props => {
         for (let val in replacing) {
             if (replacing[val]) {
                 arg.objList.push([replacing[val][0].objId, replacing[val][1]]);
-                if(custNames.length && replacing[val][0].custname !== replacing[val][1].custname && custNames.includes(replacing[val][1].custname)) {
+                if(custNames.includes(replacing[val][1].custname) && !replacingCustNm.includes(replacing[val][1].custname)) {
                     duplicateItm = true;
                     duplicateCusts.push(replacing[val][1].custname);
                 }
