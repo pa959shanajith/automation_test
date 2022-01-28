@@ -293,10 +293,13 @@ var generateTestCaseMap = function(screendata,idx,adjacentItems,sessionID){
 					else{
 						windowId=eachScrapedAction.action.windowId;
 					}
-				}            
+				}
+				
 				switch(eachScrapedAction.action.actionName){
 					case "openBrowser":
-						testcaseObj = getTestcaseStep(step,null,'@Browser','openBrowser',null,null,null,"Web");
+						if(step==1){
+							testcaseObj = getTestcaseStep(step,null,'@Browser','openBrowser',null,null,null,"Web");
+						 }
 						break;
 					case "navigate":
 						testcaseObj = getTestcaseStep(step,null,'@Browser','navigateToURL',[eachScrapedAction.action.actionData],null,null,"Web");
