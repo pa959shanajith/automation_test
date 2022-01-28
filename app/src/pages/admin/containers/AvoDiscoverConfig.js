@@ -160,7 +160,7 @@ const AvoDiscoverConfig = (props) => {
                     </div>
                     {showResetModal?
                         <ModalContainer
-                            title="Reset Avo Discover configuration"
+                            title="Reset Avo Discover Configuration"
                             content={"Are you sure you want to Reset ? All Avo Assure user configuration with Avo Discover users will be reset."}
                             close={()=>setShowResetModal(false)}
                             footer={
