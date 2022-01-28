@@ -2493,7 +2493,7 @@ exports.avoDiscoverMap = async(req, res) =>{
 		if(res1.response && res1.response.statusText === 'Unauthorized'){return res.send(res1.response.statusText);}
 		if(res1 !== "fail"){
 			if(['save','refresh','fetch'].includes(req.body.inputs.action)){var data = await avoDiscoverSaveAction(req.body.inputs.url,res1.access_token);}
-			else if(req.body.inputs.action=='map'){var data = await avoDiscoverMap(req.session.userid,valid_url['auth-server-url'],req.body.inputs);}
+			else if(req.body.inputs.action=='map'){var data = await avoDiscoverMap(valid_url['auth-server-url'],req.body.inputs);}
 			return res.send(data);     
 		}
 	}catch(err){
@@ -2524,13 +2524,13 @@ const avoDiscoverSaveAction = async(inp_url,b_token) => {
     }
 }
 
-const avoDiscoverMap = async(userid,inp_url,data) =>{
+const avoDiscoverMap = async(inp_url,data) =>{
 	try{
 		const fnName = "avoDiscoverMap";
 		logger.info("Inside UI service: " + fnName);
 		const inputs = {
 			"action":data['action'],
-			"userid":userid,
+			"userid":data['userid'],
 			"avodiscoverpwsrd":Buffer.from(data['avodiscoverpassword'], "base64").toString(),
 			"avodiscoveruser":data['avodiscoveruser'],
 			"avodiscoverurl":data['url'],

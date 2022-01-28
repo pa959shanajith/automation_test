@@ -74,6 +74,7 @@ const AvoDiscoverConfig = (props) => {
         var inputs={
             "action":action,
             "url": url,
+            "userid":Object.keys(userData).find(key => userData[key] === userRef.current.value),
             "avodiscoveruser": avoDiscoverUsrRef.current != undefined ? avoDiscoverUsrRef.current.value: null ,
             "avodiscoverpassword": avoDiscoverPswdRef.current != undefined ? Buffer.from(avoDiscoverPswdRef.current.value).toString('base64'): null
         }
