@@ -74,6 +74,7 @@ const AvoDiscoverConfig = (props) => {
         var inputs={
             "action":action,
             "url": url,
+            "userid":Object.keys(userData).find(key => userData[key] === userRef.current.value),
             "avodiscoveruser": avoDiscoverUsrRef.current != undefined ? avoDiscoverUsrRef.current.value: null ,
             "avodiscoverpassword": avoDiscoverPswdRef.current != undefined ? Buffer.from(avoDiscoverPswdRef.current.value).toString('base64'): null
         }
@@ -159,7 +160,7 @@ const AvoDiscoverConfig = (props) => {
                     </div>
                     {showResetModal?
                         <ModalContainer
-                            title="Reset Avo Discover configuration"
+                            title="Reset Avo Discover Configuration"
                             content={"Are you sure you want to Reset ? All Avo Assure user configuration with Avo Discover users will be reset."}
                             close={()=>setShowResetModal(false)}
                             footer={
@@ -178,12 +179,12 @@ const AvoDiscoverConfig = (props) => {
                         <FormSelect data-test="assure_usr" inpId={'assureusr'} inpRef={userRef} defValue={"Select Avo Assure User"} onChangeFn={() => {onChangeAvoAssureUsr()}} label={"Avo Assure User"} option={userList} />
                         <div className='avoDiscover_UserForm'>
                             <FormSelect data-test="usr_avodiscover" inpRef={avoDiscoverUsrRef} inpId={'usravodiscover'} onChangeFn={()=>{setShowPswdInput(true)}} defValue={"Select Avo Discover User"} label={'Avo Discover User'} option={avoDiscoverUserList} />
-                            <button data-test="avodiscover_refresh" onClick={()=>avoDiscoverConfigActions('refresh')} className="a__btn btn-edit refresh" title="refresh">Refresh</button>
+                            <button data-test="avodiscover_refresh" onClick={()=>avoDiscoverConfigActions('refresh')} className="a__btn btn-edit refresh" title="Refresh">Refresh</button>
                         {showPswdInput?
                         <>
                         <div>
                             <FormInput data-test="avodiscover_pswd"  type="password" inpRef={avoDiscoverPswdRef} label={'Avo Discover Password'} placeholder={'Avo Discover Password'}/>
-                            <button data-test="avodiscover_map" onClick={()=>avoDiscoverConfigActions('map')} className="a__btn btn-edit map" title="map">MAP</button>
+                            <button data-test="avodiscover_map" onClick={()=>avoDiscoverConfigActions('map')} className="a__btn btn-edit map" title="Map">Map</button>
                         </div>
                         </>:null
                         }
@@ -222,7 +223,7 @@ const AvoDiscoverConfig = (props) => {
                                     <tr key={index} className='provisionTokens'>
                                         <td> {userData[e._id]} </td>
                                         <td> {e.name} </td>
-                                        <td><button value={e._id} className="btn btn-cust-ip" onClick={() => { avoDiscoverResetConfig('unmap',e._id) }} > Un-Map </button></td>
+                                        <td><button value={e._id} className="btn btn-cust-ip" onClick={() => { avoDiscoverResetConfig('unmap',e._id) }} title="Un-Map" > Un-Map </button></td>
                                     </tr> 
                                 ))}
                                 </tbody>
