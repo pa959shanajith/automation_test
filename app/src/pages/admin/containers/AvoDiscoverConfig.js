@@ -75,10 +75,10 @@ const AvoDiscoverConfig = (props) => {
             "action":action,
             "url": url,
             "avodiscoveruser": avoDiscoverUsrRef.current != undefined ? avoDiscoverUsrRef.current.value: null ,
-            "avodiscoverpassword": avoDiscoverPswdRef.current != undefined ? Buffer.from(avoDiscoverPswdRef.current.value).toString('base64'): null
+            "avodiscoverpassword": avoDiscoverPswdRef.current != undefined ? Buffer.from(avoDiscoverPswdRef.current.value).toString('base64'): null,
+            "userid": userRef.current ? Object.keys(userData).find(key => userData[key] === userRef.current.value): null
         }
         if(action === 'save' && !regExUrl.test(url)){displayError(Messages.ADMIN.AVODISCOVER_URL_ERR);return;}
-        if(action === 'map'){inputs["userid"] = Object.keys(userData).find(key => userData[key] === userRef.current.value)}
         else{
             const getAvoDiscoverData = await avoDiscoverSaveConfig(inputs);
             if(getAvoDiscoverData.error){displayError(getAvoDiscoverData.error);return;}
