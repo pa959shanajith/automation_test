@@ -64,6 +64,8 @@ const AvoDiscoverConfig = (props) => {
         saveRef.current.disabled = true;
         avoDiscoverUrlRef.current.disabled = true;
         avoDiscoverUrlRef.current.value = data.avodiscoverurl;
+        document.getElementById('usravodiscover').selectedIndex = '0';
+        document.getElementById('assureusr').selectedIndex = '0';
 		setLoading(false);
     }
 
@@ -149,93 +151,99 @@ const AvoDiscoverConfig = (props) => {
     }
 
     return (
-        <ScrollBar thumbColor="#929397">
-            <div className="discover_container">
-                <div className="discover_containerwrap">
+        <div className="discover_container">
+            <div id="page-taskName"><span>Avo Discover Configuration</span></div>
+            <div className="adminActionBtn">
+                <button data-test="avodiscover_save" ref={saveRef} onClick={()=>avoDiscoverConfigActions('save')} className="a__btn btn-edit" title="Save">Save</button>
+                <button data-test="avodiscover_reset" ref={resetRef} onClick={()=>setShowResetModal(true)} className="a__btn" title="Reset">Reset</button>
+            </div>
+            {showResetModal?
+                <ModalContainer
+                    title="Reset Avo Discover Configuration"
+                    content={"Are you sure you want to Reset ? All Avo Assure user configuration with Avo Discover users will be reset."}
+                    close={()=>setShowResetModal(false)}
+                    footer={
+                        <>
+                        <button onClick={()=>{avoDiscoverResetConfig('reset','');refreshFields();setShowResetModal(false);}}>Yes</button>
+                        <button onClick={()=>setShowResetModal(false)}>No</button>
+                        </>
+                    }
+                    modalClass=" modal-sm"
+                />
+            :null}
+            <div className = "discover_containerwrap">
+                <ScrollBar thumbColor="#929397">
+                    <Fragment>
                     {loading?<ScreenOverlay content={loading}/>:null}
-                    <div id="page-taskName"><span>Avo Discover Configuration</span></div>
-                    <div className="adminActionBtn">
-                        <button data-test="avodiscover_save" ref={saveRef} onClick={()=>avoDiscoverConfigActions('save')} className="a__btn btn-edit" title="Save">Save</button>
-                        <button data-test="avodiscover_reset" ref={resetRef} onClick={()=>setShowResetModal(true)} className="a__btn" title="Reset">Reset</button>
-                    </div>
-                    {showResetModal?
-                        <ModalContainer
-                            title="Reset Avo Discover Configuration"
-                            content={"Are you sure you want to Reset ? All Avo Assure user configuration with Avo Discover users will be reset."}
-                            close={()=>setShowResetModal(false)}
-                            footer={
-                                <>
-                                <button onClick={()=>{avoDiscoverResetConfig('reset','');refreshFields();setShowResetModal(false);}}>Yes</button>
-                                <button onClick={()=>setShowResetModal(false)}>No</button>
-                                </>
+                    <div className="col-xs-9" style={{width: "95%"}}>
+                        <div className="discover_input">
+                            <FormInput data-test="url_avodiscover" inpRef={avoDiscoverUrlRef} label={'Avo Discover URL'} placeholder={'Avo Discover Server URL'}/>
+                            {showSave?
+                            <>
+                            <FormSelect data-test="assure_usr" inpId={'assureusr'} inpRef={userRef} defValue={"Select Avo Assure User"} onChangeFn={() => {onChangeAvoAssureUsr()}} label={"Avo Assure User"} option={userList} />
+                            <div className='avoDiscover_UserForm'>
+                                <FormSelect data-test="usr_avodiscover" inpRef={avoDiscoverUsrRef} inpId={'usravodiscover'} onChangeFn={()=>{setShowPswdInput(true)}} defValue={"Select Avo Discover User"} label={'Avo Discover User'} option={avoDiscoverUserList} />
+                                <button data-test="avodiscover_refresh" onClick={()=>avoDiscoverConfigActions('refresh')} className="a__btn btn-edit refresh" title="Refresh">Refresh</button>
+                            {showPswdInput?
+                            <>
+                            <div className='avoDiscover_UserForm'>
+                                <FormInput data-test="avodiscover_pswd"  type="password" inpRef={avoDiscoverPswdRef} label={'Avo Discover Password'} placeholder={'Avo Discover Password'}/>
+                                <button data-test="avodiscover_map" onClick={()=>avoDiscoverConfigActions('map')} className="a__btn btn-edit map" title="Map">Map</button>
+                            </div>
+                            </>:null
                             }
-                            modalClass=" modal-sm"
-                        />
-                    :null}
-                    <div className="discover_input" >
-                        <FormInput data-test="url_avodiscover" inpRef={avoDiscoverUrlRef} label={'Avo Discover URL'} placeholder={'Avo Discover Server URL'}/>
-                        {showSave?
-                        <>
-                        <FormSelect data-test="assure_usr" inpId={'assureusr'} inpRef={userRef} defValue={"Select Avo Assure User"} onChangeFn={() => {onChangeAvoAssureUsr()}} label={"Avo Assure User"} option={userList} />
-                        <div className='avoDiscover_UserForm'>
-                            <FormSelect data-test="usr_avodiscover" inpRef={avoDiscoverUsrRef} inpId={'usravodiscover'} onChangeFn={()=>{setShowPswdInput(true)}} defValue={"Select Avo Discover User"} label={'Avo Discover User'} option={avoDiscoverUserList} />
-                            <button data-test="avodiscover_refresh" onClick={()=>avoDiscoverConfigActions('refresh')} className="a__btn btn-edit refresh" title="Refresh">Refresh</button>
-                        {showPswdInput?
-                        <>
-                        <div>
-                            <FormInput data-test="avodiscover_pswd"  type="password" inpRef={avoDiscoverPswdRef} label={'Avo Discover Password'} placeholder={'Avo Discover Password'}/>
-                            <button data-test="avodiscover_map" onClick={()=>avoDiscoverConfigActions('map')} className="a__btn btn-edit map" title="Map">Map</button>
-                        </div>
-                        </>:null
+                            </div>
+                            </>:null
                         }
                         </div>
-                        </>:null
-                    }
                     </div>
-                </div>
-            </div>
-            <Fragment>
-            {mapRef?
-            <>
-                {loading ? <ScreenOverlay content={loading} /> : null}
-                <div className="col-xs-9 form-group-ip adminForm-ip map-form" style={{paddingTop:"0",marginLeft:"25px",width:"83%",marginTop: "-130px"}}>
-                    <div className="containerWrap">
-                        <div className="sessionHeading-ip" data-toggle="collapse" data-target="#activeUsersToken-x">
-                            <h4>Mapped Users</h4>
-                            <div className="search-ip">
-                                <span className="searchIcon-provision search-icon-ip">
-                                    <img src={"static/imgs/ic-search-icon.png"} className="search-img-ip" alt="search icon"/>
-                                </span>
-							<input value={searchTasks} onChange={(event)=>{setSearchTasks(event.target.value);searchMappedList(event.target.value)}} autoComplete="off" type="text" id="searchTasks" className="searchInput-list-ip searchInput-cust-ip" />
-						</div>
-                        </div>
-                        <div id="activeUsersToken" className="wrap wrap-cust-ip">
-                        <ScrollBar scrollId='activeUsersToken-ip' thumbColor="#929397" >
-                            <table className = "table table-hover sessionTable" id="tokensDetail">
-                                <tbody >
-                                <tr>
-                                    <th> Avo Assure User </th>
-                                    <th> Avo Discover User </th>
-                                    <th>  </th>
-                                    <th>  </th>
-                                </tr>
-                                {avoDiscoverMapList.map((e,index)=>(
-                                    <tr key={index} className='provisionTokens'>
-                                        <td> {userData[e._id]} </td>
-                                        <td> {e.name} </td>
-                                        <td><button value={e._id} className="btn btn-cust-ip" onClick={() => { avoDiscoverResetConfig('unmap',e._id) }} title="Un-Map" > Un-Map </button></td>
-                                    </tr> 
-                                ))}
-                                </tbody>
-                            </table>
-                            </ScrollBar>
-                        </div>
-                    </div>
+                    </Fragment>
+                    <Fragment>
+                        {loading ? <ScreenOverlay content={loading} /> : null}
+                        <div>
+                        {mapRef?
+                        <>
+                            {loading ? <ScreenOverlay content={loading} /> : null}
+                            <div className="col-xs-9 form-group-ip adminForm-ip" style={{paddingTop:"0",width:"83%"}}>
+                                <div className="containerWrap">
+                                    <div className="AvoDiscoverHeading" data-toggle="collapse">
+                                        <h4>Mapped Users</h4>
+                                        <div className="search-ip">
+                                            <span className="searchIcon-provision search-icon-ip">
+                                                <img src={"static/imgs/ic-search-icon.png"} className="search-img-ip" alt="search icon"/>
+                                            </span>
+                                        <input value={searchTasks} onChange={(event)=>{setSearchTasks(event.target.value);searchMappedList(event.target.value)}} autoComplete="off" type="text" id="searchTasks" className="searchInput-list-ip searchInput-cust-ip" />
+                                        </div>
+                                    </div>
+                                    <div className="wrap wrap-cust-ip">
+                                    <ScrollBar thumbColor="#929397">
+                                        <table className = "table table-hover sessionTable">
+                                            <tbody>
+                                            <tr>
+                                                <th> Avo Assure User </th>
+                                                <th> Avo Discover User </th>
+                                                <th>  </th>
+                                            </tr>
+                                            {avoDiscoverMapList.map((e,index)=>(
+                                                <tr key={index}>
+                                                    <td> {userData[e._id]} </td>
+                                                    <td> {e.name} </td>
+                                                    <td><button value={e._id} className="btn btn-cust-ip" onClick={() => { avoDiscoverResetConfig('unmap',e._id) }} title="Un-Map" > Un-Map </button></td>
+                                                </tr> 
+                                            ))}
+                                            </tbody>
+                                        </table>
+                                    </ScrollBar>
+                                    </div>
+                                </div>
 
-                </div>
-                </>:null}
-            </Fragment>
-        </ScrollBar>
+                            </div>
+                        </>:null}
+                    </div>
+                    </Fragment>
+                </ScrollBar>
+            </div>
+        </div>
     );
 }
 
