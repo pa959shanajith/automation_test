@@ -1,5 +1,4 @@
 const uiConfig = require('./../config/options');
-const screenShotPath = uiConfig.screenShotPath;
 const objectPredictionPath = uiConfig.objectPredictionPath;
 const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 const pingTimer = uiConfig.pingTimer;
@@ -110,7 +109,7 @@ io.on('connection', async socket => {
 
 	httpsServer.setTimeout();
 
-	socket.on('getconstants', async () => socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes, pingTimer, objectPredictionPath));
+	socket.on('getconstants', async () => socket.emit('update_variables', benchmarkRunTimes, pingTimer, objectPredictionPath));
 
 	socket.on('disconnect', async reason => {
 		logger.info("Inside Socket disconnect");
