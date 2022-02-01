@@ -131,6 +131,13 @@ const Messages={
         WARN_PROJECT_EXIST: {"CONTENT":"Project Name already Exists.", "VARIANT": VARIANT.WARNING},
         WARN_ADD_CYCLE: {"CONTENT":"Please add atleast one cycle for a release.", "VARIANT": VARIANT.WARNING},
         WARN_NO_TOKEN_ISSUED: {"CONTENT":"No tokens have been issued.", "VARIANT": VARIANT.WARNING},
+        AVODISCOVER_URL_ERR: {"CONTENT":"Invalid Avo Discover URL", "VARIENT": VARIANT.WARNING},
+        AVODISCOVER_USER_ERR:{"CONTENT":"Failed to fetch Avo Discover users", "VARIENT": VARIANT.WARNING},
+        AVODISCOVER_AUTH_ERR:{"CONTENT":"Avo Discover user authentication failed. Please check your password", "VARIENT": VARIANT.WARNING},
+        WARN_AVODISCOVER_EXIST: {"CONTENT":"Selected Avo Assure user is already configured", "VARIANT": VARIANT.WARNING},
+        AVODISCOVER_RESET_FAIL: {"CONTENT":"Failed to reset the Avo Discover configuration", "VARIANT": VARIANT.WARNING},
+        ERR_FETCH_AVODISCOVER_MAP: {"CONTENT":"Failed to fetch Avo Discover configuration", "VARIANT": VARIANT.ERROR},
+        AVODISCOVER_CONFIG_ERR: {"CONTENT":"Failed to perform Avo Discover configuration", "VARIANT": VARIANT.ERROR},
     },
     DESIGN:{
         ERR_FETCH_TC: {"CONTENT":"Failed to Fetch Testcases.", "VARIANT": VARIANT.ERROR},
@@ -200,6 +207,8 @@ const Messages={
     },
     PLUGIN:{
         ERR_LOAD_TASK: {"CONTENT":"Fail to load tasks.", "VARIANT": VARIANT.ERROR},
+        ERR_UNMAPPED_DISCOVER_USER: {"CONTENT":"The user is not mapped to Avo Discover.", "VARIANT": VARIANT.ERROR},
+        ERR_FETCHING_DISCOVER_USER: {"CONTENT":"Error fetching Avo Discover users.", "VARIANT": VARIANT.ERROR}
     },
     EXECUTE:{
         ERR_FETCH_TESTSUITE: {"CONTENT":"Error while fetching Test Suite Data.", "VARIANT": VARIANT.ERROR},
@@ -240,7 +249,7 @@ const Messages={
         ERR_TESTSUITE_DETAILS: {"CONTENT":"Failed to TestSuite Details.", "VARIANT": VARIANT.ERROR},
         ERR_MAP_TC: {"CONTENT":"Map test cases before saving.", "VARIANT": VARIANT.ERROR},
         ERR_SAVE_MAPPED_TC: {"CONTENT":"Failed to Save Mapped TestCases.", "VARIANT": VARIANT.ERROR},
-        ERR_EMPTY_MAPPED_DATA: {"CONTENT":"No Mapped Dataa Found.", "VARIANT": VARIANT.ERROR},
+        ERR_EMPTY_MAPPED_DATA: {"CONTENT":"No Mapped Data Found.", "VARIANT": VARIANT.ERROR},
         ERR_LOGIN_AGAIN: {"CONTENT":'No User Details Found ,Please Login Again.', "VARIANT": VARIANT.ERROR},
         ERR_ADD_PROJECT: {"CONTENT":"No Projects Found ,Please add Projects.", "VARIANT": VARIANT.ERROR},
         ERR_GET_LIST: {"CONTENT":"Failed to get list.", "VARIANT": VARIANT.ERROR},
@@ -351,11 +360,13 @@ const Messages={
         ERR_OBJ_SAVE: {"CONTENT":"Please save the object first.", "VARIANT": VARIANT.ERROR},
         ERR_UPDATE_IRIS: {"CONTENT":"Failed to updated IRIS Object Details.", "VARIANT": VARIANT.ERROR},
         ERR_MAPPED_SCRAPE: {"CONTENT":"Mapping scrape data failed..", "VARIANT": VARIANT.ERROR},
+        ERR_REPLACE_SCRAPE: {"CONTENT":"Scrape Data Replace Failed.", "VARIANT": VARIANT.ERROR},
         ERR_HIGHLIGHT: {"CONTENT":"Failed to highlight.", "VARIANT": VARIANT.ERROR},
         ERR_SCRAPE: {"CONTENT":"Failed to scrape.", "VARIANT": VARIANT.ERROR},
         ERR_SCRAPE_TERMINATE: {"CONTENT":"Scrape Terminated.", "VARIANT": VARIANT.ERROR},
         ERR_WINDOW_NOT_FOUND: { "CONTENT": "Window not found - Please provide valid window name.", "VARIANT": VARIANT.ERROR },
         ERR_HIGHLIGHT_OUT_OF_RANGE:{"CONTENT": "Scraped object's co-ordinates not found within the captured screenshot", "VARIANT": VARIANT.ERROR},
+        ERR_NO_NEW_SCRAPE:{"CONTENT": "Please scrape new objects to replace.", "VARIANT": VARIANT.ERROR},
         
         SUCC_WEBSERVICE_RESP: {"CONTENT":"Web Service response received successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_WS_TEMP_SAVE: {"CONTENT":"WebService Template saved successfully.", "VARIANT": VARIANT.SUCCESS},
@@ -367,6 +378,7 @@ const Messages={
         SUCC_SUBMIT: {"CONTENT":"Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_IRIS_SAVE: {"CONTENT":"Submitted Successfully. IRIS image saved.", "VARIANT": VARIANT.SUCCESS},
         SUCC_MAPPED_SCRAPED: {"CONTENT":"Mapped Scrape Data Successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_REPLACE_SCRAPED: {"CONTENT":"Scrape Data Replaced Successful.", "VARIANT": VARIANT.SUCCESS},
         SUCC_OBJ_SAVE: { "CONTENT": 'Scraped data saved successfully.', "VARIANT": VARIANT.SUCCESS },
         
         WARN_ADD_PROPERTY: {"CONTENT":"Please enter at least one property", "VARIANT": VARIANT.WARNING},

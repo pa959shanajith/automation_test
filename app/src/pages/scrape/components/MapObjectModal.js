@@ -93,8 +93,6 @@ const MapObjectModal = props => {
             projectId: projectId,
             screenId: screenId,
             screenName: screenName,
-            userId: props.user_id,
-            roleId: props.role,
             param: "mapScrapeData",
             appType: appType,
             objList: [],
@@ -224,8 +222,6 @@ const MapObjectModal = props => {
 MapObjectModal.propTypes={
     scrapeItems: PropTypes.arrayOf(PropTypes.object),
     current_task:PropTypes.object,
-    user_id: PropTypes.string,
-    role: PropTypes.string,
     fetchScrapeData:PropTypes.func,
     setShow:PropTypes.func
 }

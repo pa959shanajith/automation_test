@@ -110,6 +110,8 @@ exports.initScraping_ICE = function (req, res) {
 						}
 						data.scrapedurl = reqBody.viewString.scrapedurl;
 						data.action = reqBody.action;
+					} else if (reqBody.action == 'replace') {
+						data.action = reqBody.action;
 					}
 					if (browserType == "chrome") data.task = "OPEN BROWSER CH";
 					else if (browserType == "ie") data.task = "OPEN BROWSER IE";
@@ -188,6 +190,8 @@ exports.updateScreen_ICE = async (req, res) =>{
 		logger.info("Inside UI service: " + fnName);
 		var d = req.body;
 		var inputs = d.data;
+		inputs.userId = req.session.userid;
+		inputs.roleId = req.session.activeRoleId;
 		var data = await utils.fetchData(inputs, "design/updateScreen_ICE", fnName);
 		res.send(data)
 	} catch (exception) {

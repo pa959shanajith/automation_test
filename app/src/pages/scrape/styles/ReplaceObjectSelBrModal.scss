@@ -1,0 +1,29 @@
+.sb__SelBrObj{
+    .modal__body{
+        padding-right: 5px;
+    }
+    .modal__content{
+        width: 75%;
+    }
+}
+
+.sb__replaceObj_btns{
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.sb__replaceObj_btn{
+    border: none;
+    outline: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    flex: 0 0 6%;
+}
+
+.sb__web_icons{
+    height: 27px;
+    width: 27px;
+}

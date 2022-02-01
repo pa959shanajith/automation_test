@@ -103,6 +103,7 @@ const BottomContent = () => {
     const [customLen, setCustomLen] = useState(0);
     const [scrapeItemsLength, setScrapeLen] = useState(0);
     const [unsavedObjPresent, setUnsavedObjPresent] = useState(0);
+    const [irisLen, setIrisLen] = useState(false);
 
     const history = useHistory();
     
@@ -110,7 +111,9 @@ const BottomContent = () => {
         let customs = 0;
         let savedObjects = 0;
         let unsavedObjects = 0;
+        let irisObjects = 0;
         for (let scrapeItem of scrapeItems){
+            if( scrapeItem.xpath && scrapeItem.xpath.split(";")[0]==="iris" ) irisObjects++;
             if ( scrapeItem.objId && scrapeItem.isCustom) customs++;
             if (scrapeItem.objId) savedObjects++;
             else unsavedObjects++;
@@ -118,6 +121,7 @@ const BottomContent = () => {
         setScrapeLen(savedObjects);
         setUnsavedObjPresent(unsavedObjects);
         setCustomLen(customs);
+        setIrisLen(irisObjects);
     }, [scrapeItems])
 
     const exportScrapeObjects = () => {
@@ -239,6 +243,7 @@ const BottomContent = () => {
     const lowerList = [
         {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable:  compareFlag}, 
         {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
+        {'title': 'Replace Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("replaceObjectSelBr"), 'show': appType === 'Web', 'disable': scrapeItemsLength <= 0 || ((scrapeItemsLength) === irisLen) || compareFlag },
         {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag || unsavedObjPresent || !saved.flag },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},
         {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: (appType!=="Web"), disable: compareFlag && appType!=="Webservice"},

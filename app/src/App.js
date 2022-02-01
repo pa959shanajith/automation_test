@@ -14,7 +14,6 @@ import Mindmap from './pages/mindmap';
 import Scrape from './pages/scrape';
 import Design from './pages/design';
 import Utility from './pages/utility';
-import Report from './pages/report';
 import Integration from './pages/integration';
 import Settings from './pages/settings';
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
@@ -73,7 +72,6 @@ const RouteApp = () => {
       <Route path ="/design" component={Design}/>
       <Route path ="/utility" component={Utility}/>
       <Route path = "/integration" component={Integration}/>
-      {/* <Route path = "/reports" component={Report}/> */}
       <Route path ="/execute" component={Execute}/>
       <Route path ="/scheduling" component={Schedule}/>
       <Route path ='/settings' component={Settings}/>
