@@ -25,6 +25,7 @@ const AvoDiscoverConfig = (props) => {
     const [showSave,setShowSave] = useState(false);
     const [showResetModal, setShowResetModal] = useState(false);
     const [showPswdInput, setShowPswdInput] = useState(false);
+    const [mappedlist, setMappedList] = useState([]);
 
     useEffect(()=>{
         fetchAvoDiscoverConfig();
@@ -58,6 +59,7 @@ const AvoDiscoverConfig = (props) => {
         setAvoDiscoverUserList(users.sort());
         setShowMap(true);
         setAvoDiscoverMapList(data.mappedavodiscoverlist);
+        setMappedList(data.mappedavodiscoverlist);
         setShowSave(true);
         setShowPswdInput(false);
         resetRef.current.disabled = false;
@@ -99,6 +101,7 @@ const AvoDiscoverConfig = (props) => {
                     avoDiscoverUrlRef.current.disabled=true;
                 } else if(action == 'map'){
                     setAvoDiscoverMapList(getAvoDiscoverData.mappedavodiscoverlist);
+                    setMappedList(getAvoDiscoverData.mappedavodiscoverlist);
                     document.getElementById('usravodiscover').selectedIndex = '0';
                     document.getElementById('assureusr').selectedIndex = '0';
                     setShowMap(true);
@@ -136,13 +139,14 @@ const AvoDiscoverConfig = (props) => {
     }
 
     const searchMappedList = (val) =>{
-		const items = avoDiscoverMapList.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
+		const items = mappedlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
         setAvoDiscoverMapList(items);
 	}
 
     const refreshFields = async() => {
         setShowSave(false);
         setAvoDiscoverMapList([]);
+        setMappedList([]);
         setShowMap(false);
         setShowPswdInput(false);
         avoDiscoverUrlRef.current.disabled=false;
@@ -207,7 +211,7 @@ const AvoDiscoverConfig = (props) => {
                                             <span className="searchIcon-provision search-icon-ip">
                                                 <img src={"static/imgs/ic-search-icon.png"} className="search-img-ip" alt="search icon"/>
                                             </span>
-                                        <input value={searchTasks} onChange={(event)=>{setSearchTasks(event.target.value);searchMappedList(event.target.value)}} autoComplete="off" type="text" id="searchTasks" className="searchInput-list-ip searchInput-cust-ip" />
+                                        <input value={searchTasks} onChange={(event)=>{setSearchTasks(event.target.value);searchMappedList(event.target.value)}} autoComplete="off" type="text" className="searchInput-list-ip searchInput-cust-ip" />
                                         </div>
                                     </div>
                                     <div className="wrap wrap-cust-ip">
