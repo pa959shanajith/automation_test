@@ -300,6 +300,11 @@ module.exports.initListeners = mySocket => {
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 
+	mySocket.on("configure_field", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "configure_field", "value": value});
+		server_pub.publish("ICE2_" + username, dataToNode);
+	});
+
 	mySocket.on("result_executeTestSuite", value => {
 		const dataToNode = JSON.stringify({"username": username, "onAction": "result_executeTestSuite", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
