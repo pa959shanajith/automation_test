@@ -1246,7 +1246,7 @@ export const avoDiscoverSaveConfig = async(inputs) => {
         if(res.data === 'Unauthorized'){
             return {error:MSG.ADMIN.AVODISCOVER_AUTH_ERR}
         }
-        if(typeof(res.data) === 'string'){
+        if(res.data === 'ECONNREFUSED' || res.data === 'ENOTFOUND' || res.data === 'EAI_AGAIN'){
             return {error:MSG.ADMIN.AVODISCOVER_URL_ERR}
         }
         if(res.status===200 && res.data !== "fail"){            

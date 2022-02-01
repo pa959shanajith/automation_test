@@ -28,6 +28,62 @@ const FormInput = (props) => {
     )
 }
 
+/*Component FormInputButton
+  use: renders input box and label with button in a form
+  props: name: label , placeholder : placeholder text , inpref = ref, onClick = onclick
+*/
+    
+const FormInputButton = (props) => {
+    const name = props.label
+    const type = props.type
+    const placeholder = props.placeholder
+    const inpRef = props.inpRef
+    const validExp = props.validExp
+    const onclick = props.onClick
+    const title = props.title
+    const upateInput=()=>{
+        inpRef.current.value = ValidationExpression(inpRef.current.value,validExp);
+    }
+    return(
+        <Fragment>
+            <div className='col-xs-9 form-group input-label'>
+                <label>{name}</label>
+                <input type={type} ref={inpRef} onChange={()=>{upateInput()}} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp==="poolName" || validExp=== "emailServerName"?"100":""}></input>
+                <button className="a__btn" style={{marginLeft:'-85px'}} onClick={onclick} title={title}>{title}</button>
+            </div>
+        </Fragment>
+    )
+}
+
+/*Component FormSelectButton
+  use: renders select box and label with button in a form
+  props: name: label , option : [option1,option2] , inpRef : [ref1,ref2] , defValue : default value in options
+
+*/
+    
+const FormSelectButton = (props) => {
+    const name = props.label
+    const defValue = props.defValue
+    const option = props.option
+    const inpRef = props.inpRef
+    const onChangeFn = props.onChangeFn
+    const inpId = props.inpId
+    const onclick = props.onClick
+    const title = props.title
+    return(
+        <Fragment>
+            <div style={props.style} className='col-xs-9 form-group input-label'>
+                <label>{name}</label>
+                <select data-test="select_comp" onChange={onChangeFn} ref={inpRef} defaultValue={'def-opt'} className={"adminSelect-project-assign form-control__conv-project left-opt"} id={inpId || "selectForm"}>
+                    <option key={'def-opt'} value={'def-opt'} disabled={true}>{defValue}</option>
+                    {option.map((e,i)=><option key={i+'_def'} value={e}>{e}</option>)}
+                </select>
+                <button onClick={onclick} className="a__btn" title={title}>{title}</button>            
+            </div>
+        </Fragment>
+    )
+}
+
 /*Component FormSelect
   use: renders select box and label in a form
   props: name: label , option : [option1,option2] , inpRef : [ref1,ref2] , defValue : default value in options
@@ -228,5 +284,5 @@ const FormInpDropDownLdap = ({data,setFilter,clickInp,inpRef,defVal,ldapEdit,err
     )
 }
 
-export {FormInput,FormSelect,FormRadio,FormInpDropDown,FormInpDropDownLdap};
+export {FormInput,FormSelect,FormRadio,FormInpDropDown,FormInpDropDownLdap,FormInputButton,FormSelectButton};
 
