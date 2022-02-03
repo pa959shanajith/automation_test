@@ -285,7 +285,6 @@ exports.connectJira_ICE = function(req, res) {
                                 "inputs": inputs
                             };
                             redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
-                            var count = 0;
 
                             function jira_login_3_listener(channel, message) {
                                 var data1 = JSON.parse(message);
@@ -299,15 +298,12 @@ exports.connectJira_ICE = function(req, res) {
                                         }
                                     } else if (data1.onAction == "configure_field") {
                                         var resultData = data1.value;
-                                        if (count == 0) {
-                                            if (resultData != "Fail") {
-                                                logger.info('Jira: configure field fetched successfully.');
-                                            } else {
-                                                logger.error('Jira: Failed fetch congigure fields.');
-                                            }
-                                            res.send(resultData);
-                                            count++;
+                                        if (resultData != "Fail") {
+                                            logger.info('Jira: configure field fetched successfully.');
+                                        } else {
+                                            logger.error('Jira: Failed fetch congigure fields.');
                                         }
+                                        res.send(resultData);
                                     }
                                 }
                             }
