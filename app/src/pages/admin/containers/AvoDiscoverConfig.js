@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import {ScreenOverlay, ScrollBar, Messages, setMsg, ModalContainer} from '../../global' 
-import {FormInput,FormSelect} from '../components/FormComp'
+import {FormInput,FormSelect,FormInputButton,FormSelectButton} from '../components/FormComp'
 import {getUserDetails,avoDiscoverSaveConfig,avoDiscoverReset,fetchAvoDiscoverMap} from '../api';
 import '../styles/AvoDiscoverConfig.scss'
 
@@ -17,7 +17,7 @@ const AvoDiscoverConfig = (props) => {
     const saveRef = useRef();
     const [userData,setUserData] = useState({});
     const [userList,setUserList] = useState([]);
-    const [searchTasks,setSearchTasks] = useState([]);
+    const [searchTasks,setSearchTasks] = useState("");
     const [mapRef,setShowMap] = useState(false);
     const [avoDiscoverUserList, setAvoDiscoverUserList] = useState([]);
     const [avoDiscoverMapList, setAvoDiscoverMapList] = useState([]);
@@ -25,10 +25,11 @@ const AvoDiscoverConfig = (props) => {
     const [showSave,setShowSave] = useState(false);
     const [showResetModal, setShowResetModal] = useState(false);
     const [showPswdInput, setShowPswdInput] = useState(false);
+    const [mappedlist, setMappedList] = useState([]);
 
     useEffect(()=>{
         fetchAvoDiscoverConfig();
-      },[props.resetMiddleScreen["avoDiscoverConfigTab"],props.MiddleScreen])
+    },[props.resetMiddleScreen["avoDiscoverConfigTab"],props.MiddleScreen])
     
     const displayError = (error) =>{
         setLoading(false);
@@ -58,6 +59,7 @@ const AvoDiscoverConfig = (props) => {
         setAvoDiscoverUserList(users.sort());
         setShowMap(true);
         setAvoDiscoverMapList(data.mappedavodiscoverlist);
+        setMappedList(data.mappedavodiscoverlist);
         setShowSave(true);
         setShowPswdInput(false);
         resetRef.current.disabled = false;
@@ -71,7 +73,7 @@ const AvoDiscoverConfig = (props) => {
 
     const avoDiscoverConfigActions = async (action) => {
         setLoading("Loading...");
-        var regExUrl = /^http[s]?:\/\/[A-Za-z0-9.-]+:\d+$/;
+        var regExUrl = /^https:\/\/[A-Za-z0-9.-]+:\d+$/;
         var url = avoDiscoverUrlRef.current.value.trim();
         var inputs={
             "action":action,
@@ -99,6 +101,7 @@ const AvoDiscoverConfig = (props) => {
                     avoDiscoverUrlRef.current.disabled=true;
                 } else if(action == 'map'){
                     setAvoDiscoverMapList(getAvoDiscoverData.mappedavodiscoverlist);
+                    setMappedList(getAvoDiscoverData.mappedavodiscoverlist);
                     document.getElementById('usravodiscover').selectedIndex = '0';
                     document.getElementById('assureusr').selectedIndex = '0';
                     setShowMap(true);
@@ -136,14 +139,16 @@ const AvoDiscoverConfig = (props) => {
     }
 
     const searchMappedList = (val) =>{
-		const items = avoDiscoverMapList.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
+		const items = mappedlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
         setAvoDiscoverMapList(items);
 	}
 
     const refreshFields = async() => {
         setShowSave(false);
         setAvoDiscoverMapList([]);
+        setMappedList([]);
         setShowMap(false);
+        setShowPswdInput(false);
         avoDiscoverUrlRef.current.disabled=false;
         avoDiscoverUrlRef.current.value='';
         saveRef.current.disabled = false;
@@ -172,29 +177,23 @@ const AvoDiscoverConfig = (props) => {
                 />
             :null}
             <div className = "discover_containerwrap">
-                <ScrollBar thumbColor="#929397">
+                <ScrollBar hideXbar={true} thumbColor="#929397">
                     <Fragment>
                     {loading?<ScreenOverlay content={loading}/>:null}
-                    <div className="col-xs-9" style={{width: "95%"}}>
+                    <div className="col-xs-9" style={{width: "98%"}}>
                         <div className="discover_input">
                             <FormInput data-test="url_avodiscover" inpRef={avoDiscoverUrlRef} label={'Avo Discover URL'} placeholder={'Avo Discover Server URL'}/>
                             {showSave?
                             <>
                             <FormSelect data-test="assure_usr" inpId={'assureusr'} inpRef={userRef} defValue={"Select Avo Assure User"} onChangeFn={() => {onChangeAvoAssureUsr()}} label={"Avo Assure User"} option={userList} />
-                            <div className='avoDiscover_UserForm'>
-                                <FormSelect data-test="usr_avodiscover" inpRef={avoDiscoverUsrRef} inpId={'usravodiscover'} onChangeFn={()=>{setShowPswdInput(true)}} defValue={"Select Avo Discover User"} label={'Avo Discover User'} option={avoDiscoverUserList} />
-                                <button data-test="avodiscover_refresh" onClick={()=>avoDiscoverConfigActions('refresh')} className="a__btn btn-edit refresh" title="Refresh">Refresh</button>
-                            {showPswdInput?
-                            <>
-                            <div className='avoDiscover_UserForm'>
-                                <FormInput data-test="avodiscover_pswd"  type="password" inpRef={avoDiscoverPswdRef} label={'Avo Discover Password'} placeholder={'Avo Discover Password'}/>
-                                <button data-test="avodiscover_map" onClick={()=>avoDiscoverConfigActions('map')} className="a__btn btn-edit map" title="Map">Map</button>
-                            </div>
+                            <FormSelectButton data-test="usr_avodiscover" inpRef={avoDiscoverUsrRef} inpId={'usravodiscover'} onChangeFn={()=>{setShowPswdInput(true)}} onClick={()=>{avoDiscoverConfigActions('refresh')}} title="Refresh" defValue={"Select Avo Discover User"} label={'Avo Discover User'} option={avoDiscoverUserList} />
                             </>:null
                             }
-                            </div>
+                            {showPswdInput?
+                            <>
+                            <FormInputButton data-test="avodiscover_pswd"  type="password" inpRef={avoDiscoverPswdRef} onClick={()=>{avoDiscoverConfigActions('map')}} title="Map" label={'Avo Discover Password'} placeholder={'Avo Discover Password'}/>   
                             </>:null
-                        }
+							}
                         </div>
                     </div>
                     </Fragment>
@@ -204,15 +203,15 @@ const AvoDiscoverConfig = (props) => {
                         {mapRef?
                         <>
                             {loading ? <ScreenOverlay content={loading} /> : null}
-                            <div className="col-xs-9 form-group-ip adminForm-ip" style={{paddingTop:"0",width:"83%"}}>
+                            <div className="col-xs-9 form-group-ip adminForm-ip" style={{paddingTop:"0",width:"85%"}}>
                                 <div className="containerWrap">
-                                    <div className="AvoDiscoverHeading" data-toggle="collapse">
+                                    <div className="AvoDiscoverHeading">
                                         <h4>Mapped Users</h4>
                                         <div className="search-ip">
                                             <span className="searchIcon-provision search-icon-ip">
                                                 <img src={"static/imgs/ic-search-icon.png"} className="search-img-ip" alt="search icon"/>
                                             </span>
-                                        <input value={searchTasks} onChange={(event)=>{setSearchTasks(event.target.value);searchMappedList(event.target.value)}} autoComplete="off" type="text" id="searchTasks" className="searchInput-list-ip searchInput-cust-ip" />
+                                        <input value={searchTasks} onChange={(event)=>{setSearchTasks(event.target.value);searchMappedList(event.target.value)}} autoComplete="off" type="text" className="searchInput-list-ip searchInput-cust-ip" />
                                         </div>
                                     </div>
                                     <div className="wrap wrap-cust-ip">
