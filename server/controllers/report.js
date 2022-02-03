@@ -194,7 +194,7 @@ exports.connectJira_ICE = function(req, res) {
             }
         } else if (req.body.action == 'createIssueInJira') { //Create issues in the Jira
             var createObj = req.body.issue_dict;
-            if (!validateData(createObj.project, "empty") && !validateData(createObj.issuetype, "empty") && !validateData(createObj.summary, "empty") && !validateData(createObj.priority, "empty")) {
+            if (!validateData(createObj.project, "empty") && !validateData(createObj.issuetype, "empty") && !validateData(createObj.summary, "empty")  && !validateData(createObj.description, "empty") && !validateData(createObj.priority, "empty")) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
@@ -255,6 +255,79 @@ exports.connectJira_ICE = function(req, res) {
                 logger.error("Error occurred in the service connectJira_ICE - createIssueInJira: Invalid inputs");
                 res.send("Fail");
             }
+        } else if (req.body.action == 'getJiraConfigureFields') { //gets jira configure fields for given project and issue type
+            var createObj = req.body.jira_input_dict;
+            var project = req.body.project;
+            var issuetype = req.body.issuetype;
+            var url =req.body.url;
+            var username= req.body.username;
+            var password= req.body.password;
+            var projects=req.body.projects;
+            if (!validateData(project, "empty") && !validateData(issuetype, "empty")){
+                var inputs = {
+                    "project": project,
+                    "issuetype": issuetype,
+                    "url": url,
+                    "username": username,
+                    "password": password,
+                    "projects_data":projects
+                };
+                try {
+                    logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                    logger.debug("ICE Socket requesting Address: %s", icename);
+                    redisServer.redisPubICE.pubsub('numsub', 'ICE1_normal_' + icename, function(err, redisres) {
+                        if (redisres[1] > 0) {
+                            logger.info("Sending socket request for jira_login to cachedb");
+                            dataToIce = {
+                                "emitAction": "jiralogin",
+                                "username": icename,
+                                "action": req.body.action,
+                                "inputs": inputs
+                            };
+                            redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+
+                            function jira_login_3_listener(channel, message) {
+                                var data1 = JSON.parse(message);
+                                if (icename == data1.username && ["unavailableLocalServer", "configure_field"].includes(data1.onAction)) {
+                                    redisServer.redisSubServer.removeListener("message", jira_login_3_listener);
+                                    if (data1.onAction == "unavailableLocalServer") {
+                                        logger.error("Error occurred in connectJira_ICE - getJiraConfigureFields: Socket Disconnected");
+                                        if ('socketMapNotify' in myserver && username in myserver.socketMapNotify) {
+                                            var soc = myserver.socketMapNotify[username];
+                                            soc.emit("ICEnotAvailable");
+                                        }
+                                    } else if (data1.onAction == "configure_field") {
+                                        var resultData = data1.value;
+                                        if (resultData != "Fail") {
+                                            logger.info('Jira: configure field fetched successfully.');
+                                        } else {
+                                            logger.error('Jira: Failed fetch congigure fields.');
+                                        }
+                                        res.send(resultData);
+                                    }
+                                }
+                            }
+                            redisServer.redisSubServer.on("message", jira_login_3_listener);
+                        } else {
+                            utils.getChannelNum('ICE1_scheduling_' + icename, function(found) {
+                                var flag = "";
+                                if (found) flag = "scheduleModeOn";
+                                else {
+                                    flag = "unavailableLocalServer";
+                                    logger.error("Error occurred in the service connectJira_ICE - getJiraConfigureFields: Socket not Available");
+                                }
+                                res.send(flag);
+                            });
+                        }
+                    });
+                } catch (exception) {
+                    logger.error("Exception in the service connectJira_ICE - getJiraConfigureFields: %s", exception);
+                }
+            } else {
+                logger.error("Error occurred in the service connectJira_ICE - getJiraConfigureFields: Invalid inputs");
+                res.send("Fail");
+            }
+
         }
     } catch (exception) {
         logger.error("Exception in the service connectJira_ICE: %s", exception);
