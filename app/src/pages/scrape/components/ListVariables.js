@@ -71,6 +71,8 @@ export const objectTypes = [
 
 export const tagList = ['a', 'input', 'table', 'list', 'select', 'img', 'button', 'radiobutton', 'checkbox', 'Element']
 
+export const tagListToReplace = ['a', 'input', 'table', 'list', 'select', 'img', 'button', 'radiobutton', 'checkbox', 'Element', 'tablecell']
+
 export const irisObjectTypes = {
     "button": { name: "Button", states: [0] }, 
     "checkbox": { name: "Checkbox", states: [0, 1] }, 

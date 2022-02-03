@@ -13,6 +13,7 @@ const PluginSection = ({userInfo}) => {
         "Reports": { title: "Reports", show: false},
         "Dashboard": {title:"Dashboard", show: false},
         "Selenium To Avo": {title:"Selenium To Avo", show: false},
+        "Avo Discover": {title:"Avo Discover", show: false},
         "showList" : false,
     });
 

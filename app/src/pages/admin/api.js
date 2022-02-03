@@ -1226,3 +1226,83 @@ export const getNotificationGroups = async(props) => {
         return {error:MSG.ADMIN.ERR_GROUPNAME_FETCH}
     }
 }
+
+export const avoDiscoverSaveConfig = async(inputs) => { 
+    try{
+        const res = await axios(url+'/avoDiscoverMap', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {
+                "inputs":inputs
+            },
+            credentials: 'include',
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.data === 'Unauthorized'){
+            return {error:MSG.ADMIN.AVODISCOVER_AUTH_ERR}
+        }
+        if(res.data === 'ECONNREFUSED' || res.data === 'ENOTFOUND' || res.data === 'EAI_AGAIN'){
+            return {error:MSG.ADMIN.AVODISCOVER_URL_ERR}
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.AVODISCOVER_CONFIG_ERR}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.AVODISCOVER_CONFIG_ERR}
+    }
+}
+
+export const avoDiscoverReset = async(action, id, avodiscoverurl) => {
+    try{
+        const res = await axios(url+'/avoDiscoverReset', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                "action":action,
+                "userid":id,
+                "avodiscoverurl":avodiscoverurl},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){return res.data;}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.AVODISCOVER_RESET_FAIL}
+    }
+}
+
+export const fetchAvoDiscoverMap = async() => {
+    try{
+        const res = await axios(url+'/fetchAvoDiscoverMap', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_FETCH_AVODISCOVER_MAP}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_FETCH_AVODISCOVER_MAP}
+    }
+}

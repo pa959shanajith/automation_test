@@ -8,6 +8,8 @@ const taskflow = require('../config/options').strictTaskWorkflow;
 const epurl = process.env.DAS_URL;
 const Client = require("node-rest-client").Client;
 const client = new Client();
+const axios = require("axios");
+const https = require('https');
 
 const getChannelNum_cb = (channel,cb) => {
 	redisServer.redisPubICE.pubsub('numsub', channel, function(err, redisres) {
@@ -167,8 +169,26 @@ const fetchData = async (inputs, url, from, all) => {
 	return promiseData;
 };
 
+const fetchDiscoverData = async (url, inputs) => {
+	try{
+		const agent = new https.Agent({  
+			rejectUnauthorized: false
+		  });
+		inputs.httpsAgent = agent
+		const res = await axios(url, inputs);
+		if(res.status !== 200 || res.data === "Invalid Session"){
+			console.error('fail');
+			return "fail";
+		}
+		return res.data;
+	}catch(err){
+		return err;
+	}
+};
+
 module.exports.getChannelNum = getChannelNum_cb;
 module.exports.fetchData = fetchData;
+module.exports.fetchDiscoverData = fetchDiscoverData;
 module.exports.cache = cache;
 
 exports.getUserInfoFromHeaders = (headers) => {

@@ -44,6 +44,7 @@ exports.readTestSuite_ICE = async (req, res) => {
 			"apptypes": testscenarioDetails.apptypes,
 			"testsuitename": testsuite.name,
 			"moduleid": moduleId,
+			"batchname": testsuite.batchname,
 			"testsuiteid": testsuite.testsuiteid,
 			"versionnumber": suite.versionnumber
 		};
@@ -241,6 +242,7 @@ async function makeRequestAndAddToQueue(batchExecutionData, targetUser, userInfo
 function clubBatches(batchInfo){
 	userBatchMap = {};
 	for(let index in batchInfo){
+		batchInfo[index].smart = true;
 		let targetUser = batchInfo[index].targetUser;
 		if(targetUser && targetUser in userBatchMap){
 			userBatchMap[targetUser].push(batchInfo[index])

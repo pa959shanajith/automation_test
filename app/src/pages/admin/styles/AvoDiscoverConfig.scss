@@ -1,0 +1,63 @@
+@import "../../global/styles/ColorVariables.scss";
+.adminActionBtn .a__btn:disabled {
+    opacity: 0.5;
+}
+
+.discover_containerwrap{
+    height: 100%;
+    width: inherit;
+    float: left;
+    padding-bottom: 55px;
+}
+
+.form-group-ip{
+    margin-bottom:15px;
+    float: left;
+}
+.adminForm-ip {
+	padding-top: 5%;
+}
+
+.discover_container{
+    width: 100%;
+    padding: 20px;
+    height: 100%;
+
+    .input-label {
+        margin-top: 0;
+    }
+    .discover_input{
+        margin-bottom: 3%;
+        padding: 0px 0px;
+        position: relative;
+        float: left;
+        width: 130%;
+    }
+}
+
+.AvoDiscoverHeading{
+	padding-left: 10px;
+	display: flex;
+	background: $whisper;
+	cursor: pointer;
+	width: 100%;
+	margin-bottom: 3px;
+}
+
+.AvoDiscoverHeading h4{
+    margin-top: 10px;
+    flex-grow: 1;
+    margin-bottom: 10px;
+	display: inline-block;
+	padding-right: 5px;
+    user-select: none;
+    font-size: 18px;
+}
+
+.AvoDiscoverHeading:hover {
+	background: $backgroundOne;
+}
+
+.wrap-cust-ip{
+    max-height: 450px;
+}

@@ -2,7 +2,7 @@ const utils = require('../utils');
 const redisServer = require('../redisSocketHandler');
 var myserver = require('../socket');
 var logger = require('../../../logger.js');
-const accessibility_testing = require("../../controllers/accessibilityTesting")
+const reports = require("../../controllers/report")
 const notifications = require('../../notifications');
 var queue = require('./executionQueue')
 var scheduler = require('./scheduler')
@@ -103,6 +103,8 @@ class TestSuiteExecutor {
             "exec_mode": batchData.exectionMode,
             "exec_env": batchData.executionEnv,
             "apptype": batchData.batchInfo == undefined? '' : batchData.batchInfo[0].appType,
+            'batchname': batchData.batchInfo == undefined? '' : batchData.batchInfo[0].batchname,
+            "smart": batchData.type.includes('smart'),
             "integration": batchData.integration,
             "scenarioFlag": batchData.scenarioFlag,
             "batchId": "",
@@ -199,7 +201,7 @@ class TestSuiteExecutor {
     };
 
     /** Function responsible for generating batchid and executionid dfor given list of testsuiteid */
-    generateExecutionIds = async (execIds, tsuIds, userid, version) => {
+    generateExecutionIds = async (execIds, tsuIds, userid, version, batchname=undefined, smart=false) => {
         for (const tsuid of tsuIds) {
             if (execIds.execid[tsuid] == undefined) execIds.execid[tsuid] = null;
         }
@@ -209,8 +211,10 @@ class TestSuiteExecutor {
             "testsuiteids": tsuIds,
             "executionids": execIds.execid,
             "batchid": execIds.batchid,
+            "smart":smart,
             "version": version
         };
+        if(batchname)inputs['batchname']=batchname
         const newExecIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "generateExecutionIds");
         if (newExecIds == "fail") return "fail";
         execIds.batchid = newExecIds.batchid;
@@ -225,6 +229,7 @@ class TestSuiteExecutor {
             "testscenarioid": scenarioId,
             "browser": browserType,
             "status": reportData.overallstatus[0].overallstatus,
+            "overallstatus": reportData.overallstatus[0],
             "report": JSON.stringify(reportData),
             "modifiedby": userInfo.invokinguser,
             "modifiedbyrole": userInfo.invokinguserrole,
@@ -347,7 +352,7 @@ class TestSuiteExecutor {
                     if (!status) { // This block is for report data
                         if ("accessibility_reports" in resultData) {
                             const accessibility_reports = resultData.accessibility_reports
-                            accessibility_testing.saveAccessibilityReports(accessibility_reports);
+                            reports.saveAccessibilityReports(accessibility_reports);
                         }
                         if (resultData.report_type != "accessiblityTestingOnly") reportType = "functionalTesting";
                         const scenarioid = resultData.scenarioId;
@@ -453,8 +458,7 @@ class TestSuiteExecutor {
         if (executionRequest == "fail") return "fail";
         if (executionRequest == "gitfail") return "gitfail";
         if (executionRequest == "empty") return "empty";
-        const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser, executionRequest.version);
-        if (currExecIds == "fail") return "fail";
+        const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser, executionRequest.version, executionRequest.batchname, executionRequest.smart);        if (currExecIds == "fail") return "fail";
         executionRequest.batchId = currExecIds.batchid;
         executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
         if (execType == "SCHEDULE") executionRequest.scheduleId = batchExecutionData.scheduleId;

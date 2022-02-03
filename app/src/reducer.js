@@ -8,7 +8,6 @@ import pluginReducer from './pages/plugin/state/reducer.js';
 import mindmapReducer from './pages/mindmap/state/reducer.js';
 import scrapeReducer from './pages/scrape/state/reducer.js';
 import designReducer from './pages/design/state/reducer.js';
-import reportReducer from './pages/report/state/reducer.js';
 import integrationReducer from './pages/integration/state/reducer.js';
 import utilityReducer from './pages/utility/state/reducer.js';
 
@@ -37,7 +36,6 @@ export const rootReducer = combineReducers({
     plugin : pluginReducer,
     scrape : scrapeReducer,
     design : designReducer,
-    report: reportReducer,
     integration: integrationReducer,
     utility: utilityReducer
 });
