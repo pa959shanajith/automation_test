@@ -145,7 +145,7 @@ export const getKeywordList = (objectName, keywordList, appType, scriptData) => 
             break;
         case "@Action":
             keywords = Object.keys(keywordList.action);
-            selectedKeywordList = "a";
+            selectedKeywordList = "action";
             break;
         case "@Android_Custom":
             keywords = Object.keys(keywordList.Android_Custom);
