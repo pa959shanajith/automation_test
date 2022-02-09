@@ -104,7 +104,7 @@ class TestSuiteExecutor {
             "exec_env": batchData.executionEnv,
             "apptype": batchData.batchInfo == undefined? '' : batchData.batchInfo[0].appType,
             'batchname': batchData.batchInfo == undefined? '' : batchData.batchInfo[0].batchname,
-            "smart": batchData.type.includes('smart'),
+            "smart": batchData.type == undefined ? false : batchData.type.includes('smart'),
             "integration": batchData.integration,
             "scenarioFlag": batchData.scenarioFlag,
             "batchId": "",
