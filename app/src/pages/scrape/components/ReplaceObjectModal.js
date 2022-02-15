@@ -17,6 +17,7 @@ const ReplaceObjectModal = props => {
     const [errorMsg, setErrorMsg] = useState("");
     const [custNames, setCustNames] = useState([]);
     const [replacingCustNm, setReplacingCustNm] = useState([]);
+    const [replaceObjType, setReplaceObjType] = useState("same");
 
     useEffect(()=>{
         let tempScrapeList = {};
@@ -181,7 +182,15 @@ const ReplaceObjectModal = props => {
                 title="Replace Object"
                 content={
                     <div className="ss__replaceObjBody">
-                        <div   data-test="replaceObjectHeading" className="ss__ro_lbl ro__headerMargin">Please select the object type and then drag and drop the necessary objects to be replaced with the new objects</div>
+                        <label className="adminFormRadio">
+                            <input type="radio" checked={replaceObjType==="same"}  value="same" onChange={()=>{setReplaceObjType("same")}} />
+                            <span>Same Object Replacement</span>
+                        </label>
+                        <label className="adminFormRadio">
+                            <input type="radio" checked={replaceObjType==="cross"} value="cross" onChange={()=>{setReplaceObjType("cross")}} />
+                            <span>Cross Object Replacement</span>
+                        </label>
+                        <div  data-test="replaceObjectHeading" className="ss__ro_lbl ro__headerMargin">Please select the object type and then drag and drop the necessary objects to be replaced with the new objects</div>
                         <div className="ss__ro_lists">
                             <div data-test="replaceObjectScrapeObjectList" className="ss__ro_scrapeObjectList">
                                 <div  data-test="replaceObjectLabel" className="ss__ro_lbl ro__lblMargin">Scraped Objects</div>
@@ -191,7 +200,16 @@ const ReplaceObjectModal = props => {
                                             <div data-test="replaceObjectListContent" className="ro_listContent" id="roListId">
                                             <ScrollBar scrollId="roListId" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                                             <>
-                                            { (()=> selectedTag ? scrapedList[selectedTag] : allScraped)()
+                                            { replaceObjType === "same" && (()=> selectedTag ? scrapedList[selectedTag] : allScraped)()
+                                            .map((object, i) => {
+                                                let replaced = object.val in replace;
+                                                return (<div data-test="replaceObjectListItem" key={i} title={object.title} className={"ss__ro_listItem"+(replaced ? " ro_replaced" : "")} draggable={ replaced ? "false" : "true"} onDragStart={(e)=>onDragStart(e, object)}>
+                                                    {object.title}
+                                                </div>)
+                                            }) }
+                                            </>
+                                            <>
+                                            { replaceObjType === "cross" && (()=> selectedTag ? allScraped.filter(x => x['tag']!==selectedTag) : allScraped)()
                                             .map((object, i) => {
                                                 let replaced = object.val in replace;
                                                 return (<div data-test="replaceObjectListItem" key={i} title={object.title} className={"ss__ro_listItem"+(replaced ? " ro_replaced" : "")} draggable={ replaced ? "false" : "true"} onDragStart={(e)=>onDragStart(e, object)}>
@@ -249,7 +267,11 @@ const ReplaceObjectModal = props => {
                     </div>
                     <button data-test="showAll" onClick={onShowAllObjects}>Show All Objects</button>
                     <button data-test="unLink" onClick={onUnlink} disabled={!selectedItems.length}>Un-Map</button>
-                    <button data-test="submit" onClick={submitReplace}>Replace Objects</button>
+                    {replaceObjType == "same"?
+                    <>
+                        <button data-test="submit" onClick={submitReplace}>Replace Objects</button>
+                    </>:
+                    <button data-test="submit" onClick={()=>{}}>Replace Keywords</button>}
                 </>}
             />
         </div>
