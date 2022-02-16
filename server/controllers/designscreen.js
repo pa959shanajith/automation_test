@@ -200,6 +200,18 @@ exports.updateScreen_ICE = async (req, res) =>{
 	}
 };
 
+exports.fetchReplacedKeywords_ICE = async (req, res) => {
+	const fname = "fetchReplacedKeywords_ICE";
+	try{
+		logger.info("Inside UI service: "+fname);
+		var data = await utils.fetchData(req.body, "design/fetchReplacedKeywords", fname);
+		res.send(data);
+	} catch (exception){
+		logger.error("Error occured in designscreen/"+fname+":",exception);
+		res.status(500).send('fail');
+	}
+}
+
 exports.userObjectElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: userObjectElement_ICE");
