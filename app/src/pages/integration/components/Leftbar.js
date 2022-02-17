@@ -1,10 +1,10 @@
 import React, { Fragment} from 'react';
-import { ActionBar } from '../../global';
+import { ActionBar, Thumbnail } from '../../global';
 import  "../styles/Leftbar.scss";
 import { useDispatch ,useSelector } from 'react-redux';
 import * as actionTypes from '../state/action.js';
 
-const Leftbar = () => {
+const Leftbar = (props) => {
     const dispatch = useDispatch();
     const viewMappedFiles = useSelector(state=>state.integration.mappedScreenType);
     const screenType = useSelector(state=>state.integration.screenType);
@@ -15,7 +15,9 @@ const Leftbar = () => {
         if(iconType === "qTest" ) clickedScreen = "qTest";
         else if (iconType === "ALM") clickedScreen = "ALM";
         else if(iconType === "Zephyr") clickedScreen = "Zephyr";
-
+        else if(iconType === "Import") {
+            clickedScreen = "Zephyr";
+        }
         window.localStorage['integrationScreenType'] = clickedScreen;
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: clickedScreen });
         dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null });
@@ -118,7 +120,25 @@ const Leftbar = () => {
         )
     }
 
-    return <ActionBar upperContent={upperContent()} />;
+    const bottomContent=() => {
+        return(
+            <div className="ss__thumbnail">
+                {screenType === "Zephyr" ? 
+                <Fragment>
+                    <Thumbnail data-test="bottomContent" key="import_mappings" title="Import Mappings" tooltip="Import Mappings" img="static/imgs/ic-import-script.png" action={()=>callIconClick("Import")} disable={false}/>
+                </Fragment>
+                :null}
+            </div>
+
+        )
+    }
+
+    return (
+        <ActionBar 
+            upperContent={upperContent()}
+            bottomContent={screenType === "Zephyr"?bottomContent():null}
+        />
+    )
 }
 
 export default Leftbar
