@@ -204,7 +204,7 @@ exports.fetchReplacedKeywords_ICE = async (req, res) => {
 	const fname = "fetchReplacedKeywords_ICE";
 	try{
 		logger.info("Inside UI service: "+fname);
-		var data = await utils.fetchData(req.body, "design/fetchReplacedKeywords", fname);
+		var data = await utils.fetchData(req.body, "design/fetchReplacedKeywords_ICE", fname);
 		res.send(data);
 	} catch (exception){
 		logger.error("Error occured in designscreen/"+fname+":",exception);
