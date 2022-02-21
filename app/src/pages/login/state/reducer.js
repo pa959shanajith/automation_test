@@ -2,7 +2,66 @@ import * as actionTypes from './action';
 
 const initialState = {
     SR: "",
-    userinfo: {},
+    // userinfo: {},
+    userinfo: {
+        "user_id": "5fd99d219580352a597aff81",
+        "username": "priyanka.r",
+        "email_id": "vivek.sharma@slkgroup.com",
+        "additionalrole": ["5db0022cf87fdec084ae49ab", "5db0022cf87fdec084ae49ac"],
+        "firstname": "Vivek",
+        "lastname": "Sharma",
+        "role": "5db0022cf87fdec084ae49aa",
+        "taskwflow": false,
+        "token": "720",
+        "dbuser": true,
+        "ldapuser": false,
+        "samluser": false,
+        "openiduser": false,
+        "rolename": "Test Lead",
+        "pluginsInfo": [
+          {
+            "pluginName": "Integration",
+            "pluginValue": true
+          },
+          {
+            "pluginName": "APG",
+            "pluginValue": false
+          },
+          {
+            "pluginName": "Dashboard",
+            "pluginValue": false
+          },
+          {
+            "pluginName": "Mindmap",
+            "pluginValue": true
+          },
+          {
+            "pluginName": "Neuron Graphs",
+            "pluginValue": false
+          },
+          {
+            "pluginName": "Performance Testing",
+            "pluginValue": false
+          },
+          {
+            "pluginName": "Reports",
+            "pluginValue": true
+          },
+          {
+            "pluginName": "Utility",
+            "pluginValue": true
+          },
+          {
+            "pluginName": "Webocular",
+            "pluginValue": false
+          },
+          {
+            "pluginName": "Placeholder",
+            "pluginValue": false
+          }
+        ],
+        "page": "plugin"
+    },
     socket:undefined,
     notify:{data:[],unread:0},
     dateformat:"DD-MM-YYYY"

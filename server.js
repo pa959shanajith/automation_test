@@ -26,21 +26,21 @@ process.env.nullpool = "5fc13ea772142998e29b5e64";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
 
-if (cluster.isMaster) {
-	cluster.fork();
-	cluster.on('disconnect', function(worker) {
-		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
-	});
-	cluster.on('message', function(worker, msg) {
-		if (msg == "noRespawn") worker.noRespawn = true;
-	});
-	cluster.on('exit', function(worker) {
-		if (worker.noRespawn !== true) {
-			logger.error('Worker %d is killed!', worker.id);
-			cluster.fork();
-		}
-	});
-} else
+// if (cluster.isMaster) {
+// 	cluster.fork();
+// 	cluster.on('disconnect', function(worker) {
+// 		logger.error('Avo Assure server has encountered some problems, Disconnecting!');
+// 	});
+// 	cluster.on('message', function(worker, msg) {
+// 		if (msg == "noRespawn") worker.noRespawn = true;
+// 	});
+// 	cluster.on('exit', function(worker) {
+// 		if (worker.noRespawn !== true) {
+// 			logger.error('Worker %d is killed!', worker.id);
+// 			cluster.fork();
+// 		}
+// 	});
+// } else
 {
 	try {
 		var express = require('express');
@@ -159,6 +159,22 @@ if (cluster.isMaster) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
 			}
+			if (!req.session.username) {
+				req.session.username = "priyanka.r"; // CHANGE HERE (optional)
+				req.session.uniqueId = "vm-eH5lLa-76Ka-F2Y6aTZJsqW_KmHAo";
+				req.session.usertype = "inhouse";
+				req.session.logged = false;
+				req.session.userid = "5fd99d219580352a597aff81"; // CHANGE HERE
+				req.session.ip = "0.0.0.0";
+				req.session.loggedin = "2020-08-10T15:21:03.472Z";
+				req.session.defaultRoleId = "5db0022cf87fdec084ae49aa";
+				req.session.activeRoleId = "5db0022cf87fdec084ae49aa";
+				req.session.emailid = "vivek.sharma@slkgroup.com";
+				req.session.additionalroles = ["5db0022cf87fdec084ae49ab", "5db0022cf87fdec084ae49ac"];
+				req.session.firstname = "vivek"; // CHANGE HERE (optional)
+				req.session.lastname = "sharma"; // CHANGE HERE (optional)
+				req.session.activeRole = req.session.defaultRole = "Test Lead";
+			}
 			return next();
 		});
 
@@ -214,12 +230,12 @@ if (cluster.isMaster) {
 		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
 
-		app.use(csrf({
-			cookie: true
-		}));
+		// app.use(csrf({
+		// 	cookie: true
+		// }));
 
 		app.all('*', function(req, res, next) {
-			res.cookie('XSRF-TOKEN', req.csrfToken(), {httpOnly: false, sameSite:true, secure: true})
+			// res.cookie('XSRF-TOKEN', req.csrfToken(), {httpOnly: false, sameSite:true, secure: true})
 			next();
 		});
 
