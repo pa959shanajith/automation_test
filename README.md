@@ -1,50 +1,47 @@
-Date: 24 Jan 2022
-* Updated node modules - Added module `jsonwebtoken@8.5.1`, Removed `wkhtmltopdf@0.3.4`
+# Avo Assure Version 2.0 UI
 
-Date: 11 Aug 2021
-* Updated node modules - Added module `axios@0.21.1` `client-oauth2@4.3.3`
+Webserver Component of Avo Assure V2.0.
 
-Date: 11 May 2021
-* Updated node modules - Upgraded `socket.io@3.1.2`
+## Configuration
 
-Date: 05 Feb 2021
-* Updated node modules - Added module `csurf@1.11.0` `randexp@0.5.3`, Upgraded `npm@6.14.11`
+These instructions will help setting up the project and running on a local machine for development and testing purposes.
 
-Date: 06 Nov 2020
-* Updated node modules - Added module `archiver@5.0.2`
+### Prerequisites
 
-Date: 06 Nov 2020
-* Updated node modules - Added module `express-handlebars@5.2.0` `nodemailer@6.4.14` `nodemailer-express-handlebars@4.0.0`, Upgraded `npm@6.14.8`
+* Clone and Run [AvoAssureDB](https://10.41.31.131/nineteen68v2.0/db) DB
+* Clone and Run [CacheDB](ssh://slklocal@10.41.31.52:/home/slklocal/Nineteen68BnR/redis.git) DB
+* Clone and Run [Mindmaps](https://10.41.31.131/nineteen68v2.0/Mindmap_DB) DB(Neo4j)
+* Clone and Run [LicenseServer](https://10.41.31.131/nineteen68v2.0/licenseserver) API
+* Clone and Run [DAS](https://10.41.31.131/nineteen68v2.0/ndac) API
 
-Date: 14 Jul 2020
-* Updated Node version to 12.18.2
-* Updated node modules and package.json
 
-Date: 06 Feb 2020
-* Updated node modules - Removed module `cassandra-driver`
+### Setup
 
-Date: 06 Feb 2020
-* Added `wkhtmltox` binaries in assets
+* Clone this repository
+* Clone [UINodeModules.git](ssh://slklocal@10.41.31.52:/home/slklocal/Nineteen68BnR/UINodeModules.git) repository and place `node modules folder`, `node.exe` and `npm.cmd` files inside the source(`ui`) folder.
+* Open the `config.json` file in `config` folder within `server` folder.
+* Update `screenShot_PathName`: Value should be, shared location in the server where the screenshots are stored. For local setup, provide a folder where screenshots should be saved.
+    * ```default```: Shared location corresponding to windows systems
+    * ```mac```: Shared location corresponding to mac systems
+* Open the `.env` file present in the source folder.
+* Update the value of `ENV` variable to `DEV` / `TEST` / `PROD` accrodingly.
+* Update the `DAS_IP` and `CACHEDB_IP` variables with the `IPs` on which DAS and CacheDB are running.
+* To start the server:
+    * **In Normal Mode:** ```npm start```
+    * **In Windows Service Mode:** ***(name of the service: avoassure_web_server)***
+        * to install service and start: ```npm run service```
+        * to start (for an already installed service): ```npm run service start```
+        * to stop: ```npm run service stop```
+        * to uninstall: ```npm run service uninstall```
+        
 
-Date: 12 Jul 2019
-* Updated node modules - Upgraded `socket.io@2.2.0`
+## Built with
+* [Node JS](https://nodejs.org/) :  Web Server
+* [Express JS](https://expressjs.com/) : Web framework
+* [Angular JS](https://angularjs.org/) : UI component framework
+* [Bootstrap](https://getbootstrap.com/) : UI design library
+* **Specific Plugins**: d3.v3.min.js, dtree.m.scrapper.js, jquery.blockUI.js, jquery.jqGrid.min.js, jquery.mask.js, loading-bar.js, scroll.js
 
-Date: 27 Jun 2019
-* Updated node modules - Added module `xmldom@0.1.271` `bcryptjs`, Upgraded `npm@6.9.0`, Removed `bcrypt`
+## License
 
-Date: 13 May 2019
-* Updated node modules - Added module `excel4node@1.7.2`
-
-Date: 02 May 2019
-* Updated node modules - Added module `uuid-token-generator`
-
-Date: 30 Apr 2019
-* Updated Node version to 10.15.3
-* Updated node modules and package.json
-
-Date: 19 Sep 2017
-* Updated node modules
-
-Date: 19 Dec 2017
-*Updated Node version to 8.9.1
-*Updated node modules and package.json
+Copyright © 2020 Avo Automation. All Rights Reserved.
