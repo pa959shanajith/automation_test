@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG, setMsg, AnimatePageWrapper, AnimateDiv } from '../../global';
 import { tagListToReplace } from './ListVariables';
-import { updateScreen_ICE } from '../api';
+import { updateScreen_ICE, fetchReplacedKeywords_ICE } from '../api';
 import "../styles/ReplaceObjectModal.scss";
 import PropTypes from 'prop-types'
 import { Icon } from "@fluentui/react"
@@ -369,6 +369,7 @@ const ReplaceObjectModal = props => {
                                             arg.objMap[replacing[val][0].objId] = replacing[val][0].tag;
                                         }
                                     }
+                                    fetchReplacedKeywords_ICE(arg);
                                     setErrorMsg("");
                                     setActiveTab("keywordsReplacement") }}>Replace Keywords</button>}
                         </>) :
