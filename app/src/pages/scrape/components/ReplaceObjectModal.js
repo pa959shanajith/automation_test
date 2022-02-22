@@ -7,48 +7,58 @@ import PropTypes from 'prop-types'
 import { Icon } from "@fluentui/react"
 
 const RenderGroupItem = (props) =>{
-    const {oldObjName,newObjName,itemList,COKMap,stateUpdate} = props;
+    const {oldObj,newObj,keywords,newkeywords,COKMap,stateUpdate,replace,val,setReplace,saveGroupItem} = props;
     const [expanded,setExpanded] =  useState(false);
     const handleSelectChange = (e,keyword) =>{
-        if (e.target.value ) e.target.classList.remove("group__selectError")
+        if (e.target.value ) e.target.classList.remove("r-group__selectError")
         else return
-        if (!COKMap[oldObjName]){
-            COKMap[oldObjName] = {
+        if (!COKMap[oldObj.objId]){
+            COKMap[oldObj.objId] = {
                "keywordMap":{
                  [keyword]:e.target.value
                }
             }
         }
         else{
-            COKMap[oldObjName]["keywordMap"][keyword] = e.target.value;
+            COKMap[oldObj.objId]["keywordMap"][keyword] = e.target.value;
         }
         stateUpdate(COKMap);
     }
+    
     return (
             <div className='r-group__container'>
                 <div className="r-group__header">
                     <button className='r-group__expandButton' onClick={()=>{setExpanded(!expanded)}}><Icon iconName='chevron-right' styles={{root:{display:"flex",justifyContent:"center", height:"10px",transform: expanded?"rotate(90deg)":"rotate(0deg)", transition:"0.5s"}}} ></Icon></button>
                     <div className='r-header__mid'>
-                        <span title={oldObjName} className="r-header__objNames">{oldObjName}</span>
-                        <span title={newObjName} className="r-header__objNames">{newObjName}</span>
+                        <span title={oldObj.title} className="r-header__objNames">{oldObj.title}</span>
+                        <span title={newObj.title} className="r-header__objNames">{newObj.title}</span>
                     </div>
-                    <button className='r-group__saveButton' data-test="Save" onClick={()=>{}}>Save</button>
+                    <button className='r-group__saveButton' data-test="Save" onClick={()=>{
+                        if(!COKMap[oldObj.objId] || Object.keys(COKMap[oldObj.objId]["keywordMap"]).length !== keywords.length){
+                            return
+                        }
+
+                        // api call here
+                        // props.setShow(false);
+                        saveGroupItem(oldObj.objId,COKMap[oldObj.objId]["keywordMap"],newObj,val)
+                        
+                    }}>Save</button>
                 </div>
                 <div style={{display: expanded?"flex":"none",width:"100%",flex:1,flexDirection:"column"}}>
-                    {itemList.map(((obj,idx)=>{
+                    {keywords.map(((k_word,idx)=>{
                         return (
                             <div key={idx} className="r-group__item">
                                 <div className='r-group__spacer'></div>
                                 <div className='r-drop__container'>
                                     <span style={{width:"40%"}}> 
-                                        <select className="r-group__select" value={obj.keyword} title={obj.keyword} disabled={true}>
-                                            <option key={obj.keyword+idx} value={obj.keyword}>{obj.keyword}</option>
+                                        <select className="r-group__select" value={k_word} title={k_word} disabled={true}>
+                                            <option key={k_word+idx} value={k_word}>{k_word}</option>
                                         </select>
                                     </span>
                                     <span style={{width:"40%"}}> 
-                                        <select className="r-group__select" defaultValue={""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,obj.keyword)}}  placeholder='Select keyword'>
+                                        <select className="r-group__select" defaultValue={""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}  placeholder='Select keyword'>
                                             <option key={"notSelected"} value={""} title={"Select keyword"} disabled>{"Select keyword"}</option>
-                                            { obj.keywordList && obj.keywordList.map((keyword, i) => <option key={keyword+i} title={keyword} value={keyword}>{keyword.slice(0,30) + (keyword.length>30?"...":"")}</option>) }
+                                            { newkeywords && newkeywords.map((keyword, i) => <option key={keyword+i} title={keyword} value={keyword}>{keyword.slice(0,30) + (keyword.length>30?"...":"")}</option>) }
                                         </select>
                                     </span>
                                 </div>
@@ -76,6 +86,7 @@ const ReplaceObjectModal = props => {
     const [activeTab, setActiveTab] = useState("ObjectReplacement");
     const [firstRender, setFirstRender] = useState(true);
     const [CrossObjKeywordMap, setCrossObjKeywordMap] = useState({});
+    const [CORData,setCORData] = useState({})
 
     useEffect(() => {
         setFirstRender(false);
@@ -235,6 +246,48 @@ const ReplaceObjectModal = props => {
         setSelectedItems(updatedSelectedItems);
     }
 
+    const saveGroupItem = (oldObjId, keywordMap, newObjData,val) =>{
+        let { screenId } = props.current_task;
+ 
+        let arg = {
+            screenId,
+            replaceObjList:{
+                oldObjId,
+                newKeywordsMap:keywordMap,
+                "newObjectData":newObjData,
+                testcaseIds:CORData[oldObjId]["testcasesids"],
+            },
+            param: "crossReplaceScrapeData"
+        }
+        updateScreen_ICE(arg)
+                .then(response => {
+                    if (response === "Invalid Session") return RedirectPage(props.history);
+                    if (response==="Success") {
+                        let rep = {...replace}
+                        delete rep[val];
+                        setReplace({...rep})
+                        setMsg(MSG.SCRAPE.SUCC_OBJ_REPLACED)
+                        delete CrossObjKeywordMap[oldObjId]
+                    }
+                    
+                    // props.fetchScrapeData()
+                    //     .then(resp => {
+                    //         if (resp === "success") {
+                    //             props.setShow(false);
+                    //             setMsg(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
+                    //         }
+                    //         else setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                    //     })
+                    //     .catch(err => {
+                    //         setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                    //     });
+                })
+                .catch(error => {
+                    setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                    console.err(error);
+                })
+    }
+
         
     return (
         <div data-test="replaceObject" className="ss__replaceObj">
@@ -329,8 +382,14 @@ const ReplaceObjectModal = props => {
                             <AnimateDiv key={`${activeTab}-1`}>
                                 <div className='ss__ro_lbl'>Please map the keywords of old objects with the new objects</div>
                                     <div>
-                                        {<RenderGroupItem key={1} COKMap={CrossObjKeywordMap} stateUpdate={setCrossObjKeywordMap} oldObjName="q_txtbox" newObjName="img_NONAME1_img" itemList={[{keyword:"setText",keywordList:["click","clearText"]},]}></RenderGroupItem>}
-                                        {<RenderGroupItem key={2} COKMap={CrossObjKeywordMap} stateUpdate={setCrossObjKeywordMap} oldObjName="btnK1_btn" newObjName="q_txtbox" itemList={[{keyword:"click",keywordList:["doubleClick","setFocus"]},{keyword:"doubleClick",keywordList:["click","setFocus"]}]}></RenderGroupItem>}
+                                        {Object.keys(replace).map((val_id,idx)=>{
+                                            return replace[val_id]?
+                                            <RenderGroupItem key={idx} replace={replace} val={val_id} setReplace={setReplace} COKMap={CrossObjKeywordMap} saveGroupItem={saveGroupItem} stateUpdate={setCrossObjKeywordMap} 
+                                            oldObj={replace[val_id][0]} newObj={replace[val_id][1]} keywords={CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords:[]} 
+                                            newkeywords={CORData[replace[val_id][0].objId]?Object.keys(CORData.keywordList[replace[val_id][1].tag]):[]}></RenderGroupItem>
+                                            :null
+                                        })}
+                                        {/* {<RenderGroupItem key={2} COKMap={CrossObjKeywordMap} stateUpdate={setCrossObjKeywordMap} oldObjName="btnK1_btn" newObjName="q_txtbox" itemList={[{keyword:"click",keywordList:["doubleClick","setFocus"]},{keyword:"doubleClick",keywordList:["click","setFocus"]}]}></RenderGroupItem>} */}
 
                                     </div>
                             </AnimateDiv>
@@ -366,12 +425,23 @@ const ReplaceObjectModal = props => {
                                     for (let val in replacing) {
 
                                         if (replacing[val]) {
-                                            arg.objMap[replacing[val][0].objId] = replacing[val][0].tag;
+                                            arg.objMap[replacing[val][0].objId] = replacing[val][1].tag;
                                         }
                                     }
-                                    fetchReplacedKeywords_ICE(arg);
-                                    setErrorMsg("");
-                                    setActiveTab("keywordsReplacement") }}>Replace Keywords</button>}
+                                    fetchReplacedKeywords_ICE(arg).then((res)=>{
+                                        if(!(res==="fail")){
+                                            setCORData(res)
+                                            setErrorMsg("");
+                                            setActiveTab("keywordsReplacement")
+                                        }
+                                        else {
+                                            setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                                        }
+                                    }).catch((err)=>{
+                                        console.log(err)
+                                        setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                                    });
+                                     }}>Replace Keywords</button>}
                         </>) :
                         (<>
                             <button data-test="go-back" onClick={() => setActiveTab("ObjectReplacement")}>Go Back</button>

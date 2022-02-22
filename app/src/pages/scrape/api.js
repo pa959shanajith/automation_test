@@ -123,7 +123,7 @@ export const fetchReplacedKeywords_ICE = arg => {
                 'Content-type' : 'application/json'
             },
             data : { 
-                data: arg
+                ...arg
             },
             credentials : 'include',
         })
