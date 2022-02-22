@@ -35,13 +35,10 @@ const RenderGroupItem = (props) =>{
                     </div>
                     <button className='r-group__saveButton' data-test="Save" onClick={()=>{
                         if(!COKMap[oldObj.objId] || Object.keys(COKMap[oldObj.objId]["keywordMap"]).length !== keywords.length){
+                            setMsg({"CONTENT":"Please replace all the keywords of object.","VARIANT":"error"})
                             return
                         }
-
-                        // api call here
-                        // props.setShow(false);
                         saveGroupItem(oldObj.objId,COKMap[oldObj.objId]["keywordMap"],newObj,val)
-                        
                     }}>Save</button>
                 </div>
                 <div style={{display: expanded?"flex":"none",width:"100%",flex:1,flexDirection:"column"}}>
@@ -269,21 +266,12 @@ const ReplaceObjectModal = props => {
                         setMsg(MSG.SCRAPE.SUCC_OBJ_REPLACED)
                         delete CrossObjKeywordMap[oldObjId]
                     }
-                    
-                    // props.fetchScrapeData()
-                    //     .then(resp => {
-                    //         if (resp === "success") {
-                    //             props.setShow(false);
-                    //             setMsg(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
-                    //         }
-                    //         else setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                    //     })
-                    //     .catch(err => {
-                    //         setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                    //     });
+                    else {
+                        setMsg(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
+                    }
                 })
                 .catch(error => {
-                    setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                    setMsg(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
                     console.err(error);
                 })
     }
@@ -383,20 +371,34 @@ const ReplaceObjectModal = props => {
                                 <div className='ss__ro_lbl'>Please map the keywords of old objects with the new objects</div>
                                     <div>
                                         {Object.keys(replace).map((val_id,idx)=>{
+                                            let tag = ""
+                                            if(replace[val_id])
+                                                tag = tagListToReplace.includes(replace[val_id][1].tag) ? replace[val_id][1].tag : 'element'
                                             return replace[val_id]?
                                             <RenderGroupItem key={idx} replace={replace} val={val_id} setReplace={setReplace} COKMap={CrossObjKeywordMap} saveGroupItem={saveGroupItem} stateUpdate={setCrossObjKeywordMap} 
                                             oldObj={replace[val_id][0]} newObj={replace[val_id][1]} keywords={CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords:[]} 
-                                            newkeywords={CORData[replace[val_id][0].objId]?Object.keys(CORData.keywordList[replace[val_id][1].tag]):[]}></RenderGroupItem>
+                                            newkeywords={CORData[replace[val_id][0].objId]?Object.keys(CORData.keywordList[tag]):[]}
+                                            ></RenderGroupItem>
                                             :null
                                         })}
-                                        {/* {<RenderGroupItem key={2} COKMap={CrossObjKeywordMap} stateUpdate={setCrossObjKeywordMap} oldObjName="btnK1_btn" newObjName="q_txtbox" itemList={[{keyword:"click",keywordList:["doubleClick","setFocus"]},{keyword:"doubleClick",keywordList:["click","setFocus"]}]}></RenderGroupItem>} */}
-
                                     </div>
                             </AnimateDiv>
                         }
                     </AnimatePageWrapper>
                 }
-                close={() => props.setShow(false)}
+                close={() => {
+                    props.fetchScrapeData()
+                    .then(resp => {
+                        if (resp === "success") {
+                            setMsg(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
+                        }
+                        else setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                    })
+                    .catch(err => {
+                        setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                    }); 
+                    props.setShow(false)
+                }}
                 footer={<>
                     <div className="ro_errorMsgContainer">
                         {errorMsg && <span data-test="errorMessage" className="ro_errorMsg">{errorMsg}</span>}
@@ -423,9 +425,9 @@ const ReplaceObjectModal = props => {
 
                                     let replacing = { ...replace };
                                     for (let val in replacing) {
-
                                         if (replacing[val]) {
-                                            arg.objMap[replacing[val][0].objId] = replacing[val][1].tag;
+                                            let tag =  tagListToReplace.includes(replacing[val][1].tag) ? replacing[val][1].tag : 'element'
+                                            arg.objMap[replacing[val][0].objId] = tag;
                                         }
                                     }
                                     fetchReplacedKeywords_ICE(arg).then((res)=>{
@@ -444,7 +446,7 @@ const ReplaceObjectModal = props => {
                                      }}>Replace Keywords</button>}
                         </>) :
                         (<>
-                            <button data-test="go-back" onClick={() => setActiveTab("ObjectReplacement")}>Go Back</button>
+                            {/* <button data-test="go-back" onClick={() => setActiveTab("ObjectReplacement")}>Go Back</button> */}
                         </>)}
                 </>}
             />

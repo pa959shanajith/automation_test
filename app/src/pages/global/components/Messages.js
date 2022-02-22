@@ -361,6 +361,7 @@ const Messages={
         ERR_UPDATE_IRIS: {"CONTENT":"Failed to updated IRIS Object Details.", "VARIANT": VARIANT.ERROR},
         ERR_MAPPED_SCRAPE: {"CONTENT":"Mapping scrape data failed..", "VARIANT": VARIANT.ERROR},
         ERR_REPLACE_SCRAPE: {"CONTENT":"Scrape Data Replace Failed.", "VARIANT": VARIANT.ERROR},
+        ERR_REPLACE_OBJECT_FAILED:{"CONTENT":"Failed to replace object.", "VARIANT":VARIANT.ERROR},
         ERR_HIGHLIGHT: {"CONTENT":"Failed to highlight.", "VARIANT": VARIANT.ERROR},
         ERR_SCRAPE: {"CONTENT":"Failed to scrape.", "VARIANT": VARIANT.ERROR},
         ERR_SCRAPE_TERMINATE: {"CONTENT":"Scrape Terminated.", "VARIANT": VARIANT.ERROR},
