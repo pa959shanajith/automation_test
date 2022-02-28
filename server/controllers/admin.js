@@ -2380,6 +2380,72 @@ exports.manageJiraDetails = async (req, res) => {
 	}
 };
 
+// /* get Zephyr Details */
+exports.getDetails_Zephyr = async (req, res) => {
+	const actionName = "getDetails_Zephyr";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const userId = req.session.userid;
+		let inputs = {
+			"userId": userId
+		};
+		const result = await utils.fetchData(inputs, "admin/getDetails_Zephyr", actionName);
+
+		if (result === "fail") res.status(500).send("fail");
+		else if (result === "empty") res.send("empty");
+		else {
+			let data = {
+				zephyrURL: result['url'],
+				zephyrUsername: result['username'],
+				zephyrToken: result['token'],
+				zephyrPassword: result['password']
+			};
+			return res.send(data);
+		}
+	} catch (exception) {
+		logger.error("Exception in the service getDetails_Zephyr: %s", exception);
+		return res.status(500).send("fail");
+	}
+
+};
+
+/* manageZephyrDetails */
+exports.manageZephyrDetails = async (req, res) => {
+	const actionName = "manageZephyrDetails";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = req.session.userid;
+		const action = data.action;
+		let result;
+		if(action==='delete'){
+			let inputs = {
+				"userId": userId,
+				"action":action
+			}
+			result = await utils.fetchData(inputs, "admin/manageZephyrDetails", actionName);
+		}else{
+			console.log(data.user);
+			const zephyrUrl = data.user.zephyrUrl;
+			const zephyrUsername = data.user.zephyrUsername;
+			const zephyrPassword = data.user.zephyrPassword;
+			const zephyrToken = data.user.zephyrToken;
+			let inputs = {
+				"userId": userId,
+				"zephyrUrl": zephyrUrl,
+				"zephyrUsername": zephyrUsername,
+				"zephyrPassword": zephyrPassword,
+				"zephyrToken": zephyrToken,
+				"action": action
+			};
+			result = await utils.fetchData(inputs, "admin/manageZephyrDetails", actionName);
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error("Exception in the service gitSaveConfig: %s", exception);
+		return res.status(500).send("fail");
+	}
+};
 
 exports.getNotificationGroups = async(req,res) => {
 	const fnName = "getNotificationGroups"

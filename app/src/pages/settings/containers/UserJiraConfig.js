@@ -7,7 +7,7 @@ import { getDetails_JIRA, manageJiraDetails } from '../api'
 import classes from '../styles/UserJiraConfig.module.scss'
 
 /*Component UserJiraConfig
-  use: Settings middle screen for User Jira Configeration. 
+  use: Settings middle screen for User Jira Configuration. 
   props: resetMiddleScreen and setMiddleScreen
 */
 
@@ -62,7 +62,7 @@ const UserJiraConfig = (props) => {
                 return;
             }
             setCreateJira(false);
-            setMsg(MSG.CUSTOM(`The JIRA configeration was successfully ${action}d!!`, VARIANT.SUCCESS));
+            setMsg(MSG.CUSTOM(`The JIRA configuration was successfully ${action}d!!`, VARIANT.SUCCESS));
            getJiraDetails();
         }catch(e){
             setMsg(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
@@ -103,7 +103,7 @@ const UserJiraConfig = (props) => {
         <>
             {showDelete? <JiraDeleteModal confirmDelete={()=>{setShowDelete(false); manageDetails('delete', {});}} cancelDelete={()=>{setShowDelete(false);}} />: null}
             {loading ? <ScreenOverlay content={loading} /> : null}
-            <Header heading="Jira Configeration" />
+            <Header heading="Jira Configuration" />
             <form onSubmit={SubmitHandler} className={classes["jira-form"]}>
                 <div className={classes["action-div"]}>
                     <button data-test="main-button-test" type="submit" className={classes["action-button"]}>{createJira?'Create':'Update'}</button>
