@@ -25,7 +25,7 @@ const MappedLabel = props => {
                         <i onClick={()=>setInfo(true)} className="fa fa-info" title="Requirement mapping info" aria-hidden="true" style={{fontSize:'15px',margin:'3px',color:'#633691',cursor:'pointer'}}/>:null
                     }
                     { props.selected.includes(`${props.mapIdx}-0`) && !props.unSynced &&
-                        <button><img className="mlalm__syncBtn" alt="s-ic" title="Undo" onClick={props.handleUnSync ? ()=>props.handleUnSync(props.type) : null} src="static/imgs/ic-qcUndoSyncronise.png" /></button>
+                        <button><img className="mlalm__syncBtn" alt="s-ic" title="UnSync" onClick={props.handleUnSync ? ()=>props.handleUnSync(props.type) : null} src="static/imgs/ic-qcUndoSyncronise.png" /></button>
                     }
                     { typeof(props.list) === "object" && props.list.length>1 && <button onClick={()=>{setShow(!show); updateScrollBar()}}>
                         <img alt="mappedScrArrow" src={`static/imgs/alm_arrow_${show?"up":"down"}.svg`}/>
@@ -39,8 +39,9 @@ const MappedLabel = props => {
                             >
                                 {item}
                             </div>
+                            {/* put info here */}
                             { props.selected.includes(`${props.mapIdx}-${idx+1}`) && !props.unSynced &&
-                                <button><img className="mlalm__syncBtn" alt="s-ic" title="Undo" onClick={props.handleUnSync ? ()=>props.handleUnSync(props.type) : null} src="static/imgs/ic-qcUndoSyncronise.png" /></button>
+                                <button><img className="mlalm__syncBtn" alt="s-ic" title="UnSync" onClick={props.handleUnSync ? ()=>props.handleUnSync(props.type) : null} src="static/imgs/ic-qcUndoSyncronise.png" /></button>
                             }
                         </div>
                     )
