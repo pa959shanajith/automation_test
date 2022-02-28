@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 import { Icon } from "@fluentui/react"
 
 const RenderGroupItem = (props) =>{
-    const {oldObj,newObj,keywords,newkeywords,COKMap,stateUpdate,replace,val,setReplace,saveGroupItem} = props;
+    const {oldObj,newObj,keywords,newkeywords,COKMap,stateUpdate,val,saveGroupItem} = props;
     const [expanded,setExpanded] =  useState(false);
     const handleSelectChange = (e,keyword) =>{
         if (e.target.value ) e.target.classList.remove("r-group__selectError")
@@ -34,11 +34,14 @@ const RenderGroupItem = (props) =>{
                         <span title={newObj.title} className="r-header__objNames">{newObj.title}</span>
                     </div>
                     <button className='r-group__saveButton' data-test="Save" onClick={()=>{
-                        if(!COKMap[oldObj.objId] || Object.keys(COKMap[oldObj.objId]["keywordMap"]).length !== keywords.length){
+                        if(keywords.length>0 && (!COKMap[oldObj.objId] || Object.keys(COKMap[oldObj.objId]["keywordMap"]).length !== keywords.length)){
                             setMsg({"CONTENT":"Please replace all the keywords of object.","VARIANT":"error"})
                             return
                         }
-                        saveGroupItem(oldObj.objId,COKMap[oldObj.objId]["keywordMap"],newObj,val)
+                        if(keywords.length>0 )
+                            saveGroupItem(oldObj.objId,COKMap[oldObj.objId]["keywordMap"],newObj,val)
+                        else                             
+                            saveGroupItem(oldObj.objId,[],newObj,val)
                     }}>Save</button>
                 </div>
                 <div style={{display: expanded?"flex":"none",width:"100%",flex:1,flexDirection:"column"}}>
@@ -53,7 +56,7 @@ const RenderGroupItem = (props) =>{
                                         </select>
                                     </span>
                                     <span style={{width:"40%"}}> 
-                                        <select className="r-group__select" defaultValue={""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}  placeholder='Select keyword'>
+                                        <select className="r-group__select" defaultValue={""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}>
                                             <option key={"notSelected"} value={""} title={"Select keyword"} disabled>{"Select keyword"}</option>
                                             { newkeywords && newkeywords.map((keyword, i) => <option key={keyword+i} title={keyword} value={keyword}>{keyword.slice(0,30) + (keyword.length>30?"...":"")}</option>) }
                                         </select>
@@ -119,6 +122,14 @@ const ReplaceObjectModal = props => {
         }
         setScrapedList(tempScrapeList);
     }, [])
+
+    useEffect(()=>{
+        if(activeTab==="keywordsReplacement"){
+            if(!document.querySelector(".r-group__container")){
+                _handleModalClose()
+            }
+        }
+    },[replace])
 
     const onDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))
 
@@ -244,39 +255,102 @@ const ReplaceObjectModal = props => {
     }
 
     const saveGroupItem = (oldObjId, keywordMap, newObjData,val) =>{
-        let { screenId } = props.current_task;
- 
-        let arg = {
-            screenId,
-            replaceObjList:{
-                oldObjId,
-                newKeywordsMap:keywordMap,
-                "newObjectData":newObjData,
-                testcaseIds:CORData[oldObjId]["testcasesids"],
-            },
-            param: "crossReplaceScrapeData"
-        }
-        updateScreen_ICE(arg)
-                .then(response => {
-                    if (response === "Invalid Session") return RedirectPage(props.history);
-                    if (response==="Success") {
-                        let rep = {...replace}
-                        delete rep[val];
-                        setReplace({...rep})
-                        setMsg(MSG.SCRAPE.SUCC_OBJ_REPLACED)
-                        delete CrossObjKeywordMap[oldObjId]
-                    }
-                    else {
-                        setMsg(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
-                    }
-                })
-                .catch(error => {
-                    setMsg(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
-                    console.err(error);
-                })
+        props.setShowPop({
+            'type': 'modal',
+            'title': 'Warning !',
+            'content': <div className="ss__dup_labels">
+                Do you want to update the object and all dependent testcases ?
+            </div>,
+            'footer': <button onClick={() => {
+                props.setShowPop("")
+                let { screenId } = props.current_task;
+
+                let arg = {
+                    screenId,
+                    replaceObjList:{
+                        oldObjId,
+                        newKeywordsMap:keywordMap,
+                        "newObjectData":newObjData,
+                        testcaseIds:!CORData[oldObjId] ? [] :CORData[oldObjId]["testcasesids"],
+                    },
+                    param: "crossReplaceScrapeData"
+                }
+                updateScreen_ICE(arg)
+                        .then(response => {
+                            if (response === "Invalid Session") return RedirectPage(props.history);
+                            if (response==="Success") {
+                                let rep = {...replace}
+                                delete rep[val];
+                                setReplace({...rep})
+                                setMsg(MSG.SCRAPE.SUCC_OBJ_TESTCASES_REPLACED)
+                                delete CrossObjKeywordMap[oldObjId]
+                            }
+                            else {
+                                setMsg(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
+                            }
+                        })
+                        .catch(error => {
+                            setMsg(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
+                            console.err(error);
+                        })
+
+            }}>OK</button>
+        })
     }
 
+    const _handleModalClose  = () =>{
+        props.fetchScrapeData()
+            .then(resp => {
+                if (resp === "success") {
+                    setMsg(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
+                }
+                else setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+            })
+            .catch(err => {
+                setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+            }); 
+        props.setShow(false)
+    }
+
+    const _handleReplaceKeywordClick = () =>{
+        if (!Object.keys(replace).length) {
+            setErrorMsg("Please select atleast one object to Replace");
+            return;
+        }
+        props.setOverlay("Fetching Keywords for selected objects...")
+
+        let { screenId,appType } = props.current_task;
         
+        let arg = {
+            screenId,    
+            appType,                                  
+            objMap: {},
+        };
+
+        let replacing = { ...replace };
+        for (let val in replacing) {
+            if (replacing[val]) {
+                let tag =  tagListToReplace.includes(replacing[val][1].tag) ? replacing[val][1].tag : 'element'
+                arg.objMap[replacing[val][0].objId] = tag;
+            }
+        }
+        fetchReplacedKeywords_ICE(arg).then((res)=>{
+            props.setOverlay(null)
+            if(!(res==="fail")){
+                setCORData(res)
+                setErrorMsg("");
+                setActiveTab("keywordsReplacement")
+            }
+            else {
+                setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+            }
+        }).catch((err)=>{
+            props.setOverlay(null)
+            console.log(err)
+            setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+        });
+    }
+    
     return (
         <div data-test="replaceObject" className="ss__replaceObj">
             <ModalContainer
@@ -315,15 +389,6 @@ const ReplaceObjectModal = props => {
                                                                             </div>)
                                                                         })}
                                                                 </>
-                                                                {/* <>
-                                                { replaceObjType === "cross" && (()=> selectedTag ? allScraped.filter(x => x['tag']!==selectedTag) : allScraped)()
-                                                .map((object, i) => {
-                                                    let replaced = object.val in replace;
-                                                    return (<div data-test="replaceObjectListItem" key={i} title={object.title} className={"ss__ro_listItem"+(replaced ? " ro_replaced" : "")} draggable={ replaced ? "false" : "true"} onDragStart={(e)=>onDragStart(e, object)}>
-                                                        {object.title}
-                                                    </div>)
-                                                }) }
-                                                </> */}
                                                             </ScrollBar>
                                                         </div>
                                                     </div>
@@ -369,35 +434,40 @@ const ReplaceObjectModal = props => {
                             </AnimateDiv> :
                             <AnimateDiv key={`${activeTab}-1`}>
                                 <div className='ss__ro_lbl'>Please map the keywords of old objects with the new objects</div>
-                                    <div>
+                                    <div style={{display:"flex",flexDirection:"column",flex:1,overflow:"auto", marginTop:"1rem"}}>
+                                    <ScrollBar thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" verticalbarWidth='8px'>
                                         {Object.keys(replace).map((val_id,idx)=>{
                                             let tag = ""
                                             if(replace[val_id])
                                                 tag = tagListToReplace.includes(replace[val_id][1].tag) ? replace[val_id][1].tag : 'element'
                                             return replace[val_id]?
-                                            <RenderGroupItem key={idx} replace={replace} val={val_id} setReplace={setReplace} COKMap={CrossObjKeywordMap} saveGroupItem={saveGroupItem} stateUpdate={setCrossObjKeywordMap} 
+                                            <RenderGroupItem key={idx} val={val_id} COKMap={CrossObjKeywordMap} saveGroupItem={saveGroupItem} stateUpdate={setCrossObjKeywordMap} 
                                             oldObj={replace[val_id][0]} newObj={replace[val_id][1]} keywords={CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords:[]} 
                                             newkeywords={CORData[replace[val_id][0].objId]?Object.keys(CORData.keywordList[tag]):[]}
                                             ></RenderGroupItem>
                                             :null
                                         })}
+                                    </ScrollBar>
                                     </div>
                             </AnimateDiv>
                         }
                     </AnimatePageWrapper>
                 }
                 close={() => {
-                    props.fetchScrapeData()
-                    .then(resp => {
-                        if (resp === "success") {
-                            setMsg(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
-                        }
-                        else setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                    })
-                    .catch(err => {
-                        setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                    }); 
-                    props.setShow(false)
+                    if(activeTab==="keywordsReplacement")
+                        props.setShowPop({
+                            'type': 'modal',
+                            'title': 'Warning !',
+                            'content': <div className="ss__dup_labels">
+                                You have unsaved items ! Do you still want to exit replacing objects ?
+                            </div>,
+                            'footer': <button onClick={() => {
+                                props.setShowPop("")
+                                _handleModalClose()
+                            }}>OK</button>
+                        })
+                    else
+                        _handleModalClose() 
                 }}
                 footer={<>
                     <div className="ro_errorMsgContainer">
@@ -409,41 +479,7 @@ const ReplaceObjectModal = props => {
                             <button data-test="unLink" onClick={onUnlink} disabled={!selectedItems.length}>Un-Map</button>
                             {replaceObjType == "same" ?
                                 <button data-test="submit" onClick={submitReplace}>Replace Objects</button>
-                                : <button data-test="submit" onClick={() => {
-                                    if (!Object.keys(replace).length) {
-                                        setErrorMsg("Please select atleast one object to Replace");
-                                        return;
-                                    }
-                            
-                                    let { screenId,appType } = props.current_task;
-                                    
-                                    let arg = {
-                                        screenId,    
-                                        appType,                                  
-                                        objMap: {},
-                                    };
-
-                                    let replacing = { ...replace };
-                                    for (let val in replacing) {
-                                        if (replacing[val]) {
-                                            let tag =  tagListToReplace.includes(replacing[val][1].tag) ? replacing[val][1].tag : 'element'
-                                            arg.objMap[replacing[val][0].objId] = tag;
-                                        }
-                                    }
-                                    fetchReplacedKeywords_ICE(arg).then((res)=>{
-                                        if(!(res==="fail")){
-                                            setCORData(res)
-                                            setErrorMsg("");
-                                            setActiveTab("keywordsReplacement")
-                                        }
-                                        else {
-                                            setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                                        }
-                                    }).catch((err)=>{
-                                        console.log(err)
-                                        setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                                    });
-                                     }}>Replace Keywords</button>}
+                                : <button data-test="submit" onClick={_handleReplaceKeywordClick}>Replace Keywords</button>}
                         </>) :
                         (<>
                             {/* <button data-test="go-back" onClick={() => setActiveTab("ObjectReplacement")}>Go Back</button> */}
@@ -459,7 +495,8 @@ ReplaceObjectModal.propTypes={
     fetchScrapeData:PropTypes.func,
     setShow:PropTypes.func,
     setShowPop:PropTypes.func,
-    newScrapedData:PropTypes.arrayOf(PropTypes.object)
+    newScrapedData:PropTypes.arrayOf(PropTypes.object),
+    setOverlay:PropTypes.func
 }
 export default ReplaceObjectModal;
 

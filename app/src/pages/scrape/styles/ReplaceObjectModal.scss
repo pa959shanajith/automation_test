@@ -198,7 +198,8 @@
     display:flex;
     flex:1;
     flex-direction:column;
-    width:100%;
+    margin-bottom: 1rem;
+    margin-right: 12px;
 }
 
 .r-group__expandButton {
@@ -242,7 +243,6 @@
     align-items: center;
     border: 1px solid #643693;
     border-radius: 5px;
-    margin-top: 1rem;
     padding-right: 5px;
     &:hover {
         background: rgb(243, 242, 241);
