@@ -12,12 +12,9 @@ const Leftbar = (props) => {
     const callIconClick = iconType => {
         let clickedScreen = null;
 
-        if(iconType === "qTest" ) clickedScreen = "qTest";
-        else if (iconType === "ALM") clickedScreen = "ALM";
-        else if(iconType === "Zephyr") clickedScreen = "Zephyr";
-        else if(iconType === "Import") {
-            clickedScreen = "Zephyr";
-        }
+        if(["qTest","ALM","Zephyr"].includes(iconType)) clickedScreen = iconType;
+        else if(iconType === "Import") clickedScreen = "Zephyr";
+        
         window.localStorage['integrationScreenType'] = clickedScreen;
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: clickedScreen });
         dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null });
