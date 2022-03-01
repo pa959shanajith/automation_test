@@ -124,10 +124,8 @@ const ReplaceObjectModal = props => {
     }, [])
 
     useEffect(()=>{
-        if(activeTab==="keywordsReplacement"){
-            if(!document.querySelector(".r-group__container")){
-                _handleModalClose()
-            }
+        if(activeTab==="keywordsReplacement" && !document.querySelector(".r-group__container")){
+            _handleModalClose()
         }
     },[replace])
 
