@@ -1,0 +1,29 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.status_error{
+    background-color:$red;
+}
+
+.import_popup_label{
+    margin-right: 5px;
+    // height : auto;
+    // label{
+        width: auto;
+        font-weight: 600;
+    // }
+}
+.import_popup_error_rows{
+    margin:18px;
+}
+
+.error_rows_label{
+    width:75%;
+    
+    float: right;
+    display: flex;
+}
+
+.import_map_status_modal{
+    width:100%;
+    height: 280px;
+}

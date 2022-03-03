@@ -75,6 +75,7 @@ const Zephyr = () => {
         else if (domainDetails) {
             setDomainDetails(domainDetails);
             setLoginSuccess(true);
+            dispatch({type: actionTypes.PROJECT_LIST, payload: domainDetails})
         } 
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ""});
     }
