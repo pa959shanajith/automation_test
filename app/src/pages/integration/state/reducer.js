@@ -10,6 +10,12 @@ const initialState = {
         selectedTSNames: [],
         selectedFolderPaths: []
     },
+    selectedZTCDetails: {
+        selectedTCPhaseId: [],
+        selectedTcId: [],
+        selectedTCNames: [],
+        selectedTCReqDetails:[]
+    },
     selectedTestCase: [],
     selectedScenarioIds: [],
     syncedTestCases: [],
@@ -49,7 +55,8 @@ const reducer = (state = initialState , action) => {
         case actionTypes.SEL_TC_DETAILS:
             return{
                 ...state,
-                selectedTCDetails: action.payload
+                selectedTCDetails: action.payload,
+                selectedZTCDetails: action.payload
             }
         case actionTypes.SEL_SCN_IDS:
             return{

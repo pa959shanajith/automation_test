@@ -80,9 +80,9 @@ const Zephyr = () => {
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ""});
     }
 
-    const callViewMappedFiles=async()=>{
+    const callViewMappedFiles=async(saveFlag)=>{
         try{
-            dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: saveFlag?'Updating...':'Fetching...'});
         
             const response = await api.viewZephyrMappedList_ICE(user_id);
             
@@ -92,10 +92,21 @@ const Zephyr = () => {
             } 
             else if (response.length){
                 dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "Zephyr" });
+                if (saveFlag) 
+                    setMsg(MSG.INTEGRATION.SUCC_SAVE);
                 setMappedFilesRes(response);
             }
-            else setMsg(MSG.INTEGRATION.WARN_NO_MAPPED_DETAILS);
+            else {
+                if (saveFlag) {
+                    dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
+                    setMsg(MSG.INTEGRATION.SUCC_SAVE);
+                } else {
+                    setMsg(MSG.INTEGRATION.WARN_NO_MAPPED_DETAILS);
+                }
+            }
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+
+            return response;
         }
         catch(err) {
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
@@ -120,6 +131,7 @@ const Zephyr = () => {
                 leftBoxTitle="Zephyr Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 mappedfilesRes={mappedfilesRes}
+                fetchMappedFiles={callViewMappedFiles}
             /> 
         }
         { viewMappedFlies ===null && !loginSuccess && 

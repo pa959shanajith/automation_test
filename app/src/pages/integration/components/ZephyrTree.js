@@ -336,15 +336,48 @@ const PhaseNode = props => {
 const TestCaseNode = props => {
 
     const dispatch = useDispatch();
+    const selectedZTCDetails = useSelector(state=>state.integration.selectedZTCDetails);
     const selectedTC = useSelector(state=>state.integration.selectedTestCase);
     const syncedTestCases = useSelector(state=>state.integration.syncedTestCases);
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
 
-    let uniqueTCpath = `|${props.phaseId}\\${props.testCase.id}|`;
+    let uniqueTCpath = `|${props.phaseId}\\${props.testCase.id}\\${props.testCase.name}|`;
 
-    const handleClick = () => {
-        dispatch({type: actionTypes.SEL_TC, payload: uniqueTCpath});
+    const handleClick = e => {
+        let newSelectedTCDetails = { ...selectedZTCDetails };
+        let newSelectedTC = [...selectedTC];
+
+        if (!e.ctrlKey) {
+            newSelectedTCDetails.selectedTCPhaseId = [props.phaseId];
+            newSelectedTCDetails.selectedTcId = [props.testCase.id];
+            newSelectedTCDetails.selectedTCNames = [props.testCase.name];
+            newSelectedTCDetails.selectedTCReqDetails = [props.testCase.reqdetails];
+            newSelectedTCDetails.selectedTreeId = [props.testCase.cyclePhaseId];
+            newSelectedTCDetails.selectedParentID = [props.testCase.parentId];
+            newSelectedTC = [uniqueTCpath];
+		} else if (e.ctrlKey) { 
+            const index = newSelectedTC.indexOf(uniqueTCpath);
+            if (index !== -1) {
+                newSelectedTCDetails.selectedTCPhaseId.splice(index, 1);
+                newSelectedTCDetails.selectedTcId.splice(index, 1);
+                newSelectedTCDetails.selectedTCNames.splice(index, 1);
+                newSelectedTCDetails.selectedTCReqDetails.splice(index, 1);
+                newSelectedTCDetails.selectedTreeId.splice(index, 1);
+                newSelectedTCDetails.selectedParentID.splice(index, 1);
+                newSelectedTC.splice(index, 1);
+            } else {
+                newSelectedTCDetails.selectedTCPhaseId.push(props.phaseId);
+                newSelectedTCDetails.selectedTcId.push(props.testCase.id);
+                newSelectedTCDetails.selectedTCNames.push(props.testCase.name);
+                newSelectedTCDetails.selectedTCReqDetails.push(props.testCase.reqdetails);
+                newSelectedTCDetails.selectedTreeId.push(props.testCase.cyclePhaseId);
+                newSelectedTCDetails.selectedParentID.push(props.testCase.parentId);
+                newSelectedTC.push(uniqueTCpath)
+            } 
+        }
+        dispatch({type: actionTypes.SEL_TC_DETAILS, payload: newSelectedTCDetails});
         dispatch({type: actionTypes.SYNCED_TC, payload: []});
+        dispatch({type: actionTypes.SEL_TC, payload: newSelectedTC});
     }
 
     const handleSync = () => {
@@ -352,22 +385,29 @@ const TestCaseNode = props => {
         if(selectedScIds.length===0){
             popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
         }
+        else if(selectedZTCDetails.selectedTcId.length===0){
+            popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
+        }
+        else if(selectedZTCDetails.selectedTcId.length>1 && selectedScIds.length>1) {
+			popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
+        }
+
         if (popupMsg) setMsg(popupMsg);
         else{
             const mappedPair=[
                 {
                     projectid: parseInt(props.projectId),			
                     releaseid: parseInt(props.releaseId),
-                    treeid: String(props.testCase.cyclePhaseId),
-                    parentid: String(props.testCase.parentId),
-                    testid: String(props.testCase.id),
-                    testname: props.testCase.name,
-                    reqdetails: props.testCase.reqdetails, 
+                    treeid: selectedZTCDetails.selectedTreeId,
+                    parentid: selectedZTCDetails.selectedParentID,
+                    testid: selectedZTCDetails.selectedTcId,
+                    testname: selectedZTCDetails.selectedTCNames,
+                    reqdetails: selectedZTCDetails.selectedTCReqDetails, 
                     scenarioId: selectedScIds
                 }
             ]
             dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
-            dispatch({type: actionTypes.SYNCED_TC, payload: uniqueTCpath});
+            dispatch({type: actionTypes.SYNCED_TC, payload: selectedZTCDetails.selectedTCNames});
         }
     }
 
@@ -428,14 +468,14 @@ const TestCaseNode = props => {
                     <span className="test__tcName">{props.testCase.name}</span>
                 </label>
             </div> :
-            <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(uniqueTCpath) ? " test__syncedTC" : "")}>
+            <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(props.testCase.name) ? " test__syncedTC" : "")}>
                 <label className="test__leaf" title={props.testCase.name} onClick={handleClick}>
                     <span className="leafId">{props.testCase.id}</span>
                     <span className="test__tcName">{props.testCase.name}</span>
                 </label>
                 { selectedTC.includes(uniqueTCpath)
                         && <><div className="test__syncBtns"> 
-                        { !syncedTestCases.includes(uniqueTCpath) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
+                        { !syncedTestCases.includes(props.testCase.name) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
                         <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
                         </div></> 
                 }
