@@ -33,7 +33,7 @@ const LeftPanelBar = (props) => {
 					<li><i id='gitConfigure' title="Manage Git Configuration" onClick={() => { props.setMiddleScreen("gitConfigure"); resetScreen("gitConfigure") }} className={classes["selectBrowser"]} >
 						<span><img style={{ height: '47px' }} src={"static/imgs/GitIcon.png"} alt={"Create Git Configuration"} className={((props.middleScreen === "gitConfigure") ? ` ${classes["selected-icon"]}` : "")} ></img></span><div>Git Configuration</div></i></li>
 					<li><i id='jiraConfigure' title="Manage Jira Configuration" onClick={() => { props.setMiddleScreen("jiraConfigure"); resetScreen("jiraConfigure") }} className={classes["selectBrowser"]} >
-						<span><img style={{ height: '47px' }} src={"static/imgs/GitIcon.png"} alt={"Create Jira Configuration"} className={((props.middleScreen === "jiraConfigure") ? ` ${classes["selected-icon"]}` : "")} ></img></span><div>Jira Configuration</div></i></li>
+						<span><img style={{ height: '47px' }} src={"static/imgs/JiraSoftware.png"} alt={"Create Jira Configuration"} className={((props.middleScreen === "jiraConfigure") ? ` ${classes["selected-icon"]}` : "")} ></img></span><div>Jira Configuration</div></i></li>
 					<li><i id='zephyrConfigure' title="Manage Zephyr Configuration" onClick={() => { props.setMiddleScreen("zephyrConfigure"); resetScreen("zephyrConfigure") }} className={classes["selectBrowser"]} >
 						<span><img style={{ height: '47px' }} src={"static/imgs/Zephyr.png"} alt={"Create Zephyr Configuration"} className={((props.middleScreen === "zephyrConfigure") ? ` ${classes["selected-icon"]}` : "")} ></img></span><div>Zephyr Configuration</div></i></li>
 				</ul>

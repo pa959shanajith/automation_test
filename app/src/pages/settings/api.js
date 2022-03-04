@@ -63,7 +63,7 @@ export const manageJiraDetails = async(action, userObj) => {
 }
 
 /* getDetails_ZEPHYR
-  api returns {jiraURL: ,jiraUsername: ,jirakey:} or "empty"
+  api returns {zephyrUrl: ,zephyrUsername: ,zephyrPassword: ,zephyrToken:} or "empty"
 */
 
 export const getDetails_ZEPHYR = async() => { 
@@ -79,8 +79,6 @@ export const getDetails_ZEPHYR = async() => {
             RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){
-            // const {zephyrURL, zephyrUsername, zephyrPassword} = res.data;
-            // return {zephyrURL: jiraURL, zephyrUsername: jiraUsername, zephyrPassword: jirakey};
             return res.data;
         }
         console.error(res.data)
@@ -96,7 +94,7 @@ export const getDetails_ZEPHYR = async() => {
   api returns string "success" , "fail"
 */
 
-export const manageZephyrDetails = async(action, userObj) => { 
+export const manageZephyrDetails = async(action, userObj) => {
     try{
         const res = await axios(url+'/manageZephyrDetails', {
             method: 'POST',

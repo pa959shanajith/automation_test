@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
-import { ModalContainer } from "../../global";
+import { ModalContainer, ScreenOverlay, Messages as MSG, setMsg } from "../../global";
 import "../styles/LoginModal.scss";
+import { getDetails_ZEPHYR } from '../api';
 
 /* 
     props:
@@ -17,6 +18,7 @@ import "../styles/LoginModal.scss";
 const LoginModal = props => {
 
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState({});
 
     const onSubmit = () => {
@@ -46,9 +48,35 @@ const LoginModal = props => {
         props.setLoginError(null);
         setError({});
     }
+    const getZephyrDetails = async () =>{
+        try {
+            setLoading("Loading...")
+            const data = await getDetails_ZEPHYR()
+            if (data.error) { setMsg(data.error); return; }
+            if(data !=="empty"){
+                if(data.zephyrURL) props.urlRef.current.value = data.zephyrURL;
+                if(data.zephyrToken) {
+                    props.setAuthType("token");
+                    if(data.zephyrToken) props.authtokenRef.current.value = data.zephyrToken;
+                }
+                else {
+                    if(data.zephyrUsername) props.usernameRef.current.value = data.zephyrUsername;
+                    if(data.zephyrPassword) props.passwordRef.current.value = data.zephyrPassword;
+                }
+            }
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+        }
+    }
+    useEffect(() => {
+        props.screenType=="Zephyr" && getZephyrDetails();
+    }, [])
 
     return (
         <div className="ilm__container">
+            {loading ? <ScreenOverlay content={loading} /> : null}
             <ModalContainer 
                 title={`${props.screenType} Login`}
                 content={
