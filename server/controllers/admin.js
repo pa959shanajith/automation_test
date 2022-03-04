@@ -2425,7 +2425,6 @@ exports.manageZephyrDetails = async (req, res) => {
 			}
 			result = await utils.fetchData(inputs, "admin/manageZephyrDetails", actionName);
 		}else{
-			console.log(data.user);
 			const zephyrUrl = data.user.zephyrUrl;
 			const zephyrUsername = data.user.zephyrUsername;
 			const zephyrPassword = data.user.zephyrPassword;
