@@ -625,7 +625,7 @@ export const excelToZephyrMappings = async(data) => {
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if (res.data == 'valueError') {
-            return {error : MSG.MINDMAP.ERR_EMPTY_COL}
+            return {error : MSG.MINDMAP.ERR_EMPTY_COL}          //using the errors that are defined under Mindmap, as they have the required error content
         }
         else if(res.data == 'invalidformat'){
             return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}

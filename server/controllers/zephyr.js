@@ -985,7 +985,7 @@ exports.excelToZephyrMappings= function(req,res){
 		}
 		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
 		var numSheets = myCSV.length / 2;
-		var mappingsList = [];
+		var mappings = [];
 		var errorRows=[];
 		var err;
 		if (numSheets == 0) {
@@ -995,11 +995,11 @@ exports.excelToZephyrMappings= function(req,res){
 			var cSheet = myCSV[k * 2 + 1];
 			var cSheetRow = cSheet.split('\n');
 			if(cSheetRow[0].split(',').length>2|| cSheetRow[0].split(',').length<2){
-				return res.status(200).send("invalidformat");
+				return res.status(200).send("emptySheet");
 			}
 			var scenarioIdx = -1, testCaseIdx=-1;
 			cSheetRow[0].split(',').forEach(function (e, i) {
-				if(i== 0 && e.toLowerCase()=="testcase") testCaseIdx = i;
+				if(i== 0 && e.toLowerCase()=="testcaseid") testCaseIdx = i;
 				if(i== 1 && e.toLowerCase()=="scenario") scenarioIdx = i;
 			});
 			if (testCaseIdx == -1 || scenarioIdx == -1 || cSheetRow.length < 2) {
@@ -1026,17 +1026,17 @@ exports.excelToZephyrMappings= function(req,res){
 					errorRows.push(i+1)	
 					continue;
 				}
-				mappingsList.push({testCases:[],scenarios:[]})
+				mappings.push({row: i+1,testCaseIds:[],scenarios:[]})
 				testCaseList.forEach(testCaseId => {
-					mappingsList[mappingsList.length-1].testCases.push(testCaseId);
+					mappings[mappings.length-1].testCaseIds.push(testCaseId);
 				});
 				scenarioList.forEach(scenarioName => {
-					mappingsList[mappingsList.length-1].scenarios.push(scenarioName);
+					mappings[mappings.length-1].scenarios.push(scenarioName);
 				});
 			}
 		}
 		if (err) res.status(200).send('fail');
-		else res.status(200).send({"mappingsList" : mappingsList , "errorRows": errorRows});
+		else res.status(200).send({"mappings" : mappings , "errorRows": errorRows});
 	} catch(exception) {
 		logger.error("Error occurred in zephyr/"+fnName+":", exception);
 		return res.status(500).send("fail");

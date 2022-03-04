@@ -1,14 +1,14 @@
-import React, { useEffect, useState,useRef, Fragment,useCallback } from 'react';
-import { ModalContainer, ScrollBar, VARIANT, Messages as MSG, setMsg, AnimatePageWrapper,AnimateDiv} from '../../global';
+import React, { useEffect, useState,useRef, Fragment } from 'react';
+import { ModalContainer, ScrollBar, Messages as MSG, setMsg, AnimatePageWrapper,AnimateDiv} from '../../global';
 import { excelToZephyrMappings , zephyrTestcaseDetails_ICE} from '../api';
 import { useHistory } from 'react-router-dom';
 import { useDispatch,useSelector } from 'react-redux';
 import * as api from '../api.js';
 import { RedirectPage } from '../../global/index.js';
-import CycleNodePopUp from './ZephyrTree2';
+import CycleNodePopUp from './ImportMappingsTree';
 import * as actionTypes from '../state/action.js';
 import "../styles/ImportMappings.scss";
-import ImportMapPopup from './ImportMapPopup';
+import ImportMapStatusPopup from './ImportMapStatusPopup';
 
 const ImportMappings = ({setImportPop,displayError}) => {
     const dispatch = useDispatch();
@@ -17,16 +17,10 @@ const ImportMappings = ({setImportPop,displayError}) => {
     const [activeTab,setActiveTab] = useState("Import")
     const [submit,setSubmit] = useState(false)
     const [impStatusSubmit,setImpStatusSubmit] = useState(false)
-    const updateMapPayload = useSelector(state=>state.integration.updateMapPayload);
-    const viewMappedFlies = useSelector(state=>state.integration.mappedScreenType);
     
     useEffect(()=>{
         (async()=>{
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
-            // var res = await getProjectList()
-            // if(res.error){displayError(res.error);return;}
-            // var data = parseProjList(res)
-            // setProjList(data)
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         })()
     },[]) 
@@ -59,27 +53,20 @@ const Container = ({projList,displayError,activeTab, impStatusSubmit,setImpStatu
     const [importType, setImportType] = useState('excel')
     const [fileUpload,setFiledUpload] = useState(undefined)
     const [sheetList,setSheetList] = useState([])
-    
-    
-    const [showErrorModal,setShowErrorModal]=useState(false);
-    const [updateList, setUpdateList]=useState([]);
+    const [importStatus,setImportStatus]=useState("Partial");
+    const [tcErrorList, setTcErrorList]=useState([]);
     const [errorRows,setErrorRows]=useState([]);
-    const [warningList,setWarningList]=useState([]);
+    const [snrErrorList,setSnrErrorList]=useState([]);
     const [selectedProject , setSelectedProject]= useState("Select Project");
     const [avoProjectList , setAvoProjectList]= useState(null);
     const [releaseList, setReleaseList] = useState([]);
     const [selectedRel, setSelectedRel] = useState("Select Release");
     const [projectDetails , setProjectDetails]=useState({});
-    const [cycleCount, setCycleCount] =useState({check:0,cycles:[]});
-    const [rootCheck, setRootCheck] = useState(false);
     const [selectedPhase, setSelectedPhase] = useState([]);
     const [selectedPhaseName, setSelectedPhaseName] = useState("");
     const [phaseDets, setPhaseDets] = useState({});
-    const [scenarioArr , setScenarioArr] = useState(false);
-    const [scenario_ID , setScenario_ID] = useState("Select Project") ;
     const [firstRender, setFirstRender] = useState(true);
 
-    // const [screenexit , setScreenExit]= useState(false);
 
     const callProjectDetails_ICE=async(e)=>{
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
@@ -131,22 +118,12 @@ const Container = ({projList,displayError,activeTab, impStatusSubmit,setImpStatu
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
     }
 
-    const callScenarios =(e)=>{
-        const scenarioID = e.target.value;
-        setScenarioArr(true);
-        setScenario_ID(scenarioID);
-        // setSearchIconClicked(false);
-    }
-
     const clearSelections = () => {
-        setShowErrorModal(false);
         setSelectedProject("Select Project");
         setReleaseList([]);
         setSelectedRel("Select Release");
         setProjectDetails({});
     }
-
-
 
     const upload = () => {
         setError('')
@@ -163,7 +140,7 @@ const Container = ({projList,displayError,activeTab, impStatusSubmit,setImpStatu
         if(impStatusSubmit){
             setImpStatusSubmit(false);
             clearSelections();
-            // setImportPop(false);
+            setImportPop(false)
         }
     },[impStatusSubmit])
     
@@ -192,8 +169,10 @@ const Container = ({projList,displayError,activeTab, impStatusSubmit,setImpStatu
                     setImportPop:setImportPop,
                     selectedPhase:selectedPhase,
                     setActiveTab:setActiveTab,
-                    setShowErrorModal:setShowErrorModal,
+                    setTcErrorList:setTcErrorList,
+                    setSnrErrorList:setSnrErrorList,
                     setErrorRows:setErrorRows,
+                    setImportStatus:setImportStatus,
                 })
             })()
             
@@ -279,8 +258,6 @@ const Container = ({projList,displayError,activeTab, impStatusSubmit,setImpStatu
                                                                 }
                                                         </div>   
                                                     </Fragment>
-                                                    {/* : <div></div>
-                                                } */}
                                             </ScrollBar>
                                             </div>
                                         </div>
@@ -292,7 +269,7 @@ const Container = ({projList,displayError,activeTab, impStatusSubmit,setImpStatu
 
                                         <div>
                                             <label>Avo Project: </label>
-                                            <select ref={avoProjectRef}  defaultValue={'def-val'} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
+                                            <select ref={avoProjectRef}  defaultValue={'def-val'} className="qtestAvoAssureSelectProject">
                                                 <option value="def-val" disabled >Select Project</option>
                                                 {
                                                     avoProjectList? 
@@ -311,10 +288,11 @@ const Container = ({projList,displayError,activeTab, impStatusSubmit,setImpStatu
                     </AnimateDiv>
                     :
                     <AnimateDiv key={"dfd"}>
-                        <ImportMapPopup
-                            testCasesErrorList={errorRows}
-                            scenariosErrorList={errorRows}
+                        <ImportMapStatusPopup
+                            testCasesErrorList={tcErrorList}
+                            scenariosErrorList={snrErrorList}
                             errorRows={errorRows}
+                            importStatus={importStatus}
                         />
                     </AnimateDiv>
 
@@ -387,8 +365,8 @@ const validate = ({ftypeRef,uploadFileRef,projRef,sheetRef,avoProjectRef,selecte
     return err
 }
 
-const loadImportData = async({importData,sheet,importType,avoProjectList,setActiveTab,selectedPhase,dispatch,avoProject,displayError,setShowErrorModal, setErrorRows,setImportPop}) =>{
-    // setBlockui({content:'Importing ...',show:true})
+const loadImportData = async({importData,sheet,importType,avoProjectList,setActiveTab, setTcErrorList,setSnrErrorList,
+                        selectedPhase,dispatch,avoProject,displayError, setErrorRows,setImportPop,setImportStatus}) =>{
     dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
     if(importType === 'excel'){
         var data = await zephyrTestcaseDetails_ICE("testcase", selectedPhase[0]);
@@ -396,48 +374,109 @@ const loadImportData = async({importData,sheet,importType,avoProjectList,setActi
             displayError(data.error); return;
         }
         else if (data === "unavailableLocalServer"){
-            displayError(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
-            return;
+            displayError(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE); return;
         }
         else if (data === "scheduleModeOn"){
-            displayError(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
-            return;
+            displayError(MSG.GENERIC.WARN_UNCHECK_SCHEDULE); return;
         }
         else if (data === "Invalid Session"){
-            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
-            return;
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''}); return;
         }
         
         var res = await excelToZephyrMappings({'content':importData,'flag':'data',sheetname: sheet})
         if(res.error){displayError(res.error);return;}
         
-        var mappingsList = res.mappingsList;
+        var mappings = res.mappings;
+        const testIdToTestCase = new Map();    // will contain a map where key is testcaseid and value is the testCase object
+        const scenarioNameToScenario =new Map();// will contain a map where key is scnenarioName and value is the scenario object
+
         var scenarioList = (avoProject?avoProjectList[avoProject].scenario_details:[]);
-        
+        {scenarioList && scenarioList.map((e,i)=>scenarioNameToScenario.set(e.name,e))}
+
         var testCasesList = data.testcases;
-        const testIdToTestCase = new Map();
-        const scenarioNameToScenario =new Map();
-        {testCasesList && testCasesList.map((e,i)=>{
-            testIdToTestCase.set(e.id,e)
+        {testCasesList && testCasesList.map((e,i)=> testIdToTestCase.set(e.id,e))}
+       
+        var finalMappings = [], errorTestCasesId=[], errorScenarioNames = [];
+
+        {mappings && mappings.map((e,idx)=>{
+            var testCaseIds = e.testCaseIds;
+            var scenarios = e.scenarios;
+            var mappedpair = {
+                projectid: parseInt(selectedPhase[1]),			
+                releaseid: parseInt(selectedPhase[2]),
+                treeid: [],
+                parentid: [],
+                testid:[],
+                testname: [],
+                reqdetails: [], 
+                scenarioId: []
+            }
+
+            errorTestCasesId.push({row: e.row, tcId:[]});
+            // traversing all the test case id's received from a row of excel sheet
+            testCaseIds.map((tcId,i)=>{
+                // checking if the testCaseId exists in the selected phase/module
+                if(testIdToTestCase.has(parseInt(tcId))){
+                    var tcObject = testIdToTestCase.get(parseInt(tcId));
+                    mappedpair.treeid.push(tcObject.cyclePhaseId)
+                    mappedpair.parentid.push(tcObject.parentId)
+                    mappedpair.testname.push(tcObject.name)
+                    mappedpair.testid.push(tcObject.id)
+                    mappedpair.reqdetails.push(tcObject.reqdetails)                    
+                }
+                else{
+                    errorTestCasesId[errorTestCasesId.length -1 ].tcId.push(tcId);
+                }
+            })
+            if(errorTestCasesId[errorTestCasesId.length -1 ].tcId.length === 0)
+                errorTestCasesId.pop()
+            
+            errorScenarioNames.push({row:e.row, snrNames : []});
+
+            // traversing all the scenario names received from a row of excel sheet
+            scenarios.map((scenarioName, i)=>{
+                // checking if the scenario name exists in the selected phase/module
+                if(scenarioNameToScenario.has(scenarioName)){
+                    mappedpair.scenarioId.push(scenarioNameToScenario.get(scenarioName)._id); 
+                }
+                else{
+                    errorScenarioNames[errorScenarioNames.length - 1].snrNames.push(scenarioName)
+                }
+            })
+            if(errorScenarioNames[errorScenarioNames.length - 1].snrNames.length === 0){
+                errorScenarioNames.pop()
+            }
+            if(mappedpair.treeid.length>0 && mappedpair.scenarioId.length>0){
+                finalMappings.push(mappedpair)          //appending the mappedpair to the list of all mapped pairs                
+            }
         })}
-        {scenarioList && scenarioList.map((e,i)=>{
-            scenarioNameToScenario.set(e.name,e)
-        })}
-        
-        console.log(testIdToTestCase)
-        console.log(scenarioNameToScenario)
-        setErrorRows(res.errorRows);
-        setActiveTab("")
-        if(res.errorRows.length==0){
-            setImportPop(false)
+
+        if(finalMappings.length === 0){
+            setImportStatus("Not_Mapped")
+        }
+        else{
+            // saving the finalMappings 
+            const response = await api.saveZephyrDetails_ICE(finalMappings);
+            if (response.error){displayError(response.error); return;}
+            else if(response === "unavailableLocalServer"){displayError(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE); return;}
+            else if(response === "scheduleModeOn"){displayError(MSG.GENERIC.WARN_UNCHECK_SCHEDULE); return;}
         }
         
-        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+        //Checking in case import is partially sucessfull
+        if(!res.errorRows.length && !errorScenarioNames.length && !errorTestCasesId.length){
+            setMsg(MSG.INTEGRATION.SUCC_IMPORT);
+            setImportPop(false);
+            
+        }
+        else{
+            setErrorRows(res.errorRows);
+            setTcErrorList(errorTestCasesId)
+            setSnrErrorList(errorScenarioNames)
+            setActiveTab("")
+        }
         
+        dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});   
     }
-    
-    
-    // setImportPop(false)
 }
 
 const uploadFile = async({uploadFileRef,setSheetList,setError,setFiledUpload,dispatch}) =>{
@@ -468,7 +507,6 @@ const uploadFile = async({uploadFileRef,setSheetList,setError,setFiledUpload,dis
     }catch(err){
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
         setError("invalid File!")
-        console.error(err)
     }
 }
 

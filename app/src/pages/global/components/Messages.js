@@ -266,6 +266,7 @@ const Messages={
         ERR_UPDATE_NOT_FOUND: {"CONTENT":"Failed to Update .", "VARIANT": VARIANT.ERROR},
         
         SUCC_SAVE: {"CONTENT":"Saved successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_IMPORT: {"CONTENT":"Successfully Imported Mappings.", "VARIANT": VARIANT.SUCCESS},
         UPDATE_SAVE: {"CONTENT":"Updated successfully.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_NO_MAPPED_DETAILS: {"CONTENT":"No mapped details.", "VARIANT": VARIANT.WARNING},
