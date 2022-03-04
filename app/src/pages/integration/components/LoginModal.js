@@ -19,21 +19,22 @@ const LoginModal = props => {
 
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
+    const [isEmpty, setIsEmpty] = useState(true);
     const [error, setError] = useState({});
 
     const onSubmit = () => {
         let error = {};
         if((props.screenType==="Zephyr"&&props.authType==="basic") || props.screenType!=="Zephyr") {
-            if (!props.urlRef.current.value) error={ url: true, msg: "Please Enter URL."};
-            else if (!props.usernameRef.current.value) error={username: true, msg: "Please Enter User Name."};
-            else if (!props.passwordRef.current.value) error={password: true, msg: "Please Enter Password."};
+            if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error={ url: true, msg: "Please Enter URL."};
+            else if (props.usernameRef && props.usernameRef.current && !props.usernameRef.current.value) error={username: true, msg: "Please Enter User Name."};
+            else if (props.passwordRef && props.passwordRef.current && !props.passwordRef.current.value) error={password: true, msg: "Please Enter Password."};
             setError(error);
         } else if (props.screenType==="Zephyr"&&props.authType==="token") {
-            if (!props.urlRef.current.value) error={ url: true, msg: "Please Enter URL."};
-            else if(!props.authtokenRef.current.value) error={authtoken: true, msg: "Please Enter API Token."};
+            if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error={ url: true, msg: "Please Enter URL."};
+            else if(props.authtokenRef && props.authtokenRef.current && !props.authtokenRef.current.value) error={authtoken: true, msg: "Please Enter API Token."};
             setError(error);
         }
-        if(Object.keys(error).length==0) props.login();
+        if(Object.keys(error).length==0 && props.urlRef && props.urlRef.current && props.urlRef.current.value) props.login();
     }
 
     const populateFields=async(authtype)=>{
@@ -54,15 +55,25 @@ const LoginModal = props => {
             const data = await getDetails_ZEPHYR()
             if (data.error) { setMsg(data.error); return; }
             if(data !=="empty"){
-                if(data.zephyrURL) props.urlRef.current.value = data.zephyrURL;
+                console.log('error check');
+                setIsEmpty(false);
+                if(data.zephyrURL && props.urlRef && props.urlRef.current ) props.urlRef.current.value = data.zephyrURL;
+                console.log('error check');
                 if(data.zephyrToken) {
-                    props.setAuthType("token");
-                    if(data.zephyrToken) props.authtokenRef.current.value = data.zephyrToken;
+                    console.log('error check t');
+                    await props.setAuthType("token");
+                    if(data.zephyrToken && props.authtokenRef && props.authtokenRef.current) props.authtokenRef.current.value = data.zephyrToken;
+                    onSubmit();
+                    console.log('error check t close');
                 }
                 else {
-                    if(data.zephyrUsername) props.usernameRef.current.value = data.zephyrUsername;
-                    if(data.zephyrPassword) props.passwordRef.current.value = data.zephyrPassword;
+                    if(data.zephyrUsername && props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.zephyrUsername;
+                    if(data.zephyrPassword && props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.zephyrPassword;
+                    console.log('error check nt');
+                    onSubmit();
+                    console.log('error check nt close');
                 }
+                console.log('error check');
             }
             setLoading(false);
         } catch (error) {
@@ -80,6 +91,7 @@ const LoginModal = props => {
             <ModalContainer 
                 title={`${props.screenType} Login`}
                 content={
+                    <>
                     <div className="ilm__inputs">
                         {props.screenType=="Zephyr" ? 
                         <div className='ilm__authtype_cont'>
@@ -120,10 +132,23 @@ const LoginModal = props => {
                             placeholder={inpPlaceHolder[props.screenType].authtoken}
                             data-test="intg_authtoken_inp"
                         />:null}
+                        {
+                            // isEmpty && <><p style={{marginTop: '1.5rem'}} ><img src={"static/imgs/info.png"} style={{width: '4%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</p></>
+                        }
                     </div>
+                    
+                    </>
                 }
                 footer={<>
-                    <span data-test="intg_log_error_span" className="ilm__error_msg">{error.msg || props.error}</span>
+                    {
+                        // isEmpty && <><span style={{fontSize: '75%', marginTop: '-2rem'}} ><img src={"static/imgs/info.png"} style={{width: '6%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
+                    }
+                    <div data-test="intg_log_error_span" className="ilm__error_msg" style={{ marginTop: (error.msg || props.error) ? '0' : '-22px'}}>
+                        {
+                            props.screenType=="Zephyr" && isEmpty && <><span style={{color: '#333'}} ><img src={"static/imgs/info.png"} style={{width: '4%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
+                        }
+                        {error.msg || props.error}
+                    </div>
                     <button data-test="intg_log_submit_btn" onClick={onSubmit}>Submit</button>
                 </>}
                 close={()=>dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null })}
