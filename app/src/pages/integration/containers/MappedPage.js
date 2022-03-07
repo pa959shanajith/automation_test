@@ -64,13 +64,27 @@ const MappedPage = props =>{
                 })
             }
             else if (props.screenType === "Zephyr") {
+                let totalCounts = 0;
+                let mappedScenarios = 0;
+                let mappedTests = 0;
                 props.mappedfilesRes.forEach(object => {
+                    totalCounts = totalCounts + 1;
+                    mappedScenarios = mappedScenarios + object.testscenarioname.length;
+                    mappedTests = mappedTests + object.testname.length;
                     tempRow.push({
                         'testCaseNames': object.testname, 
                         'scenarioNames': object.testscenarioname,
+                        'mapId': object._id,
+                        'scenarioId': object.testscenarioid,
+                        'testid':object.testid,
                         "reqDetails": object.reqdetails
-                    })
-                })
+                    });
+                });
+                setCounts({
+                    totalCounts: totalCounts,
+                    mappedScenarios: mappedScenarios,
+                    mappedTests: mappedTests
+                });
             }
             setRows(tempRow);
             setUnSyncMaps({
@@ -121,38 +135,67 @@ const MappedPage = props =>{
         let tempUnSyncMaps = unSyncMaps.type === type ? { ...unSyncMaps } : {type: type, maps: {}} ;
 
         let selectedMaps = [...selectedSc, ...selectedTc]; // One Array will always be empty
-
-        for (let itemAddress of selectedMaps) {
-            let [rowIdx, labelIdx] = itemAddress.split("-");
-
-            if (type === "scenario") {
-                if (tempUnSyncMaps.maps[rowIdx]) {
-                    tempUnSyncMaps.maps[rowIdx].testscenarioid.push(rows[rowIdx].scenarioId[labelIdx]);
+        if (props.screenType === "ALM"){
+            for (let itemAddress of selectedMaps) {
+                let [rowIdx, labelIdx] = itemAddress.split("-");
+    
+                if (type === "scenario") {
+                    if (tempUnSyncMaps.maps[rowIdx]) {
+                        tempUnSyncMaps.maps[rowIdx].testscenarioid.push(rows[rowIdx].scenarioId[labelIdx]);
+                    }
+                    else {
+                        tempUnSyncMaps.maps[rowIdx] = {
+                            'mapid': rows[rowIdx].mapId,
+                            'testscenarioid': [rows[rowIdx].scenarioId[labelIdx]]
+                        }
+                    }
                 }
-                else {
-                    tempUnSyncMaps.maps[rowIdx] = {
-                        'mapid': rows[rowIdx].mapId,
-                        'testscenarioid': [rows[rowIdx].scenarioId[labelIdx]]
+                else if (type === "testcase") {
+                    if (tempUnSyncMaps.maps[rowIdx]) {
+                        tempUnSyncMaps.maps[rowIdx].qctestcase.push(rows[rowIdx].testCaseNames[labelIdx]);
+                        tempUnSyncMaps.maps[rowIdx].qcfolderpath.push(rows[rowIdx].folderPath[labelIdx]);
+                        tempUnSyncMaps.maps[rowIdx].qctestset.push(rows[rowIdx].testCaseSet[labelIdx]);
+                    }
+                    else {
+                        tempUnSyncMaps.maps[rowIdx] = {
+                            'mapid': rows[rowIdx].mapId,
+                            'qctestcase': [rows[rowIdx].testCaseNames[labelIdx]],
+                            'qcfolderpath': [rows[rowIdx].folderPath[labelIdx]],
+                            'qctestset': [rows[rowIdx].testCaseSet[labelIdx]]
+                        }
                     }
                 }
             }
-            else if (type === "testcase") {
-                if (tempUnSyncMaps.maps[rowIdx]) {
-                    tempUnSyncMaps.maps[rowIdx].qctestcase.push(rows[rowIdx].testCaseNames[labelIdx]);
-                    tempUnSyncMaps.maps[rowIdx].qcfolderpath.push(rows[rowIdx].folderPath[labelIdx]);
-                    tempUnSyncMaps.maps[rowIdx].qctestset.push(rows[rowIdx].testCaseSet[labelIdx]);
+        } else if (props.screenType === "Zephyr"){
+            for (let itemAddress of selectedMaps) {
+                let [rowIdx, labelIdx] = itemAddress.split("-");
+
+                if (type === "scenario") {
+                    if (tempUnSyncMaps.maps[rowIdx]) {
+                        tempUnSyncMaps.maps[rowIdx].testscenarioid.push(rows[rowIdx].scenarioId[labelIdx]);
+                    }
+                    else {
+                        tempUnSyncMaps.maps[rowIdx] = {
+                            'mapid': rows[rowIdx].mapId,
+                            'testscenarioid': [rows[rowIdx].scenarioId[labelIdx]]
+                        }
+                    }
                 }
-                else {
-                    tempUnSyncMaps.maps[rowIdx] = {
-						'mapid': rows[rowIdx].mapId,
-						'qctestcase': [rows[rowIdx].testCaseNames[labelIdx]],
-						'qcfolderpath': [rows[rowIdx].folderPath[labelIdx]],
-						'qctestset': [rows[rowIdx].testCaseSet[labelIdx]]
-					}
+                else if (type === "testcase") {
+                    if (tempUnSyncMaps.maps[rowIdx]) {
+                        tempUnSyncMaps.maps[rowIdx].testCaseNames.push(rows[rowIdx].testCaseNames[labelIdx]);
+                        tempUnSyncMaps.maps[rowIdx].testid.push(rows[rowIdx].testid[labelIdx]);
+                    }
+                    else {
+                        tempUnSyncMaps.maps[rowIdx] = {
+                            'mapid': rows[rowIdx].mapId,
+                            'testCaseNames': [rows[rowIdx].testCaseNames[labelIdx]],
+                            'testid': [rows[rowIdx].testid[labelIdx]]
+                        }
+                    }
                 }
             }
         }
-
         setUnSynced(true);
         setUnSyncMaps(tempUnSyncMaps);
     }
@@ -160,6 +203,7 @@ const MappedPage = props =>{
     const onSave = () => {
         if(Object.values(unSyncMaps.maps).length > 0){
             let args = Object.values(unSyncMaps.maps);
+            args['screenType']=props.screenType;
 			saveUnsyncDetails(args)
 			.then(data => {
                 if (data.error) 
@@ -187,7 +231,7 @@ const MappedPage = props =>{
                     <span className="viewMap__task_name">
                         Mapped files
                     </span>
-                    { props.screenType === "ALM" && 
+                    {(props.screenType === "ALM" || props.screenType === "Zephyr") && 
                     <> 
                         <div className="viewMap__counterContainer">
                             <div className="viewMap__totalCount">
@@ -199,7 +243,7 @@ const MappedPage = props =>{
                                 <div>{counts.mappedScenarios}</div>
                             </div>
                             <div className="viewMap__testCount">
-                                <div>Mapped ALM Tests</div>
+                                {props.screenType === "ALM"? <div>Mapped ALM Tests</div> : <div>Mapped Zephyr Tests</div>}
                                 <div>{counts.mappedTests}</div>
                             </div>
                         </div>
@@ -223,13 +267,13 @@ const MappedPage = props =>{
                                         mapIdx={index} 
                                         screenType = {props.screenType}
                                         reqDetails = {reqDetails}
-                                        handleClick={props.screenType === "ALM" ? handleClick : null} 
+                                        handleClick={(props.screenType === "ALM" || props.screenType === "Zephyr") ? handleClick : null} 
                                         selected={selectedTc} 
                                         unSynced={unSynced}
-                                        handleUnSync={props.screenType === "ALM" ? onUnSync : null}
+                                        handleUnSync={(props.screenType === "ALM" || props.screenType === "Zephyr") ? onUnSync : null}
                                         displayError={displayError}
                                     />
-                                    { props.screenType!=="ALM" && 
+                                    { (props.screenType!=="ALM" && props.screenType!== "Zephyr") && 
                                         <div className="viewMap__ropeContainer">
                                             <div className="viewMap__rope"></div>
                                         </div>
@@ -238,11 +282,11 @@ const MappedPage = props =>{
                                         list={scenarioNames} 
                                         type="scenario" 
                                         mapIdx={index} 
-                                        handleClick={props.screenType === "ALM" ? handleClick : null} 
+                                        handleClick={(props.screenType === "ALM" || props.screenType === "Zephyr") ? handleClick : null} 
                                         selected={selectedSc} 
                                         unSynced={unSynced}
                                         displayError={displayError}
-                                        handleUnSync={props.screenType === "ALM" ? onUnSync : null}
+                                        handleUnSync={(props.screenType === "ALM" || props.screenType === "Zephyr") ? onUnSync : null}
                                     />
                                 </div>) }
                             </ScrollBar>

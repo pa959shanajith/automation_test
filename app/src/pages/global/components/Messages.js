@@ -273,7 +273,8 @@ const Messages={
         WARN_SELECT_SCENARIO: {"CONTENT":"Please Select a Scenario.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_TESTCASE: {"CONTENT":"Please select Testcase.", "VARIANT": VARIANT.WARNING},
         WARN_MULTI_TC_SCENARIO: {"CONTENT":"Cannot map multiple test cases with multiple scenarios.", "VARIANT": VARIANT.WARNING},
-        WARN_UPDATE_MULTI_MATCH: {"CONTENT":"Partially Updated.", "VARIANT": VARIANT.WARNING}
+        WARN_UPDATE_MULTI_MATCH: {"CONTENT":"Partially Updated.", "VARIANT": VARIANT.WARNING},
+        WARN_ALREADY_SYNCED: {"CONTENT":"Already Synced.", "VARIANT": VARIANT.WARNING},
     },
     MINDMAP:{
         ERR_FETCH_PROJECT: {"CONTENT":"Failed to fetch project list.", "VARIANT": VARIANT.ERROR},
