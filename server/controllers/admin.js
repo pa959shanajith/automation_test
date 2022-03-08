@@ -2418,18 +2418,18 @@ exports.manageZephyrDetails = async (req, res) => {
 		const userId = req.session.userid;
 		const action = data.action;
 		let result;
+		let inputs;
 		if(action==='delete'){
-			let inputs = {
+			inputs = {
 				"userId": userId,
 				"action":action
 			}
-			result = await utils.fetchData(inputs, "admin/manageZephyrDetails", actionName);
 		}else{
 			const zephyrUrl = data.user.zephyrUrl;
 			const zephyrUsername = data.user.zephyrUsername;
 			const zephyrPassword = data.user.zephyrPassword;
 			const zephyrToken = data.user.zephyrToken;
-			let inputs = {
+			inputs = {
 				"userId": userId,
 				"zephyrUrl": zephyrUrl,
 				"zephyrUsername": zephyrUsername,
@@ -2437,8 +2437,8 @@ exports.manageZephyrDetails = async (req, res) => {
 				"zephyrToken": zephyrToken,
 				"action": action
 			};
-			result = await utils.fetchData(inputs, "admin/manageZephyrDetails", actionName);
 		}
+		result = await utils.fetchData(inputs, "admin/manageZephyrDetails", actionName);
 		return res.send(result);
 	} catch (exception) {
 		logger.error("Exception in the service gitSaveConfig: %s", exception);

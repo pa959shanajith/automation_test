@@ -78,21 +78,20 @@ const UserZephyrConfig = (props) => {
 
     const SubmitHandler = (event) => {
         event.preventDefault();
-        let isValid = true;
         if (!validate(zephyrURL, 'URL', setIsValidURL)) {
-            isValid = false;
+            setMsg(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
+            return;
         }
         if (authType==="basic" && !validate(zephyrUsername, 'USERNAME', setIsValidUsername)) {
-            isValid = false;
+            setMsg(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
+            return;
         }
         if (authType==="basic" && !validate(zephyrPassword, 'PASSWORD', setIsValidPassword)) {
-            isValid = false;
+            setMsg(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
+            return;
         }
         if (authType !="basic" && !validate(zephyrToken, 'TOKEN', setIsValidToken)) {
-            isValid = false;
-        }
-        if (!isValid) {
-           setMsg(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
+            setMsg(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
             return;
         }
         let action = ""; 
