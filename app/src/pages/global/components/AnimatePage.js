@@ -1,13 +1,11 @@
 import React from 'react';
 import  { AnimatePresence, motion } from 'framer-motion';
 import "../styles/AnimatePage.scss";
-
 const animateVariants = {
     hiddenLeft: { x: "-100vw", transition: { duration: 1 } },
     hiddenRight: { x: "100vw", transition: { duration: 1 } },
     visible: { x: 0, transition: { duration: 1 }}
 }
-
 export const AnimatePageWrapper = props => (
     <div className="apw_presence" >
         <AnimatePresence>

@@ -25,7 +25,8 @@ const initialState = {
         releaseId: "",
         phaseDets: {},
         selectedPhase: []
-    }
+    },
+    projectList: [],
 };
 
 const reducer = (state = initialState , action) => {
@@ -80,6 +81,11 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 updateMapPayload: action.payload
+            }
+        case actionTypes.PROJECT_LIST:
+            return{
+                ...state,
+                projectList: action.payload
             }
         default: 
             return state

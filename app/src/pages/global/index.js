@@ -24,7 +24,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 import ValidationExpression from './components/ValidationExpression';
 import {Messages, VARIANT} from './components/Messages';
 import SelectRecipients from './components/SelectRecipients'
-import { AnimateDiv, AnimatePageWrapper } from "./components/AnimatePage"
+import { AnimateDiv, AnimatePageWrapper } from "./components/AnimatePage";
+
 
 export { Header, 
         FooterOne, 

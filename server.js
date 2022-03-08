@@ -158,7 +158,7 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-			}
+			} 
 			return next();
 		});
 
@@ -498,6 +498,7 @@ if (cluster.isMaster) {
 		app.post('/saveZephyrDetails_ICE', auth.protect, zephyr.saveZephyrDetails_ICE);
 		app.post('/viewZephyrMappedList_ICE', auth.protect, zephyr.viewZephyrMappedList_ICE);	
 		app.post('/zephyrUpdateMapping', auth.protect, zephyr.zephyrUpdateMapping);	
+		app.post('/excelToZephyrMappings', auth.protect, zephyr.excelToZephyrMappings);
 		//app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', auth.protect, flowGraph.flowGraphResults);

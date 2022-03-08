@@ -10,6 +10,21 @@ var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+var xlsx = require('xlsx');
+var xl = require('excel4node');
+
+
+/* Convert excel file to CSV Object. */
+var xlsToCSV = function (workbook, sheetname) {
+	var result = [];
+	var csv = xlsx.utils.sheet_to_csv(workbook.Sheets[sheetname]);
+	if (csv.length > 0) {
+		result.push(sheetname);
+		result.push(csv);
+	}
+	//return result.join("\n");
+	return result;
+};
 
 exports.loginToZephyr_ICE = function (req, res) {
 	try {
@@ -958,4 +973,72 @@ function projectandmodule(projectid,cb,data){
         projectDetails.module_details = modulelist;
         cb(projectDetails);
     });
+}
+
+exports.excelToZephyrMappings= function(req,res){
+	const fnName = "excelToZephyrMappings";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
+		if (req.body.data.flag == 'sheetname') {
+			return res.status(200).send(wb1.SheetNames);
+		}
+		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+		var numSheets = myCSV.length / 2;
+		var mappings = [];
+		var errorRows=[];
+		var err;
+		if (numSheets == 0) {
+			return res.status(200).send("emptySheet");
+		}
+		for (var k = 0; k < numSheets; k++) {
+			var cSheet = myCSV[k * 2 + 1];
+			var cSheetRow = cSheet.split('\n');
+			if(cSheetRow[0].split(',').length>2|| cSheetRow[0].split(',').length<2){
+				return res.status(200).send("emptySheet");
+			}
+			var scenarioIdx = -1, testCaseIdx=-1;
+			cSheetRow[0].split(',').forEach(function (e, i) {
+				if(i== 0 && e.toLowerCase()=="testcaseid") testCaseIdx = i;
+				if(i== 1 && e.toLowerCase()=="scenario") scenarioIdx = i;
+			});
+			if (testCaseIdx == -1 || scenarioIdx == -1 || cSheetRow.length < 2) {
+				err = true;
+				break;
+			}
+			
+			for (var i = 1; i < cSheetRow.length; i++) {
+				var row = cSheetRow[i].split(',');
+				if(i==(cSheetRow.length-1) && row.length<2 && row[0]==""){
+					continue;
+				}
+				if (row[0]=="" || row[1]=="") {
+					errorRows.push(i+1)
+					continue;
+				}
+				if (row.length < 2 || row.length>2){
+					errorRows.push(i+1)	
+					continue;
+				}
+				var testCaseList = row[testCaseIdx].split(';')
+				var scenarioList = row[scenarioIdx].split(';')
+				if(testCaseList.length>1 && scenarioList.length>1){
+					errorRows.push(i+1)	
+					continue;
+				}
+				mappings.push({row: i+1,testCaseIds:[],scenarios:[]})
+				testCaseList.forEach(testCaseId => {
+					mappings[mappings.length-1].testCaseIds.push(testCaseId);
+				});
+				scenarioList.forEach(scenarioName => {
+					mappings[mappings.length-1].scenarios.push(scenarioName);
+				});
+			}
+		}
+		if (err) res.status(200).send('fail');
+		else res.status(200).send({"mappings" : mappings , "errorRows": errorRows});
+	} catch(exception) {
+		logger.error("Error occurred in zephyr/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
 }
