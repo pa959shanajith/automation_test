@@ -422,6 +422,7 @@ if (cluster.isMaster) {
 		app.post('/userObjectElement_ICE', auth.protect, designscreen.userObjectElement_ICE);
 		app.post('/exportScreenToExcel', auth.protect, designscreen.exportScreenToExcel);
 		app.post('/importScreenfromExcel', auth.protect, designscreen.importScreenfromExcel);
+		app.post('/fetchReplacedKeywords_ICE', auth.protect, designscreen.fetchReplacedKeywords_ICE);
 		
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', auth.protect, design.readTestCase_ICE);

@@ -591,6 +591,7 @@ export const saveUnsyncDetails = async(undoMapList) => {
             },
             data: {
                 action: "saveUnsyncDetails",
+                screenType: undoMapList['screenType'],
                 undoMapList : undoMapList, 
            }
         });
