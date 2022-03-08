@@ -48,12 +48,12 @@ const Zephyr = () => {
 
         var zephyrPayload = {};
         zephyrPayload.authtype = authType;
-        zephyrPayload.zephyrURL = zephyrUrlRef.current.value;
+        if (zephyrUrlRef.current) zephyrPayload.zephyrURL = zephyrUrlRef.current.value;
         if(authType==="basic") {
-            zephyrPayload.zephyrUserName = zephyrUsernameRef.current.value;
-            zephyrPayload.zephyrPassword = zephyrPasswordRef.current.value;
+            if(zephyrUsernameRef.current) zephyrPayload.zephyrUserName = zephyrUsernameRef.current.value;
+            if(zephyrPasswordRef.current) zephyrPayload.zephyrPassword = zephyrPasswordRef.current.value;
         } else {
-            zephyrPayload.zephyrApiToken = zephyrAuthTokenRef.current.value;
+            if(zephyrAuthTokenRef.current) zephyrPayload.zephyrApiToken = zephyrAuthTokenRef.current.value;
         }
 
         const domainDetails = await api.loginToZephyr_ICE(zephyrPayload);

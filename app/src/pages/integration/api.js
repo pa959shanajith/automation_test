@@ -643,3 +643,29 @@ export const excelToZephyrMappings = async(data) => {
         return {error:MSG.MINDMAP.ERR_INVALID_EXCEL_DATA}
     }
 }
+/* getDetails_ZEPHYR
+  api returns {zephyrUrl: ,zephyrUsername: ,zephyrPassword: ,zephyrToken:} or "empty"
+*/
+
+export const getDetails_ZEPHYR = async() => { 
+    try{
+        const res = await axios(url+'/getDetails_Zephyr', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }
+}
