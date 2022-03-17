@@ -242,38 +242,70 @@ const ReplaceObjectModal = props => {
             setErrorMsg("Please select atleast one object to Replace");
             return;
         }
-        props.setOverlay("Fetching Keywords for selected objects...")
-
-        let { screenId,appType } = props.current_task;
-        
-        let arg = {
-            screenId,    
-            appType,                                  
-            objMap: {},
-        };
-
-        let replacing = { ...replace };
+        let duplicateItm = false;
+        let duplicateCusts = [];
+        let object_list=[]
+        let replacing = {...replace};
         for (let val in replacing) {
             if (replacing[val]) {
-                let tag =  tagListToReplace.includes(replacing[val][1].tag) ? replacing[val][1].tag : 'element'
-                arg.objMap[replacing[val][0].objId] = tag;
+                object_list.push([replacing[val][0].objId, replacing[val][1]]);
+                if(custNames.includes(replacing[val][1].custname) && !replacingCustNm.includes(replacing[val][1].custname)) {
+                    duplicateItm = true;
+                    duplicateCusts.push(replacing[val][1].custname);
+                }
             }
         }
-        fetchReplacedKeywords_ICE(arg).then((res)=>{
-            props.setOverlay(null)
-            if(!(res==="fail")){
-                setCORData(res)
-                setErrorMsg("");
-                setActiveTab("keywordsReplacement")
+
+        if(duplicateItm) {
+            props.setShowPop({
+                'type': 'modal',
+                'title': 'Replace Scrape data',
+                'content': <div className="ss__dup_labels">
+                    Please rename/delete duplicate scraped objects
+                    <br/><br/>
+                    Object characterstics are same for:
+                    <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
+                        <div className="ss__dup_scroll">
+                        { duplicateCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
+                        </div>
+                    </ScrollBar>
+                </div>,
+                'footer': <button onClick={()=>props.setShowPop("")}>OK</button>
+            })
+        } else {
+            props.setOverlay("Fetching Keywords for selected objects...")
+
+            let { screenId,appType } = props.current_task;
+            
+            let arg = {
+                screenId,    
+                appType,                                  
+                objMap: {},
+            };
+
+            let replacing = { ...replace };
+            for (let val in replacing) {
+                if (replacing[val]) {
+                    let tag =  tagListToReplace.includes(replacing[val][1].tag) ? replacing[val][1].tag : 'element'
+                    arg.objMap[replacing[val][0].objId] = tag;
+                }
             }
-            else {
+            fetchReplacedKeywords_ICE(arg).then((res)=>{
+                props.setOverlay(null)
+                if(!(res==="fail")){
+                    setCORData(res)
+                    setErrorMsg("");
+                    setActiveTab("keywordsReplacement")
+                }
+                else {
+                    setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                }
+            }).catch((err)=>{
+                props.setOverlay(null)
+                console.log(err)
                 setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-            }
-        }).catch((err)=>{
-            props.setOverlay(null)
-            console.log(err)
-            setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-        });
+            });
+        }
     }
     
     return (
