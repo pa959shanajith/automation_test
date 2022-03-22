@@ -21,30 +21,34 @@ const LoginModal = props => {
     const [loading, setLoading] = useState(false);
     const [isEmpty, setIsEmpty] = useState(true);
     const [error, setError] = useState({});
+    const [defaultValues, setDefaultValues] = useState({});
 
-    const onSubmit = () => {
+    const onSubmit = (authType) => {
         let error = {};
-        if((props.screenType==="Zephyr"&&props.authType==="basic") || props.screenType!=="Zephyr") {
+        if((props.screenType==="Zephyr" && authType==="basic") || props.screenType!=="Zephyr") {
             if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error={ url: true, msg: "Please Enter URL."};
             else if (props.usernameRef && props.usernameRef.current && !props.usernameRef.current.value) error={username: true, msg: "Please Enter User Name."};
             else if (props.passwordRef && props.passwordRef.current && !props.passwordRef.current.value) error={password: true, msg: "Please Enter Password."};
             setError(error);
-        } else if (props.screenType==="Zephyr"&&props.authType==="token") {
+        } else if (props.screenType==="Zephyr"&&authType==="token") {
             if (props.urlRef && props.urlRef.current && !props.urlRef.current.value) error={ url: true, msg: "Please Enter URL."};
             else if(props.authtokenRef && props.authtokenRef.current && !props.authtokenRef.current.value) error={authtoken: true, msg: "Please Enter API Token."};
             setError(error);
         }
-        if(Object.keys(error).length==0 && props.urlRef && props.urlRef.current && props.urlRef.current.value) props.login();
+        if(Object.keys(error).length==0 && props.urlRef && props.urlRef.current && props.urlRef.current.value) props.login(authType);
     }
-
     const populateFields=async(authtype)=>{
+        await props.setAuthType(authtype);
         if(authtype==="token") {
-            props.urlRef.current.value="";
-            props.usernameRef.current.value="";
-            props.passwordRef.current.value="";
+            props.urlRef.current.value=(defaultValues['url']) ? defaultValues['url'] : "";
+            if (props.usernameRef && props.usernameRef.current) props.usernameRef.current.value="";
+            if (props.passwordRef && props.passwordRef.current) props.passwordRef.current.value="";
+            if(props.authtokenRef.current!=undefined) props.authtokenRef.current.value=(defaultValues['authToken']) ? defaultValues['authToken'] : "";
         } else {
-            props.urlRef.current.value="";
-            if(props.authtokenRef.current!=undefined) props.authtokenRef.current.value="";
+            props.urlRef.current.value=(defaultValues['url']) ? defaultValues['url'] : "";
+            if (props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = (defaultValues.username) ? defaultValues.username : "";
+            if (props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = (defaultValues.password) ? defaultValues.password : "";
+            if(props.authtokenRef.current!=undefined) props.authtokenRef.current.value = "";
         }
         props.setLoginError(null);
         setError({});
@@ -56,17 +60,28 @@ const LoginModal = props => {
             if (data.error) { setMsg(data.error); return; }
             if(data !=="empty"){
                 setIsEmpty(false);
-                if(data.zephyrURL && props.urlRef && props.urlRef.current ) props.urlRef.current.value = data.zephyrURL;
+                let tempDefaultValues = {};
+                if(data.zephyrURL && props.urlRef && props.urlRef.current ) {
+                    props.urlRef.current.value = data.zephyrURL;
+                    tempDefaultValues['url'] = data.zephyrURL;
+                }
+                if(data.zephyrAuthType ) {
+                    await props.setAuthType(data.zephyrAuthType);
+                }
                 if(data.zephyrToken) {
-                    await props.setAuthType("token");
-                    if(data.zephyrToken && props.authtokenRef && props.authtokenRef.current) props.authtokenRef.current.value = data.zephyrToken;
-                    onSubmit();
+                    if(props.authtokenRef && props.authtokenRef.current) props.authtokenRef.current.value = data.zephyrToken;
+                    tempDefaultValues['authToken'] = data.zephyrToken;
                 }
-                else {
-                    if(data.zephyrUsername && props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.zephyrUsername;
-                    if(data.zephyrPassword && props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.zephyrPassword;
-                    onSubmit();
+                if(data.zephyrUsername) {
+                    if(props.usernameRef && props.usernameRef.current) props.usernameRef.current.value = data.zephyrUsername;
+                    tempDefaultValues['username'] = data.zephyrUsername;
                 }
+                if(data.zephyrPassword) {
+                    if(props.passwordRef && props.passwordRef.current) props.passwordRef.current.value = data.zephyrPassword;
+                    tempDefaultValues['password'] = data.zephyrPassword;
+                }
+                setDefaultValues(tempDefaultValues);
+                onSubmit(data.zephyrAuthType);
             }
             setLoading(false);
         } catch (error) {
@@ -90,11 +105,11 @@ const LoginModal = props => {
                         <div className='ilm__authtype_cont'>
                             <span className="ilm__auth" title="Authentication Type">Authentication Type</span>
                             <label className="authTypeRadio ilm__leftauth">
-                                <input type="radio" value="basic" checked={props.authType==="basic"} onChange={()=>{props.setAuthType("basic");populateFields("basic")}}/>
+                                <input type="radio" value="basic" checked={props.authType==="basic"} onChange={()=>{populateFields("basic")}}/>
                                 <span>Basic</span>
                             </label>
                             <label className="authTypeRadio">
-                                <input type="radio" value="token" checked={props.authType==="token"} onChange={()=>{props.setAuthType("token");populateFields("token")}}/>
+                                <input type="radio" value="token" checked={props.authType==="token"} onChange={()=>{populateFields("token")}}/>
                                 <span>Token</span>
                             </label>
                         </div>:null}
@@ -142,7 +157,7 @@ const LoginModal = props => {
                         }
                         {error.msg || props.error}
                     </div>
-                    <button data-test="intg_log_submit_btn" onClick={onSubmit}>Submit</button>
+                    <button data-test="intg_log_submit_btn" onClick={() => onSubmit(props.authType)}>Submit</button>
                 </>}
                 close={()=>dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null })}
             />

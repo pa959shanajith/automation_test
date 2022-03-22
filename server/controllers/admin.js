@@ -2398,6 +2398,7 @@ exports.getDetails_Zephyr = async (req, res) => {
 				zephyrURL: result['url'],
 				zephyrUsername: result['username'],
 				zephyrToken: result['token'],
+				zephyrAuthType: result['authType'],
 				zephyrPassword: result['password']
 			};
 			return res.send(data);
@@ -2429,12 +2430,14 @@ exports.manageZephyrDetails = async (req, res) => {
 			const zephyrUsername = data.user.zephyrUsername;
 			const zephyrPassword = data.user.zephyrPassword;
 			const zephyrToken = data.user.zephyrToken;
+			const zephyrAuthType = data.user.zephyrAuthType;
 			inputs = {
 				"userId": userId,
 				"zephyrUrl": zephyrUrl,
 				"zephyrUsername": zephyrUsername,
 				"zephyrPassword": zephyrPassword,
 				"zephyrToken": zephyrToken,
+				"zephyrAuthType": zephyrAuthType,
 				"action": action
 			};
 		}

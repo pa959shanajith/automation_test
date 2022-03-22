@@ -12,7 +12,7 @@ const ZephyrDeleteModal = (props) => {
 
     return <ModalContainer
         title="Delete Zephyr Configuration"
-        content={"Are you sure you want to delete Zephyr configeration?"}
+        content={"Are you sure you want to delete Zephyr configuration? Deleting the Zephyr Configuration will delete both auth type configurations."}
         close={props.cancelDelete}
         footer={
             <>
