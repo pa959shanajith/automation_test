@@ -29,6 +29,7 @@ const PluginSection = ({userInfo}) => {
                     
                     if (tempList[pluginName]) tempList[pluginName].show = true;
                     else tempList[pluginName] = { title: pluginName, show: true};
+                    tempList["Avo Discover"].show = false;
                 }
             }
 
