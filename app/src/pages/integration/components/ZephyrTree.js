@@ -150,8 +150,7 @@ const PhaseNode = props => {
     if (props.type==="module") {
         parent = props.parent;
         cyclephaseid = props.parent["phaseid"];
-    }
-    else {
+    } else {
         parent = props.phase;
         cyclephaseid = props.phase["phaseid"];
     }
@@ -161,10 +160,12 @@ const PhaseNode = props => {
     },[])
 
     const handleClick = useCallback(async()=>{
-        var checkList = [];
-        var modLen = 0;
         if (collapse) {
-            dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Testcases...'});
+            if(props.viewMappedFlies === "ZephyrUpdate" && props.section !== "right") {
+                dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Testcases...'});
+            } else if (props.viewMappedFlies === "ZephyrUpdate" && props.section === "right"){
+                dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Folders...'});
+            }
 
             var data = ""
 
@@ -186,7 +187,9 @@ const PhaseNode = props => {
                 return RedirectPage(history);
             }
             else {
-                setTestCases(data.testcases);
+                if(props.section !== "right") {
+                    setTestCases(data.testcases);
+                }
                 setModules(data.modules);
                 setCollapse(false);
             }
@@ -265,7 +268,9 @@ const PhaseNode = props => {
                     <><span>
                     <img alt="ce-ic"
                         className="test_tree_toggle" 
-                        src={ `static/imgs/ic-taskType-blue.png` }
+                        src={ `static/imgs/ic-taskType-blue-${collapse ? "plus" : "minus"}.png` }
+                        onClick={handleClick}
+                        title={`${collapse ? "Expand" : "Collapse"}`}
                     />
                     </span>
                     <span className="sp_label"><label className="test_label" onClick={selectPhase}>{ phasename }</label></span>
@@ -349,10 +354,10 @@ const TestCaseNode = props => {
 
         if (!e.ctrlKey) {
             newSelectedTCDetails.selectedTCPhaseId = [props.phaseId];
-            newSelectedTCDetails.selectedTcId = [props.testCase.id];
+            newSelectedTCDetails.selectedTcId = [String(props.testCase.id)];
             newSelectedTCDetails.selectedTCNames = [props.testCase.name];
             newSelectedTCDetails.selectedTCReqDetails = [props.testCase.reqdetails];
-            newSelectedTCDetails.selectedTreeId = [props.testCase.cyclePhaseId];
+            newSelectedTCDetails.selectedTreeId = [String(props.testCase.cyclePhaseId)];
             newSelectedTCDetails.selectedParentID = [props.testCase.parentId];
             newSelectedTC = [uniqueTCpath];
 		} else if (e.ctrlKey) { 
@@ -367,10 +372,10 @@ const TestCaseNode = props => {
                 newSelectedTC.splice(index, 1);
             } else {
                 newSelectedTCDetails.selectedTCPhaseId.push(props.phaseId);
-                newSelectedTCDetails.selectedTcId.push(props.testCase.id);
+                newSelectedTCDetails.selectedTcId.push(String(props.testCase.id));
                 newSelectedTCDetails.selectedTCNames.push(props.testCase.name);
                 newSelectedTCDetails.selectedTCReqDetails.push(props.testCase.reqdetails);
-                newSelectedTCDetails.selectedTreeId.push(props.testCase.cyclePhaseId);
+                newSelectedTCDetails.selectedTreeId.push(String(props.testCase.cyclePhaseId));
                 newSelectedTCDetails.selectedParentID.push(props.testCase.parentId);
                 newSelectedTC.push(uniqueTCpath)
             } 
