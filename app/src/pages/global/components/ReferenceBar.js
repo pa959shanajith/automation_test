@@ -223,7 +223,7 @@ const SearchPopup = ({ closePopups, taskPopY, setShowTask }) => {
                 <span className="search_task__ic_box">
                     <img className="search_task__ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                 </span>
-                <input className="search_task__input" onChange={onSearchHandler} value={searchValue} placeholder="Seach My task(s)" autoFocus />
+                <input className="search_task__input" onChange={onSearchHandler} value={searchValue} placeholder="Search My task(s)" autoFocus />
             </div>
             <div className="task_pop__list">
                 <div id='task_pop_scroll' className="task_pop__overflow">
