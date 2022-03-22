@@ -85,6 +85,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
             "executemode": multiExecutionData.exectionMode,
             "exec_env": multiExecutionData.executionEnv,
             'scenarioFlag': multiExecutionData.scenarioFlag,
+            "type": multiExecutionData.type,
             "targetaddress": targetUser,
             "userid": userInfo.userid,
             "scenarios": [],
