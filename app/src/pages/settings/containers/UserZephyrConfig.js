@@ -48,11 +48,13 @@ const UserZephyrConfig = (props) => {
                 const username = (data.zephyrUsername) ? data.zephyrUsername : '';
                 const password = (data.zephyrPassword) ? data.zephyrPassword : '';
                 const token = (data.zephyrToken) ? data.zephyrToken : '';
+                const zephyrAuthType = (data.zephyrAuthType) ? data.zephyrAuthType : '';
                 setZephyrURL(url);
                 setZephyrUsername(username);
                 setZephyrPassword(password);
                 setZephyrToken(token);
                 setCreateZephyr(false);
+                setAuthType(zephyrAuthType);
             }
         } catch (error) {
             setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
@@ -101,7 +103,8 @@ const UserZephyrConfig = (props) => {
             action="update";
         }
         let zephyrObj = {
-            zephyrUrl: zephyrURL
+            zephyrUrl: zephyrURL,
+            zephyrAuthType: authType
         }
         if(zephyrUsername && zephyrPassword){
             zephyrObj['zephyrUsername'] = zephyrUsername;

@@ -12,7 +12,7 @@ const JiraDeleteModal = (props) => {
 
     return <ModalContainer
         title="Delete JIRA Configuration"
-        content={"Are you sure you want to delete JIRA configeration?"}
+        content={"Are you sure you want to delete JIRA configuration?"}
         close={props.cancelDelete}
         footer={
             <>
