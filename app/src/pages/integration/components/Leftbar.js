@@ -136,7 +136,7 @@ const Leftbar = (props) => {
     return (
         <ActionBar 
             upperContent={upperContent()}
-            bottomContent={screenType === "Zephyr"?bottomContent():null}
+            bottomContent={screenType === "Zephyr" && viewMappedFiles === null?bottomContent():null}
         />
     )
 }
