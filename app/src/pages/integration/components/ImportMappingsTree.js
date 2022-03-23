@@ -7,7 +7,7 @@ import * as actionTypes from '../state/action';
 import * as api from '../api.js';
 import "../styles/TestList.scss"
 
-const CycleNode = props => {
+const CycleNodePopUp = props => {
 
     const dispatch = useDispatch();
     const [collapse, setCollapse] = useState(true);
@@ -46,7 +46,10 @@ const CycleNode = props => {
                 });
             }
             props.setPhaseDets(phaseDetsVal);
-        } else if(props.section == 'right') props.setSelectedPhase([]);
+        } else if(props.section == 'right'){ 
+            props.setSelectedPhase([])
+            props.setSelectedPhaseName("")
+        };
     },[])
 
     const handleClick = useCallback(()=>{
@@ -58,16 +61,16 @@ const CycleNode = props => {
         var checkVal = props.cycleCount.check;
         var cycleVal = props.cycleCount.cycles;
         var phaseDetsVal = props.phaseDets;
-        var phases = event.target.closest('.int__cycleNode').querySelectorAll('.mp-phases');
+        var phases = event.target.closest('.int__CycleNodePopUp').querySelectorAll('.mp-phases');
         var tempPhaseVal = {};
         if(event.target.checked) {
-            var parentVal = event.target.closest('.int__cycleNode').parentElement;
+            var parentVal = event.target.closest('.int__CycleNodePopUp').parentElement;
             var allcheckbox = event.target.parentElement.parentElement.parentElement.querySelectorAll('input[type=checkbox]');
             props.checkParent(parentVal, true, '.mp-cycles');
             props.checkChildren(allcheckbox, true);
             tempPhaseVal = {"all":["all"]};
         } else {
-            var parentVal = event.target.closest('.int__cycleNode').parentElement;
+            var parentVal = event.target.closest('.int__CycleNodePopUp').parentElement;
             var allcheckbox = event.target.parentElement.parentElement.parentElement.querySelectorAll('input[type=checkbox]');
             props.checkParent(parentVal, false, '.mp-cycles');
             props.checkChildren(allcheckbox, false);
@@ -94,7 +97,7 @@ const CycleNode = props => {
         return props.rootCheck || (doc!=null && doc.checked);
     } 
 
-    return <div className="int__cycleNode" style={{paddingLeft: 17}}>
+    return <div className="int__CycleNodePopUp" style={{paddingLeft: 17}}>
             { <div className="test_tree_branches">
                 {props.section !== "right" && props.section != undefined && 
                     <span className="sel_up sel_head"><input id={`cycl-${props.id}`} checked={checkCycle()} onChange={(e)=>onCheckAll(e)} className="sel_up mp-cycles" type="checkbox"/></span>}
@@ -126,6 +129,7 @@ const CycleNode = props => {
                                                 viewMappedFlies={viewMappedFlies}
                                                 selectedPhase={props.selectedPhase}
                                                 setSelectedPhase={props.setSelectedPhase}
+                                                setSelectedPhaseName={props.setSelectedPhaseName}
                                                 phaseDets={props.phaseDets}
                                                 setPhaseDets={props.setPhaseDets}
                                             />)
@@ -142,6 +146,7 @@ const PhaseNode = props => {
     const [collapse, setCollapse] = useState(true);
     const [testCases, setTestCases] = useState([]);
     const [modules, setModules] = useState([]);
+    const [onPhaseSelect,setOnPhaseSelect] = useState(false);
 
     let phaseid = Object.keys(props.phase)[0];
     let phasename = props.phase[phaseid];
@@ -150,22 +155,19 @@ const PhaseNode = props => {
     if (props.type==="module") {
         parent = props.parent;
         cyclephaseid = props.parent["phaseid"];
-    } else {
+    }
+    else {
         parent = props.phase;
         cyclephaseid = props.phase["phaseid"];
     }
     let updateMapPayload = useSelector(state=>state.integration.updateMapPayload);
-
-    useEffect(()=>{
-    },[])
+    
 
     const handleClick = useCallback(async()=>{
+        var checkList = [];
+        var modLen = 0;
         if (collapse) {
-            if(props.viewMappedFlies === "ZephyrUpdate" && props.section !== "right") {
-                dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Testcases...'});
-            } else if (props.viewMappedFlies === "ZephyrUpdate" && props.section === "right"){
-                dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Folders...'});
-            }
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading InnerModules...'});
 
             var data = ""
 
@@ -187,9 +189,8 @@ const PhaseNode = props => {
                 return RedirectPage(history);
             }
             else {
-                if(props.section !== "right") {
-                    setTestCases(data.testcases);
-                }
+                
+                setTestCases(data.testcases);
                 setModules(data.modules);
                 setCollapse(false);
             }
@@ -234,7 +235,9 @@ const PhaseNode = props => {
 
     const selectPhase = (event) => {
         var selectedP = [phaseid,props.projectId,props.releaseId];
+        props.setSelectedPhaseName(props.phase[phaseid])
         props.setSelectedPhase(selectedP);
+        setOnPhaseSelect(true)
         dispatch({
             type: actionTypes.UPDATE_MAP_PAYLOAD, 
             payload: {
@@ -266,6 +269,10 @@ const PhaseNode = props => {
                     <span className="sel_up sel_head"><input id={`ph-${phaseid}`} checked={props.type==="module"?checkM():checkPhase()} className="sel_up mp-phases" type="checkbox" onChange={(e)=>onCheckAll(e)}/></span>}
                     {props.section === "right" &&
                     <><span>
+                    {/* <img alt="ce-ic"
+                        className="test_tree_toggle" 
+                        src={ `static/imgs/ic-taskType-blue.png` }
+                    /> */}
                     <img alt="ce-ic"
                         className="test_tree_toggle" 
                         src={ `static/imgs/ic-taskType-blue-${collapse ? "plus" : "minus"}.png` }
@@ -295,7 +302,6 @@ const PhaseNode = props => {
                                                     cycleid={props.cycleid}
                                                     phase={phase}
                                                     type="module"
-                                                    // onCheckNode={props.onCheckNode}
                                                     checkParent={props.checkParent}
                                                     checkChildren={props.checkChildren}
                                                     parent={parent}
@@ -306,13 +312,14 @@ const PhaseNode = props => {
                                                     setRootCheck={props.setRootCheck}
                                                     selectedPhase={props.selectedPhase}
                                                     setSelectedPhase={props.setSelectedPhase}
+                                                    setSelectedPhaseName = {props.setSelectedPhaseName}
                                                     phaseDets={props.phaseDets}
                                                     setPhaseDets={props.setPhaseDets}
                                                 />)
                     } </div>
                     : null
                 }
-                { !collapse && testCases.length > 0 
+                { !collapse && props.section!="right"&& testCases.length > 0 
                     ? <div> {
                         testCases
                             .map(testCase => <TestCaseNode 
@@ -341,48 +348,15 @@ const PhaseNode = props => {
 const TestCaseNode = props => {
 
     const dispatch = useDispatch();
-    const selectedZTCDetails = useSelector(state=>state.integration.selectedZTCDetails);
     const selectedTC = useSelector(state=>state.integration.selectedTestCase);
     const syncedTestCases = useSelector(state=>state.integration.syncedTestCases);
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
 
-    let uniqueTCpath = `|${props.phaseId}\\${props.testCase.id}\\${props.testCase.name}|`;
+    let uniqueTCpath = `|${props.phaseId}\\${props.testCase.id}|`;
 
-    const handleClick = e => {
-        let newSelectedTCDetails = { ...selectedZTCDetails };
-        let newSelectedTC = [...selectedTC];
-
-        if (!e.ctrlKey) {
-            newSelectedTCDetails.selectedTCPhaseId = [props.phaseId];
-            newSelectedTCDetails.selectedTcId = [String(props.testCase.id)];
-            newSelectedTCDetails.selectedTCNames = [props.testCase.name];
-            newSelectedTCDetails.selectedTCReqDetails = [props.testCase.reqdetails];
-            newSelectedTCDetails.selectedTreeId = [String(props.testCase.cyclePhaseId)];
-            newSelectedTCDetails.selectedParentID = [props.testCase.parentId];
-            newSelectedTC = [uniqueTCpath];
-		} else if (e.ctrlKey) { 
-            const index = newSelectedTC.indexOf(uniqueTCpath);
-            if (index !== -1) {
-                newSelectedTCDetails.selectedTCPhaseId.splice(index, 1);
-                newSelectedTCDetails.selectedTcId.splice(index, 1);
-                newSelectedTCDetails.selectedTCNames.splice(index, 1);
-                newSelectedTCDetails.selectedTCReqDetails.splice(index, 1);
-                newSelectedTCDetails.selectedTreeId.splice(index, 1);
-                newSelectedTCDetails.selectedParentID.splice(index, 1);
-                newSelectedTC.splice(index, 1);
-            } else {
-                newSelectedTCDetails.selectedTCPhaseId.push(props.phaseId);
-                newSelectedTCDetails.selectedTcId.push(String(props.testCase.id));
-                newSelectedTCDetails.selectedTCNames.push(props.testCase.name);
-                newSelectedTCDetails.selectedTCReqDetails.push(props.testCase.reqdetails);
-                newSelectedTCDetails.selectedTreeId.push(String(props.testCase.cyclePhaseId));
-                newSelectedTCDetails.selectedParentID.push(props.testCase.parentId);
-                newSelectedTC.push(uniqueTCpath)
-            } 
-        }
-        dispatch({type: actionTypes.SEL_TC_DETAILS, payload: newSelectedTCDetails});
+    const handleClick = () => {
+        dispatch({type: actionTypes.SEL_TC, payload: uniqueTCpath});
         dispatch({type: actionTypes.SYNCED_TC, payload: []});
-        dispatch({type: actionTypes.SEL_TC, payload: newSelectedTC});
     }
 
     const handleSync = () => {
@@ -390,29 +364,22 @@ const TestCaseNode = props => {
         if(selectedScIds.length===0){
             popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
         }
-        else if(selectedZTCDetails.selectedTcId.length===0){
-            popupMsg = MSG.INTEGRATION.WARN_SELECT_TESTCASE;
-        }
-        else if(selectedZTCDetails.selectedTcId.length>1 && selectedScIds.length>1) {
-			popupMsg = MSG.INTEGRATION.WARN_MULTI_TC_SCENARIO;
-        }
-
         if (popupMsg) setMsg(popupMsg);
         else{
             const mappedPair=[
                 {
                     projectid: parseInt(props.projectId),			
                     releaseid: parseInt(props.releaseId),
-                    treeid: selectedZTCDetails.selectedTreeId,
-                    parentid: selectedZTCDetails.selectedParentID,
-                    testid: selectedZTCDetails.selectedTcId,
-                    testname: selectedZTCDetails.selectedTCNames,
-                    reqdetails: selectedZTCDetails.selectedTCReqDetails, 
+                    treeid: String(props.testCase.cyclePhaseId),
+                    parentid: String(props.testCase.parentId),
+                    testid: String(props.testCase.id),
+                    testname: props.testCase.name,
+                    reqdetails: props.testCase.reqdetails, 
                     scenarioId: selectedScIds
                 }
             ]
             dispatch({type: actionTypes.MAPPED_PAIR, payload: mappedPair});
-            dispatch({type: actionTypes.SYNCED_TC, payload: selectedZTCDetails.selectedTCNames});
+            dispatch({type: actionTypes.SYNCED_TC, payload: uniqueTCpath});
         }
     }
 
@@ -473,18 +440,18 @@ const TestCaseNode = props => {
                     <span className="test__tcName">{props.testCase.name}</span>
                 </label>
             </div> :
-            <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(props.testCase.name) ? " test__syncedTC" : "")}>
+            <div className={"test_tree_leaves"+ ( selectedTC.includes(uniqueTCpath) ? " test__selectedTC" : "") + (selectedTC.includes(uniqueTCpath) && syncedTestCases.includes(uniqueTCpath) ? " test__syncedTC" : "")}>
                 <label className="test__leaf" title={props.testCase.name} onClick={handleClick}>
                     <span className="leafId">{props.testCase.id}</span>
                     <span className="test__tcName">{props.testCase.name}</span>
                 </label>
                 { selectedTC.includes(uniqueTCpath)
                         && <><div className="test__syncBtns"> 
-                        { !syncedTestCases.includes(props.testCase.name) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
+                        { !syncedTestCases.includes(uniqueTCpath) && <img className="test__syncBtn" alt="s-ic" title="Synchronize" onClick={handleSync} src="static/imgs/ic-qcSyncronise.png" />}
                         <img className="test__syncBtn" alt="s-ic" title="Undo" onClick={handleUnSync} src="static/imgs/ic-qcUndoSyncronise.png" />
                         </div></> 
                 }
             </div>
 }
 
-export default CycleNode;
+export default CycleNodePopUp;

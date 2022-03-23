@@ -43,17 +43,17 @@ const Zephyr = () => {
         }
     }, [])
 
-    const callLogin_zephyr = async()=>{
+    const callLogin_zephyr = async(currentAuthType)=>{
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Logging...'});
 
         var zephyrPayload = {};
-        zephyrPayload.authtype = authType;
-        zephyrPayload.zephyrURL = zephyrUrlRef.current.value;
-        if(authType==="basic") {
-            zephyrPayload.zephyrUserName = zephyrUsernameRef.current.value;
-            zephyrPayload.zephyrPassword = zephyrPasswordRef.current.value;
+        zephyrPayload.authtype = currentAuthType;
+        if (zephyrUrlRef.current) zephyrPayload.zephyrURL = zephyrUrlRef.current.value;
+        if(currentAuthType==="basic") {
+            if(zephyrUsernameRef.current) zephyrPayload.zephyrUserName = zephyrUsernameRef.current.value;
+            if(zephyrPasswordRef.current) zephyrPayload.zephyrPassword = zephyrPasswordRef.current.value;
         } else {
-            zephyrPayload.zephyrApiToken = zephyrAuthTokenRef.current.value;
+            if(zephyrAuthTokenRef.current) zephyrPayload.zephyrApiToken = zephyrAuthTokenRef.current.value;
         }
 
         const domainDetails = await api.loginToZephyr_ICE(zephyrPayload);
@@ -75,13 +75,14 @@ const Zephyr = () => {
         else if (domainDetails) {
             setDomainDetails(domainDetails);
             setLoginSuccess(true);
+            dispatch({type: actionTypes.PROJECT_LIST, payload: domainDetails})
         } 
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: ""});
     }
 
-    const callViewMappedFiles=async()=>{
+    const callViewMappedFiles=async(saveFlag)=>{
         try{
-            dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading...'});
+            dispatch({type: actionTypes.SHOW_OVERLAY, payload: saveFlag?'Updating...':'Fetching...'});
         
             const response = await api.viewZephyrMappedList_ICE(user_id);
             
@@ -91,10 +92,21 @@ const Zephyr = () => {
             } 
             else if (response.length){
                 dispatch({ type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: "Zephyr" });
+                if (saveFlag) 
+                    setMsg(MSG.INTEGRATION.SUCC_SAVE);
                 setMappedFilesRes(response);
             }
-            else setMsg(MSG.INTEGRATION.WARN_NO_MAPPED_DETAILS);
+            else {
+                if (saveFlag) {
+                    dispatch({type: actionTypes.VIEW_MAPPED_SCREEN_TYPE, payload: null});
+                    setMsg(MSG.INTEGRATION.SUCC_SAVE);
+                } else {
+                    setMsg(MSG.INTEGRATION.WARN_NO_MAPPED_DETAILS);
+                }
+            }
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
+
+            return response;
         }
         catch(err) {
             dispatch({type: actionTypes.SHOW_OVERLAY, payload: ''});
@@ -119,6 +131,7 @@ const Zephyr = () => {
                 leftBoxTitle="Zephyr Tests"
                 rightBoxTitle="Avo Assure Scenarios"
                 mappedfilesRes={mappedfilesRes}
+                fetchMappedFiles={callViewMappedFiles}
             /> 
         }
         { viewMappedFlies ===null && !loginSuccess && 

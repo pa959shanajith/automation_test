@@ -158,7 +158,7 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-			}
+			} 
 			return next();
 		});
 
@@ -397,6 +397,8 @@ if (cluster.isMaster) {
 		app.post('/gitEditConfig', auth.protect, admin.gitEditConfig);
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
+		app.post('/getDetails_Zephyr', auth.protect, admin.getDetails_Zephyr);
+		app.post('/manageZephyrDetails', auth.protect, admin.manageZephyrDetails);
 		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
 		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
 		app.post('/fetchAvoDiscoverMap', auth.protect, admin.fetchAvoDiscoverMap);
@@ -420,6 +422,7 @@ if (cluster.isMaster) {
 		app.post('/userObjectElement_ICE', auth.protect, designscreen.userObjectElement_ICE);
 		app.post('/exportScreenToExcel', auth.protect, designscreen.exportScreenToExcel);
 		app.post('/importScreenfromExcel', auth.protect, designscreen.importScreenfromExcel);
+		app.post('/fetchReplacedKeywords_ICE', auth.protect, designscreen.fetchReplacedKeywords_ICE);
 		
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', auth.protect, design.readTestCase_ICE);
@@ -495,6 +498,7 @@ if (cluster.isMaster) {
 		app.post('/saveZephyrDetails_ICE', auth.protect, zephyr.saveZephyrDetails_ICE);
 		app.post('/viewZephyrMappedList_ICE', auth.protect, zephyr.viewZephyrMappedList_ICE);	
 		app.post('/zephyrUpdateMapping', auth.protect, zephyr.zephyrUpdateMapping);	
+		app.post('/excelToZephyrMappings', auth.protect, zephyr.excelToZephyrMappings);
 		//app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', auth.protect, flowGraph.flowGraphResults);

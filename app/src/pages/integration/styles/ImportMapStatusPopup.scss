@@ -1,0 +1,54 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.status_error{
+    background-color:$red;
+}
+
+.import_popup_label{
+    margin-right: 5px;
+    width: auto;
+    font-weight: 600;
+}
+.import_popup_error_rows{
+    margin-left:18px;
+}
+
+.error_rows_label{
+    width:75%;
+    float: right;
+    display: flex;
+}
+
+.import_map_status_modal{
+    width:100%;
+    min-height: 250px;
+}
+
+.error_listItem{
+    overflow: hidden;
+    white-space:intial !important;
+    text-overflow:clip;
+    overflow-wrap: break-word;
+    width: 95%;
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+.error_lists{
+    display: flex;
+    padding: 0 10px;
+    height:140px;
+    margin-bottom: 10px;
+    margin-top: 5px;
+}
+
+.import_status_partial{
+    color: $yellowColor;
+    font-family: $avoBoldFont;
+    font-size: 15px;
+} 
+.import_status_noMappings{
+    color: $red;
+    font-family: $avoBoldFont;
+    font-size: 15px;
+} 

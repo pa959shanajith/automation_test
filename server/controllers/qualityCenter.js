@@ -356,10 +356,12 @@ exports.saveUnsyncDetails = async (req, res) => {
 	const fnName = "saveUnsyncDetails";
 	try {
 		logger.info("Inside UI service: " + fnName);
+		const screenType = req.body.screenType;
 		const undoMapList = req.body.undoMapList;
 		if (undoMapList.length == 0) return res.send("fail");
 		const inputs = {
 			"mapList": undoMapList,
+			"screenType": screenType,
 			"query": "updateMapDetails_ICE"
 		};
 		const result = await utils.fetchData(inputs, "qualityCenter/updateMapDetails_ICE", fnName);

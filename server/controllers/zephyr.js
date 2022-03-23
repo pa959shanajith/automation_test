@@ -10,6 +10,21 @@ var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
+var xlsx = require('xlsx');
+var xl = require('excel4node');
+
+
+/* Convert excel file to CSV Object. */
+var xlsToCSV = function (workbook, sheetname) {
+	var result = [];
+	var csv = xlsx.utils.sheet_to_csv(workbook.Sheets[sheetname]);
+	if (csv.length > 0) {
+		result.push(sheetname);
+		result.push(csv);
+	}
+	//return result.join("\n");
+	return result;
+};
 
 exports.loginToZephyr_ICE = function (req, res) {
 	try {
@@ -201,7 +216,7 @@ exports.zephyrMappedTestcaseDetails_ICE = async (req, res) => {
 			mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrMappedCyclePhase");
 			if (mappedDets == "fail") res.send('fail');
 			for(var i=0;i<mappedDets.length;++i) {
-				mappedTests.push(parseInt(mappedDets[i].testid));
+				mappedTests.push(...mappedDets[i].testid);
 			}
 		} catch (exception) {
 			logger.error("Error occurred in zephyr/"+zephyrMappedCyclePhase+":", exception);
@@ -263,7 +278,8 @@ exports.zephyrUpdateMapping = async (req, res) => {
 	logger.info("Inside UI service: zephyrUpdateMapping");
 	var mappedTestIds = [];
 	var mappedTestNames = [];
-	var mappedList = {};
+	var mappedTreeIds = [];
+	var mappedParentIds = [];
 	var testIds = [];
 	var testNames = [];
 	var testList = {};
@@ -272,13 +288,11 @@ exports.zephyrUpdateMapping = async (req, res) => {
 	var updateList = [];
 	var treeidParentIdMap = {};
 	try {
-		var projectId = parseInt(req.body.updateMapPayload.projectId);
 		var releaseId = parseInt(req.body.updateMapPayload.releaseId);
 		var phaseDets = req.body.updateMapPayload.phaseDets;
 		var selectedPhase = req.body.updateMapPayload.selectedPhase;
 		var rootCheck = req.body.rootCheck;
 		var mappedDets = [];
-		var parentids = [];
 		//get mapped details
 		try {
 			if(!rootCheck) {
@@ -297,9 +311,10 @@ exports.zephyrUpdateMapping = async (req, res) => {
 							if (mappedDets == "fail") res.send('fail');
 							// else if(mappedDets.length==0) res.send('notfound');
 							for(var j=0;j<mappedDets.length;++j) {
-								mappedTestIds.push(parseInt(mappedDets[j].testid));
-								mappedTestNames.push(mappedDets[j].testname);
-								mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
+								mappedTestIds.push(...mappedDets[j].testid);
+								mappedTestNames.push(...mappedDets[j].testname);
+								mappedTreeIds.push(...mappedDets[j].treeid);
+								mappedParentIds.push(...mappedDets[j].parentid);
 							}
 						} else {
 							var testcases = [];
@@ -324,9 +339,10 @@ exports.zephyrUpdateMapping = async (req, res) => {
 								if (mappedDets == "fail") res.send('fail');
 								// else if(mappedDets.length==0) res.send('notfound');
 								for(var j=0;j<mappedDets.length;++j) {
-									mappedTestIds.push(parseInt(mappedDets[j].testid));
-									mappedTestNames.push(mappedDets[j].testname);
-									mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
+									mappedTestIds.push(...mappedDets[j].testid);
+									mappedTestNames.push(...mappedDets[j].testname);
+									mappedTreeIds.push(...mappedDets[j].treeid);
+									mappedParentIds.push(...mappedDets[j].parentid);
 								}
 							};
 						}
@@ -343,9 +359,10 @@ exports.zephyrUpdateMapping = async (req, res) => {
 				if (mappedDets == "fail") res.send('fail');
 				// else if(mappedDets.length==0) res.send('notfound');
 				for(var i=0;i<mappedDets.length;++i) {
-					mappedTestIds.push(parseInt(mappedDets[i].testid));
-					mappedTestNames.push(mappedDets[i].testname);
-					mappedList[parseInt(mappedDets[i].testid)] = mappedDets[i];
+					mappedTestIds.push(...mappedDets[i].testid);
+					mappedTestNames.push(...mappedDets[i].testname);
+					mappedTreeIds.push(...mappedDets[j].treeid);
+					mappedParentIds.push(...mappedDets[j].parentid);
 				}
 			}
 		}  catch (exception) {
@@ -393,9 +410,10 @@ exports.zephyrUpdateMapping = async (req, res) => {
 										if (mappedDets == "fail") res.send('fail');
 										// if(mappedDets.length==0) res.send('notfound');
 										for(var j=0;j<mappedDets.length;++j) {
-											mappedTestIds.push(parseInt(mappedDets[j].testid));
-											mappedTestNames.push(mappedDets[j].testname);
-											mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
+											mappedTestIds.push(...mappedDets[j].testid);
+											mappedTestNames.push(...mappedDets[j].testname);
+											mappedTreeIds.push(...mappedDets[j].treeid);
+											mappedParentIds.push(...mappedDets[j].parentid);
 										}
 										const occurences = mappedTestNames.reduce(function (acc, curr) {
 											return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
@@ -407,19 +425,20 @@ exports.zephyrUpdateMapping = async (req, res) => {
 										//match testcase names
 										for(var i=0;i<mappedTestNames.length;++i) {
 											if(occurences[mappedTestNames[i]] == 1 && testNames.includes(mappedTestNames[i]) && occurences2[testNames[testNames.indexOf(mappedTestNames[i])]] == 1) {
-												var oldMap = mappedList[mappedTestIds[i]];
 												var index = testNames.indexOf(mappedTestNames[i]);
 												var newMap = testList[testIds[index]];
 												const inputs = {
-													"testscenarioid": oldMap.testscenarioid,
 													'projectid': parseInt(selectedPhase[1]),			
 													'releaseid': parseInt(selectedPhase[2]),
 													'treeid': String(newMap.cyclePhaseId),
 													'testid': String(newMap.id),
-													'parentid': oldMap.parentid,
+													'parentid': newMap.parentId,
 													'testname': newMap.name,
 													'reqdetails': newMap.reqdetails,
 													'oldtestid': mappedTestIds[i],
+													'oldtreeid': mappedTreeIds[i],
+													'oldparentid': mappedParentIds[i],
+													'oldtestname': mappedTestNames[i],
 													"query": "saveZephyrDetails_ICE"
 												};
 												var args = {
@@ -458,19 +477,20 @@ exports.zephyrUpdateMapping = async (req, res) => {
 								//match testcase names
 								for(var i=0;i<mappedTestNames.length;++i) {
 									if(occurences[mappedTestNames[i]] == 1 && testNames.includes(mappedTestNames[i]) && occurences2[testNames[testNames.indexOf(mappedTestNames[i])]] == 1) {
-										var oldMap = mappedList[mappedTestIds[i]];
 										var index = testNames.indexOf(mappedTestNames[i]);
 										var newMap = testList[testIds[index]];
 										const inputs = {
-											"testscenarioid": oldMap.testscenarioid,
 											'projectid': parseInt(selectedPhase[1]),			
 											'releaseid': parseInt(selectedPhase[2]),
 											'treeid': String(newMap.cyclePhaseId),
 											'testid': String(newMap.id),
-											'parentid': oldMap.parentid,
+											'parentid': newMap.parentId,
 											'testname': newMap.name,
 											'reqdetails': newMap.reqdetails,
 											'oldtestid': mappedTestIds[i],
+											'oldtreeid': mappedTreeIds[i],
+											'oldparentid': mappedParentIds[i],
+											'oldtestname': mappedTestNames[i],
 											"query": "saveZephyrDetails_ICE"
 										};
 										var args = {
@@ -958,4 +978,72 @@ function projectandmodule(projectid,cb,data){
         projectDetails.module_details = modulelist;
         cb(projectDetails);
     });
+}
+
+exports.excelToZephyrMappings= function(req,res){
+	const fnName = "excelToZephyrMappings";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
+		if (req.body.data.flag == 'sheetname') {
+			return res.status(200).send(wb1.SheetNames);
+		}
+		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+		var numSheets = myCSV.length / 2;
+		var mappings = [];
+		var errorRows=[];
+		var err;
+		if (numSheets == 0) {
+			return res.status(200).send("emptySheet");
+		}
+		for (var k = 0; k < numSheets; k++) {
+			var cSheet = myCSV[k * 2 + 1];
+			var cSheetRow = cSheet.split('\n');
+			if(cSheetRow[0].split(',').length>2|| cSheetRow[0].split(',').length<2){
+				return res.status(200).send("emptySheet");
+			}
+			var scenarioIdx = -1, testCaseIdx=-1;
+			cSheetRow[0].split(',').forEach(function (e, i) {
+				if(i== 0 && e.toLowerCase()=="testcaseid") testCaseIdx = i;
+				if(i== 1 && e.toLowerCase()=="scenario") scenarioIdx = i;
+			});
+			if (testCaseIdx == -1 || scenarioIdx == -1 || cSheetRow.length < 2) {
+				err = true;
+				break;
+			}
+			
+			for (var i = 1; i < cSheetRow.length; i++) {
+				var row = cSheetRow[i].split(',');
+				if(i==(cSheetRow.length-1) && row.length<2 && row[0]==""){
+					continue;
+				}
+				if (row[0]=="" || row[1]=="") {
+					errorRows.push(i+1)
+					continue;
+				}
+				if (row.length < 2 || row.length>2){
+					errorRows.push(i+1)	
+					continue;
+				}
+				var testCaseList = row[testCaseIdx].split(';')
+				var scenarioList = row[scenarioIdx].split(';')
+				if(testCaseList.length>1 && scenarioList.length>1){
+					errorRows.push(i+1)	
+					continue;
+				}
+				mappings.push({row: i+1,testCaseIds:[],scenarios:[]})
+				testCaseList.forEach(testCaseId => {
+					mappings[mappings.length-1].testCaseIds.push(testCaseId);
+				});
+				scenarioList.forEach(scenarioName => {
+					mappings[mappings.length-1].scenarios.push(scenarioName);
+				});
+			}
+		}
+		if (err) res.status(200).send('fail');
+		else res.status(200).send({"mappings" : mappings , "errorRows": errorRows});
+	} catch(exception) {
+		logger.error("Error occurred in zephyr/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
 }
