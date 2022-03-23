@@ -353,7 +353,8 @@ const TaskBox = (props) => {
                             <input data-test="propogateInput" onChange={()=>setPropagate({show:true,val:!propagate.val})} type='checkbox'></input>
                         </li>
                     :null}
-                    {complexity.show?
+                    {/* Hiding the Complexity component for every node type in mindmap */}
+                    {/* {complexity.show?
                         <li>
                             <label data-test="complexityLabel" >Complexity</label>
                             <span data-test="complexity">
@@ -362,7 +363,7 @@ const TaskBox = (props) => {
                             </span>
                         </li>
                     :null}
-                    {showcomplexity && !assignbtn.reassign?<Complexity setComplexity={setComplexity} complexity={complexity} type={t} setShowcomplexity={setShowcomplexity}/>:null}
+                    {showcomplexity && !assignbtn.reassign?<Complexity setComplexity={setComplexity} complexity={complexity} type={t} setShowcomplexity={setShowcomplexity}/>:null} */}
                 </ul>
                 <div>
                     <textarea data-test="taskDetails" ref={taskDetailsRef} placeholder={"Enter Task Details"} disabled={assignbtn.reassign} id='ct-assignDetails' ></textarea>
@@ -781,12 +782,14 @@ const taskAssign = {
         "detail": (i,node)=>"Execute scenario "+node +" "+taskAssign.scenarios.task[i].split("Execute Scenario")[1]
     },
     "screens": {
-        "task": ["Scrape", "Append", "Compare", "Add", "Map"],
+        // "task": ["Scrape", "Append", "Compare", "Add", "Map"],
+        "task": ["Scrape"],
         "attributes": ["at", "rw", "sd", "ed", "reestimation", "pg", "cx"],
         "detail": (i,node)=>taskAssign.screens.task[i]+" screen "+node
     },
     "testcases": {
-        "task": ["Design", "Update"],
+        // "task": ["Design", "Update"],
+        "task": ["Design"],
         "attributes": ["at", "rw", "sd", "ed", "reestimation", "cx"],
         "detail": (i,node)=>taskAssign.testcases.task[i]+" testcase "+node
     }

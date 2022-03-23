@@ -124,6 +124,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
         executionData["scenarioFlag"] = (current_task.scenarioFlag == 'True') ? true : false
+        executionData["type"] = schedulePoolDetails.type;
         
         setLoading("Scheduling...");
         const data = await testSuitesScheduler_ICE(executionData);
@@ -498,6 +499,7 @@ const parseLogicExecute = (schedulePoolDetails, moduleScheduledate, eachData, cu
         suiteInfo.testsuiteId = eachData[i].testsuiteid;
         suiteInfo.versionNumber = testsuiteDetails.versionnumber;
         suiteInfo.appType = appType;
+        suiteInfo.batchname = eachData[i].batchname;
         suiteInfo.domainName = projectdata.project[projectid].domain;
         suiteInfo.projectName = projectdata.projectDict[projectid];
         suiteInfo.projectId = projectid;

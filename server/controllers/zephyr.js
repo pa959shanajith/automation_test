@@ -216,7 +216,7 @@ exports.zephyrMappedTestcaseDetails_ICE = async (req, res) => {
 			mappedDets = await utils.fetchData(inputs, "qualityCenter/getMappedDetails", "zephyrMappedCyclePhase");
 			if (mappedDets == "fail") res.send('fail');
 			for(var i=0;i<mappedDets.length;++i) {
-				mappedTests.push(parseInt(mappedDets[i].testid));
+				mappedTests.push(...mappedDets[i].testid);
 			}
 		} catch (exception) {
 			logger.error("Error occurred in zephyr/"+zephyrMappedCyclePhase+":", exception);
@@ -278,7 +278,8 @@ exports.zephyrUpdateMapping = async (req, res) => {
 	logger.info("Inside UI service: zephyrUpdateMapping");
 	var mappedTestIds = [];
 	var mappedTestNames = [];
-	var mappedList = {};
+	var mappedTreeIds = [];
+	var mappedParentIds = [];
 	var testIds = [];
 	var testNames = [];
 	var testList = {};
@@ -287,13 +288,11 @@ exports.zephyrUpdateMapping = async (req, res) => {
 	var updateList = [];
 	var treeidParentIdMap = {};
 	try {
-		var projectId = parseInt(req.body.updateMapPayload.projectId);
 		var releaseId = parseInt(req.body.updateMapPayload.releaseId);
 		var phaseDets = req.body.updateMapPayload.phaseDets;
 		var selectedPhase = req.body.updateMapPayload.selectedPhase;
 		var rootCheck = req.body.rootCheck;
 		var mappedDets = [];
-		var parentids = [];
 		//get mapped details
 		try {
 			if(!rootCheck) {
@@ -312,9 +311,10 @@ exports.zephyrUpdateMapping = async (req, res) => {
 							if (mappedDets == "fail") res.send('fail');
 							// else if(mappedDets.length==0) res.send('notfound');
 							for(var j=0;j<mappedDets.length;++j) {
-								mappedTestIds.push(parseInt(mappedDets[j].testid));
-								mappedTestNames.push(mappedDets[j].testname);
-								mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
+								mappedTestIds.push(...mappedDets[j].testid);
+								mappedTestNames.push(...mappedDets[j].testname);
+								mappedTreeIds.push(...mappedDets[j].treeid);
+								mappedParentIds.push(...mappedDets[j].parentid);
 							}
 						} else {
 							var testcases = [];
@@ -339,9 +339,10 @@ exports.zephyrUpdateMapping = async (req, res) => {
 								if (mappedDets == "fail") res.send('fail');
 								// else if(mappedDets.length==0) res.send('notfound');
 								for(var j=0;j<mappedDets.length;++j) {
-									mappedTestIds.push(parseInt(mappedDets[j].testid));
-									mappedTestNames.push(mappedDets[j].testname);
-									mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
+									mappedTestIds.push(...mappedDets[j].testid);
+									mappedTestNames.push(...mappedDets[j].testname);
+									mappedTreeIds.push(...mappedDets[j].treeid);
+									mappedParentIds.push(...mappedDets[j].parentid);
 								}
 							};
 						}
@@ -358,9 +359,10 @@ exports.zephyrUpdateMapping = async (req, res) => {
 				if (mappedDets == "fail") res.send('fail');
 				// else if(mappedDets.length==0) res.send('notfound');
 				for(var i=0;i<mappedDets.length;++i) {
-					mappedTestIds.push(parseInt(mappedDets[i].testid));
-					mappedTestNames.push(mappedDets[i].testname);
-					mappedList[parseInt(mappedDets[i].testid)] = mappedDets[i];
+					mappedTestIds.push(...mappedDets[i].testid);
+					mappedTestNames.push(...mappedDets[i].testname);
+					mappedTreeIds.push(...mappedDets[j].treeid);
+					mappedParentIds.push(...mappedDets[j].parentid);
 				}
 			}
 		}  catch (exception) {
@@ -408,9 +410,10 @@ exports.zephyrUpdateMapping = async (req, res) => {
 										if (mappedDets == "fail") res.send('fail');
 										// if(mappedDets.length==0) res.send('notfound');
 										for(var j=0;j<mappedDets.length;++j) {
-											mappedTestIds.push(parseInt(mappedDets[j].testid));
-											mappedTestNames.push(mappedDets[j].testname);
-											mappedList[parseInt(mappedDets[j].testid)] = mappedDets[j];
+											mappedTestIds.push(...mappedDets[j].testid);
+											mappedTestNames.push(...mappedDets[j].testname);
+											mappedTreeIds.push(...mappedDets[j].treeid);
+											mappedParentIds.push(...mappedDets[j].parentid);
 										}
 										const occurences = mappedTestNames.reduce(function (acc, curr) {
 											return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
@@ -422,19 +425,20 @@ exports.zephyrUpdateMapping = async (req, res) => {
 										//match testcase names
 										for(var i=0;i<mappedTestNames.length;++i) {
 											if(occurences[mappedTestNames[i]] == 1 && testNames.includes(mappedTestNames[i]) && occurences2[testNames[testNames.indexOf(mappedTestNames[i])]] == 1) {
-												var oldMap = mappedList[mappedTestIds[i]];
 												var index = testNames.indexOf(mappedTestNames[i]);
 												var newMap = testList[testIds[index]];
 												const inputs = {
-													"testscenarioid": oldMap.testscenarioid,
 													'projectid': parseInt(selectedPhase[1]),			
 													'releaseid': parseInt(selectedPhase[2]),
 													'treeid': String(newMap.cyclePhaseId),
 													'testid': String(newMap.id),
-													'parentid': oldMap.parentid,
+													'parentid': newMap.parentId,
 													'testname': newMap.name,
 													'reqdetails': newMap.reqdetails,
 													'oldtestid': mappedTestIds[i],
+													'oldtreeid': mappedTreeIds[i],
+													'oldparentid': mappedParentIds[i],
+													'oldtestname': mappedTestNames[i],
 													"query": "saveZephyrDetails_ICE"
 												};
 												var args = {
@@ -473,19 +477,20 @@ exports.zephyrUpdateMapping = async (req, res) => {
 								//match testcase names
 								for(var i=0;i<mappedTestNames.length;++i) {
 									if(occurences[mappedTestNames[i]] == 1 && testNames.includes(mappedTestNames[i]) && occurences2[testNames[testNames.indexOf(mappedTestNames[i])]] == 1) {
-										var oldMap = mappedList[mappedTestIds[i]];
 										var index = testNames.indexOf(mappedTestNames[i]);
 										var newMap = testList[testIds[index]];
 										const inputs = {
-											"testscenarioid": oldMap.testscenarioid,
 											'projectid': parseInt(selectedPhase[1]),			
 											'releaseid': parseInt(selectedPhase[2]),
 											'treeid': String(newMap.cyclePhaseId),
 											'testid': String(newMap.id),
-											'parentid': oldMap.parentid,
+											'parentid': newMap.parentId,
 											'testname': newMap.name,
 											'reqdetails': newMap.reqdetails,
 											'oldtestid': mappedTestIds[i],
+											'oldtreeid': mappedTreeIds[i],
+											'oldparentid': mappedParentIds[i],
+											'oldtestname': mappedTestNames[i],
 											"query": "saveZephyrDetails_ICE"
 										};
 										var args = {

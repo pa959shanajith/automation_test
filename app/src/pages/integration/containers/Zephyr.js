@@ -43,13 +43,13 @@ const Zephyr = () => {
         }
     }, [])
 
-    const callLogin_zephyr = async()=>{
+    const callLogin_zephyr = async(currentAuthType)=>{
         dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Logging...'});
 
         var zephyrPayload = {};
-        zephyrPayload.authtype = authType;
+        zephyrPayload.authtype = currentAuthType;
         if (zephyrUrlRef.current) zephyrPayload.zephyrURL = zephyrUrlRef.current.value;
-        if(authType==="basic") {
+        if(currentAuthType==="basic") {
             if(zephyrUsernameRef.current) zephyrPayload.zephyrUserName = zephyrUsernameRef.current.value;
             if(zephyrPasswordRef.current) zephyrPayload.zephyrPassword = zephyrPasswordRef.current.value;
         } else {

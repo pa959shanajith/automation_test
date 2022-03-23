@@ -8,7 +8,7 @@ import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE, getDeta
 */
 
 const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integrationCred, setCredentialsExecution, displayError}) => {
-    const [credentials,setCredentials] = useState({url: "", userName: "", password: "", apitoken:"", authtype:""});
+    const [credentials,setCredentials] = useState({url: "", userName: "", password: "", apitoken:"", authtype:"basic"});
     const [urlErrBor,setUrlErrBor] = useState(false)
     const [usernameErrBor,setUserNameErrBor] = useState(false)
     const [passErrBor,setPassErrBor] = useState(false)
@@ -130,21 +130,25 @@ const submitModal = (errorMsg, saveAction,type,  isEmpty) => {
 
 const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, passErrBor, authErrBor, type, qtestSteps, setqtestSteps, zephAuthType, setZephAuthType, setErrorMsg, saveAction, setIsEmpty) => {
     const [loading, setLoading] = useState(false);
-
+    const [defaultValues, setDefaultValues] = useState(false);
     const populateFields=async(authtype)=>{
         setErrorMsg("");
+        let tempCredentialsData = {};
         if(authtype==="token") {
-            credentials.url="";
-            credentials.userName="";
-            credentials.password="";
-            credentials.authtype=authtype;
+            tempCredentialsData.url = (defaultValues.url) ? defaultValues.url : "";
+            tempCredentialsData.userName = "";
+            tempCredentialsData.password = "";
+            tempCredentialsData.apitoken = (defaultValues.apitoken) ? defaultValues.apitoken : "";
+            tempCredentialsData.authtype = authtype;
         } else {
-            credentials.url="";
-            credentials.apitoken="";
-            credentials.authtype=authtype;
+            tempCredentialsData.url = (defaultValues.url) ? defaultValues.url : "";
+            tempCredentialsData.userName = (defaultValues.userName) ? defaultValues.userName : "";
+            tempCredentialsData.password = (defaultValues.password) ? defaultValues.password : "";
+            tempCredentialsData.apitoken = "";
+            tempCredentialsData.authtype = authtype;
         }
-        setZephAuthType(authtype)
-        setCredentials({url: credentials.url, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: authtype});
+        setZephAuthType(authtype);
+        setCredentials({url: tempCredentialsData.url, userName: tempCredentialsData.userName, password: tempCredentialsData.password, apitoken: tempCredentialsData.apitoken, authtype: authtype});
     }
     const getZephyrDetails = async () =>{
         try {
@@ -154,15 +158,14 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
             if(data !=="empty"){
                 setIsEmpty(false);
                 let credentialsData = {authtype: 'basic'};
+
                 if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
-                if(data.zephyrToken) {
-                    credentialsData['authtype'] = 'token';
-                    if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
-                }
-                else {
-                    if(data.zephyrUsername) credentialsData['userName'] = data.zephyrUsername;
-                    if(data.zephyrPassword) credentialsData['password'] = data.zephyrPassword;
-                }
+                if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
+                if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
+                if(data.zephyrUsername) credentialsData['userName'] = data.zephyrUsername;
+                if(data.zephyrPassword) credentialsData['password'] = data.zephyrPassword;
+
+                setDefaultValues(credentialsData);
                 setZephAuthType(credentialsData.authtype);
                 setCredentials(credentialsData);
                 saveAction(true, credentialsData);

@@ -82,7 +82,6 @@ const ReplaceObjectModal = props => {
     const [errorMsg, setErrorMsg] = useState("");
     const [custNames, setCustNames] = useState([]);
     const [replacingCustNm, setReplacingCustNm] = useState([]);
-    const [replaceObjType, setReplaceObjType] = useState("same");
     const [activeTab, setActiveTab] = useState("ObjectReplacement");
     const [firstRender, setFirstRender] = useState(true);
     const [CrossObjKeywordMap, setCrossObjKeywordMap] = useState({});
@@ -169,78 +168,6 @@ const ReplaceObjectModal = props => {
 
     const onShowAllObjects = () => setSelectedTag("");
 
-    const submitReplace = () => {
-
-        let duplicateItm = false;
-        let duplicateCusts = [];
-
-        if (!Object.keys(replace).length) {
-            setErrorMsg("Please select atleast one object to Replace");
-            return;
-        }
-
-        let { screenId, screenName, projectId, appType, versionnumber } = props.current_task;
-
-        let arg = {
-            projectId: projectId,
-            screenId: screenId,
-            screenName: screenName,
-            param: "replaceScrapeData",
-            appType: appType,
-            objList: [],
-            versionnumber: versionnumber
-        };
-
-        let replacing = { ...replace };
-        for (let val in replacing) {
-            if (replacing[val]) {
-                arg.objList.push([replacing[val][0].objId, replacing[val][1]]);
-                if (custNames.includes(replacing[val][1].custname) && !replacingCustNm.includes(replacing[val][1].custname)) {
-                    duplicateItm = true;
-                    duplicateCusts.push(replacing[val][1].custname);
-                }
-            }
-        }
-
-        if (duplicateItm) {
-            props.setShowPop({
-                'type': 'modal',
-                'title': 'Replace Scrape data',
-                'content': <div className="ss__dup_labels">
-                    Please rename/delete duplicate scraped objects
-                    <br /><br />
-                    Object characterstics are same for:
-                    <ScrollBar hideXbar={true} thumbColor="#321e4f" trackColor="rgb(211, 211, 211)">
-                        <div className="ss__dup_scroll">
-                            {duplicateCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
-                        </div>
-                    </ScrollBar>
-                </div>,
-                'footer': <button onClick={() => props.setShowPop("")}>OK</button>
-            })
-        } else {
-            updateScreen_ICE(arg)
-                .then(response => {
-                    if (response === "Invalid Session") return RedirectPage(props.history);
-                    else props.fetchScrapeData()
-                        .then(resp => {
-                            if (resp === "success") {
-                                props.setShow(false);
-                                setMsg(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
-                            }
-                            else setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                        })
-                        .catch(err => {
-                            setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                        });
-                })
-                .catch(error => {
-                    setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-                    console.err(error);
-                })
-        }
-    }
-
     const onCustomClick = (showName, id) => {
         let updatedSelectedItems = [...selectedItems]
         let indexOfItem = selectedItems.indexOf(id);
@@ -310,43 +237,75 @@ const ReplaceObjectModal = props => {
         props.setShow(false)
     }
 
-    const _handleReplaceKeywordClick = () =>{
+    const handleReplaceKeywordClick = () =>{
         if (!Object.keys(replace).length) {
             setErrorMsg("Please select atleast one object to Replace");
             return;
         }
-        props.setOverlay("Fetching Keywords for selected objects...")
-
-        let { screenId,appType } = props.current_task;
-        
-        let arg = {
-            screenId,    
-            appType,                                  
-            objMap: {},
-        };
-
-        let replacing = { ...replace };
+        let duplicateItm = false;
+        let duplicateCusts = [];
+        let object_list=[]
+        let replacing = {...replace};
         for (let val in replacing) {
             if (replacing[val]) {
-                let tag =  tagListToReplace.includes(replacing[val][1].tag) ? replacing[val][1].tag : 'element'
-                arg.objMap[replacing[val][0].objId] = tag;
+                object_list.push([replacing[val][0].objId, replacing[val][1]]);
+                if(custNames.includes(replacing[val][1].custname) && !replacingCustNm.includes(replacing[val][1].custname)) {
+                    duplicateItm = true;
+                    duplicateCusts.push(replacing[val][1].custname);
+                }
             }
         }
-        fetchReplacedKeywords_ICE(arg).then((res)=>{
-            props.setOverlay(null)
-            if(!(res==="fail")){
-                setCORData(res)
-                setErrorMsg("");
-                setActiveTab("keywordsReplacement")
+
+        if(duplicateItm) {
+            props.setShowPop({
+                'type': 'modal',
+                'title': 'Replace Scrape data',
+                'content': <div className="ss__dup_labels">
+                    Please rename/delete duplicate scraped objects
+                    <br/><br/>
+                    Object characterstics are same for:
+                    <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)">
+                        <div className="ss__dup_scroll">
+                        { duplicateCusts.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>) }
+                        </div>
+                    </ScrollBar>
+                </div>,
+                'footer': <button onClick={()=>props.setShowPop("")}>OK</button>
+            })
+        } else {
+            props.setOverlay("Fetching Keywords for selected objects...")
+
+            let { screenId,appType } = props.current_task;
+            
+            let arg = {
+                screenId,    
+                appType,                                  
+                objMap: {},
+            };
+
+            let replacing = { ...replace };
+            for (let val in replacing) {
+                if (replacing[val]) {
+                    let tag =  tagListToReplace.includes(replacing[val][1].tag) ? replacing[val][1].tag : 'element'
+                    arg.objMap[replacing[val][0].objId] = tag;
+                }
             }
-            else {
+            fetchReplacedKeywords_ICE(arg).then((res)=>{
+                props.setOverlay(null)
+                if(!(res==="fail")){
+                    setCORData(res)
+                    setErrorMsg("");
+                    setActiveTab("keywordsReplacement")
+                }
+                else {
+                    setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
+                }
+            }).catch((err)=>{
+                props.setOverlay(null)
+                console.log(err)
                 setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-            }
-        }).catch((err)=>{
-            props.setOverlay(null)
-            console.log(err)
-            setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
-        });
+            });
+        }
     }
     
     return (
@@ -359,16 +318,6 @@ const ReplaceObjectModal = props => {
                             <AnimateDiv key={`${activeTab}-0`} firstPage={true} firstRender={firstRender} >
 
                                 <div className="ss__replaceObjBody">
-                                    <div className="ss__radioContainer">
-                                        <label>
-                                            <input type="radio" checked={replaceObjType === "same"} value="same" onChange={() => { setReplace({}); setReplaceObjType("same") }} />
-                                            <span>Same Object Replacement</span>
-                                        </label>
-                                        <label>
-                                            <input type="radio" checked={replaceObjType === "cross"} value="cross" onChange={() => { setReplace({}); setReplaceObjType("cross") }} />
-                                            <span>Cross Object Replacement</span>
-                                        </label>
-                                    </div>
                                     <div data-test="replaceObjectHeading" className="ss__ro_lbl ro__headerMargin">Please select the object type and then drag and drop the necessary objects to be replaced with the new objects</div>
                                     <div className="ss__ro_lists">
                                         <div data-test="replaceObjectScrapeObjectList" className="ss__ro_scrapeObjectList">
@@ -379,8 +328,7 @@ const ReplaceObjectModal = props => {
                                                         <div data-test="replaceObjectListContent" className="ro_listContent" id="roListId">
                                                             <ScrollBar scrollId="roListId" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" verticalbarWidth='8px'>
                                                                 <>
-                                                                    {(replaceObjType === "same" ? (() => selectedTag ? scrapedList[selectedTag] : allScraped)() : (() => selectedTag ? allScraped.filter(x => x['tag'] !== selectedTag) : allScraped)())
-                                                                        .map((object, i) => {
+                                                                    {allScraped.map((object, i) => {
                                                                             let replaced = object.val in replace;
                                                                             return (<div data-test="replaceObjectListItem" key={i} title={object.title} className={"ss__ro_listItem" + (replaced ? " ro_replaced" : "")} draggable={replaced ? "false" : "true"} onDragStart={(e) => onDragStart(e, object)}>
                                                                                 {object.title}
@@ -475,9 +423,7 @@ const ReplaceObjectModal = props => {
                         (<>
                             <button data-test="showAll" onClick={onShowAllObjects}>Show All Objects</button>
                             <button data-test="unLink" onClick={onUnlink} disabled={!selectedItems.length}>Un-Map</button>
-                            {replaceObjType == "same" ?
-                                <button data-test="submit" onClick={submitReplace}>Replace Objects</button>
-                                : <button data-test="submit" onClick={_handleReplaceKeywordClick}>Replace Keywords</button>}
+                            <button data-test="submit" onClick={handleReplaceKeywordClick}>Replace Keywords</button>
                         </>) :
                         (<>
                             {/* <button data-test="go-back" onClick={() => setActiveTab("ObjectReplacement")}>Go Back</button> */}
