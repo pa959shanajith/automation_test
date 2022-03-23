@@ -478,6 +478,13 @@ const Messages={
         ERR_JIRA_FETCH: {"CONTENT": "Failed to fetch JIRA details.", "VARIANT": VARIANT.ERROR},
         
         SUCC_INFO_UPDATED: {"CONTENT": "User Information updated successfully!", "VARIANT": VARIANT.SUCCESS},
+    },
+
+    LOGIN: {
+        SUCC_FORGOTP_MAIL: {"CONTENT":'Successfully sent an email to reset your password! Please login with the temporary password sent in the email.', "VARIANT": VARIANT.SUCCESS},
+        SUCC_UNLOCKED: {"CONTENT":'Successfully unlocked the user account! Please login again.', "VARIANT": VARIANT.SUCCESS},
+        SUCC_UNLOCK_MAIL: {"CONTENT":"Successfully sent an email! Please unlock the account using verification password sent in the email.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_P_CHANGE: {"CONTENT":"Password change successfull! Please login again with new password.", "VARIANT": VARIANT.SUCCESS},
     }
 }
 
