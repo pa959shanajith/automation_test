@@ -181,7 +181,8 @@ class TestSuiteExecutor {
                 suiteObj.accessibilityMap[scenario.scenarioId] = tsco.accessibilityParameters;
                 suiteObj.condition.push(scenario.condition);
                 suiteObj.dataparampath.push(scenario.dataparam[0]);
-                suiteObj.scenarioNames.push(scenario.scenarioName);
+                let scName = scenario.scenarioName || scenario.scenarioname
+                suiteObj.scenarioNames.push(scName);
                 suiteObj.scenarioIds.push(scenario.scenarioId);
                 const scenarioObj = {};
                 if(gitflag){
