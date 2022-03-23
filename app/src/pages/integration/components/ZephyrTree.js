@@ -341,7 +341,7 @@ const TestCaseNode = props => {
     const syncedTestCases = useSelector(state=>state.integration.syncedTestCases);
     const selectedScIds = useSelector(state=>state.integration.selectedScenarioIds);
 
-    let uniqueTCpath = `|${props.phaseId}\\${props.testCase.id}\\${props.testCase.name}|`;
+    let uniqueTCpath = `|${props.phaseId}\\${props.testCase.id}\\${props.testCase.name}\\${props.testCase.parentId}|`;
 
     const handleClick = e => {
         let newSelectedTCDetails = { ...selectedZTCDetails };
