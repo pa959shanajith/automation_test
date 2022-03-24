@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { ScreenOverlay , PopupMsg , ChangePassword } from '../../global';
+import { ScreenOverlay , PopupMsg , ChangePassword, Messages as MSG, setMsg } from '../../global';
 import * as api from '../api';
 import "../styles/LoginFields.scss";
 
@@ -139,7 +139,7 @@ const LoginFields = (props) => {
                     setPassword("");
                     setUsername("");
                     setforgotPassword(true);
-                    setPopup({"title": "Unlock Account", "content": "Successfully unlocked the user account! Please login again"})
+                    setMsg(MSG.LOGIN.SUCC_UNLOCKED);
                 } else if (data === "invalid_username_password") {
                     setUserError(true);
                     setPassError(true);
@@ -221,7 +221,7 @@ const LoginFields = (props) => {
         .then(data => {
             if (data === "success") {
                 setOverlayText("");
-                setPopup({'title': "Restart Service", "content": serverName+" service is restarted successfully!!"})                
+                setPopup({'title': "Restart Service", "content": serverName+" service is restarted successfully!!"})               
             } else {
                 setOverlayText("");
                 if (data === "na") errmsg = "Service is not found. Ensure "+serverName+" is running as a service.";
@@ -250,7 +250,7 @@ const LoginFields = (props) => {
 					setUserError(false);
                     setPassError(false);
                     setPassword("");
-                    setPopup({'title': "Forgot Password", "content":"Successfully sent an email to reset your password! Please login with the temporary password sent in the email"})                
+                    setMsg(MSG.LOGIN.SUCC_FORGOTP_MAIL);
                 } else if (data === "userLocked") {
 					setLockedOut(true);
                     setLoginValidation("User account is locked!");
@@ -284,7 +284,7 @@ const LoginFields = (props) => {
 					setPassword("");
                     setforgotPassword(false);
                     setUnlockCond(true);
-                    setPopup({'title': "Unlock Account", "content":"Successfully sent an email! Please unlock the account using verification password sent in the email"})                
+                    setMsg(MSG.LOGIN.SUCC_UNLOCK_MAIL);
                 } else if (data === "invalid_username_password") {
 					setUserError(false);
                     setPassError(true);
@@ -310,11 +310,7 @@ const LoginFields = (props) => {
     );
 
     const PasswordSuccessPopup = () => (
-        <PopupMsg 
-            variant={popup.variant}
-            close={()=>setSuccessPass(false)}
-            content={"Password change successfull! Please login again with new password"}
-        />
+        <>{setMsg(MSG.LOGIN.SUCC_P_CHANGE) && setSuccessPass(false)}</>
     );
 
     return (
