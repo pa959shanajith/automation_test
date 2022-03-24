@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG, setMsg, AnimatePageWrapper, AnimateDiv } from '../../global';
+import { ModalContainer, ScrollBar, RedirectPage, Messages as MSG, setMsg, AnimatePageWrapper, AnimateDiv, updateScrollBar } from '../../global';
 import { tagListToReplace } from './ListVariables';
 import { updateScreen_ICE, fetchReplacedKeywords_ICE } from '../api';
 import "../styles/ReplaceObjectModal.scss";
@@ -8,7 +8,7 @@ import { Icon } from "@fluentui/react"
 
 const RenderGroupItem = (props) =>{
     const {oldObj,newObj,keywords,newkeywords,COKMap,stateUpdate,val,saveGroupItem} = props;
-    const [expanded,setExpanded] =  useState(false);
+    const [expanded,setExpanded] = useState(false);
     const handleSelectChange = (e,keyword) =>{
         if (e.target.value ) e.target.classList.remove("r-group__selectError")
         else return
@@ -28,7 +28,7 @@ const RenderGroupItem = (props) =>{
     return (
             <div className='r-group__container'>
                 <div className="r-group__header">
-                    <button className='r-group__expandButton' onClick={()=>{setExpanded(!expanded)}}><Icon iconName='chevron-right' styles={{root:{display:"flex",justifyContent:"center", height:"10px",transform: expanded?"rotate(90deg)":"rotate(0deg)", transition:"0.5s"}}} ></Icon></button>
+                    <button className='r-group__expandButton' onClick={()=>{setExpanded(!expanded); updateScrollBar();}}><Icon iconName='chevron-right' styles={{root:{display:"flex",justifyContent:"center", height:"10px",transform: expanded?"rotate(90deg)":"rotate(0deg)", transition:"0.5s"}}} ></Icon></button>
                     <div className='r-header__mid'>
                         <span title={oldObj.title} className="r-header__objNames">{oldObj.title}</span>
                         <span title={newObj.title} className="r-header__objNames">{newObj.title}</span>
@@ -123,6 +123,7 @@ const ReplaceObjectModal = props => {
     }, [])
 
     useEffect(()=>{
+        updateScrollBar();
         if(activeTab==="keywordsReplacement" && !document.querySelector(".r-group__container")){
             _handleModalClose()
         }

@@ -21,6 +21,7 @@
 .ss__ro_scrapeObjectList, .ss__ro_customObjectList{
     flex: 1 0 50%;
     margin: 0 5px;
+    max-width: 50%;
 }
 .ss__ro_customObjectList{
     align-items: center;
@@ -35,6 +36,7 @@
 .ro_listCanvas{
     display: flex;
     height: 100%;
+    width: 100%;
     flex:1;
 }
 
