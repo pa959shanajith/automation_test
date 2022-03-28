@@ -56,6 +56,9 @@ const RenderGroupItem = (props) =>{
                                         </select>
                                     </span>
                                     <span style={{width:"40%"}}> 
+                                        {/** If we want to retain the selected mappings after saving also */}
+                                        {/* defaultValue={(COKMap[oldObj.objId] && COKMap[oldObj.objId]["keywordMap"][k_word])? COKMap[oldObj.objId]["keywordMap"][k_word]: ""}  */}
+
                                         <select className="r-group__select" defaultValue={""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}>
                                             <option key={"notSelected"} value={""} title={"Select keyword"} disabled>{"Select keyword"}</option>
                                             { newkeywords && newkeywords.map((keyword, i) => <option key={keyword+i} title={keyword} value={keyword}>{keyword.slice(0,30) + (keyword.length>30?"...":"")}</option>) }
@@ -86,6 +89,7 @@ const ReplaceObjectModal = props => {
     const [firstRender, setFirstRender] = useState(true);
     const [CrossObjKeywordMap, setCrossObjKeywordMap] = useState({});
     const [CORData,setCORData] = useState({})
+    const [forceRender, setForceRender] = useState(false); // only used to re-render the replace-keyword screen
 
     useEffect(() => {
         setFirstRender(false);
@@ -208,8 +212,13 @@ const ReplaceObjectModal = props => {
                                 let rep = {...replace}
                                 delete rep[val];
                                 setReplace({...rep})
+                                setForceRender(!forceRender)
                                 setMsg(MSG.SCRAPE.SUCC_OBJ_TESTCASES_REPLACED)
-                                delete CrossObjKeywordMap[oldObjId]
+                                /** uncomment the line below when retaining the selected mappings, for deleting only saved object */
+                                // delete CrossObjKeywordMap[oldObjId]
+
+                                /** comment the line below when retaining the selected mappings, currently deleting all mappings after saving */
+                                setCrossObjKeywordMap({})
                             }
                             else {
                                 setMsg(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
@@ -388,7 +397,7 @@ const ReplaceObjectModal = props => {
                                             if(replace[val_id])
                                                 tag = tagListToReplace.includes(replace[val_id][1].tag) ? replace[val_id][1].tag : 'element'
                                             return replace[val_id]?
-                                            <RenderGroupItem key={idx} val={val_id} COKMap={CrossObjKeywordMap} saveGroupItem={saveGroupItem} stateUpdate={setCrossObjKeywordMap} 
+                                            <RenderGroupItem key={idx+forceRender} val={val_id} COKMap={CrossObjKeywordMap} saveGroupItem={saveGroupItem} stateUpdate={setCrossObjKeywordMap} 
                                             oldObj={replace[val_id][0]} newObj={replace[val_id][1]} keywords={CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords:[]} 
                                             newkeywords={CORData[replace[val_id][0].objId]?Object.keys(CORData.keywordList[tag]):[]}
                                             ></RenderGroupItem>
@@ -422,7 +431,7 @@ const ReplaceObjectModal = props => {
                     </div>
                     {activeTab === "ObjectReplacement" ?
                         (<>
-                            <button data-test="showAll" onClick={onShowAllObjects}>Show All Objects</button>
+                            {/* <button data-test="showAll" onClick={onShowAllObjects}>Show All Objects</button> */}
                             <button data-test="unLink" onClick={onUnlink} disabled={!selectedItems.length}>Un-Map</button>
                             <button data-test="submit" onClick={handleReplaceKeywordClick}>Replace Keywords</button>
                         </>) :
