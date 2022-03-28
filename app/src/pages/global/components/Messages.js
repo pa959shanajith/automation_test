@@ -186,7 +186,7 @@ const Messages={
         ERR_SWITCH_USER: {"CONTENT":"Fail to Switch User.", "VARIANT": VARIANT.ERROR},
         ERR_ROLENAMES: {"CONTENT":"Failed to Fetch Role Name.", "VARIANT": VARIANT.ERROR},
         ERR_NOROLES_SWITCH: {"CONTENT":"There are no roles to switch.", "VARIANT": VARIANT.ERROR},
-        ERR_PACKAGE: {"CONTENT":"Package is not availabl.e", "VARIANT": VARIANT.ERROR},
+        ERR_PACKAGE: {"CONTENT":"Package is not available", "VARIANT": VARIANT.ERROR},
         ERR_UNAVAILABLE_LOCAL_SERVER: {"CONTENT":"Unavailable LocalServe.r", "VARIANT": VARIANT.ERROR},
         ERR_SOMETHING_WRONG: {"CONTENT": "Something went wrong!", "VARIANT": VARIANT.ERROR},
         
@@ -381,7 +381,7 @@ const Messages={
         SUCC_SUBMIT: {"CONTENT":"Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_IRIS_SAVE: {"CONTENT":"Submitted Successfully. IRIS image saved.", "VARIANT": VARIANT.SUCCESS},
         SUCC_MAPPED_SCRAPED: {"CONTENT":"Mapped Scrape Data Successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_REPLACE_SCRAPED: {"CONTENT":"Replaced scrape data successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_REPLACE_SCRAPED: {"CONTENT":"Replaced scraped data successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_OBJ_SAVE: { "CONTENT": 'Scraped data saved successfully.', "VARIANT": VARIANT.SUCCESS },
         SUCC_OBJ_TESTCASES_REPLACED:{"CONTENT":'Object and all dependent Testcases Replaced successfully.',"VARIANT":VARIANT.SUCCESS},
         
