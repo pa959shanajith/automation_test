@@ -90,6 +90,7 @@ const ReplaceObjectModal = props => {
     const [CrossObjKeywordMap, setCrossObjKeywordMap] = useState({});
     const [CORData,setCORData] = useState({})
     const [forceRender, setForceRender] = useState(false); // only used to re-render the replace-keyword screen
+    const [objectsReplaced, setObjectsReplaced] = useState(false) // used to detect whether any object was replaced or not
 
     useEffect(() => {
         setFirstRender(false);
@@ -214,6 +215,8 @@ const ReplaceObjectModal = props => {
                                 setReplace({...rep})
                                 setForceRender(!forceRender)
                                 setMsg(MSG.SCRAPE.SUCC_OBJ_TESTCASES_REPLACED)
+                                if(!objectsReplaced)
+                                    setObjectsReplaced(true)
                                 /** uncomment the line below when retaining the selected mappings, for deleting only saved object */
                                 // delete CrossObjKeywordMap[oldObjId]
 
@@ -237,7 +240,8 @@ const ReplaceObjectModal = props => {
         props.fetchScrapeData()
             .then(resp => {
                 if (resp === "success") {
-                    setMsg(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
+                    if(objectsReplaced) // this is required inside only.
+                        setMsg(MSG.SCRAPE.SUCC_REPLACE_SCRAPED)
                 }
                 else setMsg(MSG.SCRAPE.ERR_REPLACE_SCRAPE)
             })
