@@ -359,6 +359,8 @@ const TestCaseNode = props => {
             newSelectedTCDetails.selectedTCReqDetails = [props.testCase.reqdetails];
             newSelectedTCDetails.selectedTreeId = [String(props.testCase.cyclePhaseId)];
             newSelectedTCDetails.selectedParentID = [props.testCase.parentId];
+            newSelectedTCDetails.selectedProjectID = [parseInt(props.projectId)];
+            newSelectedTCDetails.selectedReleaseID = [parseInt(props.releaseId)];
             newSelectedTC = [uniqueTCpath];
 		} else if (e.ctrlKey) { 
             const index = newSelectedTC.indexOf(uniqueTCpath);
@@ -369,6 +371,8 @@ const TestCaseNode = props => {
                 newSelectedTCDetails.selectedTCReqDetails.splice(index, 1);
                 newSelectedTCDetails.selectedTreeId.splice(index, 1);
                 newSelectedTCDetails.selectedParentID.splice(index, 1);
+                newSelectedTCDetails.selectedProjectID.splice(index, 1);
+                newSelectedTCDetails.selectedReleaseID.splice(index, 1);
                 newSelectedTC.splice(index, 1);
             } else {
                 newSelectedTCDetails.selectedTCPhaseId.push(props.phaseId);
@@ -377,6 +381,8 @@ const TestCaseNode = props => {
                 newSelectedTCDetails.selectedTCReqDetails.push(props.testCase.reqdetails);
                 newSelectedTCDetails.selectedTreeId.push(String(props.testCase.cyclePhaseId));
                 newSelectedTCDetails.selectedParentID.push(props.testCase.parentId);
+                newSelectedTCDetails.selectedProjectID.push(parseInt(props.projectId));
+                newSelectedTCDetails.selectedReleaseID.push(parseInt(props.releaseId));
                 newSelectedTC.push(uniqueTCpath)
             } 
         }
@@ -401,8 +407,8 @@ const TestCaseNode = props => {
         else{
             const mappedPair=[
                 {
-                    projectid: parseInt(props.projectId),			
-                    releaseid: parseInt(props.releaseId),
+                    projectid: selectedZTCDetails.selectedProjectID,			
+                    releaseid: selectedZTCDetails.selectedReleaseID,
                     treeid: selectedZTCDetails.selectedTreeId,
                     parentid: selectedZTCDetails.selectedParentID,
                     testid: selectedZTCDetails.selectedTcId,
