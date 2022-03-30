@@ -402,8 +402,8 @@ const loadImportData = async({importData,sheet,importType,avoProjectList,setActi
             var testCaseIds = e.testCaseIds;
             var scenarios = e.scenarios;
             var mappedpair = {
-                projectid: parseInt(selectedPhase[1]),			
-                releaseid: parseInt(selectedPhase[2]),
+                projectid: [],			
+                releaseid: [],
                 treeid: [],
                 parentid: [],
                 testid:[],
@@ -422,7 +422,9 @@ const loadImportData = async({importData,sheet,importType,avoProjectList,setActi
                     mappedpair.parentid.push(tcObject.parentId)
                     mappedpair.testname.push(tcObject.name)
                     mappedpair.testid.push(tcObject.id)
-                    mappedpair.reqdetails.push(tcObject.reqdetails)                    
+                    mappedpair.reqdetails.push(tcObject.reqdetails) 
+                    mappedpair.projectid.push(selectedPhase[1])   
+                    mappedpair.releaseid.push(selectedPhase[2])              
                 }
                 else{
                     errorTestCasesId[errorTestCasesId.length -1 ].tcId.push(tcId);
