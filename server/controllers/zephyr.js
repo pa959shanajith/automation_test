@@ -530,10 +530,10 @@ function  saveUpdateMapping(mappedTestNames, testNames, testIds, selectedPhase, 
 					mappedParentIds[itr], mappedProjectIds[itr], mappedReleaseIds[itr], testList, occurences, occurences2, function (updateList) {
 					if(updateList.length != 0) {
 						finalList.update.push(updateList);
-					} else if(occurences[mappedTest] > 1 || occurences2[mappedTest] > 1) {
-						finalList.warning.push(mappedTest);
+					} else if(occurences[mappedTestNames[itr]] > 1 || occurences2[mappedTestNames[itr]] > 1) {
+						finalList.warning.push(mappedTestNames[itr]);
 					} else {
-						finalList.error.push(mappedTest);
+						finalList.error.push(mappedTestNames[itr]);
 					}
 					callback2();
 				});
@@ -583,9 +583,9 @@ function updateTest(mappedTest, testNames, testIds, selectedPhase, mappedTestIds
 						logger.error("Error occurred in zephyrUpdateMapping Error Code : ERRDAS");
 					}
 					updateList.push(mappedTest);
-					callback1();
 				});
 			}
+			callback1();
 		},
 		data: function (callback1) {
 			cb(updateList);
