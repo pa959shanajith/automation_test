@@ -418,13 +418,13 @@ const loadImportData = async({importData,sheet,importType,avoProjectList,setActi
                 // checking if the testCaseId exists in the selected phase/module
                 if(testIdToTestCase.has(parseInt(tcId))){
                     var tcObject = testIdToTestCase.get(parseInt(tcId));
-                    mappedpair.treeid.push(tcObject.cyclePhaseId)
+                    mappedpair.treeid.push(String(tcObject.cyclePhaseId))
                     mappedpair.parentid.push(tcObject.parentId)
                     mappedpair.testname.push(tcObject.name)
-                    mappedpair.testid.push(tcObject.id)
+                    mappedpair.testid.push(String(tcObject.id))
                     mappedpair.reqdetails.push(tcObject.reqdetails) 
-                    mappedpair.projectid.push(selectedPhase[1])   
-                    mappedpair.releaseid.push(selectedPhase[2])              
+                    mappedpair.projectid.push(parseInt(selectedPhase[1]))
+                    mappedpair.releaseid.push(parseInt(selectedPhase[2]))    
                 }
                 else{
                     errorTestCasesId[errorTestCasesId.length -1 ].tcId.push(tcId);
