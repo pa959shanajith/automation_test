@@ -390,7 +390,7 @@ const ScrapeScreen = ()=>{
         { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved} setOrderList={setOrderList} /> }
         { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} startScrape={startScrape} /> }
         { showObjModal === "replaceObjectSelBr" && <ReplaceObjectSelBrModal setShow={setShowObjModal} startScrape={startScrape} /> }
-        { showObjModal === "replaceObject" && <ReplaceObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} newScrapedData={newScrapedData} /> }
+        { showObjModal === "replaceObject" && <ReplaceObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} newScrapedData={newScrapedData} setOverlay={setOverlay} /> }
         { showObjModal === "createObject" && <CreateObjectModal setSaved={setSaved} setShow={setShowObjModal} scrapeItems={scrapeItems} updateScrapeItems={updateScrapeItems} setShowPop={setShowPop} newScrapedData={newScrapedData} setNewScrapedData={setNewScrapedData} setOrderList={setOrderList} />}
         { showObjModal === "addCert" && <CertificateModal setShow={setShowObjModal} setShowPop={setShowPop} /> }
         { showObjModal.operation === "editObject" && <EditObjectModal utils={showObjModal} setSaved={setSaved} scrapeItems={scrapeItems} setShow={setShowObjModal} setShowPop={setShowPop}/>}

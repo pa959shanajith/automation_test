@@ -21,6 +21,7 @@ const ZephyrContent = props => {
     const [scenarioArr , setScenarioArr] = useState(false);
     const [scenario_ID , setScenario_ID] = useState("Select Project") ;
     const [projectDropdn1 , setProjectDropdn1]= useState("Select Project");
+    const [projectDropdn2 , setProjectDropdn2]= useState("Select Project");
     const [SearchIconClicked , setSearchIconClicked] =useState(false);
     const [filteredNames , setFilteredName]= useState(null);
     const [screenexit , setScreenExit]= useState(false);
@@ -78,12 +79,14 @@ const ZephyrContent = props => {
     }
 
     const callScenarios =(e)=>{
-        const scenarioID = e.target.value;
+        const scenarioID = (e.target.childNodes[e.target.selectedIndex]).getAttribute("id");
+        const project_Name= e.target.value
         setScenarioArr(true);
         setScenario_ID(scenarioID);
+        setProjectDropdn2(project_Name)
         setFilteredName(null);
         setSearchIconClicked(false);
-        clearSelections();
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: []});
     }
 
     const callSaveButton =async()=>{ 
@@ -108,6 +111,7 @@ const ZephyrContent = props => {
         setScenarioArr(null);
         setProjectDropdn1("Select Project");
         setScenario_ID("Select Project");
+        setProjectDropdn2("Select Project");
         dispatch({ type: actionTypes.INTEGRATION_SCREEN_TYPE, payload: null });
     }
     
@@ -130,6 +134,20 @@ const ZephyrContent = props => {
                 )
             }
         setFilteredName(filter)
+    }
+
+    const selectScenarioMultiple = (e,id) => {
+        let newScenarioIds = [...selectedScIds];
+        if(!e.ctrlKey) {
+			newScenarioIds = [id];
+		} else if (e.ctrlKey) { 
+            const index = newScenarioIds.indexOf(id);
+            if (index !== -1) {
+                newScenarioIds.splice(index, 1);
+            }
+            else newScenarioIds.push(id);
+        }
+        dispatch({type: actionTypes.SEL_SCN_IDS, payload: newScenarioIds});	
     }
 
     return(
@@ -165,12 +183,12 @@ const ZephyrContent = props => {
                     </select>
                 }
                 selectScenarioProject={
-                    <select data-test="intg_zephyr_scenario_dwpdwn" value={scenario_ID} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
+                    <select data-test="intg_zephyr_scenario_dwpdwn" value={projectDropdn2} onChange={(e)=>callScenarios(e)} className="qtestAvoAssureSelectProject">
                         <option value="Select Project" disabled >Select Project</option>
                         {
                             avoProjects? 
                             avoProjects.map((e,i)=>(
-                                <option value={i} key={i+'_proj'} title={e.project_name}>{e.project_name}</option>))
+                                <option id={i} value={i} key={i+'_proj'} title={e.project_name}>{e.project_name}</option>))
                                 : null 
                         }
                     </select>
@@ -210,22 +228,19 @@ const ZephyrContent = props => {
                     </Fragment>
                         : <div></div>
                 }
-                scenarioList={
-                    scenarioArr ? 
+                scenarioList={scenarioArr &&
                     (filteredNames ? filteredNames : 
                         avoProjects[parseInt(scenario_ID)].scenario_details.length ? 
                         avoProjects[parseInt(scenario_ID)].scenario_details : [])
-                        .map((scenario, i)=>(
-                                <div 
-                                    key={i}
-                                    className={"scenario__listItem" + (selectedScIds == scenario._id ? " scenario__selectedTC" : "")}
-                                    title={scenario.name}
-                                    onClick={()=>{dispatch({type: actionTypes.SEL_SCN_IDS, payload: scenario._id})}}
-                                >
-                                    {scenario.name}
-                                </div>
-                        ))
-                        : <div></div>
+                        .map((e, i)=>(
+                            <div 
+                                key={i}
+                                className={"scenario__listItem" + (selectedScIds.indexOf(e._id)!==-1 ? " scenario__selectedTC" : "")}
+                                title={e.name}
+                                onClick={(event)=>{selectScenarioMultiple(event, e._id);}}
+                            >
+                                {e.name}
+                            </div>))
                 }
             />
     </Fragment>

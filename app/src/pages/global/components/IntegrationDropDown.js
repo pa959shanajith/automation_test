@@ -1,14 +1,14 @@
-import React , { useState} from 'react';
-import {ModalContainer, Messages as MSG} from '../../global' 
+import React , { useState, useEffect} from 'react';
+import {ModalContainer, ScreenOverlay, Messages as MSG, setMsg} from '../../global' 
 import '../styles/IntegrationDropDown.scss'
-import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE } from '../../execute/api';
+import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE, getDetails_ZEPHYR } from '../../execute/api';
 
 /*Component IntegrationDropDown
   use: renders integration popup for ALM/ qTest/ Zypher
 */
 
 const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integrationCred, setCredentialsExecution, displayError}) => {
-    const [credentials,setCredentials] = useState({url: "", userName: "", password: "", apitoken:"", authtype:""});
+    const [credentials,setCredentials] = useState({url: "", userName: "", password: "", apitoken:"", authtype:"basic"});
     const [urlErrBor,setUrlErrBor] = useState(false)
     const [usernameErrBor,setUserNameErrBor] = useState(false)
     const [passErrBor,setPassErrBor] = useState(false)
@@ -16,28 +16,30 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
     const [qtestSteps,setqtestSteps] = useState(false)
     const [errorMsg,setErrorMsg] = useState("")
     const [zephAuthType, setZephAuthType] = useState("basic");
+    const [isEmpty, setIsEmpty] = useState(true);
     
-    const saveAction = async () => {
+    const saveAction = async (autoSaveFlag=false, updatedData={}) => {
         setPassErrBor(false);setUrlErrBor(false);setUserNameErrBor(false);setAuthErrBor(false);setErrorMsg("");
-		if(type==="Zephyr" && !credentials.url) {
+        const latestCredentialsData = autoSaveFlag ? updatedData : credentials;
+		if(type==="Zephyr" && !latestCredentialsData.url ) {
             setUrlErrBor(true);
             setErrorMsg("Please "+placeholder[type].url);
-        } else if(type==="Zephyr" && zephAuthType==="basic" && !credentials.userName) {
+        } else if(type==="Zephyr" && latestCredentialsData.authtype==="basic" && !latestCredentialsData.userName) {
             setUserNameErrBor(true);
             setErrorMsg("Please "+placeholder[type].username);
-        } else if (type==="Zephyr" && zephAuthType==="basic" && !credentials.password) {
+        } else if (type==="Zephyr" && latestCredentialsData.authtype==="basic" && !latestCredentialsData.password) {
             setPassErrBor(true);
             setErrorMsg("Please "+placeholder[type].password);
-		} else if (type==="Zephyr" && zephAuthType==="token" && !credentials.apitoken) {
+		} else if (type==="Zephyr" && latestCredentialsData.authtype==="token" && !latestCredentialsData.apitoken) {
             setAuthErrBor(true);
             setErrorMsg("Please "+placeholder[type].apitoken);
-        } else if (type!=="Zephyr" && !credentials.url) {
+        } else if (type!=="Zephyr" && !latestCredentialsData.url) {
             setUrlErrBor(true);
             setErrorMsg("Please "+placeholder[type].url);
-		} else if (type!=="Zephyr" && !credentials.userName) {
+		} else if (type!=="Zephyr" && !latestCredentialsData.userName) {
             setUserNameErrBor(true);
             setErrorMsg("Please "+placeholder[type].username);
-		} else if (type!=="Zephyr" && !credentials.password) {
+		} else if (type!=="Zephyr" && !latestCredentialsData.password) {
             setPassErrBor(true);
             setErrorMsg("Please "+placeholder[type].password);
 		} else if (appType !== "SAP" && browserTypeExe.length === 0) {
@@ -49,8 +51,8 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             var data = undefined;
             var apiIntegration = loginQTestServer_ICE;
             if(type === "ALM") apiIntegration = loginQCServer_ICE;
-            if(type === "Zephyr") data = await loginZephyrServer_ICE(credentials.url, credentials.userName, credentials.password, credentials.apitoken, zephAuthType, type);
-			else data = await apiIntegration(credentials.url, credentials.userName, credentials.password, type);
+            if(type === "Zephyr") data = await loginZephyrServer_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, latestCredentialsData.apitoken, latestCredentialsData.authtype, type);
+			else data = await apiIntegration(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, type);
             if(data.error){displayError(data.error);return;}
             else if (data === "unavailableLocalServer") setErrorMsg("Unavailable LocalServer");
             else if (data === "Invalid Session") setErrorMsg("Invalid Session");
@@ -62,26 +64,26 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
                 var integration = {...integrationCred};
                 if(type === "ALM"){
                     integration.alm = {
-						url:credentials.url,
-						username: credentials.userName,
-						password: credentials.password
+						url:latestCredentialsData.url,
+						username: latestCredentialsData.userName,
+						password: latestCredentialsData.password
 					}
                 }
                 else if(type === "qTest"){
                     integration.qtest = {
-						url:credentials.url,
-						username: credentials.userName,
-                        password: credentials.password,
+						url:latestCredentialsData.url,
+						username: latestCredentialsData.userName,
+                        password: latestCredentialsData.password,
                         qteststeps:qtestSteps
 					}
                 }
                 else if(type === "Zephyr"){
                     integration.zephyr = {
-						url: credentials.url,
-						username: credentials.userName,
-                        password: credentials.password,
-                        apitoken: credentials.apitoken,
-                        authtype: zephAuthType
+						url: latestCredentialsData.url,
+						username: latestCredentialsData.userName,
+                        password: latestCredentialsData.password,
+                        apitoken: latestCredentialsData.apitoken,
+                        authtype: latestCredentialsData.authtype
 					}
                 }
                 setCredentialsExecution(integration)
@@ -93,47 +95,100 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
     return(
         <ModalContainer 
             title={type} 
-            footer={submitModal(errorMsg, saveAction)} 
+            footer={submitModal(errorMsg, saveAction, type, isEmpty)}
             close={()=>{setshowModal(false)}} 
-            content={MiddleContent(credentials, setCredentials, urlErrBor, usernameErrBor, passErrBor, authErrBor, type, qtestSteps, setqtestSteps, zephAuthType, setZephAuthType, setErrorMsg)} 
+            content={MiddleContent(credentials, setCredentials, urlErrBor, usernameErrBor, passErrBor, authErrBor, type, qtestSteps, setqtestSteps, zephAuthType, setZephAuthType, setErrorMsg, saveAction, setIsEmpty)} 
             modalClass=" i__modal"
         />
     )
 }
 
-const submitModal = (errorMsg, saveAction) => {
+const submitModal = (errorMsg, saveAction,type,  isEmpty) => {
     return(
-        <div className="i__popupWrapRow">
-            <div className="i__textFieldsContainer">
+        <div className="i__popupWrapRow" style={{ display: 'flex', justifyContent: 'space-between'}}>
+            <span className="i__error-msg" style={{ marginTop: '-1.4rem'}}>
+                {
+                    type==="Zephyr" && isEmpty && <><span style={{color: '#333'}} ><img src={"static/imgs/info.png"} style={{width: '6%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
+                }
+                {errorMsg}
+            </span>
+            <button type="button" className="e__btn-md " onClick={()=>{saveAction()}} >Save</button>
+            {/* <div className="i__textFieldsContainer">
             <p align="right" className="i__textFieldsContainer-cust">
-                <span className="i__error-msg">{errorMsg}</span>
+                <span className="i__error-msg" style={{ marginTop: '-1.4rem'}}>
+                    {
+                        type==="Zephyr" && isEmpty && <><span style={{color: '#333'}} ><img src={"static/imgs/info.png"} style={{width: '6%'}} alt={"Tip: "} ></img> Save Credentials in Settings for Auto Login</span><br /></>
+                    }
+                    {errorMsg}
+                </span>
                 <button type="button" className="e__btn-md " onClick={()=>{saveAction()}} >Save</button>
             </p>
-            </div>
+            </div> */}
         </div>
     )
 }
 
-const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, passErrBor, authErrBor, type, qtestSteps, setqtestSteps, zephAuthType, setZephAuthType, setErrorMsg) => {
-
+const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, passErrBor, authErrBor, type, qtestSteps, setqtestSteps, zephAuthType, setZephAuthType, setErrorMsg, saveAction, setIsEmpty) => {
+    const [loading, setLoading] = useState(false);
+    const [defaultValues, setDefaultValues] = useState(false);
     const populateFields=async(authtype)=>{
         setErrorMsg("");
+        let tempCredentialsData = {};
         if(authtype==="token") {
-            credentials.url="";
-            credentials.userName="";
-            credentials.password="";
-            credentials.authtype=authtype;
+            tempCredentialsData.url = (defaultValues.url) ? defaultValues.url : "";
+            tempCredentialsData.userName = "";
+            tempCredentialsData.password = "";
+            tempCredentialsData.apitoken = (defaultValues.apitoken) ? defaultValues.apitoken : "";
+            tempCredentialsData.authtype = authtype;
         } else {
-            credentials.url="";
-            credentials.apitoken="";
-            credentials.authtype=authtype;
+            tempCredentialsData.url = (defaultValues.url) ? defaultValues.url : "";
+            tempCredentialsData.userName = (defaultValues.userName) ? defaultValues.userName : "";
+            tempCredentialsData.password = (defaultValues.password) ? defaultValues.password : "";
+            tempCredentialsData.apitoken = "";
+            tempCredentialsData.authtype = authtype;
         }
-        setZephAuthType(authtype)
-        setCredentials({url: credentials.url, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: authtype});
+        setZephAuthType(authtype);
+        setCredentials({url: tempCredentialsData.url, userName: tempCredentialsData.userName, password: tempCredentialsData.password, apitoken: tempCredentialsData.apitoken, authtype: authtype});
     }
+    const getZephyrDetails = async () =>{
+        try {
+            setLoading("Loading...")
+            const data = await getDetails_ZEPHYR()
+            if (data.error) { setMsg(data.error); return; }
+            if(data !=="empty"){
+                setIsEmpty(false);
+                let credentialsData = {
+                    authtype: 'basic',
+                    url: '',
+                    apitoken: '',
+                    userName: '',
+                    password: ''
+                };
+
+                if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
+                if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
+                if(data.zephyrToken) credentialsData['apitoken'] = data.zephyrToken;
+                if(data.zephyrUsername) credentialsData['userName'] = data.zephyrUsername;
+                if(data.zephyrPassword) credentialsData['password'] = data.zephyrPassword;
+
+                setDefaultValues(credentialsData);
+                setZephAuthType(credentialsData.authtype);
+                setCredentials(credentialsData);
+                saveAction(true, credentialsData);
+            }
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+            setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+        }
+    }
+    useEffect(() => {
+        type==="Zephyr" && getZephyrDetails();
+    }, [])
 
     return(
         <div className="popupWrapRow">
+            {loading ? <ScreenOverlay content={loading} /> : null}
             <div className="textFieldsContainer">
             {type==="Zephyr"?
                 <>

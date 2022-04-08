@@ -186,7 +186,7 @@ const Messages={
         ERR_SWITCH_USER: {"CONTENT":"Fail to Switch User.", "VARIANT": VARIANT.ERROR},
         ERR_ROLENAMES: {"CONTENT":"Failed to Fetch Role Name.", "VARIANT": VARIANT.ERROR},
         ERR_NOROLES_SWITCH: {"CONTENT":"There are no roles to switch.", "VARIANT": VARIANT.ERROR},
-        ERR_PACKAGE: {"CONTENT":"Package is not availabl.e", "VARIANT": VARIANT.ERROR},
+        ERR_PACKAGE: {"CONTENT":"Package is not available", "VARIANT": VARIANT.ERROR},
         ERR_UNAVAILABLE_LOCAL_SERVER: {"CONTENT":"Unavailable LocalServe.r", "VARIANT": VARIANT.ERROR},
         ERR_SOMETHING_WRONG: {"CONTENT": "Something went wrong!", "VARIANT": VARIANT.ERROR},
         
@@ -266,6 +266,7 @@ const Messages={
         ERR_UPDATE_NOT_FOUND: {"CONTENT":"Failed to Update .", "VARIANT": VARIANT.ERROR},
         
         SUCC_SAVE: {"CONTENT":"Saved successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_IMPORT: {"CONTENT":"Successfully Imported Mappings.", "VARIANT": VARIANT.SUCCESS},
         UPDATE_SAVE: {"CONTENT":"Updated successfully.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_NO_MAPPED_DETAILS: {"CONTENT":"No mapped details.", "VARIANT": VARIANT.WARNING},
@@ -273,7 +274,8 @@ const Messages={
         WARN_SELECT_SCENARIO: {"CONTENT":"Please Select a Scenario.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_TESTCASE: {"CONTENT":"Please select Testcase.", "VARIANT": VARIANT.WARNING},
         WARN_MULTI_TC_SCENARIO: {"CONTENT":"Cannot map multiple test cases with multiple scenarios.", "VARIANT": VARIANT.WARNING},
-        WARN_UPDATE_MULTI_MATCH: {"CONTENT":"Partially Updated.", "VARIANT": VARIANT.WARNING}
+        WARN_UPDATE_MULTI_MATCH: {"CONTENT":"Partially Updated.", "VARIANT": VARIANT.WARNING},
+        WARN_ALREADY_SYNCED: {"CONTENT":"Already Synced.", "VARIANT": VARIANT.WARNING},
     },
     MINDMAP:{
         ERR_FETCH_PROJECT: {"CONTENT":"Failed to fetch project list.", "VARIANT": VARIANT.ERROR},
@@ -361,6 +363,7 @@ const Messages={
         ERR_UPDATE_IRIS: {"CONTENT":"Failed to updated IRIS Object Details.", "VARIANT": VARIANT.ERROR},
         ERR_MAPPED_SCRAPE: {"CONTENT":"Mapping scrape data failed..", "VARIANT": VARIANT.ERROR},
         ERR_REPLACE_SCRAPE: {"CONTENT":"Scrape Data Replace Failed.", "VARIANT": VARIANT.ERROR},
+        ERR_REPLACE_OBJECT_FAILED:{"CONTENT":"Failed to replace object.", "VARIANT":VARIANT.ERROR},
         ERR_HIGHLIGHT: {"CONTENT":"Failed to highlight.", "VARIANT": VARIANT.ERROR},
         ERR_SCRAPE: {"CONTENT":"Failed to scrape.", "VARIANT": VARIANT.ERROR},
         ERR_SCRAPE_TERMINATE: {"CONTENT":"Scrape Terminated.", "VARIANT": VARIANT.ERROR},
@@ -378,8 +381,9 @@ const Messages={
         SUCC_SUBMIT: {"CONTENT":"Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_IRIS_SAVE: {"CONTENT":"Submitted Successfully. IRIS image saved.", "VARIANT": VARIANT.SUCCESS},
         SUCC_MAPPED_SCRAPED: {"CONTENT":"Mapped Scrape Data Successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_REPLACE_SCRAPED: {"CONTENT":"Scrape Data Replaced Successful.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_REPLACE_SCRAPED: {"CONTENT":"Replaced scraped data successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_OBJ_SAVE: { "CONTENT": 'Scraped data saved successfully.', "VARIANT": VARIANT.SUCCESS },
+        SUCC_OBJ_TESTCASES_REPLACED:{"CONTENT":'Object and all dependent Testcases Replaced successfully.',"VARIANT":VARIANT.SUCCESS},
         
         WARN_ADD_PROPERTY: {"CONTENT":"Please enter at least one property", "VARIANT": VARIANT.WARNING},
         WARN_IRIS_SAVE: {"CONTENT":"Submitted successfully but failed to save IRIS image, ICE not available.", "VARIANT": VARIANT.WARNING},
@@ -474,6 +478,13 @@ const Messages={
         ERR_JIRA_FETCH: {"CONTENT": "Failed to fetch JIRA details.", "VARIANT": VARIANT.ERROR},
         
         SUCC_INFO_UPDATED: {"CONTENT": "User Information updated successfully!", "VARIANT": VARIANT.SUCCESS},
+    },
+
+    LOGIN: {
+        SUCC_FORGOTP_MAIL: {"CONTENT":'Successfully sent an email to reset your password! Please login with the temporary password sent in the email.', "VARIANT": VARIANT.SUCCESS},
+        SUCC_UNLOCKED: {"CONTENT":'Successfully unlocked the user account! Please login again.', "VARIANT": VARIANT.SUCCESS},
+        SUCC_UNLOCK_MAIL: {"CONTENT":"Successfully sent an email! Please unlock the account using verification password sent in the email.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_P_CHANGE: {"CONTENT":"Password change successfull! Please login again with new password.", "VARIANT": VARIANT.SUCCESS},
     }
 }
 

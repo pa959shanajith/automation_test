@@ -1,18 +1,18 @@
 import React from 'react'
 import { ModalContainer } from '../../global'
 
-/*Component JiraDeleteModal 
+/*Component ZephyrDeleteModal 
   use: shows popup
   props:
     confirmDelete: fn for confirm button
     cancelDelete: fn for cancel button 
 */
 
-const JiraDeleteModal = (props) => {
+const ZephyrDeleteModal = (props) => {
 
     return <ModalContainer
-        title="Delete JIRA Configuration"
-        content={"Are you sure you want to delete JIRA configuration?"}
+        title="Delete Zephyr Configuration"
+        content={"Are you sure you want to delete Zephyr configuration? Deleting the Zephyr Configuration will delete both auth type configurations."}
         close={props.cancelDelete}
         footer={
             <>
@@ -20,7 +20,7 @@ const JiraDeleteModal = (props) => {
                 <button onClick={props.cancelDelete}>No</button>
             </>
         }
-        modalClass="modal-sm"
+        modalClass="modal-mmd"
     />
 }
-export default JiraDeleteModal;
+export default ZephyrDeleteModal;

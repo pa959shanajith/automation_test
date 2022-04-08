@@ -10,6 +10,12 @@ const initialState = {
         selectedTSNames: [],
         selectedFolderPaths: []
     },
+    selectedZTCDetails: {
+        selectedTCPhaseId: [],
+        selectedTcId: [],
+        selectedTCNames: [],
+        selectedTCReqDetails:[]
+    },
     selectedTestCase: [],
     selectedScenarioIds: [],
     syncedTestCases: [],
@@ -19,7 +25,8 @@ const initialState = {
         releaseId: "",
         phaseDets: {},
         selectedPhase: []
-    }
+    },
+    projectList: [],
 };
 
 const reducer = (state = initialState , action) => {
@@ -47,7 +54,8 @@ const reducer = (state = initialState , action) => {
         case actionTypes.SEL_TC_DETAILS:
             return{
                 ...state,
-                selectedTCDetails: action.payload
+                selectedTCDetails: action.payload,
+                selectedZTCDetails: action.payload
             }
         case actionTypes.SEL_SCN_IDS:
             return{
@@ -73,6 +81,11 @@ const reducer = (state = initialState , action) => {
             return{
                 ...state,
                 updateMapPayload: action.payload
+            }
+        case actionTypes.PROJECT_LIST:
+            return{
+                ...state,
+                projectList: action.payload
             }
         default: 
             return state
