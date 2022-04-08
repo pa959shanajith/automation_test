@@ -1,0 +1,339 @@
+trigger:
+  - master
+
+variables:
+- name: PLATFORM
+  value: windows
+- name: NAS
+  value: \\$(NAS_IP)\$(NAS_SUBPATH)
+- name: PY_PATH
+  value: $(REPO_PATH)/$(PY_GIT_PATH)
+- name: TARGET_BRANCH
+  value: $(Build.SourceBranchName)
+- group: default_set
+- group: WebServer
+- name: NAS_WEB
+  value: \\$(NAS_IP_WEB)\$(NAS_SUBPATH_WEB)
+
+name: $(repo_name)_$(Build.SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+stages:
+- stage: Build
+  displayName: Build the package
+  jobs:
+  - job: BuildJob
+    variables:
+      repolink: https://$(PAT_EXP_1_JAN)@dev.azure.com/dimensionlabs/Nineteen68/_git/WebServer
+      dashboardlink: https://$(PAT_EXP_1_JAN)@dev.azure.com/dimensionlabs/Nineteen68/_git/Dashboard
+      seltoavolink: https://$(PAT_EXP_1_JAN)@dev.azure.com/dimensionlabs/Nineteen68/_git/Selenium-To-AVO
+      reportlink: https://$(PAT_EXP_1_JAN)@dev.azure.com/dimensionlabs/Nineteen68/_git/ReportServer
+      ws_ver_repolink: https://$(PAT_EXP_1_JAN)@dev.azure.com/dimensionlabs/Nineteen68/_git/WebServer-Version
+      FOLDERS_TO_ZIP_AZ: WebServer
+
+    pool: 
+      name: Nineteen68 Pool
+      demands:
+        - PLATFORM -equals windows
+    workspace: 
+      clean: all
+    steps:
+    - checkout: self
+      persistCredentials: true
+      path: s\Webapp
+      clean: true
+    - checkout: git://$(System.TeamProject)/WebServer-Version
+      persistCredentials: true
+      path: s\wsversion
+      clean: true
+
+    - script: |
+        cd wsversion
+        git checkout master
+        git reset --hard origin/master
+        git config user.name "%BUILD_USER_NAME%"
+        git config user.email "%BUILD_USER_EMAIL%"
+        cd ../Webapp
+        git checkout %TARGET_BRANCH%
+        git config user.name "%BUILD_USER_NAME%"
+        git config user.email "%BUILD_USER_EMAIL%"
+      name: ConfigureGit
+      displayName: Configure branch and user
+    
+    - script: |
+        echo Build Started!
+        cd $(Build.SourcesDirectory)/Webapp
+        git pull --tags -f
+        python .\build\genversion.py
+        call env.bat
+        set /p buildno=<buildno.txt
+        set tagno=AvoAssure_WebServer_%buildno%
+        echo Build Number - %buildno%
+        echo Tag Number - %tagno%
+        move /Y buildno.txt ..\buildno.txt
+        move /Y env.bat ..\env.bat
+        echo %tagno%>..\tagno.txt
+        echo ##vso[task.setvariable variable=tagno;isOutput=true]%tagno%
+        echo ##vso[task.setvariable variable=buildno;isOutput=true]%buildno% 
+      name: Version
+      displayName: Create Build Version     
+      
+    - script: |
+        cd $(Build.SourcesDirectory)/Webapp
+        cd app
+        call npm install
+
+        call npm run-script build
+
+        cd..
+        del .gitignore package-lock.json README.md
+        call rimraf app
+        rmdir /S /Q .vscode
+        cd logs & del .gitkeep & cd ..
+      name: Build
+      displayName: Build source code
+
+    - script: |
+        set tagno=%Version_tagno%
+        set buildno=%Version_buildno%
+        cd $(Build.SourcesDirectory)/wsversion
+        python update_server_version.py
+        echo "Should Log Version = %ENABLE_LOG_VERSION%"
+        if "%ENABLE_LOG_VERSION%" == "TRUE" (
+          git add version.json
+          git commit -m "Updated Server Version to %buildno%"
+          REM git push %ws_ver_repolink%
+          git push
+          )
+        copy version.json ..\Webapp\manifest.json
+        cd ../Webapp
+        git rev-parse HEAD > tempfile.txt
+        set /p commitno= <tempfile.txt
+        del tempfile.txt
+        echo "BUILD NUMBER=%buildno%" > versionnoUI.txt
+        git log --first-parent --pretty=format:"%%H" -n 2 > lasttwocommit.txt
+        echo "Building"
+        set /p shas= < lasttwocommit.txt
+        for /F %%a in (lasttwocommit.txt) do (set line2=%%a)
+        set mergecommits=%line2%..%shas%
+        git log %TARGET_BRANCH% --pretty=format:"%%H - %%an       - %%cd      - %%s" %mergecommits% > releasenotesUI.log
+        del lasttwocommit.txt
+        move /Y releasenotesUI.log ..\
+        move /Y versionnoUI.txt ..\
+        git tag -f -a %buildno% -m "%TAG_MSG%"
+        if "%ENABLE_TAGS%" == "TRUE" (
+        git push --tags -f
+        )
+        REM rmdir /s /q .git
+      name: Tag
+      displayName: Create tags, release notes and Update Webserver version in WS compatibility manifest
+
+    - script: |
+        setlocal enabledelayedexpansion
+        set tagno=%Version_tagno%
+        set buildno=%Version_buildno%
+        cd $(Build.SourcesDirectory)/Webapp
+        if "%ENABLE_NGINX%" == "TRUE" (
+          echo "Adding nginx in the package"
+          xcopy /I /Q /Y /E /S %NAS_WEB%\Build\windows\nginx ..\NginX
+          move /Y .\nginx.conf ..\NginX\conf
+          copy /Y .\server\https\* ..\NginX\conf
+          cd ..
+          set FOLDERS_TO_ZIP=Webapp NginX
+
+          if "%ENABLE_DASHBOARD%" == "TRUE" (
+            echo "Adding dashboard in the package"
+            set FOLDERS_TO_ZIP=!FOLDERS_TO_ZIP! Dashboard
+            git clone %dashboardlink% --branch redux_dashboard2.0 --single-branch Dashboard
+            cd Dashboard/dashboard-app
+            REM python -c "import json;p=open('package.json');d=json.load(p);p.close();d['homepage']='dashboard';p=open('package.json','w');json.dump(d,p,indent=2);p.close()"
+            call npm install
+
+            call npm run-script build
+
+            cd ..
+            del .gitignore package-lock.json README.md
+            call rimraf dashboard-app mongo-postgresql-streamer
+            git config user.name "%BUILD_USER_NAME%"
+            git config user.email "%BUILD_USER_EMAIL%"
+            git tag -f -a %buildno% -m "%TAG_MSG%"
+            if "%ENABLE_TAGS%" == "TRUE" (
+            git push --tags -f
+            )
+            rmdir /S /Q .vscode
+            rmdir /S /Q .git
+            mkdir logs
+            cd ..
+          ) else (
+            echo "Not packaging dashboard as requested"
+          )
+          if "%ENABLE_SELTOAVO%" == "TRUE" (
+            echo "Adding Selenium-To-Avo in the package"
+            set FOLDERS_TO_ZIP=!FOLDERS_TO_ZIP! SeleniumToAvo
+            git clone %seltoavolink% --branch master --single-branch SeleniumToAvo
+            cd SeleniumToAvo/app
+            REM python -c "import json;p=open('package.json');d=json.load(p);p.close();d['homepage']='.';p=open('package.json','w');json.dump(d,p,indent=2);p.close()"
+            call npm install
+
+            call npm run-script build
+
+            cd ..
+            call npm install
+            del .gitignore package-lock.json README.md
+            call rimraf app
+            git config user.name "%BUILD_USER_NAME%"
+            git config user.email "%BUILD_USER_EMAIL%"
+            git tag -f -a %buildno% -m "%TAG_MSG%"
+            if "%ENABLE_TAGS%" == "TRUE" (
+            git push --tags -f
+            )
+            rmdir /S /Q .vscode
+            rmdir /S /Q .git
+            mkdir logs
+            cd ..
+          ) else (
+            echo "Not packaging Selenium-To-Avo as requested"
+          )
+          if "%ENABLE_REPORTS%" == "TRUE" (
+            echo "Adding Reports Server in the package"
+            set FOLDERS_TO_ZIP=!FOLDERS_TO_ZIP! ReportServer
+            git clone %reportlink% --branch master --single-branch ReportServer
+            cd ReportServer/app
+            REM python -c "import json;p=open('package.json');d=json.load(p);p.close();d['homepage']='.';p=open('package.json','w');json.dump(d,p,indent=2);p.close()"
+            call npm install
+
+            call npm run-script build
+
+            cd ..
+            call npm install
+            del .gitignore package-lock.json README.md
+            call rimraf app
+            git config user.name "%BUILD_USER_NAME%"
+            git config user.email "%BUILD_USER_EMAIL%"
+            git tag -f -a %buildno% -m "%TAG_MSG%"
+            if "%ENABLE_TAGS%" == "TRUE" (
+            git push --tags -f
+            )
+            rmdir /S /Q .vscode
+            rmdir /S /Q .git
+            mkdir logs
+            cd ..
+          ) else (
+            echo "Not packaging Reports Server as requested"
+          )
+        ) else (
+          del nginx.conf
+          cd ..
+          REM move Webapp WebServer
+          mkdir WebServer
+          xcopy Webapp WebServer /i /c /k /e /r /y
+          set FOLDERS_TO_ZIP=WebServer
+        )
+        echo %FOLDERS_TO_ZIP%
+        echo "##vso[task.setvariable variable=FOLDERS_TO_ZIP_AZ]%FOLDERS_TO_ZIP%"
+      name: ConfigureNginX
+      displayName: Configure NginX and Adding Reports & Dashboard
+    
+    - script: |
+        set tagno=%Version_tagno%
+        set buildno=%Version_buildno%
+        cd $(Build.SourcesDirectory)
+        echo Zipping folders - $(FOLDERS_TO_ZIP_AZ)
+        REM 7z.exe a -mx7 %tagno%.zip versionnoUI.txt releasenotesUI.log %FOLDERS_TO_ZIP%
+        7z.exe a -tzip -mmt=on -xr!.git\ -mx7 %tagno%.zip versionnoUI.txt releasenotesUI.log %FOLDERS_TO_ZIP_AZ% 
+        echo "UPLOADING TO..... Z:/stage/UI/"
+        echo "BUILD NUMBER=%buildno%"
+        REM copy %tagno%.zip Z:\stage\windows_archive\UI
+        REM call Z:\stage\windows_archive\UI\updatenodemodules.bat
+      name: Package
+      displayName: Building package
+    
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: |
+          $(Version.tagno).zip
+          *no.txt
+          env.bat
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        OverWrite: true
+        preserveTimestamp: true
+      name: CopyToStage
+      displayName: Push package to artifacts directory
+      
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifact: 'package'
+      name: Publish
+      displayName: Publishing package for Azure Pipelines
+
+    - script: |
+        echo BUILD NUMBER=%Version_buildno% TAG NUMBER=%Version_tagno%
+        dir $(Build.ArtifactStagingDirectory)
+      name: EchoArtifacts
+      displayName: Display available Artifacts
+
+    - task: WindowsMachineFileCopy@2
+      inputs:
+        SourcePath: '$(Build.ArtifactStagingDirectory)/$(Version.tagno).zip'
+        MachineNames: '$(NAS_IP)'
+        AdminUserName: '$(SVC_USER)'
+        AdminPassword: '$(SVC_PWD)'
+        TargetPath: '$(NAS_WEB)\$(STAGE_PATH_WEB)'
+        AdditionalArguments: '/COPY:DT /DCOPY:T /IS /IT'
+      name: PushToNAS
+      displayName: Pushing to stage server
+
+    - task: WindowsMachineFileCopy@2
+      inputs:
+        SourcePath: '$(Build.ArtifactStagingDirectory)/$(Version.tagno).zip'
+        MachineNames: '$(BUILD_SERVER)'
+        AdminUserName: '$(SVC_USER)'
+        AdminPassword: '$(SVC_PWD)'
+        TargetPath: '$(BUILD_PACKAGE_PATH)'
+        AdditionalArguments: '/COPY:DT /DCOPY:T /IS /IT'
+      name: PushTo99
+      displayName: Pushing to 99 packages folder
+    - script: |
+        cd $(Build.SourcesDirectory)
+        echo Removing Build zips
+        del *.zip buildno.txt tagno.txt
+        dir
+      name: PostBuildCleanup
+      displayName: Cleaning up directory!
+
+# - stage: Deploy
+#   dependsOn:
+#   - Build
+#   - Stage
+#   displayName: Place the package in prod folder
+#   variables:
+#     tagno: $[stageDependencies.Build.BuildJob.outputs['Version.tagno']]
+#     buildno: $[stageDependencies.Build.BuildJob.outputs['Version.buildno']]
+#   jobs:
+#   - job: DeployJob
+#     displayName: Deploy the package
+#     pool:
+#       name: Nineteen68 Pool
+#       demands:
+#         - PLATFORM -equals windows
+#     steps:
+#     - checkout: none
+#     - task: DownloadPipelineArtifact@2
+#       inputs:
+#         buildType: 'current'
+#         artifactName: 'package'
+#         targetPath: '$(Build.ArtifactStagingDirectory)'
+#       name: Fetch
+#       displayName: Fetch package from Azure Pipelines
+#     - task: WindowsMachineFileCopy@2
+#       inputs:
+#         SourcePath: '$(Build.ArtifactStagingDirectory)/$(tagno).zip'
+#         MachineNames: '$(SERVER_HOST)'
+#         AdminUserName: '$(SVC_USER)'
+#         AdminPassword: '$(SVC_PWD)'
+#         TargetPath: '$(CLIENT_PATH)\$(MAJOR_VERSION).$(MINOR_VERSION)'
+#         AdditionalArguments: '/COPY:DT /DCOPY:T /IS /IT'
+#       name: CopyToProd
+#       displayName: Pushing package to Prod location!
+  
