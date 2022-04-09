@@ -64,6 +64,7 @@ stages:
         cd $(Build.SourcesDirectory)/Webapp
         git pull --tags -f
         python .\build\genversion.py
+        rmdir /S /Q build
         call env.bat
         set /p buildno=<buildno.txt
         set tagno=AvoAssure_WebServer_%buildno%
