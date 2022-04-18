@@ -294,11 +294,12 @@ if (cluster.isMaster) {
 			}
 		}
 
-		app.get('/AvoAssure_ICE.zip', async (req, res) => {
-			const iceFile = "AvoAssure_ICE.zip";
+		app.get('/downloadICE', async (req, res) => {								
+			let iceFile = req.query.ver;
+			// iceFile = "AvoAssure_ICE.zip";
 			const iceFilePath = path.resolve(process.env.HOST_PATH);
 			if (req.query.file == "getICE") {
-				return res.sendFile(iceFile, { root: iceFilePath })
+				return res.download(path.join(iceFilePath, iceFile), iceFile)
 			} else {
 				let status = "na";
 				try {

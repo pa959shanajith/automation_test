@@ -1,6 +1,6 @@
 {
     "defaultTokenExpiry": "720",
-    "showEULA": false,
+    "showEULA": true,
     "pingTimer":"120000",
     "strictTaskWorkflow": false,
     "dateFormat": "YYYY-MM-DD",
