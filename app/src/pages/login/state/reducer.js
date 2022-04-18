@@ -1,8 +1,8 @@
 import * as actionTypes from './action';
 
 const initialState = {
-    SR: "",
-    userinfo: {},
+    SR: "", //"Test Lead"
+    userinfo:  {},
     socket:undefined,
     notify:{data:[],unread:0},
     dateformat:"DD-MM-YYYY"
@@ -52,6 +52,10 @@ const reducer = (state=initialState, action) => {
         case actionTypes.SET_DATEFORMAT:
             return{
                 ...state, dateformat: action.payload
+            }
+        case actionTypes.UPDATE_USERINFO_ADDROLES:
+            return{
+              ...state, userinfo: {...state.userinfo, additionalrole: action.payload}
             }
         default:
             return state
