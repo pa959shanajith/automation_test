@@ -3,6 +3,7 @@ import LoginFields from "../components/LoginFields.js";
 import { SetProgressBar} from '../../global';
 import { persistor } from '../../../reducer';
 import StaticElements from '../components/StaticElements';
+import WelcomeWizard from '../components/WelcomeWizard.js';
 
 /*
     Component: LoginPage
@@ -20,9 +21,10 @@ const LoginPage = () => {
     }, []);
 
     return (
-        <StaticElements>
-             <LoginFields SetProgressBar={SetProgressBar}/>
-        </StaticElements>
+        // <StaticElements>
+        //      <LoginFields SetProgressBar={SetProgressBar}/>
+        // </StaticElements>
+        <WelcomeWizard />
     );
 }
 

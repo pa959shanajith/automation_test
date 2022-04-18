@@ -1,0 +1,62 @@
+.form{
+    margin: auto;
+    width: 74%;
+    height: 90%;
+    border: 3px solid #5F338F;
+    padding: 2%;
+    border-radius: 2%;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+.container1{
+    background: #0006;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+}
+.step1 {
+    color:#000000;
+    font-family: 'Mulish';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 2rem;
+}
+.type1-button{
+    background: #FAF9F8;
+    border: 2px solid #5F338F;
+    box-sizing: border-box;
+    box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    color: #5F338F;
+    width: 10%;
+    align-self: flex-end;
+}
+.step2{
+    font-family: 'Mulish';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 2rem;
+}
+.type2-button{
+    width: 16rem;
+    height: 3.4rem;
+    background: #5F338F;
+    border-radius: 1.2rem;
+    color: #FFFFFF; 
+    font-weight: 100;
+    border: none;
+}
+.welcomeInstall {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.form-container{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
