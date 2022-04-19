@@ -25,6 +25,9 @@
     font-style: normal;
     font-weight: 400;
     font-size: 2rem;
+    // align-content: center;
+    display: flex;
+    justify-content: center;
 }
 .type1-button{
     background: #FAF9F8;
@@ -34,7 +37,7 @@
     color: #5F338F;
     width: 6rem;
     align-self: flex-end;
-    height: 2.5rem;
+    // height: 2.5rem;
 
     &:hover {
         box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.12);
@@ -76,6 +79,7 @@
     flex-direction: column;
     height: 100%;
     justify-content: center;
+    overflow: hidden;
 }
 
 .stepper {
@@ -126,4 +130,7 @@
             border-color: var(--baseColorBorder);
         }
     }
+}
+.termsandconditions{
+    height: auto;
 }
