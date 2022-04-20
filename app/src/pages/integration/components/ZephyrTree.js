@@ -161,10 +161,11 @@ const PhaseNode = props => {
 
     const handleClick = useCallback(async()=>{
         if (collapse) {
-            if(props.viewMappedFlies === "ZephyrUpdate" && props.section !== "right") {
-                dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Testcases...'});
-            } else if (props.viewMappedFlies === "ZephyrUpdate" && props.section === "right"){
+            if (props.viewMappedFlies === "ZephyrUpdate" && props.section === "right"){
                 dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Folders...'});
+            }
+            else{
+                dispatch({type: actionTypes.SHOW_OVERLAY, payload: 'Loading Testcases...'});
             }
 
             var data = ""

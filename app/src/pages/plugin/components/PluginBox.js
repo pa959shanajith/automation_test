@@ -30,6 +30,10 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 			//calling a function to redirect to Avo Discover
 			openDiscover();
 		}
+		else if(pluginName === "itdm"){
+			//redirects to iTDM in new tab
+			window.open('https://www.google.com' , '_blank');
+		}
 		else {
 			if (pluginName === "integration") window.localStorage['integrationScreenType'] = null
 			setRedirectTo(`/${pluginName}`)

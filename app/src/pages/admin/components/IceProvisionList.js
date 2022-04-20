@@ -201,8 +201,8 @@ const IceProvisionList = (props) => {
 								<th> Status </th>
 								<th> Username </th>
 								<th> Hostname </th>
-								<th>  </th>
-								<th>  </th>
+								<th style={{textAlign: 'center'}}>Action</th>
+								<th> </th>
 							</tr>
                             {icelistModify.map((entry,index)=>(
                                 <tr key={index} className='provisionTokens'>

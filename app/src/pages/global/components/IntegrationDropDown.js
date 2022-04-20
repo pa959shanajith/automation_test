@@ -157,7 +157,13 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
             if (data.error) { setMsg(data.error); return; }
             if(data !=="empty"){
                 setIsEmpty(false);
-                let credentialsData = {authtype: 'basic'};
+                let credentialsData = {
+                    authtype: 'basic',
+                    url: '',
+                    apitoken: '',
+                    userName: '',
+                    password: ''
+                };
 
                 if(data.zephyrURL) credentialsData['url'] = data.zephyrURL;
                 if(data.zephyrAuthType) credentialsData['authtype'] = data.zephyrAuthType;
