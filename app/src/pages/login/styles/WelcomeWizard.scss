@@ -3,21 +3,28 @@
     margin: auto;
     width: 74%;
     height: 80%;
-    border: 3px solid #5F338F;
+    border: 2px solid #5F338F;
     padding: 2%;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    background-color: white;
+    background-color: #FAF9F8;
     min-width: 700px;
     min-height: 600px;
+    box-shadow: 0px 10px 70px #321e4f6e;
 }
 .container1{
-    background: #0006;
+    background: #faf9f859;
     display: flex;
     height: 100%;
     width: 100%;
+    z-index: 100;
     position: fixed;
+    @supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+        background: #faf9f866;
+    }
 }
 .step1 {
     color:#000000;
@@ -31,15 +38,19 @@
 }
 .type1-button{
     background: #FAF9F8;
-    border: 2px solid #5F338F;
+    border: 1px solid #5F338F;
     box-sizing: border-box;
     border-radius: 8px;
     color: #5F338F;
     width: 6rem;
     align-self: flex-end;
-    // height: 2.5rem;
-
+    margin-top: 1rem;
+    margin-right: 30px;
+    height: 2.5rem;
+    transition: 0.3s;
     &:hover {
+        color: white;
+        background-color: #5F338F;
         box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.12);
     }
 }
@@ -58,7 +69,6 @@
     border: none;
     font-family: 'Mulish';
     font-size: 1.3rem;
-    font-weight: 600;
 }
 
 .welcomeToAssure {
@@ -85,6 +95,7 @@
 .stepper {
     width: 100%;
     font-family: "LatoWeb" !important;
+    padding: 12px !important;
 }
 
 .stepButtons {
@@ -103,12 +114,11 @@
     justify-content: center;
     align-items: center;
     font-size: 1.3rem;
-    margin-top: 1rem;
     label {
         display: flex;
         justify-content: center;
         align-items: baseline;
-        font-family: $avoFont;
+        font-family: 'Mulish';
         span {
             margin-left: 0.5rem;
         }
@@ -131,6 +141,13 @@
         }
     }
 }
-.termsandconditions{
+
+.termsandconditions {
     height: auto;
+}
+
+.stepImage {
+    @media screen and (min-height:800px) {
+        margin-bottom: 1rem;
+    }
 }

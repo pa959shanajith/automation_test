@@ -5,10 +5,10 @@ import {ProgressIndicator} from "@fluentui/react";
 import { Stepper } from 'react-form-stepper';
 import { Messages as MSG, setMsg } from '../../global';
 import { AnimationClassNames } from '@fluentui/react';
-import { ModalContainer, ScrollBar } from '../../global';
+import { ScrollBar } from '../../global';
 import "../styles/TermsAndConditions.scss";
 
-const WelcomeWizard = () => {
+const WelcomeWizard = ({showWizard}) => {
   const [percentComplete,setPercentComplete] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
   const [showIndicator, setShowIndicator] = useState(false);
@@ -232,16 +232,16 @@ const WelcomeWizard = () => {
             <div>Terms and Conditions</div>
         </div>
         {getTermsAndConditions()}
-        <button className="type1-button"onClick={() => {setActiveStep((currPage) => currPage + 1);}}>Agree</button>
+        <button className="type1-button"onClick={() => {setActiveStep((currPage) => currPage + 1);}}>I Agree</button>
     </div>
   };
 
   const getDownloadStep = ()=>{
     return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
-                <span>
+                <span className="stepImage">
                     <img src={"static/imgs/WelcomInstall.svg"} className="" alt=""/>
                 </span>
-                <div className="step2">{!showIndicator || showMacOSSelection?"Please install Avo Assure Client":"Downloading Avo Assure Client"}</div>
+                <div className="step2" style={{marginBottom:"0.5rem"}}>{!showIndicator || showMacOSSelection?"Please install Avo Assure Client":"Downloading Avo Assure Client"}</div>
                 {showIndicator && !showMacOSSelection ?
                 <div className="downloadProgress">
                     <ProgressIndicator 
@@ -265,20 +265,20 @@ const WelcomeWizard = () => {
                             <span>BigSur</span>
                         </label>
                     </div>
-                    <button class="type2-button" onClick={_handleMacOSDownload}>Install</button>
+                    <button className="type2-button" onClick={_handleMacOSDownload}>Install</button>
                 </>:<button className="type2-button"onClick={startDownloadICE}>Install Now</button>)}
             </div>
   };
 
   const getStartTrialStep = ()=>{
       return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
-                <span>
+                <span style={{marginBottom:"1rem"}}>
                     <img src={"static/imgs/WelcomeStart.svg"} className="" alt=""/>
                 </span>
-                <div className="step2">Thanks for installing</div>
+                <div className="step2" style={{marginBottom:"1rem"}}>Thanks for installing</div>
                 <button className="type2-button"
                     onClick={() => {
-                        setActiveStep((currPage) => currPage + 1);
+                        showWizard(false)
                     }}
                 >Start your free trial
                 </button>
@@ -291,9 +291,9 @@ const WelcomeWizard = () => {
         <div className="progressbar">
              <Stepper
                 steps={[
-                    { label: 'Welcome', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i class="fa fa-check"></i>},
-                    { label: 'Download Client', active:activeStep===1, completed:activeStep>1, children:(activeStep<2) ?2:<i class="fa fa-solid fa-check"></i>},
-                    { label: 'Start Trial', active:activeStep===2, completed:activeStep>2, children:(activeStep<3)?3:<i class="fa fa-solid fa-check"></i>}]}
+                    { label: 'Welcome', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i className="fa fa-check"></i>},
+                    { label: 'Setup', active:activeStep===1, completed:activeStep>1, children:(activeStep<2) ?2:<i className="fa fa-solid fa-check"></i>},
+                    { label: 'Start Trial', active:activeStep===2, completed:activeStep===2, children:(activeStep<2)?3:<i className="fa fa-solid fa-check"></i>}]}
                 className="stepper"
                 stepClassName="stepButtons"
                 styleConfig={{

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 import LoginFields from "../components/LoginFields.js";
 import { SetProgressBar} from '../../global';
 import { persistor } from '../../../reducer';
@@ -14,6 +14,7 @@ import WelcomeWizard from '../components/WelcomeWizard.js';
 
 
 const LoginPage = () => {
+    const [s,sS] = useState(true)
      
     useEffect(()=>{
         persistor.purge();
@@ -21,10 +22,12 @@ const LoginPage = () => {
     }, []);
 
     return (
-        // <StaticElements>
-        //      <LoginFields SetProgressBar={SetProgressBar}/>
-        // </StaticElements>
-        <WelcomeWizard />
+        <>
+        <StaticElements>
+             <LoginFields SetProgressBar={SetProgressBar}/>
+        </StaticElements>
+        {s?<WelcomeWizard showWizard={sS}/>:null}
+        </>
     );
 }
 
