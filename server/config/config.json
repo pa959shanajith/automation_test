@@ -16,5 +16,8 @@
     "objectPredictionPath": {
         "default": "",
         "mac": ""
+    },
+    "externalPluginURL":{ 
+        "itdm":"https://google.com"
     }
 }
