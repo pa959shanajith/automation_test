@@ -310,6 +310,18 @@ if (cluster.isMaster) {
 			}
 		});
 
+		app.get('/External_Plugin_URL', async (req, res) => {
+			const pluginName = req.query.pluginName;
+			const pluginURL = uiConfig.externalPluginURL[pluginName];
+			
+			try{
+				return res.send(pluginURL);
+			}
+			catch(err){
+				console.error("external plugin doesn't exist");
+			}
+		});
+
 		//Route Directories
 		var mindmap = require('./server/controllers/mindmap');
 		var pdintegration = require('./server/controllers/pdintegration');

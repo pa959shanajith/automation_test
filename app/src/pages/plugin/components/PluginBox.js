@@ -2,7 +2,7 @@ import React, { useState} from 'react';
 import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types';
 import { getMappedDiscoverUser } from '../api';
-import { setMsg } from '../../global' 
+import { setMsg } from '../../global' ;
 
 const displayError = (error) =>{
 	setMsg(error)
@@ -18,7 +18,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 
 	const [redirectTo, setRedirectTo] = useState("");
 
-	const pluginRedirect = () => {
+	const pluginRedirect = async() => {
 		pluginName = pluginName.split(' ').join('').toLowerCase();
 		window.localStorage['navigateScreen'] = pluginName;
 		if(['dashboard', 'neurongraphs', 'seleniumtoavo', "reports"].includes(pluginName)){
@@ -30,13 +30,19 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 			//calling a function to redirect to Avo Discover
 			openDiscover();
 		}
-		else if(pluginName === "itdm"){
-			//redirects to iTDM in new tab
-			window.open('https://www.google.com' , '_blank');
+		else if (pluginName === "integration") {
+			window.localStorage['integrationScreenType'] = null
+			setRedirectTo(`/${pluginName}`) 
+		}
+		//All the plugins that require direct Redirect
+		else if(['mindmap','utility'].includes(pluginName)){
+			setRedirectTo(`/${pluginName}`) 
 		}
 		else {
-			if (pluginName === "integration") window.localStorage['integrationScreenType'] = null
-			setRedirectTo(`/${pluginName}`)
+			//redirects to the external plugin's URL in a new tab
+			const res =  await fetch(`/External_Plugin_URL?pluginName=${pluginName}`); 
+			const pluginURL = await res.text();
+			window.open(pluginURL, '_blank');
 		}
 	}
 
