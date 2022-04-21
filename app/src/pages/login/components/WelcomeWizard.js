@@ -3,10 +3,15 @@ import "../styles/WelcomeWizard.scss";
 import axios from "axios";
 import {ProgressIndicator} from "@fluentui/react";
 import { Stepper } from 'react-form-stepper';
-import { Messages as MSG, setMsg } from '../../global';
+import { Messages as MSG, setMsg, RedirectPage, BrowserFp } from '../../global';
 import { AnimationClassNames } from '@fluentui/react';
 import { ScrollBar } from '../../global';
+import { useSelector, useDispatch } from 'react-redux';
+import * as actionTypes from '../state/action';
 import "../styles/TermsAndConditions.scss";
+import * as api from '../api';
+import { useHistory } from 'react-router-dom';
+
 
 const WelcomeWizard = ({showWizard}) => {
   const [percentComplete,setPercentComplete] = useState(0);
@@ -14,12 +19,55 @@ const WelcomeWizard = ({showWizard}) => {
   const [showIndicator, setShowIndicator] = useState(false);
   const [showMacOSSelection, setShowMacOSSelection] = useState(false);
   const [selectedMacOS, setSelectedMacOS] = useState("");
+  const userInfo = useSelector(state=>state.login.userinfo);
+  const history = useHistory();
+  const dispatch = useDispatch();
+
+  useEffect(()=>{
+    setActiveStep(userInfo.welcomeStepNo)
+  },[])
 
   useEffect(()=>{
     if (percentComplete === 1) {
         setActiveStep((currPage) => currPage + 1);
     }
-  },[percentComplete])
+  },[percentComplete]);
+
+  const tcAction = (action) => {
+    let fullName = userInfo["firstname"] + " " + userInfo["lastname"];
+    let email = userInfo["email_id"];
+    let timeStamp = new Date().toLocaleString();
+    let bfp = BrowserFp()
+    let userData = {
+        'fullname': fullName,
+        'emailaddress': email,
+        'acceptance': action,
+        'timestamp': timeStamp,
+        'browserfp': bfp
+    };
+    api.storeUserDetails(userData)
+    .then(data => {
+        if(data === "Invalid Session") {
+            showWizard(false);
+            RedirectPage(history);
+        } else if (data !== "success") {
+            setMsg({"CONTENT":"Failed to record user preference. Please Try again!", "VARIANT":"error"});
+            showWizard(false);
+            RedirectPage(history, { reason: "userPrefHandle" });
+        }
+        else {
+            dispatch({type:actionTypes.SET_USERINFO, payload: {...userInfo,tandc:false}});
+            showWizard(false);
+        }
+    })
+    .catch(error => {
+        setMsg({"CONTENT":"Failed to record user preference. Please Try again!", "VARIANT":"error"});
+        showWizard(false);
+        console.error("Error updating user tnc preference", error);
+    });
+    
+}
+
 
   const getOS = () => {
     let userAgent = navigator.userAgent.toLowerCase();
@@ -278,7 +326,7 @@ const WelcomeWizard = ({showWizard}) => {
                 <div className="step2" style={{marginBottom:"1rem"}}>Thanks for installing</div>
                 <button className="type2-button"
                     onClick={() => {
-                        showWizard(false)
+                        tcAction("Accept")
                     }}
                 >Start your free trial
                 </button>

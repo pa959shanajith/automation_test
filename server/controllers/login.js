@@ -30,6 +30,7 @@ exports.loadUserInfo = async (req, res) => {
 			ldapuser: userType=="ldap",
 			samluser: userType=="saml",
 			openiduser: userType=="oidc",
+			welcomeStepNo: typeof userData.welcomeStepNo === "number"?  userData.welcomeStepNo : undefined
 		};
 		const selectedRole = req.body.selRole || userProfile.role;
 		req.session.userid = userData._id;
