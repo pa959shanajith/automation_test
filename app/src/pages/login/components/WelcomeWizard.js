@@ -11,6 +11,7 @@ import * as actionTypes from '../state/action';
 import "../styles/TermsAndConditions.scss";
 import * as api from '../api';
 import { useHistory } from 'react-router-dom';
+import { manageUserDetails } from '../../admin/api';
 
 
 const WelcomeWizard = ({showWizard}) => {
@@ -29,9 +30,25 @@ const WelcomeWizard = ({showWizard}) => {
 
   useEffect(()=>{
     if (percentComplete === 1) {
-        setActiveStep((currPage) => currPage + 1);
+        updateStepNumber();
     }
   },[percentComplete]);
+
+  const updateStepNumber = async() => {
+    let stepNo = activeStep + 1;
+    setActiveStep((currPage) => currPage + 1);
+    const userObj = {
+        userid:userInfo['user_id'],
+        username:userInfo['username'],
+        welcomeStepNo:stepNo
+    }
+    try{
+        var data = await manageUserDetails("stepUpdate", userObj);
+        dispatch({type:actionTypes.SET_USERINFO, payload: {...userInfo,welcomeStepNo:stepNo}});
+    } catch(err) {
+        console.log(err)
+    }
+  }
 
   const tcAction = (action) => {
     let fullName = userInfo["firstname"] + " " + userInfo["lastname"];
@@ -280,14 +297,14 @@ const WelcomeWizard = ({showWizard}) => {
             <div>Terms and Conditions</div>
         </div>
         {getTermsAndConditions()}
-        <button className="type1-button"onClick={() => {setActiveStep((currPage) => currPage + 1);}}>I Agree</button>
+        <button className="type1-button"onClick={updateStepNumber}>I Agree</button>
     </div>
   };
 
   const getDownloadStep = ()=>{
     return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
                 <span className="stepImage">
-                    <img src={"static/imgs/WelcomInstall.svg"} className="" alt=""/>
+                    <img src={"static/imgs/WelcomeInstall.svg"} className="" alt=""/>
                 </span>
                 <div className="step2" style={{marginBottom:"0.5rem"}}>{!showIndicator || showMacOSSelection?"Please install Avo Assure Client":"Downloading Avo Assure Client"}</div>
                 {showIndicator && !showMacOSSelection ?
@@ -326,7 +343,8 @@ const WelcomeWizard = ({showWizard}) => {
                 <div className="step2" style={{marginBottom:"1rem"}}>Thanks for installing</div>
                 <button className="type2-button"
                     onClick={() => {
-                        tcAction("Accept")
+                        updateStepNumber();
+                        tcAction("Accept");
                     }}
                 >Start your free trial
                 </button>
