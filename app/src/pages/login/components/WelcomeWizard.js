@@ -20,9 +20,22 @@ const WelcomeWizard = ({showWizard}) => {
   const [showIndicator, setShowIndicator] = useState(false);
   const [showMacOSSelection, setShowMacOSSelection] = useState(false);
   const [selectedMacOS, setSelectedMacOS] = useState("");
+  const [downloadPopover, setDownloadPop] = useState("");
   const userInfo = useSelector(state=>state.login.userinfo);
   const history = useHistory();
   const dispatch = useDispatch();
+
+  // getting the browser name using userAgent
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  const browser =
+    userAgent.indexOf('edge') > -1 ? 'edge'
+      : userAgent.indexOf('edg') > -1 ? 'edge'
+      : userAgent.indexOf('opr') > -1 && !!window.opr ? 'edge'
+      : userAgent.indexOf('chrome') > -1 && !!window.chrome ? 'chrome'
+      : userAgent.indexOf('trident') > -1 ? 'edge'
+      : userAgent.indexOf('firefox') > -1 ? 'edge'
+      : userAgent.indexOf('safari') > -1 ? 'edge'
+      : 'other';
 
   useEffect(()=>{
     setActiveStep(userInfo.welcomeStepNo)
@@ -31,9 +44,11 @@ const WelcomeWizard = ({showWizard}) => {
   useEffect(()=>{
     if (percentComplete === 1) {
         updateStepNumber();
+        showDownloadPopover();
     }
   },[percentComplete]);
 
+  // updating step no. in db and redux
   const updateStepNumber = async() => {
     let stepNo = activeStep + 1;
     setActiveStep((currPage) => currPage + 1);
@@ -50,6 +65,16 @@ const WelcomeWizard = ({showWizard}) => {
     }
   }
 
+  const showDownloadPopover = () => {
+      if (browser==="edge") {
+          setDownloadPop("edge")
+      }
+      else {
+          setDownloadPop("chrome")
+      }
+  }
+
+  // action that accepts the EULA
   const tcAction = (action) => {
     let fullName = userInfo["firstname"] + " " + userInfo["lastname"];
     let email = userInfo["email_id"];
@@ -81,23 +106,23 @@ const WelcomeWizard = ({showWizard}) => {
         setMsg({"CONTENT":"Failed to record user preference. Please Try again!", "VARIANT":"error"});
         showWizard(false);
         console.error("Error updating user tnc preference", error);
-    });
-    
-}
+    }); 
+  }
 
-
+  // getting OS version using userAgent
   const getOS = () => {
     let userAgent = navigator.userAgent.toLowerCase();
     if (/windows nt/.test(userAgent))
         return "Windows";
-    
+
     else if (/mac os x/.test(userAgent)) 
         return "MacOS";
-    
+
     else 
         return "Not Supported";
   }
-
+  
+  // check and start downloading ICE package
   const getIce = async (queryICE) => {
     try {
         const res = await fetch("/downloadICE?ver="+queryICE);
@@ -130,6 +155,7 @@ const WelcomeWizard = ({showWizard}) => {
     }
   };
 
+  // get OS and call getICE with the filename
   const startDownloadICE = () => {
       const OS = getOS();
 
@@ -148,6 +174,7 @@ const WelcomeWizard = ({showWizard}) => {
       }
   }
 
+  // send correct filename to getICE and start downloading ICE
   const _handleMacOSDownload = () =>{
       if (selectedMacOS==="") {
         setMsg({"CONTENT":"Please select a OS version", "VARIANT":"error"});
@@ -291,6 +318,7 @@ const WelcomeWizard = ({showWizard}) => {
             </ScrollBar>
       </>
   }
+
   const getWelcomeStep = ()=>{
     return <div className="welcomeToAssure">
         <div className="step1">
@@ -304,7 +332,7 @@ const WelcomeWizard = ({showWizard}) => {
   const getDownloadStep = ()=>{
     return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
                 <span className="stepImage">
-                    <img src={"static/imgs/WelcomeInstall.svg"} className="" alt=""/>
+                    <img src={"static/imgs/WelcomeInstall.svg"} alt="install-avo-client"/>
                 </span>
                 <div className="step2" style={{marginBottom:"0.5rem"}}>{!showIndicator || showMacOSSelection?"Please install Avo Assure Client":"Downloading Avo Assure Client"}</div>
                 {showIndicator && !showMacOSSelection ?
@@ -338,16 +366,10 @@ const WelcomeWizard = ({showWizard}) => {
   const getStartTrialStep = ()=>{
       return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
                 <span style={{marginBottom:"1rem"}}>
-                    <img src={"static/imgs/WelcomeStart.svg"} className="" alt=""/>
+                    <img src={"static/imgs/WelcomeStart.svg"} alt="start-free-trial"/>
                 </span>
                 <div className="step2" style={{marginBottom:"1rem"}}>Thanks for installing</div>
-                <button className="type2-button"
-                    onClick={() => {
-                        updateStepNumber();
-                        tcAction("Accept");
-                    }}
-                >Start your free trial
-                </button>
+                <button className="type2-button" onClick={() => {tcAction("Accept");}}>Start your free trial</button>
             </div>
   }
 
@@ -359,7 +381,7 @@ const WelcomeWizard = ({showWizard}) => {
                 steps={[
                     { label: 'Welcome', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i className="fa fa-check"></i>},
                     { label: 'Setup', active:activeStep===1, completed:activeStep>1, children:(activeStep<2) ?2:<i className="fa fa-solid fa-check"></i>},
-                    { label: 'Start Trial', active:activeStep===2, completed:activeStep===2, children:(activeStep<2)?3:<i className="fa fa-solid fa-check"></i>}]}
+                    { label: 'Start', active:activeStep===2, completed:activeStep===2, children:(activeStep<2)?3:<i className="fa fa-solid fa-check"></i>}]}
                 className="stepper"
                 stepClassName="stepButtons"
                 styleConfig={{
@@ -381,6 +403,24 @@ const WelcomeWizard = ({showWizard}) => {
             {activeStep===0?getWelcomeStep():null}
             {activeStep===1?getDownloadStep():null}
             {activeStep===2?getStartTrialStep():null}
+            {downloadPopover==="chrome" ?        
+                <div className="chrome-popover">
+                    <div className='chrome-popover_body'>
+                        Install <b> ICE</b>
+                    </div>
+                    <div className="chrome-popover_anchor"></div>
+                </div>:null}
+            
+            {downloadPopover==="edge" ? 
+                <div className="edge-popover">
+                    <div className="edge-popover_triangle"></div>
+                    <div className='edge-popover_body'>
+                        Open <b>Downloads</b> in the Settings menu of your toolbar to install <b>ICE</b>
+                    </div>
+                    <div className="edge-popover_image">
+                        <img src="/static/imgs/edge_download.svg" alt="download" />
+                    </div>
+                </div>:null}
         </div>
         </div>
     </div>
