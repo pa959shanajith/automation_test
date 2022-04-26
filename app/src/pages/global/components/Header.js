@@ -75,14 +75,14 @@ const Header = () => {
         
     }
     
-    const getIce = async (queryICE) => {
+    const getIce = async (queryICE,platform) => {
 		try {
             setShowUD(false);
             setShowOverlay(`Loading...`);
-			const res = await fetch("/downloadICE?ver="+queryICE);
-			const status = await res.text();
+			const res = await fetch("/downloadICE?ver="+queryICE+"&platform="+platform);
+            const {status,iceFile} = await res.json();
             // if (status === "available") window.location.href = "https://localhost:8443/downloadICE?ver="+queryICE+"&file=getICE"
-			if (status === "available") window.location.href = window.location.origin+"/downloadICE?ver="+queryICE+"&file=getICE";
+			if (status === "available") window.location.href = window.location.origin+"/downloadICE?ver="+queryICE+"&file=getICE"+"&platform="+platform;
 			else setMsg(MSG.GLOBAL.ERR_PACKAGE);
             setShowOverlay(false)
 		} catch (ex) {
@@ -227,7 +227,7 @@ const Header = () => {
                                 selectedRole !=='Admin' &&
                                 <>
                                 {getOS()==="Windows"?
-                                <div onClick={()=>{getIce("AvoAssure_ICE.zip")}} ><Link to="#">Download ICE</Link></div>:null}
+                                <div onClick={()=>{getIce("AvoAssure_ICE","windows")}} ><Link to="#">Download ICE</Link></div>:null}
                                 {getOS()==="MacOS"?
                                 <div id="downloadICEdrop" onMouseEnter={()=>{setShowICEMenu(true)}}>
                                     <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download ICE<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
@@ -235,8 +235,8 @@ const Header = () => {
                                 
                                 {showICEMenu?
                                 <div id="downloadICEMenu" onMouseLeave={()=>{ setShowICEMenu(false)}}className="user-name-menu dropdown-menu dropdown-menu-right" style={{position:"fixed",display:"flex",flexDirection:"column",top:"100px",right:"162px",width:"auto"}}>
-                                    <div onClick={()=>{getIce("AvoAssure_ICE_Catalina.zip")}} ><Link to="#">Catalina</Link></div>
-                                    <div onClick={()=>{getIce("AvoAssure_ICE_BigSur.zip")}} ><Link to="#">BigSur</Link></div>
+                                    <div onClick={()=>{getIce("AvoAssure_ICE_Catalina","mac")}} ><Link to="#">Catalina</Link></div>
+                                    <div onClick={()=>{getIce("AvoAssure_ICE_BigSur","mac")}} ><Link to="#">BigSur</Link></div>
                                     {/* <div onClick={()=>{getIce("AvoAssure_ICE_Monterey.zip")}} ><Link to="#">Monterey</Link></div> */}
                                 </div>
                                 :null}

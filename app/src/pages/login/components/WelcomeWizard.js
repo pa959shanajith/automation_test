@@ -123,14 +123,14 @@ const WelcomeWizard = ({showWizard}) => {
   }
   
   // check and start downloading ICE package
-  const getIce = async (queryICE) => {
+  const getIce = async (queryICE,platform) => {
     try {
-        const res = await fetch("/downloadICE?ver="+queryICE);
-        const status = await res.text();
+        const res = await fetch("/downloadICE?ver="+queryICE+"&platform="+platform);
+        const {status,iceFile} = await res.json();
         if (status === "available"){
             setShowIndicator(true);
             axios({
-                url: window.location.origin+"/downloadICE?ver="+queryICE+"&file=getICE",
+                url: window.location.origin+"/downloadICE?ver="+queryICE+"&file=getICE"+"&platform="+platform,
                 method: "GET",
                 responseType: "blob", 
                 onDownloadProgress(progress) {
@@ -140,7 +140,7 @@ const WelcomeWizard = ({showWizard}) => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', queryICE);
+                link.setAttribute('download', iceFile);
                 document.body.appendChild(link);
                 link.click();
             }).catch((err)=>{
@@ -162,7 +162,7 @@ const WelcomeWizard = ({showWizard}) => {
       if (OS!=="Not Supported"){
         switch(OS) {
             case "Windows":
-                return getIce("AvoAssure_ICE.zip");
+                return getIce("AvoAssure_ICE","windows");
             case "MacOS":
                 return setShowMacOSSelection(true);
             default:
@@ -181,7 +181,7 @@ const WelcomeWizard = ({showWizard}) => {
       }
       else {
         setShowMacOSSelection(false);
-        getIce(`AvoAssure_ICE_${selectedMacOS}.zip`)
+        getIce(`AvoAssure_ICE_${selectedMacOS}`,"mac")
       }
   }
 
@@ -369,7 +369,7 @@ const WelcomeWizard = ({showWizard}) => {
                     <img src={"static/imgs/WelcomeStart.svg"} alt="start-free-trial"/>
                 </span>
                 <div className="step2" style={{marginBottom:"1rem"}}>Thanks for installing</div>
-                <button className="type2-button" onClick={() => {tcAction("Accept");}}>Start your free trial</button>
+                <button className="type2-button" onClick={() => {tcAction("Accept");}}>Start your journey</button>
             </div>
   }
 

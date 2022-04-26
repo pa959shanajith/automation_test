@@ -296,7 +296,17 @@ if (cluster.isMaster) {
 		}
 
 		app.get('/downloadICE', async (req, res) => {								
-			let iceFile = req.query.ver;
+			let iceFile = String(req.query.ver);
+			if (uiConfig.isTrial) {
+				if (req.query.platform==="windows"){
+					iceFile+=".exe"
+				}
+				else if (req.query.platform==="mac") {
+					iceFile+=".jar"
+				}
+			}else {
+				iceFile += ".zip"
+			}
 			// iceFile = "AvoAssure_ICE.zip";
 			const iceFilePath = path.resolve(process.env.HOST_PATH);
 			if (req.query.file == "getICE") {
@@ -307,7 +317,7 @@ if (cluster.isMaster) {
 					await fs.promises.access(iceFilePath + path.sep + iceFile);
 					status = "available";
 				} catch (error) {}
-				return res.send(status);
+				return res.send({status,iceFile});
 			}
 		});
 
