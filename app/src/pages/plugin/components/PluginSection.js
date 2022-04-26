@@ -14,6 +14,7 @@ const PluginSection = ({userInfo}) => {
         "Dashboard": {title:"Dashboard", show: false},
         "Selenium To Avo": {title:"Selenium To Avo", show: false},
         "Avo Discover": {title:"Avo Discover", show: false},
+        "iTDM": {title:"iTDM", show: false},
         "showList" : false,
     });
 
@@ -22,17 +23,15 @@ const PluginSection = ({userInfo}) => {
             let tempList = { ...pluginList };
             let availablePlugins = userInfo.pluginsInfo;
             let pluginsLength = availablePlugins.length;
-    
             for(let i=0 ; i < pluginsLength ; i++){
-                if(availablePlugins[i].pluginValue !== false){
+                // if(availablePlugins[i].pluginValue !== false){
                     let pluginName = availablePlugins[i].pluginName;
                     
-                    if (tempList[pluginName]) tempList[pluginName].show = true;
-                    else tempList[pluginName] = { title: pluginName, show: true};
-                    tempList["Avo Discover"].show = false;
-                }
+                    if (tempList[pluginName]) tempList[pluginName].show = availablePlugins[i].pluginValue;
+                    // else tempList[pluginName] = { title: pluginName, show: true};
+                // }
             }
-
+            tempList["Avo Discover"].show = false;
             tempList.showList = true;
             setPluginList(tempList);
         }

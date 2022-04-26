@@ -40,6 +40,92 @@ const formatDate = (date) => {
     
 };
 
+
+
+/** Function responsible for returning ICE connection status */
+const checkForICEstatus = async (icename, fnName) => {
+    logger.debug("ICE Socket requesting Address: %s", icename);
+	const err = "Error occurred in the function "+fnName+": ";
+    const sockmode = await utils.channelStatus(icename);
+    if (!sockmode.schedule && !sockmode.normal) {
+        logger.error(err + "ICE is not available");
+        return "unavailableLocalServer";
+    } else if (sockmode.schedule) {
+        logger.error(err + "ICE is connected in Scheduling mode");
+        return "scheduleModeOn";
+    } else {
+		return null;
+	}
+};
+
+// To load screenshot from ICE
+const openScreenShot = async (username, path) => {
+    const fnName = "openScreenShot";
+    try {
+        var icename = undefined
+		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
+        const iceStatus = await checkForICEstatus(icename, fnName);
+        if (iceStatus !== null) return iceStatus;
+        redisServer.redisSubServer.subscribe('ICE2_' + icename);
+        logger.info("Sending socket request for render_screenshot to cachedb");
+        const dataToIce = { "emitAction": "render_screenshot", "username": icename, "path": path };
+        redisServer.redisPubICE.publish('ICE1_normal_' + icename, JSON.stringify(dataToIce));
+
+        return (new Promise((rsv, rej) => {
+            let scrShotData = [];
+            function render_screenshot_listener(channel, message) {
+                const data = JSON.parse(message);
+                if (icename == data.username && ["unavailableLocalServer", "render_screenshot_finished","render_screenshot"].includes(data.onAction)) {
+                    const resultData = data.value;
+                    if (data.onAction == "unavailableLocalServer") {
+                        redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
+                        logger.error("Error occurred in " + fnName + ": Socket Disconnected");
+                        rsv(data.onAction);
+                    } else if (data.onAction == "render_screenshot_finished") {
+                        redisServer.redisSubServer.removeListener('message', render_screenshot_listener);
+                        if (resultData === "fail") {
+                            logger.error("Screenshots processing failed!");
+                            rsv("fail");
+                        } else {
+                            logger.debug("Screenshots processed successfully");
+                            rsv(scrShotData);
+                        }
+                    } else if (data.onAction == "render_screenshot") {
+                        scrShotData = scrShotData.concat(resultData);
+                    }
+                }
+            }
+            redisServer.redisSubServer.on("message", render_screenshot_listener);
+        }));
+    } catch (exception) {
+        logger.error("Exception in openScreenShot when trying to open screenshot: %s", exception);
+        cb('fail');
+    }
+};
+
+// Render screenshots for html reports
+exports.openScreenShot_API = async (req, res) => {
+    try {
+        const username = req.body.username; //req.session.username;
+        const result = await openScreenShot(username, req.body.absPath);
+        res.send(result);
+    } catch (exception) {
+        logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
+        res.send("fail");
+    }
+};
+
+exports.openScreenShot = async (req, res) => {
+    try {
+        const username = req.session.username;
+        const result = await openScreenShot(username, req.body.absPath);
+        res.send(result);
+    } catch (exception) {
+        logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
+        res.send("fail");
+    }
+};
+
 const prepareReportData = (reportData, embedImages) => {
     let pass = fail = terminated = 0;
     const remarksLength = [];

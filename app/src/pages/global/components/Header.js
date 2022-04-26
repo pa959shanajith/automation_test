@@ -185,18 +185,20 @@ const Header = () => {
             { showConfSR && <ConfSwitchRole />  }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
             <div className = "main-header">
-                <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
+                <span className="header-logo-span"><img className={"header-logo "} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
                     <div className="dropdown user-options">
-                        { !adminDisable &&
+                        { 
                         <>
-                        <div className="btn-container">
-                            <ClickAwayListener onClickAway={()=>setClickNotify(false)}>
-                                <button onClick={(e)=>setClickNotify(true)} className="fa fa-bell no-border bell-ic notify-btn">
-                                    {(notifyCnt !== 0) && <span className='notify-cnt'>{notifyCnt}</span>}
-                                </button>
-                                <NotifyDropDown show={clickNotify}/>
-                            </ClickAwayListener>
-                        </div>
+                        { !adminDisable &&
+                            <div className="btn-container">
+                                <ClickAwayListener onClickAway={()=>setClickNotify(false)}>
+                                    <button onClick={(e)=>setClickNotify(true)} className="fa fa-bell no-border bell-ic notify-btn">
+                                        {(notifyCnt !== 0) && <span className='notify-cnt'>{notifyCnt}</span>}
+                                    </button>
+                                    <NotifyDropDown show={clickNotify}/>
+                                </ClickAwayListener>
+                            </div>
+                        }
                         <ClickAwayListener onClickAway={onClickAwaySR}>
                             <div className="switch-role-btn no-border" data-toggle="dropdown" onClick={switchRole} >
                                 <span><img className="switch-role-icon" alt="switch-ic" src="static/imgs/ic-switch-user.png"/></span>
@@ -222,7 +224,7 @@ const Header = () => {
                             <div><Link className="user-role-item" to="#">{selectedRole || "Test Manager"}</Link></div>
                             <div className="divider" />
                             {
-                                !adminDisable &&
+                                selectedRole !=='Admin' &&
                                 <>
                                 {getOS()==="Windows"?
                                 <div onClick={()=>{getIce("AvoAssure_ICE.zip")}} ><Link to="#">Download ICE</Link></div>:null}

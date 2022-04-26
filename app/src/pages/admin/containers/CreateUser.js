@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {ScreenOverlay, ScrollBar, VARIANT, setMsg, Messages as MSG, ValidationExpression } from '../../global' 
 import {getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData} from '../api';
 import * as actionTypes from '../state/action';
+import * as loginActionTypes from '../../login/state/action';
 import '../styles/CreateUser.scss'
 import CreateLanding from '../components/CreateLanding';
 import EditLanding from '../components/EditLanding';
@@ -34,7 +35,8 @@ const CreateUser = (props) => {
     const [allUserFilList,setAllUserFilList] = useState(userConf.allUsersList)
     const [ldapUserList,setLdapUserList] = useState([])
     const [ldapUserListInitial,setLdapUserListInitial] = useState([])
-    const [loading,setLoading] = useState(false)
+    const [loading,setLoading] = useState(false);
+    const userInfo = useSelector(state=>state.login.userinfo);
     useEffect(()=>{
         
         click();
@@ -97,8 +99,16 @@ const CreateUser = (props) => {
                 if(data.error){displayError(data.error);return;}
                 setLoading(false);
                 if(data === "success") {
-                    if (action === "create") click();
-                    else edit();
+                    if (action === "create") {
+                        click();
+                    }
+                    else if(action === "update"){
+                        if(userConf.userId === userInfo.user_id) updateUserInfoRoles();
+                        edit();
+                    }
+                    else {
+                        edit();                        
+                    };
                     setMsg(MSG.CUSTOM("User "+action+"d successfully!",VARIANT.SUCCESS));
                     if (action === "delete") {
                         const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
@@ -275,6 +285,14 @@ const CreateUser = (props) => {
             dispatch({type:actionTypes.UPDATE_LDAP_ALLUSER_LIST,payload:[]})
 		}
     };
+
+    const updateUserInfoRoles = () =>{
+        const addRole = [];
+        for (let role in userConf.addRole) {
+            if (userConf.addRole[role]) addRole.push(role);
+        }
+        dispatch({type: loginActionTypes.UPDATE_USERINFO_ADDROLES, payload: addRole});
+    }
     
     //Switch between multiple Usertypes
     const selectUserType = async(props) =>{
@@ -558,14 +576,13 @@ const CreateUser = (props) => {
                         ))}
                     </select>
 				</div> 
-
-                {( userConf.rolename!=='Admin' && props.showEditUser === true  && userConf.userIdName!=='')?
+                {/* userConf.rolename!=='Admin' && */}
+                {(  props.showEditUser === true  && userConf.userIdName!=='')?
                     <div  className="col-xs-6 selectRole" >
                         <label className="leftControl primaryRole" id="additionalRoleTxt">Additional Role: </label>
                         <label className="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown" onClick={()=>{setToggleAddRoles(!toggleAddRoles)}} title="Select Additional Role">Select Additional Role</label>
                         {(toggleAddRoles===true)?
                             <ul ref={node} className="dropdown-menu-multiselect" id="additionalRoles" >
-                                
                                 {userConf.allAddRoles.map((arid,index) => (  
                                     (arid[1]!==userConf.role)? 
                                         <li className='RolesCheck' key={index}  checked={userConf.addRole[arid[1]]} onClick={()=>{dispatch({type:actionTypes.EDIT_ADDROLES,payload:arid[1]})}}>
