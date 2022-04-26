@@ -24,6 +24,7 @@ const Header = () => {
     const dispatch = useDispatch();
     const [username, setUsername] = useState(null);
     const [showUD, setShowUD] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
     const [showSR, setShowSR] = useState(false);
     const [roleList, setRoleList] = useState([]);
     const [adminDisable, setAdminDisable] = useState(false);
@@ -113,7 +114,7 @@ const Header = () => {
     
     const onClickAwayUD = () => setShowUD(false);
     const onClickAwaySR = () => setShowSR(false);
-
+    const onClickAwayHelp = () => setShowHelp(false);
 
     const switchedRole = event => {
         setShowConfSR(false);
@@ -174,6 +175,18 @@ const Header = () => {
                     <div className="dropdown user-options">
                         { 
                         <>
+                        <ClickAwayListener onClickAway={onClickAwayHelp}>
+                        <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(true)}>
+                            <span className="help">Need Help ?</span>
+                        </div>
+                        <div className={"help-menu dropdown-menu " + (showHelp && "show")}>
+                            <div onClick={()=>{window.open('https://google.com','_blank')
+                                setShowHelp(false)}} ><Link to="#">Training Videos</Link></div>
+                            <div onClick={()=>{window.open('https://docs.avoautomation.com/','_blank')
+                                setShowHelp(false)}} ><Link to="#">Training Document</Link></div>   
+                        </div>
+                        </ClickAwayListener>
+
                         { !adminDisable &&
                             <div className="btn-container">
                                 <ClickAwayListener onClickAway={()=>setClickNotify(false)}>
