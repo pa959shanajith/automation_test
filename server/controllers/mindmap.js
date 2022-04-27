@@ -477,7 +477,7 @@ exports.saveData = async (req, res) => {
 						if (data_var.rows == "success"){
 							modid=data[0]._id
 						}
-						if (modid != 'fail') sendNotification(data, assigner)
+						// if (modid != 'fail') sendNotification(data, assigner)
 						res.send(modid);
 					}
 			});
