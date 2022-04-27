@@ -835,8 +835,6 @@ const ProjectNew = (props) => {
             
             
             {(taskName==="Update Project" && projectTypeSelected !== "") ? <>
-                {console.log(projectTypeSelected)}
-                {console.log(applicationType)}
                 <div className='domainTxt appTypeTxt'>Selected Application Type</div>
                 <div className="appTypesContainer">
                     {applicationType.map((app)=>(
