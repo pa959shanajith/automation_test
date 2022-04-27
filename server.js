@@ -297,12 +297,12 @@ if (cluster.isMaster) {
 
 		app.get('/downloadICE', async (req, res) => {								
 			let iceFile = String(req.query.ver);
-			if (uiConfig.isTrial) {
+			if (uiConfig.isTrial.condition) {
 				if (req.query.platform==="windows"){
-					iceFile+=".exe"
+					iceFile+=uiConfig.isTrial.windows
 				}
 				else if (req.query.platform==="mac") {
-					iceFile+=".jar"
+					iceFile+=uiConfig.isTrial.mac
 				}
 			}else {
 				iceFile += ".zip"

@@ -25,5 +25,9 @@
     "externalPluginURL":{ 
         "itdm":"https://google.com"
     },
-    "isTrial": false
+    "isTrial":{
+        "condition":false,
+        "windows":".exe",
+        "mac":".jar"
+    }
 }
