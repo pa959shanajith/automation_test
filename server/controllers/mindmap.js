@@ -477,7 +477,7 @@ exports.saveData = async (req, res) => {
 						if (data_var.rows == "success"){
 							modid=data[0]._id
 						}
-						// if (modid != 'fail') sendNotification(data, assigner)
+						if (modid != 'fail') sendNotification(data, assigner)
 						res.send(modid);
 					}
 			});
@@ -490,7 +490,7 @@ exports.saveData = async (req, res) => {
 	}
 };
 
-function sendNotification(data, assigner){
+async function sendNotification(data, assigner){
 	visited = {}
 	for(let i = 0; i < data.length; i++){
 		if (!data[i].task || data[i].task.details in visited) continue
@@ -515,11 +515,11 @@ function sendNotification(data, assigner){
 		if ('status' in task && task.status == 'assigned' && task._id == null){
 			assignedTasksNotification.notifyMsg = "Task '" + task.details + "' has been assigned by " + assigner + " to " + task.assignedToName + '.';
 			assignedObj.notifyEvent =  'onAssign';
-			notification.notify('taskWorkFlow', assignedObj, 'email')
+			await notification.notify('taskWorkFlow', assignedObj, 'email')
 		}else if('status' in task && task.status == 'unassigned') {
 			assignedTasksNotification.notifyMsg = "Task '" + task.details + "' has been unassigned by " + assigner + ". ";
 			assignedObj.notifyEvent = 'onUnassign';
-			notification.notify('taskWorkFlow', assignedObj, 'email')
+			await notification.notify('taskWorkFlow', assignedObj, 'email')
 		}
 		if(task.assignedToName in myserver.socketMapNotify){
 			var soc = myserver.socketMapNotify[task.assignedToName];
