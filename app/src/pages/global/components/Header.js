@@ -260,8 +260,10 @@ const Header = () => {
                             <div onClick={logout}><Link to="#">Logout</Link></div>
                         </div>
                         </ClickAwayListener>
+                        </>
+                        }
                     </div>
-                </div>
+            </div>
         </>
     ); 
 }
