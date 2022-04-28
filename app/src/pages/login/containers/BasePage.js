@@ -77,11 +77,12 @@ const BasePage = () => {
                                 setLoginValidation("Your session has expired!");
                                 setLoginAgain(true);
                             } else {
-                                if (userinfo.tandc) {
-                                    setUserProfile(userinfo);
-                                    setShowTCPopup(true);
-                                }
-                                else loadProfile(userinfo)
+                                // if (userinfo.tandc) {
+                                //     setUserProfile(userinfo);
+                                //     setShowTCPopup(true);
+                                // }
+                                // else 
+                                loadProfile(userinfo)
                             }
                         }
                         catch(err){

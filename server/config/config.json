@@ -1,6 +1,6 @@
 {
     "defaultTokenExpiry": "720",
-    "showEULA": false,
+    "showEULA": true,
     "pingTimer":"120000",
     "strictTaskWorkflow": false,
     "dateFormat": "YYYY-MM-DD",
@@ -24,5 +24,10 @@
     },
     "externalPluginURL":{ 
         "itdm":"https://google.com"
+    },
+    "isTrial":{
+        "condition":false,
+        "windows":".exe",
+        "mac":".jar"
     }
 }
