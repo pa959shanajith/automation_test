@@ -53,10 +53,6 @@ const reducer = (state=initialState, action) => {
             return{
                 ...state, dateformat: action.payload
             }
-        case actionTypes.UPDATE_USERINFO_ADDROLES:
-            return{
-              ...state, userinfo: {...state.userinfo, additionalrole: action.payload}
-            }
         default:
             return state
     }
