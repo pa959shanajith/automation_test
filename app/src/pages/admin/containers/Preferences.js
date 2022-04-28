@@ -41,9 +41,18 @@ const Preferences = (props) => {
 					<thead>
 						<tr id="head">
 							<th>Plugins/Modules</th>
-                            {resultList.map((data,index)=>(
+							<th>Admin</th>
+							<th>Test Lead</th>
+							<th>Test Manager</th>
+							<th>Test Engineer</th>
+                            {/* {
+                                Object.keys(resultList).forEach((data, index) => (
+                                    <th key={index} value={data} >{resultList[data]}</th>
+                                ))
+                            } */}
+                            {/* {resultList.map((data,index)=>(
                                 <th key={index} value={data.name} >{data.name}</th>
-                            ))}
+                            ))} */}
 						</tr>
 					</thead>
 					<tbody id="pref">
@@ -56,29 +65,37 @@ const Preferences = (props) => {
                     </tr>
                     <tr id="rows">
                         <td>ICE</td>
-                        {resultList.map((data,index)=>(
-                            <td key={index}><input disabled key={index} type='checkbox' value='' checked={(['Test Lead', 'Test Engineer'].indexOf(data.name) > -1)? true:false} className='module_admin'/></td>
-                        ))}
+                        <td><input type='checkbox' value='' className='module_admin' disabled/></td>
+                        <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
+                        <td><input type='checkbox' value='' className='module_admin' disabled/></td>
+                        <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
+                        {/* {Object.keys(resultList).forEach((data,index)=>(
+                            <td key={index}><input disabled key={index} type='checkbox' value='' checked={(['Test Lead', 'Test Engineer'].indexOf(resultList[data]) > -1)? true:false} className='module_admin'/></td>
+                        ))} */}
                     </tr>
-                    {rows.map((data,index)=>{
-                        if(data==="ALM"){
+                    {Object.keys(resultList).map((data,index)=>{
+                        if(resultList[data] && (data === "alm" || data === "mindmap")){
                         return(
                         <tr key={index} >
-                            <td >Integration</td>
-                            {resultList.map((data1,index)=>(
-                                <td key={index}><input disabled key={index} type='checkbox' value='' checked={(data1.plugins[data.toLowerCase()]===true)? true:false} className='module_admin'/></td>
-                            ))}
+                            <td>{(data === "alm") ? 'Integration' : 'Mindmap'}</td>
+                            <td><input type='checkbox' value='' className='module_admin' disabled/></td>
+                            <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
+                            <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
+                            <td><input type='checkbox' value='' className='module_admin' disabled/></td>
+                            {/* {Object.keys(resultList).forEach((data1,index)=>(
+                                <tdkey={index}><input disabled key={index} type='checkbox' value='' checked={(data1.plugins[data.toLowerCase()]===true)? true:false} className='module_admin'/></td>
+                            ))} */}
                         </tr>
-                        )}else{
+                        )} else if(resultList[data] && (data === "reports" || data === "utility" || data === "apg" || data === "dashboard" || data === "seleniumtoavo")){
                             return(
                             <tr key={index} >
-                                <td >{data}</td>
-                                {resultList.map((data1,index)=>(
-                                    <td key={index}><input disabled key={index} type='checkbox' value='' checked={(data1.plugins[data.toLowerCase()]===true)? true:false} className='module_admin'/></td>
-                                ))}
+                                <td>{(data === "reports") ? 'Reports' : (data === "utility") ? 'Utility' : (data === "apg") ? 'APG' : (data === "dashboard") ? 'Dashboard' : (data === "seleniumtoavo") ? 'Selenium To Avo' : ''}</td>
+                                <td><input type='checkbox' value='' className='module_admin' disabled/></td>
+                                <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
+                                <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
+                                <td><input type='checkbox' value='' checked={true} className='module_admin' disabled/></td>
                             </tr>
-                            )
-                        }
+                        )}
                     })}
                     </tbody>
 				</table>
