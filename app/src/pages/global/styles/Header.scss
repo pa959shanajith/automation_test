@@ -47,6 +47,11 @@
         text-transform: capitalize;
         margin: 0 15px;
     }
+    .help{
+        text-transform: capitalize;
+        margin: 0 15px;
+        color: $primaryColorLight;
+    }
 }
 
 .user-name-menu{
@@ -107,7 +112,11 @@
     left: 20%!important;
 }
 
-.switch-role-menu, .user-name-menu{
+.help-menu{
+    left: -10%!important;
+}
+
+.help-menu, .switch-role-menu, .user-name-menu{
     z-index: 5!important;
     margin-right: 20px!important;
     margin-top: 10px!important;

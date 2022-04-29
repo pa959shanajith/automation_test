@@ -50,6 +50,16 @@ exports.manageUserDetails = async (req, res) => {
 		const reqData = req.body.user;
 		const action = req.body.action;
 		const internalUser = reqData.type == "inhouse";
+		if (action==="stepUpdate") {
+			const inputs = {
+				action,
+				user:reqData,
+				name:reqData.username
+			}
+			const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
+			if (result == "fail" || result == "forbidden") return res.status(500).send("fail");
+			else return res.send(result);
+		}
 		let inputs = {
 			action: action,
 			createdby: req.session.userid,

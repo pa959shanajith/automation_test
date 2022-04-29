@@ -24,6 +24,7 @@ const Header = () => {
     const dispatch = useDispatch();
     const [username, setUsername] = useState(null);
     const [showUD, setShowUD] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
     const [showSR, setShowSR] = useState(false);
     const [roleList, setRoleList] = useState([]);
     const [adminDisable, setAdminDisable] = useState(false);
@@ -34,7 +35,8 @@ const Header = () => {
     const [clickNotify,setClickNotify] = useState(false)
     const userInfo = useSelector(state=>state.login.userinfo);
     const selectedRole = useSelector(state=>state.login.SR);
-    const notifyCnt = useSelector(state=>state.login.notify.unread)
+    const notifyCnt = useSelector(state=>state.login.notify.unread);
+    const [showICEMenu, setShowICEMenu] = useState(false);
 
     useEffect(()=>{
         //on Click back button on browser
@@ -60,14 +62,28 @@ const Header = () => {
         persistor.purge();
         RedirectPage(history, { reason: "logout" });
     };
+
+    const getOS = () => {
+        let userAgent = navigator.userAgent.toLowerCase();
+        if (/windows nt/.test(userAgent))
+            return "Windows";
+        
+        else if (/mac os x/.test(userAgent)) 
+            return "MacOS";
+        
+        else 
+            return "Not Supported";
+        
+    }
     
-    const getIce = async () => {
+    const getIce = async (queryICE,platform) => {
 		try {
             setShowUD(false);
-            setShowOverlay(`Loading...`)
-			const res = await fetch("/AvoAssure_ICE.zip");
-			const status = await res.text();
-			if (status === "available") window.location.href = window.location.origin+"/AvoAssure_ICE.zip?file=getICE"
+            setShowOverlay(`Loading...`);
+			const res = await fetch("/downloadICE?ver="+queryICE+"&platform="+platform);
+            const {status,iceFile} = await res.json();
+            // if (status === "available") window.location.href = "https://localhost:8443/downloadICE?ver="+queryICE+"&file=getICE"
+			if (status === "available") window.location.href = window.location.origin+"/downloadICE?ver="+queryICE+"&file=getICE"+"&platform="+platform;
 			else setMsg(MSG.GLOBAL.ERR_PACKAGE);
             setShowOverlay(false)
 		} catch (ex) {
@@ -113,7 +129,7 @@ const Header = () => {
     
     const onClickAwayUD = () => setShowUD(false);
     const onClickAwaySR = () => setShowSR(false);
-
+    const onClickAwayHelp = () => setShowHelp(false);
 
     const switchedRole = event => {
         setShowConfSR(false);
@@ -170,20 +186,32 @@ const Header = () => {
             { showConfSR && <ConfSwitchRole />  }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
             <div className = "main-header">
-                <span className="header-logo-span"><img className={"header-logo "} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
+                <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
                     <div className="dropdown user-options">
                         { 
                         <>
+                        <ClickAwayListener onClickAway={onClickAwayHelp}>
+                        <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(true)}>
+                            <span className="help">Need Help ?</span>
+                        </div>
+                        <div className={"help-menu dropdown-menu " + (showHelp && "show")}>
+                            <div onClick={()=>{window.open('https://google.com','_blank')
+                                setShowHelp(false)}} ><Link to="#">Training Videos</Link></div>
+                            <div onClick={()=>{window.open('https://docs.avoautomation.com/','_blank')
+                                setShowHelp(false)}} ><Link to="#">Training Document</Link></div>   
+                        </div>
+                        </ClickAwayListener>
+
                         { !adminDisable &&
-                            <div className="btn-container">
-                                <ClickAwayListener onClickAway={()=>setClickNotify(false)}>
-                                    <button onClick={(e)=>setClickNotify(true)} className="fa fa-bell no-border bell-ic notify-btn">
-                                        {(notifyCnt !== 0) && <span className='notify-cnt'>{notifyCnt}</span>}
-                                    </button>
-                                    <NotifyDropDown show={clickNotify}/>
-                                </ClickAwayListener>
-                            </div>
-                        }
+                        <>
+                        <div className="btn-container">
+                            <ClickAwayListener onClickAway={()=>setClickNotify(false)}>
+                                <button onClick={(e)=>setClickNotify(true)} className="fa fa-bell no-border bell-ic notify-btn">
+                                    {(notifyCnt !== 0) && <span className='notify-cnt'>{notifyCnt}</span>}
+                                </button>
+                                <NotifyDropDown show={clickNotify}/>
+                            </ClickAwayListener>
+                        </div>
                         <ClickAwayListener onClickAway={onClickAwaySR}>
                             <div className="switch-role-btn no-border" data-toggle="dropdown" onClick={switchRole} >
                                 <span><img className="switch-role-icon" alt="switch-ic" src="static/imgs/ic-switch-user.png"/></span>
@@ -209,17 +237,33 @@ const Header = () => {
                             <div><Link className="user-role-item" to="#">{selectedRole || "Test Manager"}</Link></div>
                             <div className="divider" />
                             {
-                                selectedRole !=='Admin' &&
+                                !adminDisable &&
                                 <>
-                                <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
+                                {getOS()==="Windows"?
+                                <div onClick={()=>{getIce("AvoAssure_ICE","windows")}} ><Link to="#">Download ICE</Link></div>:null}
+                                {getOS()==="MacOS"?
+                                <div id="downloadICEdrop" onMouseEnter={()=>{setShowICEMenu(true)}}>
+                                    <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download ICE<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
+                                </div>:null}
+                                
+                                {showICEMenu?
+                                <div id="downloadICEMenu" onMouseLeave={()=>{ setShowICEMenu(false)}}className="user-name-menu dropdown-menu dropdown-menu-right" style={{position:"fixed",display:"flex",flexDirection:"column",top:"100px",right:"162px",width:"auto"}}>
+                                    <div onClick={()=>{getIce("AvoAssure_ICE_Catalina","mac")}} ><Link to="#">Catalina</Link></div>
+                                    <div onClick={()=>{getIce("AvoAssure_ICE_BigSur","mac")}} ><Link to="#">BigSur</Link></div>
+                                    {/* <div onClick={()=>{getIce("AvoAssure_ICE_Monterey.zip")}} ><Link to="#">Monterey</Link></div> */}
+                                </div>
+                                :null}
+
                                 { window.localStorage['navigateScreen'] !== 'settings' && <div onClick={chngUsrConf} ><Link to="#">Settings</Link></div>}
                                 </>
                             }
                             <div onClick={logout}><Link to="#">Logout</Link></div>
                         </div>
                         </ClickAwayListener>
+                        </>
+                        }
                     </div>
-                </div>
+            </div>
         </>
     ); 
 }

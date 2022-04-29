@@ -78,9 +78,10 @@ const ProjectNew = (props) => {
             setLoading("Loading...");
             const plugins_list = await getAvailablePlugins();
             if(plugins_list.error){displayError(plugins_list.error);return;}
-            for (var i = 0; i < plugins_list.length; i++) {
-                plugins[i] = plugins_list[i];
-            }
+            plugins = Object.keys(plugins_list);
+            // for (var i = 0; i < plugins_list.length; i++) {
+            //     plugins[i] = plugins_list[i];
+            // }
             let data = await getDomains_ICE() 
             if(data.error){displayError(data.error);return;}
             else if(data.length===0){
@@ -99,8 +100,8 @@ const ProjectNew = (props) => {
                 "mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"}
             };
             var listPlugin = [];
-            for ( i = 0; i < plugins.length; i++) {
-                listPlugin.push(details[plugins[i]]);
+            for ( var i = 0; i < plugins.length; i++) {
+                listPlugin.push({...details[plugins[i]], enabled: plugins_list[plugins[i]]});
             }
             if(screen !== undefined) setSelDomain(data[0]);
             else if(taskName==="Create Project") setSelDomain(data[0]);
@@ -832,13 +833,22 @@ const ProjectNew = (props) => {
                 <div className='edit-project__label'>New Project Name : {editProjectName}. Please click on Update.</div>:null}
             </div>
             
-            <div className='domainTxt appTypeTxt'>Application Type</div>
-
-            <div className={taskName==="Update Project"?" disableApplicationType appTypesContainer":"appTypesContainer"}>
-                {applicationType.map((e,i)=>(
-                    <div key={i} onClick={()=>{setprojectTypeSelected(applicationType[i]['data'])}}  className={(projectTypeSelected===applicationType[i]['data'])?"projectTypeSelected projectTypes_create":"projectTypes_create"} data-app={applicationType[i]['data']}  title={applicationType[i]['title']} ><img src={"static/imgs/"+applicationType[i]['img']+".png"} alt={applicationType[i]['title']}/><label>{applicationType[i]['title']}</label></div>
-                ))}
-            </div>
+            
+            {(taskName==="Update Project" && projectTypeSelected !== "") ? <>
+                <div className='domainTxt appTypeTxt'>Selected Application Type</div>
+                <div className="appTypesContainer">
+                    {applicationType.map((app)=>(
+                        (app.data === projectTypeSelected) && <div key={app.data} style={app['enabled'] ? {} : {cursor: 'no-drop'}} className="projectTypeSelected projectTypes_create" data-app={app['data']}  title={app['enabled'] ? app['title'] : 'License Not Allowed'} ><img style={app['enabled'] ? {} : {filter: 'contrast(0)'}} src={"static/imgs/"+app['img']+".png"} alt={app['title']}/><label style={app['enabled'] ? {} : {cursor: 'no-drop'}}>{app['title']}</label></div>
+                    ))}
+                </div>
+            </> : <>
+                <div className='domainTxt appTypeTxt'>Application Type</div>
+                <div className={taskName==="Update Project" ? "disableApplicationType appTypesContainer" : "appTypesContainer"}>
+                    {applicationType.map((e,i)=>(
+                        <div key={i} style={applicationType[i]['enabled'] ? {} : {cursor: 'no-drop'}} onClick={()=>{(applicationType[i]['enabled']) && setprojectTypeSelected(applicationType[i]['data'])}}  className={(projectTypeSelected===applicationType[i]['data'])?"projectTypeSelected projectTypes_create":"projectTypes_create"} data-app={applicationType[i]['data']}  title={applicationType[i]['enabled'] ? applicationType[i]['title'] : 'License Not Allowed'} ><img style={applicationType[i]['enabled'] ? {} : {filter: 'contrast(0)'}} src={"static/imgs/"+applicationType[i]['img']+".png"} alt={applicationType[i]['title']}/><label style={applicationType[i]['enabled'] ? {} : {cursor: 'no-drop'}}>{applicationType[i]['title']}</label></div>
+                    ))}
+                </div>
+            </>}
         </div>
 
         <ReleaseCycle clickAddRelease={clickAddRelease} releaseList={releaseList} clickReleaseListName={clickReleaseListName} setActiveRelease={setActiveRelease} clickEditRelease={clickEditRelease} activeRelease={activeRelease} count={count} clickAddCycle={clickAddCycle} cycleList={cycleList} clickEditCycle={clickEditCycle} delCount={delCount} disableAddRelease={disableAddRelease} taskName={taskName} disableAddCycle={disableAddCycle} />

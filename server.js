@@ -295,18 +295,41 @@ if (cluster.isMaster) {
 			}
 		}
 
-		app.get('/AvoAssure_ICE.zip', async (req, res) => {
-			const iceFile = "AvoAssure_ICE.zip";
+		app.get('/downloadICE', async (req, res) => {								
+			let iceFile = String(req.query.ver);
+			if (uiConfig.isTrial.condition) {
+				if (req.query.platform==="windows"){
+					iceFile+=uiConfig.isTrial.windows
+				}
+				else if (req.query.platform==="mac") {
+					iceFile+=uiConfig.isTrial.mac
+				}
+			}else {
+				iceFile += ".zip"
+			}
+			// iceFile = "AvoAssure_ICE.zip";
 			const iceFilePath = path.resolve(process.env.HOST_PATH);
 			if (req.query.file == "getICE") {
-				return res.sendFile(iceFile, { root: iceFilePath })
+				return res.download(path.join(iceFilePath, iceFile), iceFile)
 			} else {
 				let status = "na";
 				try {
 					await fs.promises.access(iceFilePath + path.sep + iceFile);
 					status = "available";
 				} catch (error) {}
-				return res.send(status);
+				return res.send({status,iceFile});
+			}
+		});
+
+		app.get('/External_Plugin_URL', async (req, res) => {
+			const pluginName = req.query.pluginName;
+			const pluginURL = uiConfig.externalPluginURL[pluginName];
+			
+			try{
+				return res.send(pluginURL);
+			}
+			catch(err){
+				console.error("external plugin doesn't exist");
 			}
 		});
 

@@ -3,7 +3,9 @@ import { Header, FooterOne, ScrollBar } from '../../global'
 import PluginSection from '../components/PluginSection';
 import TaskSection from '../components/TaskSection';
 import { useSelector, useDispatch } from 'react-redux';
-import "../styles/PluginHome.scss"
+import "../styles/PluginHome.scss";
+import WelcomeWizard from '../../login/components/WelcomeWizard.js';
+
 
 const PluginHome = () => {
 
@@ -14,6 +16,7 @@ const PluginHome = () => {
     // localStorage.setItem("navigateEnable", true);
 
     const [name, setName] = useState("Demo User");
+    const [showTCPopup,setShowTCPopup] = useState(false);
 
     useEffect(()=>{
         if (Object.keys(userInfo).length!==0){
@@ -21,9 +24,17 @@ const PluginHome = () => {
         }
     }, [userInfo, userRole]);
 
+    useEffect(()=>{
+        if (userInfo.tandc) {
+            setShowTCPopup(true);
+        }
+    },[userInfo])
+
+     
     return(
         <div className="plugin-bg-container">
             <img className="plugin-bg-img" alt="bg-img" src="static/imgs/light-bg.png"/>
+            {showTCPopup && (userInfo.welcomeStepNo!==undefined) ?<WelcomeWizard showWizard={setShowTCPopup}/>:null}
             <Header />
             <div className="plugin-elements" id="plugin__mainScreen">
                 <ScrollBar scrollId="plugin__mainScreen" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
