@@ -229,8 +229,8 @@ class TestSuiteExecutor {
             "executionid": executionid,
             "testscenarioid": scenarioId,
             "browser": browserType,
-            "status": reportData.overallstatus[0].overallstatus,
-            "overallstatus": reportData.overallstatus[0],
+            "status": reportData.overallstatus.overallstatus,
+            "overallstatus": reportData.overallstatus,
             "report": JSON.stringify(reportData),
             "modifiedby": userInfo.invokinguser,
             "modifiedbyrole": userInfo.invokinguserrole,
@@ -370,17 +370,17 @@ class TestSuiteExecutor {
                                 if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
                                 d2R[testsuiteid].scenarios[scenarioid].push({ scenarioname, scenarioid, "overallstatus": "Not Executed" });
                             }
-                            if (reportData.overallstatus.length !== 0) {
+                            if (Object.keys(reportData.overallstatus).length !== 0) {
                                 const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
-                                const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus[0].browserType;
-                                reportData.overallstatus[0].browserType = browserType;
+                                const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
+                                reportData.overallstatus.browserType = browserType;
                                 if (execType == "API") {
                                     const cidx = d2R[testsuiteid].scenarios[scenarioid].length - 1;
-                                    d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus[0] };
+                                    d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus };
                                 }
-                                const reportStatus = reportData.overallstatus[0].overallstatus;
+                                const reportStatus = reportData.overallstatus.overallstatus;
                                 const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
-                                const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus[0].terminatedBy };
+                                const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy };
                                 if (reportid == "fail") {
                                     logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
                                     reportItem[reportid] = '';
