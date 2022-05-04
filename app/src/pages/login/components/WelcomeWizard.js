@@ -190,7 +190,7 @@ const WelcomeWizard = ({showWizard}) => {
             <ScrollBar>
             <div id="tnc_content">
                 <h4 className="tnc_header">SOFTWARE TRIAL LICENSE AGREEMENT</h4>
-                <p className="tnc_bold">THIS SOFTWARE TRIAL LICENSE AGREEMENT (“LICENSE AGREEMENT”) IS A LEGAL CONTRACT BETWEEN AVO AUTOMATION PTE. LTD (“LICENSOR”) AND YOU, EITHER AS AN INDIVIDUAL OR AN ENTITY (“LICENSEE”). IF THE LICENSEE IS ACCEPTING ON BEHALF OF AN ENTITY, THE LICENSEE REPRESENTS AND WARRANTS THAT THE LICENSEE HAS THE AUTHORITY TO BIND THAT ENTITY TO THIS AGREEMENT  LICENSORIS WILLING TO AUTHORIZE LICENSEE’S USE OF THE SOFTWARE ASSOCIATED WITH THIS LICENSE AGREEMENT ONLY UPON THE CONDITION THAT LICENSEE ACCEPTS THIS LICENSE AGREEMENT WHICH GOVERNS LICENSEE’S USE OF THE SOFTWARE. BY DOWNLOADING, INSTALLING, OR ACCESSING AND USING THE SOFTWARE, LICENSEE INDICATES LICENSEE’S ACCEPTANCE OF THIS LICENSE AGREEMENT AND LICENSEE’S AGREEMENT TO COMPLY WITH THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT.</p>
+                <p className="tnc_bold">THIS SOFTWARE TRIAL LICENSE AGREEMENT (“LICENSE AGREEMENT”) IS A LEGAL CONTRACT BETWEEN AVO AUTOMATION, A DIVISION OF SLK SOFTWARE SERVICES PVT LTD (“LICENSOR”) AND YOU, EITHER AS AN INDIVIDUAL OR AN ENTITY (“LICENSEE”). IF THE LICENSEE IS ACCEPTING ON BEHALF OF AN ENTITY, THE LICENSEE REPRESENTS AND WARRANTS THAT THE LICENSEE HAS THE AUTHORITY TO BIND THAT ENTITY TO THIS AGREEMENT LICENSORIS WILLING TO AUTHORIZE LICENSEE’S USE OF THE SOFTWARE ASSOCIATED WITH THIS LICENSE AGREEMENT ONLY UPON THE CONDITION THAT LICENSEE ACCEPTS THIS LICENSE AGREEMENT WHICH GOVERNS LICENSEE’S USE OF THE SOFTWARE. BY DOWNLOADING, INSTALLING, OR ACCESSING AND USING THE SOFTWARE, LICENSEE INDICATES LICENSEE’S ACCEPTANCE OF THIS LICENSE AGREEMENT AND LICENSEE’S AGREEMENT TO COMPLY WITH THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT.</p>
                 <div>
                     <br/>
                     <h5><span className="tnc_num_idx">1.        </span> DEFINITIONS</h5>
@@ -202,7 +202,7 @@ const WelcomeWizard = ({showWizard}) => {
                         <p>"<b>Intellectual Property Rights</b>" means all trade secrets, patents and patent applications, trademarks (whether registered or unregistered and including any goodwill acquired in such trade marks), service marks, trade names, business names, internet domain names, e-mail address names, copyrights (including rights in computer software), moral rights, database rights, design rights, rights in know-how, rights in confidential information, rights in inventions (whether patentable or not) and all other intellectual property and proprietary rights (whether registered or unregistered, and any application for the foregoing), and all other equivalent or similar rights which may subsist anywhere in the world.</p>
                         <p>"<b>License</b>" means a license to use the Software granted pursuant to the terms and conditions of this License Agreement.</p>
                         <p>"<b>Licensee</b>" means the person or entity that has entered into this License Agreement.</p>
-                        <p>"<b>Licensor</b>" means Avo Automation Pte Ltd.</p>
+                        <p>"<b>Licensor</b>" means Avo Automation, a division of SLK Software Services Pvt Ltd.</p>
                         <p>"<b>Party</b>" means either the "Licensor" or "Licensee", individually as the context so requires; and "<b>Parties</b>" means the "Licensor" and "Licensee", collectively.</p>
                         <p>"<b>Personnel</b>" means and includes a Party’s or an Affiliate’s directors, officers, employees, agents, auditors, consultants, contract employees and subcontractors.</p>
                         <p>"<b>Software</b>" means the appropriate software product licenses made available to Licensee and its Authorized Users by Licensor under this License Agreement.</p>
@@ -365,11 +365,14 @@ const WelcomeWizard = ({showWizard}) => {
 
   const getStartTrialStep = ()=>{
       return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
-                <span style={{marginBottom:"1rem"}}>
-                    <img src={"static/imgs/WelcomeStart.svg"} alt="start-free-trial"/>
+                <span style={{marginBottom:"0rem"}}>
+                    <img src={"static/imgs/WelcomeStart.svg"} alt="start-free-trial" style={{width:"100%"}}/>
                 </span>
-                <div className="step2" style={{marginBottom:"1rem"}}>Thanks for installing</div>
+                <div className="step2" style={{marginBottom:"0rem"}}>Thanks for installing</div>
+                <a href = "https://www.google.com/">View Training Videos</a>
+                <a href ="https://www.google.com/">View Training Document</a>
                 <button className="type2-button" onClick={() => {tcAction("Accept");}}>Start your journey</button>
+                <div className="WelcomeContactUs">In case you need any help, <a href="https://www.google.com/">Contact us</a></div>
             </div>
   }
 

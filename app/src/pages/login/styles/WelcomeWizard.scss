@@ -83,6 +83,10 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    a{
+        text-decoration: underline;
+        color: #5F338F;
+    }
 }
 .form-container{
     display: flex;
@@ -234,4 +238,12 @@
         -webkit-transform: translate(0);
         transform: translate(0);
     }
+}
+
+.WelcomeContactUs {
+    align-self: flex-end;
+    font-family: 'Mulish';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1rem;
 }
