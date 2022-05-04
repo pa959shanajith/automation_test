@@ -245,7 +245,7 @@ stages:
         echo "UPLOADING TO..... Z:/stage/UI/"
         echo "BUILD NUMBER=%buildno%"
         REM copy %tagno%.zip Z:\stage\windows_archive\UI
-        REM call Z:\stage\windows_archive\UI\updatenodemodules.bat
+        call Z:\stage\windows_archive\UI\updatenodemodules.bat
       name: Package
       displayName: Building package
     
