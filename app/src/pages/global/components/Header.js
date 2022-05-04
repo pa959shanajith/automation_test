@@ -37,12 +37,20 @@ const Header = () => {
     const selectedRole = useSelector(state=>state.login.SR);
     const notifyCnt = useSelector(state=>state.login.notify.unread);
     const [showICEMenu, setShowICEMenu] = useState(false);
+    const [config, setConfig] = useState({});
+    const [OS,setOS] = useState("Windows")
 
     useEffect(()=>{
         //on Click back button on browser
         window.addEventListener('popstate', (e)=> {
             logout(e)
         })
+        getOS();
+        (async()=>{
+            const response = await fetch("/getClientConfig")
+            let resConfig = await response.json();
+            setConfig(resConfig)
+        })();
     },[])
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0){
@@ -63,27 +71,27 @@ const Header = () => {
         RedirectPage(history, { reason: "logout" });
     };
 
-    const getOS = () => {
-        let userAgent = navigator.userAgent.toLowerCase();
-        if (/windows nt/.test(userAgent))
-            return "Windows";
-        
-        else if (/mac os x/.test(userAgent)) 
-            return "MacOS";
-        
-        else 
-            return "Not Supported";
-        
-    }
+  // getting OS version using userAgent
+  const getOS = () => {
+    let userAgent = navigator.userAgent.toLowerCase();
+    if (/windows nt/.test(userAgent))
+        setOS("Windows");
+
+    else if (/mac os x/.test(userAgent))
+        setOS("MacOS");
+
+    else 
+        setOS("Not Supported");
+  }
     
-    const getIce = async (queryICE,platform) => {
+    const getIce = async (clientVer) => {
 		try {
             setShowUD(false);
             setShowOverlay(`Loading...`);
-			const res = await fetch("/downloadICE?ver="+queryICE+"&platform="+platform);
-            const {status,iceFile} = await res.json();
+			const res = await fetch("/downloadICE?ver="+clientVer);
+            const {status} = await res.json();
             // if (status === "available") window.location.href = "https://localhost:8443/downloadICE?ver="+queryICE+"&file=getICE"
-			if (status === "available") window.location.href = window.location.origin+"/downloadICE?ver="+queryICE+"&file=getICE"+"&platform="+platform;
+			if (status === "available") window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE";
 			else setMsg(MSG.GLOBAL.ERR_PACKAGE);
             setShowOverlay(false)
 		} catch (ex) {
@@ -239,19 +247,23 @@ const Header = () => {
                             {
                                 !adminDisable &&
                                 <>
-                                {getOS()==="Windows"?
-                                <div onClick={()=>{getIce("AvoAssure_ICE","windows")}} ><Link to="#">Download ICE</Link></div>:null}
-                                {getOS()==="MacOS"?
+                                {OS==="Windows"?
+                                <div onClick={()=>{getIce("avoclientpath_Windows")}} ><Link to="#">Download ICE</Link></div>:null}
+                                {OS==="MacOS"?
                                 <div id="downloadICEdrop" onMouseEnter={()=>{setShowICEMenu(true)}}>
                                     <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download ICE<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
                                 </div>:null}
                                 
                                 {showICEMenu?
-                                <div id="downloadICEMenu" onMouseLeave={()=>{ setShowICEMenu(false)}}className="user-name-menu dropdown-menu dropdown-menu-right" style={{position:"fixed",display:"flex",flexDirection:"column",top:"100px",right:"162px",width:"auto"}}>
-                                    <div onClick={()=>{getIce("AvoAssure_ICE_Catalina","mac")}} ><Link to="#">Catalina</Link></div>
-                                    <div onClick={()=>{getIce("AvoAssure_ICE_BigSur","mac")}} ><Link to="#">BigSur</Link></div>
-                                    {/* <div onClick={()=>{getIce("AvoAssure_ICE_Monterey.zip")}} ><Link to="#">Monterey</Link></div> */}
-                                </div>
+                                (<div id="downloadICEMenu" onMouseLeave={()=>{ setShowICEMenu(false)}} className="user-name-menu dropdown-menu dropdown-menu-right">
+                                    {Object.keys(config).map((osPathname)=>{
+                                        if (osPathname.includes("Windows")){
+                                            return <></>;
+                                        }
+                                        let versionName = osPathname.split("_")[1]
+                                        return <div onClick={()=>{getIce("avoclientpath_"+versionName)}} ><Link to="#">{versionName}</Link></div>
+                                    })}
+                                </div>)
                                 :null}
 
                                 { window.localStorage['navigateScreen'] !== 'settings' && <div onClick={chngUsrConf} ><Link to="#">Settings</Link></div>}

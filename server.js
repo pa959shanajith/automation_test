@@ -296,29 +296,23 @@ if (cluster.isMaster) {
 		}
 
 		app.get('/downloadICE', async (req, res) => {								
-			let iceFile = String(req.query.ver);
-			if (uiConfig.isTrial.condition) {
-				if (req.query.platform==="windows"){
-					iceFile+=uiConfig.isTrial.windows
-				}
-				else if (req.query.platform==="mac") {
-					iceFile+=uiConfig.isTrial.mac
-				}
-			}else {
-				iceFile += ".zip"
-			}
+			let clientVer = String(req.query.ver);
+			let iceFile = uiConfig.avoClientConfig[clientVer];
 			// iceFile = "AvoAssure_ICE.zip";
-			const iceFilePath = path.resolve(process.env.HOST_PATH);
 			if (req.query.file == "getICE") {
-				return res.download(path.join(iceFilePath, iceFile), iceFile)
+				return res.download(path.resolve(iceFile),"AvoAssureClient."+iceFile.split(".").pop())
 			} else {
 				let status = "na";
 				try {
-					await fs.promises.access(iceFilePath + path.sep + iceFile);
+					await fs.promises.access(path.resolve(iceFile));
 					status = "available";
 				} catch (error) {}
-				return res.send({status,iceFile});
+				return res.send({status});
 			}
+		});
+
+		app.get('/getClientConfig', (req,res) => {
+			return res.send(uiConfig.avoClientConfig)
 		});
 
 		app.get('/External_Plugin_URL', async (req, res) => {

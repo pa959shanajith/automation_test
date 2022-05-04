@@ -83,12 +83,18 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    flex:1;
     a{
         text-decoration: underline;
         color: #5F338F;
+        font-family: 'Mulish';
+        font-style: normal;
+        font-weight: 400;
+        line-height: 30px;
     }
 }
-.form-container{
+
+.form-container {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -224,6 +230,58 @@
 
 }
 
+.choiceGroup {
+    margin-bottom: 0.5rem;
+}
+
+.choiceGroupOption {
+    background: #FFFFFF;
+    border: 2px solid #A19F9D;
+    box-sizing: border-box;
+    border-radius: 5px;
+    height: 3rem;
+    width: 10rem;
+    font-family: 'Mulish';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1.2rem;
+    line-height: 30px;
+    color: #323130;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+
+    &:hover {
+        border-color: #5f338f !important;
+        color: #5f338f !important;
+    }
+
+    &[data-selected=true] {
+        border-color: #5f338f !important;
+        color: #5f338f !important;
+    }
+}
+
+.OSselectionText {
+    font-family: 'Mulish';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1.2rem;
+    line-height: 30px;
+    color: #323130;
+    margin-bottom: 0.5rem;
+}
+
+.WelcomeContactUs {
+    align-self: flex-end;
+    font-family: 'Mulish';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1rem;
+    color: #5F338F;
+    line-height: 30px;
+    position: absolute;
+    bottom: 0px;
+}
 
 @keyframes bounce {
     0% {
@@ -238,12 +296,4 @@
         -webkit-transform: translate(0);
         transform: translate(0);
     }
-}
-
-.WelcomeContactUs {
-    align-self: flex-end;
-    font-family: 'Mulish';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 1rem;
 }

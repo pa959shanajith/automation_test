@@ -22,6 +22,8 @@ const WelcomeWizard = ({showWizard}) => {
   const [selectedMacOS, setSelectedMacOS] = useState("");
   const [downloadPopover, setDownloadPop] = useState("");
   const userInfo = useSelector(state=>state.login.userinfo);
+  const [config, setConfig] = useState({});
+  const [OS,setOS] = useState("Windows")
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -38,7 +40,13 @@ const WelcomeWizard = ({showWizard}) => {
       : 'other';
 
   useEffect(()=>{
-    setActiveStep(userInfo.welcomeStepNo)
+    getOS();
+    (async()=>{
+        const response = await fetch("/getClientConfig")
+        let resConfig = await response.json();
+        setConfig(resConfig)
+        setActiveStep(userInfo.welcomeStepNo)
+    })();
   },[])
 
   useEffect(()=>{
@@ -113,24 +121,27 @@ const WelcomeWizard = ({showWizard}) => {
   const getOS = () => {
     let userAgent = navigator.userAgent.toLowerCase();
     if (/windows nt/.test(userAgent))
-        return "Windows";
+        setOS("Windows");
 
-    else if (/mac os x/.test(userAgent)) 
-        return "MacOS";
+    else if (/mac os x/.test(userAgent)){
+        setShowMacOSSelection(true)
+        setOS("MacOS");
+    }
 
     else 
-        return "Not Supported";
+        setOS("Not Supported");
   }
   
   // check and start downloading ICE package
-  const getIce = async (queryICE,platform) => {
+  const getIce = async (clientVer) => {
     try {
-        const res = await fetch("/downloadICE?ver="+queryICE+"&platform="+platform);
-        const {status,iceFile} = await res.json();
+        const res = await fetch("/downloadICE?ver="+clientVer);
+        const {status} = await res.json();
         if (status === "available"){
+            setShowMacOSSelection(false);
             setShowIndicator(true);
             axios({
-                url: window.location.origin+"/downloadICE?ver="+queryICE+"&file=getICE"+"&platform="+platform,
+                url: window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE",
                 method: "GET",
                 responseType: "blob", 
                 onDownloadProgress(progress) {
@@ -140,7 +151,7 @@ const WelcomeWizard = ({showWizard}) => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', iceFile);
+                link.setAttribute('download', "AvoAssureClient."+config[clientVer].split(".").pop());
                 document.body.appendChild(link);
                 link.click();
             }).catch((err)=>{
@@ -155,34 +166,22 @@ const WelcomeWizard = ({showWizard}) => {
     }
   };
 
-  // get OS and call getICE with the filename
-  const startDownloadICE = () => {
-      const OS = getOS();
-
-      if (OS!=="Not Supported"){
-        switch(OS) {
-            case "Windows":
-                return getIce("AvoAssure_ICE","windows");
-            case "MacOS":
-                return setShowMacOSSelection(true);
-            default:
-                return
+  
+  // send correct filename to getICE and start downloading Client
+  const _handleClientDownload = () =>{
+    if(showMacOSSelection){
+        if (selectedMacOS==="") {
+            setMsg({"CONTENT":"Please select a OS version", "VARIANT":"error"});
         }
-      }
-      else {
-        setMsg(MSG.GLOBAL.ERR_PACKAGE);
-      }
-  }
+        else{
+            getIce("avoclientpath_"+selectedMacOS)
+        }
+    }
+    else if (OS==="Windows")
+        getIce("avoclientpath_Windows")
 
-  // send correct filename to getICE and start downloading ICE
-  const _handleMacOSDownload = () =>{
-      if (selectedMacOS==="") {
-        setMsg({"CONTENT":"Please select a OS version", "VARIANT":"error"});
-      }
-      else {
-        setShowMacOSSelection(false);
-        getIce(`AvoAssure_ICE_${selectedMacOS}`,"mac")
-      }
+    else
+        setMsg(MSG.GLOBAL.ERR_PACKAGE);
   }
 
   const getTermsAndConditions = () => {
@@ -331,10 +330,26 @@ const WelcomeWizard = ({showWizard}) => {
 
   const getDownloadStep = ()=>{
     return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
-                <span className="stepImage">
-                    <img src={"static/imgs/WelcomeInstall.svg"} alt="install-avo-client"/>
+                <span className="stepImage" style={{ height: "50%", display: "flex", justifyContent:"center"}}>
+                    <img src={"static/imgs/WelcomeInstall.svg"} alt="install-avo-client" height="100%"/>
                 </span>
+                
+                {(showMacOSSelection?(
+                    <>
+                        <div className="OSselectionText">Please select operating system for installation of Avo Assure Client</div>
+                        <div className="choiceGroup">
+                        {Object.keys(config).map((osPathname)=>{
+                            if (osPathname.includes("Windows")){
+                                return <></>;
+                            }
+                            let versionName = osPathname.split("_")[1]
+                            return <button className="choiceGroupOption" data-selected={selectedMacOS===versionName} onClick={()=>{setSelectedMacOS(versionName)}}>{versionName}</button>
+                        })}
+                        </div>
+                    </>):null)}
+
                 <div className="step2" style={{marginBottom:"0.5rem"}}>{!showIndicator || showMacOSSelection?"Please install Avo Assure Client":"Downloading Avo Assure Client"}</div>
+                
                 {showIndicator && !showMacOSSelection ?
                 <div className="downloadProgress">
                     <ProgressIndicator 
@@ -346,33 +361,20 @@ const WelcomeWizard = ({showWizard}) => {
                         itemDescription: { fontSize: '1em', marginTop: '0.6em' },
                     }} label={'Downloading ICE Package...'} percentComplete={percentComplete} />
                 </div> : 
-                (showMacOSSelection ? 
-                <>
-                    <div className="radioContainer">
-                        <label style={{marginRight:"2rem"}}>
-                            <input type="radio" checked={selectedMacOS === "Catalina"} value="catalina" onChange={() => { setSelectedMacOS("Catalina") }} />
-                            <span>Catalina</span>
-                        </label>
-                        <label>
-                            <input type="radio" checked={selectedMacOS === "BigSur"} value="bigsur" onChange={() => { setSelectedMacOS("BigSur") }} />
-                            <span>BigSur</span>
-                        </label>
-                    </div>
-                    <button className="type2-button" onClick={_handleMacOSDownload}>Install</button>
-                </>:<button className="type2-button"onClick={startDownloadICE}>Install Now</button>)}
+                <button className="type2-button"onClick={_handleClientDownload}>Install Now</button>}
             </div>
   };
 
   const getStartTrialStep = ()=>{
       return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
-                <span style={{marginBottom:"0rem"}}>
-                    <img src={"static/imgs/WelcomeStart.svg"} alt="start-free-trial" style={{width:"100%"}}/>
+                <span style={{height:"45%"}}>
+                    <img src={"static/imgs/WelcomeStart.svg"} alt="start-free-trial" style={{height:"100%"}}/>
                 </span>
-                <div className="step2" style={{marginBottom:"0rem"}}>Thanks for installing</div>
-                <a href = "https://www.google.com/">View Training Videos</a>
-                <a href ="https://www.google.com/">View Training Document</a>
-                <button className="type2-button" onClick={() => {tcAction("Accept");}}>Start your journey</button>
-                <div className="WelcomeContactUs">In case you need any help, <a href="https://www.google.com/">Contact us</a></div>
+                <div className="step2" style={{lineHeight: "53px"}}>Thanks for installing</div>
+                <a href="https://www.google.com/" target={"_blank"} referrerPolicy="no-referrer">View Training Videos</a>
+                <a href="https://www.google.com/" target={"_blank"} referrerPolicy="no-referrer">View Training Document</a>
+                <button className="type2-button" style={{marginTop: "0.5rem"}} onClick={() => {tcAction("Accept");}}>Start Your Journey</button>
+                <div className="WelcomeContactUs">In case you need any help, <a href="mailto:L1support.assure@avoautomation.com">Contact us</a></div>
             </div>
   }
 
@@ -409,7 +411,7 @@ const WelcomeWizard = ({showWizard}) => {
             {downloadPopover==="chrome" ?        
                 <div className="chrome-popover">
                     <div className='chrome-popover_body'>
-                        Install <b> ICE</b>
+                        Install <b>Avo Assure Client</b>
                     </div>
                     <div className="chrome-popover_anchor"></div>
                 </div>:null}
@@ -418,7 +420,7 @@ const WelcomeWizard = ({showWizard}) => {
                 <div className="edge-popover">
                     <div className="edge-popover_triangle"></div>
                     <div className='edge-popover_body'>
-                        Open <b>Downloads</b> in the Settings menu of your toolbar to install <b>ICE</b>
+                        Open <b>Downloads</b> in the Settings menu of your toolbar to install <b>Avo Assure Client</b>
                     </div>
                     <div className="edge-popover_image">
                         <img src="/static/imgs/edge_download.svg" alt="download" />
