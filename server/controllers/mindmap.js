@@ -12,6 +12,7 @@ var Client = require("node-rest-client").Client;
 var notification = require('../notifications/index')
 var epurl = process.env.DAS_URL;
 var client = new Client();
+const configpath= require('../config/options');
 
 /* Convert excel file to CSV Object. */
 var xlsToCSV = function (workbook, sheetname) {
@@ -477,7 +478,7 @@ exports.saveData = async (req, res) => {
 						if (data_var.rows == "success"){
 							modid=data[0]._id
 						}
-						if (modid != 'fail') sendNotification(data, assigner)
+						if (modid != 'fail' && configpath.enableNotification.assignTabMindmap) sendNotification(data, assigner)
 						res.send(modid);
 					}
 			});
