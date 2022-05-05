@@ -838,14 +838,14 @@ const ProjectNew = (props) => {
                 <div className='domainTxt appTypeTxt'>Selected Application Type</div>
                 <div className="appTypesContainer">
                     {applicationType.map((app)=>(
-                        (app.data === projectTypeSelected) && <div key={app.data} style={app['enabled'] ? {} : {cursor: 'no-drop'}} className="projectTypeSelected projectTypes_create" data-app={app['data']}  title={app['enabled'] ? app['title'] : 'License Not Allowed'} ><img style={app['enabled'] ? {} : {filter: 'contrast(0)'}} src={"static/imgs/"+app['img']+".png"} alt={app['title']}/><label style={app['enabled'] ? {} : {cursor: 'no-drop'}}>{app['title']}</label></div>
+                        (app.data === projectTypeSelected) && <div key={app.data} style={app['enabled'] ? {} : {cursor: 'no-drop'}} className="projectTypeSelected projectTypes_create" data-app={app['data']}  title={app['enabled'] ? app['title'] : 'License Not Available'} ><img style={app['enabled'] ? {} : {filter: 'contrast(0)'}} src={"static/imgs/"+app['img']+".png"} alt={app['title']}/><label style={app['enabled'] ? {} : {cursor: 'no-drop'}}>{app['title']}</label></div>
                     ))}
                 </div>
             </> : <>
                 <div className='domainTxt appTypeTxt'>Application Type</div>
                 <div className={taskName==="Update Project" ? "disableApplicationType appTypesContainer" : "appTypesContainer"}>
                     {applicationType.map((e,i)=>(
-                        <div key={i} style={applicationType[i]['enabled'] ? {} : {cursor: 'no-drop'}} onClick={()=>{(applicationType[i]['enabled']) && setprojectTypeSelected(applicationType[i]['data'])}}  className={(projectTypeSelected===applicationType[i]['data'])?"projectTypeSelected projectTypes_create":"projectTypes_create"} data-app={applicationType[i]['data']}  title={applicationType[i]['enabled'] ? applicationType[i]['title'] : 'License Not Allowed'} ><img style={applicationType[i]['enabled'] ? {} : {filter: 'contrast(0)'}} src={"static/imgs/"+applicationType[i]['img']+".png"} alt={applicationType[i]['title']}/><label style={applicationType[i]['enabled'] ? {} : {cursor: 'no-drop'}}>{applicationType[i]['title']}</label></div>
+                        <div key={i} style={applicationType[i]['enabled'] ? {} : {cursor: 'no-drop'}} onClick={()=>{(applicationType[i]['enabled']) && setprojectTypeSelected(applicationType[i]['data'])}}  className={(projectTypeSelected===applicationType[i]['data'])?"projectTypeSelected projectTypes_create":"projectTypes_create"} data-app={applicationType[i]['data']}  title={applicationType[i]['enabled'] ? applicationType[i]['title'] : 'License Not Available'} ><img style={applicationType[i]['enabled'] ? {} : {filter: 'contrast(0)'}} src={"static/imgs/"+applicationType[i]['img']+".png"} alt={applicationType[i]['title']}/><label style={applicationType[i]['enabled'] ? {} : {cursor: 'no-drop'}}>{applicationType[i]['title']}</label></div>
                     ))}
                 </div>
             </>}
