@@ -29,5 +29,9 @@
         "avoclientpath_Windows": "D:/FileServer/AvoAssureClient.zip",
         "avoclientpath_Catalina":"D:/FileServer/AvoAssureClient_Catalina.zip",
         "avoclientpath_BigSur":"D:/FileServer/AvoAssureClient_BigSur.zip"
+    },
+    "trainingLinks":{
+        "videos": "https://elearning.avoassure.ai/#/",
+        "documentation": "https://docs.avoautomation.com/"
     }
 }

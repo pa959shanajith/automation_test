@@ -298,7 +298,6 @@ if (cluster.isMaster) {
 		app.get('/downloadICE', async (req, res) => {								
 			let clientVer = String(req.query.ver);
 			let iceFile = uiConfig.avoClientConfig[clientVer];
-			// iceFile = "AvoAssure_ICE.zip";
 			if (req.query.file == "getICE") {
 				return res.download(path.resolve(iceFile),"AvoAssureClient."+iceFile.split(".").pop())
 			} else {
@@ -312,7 +311,7 @@ if (cluster.isMaster) {
 		});
 
 		app.get('/getClientConfig', (req,res) => {
-			return res.send(uiConfig.avoClientConfig)
+			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks})
 		});
 
 		app.get('/External_Plugin_URL', async (req, res) => {

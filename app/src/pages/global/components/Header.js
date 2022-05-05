@@ -48,8 +48,8 @@ const Header = () => {
         getOS();
         (async()=>{
             const response = await fetch("/getClientConfig")
-            let resConfig = await response.json();
-            setConfig(resConfig)
+            let {avoClientConfig,trainingLinks} = await response.json();
+            setConfig(avoClientConfig)
         })();
     },[])
     useEffect(()=>{
@@ -195,10 +195,7 @@ const Header = () => {
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
             <div className = "main-header">
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
-                    <div className="dropdown user-options">
-                        { 
-                        <>
-                        <ClickAwayListener onClickAway={onClickAwayHelp}>
+                    <ClickAwayListener onClickAway={onClickAwayHelp}>
                         <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(true)}>
                             <span className="help">Need Help ?</span>
                         </div>
@@ -208,8 +205,10 @@ const Header = () => {
                             <div onClick={()=>{window.open('https://docs.avoautomation.com/','_blank')
                                 setShowHelp(false)}} ><Link to="#">Training Document</Link></div>   
                         </div>
-                        </ClickAwayListener>
-
+                    </ClickAwayListener>
+                    <div className="dropdown user-options">
+                        { 
+                        <>
                         { !adminDisable &&
                         <>
                         <div className="btn-container">

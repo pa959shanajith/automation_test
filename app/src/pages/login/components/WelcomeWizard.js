@@ -22,6 +22,8 @@ const WelcomeWizard = ({showWizard}) => {
   const [selectedMacOS, setSelectedMacOS] = useState("");
   const [downloadPopover, setDownloadPop] = useState("");
   const userInfo = useSelector(state=>state.login.userinfo);
+  const [docLink,setDocLink] = useState("#");
+  const [vidLink,setVidLink] = useState("#");
   const [config, setConfig] = useState({});
   const [OS,setOS] = useState("Windows")
   const history = useHistory();
@@ -43,8 +45,10 @@ const WelcomeWizard = ({showWizard}) => {
     getOS();
     (async()=>{
         const response = await fetch("/getClientConfig")
-        let resConfig = await response.json();
-        setConfig(resConfig)
+        let {avoClientConfig, trainingLinks} = await response.json();
+        setConfig(avoClientConfig)
+        setDocLink(trainingLinks.documentation)
+        setVidLink(trainingLinks.videos)
         setActiveStep(userInfo.welcomeStepNo)
     })();
   },[])
@@ -348,9 +352,11 @@ const WelcomeWizard = ({showWizard}) => {
                         </div>
                     </>):null)}
 
-                <div className="step2" style={{marginBottom:"0.5rem"}}>{!showIndicator || showMacOSSelection?"Please install Avo Assure Client":"Downloading Avo Assure Client"}</div>
+                {(!showIndicator && OS!=="MacOS") && <div className="step2" style={{marginBottom:"0.5rem"}}>{"Please download Avo Assure Client"}</div>}
                 
-                {showIndicator && !showMacOSSelection ?
+                {showIndicator && !showMacOSSelection ? (
+                <>
+                <div className="step2" style={{marginBottom:"0.5rem"}}>{"Downloading Avo Assure Client"}</div>
                 <div className="downloadProgress">
                     <ProgressIndicator 
                     barHeight={30}
@@ -360,8 +366,9 @@ const WelcomeWizard = ({showWizard}) => {
                         itemName: { fontSize: '1em', marginBottom: '0.6em',color:"black", display:"none" },
                         itemDescription: { fontSize: '1em', marginTop: '0.6em' },
                     }} label={'Downloading ICE Package...'} percentComplete={percentComplete} />
-                </div> : 
-                <button className="type2-button"onClick={_handleClientDownload}>Install Now</button>}
+                </div>
+                </>) : 
+                <button className="type2-button"onClick={_handleClientDownload}>Download Now</button>}
             </div>
   };
 
@@ -370,11 +377,10 @@ const WelcomeWizard = ({showWizard}) => {
                 <span style={{height:"45%"}}>
                     <img src={"static/imgs/WelcomeStart.svg"} alt="start-free-trial" style={{height:"100%"}}/>
                 </span>
-                <div className="step2" style={{lineHeight: "53px"}}>Thanks for installing</div>
-                <a href="https://www.google.com/" target={"_blank"} referrerPolicy="no-referrer">View Training Videos</a>
-                <a href="https://www.google.com/" target={"_blank"} referrerPolicy="no-referrer">View Training Document</a>
+                <div className="step2">Thanks for downloading Avo Assure Client, Please install it on your system to start exploring</div>
+                <a href={vidLink} target={"_blank"} referrerPolicy="no-referrer">Training Videos</a>
+                <a href={docLink} target={"_blank"} referrerPolicy="no-referrer">Training Document</a>
                 <button className="type2-button" style={{marginTop: "0.5rem"}} onClick={() => {tcAction("Accept");}}>Start Your Journey</button>
-                <div className="WelcomeContactUs">In case you need any help, <a href="mailto:L1support.assure@avoautomation.com">Contact us</a></div>
             </div>
   }
 
@@ -427,6 +433,7 @@ const WelcomeWizard = ({showWizard}) => {
                     </div>
                 </div>:null}
         </div>
+        {activeStep===2?<div className="WelcomeContactUs">In case you need any help, <a href="mailto:support@avoautomation.com">Contact us</a></div>:null}
         </div>
     </div>
   );

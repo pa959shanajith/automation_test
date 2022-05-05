@@ -55,10 +55,12 @@
     }
 }
 .step2{
-    font-family: 'Mulish';
+    font-family: "Mulish";
     font-style: normal;
     font-weight: 500;
-    font-size: 2rem;
+    font-size: MIN(2rem, 2vmax);
+    text-align: center;
+    width: 80%;
 }
 .type2-button{
     width: 16rem;
@@ -279,8 +281,11 @@
     font-size: 1rem;
     color: #5F338F;
     line-height: 30px;
-    position: absolute;
-    bottom: 0px;
+    position: relative;
+    a{
+        color: #5F338F !important;
+        text-decoration: underline !important;
+    }
 }
 
 @keyframes bounce {
