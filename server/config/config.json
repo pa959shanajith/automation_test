@@ -29,5 +29,8 @@
         "condition":false,
         "windows":".exe",
         "mac":".jar"
+    },
+    "enableNotification": {
+        "assignTabMindmap" : false
     }
 }
