@@ -113,7 +113,8 @@
 }
 
 .help-menu{
-    left: -10%!important;
+    top:unset !important;
+    left: unset !important;
 }
 
 .help-menu, .switch-role-menu, .user-name-menu{
@@ -251,4 +252,14 @@
 
 .afterExecution-modal .modal-content{
     max-width: 300px;
+}
+
+#downloadICEMenu {
+    position:fixed;
+    display:flex;
+    flex-direction:column;
+    top:100px;
+    right:162px;
+    width:auto;
+    padding: 6px 0px;
 }
