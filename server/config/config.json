@@ -26,9 +26,9 @@
         "itdm":"https://google.com"
     },
     "avoClientConfig":{
-        "avoclientpath_Windows": "D:/FileServer/AvoAssureClient.zip",
-        "avoclientpath_Catalina":"D:/FileServer/AvoAssureClient_Catalina.zip",
-        "avoclientpath_BigSur":"D:/FileServer/AvoAssureClient_BigSur.zip"
+        "avoclientpath_Windows": "",
+        "avoclientpath_Catalina":"",
+        "avoclientpath_BigSur":""
     },
     "trainingLinks":{
         "videos": "https://elearning.avoassure.ai/#/",
