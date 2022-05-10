@@ -2,7 +2,7 @@
 .form{
     margin: auto;
     width: 74%;
-    height: 80%;
+    height: 85%;
     border: 2px solid #5F338F;
     padding: 2%;
     border-radius: 8px;
@@ -58,7 +58,8 @@
     font-family: "Mulish";
     font-style: normal;
     font-weight: 500;
-    font-size: MIN(2rem, 2vmax);
+    // font-size: MIN(2rem, 2vmax);
+    font-size: 150%;
     text-align: center;
     width: 80%;
 }
@@ -93,6 +94,7 @@
         font-style: normal;
         font-weight: 400;
         line-height: 30px;
+        font-size: 1.1rem;
     }
 }
 
