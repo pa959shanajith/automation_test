@@ -433,7 +433,7 @@ const WelcomeWizard = ({showWizard}) => {
                     </div>
                 </div>:null}
         </div>
-        {activeStep===2?<div className="WelcomeContactUs">In case you need any help, <a href="mailto:support@avoautomation.com">Contact us</a></div>:null}
+        {activeStep>0?<div className="WelcomeContactUs">In case you need any help, <a href="mailto:support@avoautomation.com">Contact us</a></div>:null}
         </div>
     </div>
   );

@@ -38,7 +38,8 @@ const Header = () => {
     const notifyCnt = useSelector(state=>state.login.notify.unread);
     const [showICEMenu, setShowICEMenu] = useState(false);
     const [config, setConfig] = useState({});
-    const [OS,setOS] = useState("Windows")
+    const [OS,setOS] = useState("Windows");
+    const [trainLinks, setTrainLinks] = useState({videos:"#", docs:"#"});
 
     useEffect(()=>{
         //on Click back button on browser
@@ -49,7 +50,8 @@ const Header = () => {
         (async()=>{
             const response = await fetch("/getClientConfig")
             let {avoClientConfig,trainingLinks} = await response.json();
-            setConfig(avoClientConfig)
+            setConfig(avoClientConfig);
+            setTrainLinks({videos:trainingLinks.videos, docs:trainingLinks.documentation});
         })();
     },[])
     useEffect(()=>{
@@ -200,9 +202,9 @@ const Header = () => {
                             <span className="help">Need Help ?</span>
                         </div>
                         <div className={"help-menu dropdown-menu " + (showHelp && "show")}>
-                            <div onClick={()=>{window.open('https://google.com','_blank')
+                            <div onClick={()=>{window.open(trainLinks.videos,'_blank')
                                 setShowHelp(false)}} ><Link to="#">Training Videos</Link></div>
-                            <div onClick={()=>{window.open('https://docs.avoautomation.com/','_blank')
+                            <div onClick={()=>{window.open(trainLinks.docs,'_blank')
                                 setShowHelp(false)}} ><Link to="#">Training Document</Link></div>   
                         </div>
                     </ClickAwayListener>
