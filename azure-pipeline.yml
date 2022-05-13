@@ -23,11 +23,11 @@ stages:
   jobs:
   - job: BuildJob
     variables:
-      repolink: https://$(PAT_EXP_1_JAN)@dev.azure.com/dimensionlabs/Nineteen68/_git/WebServer
-      dashboardlink: https://$(PAT_EXP_1_JAN)@dev.azure.com/dimensionlabs/Nineteen68/_git/Dashboard
-      seltoavolink: https://$(PAT_EXP_1_JAN)@dev.azure.com/dimensionlabs/Nineteen68/_git/Selenium-To-AVO
-      reportlink: https://$(PAT_EXP_1_JAN)@dev.azure.com/dimensionlabs/Nineteen68/_git/ReportServer
-      ws_ver_repolink: https://$(PAT_EXP_1_JAN)@dev.azure.com/dimensionlabs/Nineteen68/_git/WebServer-Version
+      repolink: https://$(PAT_EXP_1_JAN)@dev.azure.com/AvoAutomation/AvoAssure/_git/WebServer
+      dashboardlink: https://$(PAT_EXP_1_JAN)@dev.azure.com/AvoAutomation/AvoAssure/_git/Dashboard
+      seltoavolink: https://$(PAT_EXP_1_JAN)@dev.azure.com/AvoAutomation/AvoAssure/_git/Selenium-To-AVO
+      reportlink: https://$(PAT_EXP_1_JAN)@dev.azure.com/AvoAutomation/AvoAssure/_git/ReportServer
+      ws_ver_repolink: https://$(PAT_EXP_1_JAN)@dev.azure.com/AvoAutomation/AvoAssure/_git/WebServer-Version
       FOLDERS_TO_ZIP_AZ: WebServer
 
     pool: 
