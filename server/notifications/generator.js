@@ -8,7 +8,7 @@ const generateEmailPayload = {};
 
 module.exports.getPayload = async (channel, event, data) => {
 	let payloadGenerator;
-	if (channel == "email") payloadGenerator = generateEmailPayload[event];
+	if (channel == "email") payloadGenerator = await generateEmailPayload[event];
 	if (!payloadGenerator) return {error: { msg: "Notification event "+event+" not found", code: "UNKNOWN_EVENT"}};
 	try {
 		return payloadGenerator(data);

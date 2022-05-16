@@ -30,6 +30,7 @@ exports.loadUserInfo = async (req, res) => {
 			ldapuser: userType=="ldap",
 			samluser: userType=="saml",
 			openiduser: userType=="oidc",
+			welcomeStepNo: typeof userData.welcomeStepNo === "number"?  userData.welcomeStepNo : undefined
 		};
 		const selectedRole = req.body.selRole || userProfile.role;
 		req.session.userid = userData._id;
@@ -61,6 +62,7 @@ exports.loadUserInfo = async (req, res) => {
 		userProfile.pluginsInfo = permData.pluginresult;
 		userProfile.page = (userProfile.rolename == "Admin")? "admin":"plugin";
 		userProfile.tandc = false;
+		userProfile.isTrialUser = permData.isTrialUser;
 		if (userProfile.rolename != "Admin" && configpath.showEULA) {
 			inputs = {
 				"username": userProfile.username,

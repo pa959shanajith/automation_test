@@ -583,9 +583,11 @@ function updateTest(mappedTest, testNames, testIds, selectedPhase, mappedTestIds
 						logger.error("Error occurred in zephyrUpdateMapping Error Code : ERRDAS");
 					}
 					updateList.push(mappedTest);
+					callback1();
 				});
+			} else {
+				callback1();
 			}
-			callback1();
 		},
 		data: function (callback1) {
 			cb(updateList);

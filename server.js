@@ -213,6 +213,7 @@ if (cluster.isMaster) {
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
 		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
+		app.post('/openScreenShot_API', report.openScreenShot_API);
 
 		app.use(csrf({
 			cookie: true
@@ -294,18 +295,34 @@ if (cluster.isMaster) {
 			}
 		}
 
-		app.get('/AvoAssure_ICE.zip', async (req, res) => {
-			const iceFile = "AvoAssure_ICE.zip";
-			const iceFilePath = path.resolve(process.env.HOST_PATH);
+		app.get('/downloadICE', async (req, res) => {								
+			let clientVer = String(req.query.ver);
+			let iceFile = uiConfig.avoClientConfig[clientVer];
 			if (req.query.file == "getICE") {
-				return res.sendFile(iceFile, { root: iceFilePath })
+				return res.download(path.resolve(iceFile),"AvoAssureClient."+iceFile.split(".").pop())
 			} else {
 				let status = "na";
 				try {
-					await fs.promises.access(iceFilePath + path.sep + iceFile);
+					await fs.promises.access(path.resolve(iceFile));
 					status = "available";
 				} catch (error) {}
-				return res.send(status);
+				return res.send({status});
+			}
+		});
+
+		app.get('/getClientConfig', (req,res) => {
+			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks})
+		});
+
+		app.get('/External_Plugin_URL', async (req, res) => {
+			const pluginName = req.query.pluginName;
+			const pluginURL = uiConfig.externalPluginURL[pluginName];
+			
+			try{
+				return res.send(pluginURL);
+			}
+			catch(err){
+				console.error("external plugin doesn't exist");
 			}
 		});
 
@@ -446,6 +463,7 @@ if (cluster.isMaster) {
 		app.post('/cancelScheduledJob_ICE', auth.protect, suite.cancelScheduledJob_ICE);
 		//Report Screen Routes
 		app.post('/connectJira_ICE', auth.protect, report.connectJira_ICE);
+		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		//Plugin Routes
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', auth.protect, taskbuilder.getTaskJson_mindmaps);

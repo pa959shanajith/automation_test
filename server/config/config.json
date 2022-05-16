@@ -1,6 +1,6 @@
 {
     "defaultTokenExpiry": "720",
-    "showEULA": false,
+    "showEULA": true,
     "pingTimer":"120000",
     "strictTaskWorkflow": false,
     "dateFormat": "YYYY-MM-DD",
@@ -13,8 +13,28 @@
         "pingTimeout": "15000",
         "pingInterval": "25000"
     },
+    "screenShotPath": {
+        "default": "",
+        "mac": "",
+        "linux": ""
+    },
     "objectPredictionPath": {
         "default": "",
         "mac": ""
+    },
+    "externalPluginURL":{ 
+        "itdm":"https://google.com"
+    },
+    "avoClientConfig":{
+        "avoclientpath_Windows": "",
+        "avoclientpath_Catalina":"",
+        "avoclientpath_BigSur":""
+    },
+    "trainingLinks":{
+        "videos": "https://elearning.avoassure.ai/#/",
+        "documentation": "https://docs.avoautomation.com/"
+    },
+    "enableNotification": {
+        "assignTabMindmap" : false
     }
 }

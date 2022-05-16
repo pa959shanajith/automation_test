@@ -63,7 +63,8 @@ module.exports.notify = async (event, data, channel) => {
 		logger.error("Unable to send notifications, No Channels are configured/enabled.")
 		return {error: { msg: "Notification channel not available", code: "NO_CHANNEL"}};
 	}
-	targetChannels.forEach(async ch => {
+	for(let idx = 0; idx<targetChannels.length; idx++){
+		let ch = targetChannels[idx]
 		// Consider preferences i.e. Only send over channels which have enabled notifications event.
 		if (!preferences[event][ch]) return false;
 		data.url = channels[ch].opts.appurl;
@@ -79,7 +80,7 @@ module.exports.notify = async (event, data, channel) => {
 			logger.error("Error occured while sending "+ch+" notification, Error: "+e);
 			return {error: { msg: "Error occured while sending "+ch+" notification", code: "SEND_ERROR"}};
 		}
-	});
+	}
 };
 
 module.exports.update = async (action, name, channel, provider) => {

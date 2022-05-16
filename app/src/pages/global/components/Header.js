@@ -24,6 +24,7 @@ const Header = () => {
     const dispatch = useDispatch();
     const [username, setUsername] = useState(null);
     const [showUD, setShowUD] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
     const [showSR, setShowSR] = useState(false);
     const [roleList, setRoleList] = useState([]);
     const [adminDisable, setAdminDisable] = useState(false);
@@ -34,13 +35,24 @@ const Header = () => {
     const [clickNotify,setClickNotify] = useState(false)
     const userInfo = useSelector(state=>state.login.userinfo);
     const selectedRole = useSelector(state=>state.login.SR);
-    const notifyCnt = useSelector(state=>state.login.notify.unread)
+    const notifyCnt = useSelector(state=>state.login.notify.unread);
+    const [showICEMenu, setShowICEMenu] = useState(false);
+    const [config, setConfig] = useState({});
+    const [OS,setOS] = useState("Windows");
+    const [trainLinks, setTrainLinks] = useState({videos:"#", docs:"#"});
 
     useEffect(()=>{
         //on Click back button on browser
         window.addEventListener('popstate', (e)=> {
             logout(e)
         })
+        getOS();
+        (async()=>{
+            const response = await fetch("/getClientConfig")
+            let {avoClientConfig,trainingLinks} = await response.json();
+            setConfig(avoClientConfig);
+            setTrainLinks({videos:trainingLinks.videos, docs:trainingLinks.documentation});
+        })();
     },[])
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0){
@@ -60,14 +72,28 @@ const Header = () => {
         persistor.purge();
         RedirectPage(history, { reason: "logout" });
     };
+
+  // getting OS version using userAgent
+  const getOS = () => {
+    let userAgent = navigator.userAgent.toLowerCase();
+    if (/windows nt/.test(userAgent))
+        setOS("Windows");
+
+    else if (/mac os x/.test(userAgent))
+        setOS("MacOS");
+
+    else 
+        setOS("Not Supported");
+  }
     
-    const getIce = async () => {
+    const getIce = async (clientVer) => {
 		try {
             setShowUD(false);
-            setShowOverlay(`Loading...`)
-			const res = await fetch("/AvoAssure_ICE.zip");
-			const status = await res.text();
-			if (status === "available") window.location.href = window.location.origin+"/AvoAssure_ICE.zip?file=getICE"
+            setShowOverlay(`Loading...`);
+			const res = await fetch("/downloadICE?ver="+clientVer);
+            const {status} = await res.json();
+            // if (status === "available") window.location.href = "https://localhost:8443/downloadICE?ver="+queryICE+"&file=getICE"
+			if (status === "available") window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE";
 			else setMsg(MSG.GLOBAL.ERR_PACKAGE);
             setShowOverlay(false)
 		} catch (ex) {
@@ -113,7 +139,7 @@ const Header = () => {
     
     const onClickAwayUD = () => setShowUD(false);
     const onClickAwaySR = () => setShowSR(false);
-
+    const onClickAwayHelp = () => setShowHelp(false);
 
     const switchedRole = event => {
         setShowConfSR(false);
@@ -171,7 +197,20 @@ const Header = () => {
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
             <div className = "main-header">
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
+                    <ClickAwayListener onClickAway={onClickAwayHelp}>
+                        <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(true)}>
+                            <span className="help">Need Help ?</span>
+                        </div>
+                        <div className={"help-menu dropdown-menu " + (showHelp && "show")}>
+                            <div onClick={()=>{window.open(trainLinks.videos,'_blank')
+                                setShowHelp(false)}} ><Link to="#">Training Videos</Link></div>
+                            <div onClick={()=>{window.open(trainLinks.docs,'_blank')
+                                setShowHelp(false)}} ><Link to="#">Training Document</Link></div>   
+                        </div>
+                    </ClickAwayListener>
                     <div className="dropdown user-options">
+                        { 
+                        <>
                         { !adminDisable &&
                         <>
                         <div className="btn-container">
@@ -209,15 +248,35 @@ const Header = () => {
                             {
                                 !adminDisable &&
                                 <>
-                                <div onClick={getIce} ><Link to="#">Download ICE</Link></div>
+                                {OS==="Windows"?
+                                <div onClick={()=>{getIce("avoclientpath_Windows")}} ><Link to="#">Download ICE</Link></div>:null}
+                                {OS==="MacOS"?
+                                <div id="downloadICEdrop" onMouseEnter={()=>{setShowICEMenu(true)}}>
+                                    <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download ICE<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
+                                </div>:null}
+                                
+                                {showICEMenu?
+                                (<div id="downloadICEMenu" onMouseLeave={()=>{ setShowICEMenu(false)}} className="user-name-menu dropdown-menu dropdown-menu-right">
+                                    {Object.keys(config).map((osPathname)=>{
+                                        if (osPathname.includes("Windows")){
+                                            return <></>;
+                                        }
+                                        let versionName = osPathname.split("_")[1]
+                                        return <div onClick={()=>{getIce("avoclientpath_"+versionName)}} ><Link to="#">{versionName}</Link></div>
+                                    })}
+                                </div>)
+                                :null}
+
                                 { window.localStorage['navigateScreen'] !== 'settings' && <div onClick={chngUsrConf} ><Link to="#">Settings</Link></div>}
                                 </>
                             }
                             <div onClick={logout}><Link to="#">Logout</Link></div>
                         </div>
                         </ClickAwayListener>
+                        </>
+                        }
                     </div>
-                </div>
+            </div>
         </>
     ); 
 }

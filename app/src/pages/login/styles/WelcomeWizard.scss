@@ -1,0 +1,306 @@
+@import "../../global/styles/ColorVariables.scss";
+.form{
+    margin: auto;
+    width: 74%;
+    height: 85%;
+    border: 2px solid #5F338F;
+    padding: 2%;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    background-color: #FAF9F8;
+    min-width: 700px;
+    min-height: 600px;
+    box-shadow: 0px 10px 70px #321e4f6e;
+}
+.container1{
+    background: #faf9f859;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    z-index: 100;
+    position: fixed;
+    @supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+        -webkit-backdrop-filter: blur(2px);
+        backdrop-filter: blur(2px);
+        background: #faf9f866;
+    }
+}
+.step1 {
+    color:#000000;
+    font-family: 'Mulish';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 2rem;
+    // align-content: center;
+    display: flex;
+    justify-content: center;
+}
+.type1-button{
+    background: #FAF9F8;
+    border: 1px solid #5F338F;
+    box-sizing: border-box;
+    border-radius: 8px;
+    color: #5F338F;
+    width: 6rem;
+    align-self: flex-end;
+    margin-top: 1rem;
+    margin-right: 30px;
+    height: 2.5rem;
+    transition: 0.3s;
+    &:hover {
+        color: white;
+        background-color: #5F338F;
+        box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.12);
+    }
+}
+.step2{
+    font-family: "Mulish";
+    font-style: normal;
+    font-weight: 500;
+    // font-size: MIN(2rem, 2vmax);
+    font-size: 150%;
+    text-align: center;
+    width: 80%;
+}
+.type2-button{
+    width: 16rem;
+    height: 3.4rem;
+    background: #5f338f;
+    border-radius: 1.2rem;
+    color: #fff;
+    border: none;
+    font-family: 'Mulish';
+    font-size: 1.3rem;
+}
+
+.welcomeToAssure {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.welcomeInstall {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    flex:1;
+    a{
+        text-decoration: underline;
+        color: #5F338F;
+        font-family: 'Mulish';
+        font-style: normal;
+        font-weight: 400;
+        line-height: 30px;
+        font-size: 1.1rem;
+    }
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.stepper {
+    width: 100%;
+    font-family: "LatoWeb" !important;
+    padding: 12px !important;
+}
+
+.stepButtons {
+    cursor: default !important;
+}
+
+.downloadProgress {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.radioContainer {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3rem;
+    label {
+        display: flex;
+        justify-content: center;
+        align-items: baseline;
+        font-family: 'Mulish';
+        span {
+            margin-left: 0.5rem;
+        }
+        input[type="radio"] {
+            appearance: none;
+        }
+        input[type="radio"]::after {
+            content: "";
+            display: flex;
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 50%;
+            border-style: solid;
+            border-width: 0.1rem;
+            border-color: gray;
+        }
+        input[type="radio"]:checked::after {
+            background: radial-gradient(var(--baseColor) 0%, var(--baseColor) 40%, transparent 50%, transparent);
+            border-color: var(--baseColorBorder);
+        }
+    }
+}
+
+.termsandconditions {
+    height: auto;
+}
+
+.stepImage {
+    @media screen and (min-height:800px) {
+        margin-bottom: 1rem;
+    }
+}
+
+.chrome-popover {
+    display: flex;
+    position: fixed;
+    bottom:0px;
+    left:10px;
+    z-index: 2000;
+    transform-origin: center bottom;
+    animation: bounce 2s infinite;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+    &_body{
+        background-color: #5F338F;
+        color: #ffffff;
+        padding: 13px 21px;
+        border-radius: 5px;
+        line-height: 20px;
+        box-shadow: 0 2px 4px 0 #0000001f, 0 0 6px 0 #0000000a;
+    }
+
+    &_anchor {
+        background-color: #5F338F;
+        height: 1.2rem;
+        width: 1.2rem;
+        position: relative;
+        bottom: 0.7rem;
+        transform: rotate(45deg);
+    }
+}
+
+.edge-popover {
+    display: flex;
+    position: fixed;
+    top:11px;
+    right:5px;
+    z-index: 2000;
+    transform-origin: center bottom;
+    animation: bounce 2s infinite;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 21px;
+    line-height: 24px;
+    width: 350px;
+    background-color: #5F338F;
+    border-radius: 5px;
+
+    &_triangle {
+        height: 0;
+        width: 0;
+        opacity: .3;
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-bottom: 10px solid #fff;
+        margin: auto;
+    }
+
+    &_body {
+        color: #ffffff;
+        padding: 20px 21px;
+        margin: 16px 0;
+        box-shadow: 0 8px 16px #00000014;
+        border-radius: 5px;
+    }
+
+}
+
+.choiceGroup {
+    margin-bottom: 0.5rem;
+}
+
+.choiceGroupOption {
+    background: #FFFFFF;
+    border: 2px solid #A19F9D;
+    box-sizing: border-box;
+    border-radius: 5px;
+    height: 3rem;
+    width: 10rem;
+    font-family: 'Mulish';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1.2rem;
+    line-height: 30px;
+    color: #323130;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+
+    &:hover {
+        border-color: #5f338f !important;
+        color: #5f338f !important;
+    }
+
+    &[data-selected=true] {
+        border-color: #5f338f !important;
+        color: #5f338f !important;
+    }
+}
+
+.OSselectionText {
+    font-family: 'Mulish';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1.2rem;
+    line-height: 30px;
+    color: #323130;
+    margin-bottom: 0.5rem;
+}
+
+.WelcomeContactUs {
+    align-self: flex-end;
+    font-family: 'Mulish';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1rem;
+    color: #5F338F;
+    line-height: 30px;
+    position: relative;
+    a{
+        color: #5F338F !important;
+        text-decoration: underline !important;
+    }
+}
+
+@keyframes bounce {
+    0% {
+        -webkit-transform: translate(0);
+        transform: translate(0);
+    }
+    50% {
+        -webkit-transform: translateY(-10px);
+        transform: translateY(-10px);
+    }
+    100% {
+        -webkit-transform: translate(0);
+        transform: translate(0);
+    }
+}
