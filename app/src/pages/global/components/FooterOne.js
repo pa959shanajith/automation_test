@@ -8,6 +8,8 @@ import "../styles/FooterOne.scss"
 
 */
 
+const {REACT_APP_VERSION} = process.env;
+
 const FooterOne = () => {
     return (
         <div className="login-footer">
@@ -17,7 +19,8 @@ const FooterOne = () => {
                 <img className="footer-logo_one" alt="logo" src="static/imgs/ftr-avo-logo.png"/>
             </span>
             <span className="lower-text">
-                © {new Date().getFullYear()}  Avo Automation. All Rights Reserved
+                Avo Assure v{REACT_APP_VERSION} © {new Date().getFullYear()} <br></br>
+                Avo Automation. All Rights Reserved
             </span>
             </div>
         </div>

@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Redirect, Link, useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
-import { SetProgressBar, BrowserFp, RedirectPage } from '../../global';
+import { SetProgressBar, BrowserFp, RedirectPage, ChangePassword, setMsg } from '../../global';
 import StaticElements from '../components/StaticElements';
 import TermsAndConditions from '../components/TermsAndConditions';
 import * as api from '../api';
+import { updatePassword } from "../../global/api";
 import "../styles/BasePage.scss";
+import { persistor } from '../../../reducer';
 
 /*
     Component: BasePage
@@ -22,6 +24,8 @@ const BasePage = () => {
     const [redirectTo , setRedirectTo] = useState(null);
     const [showTCPopup, setShowTCPopup] = useState(null);
     const [userProfile, setUserProfile] = useState(null);
+    const [showChangePass, setShowChangePass] = useState(false);
+    const [showSuccessPass, setSuccessPass] = useState(false);
     const dispatch = useDispatch();
     const history = useHistory();
 
@@ -82,7 +86,12 @@ const BasePage = () => {
                                 //     setShowTCPopup(true);
                                 // }
                                 // else 
-                                loadProfile(userinfo)
+                                if(userinfo.firstTimeLogin && userinfo.dbuser) {
+                                    setUserProfile(userinfo);
+                                    setShowChangePass(true);
+                                }
+                                else
+                                    loadProfile(userinfo)
                             }
                         }
                         catch(err){
@@ -101,6 +110,30 @@ const BasePage = () => {
         })()
         //eslint-disable-next-line
     }, []);
+
+    useEffect(()=>{
+        if(showChangePass){
+            window.addEventListener('beforeunload',warnBeforeUnload);
+            window.addEventListener('unload',logout);
+        }
+        return ()=>{
+            window.removeEventListener('beforeunload', warnBeforeUnload);
+            window.removeEventListener('unload',logout)
+        }
+    },[showChangePass])
+
+    const warnBeforeUnload = (e) => {
+        if(showChangePass){
+            e.returnValue = `Are you sure you want to leave?`;
+        }
+    }
+
+    const logout = (e) => {
+        if(showChangePass){
+            persistor.purge();
+            RedirectPage(history, { reason: "logout" });
+        }
+    };
 
     const loadProfile = userinfo => {
         window.localStorage.navigateScreen = userinfo.page;
@@ -151,8 +184,28 @@ const BasePage = () => {
         
     }
 
+    const toggleChangePass = () => setShowChangePass(!showChangePass);
+    
+    const PasswordSuccessPopup = () => (
+        <>{setMsg({"CONTENT":"Password changed successfully !", "VARIANT":"success"}) && setSuccessPass(false)}</>
+    );
+
+    const updatePass = (newpassword) => {
+        updatePassword(newpassword, userProfile).then((res)=>{
+            if(res==="success"){
+                toggleChangePass();
+                setSuccessPass(true);
+                loadProfile(userProfile);
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+    }
+    
     return (
         <>
+        { showChangePass && <ChangePassword setShow={toggleChangePass} setSuccessPass={setSuccessPass} loginCurrPassword={null} changeType={"CreateNewPass"} updatePass={updatePass} /> }
+        { showSuccessPass && <PasswordSuccessPopup /> }
         {redirectTo ? <Redirect to={redirectTo} /> :
         <>
         { showTCPopup && <TermsAndConditions tcAction={tcAction}/> }
