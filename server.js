@@ -373,6 +373,7 @@ if (cluster.isMaster) {
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);
 		app.post('/resetPassword', login.resetPassword);
+		app.post('/updatePassword', login.updatePassword);
 		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
 		//Admin Routes
 		app.post('/getUserRoles', auth.protect, admin.getUserRoles);

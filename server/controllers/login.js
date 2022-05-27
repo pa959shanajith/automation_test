@@ -30,7 +30,8 @@ exports.loadUserInfo = async (req, res) => {
 			ldapuser: userType=="ldap",
 			samluser: userType=="saml",
 			openiduser: userType=="oidc",
-			welcomeStepNo: typeof userData.welcomeStepNo === "number"?  userData.welcomeStepNo : undefined
+			welcomeStepNo: typeof userData.welcomeStepNo === "number"?  userData.welcomeStepNo : undefined,
+			firstTimeLogin: typeof userData.firstTimeLogin === "boolean"?  userData.firstTimeLogin : undefined
 		};
 		const selectedRole = req.body.selRole || userProfile.role;
 		req.session.userid = userData._id;
@@ -184,6 +185,52 @@ exports.resetPassword = async (req, res) => {
 		res.send("fail");
 	}
 };
+
+// Update Current password for new users
+exports.updatePassword = async (req, res) => {
+	const fnName = "updatePassword";
+	logger.info("Inside UI Service: " + fnName);
+	try {
+		let {username, usertype} = req.session;
+		let resetFlag = false;
+		const loggedUser = req._passport.instance.verifySession(req);
+		if (!loggedUser && req.user) {
+			username = req.user.username;
+			usertype = req.user.type;
+			resetFlag = true;
+		} else if (!loggedUser) {
+			return res.status(401).send("Invalid Session");
+		}
+		if (usertype != "inhouse") return res.send("fail");
+		const newpassword = req.body.newpassword;
+		if (!regexPassword.test(newpassword)) {
+			logger.error("Error occurred in login/"+fnName+": Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.");
+			return res.send("insuff");
+		}
+
+		const userData = {username, newpass: newpassword, oldpass: ''};
+		userData["user"] =  req.body.userObj;
+
+		const password = bcrypt.hashSync(newpassword, bcrypt.genSaltSync(10));
+		const inputs = {
+			action: "resetpassword",
+			name: username,
+			userid: userData.user._id,
+			modifiedby: userData.user._id,
+			modifiedbyrole: userData.user.defaultrole,
+			password: password,
+		};
+		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else {
+			res.send(status);
+		}
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
 
 exports.logoutUser = async (req, res) => {
 	logger.info("Inside UI Service: logoutUser");
