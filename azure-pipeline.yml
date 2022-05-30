@@ -80,6 +80,10 @@ stages:
       
     - script: |
         cd $(Build.SourcesDirectory)/Webapp
+        
+        set tagno=%Version_tagno%
+        set buildno=%Version_buildno%
+
         cd app
         call npm install
 
