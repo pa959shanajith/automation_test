@@ -171,8 +171,8 @@ const ChangePassword = ({setShow, setSuccessPass,loginCurrPassword, changeType, 
 }
 
 const res = {
-    eyeSlashIcon : "password-eye fa fa-eye-slash eye-ic",
-    eyeIcon : "password-eye fa fa-eye eye-ic",
+    eyeSlashIcon : "password-eye-change-password fa fa-eye-slash eye-ic",
+    eyeIcon : "password-eye-change-password fa fa-eye eye-ic",
 }
 
 export default ChangePassword;
