@@ -242,7 +242,7 @@ const Header = () => {
                             <span className="user-name">{username || "Demo User"}</span>
                             <span><img className = "user-name-icon" alt="user-ic" src="static/imgs/ic-user-nav.png"/></span>
                         </div>
-                        <div className={"user-name-menu dropdown-menu dropdown-menu-right " + (showUD && "show")}>
+                        <div className={"user-name-menu dropdown-menu dropdown-menu-right " + (showUD && "show")} onMouseLeave={(e)=>{setShowICEMenu(false)}}>
                             <div><Link className="user-role-item" to="#">{selectedRole || "Test Manager"}</Link></div>
                             <div className="divider" />
                             {
@@ -256,21 +256,23 @@ const Header = () => {
                                 </div>:null}
                                 
                                 {showICEMenu?
-                                (<div id="downloadICEMenu" onMouseLeave={()=>{ setShowICEMenu(false)}} className="user-name-menu dropdown-menu dropdown-menu-right">
-                                    {Object.keys(config).map((osPathname)=>{
-                                        if (osPathname.includes("Windows")){
-                                            return <></>;
-                                        }
-                                        let versionName = osPathname.split("_")[1]
-                                        return <div onClick={()=>{getIce("avoclientpath_"+versionName)}} ><Link to="#">{versionName}</Link></div>
-                                    })}
+                                (<div id="downloadICEContainer">
+                                    <div id="downloadICEMenu" className="user-name-menu dropdown-menu dropdown-menu-right">
+                                        {Object.keys(config).map((osPathname)=>{
+                                            if (osPathname.includes("Windows")){
+                                                return <></>;
+                                            }
+                                            let versionName = osPathname.split("_")[1]
+                                            return <div onClick={()=>{getIce("avoclientpath_"+versionName)}} ><Link to="#">{versionName}</Link></div>
+                                        })}
+                                    </div>
                                 </div>)
                                 :null}
 
-                                { window.localStorage['navigateScreen'] !== 'settings' && <div onClick={chngUsrConf} ><Link to="#">Settings</Link></div>}
+                                { window.localStorage['navigateScreen'] !== 'settings' && <div onClick={chngUsrConf} onMouseEnter={()=>{setShowICEMenu(false)}}><Link to="#">Settings</Link></div>}
                                 </>
                             }
-                            <div onClick={logout}><Link to="#">Logout</Link></div>
+                            <div onClick={logout} onMouseEnter={()=>{setShowICEMenu(false)}}><Link to="#">Logout</Link></div>
                         </div>
                         </ClickAwayListener>
                         </>
