@@ -115,7 +115,7 @@ const CalendarComp = (props) => {
                     return <input {...props}value={ formatDate(dateVal) ? formatDate(props.value) : ''} className={(inputProps!==undefined ? inputProps.className:" fc-datePicker ")+(error ? " inputError":"")} />
                 }}
             />
-            <img  data-test="datePickerIcon"onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
+            <img data-test="datePickerIcon" onClick={openDate} className={"datepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-datepicker.png"} alt="datepicker" />
         </ClickAwayListener>
     )
 }

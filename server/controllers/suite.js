@@ -338,3 +338,17 @@ exports.cancelScheduledJob_ICE = async (req, res) => {
 	return res.send(result);
 }
 
+/** This service executes the testsuite(s) at a given recurring pattern */
+exports.testSuitesSchedulerRecurring_ICE = async (req, res) => {
+	logger.info("Inside UI service testSuitesSchedulerRecurring_ICE");
+	const fnName = "testSuitesSchedulerRecurring_ICE";
+	try{
+			var result = await scheduler.scheduleRecurringTestSuite(req.session, req.body);
+			return res.send(result);
+		
+	}catch(e){
+		logger.error("Exception in the service testSuitesSchedulerRecurring_ICE");
+		logger.debug("Exception occurred in testSuitesSchedulerRecurring_ICE: %s",e)
+		return res.status('500').send(result);
+	}
+};

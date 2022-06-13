@@ -158,7 +158,7 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-			} 
+			}
 			return next();
 		});
 
@@ -460,6 +460,7 @@ if (cluster.isMaster) {
 		app.post('/getICE_list', auth.protect, suite.getICE_list);
 		//Scheduling Screen Routes
 		app.post('/testSuitesScheduler_ICE', auth.protect, suite.testSuitesScheduler_ICE);
+		app.post('/testSuitesSchedulerRecurring_ICE', auth.protect, suite.testSuitesSchedulerRecurring_ICE);
 		app.post('/getScheduledDetails_ICE', auth.protect, suite.getScheduledDetails_ICE);
 		app.post('/cancelScheduledJob_ICE', auth.protect, suite.cancelScheduledJob_ICE);
 		//Report Screen Routes
@@ -569,6 +570,7 @@ if (cluster.isMaster) {
 						logger.error("Please run the Service API and Restart the Server");
 					} else {
 						scheduler.reScheduleTestsuite();
+						scheduler.reScheduleRecurringTestsuite();
 						console.info("Avo Assure Server Ready...\n");
 					}
 				} catch (exception) {

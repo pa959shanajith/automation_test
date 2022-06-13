@@ -25,6 +25,7 @@ import ValidationExpression from './components/ValidationExpression';
 import {Messages, VARIANT} from './components/Messages';
 import SelectRecipients from './components/SelectRecipients'
 import { AnimateDiv, AnimatePageWrapper } from "./components/AnimatePage";
+import RecurrenceComp from "./components/RecurrenceComp";
 
 
 export { Header, 
@@ -58,5 +59,6 @@ export { Header,
         setMsg,
         SelectRecipients,
         AnimateDiv,
-        AnimatePageWrapper
+        AnimatePageWrapper,
+        RecurrenceComp
     };
