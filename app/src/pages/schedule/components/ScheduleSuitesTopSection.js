@@ -193,6 +193,11 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
         }
         else if (date_time === "recurringString") {
             moduleScheduledateTime[testsuiteid]["recurringString"] = value;
+            if (moduleScheduledateTime[testsuiteid]["recurringString"] != "One Time") {
+                moduleScheduledateTime[testsuiteid]["inputPropsdate"][
+                    "disabled"
+                ] = true;
+            }
         }
         else if (date_time === "recurringStringOnHover") {	
             moduleScheduledateTime[testsuiteid]["recurringStringOnHover"] =	value;	
