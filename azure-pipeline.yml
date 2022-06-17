@@ -90,6 +90,7 @@ stages:
         call npm run-script build
 
         cd..
+        call npm install
         del .gitignore package-lock.json README.md
         call rimraf app
         rmdir /S /Q .vscode
@@ -156,6 +157,7 @@ stages:
             call npm run-script build
 
             cd ..
+            call npm install
             del .gitignore package-lock.json README.md
             call rimraf dashboard-app mongo-postgresql-streamer
             git config user.name "%BUILD_USER_NAME%"
