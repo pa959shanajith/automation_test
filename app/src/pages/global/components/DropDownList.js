@@ -15,7 +15,11 @@ const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,sel
         setList([...data])
         inputRef.current.value = ""
         if(smartMode==='normal') setSelectedICE("");
-        else setSelectedICE({});
+        else {
+            let tempICEData = {}
+            data.forEach((iceInfo)=>{if (iceInfo.statusCode === "Online") tempICEData[iceInfo.icename]=true})
+            setSelectedICE(tempICEData)
+        }
         // eslint-disable-next-line
     },[data,smartMode])
     const inputFilter = () =>{
@@ -58,9 +62,9 @@ const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,sel
                 <div className="form-inp-dropdown-popup" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
                     <ScrollBar thumbColor="#929397" >
                     {list.map((ice,index) => (  
-                        <ul key={index} role="presentation" style={{ display: (!(smartMode==='normal') && JSON.parse(ice.statusCode !== "Online") && (ExeScreen===true) ) ? 'none' : 'block' }} className="dropdown-ul"  onClick={()=>{selectOptionCheckBox(ice.icename)}} >
+                        <ul key={index} role="presentation" style={{ display: (!(smartMode==='normal') && JSON.parse(ice.statusCode !== "Online") && (ExeScreen===true) ) ? 'none' : 'block' }} className="dropdown-ul">
                             <li value={ice.icename} onClick={(event)=>{selectOption(ice.icename,event)}} title={ice.statusCode} className={"dropdown-list-item "+((selectedICE[ice.icename]!==undefined && selectedICE[ice.icename]===true)?" selectedCheckBox":"") } >
-                                <input id={ice.icename} checked={selectedICE[ice.icename]} type="checkbox" style={{ width:"auto", marginTop:"3px", display: (smartMode==='normal') ? 'none' : 'block' }}/>
+                                <input key={ice.icename+index} id={ice.icename} checked={selectedICE[ice.icename]?true:false} type="checkbox" style={{ width:"auto", marginTop:"3px", display: (smartMode==='normal') ? 'none' : 'block' }}/>
                                 <span id='status' style={{ backgroundColor: ice.color }}></span>
                                 {ice.icename}
                             </li>

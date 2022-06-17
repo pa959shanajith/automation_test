@@ -207,7 +207,7 @@ const submitModalButton = (setInputErrorBorder, iceNameIdMap, SubmitButton,  sel
     const executionData = {};
     executionData.type = (ExeScreen===true?((smartMode==="normal")?"":smartMode):scheSmartMode)
     executionData.poolid =  selectedPool
-    if((ExeScreen===true?smartMode:scheSmartMode) !== "normal") executionData.targetUser = Object.keys(selectedICE);
+    if((ExeScreen===true?smartMode:scheSmartMode) !== "normal") executionData.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
     else executionData.targetUser = selectedICE
 
     const buttonAction = () => {

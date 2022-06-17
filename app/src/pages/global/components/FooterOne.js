@@ -14,13 +14,13 @@ const FooterOne = () => {
     return (
         <div className="login-footer">
             <div className="footer-content">
-            <span className="upper-text">
+            {/* <span className="upper-text">
                 Powered By
                 <img className="footer-logo_one" alt="logo" src="static/imgs/ftr-avo-logo.png"/>
-            </span>
+            </span> */}
             <span className="lower-text">
-                Avo Assure v{REACT_APP_VERSION} © {new Date().getFullYear()} <br></br>
-                Avo Automation. All Rights Reserved
+                Avo Assure v{REACT_APP_VERSION}  <br/>
+                © {new Date().getFullYear()} Avo Automation. All Rights Reserved.
             </span>
             </div>
         </div>
