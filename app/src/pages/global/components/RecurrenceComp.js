@@ -55,13 +55,13 @@ const RecurrenceComp = (props) => {
             setRecurringStringOnHover("One Time");
         }
         else if (event.target.value == "Daily") {
-            setRecurringString("Recur daily");
+            setRecurringString("Every Day");
         }
         else if (event.target.value == "Weekly") {
-            setRecurringString("Recur weekly");
+            setRecurringString("Every Week");
         }
         else if (event.target.value == "Monthly") {
-            setRecurringString("Recur monthly");
+            setRecurringString("Every Month");
         }
     };
 
@@ -72,11 +72,11 @@ const RecurrenceComp = (props) => {
         if (dailyRecurrenceType === "days") {
             if (event.target.value == 1) {
                 setRecurringValue("0 0 * * *");
-                setRecurringStringOnHover("Recur every day");
+                setRecurringStringOnHover("Occurs every day");
             } else {
                 if (event.target.value != "") {
                     setRecurringValue("0 0 */" + event.target.value + " * *")
-                    setRecurringStringOnHover("Recur every " + event.target.value + " days");
+                    setRecurringStringOnHover("Occurs every " + event.target.value + " days");
                 }
             }
         }
@@ -88,7 +88,7 @@ const RecurrenceComp = (props) => {
 
         if (event.target.value === "weekday") {
             setRecurringValue("0 0 * * 1-5")
-            setRecurringStringOnHover("Recur every weekday");
+            setRecurringStringOnHover("Occurs every weekday");
             setDailyRecurrenceValue("")
             setDailyRecurrenceInputDisable(true)
         }
@@ -127,7 +127,7 @@ const RecurrenceComp = (props) => {
         else if (event.target.value == "saturday") {
             setRecurringValue("0 0 * * 6")
         }
-        setRecurringStringOnHover("Recur every " + event.target.value);	
+        setRecurringStringOnHover("Occurs every " + event.target.value);	
     }
 
     const getMonthlyRecurrenceType = (event) => {
@@ -159,16 +159,16 @@ const RecurrenceComp = (props) => {
             if (monthlyRecurrenceDayValue != "") {		
                 setRecurringValue("0 0 " + monthlyRecurrenceDayValue + " */" + event.target.value + " *");	
                 if (monthlyRecurrenceDayValue == 1) {	
-                    setRecurringStringOnHover("Recur on " + monthlyRecurrenceDayValue + "st day of every " + event.target.value + " month");	
+                    setRecurringStringOnHover("Occurs on " + monthlyRecurrenceDayValue + "st day of every " + event.target.value + " month");	
                 } 
                 else if (monthlyRecurrenceDayValue == 2) {	
-                    setRecurringStringOnHover("Recur on " +	monthlyRecurrenceDayValue +	"nd day of every " + event.target.value + " month");	
+                    setRecurringStringOnHover("Occurs on " +	monthlyRecurrenceDayValue +	"nd day of every " + event.target.value + " month");	
                 } 
                 else if (monthlyRecurrenceDayValue == 3) {	
-                    setRecurringStringOnHover("Recur on " +	monthlyRecurrenceDayValue +	"rd day of every " + event.target.value + " month");	
+                    setRecurringStringOnHover("Occurs on " +	monthlyRecurrenceDayValue +	"rd day of every " + event.target.value + " month");	
                 } 
                 else {	
-                    setRecurringStringOnHover("Recur on " +	monthlyRecurrenceDayValue +	"th day of every " + event.target.value + " month");	
+                    setRecurringStringOnHover("Occurs on " +	monthlyRecurrenceDayValue +	"th day of every " + event.target.value + " month");	
                 }	
             }	
         }
@@ -185,31 +185,31 @@ const RecurrenceComp = (props) => {
             if (event.target.value != "") {
                 if (monthlyRecurrenceWeekValue == "Sunday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 0")
-                    setRecurringStringOnHover("Recur on every sunday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every sunday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Monday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 1")
-                    setRecurringStringOnHover("Recur on every monday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every monday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Tuesday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 2")
-                    setRecurringStringOnHover("Recur on every tuesday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every tuesday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Wednesday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 3")
-                    setRecurringStringOnHover("Recur on every wednesday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every wednesday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Thursday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 4")
-                    setRecurringStringOnHover("Recur on every thursday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every thursday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Friday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 5")
-                    setRecurringStringOnHover("Recur on every friday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every friday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Saturday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 6")
-                    setRecurringStringOnHover("Recur on every saturday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every saturday of every " + event.target.value +	" month");
                 }
             }
         }
