@@ -13,6 +13,10 @@ const RecurrenceComp = (props) => {
     const [monthlyRecurrenceMonthValue, setMonthlyRecurrenceMonthValue] = useState("");
     const [monthlyRecurrenceWeekValue, setMonthlyRecurrenceWeekValue] = useState("Sunday");
     const [monthlyRecurrenceMonthValue_1, setMonthlyRecurrenceMonthValue_1] = useState("");
+    const [dailyRecurrenceInputDisable, setDailyRecurrenceInputDisable] = useState(true);
+    const [monthlyRecurrenceDayInputDisable, setMonthlyRecurrenceDayInputDisable] = useState(true);
+    const [monthlyRecurrenceMonthInputDisable, setMonthlyRecurrenceMonthInputDisable] = useState(true);
+    const [monthlyRecurrenceMonthInputDisable_1, setMonthlyRecurrenceMonthInputDisable_1] = useState(true);
 
     const classTimer = props.classTimer;
     const setRecurringString = props.setRecurringString;
@@ -50,6 +54,15 @@ const RecurrenceComp = (props) => {
             setRecurringValue("One Time");
             setRecurringStringOnHover("One Time");
         }
+        else if (event.target.value == "Daily") {
+            setRecurringString("Every Day");
+        }
+        else if (event.target.value == "Weekly") {
+            setRecurringString("Every Week");
+        }
+        else if (event.target.value == "Monthly") {
+            setRecurringString("Every Month");
+        }
     };
 
     // Handle input change for daily recurrence
@@ -58,14 +71,12 @@ const RecurrenceComp = (props) => {
 
         if (dailyRecurrenceType === "days") {
             if (event.target.value == 1) {
-                setRecurringString("Recur daily");
                 setRecurringValue("0 0 * * *");
-                setRecurringStringOnHover("Recur every day");
+                setRecurringStringOnHover("Occurs every day");
             } else {
                 if (event.target.value != "") {
-                    setRecurringString("Recur daily");
                     setRecurringValue("0 0 */" + event.target.value + " * *")
-                    setRecurringStringOnHover("Recur every " + event.target.value + " days");
+                    setRecurringStringOnHover("Occurs every " + event.target.value + " days");
                 }
             }
         }
@@ -76,9 +87,13 @@ const RecurrenceComp = (props) => {
         setDailyRecurrenceType(event.target.value);
 
         if (event.target.value === "weekday") {
-            setRecurringString("Recur daily");
             setRecurringValue("0 0 * * 1-5")
-            setRecurringStringOnHover("Recur every weekday");
+            setRecurringStringOnHover("Occurs every weekday");
+            setDailyRecurrenceValue("")
+            setDailyRecurrenceInputDisable(true)
+        }
+        else if (event.target.value === "days") {
+            setDailyRecurrenceInputDisable(false)
         }
     };
 
@@ -90,7 +105,6 @@ const RecurrenceComp = (props) => {
     // Get Weekly recurrence value
     const getWeeklyRecurrenceWeek = (event) => {
         setWeeklyRecurrenceWeek(event.target.value);
-        setRecurringString("Recur weekly")
 
         if (event.target.value == "sunday") {
             setRecurringValue("0 0 * * 0")
@@ -113,35 +127,48 @@ const RecurrenceComp = (props) => {
         else if (event.target.value == "saturday") {
             setRecurringValue("0 0 * * 6")
         }
-        setRecurringStringOnHover("Recur every " + event.target.value);	
+        setRecurringStringOnHover("Occurs every " + event.target.value);	
     }
 
     const getMonthlyRecurrenceType = (event) => {
         setMonthlyRecurrenceType(event.target.value);
+
+        if (event.target.value === "days") {
+            setMonthlyRecurrenceDayInputDisable(false);
+            setMonthlyRecurrenceMonthValue_1("");
+            setMonthlyRecurrenceMonthInputDisable_1(true);
+        }
+        else if (event.target.value === "weeks") {
+            setMonthlyRecurrenceMonthInputDisable_1(false);
+            setMonthlyRecurrenceDayValue("");
+            setMonthlyRecurrenceMonthValue("");
+            setMonthlyRecurrenceDayInputDisable(true);
+            setMonthlyRecurrenceMonthInputDisable(true);
+        }
     }
 
     const handleDayInputChange = (event) => {
         setMonthlyRecurrenceDayValue(event.target.value)
+        setMonthlyRecurrenceMonthInputDisable(false);
     }
 
     const handleMonthInputChange = (event) => {
         setMonthlyRecurrenceMonthValue(event.target.value)
 
-        if (monthlyRecurrenceType === "days") {	
-            if (monthlyRecurrenceDayValue != "") {	
-                setRecurringString("Recur monthly");	
+        if (monthlyRecurrenceType === "days") {
+            if (monthlyRecurrenceDayValue != "") {		
                 setRecurringValue("0 0 " + monthlyRecurrenceDayValue + " */" + event.target.value + " *");	
                 if (monthlyRecurrenceDayValue == 1) {	
-                    setRecurringStringOnHover("Recur on " + monthlyRecurrenceDayValue + "st day of every " + event.target.value + " month");	
+                    setRecurringStringOnHover("Occurs on " + monthlyRecurrenceDayValue + "st day of every " + event.target.value + " month");	
                 } 
                 else if (monthlyRecurrenceDayValue == 2) {	
-                    setRecurringStringOnHover("Recur on " +	monthlyRecurrenceDayValue +	"nd day of every " + event.target.value + " month");	
+                    setRecurringStringOnHover("Occurs on " +	monthlyRecurrenceDayValue +	"nd day of every " + event.target.value + " month");	
                 } 
                 else if (monthlyRecurrenceDayValue == 3) {	
-                    setRecurringStringOnHover("Recur on " +	monthlyRecurrenceDayValue +	"rd day of every " + event.target.value + " month");	
+                    setRecurringStringOnHover("Occurs on " +	monthlyRecurrenceDayValue +	"rd day of every " + event.target.value + " month");	
                 } 
                 else {	
-                    setRecurringStringOnHover("Recur on " +	monthlyRecurrenceDayValue +	"th day of every " + event.target.value + " month");	
+                    setRecurringStringOnHover("Occurs on " +	monthlyRecurrenceDayValue +	"th day of every " + event.target.value + " month");	
                 }	
             }	
         }
@@ -157,46 +184,39 @@ const RecurrenceComp = (props) => {
         if (monthlyRecurrenceType === "weeks") {
             if (event.target.value != "") {
                 if (monthlyRecurrenceWeekValue == "Sunday") {
-                    setRecurringString("Recur monthly")
                     setRecurringValue("0 0 * */" + event.target.value + " 0")
-                    setRecurringStringOnHover("Recur on every sunday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every sunday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Monday") {
-                    setRecurringString("Recur monthly")
                     setRecurringValue("0 0 * */" + event.target.value + " 1")
-                    setRecurringStringOnHover("Recur on every monday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every monday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Tuesday") {
-                    setRecurringString("Recur monthly")
                     setRecurringValue("0 0 * */" + event.target.value + " 2")
-                    setRecurringStringOnHover("Recur on every tuesday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every tuesday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Wednesday") {
-                    setRecurringString("Recur monthly")
                     setRecurringValue("0 0 * */" + event.target.value + " 3")
-                    setRecurringStringOnHover("Recur on every wednesday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every wednesday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Thursday") {
-                    setRecurringString("Recur monthly")
                     setRecurringValue("0 0 * */" + event.target.value + " 4")
-                    setRecurringStringOnHover("Recur on every thursday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every thursday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Friday") {
-                    setRecurringString("Recur monthly")
                     setRecurringValue("0 0 * */" + event.target.value + " 5")
-                    setRecurringStringOnHover("Recur on every friday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every friday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Saturday") {
-                    setRecurringString("Recur monthly")
                     setRecurringValue("0 0 * */" + event.target.value + " 6")
-                    setRecurringStringOnHover("Recur on every saturday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on every saturday of every " + event.target.value +	" month");
                 }
             }
         }
     }
 
     return (
-        <ClickAwayListener className={"recurrence-time-container " +(classTimer ? " " + classTimer : "")} onClickAway={() => {setShowRecurrence(false); setRecurrenceType(""); setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setWeeklyRecurrenceWeek(""); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday");}} as="span" >
+        <ClickAwayListener className={"recurrence-time-container " +(classTimer ? " " + classTimer : "")} onClickAway={() => {setShowRecurrence(false); setRecurrenceType(""); setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setWeeklyRecurrenceWeek(""); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday"); setDailyRecurrenceInputDisable(true); setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true);}} as="span" >
             <div className="rdt rdtOpen">
                 <input type="text" className={classname} placeholder={placeholder} readOnly={readonly} disabled={disabled} title={title} value={recur} />
                 {showRecurrence && ( 
@@ -233,7 +253,7 @@ const RecurrenceComp = (props) => {
                                                 <span>
                                                     &nbsp;&nbsp;&nbsp;&nbsp;Every
                                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <input className="recur-textbox" type="text" size="1" value={dailyRecurrenceValue} onInput={handleInputChange} />
+                                                    <input className="recur-textbox" type="text" size="1" disabled = {(dailyRecurrenceInputDisable)? "disabled" : ""} value={dailyRecurrenceValue} onInput={handleInputChange} />
                                                     &nbsp;&nbsp;&nbsp;&nbsp;day(s). 
                                                 </span>
                                             </lable>
@@ -305,10 +325,10 @@ const RecurrenceComp = (props) => {
                                                 <span>
                                                     &nbsp;&nbsp;&nbsp;&nbsp;Day
                                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <input className="recur-textbox" type="text" size="1" value={monthlyRecurrenceDayValue} onInput={handleDayInputChange} />
+                                                    <input className="recur-textbox" type="text" size="1" disabled = {(monthlyRecurrenceDayInputDisable)? "disabled" : ""} value={monthlyRecurrenceDayValue} onInput={handleDayInputChange} />
                                                     &nbsp;&nbsp;&nbsp;&nbsp;of every
                                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <input className="recur-textbox" type="text" size="1" value={monthlyRecurrenceMonthValue} onInput={handleMonthInputChange} />
+                                                    <input className="recur-textbox" type="text" size="1" disabled = {(monthlyRecurrenceMonthInputDisable)? "disabled" : ""} value={monthlyRecurrenceMonthValue} onInput={handleMonthInputChange} />
                                                     &nbsp;&nbsp;&nbsp;&nbsp;month(s). 
                                                 </span>
                                             </lable>
@@ -356,7 +376,7 @@ const RecurrenceComp = (props) => {
                                                     </select>
                                                     &nbsp;&nbsp;&nbsp;&nbsp;of every
                                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <input className="recur-textbox" type="text" size="1" value={monthlyRecurrenceMonthValue_1} onInput={handleMonthInputChange_1} />
+                                                    <input className="recur-textbox" type="text" size="1" disabled = {(monthlyRecurrenceMonthInputDisable_1)? "disabled" : ""} value={monthlyRecurrenceMonthValue_1} onInput={handleMonthInputChange_1} />
                                                     &nbsp;&nbsp;&nbsp;&nbsp;month(s).
                                                 </span>
                                             </lable>
