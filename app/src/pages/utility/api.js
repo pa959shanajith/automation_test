@@ -311,3 +311,128 @@ export const importDataTable = async(arg) => {
         return {error:MSG.UTILITY.ERR_IMPORT}
     }
 }
+
+export const fetchProjects = async() => {
+    return [{"_id":"620f83513eb0b5d441b73a69","name":"New Project","releases":[{"createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","cycles":[{"_id":"620f83513eb0b5d441b73a67","createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"C1"},{"_id":"620f83513eb0b5d441b73a68","createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"C2"}],"modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"R1"}],"type":"5db0022cf87fdec084ae49b6"}];
+    try{
+        const res = await axios(url+'/fetchProjects', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {"action":"populateProjects"},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_PROJECT}
+    }
+}
+
+export const fetchModules = async(props) => {
+    try{
+        const res = await axios(url+'/fetchModules', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+
+export const getPools = async(data) => { 
+    try{
+        const res = await axios(url+'/getPools', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){ 
+            if(res.data === 'empty' || Object.keys(res.data).length<1) return {val:"empty",error:MSG.ADMIN.ERR_NO_ICEPOOL}           
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.GENERIC.ERR_FETCH_POOLS}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.GENERIC.ERR_FETCH_POOLS}
+    }
+}
+
+export const storeConfigureKey = async(props) => {
+    try{
+        console.log(props)
+        const res = await axios(url+'/ExecuteTestSuite_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {"executionData":props},
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.log(res.data + '  408')
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+export const execAutomation = async(props) => {
+    try{
+        console.log(props)
+        const res = await axios(url+'/execAutomation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {"key":props},
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.log(res.data + '  408')
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
