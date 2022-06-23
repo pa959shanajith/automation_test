@@ -174,6 +174,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
             }
             else {
                   moduleScheduledateTime[testsuiteid]["date"] = "";
+                  moduleScheduledateTime[testsuiteid]["time"] = "";
                   moduleScheduledateTime[testsuiteid]["inputPropsdate"][
                       "disabled"
                   ] = true;
@@ -195,6 +196,10 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
             moduleScheduledateTime[testsuiteid]["recurringString"] = value;
             if (moduleScheduledateTime[testsuiteid]["recurringString"] != "One Time") {
                 moduleScheduledateTime[testsuiteid]["inputPropsdate"][
+                    "disabled"
+                ] = true;
+                moduleScheduledateTime[testsuiteid]["time"] = "";
+                moduleScheduledateTime[testsuiteid]["inputPropstime"][
                     "disabled"
                 ] = true;
             }
