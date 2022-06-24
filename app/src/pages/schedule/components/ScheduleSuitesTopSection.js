@@ -165,12 +165,28 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
             moduleScheduledateTime[testsuiteid]["time"] = "";
             moduleScheduledateTime[testsuiteid]["recurringValue"] = value;
             if (moduleScheduledateTime[testsuiteid]["recurringValue"] == "One Time") {
-                  moduleScheduledateTime[testsuiteid]["inputPropsdate"][
+                moduleScheduledateTime[testsuiteid]["inputPropsdate"][
                       "disabled"
-                  ] = false;
-                  moduleScheduledateTime[testsuiteid]["inputPropstime"][
-                      "disabled"
-                  ] = false;
+                ] = false;
+                if (moduleScheduledateTime[testsuiteid]["date"] != "") {
+                    moduleScheduledateTime[testsuiteid]["inputPropstime"][
+                        "disabled"
+                    ] = false;
+                    if (moduleScheduledateTime[testsuiteid]["time"] === "") {
+                        var hr = new Date().getHours();
+                        var min = parseInt(new Date().getMinutes());
+                        if (new Date().getHours().toString().length === 1)
+                            hr = "0" + hr;
+                        if (parseInt(new Date().getMinutes()).toString().length === 1)
+                            min = "0" + min;
+                        moduleScheduledateTime[testsuiteid]["time"] = hr + ":" + min;
+                    }
+                }
+                else {
+                    moduleScheduledateTime[testsuiteid]["inputPropstime"][
+                        "disabled"
+                    ] = true;
+                }
             }
             else {
                   moduleScheduledateTime[testsuiteid]["date"] = "";
