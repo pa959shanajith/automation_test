@@ -3,8 +3,7 @@ import ReactTooltip from 'react-tooltip';
 import ReportApi from '../components/ReportApi'
 import ExecMetricsApi from '../components/ExecMetricsApi'
 import ExecutionApi from '../components/ExecutionApi'
-import { ScrollBar, Messages as MSG, setMsg, ModalContainer } from '../../global';
-import { SearchBox } from '@avo/designcomponents';
+import { Messages as MSG, VARIANT, setMsg, ModalContainer } from '../../global';
 
 
 import "../styles/DevOps.scss";
@@ -12,7 +11,6 @@ import DevOpsList from '../components/DevOpsList';
 import DevOpsConfig from '../components/DevOpsConfig';
 
 const DevOps = props => {
-    const [api, setApi] = useState("Execution");
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const [error, setError] = useState({
         error: false,
@@ -50,47 +48,9 @@ const DevOps = props => {
             cycleId: false
         }
     });
+    const api = window.location.href.slice(0, -7)+'executeAutomation';
     const [currentIntegration, setCurrentIntegration] = useState(false);
 
-    useEffect(() => {
-        // setRequestText("");
-        setError({
-            error: false,
-            toDate: false,
-            fromDate: false,
-            LOB: false,
-            executionId: false,
-            scenarioIds: false,
-            source: false,
-            exectionMode: false,
-            executionEnv: false,
-            browserType: false,
-            integration: {
-                url: false,
-                username: false,
-                password: false,
-                qteststeps: false
-            },
-            gitInfo: {
-                gitConfiguration: false,
-                gitbranch: false,
-                folderPath: false,
-                gitVersion: false
-            },
-            batchInfo: {
-                testsuiteName: false,
-                testsuiteId: false,
-                versionNumber: false,
-                appType: false,
-                domainName: false,
-                projectName: false,
-                projectId: false,
-                releaseId: false,
-                cycleName: false,
-                cycleId: false
-            }
-        });
-    }, [api])
     const ConfirmPopup = () => (
         <ModalContainer 
             title={showConfirmPop.title}
@@ -104,16 +64,14 @@ const DevOps = props => {
             }
         />
     )
+    const showMessageBar = (message, selectedVariant) => (
+        setMsg(MSG.CUSTOM(message,VARIANT[selectedVariant]))
+    )
+    
 
     return (<>
         { showConfirmPop && <ConfirmPopup /> }
-        <div className="page-taskName" >
-            <span data-test="page-title-test" className="taskname">
-                { currentIntegration ? 'Create New DevOps Integration Configuration' : 'DevOps Integration Configuration'}
-                
-            </span>
-        </div>
-        {currentIntegration ? <DevOpsConfig setCurrentIntegration={setCurrentIntegration} /> : <DevOpsList setShowConfirmPop={setShowConfirmPop} setCurrentIntegration={setCurrentIntegration} /> }
+        {currentIntegration ? <DevOpsConfig url={api} setCurrentIntegration={setCurrentIntegration} currentIntegration={currentIntegration} showMessageBar={showMessageBar} /> : <DevOpsList url={api} setShowConfirmPop={setShowConfirmPop} setCurrentIntegration={setCurrentIntegration} showMessageBar={showMessageBar} /> }
 {/*         
         <div className={classes["api-ut_contents"]}>
         <div className={classes["api-ut__ab"]}>

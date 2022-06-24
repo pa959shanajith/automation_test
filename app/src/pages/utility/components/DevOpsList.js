@@ -1,170 +1,262 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
-import ReportApi from '../components/ReportApi'
-import ExecMetricsApi from '../components/ExecMetricsApi'
-import ExecutionApi from '../components/ExecutionApi'
 import { ScrollBar, Messages as MSG, setMsg, ModalContainer } from '../../global';
-
+import { SearchBox } from '@avo/designcomponents';
+import {v4 as uuid} from 'uuid';
 
 import "../styles/DevOps.scss";
 
-const DevOpsList = props => {
-    const [api, setApi] = useState("Execution");
+const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessageBar }) => {
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
-    const [request, setRequest] = useState({});
-    const [requestText, setRequestText] = useState("");
     const [searchText, setSearchText] = useState("");
-    const [searchEnable, setSearchEnable] = useState(false);
     const [configList, setConfigList] = useState([
         {
-            name: 'Name 1',
-            key: 'asdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasd12esadasda12312123',
+            name: 'Name 1ansadnsa,mdnas,mdnasm,dnsad   dasd as ',
+            key: uuid(),
             project: 'Project 1',
-            release: 'Release 1'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 1',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 2',
-            key: 'asdasdasd22e2',
-            project: 'Project 2',
-            release: 'Release 2'
+            key: uuid(),
+            project: 'Big Project Name 2',
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 2',
+            cycle: 'Cycle 2',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'synchronous'
         },{
             name: 'Name 3',
-            key: 'asdasdasd32e32332323',
-            project: 'Project 3',
-            release: 'Release 3'
+            key: uuid(),
+            project: 'Very Big Big BIg  Big Big BIg Project 3',
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 3',
+            cycle: 'Cycle 3',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 4',
-            key: 'asdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasd12esadasda12124',
+            key: uuid(),
             project: 'Project 4',
-            release: 'Release 4'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 4',
+            cycle: 'Cycle 4',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 5',
-            key: 'asdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2esadasda12312123',
+            key: uuid(),
             project: 'Project 5',
-            release: 'Release 5'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 5',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 6',
-            key: 'asdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasd12esadasda12312123',
+            key: uuid(),
             project: 'Project 6',
-            release: 'Release 6'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 6',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 7',
-            key: 'asdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaasda12312123',
+            key: uuid(),
             project: 'Project 7',
-            release: 'Release 7'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 7',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 8',
-            key: 'asdasdaaaaaaaaaaaaaacxvaaaaaaaaaaasda12312123',
+            key: uuid(),
             project: 'Project 8',
-            release: 'Release 8'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 8',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 9',
-            key: 'asdasdaaaasdkoiuiouo8asda12312123',
+            key: uuid(),
             project: 'Project 9',
-            release: 'Release 9'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 9',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 10',
-            key: 'asdasdaa__asdhuy7-312123',
+            key: uuid(),
             project: 'Project 10',
-            release: 'Release 10'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 10',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 11',
-            key: 'asdzxcdasdaaaaaaaaaaaaaaaaaaaaaaaaaaaaasda12312123',
+            key: uuid(),
             project: 'Project 11',
-            release: 'Release 11'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 11',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 12',
-            key: 'asdadsfafaaaaaaaaaaaaaaaaaaasda12312123',
+            key: uuid(),
             project: 'Project 12',
-            release: 'Release 12'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 12',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         },{
             name: 'Name 13',
-            key: 'asdasdaaaaaaaaaaaaaaaaaaasafwefweraasda12312123',
+            key: uuid(),
             project: 'Project 13',
-            release: 'Release 13'
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 13',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
+        },{
+            name: 'Name 14',
+            key: uuid(),
+            project: 'Project 14',
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 14',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
+        },{
+            name: 'Name 15',
+            key: uuid(),
+            project: 'Project 15',
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
+            ],
+            release: 'Release 15',
+            cycle: 'Cycle 1',
+            scenarioList: [],
+            avoAgentGrid: '',
+            browser: '',
+            integration: '',
+            executionType: 'asynchronous'
         }
     ]);
+    // const [configList, setConfigList] = useState([]);
     const [filteredList, setFilteredList] = useState(configList);
-    const [error, setError] = useState({
-        error: false,
-        toDate: false,
-        fromDate: false,
-        LOB: false,
-        executionId: false,
-        scenarioIds: false,
-        source: false,
-        exectionMode: false,
-        executionEnv: false,
-        browserType: false,
-        integration: {
-            url: false,
-            username: false,
-            password: false,
-            qteststeps: false
-        },
-        gitInfo: {
-            gitConfiguration: false,
-            gitbranch: false,
-            folderPath: false,
-            gitVersion: false
-        },
-        batchInfo: {
-            testsuiteName: false,
-            testsuiteId: false,
-            versionNumber: false,
-            appType: false,
-            domainName: false,
-            projectName: false,
-            projectId: false,
-            releaseId: false,
-            cycleName: false,
-            cycleId: false
-        }
-    });
-    const [integration, setIntegration] = useState(-1);
-
-    useEffect(() => {
-        setRequestText("");
-        setError({
-            error: false,
-            toDate: false,
-            fromDate: false,
-            LOB: false,
-            executionId: false,
-            scenarioIds: false,
-            source: false,
-            exectionMode: false,
-            executionEnv: false,
-            browserType: false,
-            integration: {
-                url: false,
-                username: false,
-                password: false,
-                qteststeps: false
-            },
-            gitInfo: {
-                gitConfiguration: false,
-                gitbranch: false,
-                folderPath: false,
-                gitVersion: false
-            },
-            batchInfo: {
-                testsuiteName: false,
-                testsuiteId: false,
-                versionNumber: false,
-                appType: false,
-                domainName: false,
-                projectName: false,
-                projectId: false,
-                releaseId: false,
-                cycleName: false,
-                cycleId: false
-            }
-        });
-    }, [api])
 
     const copyTokenFunc = () => {
-        console.log(document.getElementById('request-body'));
-        const data = requestText;
+        const data = url;
         if (!data) {
             setCopyToolTip("Nothing to Copy!");
             setTimeout(() => {
@@ -172,7 +264,7 @@ const DevOpsList = props => {
             }, 1500);
             return;
         }
-        const x = document.getElementById('request-body');
+        const x = document.getElementById('api-url');
         x.select();
         document.execCommand('copy');
         setCopyToolTip("Copied!");
@@ -181,245 +273,106 @@ const DevOpsList = props => {
         }, 1500);
     }
 
-    const copyConfigKey = (index) => {
-        const x = document.getElementsByClassName('tkn_table_key_value')[index];
-        // x.select();
-        // document.execCommand('copy');
-        setCopyToolTip("Copied!");
-        setTimeout(() => {
-            setCopyToolTip("Click to Copy");
-        }, 1500);
-    }
-
-    const handleSubmit = () => {
-        try {
-            if (api !== "Execution" && api !== "Report" && api !== "Execution Metrics") {
-                setMsg(MSG.UTILITY.ERR_SEL_API);
-            }
-            let obj = validate(request, api, integration);
-            setError(obj);
-            if (obj.error === true)  return;
-            setMsg(MSG.UTILITY.SUCC_REQ_BODY_GEN);
-            setRequestText(JSON.stringify(request, undefined, 4));
-        } catch (e) {
-            setMsg(MSG.UTILITY.ERR_GENERATE_RB);
+    const copyConfigKey = (key) => {
+        if (navigator.clipboard.writeText(key)) {
+            setCopyToolTip("Copied!");
+            setTimeout(() => {
+                setCopyToolTip("Click to Copy");
+            }, 1500);
         }
     }
     const deleteDevOpsConfig = () => {
-        props.setShowConfirmPop({'title': 'Delete DevOps Integration Configuration', 'content': <p>Are you sure, you want to delete <b>Name 1</b> Integration Configuration?</p>, 'onClick': ()=>console.log('Delete config action clicked')});
+        setShowConfirmPop({'title': 'Delete DevOps Configuration', 'content': <p>Are you sure, you want to delete <b>Name 1</b> Configuration?</p>, 'onClick': ()=>{ setShowConfirmPop(false); showMessageBar('Name 1 Configuration Deleted', 'SUCCESS'); }});
     }
     const handleSearchChange = (value) => {
-        let filteredItems = configList.filter(item => item.name.toLowerCase().indexOf(value.toLowerCase()) > -1);
+        let filteredItems = configList.filter(item => (item.name.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.project.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.release.toLowerCase().indexOf(value.toLowerCase()) > -1));
         setFilteredList(filteredItems);
         setSearchText(value);
     }
 
     return (<>
-        <div>
-            <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>DevOps Integration API url : </span>
-            <span className="api-ut__inputLabel"><input type="text" value='' data-test="req-body-test" className="req-body" autoComplete="off" id="request-body" name="request-body" style={{width:"25%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/executeAutomation' />
-                <label>
-                    <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
-                    <div style={{fontSize:"24px"}}>
-                        <i className="fa fa-files-o icon" style={{fontSize:"24px"}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyTokenFunc() }} ></i>
-                    </div>
-                </label>
+        <div className="page-taskName" >
+            <span data-test="page-title-test" className="taskname">
+                DevOps Integration Configuration
             </span>
         </div>
         <div className="api-ut__btnGroup">
-            {/* <button data-test="submit-button-test" onClick={handleSubmitReset} >Reset</button> */}
-            {/* <configSearchBox /> */}
-            {/* <div className="sessionHeading-ip" data-toggle="collapse" data-target="#activeUsersToken-x">
-                <h4 onClick={()=>{setShowList(!showList);}}>ICE Provisions</h4>
-                <div className="search-ip">
-                    <span className="searchIcon-provision search-icon-ip">
-                        <img src={"static/imgs/ic-search-icon.png"} className="search-img-ip" alt="search icon"/>
-                    </span>
-                    <input value={searchTasks} onChange={(event)=>{ setSearchTasks(event.target.value);searchIceList(event.target.value)}} autoComplete="off" type="text" id="searchTasks" className="searchInput-list-ip searchInput-cust-ip" />
+            <button data-test="submit-button-test" onClick={() => setCurrentIntegration({
+                    name: '',
+                    key: uuid(),
+                    selectValues: [
+                        { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '30%', disabled: false, selectedName: '' },
+                        { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
+                        { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
+                    ],
+                    project: '',
+                    release: '',
+                    cycle: '',
+                    scenarioList: [],
+                    avoAgentGrid: '',
+                    browser: '',
+                    integration: '',
+                    executionType: 'asynchronous'
+                })} >New Configuration</button>
+            { configList.length > 0 && <>
+                <div className='searchBoxInput'>
+                    <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                 </div>
-            </div> */}
-            {/* <div className="sessionHeading-ip" data-toggle="collapse" data-target="#activeUsersToken-x">
-                <h4 onClick={()=>{}}>Current DevOps Integration Configurations</h4>
-                <div className="search-ip">
-                    <span className="searchIcon-provision search-icon-ip">
-                        <img src={"static/imgs/ic-search-icon.png"} className="search-img-ip" alt="search icon"/>
+                <div>
+                    <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>DevOps Integration API url : </span>
+                    <span className="api-ut__inputLabel"><input type="text" value={url} data-test="req-body-test" className="req-body" autoComplete="off" id="api-url" name="request-body" style={{width:"25%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/executeAutomation' />
+                        <label>
+                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
+                            <div style={{fontSize:"24px"}}>
+                                <i className="fa fa-files-o icon" style={{fontSize:"24px"}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyTokenFunc() }} ></i>
+                            </div>
+                        </label>
                     </span>
-                    <input value={''} onChange={(event)=>{}} autoComplete="off" type="text" id="searchTasks" className="searchInput-list-ip searchInput-cust-ip" />
                 </div>
-            </div> */}
-            <button data-test="submit-button-test" onClick={() => props.setCurrentIntegration(true)} >New Configuration</button>
-            <div>
-                <span className="searchIcon-provision search-icon-ip" style={{ border: `2px solid ${ searchEnable ? '#633693' : '#fff' }`, marginRight: '11px' }}>
-                    <img src={"static/imgs/ic-search-icon.png"} onClick={() => setSearchEnable(!searchEnable)} className="search-img-ip" alt="search icon"/>
-                </span>
-                {
-                    searchEnable && <input value={searchText} onChange={(event)=> handleSearchChange(event.target.value) } autoFocus autoComplete="off" type="text" id="searchTasks" className="searchInput-list-ip searchInput-cust-ip" style={{ color: '#fff', background: '#633693', height: '33px' }} />
-                }
+            </> }
+        </div>
+        { configList.length > 0 ? <>
+            { /* Table */ }
+            <div className="d__table" style={{ flex: 0 }}>
+                <div className="d__table_header">
+                    <span className=" d__step_head tkn-table__sr_no tkn-table__head" >#</span>
+                    <span className="d__obj_head tkn-table__name tkn-table__head" >Name</span>
+                    <span className="d__key_head tkn-table__key tkn-table__head" >Configuration Key</span>
+                    <span className="d__inp_head tkn-table__project tkn-table__head" >Project</span>
+                    <span className="d__out_head tkn-table__project tkn-table__head" >Release</span>
+                    <span className="details_col d__det_head tkn-table__button" >Action</span>
+                </div>
             </div>
-        </div>
-        { /* Table */ }
-        <div className="d__table" style={{ flex: 0 }}>
-            <div className="d__table_header">
-                <span className=" d__step_head tkn-table__sr_no" >Sr. No</span>
-                <span className="d__obj_head tkn-table__name" >Name</span>
-                <span className="d__key_head tkn-table__key" >Configuration Key</span>
-                <span className="d__inp_head tkn-table__project" >Project</span>
-                <span className="d__out_head tkn-table__project" >Release</span>
-                {/* <span className="remark_col d__rem_head" ></span> */}
-                <span className="details_col d__det_head tkn-table__button" >Action</span>
+            <div id="activeUsersToken" className="wrap active-users-token">
+                <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
+                <table className = "table table-hover sessionTable" id="configList">
+                    <tbody>
+                        {
+                            searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.key} className='tkn-table__row'>
+                                <td className="tkn-table__sr_no"> {index+1} </td>
+                                <td className="tkn-table__name" data-for="name" data-tip={item.name}> <ReactTooltip id="name" effect="solid" backgroundColor="black" /><React.Fragment>{item.name}</React.Fragment> </td>
+                                <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.key }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.key) }} ></i></td>
+                                <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
+                                <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
+                                <td className="tkn-table__button"> <img style={{ marginRight: '10%' }} onClick={() => setCurrentIntegration(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp; <img onClick={() => deleteDevOpsConfig()} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/></td>
+                            </tr>)
+                        }
+                        {
+                            searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.key} className='tkn-table__row'>
+                                <td className="tkn-table__sr_no"> {index+1} </td>
+                                <td className="tkn-table__name" data-for="name" data-tip={item.name}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.name} </td>
+                                <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.key }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.key) }} ></i></td>
+                                <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
+                                <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
+                                <td className="tkn-table__button"> <img style={{ marginRight: '10%' }} onClick={() => setCurrentIntegration(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp; <img onClick={() => deleteDevOpsConfig()} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/></td>
+                            </tr>)
+                        }
+                    </tbody>
+                </table>
+                </ScrollBar>
             </div>
-        </div>
-        <div id="activeUsersToken" className="wrap active-users-token">
-            <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
-            <table className = "table table-hover sessionTable" id="configList">
-                <tbody>
-                    {
-                        searchEnable && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.key} className='tkn-table__row'>
-                            <td className="tkn-table__sr_no"> {index+1} </td>
-                            <td className="tkn-table__name"> {item.name} </td>
-                            <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.key }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(0) }} ></i></td>
-                            <td className="tkn-table__project"> {item.project} </td>
-                            <td className="tkn-table__project"> {item.release} </td>
-                            <td className="tkn-table__button"> <button className="btn" style={{ marginRight: '10%' }}> Edit </button> &nbsp; <button className="btn" onClick={() => deleteDevOpsConfig()} > Delete </button></td>
-                        </tr>)
-                    }
-                    {
-                        !searchEnable && configList.length > 0 && configList.map((item, index) => <tr key={item.key} className='tkn-table__row'>
-                            <td className="tkn-table__sr_no"> {index+1} </td>
-                            <td className="tkn-table__name"> {item.name} </td>
-                            <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.key }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(0) }} ></i></td>
-                            <td className="tkn-table__project"> {item.project} </td>
-                            <td className="tkn-table__project"> {item.release} </td>
-                            <td className="tkn-table__button"> <button className="btn" style={{ marginRight: '10%' }}> Edit </button> &nbsp; <button className="btn" onClick={() => deleteDevOpsConfig()} > Delete </button></td>
-                        </tr>)
-                    }
-                </tbody>
-            </table>
-            </ScrollBar>
-        </div>
+        </> : <div className="no_config_img"> <img src="static/imgs/empty-config-list.svg" alt="Empty List Image"/> </div> }
     </>);
-}
-
-const validate = (request, api, integration) => {
-    let check = {
-        error: false,
-        toDate: false,
-        fromDate: false,
-        LOB: false,
-        executionId: false,
-        scenarioIds: false,
-        source: false,
-        exectionMode: false,
-        executionEnv: false,
-        browserType: false,
-        integration: {
-            url: false,
-            username: false,
-            password: false,
-            qteststeps: false
-        },
-        gitInfo: {
-            gitConfiguration: false,
-            gitbranch: false,
-            folderPath: false,
-            gitVersion: false
-        },
-        batchInfo: {
-            testsuiteName: false,
-            testsuiteId: false,
-            versionNumber: false,
-            appType: false,
-            domainName: false,
-            projectName: false,
-            projectId: false,
-            releaseId: false,
-            cycleName: false,
-            cycleId: false
-        }
-    };
-    if (api === "Report") {
-        if (request["execution_data"].executionId.trim().length === 0) {
-            check.executionId = true;
-            check.error = true;
-        }
-        if (request["execution_data"].scenarioIds === undefined || request["execution_data"].scenarioIds.length === 0) {
-            check.scenarioIds = true;
-            check.error = true;
-        }
-    }
-    else if (api === "Execution Metrics") {
-        if (request["metrics_data"].fromDate === undefined || request["metrics_data"].fromDate.length === 0) {
-            check.fromDate = true;
-            check.error = true;
-        }
-        if (request["metrics_data"].toDate === undefined || request["metrics_data"].toDate.length === 0) {
-            check.toDate = true;
-            check.error = true;
-        }
-        if (request["metrics_data"].LOB === undefined || request["metrics_data"].LOB.length === 0) {
-            check.LOB = true;
-            check.error = true;
-        }
-    } else {
-        if (request["executionData"].source !== "api") {
-            check.source = true;
-            check.error = true;
-        }
-        if (request["executionData"].exectionMode !== "serial" && request["executionData"].exectionMode !== "parallel") {
-            check.exectionMode = true;
-            check.error = true;
-        }
-        if (request["executionData"].executionEnv !== "default" && request["executionData"].executionEnv !== "saucelabs") {
-            check.executionEnv = true;
-            check.error = true;
-        }
-        if (parseInt(request["executionData"].browserType) < 1 || parseInt(request["executionData"].browserType) > 9) {
-            check.browserType = true;
-            check.error = true;
-        }
-
-        if (integration !== -1 && integration !== "-1") {
-            const subrequest = request["executionData"].integration[integration];
-            const regex = /^https:\/\//g;
-            const regexUrl = /^http:\/\//g;
-            if (!(regex.test(subrequest['url']) || regexUrl.test(subrequest['url']))) {
-                check.integration.url = true;
-                check.error = true;
-            }
-            if (subrequest.username.length === 0) {
-                check.integration.username = true;
-                check.error = true;
-            }
-            if (subrequest.password.length === 0) {
-                check.integration.password = true;
-                check.error = true;
-            }
-        }
-        if (request["executionData"].gitInfo !== undefined) {
-            if (request["executionData"].gitInfo.gitConfiguration.length === 0) {
-                check.error = true;
-                check.gitInfo.gitConfiguration = true;
-            }
-            if (request["executionData"].gitInfo.gitbranch.length === 0) {
-                check.error = true;
-                check.gitInfo.gitbranch = true;
-            }
-            if (request["executionData"].gitInfo.folderPath.length === 0) {
-                check.error = true;
-                check.gitInfo.folderPath = true;
-            }
-            if (request["executionData"].gitInfo.gitVersion.length === 0) {
-                check.error = true;
-                check.gitInfo.gitVersion = true;
-            }
-        } else {
-            if (!request["executionData"].batchInfo) {
-                check.error = true;
-                check.batchInfo = true;
-            }
-        }
-    }
-    return check;
 }
 
 export default DevOpsList;

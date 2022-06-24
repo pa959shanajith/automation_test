@@ -311,3 +311,29 @@ export const importDataTable = async(arg) => {
         return {error:MSG.UTILITY.ERR_IMPORT}
     }
 }
+
+export const fetchReportMeta = async(data) => {
+    try{
+        // const res = await axios(url+'/getAllSuites_ICE', {
+        //     method: 'GET',
+        //     headers: {
+        //     'Content-type': 'application/json',
+        //     },
+        //     params: data,
+        //     credentials: 'include'
+        // });
+        // if(res.status === 401 || res.data === "Invalid Session"){
+        //     RedirectPage(history)
+        //     return {error:MSG.GENERIC.INVALID_SESSION};
+        // }
+        // if(res.status===200 && res.data !== "fail"){            
+        //     return res.data;
+        // }
+        // console.error(res.data)
+        // return {error:MSG.REPORT.ERR_FETCH_SUITE_LIST}
+        return [{"_id":"620f83513eb0b5d441b73a69","name":"New Project","releases":[{"createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","cycles":[{"_id":"620f83513eb0b5d441b73a67","createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"C1"},{"_id":"620f83513eb0b5d441b73a68","createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"C2"}],"modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"R1"}],"type":"5db0022cf87fdec084ae49b6"}];
+    }catch(err){
+        console.error(err)
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_LIST}
+    }
+}

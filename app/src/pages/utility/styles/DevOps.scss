@@ -7,7 +7,7 @@
         float: right;
         padding: 2px 25px;
         margin-right: 7px;
-        height: max-content;
+        height: 2.5rem;
         font-size: 17px;
         font-family: "LatoWebLight";
         background-color: #633693;
@@ -186,7 +186,6 @@
 }
 .tkn-table__row{
     display: flex;
-    text-align: center;
 }
 .tkn-table__row:nth-child(odd){
     background-color: #e8e6fe;
@@ -194,13 +193,15 @@
 .tkn-table__name{
     overflow: hidden;
     text-overflow: ellipsis;
-    text-align: center;
     flex: 0 0 14%;
     white-space: nowrap;
 }
+.tkn-table__head {
+    text-align: center !important;
+}
 .tkn-table__sr_no{
     flex: 0 0 5% !important;
-    text-align: center;
+    text-align: end;
     margin-right: 0.5px;
 }
 .tkn-table__key{
@@ -208,7 +209,7 @@
     text-overflow: ellipsis;
     display: flex;
     justify-content: center;
-    flex: 0 0 31%;
+    flex: 0 0 23%;
 }
 .tkn-table__icon {
     width: 4%;
@@ -216,11 +217,13 @@
 .tkn-table__project{
     overflow: hidden;
     text-overflow: ellipsis;
-    text-align: center;
     flex: 0 0 15%;
+    white-space: nowrap;
 }
 .tkn-table__button{
     width: 40%;
+    display: flex;
+    justify-content: center;
     button {
         visibility: visible;
     }
@@ -243,14 +246,108 @@
     height: 33px;
 }
 .devOps_module_list {
-    padding: 8px;
-    max-height: 400px;
+    padding: 1.5%;
+    border: 2px solid #633693;
+    border-radius: 0.625rem;
     width: 50%;
+    height: 60vh;
+    &_filter {
+        margin-bottom: 3%;
+        display: flex;
+        justify-content: space-between;
+    }
+    &_container {
+        height: 47vh;
+        max-height: 100%;
+    }
+}
+.devOps_pool_list {
+    width: 45%;
+    & > div {
+        margin: 7% 0;
+        display: flex;
+        align-items: center;
+    }
 }
 .devOps__scenario_list {
     padding-left: 2%;
 }
 .active-users-token {
-    max-height: 67vh;
+    max-height: 70vh;
     height: 100% !important;
+}
+.searchBoxInput {
+    position: relative;
+    float: right;
+    margin-right: 1%;
+}
+.action_icons{
+    cursor: pointer;
+    width: 5%;
+}
+.checkbox{
+    width: 5%;
+    height: 5%;
+}
+.rct-checkbox * {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+}
+.ms-Checkbox-checkmark {
+    width: 80% !important;
+    margin: 0 10% !important;
+}
+.devOps_config_name {
+    display: flex;
+    align-items: center;
+}
+.devOps_dropdown_label {
+    font-weight: 700;
+    margin-bottom: 0;
+    &_ice {
+        margin-right: 8%;
+    }
+    &_browser {
+        margin-right: 15%;
+    }
+    &_integration {
+        margin-right: 19%;
+    }
+    &_execution {
+        margin-right: 15.5%;
+        margin-bottom: 8px;
+    }
+    &_url {
+        margin-right: 2%;
+    }
+    &_key {
+        margin-right: 11%;
+    }
+    &_input {
+        width: 63%;
+    }
+    &_sync {
+        display: flex;
+        width: 37%;
+        justify-content: space-between;
+    }
+}
+.devOps_seperation {
+    height: 0.5%;
+    width: 86%;
+    background-color: #633693;
+    border-radius: 50%;
+}
+.select_project_img {
+    width: 80%;
+}
+.react-checkbox-tree label {
+    display: flex;
+}
+.no_config_img{
+    height: 78vh;
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 11%;
+    margin-top: -3%;
 }

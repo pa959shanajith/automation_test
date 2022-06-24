@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
-import ReportApi from '../components/ReportApi'
-import ExecMetricsApi from '../components/ExecMetricsApi'
-import ExecutionApi from '../components/ExecutionApi'
 import { ScrollBar, Messages as MSG, setMsg, ModalContainer } from '../../global';
 import { fetchReportMeta } from '../api';
 import { useSelector } from 'react-redux';
+import { SearchDropdown, TextField, Toggle } from '@avo/designcomponents';
 
 
 // import classes from "../styles/DevOps.scss";
@@ -18,55 +16,16 @@ const DevOpsConfig = props => {
     // const reportData = useSelector(state => state.viewReport.reportData);
     const reportData = {hasData: false};
     const [api, setApi] = useState("Execution");
-    const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
+    const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
     const [request, setRequest] = useState({});
     const [requestText, setRequestText] = useState("");
     const [configName, setConfigName] = useState("");
-    const [showConfirmPop, setShowConfirmPop] = useState(false);
     const [dataDict, setDict] = useState({});
-    const [resetFields, setResetFields] = useState(true);
-    const [selectValues, setSelectValues] = useState([
-        { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-        { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-        { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    ]);
-    const [error, setError] = useState({
-        error: false,
-        toDate: false,
-        fromDate: false,
-        LOB: false,
-        executionId: false,
-        scenarioIds: false,
-        source: false,
-        exectionMode: false,
-        executionEnv: false,
-        browserType: false,
-        integration: {
-            url: false,
-            username: false,
-            password: false,
-            qteststeps: false
-        },
-        gitInfo: {
-            gitConfiguration: false,
-            gitbranch: false,
-            folderPath: false,
-            gitVersion: false
-        },
-        batchInfo: {
-            testsuiteName: false,
-            testsuiteId: false,
-            versionNumber: false,
-            appType: false,
-            domainName: false,
-            projectName: false,
-            projectId: false,
-            releaseId: false,
-            cycleName: false,
-            cycleId: false
-        }
-    });
-    const [integration, setIntegration] = useState(-1);
+    const [integrationConfig, setIntegrationConfig] = useState(props.currentIntegration);
+    const [icepoollist, setIcepoollist] = useState([]);
+    const [browserlist, setBrowserlist] = useState([]);
+    const [dataUpdated, setDataUpdated] = useState(false);
+    const [integrationlist, setIntegrationlist] = useState([]);
     useEffect(()=> {
         (async()=>{
             const reportResponse = await fetchReportMeta({ readme: "projects" });
@@ -76,7 +35,7 @@ const DevOpsConfig = props => {
             }
             else {
                 const [projList, newDict] = prepareOptionLists(reportResponse);
-                let newSelectValues = [...selectValues];
+                let newSelectValues = [...integrationConfig.selectValues];
                 newSelectValues[0].list = projList;
 
                 if(reportData.hasData) {
@@ -104,139 +63,44 @@ const DevOpsConfig = props => {
                 }
                 
                 setDict(newDict);
-                setSelectValues(newSelectValues);
+                setIntegrationConfig({...integrationConfig, selectValues: newSelectValues});
             }
         })()
     }, []);
-    useEffect(() => {
-        setRequestText("");
-        setError({
-            error: false,
-            toDate: false,
-            fromDate: false,
-            LOB: false,
-            executionId: false,
-            scenarioIds: false,
-            source: false,
-            exectionMode: false,
-            executionEnv: false,
-            browserType: false,
-            integration: {
-                url: false,
-                username: false,
-                password: false,
-                qteststeps: false
-            },
-            gitInfo: {
-                gitConfiguration: false,
-                gitbranch: false,
-                folderPath: false,
-                gitVersion: false
-            },
-            batchInfo: {
-                testsuiteName: false,
-                testsuiteId: false,
-                versionNumber: false,
-                appType: false,
-                domainName: false,
-                projectName: false,
-                projectId: false,
-                releaseId: false,
-                cycleName: false,
-                cycleId: false
+    useEffect(()=> {
+        let isUpdated = false;
+        console.log(integrationConfig);
+        Object.keys(integrationConfig).some(element => {
+            if(typeof(integrationConfig[element]) === 'string' && integrationConfig[element] !== props.currentIntegration[element]) {
+                isUpdated = true;
+                return true;
+            } else if(typeof(integrationConfig[element]) === 'object' && element === 'scenarioList' && (integrationConfig[element].length !== props.currentIntegration[element].length || integrationConfig[element].some((scenario) => { return !props.currentIntegration[element].includes(scenario) }) )) {
+                isUpdated = true;
+                return true;
             }
         });
-    }, [api])
+        if (dataUpdated !== isUpdated) setDataUpdated(isUpdated);
+    }, [integrationConfig]);
 
-    const copyTokenFunc = () => {
-        console.log(document.getElementById('request-body'));
-        const data = requestText;
+    const copyKeyUrlFunc = (id) => {
+        const data = document.getElementById(id).value;
         if (!data) {
-            setCopyToolTip("Nothing to Copy!");
+            setApiKeyCopyToolTip("Nothing to Copy!");
             setTimeout(() => {
-                setCopyToolTip("Click to Copy");
+                setApiKeyCopyToolTip("Click to Copy");
             }, 1500);
             return;
         }
-        const x = document.getElementById('request-body');
+        const x = document.getElementById(id);
         x.select();
         document.execCommand('copy');
-        setCopyToolTip("Copied!");
+        setApiKeyCopyToolTip("Copied!");
         setTimeout(() => {
-            setCopyToolTip("Click to Copy");
+            setApiKeyCopyToolTip("Click to Copy");
         }, 1500);
     }
-
-    const copyConfigKey = (index) => {
-        const x = document.getElementsByClassName('tkn_table_key_value')[index];
-        // x.select();
-        // document.execCommand('copy');
-        setCopyToolTip("Copied!");
-        setTimeout(() => {
-            setCopyToolTip("Click to Copy");
-        }, 1500);
-    }
-
-    const handleSubmit = () => {
-        try {
-            if (api !== "Execution" && api !== "Report" && api !== "Execution Metrics") {
-                setMsg(MSG.UTILITY.ERR_SEL_API);
-            }
-            let obj = validate(request, api, integration);
-            setError(obj);
-            if (obj.error === true)  return;
-            setMsg(MSG.UTILITY.SUCC_REQ_BODY_GEN);
-            setRequestText(JSON.stringify(request, undefined, 4));
-        } catch (e) {
-            setMsg(MSG.UTILITY.ERR_GENERATE_RB);
-        }
-    }
-    const deleteDevOpsConfig = () => {
-        setShowConfirmPop({'title': 'Delete DevOps Integration Configuration', 'content': <p>Are you sure, you want to delete <b>Name 1</b> Integration Configuration?</p>, 'onClick': ()=>console.log('Delete config action clicked')});
-    }
-    // const handleSelect = fieldIndex => (selectedKey) => {
-    //     let newSelectValues = [...selectValues];
-    //     if (fieldIndex === 0) {
-    //         newSelectValues[0]['selected'] = selectedKey.key;
-    //         newSelectValues[0]['selectedName'] = selectedKey.text;
-    //         newSelectValues[1]['disabled'] = false;
-    //         newSelectValues[1]['list'] = dataDict[selectedKey.key].relList;
-    //         newSelectValues[1]['selected'] = ""; 
-    //         newSelectValues[2]['selected'] = ""; newSelectValues[2]['list'] = []; newSelectValues[2]['disabled'] = true;
-    //         newSelectValues[3]['selected'] = ""; newSelectValues[3]['list'] = []; newSelectValues[3]['disabled'] = true;
-    //     }
-    //     else if (fieldIndex === 1) {
-    //         newSelectValues[1]['selected'] = selectedKey.key;
-    //         newSelectValues[1]['selectedName'] = selectedKey.text;
-    //         newSelectValues[2]['disabled'] = false;
-    //         newSelectValues[2]['list'] = dataDict[newSelectValues[0]['selected']].relDict[selectedKey.key].cycList;
-    //         newSelectValues[2]['selected'] = ""; 
-    //         newSelectValues[3]['selected'] = ""; newSelectValues[3]['list'] = []; newSelectValues[3]['disabled'] = true;
-    //     }
-    //     else if (fieldIndex === 2) {
-    //         newSelectValues[2]['selected'] = selectedKey.key;
-    //         newSelectValues[2]['selectedName'] = selectedKey.text;
-    //         newSelectValues[3]['disabled'] = false;
-    //         newSelectValues[3]['selected'] = "";
-
-    //         const projId = newSelectValues[0]['selected'];
-    //         const relName = newSelectValues[1]['selected'];
-    //         const cycId = newSelectValues[2]['selected'];
-
-    //         fetchFunctionalReports(projId, relName, cycId);
-    //     }
-    //     else if (fieldIndex === 3) {
-    //         newSelectValues[3]['selected'] = selectedKey.key;
-    //         newSelectValues[3]['selectedName'] = selectedKey.text;
-    //         fetchModuleInfo(selectedKey.key, selectedKey.type);
-    //     }
-    //     setBarChartProps({ legends: [{text: "", color: ""}], values: {} });
-    //     setSelectedExecution({ id: "", name: "" });
-    //     setScenarioList([]);
-    //     setSelectValues(newSelectValues);
-    // }
     const handleNewSelect = fieldIndex => (selectedKey) => {
-        let newSelectValues = [...selectValues];
+        let newSelectValues = [...integrationConfig.selectValues];
         if (fieldIndex === 0) {
             newSelectValues[0]['selected'] = selectedKey.key;
             newSelectValues[0]['selectedName'] = selectedKey.text;
@@ -259,177 +123,111 @@ const DevOpsConfig = props => {
             const projId = newSelectValues[0]['selected'];
             const relName = newSelectValues[1]['selected'];
             const cycId = newSelectValues[2]['selected'];
-
-            // fetchFunctionalReports(projId, relName, cycId);
         }
-        // setBarChartProps({ legends: [{text: "", color: ""}], values: {} });
-        // setSelectedExecution({ id: "", name: "" });
-        // setScenarioList([]);
-        setSelectValues(newSelectValues);
+        setIntegrationConfig({...integrationConfig, selectValues: newSelectValues});
     }
 
     return (<>
-        <div>
-            <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Configuration Name : </span>
-            <span className="api-ut__inputLabel">
-                <input type="text" value={configName} onChange={(event) => setConfigName(event.target.value)} data-test="req-body-test" className="req-body" autoComplete="off" id="request-body" name="request-body" style={{width:"25%"}} placeholder='Enter Configuration Name' />
+        <div className="page-taskName" >
+            <span data-test="page-title-test" className="taskname">
+                { integrationConfig.key === '' ? 'Create New' : 'Update'} Configuration
             </span>
         </div>
         <div className="api-ut__btnGroup">
-            {/* <button data-test="submit-button-test" onClick={handleSubmitReset} >Reset</button> */}
-            {/* <div className="sessionHeading-ip" data-toggle="collapse" data-target="#activeUsersToken-x">
-                <h4 onClick={()=>{setShowList(!showList);}}>ICE Provisions</h4>
-                <div className="search-ip">
-                    <span className="searchIcon-provision search-icon-ip">
-                        <img src={"static/imgs/ic-search-icon.png"} className="search-img-ip" alt="search icon"/>
-                    </span>
-                    <input value={searchTasks} onChange={(event)=>{ setSearchTasks(event.target.value);searchIceList(event.target.value)}} autoComplete="off" type="text" id="searchTasks" className="searchInput-list-ip searchInput-cust-ip" />
-                </div>
-            </div> */}
-            {/* <div className="sessionHeading-ip" data-toggle="collapse" data-target="#activeUsersToken-x">
-                <h4 onClick={()=>{}}>Current DevOps Integration Configurations</h4>
-                <div className="search-ip">
-                    <span className="searchIcon-provision search-icon-ip">
-                        <img src={"static/imgs/ic-search-icon.png"} className="search-img-ip" alt="search icon"/>
-                    </span>
-                    <input value={''} onChange={(event)=>{}} autoComplete="off" type="text" id="searchTasks" className="searchInput-list-ip searchInput-cust-ip" />
-                </div>
-            </div> */}
-            <button data-test="submit-button-test" onClick={() => props.setCurrentIntegration(false)} >Save</button>
-            <button data-test="submit-button-test" onClick={() => props.setCurrentIntegration(false)} >Cancel</button>
+            <button data-test="submit-button-test" onClick={() => props.showMessageBar( `Configuration ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d Successfully` , 'SUCCESS')} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
+            <button data-test="submit-button-test" onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : 'Back'}</button>
+            <div className="devOps_config_name">
+                <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Configuration Name : </span>
+                &nbsp;&nbsp;
+                <span className="api-ut__inputLabel">
+                    <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Configuration Name" />
+                </span>
+            </div>
         </div>
         <div>
-            <ReleaseCycleSelection selectValues={selectValues} handleSelect={handleNewSelect} />
+        {
+            integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />
+        }
         </div>
         {
-            selectValues[2].selected && <div style={{ display: 'flex', justifyContent:'space-between' }}>
-                <DevOpsModuleList />
-                <div>Hello</div>
+            <div style={{ display: 'flex', justifyContent:'space-between' }}>
+                <div className="devOps_module_list">
+                    <DevOpsModuleList integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} />
+                </div>
+                <div className="devOps_pool_list">
+                    <div style={{ marginTop: '0' }}>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Agent / Avo Grid : </label>
+                        <SearchDropdown
+                            calloutMaxHeight="30vh"
+                            noItemsText={'Avo Agent / Avo Grid is empty'}
+                            onChange={(selectedIce) => setIntegrationConfig({...integrationConfig, avoAgentGrid: selectedIce})}
+                            options={icepoollist}
+                            placeholder="Select Avo Agent or Avo Grid"
+                            selectedKey={integrationConfig.avoAgentGrid}
+                            width='54%'
+                        />
+                    </div>
+                    <div>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Select Browser : </label>
+                        <SearchDropdown
+                            calloutMaxHeight="30vh"
+                            noItemsText={'No Browser available'}
+                            onChange={(selectedBrowser) => setIntegrationConfig({...integrationConfig, browser: selectedBrowser})}
+                            options={browserlist}
+                            placeholder="Select Browser"
+                            selectedKey={integrationConfig.browser}
+                            width='54%'
+                        />
+                    </div>
+                    <div>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_integration">Integration : </label>
+                        <SearchDropdown
+                            calloutMaxHeight="30vh"
+                            noItemsText={'No Integration available'}
+                            onChange={(selectedIntegration) => setIntegrationConfig({...integrationConfig, integration: selectedIntegration})}
+                            options={integrationlist}
+                            placeholder="Select Integration"
+                            selectedKey={integrationConfig.integration}
+                            width='54%'
+                        />
+                    </div>
+                    <div>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
+                        <div className="devOps_dropdown_label_sync">
+                            <label>Asynchronous </label>
+                            <Toggle checked={integrationConfig.executionType == 'synchronous'} onChange={() => setIntegrationConfig({...integrationConfig, executionType: (integrationConfig.executionType === 'synchronous') ? 'asynchronous' : 'synchronous' })} label="" inlineLabel={true} />
+                            <label>Synchronous </label>
+                        </div>
+                    </div>
+                    <div className='devOps_seperation'>
+                    </div>
+                    <div>
+                        <span className="devOps_dropdown_label devOps_dropdown_label_url">DevOps Integration API url : </span>
+                        <span className="devOps_dropdown_label_input"><input type="text" value={props.url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/executeAutomation' />
+                            <label>
+                                <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return apiKeyCopyToolTip }, 0]} />
+                                <div style={{fontSize:"24px"}}>
+                                    <i className="fa fa-files-o icon" style={{fontSize:"24px"}} data-for="copy" data-tip={apiKeyCopyToolTip} onClick={() => { copyKeyUrlFunc('api-url') }} ></i>
+                                </div>
+                            </label>
+                        </span>
+                    </div>
+                    <div>
+                        <span className="devOps_dropdown_label devOps_dropdown_label_key">Configuration Key : </span>
+                        <span className="devOps_dropdown_label_input"><input type="text" value={integrationConfig.key} id='devops-key' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='Configuration Key' />
+                            <label>
+                                <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return apiKeyCopyToolTip }, 0]} />
+                                <div style={{fontSize:"24px"}}>
+                                    <i className="fa fa-files-o icon" style={{fontSize:"24px"}} data-for="copy" data-tip={apiKeyCopyToolTip} onClick={() => { copyKeyUrlFunc('devops-key') }} ></i>
+                                </div>
+                            </label>
+                        </span>
+                    </div>
+                </div>
             </div>
         }
     </>);
 }
 
-const validate = (request, api, integration) => {
-    let check = {
-        error: false,
-        toDate: false,
-        fromDate: false,
-        LOB: false,
-        executionId: false,
-        scenarioIds: false,
-        source: false,
-        exectionMode: false,
-        executionEnv: false,
-        browserType: false,
-        integration: {
-            url: false,
-            username: false,
-            password: false,
-            qteststeps: false
-        },
-        gitInfo: {
-            gitConfiguration: false,
-            gitbranch: false,
-            folderPath: false,
-            gitVersion: false
-        },
-        batchInfo: {
-            testsuiteName: false,
-            testsuiteId: false,
-            versionNumber: false,
-            appType: false,
-            domainName: false,
-            projectName: false,
-            projectId: false,
-            releaseId: false,
-            cycleName: false,
-            cycleId: false
-        }
-    };
-    if (api === "Report") {
-        if (request["execution_data"].executionId.trim().length === 0) {
-            check.executionId = true;
-            check.error = true;
-        }
-        if (request["execution_data"].scenarioIds === undefined || request["execution_data"].scenarioIds.length === 0) {
-            check.scenarioIds = true;
-            check.error = true;
-        }
-    }
-    else if (api === "Execution Metrics") {
-        if (request["metrics_data"].fromDate === undefined || request["metrics_data"].fromDate.length === 0) {
-            check.fromDate = true;
-            check.error = true;
-        }
-        if (request["metrics_data"].toDate === undefined || request["metrics_data"].toDate.length === 0) {
-            check.toDate = true;
-            check.error = true;
-        }
-        if (request["metrics_data"].LOB === undefined || request["metrics_data"].LOB.length === 0) {
-            check.LOB = true;
-            check.error = true;
-        }
-    } else {
-        if (request["executionData"].source !== "api") {
-            check.source = true;
-            check.error = true;
-        }
-        if (request["executionData"].exectionMode !== "serial" && request["executionData"].exectionMode !== "parallel") {
-            check.exectionMode = true;
-            check.error = true;
-        }
-        if (request["executionData"].executionEnv !== "default" && request["executionData"].executionEnv !== "saucelabs") {
-            check.executionEnv = true;
-            check.error = true;
-        }
-        if (parseInt(request["executionData"].browserType) < 1 || parseInt(request["executionData"].browserType) > 9) {
-            check.browserType = true;
-            check.error = true;
-        }
-
-        if (integration !== -1 && integration !== "-1") {
-            const subrequest = request["executionData"].integration[integration];
-            const regex = /^https:\/\//g;
-            const regexUrl = /^http:\/\//g;
-            if (!(regex.test(subrequest['url']) || regexUrl.test(subrequest['url']))) {
-                check.integration.url = true;
-                check.error = true;
-            }
-            if (subrequest.username.length === 0) {
-                check.integration.username = true;
-                check.error = true;
-            }
-            if (subrequest.password.length === 0) {
-                check.integration.password = true;
-                check.error = true;
-            }
-        }
-        if (request["executionData"].gitInfo !== undefined) {
-            if (request["executionData"].gitInfo.gitConfiguration.length === 0) {
-                check.error = true;
-                check.gitInfo.gitConfiguration = true;
-            }
-            if (request["executionData"].gitInfo.gitbranch.length === 0) {
-                check.error = true;
-                check.gitInfo.gitbranch = true;
-            }
-            if (request["executionData"].gitInfo.folderPath.length === 0) {
-                check.error = true;
-                check.gitInfo.folderPath = true;
-            }
-            if (request["executionData"].gitInfo.gitVersion.length === 0) {
-                check.error = true;
-                check.gitInfo.gitVersion = true;
-            }
-        } else {
-            if (!request["executionData"].batchInfo) {
-                check.error = true;
-                check.batchInfo = true;
-            }
-        }
-    }
-    return check;
-}
 
 export default DevOpsConfig;
