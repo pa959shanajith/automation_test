@@ -1,0 +1,96 @@
+var create_ice = require('../controllers/create_ice');
+var logger = require('../../logger');
+var utils = require('../lib/utils');
+
+exports.fetchProjects =  async(req, res) => {
+	const fnName = "fetchProjects";
+	try {
+		logger.info("Inside UI service: " + fnName);
+		var reqData = {
+			"userid": req.session.userid,
+			"allflag": true
+		};
+		const data = await create_ice.getProjectIDs(reqData);
+		res.send(data);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+
+const getModule = async (d) => {
+	const inputs = {
+		"tab":d.tab,
+		"projectid":d.projectid || null,
+		"moduleid":d.moduleid,
+		"cycleid":d.cycId,
+		"name":"getModules"
+	}
+	return utils.fetchData(inputs, "devops/fetchModules", "fetchModules");
+};
+
+exports.fetchModules = async (req, res) => {
+	const fnName = "fetchModules";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const data = await getModule(req.body);
+		res.send(data);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.storeConfigureKey = async(req,res) => {
+	const fnName = "storeConfigureKey";
+	try {
+		console.log('something');
+		logger.info("Inside UI Service: " + fnName);
+		// const userDetails = req.body.userDetails;
+		// const username = req.session.username;
+		// const uId = req.session.userid;
+		// const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		const inputs = {
+			"batchInfo": req.body.batchInfo,
+			"browserType": req.body.browserType,
+			"exectionMode": req.body.exectionMode,
+			"executionEnv": req.body.executionEnv,
+			"integration": req.body.integration,
+			"poolid": req.body.poolid,
+			"scenarioFlag": req.body.scenarioFlag,
+			"source": req.body.source,
+			"targetUser": req.body.targetUser,
+			"type": req.body.type,
+			"query": "saveConfigureKey"
+		};
+		const status = await utils.fetchData(inputs, "devops/configureKey", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else res.send(status);
+	} catch (exception) {
+		logger.error(exception.message);
+		return res.send("fail");
+	}
+}
+
+exports.storeConfigureKey = async(req,res) => {
+	const fnName = "avo_ExecAutomation";
+	try {
+		console.log('New Thing!!');
+		logger.info("Inside UI Service: " + fnName);
+		// const userDetails = req.body.userDetails;
+		// const username = req.session.username;
+		// const uId = req.session.userid;
+		// const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		const inputs = {
+			"key": req.body.key,
+			"query": "fetchKeyDetails"
+		};
+		const status = await utils.fetchData(inputs, "devops/configureKey", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else res.send(status);
+	} catch (exception) {
+		logger.error(exception.message);
+		return res.send("fail");
+	}
+}
+
