@@ -30,6 +30,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [showScheduledTasks, setshowScheduledTasks] = useState(true);
     const [scheduledRecurringData, setScheduledRecurringData] = useState([]);	
     const [scheduledRecurringDataOriginal, setScheduledRecurringDataOriginal] =	useState([]);
+    const [statusChange, setStatusChange] = useState("Select Status");
 
     useEffect(()=>{
         getScheduledDetails()
@@ -103,10 +104,14 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const handleOnButtonClickRecurring = (event) => {
         setshowRecurringSchedules(true)
         setshowScheduledTasks(false)
+        selectStatus("Show All")
+        setStatusChange("Select Status")
     }
     const handleOnButtonClickScheduled = (event) => {
         setshowRecurringSchedules(false)
         setshowScheduledTasks(true)
+        selectStatus("Show All")
+        setStatusChange("Select Status")
     }
 
     const onChangePage = (newPageOfItems) => {
@@ -342,19 +347,19 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                 {/* //lower scheduled table Section */}
                 <div id="scheduleSuitesBottomSection">
                     <div id="page-taskName">
-						<span>Scheduled</span>
-                        <select defaultValue={"Select Status"} onChange={(event)=>{selectStatus(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
-                            <option disabled={true}>Select Status</option>
-                            <option>Completed</option>
+                        <span>{showScheduledTasks ? "Scheduled Tasks" : "Recurring Schedules"}</span>
+                        <select value={statusChange} onChange={(event)=>{selectStatus(event.target.value); setStatusChange(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
+                            <option disabled={true} value={"Select Status"}>Select Status</option>
+                            <option value={"Completed"}>Completed</option>
                             <option value={"Inprogress"} >In Progress</option>
-                            <option>Scheduled</option>
-                            <option>Recurring</option>
+                            <option value={"Scheduled"}>Scheduled</option>
+                            <option value={"Recurring"}>Recurring</option>
                             <option value={"Terminate"}>Terminated</option>
-                            <option>Cancelled</option>
-                            <option>Missed</option>
-                            <option>Failed</option>
-                            <option>Skipped</option>
-                            <option>Show All</option>
+                            <option value={"Cancelled"}>Cancelled</option>
+                            <option value={"Missed"}>Missed</option>
+                            <option value={"Failed"}>Failed</option>
+                            <option value={"Skipped"}>Skipped</option>
+                            <option value={"Show All"}>Show All</option>
                         </select>
                         <div id="s__btns" onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
                         <div id="s__btns">
