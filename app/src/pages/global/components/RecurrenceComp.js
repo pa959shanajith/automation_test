@@ -173,6 +173,11 @@ const RecurrenceComp = (props) => {
     const handleMonthInputChange = (event) => {
         setMonthlyRecurrenceMonthValue(event.target.value)
 
+        if (parseInt(monthlyRecurrenceDayValue) > 30 || parseInt(monthlyRecurrenceDayValue) < 1) {
+            displayError("Invalid input (should be between 1-30)");
+            return;
+        }
+        
         if (parseInt(event.target.value) > 12 || parseInt(event.target.value) < 1) {
             displayError("Invalid input (should be between 1-12)");
             return;
