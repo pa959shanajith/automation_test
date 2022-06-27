@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import ClickAwayListener from "react-click-away-listener";
+import {Messages as MSG, VARIANT, setMsg} from '../../global'
 import "../styles/RecurrenceComp.scss";
 
 const RecurrenceComp = (props) => {
@@ -46,6 +47,13 @@ const RecurrenceComp = (props) => {
         setRecurringStringOnHover("One Time");
     };
 
+    // Display error message on invalid input
+    const displayError = (error) =>{
+        setMsg(MSG.CUSTOM(error, VARIANT.ERROR));
+        setRecurringValue("")
+        setRecurringStringOnHover("");
+    }
+
     // Get the recurring type Daily, Weekly, Monthly
     const getRecurrenceType = (event) => {
         setRecurrenceType(event.target.value);
@@ -68,6 +76,11 @@ const RecurrenceComp = (props) => {
     // Handle input change for daily recurrence
     const handleInputChange = (event) => {
         setDailyRecurrenceValue(event.target.value);
+
+        if (parseInt(event.target.value) > 30 || parseInt(event.target.value) < 1) {
+            displayError("Invalid input (should be between 1-30)");
+            return;
+        }
 
         if (dailyRecurrenceType === "days") {
             if (event.target.value == 1) {
@@ -150,10 +163,25 @@ const RecurrenceComp = (props) => {
     const handleDayInputChange = (event) => {
         setMonthlyRecurrenceDayValue(event.target.value)
         setMonthlyRecurrenceMonthInputDisable(false);
+
+        if (parseInt(event.target.value) > 30 || parseInt(event.target.value) < 1) {
+            displayError("Invalid input (should be between 1-30)");
+            return;
+        }
     }
 
     const handleMonthInputChange = (event) => {
         setMonthlyRecurrenceMonthValue(event.target.value)
+
+        if (parseInt(monthlyRecurrenceDayValue) > 30 || parseInt(monthlyRecurrenceDayValue) < 1) {
+            displayError("Invalid input (should be between 1-30)");
+            return;
+        }
+        
+        if (parseInt(event.target.value) > 12 || parseInt(event.target.value) < 1) {
+            displayError("Invalid input (should be between 1-12)");
+            return;
+        }
 
         if (monthlyRecurrenceType === "days") {
             if (monthlyRecurrenceDayValue != "") {		
@@ -180,6 +208,11 @@ const RecurrenceComp = (props) => {
 
     const handleMonthInputChange_1 = (event) => {
         setMonthlyRecurrenceMonthValue_1(event.target.value)
+
+        if (parseInt(event.target.value) > 12 || parseInt(event.target.value) < 1) {
+            displayError("Invalid input (should be between 1-12)");
+            return;
+        }
 
         if (monthlyRecurrenceType === "weeks") {
             if (event.target.value != "") {
@@ -218,7 +251,7 @@ const RecurrenceComp = (props) => {
     return (
         <ClickAwayListener className={"recurrence-time-container " +(classTimer ? " " + classTimer : "")} onClickAway={() => {setShowRecurrence(false); setRecurrenceType(""); setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setWeeklyRecurrenceWeek(""); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday"); setDailyRecurrenceInputDisable(true); setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true);}} as="span" >
             <div className="rdt rdtOpen">
-                <input type="text" className={classname} placeholder={placeholder} readOnly={readonly} disabled={disabled} title={title} value={recur} />
+                <input type="text" className={classname} placeholder={placeholder} readOnly={readonly} disabled={disabled} title={title ? title : "Select Frequency"} value={recur} />
                 {showRecurrence && ( 
                     <div className="main-container rdtPicker">
                         <strong>Recurrence Pattern:</strong>
@@ -253,7 +286,7 @@ const RecurrenceComp = (props) => {
                                                 <span>
                                                     &nbsp;&nbsp;&nbsp;&nbsp;Every
                                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <input className="recur-textbox" type="text" size="1" disabled = {(dailyRecurrenceInputDisable)? "disabled" : ""} value={dailyRecurrenceValue} onInput={handleInputChange} />
+                                                    <input className={"recur-textbox " + ((parseInt(dailyRecurrenceValue) > 30 || parseInt(dailyRecurrenceValue) < 1) ? "s__err-Border" : "")} type="text" size="1" disabled = {(dailyRecurrenceInputDisable)? "disabled" : ""} value={dailyRecurrenceValue} onInput={handleInputChange} />
                                                     &nbsp;&nbsp;&nbsp;&nbsp;day(s). 
                                                 </span>
                                             </lable>
@@ -325,10 +358,10 @@ const RecurrenceComp = (props) => {
                                                 <span>
                                                     &nbsp;&nbsp;&nbsp;&nbsp;Day
                                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <input className="recur-textbox" type="text" size="1" disabled = {(monthlyRecurrenceDayInputDisable)? "disabled" : ""} value={monthlyRecurrenceDayValue} onInput={handleDayInputChange} />
+                                                    <input className={"recur-textbox " + ((parseInt(monthlyRecurrenceDayValue) > 30 || parseInt(monthlyRecurrenceDayValue) < 1) ? "s__err-Border" : "")} type="text" size="1" disabled = {(monthlyRecurrenceDayInputDisable)? "disabled" : ""} value={monthlyRecurrenceDayValue} onInput={handleDayInputChange} />
                                                     &nbsp;&nbsp;&nbsp;&nbsp;of every
                                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <input className="recur-textbox" type="text" size="1" disabled = {(monthlyRecurrenceMonthInputDisable)? "disabled" : ""} value={monthlyRecurrenceMonthValue} onInput={handleMonthInputChange} />
+                                                    <input className={"recur-textbox " + ((parseInt(monthlyRecurrenceMonthValue) > 12 || parseInt(monthlyRecurrenceMonthValue) < 1) ? "s__err-Border" : "")} type="text" size="1" disabled = {(monthlyRecurrenceMonthInputDisable)? "disabled" : ""} value={monthlyRecurrenceMonthValue} onInput={handleMonthInputChange} />
                                                     &nbsp;&nbsp;&nbsp;&nbsp;month(s). 
                                                 </span>
                                             </lable>
@@ -376,7 +409,7 @@ const RecurrenceComp = (props) => {
                                                     </select>
                                                     &nbsp;&nbsp;&nbsp;&nbsp;of every
                                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                                    <input className="recur-textbox" type="text" size="1" disabled = {(monthlyRecurrenceMonthInputDisable_1)? "disabled" : ""} value={monthlyRecurrenceMonthValue_1} onInput={handleMonthInputChange_1} />
+                                                    <input className={"recur-textbox " + ((parseInt(monthlyRecurrenceMonthValue_1) > 12 || parseInt(monthlyRecurrenceMonthValue_1) < 1) ? "s__err-Border" : "")} type="text" size="1" disabled = {(monthlyRecurrenceMonthInputDisable_1)? "disabled" : ""} value={monthlyRecurrenceMonthValue_1} onInput={handleMonthInputChange_1} />
                                                     &nbsp;&nbsp;&nbsp;&nbsp;month(s).
                                                 </span>
                                             </lable>
