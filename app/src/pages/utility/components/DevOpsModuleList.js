@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { ScrollBar, Messages as MSG, setMsg, ModalContainer } from '../../global';
+import React, { useState, useEffect } from 'react';
+import { ScrollBar, Messages as MSG, setMsg, VARIANT } from '../../global';
 import { CheckBox, SearchDropdown, Tab } from '@avo/designcomponents';
+import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
 
 import CheckboxTree from 'react-checkbox-tree';
@@ -267,6 +268,16 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig }) => {
         }
         setModuleState({...moduleState, checked: checked});
     }
+    useEffect(()=>{
+        (async() => {
+            const moduleList = await fetchModules();
+            if(moduleList.error) {
+                setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
+            }else {
+                console.log(moduleList);
+            }
+        })()
+    },[]);
     return (
         // <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
         (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>

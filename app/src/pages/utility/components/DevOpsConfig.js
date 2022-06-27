@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
-import { ScrollBar, Messages as MSG, setMsg, ModalContainer } from '../../global';
-import { fetchReportMeta } from '../api';
+import { ScrollBar, Messages as MSG, setMsg, VARIANT } from '../../global';
+import { fetchProjects, getPools } from '../api';
 import { useSelector } from 'react-redux';
 import { SearchDropdown, TextField, Toggle } from '@avo/designcomponents';
 
@@ -28,7 +28,7 @@ const DevOpsConfig = props => {
     const [integrationlist, setIntegrationlist] = useState([]);
     useEffect(()=> {
         (async()=>{
-            const reportResponse = await fetchReportMeta({ readme: "projects" });
+            const reportResponse = await fetchProjects({ readme: "projects" });
             if (reportResponse.error) {
                 console.error(reportResponse.error);
                 setMsg(MSG.REPORT.ERR_FETCH_PROJECT);
@@ -64,6 +64,15 @@ const DevOpsConfig = props => {
                 
                 setDict(newDict);
                 setIntegrationConfig({...integrationConfig, selectValues: newSelectValues});
+            }
+        })()
+        (async() => {
+            const poolList = await getPools();
+            console.log(poolList);
+            if(poolList.error) {
+                setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
+            }else {
+                // setIcepoollist(poolList);
             }
         })()
     }, []);
