@@ -190,7 +190,7 @@ const Content = ({sheetRef,fileUpload,importType,setImportType,setError,importFo
     return (
         <div className='mp__import-popup'>
             <div>
-            <label>Export As: </label>
+            <label>Import As: </label>
                 <select defaultValue={"def-val"} data-test="addObjectTypeSelect" className="imp-inp" onChange={handleType} ref={importFormat}>
                     <option disabled value="def-val">Select Import Format</option>
                     { importTypes.map( (e) =>
