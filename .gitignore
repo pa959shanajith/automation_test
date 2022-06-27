@@ -8,4 +8,3 @@ assets/wkhtmltox
 server/config/.tokens
 public/*
 output/*
-node_modules
