@@ -186,7 +186,7 @@ const TableActionButtons = props => {
             { showPS && <DtPasteStepDialog setShow={setShowPS} upperLimit={copiedCells.type === "cols" ? props.headers.length : props.data.length+1 } pasteData={pasteData} pasteType={copiedCells.type} /> }
             {
                 tableActionBtnGroup.map((btn, i) => 
-                    <button data-test="dt__tblActionBtns" key={i} className="dt__tblBtn" onClick={()=>btn.onClick()}>
+                    <button data-test="dt__tblActionBtns" key={i} className={"dt__tblBtn "+(props.dnd && btn.alt && btn.alt==="Drag Row"?"selected-btn":"")} onClick={()=>btn.onClick()}>
                         { btn.img
                             ? <img className="dt__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title} />
                             : <i className={`dt__faBtn ${btn.class}`} title={btn.title} /> }

@@ -68,7 +68,7 @@ const CreateScreen = props => {
             <div className="dt__btngroup">
             <TableActionButtons 
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
-                checkList={checkList} headerCounter={headerCounter} setDnd={setDnd}
+                checkList={checkList} headerCounter={headerCounter} dnd={dnd} setDnd={setDnd}
                 setHeaderCounter={setHeaderCounter} setCheckList={setCheckList} setFocus={setFocus}
             />
             <CreateScreenActionButtons 
@@ -129,7 +129,7 @@ const EditScreen = props => {
             <div className="dt__btngroup">
             <TableActionButtons
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
-                checkList={checkList} headerCounter={headerCounter} setDnd={setDnd}
+                checkList={checkList} headerCounter={headerCounter} dnd={dnd} setDnd={setDnd}
                 setHeaderCounter={setHeaderCounter} setCheckList={setCheckList} setFocus={setFocus}
             />
             <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} />

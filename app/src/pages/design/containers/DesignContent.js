@@ -552,7 +552,7 @@ const DesignContent = props => {
 
         // if (draggable) setDraggable(false);
         // else
-        setDraggable(true);
+        setDraggable(!draggable);
     }
 
     const copySteps = () => {
@@ -840,7 +840,7 @@ const DesignContent = props => {
                 <div className="d__table_ac_btn_grp">
                 {
                     tableActionBtnGroup.map((btn, i) => 
-                        <button data-test="d__tblActionBtns" key={i} className="d__tblBtn" onClick={()=>btn.onClick()}><img className="d__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title}/> </button>
+                        <button data-test="d__tblActionBtns" key={i} className={"d__tblBtn "+(draggable && btn.alt && btn.alt==="Drag Steps"?"selected-btn":"")} onClick={()=>btn.onClick()}><img className="d__tblBtn_ic" src={btn.img} alt={btn.alt} title={btn.title}/> </button>
                     )
                 }
                 </div>
