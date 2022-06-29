@@ -154,7 +154,7 @@
     justify-content: space-between;
 }
 .s__Table_date{
-    width: 18%;
+    width: 16%;
     cursor: pointer;
 }
 .s__Table_host{
@@ -167,10 +167,13 @@
     width: 20%;
 }
 .s__Table_appType{
-    width: 10%; 
+    width: 14%;
+}
+.s__Table_scheduleType{
+    width: 14%; 
 }
 .s__Table_status{
-    width: 14%
+    width: 12%
 }
 .s__Table_border{
     border-right: 1px solid $whiteColor

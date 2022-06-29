@@ -1,7 +1,7 @@
 import React, {useState, useEffect } from 'react';
 import {ScreenOverlay, ScrollBar, IntegrationDropDown, Messages as MSG, VARIANT, setMsg} from '../../global' 
 import { useSelector } from 'react-redux';
-import {getScheduledDetails_ICE, testSuitesScheduler_ICE, cancelScheduledJob_ICE} from '../api';
+import {getScheduledDetails_ICE, testSuitesScheduler_ICE, cancelScheduledJob_ICE, testSuitesSchedulerRecurring_ICE} from '../api';
 import "../styles/ScheduleContent.scss";
 import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
@@ -26,6 +26,11 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [moduleScheduledate,setModuleScheduledate] = useState({})
     const [sort,setSort] = useState(true)
+    const [showRecurringSchedules, setshowRecurringSchedules] = useState(false);
+    const [showScheduledTasks, setshowScheduledTasks] = useState(true);
+    const [scheduledRecurringData, setScheduledRecurringData] = useState([]);	
+    const [scheduledRecurringDataOriginal, setScheduledRecurringDataOriginal] =	useState([]);
+    const [statusChange, setStatusChange] = useState("Select Status");
 
     useEffect(()=>{
         getScheduledDetails()
@@ -44,6 +49,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         + ("0" + dt.getDate()).slice(-2) + " " + ("0" + dt.getHours()).slice(-2) + ":" + ("0" + dt.getMinutes()).slice(-2);
                 }
                 var scheduledDataParsed = [];
+                var scheduledRecurringDataParsed = [];
                 var eachScenarioDetails;
                 for(var i =result.length-1 ; i>=0  ; i-- ) {
                     eachScenarioDetails = result[i].scenariodetails[0].length>1 ? result[i].scenariodetails[0] : result[i].scenariodetails;
@@ -51,6 +57,9 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         let newScheduledScenario = {};
                         let columnValue = eachScenarioDetails[j][0] ? eachScenarioDetails[j][0] : eachScenarioDetails[j];
                         newScheduledScenario["target"] = result[i].target;
+                        newScheduledScenario["scheduletype"] = result[i].scheduletype ? result[i].scheduletype : "One Time";
+                        newScheduledScenario["recurringpattern"] = result[i].recurringpattern ? result[i].recurringpattern : "One Time";	
+                        newScheduledScenario["recurringstringonhover"] = result[i].recurringstringonhover ? result[i].recurringstringonhover : "One Time";
                         newScheduledScenario["scheduledby"] = result[i].scheduledby;
                         newScheduledScenario["scheduledatetime"] = result[i].scheduledatetime;
                         newScheduledScenario["testsuitenames"] = result[i].testsuitenames;
@@ -66,6 +75,16 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                 } 
                 setScheduledData(scheduledDataParsed);
                 setScheduledDataOriginal(scheduledDataParsed);
+
+                for (var i = 0; i < scheduledDataParsed.length; i++) {	
+                    if (scheduledDataParsed[i].recurringpattern != "One Time") {	
+                        scheduledRecurringDataParsed.push(	
+                            scheduledDataParsed[i]	
+                        );	
+                    }	
+                }	
+                setScheduledRecurringData(scheduledRecurringDataParsed);	
+                setScheduledRecurringDataOriginal(scheduledRecurringDataParsed);
             }
             setLoading(false);
             document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
@@ -82,6 +101,19 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         setMsg(error)
     }
 
+    const handleOnButtonClickRecurring = (event) => {
+        setshowRecurringSchedules(true)
+        setshowScheduledTasks(false)
+        selectStatus("Show All")
+        setStatusChange("Select Status")
+    }
+    const handleOnButtonClickScheduled = (event) => {
+        setshowRecurringSchedules(false)
+        setshowScheduledTasks(true)
+        selectStatus("Show All")
+        setStatusChange("Select Status")
+    }
+
     const onChangePage = (newPageOfItems) => {
         // update state with new page of items
         if(JSON.stringify(pageOfItems) !== JSON.stringify(newPageOfItems))
@@ -91,15 +123,29 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const selectStatus = (value) => {
         if( value === "Show All") {
             setScheduledData(scheduledDataOriginal);
+            setScheduledRecurringData(scheduledRecurringDataOriginal);
             return
         }
         var scheduledDataParsed = [];
-        for(var j =0 ; j < scheduledDataOriginal.length ; j++ ) {
-            if((scheduledDataOriginal[j]["status"]).toLowerCase() === (value).toLowerCase()) {
-                scheduledDataParsed.push(scheduledDataOriginal[j]);
+        var scheduledRecurringDataParsed = [];
+
+        if (showScheduledTasks) {
+            for(var j =0 ; j < scheduledDataOriginal.length ; j++ ) {
+                if (scheduledDataOriginal[j]["status"].toLowerCase() === value.toLowerCase()) {
+                    scheduledDataParsed.push(scheduledDataOriginal[j]);
+                }
             }
+            setScheduledData(scheduledDataParsed);
         }
-        setScheduledData(scheduledDataParsed);
+
+        if (showRecurringSchedules) {	
+            for (var j = 0; j < scheduledRecurringDataOriginal.length; j++) {	
+                if (scheduledRecurringDataOriginal[j]["status"].toLowerCase() === value.toLowerCase()) {	
+                    scheduledRecurringDataParsed.push(scheduledRecurringDataOriginal[j]);	
+                }	
+            }	
+            setScheduledRecurringData(scheduledRecurringDataParsed);	
+        }
     }
 
     const ScheduleTestSuitePopup = () => {
@@ -127,7 +173,12 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         executionData["type"] = schedulePoolDetails.type;
         
         setLoading("Scheduling...");
-        const data = await testSuitesScheduler_ICE(executionData);
+        let data = "";
+        if (executionData["batchInfo"][0].recurringValue != "" && executionData["batchInfo"][0].recurringValue != "One Time") {
+            data = await testSuitesSchedulerRecurring_ICE(executionData);
+        } else {
+            data = await testSuitesScheduler_ICE(executionData);
+        }
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data === "NotApproved") displayError(MSG.SCHEDULE.ERR_DEPENDENT_TASK);
@@ -188,9 +239,30 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         }
         
         var data = [...scheduledData];
-        if( sort === true) {data.sort( compare );setSort(false);}
-        else {data.sort( compareOpp );setSort(true);}
-        setScheduledData(data);
+        var recurringData = [...scheduledRecurringData];
+
+        if (showScheduledTasks) {
+            if( sort === true) {
+                data.sort( compare );
+                setSort(false);
+            }
+            else {
+                data.sort( compareOpp );
+                setSort(true);
+            }
+            setScheduledData(data);
+        }
+
+        if (showRecurringSchedules) {	
+            if (sort === true) {	
+                recurringData.sort(compare);	
+                setSort(false);	
+            } else {	
+                recurringData.sort(compareOpp);	
+                setSort(true);	
+            }	
+            setScheduledRecurringData(recurringData);	
+        }
     }
 
     const formatDate = (date) => {
@@ -275,20 +347,31 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                 {/* //lower scheduled table Section */}
                 <div id="scheduleSuitesBottomSection">
                     <div id="page-taskName">
-						<span>Scheduled</span>
-                        <select defaultValue={"Select Status"} onChange={(event)=>{selectStatus(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
-                            <option disabled={true}>Select Status</option>
-                            <option>Completed</option>
+                        <span>{showScheduledTasks ? "Scheduled Tasks" : "Recurring Schedules"}</span>
+                        <select value={statusChange} onChange={(event)=>{selectStatus(event.target.value); setStatusChange(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
+                            <option disabled={true} value={"Select Status"}>Select Status</option>
+                            <option value={"Completed"}>Completed</option>
                             <option value={"Inprogress"} >In Progress</option>
-                            <option>Scheduled</option>
+                            <option value={"Scheduled"}>Scheduled</option>
+                            <option value={"Recurring"}>Recurring</option>
                             <option value={"Terminate"}>Terminated</option>
-                            <option>Cancelled</option>
-                            <option>Missed</option>
-                            <option>Failed</option>
-                            <option>Skipped</option>
-                            <option>Show All</option>
+                            <option value={"Cancelled"}>Cancelled</option>
+                            <option value={"Missed"}>Missed</option>
+                            <option value={"Failed"}>Failed</option>
+                            <option value={"Skipped"}>Skipped</option>
+                            <option value={"Show All"}>Show All</option>
                         </select>
-                        <div onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
+                        <div id="s__btns" onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
+                        <div id="s__btns">
+                            <button className="s__btn-md btnAddToSchedule" onClick={() => {handleOnButtonClickRecurring();}} title="Recurring Schedules">
+                                Recurring Schedules
+                            </button>
+                        </div>
+                        <div id="s__btns">
+                            <button className="s__btn-md btnAddToSchedule" onClick={() => {handleOnButtonClickScheduled();}} title="Scheduled Tasks">
+                                Scheduled Tasks
+                            </button>
+                        </div>
                     </div>
 
                     <div className="scheduleDataTable">
@@ -298,9 +381,10 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
 							<span className="s__Table_scenario s__table_Textoverflow s__Table_border" >Scenario Name</span>
 							<span className="s__Table_suite s__table_Textoverflow s__Table_border" >Test Suite</span>
 							<span className="s__Table_appType s__table_Textoverflow s__Table_border" >App Type</span>
+                            <span className="s__Table_scheduleType s__table_Textoverflow s__Table_border" >Schedule Type</span>
 							<span className="s__Table_status s__table_Textoverflow s__Table_border" >Status</span>
 						</div>
-                        <div className="s__table_container" >
+                        { showScheduledTasks && <div className="s__table_container" >
                             <div className="s__table_contents" >
                                 <div className="s__ab">
                                     <div className="s__min">
@@ -308,7 +392,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                             <div id="scheduledDataBody" className="scheduledDataBody">
                                                 <ScrollBar scrollId="scheduledDataBody" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                     <div className='scheduleDataBodyRow'>
-                                                        {pageOfItems.map((data,index)=>(
+                                                        {pageOfItems.map((data,index)=>( data.status != "recurring" && data.recurringpattern == "One Time" &&
                                                             <div key={index} className="scheduleDataBodyRowChild">
                                                                 <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time ">{formatDate(data.scheduledatetime)}</div>
                                                                 <div data-test = "schedule_data_target_user" className="s__Table_host" title={data.target}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
@@ -319,9 +403,12 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                         <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
                                                                     ))}
                                                                 </div>
+                                                                <div data-test="schedule_data_schedule_type" className="s__Table_scheduleType" title={data.recurringstringonhover}>   
+                                                                    { data.scheduletype ? data.scheduletype : "One Time"}
+                                                                </div>
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
                                                                     {data.status}
-                                                                    {(data.status === 'scheduled')?
+                                                                    {(data.status === 'scheduled' || data.status === "recurring")?
                                                                         <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError)}} title='Cancel Job'/>
                                                                     :null}
                                                                 </div> 
@@ -335,7 +422,48 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> }
+
+                        { showRecurringSchedules && <div className="s__table_container" >
+                            <div className="s__table_contents" >
+                                <div className="s__ab">
+                                    <div className="s__min">
+                                        <div className="s__con">
+                                            <div id="scheduledDataBody" className="scheduledDataBody">
+                                                <ScrollBar scrollId="scheduledDataBody" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
+                                                    <div className='scheduleDataBodyRow'>
+                                                        {pageOfItems.map((data,index)=>( (data.status == "recurring" || data.status == "cancelled" || data.status == "Failed") && data.recurringpattern != "One Time" &&
+                                                            <div key={index} className="scheduleDataBodyRowChild">
+                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time ">{formatDate(data.scheduledatetime)}</div>
+                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" title={data.target}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                                <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
+                                                                <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
+                                                                <div data-test = "schedule_data_browser_type" className="s__Table_appType">
+                                                                    {data.browserlist.map((brow,index)=>(
+                                                                        <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
+                                                                    ))}
+                                                                </div>
+                                                                <div data-test="schedule_data_schedule_type" className="s__Table_scheduleType" title={data.recurringstringonhover}>   
+                                                                    { data.scheduletype ? data.scheduletype : "One Time"}
+                                                                </div>
+                                                                <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
+                                                                    {data.status}
+                                                                    {(data.status === 'scheduled' || data.status === "recurring")?
+                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError)}} title='Cancel Job'/>
+                                                                    :null}
+                                                                </div> 
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </ScrollBar>
+                                            </div>
+                                        </div>
+                                        <Pagination items={scheduledRecurringData} onChangePage={onChangePage} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div> }
+
 					</div>
                 </div>
             </div>
@@ -351,6 +479,8 @@ const updateDateTimeValues = (scheduleTableData, setModuleScheduledate) => {
             moduleScheduledateTime[rowData.testsuiteid] = {
                 date:"",
                 time:"",
+                recurringValue: "",
+                recurringString: "",
                 inputPropstime: {readOnly:"readonly" ,
                     disabled : true,
                     className:"fc-timePicker",
@@ -359,8 +489,14 @@ const updateDateTimeValues = (scheduleTableData, setModuleScheduledate) => {
                 inputPropsdate : {
                     placeholder: "Select Date",
                     readOnly:"readonly" ,
-                    className:"fc-datePicker"
-                }
+                    className:"fc-datePicker",
+                    disabled : true
+                },
+                inputPropsrecurring: {
+                    placeholder: "Select Frequency",
+                    readOnly: "readonly",
+                    className: "fc-timePicker textbox-container",
+                },
             };
         }
     })
@@ -442,15 +578,24 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 let moduleScheduledateTime = {...moduleScheduledate};
                 moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-timePicker";
                 moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker";
+                moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsrecurring"]["className"] = "fc-timePicker textbox-container";
 
                 var dateValue = moduleScheduledate[eachData[i].testsuiteid]["date"];
                 var timeValue = moduleScheduledate[eachData[i].testsuiteid]["time"];
-                if (dateValue === "") {  // Check if schedule date is not empty
-                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
+                var recurringValue = moduleScheduledate[eachData[i].testsuiteid]["recurringValue"];
+
+                if (recurringValue === "") {
+                    // Check if schedule recurring is not empty
+                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsrecurring"]["className"] = "fc-timePicker textbox-container s__err-Border";
+                    doNotSchedule = true;
+                } 
+                else if (recurringValue == "One Time" && dateValue == "" && timeValue == "") {
+                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"] = "fc-datePicker s__err-Border";
+                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"] = "fc-datePicker s__err-Border";
                     doNotSchedule = true;
                 }
-                else if (timeValue === "") {  // Check if schedule time is not empty
-                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
+                else if (recurringValue != "" && timeValue === "") {
+                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"] = "fc-datePicker s__err-Border";
                     doNotSchedule = true;
                 }
                 setModuleScheduledate(moduleScheduledateTime);
@@ -525,6 +670,9 @@ const parseLogicExecute = (schedulePoolDetails, moduleScheduledate, eachData, cu
                 const sltime_2 = suiteInfo.time.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 suiteInfo.timestamp = timestamp.valueOf().toString();
+                suiteInfo.recurringValue = moduleScheduledate[eachData[i].testsuiteid]["recurringValue"];
+                suiteInfo.recurringString = moduleScheduledate[eachData[i].testsuiteid]["recurringString"];
+                suiteInfo.recurringStringOnHover = moduleScheduledate[eachData[i].testsuiteid][	"recurringStringOnHover"];
             } 
         }
         if(selectedRowData.length !== 0) moduleInfo.push(suiteInfo);

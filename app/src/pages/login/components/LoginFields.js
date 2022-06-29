@@ -318,7 +318,7 @@ const LoginFields = (props) => {
         { popup && <PopUp /> }
         { overlayText && <ScreenOverlay content={overlayText}/>}
         { showSuccessPass && <PasswordSuccessPopup /> }
-        { showChangePass && <ChangePassword setShow={toggleChangePass} setSuccessPass={setSuccessPass} loginCurrPassword={password} /> }
+        { showChangePass && <ChangePassword setShow={toggleChangePass} setSuccessPass={setSuccessPass} loginCurrPassword={password} changeType={"forgotPass"}/> }
         {redirectTo ? <Redirect to={redirectTo} /> :
             <>
             { restartForm 

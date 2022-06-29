@@ -103,6 +103,33 @@ export const resetPassword = (newpassword, currpassword) => {
     })
 }
 
+/*Component ChangePassword
+  api returns "Invalid Session"/"success"/"same"/"incorrect"/"fail"
+*/
+export const updatePassword = (newpassword, userObj) => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/updatePassword", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: {'newpassword': newpassword, userObj},
+            credentials : 'include'
+        })
+        .then(res => {
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
 /*Component Header
   api returns {"": ""}
 */
