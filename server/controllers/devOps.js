@@ -1,6 +1,7 @@
 var create_ice = require('../controllers/create_ice');
 var logger = require('../../logger');
 var utils = require('../lib/utils');
+const { default: async } = require('async');
 
 exports.fetchProjects =  async(req, res) => {
 	const fnName = "fetchProjects";
@@ -93,4 +94,51 @@ exports.storeConfigureKey = async(req,res) => {
 		return res.send("fail");
 	}
 }
+
+exports.getExecScenario = async(req,res) => {
+	const fnName = "avo_getExecScenario";
+	try {
+		console.log('New Thing2!!');
+		logger.info("Inside UI Service: " + fnName);
+		// const userDetails = req.body.userDetails;
+		// const username = req.session.username;
+		// const uId = req.session.userid;
+		// const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		const inputs = {
+			"key": req.body.moduleDetail.key,
+			"moduleid": req.body.moduleDetail.moduleid,
+			"query": "fetchKeyDetails"
+		};
+		const status = await utils.fetchData(inputs, "devops/getExecScenario", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else res.send(status);
+	} catch (exception) {
+		logger.error(exception.message);
+		return res.send("fail");
+	}
+}
+
+//To get all the projects and their releases & cycles
+exports.getAllSuites_ICE = async (req, res) => {
+    const fnName = "getAllSuites_ICE";
+    logger.info("Inside UI service: " + fnName);
+    try {
+        var requestedaction = req.query.readme;
+        if (requestedaction == 'projects' || requestedaction == 'reports') {
+            const inputs = {
+                "query": "projects",
+                "userid": req.session.userid
+            };
+            const result = await utils.fetchData(inputs, "reports/getAllSuites_ICE", fnName);
+            if (result == "fail") return res.send("fail");
+            res.send(result);
+        } else {
+            logger.error("Error occurred in report/"+fnName+": Invalid input fail");
+            res.send('Invalid input fail');
+        }
+   } catch (exception) {
+     logger.error("Error occurred in report/"+fnName+":", exception);
+     res.send("fail");
+  }
+};
 

@@ -2,6 +2,7 @@ import axios from 'axios';
 import {RedirectPage, Messages as MSG} from '../global'
 import {history} from './index'
 import {url} from '../../App';
+import async from 'async';
 
 /*Component Encrypt_ICE
   use: gets the Encrypted Value of the users Input based on encryption type also given by user only
@@ -312,15 +313,16 @@ export const importDataTable = async(arg) => {
     }
 }
 
-export const fetchProjects = async() => {
-    return [{"_id":"620f83513eb0b5d441b73a69","name":"New Project","releases":[{"createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","cycles":[{"_id":"620f83513eb0b5d441b73a67","createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"C1"},{"_id":"620f83513eb0b5d441b73a68","createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"C2"}],"modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"R1"}],"type":"5db0022cf87fdec084ae49b6"}];
+export const fetchProjects = async(data) => {
+    // return [{"_id":"620f83513eb0b5d441b73a69","name":"New Project","releases":[{"createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","cycles":[{"_id":"620f83513eb0b5d441b73a67","createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"C1"},{"_id":"620f83513eb0b5d441b73a68","createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"C2"}],"modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"R1"}],"type":"5db0022cf87fdec084ae49b6"}];
+    // return [{"appType":["5db0022cf87fdec084ae49b6"],"appTypeName":["Web"],"cycles":{"620a3672479f19c38742bc93":["620a3672479f19c38742bc93","R1","C1"]},"domains":["Banking"],"projectId":["620a3672479f19c38742bc94"],"projectName":["AssurePractice"],"projecttypes":{"5db0022cf87fdec084ae49ae":"Generic","5db0022cf87fdec084ae49af":"Desktop","5db0022cf87fdec084ae49b0":"Mainframe","5db0022cf87fdec084ae49b1":"MobileApp","5db0022cf87fdec084ae49b2":"MobileWeb","5db0022cf87fdec084ae49b3":"OEBS","5db0022cf87fdec084ae49b4":"SAP","5db0022cf87fdec084ae49b5":"System","5db0022cf87fdec084ae49b6":"Web","5db0022cf87fdec084ae49b7":"Webservice"},"releases":[[{"cycles":[{"_id":"620a3672479f19c38742bc93","name":"C1"}],"name":"R1"}]]}]
     try{
         const res = await axios(url+'/fetchProjects', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {"action":"populateProjects"},
+            params: data,
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -436,3 +438,53 @@ export const execAutomation = async(props) => {
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }
+
+export const getExecScenario = async(props) => {
+    try{
+        console.log(props)
+        const res = await axios(url+'/getExecScenario', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {"moduleDetail":props},
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.log(res.data + '  408')
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+
+export const getAgentTask = async(props) => {
+    try{
+        const res = await axios(url+'/getAgentTask', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+ 
