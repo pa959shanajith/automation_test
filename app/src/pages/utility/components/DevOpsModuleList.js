@@ -270,14 +270,21 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig }) => {
     }
     useEffect(()=>{
         (async() => {
-            const moduleList = await fetchModules();
-            if(moduleList.error) {
-                setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
-            }else {
-                console.log(moduleList);
+            if (integrationConfig.selectValues[2].selected !== '') {
+                const moduleList = await fetchModules({
+                    "tab":'tabAssign',
+                    "projectid":integrationConfig.selectValues[0].selected,
+                    "moduleid":integrationConfig.selectValues[1].selected,
+                    "cycleid":integrationConfig.selectValues[2].selected
+                });
+                if(moduleList.error) {
+                    setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
+                }else {
+                    console.log(moduleList);
+                }
             }
         })()
-    },[]);
+    },[integrationConfig.selectValues[2].selected]);
     return (
         // <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
         (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>

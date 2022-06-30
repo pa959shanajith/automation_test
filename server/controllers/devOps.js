@@ -27,7 +27,7 @@ const getModule = async (d) => {
 		"cycleid":d.cycId,
 		"name":"getModules"
 	}
-	return utils.fetchData(inputs, "devops/fetchModules", "fetchModules");
+	return utils.fetchData(inputs, "mindmap/getModules", "fetchModules");
 };
 
 exports.fetchModules = async (req, res) => {

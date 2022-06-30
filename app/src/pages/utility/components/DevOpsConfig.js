@@ -25,9 +25,31 @@ const DevOpsConfig = props => {
     const [icepoollist, setIcepoollist] = useState([]);
     const [browserlist, setBrowserlist] = useState([]);
     const [dataUpdated, setDataUpdated] = useState(false);
-    const [integrationlist, setIntegrationlist] = useState([]);
+    const [integrationlist, setIntegrationlist] = useState([
+        {
+            key: 'qTest',
+            text: 'qTest'
+        }, {
+            key: 'alm',
+            text: 'ALM'
+        }, {
+            key: 'zephyr',
+            text: 'Zephyr'
+        }
+    ]);
     useEffect(()=> {
         (async()=>{
+            const args = {
+                poolid:"all",
+                projectids:[]
+            };
+            const poolList = await getPools(args);
+            console.log(poolList);
+            if(poolList.error) {
+                setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
+            }else {
+                console.log(poolList);
+            }
             const reportResponse = await fetchProjects({ readme: "projects" });
             if (reportResponse.error) {
                 console.error(reportResponse.error);
@@ -64,15 +86,6 @@ const DevOpsConfig = props => {
                 
                 setDict(newDict);
                 setIntegrationConfig({...integrationConfig, selectValues: newSelectValues});
-            }
-        })()
-        (async() => {
-            const poolList = await getPools();
-            console.log(poolList);
-            if(poolList.error) {
-                setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
-            }else {
-                // setIcepoollist(poolList);
             }
         })()
     }, []);
@@ -169,7 +182,7 @@ const DevOpsConfig = props => {
                         <SearchDropdown
                             calloutMaxHeight="30vh"
                             noItemsText={'Avo Agent / Avo Grid is empty'}
-                            onChange={(selectedIce) => setIntegrationConfig({...integrationConfig, avoAgentGrid: selectedIce})}
+                            onChange={(selectedIce) => setIntegrationConfig({...integrationConfig, avoAgentGrid: selectedIce.key})}
                             options={icepoollist}
                             placeholder="Select Avo Agent or Avo Grid"
                             selectedKey={integrationConfig.avoAgentGrid}
@@ -181,7 +194,7 @@ const DevOpsConfig = props => {
                         <SearchDropdown
                             calloutMaxHeight="30vh"
                             noItemsText={'No Browser available'}
-                            onChange={(selectedBrowser) => setIntegrationConfig({...integrationConfig, browser: selectedBrowser})}
+                            onChange={(selectedBrowser) => setIntegrationConfig({...integrationConfig, browser: selectedBrowser.key})}
                             options={browserlist}
                             placeholder="Select Browser"
                             selectedKey={integrationConfig.browser}
@@ -193,7 +206,7 @@ const DevOpsConfig = props => {
                         <SearchDropdown
                             calloutMaxHeight="30vh"
                             noItemsText={'No Integration available'}
-                            onChange={(selectedIntegration) => setIntegrationConfig({...integrationConfig, integration: selectedIntegration})}
+                            onChange={(selectedIntegration) => setIntegrationConfig({...integrationConfig, integration: selectedIntegration.key})}
                             options={integrationlist}
                             placeholder="Select Integration"
                             selectedKey={integrationConfig.integration}

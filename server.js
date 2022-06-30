@@ -343,6 +343,7 @@ if (cluster.isMaster) {
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
+		var devOps = require('./server/controllers/devOps');
 
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
@@ -528,6 +529,7 @@ if (cluster.isMaster) {
 		app.post('/getUserICE', auth.protect, io.getUserICE)
 		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE);
 		//-------------Route Mapping-------------//
+		app.post('/fetchModules', auth.protect, devOps.fetchModules);
 
 		// To prevent can't send header response
 		app.use(function(req, res, next) {
