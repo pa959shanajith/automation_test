@@ -600,7 +600,11 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 setModuleScheduledate(moduleScheduledateTime);
                 if(doNotSchedule) return false
 
-                const sldate_2 = dateValue ? dateValue.split("-") : new Date().toISOString().replace(/T.*/,'').split('-').reverse();
+                let currentDate = new Date().toString().split(' ');
+                let currentMonth = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(currentDate[1]) / 3 + 1;
+                currentDate = currentDate[2] + "-" + ("0"+ currentMonth.toString()).slice(-2) + "-" + currentDate[3]
+
+                const sldate_2 = dateValue ? dateValue.split("-") : currentDate.split('-');
                 const sltime_2 = timeValue.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 const diff = (timestamp - new Date()) / 60000;
