@@ -380,8 +380,14 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
 
     let timestamp = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), new Date(new Date().getHours()), new Date(new Date().getMinutes()))
     const targetUser = multiExecutionData.batchInfo[0].targetUser;
-    const recurringPattern = multiExecutionData['batchInfo'][0]['recurringValue'];
+    let recurringPattern = multiExecutionData['batchInfo'][0]['recurringValue'];
+    let timeSelected = multiExecutionData.batchInfo[0].time;
+    recurringPattern = recurringPattern.split(" ");
+    recurringPattern[0] = timeSelected.split(":")[1];
+    recurringPattern[1] = timeSelected.split(":")[0];
+    recurringPattern = recurringPattern.join(" ");
     let recurringString = multiExecutionData['batchInfo'][0]['recurringString'];
+    let recurringStringOnHover = multiExecutionData.batchInfo[0].recurringStringOnHover;
     inputs = {
         timestamp: timestamp.toString(),
         executeon: multiExecutionData.browserType,
@@ -399,37 +405,209 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         scheduleType: recurringString,
         recurringPattern: recurringPattern,
         recurringStringOnHover:	multiExecutionData.batchInfo[0].recurringStringOnHover,
-        time: multiExecutionData.batchInfo[0].time
+        time: timeSelected
     };
 
     const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
     let scheduleId = insResult.id;
 
     try {
-        const interval = parser.parseExpression(recurringPattern);
-        let dateString = interval.next().toString().split(' ');
-        let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
-        let timeValue = multiExecutionData['batchInfo'][0]['time'];
-        let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-        // let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(dateString[4].split(':')[0]), parseInt(dateString[4].split(':')[1]));
-        body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-        let result1 = exports.prepareSchedulingRequest(session, body);
-        schedFlag = result1;
+        let nextRun = 0;
+        let tempTimeStamp = 0;
+        let timeStamp = 0;
+        let result1 = ""
+        if (recurringString == "Every Day" && !recurringPattern.includes("1-5")) {
+            nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
+            let timeValue = multiExecutionData['batchInfo'][0]['time'];
+            timeStamp = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]))
+            tempTimeStamp = new Date(timeStamp)
+            timeStamp = tempTimeStamp
+            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+            result1 = exports.prepareSchedulingRequest(session, body);
+            schedFlag = result1;
+        }
+        else if (recurringString == "Every Month") {
+            if (['first', 'second', 'third', 'fourth', 'last'].some(element => recurringStringOnHover.includes(element))) {
+                nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
+                recurringPattern = recurringPattern.split("/")
+                recurringPattern = recurringPattern[0] + " " + recurringPattern[1].split(" ")[1]
+                const interval = parser.parseExpression(recurringPattern);
+                let dateString = interval.next().toString().split(' ');
+                let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                let timeValue = multiExecutionData['batchInfo'][0]['time'];
+                timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                tempTimeStamp = new Date(timeStamp)
+                timeStamp = tempTimeStamp
+
+                if (recurringStringOnHover.includes('first') && (timeStamp.getDate() >= 1 && timeStamp.getDate() <= 7)) {
+                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    result1 = exports.prepareSchedulingRequest(session, body);
+                    schedFlag = result1;
+                }
+                else if (recurringStringOnHover.includes('second') && (timeStamp.getDate() >= 8 && timeStamp.getDate() <= 14)) {
+                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    result1 = exports.prepareSchedulingRequest(session, body);
+                    schedFlag = result1;
+                }
+                else if (recurringStringOnHover.includes('third') && (timeStamp.getDate() >= 15 && timeStamp.getDate() <= 21)) {
+                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    result1 = exports.prepareSchedulingRequest(session, body);
+                    schedFlag = result1;
+                }
+                else if (recurringStringOnHover.includes('fourth') && (timeStamp.getDate() >= 22 && timeStamp.getDate() <= 28)) {
+                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    result1 = exports.prepareSchedulingRequest(session, body);
+                    schedFlag = result1;
+                }
+                else if (recurringStringOnHover.includes('last') && (timeStamp.getDate() >= 24 && timeStamp.getDate() <= 31)) {
+                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    result1 = exports.prepareSchedulingRequest(session, body);
+                    schedFlag = result1;
+                }
+            }
+            else {
+                nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
+                recurringPattern = recurringPattern.split("/")
+                recurringPattern = recurringPattern[0] + " " + recurringPattern[1].split(" ")[1]
+                const interval = parser.parseExpression(recurringPattern);
+                let dateString = interval.next().toString().split(' ');
+                let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                let timeValue = multiExecutionData['batchInfo'][0]['time'];
+                timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                tempTimeStamp = new Date(timeStamp)
+                timeStamp = tempTimeStamp
+                body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                result1 = exports.prepareSchedulingRequest(session, body);
+                schedFlag = result1;
+            }
+        }
+        else {
+            const interval = parser.parseExpression(recurringPattern);
+            let dateString = interval.next().toString().split(' ');
+            let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+            let timeValue = multiExecutionData['batchInfo'][0]['time'];
+            timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+            result1 = exports.prepareSchedulingRequest(session, body);
+            schedFlag = result1;
+        }
 
         const scheduledjob = schedule.scheduleJob(
             scheduleId,
             recurringPattern,
             async function () {
                 let result;
-                const interval = parser.parseExpression(recurringPattern);
-                let dateString = interval.next().toString().split(' ');
-                let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
-                let timeValue = multiExecutionData['batchInfo'][0]['time'];
-                let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                // let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(dateString[4].split(':')[0]), parseInt(dateString[4].split(':')[1]));
-                body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                result = exports.prepareSchedulingRequest(session, body);
-                schedFlag = result
+                let timeStamp = 0;
+
+                if (recurringString == "Every Day" && !recurringPattern.includes("1-5")) {
+                    tempTimeStamp.setDate(tempTimeStamp.getDate() + nextRun)
+                    timeStamp = tempTimeStamp
+                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    result = exports.prepareSchedulingRequest(session, body);
+                    schedFlag = result
+                }
+                else if (recurringString == "Every Month") {
+                    if (['first', 'second', 'third', 'fourth', 'last'].some(element => recurringStringOnHover.includes(element))) {
+                        let nextRunLimit = new Date(tempTimeStamp.valueOf())
+                        nextRunLimit.setMonth(nextRunLimit.getMonth() + nextRun)
+
+                        let nextRunDateLimit = nextRunLimit.toString().split(' ');
+                        let nextRunMonthLimit = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(nextRunDateLimit[1]) / 3 + 1;
+                        nextRunDateLimit = new Date(nextRunMonthLimit.toString()+"/"+nextRunDateLimit[2]+"/"+nextRunDateLimit[3])
+
+                        const interval = parser.parseExpression(recurringPattern);
+                        let dateString = interval.next().toString().split(' ');
+                        let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                        let timeValue = multiExecutionData['batchInfo'][0]['time'];
+
+                        let nextRunMonth = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3 + 1;
+                        let nextRunDate = new Date(nextRunMonth.toString()+"/"+dateString[2]+"/"+dateString[3])
+                        
+                        // Getting the day differnce between first run and next run
+                        let diffTime = Math.abs(nextRunDateLimit - nextRunDate);
+                        let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                        // getting the day difference between first run and next run that should happen in same month
+                        let currentRunDate = new Date().toString().split(' ')
+                        let currentRunMonth = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(currentRunDate[1]) / 3 + 1;
+                        currentRunDate = new Date(currentRunMonth.toString()+"/"+currentRunDate[2]+"/"+currentRunDate[3])
+
+                        let tempRunDate = tempTimeStamp.toString().split(' ')
+                        let tempRunMonth = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(tempRunDate[1]) / 3 + 1;
+                        tempRunDate = new Date(tempRunMonth.toString()+"/"+tempRunDate[2]+"/"+tempRunDate[3])
+                        
+                        let diffTimeTemp = Math.abs(currentRunDate - tempRunDate);
+                        let diffDaysTemp = Math.ceil(diffTimeTemp / (1000 * 60 * 60 * 24));
+
+                        timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+
+                        if (recurringStringOnHover.includes('first') && (timeStamp.getDate() >= 1 && timeStamp.getDate() <= 7) && (diffDays <= 7 || diffDaysTemp <= 7)) {
+                            tempTimeStamp = timeStamp
+                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            result1 = exports.prepareSchedulingRequest(session, body);
+                            schedFlag = result1;
+                        }
+                        else if (recurringStringOnHover.includes('second') && (timeStamp.getDate() >= 8 && timeStamp.getDate() <= 14) && (diffDays <= 7 || diffDaysTemp <= 7)) {
+                            tempTimeStamp = timeStamp
+                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            result1 = exports.prepareSchedulingRequest(session, body);
+                            schedFlag = result1;
+                        }
+                        else if (recurringStringOnHover.includes('third') && (timeStamp.getDate() >= 15 && timeStamp.getDate() <= 21) && (diffDays <= 7 || diffDaysTemp <= 7)) {
+                            tempTimeStamp = timeStamp
+                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            result1 = exports.prepareSchedulingRequest(session, body);
+                            schedFlag = result1;
+                        }
+                        else if (recurringStringOnHover.includes('fourth') && (timeStamp.getDate() >= 22 && timeStamp.getDate() <= 28) && (diffDays <= 7 || diffDaysTemp <= 7)) {
+                            tempTimeStamp = timeStamp
+                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            result1 = exports.prepareSchedulingRequest(session, body);
+                            schedFlag = result1;
+                        }
+                        else if (recurringStringOnHover.includes('last') && (timeStamp.getDate() >= 24 && timeStamp.getDate() <= 31) && (diffDays <= 7 || diffDaysTemp <= 7)) {
+                            tempTimeStamp = timeStamp
+                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            result1 = exports.prepareSchedulingRequest(session, body);
+                            schedFlag = result1;
+                        }
+                    }
+                    else {
+                        let nextRunLimit = new Date(tempTimeStamp.valueOf())
+                        nextRunLimit.setMonth(nextRunLimit.getMonth() + nextRun)
+                        
+                        let nextRunDateLimit = nextRunLimit.toString().split(' ');
+                        let nextRunMonthLimit = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(nextRunDateLimit[1]) / 3;
+                        nextRunDateLimit = new Date(parseInt(nextRunDateLimit[3]), parseInt(nextRunMonthLimit), parseInt(nextRunDateLimit[2]))
+
+                        const interval = parser.parseExpression(recurringPattern);
+                        let dateString = interval.next().toString().split(' ');
+                        let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                        let timeValue = multiExecutionData['batchInfo'][0]['time'];
+
+                        let nextRunMonth = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                        let nextRunDate = new Date(parseInt(dateString[3]), parseInt(nextRunMonth), parseInt(dateString[2]))
+
+                        timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+            
+                        if (nextRunDateLimit.valueOf() === nextRunDate.valueOf()) {
+                            tempTimeStamp = timeStamp
+                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            result = exports.prepareSchedulingRequest(session, body);
+                            schedFlag = result
+                        }
+                    }
+                }
+                else {
+                    const interval = parser.parseExpression(recurringPattern);
+                    let dateString = interval.next().toString().split(' ');
+                    let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                    let timeValue = multiExecutionData['batchInfo'][0]['time'];
+                    timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    result = exports.prepareSchedulingRequest(session, body);
+                    schedFlag = result
+                }
             }
         );
         scheduleJobMap[scheduleId] = scheduledjob;
