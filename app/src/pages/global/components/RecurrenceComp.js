@@ -83,6 +83,12 @@ const RecurrenceComp = (props) => {
             return;
         }
 
+        if ((event.target.value).length == 0) {
+            setRecurringValue("")
+            setRecurringStringOnHover("");
+            return;
+        }
+
         if (dailyRecurrenceType === "days") {
             if (event.target.value == 1) {
                 setRecurringValue("0 0 * * *");
@@ -169,6 +175,14 @@ const RecurrenceComp = (props) => {
             displayError("Invalid input (should be between 1-30)");
             return;
         }
+
+        if ((event.target.value).length == 0) {
+            setRecurringValue("")
+            setRecurringStringOnHover("");
+            setMonthlyRecurrenceMonthValue("")
+            setMonthlyRecurrenceMonthInputDisable(true)
+            return;
+        }        
     }
 
     const handleMonthInputChange = (event) => {
@@ -181,6 +195,18 @@ const RecurrenceComp = (props) => {
         
         if (parseInt(event.target.value) > 12 || parseInt(event.target.value) < 1) {
             displayError("Invalid input (should be between 1-12)");
+            return;
+        }
+
+        if ((monthlyRecurrenceDayValue).length == 0) {
+            setRecurringValue("")
+            setRecurringStringOnHover("");
+            return;
+        }
+
+        if ((event.target.value).length == 0) {
+            setRecurringValue("")
+            setRecurringStringOnHover("");
             return;
         }
 
@@ -216,6 +242,12 @@ const RecurrenceComp = (props) => {
 
         if (parseInt(event.target.value) > 12 || parseInt(event.target.value) < 1) {
             displayError("Invalid input (should be between 1-12)");
+            return;
+        }
+
+        if ((event.target.value).length == 0) {
+            setRecurringValue("")
+            setRecurringStringOnHover("");
             return;
         }
 
