@@ -13,6 +13,7 @@ const RecurrenceComp = (props) => {
     const [monthlyRecurrenceDayValue, setMonthlyRecurrenceDayValue] = useState("");
     const [monthlyRecurrenceMonthValue, setMonthlyRecurrenceMonthValue] = useState("");
     const [monthlyRecurrenceWeekValue, setMonthlyRecurrenceWeekValue] = useState("Sunday");
+    const [monthlyRecurrenceFSTFLValue, setMonthlyRecurrenceFSTFLValue] = useState("1")
     const [monthlyRecurrenceMonthValue_1, setMonthlyRecurrenceMonthValue_1] = useState("");
     const [dailyRecurrenceInputDisable, setDailyRecurrenceInputDisable] = useState(true);
     const [monthlyRecurrenceDayInputDisable, setMonthlyRecurrenceDayInputDisable] = useState(true);
@@ -79,6 +80,12 @@ const RecurrenceComp = (props) => {
 
         if (parseInt(event.target.value) > 30 || parseInt(event.target.value) < 1) {
             displayError("Invalid input (should be between 1-30)");
+            return;
+        }
+
+        if ((event.target.value).length == 0) {
+            setRecurringValue("")
+            setRecurringStringOnHover("");
             return;
         }
 
@@ -168,6 +175,14 @@ const RecurrenceComp = (props) => {
             displayError("Invalid input (should be between 1-30)");
             return;
         }
+
+        if ((event.target.value).length == 0) {
+            setRecurringValue("")
+            setRecurringStringOnHover("");
+            setMonthlyRecurrenceMonthValue("")
+            setMonthlyRecurrenceMonthInputDisable(true)
+            return;
+        }        
     }
 
     const handleMonthInputChange = (event) => {
@@ -180,6 +195,18 @@ const RecurrenceComp = (props) => {
         
         if (parseInt(event.target.value) > 12 || parseInt(event.target.value) < 1) {
             displayError("Invalid input (should be between 1-12)");
+            return;
+        }
+
+        if ((monthlyRecurrenceDayValue).length == 0) {
+            setRecurringValue("")
+            setRecurringStringOnHover("");
+            return;
+        }
+
+        if ((event.target.value).length == 0) {
+            setRecurringValue("")
+            setRecurringStringOnHover("");
             return;
         }
 
@@ -202,6 +229,10 @@ const RecurrenceComp = (props) => {
         }
     }
 
+    const handleFSTFLChange = (event) => {
+        setMonthlyRecurrenceFSTFLValue(event.target.value)
+    }
+
     const handleWeekInputChange = (event) => {
         setMonthlyRecurrenceWeekValue(event.target.value)
     }
@@ -214,35 +245,58 @@ const RecurrenceComp = (props) => {
             return;
         }
 
+        if ((event.target.value).length == 0) {
+            setRecurringValue("")
+            setRecurringStringOnHover("");
+            return;
+        }
+
         if (monthlyRecurrenceType === "weeks") {
             if (event.target.value != "") {
+                let FSTFLValue = ""
+                if (monthlyRecurrenceFSTFLValue == "1") {
+                    FSTFLValue = "first"
+                }
+                else if (monthlyRecurrenceFSTFLValue == "2") {
+                    FSTFLValue = "second"
+                }
+                else if (monthlyRecurrenceFSTFLValue == "3") {
+                    FSTFLValue = "third"
+                }
+                else if (monthlyRecurrenceFSTFLValue == "4") {
+                    FSTFLValue = "fourth"
+                }
+                else if (monthlyRecurrenceFSTFLValue == "5") {
+                    FSTFLValue = "last"
+                }
+
                 if (monthlyRecurrenceWeekValue == "Sunday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 0")
-                    setRecurringStringOnHover("Occurs on every sunday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on "+ FSTFLValue + " sunday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Monday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 1")
-                    setRecurringStringOnHover("Occurs on every monday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on "+ FSTFLValue + " monday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Tuesday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 2")
-                    setRecurringStringOnHover("Occurs on every tuesday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on "+ FSTFLValue + " tuesday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Wednesday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 3")
-                    setRecurringStringOnHover("Occurs on every wednesday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on "+ FSTFLValue + " wednesday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Thursday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 4")
-                    setRecurringStringOnHover("Occurs on every thursday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on "+ FSTFLValue + " thursday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Friday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 5")
-                    setRecurringStringOnHover("Occurs on every friday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on "+ FSTFLValue + " friday of every " + event.target.value +	" month");
                 }
                 else if (monthlyRecurrenceWeekValue == "Saturday") {
                     setRecurringValue("0 0 * */" + event.target.value + " 6")
-                    setRecurringStringOnHover("Occurs on every saturday of every " + event.target.value +	" month");
+                    setRecurringStringOnHover("Occurs on "+ FSTFLValue + " saturday of every " + event.target.value +	" month");
                 }
             }
         }
@@ -368,21 +422,24 @@ const RecurrenceComp = (props) => {
                                             <lable>
                                                 <input type="radio" value="weeks" checked={monthlyRecurrenceType === "weeks"} onChange={getMonthlyRecurrenceType} />
                                                 <span>
-                                                    &nbsp;&nbsp;&nbsp;&nbsp;The
-                                                    {/* <select name="month_day" id="month_day">
-                                                        <option value="first">
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <select name="month_day" id="month_day" value={monthlyRecurrenceFSTFLValue} onChange={handleFSTFLChange}>
+                                                        <option value="1">
                                                             First
                                                         </option>
-                                                        <option value="second">
+                                                        <option value="2">
                                                             Second
                                                         </option>
-                                                        <option value="third">
+                                                        <option value="3">
                                                             Third
                                                         </option>
-                                                        <option value="fourth">
+                                                        <option value="4">
                                                             Fourth
                                                         </option>
-                                                    </select> */}
+                                                        <option value="5">
+                                                            Last
+                                                        </option>
+                                                    </select>
                                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                                     <select id="month_week" name="month_week" value={monthlyRecurrenceWeekValue} onChange={handleWeekInputChange}>
                                                         <option value="Sunday">
