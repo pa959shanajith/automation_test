@@ -65,12 +65,18 @@ const RecurrenceComp = (props) => {
         }
         else if (event.target.value == "Daily") {
             setRecurringString("Every Day");
+            setRecurringValue("");
+            setRecurringStringOnHover("");
         }
         else if (event.target.value == "Weekly") {
             setRecurringString("Every Week");
+            setRecurringValue("");
+            setRecurringStringOnHover("");
         }
         else if (event.target.value == "Monthly") {
             setRecurringString("Every Month");
+            setRecurringValue("");
+            setRecurringStringOnHover("");
         }
     };
 
