@@ -416,7 +416,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         let tempTimeStamp = 0;
         let timeStamp = 0;
         let result1 = ""
-        if (recurringString == "Every Day" && !recurringPattern.includes("1-5")) {
+        if (recurringString == "Every Day" && !recurringPattern.includes("1-5") && recurringStringOnHover != "Occurs every day") {
             nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
             let timeValue = multiExecutionData['batchInfo'][0]['time'];
             timeStamp = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]))
@@ -499,7 +499,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 let result;
                 let timeStamp = 0;
 
-                if (recurringString == "Every Day" && !recurringPattern.includes("1-5")) {
+                if (recurringString == "Every Day" && !recurringPattern.includes("1-5") && recurringStringOnHover != "Occurs every day") {
                     tempTimeStamp.setDate(tempTimeStamp.getDate() + nextRun)
                     timeStamp = tempTimeStamp
                     body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
