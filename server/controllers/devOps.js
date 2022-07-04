@@ -24,7 +24,6 @@ const getModule = async (d) => {
 	const inputs = {
 		"tab":d.tab,
 		"projectid":d.projectid || null,
-		"moduleid":d.moduleid,
 		"cycleid":d.cycId,
 		"name":"getModules"
 	}
@@ -35,8 +34,9 @@ exports.fetchModules = async (req, res) => {
 	const fnName = "fetchModules";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		const data = await getModule(req.body);
-		res.send(data);
+		const moduleData = await getModule(req.body);
+		const finalData = await utils.fetchData(moduleData, "devops/getScenariosForDevops", "fetchModules");
+		res.send(finalData);
 	} catch(exception) {
 		logger.error("Error occurred in devops/"+fnName+":", exception);
 		return res.status(500).send("fail");
