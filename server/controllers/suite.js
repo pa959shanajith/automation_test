@@ -7,6 +7,7 @@ var queue = require('../lib/execution/executionQueue')
 var cache = require('../lib/cache').getClient(2);
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const constants = require('../lib/execution/executionConstants');
+const { default: async } = require('async');
 /** This service reads the testsuite and scenario information for the testsuites */
 exports.readTestSuite_ICE = async (req, res) => {
 	const fnName = "readTestSuite_ICE";
@@ -352,3 +353,17 @@ exports.testSuitesSchedulerRecurring_ICE = async (req, res) => {
 		return res.status('500').send(result);
 	}
 };
+exports.execAutomation = async(req,res) => {
+	let result = await queue.Execution_Queue.execAutomation(req, res);
+	return res.send(result);
+}
+
+exports.getAgentTask = async(req,res) => {
+	let result = await queue.Execution_Queue.getAgentTask(req, res);
+	return res.send(result);
+}
+
+exports.getExecScenario = async(req,res) => {
+	let result = await queue.Execution_Queue.getExecScenario(req, res);
+	return res.send(result);
+}
