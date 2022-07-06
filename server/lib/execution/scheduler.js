@@ -17,6 +17,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
     let recurringString = body.executionData.batchInfo[0].recurringString;
     let recurringStringOnHoverValue = body.executionData.batchInfo[0].recurringStringOnHover;
     let timeValue = body.executionData.batchInfo[0].time;
+    let parentId = body.executionData.batchInfo[0].parentId ? body.executionData.batchInfo[0].parentId : 0;
     if (!poolid || poolid === "") poolid = constants.EMPTYPOOL
     var invokinguser = {
         invokinguser: session.userid,
@@ -99,7 +100,8 @@ exports.prepareSchedulingRequest = async (session, body) => {
             "scheduledby": invokinguser,
             "scheduleType": recurringString,
             "recurringStringOnHover": recurringStringOnHoverValue,
-            "time": timeValue
+            "time": timeValue,
+            "parentId": parentId
         };
         for (let i = 0; i < batchIdx.length; i++) {
             let suite = batchInfo[batchIdx[i]];
@@ -333,9 +335,33 @@ exports.cancelJob = async (req) => {
             logger.info("Sending response 'inprogress' from " + fnName + " service");
             return "inprogress";
         }
-        if (scheduleJobMap[scheduleid] && scheduleJobMap[scheduleid].cancel) scheduleJobMap[scheduleid].cancel();
-        const result2 = await this.updateScheduleStatus(scheduleid, "cancelled");
-        return result2;
+        if (scheduleJobMap[scheduleid] && scheduleJobMap[scheduleid].cancel) {
+            if (status == "recurring") {
+                let inputs1 = {
+                    "query": "getscheduledata",
+                    "parentid": scheduleid
+                };
+                const result1 = await utils.fetchData(inputs1, "suite/ScheduleTestSuite_ICE", fnName);
+                if (result1 == "fail") return "fail";
+                result1.forEach(async (element) => {
+                    const status1 = element.status;
+                    if (status1 == "scheduled") {
+                        if (scheduleJobMap[element._id] && scheduleJobMap[element._id].cancel) {
+                            scheduleJobMap[element._id].cancel();
+                            const result3 = await this.updateScheduleStatus(element._id, "cancelled");
+                        }
+                    }
+                });
+                scheduleJobMap[scheduleid].cancel();
+                const result2 = await this.updateScheduleStatus(scheduleid, "cancelled");
+                return result2;
+            }
+            else {
+                scheduleJobMap[scheduleid].cancel();
+                const result2 = await this.updateScheduleStatus(scheduleid, "cancelled");
+                return result2;
+            }
+        }
     }catch(e){
         logger.error("Exception in the function " + fnName)
         logger.debug("Exception in the function " + fnName + ": %s", ex)
@@ -405,7 +431,8 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         scheduleType: recurringString,
         recurringPattern: recurringPattern,
         recurringStringOnHover:	multiExecutionData.batchInfo[0].recurringStringOnHover,
-        time: timeSelected
+        time: timeSelected,
+        parentId: 0
     };
 
     const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
@@ -428,6 +455,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
             timeStamp = tempTimeStamp
 
             body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+            body.executionData.batchInfo[0].parentId = scheduleId;
             result1 = exports.prepareSchedulingRequest(session, body);
             schedFlag = result1;
         }
@@ -456,6 +484,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
                 body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                body.executionData.batchInfo[0].parentId = scheduleId;
                 result1 = exports.prepareSchedulingRequest(session, body);
                 schedFlag = result1;
             }
@@ -473,6 +502,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 timeStamp = tempTimeStamp
 
                 body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                body.executionData.batchInfo[0].parentId = scheduleId;
                 result1 = exports.prepareSchedulingRequest(session, body);
                 schedFlag = result1;
             }
@@ -485,6 +515,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
             timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
             body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+            body.executionData.batchInfo[0].parentId = scheduleId;
             result1 = exports.prepareSchedulingRequest(session, body);
             schedFlag = result1;
         }
@@ -514,6 +545,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                         tempTimeStamp.setDate(tempTimeStamp.getDate() + nextRun)
                         timeStamp = tempTimeStamp
                         body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                        body.executionData.batchInfo[0].parentId = scheduleId;
                         result = exports.prepareSchedulingRequest(session, body);
                         schedFlag = result
                     }
@@ -527,6 +559,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                         timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
                         body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                        body.executionData.batchInfo[0].parentId = scheduleId;
                         result1 = exports.prepareSchedulingRequest(session, body);
                         schedFlag = result; 
                     }
@@ -548,6 +581,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                             tempTimeStamp.setMonth(tempTimeStamp.getMonth() + nextRun)
                             timeStamp = tempTimeStamp
                             body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            body.executionData.batchInfo[0].parentId = scheduleId;
                             result = exports.prepareSchedulingRequest(session, body);
                             schedFlag = result
                         }
@@ -561,6 +595,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
                     body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    body.executionData.batchInfo[0].parentId = scheduleId;
                     result = exports.prepareSchedulingRequest(session, body);
                     schedFlag = result
                 }
