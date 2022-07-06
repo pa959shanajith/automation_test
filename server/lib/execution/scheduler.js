@@ -289,7 +289,8 @@ exports.reScheduleTestsuite = async () => {
                         "recurringString": schd.scheduletype ? schd.scheduletype	: "One Time",	
                         "recurringValue": schd.recurringpattern ? schd.recurringpattern : "One Time",	
                         "recurringStringOnHover": schd.recurringstringonhover	? schd.recurringstringonhover : "One Time",	
-                        "time": schd.time ? schd.time : "00:00"
+                        "time": schd.time ? schd.time : "00:00",
+                        "parentId": schd.parentid ? schd.parentid : 0
                     };
                     batchObj.batchInfo.push(suiteObj);
                 }
@@ -300,6 +301,7 @@ exports.reScheduleTestsuite = async () => {
         if (status == "fail") logger.error("Status from the function " + fnName + ": Jobs are not rescheduled");
         else if (status == "few") logger.warn("Status from the function " + fnName + ": All except few jobs are rescheduled");
         else logger.info("Status from the function " + fnName + ": Jobs successfully rescheduled");
+        exports.reScheduleRecurringTestsuite()
     } catch (ex) {
         logger.error("Exception in the function " + fnName + ": %s", ex);
     }
@@ -623,78 +625,97 @@ exports.reScheduleRecurringTestsuite = async () => {
         };
         const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
 
-        const multiBatchExecutionData = {};
-
         for (var i = 0; i < result.length; i++) {
-            const schd = result[i];
-            let poolid = schd.poolid;
-            const scheduleTime = new Date(result[i].scheduledon);
-            // Create entire multiBatchExecutionData object;
-            const tsuIds = schd.testsuiteids;
-            const batchObj = {
-                exectionMode: schd.executemode,
-                executionEnv: schd.executeenv,
-                browserType: schd.executeon,
-                scenarioFlag: schd.scenarioFlag,
-                qccredentials: {
-                    qcurl: "",
-                    qcusername: "",
-                    qcpassword: "",
-                },
-                targetUser: schd.target,
-                timestamp: scheduleTime.valueOf(),
-                scheduleId: schd._id,
-                batchInfo: [],
-                poolid: schd.poolid,
-                scheduledby: schd.scheduledby,
+            let inputs1 = {
+                "query": "getscheduledata",
+                "parentid": result[i]._id
             };
 
-            inputs = {
-                query: "gettestsuiteproject",
-                testsuiteids: tsuIds,
-            };
-            const details = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-
-            if (details == "fail") {
-                await this.updateScheduleStatus(schd._id, "Failed");
-                continue;
-            }
-            const prjObj = details.project;
-            for (var j = 0; j < tsuIds.length; j++) {
-                const tsuObj = details.suitemap[tsuIds[j]];
-                const suiteObj = {
-                    testsuiteName: tsuObj.name,
-                    testsuiteId: tsuObj._id,
-                    versionNumber: tsuObj.versionnumber,
-                    appType: prjObj.type,
-                    domainName: prjObj.domain,
-                    projectName: prjObj.name,
-                    projectId: prjObj._id,
-                    releaseId: prjObj.releaseid,
-                    cycleName: prjObj.cyclename,
-                    cycleId: prjObj.cycleid,
-                    suiteDetails: schd.scenariodetails[j],
-                    targetUser: schd.target,
-                    recurringString: schd.scheduletype ? schd.scheduletype	: "One Time",
-                    recurringValue: schd.recurringpattern ? schd.recurringpattern : "One Time",
-                    recurringStringOnHover: schd.recurringstringonhover	? schd.recurringstringonhover : "One Time",
-                    time: schd.time ? schd.time : "00:00"
-                };
-                batchObj.batchInfo.push(suiteObj);
-            }
-            multiBatchExecutionData.executionData = batchObj;
-
-            var session = {
-                userid: schd.scheduledby.invokinguser,
-                username: schd.scheduledby.invokingusername,
-                role: schd.scheduledby.invokinguserrole,
-            };
-
-            const status = await exports.scheduleRecurringTestSuite(session, multiBatchExecutionData);
-            if (status == "fail") logger.error("Status from the function " + fnName + ": Jobs are not rescheduled");
-            else if (status == "few") logger.warn("Status from the function " + fnName + ": All except few jobs are rescheduled");
-            else logger.info("Status from the function " + fnName + ": Jobs successfully rescheduled");
+            const result1 = await utils.fetchData(inputs1, "suite/ScheduleTestSuite_ICE", fnName);
+            if (result1 == "fail") return "fail";
+            result1.forEach(async (element) => {
+                const status1 = element.status;
+                if (status1 == "scheduled") {
+                    if (scheduleJobMap[element._id] && scheduleJobMap[element._id].cancel) {
+                        scheduleJobMap[element._id].cancel();
+                        const result3 = await this.updateScheduleStatus(element._id, "Failed");
+                    }
+                }
+            });
         }
+
+        // const multiBatchExecutionData = {};
+
+        // for (var i = 0; i < result.length; i++) {
+        //     const schd = result[i];
+        //     let poolid = schd.poolid;
+        //     const scheduleTime = new Date(result[i].scheduledon);
+        //     // Create entire multiBatchExecutionData object;
+        //     const tsuIds = schd.testsuiteids;
+        //     const batchObj = {
+        //         exectionMode: schd.executemode,
+        //         executionEnv: schd.executeenv,
+        //         browserType: schd.executeon,
+        //         scenarioFlag: schd.scenarioFlag,
+        //         qccredentials: {
+        //             qcurl: "",
+        //             qcusername: "",
+        //             qcpassword: "",
+        //         },
+        //         targetUser: schd.target,
+        //         timestamp: scheduleTime.valueOf(),
+        //         scheduleId: schd._id,
+        //         batchInfo: [],
+        //         poolid: schd.poolid,
+        //         scheduledby: schd.scheduledby,
+        //     };
+
+        //     inputs = {
+        //         query: "gettestsuiteproject",
+        //         testsuiteids: tsuIds,
+        //     };
+        //     const details = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
+
+        //     if (details == "fail") {
+        //         await this.updateScheduleStatus(schd._id, "Failed");
+        //         continue;
+        //     }
+        //     const prjObj = details.project;
+        //     for (var j = 0; j < tsuIds.length; j++) {
+        //         const tsuObj = details.suitemap[tsuIds[j]];
+        //         const suiteObj = {
+        //             testsuiteName: tsuObj.name,
+        //             testsuiteId: tsuObj._id,
+        //             versionNumber: tsuObj.versionnumber,
+        //             appType: prjObj.type,
+        //             domainName: prjObj.domain,
+        //             projectName: prjObj.name,
+        //             projectId: prjObj._id,
+        //             releaseId: prjObj.releaseid,
+        //             cycleName: prjObj.cyclename,
+        //             cycleId: prjObj.cycleid,
+        //             suiteDetails: schd.scenariodetails[j],
+        //             targetUser: schd.target,
+        //             recurringString: schd.scheduletype ? schd.scheduletype	: "One Time",
+        //             recurringValue: schd.recurringpattern ? schd.recurringpattern : "One Time",
+        //             recurringStringOnHover: schd.recurringstringonhover	? schd.recurringstringonhover : "One Time",
+        //             time: schd.time ? schd.time : "00:00"
+        //         };
+        //         batchObj.batchInfo.push(suiteObj);
+        //     }
+        //     multiBatchExecutionData.executionData = batchObj;
+
+        //     var session = {
+        //         userid: schd.scheduledby.invokinguser,
+        //         username: schd.scheduledby.invokingusername,
+        //         role: schd.scheduledby.invokinguserrole,
+        //     };
+
+        //     const status = await exports.scheduleRecurringTestSuite(session, multiBatchExecutionData);
+        //     if (status == "fail") logger.error("Status from the function " + fnName + ": Jobs are not rescheduled");
+        //     else if (status == "few") logger.warn("Status from the function " + fnName + ": All except few jobs are rescheduled");
+        //     else logger.info("Status from the function " + fnName + ": Jobs successfully rescheduled");
+        // }
 
         if (result != "fail") {
             for (var i = 0; i < result.length; i++) {
