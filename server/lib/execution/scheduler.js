@@ -17,6 +17,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
     let recurringString = body.executionData.batchInfo[0].recurringString;
     let recurringStringOnHoverValue = body.executionData.batchInfo[0].recurringStringOnHover;
     let timeValue = body.executionData.batchInfo[0].time;
+    let parentId = body.executionData.batchInfo[0].parentId ? body.executionData.batchInfo[0].parentId : 0;
     if (!poolid || poolid === "") poolid = constants.EMPTYPOOL
     var invokinguser = {
         invokinguser: session.userid,
@@ -99,7 +100,8 @@ exports.prepareSchedulingRequest = async (session, body) => {
             "scheduledby": invokinguser,
             "scheduleType": recurringString,
             "recurringStringOnHover": recurringStringOnHoverValue,
-            "time": timeValue
+            "time": timeValue,
+            "parentId": parentId
         };
         for (let i = 0; i < batchIdx.length; i++) {
             let suite = batchInfo[batchIdx[i]];
@@ -287,7 +289,8 @@ exports.reScheduleTestsuite = async () => {
                         "recurringString": schd.scheduletype ? schd.scheduletype	: "One Time",	
                         "recurringValue": schd.recurringpattern ? schd.recurringpattern : "One Time",	
                         "recurringStringOnHover": schd.recurringstringonhover	? schd.recurringstringonhover : "One Time",	
-                        "time": schd.time ? schd.time : "00:00"
+                        "time": schd.time ? schd.time : "00:00",
+                        "parentId": schd.parentid ? schd.parentid : 0
                     };
                     batchObj.batchInfo.push(suiteObj);
                 }
@@ -298,6 +301,7 @@ exports.reScheduleTestsuite = async () => {
         if (status == "fail") logger.error("Status from the function " + fnName + ": Jobs are not rescheduled");
         else if (status == "few") logger.warn("Status from the function " + fnName + ": All except few jobs are rescheduled");
         else logger.info("Status from the function " + fnName + ": Jobs successfully rescheduled");
+        exports.reScheduleRecurringTestsuite()
     } catch (ex) {
         logger.error("Exception in the function " + fnName + ": %s", ex);
     }
@@ -333,9 +337,33 @@ exports.cancelJob = async (req) => {
             logger.info("Sending response 'inprogress' from " + fnName + " service");
             return "inprogress";
         }
-        if (scheduleJobMap[scheduleid] && scheduleJobMap[scheduleid].cancel) scheduleJobMap[scheduleid].cancel();
-        const result2 = await this.updateScheduleStatus(scheduleid, "cancelled");
-        return result2;
+        if (scheduleJobMap[scheduleid] && scheduleJobMap[scheduleid].cancel) {
+            if (status == "recurring") {
+                let inputs1 = {
+                    "query": "getscheduledata",
+                    "parentid": scheduleid
+                };
+                const result1 = await utils.fetchData(inputs1, "suite/ScheduleTestSuite_ICE", fnName);
+                if (result1 == "fail") return "fail";
+                result1.forEach(async (element) => {
+                    const status1 = element.status;
+                    if (status1 == "scheduled") {
+                        if (scheduleJobMap[element._id] && scheduleJobMap[element._id].cancel) {
+                            scheduleJobMap[element._id].cancel();
+                            const result3 = await this.updateScheduleStatus(element._id, "cancelled");
+                        }
+                    }
+                });
+                scheduleJobMap[scheduleid].cancel();
+                const result2 = await this.updateScheduleStatus(scheduleid, "cancelled");
+                return result2;
+            }
+            else {
+                scheduleJobMap[scheduleid].cancel();
+                const result2 = await this.updateScheduleStatus(scheduleid, "cancelled");
+                return result2;
+            }
+        }
     }catch(e){
         logger.error("Exception in the function " + fnName)
         logger.debug("Exception in the function " + fnName + ": %s", ex)
@@ -378,10 +406,10 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         invokinguserrole: session.activeRoleId || session.role,
     };
 
-    let timestamp = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), new Date(new Date().getHours()), new Date(new Date().getMinutes()))
+    let timeSelected = multiExecutionData.batchInfo[0].time;
+    let timestamp = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeSelected.split(':')[0]), parseInt(timeSelected.split(':')[1]))
     const targetUser = multiExecutionData.batchInfo[0].targetUser;
     let recurringPattern = multiExecutionData['batchInfo'][0]['recurringValue'];
-    let timeSelected = multiExecutionData.batchInfo[0].time;
     recurringPattern = recurringPattern.split(" ");
     recurringPattern[0] = timeSelected.split(":")[1];
     recurringPattern[1] = timeSelected.split(":")[0];
@@ -405,7 +433,8 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         scheduleType: recurringString,
         recurringPattern: recurringPattern,
         recurringStringOnHover:	multiExecutionData.batchInfo[0].recurringStringOnHover,
-        time: timeSelected
+        time: timeSelected,
+        parentId: 0
     };
 
     const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
@@ -418,19 +447,54 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         let result1 = ""
         if (recurringString == "Every Day" && !recurringPattern.includes("1-5") && recurringStringOnHover != "Occurs every day") {
             nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
+            recurringPattern = recurringPattern.split(" ")
+            recurringPattern[2] = "*"
+            recurringPattern = recurringPattern.join(" ")
+
             let timeValue = multiExecutionData['batchInfo'][0]['time'];
             timeStamp = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]))
             tempTimeStamp = new Date(timeStamp)
             timeStamp = tempTimeStamp
+
             body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+            body.executionData.batchInfo[0].parentId = scheduleId;
             result1 = exports.prepareSchedulingRequest(session, body);
             schedFlag = result1;
         }
         else if (recurringString == "Every Month") {
             if (['first', 'second', 'third', 'fourth', 'last'].some(element => recurringStringOnHover.includes(element))) {
+                if (recurringStringOnHover.includes('first')) {
+                    recurringPattern = recurringPattern + "#1"
+                }
+                else if (recurringStringOnHover.includes('second')) {
+                    recurringPattern = recurringPattern + "#2"
+                }
+                else if (recurringStringOnHover.includes('third')) {
+                    recurringPattern = recurringPattern + "#3";
+                }
+                else if (recurringStringOnHover.includes('fourth')) {
+                    recurringPattern = recurringPattern + "#4"
+                }
+                else if (recurringStringOnHover.includes('last')) {
+                    recurringPattern = recurringPattern + "#5"
+                }
+
+                const interval = parser.parseExpression(recurringPattern);
+                let dateString = interval.next().toString().split(' ');
+                let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                let timeValue = multiExecutionData['batchInfo'][0]['time'];
+                timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+
+                body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                body.executionData.batchInfo[0].parentId = scheduleId;
+                result1 = exports.prepareSchedulingRequest(session, body);
+                schedFlag = result1;
+            }
+            else {
                 nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
                 recurringPattern = recurringPattern.split("/")
                 recurringPattern = recurringPattern[0] + " " + recurringPattern[1].split(" ")[1]
+
                 const interval = parser.parseExpression(recurringPattern);
                 let dateString = interval.next().toString().split(' ');
                 let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
@@ -439,44 +503,8 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 tempTimeStamp = new Date(timeStamp)
                 timeStamp = tempTimeStamp
 
-                if (recurringStringOnHover.includes('first') && (timeStamp.getDate() >= 1 && timeStamp.getDate() <= 7)) {
-                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    result1 = exports.prepareSchedulingRequest(session, body);
-                    schedFlag = result1;
-                }
-                else if (recurringStringOnHover.includes('second') && (timeStamp.getDate() >= 8 && timeStamp.getDate() <= 14)) {
-                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    result1 = exports.prepareSchedulingRequest(session, body);
-                    schedFlag = result1;
-                }
-                else if (recurringStringOnHover.includes('third') && (timeStamp.getDate() >= 15 && timeStamp.getDate() <= 21)) {
-                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    result1 = exports.prepareSchedulingRequest(session, body);
-                    schedFlag = result1;
-                }
-                else if (recurringStringOnHover.includes('fourth') && (timeStamp.getDate() >= 22 && timeStamp.getDate() <= 28)) {
-                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    result1 = exports.prepareSchedulingRequest(session, body);
-                    schedFlag = result1;
-                }
-                else if (recurringStringOnHover.includes('last') && (timeStamp.getDate() >= 24 && timeStamp.getDate() <= 31)) {
-                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    result1 = exports.prepareSchedulingRequest(session, body);
-                    schedFlag = result1;
-                }
-            }
-            else {
-                nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
-                recurringPattern = recurringPattern.split("/")
-                recurringPattern = recurringPattern[0] + " " + recurringPattern[1].split(" ")[1]
-                const interval = parser.parseExpression(recurringPattern);
-                let dateString = interval.next().toString().split(' ');
-                let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
-                let timeValue = multiExecutionData['batchInfo'][0]['time'];
-                timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                tempTimeStamp = new Date(timeStamp)
-                timeStamp = tempTimeStamp
                 body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                body.executionData.batchInfo[0].parentId = scheduleId;
                 result1 = exports.prepareSchedulingRequest(session, body);
                 schedFlag = result1;
             }
@@ -487,7 +515,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
             let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
             let timeValue = multiExecutionData['batchInfo'][0]['time'];
             timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+
             body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+            body.executionData.batchInfo[0].parentId = scheduleId;
             result1 = exports.prepareSchedulingRequest(session, body);
             schedFlag = result1;
         }
@@ -500,99 +530,60 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 let timeStamp = 0;
 
                 if (recurringString == "Every Day" && !recurringPattern.includes("1-5") && recurringStringOnHover != "Occurs every day") {
-                    tempTimeStamp.setDate(tempTimeStamp.getDate() + nextRun)
-                    timeStamp = tempTimeStamp
-                    body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    result = exports.prepareSchedulingRequest(session, body);
-                    schedFlag = result
+                    let nextRunLimit = new Date(tempTimeStamp.valueOf())
+                    nextRunLimit.setDate(nextRunLimit.getDate() + 1)
+
+                    const interval = parser.parseExpression(recurringPattern);
+                    let dateString = interval.next().toString().split(' ');
+                    let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                    let timeValue = multiExecutionData['batchInfo'][0]['time'];
+                    timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+
+                    let nextRunDateLimit = nextRunLimit.toString().split(' ');
+                    let nextRunMonthLimit = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(nextRunDateLimit[1]) / 3;
+                    nextRunDateLimit = new Date(parseInt(nextRunDateLimit[3]), parseInt(nextRunMonthLimit), parseInt(nextRunDateLimit[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]))
+
+                    if (timeStamp.valueOf() == nextRunDateLimit.valueOf()) {
+                        tempTimeStamp.setDate(tempTimeStamp.getDate() + nextRun)
+                        timeStamp = tempTimeStamp
+                        body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                        body.executionData.batchInfo[0].parentId = scheduleId;
+                        result = exports.prepareSchedulingRequest(session, body);
+                        schedFlag = result
+                    }
                 }
                 else if (recurringString == "Every Month") {
                     if (['first', 'second', 'third', 'fourth', 'last'].some(element => recurringStringOnHover.includes(element))) {
-                        let nextRunLimit = new Date(tempTimeStamp.valueOf())
-                        nextRunLimit.setMonth(nextRunLimit.getMonth() + nextRun)
-
-                        let nextRunDateLimit = nextRunLimit.toString().split(' ');
-                        let nextRunMonthLimit = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(nextRunDateLimit[1]) / 3 + 1;
-                        nextRunDateLimit = new Date(nextRunMonthLimit.toString()+"/"+nextRunDateLimit[2]+"/"+nextRunDateLimit[3])
-
                         const interval = parser.parseExpression(recurringPattern);
                         let dateString = interval.next().toString().split(' ');
                         let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
                         let timeValue = multiExecutionData['batchInfo'][0]['time'];
-
-                        let nextRunMonth = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3 + 1;
-                        let nextRunDate = new Date(nextRunMonth.toString()+"/"+dateString[2]+"/"+dateString[3])
-                        
-                        // Getting the day differnce between first run and next run
-                        let diffTime = Math.abs(nextRunDateLimit - nextRunDate);
-                        let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                        // getting the day difference between first run and next run that should happen in same month
-                        let currentRunDate = new Date().toString().split(' ')
-                        let currentRunMonth = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(currentRunDate[1]) / 3 + 1;
-                        currentRunDate = new Date(currentRunMonth.toString()+"/"+currentRunDate[2]+"/"+currentRunDate[3])
-
-                        let tempRunDate = tempTimeStamp.toString().split(' ')
-                        let tempRunMonth = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(tempRunDate[1]) / 3 + 1;
-                        tempRunDate = new Date(tempRunMonth.toString()+"/"+tempRunDate[2]+"/"+tempRunDate[3])
-                        
-                        let diffTimeTemp = Math.abs(currentRunDate - tempRunDate);
-                        let diffDaysTemp = Math.ceil(diffTimeTemp / (1000 * 60 * 60 * 24));
-
                         timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                        if (recurringStringOnHover.includes('first') && (timeStamp.getDate() >= 1 && timeStamp.getDate() <= 7) && (diffDays <= 7 || diffDaysTemp <= 7)) {
-                            tempTimeStamp = timeStamp
-                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                            result1 = exports.prepareSchedulingRequest(session, body);
-                            schedFlag = result1;
-                        }
-                        else if (recurringStringOnHover.includes('second') && (timeStamp.getDate() >= 8 && timeStamp.getDate() <= 14) && (diffDays <= 7 || diffDaysTemp <= 7)) {
-                            tempTimeStamp = timeStamp
-                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                            result1 = exports.prepareSchedulingRequest(session, body);
-                            schedFlag = result1;
-                        }
-                        else if (recurringStringOnHover.includes('third') && (timeStamp.getDate() >= 15 && timeStamp.getDate() <= 21) && (diffDays <= 7 || diffDaysTemp <= 7)) {
-                            tempTimeStamp = timeStamp
-                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                            result1 = exports.prepareSchedulingRequest(session, body);
-                            schedFlag = result1;
-                        }
-                        else if (recurringStringOnHover.includes('fourth') && (timeStamp.getDate() >= 22 && timeStamp.getDate() <= 28) && (diffDays <= 7 || diffDaysTemp <= 7)) {
-                            tempTimeStamp = timeStamp
-                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                            result1 = exports.prepareSchedulingRequest(session, body);
-                            schedFlag = result1;
-                        }
-                        else if (recurringStringOnHover.includes('last') && (timeStamp.getDate() >= 24 && timeStamp.getDate() <= 31) && (diffDays <= 7 || diffDaysTemp <= 7)) {
-                            tempTimeStamp = timeStamp
-                            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                            result1 = exports.prepareSchedulingRequest(session, body);
-                            schedFlag = result1;
-                        }
+                        body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                        body.executionData.batchInfo[0].parentId = scheduleId;
+                        result1 = exports.prepareSchedulingRequest(session, body);
+                        schedFlag = result; 
                     }
                     else {
                         let nextRunLimit = new Date(tempTimeStamp.valueOf())
-                        nextRunLimit.setMonth(nextRunLimit.getMonth() + nextRun)
-                        
-                        let nextRunDateLimit = nextRunLimit.toString().split(' ');
-                        let nextRunMonthLimit = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(nextRunDateLimit[1]) / 3;
-                        nextRunDateLimit = new Date(parseInt(nextRunDateLimit[3]), parseInt(nextRunMonthLimit), parseInt(nextRunDateLimit[2]))
+                        nextRunLimit.setMonth(nextRunLimit.getMonth() + 1)
 
                         const interval = parser.parseExpression(recurringPattern);
                         let dateString = interval.next().toString().split(' ');
                         let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
                         let timeValue = multiExecutionData['batchInfo'][0]['time'];
-
-                        let nextRunMonth = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
-                        let nextRunDate = new Date(parseInt(dateString[3]), parseInt(nextRunMonth), parseInt(dateString[2]))
-
                         timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+
+                        let nextRunDateLimit = nextRunLimit.toString().split(' ');
+                        let nextRunMonthLimit = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(nextRunDateLimit[1]) / 3;
+                        nextRunDateLimit = new Date(parseInt(nextRunDateLimit[3]), parseInt(nextRunMonthLimit), parseInt(nextRunDateLimit[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]))
             
-                        if (nextRunDateLimit.valueOf() === nextRunDate.valueOf()) {
-                            tempTimeStamp = timeStamp
+                        if (timeStamp.valueOf() === nextRunDateLimit.valueOf()) {
+                            tempTimeStamp.setMonth(tempTimeStamp.getMonth() + nextRun)
+                            timeStamp = tempTimeStamp
                             body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            body.executionData.batchInfo[0].parentId = scheduleId;
                             result = exports.prepareSchedulingRequest(session, body);
                             schedFlag = result
                         }
@@ -604,7 +595,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
                     let timeValue = multiExecutionData['batchInfo'][0]['time'];
                     timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+
                     body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    body.executionData.batchInfo[0].parentId = scheduleId;
                     result = exports.prepareSchedulingRequest(session, body);
                     schedFlag = result
                 }
@@ -632,78 +625,97 @@ exports.reScheduleRecurringTestsuite = async () => {
         };
         const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
 
-        const multiBatchExecutionData = {};
-
         for (var i = 0; i < result.length; i++) {
-            const schd = result[i];
-            let poolid = schd.poolid;
-            const scheduleTime = new Date(result[i].scheduledon);
-            // Create entire multiBatchExecutionData object;
-            const tsuIds = schd.testsuiteids;
-            const batchObj = {
-                exectionMode: schd.executemode,
-                executionEnv: schd.executeenv,
-                browserType: schd.executeon,
-                scenarioFlag: schd.scenarioFlag,
-                qccredentials: {
-                    qcurl: "",
-                    qcusername: "",
-                    qcpassword: "",
-                },
-                targetUser: schd.target,
-                timestamp: scheduleTime.valueOf(),
-                scheduleId: schd._id,
-                batchInfo: [],
-                poolid: schd.poolid,
-                scheduledby: schd.scheduledby,
+            let inputs1 = {
+                "query": "getscheduledata",
+                "parentid": result[i]._id
             };
 
-            inputs = {
-                query: "gettestsuiteproject",
-                testsuiteids: tsuIds,
-            };
-            const details = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-
-            if (details == "fail") {
-                await this.updateScheduleStatus(schd._id, "Failed");
-                continue;
-            }
-            const prjObj = details.project;
-            for (var j = 0; j < tsuIds.length; j++) {
-                const tsuObj = details.suitemap[tsuIds[j]];
-                const suiteObj = {
-                    testsuiteName: tsuObj.name,
-                    testsuiteId: tsuObj._id,
-                    versionNumber: tsuObj.versionnumber,
-                    appType: prjObj.type,
-                    domainName: prjObj.domain,
-                    projectName: prjObj.name,
-                    projectId: prjObj._id,
-                    releaseId: prjObj.releaseid,
-                    cycleName: prjObj.cyclename,
-                    cycleId: prjObj.cycleid,
-                    suiteDetails: schd.scenariodetails[j],
-                    targetUser: schd.target,
-                    recurringString: schd.scheduletype ? schd.scheduletype	: "One Time",
-                    recurringValue: schd.recurringpattern ? schd.recurringpattern : "One Time",
-                    recurringStringOnHover: schd.recurringstringonhover	? schd.recurringstringonhover : "One Time",
-                    time: schd.time ? schd.time : "00:00"
-                };
-                batchObj.batchInfo.push(suiteObj);
-            }
-            multiBatchExecutionData.executionData = batchObj;
-
-            var session = {
-                userid: schd.scheduledby.invokinguser,
-                username: schd.scheduledby.invokingusername,
-                role: schd.scheduledby.invokinguserrole,
-            };
-
-            const status = await exports.scheduleRecurringTestSuite(session, multiBatchExecutionData);
-            if (status == "fail") logger.error("Status from the function " + fnName + ": Jobs are not rescheduled");
-            else if (status == "few") logger.warn("Status from the function " + fnName + ": All except few jobs are rescheduled");
-            else logger.info("Status from the function " + fnName + ": Jobs successfully rescheduled");
+            const result1 = await utils.fetchData(inputs1, "suite/ScheduleTestSuite_ICE", fnName);
+            if (result1 == "fail") return "fail";
+            result1.forEach(async (element) => {
+                const status1 = element.status;
+                if (status1 == "scheduled") {
+                    if (scheduleJobMap[element._id] && scheduleJobMap[element._id].cancel) {
+                        scheduleJobMap[element._id].cancel();
+                        const result3 = await this.updateScheduleStatus(element._id, "Failed");
+                    }
+                }
+            });
         }
+
+        // const multiBatchExecutionData = {};
+
+        // for (var i = 0; i < result.length; i++) {
+        //     const schd = result[i];
+        //     let poolid = schd.poolid;
+        //     const scheduleTime = new Date(result[i].scheduledon);
+        //     // Create entire multiBatchExecutionData object;
+        //     const tsuIds = schd.testsuiteids;
+        //     const batchObj = {
+        //         exectionMode: schd.executemode,
+        //         executionEnv: schd.executeenv,
+        //         browserType: schd.executeon,
+        //         scenarioFlag: schd.scenarioFlag,
+        //         qccredentials: {
+        //             qcurl: "",
+        //             qcusername: "",
+        //             qcpassword: "",
+        //         },
+        //         targetUser: schd.target,
+        //         timestamp: scheduleTime.valueOf(),
+        //         scheduleId: schd._id,
+        //         batchInfo: [],
+        //         poolid: schd.poolid,
+        //         scheduledby: schd.scheduledby,
+        //     };
+
+        //     inputs = {
+        //         query: "gettestsuiteproject",
+        //         testsuiteids: tsuIds,
+        //     };
+        //     const details = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
+
+        //     if (details == "fail") {
+        //         await this.updateScheduleStatus(schd._id, "Failed");
+        //         continue;
+        //     }
+        //     const prjObj = details.project;
+        //     for (var j = 0; j < tsuIds.length; j++) {
+        //         const tsuObj = details.suitemap[tsuIds[j]];
+        //         const suiteObj = {
+        //             testsuiteName: tsuObj.name,
+        //             testsuiteId: tsuObj._id,
+        //             versionNumber: tsuObj.versionnumber,
+        //             appType: prjObj.type,
+        //             domainName: prjObj.domain,
+        //             projectName: prjObj.name,
+        //             projectId: prjObj._id,
+        //             releaseId: prjObj.releaseid,
+        //             cycleName: prjObj.cyclename,
+        //             cycleId: prjObj.cycleid,
+        //             suiteDetails: schd.scenariodetails[j],
+        //             targetUser: schd.target,
+        //             recurringString: schd.scheduletype ? schd.scheduletype	: "One Time",
+        //             recurringValue: schd.recurringpattern ? schd.recurringpattern : "One Time",
+        //             recurringStringOnHover: schd.recurringstringonhover	? schd.recurringstringonhover : "One Time",
+        //             time: schd.time ? schd.time : "00:00"
+        //         };
+        //         batchObj.batchInfo.push(suiteObj);
+        //     }
+        //     multiBatchExecutionData.executionData = batchObj;
+
+        //     var session = {
+        //         userid: schd.scheduledby.invokinguser,
+        //         username: schd.scheduledby.invokingusername,
+        //         role: schd.scheduledby.invokinguserrole,
+        //     };
+
+        //     const status = await exports.scheduleRecurringTestSuite(session, multiBatchExecutionData);
+        //     if (status == "fail") logger.error("Status from the function " + fnName + ": Jobs are not rescheduled");
+        //     else if (status == "few") logger.warn("Status from the function " + fnName + ": All except few jobs are rescheduled");
+        //     else logger.info("Status from the function " + fnName + ": Jobs successfully rescheduled");
+        // }
 
         if (result != "fail") {
             for (var i = 0; i < result.length; i++) {
