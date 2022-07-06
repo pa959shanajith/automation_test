@@ -299,6 +299,8 @@ class TestSuiteExecutor {
         var reportType = "accessiblityTestingOnly";
         logger.info("Sending request to ICE for executeTestSuite");
         const dataToIce = { "emitAction": "executeTestSuite", "username": icename, "executionRequest": execReq };
+        const status = await utils.fetchData(dataToIce, "devops/configurekey", fnName);
+        if (status == "fail" || status == "forbidden") return "fail";
         redisServer.redisPubICE.publish('ICE1_' + channel + '_' + icename, JSON.stringify(dataToIce));
 
         const exePromise = async (resSent) => (new Promise((rsv, rej) => {
@@ -462,6 +464,7 @@ class TestSuiteExecutor {
         const currExecIds = await this.generateExecutionIds(execIds, executionRequest.testsuiteIds, userInfo.invokinguser, executionRequest.version, executionRequest.batchname, executionRequest.smart);        if (currExecIds == "fail") return "fail";
         executionRequest.batchId = currExecIds.batchid;
         executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
+        executionRequest.avogridid = batchExecutionData.avogridid;
         if (execType == "SCHEDULE") executionRequest.scheduleId = batchExecutionData.scheduleId;
         const result = await this.executionRequestToICE(executionRequest, execType, userInfo);
         return result;

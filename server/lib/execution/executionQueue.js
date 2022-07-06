@@ -7,7 +7,9 @@ const EMPTYUSER = process.env.nulluser;
 var testSuiteInvoker = require('../execution/executionInvoker')
 const constants = require('./executionConstants');
 const tokenAuth = require('../tokenAuth')
-const scheduler = require('./scheduler')
+const scheduler = require('./scheduler');
+const { default: async } = require('async');
+const { timestamp } = require('winston/lib/winston/common');
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -25,6 +27,9 @@ module.exports.Execution_Queue = class Execution_Queue {
     static notification_dict = {}
     static poolname_ice_map = {}
     static res_map = {}
+    static key_list = {}
+    static task_list = []
+    static agent_list = {}
     // executon queue initialisation
     static queue_init() {
         logger.info("Initializing Execution Queues")
@@ -530,6 +535,176 @@ module.exports.Execution_Queue = class Execution_Queue {
         this.ice_list[ice_name] = { "connected": true, "status": true, "mode": false, "poolid": "", "_id": "" };
     }
 
+    //if avogridid present add an array of agents or directly agent specified add that.
+    static execAutomation = async (req, res) => {
+        var fnName = 'execAutomation';
+        let response = {};
+        response['status'] = "fail";
+        response["message"] = "N/A";
+        response['error'] = "None";
+        try {
+            //TO-DO Apply a check whether such key exists or not.
+
+            if(!(req.body.key in this.key_list))
+                this.key_list[req.body.key] = [];
+
+            let keyQueue = this.key_list[req.body.key];
+            // testSuiteInfo = await utils.fetchData(key,'/',);
+            let Info = await utils.fetchData(req.body, "devops/getTestSuite", fnName);
+            let testSuiteInfo = Info.testSuiteInfo;
+            let avogridid = Info.avogridid;
+            console.info(testSuiteInfo);
+
+            for (let ids of testSuiteInfo)
+                keyQueue.push({moduleid:ids,status: 'QUEUED'});
+
+            // this.key_list = [];
+            await cache.set("execution_list", this.key_list);
+            let execution_Queue = await cache.get('execution_list');
+            console.info(execution_Queue);
+
+            //Fetching the Agents for Task List
+            // let taskList = this.task_list;
+            // // testSuiteInfo = await utils.fetchData(key,'/',);
+            // //TO-DO Apply check whether directly agent is mentioned.
+            // let agents = await utils.fetchData({'avogridid':avogridid}, "devops/getAgents", fnName);
+            // console.info(agents);
+
+            // for (let ids of agents)
+            //     taskList.push({'avogentid':ids.avoagentid,'key': req.body.key});
+
+            // // this.key_list = [];
+            // await cache.set("task_list", this.task_list);
+            // let task_queue = await cache.get('task_list');
+            // console.info(task_queue);
+
+            response['status'] = "pass";
+        } catch (error) {
+            console.info(error);
+            logger.error("Error in execAutomation. Error: %s", error);
+        }
+        
+        // logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on any availble ICE");
+        // response["message"] = "Execution queued on pool: " + pool["name"] + "\nQueue Length: " + pool["execution_list"].length.toString();
+        // response['variant'] = "success";
+        return response;
+    }
+
+    static getAgentTask = async (req, res) => {
+        var fnName = 'getAgentTask';
+        let response = {};
+        response['status'] = "fail";
+        response["message"] = "N/A";
+        response['error'] = "None";
+        try {
+            let agent = req.body.Hostname;
+
+            //Add agent in the agent List
+            if(!(agent in this.agent_list) ) {
+                let timestamp = new Date().toLocaleString();
+                this.agent_list[agent] = {
+                "icecount": req.body.icecount,
+                "timestamp": timestamp,
+                "status": "active"
+            };
+                let agentDetails = this.agent_list[agent];
+                agentDetails['name'] = agent;
+                const status = await utils.fetchData(agentDetails, "devops/agentDetails", fnName);
+                if (status == "fail" || status == "forbidden") return "fail";
+
+                //Storing in Cache
+                await cache.set("agent_list", this.agent_list);
+                console.info(await cache.get('agent_list'));
+            }
+
+            // corner cases needed to be added
+            //Doubt - If we find a task after sending the key should remove from task list or wait
+            // Exactly when to remove from the task list.
+            // let agentAssignedToKey = ''
+            // for(let task of this.task_list) {
+            //     if(task.avoagentid === agent) {
+            //         agentAssignedToKey = task.key;
+            //         break;
+            //     }
+            // }
+
+            //Search in all keys whether Agent is present in its execution queue.
+            let agentAssignedToKey = '';
+            const keysToBeSearched = await utils.fetchData({avoagents: agent}, "devops/keysList", fnName);
+            console.info(keysToBeSearched);
+            for(let key of keysToBeSearched) {
+                if(key in this.key_list)
+               {
+                    let testSuiteList = this.key_list[key]
+                    for(let testsuite of testSuiteList) {
+                    if(testsuite.status == "QUEUED"){
+                        agentAssignedToKey = key;
+                            break;
+                        }
+                    }
+                }
+                if(agentAssignedToKey != '') break;
+            }
+
+            //TO-DO set Agent Status..
+
+            response['status'] = 'Pass';
+            response['message'] = agentAssignedToKey;
+
+        } catch (error) {
+            console.info(error);
+            logger.error("Error in getAgentTask. Error: %s", error);
+        }
+        
+        // logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on any availble ICE");
+        // response["message"] = "Execution queued on pool: " + pool["name"] + "\nQueue Length: " + pool["execution_list"].length.toString();
+        // response['variant'] = "success";
+        return response;
+    }
+
+    static getExecScenario = async (req, res) => {
+        var fnName = 'getExecScenario';
+        let response = {};
+        response['status'] = "fail";
+        response["message"] = "N/A";
+        response['error'] = "None";
+        try {
+            const configKey = req.body.configkey;
+            if(configKey in this.key_list) {
+
+                const testSuiteList = this.key_list[configKey];
+                let executionData = '';
+                for(let testSuite of testSuiteList) {
+                    if(testSuite.status === 'QUEUED') {
+                        executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuite.moduleid}, "devops/getExecScenario", fnName);
+                        if (executionData == "fail" || executionData == "forbidden") {
+                            response['status'] = "fail";
+                            return response;
+                        }
+                        //TO_DO-->Update that item to IN_PROGRESS
+                        break;
+                    }
+                }
+
+            if(executionData != '')
+                response['status'] = executionData;
+            else 
+                response['status'] = "fail";
+                
+                return response;
+            }
+            response['status'] = "fail";
+
+        } catch (error) {
+            console.info(error);
+            logger.error("Error in execAutomation. Error: %s", error);
+        }
+        
+        // logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on any availble ICE");
+        // response["message"] = "Execution queued on pool: " + pool["name"] + "\nQueue Length: " + pool["execution_list"].length.toString();
+        // response['variant'] = "success";
+        return response;
+    }
 }
 
 
