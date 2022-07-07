@@ -25,7 +25,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'headless'
         },{
             name: 'Name 2',
             key: uuid(),
@@ -41,7 +42,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'synchronous'
+            executionType: 'synchronous',
+            executionMode: 'headless'
         },{
             name: 'Name 3',
             key: uuid(),
@@ -57,7 +59,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 4',
             key: uuid(),
@@ -73,7 +76,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 5',
             key: uuid(),
@@ -89,7 +93,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 6',
             key: uuid(),
@@ -105,7 +110,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 7',
             key: uuid(),
@@ -121,7 +127,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 8',
             key: uuid(),
@@ -137,7 +144,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 9',
             key: uuid(),
@@ -153,7 +161,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 10',
             key: uuid(),
@@ -169,7 +178,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 11',
             key: uuid(),
@@ -185,7 +195,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 12',
             key: uuid(),
@@ -201,7 +212,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 13',
             key: uuid(),
@@ -217,7 +229,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 14',
             key: uuid(),
@@ -233,7 +246,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         },{
             name: 'Name 15',
             key: uuid(),
@@ -249,7 +263,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             avoAgentGrid: '',
             browser: '',
             integration: '',
-            executionType: 'asynchronous'
+            executionType: 'asynchronous',
+            executionMode: 'non-headless'
         }
     ]);
     // const [configList, setConfigList] = useState([]);
@@ -309,7 +324,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                     avoAgentGrid: '',
                     browser: '',
                     integration: '',
-                    executionType: 'asynchronous'
+                    executionType: 'asynchronous',
+                    executionMode: 'non-headless'
                 })} >New Configuration</button>
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>

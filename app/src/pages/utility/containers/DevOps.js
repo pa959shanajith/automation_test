@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import ReportApi from '../components/ReportApi'
 import ExecMetricsApi from '../components/ExecMetricsApi'
@@ -12,42 +12,6 @@ import DevOpsConfig from '../components/DevOpsConfig';
 
 const DevOps = props => {
     const [showConfirmPop, setShowConfirmPop] = useState(false);
-    const [error, setError] = useState({
-        error: false,
-        toDate: false,
-        fromDate: false,
-        LOB: false,
-        executionId: false,
-        scenarioIds: false,
-        source: false,
-        exectionMode: false,
-        executionEnv: false,
-        browserType: false,
-        integration: {
-            url: false,
-            username: false,
-            password: false,
-            qteststeps: false
-        },
-        gitInfo: {
-            gitConfiguration: false,
-            gitbranch: false,
-            folderPath: false,
-            gitVersion: false
-        },
-        batchInfo: {
-            testsuiteName: false,
-            testsuiteId: false,
-            versionNumber: false,
-            appType: false,
-            domainName: false,
-            projectName: false,
-            projectId: false,
-            releaseId: false,
-            cycleName: false,
-            cycleId: false
-        }
-    });
     const api = window.location.href.slice(0, -7)+'executeAutomation';
     const [currentIntegration, setCurrentIntegration] = useState(false);
 

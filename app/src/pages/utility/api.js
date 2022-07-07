@@ -314,8 +314,6 @@ export const importDataTable = async(arg) => {
 }
 
 export const fetchProjects = async(data) => {
-    // return [{"_id":"620f83513eb0b5d441b73a69","name":"New Project","releases":[{"createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","cycles":[{"_id":"620f83513eb0b5d441b73a67","createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"C1"},{"_id":"620f83513eb0b5d441b73a68","createdby":"5db0022cf87fdec084ae49ad","createdbyrole":"5db0022cf87fdec084ae49a9","createdon":"Fri, 18 Feb 2022 17:00:25 GMT","modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"C2"}],"modifiedby":"5db0022cf87fdec084ae49ad","modifiedbyrole":"5db0022cf87fdec084ae49a9","modifiedon":"Fri, 18 Feb 2022 17:00:25 GMT","name":"R1"}],"type":"5db0022cf87fdec084ae49b6"}];
-    // return [{"appType":["5db0022cf87fdec084ae49b6"],"appTypeName":["Web"],"cycles":{"620a3672479f19c38742bc93":["620a3672479f19c38742bc93","R1","C1"]},"domains":["Banking"],"projectId":["620a3672479f19c38742bc94"],"projectName":["AssurePractice"],"projecttypes":{"5db0022cf87fdec084ae49ae":"Generic","5db0022cf87fdec084ae49af":"Desktop","5db0022cf87fdec084ae49b0":"Mainframe","5db0022cf87fdec084ae49b1":"MobileApp","5db0022cf87fdec084ae49b2":"MobileWeb","5db0022cf87fdec084ae49b3":"OEBS","5db0022cf87fdec084ae49b4":"SAP","5db0022cf87fdec084ae49b5":"System","5db0022cf87fdec084ae49b6":"Web","5db0022cf87fdec084ae49b7":"Webservice"},"releases":[[{"cycles":[{"_id":"620a3672479f19c38742bc93","name":"C1"}],"name":"R1"}]]}]
     try{
         const res = await axios(url+'/fetchProjects', {
             method: 'POST',
@@ -392,7 +390,6 @@ export const getPools = async(data) => {
 
 export const storeConfigureKey = async(props) => {
     try{
-        console.log(props)
         const res = await axios(url+'/ExecuteTestSuite_ICE', {
             method: 'POST',
             headers: {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT } from '../../global';
-import { fetchProjects, getPools } from '../api';
+import { fetchProjects, getPools, storeConfigureKey } from '../api';
 import { useSelector } from 'react-redux';
 import { SearchDropdown, TextField, Toggle } from '@avo/designcomponents';
 
@@ -23,7 +23,24 @@ const DevOpsConfig = props => {
     const [dataDict, setDict] = useState({});
     const [integrationConfig, setIntegrationConfig] = useState(props.currentIntegration);
     const [icepoollist, setIcepoollist] = useState([]);
-    const [browserlist, setBrowserlist] = useState([]);
+    const [browserlist, setBrowserlist] = useState([
+        {
+            key: '0',
+            text: 'Internet Exploror'
+        },{
+            key: '1',
+            text: 'Google Chrome'
+        },{
+            key: '2',
+            text: 'Mozilla Firefox'
+        },{
+            key: '3',
+            text: 'Microsoft Edge'
+        },{
+            key: '4',
+            text: 'Edge Chromium'
+        }
+    ]);
     const [dataUpdated, setDataUpdated] = useState(false);
     const [integrationlist, setIntegrationlist] = useState([
         {
@@ -37,6 +54,7 @@ const DevOpsConfig = props => {
             text: 'Zephyr'
         }
     ]);
+    const [moduleScenarioList, setModuleScenarioList] = useState([]);
     useEffect(()=> {
         (async()=>{
             const args = {
@@ -46,7 +64,11 @@ const DevOpsConfig = props => {
             const poolList = await getPools(args);
             console.log(poolList);
             if(poolList.error) {
-                setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
+                if(poolList.error.CONTENT) {
+                    setMsg(MSG.CUSTOM(poolList.error.CONTENT,VARIANT.ERROR));
+                } else {
+                    setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
+                }
             }else {
                 console.log(poolList);
             }
@@ -149,14 +171,88 @@ const DevOpsConfig = props => {
         setIntegrationConfig({...integrationConfig, selectValues: newSelectValues});
     }
 
+    const handleConfigSave = async () => {
+        const batchInfo = moduleScenarioList.filter((module) => {
+            return module.scenarios.some(scenario => {
+                return integrationConfig.scenarioList.includes(scenario._id)
+            });
+        }).map((module) => {
+            return({
+                scenarioTaskType: "disable",
+                testsuiteName: module.name,
+                testsuiteId: module.moduleid,
+                batchname: "",
+                versionNumber: 0,
+                appType: "Web",
+                domainName: "Banking",
+                projectName: integrationConfig.selectValues[0].selectedName,
+                projectId: integrationConfig.selectValues[0].selected,
+                releaseId: integrationConfig.selectValues[1].selected,
+                cycleName: integrationConfig.selectValues[2].selectedName,
+                cycleId: integrationConfig.selectValues[2].selected,
+                suiteDetails: module.scenarios.filter((scenario) => integrationConfig.scenarioList.includes(scenario._id)).map((scenario) => ({
+                    condition: 0,
+                    dataparam: [""],
+                    scenarioName: scenario.name,
+                    scenarioId: scenario._id,
+                    accessibilityParameters: []
+                }))
+            });
+        });
+        const storeConfig = await storeConfigureKey({
+            type: "",
+            poolid: "",
+            targetUser: "",
+            source: "task",
+            exectionMode: "serial",
+            executionEnv: "default",
+            browserType: [integrationConfig.browser],
+            configurename: integrationConfig.name,
+            executiontype: integrationConfig.executionType,
+            configurekey: integrationConfig.key,
+            exectionmode: integrationConfig.exectionMode,
+            integration: {
+                alm: {
+                    url: "",
+                    username: "",
+                    password: ""
+                },
+                qtest: {
+                    url: "",
+                    username: "",
+                    password: "",
+                    qteststeps: ""
+                },
+                zephyr: {
+                    url: "",
+                    username: "",
+                    password: ""
+                }
+            },
+            batchInfo: batchInfo,
+            scenarioFlag: false
+        });
+        console.log(storeConfig);
+        if(storeConfig.status !== 'pass') {
+            if(storeConfig.error.CONTENT) {
+                setMsg(MSG.CUSTOM(storeConfig.error.CONTENT,VARIANT.ERROR));
+            } else {
+                setMsg(MSG.CUSTOM("Something Went Wrong",VARIANT.ERROR));
+            }
+        }else {
+            props.setCurrentIntegration(false);
+            props.showMessageBar( `Configuration ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d Successfully` , 'SUCCESS');
+        }
+    }
+
     return (<>
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-                { integrationConfig.key === '' ? 'Create New' : 'Update'} Configuration
+                { props.currentIntegration.name === '' ? 'Create New' : 'Update'} Configuration
             </span>
         </div>
         <div className="api-ut__btnGroup">
-            <button data-test="submit-button-test" onClick={() => props.showMessageBar( `Configuration ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d Successfully` , 'SUCCESS')} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
+            <button data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
             <button data-test="submit-button-test" onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : 'Back'}</button>
             <div className="devOps_config_name">
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Configuration Name : </span>
@@ -174,7 +270,7 @@ const DevOpsConfig = props => {
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
                 <div className="devOps_module_list">
-                    <DevOpsModuleList integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} />
+                    <DevOpsModuleList integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} setModuleScenarioList={setModuleScenarioList} />
                 </div>
                 <div className="devOps_pool_list">
                     <div style={{ marginTop: '0' }}>
@@ -219,6 +315,14 @@ const DevOpsConfig = props => {
                             <label>Asynchronous </label>
                             <Toggle checked={integrationConfig.executionType == 'synchronous'} onChange={() => setIntegrationConfig({...integrationConfig, executionType: (integrationConfig.executionType === 'synchronous') ? 'asynchronous' : 'synchronous' })} label="" inlineLabel={true} />
                             <label>Synchronous </label>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Execution Mode : </label>
+                        <div className="devOps_dropdown_label_sync">
+                            <label>Non-Headless </label>
+                            <Toggle checked={integrationConfig.executionMode == 'headless'} onChange={() => setIntegrationConfig({...integrationConfig, executionMode: (integrationConfig.executionMode === 'headless') ? 'non-headless' : 'headless' })} label="" inlineLabel={true} />
+                            <label>Headless </label>
                         </div>
                     </div>
                     <div className='devOps_seperation'>

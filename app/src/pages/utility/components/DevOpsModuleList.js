@@ -6,151 +6,10 @@ import { Icon } from '@fluentui/react';
 
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
-const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig }) => {
+const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, setModuleScenarioList }) => {
     // const [moduleList, setModuleList] = useState(integrationConfig.scenarioList);
-    const [moduleList, setModuleList] = useState([
-        {
-            value: 'Module 1',
-            label: 'Module 1',
-            children: [
-                {
-                    value: 'Module 1 Scenario 1',
-                    label: 'Scenario 1'
-                },
-                {
-                    value: 'Module 1 Scenario 2',
-                    label: 'Scenario 2'
-                },
-                {
-                    value: 'Module 1 Scenario 3',
-                    label: 'Scenario 3',
-                    children: [
-                        {
-                            value: 'Module 1 TestCase 1 Scenario 1',
-                            label: 'TestCase 1'
-                        },
-                        {
-                            value: 'Module 1 TestCase 2 Scenario 2',
-                            label: 'TestCase 2'
-                        },
-                        {
-                            value: 'Module 1 TestCase 3 Scenario 3',
-                            label: 'TestCase 3'
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            value: 'Module 2',
-            label: 'Module 2',
-            children: [
-                {
-                    value: 'Module 2 Scenario 1',
-                    label: 'Scenario 1'
-                },
-                {
-                    value: 'Module 2 Scenario 2',
-                    label: 'Scenario 2'
-                },
-                {
-                    value: 'Module 2 Scenario 3',
-                    label: 'Scenario 3'
-                }
-            ]
-        },
-        {
-            value: 'Module 3',
-            label: 'Module 3',
-            children: [
-                {
-                    value: 'Module 3 Scenario 1',
-                    label: 'Scenario 3'
-                },
-                {
-                    value: 'Module 3 Scenario 2',
-                    label: 'Scenario 2'
-                },
-                {
-                    value: 'Module 3 Scenario 3',
-                    label: 'Scenario 3'
-                }
-            ]
-        },
-        {
-            value: 'Module 4',
-            label: 'Module 4',
-            children: [
-                {
-                    value: 'Module 4 Scenario 1',
-                    label: 'Scenario 1'
-                },
-                {
-                    value: 'Module 4 Scenario 2',
-                    label: 'Scenario 4'
-                },
-                {
-                    value: 'Module 4 Scenario 3',
-                    label: 'Scenario 3'
-                }
-            ]
-        },
-        {
-            value: 'Module 5',
-            label: 'Module 5',
-            children: [
-                {
-                    value: 'Module 5 Scenario 1',
-                    label: 'Scenario 1'
-                },
-                {
-                    value: 'Module 5 Scenario 2',
-                    label: 'Scenario 5'
-                },
-                {
-                    value: 'Module 5 Scenario 3',
-                    label: 'Scenario 3'
-                }
-            ]
-        },
-        {
-            value: 'Module 6',
-            label: 'Module 6',
-            children: [
-                {
-                    value: 'Module 6 Scenario 1',
-                    label: 'Scenario 6'
-                },
-                {
-                    value: 'Module 6 Scenario 2',
-                    label: 'Scenario 2'
-                },
-                {
-                    value: 'Module 6 Scenario 3',
-                    label: 'Scenario 6'
-                }
-            ]
-        },
-        {
-            value: 'Module 7',
-            label: 'Module 7',
-            children: [
-                {
-                    value: 'Module 7 Scenario 1',
-                    label: 'Scenario 1'
-                },
-                {
-                    value: 'Module 7 Scenario 2',
-                    label: 'Scenario 2'
-                },
-                {
-                    value: 'Module 7 Scenario 3',
-                    label: 'Scenario 3'
-                }
-            ]
-        }
-    ]);
-    const [filteredModuleList, setFilteredModuleList] = useState(moduleList);
+    const [moduleList, setModuleList] = useState([]);
+    const [filteredModuleList, setFilteredModuleList] = useState([]);
     const indeterminateStyle = {
         root: {
             '&[class ~= is-enabled]': {
@@ -274,13 +133,30 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig }) => {
                 const moduleList = await fetchModules({
                     "tab":'tabAssign',
                     "projectid":integrationConfig.selectValues[0].selected,
-                    "moduleid":integrationConfig.selectValues[1].selected,
                     "cycleid":integrationConfig.selectValues[2].selected
                 });
                 if(moduleList.error) {
                     setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
                 }else {
-                    console.log(moduleList);
+                    const filteredNodes = moduleList.map((module) => {
+                        let filterModule = {
+                            value: module.moduleid,
+                            label: module.name,
+                        };
+                        if(module.scenarios.length > 0) {
+                            const moduleChildren = module.scenarios.map((scenario) => {
+                                return ({
+                                    value: scenario._id,
+                                    label: scenario.name
+                                })
+                            });
+                            filterModule['children'] = moduleChildren;
+                        }
+                        return filterModule;
+                    });
+                    setModuleList(filteredNodes);
+                    setFilteredModuleList(filteredNodes);
+                    setModuleScenarioList(moduleList);
                 }
             }
         })()
