@@ -30,7 +30,7 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions}) => {
         title='Import Mindmap'
         close={()=>setImportPop(false)}
         footer={<Footer error={error} setSubmit={setSubmit}/>}
-        content={<Container submit={submit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} displayError={displayError}/>} 
+        content={<Container submit={submit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui}/>} 
       />
     )
 }

@@ -52,6 +52,7 @@ const CanvasNew = (props) => {
     const [createnew,setCreateNew] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(false)
     const setBlockui=props.setBlockui
+    const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
     const CanvasRef = useRef();
     readCtScale = () => ctScale
@@ -251,7 +252,7 @@ const CanvasNew = (props) => {
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
-            <SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>
+            <SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>
             <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>

@@ -316,13 +316,15 @@ const Messages={
         ERR_GET_NOTIFICATION: {"CONTENT":'Failed to fetch Notification Rules.', "VARIANT": VARIANT.ERROR},
         ERR_NOTIFICATION_CONFIG: {"CONTENT":'Failed to fetch Notification Configuration.', "VARIANT": VARIANT.ERROR},
         ERR_UPDATE_NOTIFICATION_RULES: {"CONTENT":'Failed to Update Notification Rules.', "VARIANT": VARIANT.ERROR},
-        
+        ERR_DELETE_SCENARIO: {"CONTENT":'Error while deleting scenarios.', "VARIANT": VARIANT.ERROR},
+
         SUCC_NODE_CREATE: {"CONTENT":"Nodes created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_EXPORTED: {"CONTENT":"Data Exported Successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_SAVE: {"CONTENT":'Tasks saved successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_SAVE: {"CONTENT":'Data saved successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_COPIED : {"CONTENT":"Data Copied successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_RULES_UPDATE : {"CONTENT":"Rules updated successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_DELETE_SCENARIO : {"CONTENT":"Scenarios successfully deleted.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_PROJECT_ASSIGN_USER: {"CONTENT":'This project is not assigned to user.', "VARIANT": VARIANT.WARNING},
         WARN_SELECT_COMPLETE_FLOW: {"CONTENT":"Please select a complete flow to assign tasks.", "VARIANT": VARIANT.WARNING},
