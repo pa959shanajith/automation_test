@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
-import { ScreenOverlay , PopupMsg , ChangePassword, Messages as MSG, setMsg } from '../../global';
+import { ScreenOverlay , PopupMsg , ChangePassword, ModalContainer, ScrollBar, Messages as MSG, setMsg } from '../../global';
 import * as api from '../api';
+import { updatePassword } from "../../global/api";
+import errorImage from "../../../assets/imgs/error_exclamation.svg";
 import "../styles/LoginFields.scss";
 
 /*
@@ -26,11 +28,20 @@ const LoginFields = (props) => {
     const [focusBtn, setFocus] = useState("");
     const [showChangePass, setShowChangePass] = useState(false);
     const [showSuccessPass, setSuccessPass] = useState(false);
+    const [showSuccessPassReset, setShowSuccessPassReset] = useState(false);
+    const [showResetPass, setShowResetPass] = useState(false);
     const [showForgotPassword, setforgotPassword] = useState(true);
     const [lockedOut,setLockedOut] = useState(false);
     const [unlockCond,setUnlockCond] = useState(false);
     const [overlayText, setOverlayText] = useState("");
     const [popup, setPopup] = useState("");
+    const [showEmailPopup, setshowEmailPopup] = useState(false);
+    const [resetUsername, setResetUsername] = useState("")
+    const [recoverEmail, setRecoverEmail] = useState("");
+    const [emailError, setEmailError] = useState("");
+    const [duplicateEmails, setDuplicateEmails] = useState([]);
+    const [userResetData, setResetUserData] = useState({})
+    const regEx_email=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
     let serverList = [{"name": "License Server", "active": false}, {"name": "DAS Server", "active": false}, {"name": "Web Server", "active": false}];
     let SetProgressBar = props.SetProgressBar;
@@ -40,7 +51,13 @@ const LoginFields = (props) => {
     }
 
     const toggleChangePass = () => setShowChangePass(!showChangePass);
+
+    const toggleResetPass = () => setShowResetPass(!showResetPass);
     
+    const PasswordSuccessPopupReset = () => (
+        <>{setMsg({"CONTENT":"Password changed successfully !", "VARIANT":"success"}) && setSuccessPass(false)}</>
+    );
+
     const handleUsername = event => {
         resetErrors();
         if (showPassField){
@@ -86,6 +103,7 @@ const LoginFields = (props) => {
                 }
                 else if (data.proceed) {
                     setPassField(true);
+                    setShowPass(false);
                     if(data.ldapuser) setforgotPassword(false);
                     else setforgotPassword(true);
                 } 
@@ -234,37 +252,61 @@ const LoginFields = (props) => {
         });
     };
     
-    const forgotPasswordEmail = () => {
-        SetProgressBar("start");
+    const forgotPasswordEmail = (email) => {
         setLoginValidation("");
-		setLockedOut(false);
-		setUserError(false);
-		if (username==="") {
-            setUserError(true);
-            setLoginValidation("Please Enter Username")
-		} else {
-            api.forgotPasswordEmail(username.toLowerCase())
+        setLockedOut(false);
+        setUserError(false);
+        if (email==="" || !regEx_email.test(email)) {
+          setEmailError("Please Enter a valid email address")
+          retriggerAnimation("rc_email_validation","shakeX")
+        }
+        else if (duplicateEmails.length>0 && !resetUsername){
+          setEmailError("Please select atleast 1 username")
+          retriggerAnimation("rc_email_validation","shakeX")
+        } 
+        else {
+            SetProgressBar("start");
+            api.forgotPasswordEmail({"email":email.toLowerCase(),"username":resetUsername.toLowerCase()})
             .then(data => {
-                SetProgressBar("stop");
-				if (data === 'success' || data === "invalid_username_password") {
-					setUserError(false);
-                    setPassError(false);
-                    setPassword("");
-                    setMsg(MSG.LOGIN.SUCC_FORGOTP_MAIL);
-                } else if (data === "userLocked") {
-					setLockedOut(true);
-                    setLoginValidation("User account is locked!");
-                    setforgotPassword(false);
-				}
-				else setLoginValidation("Failed to Login.");
+              SetProgressBar("stop");
+              if(data.status && data.status==="duplicates_found") {
+                console.log("here")
+                setDuplicateEmails(data.userList)
+                setMsg(MSG.LOGIN.DUP_ACC_EXISTS);
+              }
+				      else if (data === 'success' || data === "invalid_username_password" || data==="fail" ) {
+                  setUserError(false);
+                  setPassError(false);
+                  setPassword("");
+                  setMsg(MSG.LOGIN.SUCC_REC_MAIL);
+                  setshowEmailPopup(false); 
+              } 
+              else if (data === "userLocked") {
+                  setshowEmailPopup(false);
+                  setLockedOut(true);
+                  setLoginValidation("User account is locked!");
+                  setforgotPassword(false);
+				      } 
+              else {
+                setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+              };
             })
             .catch(err=> {
-                setLoginValidation(err);
-				SetProgressBar("stop");
+                setshowEmailPopup(false); 
+				        SetProgressBar("stop");
                 setRequested(false);
+                setMsg(MSG.GLOBAL.ERR_SOMETHING_WRONG);
+                console.error("Error",err)
             });
-		}
+		    }
     };
+
+    const retriggerAnimation = (id, clsName) => {
+      document.getElementById(id).classList.remove(clsName);
+      setTimeout(()=>{
+          document.getElementById(id).classList.add(clsName)
+      },100)
+  }
     
     const unlockAccountEmail = () => {
         SetProgressBar("start");
@@ -313,12 +355,160 @@ const LoginFields = (props) => {
         <>{setMsg(MSG.LOGIN.SUCC_P_CHANGE) && setSuccessPass(false)}</>
     );
 
+    const updatePass = (newpassword) => {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        let user_id = urlParams.get('user_id')
+        updatePassword(newpassword, user_id).then((res)=>{
+            if(res==="success"){
+                toggleResetPass();
+                setShowSuccessPassReset(true);
+                redirectToHomePage();
+            }
+        }).catch((err)=>{
+            console.log(err)
+        })
+    }
+
+    const redirectToHomePage = ()=>{
+        setTimeout(()=>{
+            setRedirectTo("/");
+        },2000)
+    }
+
+    useEffect(()=>{
+        if(props.verifyPage){
+            setOverlayText("Loading...");
+            (async()=>{
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                let user_id = urlParams.get('user_id')
+                if(!user_id){
+                    setOverlayText("");
+                    redirectToHomePage();
+                    return
+                }
+                api.shouldShowVerifyPassword(user_id).then((res)=>{
+                    if(res){
+                        setOverlayText("");
+                        setShowResetPass(true);
+                    } else {
+                        setOverlayText("");
+                        redirectToHomePage();
+                    }
+                }).catch((error)=>{
+                    console.log(error);
+                    setOverlayText("");
+                    redirectToHomePage();
+                })
+            })();
+        } else if (props.resetPassword){
+          setOverlayText("Loading...");
+            (async()=>{
+                const queryString = window.location.search;
+                const urlParams = new URLSearchParams(queryString);
+                let user_id = urlParams.get('user_id')
+                if(!user_id){
+                    setOverlayText("");
+                    redirectToHomePage();
+                    return
+                }
+                api.shouldResetPassword(user_id).then((res)=>{
+                    if(res.flag && res.flag === "changePwd"){
+                        setOverlayText("");
+                        setResetUserData(res.user)
+                        setShowChangePass(true);
+                    } else {
+                        setOverlayText("");
+                        redirectToHomePage();
+                    }
+                }).catch((error)=>{
+                    console.log(error);
+                    setOverlayText("");
+                    redirectToHomePage();
+                })
+            })();
+        }
+    },[])
+
+
+    const Content = ()=>{
+        return (
+          <>
+            { duplicateEmails.length>0 ?
+            <>
+              <ScrollBar thumbColor="#613191" >
+                <div className="reset_container" style={{gap:10, maxHeight:400, marginRight:20}}>
+                  <div className="rc_textContent" style={{fontSize:"1.2rem"}}>
+                    Multiple accounts with same email address found! Please select your username to recover your account
+                  </div>  
+                  {duplicateEmails.map((user)=>{
+                    return (
+                    <div key={user.name} className="rc_reset_username" data-selected={resetUsername===user.name} onClick={()=>{setEmailError("");setResetUsername(user.name)}}>
+                      {user.name}
+                    </div>)
+                  })}
+                </div>
+              </ScrollBar>
+            </>:
+            <>
+             <div className="reset_container">
+              <div className="rc_textContent">
+                Enter the email associated with your account and we'll send an email with instructions to recover your account.
+              </div>  
+              <div className="rc_input_group">
+                  <input className={"rc_email_input " + (emailError ? "error_reset_field" : "")} type={"email"} autoFocus={true}
+                   autoComplete="true" onChange={(e)=>{setEmailError("");setRecoverEmail(e.target.value.trim())}} autoCorrect={"false"} 
+                   autoCapitalize={"false"} tabIndex={2} value={recoverEmail}/>
+                  <label className={`rc_email_label ${recoverEmail.length?"shrinked_label":""}`}>Email address</label>
+                </div>         
+             </div>
+            </>}
+            <span id="rc_email_validation" className={"email_valid_err " + (emailError ? "shakeX" : "hide_email_valid")}>
+              {emailError ? (
+              <div style={{display:"flex"}}>
+                  <img height={16} width={16} style={{marginRight:5}} src={errorImage} alt="error_ex_image"/>
+                  <span style={{fontSize:12, fontFamily:"Mulish"}}>{emailError}</span>
+              </div>
+                )
+              : "null"}
+            </span>
+          </>
+        )
+    }
+
+    const Footer = () => {
+      return (
+        <div className="rc_dialog_btns">
+            <button tabIndex={2} type='submit' className="submit_rc_button">Send Instructions</button>
+        </div>
+      )
+    }
+
+    const recoverAccountStart = () => {
+      setResetUsername("");
+      setRecoverEmail("");
+      setEmailError("");
+      setDuplicateEmails([]);
+      setshowEmailPopup(true);
+    }
     return (
         <>
         { popup && <PopUp /> }
         { overlayText && <ScreenOverlay content={overlayText}/>}
         { showSuccessPass && <PasswordSuccessPopup /> }
-        { showChangePass && <ChangePassword setShow={toggleChangePass} setSuccessPass={setSuccessPass} loginCurrPassword={password} changeType={"forgotPass"}/> }
+        { showSuccessPassReset && <PasswordSuccessPopupReset/>}
+        { showChangePass && <ChangePassword setRedirectTo={setRedirectTo} setShow={toggleChangePass} setSuccessPass={setSuccessPass} loginCurrPassword={null} changeType={"forgotPass"} userResetData={userResetData}/>}
+        { showResetPass && <ChangePassword setRedirectTo={setRedirectTo} setShow={toggleResetPass} setSuccessPass={setShowSuccessPassReset} loginCurrPassword={null} changeType={"CreateNewPass"} updatePass={updatePass} /> }
+        { showEmailPopup && 
+          <ModalContainer
+          close={()=>{setshowEmailPopup(false)}}
+          title={"Recover Your Account"}
+          content={Content()}
+          footer={Footer()}
+          modalClass="rc_modal_dialog"
+          onSubmit={(e)=>{e.preventDefault();forgotPasswordEmail(recoverEmail);}}
+          />}
         {redirectTo ? <Redirect to={redirectTo} /> :
             <>
             { restartForm 
@@ -342,10 +532,10 @@ const LoginFields = (props) => {
                 <div data-test='login-password' className="password-wrap" style={passError ? styles.errorBorder : null }>
                     <span data-test="password-icon" className="ic-holder"><img data-test="password-image" className="ic-password" alt="pass-ic" src={passError ? res.errorPassIcon : res.defaultPassIcon}/></span>
                     <input data-test="password-input" className="field" type={showPass ? "text" : "password"} autoFocus onFocus={()=>setFocus("password")} placeholder="Password" value={password} onChange={handlePassword}></input>
-                    <button data-test="password-eyeIcon" className={ "no-decor " + (showPass ? res.eyeSlashIcon : res.eyeIcon) } onFocus={()=>setFocus("checkpass")}></button>
+                    <button data-test="password-eyeIcon" className={ "no-decor " + (showPass ? res.eyeIcon : res.eyeSlashIcon) } onFocus={()=>setFocus("checkpass")}></button>
                 </div>
                 {showForgotPassword?
-                <div ><a id="forgotPassword" className="forget-password" onClick={()=>{forgotPasswordEmail()}} >Forgot Password?</a></div>:null}
+                <div ><a id="forgotPassword" className="forget-password" onClick={recoverAccountStart} >Forgot Username/Password?</a></div>:null}
                 {passError && !loginValidation? <div data-test='password-error' className="error-msg">Please Enter Password</div> : null}
                 <div data-test="login-validation" className="error-msg">{loginValidation}
                 {lockedOut?

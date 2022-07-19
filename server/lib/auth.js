@@ -336,31 +336,70 @@ module.exports.checkUser = async (req, res) => {
 	}
 };
 
+// Verify User if its present in DB and is logged in for the first time
+module.exports.verifyUser = async (req, res) => {
+	const fnName = "verifyUser";
+	try {
+		logger.info("Inside UI Service: " + fnName);
+		const inputs = 	{ "user_id": req.body.user_id };
+		const userInfo = await utils.fetchData(inputs, "login/verifyUser", fnName);
+		// let result = { "proceed": true };
+		let proceed = false;
+		if (userInfo === "fail") return res.send(proceed);
+
+		if (userInfo && userInfo.firstTimeLogin){
+			proceed = true;
+		}
+
+		return res.send(proceed);
+	} catch (exception) {
+		logger.error(exception.message);
+		res.send("fail");
+	}
+};
+
+module.exports.checkForgotExpiry = async(req,res) => {
+  const fnName = "checkForgotExpiry";
+  let inputs = {
+    "user_id": req.body.uid,
+    "action": "checkForgotExpiry"
+  }
+  const responseData = await utils.fetchData(inputs, "login/passtimeout", fnName);
+  if (responseData == "fail") flag = "fail";
+  else if(responseData == "timeout") flag = "timeout";
+  else {
+    flag = "changePwd";
+    return res.send({flag, user:responseData.user});
+  }
+  return res.send({flag});
+}
+
 // send email when forgot password
 module.exports.forgotPasswordEmail = async (req, res) => {
 	const fnName = "forgotPasswordEmail";
 	try {
 		logger.info("Inside UI Service: " + fnName);
-		const inputs = 	{ "username": req.body.username };
-		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
+		const inputs = 	{ "email": req.body.email, fnName, "username":req.body.username ?req.body.username:undefined};
+		var users = await utils.fetchData(inputs, "login/loadUser", fnName);
 		let result = { "proceed": true };
-		if (userInfo == "fail") return result = "fail";
-		else if (!userInfo || !userInfo.auth) result = "invalid_username_password";
-		else if (userInfo.invalidCredCount == 5) result = "userLocked";
-		else if (userInfo && userInfo.auth) {
+		if (users == "fail" || users.length===0) return res.send("fail");
+    else if (users.length>1) return res.send({"status":"duplicates_found", userList:users});
+		else if (!users[0] || !users[0].auth) result = "invalid_username_password";
+		else if (users[0].invalidCredCount == 5) result = "userLocked";
+		else if (users[0] && users[0].auth) {
 			//create a temporary password here
-			const default_password = utils.generateDefPassword();
-			const password = bcrypt.hashSync(default_password, bcrypt.genSaltSync(10));
+			// const default_password = utils.generateDefPassword();
+			// const password = bcrypt.hashSync(default_password, bcrypt.genSaltSync(10));
 			//password created
 			const inputsFor = {
-				"username": req.body.username,
-				"defaultpassword": password
+				"username": users[0].name,
+				// "defaultpassword": password
 			};
 			const userUpd = await utils.fetchData(inputsFor, "login/forgotPasswordEmail", fnName);
-			if (userUpd == "fail") return result = "fail";
+			if (userUpd == "fail") return res.send("internal_api_error");
 			else {
-				userInfo.defaultpassword = default_password
-				notifications.notify("forgotPassword", {field: "password", user: userInfo});
+				// users[0].defaultpassword = default_password
+				notifications.notify("forgotPassword", {field: "password", user: users[0]});
 				result = "success";
 			}
 		}

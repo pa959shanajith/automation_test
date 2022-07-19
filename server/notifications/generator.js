@@ -1,7 +1,8 @@
 const validator = require('validator');
 const logger = require('../../logger');
 const utils = require('../lib/utils');
-
+const path = require('path')
+const companyLogo1 = "/static/imgs/companyLogo.png"
 const companyLogo = "/static/imgs/ftr-avo-logo.png";
 const productLogo = "/static/imgs/logo.png";
 const generateEmailPayload = {};
@@ -341,13 +342,15 @@ generateEmailPayload.forgotPassword = async data => {
 			'username': user.name,
 			'name': user.firstname + ' ' + user.lastname,
 			"defaultpassword": user.defaultpassword,
+      'domain':data.url,
+      'uid':user._id,
 			'datetime': new Date().toLocaleString(),
 			'customFooter': "Please contact your Avo Assure administrator for any trouble logging in, or to disable further notifications."
 		}
 	};
 
 	if (data.field === 'password') {
-		msg.subject = 'Your Avo Assure Change Password Notification';
+		msg.subject = 'Avo Assure Change Password Notification';
 		msg.context.password = true;
 	}
 
@@ -380,6 +383,39 @@ generateEmailPayload.unlockAccount = async data => {
 		msg.subject = 'Your Avo Assure Unlock Account Notification';
 		msg.context.password = true;
 	}
+
+	return {
+		error: null,
+		msg,
+		receivers: [recv]
+	};
+};
+
+generateEmailPayload.verifyUser = async data => {
+	const user = data.user;
+	const recv = user.email;
+	if (!validator.isEmail(recv)) return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
+	const msg = {
+		'subject': 'Welcome to AvoAssure',
+		'template': 'verify-user',
+		'context': {
+			'companyLogo': data.url + companyLogo,
+			'productLogo': data.url + productLogo,
+			'username': user.username,
+			'firstname': user.firstname,
+			'lastname': user.lastname,
+			'uid':user.uid,
+			'domain':data.url,
+			'datetime': new Date().toLocaleString(),
+      'mainTemplateNotRequired':true,
+			'customFooter': "Please contact your Avo Assure administrator for any trouble logging in."
+		},
+    // attachments:[{
+    //   filename: 'AvoAutomation.png',
+    //   path: path.resolve(__dirname,"../../public" + companyLogo1),
+    //   cid: 'companyLogo'
+    // }]
+	};
 
 	return {
 		error: null,

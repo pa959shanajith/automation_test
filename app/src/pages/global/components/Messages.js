@@ -485,6 +485,8 @@ const Messages={
         SUCC_UNLOCKED: {"CONTENT":'Successfully unlocked the user account! Please login again.', "VARIANT": VARIANT.SUCCESS},
         SUCC_UNLOCK_MAIL: {"CONTENT":"Successfully sent an email! Please unlock the account using verification password sent in the email.", "VARIANT": VARIANT.SUCCESS},
         SUCC_P_CHANGE: {"CONTENT":"Password change successfull! Please login again with new password.", "VARIANT": VARIANT.SUCCESS},
+        DUP_ACC_EXISTS:{"CONTENT":"Multiple accounts with same email detected !","VARIANT":VARIANT.WARNING},
+        SUCC_REC_MAIL:{"CONTENT":"If this email address was used to create an account, instructions to recover your account will be sent to you. Please check your email.", "VARIANT": VARIANT.SUCCESS}
     }
 }
 
