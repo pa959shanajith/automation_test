@@ -6,7 +6,7 @@ import { Icon } from '@fluentui/react';
 
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
-const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, setModuleScenarioList }) => {
+const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType }) => {
     // const [moduleList, setModuleList] = useState(integrationConfig.scenarioList);
     const [moduleList, setModuleList] = useState([]);
     const [filteredModuleList, setFilteredModuleList] = useState([]);
@@ -60,19 +60,18 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, setModuleSc
     ];
     const executionTypeOptions = [
         {
-            key: 'Normal execution',
+            key: 'normalExecution',
             text: 'Normal Execution'
         },
         {
-            key: 'Batch execution',
+            key: 'batchExecution',
             text: 'Batch Execution'
         },
         {
-            key: 'E2E execution',
+            key: 'e2eExecution',
             text: 'E2E Execution'
         }
     ];
-    const [selectedExecutionType, setSelectedExecutionType] = useState('Normal execution');
     const [selectedTab, setSelectedTab] = useState('all');
     const [moduleState, setModuleState] = useState({
         checked: integrationConfig.scenarioList,
@@ -130,15 +129,15 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, setModuleSc
     useEffect(()=>{
         (async() => {
             if (integrationConfig.selectValues[2].selected !== '') {
-                const moduleList = await fetchModules({
+                const fetchedModuleList = await fetchModules({
                     "tab":'tabAssign',
                     "projectid":integrationConfig.selectValues[0].selected,
                     "cycleid":integrationConfig.selectValues[2].selected
                 });
-                if(moduleList.error) {
+                if(fetchedModuleList.error) {
                     setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
                 }else {
-                    const filteredNodes = moduleList.map((module) => {
+                    const filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
                         let filterModule = {
                             value: module.moduleid,
                             label: module.name,
@@ -156,11 +155,65 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, setModuleSc
                     });
                     setModuleList(filteredNodes);
                     setFilteredModuleList(filteredNodes);
-                    setModuleScenarioList(moduleList);
+                    setModuleScenarioList(fetchedModuleList);
                 }
             }
         })()
     },[integrationConfig.selectValues[2].selected]);
+    const handleExecutionTypeChange = (selectedType) => {
+        const selectedKey = selectedType.key;
+        let filteredNodes = [];
+        console.log(moduleScenarioList);
+        if(selectedKey === 'normalExecution') {
+            filteredNodes = moduleScenarioList['normalExecution'].map((module) => {
+                let filterModule = {
+                    value: module.moduleid,
+                    label: module.name,
+                };
+                if(module.scenarios.length > 0) {
+                    const moduleChildren = module.scenarios.map((scenario) => {
+                        return ({
+                            value: scenario._id,
+                            label: scenario.name
+                        })
+                    });
+                    filterModule['children'] = moduleChildren;
+                }
+                return filterModule;
+            });
+        } else if(selectedKey === 'batchExecution') {
+            const batchData = moduleScenarioList['batchExecution'];
+            filteredNodes = Object.keys(batchData).map((batch) => {
+                let filterBatch = {
+                    value: batch,
+                    label: batch,
+                };
+                if(batchData[batch].length > 0) {
+                    filterBatch['children'] = batchData[batch].map((module) => {
+                        let filterModule = {
+                            value: module.moduleid,
+                            label: module.name,
+                        };
+                        if(module.scenarios.length > 0) {
+                            const moduleChildren = module.scenarios.map((scenario) => {
+                                return ({
+                                    value: scenario._id,
+                                    label: scenario.name
+                                })
+                            });
+                            filterModule['children'] = moduleChildren;
+                        }
+                        return filterModule;
+                    });
+                }
+                return filterBatch;
+            });
+        }
+        setSelectedExecutionType(selectedKey);
+        setModuleList(filteredNodes);
+        setFilteredModuleList(filteredNodes);
+        setIntegrationConfig({ ...integrationConfig, scenarioList: [] });
+    }
     return (
         // <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
         (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
@@ -169,7 +222,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, setModuleSc
                 <SearchDropdown
                     calloutMaxHeight="30vh"
                     noItemsText={'Loading...'}
-                    onChange={(selectedType) => setSelectedExecutionType(selectedType.key)}
+                    onChange={handleExecutionTypeChange}
                     options={executionTypeOptions}
                     placeholder="Select Avo Agent or Avo Grid"
                     selectedKey={selectedExecutionType}

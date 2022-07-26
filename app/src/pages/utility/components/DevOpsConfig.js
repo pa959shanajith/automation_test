@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
-import { ScrollBar, Messages as MSG, setMsg, VARIANT } from '../../global';
+import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown, ScreenOverlay } from '../../global';
 import { fetchProjects, getPools, storeConfigureKey } from '../api';
 import { useSelector } from 'react-redux';
-import { SearchDropdown, TextField, Toggle } from '@avo/designcomponents';
+import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
 
 
 // import classes from "../styles/DevOps.scss";
@@ -41,37 +41,49 @@ const DevOpsConfig = props => {
             text: 'Edge Chromium'
         }
     ]);
+    const [integration,setIntegration] = useState({
+        alm: {url:"",username:"",password:""}, 
+        qtest: {url:"",username:"",password:"",qteststeps:""}, 
+        zephyr: {url:"",username:"",password:""}
+    });
+    const [loading,setLoading] = useState(false);
+    const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [dataUpdated, setDataUpdated] = useState(false);
     const [integrationlist, setIntegrationlist] = useState([
         {
             key: 'qTest',
             text: 'qTest'
         }, {
-            key: 'alm',
+            key: 'ALM',
             text: 'ALM'
         }, {
-            key: 'zephyr',
+            key: 'Zephyr',
             text: 'Zephyr'
         }
     ]);
     const [moduleScenarioList, setModuleScenarioList] = useState([]);
+    const [selectedExecutionType, setSelectedExecutionType] = useState('normalExecution');
+    const syncScenarioChange = (value) => {
+        setShowIntegrationModal(value);
+        setIntegrationConfig({...integrationConfig, integration: value});
+    }
     useEffect(()=> {
         (async()=>{
             const args = {
                 poolid:"all",
                 projectids:[]
             };
-            const poolList = await getPools(args);
-            console.log(poolList);
-            if(poolList.error) {
-                if(poolList.error.CONTENT) {
-                    setMsg(MSG.CUSTOM(poolList.error.CONTENT,VARIANT.ERROR));
-                } else {
-                    setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
-                }
-            }else {
-                console.log(poolList);
-            }
+            // const poolList = await getPools(args);
+            // console.log(poolList);
+            // if(poolList.error) {
+            //     if(poolList.error.CONTENT) {
+            //         setMsg(MSG.CUSTOM(poolList.error.CONTENT,VARIANT.ERROR));
+            //     } else {
+            //         setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
+            //     }
+            // }else {
+            //     console.log(poolList);
+            // }
             const reportResponse = await fetchProjects({ readme: "projects" });
             if (reportResponse.error) {
                 console.error(reportResponse.error);
@@ -172,7 +184,7 @@ const DevOpsConfig = props => {
     }
 
     const handleConfigSave = async () => {
-        const batchInfo = moduleScenarioList.filter((module) => {
+        const batchInfo = moduleScenarioList[selectedExecutionType].filter((module) => {
             return module.scenarios.some(scenario => {
                 return integrationConfig.scenarioList.includes(scenario._id)
             });
@@ -206,29 +218,12 @@ const DevOpsConfig = props => {
             source: "task",
             exectionMode: "serial",
             executionEnv: "default",
-            browserType: [integrationConfig.browser],
+            browserType: [integrationConfig.browsers],
             configurename: integrationConfig.name,
             executiontype: integrationConfig.executionType,
             configurekey: integrationConfig.key,
             exectionmode: integrationConfig.exectionMode,
-            integration: {
-                alm: {
-                    url: "",
-                    username: "",
-                    password: ""
-                },
-                qtest: {
-                    url: "",
-                    username: "",
-                    password: "",
-                    qteststeps: ""
-                },
-                zephyr: {
-                    url: "",
-                    username: "",
-                    password: ""
-                }
-            },
+            integration: integration,
             batchInfo: batchInfo,
             scenarioFlag: false
         });
@@ -244,8 +239,31 @@ const DevOpsConfig = props => {
             props.showMessageBar( `Configuration ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d Successfully` , 'SUCCESS');
         }
     }
+    const displayError = (error) =>{
+        setLoading(false)
+        setMsg(error)
+    }
+    const setshowModal = (status) => {
+        setShowIntegrationModal(status);
+        if((showIntegrationModal === 'qTest' && integration.qtest.url === '') || (showIntegrationModal === 'ALM' && integration.alm.url === '') || (showIntegrationModal === 'Zephyr' && integration.zephyr.url === '')) {
+            setIntegrationConfig({...integrationConfig, integration: ''});
+        }
+    }
 
     return (<>
+        {loading?<ScreenOverlay content={loading}/>:null}
+        { showIntegrationModal ? 
+            <IntegrationDropDown
+                setshowModal={setshowModal}
+                type={showIntegrationModal} 
+                showIntegrationModal={showIntegrationModal} 
+                appType='' 
+                setCredentialsExecution={setIntegration}
+                integrationCred={integration}
+                displayError={displayError}
+                browserTypeExe={integrationConfig.browsers}
+            />
+        :null}
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
                 { props.currentIntegration.name === '' ? 'Create New' : 'Update'} Configuration
@@ -270,7 +288,7 @@ const DevOpsConfig = props => {
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
                 <div className="devOps_module_list">
-                    <DevOpsModuleList integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} setModuleScenarioList={setModuleScenarioList} />
+                    <DevOpsModuleList integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} />
                 </div>
                 <div className="devOps_pool_list">
                     <div style={{ marginTop: '0' }}>
@@ -286,23 +304,25 @@ const DevOpsConfig = props => {
                         />
                     </div>
                     <div>
-                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Select Browser : </label>
-                        <SearchDropdown
-                            calloutMaxHeight="30vh"
+                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Select Browsers : </label>
+                        <MultiSelectDropdown
+                            hideSelectAll
                             noItemsText={'No Browser available'}
-                            onChange={(selectedBrowser) => setIntegrationConfig({...integrationConfig, browser: selectedBrowser.key})}
+                            onSelectKeysChange={(selectedBrowsers) => setIntegrationConfig({...integrationConfig, browsers: selectedBrowsers})}
                             options={browserlist}
-                            placeholder="Select Browser"
-                            selectedKey={integrationConfig.browser}
+                            placeholder="Select Browsers"
+                            searchPlaceholder="Search Browser Name"
+                            selectedKeys={integrationConfig.browsers}
                             width='54%'
-                        />
+                            />
                     </div>
                     <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_integration">Integration : </label>
                         <SearchDropdown
+                            disabled={integrationConfig.browsers && integrationConfig.browsers.length === 0}
                             calloutMaxHeight="30vh"
                             noItemsText={'No Integration available'}
-                            onChange={(selectedIntegration) => setIntegrationConfig({...integrationConfig, integration: selectedIntegration.key})}
+                            onChange={(selectedIntegration) => syncScenarioChange(selectedIntegration.key) }
                             options={integrationlist}
                             placeholder="Select Integration"
                             selectedKey={integrationConfig.integration}

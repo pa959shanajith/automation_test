@@ -50,7 +50,7 @@ exports.fetchModules = async (req, res) => {
 		}
 
 
-		res.send(finalData);
+		res.send(responsedata);
 	} catch(exception) {
 		logger.error("Error occurred in devops/"+fnName+":", exception);
 		return res.status(500).send("fail");

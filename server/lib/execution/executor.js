@@ -469,8 +469,7 @@ class TestSuiteExecutor {
         executionRequest.batchId = currExecIds.batchid;
         executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
         executionRequest.avogridid = batchExecutionData.avogridid;
-        // executionRequest.configurekey = batchExecutionData.configurekey;
-        executionRequest.configurekey = "3524a385-943d-40c8-9576-b978bcbc50b4";
+        executionRequest.configurekey = batchExecutionData.configurekey;
         executionRequest.configurename = batchExecutionData.configurename;
         executionRequest.executiontype = batchExecutionData.executiontype;
         executionRequest.executionmode = batchExecutionData.executionmode;

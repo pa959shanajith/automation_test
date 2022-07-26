@@ -1,3 +1,12 @@
+.agent-container {
+    padding: 2%;
+}
+.page-taskName {
+    margin-top: 1%;
+}
+.agent-icons {
+    width: fit-content;
+}
 .api-ut__btnGroup {
     width: 100%;
     margin-bottom: 1%;
@@ -281,9 +290,11 @@
     float: right;
     margin-right: 1%;
 }
-.action_icons{
-    cursor: pointer;
-    width: 5%;
+.agents{
+    &__action_icons {
+        cursor: pointer;
+        width: fit-content;
+    }
 }
 .checkbox{
     width: 5%;
@@ -353,4 +364,48 @@
     justify-content: flex-end;
     margin-right: 11%;
     margin-top: -3%;
+}
+.detailslist_status {
+    display: flex;
+    align-items: baseline;
+    &>p {
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: rgb(50, 49, 48);
+        margin: 0 16px 0 0;
+        height: fit-content;
+    }
+}
+.agent_state {
+    display: flex;
+    align-items: center;
+    margin-right: 2rem;
+    &__div {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        margin-right: 0.3rem;
+    }
+    &>p {
+        margin: 0;
+    }
+    &__idle {
+        background-color: #008C5D;
+    }
+    &__in-progress{
+        background-color: #ffbf00;
+    }
+    &__busy {
+        background-color: #d81b1f;
+    }
+    &__offline{
+        background-color: #323130;
+    }
+    &__inactive{
+        background-color: #a19f9d;
+    }
+    &__legends {
+        display: flex;
+        width: inherit;
+    }
 }
