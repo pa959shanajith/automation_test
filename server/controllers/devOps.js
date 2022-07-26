@@ -36,6 +36,20 @@ exports.fetchModules = async (req, res) => {
 	try {
 		const moduleData = await getModule(req.body);
 		const finalData = await utils.fetchData(moduleData, "devops/getScenariosForDevops", "fetchModules");
+		const responsedata = {
+			'normalExecution': finalData,
+			'batchExecution': {},
+			'e2eExecution': [],
+		}
+		for(let moduleDetails of finalData) {
+			if(moduleDetails['batchname'] == '') continue;
+			if(responsedata['batchExecution'][moduleDetails['batchname']] == undefined){
+				responsedata['batchExecution'][moduleDetails['batchname']] = [];
+			}
+			responsedata['batchExecution'][moduleDetails['batchname']].push(moduleDetails);
+		}
+
+
 		res.send(finalData);
 	} catch(exception) {
 		logger.error("Error occurred in devops/"+fnName+":", exception);
@@ -142,3 +156,34 @@ exports.getAllSuites_ICE = async (req, res) => {
   }
 };
 
+exports.getConfigureList = async (req, res) => {
+	const fnName = "getConfigureList";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		// const reqData = req.session.userid;
+		const input = {
+			userid: req.session.userid
+		}
+		const list = await utils.fetchData(input, "devops/getConfigureList", "getConfigureList");
+		res.send(list);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+exports.getAvoAgentAndAvoGridList = async (req, res) => {
+	const fnName = "getAvoAgentAndAvoGridList";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		// const reqData = req.session.userid;
+		const input = {
+			userid: req.session.userid
+		}
+		const list = await utils.fetchData(input, "devops/getAvoAgentAndAvoGridList", "getAvoAgentAndAvoGridList");
+		res.send(list);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};

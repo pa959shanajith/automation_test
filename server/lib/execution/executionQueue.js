@@ -10,6 +10,7 @@ const tokenAuth = require('../tokenAuth')
 const scheduler = require('./scheduler');
 const { default: async } = require('async');
 const { timestamp } = require('winston/lib/winston/common');
+const { info } = require('winston');
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -226,6 +227,9 @@ module.exports.Execution_Queue = class Execution_Queue {
                     response['variant'] = "error";
                     response["message"] = targetICE + " not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."
                 } else {
+                    if(batchExecutionData['configurekey'] && batchExecutionData['configurekey'] != '' && batchExecutionData['configurename'] && batchExecutionData['configurename'] != '' ){
+                        this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
+                    }
                     response['status'] = "pass";
                     response["message"] = "ICE not selected."
                     response['variant'] = "info";
@@ -552,11 +556,14 @@ module.exports.Execution_Queue = class Execution_Queue {
             // testSuiteInfo = await utils.fetchData(key,'/',);
             let Info = await utils.fetchData(req.body, "devops/getTestSuite", fnName);
             let testSuiteInfo = Info.testSuiteInfo;
-            let avogridid = Info.avogridid;
+            // let avogridid = Info.avogridid;
             console.info(testSuiteInfo);
 
+            let newExecutionList = []
             for (let ids of testSuiteInfo)
-                keyQueue.push({moduleid:ids,status: 'QUEUED'});
+                newExecutionList.push({moduleid:ids,status: 'QUEUED',edited:Info.edited,avoagentList:Info.avoagentList});
+
+            keyQueue.push(newExecutionList);
 
             // this.key_list = [];
             await cache.set("execution_list", this.key_list);
@@ -592,30 +599,46 @@ module.exports.Execution_Queue = class Execution_Queue {
 
     static getAgentTask = async (req, res) => {
         var fnName = 'getAgentTask';
-        let response = {};
-        response['status'] = "fail";
-        response["message"] = "N/A";
-        response['error'] = "None";
+        let response = {
+            'status': 'fail',
+            'message': "N/A",
+            'error': "None",
+            'tasktype': "EXECUTE",
+            'maxicecount': "1",
+            'key': "",
+            'edited': -1
+        };
+
         try {
             let agent = req.body.Hostname;
 
             //Add agent in the agent List
-            if(!(agent in this.agent_list) ) {
-                let timestamp = new Date().toLocaleString();
-                this.agent_list[agent] = {
-                "icecount": req.body.icecount,
-                "timestamp": timestamp,
-                "status": "active"
-            };
-                let agentDetails = this.agent_list[agent];
-                agentDetails['name'] = agent;
-                const status = await utils.fetchData(agentDetails, "devops/agentDetails", fnName);
-                if (status == "fail" || status == "forbidden") return "fail";
+            // if(!(agent in this.agent_list) ) {
+            //     let timestamp = new Date().toLocaleString();
+            //     this.agent_list[agent] = {
+            //     "icecount": req.body.icecount,
+            //     "timestamp": timestamp,
+            //     "status": "active"
+            // };
+            //     let agentDetails = this.agent_list[agent];
+            //     agentDetails['name'] = agent;
+            //     const status = await utils.fetchData(agentDetails, "devops/agentDetails", fnName);
+            //     if (status == "fail" || status == "forbidden") return "fail";
 
-                //Storing in Cache
-                await cache.set("agent_list", this.agent_list);
-                console.info(await cache.get('agent_list'));
-            }
+            //     //Storing in Cache
+            //     await cache.set("agent_list", this.agent_list);
+            //     console.info(await cache.get('agent_list'));
+            // }
+            
+            //Add agent in the agent Collection and fetch its status
+            let agentDetails = {
+                Hostname: agent,
+                "icecount": req.body.icecount,
+                createdon: new Date().toLocaleString(),
+                status: "active",
+                recentCall: new Date().toLocaleString()
+            }   
+            const agentStatus = await utils.fetchData(agentDetails, "devops/agentDetails", fnName);
 
             // corner cases needed to be added
             //Doubt - If we find a task after sending the key should remove from task list or wait
@@ -629,27 +652,47 @@ module.exports.Execution_Queue = class Execution_Queue {
             // }
 
             //Search in all keys whether Agent is present in its execution queue.
-            let agentAssignedToKey = '';
-            const keysToBeSearched = await utils.fetchData({avoagents: agent}, "devops/keysList", fnName);
-            console.info(keysToBeSearched);
-            for(let key of keysToBeSearched) {
-                if(key in this.key_list)
-               {
-                    let testSuiteList = this.key_list[key]
-                    for(let testsuite of testSuiteList) {
-                    if(testsuite.status == "QUEUED"){
-                        agentAssignedToKey = key;
-                            break;
+
+            // let agentAssignedToKey = '';
+            // const keysToBeSearched = await utils.fetchData({avoagents: agent}, "devops/keysList", fnName);
+            // console.info(keysToBeSearched);
+            // for(let key of keysToBeSearched) {
+            //     if(key in this.key_list)
+            //    {
+            //         let testSuiteList = this.key_list[key]
+            //         for(let testsuite of testSuiteList) {
+            //         if(testsuite.status == "QUEUED"){
+            //             agentAssignedToKey = key;
+            //                 break;
+            //             }
+            //         }
+            //     }
+            //     if(agentAssignedToKey != '') break;
+            // }
+
+            if(agentStatus['status'] != 'inactive') {
+                let executionList = this.key_list;
+                for(let [key, value] of Object.entries(executionList)){
+                    let executionQueue = value;
+                    console.log(executionQueue);
+                    for(let entries of executionQueue) {
+                        if(entries[0]['avoagentList'].length == 0 || entries[0]['avoagentList'].includes(agent)) {
+                            for(let testSuites of entries) {
+                                if(testSuites['status'] == 'QUEUED') {
+                                    response['status'] = 'Pass';
+                                    response['key'] = key;
+                                    response['edited'] = testSuites['edited'];
+                                    return response;
+                                }
+                            }
+                           console.log(entries['avoagentList']);
                         }
                     }
                 }
-                if(agentAssignedToKey != '') break;
+
             }
 
             //TO-DO set Agent Status..
-
-            response['status'] = 'Pass';
-            response['message'] = agentAssignedToKey;
 
         } catch (error) {
             console.info(error);
@@ -670,34 +713,62 @@ module.exports.Execution_Queue = class Execution_Queue {
         response['error'] = "None";
         try {
             const configKey = req.body.configkey;
+            const edited = req.body.edited;
             if(configKey in this.key_list) {
 
-                const testSuiteList = this.key_list[configKey];
+                const executionQueue = this.key_list[configKey];
                 let executionData = '';
-                for(let testSuite of testSuiteList) {
-                    if(testSuite.status === 'QUEUED') {
-                        executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuite.moduleid}, "devops/getExecScenario", fnName);
-                        if (executionData == "fail" || executionData == "forbidden") {
-                            response['status'] = "fail";
-                            return response;
+                let listIndex = -1;
+                for(let entries of executionQueue) {
+                    listIndex++;
+                    if(entries[0]['edited'] == edited) {
+                        let moduleIndex = -1;
+                        for(let testSuites of entries) {
+                            moduleIndex++;
+                            if(testSuites['status'] == 'QUEUED') {
+                                executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuites.moduleid,'edited':edited}, "devops/getExecScenario", fnName);
+                                if (executionData == "fail" || executionData == "forbidden") {
+                                    response['status'] = "fail";
+                                    return response;
+                                }
+                                //Updating the status to IN_Progress
+                                this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
+                                await cache.set("execution_list", this.key_list);
+                                console.info(this.key_list);
+                                console.info(await cache.get('execution_list'));
+                                break;
+                            }
                         }
-                        //TO_DO-->Update that item to IN_PROGRESS
-                        break;
+                        if(executionData != '') break;
                     }
                 }
+                // for(let [index,testSuite] of testSuiteList.entries()) {
+                //     if(testSuite.status === 'QUEUED') {
+                //         executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuite.moduleid}, "devops/getExecScenario", fnName);
+                //         if (executionData == "fail" || executionData == "forbidden") {
+                //             response['status'] = "fail";
+                //             return response;
+                //         }
+                //         //TO_DO-->Update that item to IN_PROGRESS
+                //         this.key_list[configKey][index]['status'] = 'IN_PROGRESS'
+                //         await cache.set("execution_list", this.key_list);
+                //         console.info(this.key_list);
+                //         console.info(await cache.get('execution_list'));
+                //         break;
+                //     }
+                // }
 
-            if(executionData != '')
-                response['status'] = executionData;
-            else 
-                response['status'] = "fail";
-                
-                return response;
+           
+                if(executionData != '')
+                    response['status'] = executionData;
+            // else 
+            //     response['status'] = "fail";
+            //     return response;
             }
-            response['status'] = "fail";
-
+            // response['status'] = "fail";
         } catch (error) {
             console.info(error);
-            logger.error("Error in execAutomation. Error: %s", error);
+            logger.error("Error in getExecScenario. Error: %s", error);
         }
         
         // logger.info("Adding Test Suite to Pool: " + pool['name'] + " to be Executed on any availble ICE");

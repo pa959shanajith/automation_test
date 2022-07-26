@@ -444,7 +444,7 @@ export const getExecScenario = async(props) => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            data: {"moduleDetail":props},
+            data: props,
             credentials: 'include'
         });
         if(res.status===200 && res.data !== "fail"){
@@ -484,4 +484,55 @@ export const getAgentTask = async(props) => {
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }
- 
+
+export const fetchConfigureList = async() => {
+    try{
+        const res = await axios(url+'/getConfigureList', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                action: "configurelist"
+            }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION}
+        }
+        if(res.status === 200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+    }
+}
+
+export const fetchAvoAgentAndAvoGridList = async() => {
+    try{
+        const res = await axios(url+'/getAvoAgentAndAvoGridList', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                action: "configurelist"
+            }
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION}
+        }
+        if(res.status === 200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+    }
+}
