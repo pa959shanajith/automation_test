@@ -14,7 +14,8 @@ const initialState = {
     deletedNodes: [],
     scenarioList:[],
     importData:{createdby:undefined,data:undefined},
-    unassignTask:[]
+    unassignTask:[],
+    toDeleteScenarios: []
 };
 
 const reducer = (state = initialState , action) => {
@@ -104,6 +105,11 @@ const reducer = (state = initialState , action) => {
                 moduleList : res.moduleList,
                 importData : res.importData
             }
+        case actionTypes.DELETE_SCENARIO:
+            return{
+                ...state,
+                toDeleteScenarios: action.payload
+            } 
         default: 
             return state
     }

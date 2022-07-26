@@ -374,6 +374,7 @@ if (cluster.isMaster) {
 		app.post('/pdProcess', auth.protect, pdintegration.pdProcess);	// process discovery service
 		app.post('/exportToGit', auth.protect, mindmap.exportToGit);
 		app.post('/importGitMindmap', auth.protect, mindmap.importGitMindmap);
+		app.post('/deleteScenario', auth.protect, mindmap.deleteScenario);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
