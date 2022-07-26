@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, Link, Redirect } from 'react-router-dom';
 import { loadUserInfo } from '../../login/api';
@@ -8,7 +8,7 @@ import { SWITCHED } from '../state/action';
 import ClickAwayListener from 'react-click-away-listener';
 import { persistor } from '../../../reducer';
 import NotifyDropDown from './NotifyDropDown';
-import { RedirectPage, ModalContainer, ScreenOverlay, Messages as MSG, setMsg } from '../../global';
+import { RedirectPage, ModalContainer, ScreenOverlay, WelcomePopover, Messages as MSG, setMsg } from '../../global';
 import "../styles/Header.scss";
 
 /*
@@ -18,7 +18,7 @@ import "../styles/Header.scss";
 
 */
 
-const Header = () => {
+const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
 
     const history = useHistory();
     const dispatch = useDispatch();
@@ -39,6 +39,7 @@ const Header = () => {
     const [showICEMenu, setShowICEMenu] = useState(false);
     const [config, setConfig] = useState({});
     const [OS,setOS] = useState("Windows");
+    const [WP_STEPNO, set_WP_STEPNO] = useState(0);
     const [trainLinks, setTrainLinks] = useState({videos:"#", docs:"#"});
 
     useEffect(()=>{
@@ -147,7 +148,7 @@ const Header = () => {
 		loadUserInfo(clickedRole.rid)
 		.then(data => {
             setShowOverlay("");
-			if (data !== "fail") {
+			if (data !== "fail" && data !== "Licence Expired") {
                 dispatch({type: actionTypes.SET_SR, payload: clickedRole.data});
                 dispatch({type: actionTypes.SET_USERINFO, payload: data});
                 dispatch({type: SWITCHED, payload: true});
@@ -190,15 +191,33 @@ const Header = () => {
         />
     );
 
+    const handleWPEvents = (skip = false) => {
+        if (typeof skip === 'number') {
+            set_WP_STEPNO(skip);
+            return
+        }
+        if(WP_STEPNO===1 || skip===true) {
+            otherProps.setPopover(false);
+            return
+        }
+        set_WP_STEPNO((prevno)=>prevno + 1)
+    }
+
+    const WP_ITEM_LIST =  useMemo(()=>[
+        {imageName:"wp_video_image.svg",content:<>Make your journey smoother with <b>Training videos.</b>  <br/>  <a href={trainLinks.videos} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training videos or choose <br/> "Training Videos" from "Need Help" button.</>},
+        {imageName:"wp_docs_image.svg",content:<>Make your journey smoother with <b>Training document.</b>  <br/>  <a href={trainLinks.docs} target="_blank" referrerPolicy="no-referrer">Click here</a> to watch training document or choose <br/> "Training Document" from "Need Help" button.</>}
+    ],[trainLinks]);
+
     return(
         <> 
             { redirectTo && <Redirect to={redirectTo} /> }
             { showConfSR && <ConfSwitchRole />  }
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
+            { show_WP_POPOVER && <div className="tranparentBlocker"></div>}
             <div className = "main-header">
                 <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
-                    <ClickAwayListener onClickAway={onClickAwayHelp}>
-                        <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(true)}>
+                    <ClickAwayListener onClickAway={onClickAwayHelp} style={{zIndex:10, background:show_WP_POPOVER?"white":"transparent", borderRadius:5, position:"relative"}}>
+                        <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(!showHelp)} style={{padding:5}}>
                             <span className="help">Need Help ?</span>
                         </div>
                         <div className={"help-menu dropdown-menu " + (showHelp && "show")}>
@@ -207,6 +226,14 @@ const Header = () => {
                             <div onClick={()=>{window.open(trainLinks.docs,'_blank')
                                 setShowHelp(false)}} ><Link to="#">Training Document</Link></div>   
                         </div>
+                        {show_WP_POPOVER ? 
+                            <WelcomePopover 
+                                title={`Welcome ${userInfo.firstname} !!`} 
+                                handleWPEvents={handleWPEvents}
+                                WP_STEPNO={WP_STEPNO}
+                                items={WP_ITEM_LIST}
+                            ></WelcomePopover>
+                        :null}
                     </ClickAwayListener>
                     <div className="dropdown user-options">
                         { 

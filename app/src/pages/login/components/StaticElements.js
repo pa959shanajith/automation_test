@@ -22,7 +22,7 @@ const StaticElements = ({children}) => {
                     <h3>Login to Experience Intelligence</h3>
                 </div>
                 <div className="login-block">
-                    <span className="logo-wrap"><img className="logo-img" alt="logo" src="static/imgs/logo.png"/></span>
+                    <span className="logo-wrap"><img className="logo-img" alt="logo" src="static/imgs/logo.svg"/></span>
                     {children}
                 </div>
             </div>

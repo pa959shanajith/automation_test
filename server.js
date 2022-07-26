@@ -273,6 +273,10 @@ if (cluster.isMaster) {
 			sessionCheck(req, res, roles);
 		});
 
+		app.get(/^\/(verify|reset|expiry)$/, async (req, res, next) => {
+			return res.sendFile("index.html", { root: __dirname + "/public/" });
+		});
+
 		function sessionCheck(req, res, roles) {
 			logger.info("Inside sessioncheck for URL : %s", req.url);
 			var sess = req.session;
@@ -303,9 +307,16 @@ if (cluster.isMaster) {
 			} else {
 				let status = "na";
 				try {
-					await fs.promises.access(path.resolve(iceFile));
-					status = "available";
-				} catch (error) {}
+					let stats = await fs.promises.stat(path.resolve(iceFile))
+					// await fs.promises.access(path.resolve(iceFile));
+					if(stats.isFile()){
+						status = "available";
+					}else {
+						console.error("Error Occurred in fetching Avo Client")
+					}
+				} catch (error) {
+					console.error("Catch: Error Occurred in fetching Avo Client")
+				}
 				return res.send({status});
 			}
 		});
@@ -363,12 +374,15 @@ if (cluster.isMaster) {
 		app.post('/pdProcess', auth.protect, pdintegration.pdProcess);	// process discovery service
 		app.post('/exportToGit', auth.protect, mindmap.exportToGit);
 		app.post('/importGitMindmap', auth.protect, mindmap.importGitMindmap);
+		app.post('/deleteScenario', auth.protect, mindmap.deleteScenario);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/forgotPasswordEmail', authlib.forgotPasswordEmail);
 		app.post('/unlockAccountEmail', authlib.unlockAccountEmail);
 		app.post('/unlock', authlib.unlock);
+		app.post('/verifyUser',authlib.verifyUser);
+    app.post('/checkForgotExpiry',authlib.checkForgotExpiry);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);

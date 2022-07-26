@@ -16,6 +16,37 @@
     align-items: center;
     color: $darkestGray;
     cursor: pointer;
+    position: relative;
+    &:hover {
+      .disabled-info{
+        width: 80px;
+        transition: 1s ease-out;
+      }
+    }
+}
+
+.disabled-plugin {
+  cursor: default !important;
+  color: $pluginGray;
+  .plugin-text {
+    cursor: default !important;
+  }
+}
+
+.disabled-info{
+  height: 15px;
+  width: 15px;
+  background: #0009;
+  position: absolute;
+  top: 99px;
+  border-radius: 2px;
+  right: 16px;
+  font-family: Mulish;
+  overflow: hidden;
+  font-size: 10px;
+  align-items: center;
+  color: white;
+  transition: 0.3s ease-in;
 }
 
 .plugin-section{
@@ -49,6 +80,12 @@
     .plugin-ic{
         height: 105px;
         width: 130px;
+    }
+    .disabled-info {
+      height: 14px;
+      width: 14px;
+      top: 78px;
+      right: 26px;
     }
 }
 

@@ -1,0 +1,81 @@
+<svg width="121" height="121" viewBox="0 0 121 121" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="12" y="12" width="97" height="97" rx="2" fill="#70829d"/>
+<rect x="14.5" y="14.5" width="92" height="92" rx="1.5" fill="#70829d" stroke="white"/>
+<mask id="path-4-inside-1" fill="white">
+<rect x="33" y="33" width="26" height="26" rx="3"/>
+</mask>
+<rect x="33" y="33" width="26" height="26" rx="3" fill="#70829d" stroke="white" stroke-width="8" mask="url(#path-4-inside-1)"/>
+<mask id="path-5-inside-2" fill="white">
+<rect x="33" y="61" width="26" height="26" rx="3"/>
+</mask>
+<rect x="33" y="61" width="26" height="26" rx="3" fill="#70829d" stroke="white" stroke-width="8" mask="url(#path-5-inside-2)"/>
+<mask id="path-6-inside-3" fill="white">
+<rect x="61" y="33" width="26" height="26" rx="3"/>
+</mask>
+<rect x="61" y="33" width="26" height="26" rx="3" fill="#70829d" stroke="white" stroke-width="8" mask="url(#path-6-inside-3)"/>
+<rect x="63" y="63" width="22" height="22" rx="11" fill="#70829d" stroke="white" stroke-width="4"/>
+<rect x="46" width="2" height="12" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="45" y="5" width="4" height="7" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="121" y="45" width="2" height="12" transform="rotate(90 121 45)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="116" y="44" width="4" height="7" transform="rotate(90 116 44)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect y="74" width="2" height="12" transform="rotate(-90 0 74)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="5" y="75" width="4" height="7" transform="rotate(-90 5 75)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="74" y="121" width="2" height="12" transform="rotate(180 74 121)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="75" y="116" width="4" height="7" transform="rotate(180 75 116)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="55" width="2" height="12" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="54" y="5" width="4" height="7" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="121" y="54" width="2" height="12" transform="rotate(90 121 54)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="116" y="53" width="4" height="7" transform="rotate(90 116 53)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect y="65" width="2" height="12" transform="rotate(-90 0 65)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="5" y="66" width="4" height="7" transform="rotate(-90 5 66)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="65" y="121" width="2" height="12" transform="rotate(180 65 121)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="66" y="116" width="4" height="7" transform="rotate(180 66 116)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="64" width="2" height="12" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="63" y="5" width="4" height="7" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="121" y="63" width="2" height="12" transform="rotate(90 121 63)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="116" y="62" width="4" height="7" transform="rotate(90 116 62)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect y="56" width="2" height="12" transform="rotate(-90 0 56)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="5" y="57" width="4" height="7" transform="rotate(-90 5 57)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="56" y="121" width="2" height="12" transform="rotate(180 56 121)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="57" y="116" width="4" height="7" transform="rotate(180 57 116)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="73" width="2" height="12" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="72" y="5" width="4" height="7" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="121" y="72" width="2" height="12" transform="rotate(90 121 72)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="116" y="71" width="4" height="7" transform="rotate(90 116 71)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect y="47" width="2" height="12" transform="rotate(-90 0 47)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="5" y="48" width="4" height="7" transform="rotate(-90 5 48)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+<rect x="47" y="121" width="2" height="12" transform="rotate(180 47 121)" fill="#CECCCC" fill-opacity="0.49"/>
+<g style="mix-blend-mode:multiply" opacity="0.8">
+<rect x="48" y="116" width="4" height="7" transform="rotate(180 48 116)" fill="#B3B3B3" fill-opacity="0.54"/>
+</g>
+</svg>

@@ -938,3 +938,17 @@ exports.getNotificationRules = async(req,res) => {
 		return res.status('500').send("fail");
 	}
 } 
+
+exports.deleteScenario = async(req,res) => {
+	const fnName = "deleteScenario"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const inputs = {};
+		console.log(req.body);		
+		const result = await utils.fetchData(req.body, "mindmap/deleteScenario", fnName);
+		return res.status('200').send(result);
+	}catch (exception){
+		logger.error("Error occurred in mindmaps/deleteScenario:", exception);
+		return res.status('500').send("fail");
+	}
+} 
