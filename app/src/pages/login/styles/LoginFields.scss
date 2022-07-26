@@ -48,36 +48,81 @@
     flex-direction: column;
     justify-content: center;
     box-sizing: content-box;
+
+    .ms-TextField-wrapper>.ms-Label {
+      pointer-events: none !important;
+    }
 }
 
+.login-hint {
+  text-align: center;
+  width: calc(450px + 6rem);
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.forgot-container {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// .username-container {
+//   display: flex;
+//   flex-direction: column;
+//   // overflow-y: auto;
+//   max-height: 30vh;
+//   flex:1;
+  
+//   .ms-Checkbox-checkbox {
+//     height: 1.5rem !important;
+//     width: 1.5rem !important;
+//   }
+
+// }
+
 .restart-service-btn, .login-btn{
-    font-family: $avoFont ;
-    font-size: 32px;
-    border-radius: 22px!important;
+    font-family: 'Mulish';
+    font-size: 1.125rem;
+    font-weight: 600;
+    border-radius: 10px!important;
     border: none;
-    background-color: $primaryColorLogin;
-    color: $whiteColor;
-    padding: 4px 12px;
-    margin-top: 30px!important;
+    background: #5F338F;
+    color: white;
+    padding: 8px 25px;
+    margin-top: 40px;
+    align-self: center;
     cursor: pointer;
     touch-action: manipulation;
     outline: none;
+    width: fit-content;
     &:focus{
         outline: none!important;
     }
     &:disabled{
-        background-color: $backgroundLogin;
+        background: #E1DFDD;
         cursor: auto;
+        color: #323130;
+    }
+
+    &[data-test=cancel-button] {
+      border: 2px solid #5F338F;
+      padding: 6px 25px !important;
+      background-color: white !important;
+      color: #5F338F !important;
+    }
+
+    &[data-type=mr-top-1] {
+      margin-top: 20px !important;
     }
 }
 
-.login-btn{
-    padding: 0 12px!important; 
- }
+// .login-btn{
+//     padding: 0 12px!important; 
+//  }
 
 .restart-service-btn{
     font-size: 24px!important;
-    width: 100%;
     margin: 10px 0;
 }
 
@@ -98,12 +143,12 @@
     }
 }
 
-.error-msg{
-    font-family: $avoPrimaryFont;
-    font-size: 14px;
+.error-msg-login{
+    font-family: 'Mulish';
+    font-size: 1rem;
     color:  $redError;
     width: 100%;
-    text-align: center;
+    text-align: left;
     a{
         color:  $redError;
     }
@@ -231,7 +276,7 @@
 
 @media screen and (max-width: 800px){
     .login-btn{
-        margin-top: 0;
+        margin-top: 20 !important;
         margin-bottom: 20px;
     }
 }
@@ -252,20 +297,20 @@
         margin-bottom: 2.5vw;
     }
 
-    .error-msg{
-        font-size: 1.1vw;
-    }
+    // .error-msg-login{
+    //     font-size: 1.1vw;
+    // }
 
-    .login-btn{
-        padding: 0 .2px!important; 
-     }
+    // .login-btn{
+    //     // padding: 0 .2px!important; 
+    //  }
 
-    .login-btn{
-        font-size: 2.5vw;
-        border-radius: 2vw!important;
-        padding: 0 .2vw;
-        margin-top: .2vw;
-    }
+    // .login-btn{
+    //     // font-size: 2.5vw;
+    //     // border-radius: 2vw!important;
+    //     // padding: 0 .2vw;
+    //     // margin-top: .2vw;
+    // }
 
     .restart-service-btn{
         font-size: 1.7vw;
@@ -283,12 +328,71 @@
     
 }
 
-.forget-password,
-.forget-password:hover {
+.forget-password {
     float: right;
-    color: $primaryColorLogin;
-    font-size: 14px;
+    color: #5F338F;
+    font-size: 1rem;
     font-family: $avoFont;
-    text-decoration: underline;
+    text-decoration: none !important;
     cursor: pointer;
+    margin-top: 10px;
+
+    &:hover {
+      color: #7d6596;
+    }
+}
+
+.forgot-content {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.login-container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.username-container {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  max-height: 30vh;
+  margin-bottom: 0.5rem;
+  flex-direction: column;
+  label {
+      cursor: pointer;
+      margin-right:2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: black;
+      font-family: Mulish;
+      font-size: 1rem;
+      span {
+          margin-left: 0.5rem;
+      }
+      input[type="radio"] {
+          appearance: none;
+          cursor: pointer;
+      }
+      input[type="radio"]::after {
+          content: "";
+          display: flex;
+          width: 1rem;
+          height: 1rem;
+          border-radius: 50%;
+          border-style: solid;
+          border-width: 0.1rem;
+          border-color: gray;
+          cursor: pointer;
+      }
+      input[type="radio"]:checked::after {
+          background: radial-gradient(var(--baseColor) 0%, var(--baseColor) 40%, transparent 50%, transparent);
+          border-color: var(--baseColorBorder);
+          cursor: pointer;
+      }
+  }
 }

@@ -8,6 +8,8 @@
     left: 0;
     right: 0;
     background-color: $whisper;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .element-holder{
@@ -33,6 +35,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    width: 400px;
 }
 
 
@@ -40,21 +43,33 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-right: 10%;
-    width: 290px;
+    align-items: center;
+    // margin-right: 10%;
+    width: 450px;
     background: $whiteColor;
-    padding: 5% 4%;
-    border-radius: 50px;
+    padding: 2rem;
+    border: 2px solid #5F338F;
+    border-radius: 8px;
     box-sizing: content-box;
+    position:relative;
+    min-height: MIN(50vh, 575px);
+    transition: 0.5s ease-in-out;
 }
 
 .logo-img{
-    height: 65px;
+    height: 80px;
 }
 .logo-wrap{
-    margin-bottom: 50px;
+    margin-bottom: 20px;
     display: flex;
     justify-content: center;
+}
+
+.form-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 .greet-text{
@@ -80,12 +95,19 @@
     }
 }
 
+@media screen and (max-height:800px){
+  .element-holder{
+    justify-content: unset !important;
+  }
+}
 
 @media screen and (max-width: 800px){
     .login-block{
-        padding: 6% 4%;
-        margin-top: 20px;
+        padding: 2rem;
+        margin-top: 2rem;
         margin-right: 0;
+        min-height: unset;
+        max-height: unset;
     }
     .element-holder{
         flex-direction: column;
@@ -93,7 +115,7 @@
         padding: 0 6%;
     }
     .logo-wrap{
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
     .greet-text{
         flex-grow: 0;
@@ -135,17 +157,14 @@
         }
     }
         
-    .login-block{
-        margin-right: 10%;
-        width: 20vw;
-        padding: 5vw 3vw;
-        border-radius: 3vw;
-    }
+    // .login-block{
+    //     // margin-right: 10%;
+    // }
 
     .logo-img{
         height: 3.5vw;
     }
     .logo-wrap{
-        margin-bottom: 4vw;
+        margin-bottom: 1.5vw;
     }
 }
