@@ -214,6 +214,7 @@ if (cluster.isMaster) {
 		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
 		app.post('/openScreenShot_API', report.openScreenShot_API);
+		app.post('/getExecScenario', suite.getExecScenario);
 
 		app.use(csrf({
 			cookie: true
@@ -528,8 +529,22 @@ if (cluster.isMaster) {
 		app.post('/APG_runDeadcodeIdentifier', auth.protect, flowGraph.APG_runDeadcodeIdentifier);
 		app.post('/getUserICE', auth.protect, io.getUserICE)
 		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE);
-		//-------------Route Mapping-------------//
+
+		// Devops Routes
+		// app.post('/fetchProjects', auth.protect, devOps.fetchProjects);
+		app.post('/getConfigureList', auth.protect, devOps.getConfigureList);
+		app.post('/getAvoAgentAndAvoGridList', auth.protect, devOps.getAvoAgentAndAvoGridList);
 		app.post('/fetchModules', auth.protect, devOps.fetchModules);
+		app.post('/storeConfigureKey', auth.protect, devOps.storeConfigureKey);
+		app.post('/execAutomation', auth.protect, suite.execAutomation);
+		app.post('/getAgentTask', auth.protect, suite.getAgentTask);
+		app.post('/fetchProjects', auth.protect, devOps.getAllSuites_ICE);
+		
+
+
+
+		//-------------Route Mapping-------------//
+		// app.post('/fetchModules', auth.protect, devOps.fetchModules);
 
 		// To prevent can't send header response
 		app.use(function(req, res, next) {
