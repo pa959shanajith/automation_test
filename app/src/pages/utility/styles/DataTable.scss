@@ -24,6 +24,10 @@
     background-color: transparent;
     padding: 0;
     margin: 0;
+    &:active {
+      background-color: #0003 !important;
+      border-radius: 5px;
+    }
 }
 
 .dt__tblBtn_ic{
@@ -137,4 +141,9 @@
         border-radius: 4px;
         box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     }
+}
+
+.selected-btn {
+  background: #0003 !important;
+  border-radius: 5px !important;
 }
