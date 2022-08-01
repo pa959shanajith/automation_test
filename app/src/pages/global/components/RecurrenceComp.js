@@ -19,9 +19,13 @@ const RecurrenceComp = (props) => {
     const [monthlyRecurrenceMonthInputDisable, setMonthlyRecurrenceMonthInputDisable] = useState(true);
     const [monthlyRecurrenceMonthInputDisable_1, setMonthlyRecurrenceMonthInputDisable_1] = useState(true);
 
-    const weekDays = [{ name: "Sunday" }, { name: "Monday" }, { name: "Tuesday" }, { name: "Wednesday" }, { name: "Thursday" }, { name: "Friday" }, { name: "Saturday" }];
+    const weekDays = [{ name: "Sunday" }, { name: "Monday" }, { name: "Tuesday" }, { name: "Wednesday" }, { name: "Thursday" }, { name: "Friday" }, { name: "Saturday" }, { name: "All" }];
 
     const [weeklyRecurrenceWeek, setWeeklyRecurrenceWeek] = useState(
+        new Array(weekDays.length).fill(false)
+    );
+
+    const [selectedWeek, setSelectedWeek] = useState(
         new Array(weekDays.length).fill(false)
     );
 
@@ -141,6 +145,19 @@ const RecurrenceComp = (props) => {
 
         setWeeklyRecurrenceWeek(updatedCheckedState);
 
+        if (position === weekDays.length - 1) {
+            const updatedDisableState = selectedWeek.map((item, index) =>
+                (index === position && weekDays[index].name === "All") ? item : !item
+            );
+            setSelectedWeek(updatedDisableState);
+        }
+        else {
+            const updatedDisableState = selectedWeek.map((item, index) =>
+                (weekDays[index].name !== "All") ? item : true
+            );
+            setSelectedWeek(updatedDisableState);
+        }
+
         let weekValuesString = "";
         let weekValuesOnHoverString = "";
         updatedCheckedState.map((item, index) => {
@@ -153,10 +170,15 @@ const RecurrenceComp = (props) => {
         if (weekValuesString != "") {
             weekValuesString = "0 0 * * " + weekValuesString.replace(/,\s*$/, "");
             weekValuesOnHoverString = "Occurs on every " + weekValuesOnHoverString.toLowerCase().replace(/,\s*$/, "");
+            if (weekValuesOnHoverString.includes('all')) {
+                weekValuesString = "0 0 * * 0,1,2,3,4,5,6";
+                weekValuesOnHoverString = "Occurs on every week";
+            }
             setRecurringValue(weekValuesString);
             setRecurringStringOnHover(weekValuesOnHoverString);
         }
         else {
+            setSelectedWeek(new Array(weekDays.length).fill(false));
             setRecurringValue(weekValuesString);
             setRecurringStringOnHover(weekValuesOnHoverString);
         }
@@ -330,7 +352,7 @@ const RecurrenceComp = (props) => {
     };
 
     return (
-        <ClickAwayListener className={"recurrence-time-container " + (classTimer ? " " + classTimer : "")} onClickAway={() => { setShowRecurrence(false); setRecurrenceType(""); setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setWeeklyRecurrenceWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday"); setDailyRecurrenceInputDisable(true); setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true); }} as="span" >
+        <ClickAwayListener className={"recurrence-time-container " + (classTimer ? " " + classTimer : "")} onClickAway={() => { setShowRecurrence(false); setRecurrenceType(""); setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setWeeklyRecurrenceWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday"); setDailyRecurrenceInputDisable(true); setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true); setSelectedWeek(new Array(weekDays.length).fill(false)); }} as="span" >
             <div className="rdt rdtOpen">
                 <input type="text" className={classname} placeholder={placeholder} readOnly={readonly} disabled={disabled} title={title ? title : "Select Frequency"} value={recur} />
                 {showRecurrence && (
@@ -388,7 +410,7 @@ const RecurrenceComp = (props) => {
                                                     return (
                                                         <div className="weeks-child">
                                                             <lable>
-                                                                <input type="checkbox" name={name} value={name} checked={weeklyRecurrenceWeek[index]} onChange={() => getWeeklyRecurrenceWeeks(index)} />
+                                                                <input type="checkbox" name={name} value={name} disabled={selectedWeek[index]} checked={weeklyRecurrenceWeek[index]} onChange={() => getWeeklyRecurrenceWeeks(index)} />
                                                                 <span> {name}</span>
                                                             </lable>
                                                         </div>
