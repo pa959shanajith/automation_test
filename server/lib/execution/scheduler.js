@@ -25,6 +25,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
     let recurringStringOnHoverValue = body.executionData.batchInfo[0].recurringStringOnHover;
     let timeValue = body.executionData.batchInfo[0].time;
     let parentId = body.executionData.batchInfo[0].parentId ? body.executionData.batchInfo[0].parentId : 0;
+    let startDate = body.executionData.batchInfo[0].startDate ? body.executionData.batchInfo[0].startDate : body.executionData.batchInfo[0].timestamp;
     if (!poolid || poolid === "") poolid = constants.EMPTYPOOL
     var invokinguser = {
         invokinguser: session.userid,
@@ -108,7 +109,8 @@ exports.prepareSchedulingRequest = async (session, body) => {
             "scheduleType": recurringString,
             "recurringStringOnHover": recurringStringOnHoverValue,
             "time": timeValue,
-            "parentId": parentId
+            "parentId": parentId,
+            "startDate": startDate.toString()
         };
         for (let i = 0; i < batchIdx.length; i++) {
             let suite = batchInfo[batchIdx[i]];
@@ -418,6 +420,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
     recurringPattern = recurringPattern.join(" ");
     body.executionData.batchInfo[0].recurringValue = recurringPattern;
     body.executionData.batchInfo[0].poolid = poolid;
+    body.executionData.batchInfo[0].startDate = timestamp;
     let recurringString = multiExecutionData['batchInfo'][0]['recurringString'];
     let recurringStringOnHover = multiExecutionData.batchInfo[0].recurringStringOnHover;
     inputs = {
@@ -438,7 +441,8 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         recurringPattern: recurringPattern,
         recurringStringOnHover:	multiExecutionData.batchInfo[0].recurringStringOnHover,
         time: timeSelected,
-        parentId: 0
+        parentId: 0,
+        startDate: timestamp.toString()
     };
 
     const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
