@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../styles/WelcomeWizard.scss";
 import axios from "axios";
-import {ProgressIndicator} from "@fluentui/react";
+import {ProgressIndicator , AnimationClassNames} from "@fluentui/react";
 import { Stepper } from 'react-form-stepper';
 import { Messages as MSG, setMsg, RedirectPage, BrowserFp } from '../../global';
-import { AnimationClassNames } from '@fluentui/react';
 import { ScrollBar } from '../../global';
 import { useSelector, useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
@@ -12,16 +11,17 @@ import "../styles/TermsAndConditions.scss";
 import * as api from '../api';
 import { useHistory } from 'react-router-dom';
 import { manageUserDetails } from '../../admin/api';
+import { IconButton } from "@avo/designcomponents"
 
 const DPCard = ({htitle, itemObj}) => {
     return (<div className="d-p-card">
-                <div className="d-p-card__upper">
+                <div className="d-p-card__left">
+                   <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${itemObj.imageName}.svg)`}}></div>
+                </div>
+                <div className="d-p-card__right">
                     <div className="d-p-card__title">{htitle}</div>
                     <div className="d-p-card__subtitle">{itemObj.subtitle}</div>
                     <div className="d-p-card__content">{itemObj.content}</div>
-                </div>
-                <div className="d-p-card__lower">
-                   <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${itemObj.imageName}.svg)`}}></div>
                 </div>
             </div>)
 }
@@ -41,6 +41,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const [OS,setOS] = useState("Windows");
   const [downloadScreenCounter,setdownloadScreenCounter] = useState(0);
   const [animationDir, setAnimationDir] = useState(false);
+  const [cardListNo, setCardListNo] = useState(1);
   const animationInterval = useRef(undefined);
   const history = useHistory();
   const dispatch = useDispatch();
@@ -395,17 +396,35 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
             <div className="d-p-header__title"><div>Thanks for downloading !</div><div>You're just a few steps away.</div></div>
             {/* <div className="d-p-header__subtitle">If your download didn't start then don't worry, you can download it from <b>"User Profile" dropdown</b> on <b>landing page.</b></div> */}
         </div>
-        <div className="download-progress-container">
+        <div className="installation-instructions-container">
             <div className="d-p-card-container">
+                <IconButton icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo(1)}} variant="borderless" />
                 {OS==="Windows" && InstallationSteps_win.map((item,idx)=>{
-                    return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    if (cardListNo===1 && idx<2){
+                      return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    } 
+                    else if (cardListNo===2 && idx>1 ){
+                      return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    }
+                    else return null;
                 })}
                 {OS==="MacOS" && InstallationSteps_mac.map((item,idx)=>{
-                    return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    if (cardListNo===1 && idx<2){
+                      return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    } 
+                    else if (cardListNo===2 && idx>1 ){
+                      return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    }
+                    else return null;
                 })}
+                <IconButton icon="chevron-right" styles={{root:{right:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo(2)}} variant="borderless" />
+            </div>
+            <div style={{display:"flex", flexDirection:"row"}}>
+              <div key={"select-1"} className="circle" data-type={cardListNo===1} onClick={()=>{setCardListNo(1)}}></div>
+              <div key={"select-2"} className="circle" data-type={cardListNo===2} onClick={()=>{setCardListNo(2)}}></div>
             </div>
         </div>
-        <button className="type1-button" onClick={()=>{updateStepNumber(1)}}>Next</button>
+        <button className="type1-button static-button" onClick={()=>{updateStepNumber(1)}}>Next</button>
       </div>
   }
 

@@ -95,7 +95,7 @@ const BasePage = () => {
                                 //     setShowTCPopup(true);
                                 // }
                                 // else 
-                                if(userinfo.firstTimeLogin && userinfo.dbuser) {
+                                if(userinfo.firstTimeLogin && userinfo.dbuser && userinfo.isTrial) {
                                     setUserProfile(userinfo);
                                     setShowChangePass(true);
                                 }

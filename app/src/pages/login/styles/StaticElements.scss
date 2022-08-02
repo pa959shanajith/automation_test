@@ -54,6 +54,11 @@
     position:relative;
     min-height: MIN(50vh, 575px);
     transition: 0.5s ease-in-out;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    input::-ms-reveal, input::-ms-clear {
+        display: none;
+    }
 }
 
 .logo-img{
