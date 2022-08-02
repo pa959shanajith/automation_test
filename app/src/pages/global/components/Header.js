@@ -215,7 +215,7 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
             { showOverlay && <ScreenOverlay content={showOverlay} /> }
             { show_WP_POPOVER && <div className="tranparentBlocker"></div>}
             <div className = "main-header">
-                <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/logo.png" onClick={ !adminDisable ? naviPg : null } /></span>
+                <span className="header-logo-span"><img className={"header-logo " + (adminDisable && "logo-disable")} alt="logo" src="static/imgs/AssureLogo_horizonal.svg" onClick={ !adminDisable ? naviPg : null } /></span>
                     <ClickAwayListener onClickAway={onClickAwayHelp} style={{zIndex:10, background:show_WP_POPOVER?"white":"transparent", borderRadius:5, position:"relative"}}>
                         <div className="user-name-btn no-border" data-toggle="dropdown" onClick={()=>setShowHelp(!showHelp)} style={{padding:5}}>
                             <span className="help">Need Help ?</span>

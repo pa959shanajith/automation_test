@@ -45,7 +45,8 @@ const LoginFields = (props) => {
     const [dpEmailViewMore, setdpEmailViewMore] = useState(false);
     const [userResetData, setResetUserData] = useState({});
     const [initialFormPos,setInitialFormPos] = useState(0)
-    const [formTitle, setFormTitle] = useState("Avo Assure - Log In")
+    const [formTitle, setFormTitle] = useState("Avo Assure - Log In");
+    const [isTrialInstance, setIsTrialInstance] = useState(false);
     const regEx_email=/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
     let serverList = [{"name": "License Server", "active": false}, {"name": "DAS Server", "active": false}, {"name": "Web Server", "active": false}];
@@ -384,6 +385,11 @@ const LoginFields = (props) => {
 
     useEffect(()=>{
         setInitialFormPos(-20);
+        (async()=>{
+          const response = await fetch("/getLicenseInfo")
+          let { isTrialUser } = await response.json();
+          setIsTrialInstance(isTrialUser)
+        })();
         if(props.verifyPage){
             setOverlayText("Loading...");
             (async()=>{
@@ -653,7 +659,7 @@ const LoginFields = (props) => {
                   </>
               }
               </form>
-              {!unlockCond?<div className='login-hint'>Don't have an account? Contact your admin for creating an account.</div>:null}
+              {!unlockCond && !isTrialInstance?<div className='login-hint'>Don't have an account? Contact your admin for creating an account.</div>:null}
             </motion.div>
             )} 
           </AnimatePresence>

@@ -25,7 +25,7 @@ process.env.nulluser = "5fc137cc72142998e29b5e63";
 process.env.nullpool = "5fc13ea772142998e29b5e64";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
-
+let isTrialUser = false;
 if (cluster.isMaster) {
 	cluster.fork();
 	cluster.on('disconnect', function(worker) {
@@ -337,6 +337,10 @@ if (cluster.isMaster) {
 			}
 		});
 
+    app.get('/getLicenseInfo', (req,res) => {
+      return res.send({isTrialUser})
+    })
+
 		//Route Directories
 		var mindmap = require('./server/controllers/mindmap');
 		var pdintegration = require('./server/controllers/pdintegration');
@@ -579,10 +583,11 @@ if (cluster.isMaster) {
 		try {
 			var apireq = apiclient.post(epurl + "server", function(data, response) {
 				try {
-					if (response.statusCode != 200 || !data || data.toString() != "pass") {
+					if (response.statusCode != 200 || !data || data.toString() === "fail") {
 						httpsServer.close();
 						logger.error("Please run the Service API and Restart the Server");
 					} else {
+            isTrialUser = JSON.parse(data.toString()).isTrial
 						scheduler.reScheduleTestsuite();
 						scheduler.reScheduleRecurringTestsuite();
 						console.info("Avo Assure Server Ready...\n");

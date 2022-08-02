@@ -70,6 +70,12 @@
         box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.12);
     }
 }
+
+.static-button {
+  position: static !important;
+  margin-bottom: 0.6rem;
+}
+
 .step2{
     font-family: "Mulish";
     font-style: normal;
@@ -367,16 +373,28 @@
     }
 }
 
-.download-progress-container {
+.installation-instructions-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     max-height: 100%;
-    width: auto;
+    width: 100%;
     font-family: Mulish;
-    margin: 0 calc(2% + 6rem);
-    flex: 2;
+    margin: 0;
+    flex: 3;
+
+    .circle {
+      height: 1rem;
+      width: 1rem;
+      margin: 0.3rem;
+      border-radius: 50%;
+      background-color: #999;
+      cursor: pointer;
+      &[data-type=true] {
+        background-color: #341655;
+      }
+    }
 
     .d-p-card-container {
         display: flex;
@@ -385,18 +403,15 @@
         justify-content: center;
         align-items: center;
         height: 100%;
-        @media screen and (max-width:1400px) {
-            max-width: 90%;
-        }
 
         .d-p-card {
             height: 90%;
-            max-width: 260px;
+            // max-width: 260px;
             min-width: 170px;
             display: flex;
-            max-height: 350px;
-            flex:1;
-            flex-direction: column;
+            max-height: 270px;
+            flex: 1;
+            flex-direction: row;
             border: 1px solid #E1DFDD;
             border-radius: 8px;
             align-items: center;
@@ -405,15 +420,16 @@
             -webkit-box-shadow: 0px 1px 9px 0px rgba(0,0,0,0.5);
             -moz-box-shadow: 0px 1px 9px 0px rgba(0,0,0,0.5);
 
-            .d-p-card__upper {
+            .d-p-card__right {
                 display: flex;
                 flex-direction: column;
-                height: 50%;
                 border-radius: 8px 8px 0px 0px;
-                width: 94%;
-                margin-top: 3%;
                 gap: 14px;
+                flex: 3;
                 font-family: Mulish;
+                height: 100%;
+                margin-left: 5px;
+                justify-content: center;
             }
 
             .d-p-card__title {
@@ -443,15 +459,14 @@
                 }
             }
 
-            .d-p-card__lower {
+            .d-p-card__left {
                 display: flex;
-                height: 50%;
-                width: 100%;
+                flex: 4;
                 align-items: flex-end;
                 justify-content: center;
                 background-color: #5F338F;
                 border-bottom-left-radius: 8px;
-                border-bottom-right-radius: 8px;
+                height: 100%;
 
                 .d-p-card__image {
                     width: 90%;
