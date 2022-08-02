@@ -584,7 +584,7 @@ if (cluster.isMaster) {
 						logger.error("Please run the Service API and Restart the Server");
 					} else {
 						scheduler.reScheduleTestsuite();
-						// scheduler.reScheduleRecurringTestsuite();
+						scheduler.reScheduleRecurringTestsuite();
 						console.info("Avo Assure Server Ready...\n");
 					}
 				} catch (exception) {
