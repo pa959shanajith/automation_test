@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip';
 import ReportApi from '../components/ReportApi'
 import ExecMetricsApi from '../components/ExecMetricsApi'
 import ExecutionApi from '../components/ExecutionApi'
-import { Messages as MSG, VARIANT, setMsg, ModalContainer } from '../../global';
+import { Messages as MSG, VARIANT, setMsg, ModalContainer, ScreenOverlay } from '../../global';
 
 
 import "../styles/DevOps.scss";
@@ -14,6 +14,7 @@ const DevOps = props => {
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const api = window.location.href.slice(0, -7)+'executeAutomation';
     const [currentIntegration, setCurrentIntegration] = useState(false);
+    const [loading,setLoading] = useState(false);
 
     const ConfirmPopup = () => (
         <ModalContainer 
@@ -35,7 +36,8 @@ const DevOps = props => {
 
     return (<>
         { showConfirmPop && <ConfirmPopup /> }
-        {currentIntegration ? <DevOpsConfig url={api} setCurrentIntegration={setCurrentIntegration} currentIntegration={currentIntegration} showMessageBar={showMessageBar} /> : <DevOpsList url={api} setShowConfirmPop={setShowConfirmPop} setCurrentIntegration={setCurrentIntegration} showMessageBar={showMessageBar} /> }
+        {loading?<ScreenOverlay content={loading}/>:null}
+        {currentIntegration ? <DevOpsConfig url={api} setCurrentIntegration={setCurrentIntegration} currentIntegration={currentIntegration} showMessageBar={showMessageBar} setLoading={setLoading} /> : <DevOpsList url={api} setShowConfirmPop={setShowConfirmPop} setCurrentIntegration={setCurrentIntegration} showMessageBar={showMessageBar} setLoading={setLoading} /> }
 {/*         
         <div className={classes["api-ut_contents"]}>
         <div className={classes["api-ut__ab"]}>

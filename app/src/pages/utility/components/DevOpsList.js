@@ -2,272 +2,14 @@ import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer } from '../../global';
 import { SearchBox } from '@avo/designcomponents';
-import { fetchConfigureList } from '../api';
+import { fetchConfigureList, deleteConfigureKey } from '../api';
 import {v4 as uuid} from 'uuid';
 
 import "../styles/DevOps.scss";
 
-const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessageBar }) => {
+const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading }) => {
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
-    // const [configList, setConfigList] = useState([
-    //     {
-    //         name: 'Name 1ansadnsa,mdnas,mdnasm,dnsad   dasd as ',
-    //         key: uuid(),
-    //         project: 'Project 1',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 1',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'headless'
-    //     },{
-    //         name: 'Name 2',
-    //         key: uuid(),
-    //         project: 'Big Project Name 2',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 2',
-    //         cycle: 'Cycle 2',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'synchronous',
-    //         executionMode: 'headless'
-    //     },{
-    //         name: 'Name 3',
-    //         key: uuid(),
-    //         project: 'Very Big Big BIg  Big Big BIg Project 3',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 3',
-    //         cycle: 'Cycle 3',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 4',
-    //         key: uuid(),
-    //         project: 'Project 4',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 4',
-    //         cycle: 'Cycle 4',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 5',
-    //         key: uuid(),
-    //         project: 'Project 5',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 5',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 6',
-    //         key: uuid(),
-    //         project: 'Project 6',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 6',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 7',
-    //         key: uuid(),
-    //         project: 'Project 7',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 7',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 8',
-    //         key: uuid(),
-    //         project: 'Project 8',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 8',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 9',
-    //         key: uuid(),
-    //         project: 'Project 9',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 9',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 10',
-    //         key: uuid(),
-    //         project: 'Project 10',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 10',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 11',
-    //         key: uuid(),
-    //         project: 'Project 11',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 11',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 12',
-    //         key: uuid(),
-    //         project: 'Project 12',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 12',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 13',
-    //         key: uuid(),
-    //         project: 'Project 13',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 13',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 14',
-    //         key: uuid(),
-    //         project: 'Project 14',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 14',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     },{
-    //         name: 'Name 15',
-    //         key: uuid(),
-    //         project: 'Project 15',
-    //         selectValues: [
-    //             { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
-    //             { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //             { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '18%', disabled: true, selectedName: '' },
-    //         ],
-    //         release: 'Release 15',
-    //         cycle: 'Cycle 1',
-    //         scenarioList: [],
-    //         avoAgentGrid: '',
-    //         browser: '',
-    //         integration: '',
-    //         executionType: 'asynchronous',
-    //         executionMode: 'non-headless'
-    //     }
-    // ]);
     const [configList, setConfigList] = useState([]);
     const [filteredList, setFilteredList] = useState(configList);
 
@@ -297,26 +39,97 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             }, 1500);
         }
     }
-    const deleteDevOpsConfig = () => {
-        setShowConfirmPop({'title': 'Delete DevOps Configuration', 'content': <p>Are you sure, you want to delete <b>Name 1</b> Configuration?</p>, 'onClick': ()=>{ setShowConfirmPop(false); showMessageBar('Name 1 Configuration Deleted', 'SUCCESS'); }});
+    const deleteDevOpsConfig = (key) => {
+        setLoading('Please Wait...');
+        setTimeout(async () => {
+            const deletedConfig = await deleteConfigureKey(key);
+            if(deletedConfig.error) {
+                if(deletedConfig.error.CONTENT) {
+                    setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT,VARIANT.ERROR));
+                } else {
+                    setMsg(MSG.CUSTOM("Error While Deleting DevOps Configuration",VARIANT.ERROR));
+                }
+            }else {
+                const configurationList = await fetchConfigureList();
+                if(configurationList.error) {
+                    if(configurationList.error.CONTENT) {
+                        setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
+                    } else {
+                        setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
+                    }
+                }else {
+                    setConfigList(configurationList);
+                }
+                setMsg(MSG.CUSTOM("DevOps Configuration deleted successfully",VARIANT.SUCCESS));
+            }
+            setLoading(false);
+        }, 500);
+        setShowConfirmPop(false);
+    }
+    const onClickDeleteDevOpsConfig = (name, key) => {
+        setShowConfirmPop({'title': 'Delete DevOps Configuration', 'content': <p>Are you sure, you want to delete <b>{name}</b> Configuration?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
     }
     const handleSearchChange = (value) => {
         let filteredItems = configList.filter(item => (item.configurename.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.project.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.release.toLowerCase().indexOf(value.toLowerCase()) > -1));
         setFilteredList(filteredItems);
         setSearchText(value);
     }
-    useEffect(() => {
-        (async() => {
-            const configurationList = await fetchConfigureList();
-            if(configurationList.error) {
-                if(configurationList.error.CONTENT) {
-                    setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
-                } else {
-                    setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
-                }
-            }else {
-                setConfigList(configurationList);
+    const getIntegrationSelected = (integration) => {
+        let selectedIntegration = '';
+        Object.keys(integration).forEach((currentInteg) => {
+            if(integration[currentInteg].url !== '') {
+                selectedIntegration = currentInteg;
             }
+        });
+        if(selectedIntegration === 'qtest') selectedIntegration = 'qTest'
+        if(selectedIntegration === 'alm') selectedIntegration = 'ALM'
+        if(selectedIntegration === 'zephyr') selectedIntegration = 'Zephyr'
+        return selectedIntegration;
+    }
+    const handleEdit = (item) => {
+        setCurrentIntegration({
+            name: item.configurename,
+            key: item.configurekey,
+            selectValues: [
+                { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '30%', disabled: false, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
+            ],
+            scenarioList: getScenarioList(item.executionRequest.suitedetails),
+            avoAgentGrid: '',
+            browsers: item.executionRequest.suitedetails[0].browserType,
+            integration: getIntegrationSelected(item.executionRequest.integration),
+            executionType: item.executionRequest.executiontype,
+            executionMode: 'non-headless',
+            executionRequest: item.executionRequest
+        });
+        return;
+    }
+    const getScenarioList = (suitedetails) => {
+        let scenarioList = [];
+        suitedetails.forEach(suite => {
+            suite.scenarioIds.forEach((scenarioID) => {
+                if(!scenarioList.includes(scenarioID)) scenarioList.push(scenarioID);
+            });
+        });
+        return scenarioList;
+    }
+    useEffect(() => {
+        (() => {
+            setLoading('Please Wait...');
+            setTimeout(async () => {
+                const configurationList = await fetchConfigureList();
+                if(configurationList.error) {
+                    if(configurationList.error.CONTENT) {
+                        setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
+                    } else {
+                        setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
+                    }
+                }else {
+                    setConfigList(configurationList);
+                }
+                setLoading(false);
+            }, 500);
         })()
     }, []);
 
@@ -379,20 +192,20 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                             searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.key} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
                                 <td className="tkn-table__name" data-for="name" data-tip={item.configurename}> <ReactTooltip id="name" effect="solid" backgroundColor="black" /><React.Fragment>{item.configurename}</React.Fragment> </td>
-                                <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.key) }} ></i></td>
+                                <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
                                 <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
-                                <td className="tkn-table__button"> <img style={{ marginRight: '10%' }} onClick={() => setCurrentIntegration(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp; <img onClick={() => deleteDevOpsConfig()} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/></td>
+                                <td className="tkn-table__button"> <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp; <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/></td>
                             </tr>)
                         }
                         {
                             searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.key} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
                                 <td className="tkn-table__name" data-for="name" data-tip={item.configurename}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>
-                                <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.key) }} ></i></td>
+                                <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
                                 <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
-                                <td className="tkn-table__button"> <img style={{ marginRight: '10%' }} onClick={() => setCurrentIntegration(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp; <img onClick={() => deleteDevOpsConfig()} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/></td>
+                                <td className="tkn-table__button"> <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp; <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/></td>
                             </tr>)
                         }
                     </tbody>

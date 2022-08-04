@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
-import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown, ScreenOverlay } from '../../global';
+import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown } from '../../global';
 import { fetchProjects, getPools, storeConfigureKey } from '../api';
 import { useSelector } from 'react-redux';
 import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
@@ -41,15 +41,14 @@ const DevOpsConfig = props => {
             text: 'Edge Chromium'
         }
     ]);
-    const [integration,setIntegration] = useState({
+    const [integration,setIntegration] = useState(props.currentIntegration.executionRequest ? props.currentIntegration.executionRequest.integration : {
         alm: {url:"",username:"",password:""}, 
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
         zephyr: {url:"",username:"",password:""}
     });
-    const [loading,setLoading] = useState(false);
     const [showIntegrationModal,setShowIntegrationModal] = useState(false)
     const [dataUpdated, setDataUpdated] = useState(false);
-    const [integrationlist, setIntegrationlist] = useState([
+    const integrationlist = [
         {
             key: 'qTest',
             text: 'qTest'
@@ -60,7 +59,7 @@ const DevOpsConfig = props => {
             key: 'Zephyr',
             text: 'Zephyr'
         }
-    ]);
+    ];
     const [moduleScenarioList, setModuleScenarioList] = useState([]);
     const [selectedExecutionType, setSelectedExecutionType] = useState('normalExecution');
     const syncScenarioChange = (value) => {
@@ -69,6 +68,7 @@ const DevOpsConfig = props => {
     }
     useEffect(()=> {
         (async()=>{
+            props.setLoading('Please Wait...');
             const args = {
                 poolid:"all",
                 projectids:[]
@@ -94,33 +94,35 @@ const DevOpsConfig = props => {
                 let newSelectValues = [...integrationConfig.selectValues];
                 newSelectValues[0].list = projList;
 
-                if(reportData.hasData) {
+                if(props.currentIntegration.name !== '') {
+                    console.log(props.currentIntegration.executionRequest);
+                    console.log('props.currentIntegration.executionRequest');
                     // proj
-                    newSelectValues[0]['selected'] = reportData.projectid;
-                    newSelectValues[0]['selectedName'] = reportData.projectname;
+                    newSelectValues[0]['selected'] = props.currentIntegration.executionRequest.suitedetails[0].projectid;
+                    newSelectValues[0]['selectedName'] = props.currentIntegration.executionRequest.suitedetails[0].projectname;
 
                     // rel
                     newSelectValues[1]['disabled'] = false;
-                    newSelectValues[1]['list'] = newDict[reportData.projectid].relList;
-                    newSelectValues[1]['selected'] = reportData.releaseid;
-                    newSelectValues[1]['selectedName'] = reportData.releaseid;
+                    newSelectValues[1]['list'] = newDict[props.currentIntegration.executionRequest.suitedetails[0].projectid].relList;
+                    newSelectValues[1]['selected'] = props.currentIntegration.executionRequest.suitedetails[0].releaseid;
+                    newSelectValues[1]['selectedName'] = props.currentIntegration.executionRequest.suitedetails[0].releaseid;
 
                     //cyc
                     newSelectValues[2]['disabled'] = false;
-                    newSelectValues[2]['list'] = newDict[reportData.projectid].relDict[reportData.releaseid].cycList;
-                    newSelectValues[2]['selected'] = reportData.cycleid;
-                    newSelectValues[2]['selectedName'] = reportData.cyclename;
+                    newSelectValues[2]['list'] = newDict[props.currentIntegration.executionRequest.suitedetails[0].projectid].relDict[props.currentIntegration.executionRequest.suitedetails[0].releaseid].cycList;
+                    newSelectValues[2]['selected'] = props.currentIntegration.executionRequest.suitedetails[0].cycleid;
+                    newSelectValues[2]['selectedName'] = props.currentIntegration.executionRequest.suitedetails[0].cyclename;
 
                     const projId = newSelectValues[0]['selected'];
                     const relName = newSelectValues[1]['selected'];
                     const cycId = newSelectValues[2]['selected'];
-
-                    // fetchFunctionalReports(projId, relName, cycId);
+                    props.currentIntegration.executionRequest.batchname !== '' && setSelectedExecutionType('batchExecution');
                 }
                 
                 setDict(newDict);
                 setIntegrationConfig({...integrationConfig, selectValues: newSelectValues});
             }
+            props.setLoading(false);
         })()
     }, []);
     useEffect(()=> {
@@ -184,7 +186,7 @@ const DevOpsConfig = props => {
     }
 
     const handleConfigSave = async () => {
-        const batchInfo = moduleScenarioList[selectedExecutionType].filter((module) => {
+        const batchInfo = moduleScenarioList['normalExecution'].filter((module) => {
             return module.scenarios.some(scenario => {
                 return integrationConfig.scenarioList.includes(scenario._id)
             });
@@ -193,7 +195,7 @@ const DevOpsConfig = props => {
                 scenarioTaskType: "disable",
                 testsuiteName: module.name,
                 testsuiteId: module.moduleid,
-                batchname: "",
+                batchname: (selectedExecutionType === 'batchExecution') ? module.batchname : "",
                 versionNumber: 0,
                 appType: "Web",
                 domainName: "Banking",
@@ -211,6 +213,7 @@ const DevOpsConfig = props => {
                 }))
             });
         });
+        props.setLoading('Please Wait...');
         const storeConfig = await storeConfigureKey({
             type: "",
             poolid: "",
@@ -218,16 +221,16 @@ const DevOpsConfig = props => {
             source: "task",
             exectionMode: "serial",
             executionEnv: "default",
-            browserType: [integrationConfig.browsers],
+            browserType: integrationConfig.browsers,
             configurename: integrationConfig.name,
             executiontype: integrationConfig.executionType,
             configurekey: integrationConfig.key,
             exectionmode: integrationConfig.exectionMode,
+            avoagents: [],
             integration: integration,
             batchInfo: batchInfo,
             scenarioFlag: false
         });
-        console.log(storeConfig);
         if(storeConfig.status !== 'pass') {
             if(storeConfig.error.CONTENT) {
                 setMsg(MSG.CUSTOM(storeConfig.error.CONTENT,VARIANT.ERROR));
@@ -235,23 +238,20 @@ const DevOpsConfig = props => {
                 setMsg(MSG.CUSTOM("Something Went Wrong",VARIANT.ERROR));
             }
         }else {
-            props.setCurrentIntegration(false);
             props.showMessageBar( `Configuration ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d Successfully` , 'SUCCESS');
+            props.setCurrentIntegration(false);
         }
+        props.setLoading(false);
     }
     const displayError = (error) =>{
-        setLoading(false)
+        props.setLoading(false)
         setMsg(error)
     }
     const setshowModal = (status) => {
         setShowIntegrationModal(status);
-        if((showIntegrationModal === 'qTest' && integration.qtest.url === '') || (showIntegrationModal === 'ALM' && integration.alm.url === '') || (showIntegrationModal === 'Zephyr' && integration.zephyr.url === '')) {
-            setIntegrationConfig({...integrationConfig, integration: ''});
-        }
     }
 
     return (<>
-        {loading?<ScreenOverlay content={loading}/>:null}
         { showIntegrationModal ? 
             <IntegrationDropDown
                 setshowModal={setshowModal}
@@ -288,7 +288,7 @@ const DevOpsConfig = props => {
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
                 <div className="devOps_module_list">
-                    <DevOpsModuleList integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} />
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} />
                 </div>
                 <div className="devOps_pool_list">
                     <div style={{ marginTop: '0' }}>

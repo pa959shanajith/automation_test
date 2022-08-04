@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollBar, Messages as MSG, setMsg, VARIANT } from '../../global';
+import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../../global';
 import { CheckBox, SearchDropdown, Tab } from '@avo/designcomponents';
 import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
 
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
-const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType }) => {
+const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading }) => {
     // const [moduleList, setModuleList] = useState(integrationConfig.scenarioList);
     const [moduleList, setModuleList] = useState([]);
     const [filteredModuleList, setFilteredModuleList] = useState([]);
@@ -81,37 +81,95 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         const key = tab.props.itemKey;
         if(key === 'all') setFilteredModuleList(moduleList);
         else if(key === 'selected'){
-            let newFilteredList = moduleList.filter( (element) => {
-                let children = element.children.filter( (scenario) => {
-                    return integrationConfig.scenarioList.includes(scenario.value)
+            let newFilteredList = [];
+            if (selectedExecutionType === 'normalExecution') {
+                newFilteredList = moduleList.filter( (element) => {
+                    let children = element.children.filter( (scenario) => {
+                        return integrationConfig.scenarioList.includes(scenario.value)
+                    });
+                    return children.length > 0;
+                }).map ( (element) => {
+                    let children = element.children.filter( (scenario) => {
+                        return integrationConfig.scenarioList.includes(scenario.value)
+                    });
+                    return ({
+                        ...element,
+                        children: children
+                    });
                 });
-                return children.length > 0;
-            }).map ( (element) => {
-                let children = element.children.filter( (scenario) => {
-                    return integrationConfig.scenarioList.includes(scenario.value)
+            } else if (selectedExecutionType === 'batchExecution') {
+                newFilteredList = moduleList.filter((batch) => {
+                    return batch.children.some((module) => {
+                        return module.children.some((scenario) => {
+                            return integrationConfig.scenarioList.includes(scenario.value)
+                        });
+                    })
+                }).map ( (element) => {
+                    let batchChildren = element.children.filter( (module) => {
+                        return module.children.some( (scenario) => {
+                            return integrationConfig.scenarioList.includes(scenario.value)
+                        });
+                    }).map( (module) => {
+                        let children = module.children.filter( (scenario) => {
+                            return integrationConfig.scenarioList.includes(scenario.value)
+                        });
+                        return ({
+                            ...module,
+                            children: children
+                        });
+                    });
+                    return ({
+                        ...element,
+                        children: batchChildren
+                    });
                 });
-                return ({
-                    ...element,
-                    children: children
-                });
-            });
+            }
             setFilteredModuleList(newFilteredList);
         }
         else if(key === 'unselected') {
-            let newFilteredList = moduleList.filter( (element) => {
-                let children = element.children.filter( (scenario) => {
-                    return !integrationConfig.scenarioList.includes(scenario.value)
+            let newFilteredList = [];
+            if (selectedExecutionType === 'normalExecution') {
+                newFilteredList = moduleList.filter( (element) => {
+                    let children = element.children.filter( (scenario) => {
+                        return !integrationConfig.scenarioList.includes(scenario.value)
+                    });
+                    return children.length > 0;
+                }).map ( (element) => {
+                    let children = element.children.filter( (scenario) => {
+                        return !integrationConfig.scenarioList.includes(scenario.value)
+                    });
+                    return ({
+                        ...element,
+                        children: children
+                    });
                 });
-                return children.length > 0;
-            }).map ( (element) => {
-                let children = element.children.filter( (scenario) => {
-                    return !integrationConfig.scenarioList.includes(scenario.value)
+            } else if (selectedExecutionType === 'batchExecution') {
+                newFilteredList = moduleList.filter((batch) => {
+                    return batch.children.some((module) => {
+                        return module.children.some((scenario) => {
+                            return !integrationConfig.scenarioList.includes(scenario.value)
+                        });
+                    })
+                }).map ( (element) => {
+                    let batchChildren = element.children.filter( (module) => {
+                        return module.children.some( (scenario) => {
+                            return !integrationConfig.scenarioList.includes(scenario.value)
+                        });
+                    }).map( (module) => {
+                        let children = module.children.filter( (scenario) => {
+                            return !integrationConfig.scenarioList.includes(scenario.value)
+                        });
+                        return ({
+                            ...module,
+                            children: children
+                        });
+                    });
+                    return ({
+                        ...element,
+                        children: batchChildren
+                    });
                 });
-                return ({
-                    ...element,
-                    children: children
-                });
-            });
+            }
             setFilteredModuleList(newFilteredList);
         }
         setSelectedTab(key);
@@ -129,6 +187,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
     useEffect(()=>{
         (async() => {
             if (integrationConfig.selectValues[2].selected !== '') {
+                setLoading('Please Wait...');
                 const fetchedModuleList = await fetchModules({
                     "tab":'tabAssign',
                     "projectid":integrationConfig.selectValues[0].selected,
@@ -137,33 +196,63 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                 if(fetchedModuleList.error) {
                     setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
                 }else {
-                    const filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
-                        let filterModule = {
-                            value: module.moduleid,
-                            label: module.name,
-                        };
-                        if(module.scenarios.length > 0) {
-                            const moduleChildren = module.scenarios.map((scenario) => {
-                                return ({
-                                    value: scenario._id,
-                                    label: scenario.name
-                                })
-                            });
-                            filterModule['children'] = moduleChildren;
-                        }
-                        return filterModule;
-                    });
+                    let filteredNodes = [];
+                    if(selectedExecutionType === 'normalExecution') {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
+                            let filterModule = {
+                                value: module.moduleid,
+                                label: module.name,
+                            };
+                            if(module.scenarios.length > 0) {
+                                const moduleChildren = module.scenarios.map((scenario) => {
+                                    return ({
+                                        value: scenario._id,
+                                        label: scenario.name
+                                    })
+                                });
+                                filterModule['children'] = moduleChildren;
+                            }
+                            return filterModule;
+                        });
+                    } else if(selectedExecutionType === 'batchExecution') {
+                        const batchData = fetchedModuleList['batchExecution'];
+                        filteredNodes = Object.keys(batchData).map((batch) => {
+                            let filterBatch = {
+                                value: batch,
+                                label: batch,
+                            };
+                            if(batchData[batch].length > 0) {
+                                filterBatch['children'] = batchData[batch].map((module) => {
+                                    let filterModule = {
+                                        value: module.moduleid,
+                                        label: module.name,
+                                    };
+                                    if(module.scenarios.length > 0) {
+                                        const moduleChildren = module.scenarios.map((scenario) => {
+                                            return ({
+                                                value: scenario._id,
+                                                label: scenario.name
+                                            })
+                                        });
+                                        filterModule['children'] = moduleChildren;
+                                    }
+                                    return filterModule;
+                                });
+                            }
+                            return filterBatch;
+                        });
+                    }
                     setModuleList(filteredNodes);
                     setFilteredModuleList(filteredNodes);
                     setModuleScenarioList(fetchedModuleList);
                 }
+                setLoading(false);
             }
         })()
     },[integrationConfig.selectValues[2].selected]);
     const handleExecutionTypeChange = (selectedType) => {
         const selectedKey = selectedType.key;
         let filteredNodes = [];
-        console.log(moduleScenarioList);
         if(selectedKey === 'normalExecution') {
             filteredNodes = moduleScenarioList['normalExecution'].map((module) => {
                 let filterModule = {
@@ -212,6 +301,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         setSelectedExecutionType(selectedKey);
         setModuleList(filteredNodes);
         setFilteredModuleList(filteredNodes);
+        setModuleState({expanded: [], checked: []});
         setIntegrationConfig({ ...integrationConfig, scenarioList: [] });
     }
     return (
