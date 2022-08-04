@@ -31,6 +31,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [scheduledRecurringData, setScheduledRecurringData] = useState([]);	
     const [scheduledRecurringDataOriginal, setScheduledRecurringDataOriginal] =	useState([]);
     const [statusChange, setStatusChange] = useState("Select Status");
+    const [clearScheduleData, setClearScheduleData] = useState(false);
 
     useEffect(()=>{
         getScheduledDetails()
@@ -195,9 +196,11 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
             else displayError(MSG.SCHEDULE.SUCC_SHEDULE)
             updateDateTimeValues(scheduleTableData, setModuleScheduledate);
             getScheduledDetails();
+            setClearScheduleData(true);
         } else if (data === "few") {
             displayError(MSG.SCHEDULE.ERR_FEW_TESTSUITE_SCHEDULE);
             updateDateTimeValues(scheduleTableData, setModuleScheduledate);
+            setClearScheduleData(true);
         } else if (data === "fail") {
             displayError(MSG.SCHEDULE.ERR_FEW_TESTSUITE_SCHEDULE);
         } else {
@@ -346,7 +349,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         <div id="s__btns">
                             <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}} title="Add">Schedule</button>
                         </div>
-                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} />
+                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
                     </div>
 
                 {/* //lower scheduled table Section */}
@@ -411,7 +414,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    {data.status}
+                                                                    {data.status === "Terminate" ? "Terminated" : data.status}
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
                                                                         <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError)}} title='Cancel Job'/>
                                                                     :null}
