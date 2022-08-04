@@ -539,10 +539,38 @@ module.exports.Execution_Queue = class Execution_Queue {
         this.ice_list[ice_name] = { "connected": true, "status": true, "mode": false, "poolid": "", "_id": "" };
     }
 
+    static checkForCompletion = (configureKey,executionListId) => {
+        const timestamp = Date.parse(new Date);
+        return new Promise((rsv,rej) => {
+            const configureTime = 1000,response = false;
+            let flag = true;
+            try{      
+                const startChecking = setInterval(()=> {
+                for(let executionQueues of this.key_list[configureKey]){
+                    if(executionQueues[0]['executionListId'] == executionListId){
+                        if(executionQueues[0].status != 'COMPLETED'){
+                            flag = false;
+                        }
+                    }
+                }
+                if(flag || timestamp+40000 <= Date.parse(new Date)) {
+                    clearInterval(startChecking);
+                    rsv(true);
+                }
+            },configureTime);
+    
+        } catch (error) {
+            console.info(error);
+            logger.error("Error in execAutomation. Error: %s", error);
+            rej(false);
+        }
+        })
+    }
     //if avogridid present add an array of agents or directly agent specified add that.
     static execAutomation = async (req, res) => {
         var fnName = 'execAutomation';
         let response = {};
+        let synchronousFlag = false;
         response['status'] = "fail";
         response["message"] = "N/A";
         response['error'] = "None";
@@ -561,7 +589,11 @@ module.exports.Execution_Queue = class Execution_Queue {
 
             let newExecutionList = []
             for (let ids of testSuiteInfo)
-                newExecutionList.push({moduleid:ids,status: 'QUEUED',edited:Info.edited,avoagentList:Info.avoagentList});
+                newExecutionList.push({
+                    executionListId:Info.executionListId,
+                    moduleid:ids,status: 'QUEUED',
+                    edited:Info.edited,
+                    avoagentList:Info.avoagentList});
 
             keyQueue.push(newExecutionList);
 
@@ -585,7 +617,13 @@ module.exports.Execution_Queue = class Execution_Queue {
             // let task_queue = await cache.get('task_list');
             // console.info(task_queue);
 
-            response['status'] = "pass";
+            if(Info.executiontype == 'asynchronous'){
+                response['status'] = "pass";
+                return response;
+            }
+            synchronousFlag = await this.checkForCompletion(req.body.key,Info.executionListId);
+            if(synchronousFlag) response['status'] = 'pass';
+
         } catch (error) {
             console.info(error);
             logger.error("Error in execAutomation. Error: %s", error);
