@@ -187,3 +187,21 @@ exports.getAvoAgentAndAvoGridList = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+exports.deleteConfigureKey = async(req,res) => {
+	const fnName = "deleteConfigureKey";
+	try {
+		console.log('something');
+		logger.info("Inside UI Service: " + fnName);
+		const inputs = {
+			"key": req.body.key,
+			"query": "deleteConfigureKey"
+		};
+		const status = await utils.fetchData(inputs, "devops/deleteConfigureKey", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else res.send(status);
+	} catch (exception) {
+		logger.error(exception.message);
+		return res.send("fail");
+	}
+}
