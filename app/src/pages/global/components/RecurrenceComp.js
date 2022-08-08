@@ -18,6 +18,7 @@ const RecurrenceComp = (props) => {
     const [monthlyRecurrenceDayInputDisable, setMonthlyRecurrenceDayInputDisable] = useState(true);
     const [monthlyRecurrenceMonthInputDisable, setMonthlyRecurrenceMonthInputDisable] = useState(true);
     const [monthlyRecurrenceMonthInputDisable_1, setMonthlyRecurrenceMonthInputDisable_1] = useState(true);
+    const [isClicked, setIsClicked] = useState(false);
 
     const weekDays = [{ name: "Sunday" }, { name: "Monday" }, { name: "Tuesday" }, { name: "Wednesday" }, { name: "Thursday" }, { name: "Friday" }, { name: "Saturday" }, { name: "All" }];
 
@@ -44,9 +45,13 @@ const RecurrenceComp = (props) => {
     const clearScheduleData = props.clearScheduleData;
 
     useEffect(() => {
-        if (closeCal) setShowRecurrence(false);
-        if (clearScheduleData) { setRecurrenceType(""); setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setWeeklyRecurrenceWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday"); setDailyRecurrenceInputDisable(true); setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true); setSelectedWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceFSTFLValue("1") }
-    }, [closeCal, clearScheduleData]);
+        if (closeCal) setShowRecurrence(false); 
+    }, [closeCal]);
+
+    // will be run on a successful schedule (to clear the data)
+    useEffect(() => {
+        if (clearScheduleData) { setRecurrenceType(""); setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setWeeklyRecurrenceWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday"); setDailyRecurrenceInputDisable(true); setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true); setSelectedWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceFSTFLValue("1"); setIsClicked(false); }
+    }, [clearScheduleData]);
 
 
     // To open the recurrence screen
@@ -54,10 +59,13 @@ const RecurrenceComp = (props) => {
         if (disabled) return;
         setShowRecurrence(true);
         setCloseCal && setCloseCal(false);
-        // setRecurrenceType("One Time");
-        // setRecurringString("One Time");
-        // setRecurringValue("One Time");
-        // setRecurringStringOnHover("One Time");
+        if (!isClicked) {
+            setRecurrenceType("One Time");
+            setRecurringString("One Time");
+            setRecurringValue("One Time");
+            setRecurringStringOnHover("One Time");
+            setIsClicked(true);
+        }
     };
 
     // Display error message on invalid input
