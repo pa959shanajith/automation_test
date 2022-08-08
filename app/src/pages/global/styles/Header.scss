@@ -12,6 +12,11 @@
     cursor: pointer;
 }
 
+.fa-disabled {
+  color: #aaa !important;
+  cursor: default !important;
+}
+
 @media screen and (min-width: 1800px), screen and (min-height: 850px){
     .header-logo{
         height: 50px;
@@ -78,6 +83,11 @@
 
 .logo-disable{
     cursor: default;
+}
+
+.logo-grey {
+  color: #aaa !important;
+  cursor: default !important;
 }
 
 .user-name-btn, .switch-role-btn {

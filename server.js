@@ -321,6 +321,13 @@ if (cluster.isMaster) {
 			}
 		});
 
+    app.get('/downloadURL', (req, res) => {
+      var text = String(req.query.link)
+      res.attachment('avoURL.txt');
+      res.type('txt');
+      res.send(text);
+    })
+
 		app.get('/getClientConfig', (req,res) => {
 			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks})
 		});

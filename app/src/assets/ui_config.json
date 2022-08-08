@@ -52,7 +52,7 @@
     },
     "itdm":{
       "tooltip":{
-        "generic":"Test Data Management tool to create or fetch from source & mask sensitive data for your testing"
+        "generic":"Test Data Management tool to create synthetic data"
       },
       "availableForTrial":false
     }
