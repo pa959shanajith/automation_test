@@ -61,7 +61,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
                 <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}${disabled?"_disabled":""}.svg`} />
                 <span data-test="plugin-name" className="plugin-text">{pluginTitle}</span>
                 {disabled?
-                  <div className='disabled-info'><i class="fa fa-lock fa-fw" style={{color:"#ffcc62",paddingLeft:1,fontSize:9, marginRight:4}} aria-hidden="true"></i>Paid Add-On</div>
+                  <div className='disabled-info'><i class="fa fa-lock fa-fw" style={{color:"#ffcc62",paddingLeft:1,fontSize:9, marginRight:4}} aria-hidden="true"></i>Premium</div>
                 :null}
         	  </div>
 		</>

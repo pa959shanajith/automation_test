@@ -29,6 +29,7 @@ const ReferenceBar = (props) => {
     const [showInfo, setShowInfo] = useState(false);
     const [taskPopY, setTaskPopY] = useState(null);
     const [showProfJ , setshowProfJ]= useState(false);
+    const userInfo = useSelector(state=>state.login.userinfo);
     
     const { uid } = useSelector(state=>state.plugin.CT);
 
@@ -105,9 +106,9 @@ const ReferenceBar = (props) => {
                     
                 </div>
             </div>
-            <div className="rb__bottom_content" title="Prof J">
+            {!userInfo.isTrial ?<div className="rb__bottom_content" title="Prof J">
                 <div className="ic_box"><img className="rb__ic-assist thumb__ic" alt="assist-ic" src="static/imgs/ic-assist.png" onClick={(e)=>callProfJ(e)}/><span className="rb_box_title">Assist</span></div>
-            </div>
+            </div>:null}
         </>
         }
         </div>

@@ -89,14 +89,22 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
     
     const getIce = async (clientVer) => {
 		try {
-            setShowUD(false);
-            setShowOverlay(`Loading...`);
+      setShowUD(false);
+      setShowOverlay(`Loading...`);
 			const res = await fetch("/downloadICE?ver="+clientVer);
-            const {status} = await res.json();
-            // if (status === "available") window.location.href = "https://localhost:8443/downloadICE?ver="+queryICE+"&file=getICE"
-			if (status === "available") window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE";
+      const {status} = await res.json();
+      // if (status === "available") window.location.href = "https://localhost:8443/downloadICE?ver="+queryICE+"&file=getICE"
+			if (status === "available"){
+        const link = document.createElement('a');
+        link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
+        link.setAttribute('download', "avoURL.txt");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE";
+      } 
 			else setMsg(MSG.GLOBAL.ERR_PACKAGE);
-            setShowOverlay(false)
+      setShowOverlay(false)
 		} catch (ex) {
 			console.error("Error while downloading ICE package. Error:", ex);
 			setMsg(MSG.GLOBAL.ERR_PACKAGE);
@@ -104,6 +112,7 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
 	}
 
     const switchRole = () => {
+    if(userInfo.isTrial) return;
 		let roleasarray = userInfo.additionalrole;
 		if (roleasarray.length === 0) {
 			setShowSR(false);
@@ -242,15 +251,15 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                         <>
                         <div className="btn-container">
                             <ClickAwayListener onClickAway={()=>setClickNotify(false)}>
-                                <button onClick={(e)=>setClickNotify(true)} className="fa fa-bell no-border bell-ic notify-btn">
+                                <button title={userInfo.isTrial?"Notifications is available as part of premium":"Notifications"} onClick={(e)=>{if(!userInfo.isTrial) setClickNotify(true)}} className={"fa fa-bell no-border bell-ic notify-btn " + (userInfo.isTrial?"fa-disabled":"")}>
                                     {(notifyCnt !== 0) && <span className='notify-cnt'>{notifyCnt}</span>}
                                 </button>
                                 <NotifyDropDown show={clickNotify}/>
                             </ClickAwayListener>
                         </div>
                         <ClickAwayListener onClickAway={onClickAwaySR}>
-                            <div className="switch-role-btn no-border" data-toggle="dropdown" onClick={switchRole} >
-                                <span><img className="switch-role-icon" alt="switch-ic" src="static/imgs/ic-switch-user.png"/></span>
+                            <div title={userInfo.isTrial?"Admin role is available as part of premium":"Switch Role"} className={"switch-role-btn no-border "+ (userInfo.isTrial?"logo-grey":"")} data-toggle="dropdown" onClick={switchRole}  >
+                                <span><img className="switch-role-icon" alt="switch-ic" src={"static/imgs/ic-switch-user"+ (userInfo.isTrial?"_disabled.png":".png")}/></span>
                                 <span>Switch Role</span>
                             </div>
                             <div className={ "switch-role-menu dropdown-menu " + (showSR && "show")}>
