@@ -42,6 +42,12 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
                 </div>
                 </>
             :null}
+            {appType === "MobileWeb" && 
+                <div className="e__parallel_icon" title="SauceLabs Execution" onClick={()=>{updateExecEnv()}}>
+                    <img className={"e__parallel_icon__img"+ (execEnv!=="default" ? " e__selectedBrowser" : "" )}   src='static/imgs/saucelabs.png' alt="SauceLabs Execution" title="SauceLabs Execution"/>
+                    <span className="thumbnail__title">SauceLabs Execution</span>
+                </div>
+            }
             <div className="e__parallel_icon"  title="Scheduling" onClick={()=>{scheduleRedirect()}}>
                 <img className="e__parallel_icon__img"   src='static/imgs/ic-scheduling.png' alt="Scheduling"/>
                 <span className="thumbnail__title">Schedule</span>

@@ -96,6 +96,12 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
                     </div>
                 </>
             :null}
+            {appType === "MobileWeb" && 
+                <div className="s__parallel_icon" title="SauceLabs Execution" onClick={()=>{updateExecEnv()}}>
+                    <img className={"s__parallel_icon__img"+ (execEnv!=="default" ? " s__selectedBrowser" : "" )}   src='static/imgs/saucelabs.png' alt="SauceLabs Execution"/>
+                    <span className="s__thumbnail__title">SauceLabs Execution</span>
+                </div>
+            }
         </>
     );
 };
