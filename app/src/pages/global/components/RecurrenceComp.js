@@ -18,6 +18,7 @@ const RecurrenceComp = (props) => {
     const [monthlyRecurrenceDayInputDisable, setMonthlyRecurrenceDayInputDisable] = useState(true);
     const [monthlyRecurrenceMonthInputDisable, setMonthlyRecurrenceMonthInputDisable] = useState(true);
     const [monthlyRecurrenceMonthInputDisable_1, setMonthlyRecurrenceMonthInputDisable_1] = useState(true);
+    const [isClicked, setIsClicked] = useState(false);
 
     const weekDays = [{ name: "Sunday" }, { name: "Monday" }, { name: "Tuesday" }, { name: "Wednesday" }, { name: "Thursday" }, { name: "Friday" }, { name: "Saturday" }, { name: "All" }];
 
@@ -41,20 +42,30 @@ const RecurrenceComp = (props) => {
     const title = props.title;
     const closeCal = props.closeCal;
     const setCloseCal = props.setCloseCal;
+    const clearScheduleData = props.clearScheduleData;
 
     useEffect(() => {
-        if (closeCal) setShowRecurrence(false);
+        if (closeCal) setShowRecurrence(false); 
     }, [closeCal]);
+
+    // will be run on a successful schedule (to clear the data)
+    useEffect(() => {
+        if (clearScheduleData) { setRecurrenceType(""); setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setWeeklyRecurrenceWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday"); setDailyRecurrenceInputDisable(true); setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true); setSelectedWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceFSTFLValue("1"); setIsClicked(false); }
+    }, [clearScheduleData]);
+
 
     // To open the recurrence screen
     const openRecurrenceScreen = () => {
         if (disabled) return;
         setShowRecurrence(true);
         setCloseCal && setCloseCal(false);
-        setRecurrenceType("One Time");
-        setRecurringString("One Time");
-        setRecurringValue("One Time");
-        setRecurringStringOnHover("One Time");
+        if (!isClicked) {
+            setRecurrenceType("One Time");
+            setRecurringString("One Time");
+            setRecurringValue("One Time");
+            setRecurringStringOnHover("One Time");
+            setIsClicked(true);
+        }
     };
 
     // Display error message on invalid input
@@ -71,21 +82,25 @@ const RecurrenceComp = (props) => {
             setRecurringString("One Time");
             setRecurringValue("One Time");
             setRecurringStringOnHover("One Time");
+            setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setDailyRecurrenceInputDisable(true); setWeeklyRecurrenceWeek(new Array(weekDays.length).fill(false)); setSelectedWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday");setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true); setMonthlyRecurrenceFSTFLValue("1");
         }
         else if (event.target.value == "Daily") {
             setRecurringString("Every Day");
             setRecurringValue("");
             setRecurringStringOnHover("");
+            setWeeklyRecurrenceWeek(new Array(weekDays.length).fill(false)); setSelectedWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday");setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true); setMonthlyRecurrenceFSTFLValue("1");
         }
         else if (event.target.value == "Weekly") {
             setRecurringString("Every Week");
             setRecurringValue("");
             setRecurringStringOnHover("");
+            setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setDailyRecurrenceInputDisable(true); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday");setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true); setMonthlyRecurrenceFSTFLValue("1");
         }
         else if (event.target.value == "Monthly") {
             setRecurringString("Every Month");
             setRecurringValue("");
             setRecurringStringOnHover("");
+            setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setDailyRecurrenceInputDisable(true); setWeeklyRecurrenceWeek(new Array(weekDays.length).fill(false)); setSelectedWeek(new Array(weekDays.length).fill(false)); 
         }
     };
 
@@ -93,7 +108,7 @@ const RecurrenceComp = (props) => {
     const handleInputChange = (event) => {
         setDailyRecurrenceValue(event.target.value);
 
-        if (isNaN(event.target.value)) {
+        if (isNaN(event.target.value) || event.target.value.includes(".")) {
             displayError("Invalid input, Please enter a number");
             return;
         }
@@ -125,6 +140,8 @@ const RecurrenceComp = (props) => {
     // Get the Daily recurring value i.e everyday, every weekday
     const getDailyRecurrenceType = (event) => {
         setDailyRecurrenceType(event.target.value);
+        setRecurringValue("");
+        setRecurringStringOnHover("");
 
         if (event.target.value === "weekday") {
             setRecurringValue("0 0 * * 1-5");
@@ -186,6 +203,8 @@ const RecurrenceComp = (props) => {
 
     const getMonthlyRecurrenceType = (event) => {
         setMonthlyRecurrenceType(event.target.value);
+        setRecurringValue("");
+        setRecurringStringOnHover("");
 
         if (event.target.value === "days") {
             setMonthlyRecurrenceDayInputDisable(false);
@@ -205,7 +224,7 @@ const RecurrenceComp = (props) => {
         setMonthlyRecurrenceDayValue(event.target.value);
         setMonthlyRecurrenceMonthInputDisable(false);
 
-        if (isNaN(event.target.value)) {
+        if (isNaN(event.target.value) || event.target.value.includes(".")) {
             displayError("Invalid input, Please enter a number");
             return;
         }
@@ -227,7 +246,7 @@ const RecurrenceComp = (props) => {
     const handleMonthInputChange = (event) => {
         setMonthlyRecurrenceMonthValue(event.target.value);
 
-        if (isNaN(event.target.value)) {
+        if (isNaN(event.target.value) || event.target.value.includes(".")) {
             displayError("Invalid input, Please enter a number");
             return;
         }
@@ -284,7 +303,7 @@ const RecurrenceComp = (props) => {
     const handleMonthInputChange_1 = (event) => {
         setMonthlyRecurrenceMonthValue_1(event.target.value);
 
-        if (isNaN(event.target.value)) {
+        if (isNaN(event.target.value) || event.target.value.includes(".")) {
             displayError("Invalid input, Please enter a number");
             return;
         }
@@ -352,7 +371,7 @@ const RecurrenceComp = (props) => {
     };
 
     return (
-        <ClickAwayListener className={"recurrence-time-container " + (classTimer ? " " + classTimer : "")} onClickAway={() => { setShowRecurrence(false); setRecurrenceType(""); setDailyRecurrenceType(""); setDailyRecurrenceValue(""); setWeeklyRecurrenceWeek(new Array(weekDays.length).fill(false)); setMonthlyRecurrenceType(""); setMonthlyRecurrenceDayValue(""); setMonthlyRecurrenceMonthValue(""); setMonthlyRecurrenceMonthValue_1(""); setMonthlyRecurrenceWeekValue("Sunday"); setDailyRecurrenceInputDisable(true); setMonthlyRecurrenceDayInputDisable(true); setMonthlyRecurrenceMonthInputDisable(true); setMonthlyRecurrenceMonthInputDisable_1(true); setSelectedWeek(new Array(weekDays.length).fill(false)); }} as="span" >
+        <ClickAwayListener className={"recurrence-time-container " + (classTimer ? " " + classTimer : "")} onClickAway={() => { setShowRecurrence(false); }} as="span" >
             <div className="rdt rdtOpen">
                 <input type="text" className={classname} placeholder={placeholder} readOnly={readonly} disabled={disabled} title={title ? title : "Select Frequency"} value={recur} />
                 {showRecurrence && (
