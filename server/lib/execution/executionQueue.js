@@ -592,7 +592,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 newExecutionList.push({
                     executionListId:Info.executionListId,
                     moduleid:ids,status: 'QUEUED',
-                    edited:Info.edited,
+                    version:Info.version,
                     avoagentList:Info.avoagentList});
 
             keyQueue.push(newExecutionList);
@@ -644,7 +644,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             'tasktype': "EXECUTE",
             'maxicecount': "1",
             'key': "",
-            'edited': -1
+            'executionListId': ''
         };
 
         try {
@@ -719,7 +719,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                 if(testSuites['status'] == 'QUEUED') {
                                     response['status'] = 'Pass';
                                     response['key'] = key;
-                                    response['edited'] = testSuites['edited'];
+                                    response['executionListId'] = testSuites['executionListId'];
                                     return response;
                                 }
                             }
@@ -751,7 +751,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         response['error'] = "None";
         try {
             const configKey = req.body.configkey;
-            const edited = req.body.edited;
+            const executionListId = req.body.executionListId;
             if(configKey in this.key_list) {
 
                 const executionQueue = this.key_list[configKey];
@@ -759,12 +759,12 @@ module.exports.Execution_Queue = class Execution_Queue {
                 let listIndex = -1;
                 for(let entries of executionQueue) {
                     listIndex++;
-                    if(entries[0]['edited'] == edited) {
+                    if(entries[0]['executionListId'] == executionListId) {
                         let moduleIndex = -1;
                         for(let testSuites of entries) {
                             moduleIndex++;
                             if(testSuites['status'] == 'QUEUED') {
-                                executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuites.moduleid,'edited':edited}, "devops/getExecScenario", fnName);
+                                executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuites.moduleid,'version':testSuites['version']}, "devops/getExecScenario", fnName);
                                 if (executionData == "fail" || executionData == "forbidden") {
                                     response['status'] = "fail";
                                     return response;
@@ -814,7 +814,64 @@ module.exports.Execution_Queue = class Execution_Queue {
         // response['variant'] = "success";
         return response;
     }
+    static insertReport = async (executionid, scenarioId, browserType, userInfo, reportData) => {
+        const inputs = {
+            "executionid": executionid,
+            "testscenarioid": scenarioId,
+            "browser": browserType,
+            "status": reportData.overallstatus.overallstatus,
+            "overallstatus": reportData.overallstatus,
+            "report": JSON.stringify(reportData),
+            "modifiedby": userInfo.invokinguser,
+            "modifiedbyrole": userInfo.invokinguserrole,
+            "query": "insertreportquery"
+        };
+        const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
+        return result;
+    };
+    static storeReportStatus = async (req, res) => {
+        var fnName = 'storeReportStatus';
+        let response = {};
+        response['status'] = "fail";
+        response["message"] = "N/A";
+        response['error'] = "None";
+        try {
+            const resultData = req.body.value;
+            const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
+            var d2R = {};
+            if (execType == "API") {
+                if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = { "testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {} };
+                if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
+                d2R[testsuiteid].scenarios[scenarioid].push({ scenarioname, scenarioid, "overallstatus": "Not Executed" });
+            }
+            if (Object.keys(reportData.overallstatus).length !== 0) {
+                const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
+                const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
+                reportData.overallstatus.browserType = browserType;
+                if (execType == "API") {
+                    const cidx = d2R[testsuiteid].scenarios[scenarioid].length - 1;
+                    d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus };
+                }
+                const reportStatus = reportData.overallstatus.overallstatus;
+                const reportid = await this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
+                const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy };
+                if (reportid == "fail") {
+                    logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
+                    reportItem[reportid] = '';
+                } else {
+                    logger.info("Successfully inserted report data");
+                    logger.debug("Successfully inserted report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
+                }
+                // testsuite.reportData[scenarioIndex] = reportItem;
+                testsuite.reportData.push(reportItem);
+                response['status'] = "success";
+
+            }
+        } catch (error) {
+            console.info(error);
+            logger.error("Error in storeReportStatus. Error: %s", error);
+        }
+        return response;
+    }
 }
-
-
 
