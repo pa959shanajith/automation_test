@@ -164,6 +164,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
 
     const ScheduleTestSuite = async (schedulePoolDetails) => {
         setAllocateICE(false);
+        setClearScheduleData(false);
         const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, current_task, appType, filter_data);
         if(!modul_Info){
             return
