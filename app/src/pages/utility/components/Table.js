@@ -279,7 +279,7 @@ const RowNumColumn = props => {
                     return (
                         <div 
                             key={`rownum-${row.__CELL_ID__}`}
-                            className={"dt__table_numbered_column "+(props.checkList.list.includes(`sel||row||${row.__CELL_ID__}`)?" dt__hdrCell_Sel":"")} 
+                            className={"dt__table_numbered_column "+(props.checkList.list.includes(`sel||row||${row.__CELL_ID__}`)?" dt__hdrCell_Sel":"")+(props.dnd?" grabbable":"")} 
                             onClick={(e)=>props.updateCheckList(e, "row", row.__CELL_ID__)}
                             data-test="dt__number_cell"
                             id={`rowNum-${rowIndex+2}`}

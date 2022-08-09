@@ -189,23 +189,35 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                 }
             }
             else {
-                  moduleScheduledateTime[testsuiteid]["date"] = "";
-                  moduleScheduledateTime[testsuiteid]["time"] = "";
-                  moduleScheduledateTime[testsuiteid]["inputPropsdate"][
-                      "disabled"
-                  ] = true;
-                  if (moduleScheduledateTime[testsuiteid]["time"] === "") {
-                      var hr = new Date().getHours();
-                      var min = parseInt(new Date().getMinutes());
-                      if (new Date().getHours().toString().length === 1)
-                          hr = "0" + hr;
-                      if (parseInt(new Date().getMinutes()).toString().length === 1)
-                          min = "0" + min;
-                      moduleScheduledateTime[testsuiteid]["time"] = hr + ":" + min;
-                  }
-                  moduleScheduledateTime[testsuiteid]["inputPropstime"][
-                      "disabled"
-                  ] = false;
+                if (moduleScheduledateTime[testsuiteid]["recurringValue"] != '') {
+                    moduleScheduledateTime[testsuiteid]["date"] = "";
+                    moduleScheduledateTime[testsuiteid]["time"] = "";
+                    moduleScheduledateTime[testsuiteid]["inputPropsdate"][
+                        "disabled"
+                    ] = true;
+                    if (moduleScheduledateTime[testsuiteid]["time"] === "") {
+                        var hr = new Date().getHours();
+                        var min = parseInt(new Date().getMinutes());
+                        if (new Date().getHours().toString().length === 1)
+                            hr = "0" + hr;
+                        if (parseInt(new Date().getMinutes()).toString().length === 1)
+                            min = "0" + min;
+                        moduleScheduledateTime[testsuiteid]["time"] = hr + ":" + min;
+                    }
+                    moduleScheduledateTime[testsuiteid]["inputPropstime"][
+                        "disabled"
+                    ] = false;
+                }
+                else {
+                    moduleScheduledateTime[testsuiteid]["date"] = "";
+                    moduleScheduledateTime[testsuiteid]["time"] = "";
+                    moduleScheduledateTime[testsuiteid]["inputPropsdate"][
+                        "disabled"
+                    ] = true;
+                    moduleScheduledateTime[testsuiteid]["inputPropstime"][
+                        "disabled"
+                    ] = true;
+                }
             }
         }
         else if (date_time === "recurringString") {

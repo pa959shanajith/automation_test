@@ -15,7 +15,7 @@
         margin: 4px;
         width: calc(100% - 14px);
     }
-    li:hover{
+    .dropdown-list-item:hover{
         background: $primaryColor;
         border-radius: 3px;
         color: $whiteColor;

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {Messages as MSG, VARIANT, setMsg, ModalContainer, ScrollBar} from '../../global';
-import { SearchBox, DetailsList, Tab } from '@avo/designcomponents';
+import { SearchBox, DetailsList, Dialog, Tab, CardList } from '@avo/designcomponents';
 import '../styles/Agents.scss';
 import ReactTooltip from 'react-tooltip';
+import { Icon } from '@fluentui/react';
 import CreateGrid from './CreateGrid';
 
 /* Component Grids List */
@@ -116,9 +117,107 @@ const GridList = ({ setShowConfirmPop, showMessageBar }) => {
         setFilteredList(filteredItems);
         setSearchText(value);
     }
+    const [hideDialog, setHideDialog ] = useState(true);
+    const [selectedTab, setSelectedTab] = useState('windows');
+    const [selectedConfig, setSelectedConfig] = useState('x64');
+    const configOptions = () => {
+        if(selectedTab === 'windows') {
+            return (
+                <div>
+                    <p className={`${selectedConfig === 'x64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('x64')}>x64</p>
+                    <p className={`${selectedConfig === 'x86' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('x86')}>x86</p>
+                </div>
+            );
+        } else if(selectedTab === 'linux') {
+            return (
+                <div>
+                    <p className={`${selectedConfig === 'x64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('x64')}>x64</p>
+                    <p className={`${selectedConfig === 'arm' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('arm')}>ARM</p>
+                    <p className={`${selectedConfig === 'arm64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('arm64')}>ARM64</p>
+                    <p className={`${selectedConfig === 'rhel6' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('rhel6')}>RHEL6</p>
+                </div>
+            );
+        } else return <></>;
+    }
+    const [requisiteExpand, setRequisiteExpand] = useState(false);
+    const dialogBody = () => {
+        if(selectedTab === 'windows') {
+            return (
+                <div>
+                    <p>System Prerequisites</p>
+                </div>
+            );
+        } else if(selectedTab === 'mac') {
+            return (
+                <div>
+                    <p>System Prerequisites</p>
+                </div>
+            );
+        } else {
+            return (
+                <div className='grid_download_dialog__content'>
+                    <div className='grid_download_dialog__prerequisite'>
+                        <div className='grid_download_dialog__prerequisite__header'>
+                            <p>System Prerequisites</p>
+                            <Icon iconName={`chevron-${requisiteExpand ? 'up' : 'down'}`} style={{width: '1rem'}} onClick={() => setRequisiteExpand(!requisiteExpand)} />
+                        </div>
+                        {
+                            requisiteExpand && <div className='grid_download_dialog__prerequisite__body'>
+                                <ul>
+                                    <li>Configure your account by following the steps</li>
+                                    <li>Create the Agent</li>
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                    <div className='grid_download_dialog__content__br' />
+                    <p>Configure your Account</p>
+                    <h6>Configure your account by following the steps</h6>
+                    <div className='grid_download_dialog__content__br' />
+                    <p>Create the Agent</p>
+                    <pre className='grid_download_dialog__content__code'>
+                        <code>
+                            PS C:\&gt; mkdir agent ; cd agent 
+                            PS C:\agent&gt; Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$HOME\Downloads\vsts-agent-win-x64-2.206.1.zip", "$PWD")
+                        </code>
+                    </pre>
+                    <div className='grid_download_dialog__content__br' />
+                    <p>Configure the Agent</p>
+                    <pre className='grid_download_dialog__content__code'>
+                        <code>
+                            PS C:\agent&gt; .\config.cmd
+                        </code>
+                    </pre>
+                </div>
+            );
+        }
+    }
     return (
             (currentGrid) ? <CreateGrid setCurrentGrid={setCurrentGrid} currentGrid={currentGrid} /> : 
             <>
+                <Dialog
+                    hidden = {hideDialog}
+                    onDismiss = {() => setHideDialog(!hideDialog)}
+                    title = 'Get the Agent'
+                    minWidth = '60rem'
+                    confirmText = ''
+                    declineText = ''
+                    leftText = 'Download'
+                    leftButtonProps = {{ icon: 'download' }}
+                    content = {<div>
+                        <Tab options={[
+                            { key: 'windows', text: 'Windows' },
+                            { key: 'mac', text: 'MacOS' },
+                            { key: 'linux', text: 'Linux' }
+                        ]} selectedKey={selectedTab} onLinkClick = {(item) => item && setSelectedTab(item.props.itemKey)} />
+                        <hr className='grid_download_dialog__hr' />
+                        <div className='grid_download_dialog'>
+                            {configOptions()}
+                            <div className='grid_download_dialog__seperator'></div>
+                            {dialogBody()}
+                        </div>
+                    </div>} >
+                </Dialog>
                 <div className="page-taskName" >
                     <span data-test="page-title-test" className="taskname">
                         Avo Grid Configuration
@@ -134,7 +233,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar }) => {
                             <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                         </div>
                         <div>
-                            <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>'''' Please Download Avo Agent '''' </span>
+                            <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Click <a style={{ textDecoration: 'underline', color: 'blueviolet', cursor: 'pointer' }} onClick={() => setHideDialog(!hideDialog)}>here</a> to get the Agent </span>
                         </div>
                     </> }
                 </div>

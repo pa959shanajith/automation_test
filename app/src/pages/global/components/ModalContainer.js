@@ -15,9 +15,9 @@ const ModalContainer = (props) => {
     return(
         <div className='modal__container'>
             <div className={'modal-dialog '+(props.modalClass?props.modalClass:"")}>
-                <form onSubmit={(e)=>e.preventDefault()} className='modal__content modal-content'>
+                <form className='modal__content modal-content' onSubmit={props.onSubmit ?props.onSubmit:(e)=>{e.preventDefault()}}>
                     <div className='modal-header modal__header'>
-                        {props.close ?<button data-test="modal_close_btn"onClick={(e)=>props.close(e)}>×</button>:null}
+                        {props.close ?<button tabIndex={1} type="button" data-test="modal_close_btn" onClick={(e)=>props.close(e)}>×</button>:null}
                         <h4 data-test="modal_title_head" className='modal-title'>{props.title}</h4>
                     </div>
                     <div className='modal-body modal__body'>

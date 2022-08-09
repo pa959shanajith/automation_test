@@ -347,7 +347,6 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                 {/* //lower scheduled table Section */}
                 <div id="scheduleSuitesBottomSection">
                     <div id="page-taskName">
-                        <span>{showScheduledTasks ? "Scheduled Tasks" : "Recurring Schedules"}</span>
                         <select value={statusChange} onChange={(event)=>{selectStatus(event.target.value); setStatusChange(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
                             <option disabled={true} value={"Select Status"}>Select Status</option>
                             <option value={"Completed"}>Completed</option>
@@ -363,12 +362,12 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         </select>
                         <div id="s__btns" onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
                         <div id="s__btns">
-                            <button className="s__btn-md btnAddToSchedule" onClick={() => {handleOnButtonClickRecurring();}} title="Recurring Schedules">
+                            <button className={"s__btn-md btnAddToSchedule"+(showScheduledTasks?" disabled":"")} onClick={() => {handleOnButtonClickRecurring();}} title="Recurring Schedules">
                                 Recurring Schedules
                             </button>
                         </div>
                         <div id="s__btns">
-                            <button className="s__btn-md btnAddToSchedule" onClick={() => {handleOnButtonClickScheduled();}} title="Scheduled Tasks">
+                            <button className={"s__btn-md btnAddToSchedule"+(showRecurringSchedules?" disabled":"")} onClick={() => {handleOnButtonClickScheduled();}} title="Scheduled Tasks">
                                 Scheduled Tasks
                             </button>
                         </div>
@@ -601,13 +600,21 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 setModuleScheduledate(moduleScheduledateTime);
                 if(doNotSchedule) return false
 
-                const sldate_2 = dateValue.split("-");
+                let currentDate = new Date().toString().split(' ');
+                let currentMonth = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(currentDate[1]) / 3 + 1;
+                currentDate = currentDate[2] + "-" + ("0"+ currentMonth.toString()).slice(-2) + "-" + currentDate[3]
+
+                const sldate_2 = dateValue ? dateValue.split("-") : currentDate.split('-');
                 const sltime_2 = timeValue.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 const diff = (timestamp - new Date()) / 60000;
                 if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
-                    if (diff < 0) moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
-                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
+                    if (recurringValue != "One Time") {
+                        moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
+                    } else {
+                        if (diff < 0) moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";
+                        moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
+                    }
                     displayError(MSG.SCHEDULE.WARN_SCHEDULE_TIME);
                     setModuleScheduledate(moduleScheduledateTime);
                     return false

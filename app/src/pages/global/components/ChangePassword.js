@@ -162,7 +162,7 @@ const ChangePassword = ({setShow, setSuccessPass,loginCurrPassword, changeType, 
 
     return (
         <ModalContainer
-        close={changeType==="forgotPass"?handleClose():null}
+        close={changeType==="forgotPass"?handleClose:null}
         title={"Change Password"}
         content={Content()}
         footer={Footer()}

@@ -67,6 +67,10 @@
     background-color: transparent;
     padding: 0;
     margin: 0;
+    &:active {
+      background-color: #0003 !important;
+      border-radius: 5px;
+    }
 }
 
 .d__taskBtns{
@@ -235,6 +239,11 @@
         width: 63%;
         margin-bottom: 80px
     }
+}
+
+.selected-btn {
+  background: #0003 !important;
+  border-radius: 5px !important;
 }
 
 // @media screen and (min-width: 1400px) and (min-height: 770px){
