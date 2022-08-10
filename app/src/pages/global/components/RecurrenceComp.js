@@ -189,7 +189,7 @@ const RecurrenceComp = (props) => {
             weekValuesOnHoverString = "Occurs on every " + weekValuesOnHoverString.toLowerCase().replace(/,\s*$/, "");
             if (weekValuesOnHoverString.includes('all')) {
                 weekValuesString = "0 0 * * 0,1,2,3,4,5,6";
-                weekValuesOnHoverString = "Occurs on every week";
+                weekValuesOnHoverString = "Occurs every day";
             }
             setRecurringValue(weekValuesString);
             setRecurringStringOnHover(weekValuesOnHoverString);
