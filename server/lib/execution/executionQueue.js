@@ -11,6 +11,7 @@ const scheduler = require('./scheduler');
 const { default: async } = require('async');
 const { timestamp } = require('winston/lib/winston/common');
 const { info } = require('winston');
+const { update } = require('../../notifications');
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -829,47 +830,80 @@ module.exports.Execution_Queue = class Execution_Queue {
         const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
         return result;
     };
-    static storeReportStatus = async (req, res) => {
-        var fnName = 'storeReportStatus';
+    static setExecStatus = async (req, res) => {
+        var fnName = 'setExecStatus';
         let response = {};
         response['status'] = "fail";
         response["message"] = "N/A";
         response['error'] = "None";
         try {
-            const resultData = req.body.value;
-            const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
-            var d2R = {};
-            if (execType == "API") {
-                if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = { "testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {} };
-                if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
-                d2R[testsuiteid].scenarios[scenarioid].push({ scenarioname, scenarioid, "overallstatus": "Not Executed" });
-            }
-            if (Object.keys(reportData.overallstatus).length !== 0) {
-                const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
-                const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
-                reportData.overallstatus.browserType = browserType;
-                if (execType == "API") {
-                    const cidx = d2R[testsuiteid].scenarios[scenarioid].length - 1;
-                    d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus };
-                }
-                const reportStatus = reportData.overallstatus.overallstatus;
-                const reportid = await this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
-                const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy };
-                if (reportid == "fail") {
-                    logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
-                    reportItem[reportid] = '';
-                } else {
-                    logger.info("Successfully inserted report data");
-                    logger.debug("Successfully inserted report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
-                }
-                // testsuite.reportData[scenarioIndex] = reportItem;
-                testsuite.reportData.push(reportItem);
-                response['status'] = "success";
+            const resultData = req.body;
+            // const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
+            // var d2R = {};
+            // if (execType == "API") {
+            //     if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = { "testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {} };
+            //     if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
+            //     d2R[testsuiteid].scenarios[scenarioid].push({ scenarioname, scenarioid, "overallstatus": "Not Executed" });
+            // }
+            // if (Object.keys(reportData.overallstatus).length !== 0) {
+            //     const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
+            //     const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
+            //     reportData.overallstatus.browserType = browserType;
+            //     if (execType == "API") {
+            //         const cidx = d2R[testsuiteid].scenarios[scenarioid].length - 1;
+            //         d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus };
+            //     }
+            //     const reportStatus = reportData.overallstatus.overallstatus;
+            //     const reportid = await this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
+            //     const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy };
+            //     if (reportid == "fail") {
+            //         logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
+            //         reportItem[reportid] = '';
+            //     } else {
+            //         logger.info("Successfully inserted report data");
+            //         logger.debug("Successfully inserted report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
+            //     }
+            //     // testsuite.reportData[scenarioIndex] = reportItem;
+            //     testsuite.reportData.push(reportItem);
+            // }
 
+            //Changing the status and Deleting if completed.. from the cache
+            let keyQueue = this.key_list[resultData.configkey];
+            let updatedKeyQueue = [];
+            let listIndex = -1,statusCount = 0;
+            for(let executionList of keyQueue) {
+                listIndex++;
+                
+                if(executionList[0]['executionListId'] == resultData.executionListId)
+                {
+                    let moduleIndex = -1;
+                    for (let testSuite of executionList){
+                        moduleIndex++;
+                        if(testSuite.moduleid == resultData.moduleid){
+                            this.key_list[resultData.configkey][listIndex][moduleIndex]['status'] = 'COMPLETED'
+                            await cache.set("execution_list", this.key_list);
+                            console.info(this.key_list);
+                            console.info(await cache.get('execution_list'));
+                        }
+                        statusCount+=(testSuite.status == 'COMPLETED');
+                        if(statusCount == executionList[0]['executionListId'].length) {
+                            statusCount = 1;
+                        }
+                    }
+                } else {
+                    updatedKeyQueue.push(executionList);
+                }
             }
+            if(statusCount){
+                await cache.set("execution_list", updatedKeyQueue);
+                console.info(await cache.get('execution_list'));
+            }
+
+            response['status'] = "success";
+            
         } catch (error) {
             console.info(error);
-            logger.error("Error in storeReportStatus. Error: %s", error);
+            logger.error("Error in setExecStatus. Error: %s", error);
         }
         return response;
     }

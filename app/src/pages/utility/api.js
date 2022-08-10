@@ -320,7 +320,7 @@ export const fetchProjects = async(data) => {
             headers: {
             'Content-type': 'application/json',
             },
-            params: data,
+            data: data,
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -554,6 +554,30 @@ export const deleteConfigureKey = async(props) => {
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         console.log(res.data + '  408')
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+
+export const setExecStatus = async(props) => {
+    try{
+        const res = await axios(url+'/setExecStatus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.error(res.data)
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }catch(err){
         console.error(err)
