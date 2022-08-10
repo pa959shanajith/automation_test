@@ -188,12 +188,12 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         if (status === "available"){
             setShowMacOSSelection(false);
             setShowIndicator(true);
-            const link = document.createElement('a');
-            link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
-            link.setAttribute('download', "avoURL.txt");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // const link = document.createElement('a');
+            // link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
+            // link.setAttribute('download', "avoURL.txt");
+            // document.body.appendChild(link);
+            // link.click();
+            // document.body.removeChild(link);
             axios({
                 url: window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE",
                 method: "GET",
@@ -205,9 +205,10 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', "AvoAssureClient."+config[clientVer].split(".").pop());
+                link.setAttribute('download', "AvoAssureClient"+(userInfo.isTrial?("_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"")+"."+config[clientVer].split(".").pop());
                 document.body.appendChild(link);
                 link.click();
+                document.body.removeChild(link);
             }).catch((err)=>{
                 console.log(err);
                 setShowIndicator(false);

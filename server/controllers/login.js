@@ -12,7 +12,7 @@ exports.loadUserInfo = async (req, res) => {
 		logger.info("Inside UI Service: " + fnName);
 		const username = req.session.username;
 		const userType = req.session.usertype;
-		let inputs = { username };
+		let inputs = { username, fnName };
 		const userData = await utils.fetchData(inputs, "login/loadUser", fnName);
     if (userData === "Licence Expired") return res.send("Licence Expired");
 		if (userData == "fail") return res.send("fail");
@@ -108,7 +108,7 @@ exports.getRoleNameByRoleId = async (req, res) => {
 const verifyPasswordHistory = async (uData) => {
 	const fnName = "verifyPasswordHistory";
 	let {username, newpass, oldpass} = uData;
-	const userDet = await utils.fetchData({ username }, "login/loadUser", fnName);
+	const userDet = await utils.fetchData({ username,fnName }, "login/loadUser", fnName);
 	if (userDet == "fail") return "fail";
 	uData.user = userDet;
 	oldpass = uData.oldpass = userDet.auth.password;

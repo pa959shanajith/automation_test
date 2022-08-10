@@ -95,13 +95,13 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
       const {status} = await res.json();
       // if (status === "available") window.location.href = "https://localhost:8443/downloadICE?ver="+queryICE+"&file=getICE"
 			if (status === "available"){
-        const link = document.createElement('a');
-        link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
-        link.setAttribute('download', "avoURL.txt");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE";
+        // const link = document.createElement('a');
+        // link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
+        // link.setAttribute('download', "avoURL.txt");
+        // document.body.appendChild(link);
+        // link.click();
+        // document.body.removeChild(link);
+        window.location.href = window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE"+(userInfo.isTrial?("&fileName=_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"");
       } 
 			else setMsg(MSG.GLOBAL.ERR_PACKAGE);
       setShowOverlay(false)
