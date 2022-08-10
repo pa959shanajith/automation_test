@@ -144,7 +144,7 @@ generateEmailPayload.taskWorkFlow = async data => {
 				"assigneeid":data.asigneeid
 			}
 			result = await getReceivers(inputs, data.nodeid, 'onUnassign')
-			taskupdate = data.assigner + " has unassinged " + result.owners.assignee + " from task " + data.taskdetails + "."
+			taskupdate = data.assigner + " has unassigned " + result.owners.assignee + " from task " + data.taskdetails + "."
 			recv = result['emails']
 			break
 

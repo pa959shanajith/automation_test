@@ -42,10 +42,10 @@
   padding: 0.7rem 1.4rem;
 
   &[data-type=disabled] {
-    border: 2px solid #aaa;
+    border: 2px solid #aaa !important;
     color: #fff !important;
-    background-color: #ccc !important;
-    left: 0;
+    background-color: #aaa !important;
+    box-shadow: none !important;
   }
 
   &:hover {

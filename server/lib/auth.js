@@ -30,7 +30,7 @@ const strategyUtil = {
 			let userInfo = null;
 			let validAuth = false;
 			let forgotPass = false;
-			let inputs = { username };
+			let inputs = { username, fnName };
 			const user = await utils.fetchData(inputs, "login/loadUser", fnName);
 			if (user == "fail") flag = "fail";
 			else if (!user || !user.auth) flag = "invalid_username_password";
@@ -301,7 +301,7 @@ module.exports.checkUser = async (req, res) => {
 	const fnName = "checkUser";
 	try {
 		logger.info("Inside UI Service: " + fnName);
-		const inputs = 	{ "username": req.body.username.toLowerCase() };
+		const inputs = 	{ "username": req.body.username.toLowerCase(), fnName };
 		const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
 		let result = { "proceed": true };
 		if (userInfo == "fail") return res.send("fail");
@@ -379,7 +379,7 @@ module.exports.forgotPasswordEmail = async (req, res) => {
 	const fnName = "forgotPasswordEmail";
 	try {
 		logger.info("Inside UI Service: " + fnName);
-		const inputs = 	{ "email": req.body.email, fnName, "username":req.body.username ?req.body.username:undefined};
+		const inputs = 	{ "email": req.body.email, fnName, "username":req.body.username ?req.body.username:undefined, fnName};
 		var users = await utils.fetchData(inputs, "login/loadUser", fnName);
 		let result = { "proceed": true };
 		if (users == "fail" || users.length===0) return res.send("fail");
@@ -416,7 +416,7 @@ module.exports.unlock = async (req, res) => {
 	try {
 		logger.info("Inside UI Service: " + fnName);
 		const username = req.user.username;
-		const inputs = 	{ "username": username };
+		const inputs = 	{ "username": username, fnName };
 		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
 		let result = { "proceed": true };
 		if (userInfo == "fail") return result = "fail";
@@ -447,7 +447,7 @@ module.exports.unlockAccountEmail = async (req, res) => {
 	const fnName = "unlockAccountEmail";
 	try {
 		logger.info("Inside UI Service: " + fnName);
-		const inputs = 	{ "username": req.user.username };
+		const inputs = 	{ "username": req.user.username, fnName };
 		var userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
 		let result = { "proceed": true };
 		if (userInfo == "fail") return result = "fail";
@@ -483,7 +483,7 @@ const checkAssignedProjects = async (username, usertype) => {
 	logger.info("Inside " + fnName + " function");
 	let assignedProjects = false;
 	// Get user profile by username
-	let inputs = { username };
+	let inputs = { username, fnName };
 	const userInfo = await utils.fetchData(inputs, "login/loadUser", fnName);
 	if (userInfo == "fail") return { err: 'fail' };
 	else if (!userInfo) {

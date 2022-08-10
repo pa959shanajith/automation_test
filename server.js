@@ -303,7 +303,7 @@ if (cluster.isMaster) {
 			let clientVer = String(req.query.ver);
 			let iceFile = uiConfig.avoClientConfig[clientVer];
 			if (req.query.file == "getICE") {
-				return res.download(path.resolve(iceFile),"AvoAssureClient."+iceFile.split(".").pop())
+				return res.download(path.resolve(iceFile),"AvoAssureClient"+(req.query.fileName?(req.query.fileName):"")+"."+iceFile.split(".").pop())
 			} else {
 				let status = "na";
 				try {
