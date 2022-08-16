@@ -62,6 +62,13 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
 
   useEffect(()=>{
     getOS();
+    if(activeStep===0){
+      let observer = new IntersectionObserver(function(entries) {
+        if(entries[0].isIntersecting === true)
+            setTncAcceptEnabled(true)
+      }, { threshold: [1], root: document.querySelector('#tnc_content')});
+      observer.observe(document.querySelector("#lastStepTnC"));
+    }
     (async()=>{
         const response = await fetch("/getClientConfig")
         let {avoClientConfig, trainingLinks} = await response.json();
@@ -240,18 +247,18 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         setMsg(MSG.GLOBAL.ERR_PACKAGE);
   }
 
-  const onScrollTnC = (e) => {
-    if (TnCInnerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = TnCInnerRef.current;
-      if (scrollTop + clientHeight === scrollHeight) {
-        setTncAcceptEnabled(true)
-      }
-    }
-  }
+  // const onScrollTnC = (e) => {
+  // //   if (TnCInnerRef.current) {
+  // //     // const { scrollTop, scrollHeight, clientHeight } = TnCInnerRef.current;
+  // //     // if (Math.abs(scrollHeight - (scrollTop + clientHeight) <= 1)) {
+          
+  // //     // }
+  // //   }
+  // }
 
   const getTermsAndConditions = () => {
       return (
-            <div id="tnc_content" ref={TnCInnerRef} onScroll={onScrollTnC}>
+            <div id="tnc_content" ref={TnCInnerRef}>
                 <h4 className="tnc_header">SOFTWARE {userInfo.isTrial?"TRIAL":""} LICENSE AGREEMENT</h4>
                 <p className="tnc_bold">THIS SOFTWARE {userInfo.isTrial?"TRIAL":""} LICENSE AGREEMENT (“LICENSE AGREEMENT”) IS A LEGAL CONTRACT BETWEEN AVO AUTOMATION, A DIVISION OF SLK SOFTWARE SERVICES PVT LTD (“LICENSOR”) AND YOU, EITHER AS AN INDIVIDUAL OR AN ENTITY (“LICENSEE”). IF THE LICENSEE IS ACCEPTING ON BEHALF OF AN ENTITY, THE LICENSEE REPRESENTS AND WARRANTS THAT THE LICENSEE HAS THE AUTHORITY TO BIND THAT ENTITY TO THIS AGREEMENT LICENSORIS WILLING TO AUTHORIZE LICENSEE’S USE OF THE SOFTWARE ASSOCIATED WITH THIS LICENSE AGREEMENT ONLY UPON THE CONDITION THAT LICENSEE ACCEPTS THIS LICENSE AGREEMENT WHICH GOVERNS LICENSEE’S USE OF THE SOFTWARE. BY DOWNLOADING, INSTALLING, OR ACCESSING AND USING THE SOFTWARE, LICENSEE INDICATES LICENSEE’S ACCEPTANCE OF THIS LICENSE AGREEMENT AND LICENSEE’S AGREEMENT TO COMPLY WITH THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT.</p>
                 <div>
@@ -376,7 +383,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     <p><span className="tnc_num_idx">17.3.    </span> <b>Severability.</b> If a court of competent jurisdiction declares any provision of this Agreement to be invalid, unlawful or unenforceable as drafted, the Parties intend that such provision be amended and construed in a manner designed to effectuate the purposes of the provision to the fullest extent permitted by law. If such provision cannot be so amended and construed, it shall be severed, and the remaining provisions shall remain unimpaired and in full force and effect to the fullest extent permitted by law.</p>
                 </div>
                 <br/>
-                <p><b>By clicking the “Agree” button, Licensee hereby agrees to be bound by all the terms and conditions stated herein</b></p>
+                <p id="lastStepTnC"><b>By clicking the “Agree” button, Licensee hereby agrees to be bound by all the terms and conditions stated herein</b></p>
             </div>)
   }
 
@@ -415,7 +422,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         </div>
         <div className="installation-instructions-container">
             <div className="d-p-card-container">
-                <IconButton icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo(1)}} variant="borderless" />
+                <IconButton id="arrow__WW" data-type={cardListNo===1?"disabled":"not-disabled"} disabled={cardListNo===1} icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo(1)}} variant="borderless" />
                 {OS==="Windows" && InstallationSteps_win.map((item,idx)=>{
                     if (cardListNo===1 && idx<2){
                       return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
@@ -434,7 +441,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     }
                     else return null;
                 })}
-                <IconButton icon="chevron-right" styles={{root:{right:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo(2)}} variant="borderless" />
+                <IconButton id="arrow__WW" disabled={cardListNo===2} data-type={cardListNo===2?"disabled":"not-disabled"} icon="chevron-right" styles={{root:{right:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo(2)}} variant="borderless" />
             </div>
             <div style={{display:"flex", flexDirection:"row"}}>
               <div key={"select-1"} className="circle" data-type={cardListNo===1} onClick={()=>{setCardListNo(1)}}></div>
