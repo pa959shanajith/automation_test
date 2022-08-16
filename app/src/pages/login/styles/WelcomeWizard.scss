@@ -320,6 +320,14 @@
     }
 }
 
+#arrow__WW {
+  &[data-type=disabled] {
+    path {
+      stroke: #aaa !important;
+    }
+  }
+}
+
 .OSselectionText {
     font-family: 'Mulish';
     font-style: normal;
