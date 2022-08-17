@@ -48,7 +48,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     const dt = new Date(result[k].scheduledon);
                     result[k].scheduledatetime = dt.getFullYear() + "-" + ("0" + (dt.getMonth() + 1)).slice(-2) + "-"
                         + ("0" + dt.getDate()).slice(-2) + " " + ("0" + dt.getHours()).slice(-2) + ":" + ("0" + dt.getMinutes()).slice(-2);
-                    const startDT = result[k].startdate ? result[k].startdate : result[k].scheduledon
+                    const startDT = ((result[k].recurringstringonhover === "One Time") ? (result[k].startdate ? result[k].startdate : result[k].scheduledon) : (((typeof result[k].recurringstringonhover !== "undefined" && result[k].recurringstringonhover !== "One Time" && result[k].status !== "recurring" && !result[k].recurringpattern.includes('*'))) ? (result[k].createddate ? result[k].createddate : result[k].scheduledon) : ((typeof result[k].recurringpattern !== "undefined" && result[k].recurringpattern.includes('*')) ? (result[k].createddate ? result[k].createddate : result[k].scheduledon) : result[k].scheduledon)))
                     const sdt = new Date(startDT);
                     result[k].startdatetime = sdt.getFullYear() + "-" + ("0" + (sdt.getMonth() + 1)).slice(-2) + "-"
                             + ("0" + sdt.getDate()).slice(-2) + " " + ("0" + sdt.getHours()).slice(-2) + ":" + ("0" + sdt.getMinutes()).slice(-2);
@@ -402,7 +402,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                     <div className='scheduleDataBodyRow'>
                                                         {pageOfItems.map((data,index)=>( data.status != "recurring" && data.recurringpattern == "One Time" &&
                                                             <div key={index} className="scheduleDataBodyRowChild">
-                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Start Date: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
+                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Job created on: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
                                                                 <div data-test = "schedule_data_target_user" className="s__Table_host" title={"Ice Pool: " +data.poolname}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
                                                                 <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                                 <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
@@ -442,7 +442,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                     <div className='scheduleDataBodyRow'>
                                                         {pageOfItems.map((data,index)=>( (data.status == "recurring" || data.status == "cancelled" || data.status == "Failed") && data.recurringpattern != "One Time" &&
                                                             <div key={index} className="scheduleDataBodyRowChild">
-                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time ">{formatDate(data.scheduledatetime)}</div>
+                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Job created on: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
                                                                 <div data-test = "schedule_data_target_user" className="s__Table_host" title={"Ice Pool: " +data.poolname}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
                                                                 <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                                 <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>

@@ -25,7 +25,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
     let recurringStringOnHoverValue = body.executionData.batchInfo[0].recurringStringOnHover;
     let timeValue = body.executionData.batchInfo[0].time;
     let parentId = body.executionData.batchInfo[0].parentId ? body.executionData.batchInfo[0].parentId : 0;
-    let startDate = body.executionData.batchInfo[0].startDate ? body.executionData.batchInfo[0].startDate : body.executionData.batchInfo[0].timestamp;
+    let startDate = (recurringStringOnHoverValue === "One Time") ? (+ new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), new Date(new Date().getHours()), new Date(new Date().getMinutes()))).toString() : (body.executionData.batchInfo[0].startDate ? body.executionData.batchInfo[0].startDate : body.executionData.batchInfo[0].timestamp)
     if (!poolid || poolid === "") poolid = constants.EMPTYPOOL
     var invokinguser = {
         invokinguser: session.userid,
@@ -412,6 +412,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
 
     let timeSelected = multiExecutionData.batchInfo[0].time;
     let timestamp = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeSelected.split(':')[0]), parseInt(timeSelected.split(':')[1]))
+    let createdDate = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), new Date(new Date().getHours()), new Date(new Date().getMinutes()))
     const targetUser = multiExecutionData.batchInfo[0].targetUser;
     let recurringPattern = multiExecutionData['batchInfo'][0]['recurringValue'];
     recurringPattern = recurringPattern.split(" ");
@@ -420,7 +421,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
     recurringPattern = recurringPattern.join(" ");
     body.executionData.batchInfo[0].recurringValue = recurringPattern;
     body.executionData.batchInfo[0].poolid = poolid;
-    body.executionData.batchInfo[0].startDate = timestamp;
+    body.executionData.batchInfo[0].startDate = createdDate;
     let recurringString = multiExecutionData['batchInfo'][0]['recurringString'];
     let recurringStringOnHover = multiExecutionData.batchInfo[0].recurringStringOnHover;
     inputs = {
@@ -442,7 +443,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         recurringStringOnHover:	multiExecutionData.batchInfo[0].recurringStringOnHover,
         time: timeSelected,
         parentId: 0,
-        startDate: timestamp.toString()
+        startDate: createdDate.toString()
     };
 
     const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
