@@ -137,7 +137,7 @@ exports.getAllSuites_ICE = async (req, res) => {
     const fnName = "getAllSuites_ICE";
     logger.info("Inside UI service: " + fnName);
     try {
-        var requestedaction = req.query.readme;
+        var requestedaction = req.body.readme;
         if (requestedaction == 'projects' || requestedaction == 'reports') {
             const inputs = {
                 "query": "projects",
@@ -178,7 +178,8 @@ exports.getAvoAgentAndAvoGridList = async (req, res) => {
 	try {
 		// const reqData = req.session.userid;
 		const input = {
-			userid: req.session.userid
+			userid: req.session.userid,
+			query: req.body.query
 		}
 		const list = await utils.fetchData(input, "devops/getAvoAgentAndAvoGridList", "getAvoAgentAndAvoGridList");
 		res.send(list);

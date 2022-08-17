@@ -511,16 +511,14 @@ export const fetchConfigureList = async() => {
     }
 }
 
-export const fetchAvoAgentAndAvoGridList = async() => {
+export const fetchAvoAgentAndAvoGridList = async(props) => {
     try{
         const res = await axios(url+'/getAvoAgentAndAvoGridList', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            data: {
-                action: "configurelist"
-            }
+            data:props
         });
         if(res.status === 401){
             RedirectPage(history)
