@@ -206,3 +206,22 @@ exports.deleteConfigureKey = async(req,res) => {
 		return res.send("fail");
 	}
 }
+
+exports.saveAvoAgent = async(req,res) => {
+	const fnName = "saveAvoAgent";
+	try {
+		console.log('something');
+		logger.info("Inside UI Service: " + fnName);
+		// const userDetails = req.body.userDetails;
+		// const username = req.session.username;
+		// const uId = req.session.userid;
+		// const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		const inputs = req.body
+		const status = await utils.fetchData(inputs, "devops/saveAvoAgent", fnName);
+		if (status == "fail" || status == "forbidden") return res.send("fail");
+		else res.send(status);
+	} catch (exception) {
+		logger.error(exception.message);
+		return res.send("fail");
+	}
+}
