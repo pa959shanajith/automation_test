@@ -1,53 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown, ScreenOverlay } from '../../global';
-// import { fetchProjects, getPools, storeConfigureKey } from '../api';
+import { saveAvoGrid, fetchAvoAgentAndAvoGridList,  } from '../api';
 import { useSelector } from 'react-redux';
 import { SearchDropdown, TextField, Toggle, MultiSelectDropdown, CheckBox, DetailsList, SpinInput, Label, SearchBox } from '@avo/designcomponents';
 import '../styles/Agents.scss';
 import { Selection } from '@fluentui/react';
 
-const CreateGrid = ({ currentGrid, setCurrentGrid }) => {
+const CreateGrid = ({ currentGrid, setCurrentGrid, showMessageBar, setLoading }) => {
     const [gridName, setGridName] = useState(currentGrid.name);
     const [searchText, setSearchText] = useState("");
     const [dataUpdated, setDataUpdated] = useState(false);
-    const agentlistAPIResponse = [
-        {
-            key: '981srv',
-            state: 'idle',
-            name: '981srv',
-            count: 1,
-            status: 'active'
-        },
-        {
-            key: '982srv',
-            state: 'in-progress',
-            name: '982srv',
-            count: 4,
-            status: 'inactive'
-        },
-        {
-            key: '983srv',
-            state: 'busy',
-            name: '983srv',
-            count: 10,
-            status: 'active'
-        },
-        {
-            key: '984srv',
-            state: 'offline',
-            name: '984srv',
-            count: 2,
-            status: 'inactive'
-        },
-        {
-            key: '985srv',
-            state: 'inactive',
-            name: '985srv',
-            count: 3,
-            status: 'inactive'
-        }
-    ];
+    // const agentlistAPIResponse = [
+    //     {
+    //         key: '981srv',
+    //         state: 'idle',
+    //         name: '981srv',
+    //         count: 1,
+    //         status: 'active'
+    //     },
+    //     {
+    //         key: '982srv',
+    //         state: 'in-progress',
+    //         name: '982srv',
+    //         count: 4,
+    //         status: 'inactive'
+    //     },
+    //     {
+    //         key: '983srv',
+    //         state: 'busy',
+    //         name: '983srv',
+    //         count: 10,
+    //         status: 'active'
+    //     },
+    //     {
+    //         key: '984srv',
+    //         state: 'offline',
+    //         name: '984srv',
+    //         count: 2,
+    //         status: 'inactive'
+    //     },
+    //     {
+    //         key: '985srv',
+    //         state: 'inactive',
+    //         name: '985srv',
+    //         count: 3,
+    //         status: 'inactive'
+    //     }
+    // ];
     const [agentData, setAgentData] = useState([]);
     let selectedAgents = undefined;
     // const trackSelection = new Selection({
@@ -78,14 +78,15 @@ const CreateGrid = ({ currentGrid, setCurrentGrid }) => {
                 selectedAgents = selection.getSelection();
         }
     }) );
-    const onClientCountChange = (operation, index, newVal = '') => {
-        if((operation === 'add') || ((operation === 'sub') && agentData[index].count > 1)) {
-            const updatedData = [...agentData];
-            updatedData[index] = {...agentData[index], count: (operation === 'add') ? agentData[index].count+1 : agentData[index].count-1};
+    const onClientIceCountChange = (operation, name, newVal = '') => {
+        const updatedData = [...agentData];
+        const index = updatedData.findIndex((agent) => agent.name === name);
+        console.log(index);
+        if((operation === 'add') || ((operation === 'sub') && agentData[index].icecount > 1)) {
+            updatedData[index] = {...agentData[index], icecount: (operation === 'add') ? agentData[index].icecount+1 : agentData[index].icecount-1};
             setAgentData([...updatedData]);
         }else if(operation === 'update' && newVal > 0) {
-            const updatedData = [...agentData];
-            updatedData[index] = {...agentData[index], count: parseInt(newVal)};
+            updatedData[index] = {...agentData[index], icecount: parseInt(newVal)};
             setAgentData([...updatedData]);
         }
     }
@@ -98,6 +99,13 @@ const CreateGrid = ({ currentGrid, setCurrentGrid }) => {
     }
     const agentListHeader = [
         {
+            fieldName: 'checkbox',
+            key: '0',
+            minWidth: 30,
+            maxWidth: 50,
+            name: ''
+        }
+        ,{
             fieldName: 'agent',
             isResizable: true,
             key: '1',
@@ -126,30 +134,70 @@ const CreateGrid = ({ currentGrid, setCurrentGrid }) => {
     const [selectedAgentsNumbers, setSelectedAgentsNumbers] = useState(0);
     let newselectedAgentsNumbers = 0;
     useEffect(()=> {
-        if(currentGrid.agents.length > 0) {
-            let selectedAgentsList = [];
-            let unSelectedAgentsList = [];
-            const selectedAgentnameList = currentGrid.agents.map((agent) => agent.name);
-            agentlistAPIResponse.forEach((agent) => {
-                if(selectedAgentnameList.includes(agent.name)){
-                    selectedAgentsList.push(agent);
-                } else{
-                    unSelectedAgentsList.push(agent);
-                }
+        (async() => {
+            setLoading('Loading...');
+            const agentList = await fetchAvoAgentAndAvoGridList({
+                query: 'avoAgentList'
             });
-            selection.setItems(
-                agentlistAPIResponse.map((agent, index) => ({
-                    agent: <div className='agent_state'><ReactTooltip id={agent.name} effect="solid" backgroundColor="black" /><div data-for={agent.name} data-tip={agent.state} className={`agent_state__div agent_state__${agent.state}`}></div><p>{agent.name}</p></div>,
-                    clientCount: <SpinInput disabled={agent.status !== 'active'} value={agent.count} onChange={(ev, newVal) => onClientCountChange('update', index, newVal)} onDecrement={() => onClientCountChange('sub', index)} onIncrement={() => onClientCountChange('add', index)} width="5%" />,
-                    status: <div className='detailslist_status'><p>{agent.status}</p></div>
-                }))
-            );
-            setAgentData([...selectedAgentsList, ...unSelectedAgentsList]);
-            if(selectedAgentsList.length > 0) setSelectedAgentsNumbers(selectedAgentsList.length);
-            if(selectedAgentsList.length > 0) newselectedAgentsNumbers = selectedAgentsList.length;
-        } else {
-            setAgentData(agentlistAPIResponse);
-        }
+            if(agentList.error) {
+                if(agentList.error.CONTENT) {
+                    setMsg(MSG.CUSTOM(agentList.error.CONTENT,VARIANT.ERROR));
+                } else {
+                    setMsg(MSG.CUSTOM("Error While Fetching Agent List",VARIANT.ERROR));
+                }
+            }else {
+                if(currentGrid.agents.length > 0) {
+                    let selectedAgentsList = [];
+                    let unSelectedAgentsList = [];
+                    const selectedAgentnameList = currentGrid.agents.map((agent) => agent.Hostname);
+                    agentList.avoagents.forEach((agent) => {
+                        if(selectedAgentnameList.includes(agent.Hostname)){
+                            selectedAgentsList.push(agent);
+                        } else{
+                            unSelectedAgentsList.push(agent);
+                        }
+                    });
+                    // selection.setItems(
+                    //     agentList.avoagents.map((agent) => ({
+                    //         agent: <div className='agent_state'><ReactTooltip id={agent.Hostname} effect="solid" backgroundColor="black" /><div data-for={agent.Hostname} data-tip={agent.state} className={`agent_state__div agent_state__${agent.state}`}></div><p>{agent.Hostname}</p></div>,
+                    //         clientCount: <SpinInput disabled={agent.status !== 'active'} value={agent.icecount} onChange={(ev, newVal) => onClientIceCountChange('update', agent.Hostname, newVal)} onDecrement={() => onClientIceCountChange('sub', agent.Hostname)} onIncrement={() => onClientIceCountChange('add', agent.Hostname)} width="5%" />,
+                    //         status: <div className='detailslist_status'><p>{agent.status}</p></div>
+                    //     }))
+                    // );
+                    // setAgentData([...selectedAgentsList, ...unSelectedAgentsList]);
+                    // if(selectedAgentsList.length > 0) {
+                    //     setSelectedAgentsNumbers(selectedAgentsList.length);
+                    //     newselectedAgentsNumbers = selectedAgentsList.length;
+                    // }
+                    setAgentData(
+                        [
+                            ...selectedAgentsList.map((agent) => ({
+                                ...agent,
+                                isSelected: true,
+                                name: agent.Hostname,
+                                state: 'idle'
+                            })),
+                            ...unSelectedAgentsList.map((agent) => ({
+                                ...agent,
+                                isSelected: false,
+                                name: agent.Hostname,
+                                state: 'idle'
+                            }))
+                        ]
+                    );
+                } else {
+                    setAgentData(
+                        agentList.avoagents.map((agent) => ({
+                            ...agent,
+                            isSelected: false,
+                            name: agent.Hostname,
+                            state: 'idle'
+                        }))
+                    );
+                }
+            }
+            setLoading(false);
+        })()
     }, []);
     // useEffect(()=> {
     //     console.log(selectedAgents);
@@ -223,6 +271,34 @@ const CreateGrid = ({ currentGrid, setCurrentGrid }) => {
             <div className={`agent_state__div agent_state__${state}`}></div><p>{name}</p>
         </div>);
     }
+    const handleConfigSave  = async() => {
+        setLoading('Loading...');
+        const storeConfig = await saveAvoGrid({
+            name: gridName,
+            agents: agentData.filter((agent) => agent.isSelected).map((agent) => ({
+                Hostname: agent.name,
+                icecount: agent.icecount,
+                _id: agent._id
+            }))
+        });
+        if(storeConfig !== 'success') {
+            if(storeConfig.error && storeConfig.error.CONTENT) {
+                setMsg(MSG.CUSTOM(storeConfig.error.CONTENT,VARIANT.ERROR));
+            } else {
+                setMsg(MSG.CUSTOM("Something Went Wrong",VARIANT.ERROR));
+            }
+        }else {
+            showMessageBar( 'Grid Create Successfully' , 'SUCCESS');
+            setCurrentGrid(false);
+        }
+        setLoading(false);
+    }
+    const onAgentSelection = (name) => {
+        const updatedData = [...agentData];
+        const index = updatedData.findIndex((agent) => agent.name === name);
+        updatedData[index] = {...agentData[index], isSelected: !agentData[index].isSelected};
+        setAgentData([...updatedData]);
+    }
 
     return (<>
         <div className="page-taskName" >
@@ -233,7 +309,7 @@ const CreateGrid = ({ currentGrid, setCurrentGrid }) => {
         </div>
         <div className="api-ut__btnGroup">
             {/* <button data-test="submit-button-test" onClick={() => console.log()} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button> */}
-            <button data-test="submit-button-test" onClick={() => console.log(selectedAgents)} >Save</button>
+            <button data-test="submit-button-test" onClick={handleConfigSave} >Save</button>
             <button data-test="submit-button-test" onClick={() => setCurrentGrid(false)} >{dataUpdated ? 'Cancel' : 'Back'}</button>
             {
                 agentData.length > 0 && <>
@@ -259,14 +335,15 @@ const CreateGrid = ({ currentGrid, setCurrentGrid }) => {
                 {showLegend('offline','Offline')}
             </div>
         </div>
-        <div style={{ position: 'absolute', width: '100%', height: '82%', marginTop: '1.5%' }}>
+        <div style={{ position: 'absolute', width: '100%', height: '70%', marginTop: '1.5%' }}>
             <DetailsList columns={agentListHeader} items={
-                ((searchText.length > 0) ? filteredList : agentData).map((agent, index) => ({
+                ((searchText.length > 0) ? filteredList : agentData).map((agent) => ({
+                    checkbox : <CheckBox checked={agent.isSelected} onChange={() => onAgentSelection(agent.name)} />,
                     agent: <div className='agent_state'><ReactTooltip id={agent.name} effect="solid" backgroundColor="black" /><div data-for={agent.name} data-tip={agent.state} className={`agent_state__div agent_state__${agent.state}`}></div><p>{agent.name}</p></div>,
-                    clientCount: <SpinInput disabled={agent.status !== 'active'} value={agent.count} onChange={(ev, newVal) => onClientCountChange('update', index, newVal)} onDecrement={() => onClientCountChange('sub', index)} onIncrement={() => onClientCountChange('add', index)} width="5%" />,
+                    clientCount: <SpinInput disabled={agent.status !== 'active'} value={agent.icecount} onChange={(ev, newVal) => onClientIceCountChange('update', agent.name, newVal)} onDecrement={() => onClientIceCountChange('sub', agent.name)} onIncrement={() => onClientIceCountChange('add', agent.name)} width="5%" />,
                     status: <div className='detailslist_status'><p>{agent.status}</p></div>
                 }))
-            } selection={selection} layoutMode={1} selectionMode={2} variant="variant-two" />
+            } selection={selection} layoutMode={1} selectionMode={0} variant="variant-two" />
         </div>
     </>);
 }

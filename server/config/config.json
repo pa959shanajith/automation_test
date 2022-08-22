@@ -30,6 +30,7 @@
         "avoclientpath_Catalina":"",
         "avoclientpath_BigSur":""
     },
+    "avoAgentConfig": "",
     "trainingLinks":{
         "videos": "https://elearning.avoassure.ai/#/",
         "documentation": "https://docs.avoautomation.com/"

@@ -311,6 +311,16 @@ if (cluster.isMaster) {
 			}
 		});
 
+		app.get('/downloadAgent', async (req, res) => {
+			try {
+				let agentFile = uiConfig.avoAgentConfig;
+				return res.download(path.resolve(agentFile),"AvoAgent."+agentFile.split(".").pop())
+			}
+			catch (error) {
+				console.error("Catch: Error Occurred in fetching Avo Agent");
+			}
+		});
+
 		app.get('/getClientConfig', (req,res) => {
 			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks})
 		});
@@ -539,7 +549,10 @@ if (cluster.isMaster) {
 		app.post('/execAutomation', auth.protect, suite.execAutomation);
 		app.post('/getAgentTask', auth.protect, suite.getAgentTask);
 		app.post('/fetchProjects', auth.protect, devOps.getAllSuites_ICE);
-		
+		app.post('/deleteConfigureKey', auth.protect, devOps.deleteConfigureKey);
+		app.post('/saveAvoAgent', auth.protect, devOps.saveAvoAgent);
+		app.post('/saveAvoGrid', auth.protect, devOps.saveAvoGrid);
+		app.post('/deleteAvoGrid', auth.protect, devOps.deleteAvoGrid);
 
 
 

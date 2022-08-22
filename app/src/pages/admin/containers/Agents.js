@@ -40,8 +40,8 @@ const Agents = () => {
                 { key: 'grids', text: 'Grids' },
                 { key: 'agents', text: 'Agents' }
             ]} selectedKey={selectedTab} onLinkClick = {(item) => item && setSelectedTab(item.props.itemKey)} />
-            { selectedTab === 'agents' ? <AgentsList setShowConfirmPop={setShowConfirmPop} showMessageBar={showMessageBar} /> : 
-                <GridList setShowConfirmPop={setShowConfirmPop} showMessageBar={showMessageBar} />
+            { selectedTab === 'agents' ? <AgentsList setShowConfirmPop={setShowConfirmPop} showMessageBar={showMessageBar} setLoading={setLoading} /> : 
+                <GridList setShowConfirmPop={setShowConfirmPop} showMessageBar={showMessageBar} setLoading={setLoading} />
             }
         </div>
     </>);

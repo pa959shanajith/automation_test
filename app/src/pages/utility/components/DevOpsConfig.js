@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown } from '../../global';
-import { fetchProjects, getPools, storeConfigureKey } from '../api';
+import { fetchProjects, fetchAvoAgentAndAvoGridList, storeConfigureKey } from '../api';
 import { useSelector } from 'react-redux';
 import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
 
@@ -69,21 +69,19 @@ const DevOpsConfig = props => {
     useEffect(()=> {
         (async()=>{
             props.setLoading('Please Wait...');
-            const args = {
-                poolid:"all",
-                projectids:[]
-            };
-            // const poolList = await getPools(args);
-            // console.log(poolList);
-            // if(poolList.error) {
-            //     if(poolList.error.CONTENT) {
-            //         setMsg(MSG.CUSTOM(poolList.error.CONTENT,VARIANT.ERROR));
-            //     } else {
-            //         setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
-            //     }
-            // }else {
-            //     console.log(poolList);
-            // }
+            const gridAgentList = await fetchAvoAgentAndAvoGridList({
+                query: 'all'
+            });
+            console.log(gridAgentList);
+            if(gridAgentList.error) {
+                if(gridAgentList.error.CONTENT) {
+                    setMsg(MSG.CUSTOM(gridAgentList.error.CONTENT,VARIANT.ERROR));
+                } else {
+                    setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
+                }
+            }else {
+                setIcepoollist([ ...gridAgentList.avoagents.filter((agent) => agent.status === 'active').map((agent) => ({key: agent._id, text: agent.Hostname})), ...gridAgentList.avogrids.map((grid) => ({key: grid._id, text: grid.name})) ]);
+            }
             const reportResponse = await fetchProjects({ readme: "projects" });
             if (reportResponse.error) {
                 console.error(reportResponse.error);
@@ -226,7 +224,7 @@ const DevOpsConfig = props => {
             executiontype: integrationConfig.executionType,
             configurekey: integrationConfig.key,
             exectionmode: integrationConfig.exectionMode,
-            avoagents: [],
+            avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid.length > 0) ? [integrationConfig.avoAgentGrid] : [],
             integration: integration,
             batchInfo: batchInfo,
             scenarioFlag: false

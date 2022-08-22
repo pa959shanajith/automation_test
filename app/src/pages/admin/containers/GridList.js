@@ -5,85 +5,109 @@ import '../styles/Agents.scss';
 import ReactTooltip from 'react-tooltip';
 import { Icon } from '@fluentui/react';
 import CreateGrid from './CreateGrid';
+import { deleteAvoGrid, fetchAvoAgentAndAvoGridList } from '../api';
 
 /* Component Grids List */
 
-const GridList = ({ setShowConfirmPop, showMessageBar }) => {
+const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
     const [currentGrid, setCurrentGrid] = useState(false);
     const [searchText, setSearchText] = useState("");
-    const deleteGridConfig = () => {
+    const deleteGridConfig = async (id) => {
+        // setLoading('Please Wait...');
+        // const deletedConfig = await deleteConfigureKey({id});
+        // if(deletedConfig.error) {
+        //     if(deletedConfig.error.CONTENT) {
+        //         setMsg(MSG.CUSTOM(deletedConfig.error.CONTENT,VARIANT.ERROR));
+        //     } else {
+        //         setMsg(MSG.CUSTOM("Error While Deleting Grid Configuration",VARIANT.ERROR));
+        //     }
+        // }else {
+        //     const configurationList = await fetchConfigureList();
+        //     if(configurationList.error) {
+        //         if(configurationList.error.CONTENT) {
+        //             setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
+        //         } else {
+        //             setMsg(MSG.CUSTOM("Error While Fetching Grid List",VARIANT.ERROR));
+        //         }
+        //     }else {
+        //         setConfigList(configurationList);
+        //     }
+        //     setMsg(MSG.CUSTOM("Grid deleted successfully",VARIANT.SUCCESS));
+        // }
+        // setLoading(false);
+        // setShowConfirmPop(false);
         setShowConfirmPop({'title': 'Delete Avo Grid Configuration', 'content': <p>Are you sure, you want to delete <b>Name 1</b> Configuration?</p>, 'onClick': ()=>{ setShowConfirmPop(false); showMessageBar('Name 1 Configuration Deleted', 'SUCCESS'); }});
     }
-    // const [gridList, setGridList] = useState([]);
-    const [gridList, setGridList] = useState([
-        {
-            name: 'Name 1ansadnsa,mdnas,mdnasm,dnsad   dasd as ',
-            editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid({
-                name: 'Name 1ansadnsa,mdnas,mdnasm,dnsad   dasd as ',
-                agents: [
-                    {
-                        state: 'idle',
-                        name: '981srv',
-                        count: 1,
-                        status: 'active'
-                    },
-                    {
-                        state: 'in-progress',
-                        name: '982srv',
-                        count: 4,
-                        status: 'inactive'
-                    }
-                ]
-            })} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,
-            deleteIcon: <img onClick={() => deleteGridConfig()} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
-        },{
-            name: 'Name 2',
-            editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid({
-                name: 'Name 2',
-                agents: [
-                    {
-                        state: 'busy',
-                        name: '983srv',
-                        count: 10,
-                        status: 'active'
-                    },
-                    {
-                        state: 'offline',
-                        name: '984srv',
-                        count: 2,
-                        status: 'inactive'
-                    }
-                ]
-            })} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,
-            deleteIcon: <img onClick={() => deleteGridConfig()} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
-        },{
-            name: 'Name 3',
-            editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid({
-                name: 'Name 3',
-                agents: [
-                    {
-                        state: 'idle',
-                        name: '981srv',
-                        count: 1,
-                        status: 'active'
-                    },
-                    {
-                        state: 'busy',
-                        name: '983srv',
-                        count: 10,
-                        status: 'active'
-                    },
-                    {
-                        state: 'inactive',
-                        name: '985srv',
-                        count: 3,
-                        status: 'inactive'
-                    }
-                ]
-            })} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,
-            deleteIcon: <img onClick={() => deleteGridConfig()} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
-        }
-    ]);
+    const [gridList, setGridList] = useState([]);
+    // const [gridList, setGridList] = useState([
+    //     {
+    //         name: 'Name 1ansadnsa,mdnas,mdnasm,dnsad   dasd as ',
+    //         editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid({
+    //             name: 'Name 1ansadnsa,mdnas,mdnasm,dnsad   dasd as ',
+    //             agents: [
+    //                 {
+    //                     state: 'idle',
+    //                     name: '981srv',
+    //                     count: 1,
+    //                     status: 'active'
+    //                 },
+    //                 {
+    //                     state: 'in-progress',
+    //                     name: '982srv',
+    //                     count: 4,
+    //                     status: 'inactive'
+    //                 }
+    //             ]
+    //         })} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,
+    //         deleteIcon: <img onClick={() => deleteGridConfig()} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
+    //     },{
+    //         name: 'Name 2',
+    //         editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid({
+    //             name: 'Name 2',
+    //             agents: [
+    //                 {
+    //                     state: 'busy',
+    //                     name: '983srv',
+    //                     count: 10,
+    //                     status: 'active'
+    //                 },
+    //                 {
+    //                     state: 'offline',
+    //                     name: '984srv',
+    //                     count: 2,
+    //                     status: 'inactive'
+    //                 }
+    //             ]
+    //         })} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,
+    //         deleteIcon: <img onClick={() => deleteGridConfig()} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
+    //     },{
+    //         name: 'Name 3',
+    //         editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid({
+    //             name: 'Name 3',
+    //             agents: [
+    //                 {
+    //                     state: 'idle',
+    //                     name: '981srv',
+    //                     count: 1,
+    //                     status: 'active'
+    //                 },
+    //                 {
+    //                     state: 'busy',
+    //                     name: '983srv',
+    //                     count: 10,
+    //                     status: 'active'
+    //                 },
+    //                 {
+    //                     state: 'inactive',
+    //                     name: '985srv',
+    //                     count: 3,
+    //                     status: 'inactive'
+    //                 }
+    //             ]
+    //         })} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,
+    //         deleteIcon: <img onClick={() => deleteGridConfig()} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
+    //     }
+    // ]);
     const listHeaders = [
         {
             data: {
@@ -143,18 +167,6 @@ const GridList = ({ setShowConfirmPop, showMessageBar }) => {
     const dialogBody = () => {
         if(selectedTab === 'windows') {
             return (
-                <div>
-                    <p>System Prerequisites</p>
-                </div>
-            );
-        } else if(selectedTab === 'mac') {
-            return (
-                <div>
-                    <p>System Prerequisites</p>
-                </div>
-            );
-        } else {
-            return (
                 <div className='grid_download_dialog__content'>
                     <div className='grid_download_dialog__prerequisite'>
                         <div className='grid_download_dialog__prerequisite__header'>
@@ -190,10 +202,94 @@ const GridList = ({ setShowConfirmPop, showMessageBar }) => {
                     </pre>
                 </div>
             );
+        } else if(selectedTab === 'mac') {
+            return (
+                <div>
+                    <p>System Prerequisites</p>
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <p>System Prerequisites</p>
+                </div>
+            );
         }
     }
+    const onDownloadAgentClick = () => {
+        // const link = document.createElement('a');
+        // link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
+        // console.log(window.location.origin.split("//")[1]);
+        // link.setAttribute('download', "avoURL.txt");
+        // document.body.appendChild(link);
+        // link.click();
+        // document.body.removeChild(link);
+        window.location.href = window.location.origin+"/downloadAgent";
+
+        // const link = document.createElement('a');
+        // const file = new Blob([window.location.origin.split("//")[1]], {type: 'text/plain'});
+        // link.href = URL.createObjectURL(file);
+        // link.download = 'avoURL.txt';
+        // document.body.appendChild(link);
+        // link.click();
+        // URL.revokeObjectURL(link.href);
+        // document.body.removeChild(link);
+
+        // getAgent();
+        // const gridAgentList = await getAgent();
+        // if(gridAgentList.error) {
+        //     if(gridAgentList.error.CONTENT) {
+        //         setMsg(MSG.CUSTOM(gridAgentList.error.CONTENT,VARIANT.ERROR));
+        //     } else {
+        //         setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
+        //     }
+        // }else {
+        //     setIcepoollist([ ...gridAgentList.avoagents.map((agent) => ({key: agent._id, text: agent.name})), ...gridAgentList.avogrids ]);
+        // }
+    }
+    useEffect( () => {
+        (async () => {
+            setLoading('Loading...');
+            const gridList = await fetchAvoAgentAndAvoGridList({
+                query: 'avoGridList'
+            });
+            console.log(gridList);
+            if(gridList.error) {
+                if(gridList.error.CONTENT) {
+                    setMsg(MSG.CUSTOM(gridList.error.CONTENT,VARIANT.ERROR));
+                } else {
+                    setMsg(MSG.CUSTOM("Error While Fetching Grid List",VARIANT.ERROR));
+                }
+            }else {
+                setGridList(gridList.avogrids);
+            }
+            setLoading(false);
+        }
+        )();
+    },[]);
+    const fetchGridList = (bool) => {
+        setCurrentGrid(bool);
+        (async () => {
+            setLoading('Loading...');
+            const gridList = await fetchAvoAgentAndAvoGridList({
+                query: 'avoGridList'
+            });
+            console.log(gridList);
+            if(gridList.error) {
+                if(gridList.error.CONTENT) {
+                    setMsg(MSG.CUSTOM(gridList.error.CONTENT,VARIANT.ERROR));
+                } else {
+                    setMsg(MSG.CUSTOM("Error While Fetching Grid List",VARIANT.ERROR));
+                }
+            }else {
+                setGridList(gridList.avogrids);
+            }
+            setLoading(false);
+        }
+        )();
+    }
     return (
-            (currentGrid) ? <CreateGrid setCurrentGrid={setCurrentGrid} currentGrid={currentGrid} /> : 
+            (currentGrid) ? <CreateGrid setCurrentGrid={fetchGridList} currentGrid={currentGrid} showMessageBar={showMessageBar} setLoading={setLoading} /> : 
             <>
                 <Dialog
                     hidden = {hideDialog}
@@ -204,6 +300,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar }) => {
                     declineText = ''
                     leftText = 'Download'
                     leftButtonProps = {{ icon: 'download' }}
+                    onLeftClick={onDownloadAgentClick}
                     content = {<div>
                         <Tab options={[
                             { key: 'windows', text: 'Windows' },
@@ -238,7 +335,11 @@ const GridList = ({ setShowConfirmPop, showMessageBar }) => {
                     </> }
                 </div>
                 { gridList.length > 0 ? <div style={{ position: 'absolute', width: '100%', height: '82%', marginTop: '1.5%' }}>
-                    <DetailsList columns={listHeaders} items={(searchText.length > 0) ? filteredList : gridList} layoutMode={1} selectionMode={0} variant="variant-two" />
+                    <DetailsList columns={listHeaders} items={((searchText.length > 0) ? filteredList : gridList).map((grid) => ({
+                        name: grid.name,
+                        editIcon: <img style={{ marginRight: '10%' }} onClick={() => setCurrentGrid(grid)} src="static/imgs/EditIcon.svg" className="agents__action_icons" alt="Edit Icon"/>,
+                        deleteIcon: <img onClick={() => deleteGridConfig(grid._id)} src="static/imgs/DeleteIcon.svg" className="agents__action_icons" alt="Delete Icon"/>
+                    }))} layoutMode={1} selectionMode={0} variant="variant-two" />
                 </div> : <div className="no_config_img"> <img src="static/imgs/empty-config-list.svg" alt="Empty List Image"/> </div> }
             </>
     );
