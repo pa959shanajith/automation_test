@@ -410,6 +410,18 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         invokinguserrole: session.activeRoleId || session.role,
     };
 
+    // check a job is already scheduled for a particular time
+    const addressList = multiExecutionData.batchInfo.map(u => u.targetUser);
+    const dateTimeList = multiExecutionData.batchInfo.map(u => u.time)
+    var inputs = {
+        "query": "checkrecurringscheduleddetails",
+        "scheduledatetime": dateTimeList,
+        "targetaddress": addressList
+    };
+    
+    const chkResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
+    if (chkResult != -1) return (chkResult == "fail") ? "fail" : { "status": "booked", "user": addressList[chkResult] };
+
     let timeSelected = multiExecutionData.batchInfo[0].time;
     let timestamp = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeSelected.split(':')[0]), parseInt(timeSelected.split(':')[1]))
     let createdDate = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), new Date(new Date().getHours()), new Date(new Date().getMinutes()))
