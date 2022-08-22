@@ -325,12 +325,12 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                         name: '',
                         agents: []
                     })} >New Grid</button>
+                    <div>
+                        <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Click <a style={{ textDecoration: 'underline', color: 'blueviolet', cursor: 'pointer' }} onClick={() => setHideDialog(!hideDialog)}>here</a> to get the Agent </span>
+                    </div>
                     { gridList.length > 0 && <>
                         <div className='searchBoxInput'>
                             <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
-                        </div>
-                        <div>
-                            <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Click <a style={{ textDecoration: 'underline', color: 'blueviolet', cursor: 'pointer' }} onClick={() => setHideDialog(!hideDialog)}>here</a> to get the Agent </span>
                         </div>
                     </> }
                 </div>

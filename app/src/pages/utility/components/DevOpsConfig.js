@@ -120,6 +120,7 @@ const DevOpsConfig = props => {
                 setDict(newDict);
                 setIntegrationConfig({...integrationConfig, selectValues: newSelectValues});
             }
+            props.currentIntegration && props.currentIntegration.executionRequest && props.currentIntegration.executionRequest.avoagents && props.currentIntegration.executionRequest.avoagents.length > 0 && setIntegrationConfig({...integrationConfig, avoAgentGrid: props.currentIntegration.executionRequest.avoagents[0]});
             props.setLoading(false);
         })()
     }, []);
