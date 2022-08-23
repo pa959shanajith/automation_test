@@ -34,7 +34,6 @@ const MindmapHome = () => {
     
   }
   const setOptions1 = (data) =>{
-    debugger;
     setOptions(data)
   }
   const displayError = (error) =>{
@@ -68,7 +67,7 @@ function jsonDownload(filename, responseData) {
         0, 0, 0, 0, 0, false, false, false, false, 0, null);
     a.dispatchEvent(e);
 }
-  const Component = (!options)? null : createType[options];
+  var Component = (!options)? null : createType[options];
   return (
     <div className='mp__container'>
       <Header/> 

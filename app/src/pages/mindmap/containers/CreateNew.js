@@ -11,7 +11,6 @@ import ExportMapButton from '../components/ExportMapButton';
 import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils';
 import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
-import DeleteScenarioPopUp from '../components/DeleteScenarioPopup'
 
 /*Component CreateNew
   use: renders create New Mindmap page
@@ -20,7 +19,6 @@ import DeleteScenarioPopUp from '../components/DeleteScenarioPopup'
 const CreateNew = ({importRedirect}) => {
   const dispatch = useDispatch()
   const [blockui,setBlockui] = useState({show:false})
-  const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
   const [fullScreen,setFullScreen] = useState(false)
   const [verticalLayout,setVerticalLayout] = useState(false)
   const [loading,setLoading] = useState(true)
@@ -38,7 +36,7 @@ const CreateNew = ({importRedirect}) => {
         }
         setInfo(dict)
     }
-  },[selectProj])
+  },[selectProj,prjList])
   useEffect(()=>{
     (async()=>{
         setBlockui({show:true,content:'Loading modules ...'})
@@ -70,7 +68,6 @@ const CreateNew = ({importRedirect}) => {
   return (
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-        {(delSnrWarnPop)? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} displayError={displayError}/>:null}
         {(!loading)?
             <div className='mp__canvas_container'>
                 <div className='mp__toolbar__container'>
@@ -79,7 +76,7 @@ const CreateNew = ({importRedirect}) => {
                 <ModuleListDrop />
                 <div id='mp__canvas' className='mp__canvas'>
                     {(Object.keys(moduleSelect).length>0)?
-                    <CanvasNew displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
+                    <CanvasNew displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
                     :<Fragment>
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>

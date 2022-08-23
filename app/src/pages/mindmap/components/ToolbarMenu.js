@@ -26,7 +26,7 @@ const Toolbarmenu = ({setBlockui,displayError}) => {
     const [modlist,setModList] = useState(moduleList)
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
-        dispatch({type:actionTypes.SELECT_PROJECT,payload:prjList[proj]})
+        dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
         var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(proj)

@@ -36,8 +36,8 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
         modalClass = 'modal-md'
         title='Import Modules'
         close={()=>setImportPop(false)}
-        footer={<Footer error={error} setSubmit={setSubmit}/>}
-        content={<Container submit={submit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} />} 
+        footer={<Footer error={error} disableSubmit={disableSubmit} setSubmit={setSubmit}/>}
+        content={<Container submit={submit} setMindmapData={setMindmapData} mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}/>} 
       />
     )
 }
