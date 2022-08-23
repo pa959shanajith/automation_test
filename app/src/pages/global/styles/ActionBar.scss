@@ -1,4 +1,28 @@
 @import "../../global/styles/ColorVariables.scss";
+
+.ss__body, .s__body, .d__body, .e__body {
+  .action__bar {
+    background: #fff;
+    border-right: 1px solid #0000001a;
+  }
+
+  .action__wrapper {
+    color: #000000;
+  }
+
+  .caret__action_bar {
+    color: black;
+  }
+
+  .ab__upper_contents {
+    border-bottom: 1px solid #ccc;
+  }
+
+  .action__contents {
+    font-family: Mulish;
+  }
+}
+ 
 .action__bar{
     // width: 166px;
     background: $primaryColor;
@@ -78,7 +102,9 @@
 .ab__bottom_contents{
     font-size: 16px;
     .thumbnail__title{
-        font-size: 16px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: Mulish;
     }
     .thumbnail{
         margin: 12% 0 13%;

@@ -51,11 +51,11 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
     }, [current_task])
 
     const WebList = [
-        {'title': "Internet Explorer", 'tooltip':"Debug on Intenet Explorer", 'img': "static/imgs/ic-ie.png", action: ()=>debugTestCases('3'), 'disable': disable}, 
-        {'title': "Google Chrome", 'tooltip':"Debug on Chrome", 'img': "static/imgs/ic-chrome.png", action: ()=>debugTestCases('1'), 'disable': disable},
-        {'title': "Mozilla Firefox", 'tooltip':"Debug on Firefox", 'img': "static/imgs/ic-mozilla.png", action: ()=>debugTestCases('2'), 'disable': disable},
-        {'title': "Microsoft Edge", 'tooltip':"Debug on Microsoft Edge", 'svg': "static/imgs/ic-edge.svg", action: ()=>debugTestCases('7'), 'disable': disable},
-        {'title': "Edge Chromium", 'tooltip':"Debug on MS Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg", action: ()=>debugTestCases('8'), 'disable': disable}
+        {'title': "Internet Explorer", 'tooltip':"Debug on Intenet Explorer", 'img': "static/imgs/internet_explorer_logo_new.svg", action: ()=>debugTestCases('3'), 'disable': disable}, 
+        {'title': "Google Chrome", 'tooltip':"Debug on Chrome", 'img': "static/imgs/chrome_logo_new.svg", action: ()=>debugTestCases('1'), 'disable': disable},
+        {'title': "Mozilla Firefox", 'tooltip':"Debug on Firefox", 'img': "static/imgs/firefox_logo_new.svg", action: ()=>debugTestCases('2'), 'disable': disable},
+        {'title': "Microsoft Edge", 'tooltip':"Debug on Microsoft Edge", 'svg': "static/imgs/edge_logo_new.svg", action: ()=>debugTestCases('7'), 'disable': disable},
+        {'title': "Edge Chromium", 'tooltip':"Debug on MS Edge Chromium", 'svg': "static/imgs/edge_logo_new.svg", action: ()=>debugTestCases('8'), 'disable': disable}
         ]
     
     const oebsList = [{'title': "OEBS Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
