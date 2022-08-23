@@ -17,7 +17,7 @@ const ExecuteHome = () => {
     const [appType, setAppType] = useState(null);
     const [syncScenario, setSyncScenario] = useState(false);
     const [readTestSuite,setreadTestSuite] = useState("");
-    const isMac = navigator.appVersion.indexOf("Mac") !== -1;
+    const isMac = navigator.appVersion.toLowerCase().indexOf("mac") !== -1;
     var versionnumber;
     
     useEffect(()=>{
