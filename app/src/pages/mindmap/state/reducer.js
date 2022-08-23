@@ -8,6 +8,7 @@ const initialState = {
     searchModule: undefined,
     initEnEProj: undefined,
     selectedModule: {},
+    selectedModulelist:[],
     selectBoxState: false,
     selectNodes: {nodes:[],links:[]},
     copyNodes: {nodes:[],links:[]},
@@ -55,6 +56,11 @@ const reducer = (state = initialState , action) => {
                 ...state,
                 selectedModule: action.payload
             }
+        case actionTypes.SELECT_MODULELIST:
+            return{
+                ...state,
+                selectedModulelist: action.payload
+            }            
         case actionTypes.SELECT_SELECTBOX:
             return{
                 ...state,
@@ -87,6 +93,7 @@ const reducer = (state = initialState , action) => {
                 deletedNodes: [],
                 moduleList: action.payload.moduledata,
                 selectedModule: {},
+                selectedModulelist: [],
                 scenarioList:[],
                 unassignTask:[]
             }

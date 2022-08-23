@@ -24,7 +24,7 @@ const CreateOptions = (props) => {
   return (
     <Fragment>
       {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-      {importPop?<ImportMindmap setBlockui={setBlockui} setOptions={props.setOptions} displayError={displayError} setImportPop={setImportPop}/>:null}
+      {importPop?<ImportMindmap setBlockui={setBlockui} setOptions={props.setOptions} displayError={displayError} setImportPop={setImportPop} isMultiImport={false}/>:null}
       <div className='mindmap__option-container'>
         <div>
           {options.map((e,i)=>(

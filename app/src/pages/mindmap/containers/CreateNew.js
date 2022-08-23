@@ -38,7 +38,7 @@ const CreateNew = ({importRedirect}) => {
         }
         setInfo(dict)
     }
-  },[selectProj,prjList])
+  },[selectProj])
   useEffect(()=>{
     (async()=>{
         setBlockui({show:true,content:'Loading modules ...'})
@@ -47,8 +47,8 @@ const CreateNew = ({importRedirect}) => {
         var data = parseProjList(res)
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
         if(!importRedirect){
-            dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
-            var moduledata = await getModules({"tab":"tabCreate","projectid":res.projectId[0],"moduleid":null})
+            dispatch({type:actionTypes.SELECT_PROJECT,payload:selectProj?selectProj:res.projectId[0]}) 
+            var moduledata = await getModules({"tab":"tabCreate","projectid":selectProj?selectProj:res.projectId[0],"moduleid":null})
             if(moduledata.error){displayError(moduledata.error);return;}
             var screendata = await getScreens(res.projectId[0])
             if(screendata.error){displayError(screendata.error);return;}

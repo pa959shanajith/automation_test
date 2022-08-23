@@ -5,7 +5,7 @@ import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import {Messages as MSG, setMsg} from '../../global';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
 
 
 /*Component ToolbarMenu
@@ -21,10 +21,12 @@ const Toolbarmenu = ({setBlockui,displayError}) => {
     const prjList = useSelector(state=>state.mindmap.projectList)
     const initProj = useSelector(state=>state.mindmap.selectedProj)
     const moduleList = useSelector(state=>state.mindmap.moduleList)
+    // const selectedModule = useSelector(state=>state.mindmap.selectedModule)
+    // const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
     const [modlist,setModList] = useState(moduleList)
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
-        dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
+        dispatch({type:actionTypes.SELECT_PROJECT,payload:prjList[proj]})
         var moduledata = await getModules({"tab":"tabCreate","projectid":proj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(proj)
@@ -33,7 +35,10 @@ const Toolbarmenu = ({setBlockui,displayError}) => {
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
-        SearchInp.current.value = ""
+        if(SearchInp){
+            SearchInp.current.value = ""
+        }
+        
         setBlockui({show:false})
     }
     const searchModule = (val) =>{
@@ -43,6 +48,9 @@ const Toolbarmenu = ({setBlockui,displayError}) => {
     const CreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
     }
+    // const exportSelectedModules = () => {
+    //     toJSON(selectedModulelist.length>0?selectedModulelist:selectedModule,'File',displayError);
+    // }
     const clickSelectBox = () =>{
         d3.select('#pasteImg').classed('active-map',false)
         d3.select('#copyImg').classed('active-map',false)
@@ -96,11 +104,45 @@ const Toolbarmenu = ({setBlockui,displayError}) => {
                 <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
                 <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
             </span>
+            {/* <button data-test="exportModules" disabled ={selectedModulelist.length==0} className='btn' title="Export Modules" onClick={()=>exportSelectedModules()}>Export Modules</button> */}
             <button data-test="createNew" className='btn' title="Create New Mindmap" onClick={()=>CreateNew()}>Create New</button>
         </div>
         </Fragment>
     )
 }
+/*
+    function : toJSON()
+    Purpose : Exporting Module in json file
+    param :
+*/
+// const toJSON = async(module,fname,displayError) => {
+//     try{
+//         var result =  await exportMindmap(Array.isArray(module)?module:module._id)
+//         if(result.error){displayError(result.error);return;}
+//         jsonDownload(fname+'.mm', JSON.stringify(result));
+//         setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
+//     }catch(err){
+//         console.error(err)
+//         displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
+//     }
+// }
+
+/*
+function : jsonDownload()
+Purpose : download json file
+*/
+
+// function jsonDownload(filename, responseData) {
+//     var blob = new Blob([responseData], { type: 'text/json' });
+//     var e = document.createEvent('MouseEvents');
+//     var a = document.createElement('a');
+//     a.download = filename;
+//     a.href = window.URL.createObjectURL(blob);
+//     a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+//     e.initMouseEvent('click', true, true, window,
+//         0, 0, 0, 0, 0, false, false, false, false, 0, null);
+//     a.dispatchEvent(e);
+// }
 
 //check for paste errors and paste action
 const paste = (copyNodes) =>{
@@ -169,3 +211,6 @@ Toolbarmenu.propTypes={
     displayError:PropTypes.func
 }
 export default Toolbarmenu;
+
+
+         
