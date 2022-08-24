@@ -20,9 +20,9 @@ const MindmapHome = () => {
   const [options,setOptions] = useState(undefined)
   const [importPop,setImportPop] = useState(false)
   const [blockui,setBlockui] = useState({show:false})
-  const selectedModule = useSelector(state=>state.mindmap.selectedModule)
-  const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
-  const selectedProj = useSelector(state=>state.mindmap.selectedProj)
+  // const selectedModule = useSelector(state=>state.mindmap.selectedModule)
+  // const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
+  // const selectedProj = useSelector(state=>state.mindmap.selectedProj)
   
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
@@ -41,9 +41,9 @@ const MindmapHome = () => {
     setMsg(error)
   }
  
-  const exportSelectedModules = () => {
-   toJSON(selectedModulelist.length>0?selectedModulelist:selectedModule,selectedProj,displayError);
-}
+//   const exportSelectedModules = () => {
+//    toJSON(selectedModulelist.length>0?selectedModulelist:selectedModule,selectedProj,displayError);
+// }
 const toJSON = async(module,fname,displayError) => {
   try{
       var result =  await exportMindmap(Array.isArray(module)?module:module._id)
@@ -86,10 +86,10 @@ function jsonDownload(filename, responseData) {
               <img onClick={()=>{setOptions('importmodules');setImportPop(true);}} alt='Import Modules' className={"thumb__ic"+(options==='importmodules'? " selected_rb_thumb":"")} src="static/imgs/ic-import-script.png"/>
               <span className="rb_box_title">Import Modules</span>
             </div>
-            <div className="ic_box" title="Export Modules">
+            {/* <div className="ic_box" title="Export Modules">
               <img onClick={()=>exportSelectedModules()} alt='Export Modules' className={"thumb__ic"+(options==='exportmodules'? " selected_rb_thumb":"")} src="static/imgs/ic-export-script.png"/>
               <span className="rb_box_title">Export Modules</span>
-            </div>
+            </div> */}
           </div> 
       </ActionBar>
         {(!options)?
