@@ -11,6 +11,9 @@ import ExportMapButton from '../components/ExportMapButton';
 import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils';
 import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
+import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
+
+
 
 /*Component CreateNew
   use: renders create New Mindmap page
@@ -26,6 +29,8 @@ const CreateNew = ({importRedirect}) => {
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
   const selectProj = useSelector(state=>state.mindmap.selectedProj)
   const prjList = useSelector(state=>state.mindmap.projectList)
+  const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
+
 
   useEffect(()=>{
     if(selectProj && prjList[selectProj]){
@@ -68,6 +73,7 @@ const CreateNew = ({importRedirect}) => {
   return (
     <Fragment>
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
+        {(delSnrWarnPop)? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} displayError={displayError}/>:null}
         {(!loading)?
             <div className='mp__canvas_container'>
                 <div className='mp__toolbar__container'>
@@ -76,7 +82,7 @@ const CreateNew = ({importRedirect}) => {
                 <ModuleListDrop />
                 <div id='mp__canvas' className='mp__canvas'>
                     {(Object.keys(moduleSelect).length>0)?
-                    <CanvasNew displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
+                    <CanvasNew displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
                     :<Fragment>
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
