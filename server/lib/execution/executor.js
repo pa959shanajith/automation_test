@@ -300,8 +300,9 @@ class TestSuiteExecutor {
         logger.info("Sending request to ICE for executeTestSuite");
         const dataToIce = { "emitAction": "executeTestSuite", "username": icename, "executionRequest": execReq };
         if(execReq['configurekey'] && execReq['configurekey']!='' && execReq['configurename'] && execReq['configurename']!=''){
-            const status = await utils.fetchData(dataToIce, "devops/configurekey", fnName);
+            const status = await utils.fetchData(dataToIce, "devops/executionList", fnName);
             if (status == "fail" || status == "forbidden") return "fail";
+            // return 'CICD'
         }
         else{
             redisServer.redisPubICE.publish('ICE1_' + channel + '_' + icename, JSON.stringify(dataToIce));
@@ -470,11 +471,13 @@ class TestSuiteExecutor {
         executionRequest.executionIds = executionRequest.testsuiteIds.map(i => currExecIds.execids[i]);
         executionRequest.avogridid = batchExecutionData.avogridid;
         executionRequest.configurekey = batchExecutionData.configurekey;
+        // executionRequest.configurekey = "3524a385-943d-40c8-9576-b978bcbc50b4";
         executionRequest.configurename = batchExecutionData.configurename;
         executionRequest.executiontype = batchExecutionData.executiontype;
         executionRequest.executionmode = batchExecutionData.executionmode;
         executionRequest.avoagents = batchExecutionData.avoagents;
         executionRequest.invokinguser = userInfo.invokinguser;
+        executionRequest.executionListId = batchExecutionData.executionListId;
         if (execType == "SCHEDULE") executionRequest.scheduleId = batchExecutionData.scheduleId;
         const result = await this.executionRequestToICE(executionRequest, execType, userInfo);
         return result;

@@ -390,7 +390,7 @@ export const getPools = async(data) => {
 
 export const storeConfigureKey = async(props) => {
     try{
-        const res = await axios(url+'/ExecuteTestSuite_ICE', {
+        const res = await axios(url+'/storeConfigureKey', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

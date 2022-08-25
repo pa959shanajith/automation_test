@@ -1,5 +1,5 @@
 const utils = require('../utils');
-var uuid = require('uuid-random');
+var uuidV4 = require('uuid-random');
 const redisServer = require('../redisSocketHandler');
 const cache = require("../cache.js").getClient(2);
 var logger = require('../../../logger.js');
@@ -12,6 +12,7 @@ const { default: async } = require('async');
 const { timestamp } = require('winston/lib/winston/common');
 const { info } = require('winston');
 const { update } = require('../../notifications');
+const suitFunctions = require('../../controllers/suite');
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -229,7 +230,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     response["message"] = targetICE + " not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."
                 } else {
                     if(batchExecutionData['configurekey'] && batchExecutionData['configurekey'] != '' && batchExecutionData['configurename'] && batchExecutionData['configurename'] != '' ){
-                        this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
+                        await this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
                     }
                     response['status'] = "pass";
                     response["message"] = "ICE not selected."
@@ -576,54 +577,102 @@ module.exports.Execution_Queue = class Execution_Queue {
         response["message"] = "N/A";
         response['error'] = "None";
         try {
+
+        // New IMPLementation.
+        const inputs = {
+            'key': req.body.key,
+            'query': 'fetchExecutionData'
+        }
+        const executionData = await utils.fetchData(inputs, "devops/configurekey", fnName);
+        const newExecutionListId = uuidV4()
+        executionData['executionData']['executionListId'] = newExecutionListId;
+        const response = await suitFunctions.ExecuteTestSuite_ICE({
+            'body': executionData,
+            'session':executionData.session
+        });
+
+
+        if(!(req.body.key in this.key_list))
+            this.key_list[req.body.key] = [];
+
+        let keyQueue = this.key_list[req.body.key];
+        // testSuiteInfo = await utils.fetchData(key,'/',);
+        const inputsToGetTestSuite = {
+            'executionListId': newExecutionListId,
+            'key': req.body.key
+        }
+        let Info = await utils.fetchData(inputsToGetTestSuite, "devops/getTestSuite", fnName);
+        let testSuiteInfo = Info.testSuiteInfo;
+        // let avogridid = Info.avogridid;
+        console.info(testSuiteInfo);
+
+        let newExecutionList = []
+        for (let ids of testSuiteInfo)
+            newExecutionList.push({
+                executionListId:Info.executionListId,
+                moduleid:ids,status: 'QUEUED',
+                version:Info.version,
+                avoagentList:Info.avoagentList});
+
+        keyQueue.push(newExecutionList);
+
+        // this.key_list = [];
+        await cache.set("execution_list", this.key_list);
+        let execution_Queue = await cache.get('execution_list');
+        console.info(execution_Queue);
+
+
+
+
+            //prev-IMPLementation
             //TO-DO Apply a check whether such key exists or not.
 
-            if(!(req.body.key in this.key_list))
-                this.key_list[req.body.key] = [];
+        //     if(!(req.body.key in this.key_list))
+        //         this.key_list[req.body.key] = [];
 
-            let keyQueue = this.key_list[req.body.key];
-            // testSuiteInfo = await utils.fetchData(key,'/',);
-            let Info = await utils.fetchData(req.body, "devops/getTestSuite", fnName);
-            let testSuiteInfo = Info.testSuiteInfo;
-            // let avogridid = Info.avogridid;
-            console.info(testSuiteInfo);
+        //     let keyQueue = this.key_list[req.body.key];
+        //     // testSuiteInfo = await utils.fetchData(key,'/',);
+        //     let Info = await utils.fetchData(req.body, "devops/getTestSuite", fnName);
+        //     let testSuiteInfo = Info.testSuiteInfo;
+        //     // let avogridid = Info.avogridid;
+        //     console.info(testSuiteInfo);
 
-            let newExecutionList = []
-            for (let ids of testSuiteInfo)
-                newExecutionList.push({
-                    executionListId:Info.executionListId,
-                    moduleid:ids,status: 'QUEUED',
-                    version:Info.version,
-                    avoagentList:Info.avoagentList});
+        //     let newExecutionList = []
+        //     for (let ids of testSuiteInfo)
+        //         newExecutionList.push({
+        //             executionListId:Info.executionListId,
+        //             moduleid:ids,status: 'QUEUED',
+        //             version:Info.version,
+        //             avoagentList:Info.avoagentList});
 
-            keyQueue.push(newExecutionList);
+        //     keyQueue.push(newExecutionList);
 
-            // this.key_list = [];
-            await cache.set("execution_list", this.key_list);
-            let execution_Queue = await cache.get('execution_list');
-            console.info(execution_Queue);
+        //     // this.key_list = [];
+        //     await cache.set("execution_list", this.key_list);
+        //     let execution_Queue = await cache.get('execution_list');
+        //     console.info(execution_Queue);
 
-            //Fetching the Agents for Task List
-            // let taskList = this.task_list;
-            // // testSuiteInfo = await utils.fetchData(key,'/',);
-            // //TO-DO Apply check whether directly agent is mentioned.
-            // let agents = await utils.fetchData({'avogridid':avogridid}, "devops/getAgents", fnName);
-            // console.info(agents);
+        //     //Fetching the Agents for Task List
+        //     // let taskList = this.task_list;
+        //     // // testSuiteInfo = await utils.fetchData(key,'/',);
+        //     // //TO-DO Apply check whether directly agent is mentioned.
+        //     // let agents = await utils.fetchData({'avogridid':avogridid}, "devops/getAgents", fnName);
+        //     // console.info(agents);
 
-            // for (let ids of agents)
-            //     taskList.push({'avogentid':ids.avoagentid,'key': req.body.key});
+        //     // for (let ids of agents)
+        //     //     taskList.push({'avogentid':ids.avoagentid,'key': req.body.key});
 
-            // // this.key_list = [];
-            // await cache.set("task_list", this.task_list);
-            // let task_queue = await cache.get('task_list');
-            // console.info(task_queue);
+        //     // // this.key_list = [];
+        //     // await cache.set("task_list", this.task_list);
+        //     // let task_queue = await cache.get('task_list');
+        //     // console.info(task_queue);
 
-            if(Info.executiontype == 'asynchronous'){
-                response['status'] = "pass";
-                return response;
-            }
-            synchronousFlag = await this.checkForCompletion(req.body.key,Info.executionListId);
-            if(synchronousFlag) response['status'] = 'pass';
+        if(Info.executiontype == 'asynchronous'){
+            response['status'] = "pass";
+            return response;
+        }
+        //     synchronousFlag = await this.checkForCompletion(req.body.key,Info.executionListId);
+        //     if(synchronousFlag) response['status'] = 'pass';
 
         } catch (error) {
             console.info(error);
@@ -765,7 +814,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                         for(let testSuites of entries) {
                             moduleIndex++;
                             if(testSuites['status'] == 'QUEUED') {
-                                executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuites.moduleid,'version':testSuites['version']}, "devops/getExecScenario", fnName);
+                                executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}, "devops/getExecScenario", fnName);
                                 if (executionData == "fail" || executionData == "forbidden") {
                                     response['status'] = "fail";
                                     return response;
@@ -825,6 +874,8 @@ module.exports.Execution_Queue = class Execution_Queue {
             "report": JSON.stringify(reportData),
             "modifiedby": userInfo.invokinguser,
             "modifiedbyrole": userInfo.invokinguserrole,
+            // "configkey": configkey,
+            // "executionListId": executionListId,
             "query": "insertreportquery"
         };
         const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
@@ -837,35 +888,45 @@ module.exports.Execution_Queue = class Execution_Queue {
         response["message"] = "N/A";
         response['error'] = "None";
         try {
-            const resultData = req.body;
-            // const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
-            // var d2R = {};
-            // if (execType == "API") {
-            //     if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = { "testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {} };
-            //     if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
-            //     d2R[testsuiteid].scenarios[scenarioid].push({ scenarioname, scenarioid, "overallstatus": "Not Executed" });
-            // }
-            // if (Object.keys(reportData.overallstatus).length !== 0) {
-            //     const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
-            //     const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
-            //     reportData.overallstatus.browserType = browserType;
-            //     if (execType == "API") {
-            //         const cidx = d2R[testsuiteid].scenarios[scenarioid].length - 1;
-            //         d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus };
-            //     }
-            //     const reportStatus = reportData.overallstatus.overallstatus;
-            //     const reportid = await this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
-            //     const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy };
-            //     if (reportid == "fail") {
-            //         logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
-            //         reportItem[reportid] = '';
-            //     } else {
-            //         logger.info("Successfully inserted report data");
-            //         logger.debug("Successfully inserted report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
-            //     }
-            //     // testsuite.reportData[scenarioIndex] = reportItem;
-            //     testsuite.reportData.push(reportItem);
-            // }
+            const resultData = req.body.exce_data;
+            const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
+            const executionid = (resultData) ? resultData.executionId : "";
+            const testsuiteid = resultData.testsuiteId;
+            const scenarioid = resultData.scenarioId;
+            let d2R = {},execType = 'Active';
+            let execReq = {
+                'apptype': '',
+            };
+            let userInfo = {
+                invokinguser: '267ad96f374e4b06344f039c',
+                invokinguserrole: 'f048d7303be440b943dd80f4'
+            };
+            if (execType == "API") {
+                if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = { "testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {} };
+                if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
+                d2R[testsuiteid].scenarios[scenarioid].push({ scenarioname, scenarioid, "overallstatus": "Not Executed" });
+            }
+            if (Object.keys(reportData.overallstatus).length !== 0) {
+                const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
+                const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
+                reportData.overallstatus.browserType = browserType;
+                if (execType == "API") {
+                    const cidx = d2R[testsuiteid].scenarios[scenarioid].length - 1;
+                    d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus };
+                }
+                const reportStatus = reportData.overallstatus.overallstatus;
+                const reportid = await this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
+                // const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy };
+                if (reportid == "fail") {
+                    logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
+                    reportItem[reportid] = '';
+                } else {
+                    logger.info("Successfully inserted report data");
+                    logger.debug("Successfully inserted report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
+                }
+                // testsuite.reportData[scenarioIndex] = reportItem;
+                // testsuite.reportData.push(reportItem);
+            }
 
             //Changing the status and Deleting if completed.. from the cache
             let keyQueue = this.key_list[resultData.configkey];
@@ -879,7 +940,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     let moduleIndex = -1;
                     for (let testSuite of executionList){
                         moduleIndex++;
-                        if(testSuite.moduleid == resultData.moduleid){
+                        if(testSuite.moduleid == resultData.testsuiteId){
                             this.key_list[resultData.configkey][listIndex][moduleIndex]['status'] = 'COMPLETED'
                             await cache.set("execution_list", this.key_list);
                             console.info(this.key_list);
@@ -895,7 +956,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                 }
             }
             if(statusCount){
-                await cache.set("execution_list", updatedKeyQueue);
+                this.key_list[resultData.configkey] = updatedKeyQueue
+                await cache.set("execution_list", this.key_list);
                 console.info(await cache.get('execution_list'));
             }
 
