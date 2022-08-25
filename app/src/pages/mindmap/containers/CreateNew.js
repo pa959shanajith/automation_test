@@ -11,7 +11,9 @@ import ExportMapButton from '../components/ExportMapButton';
 import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils';
 import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
-import DeleteScenarioPopUp from '../components/DeleteScenarioPopup'
+import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
+
+
 
 /*Component CreateNew
   use: renders create New Mindmap page
@@ -20,7 +22,6 @@ import DeleteScenarioPopUp from '../components/DeleteScenarioPopup'
 const CreateNew = ({importRedirect}) => {
   const dispatch = useDispatch()
   const [blockui,setBlockui] = useState({show:false})
-  const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
   const [fullScreen,setFullScreen] = useState(false)
   const [verticalLayout,setVerticalLayout] = useState(false)
   const [loading,setLoading] = useState(true)
@@ -28,6 +29,8 @@ const CreateNew = ({importRedirect}) => {
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
   const selectProj = useSelector(state=>state.mindmap.selectedProj)
   const prjList = useSelector(state=>state.mindmap.projectList)
+  const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
+
 
   useEffect(()=>{
     if(selectProj && prjList[selectProj]){
@@ -47,8 +50,8 @@ const CreateNew = ({importRedirect}) => {
         var data = parseProjList(res)
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
         if(!importRedirect){
-            dispatch({type:actionTypes.SELECT_PROJECT,payload:res.projectId[0]}) 
-            var moduledata = await getModules({"tab":"tabCreate","projectid":res.projectId[0],"moduleid":null})
+            dispatch({type:actionTypes.SELECT_PROJECT,payload:selectProj?selectProj:res.projectId[0]}) 
+            var moduledata = await getModules({"tab":"tabCreate","projectid":selectProj?selectProj:res.projectId[0],"moduleid":null})
             if(moduledata.error){displayError(moduledata.error);return;}
             var screendata = await getScreens(res.projectId[0])
             if(screendata.error){displayError(screendata.error);return;}

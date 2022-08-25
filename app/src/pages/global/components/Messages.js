@@ -303,6 +303,7 @@ const Messages={
         ERR_GIT_ACCESS_TOKEN: {"CONTENT":"Error in Git configuration: Invalid Git access token.", "VARIANT": VARIANT.ERROR},
         ERR_EXPORT_GITT: {"CONTENT":'Error while exporting to Git.', "VARIANT": VARIANT.ERROR},
         ERR_EXPORT_DATA: {"CONTENT":'Failed to export data.', "VARIANT": VARIANT.ERROR},
+        ERR_IMPORT_DATA: {"CONTENT":'Failed to import data.', "VARIANT": VARIANT.ERROR},
         ERR_INVALID_MODULE_NAME: {"CONTENT":'Some node names are invalid.', "VARIANT": VARIANT.ERROR},
         ERR_NO_NODES_CREATE: {"CONTENT":'No nodes to create.', "VARIANT": VARIANT.ERROR},
         ERR_SAVE: {"CONTENT":'Error while Saving.', "VARIANT": VARIANT.ERROR},
@@ -317,9 +318,9 @@ const Messages={
         ERR_NOTIFICATION_CONFIG: {"CONTENT":'Failed to fetch Notification Configuration.', "VARIANT": VARIANT.ERROR},
         ERR_UPDATE_NOTIFICATION_RULES: {"CONTENT":'Failed to Update Notification Rules.', "VARIANT": VARIANT.ERROR},
         ERR_DELETE_SCENARIO: {"CONTENT":'Error while deleting scenarios.', "VARIANT": VARIANT.ERROR},
-
         SUCC_NODE_CREATE: {"CONTENT":"Nodes created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_EXPORTED: {"CONTENT":"Data Exported Successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_DATA_IMPORTED: {"CONTENT":"Data Imported Successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_SAVE: {"CONTENT":'Tasks saved successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_SAVE: {"CONTENT":'Data saved successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_COPIED : {"CONTENT":"Data Copied successfully.", "VARIANT": VARIANT.SUCCESS},
@@ -490,6 +491,6 @@ const Messages={
         DUP_ACC_EXISTS:{"CONTENT":"Multiple accounts with same email detected !","VARIANT":VARIANT.WARNING},
         SUCC_REC_MAIL:{"CONTENT":"If this email address was used to create an account, instructions to recover your account will be sent to you. Please check your email.", "VARIANT": VARIANT.SUCCESS}
     }
-}
+  }
 
 export {Messages, VARIANT};
