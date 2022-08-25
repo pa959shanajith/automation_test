@@ -317,7 +317,7 @@ const Messages={
         ERR_GET_NOTIFICATION: {"CONTENT":'Failed to fetch Notification Rules.', "VARIANT": VARIANT.ERROR},
         ERR_NOTIFICATION_CONFIG: {"CONTENT":'Failed to fetch Notification Configuration.', "VARIANT": VARIANT.ERROR},
         ERR_UPDATE_NOTIFICATION_RULES: {"CONTENT":'Failed to Update Notification Rules.', "VARIANT": VARIANT.ERROR},
-        
+        ERR_DELETE_SCENARIO: {"CONTENT":'Error while deleting scenarios.', "VARIANT": VARIANT.ERROR},
         SUCC_NODE_CREATE: {"CONTENT":"Nodes created successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_EXPORTED: {"CONTENT":"Data Exported Successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_IMPORTED: {"CONTENT":"Data Imported Successfully.", "VARIANT": VARIANT.SUCCESS},
@@ -325,6 +325,7 @@ const Messages={
         SUCC_DATA_SAVE: {"CONTENT":'Data saved successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_COPIED : {"CONTENT":"Data Copied successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_RULES_UPDATE : {"CONTENT":"Rules updated successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_DELETE_SCENARIO : {"CONTENT":"Scenarios successfully deleted.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_PROJECT_ASSIGN_USER: {"CONTENT":'This project is not assigned to user.', "VARIANT": VARIANT.WARNING},
         WARN_SELECT_COMPLETE_FLOW: {"CONTENT":"Please select a complete flow to assign tasks.", "VARIANT": VARIANT.WARNING},
@@ -487,7 +488,9 @@ const Messages={
         SUCC_UNLOCKED: {"CONTENT":'Successfully unlocked the user account! Please login again.', "VARIANT": VARIANT.SUCCESS},
         SUCC_UNLOCK_MAIL: {"CONTENT":"Successfully sent an email! Please unlock the account using verification password sent in the email.", "VARIANT": VARIANT.SUCCESS},
         SUCC_P_CHANGE: {"CONTENT":"Password change successfull! Please login again with new password.", "VARIANT": VARIANT.SUCCESS},
+        DUP_ACC_EXISTS:{"CONTENT":"Multiple accounts with same email detected !","VARIANT":VARIANT.WARNING},
+        SUCC_REC_MAIL:{"CONTENT":"If this email address was used to create an account, instructions to recover your account will be sent to you. Please check your email.", "VARIANT": VARIANT.SUCCESS}
     }
-}
+  }
 
 export {Messages, VARIANT};
