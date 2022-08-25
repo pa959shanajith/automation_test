@@ -8,8 +8,6 @@ import ImportMindmap from'../components/ImportMindmap.js';
 import {exportMindmap} from '../api';
 import '../styles/MindmapHome.scss';
 import {Messages as MSG} from '../../global';
-import { useSelector } from 'react-redux';
-import { data } from 'node-env-file';
 
 /*Component MindmapHome
   use: renders mindmap plugins landing page 
