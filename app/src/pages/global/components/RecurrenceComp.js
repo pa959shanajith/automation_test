@@ -226,11 +226,15 @@ const RecurrenceComp = (props) => {
 
         if (isNaN(event.target.value) || event.target.value.includes(".")) {
             displayError("Invalid input, Please enter a number");
+            setMonthlyRecurrenceMonthValue("");
+            setMonthlyRecurrenceMonthInputDisable(true);
             return;
         }
 
         if (parseInt(event.target.value) > 30 || parseInt(event.target.value) < 1) {
             displayError("Invalid input (should be between 1-30)");
+            setMonthlyRecurrenceMonthValue("");
+            setMonthlyRecurrenceMonthInputDisable(true);
             return;
         }
 
