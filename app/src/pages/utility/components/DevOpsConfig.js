@@ -232,7 +232,7 @@ const DevOpsConfig = props => {
             configurename: integrationConfig.name,
             executiontype: integrationConfig.executionType,
             configurekey: integrationConfig.key,
-            exectionmode: integrationConfig.exectionMode,
+            isHeadless: integrationConfig.isHeadless,
             avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid.length > 0 && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected") ? [integrationConfig.avoAgentGrid] : [],
             integration: integration,
             batchInfo: batchInfo,
@@ -348,7 +348,7 @@ const DevOpsConfig = props => {
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Execution Mode : </label>
                         <div className="devOps_dropdown_label_sync">
                             <label>Non-Headless </label>
-                            <Toggle checked={integrationConfig.executionMode == 'headless'} onChange={() => setIntegrationConfig({...integrationConfig, executionMode: (integrationConfig.executionMode === 'headless') ? 'non-headless' : 'headless' })} label="" inlineLabel={true} />
+                            <Toggle checked={integrationConfig.isHeadless} onChange={() => setIntegrationConfig({...integrationConfig, isHeadless: !integrationConfig.isHeadless })} label="" inlineLabel={true} />
                             <label>Headless </label>
                         </div>
                     </div>

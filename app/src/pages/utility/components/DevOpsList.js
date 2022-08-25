@@ -100,7 +100,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             browsers: item.executionRequest.browserType,
             integration: getIntegrationSelected(item.executionRequest.integration),
             executionType: item.executionRequest.executiontype,
-            executionMode: 'non-headless',
+            isHeadless: item.executionRequest.isHeadless,
             executionRequest: item.executionRequest
         });
         return;
@@ -153,7 +153,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                     browsers: [],
                     integration: '',
                     executionType: 'asynchronous',
-                    executionMode: 'non-headless'
+                    isHeadless: false
                 })} >New Configuration</button>
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>
