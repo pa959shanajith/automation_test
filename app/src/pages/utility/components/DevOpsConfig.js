@@ -22,7 +22,9 @@ const DevOpsConfig = props => {
     const [configName, setConfigName] = useState("");
     const [dataDict, setDict] = useState({});
     const [integrationConfig, setIntegrationConfig] = useState(props.currentIntegration);
-    const [icepoollist, setIcepoollist] = useState([]);
+    const [icepoollist, setIcepoollist] = useState([
+        { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
+    ]);
     const [browserlist, setBrowserlist] = useState([
         {
             key: '0',
@@ -80,7 +82,11 @@ const DevOpsConfig = props => {
                     setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
                 }
             }else {
-                setIcepoollist([ ...gridAgentList.avoagents.filter((agent) => agent.status === 'active').map((agent) => ({key: agent._id, text: agent.Hostname})), ...gridAgentList.avogrids.map((grid) => ({key: grid._id, text: grid.name})) ]);
+                setIcepoollist([
+                    { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
+                    ...gridAgentList.avoagents.filter((agent) => agent.status === 'active').map((agent) => ({key: agent.Hostname, text: agent.Hostname})),
+                    ...gridAgentList.avogrids.map((grid) => ({key: grid.name, text: grid.name}))
+                ]);
             }
             const reportResponse = await fetchProjects({ readme: "projects" });
             if (reportResponse.error) {
@@ -93,28 +99,30 @@ const DevOpsConfig = props => {
                 newSelectValues[0].list = projList;
 
                 if(props.currentIntegration.name !== '') {
-                    console.log(props.currentIntegration.executionRequest);
+                    console.log(props.currentIntegration.executionRequest.batchInfo[0]);
                     console.log('props.currentIntegration.executionRequest');
+                    const projSetDetails = props.currentIntegration.executionRequest.batchInfo[0];
                     // proj
-                    newSelectValues[0]['selected'] = props.currentIntegration.executionRequest.suitedetails[0].projectid;
-                    newSelectValues[0]['selectedName'] = props.currentIntegration.executionRequest.suitedetails[0].projectname;
+                    newSelectValues[0]['selected'] = projSetDetails.projectId;
+                    newSelectValues[0]['selectedName'] = projSetDetails.projectName;
 
                     // rel
                     newSelectValues[1]['disabled'] = false;
-                    newSelectValues[1]['list'] = newDict[props.currentIntegration.executionRequest.suitedetails[0].projectid].relList;
-                    newSelectValues[1]['selected'] = props.currentIntegration.executionRequest.suitedetails[0].releaseid;
-                    newSelectValues[1]['selectedName'] = props.currentIntegration.executionRequest.suitedetails[0].releaseid;
+                    newSelectValues[1]['list'] = newDict[projSetDetails.projectId].relList;
+                    newSelectValues[1]['selected'] = projSetDetails.releaseId;
+                    newSelectValues[1]['selectedName'] = projSetDetails.releaseId;
 
                     //cyc
                     newSelectValues[2]['disabled'] = false;
-                    newSelectValues[2]['list'] = newDict[props.currentIntegration.executionRequest.suitedetails[0].projectid].relDict[props.currentIntegration.executionRequest.suitedetails[0].releaseid].cycList;
-                    newSelectValues[2]['selected'] = props.currentIntegration.executionRequest.suitedetails[0].cycleid;
-                    newSelectValues[2]['selectedName'] = props.currentIntegration.executionRequest.suitedetails[0].cyclename;
+                    newSelectValues[2]['list'] = newDict[projSetDetails.projectId].relDict[projSetDetails.releaseId].cycList;
+                    newSelectValues[2]['selected'] = projSetDetails.cycleId;
+                    newSelectValues[2]['selectedName'] = projSetDetails.cycleName;
 
                     const projId = newSelectValues[0]['selected'];
                     const relName = newSelectValues[1]['selected'];
                     const cycId = newSelectValues[2]['selected'];
-                    props.currentIntegration.executionRequest.batchname !== '' && setSelectedExecutionType('batchExecution');
+                    props.currentIntegration.executionRequest.batchInfo[0].batchname !== '' && setSelectedExecutionType('batchExecution');
+
                 }
                 
                 setDict(newDict);
@@ -225,13 +233,13 @@ const DevOpsConfig = props => {
             executiontype: integrationConfig.executionType,
             configurekey: integrationConfig.key,
             exectionmode: integrationConfig.exectionMode,
-            avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid.length > 0) ? [integrationConfig.avoAgentGrid] : [],
+            avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid.length > 0 && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected") ? [integrationConfig.avoAgentGrid] : [],
             integration: integration,
             batchInfo: batchInfo,
             scenarioFlag: false
         });
-        if(storeConfig.status !== 'pass') {
-            if(storeConfig.error.CONTENT) {
+        if(storeConfig !== 'success') {
+            if(storeConfig && storeConfig.error && storeConfig.error.CONTENT) {
                 setMsg(MSG.CUSTOM(storeConfig.error.CONTENT,VARIANT.ERROR));
             } else {
                 setMsg(MSG.CUSTOM("Something Went Wrong",VARIANT.ERROR));
@@ -348,7 +356,7 @@ const DevOpsConfig = props => {
                     </div>
                     <div>
                         <span className="devOps_dropdown_label devOps_dropdown_label_url">DevOps Integration API url : </span>
-                        <span className="devOps_dropdown_label_input"><input type="text" value={props.url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/executeAutomation' />
+                        <span className="devOps_dropdown_label_input"><input type="text" value={props.url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
                             <label>
                                 <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return apiKeyCopyToolTip }, 0]} />
                                 <div style={{fontSize:"24px"}}>

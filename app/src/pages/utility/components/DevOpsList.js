@@ -95,9 +95,9 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
                 { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
             ],
-            scenarioList: getScenarioList(item.executionRequest.suitedetails),
-            avoAgentGrid: '',
-            browsers: item.executionRequest.suitedetails[0].browserType,
+            scenarioList: getScenarioList(item.executionRequest.batchInfo),
+            avoAgentGrid: 'cicdanyagentcanbeselected',
+            browsers: item.executionRequest.browserType,
             integration: getIntegrationSelected(item.executionRequest.integration),
             executionType: item.executionRequest.executiontype,
             executionMode: 'non-headless',
@@ -105,11 +105,11 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
         });
         return;
     }
-    const getScenarioList = (suitedetails) => {
+    const getScenarioList = (batchInfo) => {
         let scenarioList = [];
-        suitedetails.forEach(suite => {
-            suite.scenarioIds.forEach((scenarioID) => {
-                if(!scenarioList.includes(scenarioID)) scenarioList.push(scenarioID);
+        batchInfo.forEach(batch => {
+            batch.suiteDetails.forEach(suite => {
+                scenarioList.push(suite.scenarioId);
             });
         });
         return scenarioList;
@@ -149,7 +149,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                         { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
                     ],
                     scenarioList: [],
-                    avoAgentGrid: '',
+                    avoAgentGrid: 'cicdanyagentcanbeselected',
                     browsers: [],
                     integration: '',
                     executionType: 'asynchronous',
@@ -161,7 +161,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 </div>
                 <div>
                     <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>DevOps Integration API url : </span>
-                    <span className="api-ut__inputLabel"><input type="text" value={url} data-test="req-body-test" className="req-body" autoComplete="off" id="api-url" name="request-body" style={{width:"25%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/executeAutomation' />
+                    <span className="api-ut__inputLabel"><input type="text" value={url} data-test="req-body-test" className="req-body" autoComplete="off" id="api-url" name="request-body" style={{width:"25%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
                         <label>
                             <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
                             <div style={{fontSize:"24px"}}>
