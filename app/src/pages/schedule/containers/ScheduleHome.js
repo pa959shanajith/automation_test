@@ -9,13 +9,13 @@ const ScheduleHome = () => {
     
     const current_task = useSelector(state=>state.plugin.CT)
     const filter_data = useSelector(state=>state.plugin.FD)
-	const [browserTypeExe,setBrowserTypeExe] = useState([]);
-	const [execAction,setExecAction] = useState("serial");
+    const [browserTypeExe,setBrowserTypeExe] = useState([]);
+    const [execAction,setExecAction] = useState("serial");
     const [appType, setAppType] = useState(null);
     const [syncScenario, setSyncScenario] = useState(false);
     const [execEnv,setExecEnv] = useState("default");
     const [smartMode,setSmartMode] = useState('normal')
-    const isMac = navigator.appVersion.indexOf("Mac") !== -1;
+    const isMac = navigator.appVersion.toLowerCase().indexOf("mac") !== -1;
 	
     
     useEffect(()=>{

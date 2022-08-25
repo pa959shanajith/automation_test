@@ -410,8 +410,20 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         invokinguserrole: session.activeRoleId || session.role,
     };
 
+    // check a job is already scheduled for a particular time
+    const addressList = multiExecutionData.batchInfo.map(u => u.targetUser);
+    const dateTimeList = multiExecutionData.batchInfo.map(u => u.time)
+    var inputs = {
+        "query": "checkrecurringscheduleddetails",
+        "scheduledatetime": dateTimeList,
+        "targetaddress": addressList
+    };
+    
+    const chkResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
+    if (chkResult != -1) return (chkResult == "fail") ? "fail" : { "status": "booked", "user": addressList[chkResult] };
+
     let timeSelected = multiExecutionData.batchInfo[0].time;
-    let timestamp = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeSelected.split(':')[0]), parseInt(timeSelected.split(':')[1]))
+    let timestamp = '';
     let createdDate = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), new Date(new Date().getHours()), new Date(new Date().getMinutes()))
     const targetUser = multiExecutionData.batchInfo[0].targetUser;
     let recurringPattern = multiExecutionData['batchInfo'][0]['recurringValue'];
@@ -424,6 +436,66 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
     body.executionData.batchInfo[0].startDate = createdDate;
     let recurringString = multiExecutionData['batchInfo'][0]['recurringString'];
     let recurringStringOnHover = multiExecutionData.batchInfo[0].recurringStringOnHover;
+
+    if (recurringString == "Every Day") {
+        if (!recurringPattern.includes("1-5") && recurringStringOnHover != "Occurs every day") {
+            let timeValue = multiExecutionData['batchInfo'][0]['time'];
+            timestamp = + new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+        }
+        else {
+            const interval = parser.parseExpression(recurringPattern);
+            let dateString = interval.next().toString().split(' ');
+            let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+            let timeValue = multiExecutionData['batchInfo'][0]['time'];
+            timestamp = + new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+        }
+    }
+    else if (recurringString == "Every Week") {
+        const interval = parser.parseExpression(recurringPattern);
+        let dateString = interval.next().toString().split(' ');
+        let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+        let timeValue = multiExecutionData['batchInfo'][0]['time'];
+        timestamp = + new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+    }
+    else if (recurringString == "Every Month") {
+        if (['first', 'second', 'third', 'fourth', 'last'].some(element => recurringStringOnHover.includes(element))) {
+            let recurringPatternTemp = recurringPattern.split("/");
+            recurringPatternTemp = recurringPatternTemp[0] + " " + recurringPatternTemp[1].split(" ")[1];
+
+            if (recurringStringOnHover.includes('first')) {
+                recurringPatternTemp = recurringPatternTemp + "#1";
+            }
+            else if (recurringStringOnHover.includes('second')) {
+                recurringPatternTemp = recurringPatternTemp + "#2";
+            }
+            else if (recurringStringOnHover.includes('third')) {
+                recurringPatternTemp = recurringPatternTemp + "#3";
+            }
+            else if (recurringStringOnHover.includes('fourth')) {
+                recurringPatternTemp = recurringPatternTemp + "#4";
+            }
+            else if (recurringStringOnHover.includes('last')) {
+                recurringPatternTemp = recurringPatternTemp + "#5";
+            }
+
+            const interval = parser.parseExpression(recurringPatternTemp);
+            let dateString = interval.next().toString().split(' ');
+            let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+            let timeValue = multiExecutionData['batchInfo'][0]['time'];
+            timestamp = + new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+        }
+        else {
+            let recurringPatternTemp = recurringPattern.split("/");
+            recurringPatternTemp = recurringPatternTemp[0] + " " + recurringPatternTemp[1].split(" ")[1];
+
+            const interval = parser.parseExpression(recurringPatternTemp);
+            let dateString = interval.next().toString().split(' ');
+            let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+            let timeValue = multiExecutionData['batchInfo'][0]['time'];
+            timestamp = + new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+        }
+    }
+
     inputs = {
         timestamp: timestamp.toString(),
         executeon: multiExecutionData.browserType,
