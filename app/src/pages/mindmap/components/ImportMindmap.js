@@ -6,7 +6,6 @@ import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
-import isBoolean from 'validator/lib/isboolean';
 
 
 // const [selectedProject , setSelectedProject]= useState("Select Project");
