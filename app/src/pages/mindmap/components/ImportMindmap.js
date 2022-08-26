@@ -516,7 +516,7 @@ const uploadFile = async({uploadFileRef,setMindmapData,setSheetList,setDisableSu
             var uniqlength=data.length;
             
             if(uniqlength > 0) {
-                setError((uniqlength)+"/"+(totallength) + " unique modules found.\n Only unique modules will be imported");
+                setError((uniqlength)+"/"+(totallength) + " unique modules found. Unique will be imported");
                 
            } 
             else    if(uniqlength == 0) {
