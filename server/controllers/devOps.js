@@ -262,3 +262,18 @@ exports.saveAvoGrid = async(req,res) => {
 // 		return res.status(500).send("fail");
 // 	}
 // };
+exports.fetchProjectReleaseCycleDevops =  async(req, res) => {
+	const fnName = "fetchProjectReleaseCycleDevops";
+	try {
+		logger.info("Inside UI service: " + fnName);
+		var input = {
+			"configurekey": req.body.configkey,
+			"executionListId": req.body.executionListId
+		};
+		const list = await utils.fetchData(input, "devops/fetchProjectReleaseCycleDevops", "fetchProjectReleaseCycleDevops");
+		res.send(list);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};

@@ -213,4 +213,22 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
         try { return await promiseData; }
         catch (e) { logger.error(e); }
     }
+
+    setExecStatus = async function (batchExecutionData, execIds, userInfo, type) {
+        try {
+            var result = await executor.setExecStatus(batchExecutionData, execIds, userInfo, type);
+        } catch (ex) {
+            var result = "fail";
+            logger.error("Error in setExecStatus. Error: %s", ex)
+        }
+        // if(batchExecutionData['configurekey']) return 'pass'
+        // let reportResult = {};
+        // batchExecutionData.batchInfo[0]["testsuitename"] = batchExecutionData.batchInfo[0]["testsuiteName"];
+
+        // reportResult["testSuiteIds"] = batchExecutionData.batchInfo;
+        // reportResult["status"] = result;
+        // let username = userInfo.username;
+        // this.setNotifications(username, reportResult);
+        return result;
+    }
 }
