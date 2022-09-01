@@ -214,9 +214,9 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
         catch (e) { logger.error(e); }
     }
 
-    setExecStatus = async function (batchExecutionData, execIds, userInfo, type) {
+    setExecStatus = async function (dataFromIce) {
         try {
-            var result = await executor.setExecStatus(batchExecutionData, execIds, userInfo, type);
+            var result = await executor.setExecStatus(dataFromIce);
         } catch (ex) {
             var result = "fail";
             logger.error("Error in setExecStatus. Error: %s", ex)

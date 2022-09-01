@@ -37,11 +37,16 @@ exports.fetchModules = async (req, res) => {
 		const moduleData = await getModule(req.body);
 		const finalData = await utils.fetchData(moduleData, "devops/getScenariosForDevops", "fetchModules");
 		const responsedata = {
-			'normalExecution': finalData,
+			'normalExecution': [],
 			'batchExecution': {},
 			'e2eExecution': [],
 		}
-		for(let moduleDetails of finalData) {
+		for(let [index,moduleDetails] of finalData.entries()) {
+			if(moduleData[index].type == 'basic'){
+				responsedata['normalExecution'].push(moduleDetails);
+			} else {
+				responsedata['e2eExecution'].push(moduleDetails);
+			}
 			if(moduleDetails['batchname'] == '') continue;
 			if(responsedata['batchExecution'][moduleDetails['batchname']] == undefined){
 				responsedata['batchExecution'][moduleDetails['batchname']] = [];

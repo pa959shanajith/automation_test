@@ -179,7 +179,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     } else {
                         response["message"] = "Execution queued on " + targetICE + "\nQueue Length: " + pool["execution_list"].length.toString();
                         response['variant'] = "success";
-                    }    
+                    }
                 }
 
             } else if (poolid && poolid in this.queue_list) {
@@ -611,8 +611,8 @@ module.exports.Execution_Queue = class Execution_Queue {
             newExecutionList.push({
                 executionListId:Info.executionListId,
                 moduleid:ids,status: 'QUEUED',
-                version:Info.version,
-                avoagentList:Info.avoagentList});
+                avoagentList:Info.avoagentList,
+            });
 
         keyQueue.push(newExecutionList);
 
@@ -764,17 +764,20 @@ module.exports.Execution_Queue = class Execution_Queue {
                     let executionQueue = value;
                     console.log(executionQueue);
                     for(let entries of executionQueue) {
-                        if(entries[0]['avoagentList'].length == 0 || entries[0]['avoagentList'].includes(agent)) {
+                        let checkForAgentName = (entries[0]['avoagentList'] instanceof Array ? entries[0]['avoagentList'].length == 0 || entries[0]['avoagentList'].includes(agent) : 
+                        agent in entries[0]['avoagentList'])
+
+                        if(checkForAgentName){
                             for(let testSuites of entries) {
                                 if(testSuites['status'] == 'QUEUED') {
                                     response['status'] = 'Pass';
                                     response['key'] = key;
                                     response['executionListId'] = testSuites['executionListId'];
-                                    response['maxicecount'] = agentStatus['icecount'];
+                                    // response['maxicecount'] = agentStatus['icecount'];
+                                    response['maxicecount'] = (entries[0]['avoagentList'] instanceof Array ? agentStatus['icecount'] : entries[0]['avoagentList'][agent]);
                                     return response;
                                 }
                             }
-                           console.log(entries['avoagentList']);
                         }
                     }
                 }
@@ -970,7 +973,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         // }
         // return response;
 
-        return await this.executionInvoker.setExecStatus(batchExecutionData, execIds, userInfo, type);
+        let dataFromIce = req.body;
+        return await this.executionInvoker.setExecStatus(dataFromIce);
 
     }
 }
