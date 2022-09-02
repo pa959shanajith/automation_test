@@ -71,6 +71,7 @@ import { ReactComponent as TaskboardWhite } from '@avo/designcomponents/lib/asse
 import { ReactComponent as BarChart } from '@avo/designcomponents/lib/assets/icons/bar-graph.svg';
 import { ReactComponent as PieChart } from '@avo/designcomponents/lib/assets/icons/pie-chart.svg';
 import { ReactComponent as DonutChart } from '@avo/designcomponents/lib/assets/icons/donut-chart.svg';
+import { ReactComponent as Input } from '@avo/designcomponents/lib/assets/icons/input.svg';
 
 registerIcons({
   icons: {
@@ -142,6 +143,7 @@ registerIcons({
     pass: <Pass />,
     'studio-white': <StudioWhite />,
     studio: <Studio />,
-    'taskboard-white': <TaskboardWhite />
+    'taskboard-white': <TaskboardWhite />,
+    input: <Input />
   }
 });

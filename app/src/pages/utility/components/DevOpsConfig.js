@@ -21,7 +21,10 @@ const DevOpsConfig = props => {
     const [requestText, setRequestText] = useState("");
     const [configName, setConfigName] = useState("");
     const [dataDict, setDict] = useState({});
-    const [integrationConfig, setIntegrationConfig] = useState(props.currentIntegration);
+    const [integrationConfig, setIntegrationConfig] = useState({
+        ...props.currentIntegration,
+        dataParameters: []
+    });
     const [icepoollist, setIcepoollist] = useState([
         { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
     ]);
@@ -84,8 +87,8 @@ const DevOpsConfig = props => {
             }else {
                 setIcepoollist([
                     { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
-                    ...gridAgentList.avoagents.filter((agent) => agent.status === 'active').map((agent) => ({key: agent.Hostname, text: agent.Hostname})),
-                    ...gridAgentList.avogrids.map((grid) => ({key: grid.name, text: grid.name}))
+                    ...gridAgentList.avoagents.filter((agent) => agent.status === 'active').map((agent) => ({key: 'a_'+agent.Hostname, text: agent.Hostname})),
+                    ...gridAgentList.avogrids.map((grid) => ({key: 'g_'+grid._id, text: grid.name}))
                 ]);
             }
             const reportResponse = await fetchProjects({ readme: "projects" });
@@ -191,7 +194,16 @@ const DevOpsConfig = props => {
         }
         setIntegrationConfig({...integrationConfig, selectValues: newSelectValues});
     }
-
+    const getScenarioParams = (scenarioId) => {
+        let data = {
+            dataparam: '',
+            condition: 0
+        };
+        for(let scenario of integrationConfig.dataParameters) {
+            if(scenario.scenarioId === scenarioId) data = scenario;
+        }
+        return data;
+    }
     const handleConfigSave = async () => {
         const batchInfo = moduleScenarioList['normalExecution'].filter((module) => {
             return module.scenarios.some(scenario => {
@@ -212,8 +224,8 @@ const DevOpsConfig = props => {
                 cycleName: integrationConfig.selectValues[2].selectedName,
                 cycleId: integrationConfig.selectValues[2].selected,
                 suiteDetails: module.scenarios.filter((scenario) => integrationConfig.scenarioList.includes(scenario._id)).map((scenario) => ({
-                    condition: 0,
-                    dataparam: [""],
+                    condition: getScenarioParams(scenario._id).condition,
+                    dataparam: [getScenarioParams(scenario._id).dataparam],
                     scenarioName: scenario.name,
                     scenarioId: scenario._id,
                     accessibilityParameters: []
@@ -233,7 +245,8 @@ const DevOpsConfig = props => {
             executiontype: integrationConfig.executionType,
             configurekey: integrationConfig.key,
             isHeadless: integrationConfig.isHeadless,
-            avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid.length > 0 && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected") ? [integrationConfig.avoAgentGrid] : [],
+            avogridId: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'g_') ? [integrationConfig.avoAgentGrid.slice(2)] : '',
+            avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'a_') ? [integrationConfig.avoAgentGrid.slice(2)] : [],
             integration: integration,
             batchInfo: batchInfo,
             scenarioFlag: false

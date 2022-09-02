@@ -354,3 +354,11 @@
     margin-right: 11%;
     margin-top: -3%;
 }
+.devOps_input_icon {
+    display: flex;
+    align-items: center;
+    &>img {
+        width: 1.2rem;
+        margin-left: 1rem;
+    }
+}

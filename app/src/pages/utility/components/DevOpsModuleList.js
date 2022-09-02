@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../../global';
-import { CheckBox, SearchDropdown, Tab } from '@avo/designcomponents';
+import { CheckBox, SearchDropdown, Tab, NormalDropDown, Dialog, TextField } from '@avo/designcomponents';
 import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
 
@@ -35,9 +35,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         }
     };
     const icons = {
-        check: <CheckBox checked={true} indeterminate={false} />,
-        uncheck: <CheckBox checked={false} indeterminate={false} />,
-        halfCheck: <CheckBox indeterminate={true} checked={false} styles={indeterminateStyle} />,
+        check: <CheckBox checked={true} indeterminate={false} onChange={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} />,
+        uncheck: <CheckBox checked={false} indeterminate={false} onChange={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} />,
+        halfCheck: <CheckBox indeterminate={true} checked={false} styles={indeterminateStyle} onChange={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} />,
         expandClose: <Icon iconName='chevron-down' styles={{root:{transform: "rotate(-90deg)"}}}/>,
         expandOpen: <Icon iconName='chevron-down' />,
         parentOpen: <></>,
@@ -196,6 +196,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                 if(fetchedModuleList.error) {
                     setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
                 }else {
+                    // <Icon iconName='input' />
                     let filteredNodes = [];
                     if(selectedExecutionType === 'normalExecution') {
                         filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
@@ -207,7 +208,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                                 const moduleChildren = module.scenarios.map((scenario) => {
                                     return ({
                                         value: scenario._id,
-                                        label: scenario.name
+                                        label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                            event.preventDefault();
+                                            onDataParamsIconClick(scenario._id, scenario.name)}}/></div>
                                     })
                                 });
                                 filterModule['children'] = moduleChildren;
@@ -231,7 +234,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                                         const moduleChildren = module.scenarios.map((scenario) => {
                                             return ({
                                                 value: scenario._id,
-                                                label: scenario.name
+                                                label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                                    event.preventDefault();
+                                                    onDataParamsIconClick(scenario._id)}}/></div>
                                             })
                                         });
                                         filterModule['children'] = moduleChildren;
@@ -304,26 +309,68 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         setModuleState({expanded: [], checked: []});
         setIntegrationConfig({ ...integrationConfig, scenarioList: [] });
     }
+    const [modalContent, setModalContent] = useState(false);
+    const onDataParamsIconClick = (scenarioId, name) => {
+        setModalContent({
+            scenarioId: scenarioId,
+            name: name,
+            dataparam: '',
+            condition: 0
+        })
+    }
     return (
-        // <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
-        (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
-            <div className='devOps_module_list_filter'>
-                <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
-                <SearchDropdown
-                    calloutMaxHeight="30vh"
-                    noItemsText={'Loading...'}
-                    onChange={handleExecutionTypeChange}
-                    options={executionTypeOptions}
-                    placeholder="Select Avo Agent or Avo Grid"
-                    selectedKey={selectedExecutionType}
-                    width='35%'
-                />
-            </div>
-            <div id="moduleScenarioList" className="devOps_module_list_container">
-                <ScrollBar scrollId='moduleScenarioList' thumbColor="#929397" >
-                    <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
-                </ScrollBar>
-            </div>
+        <>
+            <Dialog
+                hidden = {modalContent === false}
+                onDismiss = {() => setModalContent(false)}
+                title = 'Scenario Data Parametrization'
+                minWidth = '60rem'
+                confirmText = 'Save'
+                declineText = 'Cancel'
+                onConfirm = {() => {
+                    setIntegrationConfig({ ...integrationConfig, dataParameters: [...integrationConfig.dataParameters, modalContent] });
+                    setModalContent(false);
+                }} >
+                    <div style={{ display: 'flex', flexDirection: 'column'}}>
+                        <div style={{display: 'flex', alignItems: 'baseline'}}>
+                            <h4 style={{marginRight: '1rem'}} >Scenario Name : </h4><h5>{modalContent.name}</h5>
+                        </div>
+                        <div style={{display: 'flex'}}>
+                            {/* <TextField value = {modalContent.name} label='Scenario Name' width='rem' standard={true} /> */}
+                            <div style={{ marginRight: '2rem' }}>
+                                <TextField value = {modalContent.dataparam} onChange={(ev, newValue) => {
+                                    if (newValue === '') setModalContent({...modalContent, dataparam: ''});
+                                    if (newValue) setModalContent({...modalContent, dataparam: newValue.toString()});
+                                }} label='Data Parameterization' width='30rem' standard={true} placeholder='Enter Data Paramterization' />
+                            </div>
+                            <NormalDropDown selectedKey={modalContent.condition} width='8rem' options={[
+                            { key: 0, text: 'False'},
+                            { key: 1, text: 'True' }
+                            ]} label='Condition' onChange={(ev, option) =>setModalContent({...modalContent, condition: option.key })} />
+                        </div>
+                    </div>
+            </Dialog>
+            {
+                (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
+                    <div className='devOps_module_list_filter'>
+                        <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
+                        <SearchDropdown
+                            calloutMaxHeight="30vh"
+                            noItemsText={'Loading...'}
+                            onChange={handleExecutionTypeChange}
+                            options={executionTypeOptions}
+                            placeholder="Select Avo Agent or Avo Grid"
+                            selectedKey={selectedExecutionType}
+                            width='35%'
+                        />
+                    </div>
+                    <div id="moduleScenarioList" className="devOps_module_list_container">
+                        <ScrollBar scrollId='moduleScenarioList' thumbColor="#929397" >
+                            <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
+                        </ScrollBar>
+                    </div>
+                </>
+            }
         </>
     );
 };
