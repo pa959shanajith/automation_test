@@ -33,10 +33,10 @@ const UpperContent = props => {
     const WebList = [
         { 'title': "Internet Explorer", 'img': "static/imgs/internet_explorer_logo_new.svg", action: () => startScrape('ie'), 'disable': disableAction || compareFlag },
         { 'title': "Google Chrome", 'img': "static/imgs/chrome_logo_new.svg", action: () => startScrape('chrome'), 'disable': disableAction || compareFlag },
-        { 'title': "Safari", 'img': "static/imgs/ic-safari.png", action: () => startScrape('safari'), 'disable': disableAction || compareFlag },
+        { 'title': "Safari", 'img': "static/imgs/safari_logo_new.svg", action: () => startScrape('safari'), 'disable': disableAction || compareFlag },
         { 'title': "Mozilla Firefox", 'img': "static/imgs/firefox_logo_new.svg", action: () => startScrape('mozilla'), 'disable': disableAction || compareFlag },
-        { 'title': "Microsoft Edge", 'svg': "static/imgs/edge_logo_new.svg", action: () => startScrape('edge'), 'disable': disableAction || compareFlag },
-        { 'title': "Edge Chromium", 'svg': "static/imgs/edge_logo_new.svg", action: () => startScrape('chromium'), 'disable': disableAction || compareFlag }
+        { 'title': "Microsoft Edge", 'img': "static/imgs/edge_logo_new.svg", action: () => startScrape('edge'), 'disable': disableAction || compareFlag },
+        { 'title': "Edge Chromium", 'img': "static/imgs/edge_logo_new.svg", action: () => startScrape('chromium'), 'disable': disableAction || compareFlag }
     ]
 
     const oebsList = [{ 'title': "OEBS Apps", 'img': 'static/imgs/ic-desktop.png', action: ()=> setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction }]

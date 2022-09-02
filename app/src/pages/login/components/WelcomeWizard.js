@@ -13,15 +13,18 @@ import { useHistory } from 'react-router-dom';
 import { manageUserDetails } from '../../admin/api';
 import { IconButton } from "@avo/designcomponents"
 
-const DPCard = ({htitle, itemObj}) => {
+const DPCard = ({title, items, type}) => {
     return (<div className="d-p-card">
-                <div className="d-p-card__left">
-                   <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${itemObj.imageName}.svg)`}}></div>
-                </div>
-                <div className="d-p-card__right">
-                    <div className="d-p-card__title">{htitle}</div>
-                    <div className="d-p-card__subtitle">{itemObj.subtitle}</div>
-                    <div className="d-p-card__content">{itemObj.content}</div>
+                <div className="d-p-card__title">{title}</div>
+                <div className="d-p-card__itemsContainer">
+                  {items.map((item,idx)=> (<>
+                    <div key={title+idx} className="d-p-card__item">
+                      <div className="d-p-card__I-title">{type!=="OR" ? idx+1+". " : ""} {item.title}</div>
+                      {/* <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${item.imageName}.svg)`}}></div> */}
+                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.svg`} className="d-p-card__image"/></div>
+                    </div>
+                    {idx !== items.length-1 ? <div key={title+idx+"sep"} className="d-p-card__separator">{type==="OR"?"OR  ": <div className="d-p-card__div__image" style={{backgroundImage:`url(static/imgs/WW_r_arrow.svg)`}}></div>}</div>:null}
+                  </>))}
                 </div>
             </div>)
 }
@@ -41,7 +44,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const [OS,setOS] = useState("Windows");
   const [downloadScreenCounter,setdownloadScreenCounter] = useState(0);
   const [animationDir, setAnimationDir] = useState(false);
-  const [cardListNo, setCardListNo] = useState(1);
+  const [cardListNo, setCardListNo] = useState(0);
   const [tncAcceptEnabled, setTncAcceptEnabled] = useState(false);
   const animationInterval = useRef(undefined);
   const TnCInnerRef = useRef(undefined);
@@ -398,57 +401,118 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   };
 
   const InstallationSteps_win = [
-      {subtitle:"Open", content:<>Open the "AvoAssureClient.exe" file either from:
-      <br/><ol type="1" style={{margin: 0, paddingLeft: 20}}><li>Download panel at the bottom of your browser window.</li><li>Browser's downloads section.</li><li>System's downloads folder.</li></ol></>, imageName:"instruction-1"},
-      {subtitle:"Allow", content:<>If there's a windows prompt, click on <b>"More Info"</b> and then click on <b>"Run Anyway"</b>.</>,imageName:"instruction-2"},
-      {subtitle:"Install",content:<>The Avo Assure Client will open automatically after it's installed successfully.</>,imageName:"instruction-3"},
-      // {subtitle:"Install",content:<>Please be patient while it's installing. Avo Assure Client will open automatically once it's done.</>,imageName:"instruction-3"},
-      {subtitle:"Connect", content:<><ol type="1" style={{margin: 0, paddingLeft: 20}}><li>Double click on AvoClient shortcut on the desktop to access Avo Assure.</li><li>Click on <b>Register</b> button, and then click on submit.</li><li>Click on the <b>Connect</b> button in AvoAssure Client.</li></ol></>,imageName:"instruction-4"}
+      {
+        title:"Open the AvoAssureClient.exe file either from:", 
+        items:[
+          {title:"Download panel",imageName:"WW_win_1_1"},
+          {title:"Browser's downloads section.",imageName:"WW_win_1_2"},
+          {title:"System's downloads folder.",imageName:"WW_win_1_3"}
+        ],
+        type:"OR"
+      },
+      {
+        title:"If prompted, allow the following permission:", 
+        items:[
+          {title:<>Click on <b>"More Info"</b></>,imageName:"WW_win_2_1"},
+          {title:<>Click on <b>"Run Anyway"</b></>,imageName:"WW_win_2_2"}
+        ],
+        type:"NOR"
+      },
+      {
+        title:"To install Avo Assure client follow the below steps:", 
+        items:[
+          {title:"Intialise installation",imageName:"WW_win_3_1"},
+          {title:"Extracting files",imageName:"WW_win_3_2"},
+          {title:"Finish and Launch",imageName:"WW_win_3_2"}
+        ],
+        type:"NOR"
+      },
+      {
+        title:"Establish Avo Server and Client Connection:", 
+        items:[
+          {title:"Initialise Avo Client via desktop shortcut",imageName:"WW_win_4_1"},
+          {title:"Connect ICE via clicking on Connect Button",imageName:"WW_win_4_2"}
+        ],
+        type:"NOR"
+      }
   ] 
 
   const InstallationSteps_mac = [
-    {subtitle:"Open", content:<>Open and Extract the "AvoAssureClient.zip" file either from:
-    <br/><ol type="1" style={{margin: 0, paddingLeft: 20}}><li>Download panel at the bottom of your browser window.</li><li>Browser's downloads section.</li><li>System's downloads folder.</li></ol></>, imageName:"instruction-1_mac"},
-    {subtitle:"Before Installing",content:<><div style={{fontStyle:"italic", marginBottom:5}}>Note - You need to have <b>Python {selectedMacOS==="BigSur"?"v3.7.0":"v3.7.9"}</b> installed in your system or <a style={{color:"#5f338f"}} href={`https://www.python.org/ftp/python/${selectedMacOS==="BigSur"?"3.7.0":"3.7.9"}/`}>click here to install</a>.</div><div>Drag and drop the extracted folder onto the Terminal icon in the Dock.</div></>,imageName:"instruction-2_mac"},
-    {subtitle:"Run Files", content:<><ol type="1" style={{margin: 0, paddingLeft: 20}}><li>Type <b>"./unquarantine.sh"</b> in the terminal window and press enter. If prompted, enter your system password.</li><li>Type <b>"./run.sh"</b> and press enter.</li></ol></>,imageName:"instruction-3_mac"},
-    {subtitle:"Connect", content:<><ol type="1" style={{margin: 0, paddingLeft: 20}}><li>Click on <b>Register</b> button, and then click on submit.</li><li>Click on the <b>Connect</b> button in AvoAssure Client.</li></ol></>,imageName:"instruction-4_mac"}
+    {
+      title:`Open and Extract the "AvoAssureClient.zip" file either from:`, 
+      items:[
+        {title:"Download panel",imageName:"WW_mac_1_1"},
+        {title:"Browser's downloads section.",imageName:"WW_mac_1_2"},
+        {title:"System's downloads folder.",imageName:"WW_mac_1_3"}
+      ],
+      type:"OR"
+    },
+    {
+      title:<><div style={{fontStyle:"italic", fontSize:"0.7rem"}}>Note: You need to have <b>Python {selectedMacOS==="BigSur"?"v3.7.0":"v3.7.9"}</b> installed in your system or <a style={{color:"#5f338f"}} href={`https://www.python.org/ftp/python/${selectedMacOS==="BigSur"?"3.7.0":"3.7.9"}/`}>click here to install</a>.</div></>, 
+      items:[
+        {title:"Drag and drop the extracted folder onto the Terminal icon in the Dock.",imageName:"WW_mac_2_1"},
+      ],
+      type:"OR"
+    },
+    {
+      title:`Run the below files:`, 
+      items:[
+        {title:`Type "./unquarantine.sh" and press enter.`,imageName:"WW_mac_3_1"},
+        {title:`Type "./run.sh" and press enter.`,imageName:"WW_mac_3_2"},
+      ],
+      type:"NOR"
+    },
+    {
+      title:"Establish Avo Server and Client Connection:", 
+      items:[
+        {title:"Connect ICE via clicking on Connect Button",imageName:"WW_mac_4_1"}
+      ],
+      type:"OR"
+    }
+    // {subtitle:"Before Installing",content:<><div style={{fontStyle:"italic", marginBottom:5}}>Note - You need to have <b>Python {selectedMacOS==="BigSur"?"v3.7.0":"v3.7.9"}</b> installed in your system or <a style={{color:"#5f338f"}} href={`https://www.python.org/ftp/python/${selectedMacOS==="BigSur"?"3.7.0":"3.7.9"}/`}>click here to install</a>.</div><div>Drag and drop the extracted folder onto the Terminal icon in the Dock.</div></>,imageName:"instruction-2_mac"},
+    // {subtitle:"Run Files", content:<><ol type="1" style={{margin: 0, paddingLeft: 20}}><li>Type <b>"./unquarantine.sh"</b> in the terminal window and press enter. If prompted, enter your system password.</li><li>Type <b>"./run.sh"</b> and press enter.</li></ol></>,imageName:"instruction-3_mac"},
+    // {subtitle:"Connect", content:<><ol type="1" style={{margin: 0, paddingLeft: 20}}><li>Click on <b>Register</b> button, and then click on submit.</li><li>Click on the <b>Connect</b> button in AvoAssure Client.</li></ol></>,imageName:"instruction-4_mac"}
   ]
 
   const afterDownloadInstructions = () => {
       return <div className={"welcomeInstall "+(animationDir?AnimationClassNames.slideRightIn400:AnimationClassNames.slideLeftIn400)} style={{justifyContent:"space-evenly"}}>
         <div className="d-p-header">
-            <div className="d-p-header__title"><div>Thanks for downloading !</div><div>You're just a few steps away.</div></div>
-            {/* <div className="d-p-header__subtitle">If your download didn't start then don't worry, you can download it from <b>"User Profile" dropdown</b> on <b>landing page.</b></div> */}
+            <div className="d-p-header__title"><div>Thanks for downloading !</div></div>
+            <div className="d-p-header__subtitle">If your download didn't start then don't worry, you can download it from <b>"User Profile" dropdown</b> on <b>landing page.</b></div>
         </div>
         <div className="installation-instructions-container">
             <div className="d-p-card-container">
-                <IconButton id="arrow__WW" data-type={cardListNo===1?"disabled":"not-disabled"} disabled={cardListNo===1} icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo(1)}} variant="borderless" />
+                <IconButton id="arrow__WW" data-type={cardListNo===0?"disabled":"not-disabled"} disabled={cardListNo===0} icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState-1)}} variant="borderless" />
                 {OS==="Windows" && InstallationSteps_win.map((item,idx)=>{
-                    if (cardListNo===1 && idx<2){
-                      return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    if (cardListNo===idx){
+                      return <DPCard key={item.title+idx} title={item.title} items={item.items} type={item.type}></DPCard>
                     } 
-                    else if (cardListNo===2 && idx>1 ){
-                      return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
-                    }
+                    // else if (cardListNo===2 && idx>1 ){
+                    //   return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    // }
                     else return null;
                 })}
                 {OS==="MacOS" && InstallationSteps_mac.map((item,idx)=>{
-                    if (cardListNo===1 && idx<2){
-                      return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    if (cardListNo===idx){
+                      return <DPCard key={item.title+idx} title={item.title} items={item.items} type={item.type}></DPCard>
                     } 
-                    else if (cardListNo===2 && idx>1 ){
-                      return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
-                    }
+                    // else if (cardListNo===2 && idx>1 ){
+                    //   return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    // }
                     else return null;
                 })}
-                <IconButton id="arrow__WW" disabled={cardListNo===2} data-type={cardListNo===2?"disabled":"not-disabled"} icon="chevron-right" styles={{root:{right:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo(2)}} variant="borderless" />
+                <IconButton id="arrow__WW" disabled={cardListNo===3} data-type={cardListNo===3?"disabled":"not-disabled"} icon="chevron-right" styles={{root:{right:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState+1)}} variant="borderless" />
             </div>
             <div style={{display:"flex", flexDirection:"row"}}>
-              <div key={"select-1"} className="circle" data-type={cardListNo===1} onClick={()=>{setCardListNo(1)}}></div>
-              <div key={"select-2"} className="circle" data-type={cardListNo===2} onClick={()=>{setCardListNo(2)}}></div>
+              {OS==="Windows" ? InstallationSteps_win.map((item,idx)=> <div key={"select-"+idx} className="circle" data-type={cardListNo===idx} onClick={()=>{setCardListNo(idx)}}></div>):null}
+              {OS==="MacOS" ? InstallationSteps_mac.map((item,idx)=> <div key={"select-"+idx} className="circle" data-type={cardListNo===idx} onClick={()=>{setCardListNo(idx)}}></div>):null}
             </div>
         </div>
-        <button className="type1-button static-button" onClick={()=>{updateStepNumber(1)}}>Next</button>
+        <div style={{display:"flex", width:"100%",justifyContent:"space-between"}}>
+          <button className="type1-button static-button" data-type={"empty"} onClick={()=>{updateStepNumber(1)}}>SKIP</button>
+          {cardListNo===3?<button className="type1-button static-button" onClick={()=>{updateStepNumber(1)}}>Next</button>:null}
+
+        </div>
       </div>
   }
 
@@ -462,18 +526,20 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     {/* <img src={"static/imgs/WelcomeInstall.svg"} alt="install-avo-client" height="100%"/> */}
                 </span>}
 
-                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 10 - 15 minutes to complete"}</div>: <div className="step2" style={{marginBottom:"1rem"}}>{"Please Download The Avo Assure Client"}</div>}
+                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 10 - 15 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
+                // <div className="step2" style={{marginBottom:"1rem"}}>{"Please Download The Avo Assure Client"}</div>
+                }
                 
                 {(showMacOSSelection?(
                     <>
-                        <div className="OSselectionText">Select an operating system for the installation of the Avo Assure Client</div>
+                        <div className="OSselectionText">Please select Operating System for downloading Avo Assure Client</div>
                         <div className="choiceGroup">
                             {Object.keys(config).map((osPathname)=>{
                                 if (osPathname.includes("Windows")){
                                     return <></>;
                                 }
                                 let versionName = osPathname.split("_")[1]
-                                return <button className="choiceGroupOption" data-selected={selectedMacOS===versionName} onClick={()=>{_handleClientDownload(versionName)}}>{versionName}</button>
+                                return <button className="choiceGroupOption" data-selected={selectedMacOS===versionName} onClick={()=>{_handleClientDownload(versionName)}}>Download on {versionName}</button>
                             })}
                         </div>
                     </>)
@@ -494,8 +560,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                         </div>
                     </>
                 :
-                (OS==="Windows"?<button className="type2-button" onClick={_handleClientDownload}>Download Now</button>:null)}
-                <div style={{marginTop:"2rem"}}>Once the download is completed, you can proceed with further steps</div>
+                (OS==="Windows"?<button className="type2-button" onClick={_handleClientDownload}>Download Avo Assure Client</button>:null)}
+                {/* <div style={{marginTop:"2rem"}}>Once the download is completed, you can proceed with further steps</div> */}
             </div>
   };
 
@@ -505,7 +571,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     <img src={"static/imgs/green_thumbs_up.svg"} alt="thanks-for-downloading" style={{height:"100%"}}/>
                 </span>
                 <div className="step-body-container">
-                    <div className="step2">Once the installation is completed,<br/> Begin your journey with us !!</div>
+                    <div className="step2">Thanks for installing !</div>
                     {/* <div className="links-container">
                         <a href={vidLink} target={"_blank"} referrerPolicy="no-referrer">Training Videos</a>
                         <a href={docLink} target={"_blank"} referrerPolicy="no-referrer">Training Document</a>
@@ -522,10 +588,10 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         <div className="progressbar">
              <Stepper
                 steps={[
-                    { label: 'Welcome', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i className="fa fa-check"></i>},
-                    { label: 'Download', active:activeStep===1, completed:activeStep>1, children:activeStep<=1?2:<i className="fa fa-check"></i>},
-                    { label: 'Setup', active:activeStep===2, completed:activeStep>2, children:(activeStep<=2)?3:<i className="fa fa-solid fa-check"></i>},
-                    { label: 'Start', active:activeStep===3, completed:activeStep>3, children:(activeStep<=3)?4:<i className="fa fa-solid fa-check"></i>}]}
+                    { label: 'Accept Terms and Conditions', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i className="fa fa-check"></i>},
+                    { label: 'Download Avo Assure Client', active:activeStep===1, completed:activeStep>1, children:activeStep<=1?2:<i className="fa fa-check"></i>},
+                    { label: 'Setup Avo Assure Client', active:activeStep===2, completed:activeStep>2, children:(activeStep<=2)?3:<i className="fa fa-solid fa-check"></i>},
+                    { label: 'Getting Started', active:activeStep===3, completed:activeStep>3, children:(activeStep<=3)?4:<i className="fa fa-solid fa-check"></i>}]}
                 className="stepper"
                 stepClassName="stepButtons"
                 styleConfig={{
@@ -533,7 +599,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     activeBgColor:"#643693",
                     completedBgColor:"#321e4f",
                     inactiveBgColor:"#aaa",
-                    labelFontSize:"16px",
+                    labelFontSize:"14px",
                     size:"2rem"
                 }}
                 connectorStateColors={true}
@@ -570,7 +636,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 </div>
                 :null
             }
-          {<div className="WelcomeContactUs">For help, <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="no-referrer">Click here</a> OR <a href="mailto:support@avoautomation.com">Contact us</a></div>}
+          {<div className="WelcomeContactUs">In case you need any help, <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="no-referrer">Click here</a> OR <a href="mailto:support@avoautomation.com">Contact us</a></div>}
         </div>
         </div>
     </div>
