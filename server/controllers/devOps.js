@@ -37,11 +37,16 @@ exports.fetchModules = async (req, res) => {
 		const moduleData = await getModule(req.body);
 		const finalData = await utils.fetchData(moduleData, "devops/getScenariosForDevops", "fetchModules");
 		const responsedata = {
-			'normalExecution': finalData,
+			'normalExecution': [],
 			'batchExecution': {},
 			'e2eExecution': [],
 		}
-		for(let moduleDetails of finalData) {
+		for(let [index,moduleDetails] of finalData.entries()) {
+			if(moduleData[index].type == 'basic'){
+				responsedata['normalExecution'].push(moduleDetails);
+			} else {
+				responsedata['e2eExecution'].push(moduleDetails);
+			}
 			if(moduleDetails['batchname'] == '') continue;
 			if(responsedata['batchExecution'][moduleDetails['batchname']] == undefined){
 				responsedata['batchExecution'][moduleDetails['batchname']] = [];
@@ -262,3 +267,18 @@ exports.saveAvoGrid = async(req,res) => {
 // 		return res.status(500).send("fail");
 // 	}
 // };
+exports.fetchProjectReleaseCycleDevops =  async(req, res) => {
+	const fnName = "fetchProjectReleaseCycleDevops";
+	try {
+		logger.info("Inside UI service: " + fnName);
+		var input = {
+			"configurekey": req.body.configkey,
+			"executionListId": req.body.executionListId
+		};
+		const list = await utils.fetchData(input, "devops/fetchProjectReleaseCycleDevops", "fetchProjectReleaseCycleDevops");
+		res.send(list);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
