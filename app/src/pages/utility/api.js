@@ -583,9 +583,9 @@ export const setExecStatus = async(props) => {
     }
 }
 
-export const fetchProjectReleaseCycleDevops = async(props) => {
+export const fetchModuleListDevopsReport = async(props) => {
     try{
-        const res = await axios(url+'/fetchProjectReleaseCycleDevops', {
+        const res = await axios(url+'/fetchModuleListDevopsReport', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',

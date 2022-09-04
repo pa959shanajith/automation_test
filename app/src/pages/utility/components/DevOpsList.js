@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer } from '../../global';
 import { SearchBox } from '@avo/designcomponents';
-import { fetchConfigureList, deleteConfigureKey } from '../api';
+import { fetchConfigureList, deleteConfigureKey, execAutomation } from '../api';
 import {v4 as uuid} from 'uuid';
 
 import "../styles/DevOps.scss";
@@ -195,7 +195,16 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                 <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
                                 <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
-                                <td className="tkn-table__button"> <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp; <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/></td>
+                                <td className="tkn-table__button">
+                                     <button style={{ marginRight: '10%' }} onClick={async ()=>{
+                                            let temp = await execAutomation(item.configurekey);
+                                            if(temp.status == 'pass') {
+                                                setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                                            }
+                                        }}>Execute Now</button>
+                                     <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
+                                     <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>;
+                                </td>
                             </tr>)
                         }
                         {
@@ -205,7 +214,16 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                 <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
                                 <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
-                                <td className="tkn-table__button"> <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp; <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/></td>
+                                <td className="tkn-table__button">
+                                     <button style={{ marginRight: '10%' }} onClick={async ()=>{
+                                         let temp = await execAutomation(item.configurekey);
+                                         if(temp.status == 'pass') {
+                                            setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                                        }
+                                     }}>Execute Now</button>
+                                     <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
+                                     <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>;
+                                      </td>
                             </tr>)
                         }
                     </tbody>
