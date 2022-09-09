@@ -165,12 +165,13 @@ const CreateGrid = ({
 
           let Agents = currentGrid.agents;
           const getIceCount = (hostname) => {
-            for (let element = 0; element < Agents.length; element++) {
-              if (Agents[element].Hostname == hostname) {
-                return Agents[element].icecount;
+            for (let index = 0; index < Agents.length; index++) {
+              if (Agents[index].Hostname === hostname) {
+                return Agents[index].icecount;
               }
             }
           };
+
           setAgentData([
             ...selectedAgentsList.map((agent) => ({
               ...agent,
