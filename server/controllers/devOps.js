@@ -42,6 +42,7 @@ exports.fetchModules = async (req, res) => {
 			'e2eExecution': [],
 		}
 		for(let [index,moduleDetails] of finalData.entries()) {
+			moduleDetails['type'] = moduleData[index].type;
 			if(moduleData[index].type == 'basic'){
 				responsedata['normalExecution'].push(moduleDetails);
 			} else {
