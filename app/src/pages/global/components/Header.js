@@ -83,7 +83,9 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
     else if (/mac os x/.test(userAgent))
         setOS("MacOS");
 
-    else 
+    else if (/linux x86_64/.test(userAgent))
+        setOS("Linux")
+    else
         setOS("Not Supported");
   }
     
@@ -290,12 +292,14 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
                                 <div id="downloadICEdrop" onMouseEnter={()=>{setShowICEMenu(true)}}>
                                     <Link style={{display:"flex", justifyContent:"space-between"}} to="#">Download ICE<div className="fa chevron fa-chevron-right" style={{display:"flex",justifyContent:"flex-end",alignItems:"center"}}></div></Link>
                                 </div>:null}
+                                {OS === "Linux" ?
+                                <div onClick={()=>{getIce("avoclientpath_Linux")}}><Link to="#">Download ICE</Link></div>:null}
                                 
                                 {showICEMenu?
                                 (<div id="downloadICEContainer">
                                     <div id="downloadICEMenu" className="user-name-menu dropdown-menu dropdown-menu-right">
                                         {Object.keys(config).map((osPathname)=>{
-                                            if (osPathname.includes("Windows")){
+                                            if (osPathname.includes("Windows") || osPathname.includes("Linux")){
                                                 return <></>;
                                             }
                                             let versionName = osPathname.split("_")[1]
