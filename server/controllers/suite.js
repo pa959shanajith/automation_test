@@ -173,7 +173,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	const fnName = "ExecuteTestSuite_ICE"
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	const batchExecutionData = req.body.executionData;
-	if(batchExecutionData['configurekey']) {
+	if(batchExecutionData['configurekey'] && req.query == 'fetchingTestSuiteIds') {
 		let index = -1;
 		for (let testSuiteData of batchExecutionData.batchInfo){
 			index++;
@@ -199,6 +199,10 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 			batchExecutionData['batchInfo'][index]['testsuiteId'] = response[mindmapid].testsuiteid;
 			console.log(response);
 		}
+		return {
+			'executionData': batchExecutionData,
+            'session':req.session,
+		};
 	}
 	var targetUser = batchExecutionData.targetUser;
 	const type = batchExecutionData.type;
@@ -246,8 +250,8 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 		Object.assign(result,makeReq);
 	}
 	if(batchExecutionData['configurekey']) {
-		result['cicd'] = 'pass';
-		return result;
+		
+		return makeReq;
 	}
 	return res.send(result);
 };

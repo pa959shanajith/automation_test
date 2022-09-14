@@ -17,7 +17,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
             var result = "fail";
             logger.error("Error in executeTestSuite. Error: %s", ex)
         }
-        if(batchExecutionData['configurekey']) return 'pass'
+        if(batchExecutionData['configurekey']) return result;
         let reportResult = {};
         batchExecutionData.batchInfo[0]["testsuitename"] = batchExecutionData.batchInfo[0]["testsuiteName"];
 

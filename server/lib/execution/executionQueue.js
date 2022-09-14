@@ -229,8 +229,10 @@ module.exports.Execution_Queue = class Execution_Queue {
                     response['variant'] = "error";
                     response["message"] = targetICE + " not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."
                 } else {
+                    let executionRequest = '' 
                     if(batchExecutionData['configurekey'] && batchExecutionData['configurekey'] != '' && batchExecutionData['configurename'] && batchExecutionData['configurename'] != '' ){
-                        await this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
+                        executionRequest = await this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
+                        return executionRequest;
                     }
                     response['status'] = "pass";
                     response["message"] = "ICE not selected."
@@ -587,10 +589,14 @@ module.exports.Execution_Queue = class Execution_Queue {
         const executionData = await utils.fetchData(inputs, "devops/configurekey", fnName);
         const newExecutionListId = uuidV4()
         executionData['executionData']['executionListId'] = newExecutionListId;
-        const responseFromAddingExecutionData = await suitFunctions.ExecuteTestSuite_ICE({
+        const gettingTestSuiteIds = await suitFunctions.ExecuteTestSuite_ICE({
             'body': executionData,
-            'session':executionData.session
+            'session':executionData.session,
+            'query':'fetchingTestSuiteIds'
         });
+
+        //Storing the data in executionlist
+        const storeInExecutionList =  await utils.fetchData(gettingTestSuiteIds, "devops/executionList", fnName);
 
 
         if(!(req.body.key in this.key_list))
@@ -598,21 +604,21 @@ module.exports.Execution_Queue = class Execution_Queue {
 
         let keyQueue = this.key_list[req.body.key];
         // testSuiteInfo = await utils.fetchData(key,'/',);
-        const inputsToGetTestSuite = {
-            'executionListId': newExecutionListId,
-            'key': req.body.key
-        }
-        let Info = await utils.fetchData(inputsToGetTestSuite, "devops/getTestSuite", fnName);
-        let testSuiteInfo = Info.testSuiteInfo;
+        // const inputsToGetTestSuite = {
+        //     'executionListId': newExecutionListId,
+        //     'key': req.body.key
+        // }
+        // let Info = await utils.fetchData(inputsToGetTestSuite, "devops/getTestSuite", fnName);
+        let testSuiteInfo = gettingTestSuiteIds.executionData.batchInfo;
         // let avogridid = Info.avogridid;
-        console.info(testSuiteInfo);
+        // console.info(testSuiteInfo);
 
         let newExecutionList = []
         for (let ids of testSuiteInfo)
             newExecutionList.push({
-                executionListId:Info.executionListId,
-                moduleid:ids,status: 'QUEUED',
-                avoagentList:Info.avoagentList,
+                executionListId:newExecutionListId,
+                moduleid:ids.testsuiteId,status: 'QUEUED',
+                avoagentList:gettingTestSuiteIds.executionData.avoagents,
             });
 
         keyQueue.push(newExecutionList);
@@ -622,11 +628,11 @@ module.exports.Execution_Queue = class Execution_Queue {
         let execution_Queue = await cache.get('execution_list');
         console.info(execution_Queue);
 
-        if(Info.executiontype == 'asynchronous'){
+        if(gettingTestSuiteIds.executionData.executiontype == 'asynchronous'){
             response['status'] = "pass";
             return response;
         }
-        synchronousFlag = await this.checkForCompletion(req.body.key,Info.executionListId);
+        synchronousFlag = await this.checkForCompletion(req.body.key,gettingTestSuiteIds.executionData.executionListId);
         if(synchronousFlag) response['status'] = "pass";
 
         } catch (error) {
@@ -774,10 +780,15 @@ module.exports.Execution_Queue = class Execution_Queue {
                             moduleIndex++;
                             if(testSuites['status'] == 'QUEUED') {
                                 executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}, "devops/getExecScenario", fnName);
+                                const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
+                                    'body': executionData[0],
+                                    'session':executionData[0].session,
+                                });
                                 if (executionData == "fail" || executionData == "forbidden") {
                                     response['status'] = "fail";
                                     return response;
                                 }
+                                executionData = [executionRequest];
                                 //Updating the status to IN_Progress
                                 this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
                                 await cache.set("execution_list", this.key_list);

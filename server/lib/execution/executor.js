@@ -308,9 +308,10 @@ class TestSuiteExecutor {
         logger.info("Sending request to ICE for executeTestSuite");
         const dataToIce = { "emitAction": "executeTestSuite", "username": icename, "executionRequest": execReq };
         if(execReq['configurekey'] && execReq['configurekey']!='' && execReq['configurename'] && execReq['configurename']!=''){
-            const status = await utils.fetchData(dataToIce, "devops/executionList", fnName);
-            if (status == "fail" || status == "forbidden") return "fail";
+            // const status = await utils.fetchData(dataToIce, "devops/executionList", fnName);
+            // if (status == "fail" || status == "forbidden") return "fail";
             // return 'CICD'
+            return dataToIce;
         }
         else{
             redisServer.redisPubICE.publish('ICE1_' + channel + '_' + icename, JSON.stringify(dataToIce));
