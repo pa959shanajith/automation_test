@@ -382,6 +382,7 @@ if (cluster.isMaster) {
 		app.post('/exportToExcel', auth.protect, mindmap.exportToExcel);
 		app.post('/exportMindmap', auth.protect, mindmap.exportMindmap);
 		app.post('/importMindmap', auth.protect, mindmap.importMindmap);
+		app.post('/gitToMindmap', auth.protect, mindmap.gitToMindmap);
 		app.post('/pdProcess', auth.protect, pdintegration.pdProcess);	// process discovery service
 		app.post('/exportToGit', auth.protect, mindmap.exportToGit);
 		app.post('/importGitMindmap', auth.protect, mindmap.importGitMindmap);
