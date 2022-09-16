@@ -215,7 +215,9 @@ if (cluster.isMaster) {
 		app.post('/ICE_provisioning_register', io.registerICE);
 		app.post('/openScreenShot_API', report.openScreenShot_API);
 		app.post('/getExecScenario', suite.getExecScenario);
-
+		app.post('/execAutomation',suite.execAutomation);
+		app.post('/getAgentTask',suite.getAgentTask);
+		app.post('/setExecStatus',suite.setExecStatus);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -546,8 +548,6 @@ if (cluster.isMaster) {
 		app.post('/getAvoAgentAndAvoGridList', auth.protect, devOps.getAvoAgentAndAvoGridList);
 		app.post('/fetchModules', auth.protect, devOps.fetchModules);
 		app.post('/storeConfigureKey', auth.protect, devOps.storeConfigureKey);
-		app.post('/execAutomation', auth.protect, suite.execAutomation);
-		app.post('/getAgentTask', auth.protect, suite.getAgentTask);
 		app.post('/fetchProjects', auth.protect, devOps.getAllSuites_ICE);
 		app.post('/deleteConfigureKey', auth.protect, devOps.deleteConfigureKey);
 		app.post('/saveAvoAgent', auth.protect, devOps.saveAvoAgent);
