@@ -95,7 +95,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
                 { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
             ],
-            scenarioList: getScenarioList(item.executionRequest.batchInfo),
+            scenarioList: getScenarioList(item.executionRequest.batchInfo, item.executionRequest.selectedModuleType),
+            selectedModuleType: item.executionRequest.selectedModuleType,
             avoAgentGrid: 'cicdanyagentcanbeselected',
             browsers: item.executionRequest.browserType,
             integration: getIntegrationSelected(item.executionRequest.integration),
@@ -105,13 +106,15 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
         });
         return;
     }
-    const getScenarioList = (batchInfo) => {
+    const getScenarioList = (batchInfo, selectedModulesType) => {
         let scenarioList = [];
-        batchInfo.forEach(batch => {
-            batch.suiteDetails.forEach(suite => {
-                scenarioList.push(suite.scenarioId);
-            });
-        });
+        for(let batch of batchInfo)
+            for(let suiteIndex=0; suiteIndex<batch.suiteDetails.length; suiteIndex++) {
+                if(selectedModulesType === 'normalExecution') scenarioList.push(batch.suiteDetails[suiteIndex].scenarioId)
+                else if(selectedModulesType === 'batchExecution') scenarioList.push(batch.batchname+batch.testsuiteId+suiteIndex+batch.suiteDetails[suiteIndex].scenarioId)
+                else {
+                    scenarioList.push(batch.batchname+batch.testsuiteId+suiteIndex+batch.suiteDetails[suiteIndex].scenarioId)}
+            }
         return scenarioList;
     }
     useEffect(() => {
@@ -151,6 +154,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                     scenarioList: [],
                     avoAgentGrid: 'cicdanyagentcanbeselected',
                     browsers: [],
+                    selectedModuleType: 'normalExecution',
                     integration: '',
                     executionType: 'asynchronous',
                     isHeadless: false
@@ -189,7 +193,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 <table className = "table table-hover sessionTable" id="configList">
                     <tbody>
                         {
-                            searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.key} className='tkn-table__row'>
+                            searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
                                 <td className="tkn-table__name" data-for="name" data-tip={item.configurename}> <ReactTooltip id="name" effect="solid" backgroundColor="black" /><React.Fragment>{item.configurename}</React.Fragment> </td>
                                 <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
@@ -203,12 +207,12 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                             }
                                         }}>Execute Now</button>
                                      <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
-                                     <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>;
+                                     <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
                                 </td>
                             </tr>)
                         }
                         {
-                            searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.key} className='tkn-table__row'>
+                            searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
                                 <td className="tkn-table__name" data-for="name" data-tip={item.configurename}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>
                                 <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
@@ -222,7 +226,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                         }
                                      }}>Execute Now</button>
                                      <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
-                                     <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>;
+                                     <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
                                       </td>
                             </tr>)
                         }
