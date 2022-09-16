@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import ThumbnailExecute from './ThumbnailExecute';
 import { useHistory } from 'react-router-dom';
+import {CheckBox} from "@avo/designcomponents";
 import "../styles/ActionBarItems.scss"
 
 const UpperContent = ({appType, isMac, UpdateBrowserTypeExe, browserTypeExe}) => {
@@ -8,7 +9,7 @@ const UpperContent = ({appType, isMac, UpdateBrowserTypeExe, browserTypeExe}) =>
 
     if (appType === "Web") {renderComp.splice(1, 0, <Fragment key={2}>
                                 {WebList.map((icon, i) => <ThumbnailExecute key={i} title={icon.title} tooltip={icon.tooltip} img={icon.img} svg={icon.svg} id={icon.id} UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe} />)}
-                                { isMac && <ThumbnailExecute title="Safari" tooltip={"Execute on Safari"} img="static/imgs/ic-safari.png"  id="6" UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe} />}</Fragment>)}
+                                { isMac && <ThumbnailExecute title="Safari" tooltip={"Execute on Safari"} img="static/imgs/safari_logo_new.svg"  id="6" UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe} />}</Fragment>)}
     else if (appType === "OEBS") renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <ThumbnailExecute key={i} title={icon.title} tooltip={"Execute on "+icon.title} img={icon.img} id={icon.id} UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe} />)}</Fragment>)
     else if (appType === "Desktop") renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <ThumbnailExecute key={i} title={icon.title} tooltip={"Execute on "+icon.title} img={icon.img} id={icon.id} UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe} />)}</Fragment>)
     else if (appType === "System") renderComp.splice(1, 0, <Fragment key={2}>{systemList.map((icon, i) => <ThumbnailExecute key={i} title={icon.title} tooltip={"Execute on "+icon.title} img={icon.img} id={icon.id} UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe}/>)}</Fragment>)
@@ -32,16 +33,25 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
         <>
             {appType === "Web"?
                 <>
-                <div className="e__parallel_icon" title="Parallel Execution" onClick={()=>{updateExecAction()}}>
-                    <img className={"e__parallel_icon__img"+ (execAction==="parallel" ? " e__selectedBrowser" : "" )}   src='static/imgs/ic-parallel.png' alt="Parallel Execution"/>
+                <div className={"e__parallel_icon" + (execAction==="parallel" ? " e__selectedBrowser" : "" )} title="Parallel Execution" onClick={()=>{updateExecAction()}}>
+                    {execAction==="parallel" ?<div id="browser-checkbox"><CheckBox label="" checked={true} onChange={() => {}} variant="circle"/></div> :null}
+                    <img className={"e__parallel_icon__img"}   src='static/imgs/ic-parallel.png' alt="Parallel Execution"/>
                     <span className="thumbnail__title">Parallel Execution</span>
                 </div>
-                <div className="e__parallel_icon" title="SauceLabs Execution" onClick={()=>{updateExecEnv()}}>
-                    <img className={"e__parallel_icon__img"+ (execEnv!=="default" ? " e__selectedBrowser" : "" )}   src='static/imgs/saucelabs.png' alt="SauceLabs Execution" title="SauceLabs Execution"/>
+                <div className={"e__parallel_icon" + (execEnv!=="default" ? " e__selectedBrowser" : "" )} title="SauceLabs Execution" onClick={()=>{updateExecEnv()}}>
+                    {execEnv!=="default"?<div id="browser-checkbox"><CheckBox label="" checked={true} onChange={() => {}} variant="circle"/></div> : null}
+                    <img className={"e__parallel_icon__img"}   src='static/imgs/saucelabs.png' alt="SauceLabs Execution" title="SauceLabs Execution"/>
                     <span className="thumbnail__title">SauceLabs Execution</span>
                 </div>
                 </>
             :null}
+            {appType === "MobileWeb" && 
+                <div className={"e__parallel_icon" + (execEnv!=="default" ? " e__selectedBrowser" : "" )} title="SauceLabs Execution" onClick={()=>{updateExecEnv()}}>
+                    {execEnv!=="default"?<div id="browser-checkbox"><CheckBox label="" checked={true} onChange={() => {}} variant="circle"/></div> : null}
+                    <img className={"e__parallel_icon__img"} src='static/imgs/saucelabs.png' alt="SauceLabs Execution" title="SauceLabs Execution"/>
+                    <span className="thumbnail__title">SauceLabs Execution</span>
+                </div>
+            }
             <div className="e__parallel_icon"  title="Scheduling" onClick={()=>{scheduleRedirect()}}>
                 <img className="e__parallel_icon__img"   src='static/imgs/ic-scheduling.png' alt="Scheduling"/>
                 <span className="thumbnail__title">Schedule</span>
@@ -51,11 +61,11 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
 };
 
 const WebList = [
-    {'title': "Internet Explorer", 'tooltip':"Execute on IE", 'img': "static/imgs/ic-ie.png",'id':"3"}, 
-    {'title': "Google Chrome", 'tooltip':"Execute on Chrome", 'img': "static/imgs/ic-chrome.png",'id':"1"},
-    {'title': "Mozilla Firefox", 'tooltip':"Execute on Mozilla Firefox", 'img': "static/imgs/ic-mozilla.png",'id':"2"},
-    {'title': "Microsoft Edge", 'tooltip':"Execute on Microsoft Edge", 'svg': "static/imgs/ic-edge.svg",'id':"7"},
-    {'title': "Edge Chromium", 'tooltip':"Execute on Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg",'id':"8"}
+    {'title': "Internet Explorer", 'tooltip':"Execute on IE", 'img': "static/imgs/internet_explorer_logo_new.svg",'id':"3"}, 
+    {'title': "Google Chrome", 'tooltip':"Execute on Chrome", 'img': "static/imgs/chrome_logo_new.svg",'id':"1"},
+    {'title': "Mozilla Firefox", 'tooltip':"Execute on Mozilla Firefox", 'img': "static/imgs/firefox_logo_new.svg",'id':"2"},
+    {'title': "Microsoft Edge", 'tooltip':"Execute on Microsoft Edge", 'img': "static/imgs/edge_logo_new.svg",'id':"7"},
+    {'title': "Edge Chromium", 'tooltip':"Execute on Edge Chromium", 'img': "static/imgs/edge_logo_new.svg",'id':"8"}
     ]
 
 const oebsList = [{'title': "OEBS Apps" , 'img': 'static/imgs/ic-desktop.png','id':"1"}]

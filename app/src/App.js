@@ -64,7 +64,7 @@ const RouteApp = () => {
     <SocketFactory/>
     <Switch>
       <Route exact path="/" component={Base} />
-      <Route path="/login" component={Login} />
+      <Route path={["/login","/verify","/reset"]} component={Login} />
       <Route path="/admin" component={Admin} />
       <Route path="/mindmap" component={Mindmap} />
       <Route path="/plugin" component={Plugin} />

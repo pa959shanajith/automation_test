@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../styles/WelcomeWizard.scss";
 import axios from "axios";
-import {ProgressIndicator} from "@fluentui/react";
+import {ProgressIndicator , AnimationClassNames} from "@fluentui/react";
 import { Stepper } from 'react-form-stepper';
 import { Messages as MSG, setMsg, RedirectPage, BrowserFp } from '../../global';
-import { AnimationClassNames } from '@fluentui/react';
 import { ScrollBar } from '../../global';
 import { useSelector, useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
@@ -12,9 +11,26 @@ import "../styles/TermsAndConditions.scss";
 import * as api from '../api';
 import { useHistory } from 'react-router-dom';
 import { manageUserDetails } from '../../admin/api';
+import { IconButton } from "@avo/designcomponents"
+
+const DPCard = ({title, items, type}) => {
+    return (<div className="d-p-card">
+                <div className="d-p-card__title">{title}</div>
+                <div className="d-p-card__itemsContainer">
+                  {items.map((item,idx)=> (<>
+                    <div key={title+idx} className="d-p-card__item">
+                      <div className="d-p-card__I-title">{type!=="OR" ? idx+1+". " : ""} {item.title}</div>
+                      {/* <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${item.imageName}.svg)`}}></div> */}
+                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.svg`} className="d-p-card__image"/></div>
+                    </div>
+                    {idx !== items.length-1 ? <div key={title+idx+"sep"} className="d-p-card__separator">{type==="OR"?"OR  ": <div className="d-p-card__div__image" style={{backgroundImage:`url(static/imgs/WW_r_arrow.svg)`}}></div>}</div>:null}
+                  </>))}
+                </div>
+            </div>)
+}
 
 
-const WelcomeWizard = ({showWizard}) => {
+const WelcomeWizard = ({showWizard, setPopover}) => {
   const [percentComplete,setPercentComplete] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
   const [showIndicator, setShowIndicator] = useState(false);
@@ -25,7 +41,13 @@ const WelcomeWizard = ({showWizard}) => {
   const [docLink,setDocLink] = useState("#");
   const [vidLink,setVidLink] = useState("#");
   const [config, setConfig] = useState({});
-  const [OS,setOS] = useState("Windows")
+  const [OS,setOS] = useState("Windows");
+  const [downloadScreenCounter,setdownloadScreenCounter] = useState(0);
+  const [animationDir, setAnimationDir] = useState(false);
+  const [cardListNo, setCardListNo] = useState(0);
+  const [tncAcceptEnabled, setTncAcceptEnabled] = useState(false);
+  const animationInterval = useRef(undefined);
+  const TnCInnerRef = useRef(undefined);
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -43,6 +65,13 @@ const WelcomeWizard = ({showWizard}) => {
 
   useEffect(()=>{
     getOS();
+    if(activeStep===0){
+      let observer = new IntersectionObserver(function(entries) {
+        if(entries[0].isIntersecting === true)
+            setTncAcceptEnabled(true)
+      }, { threshold: [1], root: document.querySelector('#tnc_content')});
+      observer.observe(document.querySelector("#lastStepTnC"));
+    }
     (async()=>{
         const response = await fetch("/getClientConfig")
         let {avoClientConfig, trainingLinks} = await response.json();
@@ -54,24 +83,46 @@ const WelcomeWizard = ({showWizard}) => {
   },[])
 
   useEffect(()=>{
+    if(activeStep===1)
+        animationInterval.current = setInterval(()=>{
+            setdownloadScreenCounter((prevCount)=>{
+                if (prevCount===2){
+                    return prevCount-2;
+                }
+                return prevCount+1
+            })
+        },1000)
+
+    return ()=>{
+        if(animationInterval.current){
+            clearInterval(animationInterval.current)
+        }
+    }
+  },[activeStep])
+
+  useEffect(()=>{
     if (percentComplete === 1) {
-        updateStepNumber();
+        updateStepNumber(1);
         showDownloadPopover();
     }
   },[percentComplete]);
 
   // updating step no. in db and redux
-  const updateStepNumber = async() => {
-    let stepNo = activeStep + 1;
-    setActiveStep((currPage) => currPage + 1);
+  const updateStepNumber = async(n) => {
+    let stepNo = activeStep + n;
+
+    if(stepNo===3)
+        setAnimationDir(true);
+
+    setActiveStep((currPage) => currPage + n);
     const userObj = {
         userid:userInfo['user_id'],
         username:userInfo['username'],
         welcomeStepNo:stepNo
     }
     try{
-        var data = await manageUserDetails("stepUpdate", userObj);
         dispatch({type:actionTypes.SET_USERINFO, payload: {...userInfo,welcomeStepNo:stepNo}});
+        var data = await manageUserDetails("stepUpdate", userObj);
     } catch(err) {
         console.log(err)
     }
@@ -84,6 +135,7 @@ const WelcomeWizard = ({showWizard}) => {
       else {
           setDownloadPop("chrome")
       }
+      setTimeout(()=>{setDownloadPop("")},10000)
   }
 
   // action that accepts the EULA
@@ -106,12 +158,14 @@ const WelcomeWizard = ({showWizard}) => {
             RedirectPage(history);
         } else if (data !== "success") {
             setMsg({"CONTENT":"Failed to record user preference. Please Try again!", "VARIANT":"error"});
-            showWizard(false);
+            // showWizard(false);
             RedirectPage(history, { reason: "userPrefHandle" });
         }
         else {
             dispatch({type:actionTypes.SET_USERINFO, payload: {...userInfo,tandc:false}});
-            showWizard(false);
+            setPopover(true);
+            setActiveStep((prevStep)=>prevStep+1);
+            setTimeout(()=>{showWizard(false)},1000);
         }
     })
     .catch(error => {
@@ -144,6 +198,12 @@ const WelcomeWizard = ({showWizard}) => {
         if (status === "available"){
             setShowMacOSSelection(false);
             setShowIndicator(true);
+            // const link = document.createElement('a');
+            // link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
+            // link.setAttribute('download', "avoURL.txt");
+            // document.body.appendChild(link);
+            // link.click();
+            // document.body.removeChild(link);
             axios({
                 url: window.location.origin+"/downloadICE?ver="+clientVer+"&file=getICE",
                 method: "GET",
@@ -155,9 +215,10 @@ const WelcomeWizard = ({showWizard}) => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', "AvoAssureClient."+config[clientVer].split(".").pop());
+                link.setAttribute('download', "AvoAssureClient"+(userInfo.isTrial?("_"+window.location.origin.split("//")[1].split(".avoassure")[0]):"")+"."+config[clientVer].split(".").pop());
                 document.body.appendChild(link);
                 link.click();
+                document.body.removeChild(link);
             }).catch((err)=>{
                 console.log(err);
                 setShowIndicator(false);
@@ -172,14 +233,15 @@ const WelcomeWizard = ({showWizard}) => {
 
   
   // send correct filename to getICE and start downloading Client
-  const _handleClientDownload = () =>{
+  const _handleClientDownload = (pkgName=undefined) =>{
     if(showMacOSSelection){
-        if (selectedMacOS==="") {
-            setMsg({"CONTENT":"Please select a OS version", "VARIANT":"error"});
-        }
-        else{
-            getIce("avoclientpath_"+selectedMacOS)
-        }
+        // if (selectedMacOS==="") {
+        //     setMsg({"CONTENT":"Please select a OS version", "VARIANT":"error"});
+        // }
+        // else{
+        setSelectedMacOS(pkgName)
+        getIce("avoclientpath_"+pkgName)
+        // }
     }
     else if (OS==="Windows")
         getIce("avoclientpath_Windows")
@@ -188,10 +250,18 @@ const WelcomeWizard = ({showWizard}) => {
         setMsg(MSG.GLOBAL.ERR_PACKAGE);
   }
 
+  // const onScrollTnC = (e) => {
+  // //   if (TnCInnerRef.current) {
+  // //     // const { scrollTop, scrollHeight, clientHeight } = TnCInnerRef.current;
+  // //     // if (Math.abs(scrollHeight - (scrollTop + clientHeight) <= 1)) {
+          
+  // //     // }
+  // //   }
+  // }
+
   const getTermsAndConditions = () => {
-      return <>
-            <ScrollBar>
-            <div id="tnc_content">
+      return (
+            <div id="tnc_content" ref={TnCInnerRef}>
                 <h4 className="tnc_header">SOFTWARE {userInfo.isTrial?"TRIAL":""} LICENSE AGREEMENT</h4>
                 <p className="tnc_bold">THIS SOFTWARE {userInfo.isTrial?"TRIAL":""} LICENSE AGREEMENT (“LICENSE AGREEMENT”) IS A LEGAL CONTRACT BETWEEN AVO AUTOMATION, A DIVISION OF SLK SOFTWARE SERVICES PVT LTD (“LICENSOR”) AND YOU, EITHER AS AN INDIVIDUAL OR AN ENTITY (“LICENSEE”). IF THE LICENSEE IS ACCEPTING ON BEHALF OF AN ENTITY, THE LICENSEE REPRESENTS AND WARRANTS THAT THE LICENSEE HAS THE AUTHORITY TO BIND THAT ENTITY TO THIS AGREEMENT LICENSORIS WILLING TO AUTHORIZE LICENSEE’S USE OF THE SOFTWARE ASSOCIATED WITH THIS LICENSE AGREEMENT ONLY UPON THE CONDITION THAT LICENSEE ACCEPTS THIS LICENSE AGREEMENT WHICH GOVERNS LICENSEE’S USE OF THE SOFTWARE. BY DOWNLOADING, INSTALLING, OR ACCESSING AND USING THE SOFTWARE, LICENSEE INDICATES LICENSEE’S ACCEPTANCE OF THIS LICENSE AGREEMENT AND LICENSEE’S AGREEMENT TO COMPLY WITH THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT.</p>
                 <div>
@@ -316,83 +386,212 @@ const WelcomeWizard = ({showWizard}) => {
                     <p><span className="tnc_num_idx">17.3.    </span> <b>Severability.</b> If a court of competent jurisdiction declares any provision of this Agreement to be invalid, unlawful or unenforceable as drafted, the Parties intend that such provision be amended and construed in a manner designed to effectuate the purposes of the provision to the fullest extent permitted by law. If such provision cannot be so amended and construed, it shall be severed, and the remaining provisions shall remain unimpaired and in full force and effect to the fullest extent permitted by law.</p>
                 </div>
                 <br/>
-                <p><b>By clicking the “Agree” button, Licensee hereby agrees to be bound by all the terms and conditions stated herein</b></p>
-            </div>
-            </ScrollBar>
-      </>
+                <p id="lastStepTnC"><b>By clicking the “Agree” button, Licensee hereby agrees to be bound by all the terms and conditions stated herein</b></p>
+            </div>)
   }
 
   const getWelcomeStep = ()=>{
-    return <div className="welcomeToAssure">
-        <div className="step1">
+    return <div className={"welcomeInstall "+AnimationClassNames.slideDownIn20} style={{justifyContent:"unset !important"}}>
+        {/* <div className="step1">
             <div>Terms and Conditions</div>
-        </div>
+        </div> */}
         {getTermsAndConditions()}
-        <button className="type1-button"onClick={updateStepNumber}>I Agree</button>
+        <button className="type1-button static-button" disabled={!tncAcceptEnabled} onClick={()=>{updateStepNumber(1)}}>I Agree</button>
     </div>
   };
 
+  const InstallationSteps_win = [
+      {
+        title:"Open the AvoAssureClient.exe file either from:", 
+        items:[
+          {title:"Download panel",imageName:"WW_win_1_1"},
+          {title:"Browser's downloads section.",imageName:"WW_win_1_2"},
+          {title:"System's downloads folder.",imageName:"WW_win_1_3"}
+        ],
+        type:"OR"
+      },
+      {
+        title:"If prompted, allow the following permission:", 
+        items:[
+          {title:<>Click on <b>"More Info"</b></>,imageName:"WW_win_2_1"},
+          {title:<>Click on <b>"Run Anyway"</b></>,imageName:"WW_win_2_2"}
+        ],
+        type:"NOR"
+      },
+      {
+        title:"To install Avo Assure client follow the below steps:", 
+        items:[
+          {title:"Intialise installation",imageName:"WW_win_3_1"},
+          {title:"Extracting files",imageName:"WW_win_3_2"},
+          {title:"Finish and Launch",imageName:"WW_win_3_2"}
+        ],
+        type:"NOR"
+      },
+      {
+        title:"Establish Avo Server and Client Connection:", 
+        items:[
+          {title:"Initialise Avo Client via desktop shortcut",imageName:"WW_win_4_1"},
+          {title:"Connect ICE via clicking on Connect Button",imageName:"WW_win_4_2"}
+        ],
+        type:"NOR"
+      }
+  ] 
+
+  const InstallationSteps_mac = [
+    {
+      title:`Open and Extract the "AvoAssureClient.zip" file either from:`, 
+      items:[
+        {title:"Download panel",imageName:"WW_mac_1_1"},
+        {title:"Browser's downloads section.",imageName:"WW_mac_1_2"},
+        {title:"System's downloads folder.",imageName:"WW_mac_1_3"}
+      ],
+      type:"OR"
+    },
+    {
+      title:<><div style={{fontStyle:"italic", fontSize:"0.7rem"}}>Note: You need to have <b>Python {selectedMacOS==="BigSur"?"v3.7.0":"v3.7.9"}</b> installed in your system or <a style={{color:"#5f338f"}} href={`https://www.python.org/ftp/python/${selectedMacOS==="BigSur"?"3.7.0":"3.7.9"}/`}>click here to install</a>.</div></>, 
+      items:[
+        {title:"Drag and drop the extracted folder onto the Terminal icon in the Dock.",imageName:"WW_mac_2_1"},
+      ],
+      type:"OR"
+    },
+    {
+      title:`Run the below files:`, 
+      items:[
+        {title:`Type "./unquarantine.sh" and press enter.`,imageName:"WW_mac_3_1"},
+        {title:`Type "./run.sh" and press enter.`,imageName:"WW_mac_3_2"},
+      ],
+      type:"NOR"
+    },
+    {
+      title:"Establish Avo Server and Client Connection:", 
+      items:[
+        {title:"Connect ICE via clicking on Connect Button",imageName:"WW_mac_4_1"}
+      ],
+      type:"OR"
+    }
+    // {subtitle:"Before Installing",content:<><div style={{fontStyle:"italic", marginBottom:5}}>Note - You need to have <b>Python {selectedMacOS==="BigSur"?"v3.7.0":"v3.7.9"}</b> installed in your system or <a style={{color:"#5f338f"}} href={`https://www.python.org/ftp/python/${selectedMacOS==="BigSur"?"3.7.0":"3.7.9"}/`}>click here to install</a>.</div><div>Drag and drop the extracted folder onto the Terminal icon in the Dock.</div></>,imageName:"instruction-2_mac"},
+    // {subtitle:"Run Files", content:<><ol type="1" style={{margin: 0, paddingLeft: 20}}><li>Type <b>"./unquarantine.sh"</b> in the terminal window and press enter. If prompted, enter your system password.</li><li>Type <b>"./run.sh"</b> and press enter.</li></ol></>,imageName:"instruction-3_mac"},
+    // {subtitle:"Connect", content:<><ol type="1" style={{margin: 0, paddingLeft: 20}}><li>Click on <b>Register</b> button, and then click on submit.</li><li>Click on the <b>Connect</b> button in AvoAssure Client.</li></ol></>,imageName:"instruction-4_mac"}
+  ]
+
+  const afterDownloadInstructions = () => {
+      return <div className={"welcomeInstall "+(animationDir?AnimationClassNames.slideRightIn400:AnimationClassNames.slideLeftIn400)} style={{justifyContent:"space-evenly"}}>
+        <div className="d-p-header">
+            <div className="d-p-header__title"><div>Thanks for downloading !</div></div>
+            <div className="d-p-header__subtitle">If your download didn't start then don't worry, you can download it from <b>"User Profile" dropdown</b> on <b>landing page.</b></div>
+        </div>
+        <div className="installation-instructions-container">
+            <div className="d-p-card-container">
+                <IconButton id="arrow__WW" data-type={cardListNo===0?"disabled":"not-disabled"} disabled={cardListNo===0} icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState-1)}} variant="borderless" />
+                {OS==="Windows" && InstallationSteps_win.map((item,idx)=>{
+                    if (cardListNo===idx){
+                      return <DPCard key={item.title+idx} title={item.title} items={item.items} type={item.type}></DPCard>
+                    } 
+                    // else if (cardListNo===2 && idx>1 ){
+                    //   return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    // }
+                    else return null;
+                })}
+                {OS==="MacOS" && InstallationSteps_mac.map((item,idx)=>{
+                    if (cardListNo===idx){
+                      return <DPCard key={item.title+idx} title={item.title} items={item.items} type={item.type}></DPCard>
+                    } 
+                    // else if (cardListNo===2 && idx>1 ){
+                    //   return <DPCard key={item.imageName+idx} htitle={`Step ${idx+1}`} itemObj={item}></DPCard>
+                    // }
+                    else return null;
+                })}
+                <IconButton id="arrow__WW" disabled={cardListNo===3} data-type={cardListNo===3?"disabled":"not-disabled"} icon="chevron-right" styles={{root:{right:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState+1)}} variant="borderless" />
+            </div>
+            <div style={{display:"flex", flexDirection:"row"}}>
+              {OS==="Windows" ? InstallationSteps_win.map((item,idx)=> <div key={"select-"+idx} className="circle" data-type={cardListNo===idx} onClick={()=>{setCardListNo(idx)}}></div>):null}
+              {OS==="MacOS" ? InstallationSteps_mac.map((item,idx)=> <div key={"select-"+idx} className="circle" data-type={cardListNo===idx} onClick={()=>{setCardListNo(idx)}}></div>):null}
+            </div>
+        </div>
+        <div style={{display:"flex", width:"100%",justifyContent:"space-between"}}>
+          <button className="type1-button static-button" data-type={"empty"} onClick={()=>{updateStepNumber(1)}}>SKIP</button>
+          {cardListNo===3?<button className="type1-button static-button" onClick={()=>{updateStepNumber(1)}}>Next</button>:null}
+
+        </div>
+      </div>
+  }
+
   const getDownloadStep = ()=>{
     return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
-                <span className="stepImage" style={{ height: "50%", display: "flex", justifyContent:"center"}}>
-                    <img src={"static/imgs/WelcomeInstall.svg"} alt="install-avo-client" height="100%"/>
-                </span>
+                {!showIndicator && <span className="animate-text-container">
+                    {downloadScreenCounter===0 && <span>Automate.</span>}
+                    {downloadScreenCounter===1 && <span>Work.</span>}
+                    {downloadScreenCounter===2 && <span>Access.</span>}
+                    <span style={{color:"#5F338F"}}>&nbsp;Now.</span>
+                    {/* <img src={"static/imgs/WelcomeInstall.svg"} alt="install-avo-client" height="100%"/> */}
+                </span>}
+
+                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 10 - 15 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
+                // <div className="step2" style={{marginBottom:"1rem"}}>{"Please Download The Avo Assure Client"}</div>
+                }
                 
                 {(showMacOSSelection?(
                     <>
-                        <div className="OSselectionText">Please select operating system for installation of Avo Assure Client</div>
+                        <div className="OSselectionText">Please select Operating System for downloading Avo Assure Client</div>
                         <div className="choiceGroup">
-                        {Object.keys(config).map((osPathname)=>{
-                            if (osPathname.includes("Windows")){
-                                return <></>;
-                            }
-                            let versionName = osPathname.split("_")[1]
-                            return <button className="choiceGroupOption" data-selected={selectedMacOS===versionName} onClick={()=>{setSelectedMacOS(versionName)}}>{versionName}</button>
-                        })}
+                            {Object.keys(config).map((osPathname)=>{
+                                if (osPathname.includes("Windows")){
+                                    return <></>;
+                                }
+                                let versionName = osPathname.split("_")[1]
+                                return <button className="choiceGroupOption" data-selected={selectedMacOS===versionName} onClick={()=>{_handleClientDownload(versionName)}}>Download on {versionName}</button>
+                            })}
                         </div>
-                    </>):null)}
+                    </>)
+                    :null)}
 
-                {(!showIndicator && OS!=="MacOS") && <div className="step2" style={{marginBottom:"0.5rem"}}>{"Please download Avo Assure Client"}</div>}
-                
-                {showIndicator && !showMacOSSelection ? (
-                <>
-                <div className="step2" style={{marginBottom:"0.5rem"}}>{"Downloading Avo Assure Client"}</div>
-                <div className="downloadProgress">
-                    <ProgressIndicator 
-                    barHeight={30}
-                    styles = {{
-                        root:{width:"90%"},
-                        progressBar: { background:"#643693"},
-                        itemName: { fontSize: '1em', marginBottom: '0.6em',color:"black", display:"none" },
-                        itemDescription: { fontSize: '1em', marginTop: '0.6em' },
-                    }} label={'Downloading ICE Package...'} percentComplete={percentComplete} />
-                </div>
-                </>) : 
-                <button className="type2-button"onClick={_handleClientDownload}>Download Now</button>}
+                {showIndicator && !showMacOSSelection ? 
+                    <>
+                        <div className="step2" style={{marginBottom:"0.5rem"}}>{"Downloading the Avo Assure Client"}</div>
+                        <div className="downloadProgress">
+                            <ProgressIndicator 
+                            barHeight={30}
+                            styles = {{
+                                root:{width:"90%"},
+                                progressBar: { background:"#643693"},
+                                itemName: { fontSize: '1em', marginBottom: '0.6em',color:"black", display:"none" },
+                                itemDescription: { fontSize: '1em', marginTop: '0.6em' },
+                            }} label={'Downloading ICE Package...'} percentComplete={percentComplete} />
+                        </div>
+                    </>
+                :
+                (OS==="Windows"?<button className="type2-button" onClick={_handleClientDownload}>Download Avo Assure Client</button>:null)}
+                {/* <div style={{marginTop:"2rem"}}>Once the download is completed, you can proceed with further steps</div> */}
             </div>
   };
 
   const getStartTrialStep = ()=>{
       return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
-                <span style={{height:"45%"}}>
-                    <img src={"static/imgs/WelcomeStart.svg"} alt="start-free-trial" style={{height:"100%"}}/>
+                <span style={{height:"30%"}}>
+                    <img src={"static/imgs/green_thumbs_up.svg"} alt="thanks-for-downloading" style={{height:"100%"}}/>
                 </span>
-                <div className="step2">Thanks for downloading Avo Assure Client, Please install it on your system to start exploring</div>
-                <a href={vidLink} target={"_blank"} referrerPolicy="no-referrer">Training Videos</a>
-                <a href={docLink} target={"_blank"} referrerPolicy="no-referrer">Training Document</a>
-                <button className="type2-button" style={{marginTop: "0.5rem"}} onClick={() => {tcAction("Accept");}}>Start Your Journey</button>
+                <div className="step-body-container">
+                    <div className="step2">Thanks for installing !</div>
+                    {/* <div className="links-container">
+                        <a href={vidLink} target={"_blank"} referrerPolicy="no-referrer">Training Videos</a>
+                        <a href={docLink} target={"_blank"} referrerPolicy="no-referrer">Training Document</a>
+                    </div> */}
+                    <button className="type2-button" style={{marginTop: "2rem"}} onClick={() => {tcAction("Accept");}}>Get Started</button>
+                </div>
+                <button className="type1-button" data-type={"bordered"} onClick={()=>{updateStepNumber(-1)}}>Back</button>
             </div>
   }
 
   return (
-      <div className="container1">
+      <div className={"WW_container "+(activeStep>3?AnimationClassNames.fadeOut500:AnimationClassNames.fadeIn100)}>
         <div className="form">
         <div className="progressbar">
              <Stepper
                 steps={[
-                    { label: 'Welcome', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i className="fa fa-check"></i>},
-                    { label: 'Setup', active:activeStep===1, completed:activeStep>1, children:(activeStep<2) ?2:<i className="fa fa-solid fa-check"></i>},
-                    { label: 'Start', active:activeStep===2, completed:activeStep===2, children:(activeStep<2)?3:<i className="fa fa-solid fa-check"></i>}]}
+                    { label: 'Accept Terms and Conditions', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i className="fa fa-check"></i>},
+                    { label: 'Download Avo Assure Client', active:activeStep===1, completed:activeStep>1, children:activeStep<=1?2:<i className="fa fa-check"></i>},
+                    { label: 'Setup Avo Assure Client', active:activeStep===2, completed:activeStep>2, children:(activeStep<=2)?3:<i className="fa fa-solid fa-check"></i>},
+                    { label: 'Getting Started', active:activeStep===3, completed:activeStep>3, children:(activeStep<=3)?4:<i className="fa fa-solid fa-check"></i>}]}
                 className="stepper"
                 stepClassName="stepButtons"
                 styleConfig={{
@@ -400,8 +599,8 @@ const WelcomeWizard = ({showWizard}) => {
                     activeBgColor:"#643693",
                     completedBgColor:"#321e4f",
                     inactiveBgColor:"#aaa",
-                    labelFontSize:"16px",
-                    size:"1.8rem"
+                    labelFontSize:"14px",
+                    size:"2rem"
                 }}
                 connectorStateColors={true}
                 connectorStyleConfig={{
@@ -413,14 +612,17 @@ const WelcomeWizard = ({showWizard}) => {
         <div className="form-container">
             {activeStep===0?getWelcomeStep():null}
             {activeStep===1?getDownloadStep():null}
-            {activeStep===2?getStartTrialStep():null}
+            {activeStep===2?afterDownloadInstructions():null}
+            {activeStep===3?getStartTrialStep():null}
             {downloadPopover==="chrome" ?        
                 <div className="chrome-popover">
                     <div className='chrome-popover_body'>
                         Install <b>Avo Assure Client</b>
                     </div>
                     <div className="chrome-popover_anchor"></div>
-                </div>:null}
+                </div>
+                :null
+            }
             
             {downloadPopover==="edge" ? 
                 <div className="edge-popover">
@@ -431,9 +633,11 @@ const WelcomeWizard = ({showWizard}) => {
                     <div className="edge-popover_image">
                         <img src="/static/imgs/edge_download.svg" alt="download" />
                     </div>
-                </div>:null}
+                </div>
+                :null
+            }
+          {<div className="WelcomeContactUs">In case you need any help, <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="no-referrer">Click here</a> OR <a href="mailto:support@avoautomation.com">Contact us</a></div>}
         </div>
-        {activeStep>0?<div className="WelcomeContactUs">In case you need any help, <a href="mailto:support@avoautomation.com">Contact us</a></div>:null}
         </div>
     </div>
   );

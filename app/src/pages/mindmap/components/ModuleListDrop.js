@@ -18,12 +18,47 @@ const ModuleListDrop = (props) =>{
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const proj = useSelector(state=>state.mindmap.selectedProj)
     const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
+    const moduleSelectlist = useSelector(state=>state.mindmap.selectedModulelist)
     const [moddrop,setModdrop]=useState(false)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)
+    const [selectedModuleList,setSelectedModuleList] = useState([]);
     const isAssign = props.isAssign
     const selectModule = (e) => {
         var modID = e.target.getAttribute("value")
+        if(e.target.type=='checkbox'){
+            let selectedModList = [];
+            if(moduleSelectlist.length>0){
+                selectedModList=moduleSelectlist;                
+            }
+            if(e.target.checked){
+                if(selectedModList.indexOf(modID)==-1){
+                    selectedModList.push(modID);
+                }
+            }else{
+                selectedModList = selectedModList.filter(item => item !== modID)
+            }
+            //loadModule(selectedModList);
+           /*  var req={
+                tab:"tabCreate",
+                projectid:proj,
+                version:0,
+                cycId: null,
+                // modName:"",
+                moduleid:selectedModList
+            }     
+            var res = await getModules(req)
+        if(res.error){displayError(res.error);return}
+        if(isAssign && res.completeFlow === false){
+            displayError(MSG.MINDMAP.WARN_SELECT_COMPLETE_FLOW)
+            return;
+        }   */    
+            dispatch({type:actionTypes.SELECT_MODULELIST,payload:selectedModList})
+            // d3.select('#pasteImg').classed('active-map',false)
+            // d3.select('#copyImg').classed('active-map',false)
+            // d3.selectAll('.ct-node').classed('node-selected',false)
+            return;
+        }
         d3.select('#pasteImg').classed('active-map',false)
         d3.select('#copyImg').classed('active-map',false)
         d3.selectAll('.ct-node').classed('node-selected',false)
@@ -33,6 +68,9 @@ const ModuleListDrop = (props) =>{
         }else{
             setWarning(modID)
         }
+    }
+    const selectModuleChkBox = (e) => {
+
     }
     const loadModule = async(modID) =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
@@ -45,7 +83,7 @@ const ModuleListDrop = (props) =>{
             version:0,
             cycId: null,
             // modName:"",
-            moduleid:modID
+            moduleid:[modID]
         }
         if(isAssign){
             req.tab = "tabAssign"
@@ -79,17 +117,21 @@ const ModuleListDrop = (props) =>{
                     <ScrollBar scrollId='toolbar_module-list' trackColor={'transperent'} thumbColor={'grey'}> 
                         {moduleList.map((e,i)=>{
                             return(
-                                <div data-test="modules" onClick={(e)=>selectModule(e)} value={e._id} key={i} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} title={e.name}>
-                                    <img value={e._id}  src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
-                                    <span value={e._id} >{e.name}</span>
-                                </div>
-                            )
+                                    <div data-test="modules" onClick={(e)=>selectModule(e)} value={e._id} key={i} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} title={e.name}>                                    
+                                        <img value={e._id}  src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
+                                        <span value={e._id} >{!isAssign && <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />}{e.name}</span>
+                                    </div>
+                                )
                         })}
                     </ScrollBar>
                 </div>
                 :null
             }
-            <div data-test="dropDown" className={'toolbar__module-footer'+ (moddrop?' z-up':'')} onClick={()=>setModdrop(!moddrop)}>
+            <div data-test="dropDown" className={'toolbar__module-footer'+ (moddrop?' z-up':'')} onClick={()=>{
+                if(!moddrop){
+                    dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})
+                }
+                setModdrop(!moddrop)}}>
                 <div><i className={(!moddrop)?"fa fa-caret-down":"fa fa-caret-up"} title="Drop down button"></i></div>
             </div>
         </Fragment>

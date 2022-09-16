@@ -31,6 +31,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [scheduledRecurringData, setScheduledRecurringData] = useState([]);	
     const [scheduledRecurringDataOriginal, setScheduledRecurringDataOriginal] =	useState([]);
     const [statusChange, setStatusChange] = useState("Select Status");
+    const [clearScheduleData, setClearScheduleData] = useState(false);
 
     useEffect(()=>{
         getScheduledDetails()
@@ -47,6 +48,10 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     const dt = new Date(result[k].scheduledon);
                     result[k].scheduledatetime = dt.getFullYear() + "-" + ("0" + (dt.getMonth() + 1)).slice(-2) + "-"
                         + ("0" + dt.getDate()).slice(-2) + " " + ("0" + dt.getHours()).slice(-2) + ":" + ("0" + dt.getMinutes()).slice(-2);
+                    const startDT = ((result[k].recurringstringonhover === "One Time") ? (result[k].startdate ? result[k].startdate : result[k].scheduledon) : (((typeof result[k].recurringstringonhover !== "undefined" && result[k].recurringstringonhover !== "One Time" && result[k].status !== "recurring" && !result[k].recurringpattern.includes('*'))) ? (result[k].createddate ? result[k].createddate : result[k].scheduledon) : ((typeof result[k].recurringpattern !== "undefined" && result[k].recurringpattern.includes('*')) ? (result[k].createddate ? result[k].createddate : result[k].scheduledon) : result[k].scheduledon)))
+                    const sdt = new Date(startDT);
+                    result[k].startdatetime = sdt.getFullYear() + "-" + ("0" + (sdt.getMonth() + 1)).slice(-2) + "-"
+                            + ("0" + sdt.getDate()).slice(-2) + " " + ("0" + sdt.getHours()).slice(-2) + ":" + ("0" + sdt.getMinutes()).slice(-2);
                 }
                 var scheduledDataParsed = [];
                 var scheduledRecurringDataParsed = [];
@@ -62,13 +67,14 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         newScheduledScenario["recurringstringonhover"] = result[i].recurringstringonhover ? result[i].recurringstringonhover : "One Time";
                         newScheduledScenario["scheduledby"] = result[i].scheduledby;
                         newScheduledScenario["scheduledatetime"] = result[i].scheduledatetime;
+                        newScheduledScenario["startdatetime"] = result[i].startdatetime;
                         newScheduledScenario["testsuitenames"] = result[i].testsuitenames;
                         newScheduledScenario["browserlist"] = result[i].browserlist;
                         newScheduledScenario["_id"] = result[i]._id;
                         newScheduledScenario["status"] = result[i].status;
                         newScheduledScenario["scenarioname"] = columnValue["scenarioname"];
                         newScheduledScenario["appType"] = columnValue["appType"];
-                        newScheduledScenario["poolname"] =  columnValue["poolname"];
+                        newScheduledScenario["poolname"] =  result[i].poolname ? result[i].poolname : 'Unallocated ICE';
                         newScheduledScenario["cycleid"] = columnValue["cycleid"];
                         scheduledDataParsed.push(newScheduledScenario);
                     }
@@ -158,6 +164,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
 
     const ScheduleTestSuite = async (schedulePoolDetails) => {
         setAllocateICE(false);
+        setClearScheduleData(false);
         const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, current_task, appType, filter_data);
         if(!modul_Info){
             return
@@ -190,9 +197,11 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
             else displayError(MSG.SCHEDULE.SUCC_SHEDULE)
             updateDateTimeValues(scheduleTableData, setModuleScheduledate);
             getScheduledDetails();
+            setClearScheduleData(true);
         } else if (data === "few") {
             displayError(MSG.SCHEDULE.ERR_FEW_TESTSUITE_SCHEDULE);
             updateDateTimeValues(scheduleTableData, setModuleScheduledate);
+            setClearScheduleData(true);
         } else if (data === "fail") {
             displayError(MSG.SCHEDULE.ERR_FEW_TESTSUITE_SCHEDULE);
         } else {
@@ -341,7 +350,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         <div id="s__btns">
                             <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}} title="Add">Schedule</button>
                         </div>
-                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} />
+                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
                     </div>
 
                 {/* //lower scheduled table Section */}
@@ -393,8 +402,8 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                     <div className='scheduleDataBodyRow'>
                                                         {pageOfItems.map((data,index)=>( data.status != "recurring" && data.recurringpattern == "One Time" &&
                                                             <div key={index} className="scheduleDataBodyRowChild">
-                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time ">{formatDate(data.scheduledatetime)}</div>
-                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" title={data.target}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Job created on: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
+                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" title={"Ice Pool: " +data.poolname}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
                                                                 <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                                 <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
                                                                 <div data-test = "schedule_data_browser_type" className="s__Table_appType">
@@ -406,7 +415,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    {data.status}
+                                                                    {data.status === "Terminate" ? "Terminated" : data.status}
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
                                                                         <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError)}} title='Cancel Job'/>
                                                                     :null}
@@ -433,8 +442,8 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                     <div className='scheduleDataBodyRow'>
                                                         {pageOfItems.map((data,index)=>( (data.status == "recurring" || data.status == "cancelled" || data.status == "Failed") && data.recurringpattern != "One Time" &&
                                                             <div key={index} className="scheduleDataBodyRowChild">
-                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time ">{formatDate(data.scheduledatetime)}</div>
-                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" title={data.target}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
+                                                                <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Job created on: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
+                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" title={"Ice Pool: " +data.poolname}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
                                                                 <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
                                                                 <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
                                                                 <div data-test = "schedule_data_browser_type" className="s__Table_appType">

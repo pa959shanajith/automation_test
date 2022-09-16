@@ -15,6 +15,7 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
     const history = useHistory();
     const dispatch = useDispatch();
     const tasksJson = useSelector(state=>state.plugin.tasksJson)
+    const userInfo = useSelector(state=>state.login.userinfo);
     const [loading,setLoading] = useState(false)
     const [eachData,setEachData] = useState([])
     const [update,updateScreen] = useState(true)
@@ -306,12 +307,12 @@ const ExecuteContent = ({execEnv, setExecEnv, setExecAction, taskName, status, r
                     {taskName==="Batch Execution"?<div><span className='parentBatchContainer'><input id="selectAllBatch" onClick={()=>{setSelectAllBatchClick()}} title='Select Batch' type='checkbox' className='checkParentBatch' /><span className='parentObject'>Select All</span></span></div>:null}
                     <button id="excSaveBtn" onClick={()=>{updateTestSuite()}} title="Save" className={"e__taskBtn e__btn "+ ((taskName==="Batch Execution") ? "e__btnLeft" : "")}>Save</button>
                     <button onClick={()=>{setShowAdvOption(true)}} style={{display:taskName ==="Batch Execution"?"none":""}} title="Configure" className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>Configure</button>
-                    <select defaultValue={""} id='syncScenario' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>
+                    {!userInfo.isTrial && <select defaultValue={""} id='syncScenario' onChange={(event)=>{syncScenarioChange(event.target.value)}} disabled={!syncScenario?true:false} className={"e__taskBtn e__btn"+ ((taskName==="Batch Execution") ? " e__btnLeft" : "")}>
                         <option value="" disabled className="e__disableOption">Select Integration</option>
                         <option value="1">ALM</option>
                         <option value="0">qTest</option>
                         <option value="2">Zephyr</option>
-                    </select>
+                    </select>}
                     <button className="e__btn-md submitTaskBtn" onClick={()=>{setModalDetails({title:(status!=='underReview'?'Submit Task':'Approve Task'),task:(status!=='underReview'?"submit":"approve")});setshowDeleteModal(true)}} title="Submit Task">{status!=='underReview'?"Submit":"Approve"}</button>
                     <button className={"e__btn-md reassignTaskBtn"+ ((status==='underReview') ? "" : " e__btn_display-hide")} onClick={()=>{setModalDetails({title:'Reassign Task',task:"reassign"});setshowDeleteModal(true)}} title="Reassign Task">Reassign</button>
                     <button className="e__btn-md executeBtn" onClick={()=>{ExecuteTestSuitePopup()}} title="Execute">Execute</button>

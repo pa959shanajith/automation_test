@@ -15,10 +15,10 @@ const Footer = () => {
             <span className="right-text">
                 © {new Date().getFullYear()}  Avo Automation. All Rights Reserved
             </span>
-            <span className="left-text">
+            {/* <span className="left-text">
                 Powered By
                 <img className="footer-logo_two" alt="logo" src="static/imgs/ftr-avo-logo.png"/>
-            </span>
+            </span> */}
             </div>
         </div>
     );

@@ -15,7 +15,7 @@ const CreateOptions = (props) => {
   const options = [
     {ico : "ic-create-newMindmap.png",label:'Create New',comp:'newmindmap'},
     {ico : "ic-endtoendFlow.png",label:'End to End Flow',comp:'enemindmap'},
-    {ico :"ic-importfromexcel-mindmap.png",label:'Import Mindmap',comp:'importmindmap'}
+    // {ico :"ic-importfromexcel-mindmap.png",label:'Import Mindmap',comp:'importmindmap'}
   ]
   const displayError = (error) =>{
     setBlockui({show:false})
@@ -24,7 +24,7 @@ const CreateOptions = (props) => {
   return (
     <Fragment>
       {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
-      {importPop?<ImportMindmap setBlockui={setBlockui} setOptions={props.setOptions} displayError={displayError} setImportPop={setImportPop}/>:null}
+      {importPop?<ImportMindmap setBlockui={setBlockui} setOptions={props.setOptions} displayError={displayError} setImportPop={setImportPop} isMultiImport={false}/>:null}
       <div className='mindmap__option-container'>
         <div>
           {options.map((e,i)=>(

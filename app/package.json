@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "private": true,
   "dependencies": {
-    "@avo/designcomponents": "^1.0.13",
+    "@avo/designcomponents": "^1.2.4",
     "@fluentui/react": "^7.158.3",
     "@monaco-editor/react": "^4.2.2",
     "@testing-library/jest-dom": "^4.2.4",

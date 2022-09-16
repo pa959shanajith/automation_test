@@ -8,6 +8,12 @@
     .selectBrowser{
         cursor: pointer;
     }
+    
+    .disable-thumbnail-settings{
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
     .selected-icon{
         background: #331d4c;
         border-radius: 6px;

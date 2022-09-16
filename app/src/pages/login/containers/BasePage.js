@@ -9,6 +9,8 @@ import * as api from '../api';
 import { updatePassword } from "../../global/api";
 import "../styles/BasePage.scss";
 import { persistor } from '../../../reducer';
+import LicenseExpired from '../components/LicenseExpired.js';
+import { logoutUser } from '../../global/api';
 
 /*
     Component: BasePage
@@ -26,6 +28,7 @@ const BasePage = () => {
     const [userProfile, setUserProfile] = useState(null);
     const [showChangePass, setShowChangePass] = useState(false);
     const [showSuccessPass, setSuccessPass] = useState(false);
+    const [licenceExpired, setLicenseExpired] = useState(false);
     const dispatch = useDispatch();
     const history = useHistory();
 
@@ -76,7 +79,13 @@ const BasePage = () => {
                     } else {
                         try{
                             let userinfo = await api.loadUserInfo()
-                            if (userinfo === "fail") setLoginValidation("Failed to Login.");
+                            if(userinfo === "Licence Expired") {
+                              setLicenseExpired(true);
+                              logoutUser();
+                            }
+                            else if (userinfo === "fail") {
+                              setLoginValidation("Failed to Login.");
+                            }
                             else if (userinfo === "Invalid Session") {
                                 setLoginValidation("Your session has expired!");
                                 setLoginAgain(true);
@@ -86,7 +95,7 @@ const BasePage = () => {
                                 //     setShowTCPopup(true);
                                 // }
                                 // else 
-                                if(userinfo.firstTimeLogin && userinfo.dbuser) {
+                                if(userinfo.firstTimeLogin && userinfo.dbuser && userinfo.isTrial) {
                                     setUserProfile(userinfo);
                                     setShowChangePass(true);
                                 }
@@ -209,10 +218,11 @@ const BasePage = () => {
         {redirectTo ? <Redirect to={redirectTo} /> :
         <>
         { showTCPopup && <TermsAndConditions tcAction={tcAction}/> }
+        {licenceExpired ? <LicenseExpired/> :
         < StaticElements> 
             <div className="error-msg">{loginValidation}</div>
             {loginAgain && <span className="error-msg">Click <Link to="/login" className="base__redirect">here</Link> to login again.</span>}
-        </ StaticElements>
+        </ StaticElements>}
         </>
         }
         </>
