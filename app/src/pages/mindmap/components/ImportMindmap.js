@@ -6,8 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
-import isBoolean from 'validator/lib/isboolean';
 import { Link } from 'react-router-dom';
+
 
 
 

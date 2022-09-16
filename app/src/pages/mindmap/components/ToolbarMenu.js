@@ -7,14 +7,14 @@ import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import PropTypes from 'prop-types';
-import ExportMapButton from './ExportMapButton';
+
 
 
 /*Component ToolbarMenu
   use: renders tool bar menus of create new page
 */
 
-const Toolbarmenu = ({setBlockui,displayError,isAssign,releaseRef,cycleRef}) => {
+const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const dispatch = useDispatch()
     const SearchInp = useRef()
     const fnameRef = useRef()
@@ -74,7 +74,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign,releaseRef,cycleRef}) => 
         }
         
         if(ftype === 'excel') toExcel(selectedProj,selectedModulelist.length>0?selectedModulelist[0]:selectedModule,fnameRef.current.value,displayError,setBlockui);
-        if(ftype === 'custom') toCustom(selectedProj,selectedModuleVar,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
+        // if(ftype === 'custom') toCustom(selectedProj,selectedModuleVar,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
         if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelist.length>0?selectedModulelist[0]:selectedModule});
     }
     const validate = (arr) =>{
