@@ -24,7 +24,7 @@ const MindmapHome = () => {
   
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
-    // 'importmindmap': React.memo(() => (<CreateNew importRedirect={true}/>)),
+    //'importmindmap': React.memo(() => (<CreateNew importRedirect={true}/>)),
     'enemindmap': React.memo(() => (<CreateEnE/>)),
     'assignmap': React.memo(() => (<CreateAssign/>)),
     'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))
@@ -39,32 +39,8 @@ const MindmapHome = () => {
     setMsg(error)
   }
  
-//   const exportSelectedModules = () => {
-//    toJSON(selectedModulelist.length>0?selectedModulelist:selectedModule,selectedProj,displayError);
-// }
-const toJSON = async(module,fname,displayError) => {
-  try{
-      var result =  await exportMindmap(Array.isArray(module)?module:module._id)
-      if(result.error){displayError(result.error);return;}
-      jsonDownload(fname+'.mm', JSON.stringify(result));
-      setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
-  }catch(err){
-      console.error(err)
-      displayError(MSG.MINDMAP.ERR_EXPORT_MINDMAP)
-  }
-}
 
-function jsonDownload(filename, responseData) {
-    var blob = new Blob([responseData], { type: 'text/json' });
-    var e = document.createEvent('MouseEvents');
-    var a = document.createElement('a');
-    a.download = filename;
-    a.href = window.URL.createObjectURL(blob);
-    a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-    e.initMouseEvent('click', true, true, window,
-        0, 0, 0, 0, 0, false, false, false, false, 0, null);
-    a.dispatchEvent(e);
-}
+
   var Component = (!options)? null : createType[options];
   return (
     <div className='mp__container'>
@@ -73,7 +49,7 @@ function jsonDownload(filename, responseData) {
         <ActionBar collapsible={true} collapse={options}>
           <div className="mp__ic_box">
             <div className="ic_box" title="Create">
-              <img onClick={()=>setOptions(undefined)} alt='Create Mindmap' className={"thumb__ic"+(options!=='assignmap'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
+              <img onClick={()=>setOptions(undefined)} alt='Create Mindmap' className={"thumb__ic"+(options==='createmindmap'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
                 <span className="rb_box_title">Create</span>
             </div>
             <div className="ic_box" title="Assign">

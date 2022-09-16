@@ -854,6 +854,22 @@ exports.importMindmap = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+exports.gitToMindmap = async (req, res) => {
+	const fnName = "gitToMindmap";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const content = req.body;
+		const inputs= {
+			"mindmap": content,
+			"query":"gitToMindmap"
+		}
+		const result = await utils.fetchData(inputs, "mindmap/gitToMindmap", fnName);
+		res.send(result)
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
 
 exports.importGitMindmap = async (req, res) => {
 	const fnName = "importGitMindmap";

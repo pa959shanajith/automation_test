@@ -119,7 +119,7 @@ const ModuleListDrop = (props) =>{
                             return(
                                     <div data-test="modules" onClick={(e)=>selectModule(e)} value={e._id} key={i} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} title={e.name}>                                    
                                         <img value={e._id}  src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
-                                        <span value={e._id} ><input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />{e.name}</span>
+                                        <span value={e._id} >{!isAssign && <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />}{e.name}</span>
                                     </div>
                                 )
                         })}
@@ -127,7 +127,11 @@ const ModuleListDrop = (props) =>{
                 </div>
                 :null
             }
-            <div data-test="dropDown" className={'toolbar__module-footer'+ (moddrop?' z-up':'')} onClick={()=>setModdrop(!moddrop)}>
+            <div data-test="dropDown" className={'toolbar__module-footer'+ (moddrop?' z-up':'')} onClick={()=>{
+                if(!moddrop){
+                    dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})
+                }
+                setModdrop(!moddrop)}}>
                 <div><i className={(!moddrop)?"fa fa-caret-down":"fa fa-caret-up"} title="Drop down button"></i></div>
             </div>
         </Fragment>

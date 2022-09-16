@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux';
 import {generateTree,toggleNode,moveNodeEnd,moveNodeBegin} from './MindmapUtils'
 import * as actionTypes from '../state/action';
 import '../styles/CanvasAssign.scss'
+import Toolbarmenu from '../components/ToolbarMenu';
 
 const types = {
     'modules': 112,
@@ -131,6 +132,7 @@ const CanvasAssign =(props)=>{
             {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={releaseid} cycleid={cycleid} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
             <SaveMapButton isAssign={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} cycId={cycleid} setBlockui={setBlockui}/>
             <ExportMapButton isAssign={true} setBlockui={setBlockui} displayError={displayError} releaseRef={props.releaseRef} cycleRef={props.cycleRef}/>
+            <Toolbarmenu isAssign={true} setBlockui={setBlockui} displayError={displayError} releaseRef={props.releaseRef} cycleRef={props.cycleRef}/>
             <AdvancedOptions executionScreen={false} priority={0} dNodes={[...dNodes]} setBlockui={setBlockui} displayError={displayError}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
