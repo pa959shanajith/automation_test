@@ -163,7 +163,6 @@ const DevOpsConfig = props => {
     }, []);
     useEffect(()=> {
         let isUpdated = false;
-        console.log(integrationConfig);
         Object.keys(integrationConfig).some(element => {
             if(typeof(integrationConfig[element]) === 'string' && integrationConfig[element] !== props.currentIntegration[element]) {
                 isUpdated = true;
