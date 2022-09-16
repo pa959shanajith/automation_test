@@ -7,7 +7,7 @@ import * as actionTypes from '../state/action';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
-import { color } from 'd3';
+
 
 
 
