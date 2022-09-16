@@ -201,10 +201,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
                                 <td className="tkn-table__button">
                                      <button style={{ marginRight: '10%' }} onClick={async ()=>{
-                                            let temp = await execAutomation(item.configurekey);
-                                            if(temp.status == 'pass') {
-                                                setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                            }
+                                         let temp = execAutomation(item.configurekey);
+                                         setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                         }}>Execute Now</button>
                                      <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
                                      <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
@@ -220,10 +218,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
                                 <td className="tkn-table__button">
                                      <button style={{ marginRight: '10%' }} onClick={async ()=>{
-                                         let temp = await execAutomation(item.configurekey);
-                                         if(temp.status == 'pass') {
-                                            setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                        }
+                                         let temp = execAutomation(item.configurekey);
+                                         setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>
                                      <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
                                      <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>

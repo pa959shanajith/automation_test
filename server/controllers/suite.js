@@ -197,7 +197,6 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 			const response = await this.readTestSuite_ICE({body,session});
 			const mindmapid = batchExecutionData['batchInfo'][index]['testsuiteId'];
 			batchExecutionData['batchInfo'][index]['testsuiteId'] = response[mindmapid].testsuiteid;
-			console.log(response);
 		}
 		return {
 			'executionData': batchExecutionData,
