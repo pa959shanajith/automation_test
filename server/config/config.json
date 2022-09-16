@@ -32,6 +32,7 @@
         "avoclientpath_Monterey":"",
         "avoclientpath_Linux":""
     },
+    "avoAgentConfig": "",
     "trainingLinks":{
         "videos": "https://elearning.avoassure.ai/#/",
         "documentation": "https://docs.avoautomation.com/"

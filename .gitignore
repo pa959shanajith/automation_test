@@ -9,3 +9,4 @@ server/config/.tokens
 server/config/.dbtokens
 public/*
 output/*
+node_modules

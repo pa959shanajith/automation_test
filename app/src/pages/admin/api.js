@@ -1306,3 +1306,118 @@ export const fetchAvoDiscoverMap = async() => {
         return {error:MSG.ADMIN.ERR_FETCH_AVODISCOVER_MAP}
     }
 }
+export const getAgent = async () => {
+    try {
+        // const res = await fetch("/downloadAgent");
+        // const {status} = await res.json();
+        // if (status === "available") window.location.href = "https://localhost:8443/downloadAgent"+queryICE+"&file=getICE"
+        // if (status === "available"){
+        const link = document.createElement('a');
+        link.href = "/downloadURL?link="+window.location.origin.split("//")[1];
+        link.setAttribute('download', "avoURL.txt");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.location.href = window.location.origin+"/downloadAgent";
+        // }
+        // else setMsg(MSG.GLOBAL.ERR_PACKAGE);
+    } catch (ex) {
+        console.error("Error while downloading Agent. Error:", ex);
+    }
+}
+
+export const fetchAvoAgentAndAvoGridList = async(props) => {
+    try{
+        const res = await axios(url+'/getAvoAgentAndAvoGridList', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data:props
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION}
+        }
+        if(res.status === 200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+    }
+}
+
+
+export const saveAvoAgent = async(props) => {
+    try{
+        const res = await axios(url+'/saveAvoAgent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+export const saveAvoGrid = async(props) => {
+    try{
+        const res = await axios(url+'/saveAvoGrid', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+
+export const deleteAvoGrid = async(props) => {
+    try{
+        const res = await axios(url+'/deleteAvoGrid', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}

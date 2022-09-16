@@ -214,7 +214,10 @@ if (cluster.isMaster) {
 		app.post('/getExecution_metrics_API', report.getExecution_metrics_API);
 		app.post('/ICE_provisioning_register', io.registerICE);
 		app.post('/openScreenShot_API', report.openScreenShot_API);
-
+		app.post('/getExecScenario', suite.getExecScenario);
+		app.post('/execAutomation',suite.execAutomation);
+		app.post('/getAgentTask',suite.getAgentTask);
+		app.post('/setExecStatus',suite.setExecStatus);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -321,12 +324,15 @@ if (cluster.isMaster) {
 			}
 		});
 
-    app.get('/downloadURL', (req, res) => {
-      var text = String(req.query.link)
-      res.attachment('avoURL.txt');
-      res.type('txt');
-      res.send(text);
-    })
+		app.get('/downloadAgent', async (req, res) => {
+			try {
+				let agentFile = uiConfig.avoAgentConfig;
+				return res.download(path.resolve(agentFile),"AvoAgent."+agentFile.split(".").pop())
+			}
+			catch (error) {
+				console.error("Catch: Error Occurred in fetching Avo Agent");
+			}
+		});
 
 		app.get('/getClientConfig', (req,res) => {
 			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks})
@@ -365,6 +371,7 @@ if (cluster.isMaster) {
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 		var taskbuilder = require('./server/controllers/taskJson');
 		var flowGraph = require('./server/controllers/flowGraph');
+		var devOps = require('./server/controllers/devOps');
 
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
@@ -553,7 +560,23 @@ if (cluster.isMaster) {
 		app.post('/APG_runDeadcodeIdentifier', auth.protect, flowGraph.APG_runDeadcodeIdentifier);
 		app.post('/getUserICE', auth.protect, io.getUserICE)
 		app.post('/setDefaultUserICE', auth.protect, io.setDefaultUserICE);
+
+		// Devops Routes
+		// app.post('/fetchProjects', auth.protect, devOps.fetchProjects);
+		app.post('/getConfigureList', auth.protect, devOps.getConfigureList);
+		app.post('/getAvoAgentAndAvoGridList', auth.protect, devOps.getAvoAgentAndAvoGridList);
+		app.post('/fetchModules', auth.protect, devOps.fetchModules);
+		app.post('/storeConfigureKey', auth.protect, devOps.storeConfigureKey);
+		app.post('/fetchProjects', auth.protect, devOps.getAllSuites_ICE);
+		app.post('/deleteConfigureKey', auth.protect, devOps.deleteConfigureKey);
+		app.post('/saveAvoAgent', auth.protect, devOps.saveAvoAgent);
+		app.post('/saveAvoGrid', auth.protect, devOps.saveAvoGrid);
+		app.post('/deleteAvoGrid', auth.protect, devOps.deleteAvoGrid);
+
+
+
 		//-------------Route Mapping-------------//
+		// app.post('/fetchModules', auth.protect, devOps.fetchModules);
 
 		// To prevent can't send header response
 		app.use(function(req, res, next) {

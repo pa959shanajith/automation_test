@@ -15,6 +15,7 @@ import TokenManagement from './TokenMangement';
 import LdapConfig from './LdapConfig';
 import EmailConfig from './EmailConfig';
 import CreateEmailGroup from './CreateEmailGroup';
+import Agents from './Agents';
 import AllocateIcePool from './AllocateIcePool';
 import {Header,FooterTwo,ReferenceBar} from '../../global';
 import '../styles/AdminHome.scss';
@@ -53,6 +54,7 @@ const AdminHome = () => {
                                 {(middleScreen==="oidcConfigTab")?<OidcConfig resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
                                 {(middleScreen==="emailConfigTab")?<EmailConfig resetMiddleScreen={resetMiddleScreen}/>:null}
                                 {(middleScreen==="emailGroupTab")?<CreateEmailGroup resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
+                                {(middleScreen==="agents")?<Agents resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
                                 {(middleScreen==="sessionTab")?<SessionManagement resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen}  />:null}
                                 {(middleScreen==="Preferences")?<Preferences resetMiddleScreen={resetMiddleScreen} middleScreen={middleScreen} />:null}
                             </div>
