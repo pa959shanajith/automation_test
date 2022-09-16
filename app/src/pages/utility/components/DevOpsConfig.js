@@ -13,7 +13,6 @@ import { prepareOptionLists } from './DevOpsUtils';
 import DevOpsModuleList from './DevOpsModuleList';
 
 const DevOpsConfig = props => {
-    // const reportData = useSelector(state => state.viewReport.reportData);
     const reportData = {hasData: false};
     const [api, setApi] = useState("Execution");
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
@@ -21,8 +20,46 @@ const DevOpsConfig = props => {
     const [requestText, setRequestText] = useState("");
     const [configName, setConfigName] = useState("");
     const [dataDict, setDict] = useState({});
-    const [integrationConfig, setIntegrationConfig] = useState(props.currentIntegration);
-    const [icepoollist, setIcepoollist] = useState([]);
+    const dataParametersCollection = [];
+    if(props.currentIntegration && props.currentIntegration.executionRequest && props.currentIntegration.executionRequest.batchInfo){
+        if(props.currentIntegration.selectedModuleType === 'normalExecution')
+            for (let info of props.currentIntegration.executionRequest.batchInfo) {
+                for(let suite of info.suiteDetails) 
+                    dataParametersCollection.push({
+                        scenarioId: suite.scenarioId,
+                        name: suite.scenarioName,
+                        dataparam: suite.dataparam[0],
+                        condition: suite.condition
+                    })
+            }
+        else if(props.currentIntegration.selectedModuleType === 'batchExecution')
+            for (let info of props.currentIntegration.executionRequest.batchInfo) {
+                for(let suite in info.suiteDetails) 
+                    dataParametersCollection.push({
+                        scenarioId: info.batchname+info.testsuiteId+info.suiteDetails[suite].scenarioId,
+                        name: info.suiteDetails[suite].scenarioName,
+                        dataparam: info.suiteDetails[suite].dataparam[0],
+                        condition: info.suiteDetails[suite].condition
+                    });
+            }
+        else
+            for (let info of props.currentIntegration.executionRequest.batchInfo) {
+                for(let suite in info.suiteDetails)
+                    dataParametersCollection.push({
+                        scenarioId: info.batchname+info.testsuiteId+suite+info.suiteDetails[suite].scenarioId,
+                        name: info.suiteDetails[suite].scenarioName,
+                        dataparam: info.suiteDetails[suite].dataparam[0],
+                        condition: info.suiteDetails[suite].condition
+                    });
+            }
+    }
+    const [integrationConfig, setIntegrationConfig] = useState({
+        ...props.currentIntegration,
+        dataParameters: dataParametersCollection
+    });
+    const [icepoollist, setIcepoollist] = useState([
+        { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
+    ]);
     const [browserlist, setBrowserlist] = useState([
         {
             key: '0',
@@ -61,7 +98,7 @@ const DevOpsConfig = props => {
         }
     ];
     const [moduleScenarioList, setModuleScenarioList] = useState([]);
-    const [selectedExecutionType, setSelectedExecutionType] = useState('normalExecution');
+    const [selectedExecutionType, setSelectedExecutionType] = useState(props.currentIntegration.selectedModuleType);
     const syncScenarioChange = (value) => {
         setShowIntegrationModal(value);
         setIntegrationConfig({...integrationConfig, integration: value});
@@ -72,7 +109,6 @@ const DevOpsConfig = props => {
             const gridAgentList = await fetchAvoAgentAndAvoGridList({
                 query: 'all'
             });
-            console.log(gridAgentList);
             if(gridAgentList.error) {
                 if(gridAgentList.error.CONTENT) {
                     setMsg(MSG.CUSTOM(gridAgentList.error.CONTENT,VARIANT.ERROR));
@@ -80,7 +116,11 @@ const DevOpsConfig = props => {
                     setMsg(MSG.CUSTOM("Error While Fetching PoolsList",VARIANT.ERROR));
                 }
             }else {
-                setIcepoollist([ ...gridAgentList.avoagents.filter((agent) => agent.status === 'active').map((agent) => ({key: agent._id, text: agent.Hostname})), ...gridAgentList.avogrids.map((grid) => ({key: grid._id, text: grid.name})) ]);
+                setIcepoollist([
+                    { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
+                    ...gridAgentList.avoagents.filter((agent) => agent.status === 'active').map((agent) => ({key: 'a_'+agent.Hostname, text: agent.Hostname})),
+                    ...gridAgentList.avogrids.map((grid) => ({key: 'g_'+grid._id, text: grid.name}))
+                ]);
             }
             const reportResponse = await fetchProjects({ readme: "projects" });
             if (reportResponse.error) {
@@ -93,34 +133,31 @@ const DevOpsConfig = props => {
                 newSelectValues[0].list = projList;
 
                 if(props.currentIntegration.name !== '') {
-                    console.log(props.currentIntegration.executionRequest);
-                    console.log('props.currentIntegration.executionRequest');
+                    const projSetDetails = props.currentIntegration.executionRequest.batchInfo[0];
                     // proj
-                    newSelectValues[0]['selected'] = props.currentIntegration.executionRequest.suitedetails[0].projectid;
-                    newSelectValues[0]['selectedName'] = props.currentIntegration.executionRequest.suitedetails[0].projectname;
+                    newSelectValues[0]['selected'] = projSetDetails.projectId;
+                    newSelectValues[0]['selectedName'] = projSetDetails.projectName;
 
                     // rel
                     newSelectValues[1]['disabled'] = false;
-                    newSelectValues[1]['list'] = newDict[props.currentIntegration.executionRequest.suitedetails[0].projectid].relList;
-                    newSelectValues[1]['selected'] = props.currentIntegration.executionRequest.suitedetails[0].releaseid;
-                    newSelectValues[1]['selectedName'] = props.currentIntegration.executionRequest.suitedetails[0].releaseid;
+                    newSelectValues[1]['list'] = newDict[projSetDetails.projectId].relList;
+                    newSelectValues[1]['selected'] = projSetDetails.releaseId;
+                    newSelectValues[1]['selectedName'] = projSetDetails.releaseId;
 
                     //cyc
                     newSelectValues[2]['disabled'] = false;
-                    newSelectValues[2]['list'] = newDict[props.currentIntegration.executionRequest.suitedetails[0].projectid].relDict[props.currentIntegration.executionRequest.suitedetails[0].releaseid].cycList;
-                    newSelectValues[2]['selected'] = props.currentIntegration.executionRequest.suitedetails[0].cycleid;
-                    newSelectValues[2]['selectedName'] = props.currentIntegration.executionRequest.suitedetails[0].cyclename;
+                    newSelectValues[2]['list'] = newDict[projSetDetails.projectId].relDict[projSetDetails.releaseId].cycList;
+                    newSelectValues[2]['selected'] = projSetDetails.cycleId;
+                    newSelectValues[2]['selectedName'] = projSetDetails.cycleName;
 
                     const projId = newSelectValues[0]['selected'];
                     const relName = newSelectValues[1]['selected'];
                     const cycId = newSelectValues[2]['selected'];
-                    props.currentIntegration.executionRequest.batchname !== '' && setSelectedExecutionType('batchExecution');
                 }
-                
                 setDict(newDict);
                 setIntegrationConfig({...integrationConfig, selectValues: newSelectValues});
             }
-            props.currentIntegration && props.currentIntegration.executionRequest && props.currentIntegration.executionRequest.avoagents && props.currentIntegration.executionRequest.avoagents.length > 0 && setIntegrationConfig({...integrationConfig, avoAgentGrid: props.currentIntegration.executionRequest.avoagents[0]});
+            props.currentIntegration && props.currentIntegration.executionRequest && setIntegrationConfig({...integrationConfig, avoAgentGrid: (props.currentIntegration.executionRequest.avogridId === "") ? ((props.currentIntegration.executionRequest.avoagents.length > 0) ? 'a_'+props.currentIntegration.executionRequest.avoagents[0] : 'cicdanyagentcanbeselected') : 'g_'+props.currentIntegration.executionRequest.avogridId});
             props.setLoading(false);
         })()
     }, []);
@@ -183,35 +220,104 @@ const DevOpsConfig = props => {
         }
         setIntegrationConfig({...integrationConfig, selectValues: newSelectValues});
     }
-
+    const getScenarioParams = (scenarioId) => {
+        let data = {
+            dataparam: '',
+            condition: 0
+        };
+        for(let scenario of integrationConfig.dataParameters) {
+            if(scenario.scenarioId === scenarioId) data = scenario;
+        }
+        return data;
+    }
     const handleConfigSave = async () => {
-        const batchInfo = moduleScenarioList['normalExecution'].filter((module) => {
-            return module.scenarios.some(scenario => {
-                return integrationConfig.scenarioList.includes(scenario._id)
-            });
-        }).map((module) => {
-            return({
-                scenarioTaskType: "disable",
-                testsuiteName: module.name,
-                testsuiteId: module.moduleid,
-                batchname: (selectedExecutionType === 'batchExecution') ? module.batchname : "",
-                versionNumber: 0,
-                appType: "Web",
-                domainName: "Banking",
-                projectName: integrationConfig.selectValues[0].selectedName,
-                projectId: integrationConfig.selectValues[0].selected,
-                releaseId: integrationConfig.selectValues[1].selected,
-                cycleName: integrationConfig.selectValues[2].selectedName,
-                cycleId: integrationConfig.selectValues[2].selected,
-                suiteDetails: module.scenarios.filter((scenario) => integrationConfig.scenarioList.includes(scenario._id)).map((scenario) => ({
-                    condition: 0,
-                    dataparam: [""],
-                    scenarioName: scenario.name,
-                    scenarioId: scenario._id,
-                    accessibilityParameters: []
-                }))
-            });
-        });
+        let batchInfo = [];
+        if(selectedExecutionType === 'normalExecution')
+            batchInfo = moduleScenarioList[selectedExecutionType].filter((module) => {
+                    return module.scenarios.some(scenario => {
+                        return integrationConfig.scenarioList.includes(scenario._id)
+                    });
+                }).map((module) => {
+                    return({
+                        scenarioTaskType: "disable",
+                        testsuiteName: module.name,
+                        testsuiteId: module.moduleid,
+                        batchname: "",
+                        versionNumber: 0,
+                        appType: "Web",
+                        domainName: "Banking",
+                        projectName: integrationConfig.selectValues[0].selectedName,
+                        projectId: integrationConfig.selectValues[0].selected,
+                        releaseId: integrationConfig.selectValues[1].selected,
+                        cycleName: integrationConfig.selectValues[2].selectedName,
+                        cycleId: integrationConfig.selectValues[2].selected,
+                        suiteDetails: module.scenarios.filter((scenario) => integrationConfig.scenarioList.includes(scenario._id)).map((scenario) => ({
+                            condition: getScenarioParams(scenario._id).condition,
+                            dataparam: [getScenarioParams(scenario._id).dataparam],
+                            scenarioName: scenario.name,
+                            scenarioId: scenario._id,
+                            accessibilityParameters: []
+                        }))
+                    });
+                });
+        else if(selectedExecutionType === 'e2eExecution')
+            batchInfo = moduleScenarioList[selectedExecutionType].filter((module) => {
+                    return module.scenarios.some((scenario, index) => {
+                        return integrationConfig.scenarioList.includes(module.batchname+module.moduleid+index+scenario._id)
+                    });
+                }).map((module) => {
+                    return({
+                        scenarioTaskType: "disable",
+                        testsuiteName: module.name,
+                        testsuiteId: module.moduleid,
+                        batchname: "",
+                        versionNumber: 0,
+                        appType: "Web",
+                        domainName: "Banking",
+                        projectName: integrationConfig.selectValues[0].selectedName,
+                        projectId: integrationConfig.selectValues[0].selected,
+                        releaseId: integrationConfig.selectValues[1].selected,
+                        cycleName: integrationConfig.selectValues[2].selectedName,
+                        cycleId: integrationConfig.selectValues[2].selected,
+                        suiteDetails: module.scenarios.filter((scenario, index) => integrationConfig.scenarioList.includes(module.batchname+module.moduleid+index+scenario._id)).map((scenario, index) => ({
+                            condition: getScenarioParams(module.batchname+module.moduleid+index+scenario._id).condition,
+                            dataparam: [getScenarioParams(module.batchname+module.moduleid+index+scenario._id).dataparam],
+                            scenarioName: scenario.name,
+                            scenarioId: scenario._id,
+                            accessibilityParameters: []
+                        }))
+                    });
+                });
+        else
+            for (let batchModules in moduleScenarioList['batchExecution'])
+                batchInfo.push(...moduleScenarioList['batchExecution'][batchModules].filter((module) => {
+                    return module.scenarios.some((scenario, index) => {
+                        return integrationConfig.scenarioList.includes(module.batchname+module.moduleid+index+scenario._id)
+                    });
+                }).map((module) => {
+                    return({
+                        scenarioTaskType: "disable",
+                        testsuiteName: module.name,
+                        testsuiteId: module.moduleid,
+                        batchname: module.batchname,
+                        versionNumber: 0,
+                        appType: "Web",
+                        domainName: "Banking",
+                        projectName: integrationConfig.selectValues[0].selectedName,
+                        projectId: integrationConfig.selectValues[0].selected,
+                        releaseId: integrationConfig.selectValues[1].selected,
+                        cycleName: integrationConfig.selectValues[2].selectedName,
+                        cycleId: integrationConfig.selectValues[2].selected,
+                        suiteDetails: module.scenarios.map((scenario, index) => ({
+                            condition: getScenarioParams(module.batchname+module.moduleid+index+scenario._id).condition,
+                            dataparam: [getScenarioParams(module.batchname+module.moduleid+index+scenario._id).dataparam],
+                            scenarioName: scenario.name,
+                            scenarioId: scenario._id,
+                            accessibilityParameters: []
+                        })).filter((scenario, index) => integrationConfig.scenarioList.includes(module.batchname+module.moduleid+index+scenario.scenarioId))
+                    });
+                }));
+
         props.setLoading('Please Wait...');
         const storeConfig = await storeConfigureKey({
             type: "",
@@ -223,15 +329,17 @@ const DevOpsConfig = props => {
             browserType: integrationConfig.browsers,
             configurename: integrationConfig.name,
             executiontype: integrationConfig.executionType,
+            selectedModuleType: selectedExecutionType,
             configurekey: integrationConfig.key,
-            exectionmode: integrationConfig.exectionMode,
-            avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid.length > 0) ? [integrationConfig.avoAgentGrid] : [],
+            isHeadless: integrationConfig.isHeadless,
+            avogridId: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'g_') ? integrationConfig.avoAgentGrid.slice(2) : '',
+            avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'a_') ? [integrationConfig.avoAgentGrid.slice(2)] : [],
             integration: integration,
             batchInfo: batchInfo,
             scenarioFlag: false
         });
-        if(storeConfig.status !== 'pass') {
-            if(storeConfig.error.CONTENT) {
+        if(storeConfig !== 'success') {
+            if(storeConfig && storeConfig.error && storeConfig.error.CONTENT) {
                 setMsg(MSG.CUSTOM(storeConfig.error.CONTENT,VARIANT.ERROR));
             } else {
                 setMsg(MSG.CUSTOM("Something Went Wrong",VARIANT.ERROR));
@@ -340,7 +448,7 @@ const DevOpsConfig = props => {
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Execution Mode : </label>
                         <div className="devOps_dropdown_label_sync">
                             <label>Non-Headless </label>
-                            <Toggle checked={integrationConfig.executionMode == 'headless'} onChange={() => setIntegrationConfig({...integrationConfig, executionMode: (integrationConfig.executionMode === 'headless') ? 'non-headless' : 'headless' })} label="" inlineLabel={true} />
+                            <Toggle checked={integrationConfig.isHeadless} onChange={() => setIntegrationConfig({...integrationConfig, isHeadless: !integrationConfig.isHeadless })} label="" inlineLabel={true} />
                             <label>Headless </label>
                         </div>
                     </div>
@@ -348,7 +456,7 @@ const DevOpsConfig = props => {
                     </div>
                     <div>
                         <span className="devOps_dropdown_label devOps_dropdown_label_url">DevOps Integration API url : </span>
-                        <span className="devOps_dropdown_label_input"><input type="text" value={props.url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/executeAutomation' />
+                        <span className="devOps_dropdown_label_input"><input type="text" value={props.url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
                             <label>
                                 <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return apiKeyCopyToolTip }, 0]} />
                                 <div style={{fontSize:"24px"}}>

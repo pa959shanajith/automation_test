@@ -390,7 +390,7 @@ export const getPools = async(data) => {
 
 export const storeConfigureKey = async(props) => {
     try{
-        const res = await axios(url+'/ExecuteTestSuite_ICE', {
+        const res = await axios(url+'/storeConfigureKey', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -580,5 +580,29 @@ export const setExecStatus = async(props) => {
     }catch(err){
         console.error(err)
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+
+export const fetchModuleListDevopsReport = async(props) => {
+    try{
+        const res = await axios(url+'/fetchModuleListDevopsReport', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data:props
+        });
+        if(res.status === 401){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION}
+        }
+        if(res.status === 200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error:MSG.UTILITY.ERR_FETCH_DATATABLES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }
 }

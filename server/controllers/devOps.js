@@ -37,11 +37,17 @@ exports.fetchModules = async (req, res) => {
 		const moduleData = await getModule(req.body);
 		const finalData = await utils.fetchData(moduleData, "devops/getScenariosForDevops", "fetchModules");
 		const responsedata = {
-			'normalExecution': finalData,
+			'normalExecution': [],
 			'batchExecution': {},
 			'e2eExecution': [],
 		}
-		for(let moduleDetails of finalData) {
+		for(let [index,moduleDetails] of finalData.entries()) {
+			moduleDetails['type'] = moduleData[index].type;
+			if(moduleData[index].type == 'basic'){
+				responsedata['normalExecution'].push(moduleDetails);
+			} else {
+				responsedata['e2eExecution'].push(moduleDetails);
+			}
 			if(moduleDetails['batchname'] == '') continue;
 			if(responsedata['batchExecution'][moduleDetails['batchname']] == undefined){
 				responsedata['batchExecution'][moduleDetails['batchname']] = [];
@@ -59,26 +65,14 @@ exports.fetchModules = async (req, res) => {
 exports.storeConfigureKey = async(req,res) => {
 	const fnName = "storeConfigureKey";
 	try {
-		console.log('something');
 		logger.info("Inside UI Service: " + fnName);
-		// const userDetails = req.body.userDetails;
-		// const username = req.session.username;
-		// const uId = req.session.userid;
-		// const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		console.log(req.body);
 		const inputs = {
-			"batchInfo": req.body.batchInfo,
-			"browserType": req.body.browserType,
-			"exectionMode": req.body.exectionMode,
-			"executionEnv": req.body.executionEnv,
-			"integration": req.body.integration,
-			"poolid": req.body.poolid,
-			"scenarioFlag": req.body.scenarioFlag,
-			"source": req.body.source,
-			"targetUser": req.body.targetUser,
-			"type": req.body.type,
+			"executionData": req.body.executionData,
+			"session": req.session,
 			"query": "saveConfigureKey"
 		};
-		const status = await utils.fetchData(inputs, "devops/configureKey", fnName);
+		const status = await utils.fetchData(inputs, "devops/configurekey", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");
 		else res.send(status);
 	} catch (exception) {
@@ -87,27 +81,27 @@ exports.storeConfigureKey = async(req,res) => {
 	}
 }
 
-exports.storeConfigureKey = async(req,res) => {
-	const fnName = "avo_ExecAutomation";
-	try {
-		console.log('New Thing!!');
-		logger.info("Inside UI Service: " + fnName);
-		// const userDetails = req.body.userDetails;
-		// const username = req.session.username;
-		// const uId = req.session.userid;
-		// const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		const inputs = {
-			"key": req.body.key,
-			"query": "fetchKeyDetails"
-		};
-		const status = await utils.fetchData(inputs, "devops/configureKey", fnName);
-		if (status == "fail" || status == "forbidden") return res.send("fail");
-		else res.send(status);
-	} catch (exception) {
-		logger.error(exception.message);
-		return res.send("fail");
-	}
-}
+// exports.storeConfigureKey = async(req,res) => {
+// 	const fnName = "avo_ExecAutomation";
+// 	try {
+// 		console.log('New Thing!!');
+// 		logger.info("Inside UI Service: " + fnName);
+// 		// const userDetails = req.body.userDetails;
+// 		// const username = req.session.username;
+// 		// const uId = req.session.userid;
+// 		// const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+// 		const inputs = {
+// 			"key": req.body.key,
+// 			"query": "fetchKeyDetails"
+// 		};
+// 		const status = await utils.fetchData(inputs, "devops/configureKey", fnName);
+// 		if (status == "fail" || status == "forbidden") return res.send("fail");
+// 		else res.send(status);
+// 	} catch (exception) {
+// 		logger.error(exception.message);
+// 		return res.send("fail");
+// 	}
+// }
 
 exports.getExecScenario = async(req,res) => {
 	const fnName = "avo_getExecScenario";
@@ -257,3 +251,35 @@ exports.saveAvoGrid = async(req,res) => {
 		return res.send("fail");
 	}
 }
+
+// exports.getAvoAgentAndAvoGridList = async (req, res) => {
+// 	const fnName = "getAvoAgentAndAvoGridList";
+// 	logger.info("Inside UI service: " + fnName);
+// 	try {
+// 		// const reqData = req.session.userid;
+// 		const input = {
+// 			fetchData: req.body,
+// 			query: 'CICD'
+// 		}
+// 		const list = await utils.fetchData(input, "devops/getAvoAgentAndAvoGridList", "getAvoAgentAndAvoGridList");
+// 		res.send(list);
+// 	} catch(exception) {
+// 		logger.error("Error occurred in devops/"+fnName+":", exception);
+// 		return res.status(500).send("fail");
+// 	}
+// };
+exports.fetchModuleListDevopsReport =  async(req, res) => {
+	const fnName = "fetchModuleListDevopsReport";
+	try {
+		logger.info("Inside UI service: " + fnName);
+		var input = {
+			"configurekey": req.body.configkey,
+			"executionListId": req.body.executionListId
+		};
+		const list = await utils.fetchData(input, "devops/fetchModuleListDevopsReport", "fetchModuleListDevopsReport");
+		res.send(list);
+	} catch(exception) {
+		logger.error("Error occurred in devops/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};

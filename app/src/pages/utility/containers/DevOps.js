@@ -12,7 +12,7 @@ import DevOpsConfig from '../components/DevOpsConfig';
 
 const DevOps = props => {
     const [showConfirmPop, setShowConfirmPop] = useState(false);
-    const api = window.location.href.slice(0, -7)+'executeAutomation';
+    const api = window.location.href.slice(0, -7)+'execAutomation';
     const [currentIntegration, setCurrentIntegration] = useState(false);
     const [loading,setLoading] = useState(false);
 

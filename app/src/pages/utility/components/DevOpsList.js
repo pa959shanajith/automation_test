@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer } from '../../global';
 import { SearchBox } from '@avo/designcomponents';
-import { fetchConfigureList, deleteConfigureKey } from '../api';
+import { fetchConfigureList, deleteConfigureKey, execAutomation } from '../api';
 import {v4 as uuid} from 'uuid';
 
 import "../styles/DevOps.scss";
@@ -95,23 +95,26 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
                 { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
             ],
-            scenarioList: getScenarioList(item.executionRequest.suitedetails),
-            avoAgentGrid: '',
-            browsers: item.executionRequest.suitedetails[0].browserType,
+            scenarioList: getScenarioList(item.executionRequest.batchInfo, item.executionRequest.selectedModuleType),
+            selectedModuleType: item.executionRequest.selectedModuleType,
+            avoAgentGrid: 'cicdanyagentcanbeselected',
+            browsers: item.executionRequest.browserType,
             integration: getIntegrationSelected(item.executionRequest.integration),
             executionType: item.executionRequest.executiontype,
-            executionMode: 'non-headless',
+            isHeadless: item.executionRequest.isHeadless,
             executionRequest: item.executionRequest
         });
         return;
     }
-    const getScenarioList = (suitedetails) => {
+    const getScenarioList = (batchInfo, selectedModulesType) => {
         let scenarioList = [];
-        suitedetails.forEach(suite => {
-            suite.scenarioIds.forEach((scenarioID) => {
-                if(!scenarioList.includes(scenarioID)) scenarioList.push(scenarioID);
-            });
-        });
+        for(let batch of batchInfo)
+            for(let suiteIndex=0; suiteIndex<batch.suiteDetails.length; suiteIndex++) {
+                if(selectedModulesType === 'normalExecution') scenarioList.push(batch.suiteDetails[suiteIndex].scenarioId)
+                else if(selectedModulesType === 'batchExecution') scenarioList.push(batch.batchname+batch.testsuiteId+suiteIndex+batch.suiteDetails[suiteIndex].scenarioId)
+                else {
+                    scenarioList.push(batch.batchname+batch.testsuiteId+suiteIndex+batch.suiteDetails[suiteIndex].scenarioId)}
+            }
         return scenarioList;
     }
     useEffect(() => {
@@ -149,11 +152,12 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                         { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
                     ],
                     scenarioList: [],
-                    avoAgentGrid: '',
+                    avoAgentGrid: 'cicdanyagentcanbeselected',
                     browsers: [],
+                    selectedModuleType: 'normalExecution',
                     integration: '',
                     executionType: 'asynchronous',
-                    executionMode: 'non-headless'
+                    isHeadless: false
                 })} >New Configuration</button>
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>
@@ -161,7 +165,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 </div>
                 <div>
                     <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>DevOps Integration API url : </span>
-                    <span className="api-ut__inputLabel"><input type="text" value={url} data-test="req-body-test" className="req-body" autoComplete="off" id="api-url" name="request-body" style={{width:"25%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/executeAutomation' />
+                    <span className="api-ut__inputLabel"><input type="text" value={url} data-test="req-body-test" className="req-body" autoComplete="off" id="api-url" name="request-body" style={{width:"25%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
                         <label>
                             <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
                             <div style={{fontSize:"24px"}}>
@@ -189,23 +193,41 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 <table className = "table table-hover sessionTable" id="configList">
                     <tbody>
                         {
-                            searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.key} className='tkn-table__row'>
+                            searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
                                 <td className="tkn-table__name" data-for="name" data-tip={item.configurename}> <ReactTooltip id="name" effect="solid" backgroundColor="black" /><React.Fragment>{item.configurename}</React.Fragment> </td>
                                 <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
                                 <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
-                                <td className="tkn-table__button"> <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp; <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/></td>
+                                <td className="tkn-table__button">
+                                     <button style={{ marginRight: '10%' }} onClick={async ()=>{
+                                            let temp = await execAutomation(item.configurekey);
+                                            if(temp.status == 'pass') {
+                                                setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                                            }
+                                        }}>Execute Now</button>
+                                     <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
+                                     <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
+                                </td>
                             </tr>)
                         }
                         {
-                            searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.key} className='tkn-table__row'>
+                            searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
                                 <td className="tkn-table__name" data-for="name" data-tip={item.configurename}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>
                                 <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
                                 <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
-                                <td className="tkn-table__button"> <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp; <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/></td>
+                                <td className="tkn-table__button">
+                                     <button style={{ marginRight: '10%' }} onClick={async ()=>{
+                                         let temp = await execAutomation(item.configurekey);
+                                         if(temp.status == 'pass') {
+                                            setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                                        }
+                                     }}>Execute Now</button>
+                                     <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
+                                     <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
+                                      </td>
                             </tr>)
                         }
                     </tbody>
