@@ -108,7 +108,7 @@ const RecurrenceComp = (props) => {
     const handleInputChange = (event) => {
         setDailyRecurrenceValue(event.target.value);
 
-        if (isNaN(event.target.value) || event.target.value.includes(".")) {
+        if (isNaN(event.target.value) || isNaN(parseInt(event.target.value)) || event.target.value.includes(".")) {
             displayError("Invalid input, Please enter a number");
             return;
         }
@@ -224,7 +224,7 @@ const RecurrenceComp = (props) => {
         setMonthlyRecurrenceDayValue(event.target.value);
         setMonthlyRecurrenceMonthInputDisable(false);
 
-        if (isNaN(event.target.value) || event.target.value.includes(".")) {
+        if (isNaN(event.target.value) || isNaN(parseInt(event.target.value)) || event.target.value.includes(".")) {
             displayError("Invalid input, Please enter a number");
             setMonthlyRecurrenceMonthValue("");
             setMonthlyRecurrenceMonthInputDisable(true);
@@ -250,7 +250,7 @@ const RecurrenceComp = (props) => {
     const handleMonthInputChange = (event) => {
         setMonthlyRecurrenceMonthValue(event.target.value);
 
-        if (isNaN(event.target.value) || event.target.value.includes(".")) {
+        if (isNaN(event.target.value) || isNaN(parseInt(event.target.value)) || event.target.value.includes(".")) {
             displayError("Invalid input, Please enter a number");
             return;
         }
@@ -307,7 +307,7 @@ const RecurrenceComp = (props) => {
     const handleMonthInputChange_1 = (event) => {
         setMonthlyRecurrenceMonthValue_1(event.target.value);
 
-        if (isNaN(event.target.value) || event.target.value.includes(".")) {
+        if (isNaN(event.target.value) || isNaN(parseInt(event.target.value)) || event.target.value.includes(".")) {
             displayError("Invalid input, Please enter a number");
             return;
         }
