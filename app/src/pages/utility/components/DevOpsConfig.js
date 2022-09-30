@@ -21,6 +21,7 @@ const DevOpsConfig = props => {
     const [configName, setConfigName] = useState("");
     const [dataDict, setDict] = useState({});
     const dataParametersCollection = [];
+    const [error, setError] = useState({});
     if(props.currentIntegration && props.currentIntegration.executionRequest && props.currentIntegration.executionRequest.batchInfo){
         if(props.currentIntegration.selectedModuleType === 'normalExecution')
             for (let info of props.currentIntegration.executionRequest.batchInfo) {
@@ -230,6 +231,17 @@ const DevOpsConfig = props => {
         return data;
     }
     const handleConfigSave = async () => {
+        if(integrationConfig.name === ''){
+            setError({
+                ...error,
+                name: 'Please Enter Configuration Name'
+            });
+            return;
+        }
+        if(integrationConfig.browsers.length < 1) {
+            setMsg(MSG.CUSTOM("Please Select atlease one Browser",VARIANT.ERROR));
+            return;
+        }
         let batchInfo = [];
         if(selectedExecutionType === 'normalExecution')
             batchInfo = moduleScenarioList[selectedExecutionType].filter((module) => {
@@ -382,7 +394,9 @@ const DevOpsConfig = props => {
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Configuration Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
-                    <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Configuration Name" />
+                    <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Configuration Name"
+                        errorMessage={(integrationConfig.name === '' && error.name && error.name !== '') ?  error.name : null}
+                    />
                 </span>
             </div>
         </div>
