@@ -34,9 +34,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         }
     };
     const icons = {
-        check: <CheckBox checked={true} indeterminate={false} onChange={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} />,
-        uncheck: <CheckBox checked={false} indeterminate={false} onChange={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} />,
-        halfCheck: <CheckBox indeterminate={true} checked={false} styles={indeterminateStyle} onChange={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} />,
+        check: <img src="static/imgs/Checkbox-checked.png" alt="Checkbox-Checked"/>,
+        uncheck: <img src="static/imgs/Checkbox-unchecked.png" alt="Checkbox-Unchecked"/>,
+        halfCheck: <img src="static/imgs/Checkbox-intermediate.png" alt="Checkbox-Intermediate"/>,
         expandClose: <Icon iconName='chevron-down' styles={{root:{transform: "rotate(-90deg)"}}}/>,
         expandOpen: <Icon iconName='chevron-down' />,
         parentOpen: <></>,
@@ -441,7 +441,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                     </div>
                     <div id="moduleScenarioList" className="devOps_module_list_container">
                         <ScrollBar scrollId='moduleScenarioList' thumbColor="#929397" >
-                            <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
+                        <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
                         </ScrollBar>
                     </div>
                 </>

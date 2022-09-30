@@ -715,6 +715,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                         for(let testSuites of entries) {
                             moduleIndex++;
                             if(testSuites['status'] == 'QUEUED') {
+                                this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
                                 executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}, "devops/getExecScenario", fnName);
                                 const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
                                     'body': executionData[0],
@@ -726,7 +727,6 @@ module.exports.Execution_Queue = class Execution_Queue {
                                 }
                                 executionData = [executionRequest];
                                 //Updating the status to IN_Progress
-                                this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
                                 await cache.set("execution_list", this.key_list);
                                 break;
                             }
