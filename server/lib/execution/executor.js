@@ -564,7 +564,7 @@ class TestSuiteExecutor {
                 const testsuiteIndex = execReq.testsuiteIds.indexOf(resultData.testsuiteId);
                 const testsuite = execReq.suitedetails[testsuiteIndex];
                 const exeStatus = data.executionStatus ? "pass" : "fail";
-                await _this.updateExecutionStatus([executionid], { endtime: resultData.endTime, status: exeStatus });
+                await _this.updateExecutionStatus([executionid], { endtime: data.endTime, status: exeStatus });
                 if (reportType != "accessiblityTestingOnly")
                     notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag});
             }
