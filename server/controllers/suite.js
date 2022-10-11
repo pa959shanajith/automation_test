@@ -406,3 +406,8 @@ exports.setExecStatus = async(req,res) => {
 	let result = await queue.Execution_Queue.setExecStatus(req, res);
 	return res.send(result);
 }
+
+exports.getQueueState = async(req,res) => {
+	let result = await queue.Execution_Queue.getQueueState(req, res);
+	return res.send(result);
+}
