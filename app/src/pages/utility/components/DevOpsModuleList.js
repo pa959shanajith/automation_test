@@ -3,9 +3,9 @@ import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../.
 import { CheckBox, SearchDropdown, Tab, NormalDropDown, Dialog, TextField } from '@avo/designcomponents';
 import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
-
-import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
+import CheckboxTree from 'react-checkbox-tree';
+
 const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading }) => {
     const [moduleList, setModuleList] = useState([]);
     const [filteredModuleList, setFilteredModuleList] = useState([]);
@@ -34,9 +34,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         }
     };
     const icons = {
-        check: <CheckBox checked={true} indeterminate={false} onChange={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} />,
-        uncheck: <CheckBox checked={false} indeterminate={false} onChange={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} />,
-        halfCheck: <CheckBox indeterminate={true} checked={false} styles={indeterminateStyle} onChange={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()} />,
+        check: <img src="static/imgs/Checkbox-checked.png" alt="Checkbox-Checked"/>,
+        uncheck: <img src="static/imgs/Checkbox-unchecked.png" alt="Checkbox-Unchecked"/>,
+        halfCheck: <img src="static/imgs/Checkbox-intermediate.png" alt="Checkbox-Intermediate"/>,
         expandClose: <Icon iconName='chevron-down' styles={{root:{transform: "rotate(-90deg)"}}}/>,
         expandOpen: <Icon iconName='chevron-down' />,
         parentOpen: <></>,
@@ -195,10 +195,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                 if(fetchedModuleList.error) {
                     setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
                 }else {
-                    // <Icon iconName='input' />
                     let filteredNodes = [];
                     if(selectedExecutionType === 'normalExecution') {
-                        filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return module.scenarios.length > 0 } ).map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
                                 label: module.name,
@@ -227,7 +226,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                                 label: batch,
                             };
                             if(batchData[batch].length > 0) {
-                                filterBatch['children'] = batchData[batch].map((module) => {
+                                filterBatch['children'] = batchData[batch].filter((module) => { return module.scenarios.length > 0 } ).map((module) => {
                                     let filterModule = {
                                         value: module.moduleid,
                                         label: module.name,
@@ -264,14 +263,13 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                             setIntegrationConfig({...integrationConfig, scenarioList: newScenarioList, dataParameters: newDataParams});
                         }
                     } else if(selectedExecutionType === 'e2eExecution') {
-                        filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return module.scenarios.length > 0 } ).map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
                                 label: module.name,
                             };
                             if(module.scenarios.length > 0) {
                                 const moduleChildren = module.scenarios.map((scenario, index) => {
-                                    console.log('useeffect : '+module.batchname+module.moduleid+index+scenario._id);
                                     return ({
                                         value: module.batchname+module.moduleid+index+scenario._id,
                                         label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
@@ -389,7 +387,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
             <Dialog
                 hidden = {modalContent === false}
                 onDismiss = {() => setModalContent(false)}
-                title = 'Scenario Data Parametrization'
+                title = 'Execution Parameters'
                 minWidth = '60rem'
                 confirmText = 'Save'
                 declineText = 'Cancel'
@@ -441,7 +439,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                     </div>
                     <div id="moduleScenarioList" className="devOps_module_list_container">
                         <ScrollBar scrollId='moduleScenarioList' thumbColor="#929397" >
-                            <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
+                        <CheckboxTree className='devOps_checkbox_tree' icons={icons} nodes={filteredModuleList} checked={moduleState.checked} expanded={moduleState.expanded} onCheck={HandleTreeChange} onExpand={(expanded) => setModuleState({checked: moduleState.checked, expanded: expanded}) } />
                         </ScrollBar>
                     </div>
                 </>

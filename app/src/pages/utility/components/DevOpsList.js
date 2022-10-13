@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer } from '../../global';
-import { SearchBox } from '@avo/designcomponents';
-import { fetchConfigureList, deleteConfigureKey, execAutomation } from '../api';
+import { SearchBox, Dialog } from '@avo/designcomponents';
+import { fetchConfigureList, deleteConfigureKey, execAutomation, getQueueState } from '../api';
 import {v4 as uuid} from 'uuid';
+import CheckboxTree from 'react-checkbox-tree';
 
 import "../styles/DevOps.scss";
 
@@ -11,6 +12,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
+    const [executionQueue, setExecutionQueue] = useState(false);
     const [filteredList, setFilteredList] = useState(configList);
 
     const copyTokenFunc = () => {
@@ -65,6 +67,49 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             setLoading(false);
         }, 500);
         setShowConfirmPop(false);
+    }
+    const getCurrentQueueState = async () => {
+        setLoading('Please Wait...');
+        const queueList = await getQueueState();
+        if(queueList.error) {
+            if(queueList.error.CONTENT) {
+                setMsg(MSG.CUSTOM(queueList.error.CONTENT,VARIANT.ERROR));
+            } else {
+                setMsg(MSG.CUSTOM("Error While Fetching Execution Queue List",VARIANT.ERROR));
+            }
+        }else {
+            let nodesCollection = [];
+            for (let item in queueList) {
+                let nodeItem = {
+                    value: item,
+                    label: item+'   :   '+queueList[item][0][0].configurename,
+                    showCheckbox: false
+                }
+                let nodeItemChildren = [];
+                let nodeItemChildrenIndex = 1;
+                for (let executionNode of queueList[item]) {
+                    let executionItem = {
+                        value: item+nodeItemChildrenIndex,
+                        label: 'Execution '+nodeItemChildrenIndex,
+                        showCheckbox: false,
+                        children: executionNode.map((executionRequest) => ({
+                            label: 'Module : '+executionRequest.modulename+',   Status: '+executionRequest.status,
+                            value: executionRequest.executionListId+executionRequest.moduleid,
+                            showCheckbox: false
+                        }))
+                    };
+                    nodeItemChildrenIndex++;
+                    nodeItemChildren.push(executionItem);
+                }
+                nodeItem['children'] = nodeItemChildren;
+                nodesCollection.push(nodeItem);
+            }
+            setExecutionQueue({
+                list: nodesCollection,
+                expanded: []
+            });
+        }
+        setLoading(false);
     }
     const onClickDeleteDevOpsConfig = (name, key) => {
         setShowConfirmPop({'title': 'Delete DevOps Configuration', 'content': <p>Are you sure, you want to delete <b>{name}</b> Configuration?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
@@ -137,6 +182,20 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
     }, []);
 
     return (<>
+        {
+            executionQueue && 
+            <Dialog
+                hidden = {executionQueue === false}
+                onDismiss = {() => setExecutionQueue(false)}
+                title = 'Current Execution Queue'
+                minWidth = '60rem' >
+                    {
+                        (executionQueue.list.length > 0 ) ? <CheckboxTree
+                            showNodeIcon={false} className='devOps_checkbox_tree' nodes={executionQueue.list} expanded={executionQueue.expanded} onExpand={(expanded) => setExecutionQueue({...executionQueue, expanded: expanded}) } /> : 
+                            <p>You have nothing pending to execute. Try to Execute any Configure Key and come here. </p>
+                    }
+            </Dialog>
+        }
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
                 DevOps Integration Configuration
@@ -162,6 +221,9 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>
                     <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                </div>
+                <div className="api-ut__btnGroup">
+                    <button onClick={() => getCurrentQueueState() }>Manage Execution Queue</button>
                 </div>
                 <div>
                     <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>DevOps Integration API url : </span>
@@ -230,7 +292,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 </table>
                 </ScrollBar>
             </div>
-        </> : <div className="no_config_img"> <img src="static/imgs/empty-config-list.svg" alt="Empty List Image"/> </div> }
+        </> : <div className="no_config_img"> <img src="static/imgs/no-devops-config.svg" alt="Empty List Image"/> </div> }
     </>);
 }
 

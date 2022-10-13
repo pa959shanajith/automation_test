@@ -550,7 +550,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         return new Promise((rsv,rej) => {
             const configureTime = 1000,response = false;
             let executionCompleted = true;
-            try{      
+            try{
                 const startChecking = setInterval(()=> {
                 if(this.key_list[configureKey].length == 0){
                     executionCompleted = true;
@@ -610,6 +610,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         for (let ids of testSuiteInfo)
             newExecutionList.push({
                 executionListId:newExecutionListId,
+                configurename: gettingTestSuiteIds.executionData.configurename,
+                modulename:ids.testsuiteName,
                 moduleid:ids.testsuiteId,status: 'QUEUED',
                 avoagentList:gettingTestSuiteIds.executionData.avoagents,
             });
@@ -830,6 +832,9 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         return await this.executionInvoker.setExecStatus(dataFromIce);
 
+    }
+    static getQueueState = async (req, res) => {
+        return this.key_list;
     }
 }
 
