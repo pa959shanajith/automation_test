@@ -259,6 +259,7 @@
     &_container {
         height: 47vh;
         max-height: 100%;
+        overflow-x: auto;
     }
 }
 .devOps_pool_list {
@@ -344,8 +345,11 @@
 .select_project_img {
     width: 80%;
 }
-.react-checkbox-tree label {
-    display: flex;
+.react-checkbox-tree{
+    overflow-x: auto;
+    label {
+        display: flex;
+    }
 }
 .no_config_img{
     height: 60vh;

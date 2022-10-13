@@ -3,9 +3,9 @@ import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../.
 import { CheckBox, SearchDropdown, Tab, NormalDropDown, Dialog, TextField } from '@avo/designcomponents';
 import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
-
-import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
+import CheckboxTree from 'react-checkbox-tree';
+
 const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading }) => {
     const [moduleList, setModuleList] = useState([]);
     const [filteredModuleList, setFilteredModuleList] = useState([]);
@@ -195,10 +195,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                 if(fetchedModuleList.error) {
                     setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
                 }else {
-                    // <Icon iconName='input' />
                     let filteredNodes = [];
                     if(selectedExecutionType === 'normalExecution') {
-                        filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return module.scenarios.length > 0 } ).map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
                                 label: module.name,
@@ -227,7 +226,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                                 label: batch,
                             };
                             if(batchData[batch].length > 0) {
-                                filterBatch['children'] = batchData[batch].map((module) => {
+                                filterBatch['children'] = batchData[batch].filter((module) => { return module.scenarios.length > 0 } ).map((module) => {
                                     let filterModule = {
                                         value: module.moduleid,
                                         label: module.name,
@@ -264,14 +263,13 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                             setIntegrationConfig({...integrationConfig, scenarioList: newScenarioList, dataParameters: newDataParams});
                         }
                     } else if(selectedExecutionType === 'e2eExecution') {
-                        filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return module.scenarios.length > 0 } ).map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
                                 label: module.name,
                             };
                             if(module.scenarios.length > 0) {
                                 const moduleChildren = module.scenarios.map((scenario, index) => {
-                                    console.log('useeffect : '+module.batchname+module.moduleid+index+scenario._id);
                                     return ({
                                         value: module.batchname+module.moduleid+index+scenario._id,
                                         label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
@@ -389,7 +387,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
             <Dialog
                 hidden = {modalContent === false}
                 onDismiss = {() => setModalContent(false)}
-                title = 'Scenario Data Parametrization'
+                title = 'Execution Parameters'
                 minWidth = '60rem'
                 confirmText = 'Save'
                 declineText = 'Cancel'
