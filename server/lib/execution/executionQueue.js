@@ -629,6 +629,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         synchronousFlag = await this.checkForCompletion(req.body.key,gettingTestSuiteIds.executionData.executionListId);
         let synchronous_report = await cache.get('synchronous_report');
         // console.log(synchronous_report);
+        //Below code is to generate synchronous report.
         let responseFromGetReportApi = [];
         for(let executions of synchronous_report[newExecutionListId]) {
             const data = await reportFunctions.getDevopsReport_API({
@@ -638,7 +639,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             responseFromGetReportApi.push(data);
         }
         if(synchronousFlag) response['status'] = responseFromGetReportApi;
-
+        response['reportLink'] = "http://" + (req.headers["origin"] || req.hostname) + "/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
         } catch (error) {
             console.info(error);
             logger.error("Error in execAutomation. Error: %s", error);
