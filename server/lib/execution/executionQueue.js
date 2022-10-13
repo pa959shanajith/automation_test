@@ -13,6 +13,7 @@ const { timestamp } = require('winston/lib/winston/common');
 const { info } = require('winston');
 const { update } = require('../../notifications');
 const suitFunctions = require('../../controllers/suite');
+const reportFunctions = require('../../controllers/report')
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -31,7 +32,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     static poolname_ice_map = {}
     static res_map = {}
     static key_list = {}
-    static task_list = []
+    static synchronous_execution_report = {}
     static agent_list = {}
     // executon queue initialisation
     static queue_init() {
@@ -549,7 +550,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         return new Promise((rsv,rej) => {
             const configureTime = 1000,response = false;
             let executionCompleted = true;
-            try{      
+            try{
                 const startChecking = setInterval(()=> {
                 if(this.key_list[configureKey].length == 0){
                     executionCompleted = true;
@@ -609,6 +610,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         for (let ids of testSuiteInfo)
             newExecutionList.push({
                 executionListId:newExecutionListId,
+                configurename: gettingTestSuiteIds.executionData.configurename,
+                modulename:ids.testsuiteName,
                 moduleid:ids.testsuiteId,status: 'QUEUED',
                 avoagentList:gettingTestSuiteIds.executionData.avoagents,
             });
@@ -624,8 +627,19 @@ module.exports.Execution_Queue = class Execution_Queue {
             return response;
         }
         synchronousFlag = await this.checkForCompletion(req.body.key,gettingTestSuiteIds.executionData.executionListId);
-        if(synchronousFlag) response['status'] = "pass";
-
+        let synchronous_report = await cache.get('synchronous_report');
+        // console.log(synchronous_report);
+        //Below code is to generate synchronous report.
+        let responseFromGetReportApi = [];
+        for(let executions of synchronous_report[newExecutionListId]) {
+            const data = await reportFunctions.getDevopsReport_API({
+                'body':executions,
+                'req': req
+            });
+            responseFromGetReportApi.push(data);
+        }
+        if(synchronousFlag) response['status'] = responseFromGetReportApi;
+        response['reportLink'] = "http://" + (req.headers["origin"] || req.hostname) + "/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
         } catch (error) {
             console.info(error);
             logger.error("Error in execAutomation. Error: %s", error);
@@ -783,7 +797,23 @@ module.exports.Execution_Queue = class Execution_Queue {
                     for (let testSuite of executionList){
                         moduleIndex++;
                         if(testSuite.moduleid == resultData.testsuiteId){
-                            this.key_list[resultData.configkey][listIndex][moduleIndex]['status'] = 'COMPLETED'
+                            this.key_list[resultData.configkey][listIndex][moduleIndex]['status'] = 'COMPLETED';
+                            
+                            //Adding details for synchronous report
+                            if(resultData.execReq.executiontype != 'asynchronous') {
+                                if(!(resultData['executionListId'] in this.synchronous_execution_report))
+                                    this.synchronous_execution_report[[resultData['executionListId']]] = [];
+
+                                this.synchronous_execution_report[resultData['executionListId']].push({
+                                    "execution_data": {
+                                        "executionId": resultData.executionId,
+                                        "scenarioIds": resultData.execReq.suitedetails[0].scenarioIds
+                                    }
+                                })
+                                await cache.set("synchronous_report", this.synchronous_execution_report);
+                                let synchronous_report = await cache.get('synchronous_report');
+                                console.log(synchronous_report);
+                            }
                             await cache.set("execution_list", this.key_list);
                         }
                         statusCount+=(testSuite.status == 'COMPLETED');
@@ -803,6 +833,9 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
         return await this.executionInvoker.setExecStatus(dataFromIce);
 
+    }
+    static getQueueState = async (req, res) => {
+        return this.key_list;
     }
 }
 
