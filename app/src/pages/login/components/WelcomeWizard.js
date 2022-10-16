@@ -482,7 +482,9 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         </div>
         <div className="installation-instructions-container">
             <div className="d-p-card-container">
-                <IconButton id="arrow__WW" data-type={cardListNo===0?"disabled":"not-disabled"} disabled={cardListNo===0} icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState-1)}} variant="borderless" />
+                { cardListNo===0 ? null : 
+                    <IconButton id="arrow__WW" data-type={cardListNo===0?"disabled":"not-disabled"} disabled={cardListNo===0} icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState-1)}} variant="borderless" />
+                }
                 {OS==="Windows" && InstallationSteps_win.map((item,idx)=>{
                     if (cardListNo===idx){
                       return <DPCard key={item.title+idx} title={item.title} items={item.items} type={item.type}></DPCard>
@@ -501,7 +503,9 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     // }
                     else return null;
                 })}
+                { cardListNo===3 ? null : 
                 <IconButton id="arrow__WW" disabled={cardListNo===3} data-type={cardListNo===3?"disabled":"not-disabled"} icon="chevron-right" styles={{root:{right:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState+1)}} variant="borderless" />
+                }
             </div>
             <div style={{display:"flex", flexDirection:"row"}}>
               {OS==="Windows" ? InstallationSteps_win.map((item,idx)=> <div key={"select-"+idx} className="circle" data-type={cardListNo===idx} onClick={()=>{setCardListNo(idx)}}></div>):null}
