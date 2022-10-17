@@ -50,13 +50,13 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
         //eslint-disable-next-line
     }, [current_task])
 
-    const WebList = [
-        {'title': "Internet Explorer", 'tooltip':"Debug on Intenet Explorer", 'img': "static/imgs/internet_explorer_logo_new.svg", action: ()=>debugTestCases('3'), 'disable': disable}, 
-        {'title': "Google Chrome", 'tooltip':"Debug on Chrome", 'img': "static/imgs/chrome_logo_new.svg", action: ()=>debugTestCases('1'), 'disable': disable},
-        {'title': "Mozilla Firefox", 'tooltip':"Debug on Firefox", 'img': "static/imgs/firefox_logo_new.svg", action: ()=>debugTestCases('2'), 'disable': disable},
-        {'title': "Microsoft Edge", 'tooltip':"Debug on Microsoft Edge", 'img': "static/imgs/edge_logo_new.svg", action: ()=>debugTestCases('7'), 'disable': disable},
-        {'title': "Edge Chromium", 'tooltip':"Debug on MS Edge Chromium", 'img': "static/imgs/edge_logo_new.svg", action: ()=>debugTestCases('8'), 'disable': disable}
-        ]
+    // const WebList = [
+        // {'title': "Internet Explorer", 'tooltip':"Debug on Intenet Explorer", 'img': "static/imgs/internet_explorer_logo_new.svg", action: ()=>debugTestCases('3'), 'disable': disable}, 
+        // {'title': "Google Chrome", 'tooltip':"Debug on Chrome", 'img': "static/imgs/chrome_logo_new.svg", action: ()=>debugTestCases('1'), 'disable': disable},
+        // {'title': "Mozilla Firefox", 'tooltip':"Debug on Firefox", 'img': "static/imgs/firefox_logo_new.svg", action: ()=>debugTestCases('2'), 'disable': disable},
+        // {'title': "Microsoft Edge", 'tooltip':"Debug on Microsoft Edge", 'img': "static/imgs/edge_logo_new.svg", action: ()=>debugTestCases('7'), 'disable': disable},
+        // {'title': "Edge Chromium", 'tooltip':"Debug on MS Edge Chromium", 'img': "static/imgs/edge_logo_new.svg", action: ()=>debugTestCases('8'), 'disable': disable}
+        // ]
     
     const oebsList = [{'title': "OEBS Apps" , 'img': 'static/imgs/ic-desktop.png', action: ()=>debugTestCases('1'), 'disable': disable}]
     
@@ -139,9 +139,9 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
 
     
     switch(appType) {
-        case "Web": renderComp.splice(1, 0, <Fragment key={2}> { WebList.map((icon, i) => <Thumbnail key={i} title={icon.title} tooltip={icon.tooltip} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable}/>)}
-                                            { isMac && <Thumbnail title="Safari" img="static/imgs/safari_logo_new.svg" action={()=>debugTestCases('6')} disable={disable}/>}</Fragment>);
-                    break;
+        // case "Web": renderComp.splice(1, 0, <Fragment key={2}> { WebList.map((icon, i) => <Thumbnail key={i} title={icon.title} tooltip={icon.tooltip} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable}/>)}
+        //                                     { isMac && <Thumbnail title="Safari" img="static/imgs/safari_logo_new.svg" action={()=>debugTestCases('6')} disable={disable}/>}</Fragment>);
+        //             break;
         case "OEBS": renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} tooltip={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
                     break;
         case "Desktop": renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} tooltip={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
@@ -291,5 +291,4 @@ const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay}) =
         </>
     );
 };
-
 export { UpperContent, BottomContent };
