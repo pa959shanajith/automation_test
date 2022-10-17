@@ -71,7 +71,7 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
     const logout = event => {
         event.preventDefault();
         persistor.purge();
-        //RedirectPage(history, { reason: "logout" });
+        RedirectPage(history, { reason: "logout" });
         window.location.replace('https://avoautomation.ai/cloud-pricing/')
     };
 
