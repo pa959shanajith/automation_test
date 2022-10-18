@@ -53,9 +53,9 @@
 }
 
 .d__tblBtn_ic{
-    padding: 6px 16px;
+    padding: 7px 8px;
     font-size: 14px;
-    margin: 0 3px;
+    margin: 1px 2px;
     vertical-align: middle;
     cursor: pointer;
     touch-action: manipulation;
@@ -76,7 +76,7 @@
 .d__taskBtns{
     display: flex;
     align-items: center;
-    margin-left: 60px;
+    margin-left:-2px;
     flex-grow: 1;
     font-size: 14px;
 }
@@ -90,6 +90,14 @@
         cursor: not-allowed;
     }
 }
+
+
+
+
+.d__submitBtn{
+   margin: 24px 68px -3px -57px;
+}
+
 
 .d__submitBtn, .d__reassignBtn, .d__approveBtn{
     background-color: $submitBtn;
@@ -245,6 +253,8 @@
   background: #0003 !important;
   border-radius: 5px !important;
 }
+
+
 
 // @media screen and (min-width: 1400px) and (min-height: 770px){
 //     .d__content{

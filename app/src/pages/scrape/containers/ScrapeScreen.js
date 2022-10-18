@@ -380,6 +380,7 @@ const ScrapeScreen = ()=>{
     }
 
     return (
+        
         <>
         { overlay && <ScreenOverlay content={overlay} />}
         { showPop && <PopupDialog />}
@@ -397,7 +398,8 @@ const ScrapeScreen = ()=>{
         { showObjModal.operation === "editIrisObject" && <EditIrisObject utils={showObjModal} setShow={setShowObjModal} setShowPop={setShowPop} taskDetails={{projectid: current_task.projectId, screenid: current_task.screenId, screenname: current_task.screenName,versionnumber: current_task.versionnumber, appType: current_task.appType}} />}
         { showAppPop && <LaunchApplication setShow={setShowAppPop} appPop={showAppPop} />}
         <div data-test="ssBody" className="ss__body">
-            <Header/>
+            {/* <Header/> */}
+            
             <div data-test="ssMidSection" className="ss__mid_section">
                 <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList, setOrderList }}>
                     <ActionBarItems />
@@ -407,7 +409,7 @@ const ScrapeScreen = ()=>{
                     <RefBarItems mirror={mirror}/>
                 </ScrapeContext.Provider>
             </div>
-            <div data-test="ssFooter"className='ss__footer'><Footer/></div>
+            {/* <div data-test="ssFooter"className='ss__footer'><Footer/></div> */}
         </div>
         </>
     );
