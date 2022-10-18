@@ -72,7 +72,9 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
         event.preventDefault();
         persistor.purge();
         RedirectPage(history, { reason: "logout" });
-        window.location.replace('https://avoautomation.ai/cloud-pricing/')
+        if(userInfo.isTrial){
+            window.location.replace('https://avoautomation.ai/cloud-pricing/')
+        }
     };
 
   // getting OS version using userAgent
