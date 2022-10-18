@@ -8,13 +8,14 @@ import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
+// import '../styles/ProjectAssign.scss';
 import PropTypes from 'prop-types';
 import { NormalDropDown, TextField} from '@avo/designcomponents';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
-import projectAssign from '../../admin/containers/ProjectAssign'
+import ProjectAssign from '../../admin/containers/ProjectAssign'
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import ProjectNew from '../../admin/containers/ProjectAssign';
@@ -373,7 +374,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
        
         {overlay && <ScreenOverlay data-test="screenoverlay-component" content={overlay}/>}
         { showFltrDlg && <FilterDialog data-test="filterdialog-component" setShow={setShowFltrDlg} dataDict={dataDictState} filterData={filterData} filterTasks={filterTasks} /> }
-        <div  data-test="task-section" className="task-section">
+    <div  data-test="task-section" className="task-section">
             <div data-test="task-header" className="task-header">
                 <span data-test="my-task" className="my-task"> Projects </span>
                 { showSearch && <input data-test="search-input" className="task-search-bar " autoFocus onChange={onSearchHandler} value={searchValue} />}
@@ -382,150 +383,105 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             </div>
             <div>
             
-            <Button  style={{ background: "transparent", color: "#5F338F", border: "none"}} label="add project"  onClick={() => onClick('displayBasic')} />
+            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10"}} label="add project"  onClick={() => onClick('displayBasic')} />
             
             </div>
             <div>
             <div className="task-nav-bar1">
             <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")}>{projectNames && projectNames.projectName[0]}</span>
-            <button className="reset-action__exit" style={{lineBreak:'50px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"2px 5px",background: "#633693;",float:'right',marginLeft:"150px" }} onClick={(e) => { }}>Design</button>
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"2px 5px",background: "#633693;",float:'right',marginRight:"50px" }} onClick={(e) => { }}>Execute</button>
+            <button className="reset-action__exit" style={{lineBreak:'50px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"2px 5px",background: "white",float:'right',marginLeft:"150px" }} onClick={(e) => { }}>Design</button>
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"2px 5px",background: "white",float:'right',marginRight:"50px" }} onClick={(e) => { }}>Execute</button>
             </div> 
             </div>
             {/* <div>
             {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
                 
                 
-                <Dialog 
-                header='Create Project'
-        
-        
-        
-        
-               visible={displayBasic} style={{ width: '70vw' }}  onHide={() => onHide('displayBasic')}>
-                {/* <div> */}
-                  
-                {/* <div className="greeting-text1">
-                   
-                    <h3>Create Project</h3>
-                </div> */}
-              <div >
-                <TextField
-                  label=" Project Name"
-              
-                  placeholder="enter the project name"
-                  standard
-                  
-                  
-                  width="300px"
-                  fontSize='14px'
-                 />
-          </div>
-                {/* </div> */}
-                                <div style={{
-                                 display: "flex",
-                                 flexDirection: 'row',
-                                  margin: "0 10px",
-                                            }}>
-
-                                 </div>
-                            <div style={{ marginTop: 10 ,lineBreak:'10px'}}>
-            <NormalDropDown
-            label="App type"
-            options={[
-            {
-                
-                key: 'web',
-                text: 'Web'
-            },
-            {
-                key: 'Desktop',
-                text: 'Desktop'
-            },
-            {
-             
-              key: 'Mobile App',
-              text: 'Mobile App'
-            }
-          
-        ]}
-              label1="Apptype"
-              options1={[
-                selectedProject && allProjects[selectedProject] ?
-                  {
-                    key: allProjects[selectedProject].apptype,
-                    text: allProjects[selectedProject].apptypeName
-                  }
-                  : {}
-              ]}
-              placeholder="Select an apptype"
-              width="300px"
-              // disabled={!selectedProject}
-              // required
-              onChange={(e, item) => {
-                setAppType(item.text)
-              }}
-              
-            />
-            {/* <div> */}
-            {/* <div> */}
-                <projectAssign/>
-              <div className="col-xs-9 form-group assign-container" style={{width: "100%",marginBlock:"10"}}>
-				<div className="project-left2">
-					{/* <!--Left Select Box--> */}
-					<div className="wrap assign-select">
-						{/* <!--Labels--> */}
-						<label className="labelStyle1"><h5>All User List</h5></label>
-                        <div onClick={()=>console.log(userDetailList)}>click</div>
-						<div className="seprator" >
-                            <select multiple id="allProjectAP">
-                            {/* <DataTable value={userDetailList} selection={userDetailList} onSelectionChange={e => setuserDetailList(e.value)} dataKey="id" responsiveLayout="scroll">
-                    <Column selectionMode="multiple" headerStyle={{width: '3em'}}></Column>
-                    <Column field={userDetailList} header="Code"></Column> */}
-                   
-                                {userDetailList.map((user) => ( 
-                                    <option key={user[0]} value={JSON.stringify(user)} >{user[0]} </option>
-                              
-                                
-                                    
-                                ) )}
-
-                            </select>
-                        </div>
-					</div>
-                </div>
-             </div>
-             {/* </div> */}
-             {/* </div> */}
-            
+    <Dialog header='Create Project'visible={displayBasic} style={{ width: '60vw' }}  onHide={() => onHide('displayBasic')}>
         <div>
-            <div>
-            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} onClick={(e) => { }}>Creat</button>
-            </div>  
-        </div>
-
-            
+            <div className='dialog_textfield'>
+                <TextField 
+                    label=" Project Name"
+                    placeholder="enter the project name"
+                    standard
+                    width="300px"
+                    //   fontSize='40px'
+                    //   marginLeft="200px"
+                />
+            </div>
+            <div className='dialog_dropDown'>  
+                <NormalDropDown  
+                    label="App type"
+                    options={[
+                    {
+                        
+                        key: 'web',
+                        text: 'Web'
+                    },
+                    {
+                        key: 'Desktop',
+                        text: 'Desktop'
+                    },
+                    {
+                    
+                    key: 'Mobile App',
+                    text: 'Mobile App'
+                    }
+                
+                    ]}
+                    label1="Apptype"
+                    options1={[selectedProject && allProjects[selectedProject] ?
+                            {
+                                key: allProjects[selectedProject].apptype,
+                                text: allProjects[selectedProject].apptypeName
+                            }
+                        : {}
+                    ]}
+                    placeholder="Select an apptype"
+                    width="150px"
+                    // disabled={!selectedProject}
+                    // required
+                    onChange={(e, item) => {
+                    setAppType(item.text)
+                    }}
+              
+                />
             </div>
             
-                            
-                </Dialog>
-           
-                </div>
-
-                <div>
-                 
-                
-                </div>
-
-                {userRole !== "Test Manager" && <div className="task-overflow" id="plugin__taskScroll">
-                <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                    <div data-test="task-content" className="task-content" id="plugin_page__list">
-                        <TaskContents data-test="taskcontent-component" items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} cycleDict={dataDictState.cycleDict} taskJson={taskJson} />
+            <div className='labelStyle1'><h5>All User list</h5></div>
+        
+					<div className="wrap">
+                            <div className='display_project_box'>
+                                {userDetailList.map((user, index) => (
+                                        <div key={index} className='display_project_box_list'>
+                                            <input type='checkbox' value={JSON.stringify(user[0])}></input>
+                                            <span >{user[0]}</span>
+                                            {/* <option key={user[0]} value={JSON.stringify(user)} >{user[0]} </option> */}
+                                        </div> 
+                                         
+                                ) )}
+                            </div>
                     </div>
-                 </ScrollBar>
-                 
-            </div>}
-        {/* </div> */}
+                    <div>
+                        <div>
+                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} onClick={(e) => { }}>Create</button>
+                        </div>  
+                    </div>
+ 
+        </div>
+    </Dialog>
+      
+    </div>
+                {userRole !== "Test Manager" && 
+                    <div className="task-overflow" id="plugin__taskScroll">
+                        <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
+                            <div data-test="task-content" className="task-content" id="plugin_page__list">
+                                <TaskContents data-test="taskcontent-component" items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} cycleDict={dataDictState.cycleDict} taskJson={taskJson} />
+                            </div>
+                        </ScrollBar>
+                    
+                    </div>
+                }
         </>
     );
 }
