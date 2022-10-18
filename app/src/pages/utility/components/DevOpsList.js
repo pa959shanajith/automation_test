@@ -68,6 +68,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
         }, 500);
         setShowConfirmPop(false);
     }
+    const [confirmExecuteNow, setConfirmExecuteNow] = useState(false);
     const getCurrentQueueState = async () => {
         setLoading('Please Wait...');
         const queueList = await getQueueState();
@@ -196,6 +197,31 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                     }
             </Dialog>
         }
+        {
+            confirmExecuteNow && <Dialog
+                hidden = {confirmExecuteNow === false}
+                onDismiss = {() => setConfirmExecuteNow(false)}
+                title = 'Confirm Execute Now'
+                minWidth = '60rem'
+                confirmText = 'Confirm'
+                declineText = 'Cancel'
+                onDecline={() => setConfirmExecuteNow(false)}
+                onConfirm = {async () => {
+                    const temp = await execAutomation(confirmExecuteNow.configurekey);
+                    if(temp.status !== "pass") {
+                        if(temp.error && temp.error.CONTENT) {
+                            setMsg(MSG.CUSTOM(temp.error.CONTENT,VARIANT.ERROR));
+                        } else {
+                            setMsg(MSG.CUSTOM("Error While Adding Configuration to the Queue",VARIANT.ERROR));
+                        }
+                    }else {
+                        setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                    }
+                    setConfirmExecuteNow(false);
+                }} >
+                    Are you sure you want to execute <b>{confirmExecuteNow.configname}</b> now?
+            </Dialog>
+        }
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
                 DevOps Integration Configuration
@@ -262,10 +288,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                 <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
                                 <td className="tkn-table__button">
-                                     <button style={{ marginRight: '10%' }} onClick={async ()=>{
-                                         let temp = execAutomation(item.configurekey);
-                                         setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                        }}>Execute Now</button>
+                                     <button style={{ marginRight: '10%' }} onClick={()=>setConfirmExecuteNow({ configurekey: item.configurekey, configname: item.configurename})} >Execute Now</button>
                                      <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
                                      <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
                                 </td>
@@ -279,10 +302,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                 <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td>
                                 <td className="tkn-table__button">
-                                     <button style={{ marginRight: '10%' }} onClick={async ()=>{
-                                         let temp = execAutomation(item.configurekey);
-                                         setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                     }}>Execute Now</button>
+                                     <button style={{ marginRight: '10%' }} onClick={()=>setConfirmExecuteNow({ configurekey: item.configurekey, configname: item.configurename})} >Execute Now</button>
                                      <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
                                      <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
                                       </td>
