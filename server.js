@@ -572,7 +572,7 @@ if (cluster.isMaster) {
 		app.post('/saveAvoAgent', auth.protect, devOps.saveAvoAgent);
 		app.post('/saveAvoGrid', auth.protect, devOps.saveAvoGrid);
 		app.post('/deleteAvoGrid', auth.protect, devOps.deleteAvoGrid);
-		app.get('/getQueueState',suite.getQueueState);
+		app.get('/getQueueState', auth.protect, suite.getQueueState);
 
 
 
