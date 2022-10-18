@@ -87,10 +87,23 @@ stages:
         cd app
         call npm install
 
+        cd..
+        call npm install
+      name: Build
+      displayName: Install Packages
+
+    - script: |
+        cd $(Build.SourcesDirectory)/Webapp
+        
+        set tagno=%Version_tagno%
+        set buildno=%Version_buildno%
+
+        cd app
+
         call npm run-script build
 
         cd..
-        call npm install
+
         del .gitignore package-lock.json README.md
         call rimraf app
         rmdir /S /Q .vscode
