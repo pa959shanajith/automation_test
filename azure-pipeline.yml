@@ -89,7 +89,7 @@ stages:
 
         cd..
         call npm install
-      name: Build
+      name: Install_packages
       displayName: Install Packages
 
     - script: |
