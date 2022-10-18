@@ -81,6 +81,22 @@
     border-bottom: 1px solid $borderFour;
 }
 
+.task-nav-bar1{
+    font-family:  "LatoWeb" ;
+    font-size: 20px;
+   
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    border-bottom: 3px solid $borderFour;
+    
+   }
+   .task-nav-bar2{
+    
+    float:"left";
+    
+   }
+
 .task-nav-item{
     border: 1px solid transparent;
     color: $primaryColor;
@@ -108,6 +124,8 @@
         cursor: default;
     }
 }
+
+
 
 @media screen and (min-width: 1400px) and (min-height: 770px){
     .task-section{

@@ -1,0 +1,96 @@
+/* AVO ASSURE FONT FAMILY */
+.plugin-bg-container {
+  display: flex;
+  flex-flow: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.plugin-bg-img {
+  z-index: -1;
+  height: 70%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.plugin-elements {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  flex-grow: 1;
+}
+
+.page-contents {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  padding: 0 11% 0 11%;
+  flex-grow: 1;
+  min-height: 0;
+  z-index: 1;
+}
+
+.greeting-text {
+  font-family: "LatoWebLight";
+  color: rgb(51, 51, 51);
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.1;
+  text-align: center;
+  margin-bottom: 10px;
+  text-transform: capitalize;
+}
+.greeting-text1{
+  font-family: "Bold";
+  color: rgb(51, 51, 51);
+  font-size: 50px;
+  font-weight: 600;
+  line-height: 7.1;
+  text-align: left;
+  margin-bottom: 20px;
+  text-transform: capitalize;
+  margin-top: -10px;
+}
+.p-button-success{
+  background-color: blue;
+}
+
+.min_gap {
+  display: flex;
+  flex: 0 0 18%;
+  justify-content: center;
+}
+
+.section-divider {
+  flex-shrink: 0;
+  height: 95%;
+  width: 2px;
+  background-color: #888;
+}
+
+@media screen and (max-width: 1000px) {
+  .page-contents {
+    padding: 0 7% 0 8%;
+  }
+}
+@media screen and (max-height: 650px) {
+  .plugin-bg-img {
+    width: 30%;
+  }
+  .greeting-text {
+    font-size: 35px;
+    margin-bottom: 30px;
+  }
+}
+@media screen and (min-width: 1800px), screen and (min-height: 850px) {
+  .page-contents {
+    padding: 2% 10% 0 15%;
+  }
+}/*# sourceMappingURL=PluginHome.css.map */
