@@ -782,10 +782,10 @@ module.exports.Execution_Queue = class Execution_Queue {
 
         let dataFromIce = req.body,checkInCache = false;
         let resultData = dataFromIce.exce_data;
+        let keyQueue = this.key_list[resultData.configkey];
         if (dataFromIce.status == 'finished')
         {
             //Changing the status to completed in the cache.
-            let keyQueue = this.key_list[resultData.configkey];
             let updatedKeyQueue = [];
             let listIndex = -1,statusCount = 0;
             for(let executionList of keyQueue) {
@@ -836,6 +836,18 @@ module.exports.Execution_Queue = class Execution_Queue {
             if(!checkInCache) {
                 dataFromIce.executionStatus = false;
             }
+        }
+        //To check whether executionListId present in cache data.
+        for(let execution of keyQueue) {
+            if(execution[0].executionListId == resultData.executionListId) {
+                // newConfigureKeyExecution.push(execution);
+                checkInCache = true
+            }
+        }
+
+        if(!checkInCache && 'reportData' in resultData && 'overallstatus' in resultData.reportData) {
+            console.log('yayyy');
+            resultData.reportData.overallstatus.overallstatus = 'Terminated';
         }
         return await this.executionInvoker.setExecStatus(dataFromIce);
 
