@@ -1,20 +1,42 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import ClickAwayListener from 'react-click-away-listener';
 import '../styles/ControlBox.scss'
 import * as d3 from 'd3';
-import PropTypes from 'prop-types'
+import PropTypes from 'prop-types';
+import '../styles/TaskBox.scss';
+import ExecuteHome from '../../execute/containers/ExecuteHome';
+// import MindmapHome from '../../mindmap/containers/MindmapHome';
+import {Dialog} from '@avo/designcomponents';
+import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
+import DesignHome from '../../design/containers/DesignHome';
+import TaskBox from './TaskBox';
+import { assign } from 'nodemailer/lib/shared';
+// import { assign } from 'nodemailer/lib/shared';
 
 /*Component ControlBox
   use: returns node control options 
   props={nid:'nodeid',clickAdd:function to add node,ctScale:{x:1,y:1,k:1}
 */
 
+
 const ControlBox = (props) => {
+    const [showScrape, setShowScrape] = useState(false);
+    const [ShowDesignTestSetup,setShowDesignTestSetup] = useState(false);
+    const [showExecute,setShowExecute] = useState(false);
+    const [redirectTo, setRedirectTo] = useState("");
+    const history = useHistory();
+    // const [showAssign,setShowAssign] = useEffect(false);
     var faRef = {
         "plus": "fa-plus",
         "plus1": "fa-hand-peace-o",
         "edit": "fa-pencil-square-o",
-        "delete": "fa-trash-o"
+        "delete": "fa-trash-o",
+        "assign":"fa-light fa-user",
+        "execute":"fa-light fa-badge-check",
+        "record":"fa-light fa-album-circle-user",
+        "captureelements":"fa-light fa-crop-simple",
+        "designtestsetup":"fa-light fa-crop-simple",
     };
     var ctScale = props.ctScale;
     var isEnE = props.isEnE;
@@ -25,51 +47,76 @@ const ControlBox = (props) => {
         var split_char = ',';
         var l = p.attr('transform').slice(10, -1).split(split_char);
         l = [(parseFloat(l[0]) + 40) * ctScale.k + ctScale.x, (parseFloat(l[1]) + 40) * ctScale.k + ctScale.y];
+        console.log('l',l);
         var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px')
         if(isEnE){
             if(t==='endtoend'){
                 c.select('p.' + faRef.plus).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.plus1).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
-                c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit End to End Module');
+                c.select('p.' + faRef.edit).html('Edit End to End Module');
                 c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
             }else{
                 c.select('p.' + faRef.plus).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.plus1).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !0);
                 c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-                c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
+                c.select('p.' + faRef.delete).html('Delete Scenario');
             }
         }else if (t === 'modules') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Scenarios');
+            c.select('p.' + faRef.plus).html('Add Scenario');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Scenarios');
-            c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
+            c.select('p.' + faRef.plus1 ).html('Add Scenarios');
+            c.select('p.' + faRef.edit ).html('Rename');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
+            c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.assign).html('Assign');
+            c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.execute).html('Execute');
+            c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
+
         } else if (t === 'scenarios') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Screens');
+            c.select('p.' + faRef.plus ).html('Add Screen');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Screens');
-            c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Scenario');
+            c.select('p.' + faRef.plus1).html('Add Screens');
+            c.select('p.' + faRef.edit ).html('Rename');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
+            c.select('p.' + faRef.delete).html('Delete ');
+            c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.record).html('record');
+            c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.assign).html('Assign');
+            c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.execute).html('Execute');
         } else if (t === 'screens') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Testcases');
+            c.select('p.' + faRef.plus).html('Add Testcase');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Testcases');
-            c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Screen');
+            c.select('p.' + faRef.plus1).html('Add Testcases');
+            c.select('p.' + faRef.edit ).html('Rename');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Screen');
+            c.select('p.' + faRef.delete).html('Delete ');
+            c.select('p.' + faRef.captureelements).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.captureelements).html('Capture Elements');
+            c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.assign).html('Assign');
+            c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.execute).html('Execute');
         } else if (t === 'testcases') {
-            c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
+            c.select('p.' + faRef.plus ).classed('ct-ctrl-inactive', !0);
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !0);
             c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Testcase');
+            c.select('p.' + faRef.edit ).html('Rename');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Testcase');
+            c.select('p.' + faRef.delete ).html('Delete');
+            c.select('p.' + faRef.designtestsetup).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.designtestsetup).html('Design Test Setup');
+            c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.assign).html('Assign');
+            c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
+            c.select('p.' + faRef.execute).html('Execute');
         }
         d3.select('#ct-ctrlBox').classed('show-box', !0);
         p.classed('node-highlight',!0)
@@ -94,15 +141,95 @@ const ControlBox = (props) => {
         props.clickDeleteNode(props.nid)
         props.setCtrlBox(false)
     }
+    const DesignTest = () =>{
+        setShowDesignTestSetup(true);
+    };
+    const execute =() =>{
+        setShowExecute(true);
+        
+    }; 
+    const CaptureElement = () =>{
+        setShowScrape(true);
+    };
+    // const Assign = () =>{
+    //     <TaskBox/>
+    // }
     return(
+        <>
+        {/* {redirectTo && <Redirect to={redirectTo} />} */}
+        <Dialog
+            
+            hidden = {showScrape === false}
+            onDismiss = {() => console.log(false)}
+            title = 'Capture'
+            minWidth = '60rem'
+            confirmText = 'Save'
+            onDecline={() => console.log(false)}
+            onConfirm = {() => { }} >
+                <div style={{ height: '623px'}}><ScrapeScreen /></div>
+            </Dialog>
+            <Dialog
+            
+            hidden = {ShowDesignTestSetup === false}
+            onDismiss = {() => console.log(false)}
+            title = 'Design Test Setup'
+            minWidth = '60rem'
+            confirmText = 'Save'
+            onDecline={() => console.log(false)}
+            onConfirm = {() => { }} >
+                <div style={{ height: '623px'}}><DesignHome /></div>
+            </Dialog>
+            <Dialog
+            
+            hidden = {showExecute === false}
+            onDismiss = {() => console.log(false)}
+            title = 'Execute'
+            minWidth = '60rem'
+            confirmText = 'Save'
+            onDecline={() => console.log(false)}
+            onConfirm = {() => { }} >
+                <div style={{ height: '623px'}}><ExecuteHome/></div>
+            </Dialog>
+            {/* <div hidden = {showAssign === false} ><MindmapHome/></div> */}
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
-            <div id="ct-ctrlBox" className={(isEnE?'end-to-end':'')}>
-                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}><span className="ct-tooltiptext">Create Scenarios</span></p>
-                <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}><span className="ct-tooltiptext">Create Multiple Scenarios</span></p>
-                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode} ><span className="ct-tooltiptext">Edit Module</span></p>
-                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode} ><span className="ct-tooltiptext"></span></p>
-            </div>
-        </ClickAwayListener>
+           {t ==='modules'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
+                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
+                <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
+                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}} onClick={editNode}></p>
+                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode}></p>
+                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}} ><>  Assign </></p>
+                <p data-test="execute"  className="ct-ctrl fa fa-light fa-badge-check" onClick={() => execute()}> Execute </p>
+            </div>   :     
+            t ==='scenarios'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
+                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
+                <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
+                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode}></p>
+                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}}  onClick={deleteNode}></p>
+                <p data-test="record"  className="ct-ctrl fa fa-light fa-album-circle-user " style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}}  > <> Record_AvoGenius </></p >
+                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}} ><>  Assign </></p>
+                <p data-test="execute"  className="ct-ctrl fa fa-light fa-badge-check" onClick={() => execute()}> Execute </p>
+               </div> : 
+            t ==='screens'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
+               <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
+               <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
+               <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode}></p>
+               <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59"}} onClick={deleteNode}></p>
+               <p data-test="captureelements"  className="ct-ctrl fa fa-light fa-crop-simple "  onClick={() => CaptureElement()}><> Capture Elements  </></p>
+               <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59"}} ><>  Assign </></p>
+               <p data-test="execute"  className="ct-ctrl fa fa-light fa-badge-check"  onClick={() => execute()}> Execute </p>
+            </div>   : 
+            t ==='testcases'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
+               <p data-test="add" className="ct-ctrl fa fa-plus ct-ctrl-inactive" value={props.nid} onClick={addNode}> </p>
+           <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o ct-ctrl-inactive" value={props.nid} onClick={addMultipleNode}></p>
+           <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" onClick={editNode}></p>
+           <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}} onClick={deleteNode}></p>
+           <p data-test="designtestsetup"  className="ct-ctrl fa fa-light fa-crop-simple " onClick={()=> DesignTest()} > <> Design Test Setup </></p>
+           <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}} ><>  Assign </></p>
+           <p data-test="execute"  className="ct-ctrl fa fa-light fa-badge-check" onClick={() => execute(redirectTo)} > Execute </p>
+       </div> : "" 
+}
+        </ClickAwayListener> 
+        </>
     )
 }
 

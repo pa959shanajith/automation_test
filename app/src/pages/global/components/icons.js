@@ -72,6 +72,13 @@ import { ReactComponent as BarChart } from '@avo/designcomponents/lib/assets/ico
 import { ReactComponent as PieChart } from '@avo/designcomponents/lib/assets/icons/pie-chart.svg';
 import { ReactComponent as DonutChart } from '@avo/designcomponents/lib/assets/icons/donut-chart.svg';
 import { ReactComponent as Input } from '@avo/designcomponents/lib/assets/icons/input.svg';
+// import {ReactComponent as ChromeIcon} from "../../../assets/imgs/chrome_logo_new.svg";
+// import {ReactComponent as Safari} from "../../../assets/imgs/safari_logo_new.svg";
+// import {ReactComponent as InternetExplorer} from "../../../assets/imgs/internet_explorer_logo_new.svg";
+// import {ReactComponent as Edge} from "../../../assets/imgs/edge_logo_new.svg";
+
+// import {ReactComponent as Firefox} from "../../../assets/imgs/firefox_logo_new.svg";
+
 
 registerIcons({
   icons: {
@@ -85,6 +92,16 @@ registerIcons({
     'add-user': <AddUser />,
     computer: <Computer />,
     undeploy: <Undeploy />,
+    'chrome':<img src={"static/imgs/chrome_logo_new.svg"} />,
+    'internet':<img src={"static/imgs/internet_explorer_logo_new.svg"} />,
+    'edge':<img src={"static/imgs/edge_logo_new.svg"} />,
+    'safari':<img src={"static/imgs/safari_logo_new.svg"} />,
+    'firefox':<img src={"static/imgs/firefox_logo_new.svg"} />,
+    // 'chrome':<ChromeIcon />,
+    // 'internet':<InternetExplorer/>,
+    // 'edge':<Edge />,
+    // 'safari':<Safari />,
+    // 'firefox':<Firefox />,
     play: <Play />,
     link: <Link />,
     export: <Export />,

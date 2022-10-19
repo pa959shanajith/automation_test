@@ -67,7 +67,7 @@ const DesignHome = () => {
                                 />
         }
         <div className="d__body">
-            <Header data-test="d__header" />
+            {/* <Header data-test="d__header" /> */}
             <div className="d__mid_section">
                 
                 <ActionBar data-test="d__actionBar" 
@@ -94,6 +94,17 @@ const DesignHome = () => {
                             }
                 />
                 <DesignContent data-test="d__contents" 
+                                key={777} 
+                                showDlg={showDpndntTcDlg} 
+                                setShowDlg={setShowDpndntTcDlg}
+                                dTcFlag={dTcFlag} 
+                                setDTcFlag={setDTcFlag} 
+                                setCheckedTc={setCheckedTc}
+                                checkedTc={checkedTc} 
+                                isMac={isMac}
+                                disable={disableActionBar} 
+                                setOverlay={setOverlay}
+
                                 current_task={current_task} 
                                 imported={imported} 
                                 setImported={setImported} 
@@ -105,7 +116,7 @@ const DesignHome = () => {
                 <ReferenceContent data-test="d__refBar" mirror={mirror}/>
                 
             </div>
-            <div data-test="d__footer" className='d__footer'><Footer/></div>
+            {/* <div data-test="d__footer" className='d__footer'><Footer/></div> */}
         </div>
         </>}
         </>

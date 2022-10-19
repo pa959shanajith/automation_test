@@ -6,20 +6,28 @@
     margin-left: 36px;
     justify-content: space-between;
     font-family: $avoSecondaryFont;
+    height:1px;
+    margin-top: 100px;
+   
 }
 
 .ss__left-btns{
     border-bottom: 1px solid $borderOne;
-    padding-bottom: 10px;
+    padding-bottom: 22px;
     display: flex;
-    align-items: center;
+    align-items:center;
+    margin:-72px -135px -13px 2px;
+    height:8px;
 }
+   
+
 
 .ss__select-all{
     display: flex;
     align-items: center;
     margin: 0;
 }
+    
 
 .ss__select-all-chkbox{
     height: 15px;
@@ -127,4 +135,11 @@
 }
 .ss__dup_li{
     font-weight: normal;
+}
+
+.p-button-warning {
+    width: 100px;
+    height: 30px;
+    font-family: 'latoWeb';
+
 }
