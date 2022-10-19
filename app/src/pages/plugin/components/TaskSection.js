@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// import {getUserDetails} from '../api';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
@@ -7,12 +8,26 @@ import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
+// import '../styles/ProjectAssign.scss';
 import PropTypes from 'prop-types';
+import { NormalDropDown, TextField} from '@avo/designcomponents';
+import 'primeicons/primeicons.css';
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.css';
+import 'primeflex/primeflex.css';
+import ProjectAssign from '../../admin/containers/ProjectAssign'
+import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+import ProjectNew from '../../admin/containers/ProjectAssign';
+import { DataTable } from 'primereact/datatable';
+
+// import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 
 const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
     const history = useHistory();
+    
 
     const taskJson = useSelector(state=>state.plugin.tasksJson);
     const [showSearch, setShowSearch] = useState(false);
@@ -27,8 +42,101 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [showFltrDlg, setShowFltrDlg] = useState(false);
     const [filterData, setFilterData] = useState({'prjval':'Select Project','relval':'Select Release','cycval':'Select Cycle','apptype':{},'tasktype':{}});
     const [filtered, setFiltered] = useState(false);
+    const [hideDialog, setHideDialog ] = useState(true);
+    const [selectedModule, setSelectedModule] = useState(null);
+    const [selectedScenario, setSelectedScenario] = useState(null);
+    const [modScenarios, setModScenarios] = useState([]);
+    const [selectedTab, setSelectedTab] = useState('windows');
+    const [selectedProject, setSelectedProject] = useState(null);
+    const [appType, setAppType] = useState(null);
+    const [allProjects, setAllProjects] = useState({});
+    const [projModules, setProjModules] = useState([]);
+    const [assignProj,setAssignProj] = useState({allProjectAP:[],assignedProjectAP:[]});
+    const [unAssignedFlag,setUnAssignedFlag] = useState(false);
+    const [statechange,setStateChange] = useState(true);
+    const [selectBox,setSelectBox] = useState([]);
+    const [userDetailList,setUserDetailList]=useState([]);
+   
+   
+    const [projectNames, setProjectNames] = useState(null);
+
     let dataDict;
-    
+     
+
+
+    useEffect( async () => {
+        const UserList =  await pluginApi.getUserDetails("user");
+        if(UserList.error){
+            setMsg(MSG.CUSTOM("Error while fetching the user Details"));
+        }else{
+            setUserDetailList(UserList);
+        }
+
+        console.log("UserDetailsList");
+        console.log(UserList);
+    },[]);
+
+    const moveItemsLeftgo = (to,from) =>{
+      setUnAssignedFlag(true);
+          
+          var selectId = document.getElementById("assignedProjectAP");
+  
+          var newAllProj = [];
+          var newAssignProj = [];
+          for(var i=0;i<selectId.options.length;i++){
+              if(selectId.options[i].selected ===  true){
+                  newAllProj.push(JSON.parse(selectId.options[i].value));
+              }
+              else{
+                  newAssignProj.push(JSON.parse(selectId.options[i].value));
+              }
+          }
+          newAllProj = assignProj.allProjectAP.concat(newAllProj);
+          setAssignProj({allProjectAP:newAllProj,assignedProjectAP:newAssignProj});
+          selectId.selectedIndex = "-1";
+      };
+
+    const moveItemsRightgo = (from,to) =>{
+      setUnAssignedFlag(false);
+  
+          var selectId = document.getElementById("allProjectAP");
+          var newAllProj = [];
+          var newAssignProj = [];
+          for(var i=0;i<selectId.options.length;i++){
+              if(selectId.options[i].selected ===  true){
+                  newAssignProj.push(JSON.parse(selectId.options[i].value));
+              }
+              else{
+                  newAllProj.push(JSON.parse(selectId.options[i].value));
+              }
+          }
+          newAssignProj = assignProj.assignedProjectAP.concat(newAssignProj);
+          setAssignProj({allProjectAP:newAllProj,assignedProjectAP:newAssignProj});
+          selectId.selectedIndex = "-1";
+    };
+  
+    const moveItemsLeftall =  ()=> {
+      setUnAssignedFlag(true);
+          for(var i=0; i<assignProj.assignedProjectAP.length; i++){
+              assignProj.allProjectAP.push(assignProj.assignedProjectAP[i]);
+          }
+          assignProj.assignedProjectAP=[];
+          setAssignProj(assignProj);
+          setStateChange(!statechange);
+    };
+  
+    const moveItemsRightall =() =>{
+  
+          setUnAssignedFlag(false);
+          for(var i=0; i<assignProj.allProjectAP.length; i++){
+              assignProj.assignedProjectAP.push(assignProj.allProjectAP[i]);
+          }
+          assignProj.allProjectAP=[];
+          setAssignProj(assignProj);
+          setStateChange(!statechange);
+      };
+
+
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0 && userRole!=="Admin") {
             resetStates();
@@ -36,6 +144,8 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             setOverlay("Loading Tasks..Please wait...");
             pluginApi.getProjectIDs()
             .then(data => {
+                console.log(data)
+                setProjectNames(data);
                 if(data === "Fail" || data === "Invalid Session") return RedirectPage(history);
                 else {
                     pluginApi.getTaskJson_mindmaps(data)
@@ -79,7 +189,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
                         setDataDictState(dataDict);
                         dispatch({type: actionTypes.SET_FD, payload: dataDict})
-                        
+                        console.log(data)
                     })
                     .catch(error => {
                         setOverlay("");
@@ -199,33 +309,160 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         setSearchValue("");
         setShowSearch(!showSearch)
     }
+    // const confirm = () => {
+    //     confirmDialog({
+    //         message: 'Are you sure you want to proceed?',
+    //         header: 'Confirmation',
+    //         icon: 'pi pi-exclamation-triangle',
+    //     });
+    // }
+    const [displayBasic, setDisplayBasic] = useState(false);
+    const [position, setPosition] = useState('center');
+
+    const dialogFuncMap = {
+        'displayBasic': setDisplayBasic,
+    }
+
+    const onClick = (name, position) => {
+        dialogFuncMap[`${name}`](true);
+
+        if (position) {
+            setPosition(position);
+        }
+    }
+
+    const onHide = (name) => {
+        dialogFuncMap[`${name}`](false);
+    }
+
+    // const renderFooter = (name) => {
+    //     return (
+    //         <div>
+    //             <Button label="No" icon="pi pi-times" onClick={() => onHide(name)} className="p-button-text" />
+    //             <Button label="Yes" icon="pi pi-check" onClick={() => onHide(name)} autoFocus />
+    //         </div>
+    //     );
+    // }
+    
     
     return (
+        
         <>
+       
         {overlay && <ScreenOverlay data-test="screenoverlay-component" content={overlay}/>}
         { showFltrDlg && <FilterDialog data-test="filterdialog-component" setShow={setShowFltrDlg} dataDict={dataDictState} filterData={filterData} filterTasks={filterTasks} /> }
-        <div  data-test="task-section" className="task-section">
+    <div  data-test="task-section" className="task-section">
             <div data-test="task-header" className="task-header">
-                <span data-test="my-task" className="my-task">My Task(s)</span>
+                <span data-test="my-task" className="my-task"> Projects </span>
                 { showSearch && <input data-test="search-input" className="task-search-bar " autoFocus onChange={onSearchHandler} value={searchValue} />}
                 <span data-test="search-icon" className={"task-ic-container"+(showSearch?" plugin__showSearch":"")} onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
                 <span data-test="filter-icon" className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span>
             </div>
-            <div className="task-nav-bar">
-                <span data-test="task-toDo" className={"task-nav-item " + (activeTab==="todo" && "active-tab")} onClick={onSelectTodo}>To Do</span>
-                <span  data-test="task-toReview" className={"task-nav-item " + (activeTab==="review" && "active-tab")} onClick={onSelectReview}>To Review</span>
+            <div>
+            
+            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10"}} label="add project"  onClick={() => onClick('displayBasic')} />
+            
             </div>
-            {userRole !== "Test Manager" && <div className="task-overflow" id="plugin__taskScroll">
-                <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
-                    <div data-test="task-content" className="task-content" id="plugin_page__list">
-                        <TaskContents data-test="taskcontent-component" items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} cycleDict={dataDictState.cycleDict} taskJson={taskJson} />
+            <div>
+            <div className="task-nav-bar1">
+            <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")}>{projectNames && projectNames.projectName[0]}</span>
+            <button className="reset-action__exit" style={{lineBreak:'50px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"2px 5px",background: "white",float:'right',marginLeft:"150px" }} onClick={(e) => { }}>Design</button>
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"2px 5px",background: "white",float:'right',marginRight:"50px" }} onClick={(e) => { }}>Execute</button>
+            </div> 
+            </div>
+            {/* <div>
+            {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
+                
+                
+    <Dialog header='Create Project'visible={displayBasic} style={{ width: '60vw' }}  onHide={() => onHide('displayBasic')}>
+        <div>
+            <div className='dialog_textfield'>
+                <TextField 
+                    label=" Project Name"
+                    placeholder="enter the project name"
+                    standard
+                    width="300px"
+                    //   fontSize='40px'
+                    //   marginLeft="200px"
+                />
+            </div>
+            <div className='dialog_dropDown'>  
+                <NormalDropDown  
+                    label="App type"
+                    options={[
+                    {
+                        
+                        key: 'web',
+                        text: 'Web'
+                    },
+                    {
+                        key: 'Desktop',
+                        text: 'Desktop'
+                    },
+                    {
+                    
+                    key: 'Mobile App',
+                    text: 'Mobile App'
+                    }
+                
+                    ]}
+                    label1="Apptype"
+                    options1={[selectedProject && allProjects[selectedProject] ?
+                            {
+                                key: allProjects[selectedProject].apptype,
+                                text: allProjects[selectedProject].apptypeName
+                            }
+                        : {}
+                    ]}
+                    placeholder="Select an apptype"
+                    width="150px"
+                    // disabled={!selectedProject}
+                    // required
+                    onChange={(e, item) => {
+                    setAppType(item.text)
+                    }}
+              
+                />
+            </div>
+            
+            <div className='labelStyle1'><h5>All User list</h5></div>
+        
+					<div className="wrap">
+                            <div className='display_project_box'>
+                                {userDetailList.map((user, index) => (
+                                        <div key={index} className='display_project_box_list'>
+                                            <input type='checkbox' value={JSON.stringify(user[0])}></input>
+                                            <span >{user[0]}</span>
+                                            {/* <option key={user[0]} value={JSON.stringify(user)} >{user[0]} </option> */}
+                                        </div> 
+                                         
+                                ) )}
+                            </div>
                     </div>
-                 </ScrollBar>
-            </div>}
+                    <div>
+                        <div>
+                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} onClick={(e) => { }}>Create</button>
+                        </div>  
+                    </div>
+ 
         </div>
+    </Dialog>
+      
+    </div>
+                {userRole !== "Test Manager" && 
+                    <div className="task-overflow" id="plugin__taskScroll">
+                        <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
+                            <div data-test="task-content" className="task-content" id="plugin_page__list">
+                                <TaskContents data-test="taskcontent-component" items={searchValue ? searchItems : activeTab === "todo" ? todoItems : reviewItems} cycleDict={dataDictState.cycleDict} taskJson={taskJson} />
+                            </div>
+                        </ScrollBar>
+                    
+                    </div>
+                }
         </>
     );
 }
+
 TaskSection.propTypes={
     userInfo : PropTypes.object,
     userRole : PropTypes.string,

@@ -12,7 +12,7 @@ import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils'
 import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
-
+import Sidebar from './SideBars/Sidebar';
 
 
 /*Component CreateNew
@@ -30,6 +30,7 @@ const CreateNew = ({importRedirect}) => {
   const selectProj = useSelector(state=>state.mindmap.selectedProj)
   const prjList = useSelector(state=>state.mindmap.projectList)
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
+  
 
 
   useEffect(()=>{
@@ -51,7 +52,18 @@ const CreateNew = ({importRedirect}) => {
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
         if(!importRedirect){
             dispatch({type:actionTypes.SELECT_PROJECT,payload:selectProj?selectProj:res.projectId[0]}) 
-            var moduledata = await getModules({"tab":"tabCreate","projectid":selectProj?selectProj:res.projectId[0],"moduleid":null})
+            console.log('hello');
+            var req={
+                tab:"endToend",
+                projectid:selectProj?selectProj:res.projectId[0],
+                version:0,
+                cycId: null,
+                modName:"",
+                moduleid:null
+            }
+            // var moduledata = await getModules({"tab":"tabCreate","projectid":selectProj?selectProj:res.projectId[0],"moduleid":null})
+            var moduledata = await getModules(req);
+
             if(moduledata.error){displayError(moduledata.error);return;}
             var screendata = await getScreens(res.projectId[0])
             if(screendata.error){displayError(screendata.error);return;}
@@ -75,22 +87,31 @@ const CreateNew = ({importRedirect}) => {
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(delSnrWarnPop)? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} displayError={displayError}/>:null}
         {(!loading)?
+        
             <div className='mp__canvas_container'>
                 <div className='mp__toolbar__container'>
                     <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
+                    
                 </div>
+                
                 <ModuleListDrop />
                 <div id='mp__canvas' className='mp__canvas'>
+                
                     {(Object.keys(moduleSelect).length>0)?
                     <CanvasNew displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
                     :<Fragment>
+                   
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
                         <Legends/>
                     </Fragment>}
+                    
                 </div>
+                
             </div>:null
         }
+        {/* <Sidebar/> */}
+        
         <ReferenceBar taskInfo={info} taskTop={true} collapsible={true} collapse={true}>
             <div className="ic_box" title="SwitchLayout" >
                 <img onClick={()=>ClickSwitchLayout(verticalLayout,setVerticalLayout,moduleSelect,setBlockui,dispatch)} alt='Switch Layout' style={{height: '55px'}} className={"rb__ic-task thumb__ic " + (verticalLayout?"active_rb_thumb ":"")} src="static/imgs/switch.png"/>

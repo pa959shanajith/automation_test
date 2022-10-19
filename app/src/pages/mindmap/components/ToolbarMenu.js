@@ -7,6 +7,11 @@ import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import PropTypes from 'prop-types';
+// // primeReact components
+// import "primereact/resources/themes/lara-light-indigo/theme.css";  //theme
+// import "primereact/resources/primereact.min.css";                  //core css
+// import "primeicons/primeicons.css";                                //icons
+ 
 
 
 
@@ -145,13 +150,15 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 <i className="fa fa-files-o fa-lg" title="copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
             </span>
-            <span data-test="searchBox" className='toolbar__header-searchbox'>
+            {/* <span data-test="searchBox" className='toolbar__header-searchbox'>
                 <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
                 <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
-            </span>
+            </span> */}
             <button data-test="exportModules" disabled ={selectedModulelist.length==0} className='btn' title="Export Modules" onClick={()=>setExportBox(true)}>Export Modules</button>
-            <button data-test="createNew" className='btn' title="Create New Mindmap" onClick={()=>CreateNew()}>Create New</button>
+            {/* <button data-test="createNew" className='btn' title="Create New Mindmap" onClick={()=>CreateNew()}>Create New</button> */}
         </div>
+        
+
         </Fragment>
     )
 }

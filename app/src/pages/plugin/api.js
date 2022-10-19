@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {url} from '../../App';
-import {  Messages as MSG } from '../global'
+import {history} from './index'
+import { RedirectPage, Messages as MSG } from '../global'
 
 /*Component TaskSection
   api returns {"appType":[""],"appTypeName":[""],"cycles":{"":[""]},"domains":[],"projectId":[],"projectName":[],"projecttypes":{},"releases":[[{"cycles":[{"_id":"","name":""}],"name":""}]]}
@@ -27,6 +28,37 @@ export const getProjectIDs = () => {
             reject(err);
         })
     })
+}
+
+export const getUserDetails = async(action, args) => { 
+    try{
+        const res = await axios(url+'/getUserDetails', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,args: args},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        else if(res.status === "fail" ){
+            return {error:MSG.ADMIN.ERR_FETCH_USER}
+        }
+        else if(res.status === "empty" ){
+            return {error:MSG.ADMIN.ERR_EMPTY_USER}
+        }
+        else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_FETCH_USER}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_FETCH_USER}
+    }
 }
 
 

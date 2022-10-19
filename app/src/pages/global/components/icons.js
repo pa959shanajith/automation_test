@@ -88,6 +88,7 @@ registerIcons({
     donut: <DonutChart />,
     cancel: <Cancel />,
     warning: <Warning />,
+    'plusIcon' : <img style={{width:'1.86rem', marginRight:'0.7rem',marginTop:'0.02rem'}} src='static/imgs/plusNew.png' />,
     'add-user': <AddUser />,
     computer: <Computer />,
     undeploy: <Undeploy />,
