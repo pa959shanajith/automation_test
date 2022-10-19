@@ -394,6 +394,7 @@ if (cluster.isMaster) {
 		app.post('/exportToGit', auth.protect, mindmap.exportToGit);
 		app.post('/importGitMindmap', auth.protect, mindmap.importGitMindmap);
 		app.post('/deleteScenario', auth.protect, mindmap.deleteScenario);
+		app.post('/deleteScenarioETE', auth.protect, mindmap.deleteScenarioETE);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
