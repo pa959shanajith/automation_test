@@ -136,31 +136,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
           setStateChange(!statechange);
       };
 
-//     useEffect( async () => {
-    
-//         const userDetails = await pluginApi.getUserDetails();
-//         console.log(userDetails);
-//         if(userDetails.error){
-//             console.log(userDetails);
-//             setMsg(MSG.CUSTOM(userDetails.error));return;}
-        
-//         else{  
-//             console.log(userDetails);
-//             var userOptions = [];
-//             for(var i=0; i<userDetails.length; i++){
-//                 if(userDetails[i][3] !== "Admin"){
-//                     userOptions.push(userDetails[i]);
-//                 }
-//             }
-//             setSelectBox(userOptions.sort());
-//             if(document.getElementById("selAssignUser") !== null)
-//                 document.getElementById("selAssignUser").selectedIndex = "0"; 
-//             if(document.getElementById("selDomains") !== null)
-//             document.getElementById("selDomains").selectedIndex = "0";       
-//     }
-    
-// },[])
-    
+
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0 && userRole!=="Admin") {
             resetStates();
@@ -168,6 +144,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             setOverlay("Loading Tasks..Please wait...");
             pluginApi.getProjectIDs()
             .then(data => {
+                console.log(data)
                 setProjectNames(data);
                 if(data === "Fail" || data === "Invalid Session") return RedirectPage(history);
                 else {
