@@ -780,7 +780,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     // };
     static setExecStatus = async (req, res) => {
 
-        let dataFromIce = req.body;
+        let dataFromIce = req.body,checkInCache = false;
         let resultData = dataFromIce.exce_data;
         if (dataFromIce.status == 'finished')
         {
@@ -793,6 +793,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                 
                 if(executionList[0]['executionListId'] == resultData.executionListId)
                 {
+                    checkInCache = true;
                     let moduleIndex = -1;
                     for (let testSuite of executionList){
                         moduleIndex++;
@@ -830,12 +831,51 @@ module.exports.Execution_Queue = class Execution_Queue {
                 this.key_list[resultData.configkey] = updatedKeyQueue
                 await cache.set("execution_list", this.key_list);
             }
+
+            //User Manually deleted from cache
+            if(!checkInCache) {
+                dataFromIce.executionStatus = false;
+            }
         }
         return await this.executionInvoker.setExecStatus(dataFromIce);
 
     }
+
+
     static getQueueState = async (req, res) => {
         return this.key_list;
+    }
+
+    static deleteExecutionListId = async (req, res) => {
+        var fnName = 'deleteExecutionListId';
+        let response = {};
+        let synchronousFlag = false;
+        response['status'] = "fail";
+        response["message"] = "N/A";
+        response['error'] = "None";
+        try {
+
+            const configurekey = req.body.configurekey;
+            const executionListId = req.body.executionListId;
+
+            const configureKeyExecution = this.key_list[configurekey];
+            let newConfigureKeyExecution = [];
+            for(let execution of configureKeyExecution) {
+                if(execution[0].executionListId != executionListId) {
+                    newConfigureKeyExecution.push(execution);
+                }
+            }
+            this.key_list[configurekey] = newConfigureKeyExecution
+            await cache.set("execution_list", this.key_list);
+            console.log(this.key_list);
+            return response;
+
+        } catch (error) {
+            console.info(error);
+            logger.error("Error in deleteExecutionListId. Error: %s", error);
+        }
+
+        return response;
     }
 }
 
