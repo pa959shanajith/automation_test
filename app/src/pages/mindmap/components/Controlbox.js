@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import ClickAwayListener from 'react-click-away-listener';
 import '../styles/ControlBox.scss'
 import * as d3 from 'd3';
+import {Provider, useSelector, useDispatch} from 'react-redux';
 import PropTypes from 'prop-types';
 import '../styles/TaskBox.scss';
 import ExecuteHome from '../../execute/containers/ExecuteHome';
@@ -25,6 +26,14 @@ const ControlBox = (props) => {
     const [ShowDesignTestSetup,setShowDesignTestSetup] = useState(false);
     const [showExecute,setShowExecute] = useState(false);
     const [redirectTo, setRedirectTo] = useState("");
+//     const dispatch = useDispatch();
+//     const roleSwitched = useSelector(state=>state.mindmap.breadcrumbValue);
+//     useEffect(()=>{
+//       if(roleSwitched){
+//           dispatch({type: SWITCHED, payload: false});
+//           setRole(true);
+//       }
+//   }, [roleSwitched])
     const history = useHistory();
     // const [showAssign,setShowAssign] = useEffect(false);
     var faRef = {
@@ -214,7 +223,7 @@ const ControlBox = (props) => {
                <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode}></p>
                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59"}} onClick={deleteNode}></p>
-               <p data-test="captureelements"  className="ct-ctrl fa fa-light fa-crop-simple "  onClick={() => CaptureElement()}><> Capture Elements  </></p>
+               <p data-test="captureelements"  className="ct-ctrl fa fa-light fa-crop-simple "  onClick={() => {;CaptureElement();}}><> Capture Elements  </></p>
                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59"}} ><>  Assign </></p>
                <p data-test="execute"  className="ct-ctrl fa fa-light fa-badge-check"  onClick={() => execute()}> Execute </p>
             </div>   : 
