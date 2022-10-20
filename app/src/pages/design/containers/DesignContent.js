@@ -29,7 +29,8 @@ import "../styles/DesignContent.scss";
 import { NormalDropDown } from "@avo/designcomponents";
 import {ResetSession } from '../../global';
 import * as DesignActions from '../state/action';
-
+import Breadcrumb from 'react-bootstrap/Breadcrumb';
+import * as pluginApi from "../../plugin/api";
 import { Button } from "primereact/button";
 
 
@@ -53,7 +54,8 @@ const DesignContent = (props) => {
   const modified = useSelector((state) => state.design.modified);
   const saveEnable = useSelector((state) => state.design.saveEnable);
   const mainTestCases = useSelector(state=>state.design.testCases);
-
+  const [projectDetails, setProjectDetails]= useState(null)
+  const [projectNames, setProjectNames] = useState(null)
 //   const mainTestCases = useSelector(state=>state.design.testCases);
 
   const headerCheckRef = useRef();
@@ -238,6 +240,16 @@ const DesignContent = (props) => {
     }
     //eslint-disable-next-line
   }, [userInfo, props.current_task]);
+
+  useEffect(()=>{
+    pluginApi.getProjectIDs()
+    .then(data => {
+            setProjectNames(data)
+            pluginApi.getTaskJson_mindmaps(data)
+            .then(tasksJson => {
+                setProjectDetails(tasksJson)
+            })       
+})},[])
 
   const fetchTestCases = () => {
     return new Promise((resolve, reject) => {
@@ -1238,6 +1250,14 @@ const DesignContent = (props) => {
       {overlay && <ScreenOverlay content={overlay} />}
       {showConfPaste && <ConfPasteStep />}
       <div className="d__content">
+      <Breadcrumb  className='breadcrumb-item'>
+                <Breadcrumb.Item active style={{color: 'blue'}}>{projectNames && projectNames.projectName[0]}</Breadcrumb.Item>
+                <Breadcrumb.Item active style={{color: 'blue'}}>{projectDetails && projectDetails[0].taskDetails[0].taskName}</Breadcrumb.Item>
+                <Breadcrumb.Item  active style={{color: 'blue'}}>{projectDetails && projectDetails[1].taskDetails[0].taskName}</Breadcrumb.Item>
+                <Breadcrumb.Item  active style={{color: 'blue'}}>{projectDetails && projectDetails[2].taskDetails[0].taskName}</Breadcrumb.Item>
+                <Breadcrumb.Item  active style={{color: 'blue'}}>{props.current_task.taskName}</Breadcrumb.Item>
+                {/* <Breadcrumb.Item  active style={{textDecoration:'none'}} id={!isCaptured?'bluecolor':'graycolor'}>Debug</Breadcrumb.Item> */}
+            </Breadcrumb>
         <div className="d__content_wrap">
           {/* Task Name */}
           <div className="d__task_title">

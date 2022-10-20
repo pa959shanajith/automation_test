@@ -139,7 +139,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
     return (<>
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-                DevOps Integration Configuration
+                Execution Profile
             </span>
         </div>
         <div className="api-ut__btnGroup">
