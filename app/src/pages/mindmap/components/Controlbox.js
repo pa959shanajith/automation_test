@@ -11,7 +11,10 @@ import {Dialog} from '@avo/designcomponents';
 import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
 import DesignHome from '../../design/containers/DesignHome';
 import TaskBox from './TaskBox';
+import { useSelector, useDispatch }  from  "react-redux";
+
 import { assign } from 'nodemailer/lib/shared';
+import {SET_CT} from "../../plugin/state/action"
 // import { assign } from 'nodemailer/lib/shared';
 
 /*Component ControlBox
@@ -26,6 +29,9 @@ const ControlBox = (props) => {
     const [showExecute,setShowExecute] = useState(false);
     const [redirectTo, setRedirectTo] = useState("");
     const history = useHistory();
+    const current_task = useSelector(state=>state.plugin.CT);
+    const dispatch = useDispatch()
+
     // const [showAssign,setShowAssign] = useEffect(false);
     var faRef = {
         "plus": "fa-plus",
@@ -154,31 +160,36 @@ const ControlBox = (props) => {
     // const Assign = () =>{
     //     <TaskBox/>
     // }
+    console.log("taskname  "+props.taskname)
     return(
         <>
         {/* {redirectTo && <Redirect to={redirectTo} />} */}
         <Dialog
             
             hidden = {showScrape === false}
-            onDismiss = {() => console.log(false)}
-            title = 'Capture'
-            minWidth = '60rem'
-            confirmText = 'Save'
-            onDecline={() => console.log(false)}
+            onDismiss = {() => setShowScrape(false)}
+            title={props.taskname}
+            minWidth = '68rem'
+            
+            // onDecline={() => console.log(false)}
             onConfirm = {() => { }} >
                 <div style={{ height: '623px'}}><ScrapeScreen /></div>
             </Dialog>
+
+
             <Dialog
             
             hidden = {ShowDesignTestSetup === false}
-            onDismiss = {() => console.log(false)}
-            title = 'Design Test Setup'
-            minWidth = '60rem'
-            confirmText = 'Save'
-            onDecline={() => console.log(false)}
+            onDismiss = {() => setShowDesignTestSetup(false)}
+            title={props.taskname}
+            minWidth = '65rem'
+            
+            // onDecline={() => console.log(false)}
             onConfirm = {() => { }} >
                 <div style={{ height: '623px'}}><DesignHome /></div>
             </Dialog>
+
+            
             <Dialog
             
             hidden = {showExecute === false}

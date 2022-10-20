@@ -406,7 +406,7 @@ const ScrapeScreen = ()=>{
                     { current_task.appType === "Webservice" 
                         ? <WebserviceScrape /> 
                         : compareFlag ? <CompareObjectList /> : <ScrapeObjectList />}
-                    <RefBarItems mirror={mirror}/>
+                    {/* <RefBarItems mirror={mirror}/> */}
                 </ScrapeContext.Provider>
             </div>
             {/* <div data-test="ssFooter"className='ss__footer'><Footer/></div> */}
