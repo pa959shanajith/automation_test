@@ -14,6 +14,8 @@ import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import * as actionTypes from '../state/action';
 import '../styles/MindmapCanvas.scss';
+import TaskBox from '../components/TaskBox';
+
 
 /*Component Canvas
   use: return mindmap on a canvas
@@ -51,7 +53,8 @@ const CanvasNew = (props) => {
     const [dNodes,setdNodes] = useState([])
     const [dLinks,setdLinks] = useState([])
     const [createnew,setCreateNew] = useState(false)
-    const [verticalLayout,setVerticalLayout] = useState(false)
+    const [verticalLayout,setVerticalLayout] = useState(false);
+    const [taskbox,setTaskBox] = useState(false);
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
@@ -245,8 +248,22 @@ const CanvasNew = (props) => {
             temp={...temp,...res.temp}
         }
     }
+
+    const clickUnassign = (res) =>{
+        setNodes(res.nodeDisplay)
+        dispatch({type:actionTypes.UPDATE_UNASSIGNTASK,payload:res.unassignTask})
+        setTaskBox(false)
+    }
+
+    const clickAddTask = (res) =>{
+        setNodes(res.nodeDisplay)
+        setdNodes(res.dNodes)
+        setTaskBox(false)
+    }
+
     return (
         <Fragment>
+            {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={"R1"} cycleid={"C1"} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
             {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
             {(ctrlBox !== false)?<ControlBox  taskname={taskname} nid={ctrlBox} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
@@ -263,7 +280,7 @@ const CanvasNew = (props) => {
                 })}
                 {Object.entries(nodes).map((node)=>
                     <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                        <image  onClick={(e)=>nodeClick(e)} style={{height:'40px',width:'40px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
+                        <image  onClick={(e)=>nodeClick(e)} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                         <text className="ct-nodeLabel" textAnchor="middle" x="20" title={node[1].title} y="50">{node[1].name}</text>
                         <title val={node[0]} className="ct-node-title">{node[1].title}</title>
                         {(node[1].type!=='testcases')?
