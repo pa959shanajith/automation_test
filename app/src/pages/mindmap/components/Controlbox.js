@@ -8,17 +8,11 @@ import ExecuteHome from '../../execute/containers/ExecuteHome';
 import {Dialog} from '@avo/designcomponents';
 import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
 import DesignHome from '../../design/containers/DesignHome';
-<<<<<<< HEAD
 import TaskBox from './TaskBox';
 import { useSelector, useDispatch }  from  "react-redux";
 
 import { assign } from 'nodemailer/lib/shared';
 import {SET_CT} from "../../plugin/state/action"
-=======
-
-
-
->>>>>>> 7f8bfd291ad09db7f64a7ac1e17ebc2cca675f94
 // import { assign } from 'nodemailer/lib/shared';
 
 /*Component ControlBox
@@ -31,17 +25,14 @@ const ControlBox = (props) => {
     const [showScrape, setShowScrape] = useState(false);
     const [ShowDesignTestSetup,setShowDesignTestSetup] = useState(false);
     const [showExecute,setShowExecute] = useState(false);
-<<<<<<< HEAD
     const [redirectTo, setRedirectTo] = useState("");
     const history = useHistory();
     const current_task = useSelector(state=>state.plugin.CT);
     const dispatch = useDispatch()
 
     // const [showAssign,setShowAssign] = useEffect(false);
-=======
     const [showAssign,setShowAssign] = useState(false);
 
->>>>>>> 7f8bfd291ad09db7f64a7ac1e17ebc2cca675f94
     var faRef = {
         "plus": "fa-plus",
         "plus1": "fa-hand-peace-o",
