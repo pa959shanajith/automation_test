@@ -72,12 +72,7 @@ import { ReactComponent as BarChart } from '@avo/designcomponents/lib/assets/ico
 import { ReactComponent as PieChart } from '@avo/designcomponents/lib/assets/icons/pie-chart.svg';
 import { ReactComponent as DonutChart } from '@avo/designcomponents/lib/assets/icons/donut-chart.svg';
 import { ReactComponent as Input } from '@avo/designcomponents/lib/assets/icons/input.svg';
-// import {ReactComponent as ChromeIcon} from "../../../assets/imgs/chrome_logo_new.svg";
-// import {ReactComponent as Safari} from "../../../assets/imgs/safari_logo_new.svg";
-// import {ReactComponent as InternetExplorer} from "../../../assets/imgs/internet_explorer_logo_new.svg";
-// import {ReactComponent as Edge} from "../../../assets/imgs/edge_logo_new.svg";
-
-// import {ReactComponent as Firefox} from "../../../assets/imgs/firefox_logo_new.svg";
+import { ReactComponent as Error } from '../../../assets/imgs/fullscreen_black_24dp 1.svg';
 
 
 registerIcons({
@@ -102,6 +97,7 @@ registerIcons({
     // 'edge':<Edge />,
     // 'safari':<Safari />,
     // 'firefox':<Firefox />,
+    'error-e':<Error />,
     play: <Play />,
     link: <Link />,
     export: <Export />,

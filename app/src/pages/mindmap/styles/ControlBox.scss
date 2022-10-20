@@ -4,19 +4,19 @@
     display: flex;
     position: absolute;
     height: fit-content;
-    width: 170px;
+    width: 175px;
     z-index: 10;
     background-color: #323130;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
-    border-radius: 2px;
+    border-radius: 8px;
     text-align: left;
-    padding: 3px 0px;
+    padding: 8px 8px;
 }
 .ct-ctrl  {
     color: $whiteColor;
     // margin: 0 72px 0 0;
-    margin : -33px 0px 9px 0px;
+    margin : -33px -1px 9px 0px;
     // margin : -12px 9px 7px -1px;
     cursor : pointer;
     font-family: 'LatoWeb';
@@ -72,7 +72,7 @@
     background-color: #323130;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
-    border-radius: 2px;
+    border-radius: 8px;
     text-align: left;
     padding: 3px 0px;
 }
@@ -84,6 +84,8 @@
     // background-color: $primaryColorDarkest ;
     padding: 3px ;
     border: 1px  ;
+    line-height: 1.5;
+
 
 }
 .fa-hand-peace-o:before
@@ -94,6 +96,8 @@
     margin: 10px;
     padding: 3px ;
     border: 1px ;
+    line-height: 1.5;
+
 }
 .fa-pencil-square-o:before 
 {
@@ -103,6 +107,7 @@
     padding: 3px ;
     margin: 10px;
     border: 1px ;
+    line-height: 1.5;
 }
 .fa-trash-o:before
 {
@@ -112,6 +117,7 @@
     padding: 3px ;
     margin: 10px;
     border: 1px ;
+    line-height: 1.5;
 }
 .fa-user:before 
 {
@@ -121,6 +127,7 @@
     padding: 3px 5px ;
     margin: 8px;
     border: 1px ; 
+    line-height: 1.5;
 }
 // .fa-crop-simple:before
 // {
@@ -132,37 +139,54 @@
 //     margin: 8px;
 //     border: 1px ; 
 // }
-.fa-badge-check:before 
+.fa-play:before 
 {
     color: $whisper;
-    content: "\f336";
     // padding: 5px 49px 4px 18px;
     // background-color: $primaryColorDarkest ;
     padding: 3px 5px ;
     margin: 8px;
     border: 1px ; 
+    line-height: 1.5;
 
 }
-.fa-album-circle-user:before
+.fa-dot-circle-o:before
 {
     color: $whisper;
-    content: "\e48d";
     // padding: 5px 49px 4px 18px;
     // background-color: $primaryColorDarkest ;
     padding: 3px 5px ;
     margin: 8px;
     border: 1px ; 
+    line-height: 1.5;
 
 }
-.fa-crop-simple:before
+.fa-crop:before
 {
-    
-    content: "\f565";
+    color: $whisper;
+    // padding: 5px 49px 4px 18px;
+    // background-color: $primaryColorDarkest ;
+    padding: 3px 5px ;
+    margin: 8px;
+    border: 1px ;
+    line-height: 1.5; 
+
+}
+.fa-list-alt:before
+{
     color: $whisper;
     // padding: 5px 49px 4px 18px;
     // background-color: $primaryColorDarkest ;
     padding: 3px 5px ;
     margin: 8px;
     border: 1px ; 
+    line-height: 1.5;
 
+}
+.Ca{
+    width: "-webkit-fill-available";
+    height: 24;
+    margin-left: 0;
+    margin-right: 0;
+    border-bottom: "2px solid #5B5A59";
 }
