@@ -12,14 +12,15 @@
 .e__mid_section{
     display: flex;
     flex: auto;
+    flex-direction: column;
     width: 100%;
     background-color: rgb(255, 255, 255);
-    margin: 0;
-    padding: 0;
+    margin-bottom: 1%;
+    padding: 1rem;
 }
 
 .e__footer .main-footer{
-    position: static;
+    position: fixed;
 }
 
 
