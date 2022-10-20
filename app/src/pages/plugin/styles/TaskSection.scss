@@ -11,8 +11,8 @@
 }
 
 .task-section{
-    width: 45%;
-    min-width: 40%;
+    width: 50%;
+    min-width: 50%;
 }
 
 .task-content{
@@ -73,13 +73,33 @@
 .labelStyle1 {
     display:flex;
     flex-direction: column;
-    margin-bottom: 0.7rem;
+    margin-bottom: -0.3rem;
     padding:0rem 1rem;
-    font-weight: 300;
+    // font-weight: 300;
+    line-height: 70%;
+    margin-top: 0.7rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #323130;;
+   font-family: Mulish;
+    font-style: normal;
+    
 }
-.display_project_box{
+.display_project_box {
 
     display: inline-flexbox;
+    padding:0rem 1rem 0rem 1rem;
+    line-height: 1.5rem;
+    border: 2px solid var(--baseColorBorder);
+    box-sizing: content-box;
+    width: 300px;
+    margin: 6px;
+}
+.display_project_box_list, input[type=checkbox]{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 6px;
+    
 }
 .task-search-bar{
     outline: none;
@@ -109,13 +129,19 @@
 .task-nav-bar1{
     font-family:  "LatoWeb" ;
     font-size: 20px;
-   
+    margin: 3px;
     margin-top: 10px;
     display: flex;
     flex-direction: row;
     border-bottom: 3px solid $borderFour;
     
    }
+.button-design{
+    float: "left";
+    margin-left: 7.5rem;
+    font-family:"LatoWeb";
+    font-size: 18px;
+}
 
 // .create-project1{
 //     // font-size: 40px;
