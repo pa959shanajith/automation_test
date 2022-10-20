@@ -69,7 +69,7 @@ const ExecuteHome = () => {
         <div className="e__body">
             <Header />
                 <div className="e__mid_section">
-                    <ExecuteContent/>
+                    <ExecuteContent />
                     {/* <ActionBar 
                         upperContent={<UpperContent appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />}
                         bottomContent={<BottomContent execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
