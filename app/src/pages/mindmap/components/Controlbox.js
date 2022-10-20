@@ -1,18 +1,19 @@
-import React, { useEffect,useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect,useState } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import '../styles/ControlBox.scss'
 import * as d3 from 'd3';
 import {Provider, useSelector, useDispatch} from 'react-redux';
 import PropTypes from 'prop-types';
-import '../styles/TaskBox.scss';
 import ExecuteHome from '../../execute/containers/ExecuteHome';
 // import MindmapHome from '../../mindmap/containers/MindmapHome';
 import {Dialog} from '@avo/designcomponents';
 import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
 import DesignHome from '../../design/containers/DesignHome';
 import TaskBox from './TaskBox';
+import { useSelector, useDispatch }  from  "react-redux";
+
 import { assign } from 'nodemailer/lib/shared';
+import {SET_CT} from "../../plugin/state/action"
 // import { assign } from 'nodemailer/lib/shared';
 
 /*Component ControlBox
@@ -35,17 +36,22 @@ const ControlBox = (props) => {
 //       }
 //   }, [roleSwitched])
     const history = useHistory();
+    const current_task = useSelector(state=>state.plugin.CT);
+    const dispatch = useDispatch()
+
     // const [showAssign,setShowAssign] = useEffect(false);
+    const [showAssign,setShowAssign] = useState(false);
+
     var faRef = {
         "plus": "fa-plus",
         "plus1": "fa-hand-peace-o",
         "edit": "fa-pencil-square-o",
         "delete": "fa-trash-o",
         "assign":"fa-light fa-user",
-        "execute":"fa-light fa-badge-check",
-        "record":"fa-light fa-album-circle-user",
-        "captureelements":"fa-light fa-crop-simple",
-        "designtestsetup":"fa-light fa-crop-simple",
+        "execute":"fa-play",
+        "record":"fa-dot-circle-o",
+        "captureelements":"fa-crop",
+        "designtestsetup":"fa-list-alt",
     };
     var ctScale = props.ctScale;
     var isEnE = props.isEnE;
@@ -163,78 +169,94 @@ const ControlBox = (props) => {
     // const Assign = () =>{
     //     <TaskBox/>
     // }
+    console.log("taskname  "+props.taskname)
+    const Assign = () =>{
+        setShowAssign(true);
+        props.setTaskBox(props.nid);
+        props.setCtrlBox(false);
+    };
+    
+
     return(
         <>
-        {/* {redirectTo && <Redirect to={redirectTo} />} */}
         <Dialog
-            
+            // open={this.state.show} onClose={this.onClose}
             hidden = {showScrape === false}
-            onDismiss = {() => console.log(false)}
-            title = 'Capture'
-            minWidth = '60rem'
-            confirmText = 'Save'
-            onDecline={() => console.log(false)}
+            onDismiss = {() => setShowScrape(false)}
+            title={props.taskname}
+            minWidth = '68rem'
+            
+            // onDecline={() => console.log(false)}
             onConfirm = {() => { }} >
                 <div style={{ height: '623px'}}><ScrapeScreen /></div>
             </Dialog>
+
+
             <Dialog
             
             hidden = {ShowDesignTestSetup === false}
-            onDismiss = {() => console.log(false)}
-            title = 'Design Test Setup'
-            minWidth = '60rem'
-            confirmText = 'Save'
-            onDecline={() => console.log(false)}
+            onDismiss = {() => setShowDesignTestSetup(false)}
+            title={props.taskname}
+            minWidth = '65rem'
+            
+            // onDecline={() => console.log(false)}
             onConfirm = {() => { }} >
                 <div style={{ height: '623px'}}><DesignHome /></div>
             </Dialog>
+
+            
             <Dialog
             
             hidden = {showExecute === false}
-            onDismiss = {() => console.log(false)}
+            onDismiss = {() => {setShowExecute(false)}}
             title = 'Execute'
             minWidth = '60rem'
             confirmText = 'Save'
-            onDecline={() => console.log(false)}
             onConfirm = {() => { }} >
                 <div style={{ height: '623px'}}><ExecuteHome/></div>
             </Dialog>
-            {/* <div hidden = {showAssign === false} ><MindmapHome/></div> */}
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
            {t ==='modules'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
                 <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
                 <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
-                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}} onClick={editNode}></p>
+                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={editNode}></p>
                 <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode}></p>
-                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}} ><>  Assign </></p>
-                <p data-test="execute"  className="ct-ctrl fa fa-light fa-badge-check" onClick={() => execute()}> Execute </p>
+                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user " style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59" , marginBottom: 8,paddingBottom: "20%"}} onClick={Assign} ><>  Assign </></p>
+                <p data-test="execute"  className="ct-ctrl fa fa-play" onClick={() => execute()}> Execute </p>
             </div>   :     
             t ==='scenarios'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
                 <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
                 <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
                 <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode}></p>
-                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}}  onClick={deleteNode}></p>
-                <p data-test="record"  className="ct-ctrl fa fa-light fa-album-circle-user " style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}}  > <> Record_AvoGenius </></p >
-                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}} ><>  Assign </></p>
-                <p data-test="execute"  className="ct-ctrl fa fa-light fa-badge-check" onClick={() => execute()}> Execute </p>
+                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}}  onClick={deleteNode}></p>
+                <p data-test="record"  className="ct-ctrl fa fa-dot-circle-o " style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}}  > <> Record_AvoGenius </></p >
+                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign}><>  Assign </></p>
+                <p data-test="execute"  className="ct-ctrl fa fa-play" onClick={() => execute()}> Execute </p>
                </div> : 
             t ==='screens'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
                <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode}></p>
+<<<<<<< HEAD
                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59"}} onClick={deleteNode}></p>
                <p data-test="captureelements"  className="ct-ctrl fa fa-light fa-crop-simple "  onClick={() => {;CaptureElement();}}><> Capture Elements  </></p>
                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59"}} ><>  Assign </></p>
                <p data-test="execute"  className="ct-ctrl fa fa-light fa-badge-check"  onClick={() => execute()}> Execute </p>
+=======
+               <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={deleteNode}></p>
+               <p data-test="captureelements"  className="ct-ctrl fa fa-crop"  onClick={() => CaptureElement()}><> Capture Elements  </></p>
+               <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign}><>  Assign </></p>
+               <p data-test="execute"  className="ct-ctrl fa fa-play"  onClick={() => execute()}> Execute </p>
+>>>>>>> 48e604ebd1c0039b44d679a06a9dad220d91b795
             </div>   : 
             t ==='testcases'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
                <p data-test="add" className="ct-ctrl fa fa-plus ct-ctrl-inactive" value={props.nid} onClick={addNode}> </p>
            <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o ct-ctrl-inactive" value={props.nid} onClick={addMultipleNode}></p>
            <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" onClick={editNode}></p>
-           <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}} onClick={deleteNode}></p>
-           <p data-test="designtestsetup"  className="ct-ctrl fa fa-light fa-crop-simple " onClick={()=> DesignTest()} > <> Design Test Setup </></p>
-           <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59"}} ><>  Assign </></p>
-           <p data-test="execute"  className="ct-ctrl fa fa-light fa-badge-check" onClick={() => execute(redirectTo)} > Execute </p>
+           <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={deleteNode}></p>
+           <p data-test="designtestsetup"  className="ct-ctrl fa fa-list-alt" onClick={()=> DesignTest()} > <> Design Test Setup </></p>
+           <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign} ><>  Assign </></p>
+           <p data-test="execute"  className="ct-ctrl fa fa-play" onClick={() => execute()} > Execute </p>
        </div> : "" 
 }
         </ClickAwayListener> 

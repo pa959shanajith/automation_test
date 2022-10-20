@@ -5,9 +5,10 @@
     flex: 0 1 100%;
     min-width: 0;
     padding: 20px;
-    margin: 0 5px;
+    margin: -22px -8px;
     background-color: $whiteColor;
     overflow-x: hidden;
+
 }
 
 .d__task_title{
@@ -80,6 +81,10 @@
     flex-grow: 1;
     font-size: 14px;
 }
+.p-button-warning{
+
+    margin: 55px -8px 56px 7px;
+}
 
 .d__taskBtn{
     padding: 0px 12px;
@@ -94,16 +99,16 @@
 
 
 
-.d__submitBtn{
-   margin: 24px 68px -3px -57px;
-}
+// .d__submitBtn{
+//    margin: 24px 68px -3px -57px;
+// }
 
 
 .d__submitBtn, .d__reassignBtn, .d__approveBtn{
     background-color: $submitBtn;
     padding: 2px 15px;
     font-size: 17px;
-    margin-right: 5px;
+    margin: 59px 15px 10px 10px;
 }
 
 .d__table_contents{

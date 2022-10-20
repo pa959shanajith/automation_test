@@ -12,7 +12,11 @@ import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils'
 import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
+<<<<<<< HEAD
 // import Sidebar from './SideBars/Sidebar';
+=======
+
+>>>>>>> 48e604ebd1c0039b44d679a06a9dad220d91b795
 
 
 /*Component CreateNew
@@ -23,7 +27,7 @@ const CreateNew = ({importRedirect}) => {
   const dispatch = useDispatch()
   const [blockui,setBlockui] = useState({show:false})
   const [fullScreen,setFullScreen] = useState(false)
-  const [verticalLayout,setVerticalLayout] = useState(false)
+  const [verticalLayout,setVerticalLayout] = useState(true)
   const [loading,setLoading] = useState(true)
   const [info,setInfo] = useState(undefined)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)
