@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
 import {IconDropdown} from '@avo/designcomponents'
-import plusIcon from './plusIcon.png';
+
 
 
 // import CreateOptions from '../components/CreateOptions.js';
@@ -151,7 +151,7 @@ const ModuleListDrop = (props) =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
     }
     const searchModule = (val) =>{
-        var filter = modlist.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        var filter = modlist.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
     }
     // E2E search button
@@ -161,7 +161,7 @@ const ModuleListDrop = (props) =>{
             initmodule = moduleList
             setModE2EList(moduleList)
         }
-        var filter = initmodule.filter((e)=>e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)
+        var filter = initmodule.filter((e)=>(e.type==='endtoend'&&(e.name.toUpperCase().indexOf(val.toUpperCase())!==-1)||e.type==='basic'))
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
     }
     const setOptions1 = (data) =>{
@@ -183,7 +183,8 @@ const ModuleListDrop = (props) =>{
                 
                 <div data-test="moduleList" id='toolbar_module-list' className='toolbar__module-container'>
                 
-                <div className='module_title'><h6 ><b>Modules</b></h6></div>
+                <div className='module_title'><h6 ><b>Modules
+                </b></h6></div>
                 <div className= 'plusSymbol' >
                 <IconDropdown 
                             items={[ 
@@ -216,7 +217,7 @@ const ModuleListDrop = (props) =>{
                         {moduleList.map((e,i)=>{
                             if(e.type==="basic")
                             return(<div key={i} >
-                                    <div data-test="modules" onClick={(e)=>selectModule(e)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?{backgroundColor:'#EFE6FF'}:{}} title={e.name} type={e.type}>                                    
+                                    <div style={{}} data-test="modules" onClick={(e)=>selectModule(e)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?{backgroundColor:'#EFE6FF'}:{}} title={e.name} type={e.type}>                                    
                                     <div  className='modClick' value={e._id} >{!isAssign && <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />}</div>
                                         <img value={e._id} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
                                         <span className='modNme' value={e._id} >{e.name}</span>
@@ -228,7 +229,7 @@ const ModuleListDrop = (props) =>{
                         {moduleList.map((e,i)=>{
                             if(e.type==="basic")
                             return(<div key={i} >
-                                    <div data-test="modules" onClick={(e)=>selectModule(e)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?{backgroundColor:'#EFE6FF'}:{}} title={e.name} type={e.type}>                                    
+                                    <div style={{}} data-test="modules" onClick={(e)=>selectModule(e)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?{backgroundColor:'#EFE6FF'}:{}} title={e.name} type={e.type}>                                    
                                     <div  className='modClick' value={e._id} >{!isAssign && <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />}</div>
                                         <img value={e._id} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
                                         <span className='modNme' value={e._id} >{e.name}</span>
@@ -237,6 +238,7 @@ const ModuleListDrop = (props) =>{
                                     
                                 )
                         })}
+                
                     
                       
      
@@ -248,20 +250,21 @@ const ModuleListDrop = (props) =>{
                     <div className='section-dividers'></div>
                     <div><IconDropdown style={{width:'1.67rem',height:'1.67rem', marginLeft:'9.8rem',marginTop:'0.3rem', border: 'white'}}  onClick={()=>CreateNew} placeholderIconName = 'plusIcon'/> </div>     
                     <div className='toolbar__ENE__module-container' >
-                    <h6 style={{ alignContent: 'center',width:'8rem', marginLeft:'.1rem',marginTop:'7.1rem',fontFamily: '$avoFont'}}><b>End To End Flows</b></h6>
+                    <h6 style={{ alignContent: 'center',width:'8rem', marginLeft:'.1rem',marginTop:'6.1rem',fontFamily: '$avoFont'}}><b>End To End Flows</b></h6>
                     <span data-test="search" style={{width:'12rem',borderRadius: '0.9rem',marginTop:'0.05rem'}} className='ene_toolbar__header-searchbox'>
                         <input data-test="searchInput" placeholder="Search Modules" ref={SearchMdInp} onChange={(e)=>searchModule_E2E(e.target.value)}></input>
                         <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                     </span>
                
-                    <div  style={{overflowY:'scroll',scrollBehavior: 'smooth', marginLeft:'2rem',marginBottom:'60%', 
-                    display:'flex',flexDirection:'column', alignItems:'center',textAlign:'center',  }} scrollId='toolbar_module-list' trackColor={'transperent'} thumbColor={'grey'}>
+                    <div  style={{overflowY:'scroll',scrollBehavior: 'smooth', 
+                    display:'flex',flexDirection:'column', alignItems:'center',textAlign:'center', height:'5.2rem', marginLeft:'-0.87rem', }} scrollId='toolbar_module-list' trackColor={'transperent'} thumbColor={'grey'}>
             {moduleList.map((e,i)=>{
                 if(e.type==="endtoend")
                 return(
                     <div className= 'ene_toolbar__module-box_hover' style={{display:'flex', alignContent:'center',width: '11.25rem',
-    height:'1.75rem',alignItems: 'center', marginLeft:'-1rem' }} data-test="individualModules" name={e.name} type={e.type} onClick={(e)=>selectModule(e)} key={i} className={'ene_toolbar__module-box'+((moduleSelect._id === e._id)?" selected":"")} title={e.name}>
-                        <img style={{display:'inlineBlock',height: '1.5625rem',width: '1.5625rem',cursor: 'pointer',marginLeft: '0.625rem'}} src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img>
+    height:'1.7rem',alignItems: 'center',marginLeft:'1rem', marginTop:'-0.6rem' }} data-test="individualModules" name={e.name} type={e.type} onClick={(e)=>selectModule(e)} key={i} className={'ene_toolbar__module-box'+((moduleSelect._id === e._id)?" selected":"")} title={e.name}>
+    <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />
+                        <img style={{display:'inlineBlock',height: '1.54rem',width: '1.54rem',cursor: 'pointer',marginLeft: '0.9rem'}} src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img>
                         <span >{e.name}</span>
                     </div>
                 )
