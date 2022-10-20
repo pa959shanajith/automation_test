@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // import {getUserDetails} from '../api';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Redirect } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
 import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, GenerateTaskList, Messages as MSG, setMsg } from '../../global';
 import FilterDialog from "./FilterDialog";
@@ -20,6 +20,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import ProjectNew from '../../admin/containers/ProjectAssign';
 import { DataTable } from 'primereact/datatable';
+
 
 // import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
@@ -115,26 +116,26 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
           selectId.selectedIndex = "-1";
     };
   
-    const moveItemsLeftall =  ()=> {
-      setUnAssignedFlag(true);
-          for(var i=0; i<assignProj.assignedProjectAP.length; i++){
-              assignProj.allProjectAP.push(assignProj.assignedProjectAP[i]);
-          }
-          assignProj.assignedProjectAP=[];
-          setAssignProj(assignProj);
-          setStateChange(!statechange);
-    };
+    // const moveItemsLeftall =  ()=> {
+    //   setUnAssignedFlag(true);
+    //       for(var i=0; i<assignProj.assignedProjectAP.length; i++){
+    //           assignProj.allProjectAP.push(assignProj.assignedProjectAP[i]);
+    //       }
+    //       assignProj.assignedProjectAP=[];
+    //       setAssignProj(assignProj);
+    //       setStateChange(!statechange);
+    // };
   
-    const moveItemsRightall =() =>{
+    // const moveItemsRightall =() =>{
   
-          setUnAssignedFlag(false);
-          for(var i=0; i<assignProj.allProjectAP.length; i++){
-              assignProj.assignedProjectAP.push(assignProj.allProjectAP[i]);
-          }
-          assignProj.allProjectAP=[];
-          setAssignProj(assignProj);
-          setStateChange(!statechange);
-      };
+    //       setUnAssignedFlag(false);
+    //       for(var i=0; i<assignProj.allProjectAP.length; i++){
+    //           assignProj.assignedProjectAP.push(assignProj.allProjectAP[i]);
+    //       }
+    //       assignProj.allProjectAP=[];
+    //       setAssignProj(assignProj);
+    //       setStateChange(!statechange);
+    //   };
 
 
     useEffect(()=>{
@@ -360,21 +361,34 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             </div>
             <div>
             
-            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10"}} label="add project"  onClick={() => onClick('displayBasic')} />
+            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10", FontSize:"10px",marginLeft:"300px"}} label="Add and Manage Project"  onClick={() => onClick('displayBasic')} />
             
             </div>
             <div>
             <div className="task-nav-bar1">
             <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")}>{projectNames && projectNames.projectName[0]}</span>
-            <button className="reset-action__exit" style={{lineBreak:'50px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"2px 5px",background: "white",float:'right',marginLeft:"150px" }} onClick={(e) => { }}>Design</button>
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"2px 5px",background: "white",float:'right',marginRight:"50px" }} onClick={(e) => { }}>Execute</button>
+            {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
+       
+            <div className='button-design'>
+            <button className="reset-action__exit" style={{lineBreak:'50px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"50px",margin: "3px", }} onClick={(e) => { }}>Manage</button>
+            
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { }}>Execute</button>
+            
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { 
+                window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+			window.localStorage['integrationScreenType'] = null;
+
+                window.location.href = "/mindmap";
+                }}>Design</button>
+            </div>
+       
             </div> 
             </div>
             {/* <div>
             {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
                 
                 
-    <Dialog header='Create Project'visible={displayBasic} style={{ width: '60vw' }}  onHide={() => onHide('displayBasic')}>
+    <Dialog header='Create Project'visible={displayBasic} style={{ width: '40vw' }}  onHide={() => onHide('displayBasic')}>
         <div>
             <div className='dialog_textfield'>
                 <TextField 
@@ -415,7 +429,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                         : {}
                     ]}
                     placeholder="Select an apptype"
-                    width="150px"
+                    width="300px"
                     // disabled={!selectedProject}
                     // required
                     onChange={(e, item) => {
@@ -425,7 +439,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 />
             </div>
             
-            <div className='labelStyle1'><h5>All User list</h5></div>
+            <div className='labelStyle1'> <label>users</label></div>
         
 					<div className="wrap">
                             <div className='display_project_box'>
@@ -449,7 +463,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     </Dialog>
       
     </div>
-                {userRole !== "Test Manager" && 
+                {/* {userRole !== "Test Manager" && 
                     <div className="task-overflow" id="plugin__taskScroll">
                         <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                             <div data-test="task-content" className="task-content" id="plugin_page__list">
@@ -458,7 +472,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                         </ScrollBar>
                     
                     </div>
-                }
+                } */}
         </>
     );
 }

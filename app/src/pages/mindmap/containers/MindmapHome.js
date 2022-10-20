@@ -21,7 +21,10 @@ const MindmapHome = () => {
   // const selectedModule = useSelector(state=>state.mindmap.selectedModule)
   // const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
   // const selectedProj = useSelector(state=>state.mindmap.selectedProj)
-  
+  const[isCaptured,setIsCaptured]=useState(false)
+  const[isCaptured1,setIsCaptured1]=useState(false)
+  const[isCaptured2,setIsCaptured2]=useState(false)
+  const[isCaptured3,setIsCaptured3]=useState(false)
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
     //'importmindmap': React.memo(() => (<CreateNew importRedirect={true}/>)),
@@ -40,11 +43,43 @@ const MindmapHome = () => {
   }
  
 
-
+//data-selected="true"
   var Component = (!options)? null : createType[options];
   return (
     <div className='mp__container'>
       <Header/> 
+      <div className="breadcrumbs__container">
+      <div style={{width: '2px',
+    height: '39px',
+    position: 'absolute',
+    backgroundColor: '#5f338f',
+    /* margin-right: -2rem; */
+    left: '0px',
+    zIndex:100,
+    top: '5.2rem'}}></div>
+            <ol className="breadcrumbs__elements" style={{ listStyle: "none", display: "flex", gap: "2px", flex:1, margin: '1px'}}>
+                <li className="breadcrumbs__element__inner" data-selected={isCaptured?true:false} id={'bluecolor'} >
+                    <span className="containerSpan"  ><p className="styledSpan" style={!isCaptured?{color:'#5f338f'}:null}>Mindmap</p></span>
+                </li>
+                <li className="breadcrumbs__element__inner" data-selected={isCaptured1?true:false} id={isCaptured?'bluecolor':'graycolor'}>
+                    <span className="containerSpan"><p className="styledSpan" style={isCaptured?isCaptured1?{color:'white'}:{color:'#5f338f'}:{color:'gray'}}>Capture Element</p></span>
+                </li>
+                <li className="breadcrumbs__element__inner" data-selected={isCaptured2?true:false} id={isCaptured1?'bluecolor':'graycolor'}>
+                    <span className="containerSpan"><p className="styledSpan" style={isCaptured1?isCaptured2?{color:'white'}:{color:'#5f338f'}:{color:'gray'}}>Design Test Case</p></span>
+                </li>
+                <li className="breadcrumbs__element__inner" data-selected={isCaptured3?true:false} id={isCaptured2?'bluecolor':'graycolor'}>
+                    <span className="containerSpan"><p className="styledSpan" style={isCaptured2?isCaptured3?{color:'white'}:{color:'#5f338f'}:{color:'gray'}}>Execute Test Case</p></span>
+                </li>
+            </ol>
+            <div style={{width: '2px',
+    height: '39px',
+    position: 'absolute',
+    backgroundColor: '#5f338f',
+    /* margin-right: -2rem; */
+    right: '0px',
+    top: '5.2rem'}}></div>
+
+      </div>
       <div className='mp__body'>
         <ActionBar collapsible={true} collapse={options}>
           <div className="mp__ic_box">
