@@ -160,6 +160,7 @@ const CanvasAssign =(props)=>{
                     </g>)}
                 </g>
             </svg>
+            
         </Fragment>
     )
 }
