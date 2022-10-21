@@ -14,7 +14,6 @@ import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
 
 
-
 /*Component CreateNew
   use: renders create New Mindmap page
 */

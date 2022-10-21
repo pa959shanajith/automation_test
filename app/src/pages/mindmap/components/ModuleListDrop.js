@@ -6,8 +6,7 @@ import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
-import {IconDropdown} from '@avo/designcomponents'
-
+import {IconDropdown} from '@avo/designcomponents';
 
 
 // import CreateOptions from '../components/CreateOptions.js';
