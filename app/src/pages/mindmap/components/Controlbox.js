@@ -9,9 +9,11 @@ import ExecuteHome from '../../execute/containers/ExecuteHome';
 import {Dialog} from '@avo/designcomponents';
 import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
 import DesignHome from '../../design/containers/DesignHome';
-
+import TaskBox from './TaskBox';
+import { useSelector, useDispatch }  from  "react-redux";
 import { useHistory } from 'react-router-dom';
-
+import { assign } from 'nodemailer/lib/shared';
+import {SET_CT} from "../../plugin/state/action"
 // import { assign } from 'nodemailer/lib/shared';
 
 /*Component ControlBox
