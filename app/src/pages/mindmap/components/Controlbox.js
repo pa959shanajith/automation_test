@@ -16,7 +16,6 @@ import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
 // import { useHistory } from 'react-router-dom';
 import DesignHome from '../../design/containers/DesignHome';
 import TaskBox from './TaskBox';
-import { useSelector, useDispatch }  from  "react-redux";
 import { useHistory } from 'react-router-dom';
 import { assign } from 'nodemailer/lib/shared';
 import {SET_CT} from "../../plugin/state/action"
@@ -210,8 +209,7 @@ const ControlBox = (props) => {
             hidden = {showScrape === false}
             onDismiss = {() => setShowScrape(false)}
             title={props.taskname}
-            minWidth = '68rem'
-            
+            minWidth = '68rem' 
             // onDecline={() => console.log(false)}
             onConfirm = {() => { }} >
                 <div style={{ height: '623px'}}><ScrapeScreen /></div>
