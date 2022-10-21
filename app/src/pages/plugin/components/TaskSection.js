@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // import {getUserDetails} from '../api';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Redirect } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
 import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, GenerateTaskList, Messages as MSG, setMsg } from '../../global';
 import FilterDialog from "./FilterDialog";
@@ -20,6 +20,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import ProjectNew from '../../admin/containers/ProjectAssign';
 import { DataTable } from 'primereact/datatable';
+import { FontSizes } from '@fluentui/react';
 
 
 // import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -57,6 +58,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [statechange,setStateChange] = useState(true);
     const [selectBox,setSelectBox] = useState([]);
     const [userDetailList,setUserDetailList]=useState([]);
+    // const [getAvailablePlugins,setAvailablePlugins]=useState([]);
    
    
     const [projectNames, setProjectNames] = useState(null);
@@ -77,65 +79,13 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         console.log(UserList);
     },[]);
 
-    const moveItemsLeftgo = (to,from) =>{
-      setUnAssignedFlag(true);
-          
-          var selectId = document.getElementById("assignedProjectAP");
-  
-          var newAllProj = [];
-          var newAssignProj = [];
-          for(var i=0;i<selectId.options.length;i++){
-              if(selectId.options[i].selected ===  true){
-                  newAllProj.push(JSON.parse(selectId.options[i].value));
-              }
-              else{
-                  newAssignProj.push(JSON.parse(selectId.options[i].value));
-              }
-          }
-          newAllProj = assignProj.allProjectAP.concat(newAllProj);
-          setAssignProj({allProjectAP:newAllProj,assignedProjectAP:newAssignProj});
-          selectId.selectedIndex = "-1";
-      };
+    // useEffect(async()=>{
+    //     const AppList = await plugin.getAvailablePlugins("")
+    // })
 
-    const moveItemsRightgo = (from,to) =>{
-      setUnAssignedFlag(false);
   
-          var selectId = document.getElementById("allProjectAP");
-          var newAllProj = [];
-          var newAssignProj = [];
-          for(var i=0;i<selectId.options.length;i++){
-              if(selectId.options[i].selected ===  true){
-                  newAssignProj.push(JSON.parse(selectId.options[i].value));
-              }
-              else{
-                  newAllProj.push(JSON.parse(selectId.options[i].value));
-              }
-          }
-          newAssignProj = assignProj.assignedProjectAP.concat(newAssignProj);
-          setAssignProj({allProjectAP:newAllProj,assignedProjectAP:newAssignProj});
-          selectId.selectedIndex = "-1";
-    };
+
   
-    // const moveItemsLeftall =  ()=> {
-    //   setUnAssignedFlag(true);
-    //       for(var i=0; i<assignProj.assignedProjectAP.length; i++){
-    //           assignProj.allProjectAP.push(assignProj.assignedProjectAP[i]);
-    //       }
-    //       assignProj.assignedProjectAP=[];
-    //       setAssignProj(assignProj);
-    //       setStateChange(!statechange);
-    // };
-  
-    // const moveItemsRightall =() =>{
-  
-    //       setUnAssignedFlag(false);
-    //       for(var i=0; i<assignProj.allProjectAP.length; i++){
-    //           assignProj.assignedProjectAP.push(assignProj.allProjectAP[i]);
-    //       }
-    //       assignProj.allProjectAP=[];
-    //       setAssignProj(assignProj);
-    //       setStateChange(!statechange);
-    //   };
 
 
     useEffect(()=>{
@@ -361,7 +311,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             </div>
             <div>
             
-            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10"}} label="add project"  onClick={() => onClick('displayBasic')} />
+            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10", FontSize:"10px",marginLeft:"300px"}} label="Add and Manage Project"  onClick={() => onClick('displayBasic')} />
             
             </div>
             <div>
@@ -370,11 +320,17 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
        
             <div className='button-design'>
-            <button className="reset-action__exit" style={{lineBreak:'50px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"50px",margin: "3px", }} onClick={(e) => { }}>Manage</button>
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { }}>Execute</button>
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { }}>Design</button>
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginLeft:"500px" ,margin: "3px"}} onClick={(e) => {
+                   window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+                   window.location.href = "/Execute";
+             }}>Execute</button>
+            
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { 
+                window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+                window.location.href = "/mindmap";
+                }}>Design</button>
             </div>
        
             </div> 
@@ -385,9 +341,28 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 
     <Dialog header='Create Project'visible={displayBasic} style={{ width: '40vw' }}  onHide={() => onHide('displayBasic')}>
         <div>
-            <div className='dialog_textfield'>
-                <TextField 
+            <div className='dialog_dropDown'>
+                <NormalDropDown
                     label=" Project Name"
+                    options={[
+                        {
+                            
+                            key: 'web',
+                            text: 'Web'
+                        },
+                        {
+                            key: 'Desktop',
+                            text: 'Desktop'
+                        },
+                        {
+                        
+                        key: 'Mobile App',
+                        text: 'Mobile App'
+                        }
+                    
+                        ]}
+                    
+                        
                     placeholder="enter the project name"
                     standard
                     width="300px"
@@ -458,7 +433,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     </Dialog>
       
     </div>
-                {userRole !== "Test Manager" && 
+                {/* {userRole !== "Test Manager" && 
                     <div className="task-overflow" id="plugin__taskScroll">
                         <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                             <div data-test="task-content" className="task-content" id="plugin_page__list">
@@ -467,7 +442,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                         </ScrollBar>
                     
                     </div>
-                }
+                } */}
         </>
     );
 }
