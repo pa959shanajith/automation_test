@@ -44,6 +44,7 @@ const CanvasNew = (props) => {
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
     const [sections,setSection] =  useState({})
     const [ctrlBox,setCtrlBox] = useState(false);
+    const [taskname, setTaskName] = useState("") 
     const [inpBox,setInpBox] = useState(false);
     const [multipleNode,setMultipleNode] = useState(false)
     const [ctScale,setCtScale] = useState({})
@@ -169,6 +170,7 @@ const CanvasNew = (props) => {
         }else{
             setInpBox(false)
             setCtrlBox(e.target.parentElement.id)
+            setTaskName(e.target.parentElement.children[2].innerHTML)
         }
     }
     const createMultipleNode = (e,mnode)=>{
@@ -263,7 +265,7 @@ const CanvasNew = (props) => {
         <Fragment>
             {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={"R1"} cycleid={"C1"} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
             {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
-            {(ctrlBox !== false)?<ControlBox setTaskBox={setTaskBox} nid={ctrlBox} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
+            {(ctrlBox !== false)?<ControlBox  taskname={taskname} nid={ctrlBox} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>

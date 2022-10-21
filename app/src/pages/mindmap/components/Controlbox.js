@@ -3,14 +3,23 @@ import ClickAwayListener from 'react-click-away-listener';
 import '../styles/ControlBox.scss'
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
+import '../styles/TaskBox.scss';
+import TaskBox from './TaskBox';
+import CanvasAssign from '../containers/CanvasAssign';
+import CreateAssign from '../containers/CreateAssign';
 import ExecuteHome from '../../execute/containers/ExecuteHome';
+// import ExecuteHome from '../../execute/containers/ExecuteHome';
 // import MindmapHome from '../../mindmap/containers/MindmapHome';
 import {Dialog} from '@avo/designcomponents';
 import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
+// import { useHistory } from 'react-router-dom';
 import DesignHome from '../../design/containers/DesignHome';
+import { useSelector, useDispatch }  from  "react-redux";
+import * as actionTypes from '../state/action';
 
 
-
+import { assign } from 'nodemailer/lib/shared';
+import {SET_CT} from "../../plugin/state/action"
 // import { assign } from 'nodemailer/lib/shared';
 
 /*Component ControlBox
@@ -23,6 +32,12 @@ const ControlBox = (props) => {
     const [showScrape, setShowScrape] = useState(false);
     const [ShowDesignTestSetup,setShowDesignTestSetup] = useState(false);
     const [showExecute,setShowExecute] = useState(false);
+    // const [redirectTo, setRedirectTo] = useState("");
+    // const history = useHistory();
+    // const current_task = useSelector(state=>state.plugin.CT);
+    const dispatch = useDispatch()
+
+    // const [showAssign,setShowAssign] = useEffect(false);
     const [showAssign,setShowAssign] = useState(false);
 
     var faRef = {
@@ -83,7 +98,7 @@ const ControlBox = (props) => {
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.delete).html('Delete ');
             c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.record).html('record');
+            c.select('p.' + faRef.record).html('Record');
             c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.assign).html('Assign');
             c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
@@ -149,11 +164,26 @@ const ControlBox = (props) => {
     const CaptureElement = () =>{
         setShowScrape(true);
     };
-    const Assign = () =>{
-        setShowAssign(true);
-        props.setTaskBox(props.nid);
-        props.setCtrlBox(false);
-    };
+    // const Assign = () =>{
+    //     <TaskBox/>
+    // }
+    // console.log("taskname  "+props.taskname)
+    // const Assign = () =>{
+    //     setShowAssign(true);
+    //     props.setTaskBox(props.nid);
+    //     props.setCtrlBox(false);
+    // };
+    // const clickUnassign = (res) =>{
+    //     setNodes(res.nodeDisplay)
+    //     dispatch({type:actionTypes.UPDATE_UNASSIGNTASK,payload:res.unassignTask})
+    //     setTaskBox(false)
+    // };
+    // useEffect(()=>{
+    //     //useEffect to clear redux data selected module on unmount
+    //     return ()=>{
+    //         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+    //     }
+    // },[dispatch])
     
 
     return(
@@ -161,23 +191,29 @@ const ControlBox = (props) => {
         <Dialog
             // open={this.state.show} onClose={this.onClose}
             hidden = {showScrape === false}
-            onDismiss = {()=>{setShowScrape(false)}}
-            title = 'Capture'
-            minWidth = '80rem'
-            confirmText = 'Save'
-            >
+            onDismiss = {() => setShowScrape(false)}
+            title={props.taskname}
+            minWidth = '68rem'
+            
+            // onDecline={() => console.log(false)}
+            onConfirm = {() => { }} >
                 <div style={{ height: '623px'}}><ScrapeScreen /></div>
             </Dialog>
+
+
             <Dialog
             
             hidden = {ShowDesignTestSetup === false}
-            onDismiss = {() => {setShowDesignTestSetup(false)}}
-            title = 'Design Test Setup'
-            minWidth = '80rem'
-            confirmText = 'Save'
+            onDismiss = {() => setShowDesignTestSetup(false)}
+            title={props.taskname}
+            minWidth = '65rem'
+            
+            // onDecline={() => console.log(false)}
             onConfirm = {() => { }} >
                 <div style={{ height: '623px'}}><DesignHome /></div>
             </Dialog>
+
+            
             <Dialog
             
             hidden = {showExecute === false}
@@ -188,13 +224,16 @@ const ControlBox = (props) => {
             onConfirm = {() => { }} >
                 <div style={{ height: '623px'}}><ExecuteHome/></div>
             </Dialog>
+             {/* {showAssign ? <TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={releaseid} cycleid={cycleid} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
+             <div hidden = {showAssign === false} ><MindmapHome/></div> */}
+
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
            {t ==='modules'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
                 <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
                 <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
                 <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={editNode}></p>
                 <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode}></p>
-                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user " style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59" , marginBottom: 8,paddingBottom: "20%"}} onClick={Assign} ><>  Assign </></p>
+                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user " style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59" , marginBottom: 8,paddingBottom: "20%"}}  ><>  Assign </></p>
                 <p data-test="execute"  className="ct-ctrl fa fa-play" onClick={() => execute()}> Execute </p>
             </div>   :     
             t ==='scenarios'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
@@ -203,7 +242,7 @@ const ControlBox = (props) => {
                 <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode}></p>
                 <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}}  onClick={deleteNode}></p>
                 <p data-test="record"  className="ct-ctrl fa fa-dot-circle-o " style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}}  > <> Record_AvoGenius </></p >
-                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign}><>  Assign </></p>
+                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} ><>  Assign </></p>
                 <p data-test="execute"  className="ct-ctrl fa fa-play" onClick={() => execute()}> Execute </p>
                </div> : 
             t ==='screens'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
@@ -212,7 +251,7 @@ const ControlBox = (props) => {
                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode}></p>
                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={deleteNode}></p>
                <p data-test="captureelements"  className="ct-ctrl fa fa-crop"  onClick={() => CaptureElement()}><> Capture Elements  </></p>
-               <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign}><>  Assign </></p>
+               <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}}><>  Assign </></p>
                <p data-test="execute"  className="ct-ctrl fa fa-play"  onClick={() => execute()}> Execute </p>
             </div>   : 
             t ==='testcases'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
@@ -221,7 +260,7 @@ const ControlBox = (props) => {
            <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" onClick={editNode}></p>
            <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={deleteNode}></p>
            <p data-test="designtestsetup"  className="ct-ctrl fa fa-list-alt" onClick={()=> DesignTest()} > <> Design Test Setup </></p>
-           <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign} ><>  Assign </></p>
+           <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} ><>  Assign </></p>
            <p data-test="execute"  className="ct-ctrl fa fa-play" onClick={() => execute()} > Execute </p>
        </div> : "" 
 }
