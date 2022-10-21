@@ -54,8 +54,8 @@ const DesignContent = (props) => {
   const modified = useSelector((state) => state.design.modified);
   const saveEnable = useSelector((state) => state.design.saveEnable);
   const mainTestCases = useSelector(state=>state.design.testCases);
-  const [projectDetails, setProjectDetails]= useState(null)
-  const [projectNames, setProjectNames] = useState(null)
+  // const [projectDetails, setProjectDetails]= useState(null)
+  // const [projectNames, setProjectNames] = useState(null)
 //   const mainTestCases = useSelector(state=>state.design.testCases);
 
   const headerCheckRef = useRef();
@@ -241,15 +241,15 @@ const DesignContent = (props) => {
     //eslint-disable-next-line
   }, [userInfo, props.current_task]);
 
-  useEffect(()=>{
-    pluginApi.getProjectIDs()
-    .then(data => {
-            setProjectNames(data)
-            pluginApi.getTaskJson_mindmaps(data)
-            .then(tasksJson => {
-                setProjectDetails(tasksJson)
-            })       
-})},[])
+//   useEffect(()=>{
+//     pluginApi.getProjectIDs()
+//     .then(data => {
+//             setProjectNames(data)
+//             pluginApi.getTaskJson_mindmaps(data)
+//             .then(tasksJson => {
+//                 setProjectDetails(tasksJson)
+//             })       
+// })},[])
 
   const fetchTestCases = () => {
     return new Promise((resolve, reject) => {
@@ -1250,21 +1250,22 @@ const DesignContent = (props) => {
       {overlay && <ScreenOverlay content={overlay} />}
       {showConfPaste && <ConfPasteStep />}
       <div className="d__content">
-      <Breadcrumb  className='breadcrumb-item'>
+      {/* <Breadcrumb  className='breadcrumb-item'>
                 <Breadcrumb.Item active style={{color: 'blue'}}>{projectNames && projectNames.projectName[0]}</Breadcrumb.Item>
                 <Breadcrumb.Item active style={{color: 'blue'}}>{projectDetails && projectDetails[0].taskDetails[0].taskName}</Breadcrumb.Item>
                 <Breadcrumb.Item  active style={{color: 'blue'}}>{projectDetails && projectDetails[1].taskDetails[0].taskName}</Breadcrumb.Item>
                 <Breadcrumb.Item  active style={{color: 'blue'}}>{projectDetails && projectDetails[2].taskDetails[0].taskName}</Breadcrumb.Item>
                 <Breadcrumb.Item  active style={{color: 'blue'}}>{props.current_task.taskName}</Breadcrumb.Item>
-                {/* <Breadcrumb.Item  active style={{textDecoration:'none'}} id={!isCaptured?'bluecolor':'graycolor'}>Debug</Breadcrumb.Item> */}
-            </Breadcrumb>
+                <Breadcrumb.Item  active style={{textDecoration:'none'}} id={!isCaptured?'bluecolor':'graycolor'}>Debug</Breadcrumb.Item>
+            </Breadcrumb> */}
+
         <div className="d__content_wrap">
           {/* Task Name */}
-          <div className="d__task_title">
+          {/* <div className="d__task_title">
             <div className="d__task_name" data-test="d__taskName">
               {props.current_task.taskName}
             </div>
-          </div>
+          </div> */}
 
           {/* Button Group */}
           <div className="d__btngroup">
@@ -1312,9 +1313,10 @@ const DesignContent = (props) => {
               </button>
 
               <div style={{ marginLeft: '4px', marginBottom: '10px', marginRight:'3px',marginTop:'30px' }}>
-              <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span>
+              {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
               <NormalDropDown
-              style={{height:'25px',marginLeft:'50px', marginBottom: '15px',marginRight:'3px', boxSizing:'40px', fontFamily:'LatoWeb' }}
+              style={{height:'25px',marginLeft:'2px', marginBottom: '50px', boxSizing:'40px', fontFamily:'LatoWeb' }}
+              label="Select Browser"
                
 
                 onChange={(e,item)=>{setDebugButton(item.key)}}
@@ -1374,7 +1376,7 @@ const DesignContent = (props) => {
                   },
                 ]}
                 placeholder="Select Browser"
-                width="290px"
+                width="220px"
               />
             </div>
         
@@ -1383,7 +1385,7 @@ const DesignContent = (props) => {
               </div>
             
 
-            {/* divyabhyresh */}
+           
 
             <div className="d__submit" data-test="d__actionBtn">
               {isUnderReview && (
@@ -1404,15 +1406,9 @@ const DesignContent = (props) => {
                   </button>
                 </>
               )}
-              {!hideSubmit && !isUnderReview && (
-                <button
-                  className="d__submitBtn d__btn"
-                  title="Submit Task"
-                  onClick={() => onAction("submit")}
-                >
-                  Submit
-                </button>
-              )}
+
+              
+              
             </div>
           </div>
         </div>
@@ -1491,6 +1487,16 @@ const DesignContent = (props) => {
                               />
                             ))}
                           </ReactSortable>
+
+                          {!hideSubmit && !isUnderReview && (
+                <button
+                  className="d__submitBtn d__btn"
+                  title="Submit Task"
+                  onClick={() => onAction("submit")}
+                >
+                  Submit
+                </button>
+              )}
                         </ClickAwayListener>
                       </ScrollBar>
                     </div>

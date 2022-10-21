@@ -113,7 +113,7 @@ const DesignHome = () => {
                                 setDisableActionBar={setDisableActionBar}
                                 />
                 
-                <ReferenceContent data-test="d__refBar" mirror={mirror}/>
+                {/* <ReferenceContent data-test="d__refBar" mirror={mirror}/> */}
                 
             </div>
             {/* <div data-test="d__footer" className='d__footer'><Footer/></div> */}

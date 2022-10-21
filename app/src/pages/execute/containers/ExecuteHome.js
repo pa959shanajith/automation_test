@@ -69,14 +69,14 @@ const ExecuteHome = () => {
         <div className="e__body">
             <Header />
                 <div className="e__mid_section">
-                    <ExecuteContent/>
+                    <ExecuteContent />
                     {/* <ActionBar 
                         upperContent={<UpperContent appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />}
                         bottomContent={<BottomContent execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
                     <ExecuteContent setExecEnv={setExecEnv} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} setSyncScenario={setSyncScenario} projectdata={filter_data} execAction={execAction} appType={appType} browserTypeExe={browserTypeExe} syncScenario={syncScenario} taskName={taskName} status={status} readTestSuite={readTestSuite} current_task={current_task} />
                     <ReferenceBar />  */}
                 </div>
-            <div className='e__footer'><Footer/></div>
+            <div className='e__footer' style={{marginTop: '-2rem'}}><Footer/></div>
         </div>
     );
 }

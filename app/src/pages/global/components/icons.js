@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 
+
 import { registerIcons } from 'office-ui-fabric-react';
 import React from 'react';
 import { ReactComponent as Search } from '@avo/designcomponents/lib/assets/icons/search.svg';
@@ -72,7 +73,7 @@ import { ReactComponent as BarChart } from '@avo/designcomponents/lib/assets/ico
 import { ReactComponent as PieChart } from '@avo/designcomponents/lib/assets/icons/pie-chart.svg';
 import { ReactComponent as DonutChart } from '@avo/designcomponents/lib/assets/icons/donut-chart.svg';
 import { ReactComponent as Input } from '@avo/designcomponents/lib/assets/icons/input.svg';
-import { ReactComponent as Error } from '../../../assets/imgs/fullscreen_black_24dp 1.svg';
+//import { ReactComponent as Error } from '../../../assets/imgs/fullscreen_black_24dp 1.svg';
 
 
 registerIcons({
@@ -87,17 +88,12 @@ registerIcons({
     'add-user': <AddUser />,
     computer: <Computer />,
     undeploy: <Undeploy />,
-    'chrome':<img src={"static/imgs/chrome_logo_new.svg"} />,
-    'internet':<img src={"static/imgs/internet_explorer_logo_new.svg"} />,
-    'edge':<img src={"static/imgs/edge_logo_new.svg"} />,
-    'safari':<img src={"static/imgs/safari_logo_new.svg"} />,
-    'firefox':<img src={"static/imgs/firefox_logo_new.svg"} />,
-    // 'chrome':<ChromeIcon />,
-    // 'internet':<InternetExplorer/>,
-    // 'edge':<Edge />,
-    // 'safari':<Safari />,
-    // 'firefox':<Firefox />,
-    'error-e':<Error />,
+    'chrome':<img  style={{width:'1.41rem', padding: '3px'}}src={"static/imgs/chrome_logo_new.svg"} />,
+    'internet':<img style={{width:'1.41rem', padding: '3px'}}src={"static/imgs/internet_explorer_logo_new.svg"} />,
+    'edge':<img style={{width:'1.41rem', padding: '3px' }}src={"static/imgs/edge_logo_new.svg"} />,
+    'safari':<img style={{width:'1.41rem', padding: '3px'}}src={"static/imgs/safari_logo_new.svg"} />,
+    'firefox':<img style={{width:'1.41rem',padding: '3px'}}src={"static/imgs/firefox_logo_new.svg"} />,
+    
     play: <Play />,
     link: <Link />,
     export: <Export />,

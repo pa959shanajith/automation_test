@@ -13,9 +13,9 @@ const Mindmap = () => {
   history =  useHistory()
   const dispatch = useDispatch();
   useEffect(()=>{
-    // if(window.localStorage['navigateScreen'] !== "mindmap"){
-    //     RedirectPage(history, { reason: "screenMismatch" });
-    // }
+    if(window.localStorage['navigateScreen'] !== "mindmap"){
+        RedirectPage(history, { reason: "screenMismatch" });
+    }
     SetProgressBar("stop", dispatch);
   }, [dispatch]);
   return (

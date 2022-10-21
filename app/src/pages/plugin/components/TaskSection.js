@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // import {getUserDetails} from '../api';
 import { useSelector } from 'react-redux';
-import { useHistory, Redirect } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
 import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, GenerateTaskList, Messages as MSG, setMsg } from '../../global';
 import FilterDialog from "./FilterDialog";
@@ -361,12 +361,12 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             </div>
             <div>
             
-            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10", FontSize:"10px",marginLeft:"300px"}} label="Add and Manage Project"  onClick={() => onClick('displayBasic')} />
+            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10"}} label="add project"  onClick={() => onClick('displayBasic')} />
             
             </div>
             <div>
             <div className="task-nav-bar1">
-            <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")}>{projectNames && projectNames.projectName[0]}</span>
+            <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")}><ol><li>{projectNames && projectNames.projectName}</li></ol></span>
             {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
        
             <div className='button-design'>
@@ -374,12 +374,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { }}>Execute</button>
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { 
-                window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-			window.localStorage['integrationScreenType'] = null;
-
-                window.location.href = "/mindmap";
-                }}>Design</button>
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { }}>Design</button>
             </div>
        
             </div> 
@@ -463,7 +458,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     </Dialog>
       
     </div>
-                {/* {userRole !== "Test Manager" && 
+                {userRole !== "Test Manager" && 
                     <div className="task-overflow" id="plugin__taskScroll">
                         <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                             <div data-test="task-content" className="task-content" id="plugin_page__list">
@@ -472,7 +467,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                         </ScrollBar>
                     
                     </div>
-                } */}
+                }
         </>
     );
 }

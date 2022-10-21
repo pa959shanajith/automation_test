@@ -643,10 +643,10 @@ const ScrapeObjectList = () => {
               }
             ></div>
             <div style={{  marginLeft: '30px',marginTop:'20px',  boxSizing:'40px'  }}>
-              <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span>
+              {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
               <NormalDropDown 
-              style={{height:'25px',marginLeft:'60px', marginBottom: '15px', boxSizing:'40px', fontFamily:'LatoWeb' }}
-                // label="Select Browser"
+              style={{height:'25px',marginLeft:'-3px', marginBottom: '50px', boxSizing:'40px', fontFamily:'LatoWeb' }}
+                label="Select Browser"
                 className={
                   "ss__scrapeOn" +
                   (disableAction || compareFlag ? " disable-thumbnail" : "")
@@ -710,7 +710,7 @@ const ScrapeObjectList = () => {
                   },
                 ]}
                 placeholder="Select Browser"
-                width="300px"
+                width="200px"
                 
               />
             </div>
@@ -736,7 +736,7 @@ const ScrapeObjectList = () => {
             </div>
            
 
-            <Button label="Capture" className="p-button-warning" onClick={()=>{startScrape(captureButton)}} />
+            <Button label="Capture" className="p-button-warning" onClick={()=>{startScrape(captureButton)}} style={{marginLeft:'-18px'}} />
           </div>
 
 

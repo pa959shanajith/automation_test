@@ -22,7 +22,7 @@ const CreateNew = ({importRedirect}) => {
   const dispatch = useDispatch()
   const [blockui,setBlockui] = useState({show:false})
   const [fullScreen,setFullScreen] = useState(false)
-  const [verticalLayout,setVerticalLayout] = useState(false)
+  const [verticalLayout,setVerticalLayout] = useState(true)
   const [loading,setLoading] = useState(true)
   const [info,setInfo] = useState(undefined)
   const moduleSelect = useSelector(state=>state.mindmap.selectedModule)

@@ -390,7 +390,7 @@ const DevOpsConfig = props => {
         <div className="api-ut__btnGroup">
             <button data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
             <button data-test="submit-button-test" onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : 'Back'}</button>
-            <div className="devOps_config_name">
+            <div className="devOps_config_name" style={{marginRight:'45rem'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Configuration Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
@@ -468,7 +468,7 @@ const DevOpsConfig = props => {
                     <div className='devOps_seperation'>
                     </div>
                     <div>
-                        <span className="devOps_dropdown_label devOps_dropdown_label_url">DevOps Integration API url : </span>
+                        <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%'}}>DevOps Integration API url : </span>
                         <span className="devOps_dropdown_label_input"><input type="text" value={props.url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
                             <label>
                                 <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return apiKeyCopyToolTip }, 0]} />

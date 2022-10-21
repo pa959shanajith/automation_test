@@ -2,6 +2,7 @@ import React, { useEffect,useState } from 'react';
 import ClickAwayListener from 'react-click-away-listener';
 import '../styles/ControlBox.scss'
 import * as d3 from 'd3';
+import {Provider, useSelector, useDispatch} from 'react-redux';
 import PropTypes from 'prop-types';
 import '../styles/TaskBox.scss';
 import TaskBox from './TaskBox';
@@ -14,10 +15,9 @@ import {Dialog} from '@avo/designcomponents';
 import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
 // import { useHistory } from 'react-router-dom';
 import DesignHome from '../../design/containers/DesignHome';
+import TaskBox from './TaskBox';
 import { useSelector, useDispatch }  from  "react-redux";
-import * as actionTypes from '../state/action';
-
-
+import { useHistory } from 'react-router-dom';
 import { assign } from 'nodemailer/lib/shared';
 import {SET_CT} from "../../plugin/state/action"
 // import { assign } from 'nodemailer/lib/shared';
@@ -35,6 +35,17 @@ const ControlBox = (props) => {
     // const [redirectTo, setRedirectTo] = useState("");
     // const history = useHistory();
     // const current_task = useSelector(state=>state.plugin.CT);
+    const [redirectTo, setRedirectTo] = useState("");
+//     const dispatch = useDispatch();
+//     const roleSwitched = useSelector(state=>state.mindmap.breadcrumbValue);
+//     useEffect(()=>{
+//       if(roleSwitched){
+//           dispatch({type: SWITCHED, payload: false});
+//           setRole(true);
+//       }
+//   }, [roleSwitched])
+    const history = useHistory();
+    const current_task = useSelector(state=>state.plugin.CT);
     const dispatch = useDispatch()
 
     // const [showAssign,setShowAssign] = useEffect(false);
@@ -184,6 +195,12 @@ const ControlBox = (props) => {
     //         dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
     //     }
     // },[dispatch])
+    console.log("taskname  "+props.taskname)
+    const Assign = () =>{
+        setShowAssign(true);
+        props.setTaskBox(props.nid);
+        props.setCtrlBox(false);
+    };
     
 
     return(
