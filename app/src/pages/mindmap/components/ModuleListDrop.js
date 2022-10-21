@@ -7,11 +7,8 @@ import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
 import {IconDropdown} from '@avo/designcomponents'
-<<<<<<< HEAD
 //import plusIcon from './plusIcon.png';
-=======
 
->>>>>>> 48e604ebd1c0039b44d679a06a9dad220d91b795
 
 
 // import CreateOptions from '../components/CreateOptions.js';

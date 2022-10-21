@@ -12,11 +12,8 @@ import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils'
 import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
-<<<<<<< HEAD
 // import Sidebar from './SideBars/Sidebar';
-=======
 
->>>>>>> 48e604ebd1c0039b44d679a06a9dad220d91b795
 
 
 /*Component CreateNew
@@ -114,7 +111,7 @@ const CreateNew = ({importRedirect}) => {
                 
             </div>:null
         }
-        {/* <Sidebar/> */}
+        
         
         <ReferenceBar taskInfo={info} taskTop={true} collapsible={true} collapse={true}>
             <div className="ic_box" title="SwitchLayout" >
