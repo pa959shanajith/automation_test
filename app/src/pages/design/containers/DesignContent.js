@@ -1256,13 +1256,9 @@ const DesignContent = (props) => {
                 <Breadcrumb.Item  active style={{color: 'blue'}}>{projectDetails && projectDetails[1].taskDetails[0].taskName}</Breadcrumb.Item>
                 <Breadcrumb.Item  active style={{color: 'blue'}}>{projectDetails && projectDetails[2].taskDetails[0].taskName}</Breadcrumb.Item>
                 <Breadcrumb.Item  active style={{color: 'blue'}}>{props.current_task.taskName}</Breadcrumb.Item>
-<<<<<<< HEAD
                 <Breadcrumb.Item  active style={{textDecoration:'none'}} id={!isCaptured?'bluecolor':'graycolor'}>Debug</Breadcrumb.Item>
             </Breadcrumb> */}
-=======
-                {/* <Breadcrumb.Item  active style={{textDecoration:'none'}} id={!isCaptured?'bluecolor':'graycolor'}>Debug</Breadcrumb.Item> */}
-            {/* </Breadcrumb> */} 
->>>>>>> 48e604ebd1c0039b44d679a06a9dad220d91b795
+
         <div className="d__content_wrap">
           {/* Task Name */}
           {/* <div className="d__task_title">

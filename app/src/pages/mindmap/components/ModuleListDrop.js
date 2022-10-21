@@ -6,12 +6,7 @@ import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
-import {IconDropdown} from '@avo/designcomponents'
-<<<<<<< HEAD
-//import plusIcon from './plusIcon.png';
-=======
-
->>>>>>> 48e604ebd1c0039b44d679a06a9dad220d91b795
+import {IconDropdown} from '@avo/designcomponents';
 
 
 // import CreateOptions from '../components/CreateOptions.js';
@@ -221,7 +216,7 @@ const ModuleListDrop = (props) =>{
                         {moduleList.map((e,i)=>{
                             if(e.type==="basic")
                             return(<div key={i} >
-                                    <div style={{}} data-test="modules" onClick={(e)=>selectModule(e)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?{backgroundColor:'#EFE6FF'}:{}} title={e.name} type={e.type}>                                    
+                                    <div style={{}} data-test="modules" onClick={(e)=>selectModule(e)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")}  title={e.name} type={e.type}>                                    
                                     <div  className='modClick' value={e._id} >{!isAssign && <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />}</div>
                                         <img value={e._id} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
                                         <span className='modNme' value={e._id} >{e.name}</span>
@@ -233,7 +228,7 @@ const ModuleListDrop = (props) =>{
                         {moduleList.map((e,i)=>{
                             if(e.type==="basic")
                             return(<div key={i} >
-                                    <div style={{}} data-test="modules" onClick={(e)=>selectModule(e)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?{backgroundColor:'#EFE6FF'}:{}} title={e.name} type={e.type}>                                    
+                                    <div style={{}} data-test="modules" onClick={(e)=>selectModule(e)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")}  title={e.name} type={e.type}>                                    
                                     <div  className='modClick' value={e._id} >{!isAssign && <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />}</div>
                                         <img value={e._id} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
                                         <span className='modNme' value={e._id} >{e.name}</span>
@@ -266,7 +261,7 @@ const ModuleListDrop = (props) =>{
                 if(e.type==="endtoend")
                 return(
                     <div className= 'ene_toolbar__module-box_hover' style={{display:'flex', alignContent:'center',width: '11.25rem',
-    height:'1.7rem',alignItems: 'center',marginLeft:'1rem', marginTop:'-0.6rem' }} data-test="individualModules" name={e.name} type={e.type} onClick={(e)=>selectModule(e)} key={i} className={'ene_toolbar__module-box'+((moduleSelect._id === e._id)?" selected":"")} title={e.name}>
+    height:'1.7rem',alignItems: 'center',marginLeft:'1rem', marginTop:'-0.6rem' }} data-test="individualModules" name={e.name} type={e.type} onClick={(e)=>selectModule(e)} key={i} title={e.name}>
     <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />
                         <img style={{display:'inlineBlock',height: '1.54rem',width: '1.54rem',cursor: 'pointer',marginLeft: '0.9rem'}} src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img>
                         <span >{e.name}</span>

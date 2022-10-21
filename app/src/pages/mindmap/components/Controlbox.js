@@ -9,11 +9,9 @@ import ExecuteHome from '../../execute/containers/ExecuteHome';
 import {Dialog} from '@avo/designcomponents';
 import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
 import DesignHome from '../../design/containers/DesignHome';
-import TaskBox from './TaskBox';
-import { useSelector, useDispatch }  from  "react-redux";
 
-import { assign } from 'nodemailer/lib/shared';
-import {SET_CT} from "../../plugin/state/action"
+import { useHistory } from 'react-router-dom';
+
 // import { assign } from 'nodemailer/lib/shared';
 
 /*Component ControlBox
@@ -237,17 +235,11 @@ const ControlBox = (props) => {
                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
                <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode}></p>
-<<<<<<< HEAD
                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59"}} onClick={deleteNode}></p>
                <p data-test="captureelements"  className="ct-ctrl fa fa-light fa-crop-simple "  onClick={() => {;CaptureElement();}}><> Capture Elements  </></p>
                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59"}} ><>  Assign </></p>
                <p data-test="execute"  className="ct-ctrl fa fa-light fa-badge-check"  onClick={() => execute()}> Execute </p>
-=======
-               <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={deleteNode}></p>
-               <p data-test="captureelements"  className="ct-ctrl fa fa-crop"  onClick={() => CaptureElement()}><> Capture Elements  </></p>
-               <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign}><>  Assign </></p>
-               <p data-test="execute"  className="ct-ctrl fa fa-play"  onClick={() => execute()}> Execute </p>
->>>>>>> 48e604ebd1c0039b44d679a06a9dad220d91b795
+
             </div>   : 
             t ==='testcases'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
                <p data-test="add" className="ct-ctrl fa fa-plus ct-ctrl-inactive" value={props.nid} onClick={addNode}> </p>

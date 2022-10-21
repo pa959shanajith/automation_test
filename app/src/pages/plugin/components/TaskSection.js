@@ -366,7 +366,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             </div>
             <div>
             <div className="task-nav-bar1">
-            <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")}>{projectNames && projectNames.projectName[0]}</span>
+            <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")}><ol><li>{projectNames && projectNames.projectName}</li></ol></span>
             {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
        
             <div className='button-design'>
