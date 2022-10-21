@@ -259,13 +259,13 @@
   border-radius: 5px !important;
 }
 
-.breadcrumb-item {
-    + .breadcrumb-item::before {
-      content: ">>" !important;
-      align-self: baseline;
-      color: #7d8daa;
-    }
-  }
+// .breadcrumb-item {
+//     + .breadcrumb-item::before {
+//       content: ">>" !important;
+//       align-self: baseline;
+//       color: #7d8daa;
+//     }
+//   }
 
 // @media screen and (min-width: 1400px) and (min-height: 770px){
 //     .d__content{
