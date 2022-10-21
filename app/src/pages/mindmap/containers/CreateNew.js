@@ -12,8 +12,6 @@ import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils'
 import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
-// import Sidebar from './SideBars/Sidebar';
-
 
 
 /*Component CreateNew

@@ -76,7 +76,7 @@ const ExecuteHome = () => {
                     <ExecuteContent setExecEnv={setExecEnv} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} setSyncScenario={setSyncScenario} projectdata={filter_data} execAction={execAction} appType={appType} browserTypeExe={browserTypeExe} syncScenario={syncScenario} taskName={taskName} status={status} readTestSuite={readTestSuite} current_task={current_task} />
                     <ReferenceBar />  */}
                 </div>
-            <div className='e__footer'><Footer/></div>
+            <div className='e__footer' style={{marginTop: '-2rem'}}><Footer/></div>
         </div>
     );
 }
