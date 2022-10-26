@@ -1,5 +1,5 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
-import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap} from '../api';
+import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, getProjectTypeMM} from '../api';
 import {ModalContainer, Messages as MSG,setMsg, VARIANT} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,6 +29,7 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
             var data = parseProjList(res)
             setProjList(data)
             setBlockui({show:false})
+            setDuplicateModuleList([])
         })()
     },[]) 
     if(!Object.keys(projList).length >0) return null
@@ -70,6 +71,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     }
         setError('')
         setFiledUpload(undefined)
+        setDuplicateModuleList([])
         uploadFile({setBlockui,setMindmapData,setDuplicateModuleList,projList,uploadFileRef,setSheetList,setError,setDisableSubmit,setFiledUpload, selectedProject:project})
     }
     const changeImportType = (e) => {
@@ -328,7 +330,7 @@ const Footer = ({error,setSubmit,disableSubmit,duplicateModuleList}) =>{
       <Fragment>
             <div className='mnode__buttons'>
                 <label className='err-message'>{error}
-                {error && duplicateModuleList?.size>0 && <><br/><Link className="tcView" to="#" onClick={()=>setDuplicateFlag(true)}>View Duplicate Modules</Link></>
+                {error && duplicateModuleList?.size>0 && error.indexOf("duplicate")>-1 && <><br/><Link className="tcView" to="#" onClick={()=>setDuplicateFlag(true)}>View Duplicate Modules</Link></>
                 }</label>                
                 <button disabled={disableSubmit} onClick={()=>setSubmit(true)}>Import</button>                
             </div>
@@ -463,9 +465,8 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
         }else if(extension === 'json' || extension === 'mm'){
             var projFlag = false
             var duplicateData = JSON.parse(result);
-            let selectedAppType = projList[selectedProject].apptypeName;
-            let importedProjId = duplicateData[0].projectid.$oid;
-            let importedAppType = projList[importedProjId].apptypeName;
+            let selectedAppType = projList[selectedProject].apptypeName;  
+            var importedAppType=duplicateData[0].apptype;
             if(selectedAppType!==importedAppType){
                 setError("Selected project is of different App Type");
                 setDisableSubmit(true)
@@ -513,7 +514,7 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
                 setMsg(MSG.MINDMAP.ERR_IMPORT_DATA)
             }
             else if(duplicatelength > 0) {
-                setError((duplicatelength)+" modules are dupliacte. Only"+ (uniqlength)+" will be imported");
+                setError((duplicatelength)+" modules are duplicate. Only"+ (uniqlength)+" will be imported");
                 
             }
             
