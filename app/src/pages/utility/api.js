@@ -413,7 +413,6 @@ export const storeConfigureKey = async(props) => {
 }
 export const execAutomation = async(props) => {
     try{
-        console.log(props)
         const res = await axios(url+'/execAutomation', {
             method: 'POST',
             headers: {
@@ -624,5 +623,28 @@ export const getQueueState = async(data) => {
         return {error:MSG.GLOBAL.ERR_SOMETHING_WRONG}
     }catch(err){
         return {error:MSG.GLOBAL.ERR_SOMETHING_WRONG}
+    }
+}
+
+export const deleteExecutionListId = async(props) => {
+    try{
+            const res = await axios(url+'/deleteExecutionListId', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            credentials: 'include'
+        });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }

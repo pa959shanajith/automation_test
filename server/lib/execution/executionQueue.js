@@ -877,8 +877,11 @@ module.exports.Execution_Queue = class Execution_Queue {
                     newConfigureKeyExecution.push(execution);
                 }
             }
-            this.key_list[configurekey] = newConfigureKeyExecution
+            this.key_list[configurekey] = newConfigureKeyExecution;
+            if(newConfigureKeyExecution.length === 0)
+                delete this.key_list[configurekey]
             await cache.set("execution_list", this.key_list);
+            response['status'] = 'pass';
             console.log(this.key_list);
             return response;
 

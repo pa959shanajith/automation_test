@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer } from '../../global';
 import { SearchBox, Dialog } from '@avo/designcomponents';
-import { fetchConfigureList, deleteConfigureKey, execAutomation, getQueueState } from '../api';
+import { fetchConfigureList, deleteConfigureKey, execAutomation, getQueueState, deleteExecutionListId } from '../api';
 import {v4 as uuid} from 'uuid';
 import CheckboxTree from 'react-checkbox-tree';
 
@@ -91,8 +91,16 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 for (let executionNode of queueList[item]) {
                     let executionItem = {
                         value: item+nodeItemChildrenIndex,
-                        label: 'Execution '+nodeItemChildrenIndex,
+                        label: <div className="devOps_terminate_icon">Execution {nodeItemChildrenIndex}   <img src={"static/imgs/cicd_terminate.png"} title="Terminate Execution" alt="Terminate icon" onClick={async () => {
+                                const deleteExecutionFromQueue = await deleteExecutionListId({configurekey: item, executionListId: executionNode[0].executionListId});
+                                if(deleteExecutionFromQueue.status !== 'pass') {
+                                    setMsg(MSG.CUSTOM("Error While Removing Execution from Execution Queue",VARIANT.ERROR));
+                                }else {
+                                    getCurrentQueueState();
+                                }
+                            }}/></div>,
                         showCheckbox: false,
+                        // className: 'devOps_terminate_style',
                         children: executionNode.map((executionRequest) => ({
                             label: 'Module : '+executionRequest.modulename+',   Status: '+executionRequest.status,
                             value: executionRequest.executionListId+executionRequest.moduleid,
@@ -188,7 +196,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             <Dialog
                 hidden = {executionQueue === false}
                 onDismiss = {() => setExecutionQueue(false)}
-                title = 'Current Execution Queue'
+                title = 'Manage Execution Queue'
                 minWidth = '60rem' >
                     {
                         (executionQueue.list.length > 0 ) ? <CheckboxTree
