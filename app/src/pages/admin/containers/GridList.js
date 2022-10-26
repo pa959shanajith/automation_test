@@ -60,16 +60,16 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
             return (
                 <div>
                     <p className={`${selectedConfig === 'x64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('x64')}>x64</p>
-                    <p className={`${selectedConfig === 'x86' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('x86')}>x86</p>
+                    <p title='Currently not supported' className={`grid_download_dialog__disabled ${selectedConfig === 'x86' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => console.log("setSelectedConfig('x86')")}>x86</p>
                 </div>
             );
         } else if(selectedTab === 'linux') {
             return (
                 <div>
-                    <p className={`${selectedConfig === 'x64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('x64')}>x64</p>
-                    <p className={`${selectedConfig === 'arm' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('arm')}>ARM</p>
-                    <p className={`${selectedConfig === 'arm64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('arm64')}>ARM64</p>
-                    <p className={`${selectedConfig === 'rhel6' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => setSelectedConfig('rhel6')}>RHEL6</p>
+                    <p title='Currently not supported' className={`grid_download_dialog__disabled ${selectedConfig === 'x64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => console.log("setSelectedConfig('x64')")}>x64</p>
+                    <p title='Currently not supported' className={`grid_download_dialog__disabled ${selectedConfig === 'arm' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => console.log("setSelectedConfig('arm')")}>ARM</p>
+                    <p title='Currently not supported' className={`grid_download_dialog__disabled ${selectedConfig === 'arm64' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => console.log("setSelectedConfig('arm64')")}>ARM64</p>
+                    <p title='Currently not supported' className={`grid_download_dialog__disabled ${selectedConfig === 'rhel6' ? 'grid_download_dialog__content__selectedConfig' : ''}`} onClick={() => console.log("setSelectedConfig('rhel6')")}>RHEL6</p>
                 </div>
             );
         } else return <></>;
@@ -79,7 +79,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
         if(selectedTab === 'windows') {
             return (
                 <div className='grid_download_dialog__content'>
-                    <div className='grid_download_dialog__prerequisite'>
+                    {/* <div className='grid_download_dialog__prerequisite'>
                         <div className='grid_download_dialog__prerequisite__header'>
                             <p>System Prerequisites</p>
                             <Icon iconName={`chevron-${requisiteExpand ? 'up' : 'down'}`} style={{width: '1rem'}} onClick={() => setRequisiteExpand(!requisiteExpand)} />
@@ -92,23 +92,43 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
                                 </ul>
                             </div>
                         }
-                    </div>
+                    </div> */}
                     <div className='grid_download_dialog__content__br' />
-                    <p>Configure your Account</p>
-                    <h6>Configure your account by following the steps</h6>
+                    <p>Configure Avo Agent</p>
+                    <h6>Configure Avo Agent by following below steps</h6>
                     <div className='grid_download_dialog__content__br' />
-                    <p>Create the Agent</p>
+                    <p>Download the Agent</p>
+                    <pre className='grid_download_dialog__content__code'>
+                        <code>
+                            Click <u><a onClick={onDownloadAgentClick}>Here</a></u> to Download the Agent
+                        </code>
+                    </pre>
+                    <p>Run Avo Agent</p>
+                    <pre className='grid_download_dialog__content__code'>
+                        <code>
+                            <ol>
+                            <li>Place avo agent.exe file in a seperate folder to track agent logs and configuration file.</li>
+                            <li><p>Run AvoAgent.exe</p></li>
+                            <img src="static/imgs/Run-Agent.png" alt="Run AvoAgent.exe File"/>
+                            <li><p>Track you Avo Agent in Tray Application</p></li>
+                            <img src="static/imgs/Running-Agent.png" alt="Running AvoAgent.exe in Windows Tray Application"/>
+                            </ol>
+                        </code>
+                    </pre>
+                    {/* <p>Run Avo Agent</p>
                     <pre className='grid_download_dialog__content__code'>
                         <code>
                             PS C:\&gt; mkdir agent ; cd agent 
                             PS C:\agent&gt; Add-Type -AssemblyName System.IO.Compression.FileSystem ; [System.IO.Compression.ZipFile]::ExtractToDirectory("$HOME\Downloads\vsts-agent-win-x64-2.206.1.zip", "$PWD")
                         </code>
-                    </pre>
+                    </pre> */}
                     <div className='grid_download_dialog__content__br' />
                     <p>Configure the Agent</p>
                     <pre className='grid_download_dialog__content__code'>
                         <code>
-                            PS C:\agent&gt; .\config.cmd
+                            {/* PS C:\agent&gt; .\config.cmd */}
+                            You can Track and Update your Avo Agent Logs, Configuration, and Status.
+                            <img src="static/imgs/Config-Agent.png" alt="Options to configure and Track Avo Agent"/>
                         </code>
                     </pre>
                 </div>
@@ -116,13 +136,13 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
         } else if(selectedTab === 'mac') {
             return (
                 <div>
-                    <p>System Prerequisites</p>
+                    <p>Coming Soon for MacOS.... Stay Tuned !!!</p>
                 </div>
             );
         } else {
             return (
                 <div>
-                    <p>System Prerequisites</p>
+                    <p>Coming Soon for Linux.... Stay Tuned !!!</p>
                 </div>
             );
         }
