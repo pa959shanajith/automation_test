@@ -325,7 +325,8 @@ const Messages={
         SUCC_DATA_SAVE: {"CONTENT":'Data saved successfully.', "VARIANT": VARIANT.SUCCESS},
         SUCC_DATA_COPIED : {"CONTENT":"Data Copied successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_RULES_UPDATE : {"CONTENT":"Rules updated successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_DELETE_SCENARIO : {"CONTENT":"Scenarios successfully deleted.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_DELETE_SCENARIO : {"CONTENT":"Data deleted successfully.", "VARIANT": VARIANT.SUCCESS},
+        SUCC_REMOVED_SCENARIO : {"CONTENT":"Test scenario removed successfully.", "VARIANT": VARIANT.SUCCESS},
         
         WARN_PROJECT_ASSIGN_USER: {"CONTENT":'This project is not assigned to user.', "VARIANT": VARIANT.WARNING},
         WARN_SELECT_COMPLETE_FLOW: {"CONTENT":"Please select a complete flow to assign tasks.", "VARIANT": VARIANT.WARNING},
