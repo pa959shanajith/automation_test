@@ -6,8 +6,9 @@ import "../styles/ScheduleContent.scss";
 import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import Pagination from '../components/Pagination';
+import DevOpsList from '../../utility/components/DevOpsList';
 
-const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction}) => {
+const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction,item}) => {
 
     const nulluser = "5fc137cc72142998e29b5e63";
     const filter_data = useSelector(state=>state.plugin.FD)
@@ -32,6 +33,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [scheduledRecurringDataOriginal, setScheduledRecurringDataOriginal] =	useState([]);
     const [statusChange, setStatusChange] = useState("Select Status");
     const [clearScheduleData, setClearScheduleData] = useState(false);
+    const [selectedItem, setSelectedItem] = useState({});
 
     useEffect(()=>{
         getScheduledDetails()
@@ -156,8 +158,9 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
 
     const ScheduleTestSuitePopup = () => {
         setClosePopups(true);
-        const check = SelectBrowserCheck(appType,browserTypeExe,execAction,displayError);
-        const valid = checkSelectedModules(scheduleTableData, displayError);
+        const valid = true
+        const check = SelectBrowserCheck(appType,browserTypeExe,execAction,displayError,item);
+        // const valid = checkSelectedModules(scheduleTableData, displayError);
         const checkDateTime = checkDateTimeValues(scheduleTableData, moduleScheduledate, setModuleScheduledate, displayError);
         if(check && valid && checkDateTime) setAllocateICE(true);
     } 
@@ -173,7 +176,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
         executionData["source"]="schedule";
         executionData["exectionMode"]=execAction;
         executionData["executionEnv"]=execEnv;
-        executionData["browserType"]=browserTypeExe;
+        executionData["browserType"]=browserTypeExe || item.executionRequest.browserType;
         executionData["integration"]=integration;
         executionData["batchInfo"]=modul_Info;
         executionData["scenarioFlag"] = (current_task.scenarioFlag == 'True') ? true : false
@@ -348,7 +351,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                             <option value="2">Zephyr</option>
                         </select>
                         <div id="s__btns">
-                            <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}} title="Add">Schedule</button>
+                            <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}}  title="Add">Schedule</button>
                         </div>
                         <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
                     </div>
@@ -530,7 +533,9 @@ const cancelThisJob = async (cycleid,scheduledatetime,_id,target,scheduledby,sta
     else displayError(MSG.SCHEDULE.ERR_JOB_CANCEL);
 }
 
-const SelectBrowserCheck = (appType,browserTypeExe,execAction,displayError)=>{
+const SelectBrowserCheck = (appType,browserTypeExe,execAction,displayError,item)=>{ 
+    // console.log(item)
+    browserTypeExe = browserTypeExe || item.executionRequest.browserType
     if ((appType === "Web") && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_BROWSER);
     else if (appType === "Webservice" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_WEBSERVICE);
     else if (appType === "MobileApp" && browserTypeExe.length === 0) displayError(MSG.SCHEDULE.WARN_SELECT_MOBILE_APP);
