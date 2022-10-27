@@ -6,7 +6,7 @@ import { fetchConfigureList, deleteConfigureKey, execAutomation } from '../api';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button'
 import {v4 as uuid} from 'uuid';
-
+import ScheduleHome from '../../schedule/containers/ScheduleHome'
 import "../styles/DevOps.scss";
 import { TextFieldBase } from '@fluentui/react';
 
@@ -27,10 +27,13 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
         'displayBasic1': setDisplayBasic1,
         'displayBasic2': setDisplayBasic2
     }
+    const [selectedItem, setSelectedItem] = useState({});
 
     const onClick = (name, position) => {
         dialogFuncMap[`${name}`](true);
-
+        if(name === 'displayBasic1'){
+            setSelectedItem(position);
+        }
         if (position) {
             setPosition(position);
         }
@@ -284,6 +287,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <button  onClick={() =>onClick('displayBasic')}> CI / CD </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                      <button  onClick={() =>onClick('displayBasic1')}>  Schedule </button>
+                                     
                                     </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     <td className="tkn-table__button" >
                                         <img style={{marginRight: '3rem'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -309,7 +313,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
                                      <button  onClick={() =>onClick('displayBasic')}> CI / CD </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                     <button  onClick={() =>onClick('displayBasic1')}>  Schedule </button>
+                                     <button  onClick={() =>onClick('displayBasic1', item)}>  Schedule </button>
                                     </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     <td className="tkn-table__button" >
                                         <img style={{marginRight: '3rem'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -326,7 +330,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 <input type="radio" />&nbsp;&nbsp;
                 <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Assure Client</label>
                 </Dialog>
-                <Dialog header="Schedule" visible={displayBasic1} style={{ width: '50vw' }}  onHide={() => onHide('displayBasic1')}></Dialog>
+                <Dialog header="Schedule" visible={displayBasic1}   onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
                 <Dialog header="Execute via CI/CD" visible={displayBasic} style={{ width: '50vw' }}  onHide={() => onHide('displayBasic')}>
                 <div>
                         <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%'}}>DevOps Integration API url : </span>

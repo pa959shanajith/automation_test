@@ -244,38 +244,38 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
             <div className="s__ab">
                 <div className="s__min">
                     <div className="s__con" id="schSuiteTable">
-                        <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" onScrollY={()=>setCloseCal(true)}>
+                        {/* <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" onScrollY={()=>setCloseCal(true)}> */}
                         {scheduleTableData.map((rowData,i)=>(
                             <div key={i} className="batchSuite">
                                 <div className="scheduleSuite" id={`ss-id${i}`} >
-                                    <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" />
-                                    <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span>
+                                    {/* <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" /> */}
+                                    {/* <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span> */}
                                     <TimeComp idx={i} closeCal={closeCal} setCloseCal={setCloseCal} screen="scheduleSuiteTop" time={moduleScheduledate[rowData.testsuiteid]["time"]} setTime={(val)=>{updateDateTime("time",val,rowData.testsuiteid)}} inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropstime"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropstime"].disabled} classTimer="schedule_timer"/>
                                     <CalendarComp idx={i} closeCal={closeCal} setCloseCal={setCloseCal} screen="scheduleSuiteTop" inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropsdate"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropsdate"].disabled} date={moduleScheduledate[rowData.testsuiteid]["date"]} setDate={(val)=>{updateDateTime("date",val,rowData.testsuiteid)}} classCalender="schedule_calender"/>
                                     <RecurrenceComp closeCal={closeCal} setCloseCal={setCloseCal} placeholder={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].placeholder} classname={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].className} readonly={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].readOnly } title={moduleScheduledate[rowData.testsuiteid]["recurringStringOnHover"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].disabled } recur={moduleScheduledate[rowData.testsuiteid]["recurringString"]} setRecurringString={(val) => {updateDateTime("recurringString", val, rowData.testsuiteid)}} setRecurringStringOnHover={(val) => {updateDateTime("recurringStringOnHover", val, rowData.testsuiteid)}} setRecurringValue={(val) => {updateDateTime("recurringValue", val, rowData.testsuiteid)}} clearScheduleData={clearScheduleData} classTimer="schedule_timer" />
                                 </div>
                                 <table className="scenarioSchdCon scenarioSch_' + i + '">
                                     <thead className="scenarioHeaders">
-                                        <tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td><td>App type</td></tr>
+                                        {/* <tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td><td>App type</td></tr> */}
                                     </thead>
                                     <tbody className="scenarioBody scenarioTbCon_' + i + '">
                                     {rowData.scenarioids.map((sid,j)=>(
                                         <tr key={j}>
-                                            <td><span>{j+1}</span><input type="checkbox" checked={rowData.executestatus[j]?true:false}  onChange={()=>{changeExecutestatus(i,j)}} id={"executestatus_"+i+"_"+j} className="selectToSched"/></td>
-                                            <td data-scenarioid={sid}>{rowData.scenarionames[j]}</td>
-                                            <td style={{padding: "2px 0 2px 0"}}><input type="text" value={(rowData.dataparam[j]).trim()} disabled/></td>
-                                            <td><select disabled defaultValue={(rowData.condition[j] === 0) ? "0" : "1"} ><option value="1" >True</option><option value="0" >False</option></select></td>
-                                            <td>{rowData.projectnames[j]}</td> 
-                                            <td title={details[rowData.apptypes[j].toLowerCase()]['data']}>
+                                            {/* <td><span>{j+1}</span><input type="checkbox" checked={rowData.executestatus[j]?true:false}  onChange={()=>{changeExecutestatus(i,j)}} id={"executestatus_"+i+"_"+j} className="selectToSched"/></td> */}
+                                            {/* <td data-scenarioid={sid}>{rowData.scenarionames[j]}</td> */}
+                                            {/* <td style={{padding: "2px 0 2px 0"}}><input type="text" value={(rowData.dataparam[j]).trim()} disabled/></td> */}
+                                            {/* <td><select disabled defaultValue={(rowData.condition[j] === 0) ? "0" : "1"} ><option value="1" >True</option><option value="0" >False</option></select></td> */}
+                                            {/* <td>{rowData.projectnames[j]}</td>  */}
+                                            {/* <td title={details[rowData.apptypes[j].toLowerCase()]['data']}>
                                                 <img src={"static/imgs/"+details[rowData.apptypes[j].toLowerCase()]['img']+".png"} alt="apptype"/>
-                                            </td>
+                                            </td> */}
                                         </tr>
                                     ))}
                                     </tbody>
                                 </table>
                             </div>
                         ))}
-                        </ScrollBar>
+                        {/* </ScrollBar> */}
                     </div>
                 </div>
             </div>

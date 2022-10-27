@@ -5,7 +5,7 @@ import { Header, FooterTwo as Footer, PopupMsg, ActionBar, ReferenceBar } from '
 import "../styles/ScheduleHome.scss";
 import ScheduleContent from './ScheduleContent';
 
-const ScheduleHome = () => {
+const ScheduleHome = ({item}) => {
     
     const current_task = useSelector(state=>state.plugin.CT)
     const filter_data = useSelector(state=>state.plugin.FD)
@@ -48,17 +48,18 @@ const ScheduleHome = () => {
     return ( 
         <>
         <div className="s__body">
-            <Header />
+            {/* {JSON.stringify(item)} */}
+            {/* <Header /> */}
                 <div className="s__mid_section">
-                    <ActionBar  
-                    upperContent={<UpperContent key={666} appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />} 
-                    bottomContent={<BottomContent smartMode={smartMode} setSmartMode={setSmartMode} execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
+                    <ActionBar 
+                    // upperContent={<UpperContent key={666} appType={appType} isMac={isMac}browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />}  
+                    bottomContent={<BottomContent smartMode={smartMode} setSmartMode={setSmartMode} execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction} />}/> 
                     <div className="s__content">
-                        <ScheduleContent setExecEnv={setExecEnv} smartMode={smartMode} syncScenario={syncScenario} setSyncScenario={setSyncScenario} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} appType={appType} browserTypeExe={browserTypeExe} execAction={execAction} />
+                        <ScheduleContent setExecEnv={setExecEnv} smartMode={smartMode} syncScenario={syncScenario} setSyncScenario={setSyncScenario} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} appType={appType} execAction={execAction} item={item} />
                     </div>
-                    <ReferenceBar /> 
+                    {/* <ReferenceBar />  */}
                 </div>
-            <div className='s__footer'><Footer/></div>
+            {/* <div className='s__footer'><Footer/></div> */}
         </div>
         </>
     );
