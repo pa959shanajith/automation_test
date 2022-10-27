@@ -1283,7 +1283,7 @@ const DesignContent = (props) => {
                   onClick={() => btn.onClick()}
                 >
                   <img
-                    className="d__tblBtn_ic"
+                    className="d__tblBtn_ic" 
                     src={btn.img}
                     alt={btn.alt}
                     title={btn.title}
@@ -1376,7 +1376,7 @@ const DesignContent = (props) => {
                   },
                 ]}
                 placeholder="Select Browser"
-                width="220px"
+                width="180px"
               />
             </div>
         

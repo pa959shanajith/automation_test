@@ -39,7 +39,7 @@
 .d__btngroup{
     display: flex;
     max-width: 100%;
-    margin-bottom: 15px;
+    margin: -34px -18px -41px -7px;
     font-family: $avoSecondaryFont;
 }
 
@@ -77,9 +77,9 @@
 .d__taskBtns{
     display: flex;
     align-items: center;
-    margin-left:-2px;
+    margin: 21px 21px 16px 9px;
     flex-grow: 1;
-    font-size: 14px;
+    font-size: 11.5px;
 }
 .p-button-warning{
 
@@ -194,12 +194,12 @@
 }
 
 .input_col, .output_col{
-    flex: 0 0 20%;
+    flex: 3 0 15%;
     display: flex;
     text-align: center;
     width: 100%;
     overflow: hidden;
-    padding: 0 2px;
+    padding: 0 -5px;
 }
 
 .remark_col, .details_col{
@@ -257,6 +257,16 @@
 .selected-btn {
   background: #0003 !important;
   border-radius: 5px !important;
+}
+
+.dialog_avo-dialog__title__1yow4{
+    padding-bottom: 1.3125rem;
+}
+
+
+.scrollableContent-158{
+
+    overflow: hidden;
 }
 
 // .breadcrumb-item {

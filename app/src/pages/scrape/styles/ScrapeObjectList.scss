@@ -3,11 +3,11 @@
     display: flex;
     max-width: 100%;
     margin-bottom: 15px;
-    margin-left: -8px;
+    margin-left: 36px;
     justify-content: space-between;
     font-family: $avoSecondaryFont;
     height:1px;
-    margin-top: -5px;
+    margin-top: 100px;
    
 }
 
@@ -16,7 +16,7 @@
     padding-bottom: 22px;
     display: flex;
     align-items:center;
-    margin:-72px -135px -13px 2px;
+    margin:-73px -120px -1px -52px;
     height:8px;
 }
    
@@ -35,17 +35,17 @@
 }
 
 .ss__select-all-lbl{
-    margin: 0 12px;
+    margin:  8px 0px;
     font-family: $avoFont;
     color: $darkGray;
-    font-size: 16px;
+    font-size: 12px;
 }
 
 .ss__taskBtn{
-    padding: 1px 13px;
-    margin-right: 2px;
-    height: 21px;
-    font-size: 13px;
+    padding: 2px 11px;
+    margin-right: 7px;
+    height: 20px;
+    font-size: 11px;
     background-color: $primaryColor;
     &:disabled{
         background-color: $backgroundThree;
@@ -58,6 +58,7 @@
     outline: none;
     color: $whiteColor;
     border-radius: 20px;
+    margin: 13px 0px 9px 5px;
 }
 
 .ss__search-btn{
@@ -67,7 +68,9 @@
     display: flex;
     border: 1px solid $primaryColor;
     border-radius: 5px;
-    height: 24px;
+    height: 22px;
+    margin: -1px 4px -3px 4px;
+
 }
 
 .ss__search-icon{
@@ -138,14 +141,35 @@
 }
 
 .p-button-warning {
-    width: 100px;
-    height: 30px;
+    
     font-family: 'latoWeb';
+    width: 87px;
+    height: 26px;
+    margin: 7px -10px 12px -25px;
+    padding: 11px 10px 10px 12px;
+    border-radius: 2px;
+
    
 
 }
 
 .p-button{
     margin: 54px -19px 54px -18px;
+   
+}
 
+.dialog_avo-dialog__title__1yow4 {
+    font-size: 15px;
+    font-family: "latoWebMedium";
+    font-weight: 400;
+}
+
+.dropdown-181 {
+    border-radius: 0.42rem;
+    margin: -3px;
+    font-size: 12px;
+}
+.label-199{
+    font-size: 12px;
+    font-family: "latoWebMedium";
 }

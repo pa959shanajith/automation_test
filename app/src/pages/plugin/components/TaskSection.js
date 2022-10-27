@@ -65,8 +65,8 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
      
 
 
-    useEffect( async () => {
-        const UserList =  await pluginApi.getUserDetails("user");
+    useEffect( () => {
+        (async() => {const UserList =  await pluginApi.getUserDetails("user");
         if(UserList.error){
             setMsg(MSG.CUSTOM("Error while fetching the user Details"));
         }else{
@@ -74,7 +74,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         }
 
         console.log("UserDetailsList");
-        console.log(UserList);
+        console.log(UserList);})()
     },[]);
 
     const moveItemsLeftgo = (to,from) =>{

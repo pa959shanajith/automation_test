@@ -5,7 +5,7 @@ import * as d3 from 'd3';
 import {Provider, useSelector, useDispatch} from 'react-redux';
 import PropTypes from 'prop-types';
 import '../styles/TaskBox.scss';
-import TaskBox from './TaskBox';
+
 import CanvasAssign from '../containers/CanvasAssign';
 import CreateAssign from '../containers/CreateAssign';
 import ExecuteHome from '../../execute/containers/ExecuteHome';
@@ -19,6 +19,7 @@ import TaskBox from './TaskBox';
 import { useHistory } from 'react-router-dom';
 import { assign } from 'nodemailer/lib/shared';
 import {SET_CT} from "../../plugin/state/action"
+import { style } from 'd3';
 // import { assign } from 'nodemailer/lib/shared';
 
 /*Component ControlBox
@@ -208,11 +209,12 @@ const ControlBox = (props) => {
             // open={this.state.show} onClose={this.onClose}
             hidden = {showScrape === false}
             onDismiss = {() => setShowScrape(false)}
-            title={props.taskname}
-            minWidth = '68rem' 
+            
+            title={props.taskname + " : Capture Elements"} 
+            minWidth = '60rem' 
             // onDecline={() => console.log(false)}
             onConfirm = {() => { }} >
-                <div style={{ height: '623px'}}><ScrapeScreen /></div>
+                <div style={{ height: '120rem' }}><ScrapeScreen /></div>
             </Dialog>
 
 
@@ -220,8 +222,12 @@ const ControlBox = (props) => {
             
             hidden = {ShowDesignTestSetup === false}
             onDismiss = {() => setShowDesignTestSetup(false)}
-            title={props.taskname}
-            minWidth = '65rem'
+          
+            title ={ props.taskname  +  " : Design Test Setup"}  
+            
+            
+           
+            minWidth = '60rem'
             
             // onDecline={() => console.log(false)}
             onConfirm = {() => { }} >

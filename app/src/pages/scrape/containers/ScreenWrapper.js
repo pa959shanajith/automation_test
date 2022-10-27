@@ -30,9 +30,9 @@ const ScreenWrapper = props => {
             </Breadcrumb> */}
             <div className="ss__content_wrap" style={ props.fullHeight ? {height: "100%"} : {}}>
                 { /* Task Name */ }
-                <div className="ss__task_title">
+                {/* <div className="ss__task_title">
                     <div className="ss__task_name">{taskName}</div>
-                </div>
+                </div> */}
                 {props.compareContent}
                 {props.buttonGroup}
                 {props.webserviceContent}
