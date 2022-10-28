@@ -84,6 +84,7 @@ registerIcons({
     cancel: <Cancel />,
     warning: <Warning />,
     'plusIcon' : <img style={{width:'1.86rem', marginRight:'0.7rem',marginTop:'0.02rem'}} src='static/imgs/plusNew.png' />,
+    'E2Eicon' : <img src='static/imgs/E2Eicon.png'/>,
     'add-user': <AddUser />,
     computer: <Computer />,
     undeploy: <Undeploy />,

@@ -96,9 +96,9 @@ const ReferenceBar = (props) => {
                     <ScrollBar scrollId="ref_bar_scroll" trackColor="transparent" thumbColor="#7143b3">
                         <div className="ref__content">
                             <div className="rb_upper_contents">
-                                {props.taskTop?<div className="ic_box" onClick={toggleTaskPop} title="Tasks"><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} alt="task-ic" src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
+                                {props.taskTop?<div className="ic_box" onClick={toggleTaskPop} title="Tasks"></div>:null}
                                     {props.children}
-                                {!props.taskTop && !props.hideTask?<div className="ic_box" onClick={toggleTaskPop} title="Tasks"><img className={"rb__ic-task thumb__ic " + (showTask && "active_rb_thumb")} alt="task-ico" src="static/imgs/ic-task.png"/><span className="rb_box_title">Tasks</span></div>:null}
+                                
                                 {!props.hideInfo && <div className="ic_box"  onClick={toggleInfoPop} title="Info"><img className="rb__ic-info thumb__ic" alt="info-ic" src="static/imgs/ic-info.png"/><span className="rb_box_title">Info</span></div>}
                             </div>
                         </div>
@@ -106,9 +106,7 @@ const ReferenceBar = (props) => {
                     
                 </div>
             </div>
-            {!userInfo.isTrial ?<div className="rb__bottom_content" title="Prof J">
-                <div className="ic_box"><img className="rb__ic-assist thumb__ic" alt="assist-ic" src="static/imgs/ic-assist.png" onClick={(e)=>callProfJ(e)}/><span className="rb_box_title">Assist</span></div>
-            </div>:null}
+            
         </>
         }
         </div>
