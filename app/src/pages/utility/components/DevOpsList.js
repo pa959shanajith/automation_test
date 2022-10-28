@@ -7,6 +7,7 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { MultiSelect } from 'primereact/multiselect';
 // import { fetchProjects } from '../api';
+import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
 import * as pluginApi from "../../plugin/api";
 import {v4 as uuid} from 'uuid';
 import ScheduleHome from '../../schedule/containers/ScheduleHome'
@@ -24,18 +25,85 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
     const [displayBasic2, setDisplayBasic2] = useState(false);
     const [position, setPosition] = useState('center');
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
-    const [projectdata, setProjectData] = useState('');
-
-
+    const [getProjectList,setProjectList]=useState([]);
+    const [getplugins_list,setplugins_list]=useState([]);
+    const [userDetailList,setUserDetailList]=useState([]);
+    // useEffect(()=>{
+    //             pluginApi.getProjectIDs()
+    //             .then(data => {
+    //                     setProjectData(data.projectName);
+    //                     console.log(data)           
+    //     })},[])
+    //     const projects = [
+    //         { name: projectdata},
+    //     ];
     useEffect(()=>{
-                pluginApi.getProjectIDs()
-                .then(data => {
-                        setProjectData(data);
-                        console.log(data)           
-        })},[])
-        const projects = [
-            { name: projectdata},
-        ];
+        (async() => {
+            const UserList =  await pluginApi.getUserDetails("user");
+        if(UserList.error){
+            setMsg(MSG.CUSTOM("Error while fetching the user Details"));
+        }else{
+            setUserDetailList(UserList);
+        }
+
+        console.log("UserDetailsList");
+        console.log(UserList);
+            const ProjectList = await getDetails_ICE(["domaindetails"],["Banking"]);
+        if(ProjectList.error){
+            setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+        }else{
+            
+            const arraynew = ProjectList.projectIds.map((element, index) => {
+                return (
+                    {
+                        key: element,
+                        text: ProjectList.projectNames[index],
+                        disabled: true,
+                        title: 'License Not Supported'
+                    }
+                )
+            });
+            setProjectList(arraynew);
+        }
+       
+
+        console.log("domaindetails","Banking");
+        console.log(ProjectList);
+            var plugins = []; 
+        const plugins_list= await getAvailablePlugins();
+       
+        
+        if(plugins_list.error){
+            setMsg(MSG.CUSTOM("Error while fetching the app Details"));
+        }else{
+            console.log(plugins_list);
+           
+                    let txt = [];
+                     for (let x in plugins_list) {
+                        if(plugins_list[x] === true) {
+                            txt.push({
+                                key: x,
+                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                                title: x.charAt(0).toUpperCase()+x.slice(1),
+                                disabled: false
+                            })
+                        }
+                        else {
+                            txt.push({
+                                key: x,
+                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                                title: 'License Not Supported',
+                                disabled: true
+                            })
+                        }
+                       }
+                   
+            setplugins_list(txt);
+        }
+        
+        })()
+        
+    },[]);
         
     const dialogFuncMap = {
         'displayBasic': setDisplayBasic,
@@ -251,22 +319,11 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 {setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />)}
                 </div> */}
                 {/* <MultiSelect options={projects}  optionLabel="name" placeholder="Select a Project" /> */}
-                { 
-                setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) => 
+                {setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) =>
                 <SearchDropdown
                     noItemsText={[ ]}
                     onChange={(selectedIce) => false}
-                    options={[
-                            {
-                            key: 1,
-                            text: item.project
-                            },
-                            {
-                            key: 2,
-                            text: item.project
-                            }
-                            
-                        ]}
+                    options={getProjectList}
                     placeholder={item.project}
                     selectedKey={""}
                     width='15rem'
@@ -353,7 +410,12 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 <input type="radio" onSelect={()=>{}} />&nbsp;&nbsp;
                 <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Assure Client</label>
                 </Dialog>
+
+                {/* Dialog for Schedule */}
                 <Dialog header="Schedule" visible={displayBasic1}   onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
+
+                {/* Dialog for CI /CD  */}
+
                 <Dialog header="Execute via CI/CD" visible={displayBasic} style={{ width: '50vw' }}  onHide={() => onHide('displayBasic')}>
                 <div style={{display: 'flex', marginBottom:'1rem'}}>
                     <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%', marginTop: '1.5rem'}}>DevOps Integration API url : </span>

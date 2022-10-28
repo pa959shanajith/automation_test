@@ -455,14 +455,14 @@ const DevOpsConfig = props => {
                             width='54%'
                         />
                     </div>
-                    <div>
+                    {/* <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
                         <div className="devOps_dropdown_label_sync">
                             <label>Asynchronous </label>
                             <Toggle checked={integrationConfig.executionType == 'synchronous'} onChange={() => setIntegrationConfig({...integrationConfig, executionType: (integrationConfig.executionType === 'synchronous') ? 'asynchronous' : 'synchronous' })} label="" inlineLabel={true} />
                             <label>Synchronous </label>
                         </div>
-                    </div>
+                    </div> */}
                      <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Execution Mode : </label>
                         <div className="devOps_dropdown_label_sync">
