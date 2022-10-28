@@ -24,17 +24,15 @@ const ModuleListDrop = (props) =>{
     const [loading,setLoading] = useState(false)
     const [selectedModuleList,setSelectedModuleList] = useState([]);
     const isAssign = props.isAssign
-    const selectModule = (e) => {
-        var modID = e.target.getAttribute("value")
-        if(e.target.type=='checkbox'){
+    const selectModule = (e, arg=null) => {
+        let modID = e.target.getAttribute("value")
+        if(arg==='checkbox'){
             let selectedModList = [];
             if(moduleSelectlist.length>0){
                 selectedModList=moduleSelectlist;                
             }
-            if(e.target.checked){
-                if(selectedModList.indexOf(modID)==-1){
-                    selectedModList.push(modID);
-                }
+            if(selectedModList.indexOf(modID)===-1){
+                selectedModList.push(modID);
             }else{
                 selectedModList = selectedModList.filter(item => item !== modID)
             }
@@ -53,7 +51,7 @@ const ModuleListDrop = (props) =>{
             displayError(MSG.MINDMAP.WARN_SELECT_COMPLETE_FLOW)
             return;
         }   */    
-            dispatch({type:actionTypes.SELECT_MODULELIST,payload:selectedModList})
+            dispatch({type:actionTypes.SELECT_MODULELIST,payload:[...selectedModList]})
             // d3.select('#pasteImg').classed('active-map',false)
             // d3.select('#copyImg').classed('active-map',false)
             // d3.selectAll('.ct-node').classed('node-selected',false)
@@ -117,9 +115,9 @@ const ModuleListDrop = (props) =>{
                     <ScrollBar scrollId='toolbar_module-list' trackColor={'transperent'} thumbColor={'grey'}> 
                         {moduleList.map((e,i)=>{
                             return(
-                                    <div data-test="modules" onClick={(e)=>selectModule(e)} value={e._id} key={i} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} title={e.name}>                                    
-                                        <img value={e._id}  src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
-                                        <span value={e._id} >{!isAssign && <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />}{e.name}</span>
+                                    <div data-test="modules" value={e._id} key={i} style={{cursor:"default !important"}} className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} title={e.name}>                                    
+                                        <img value={e._id} style={{cursor:"pointer"}} onClick={(e)=>selectModule(e)}  src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
+                                        <span value={e._id} >{!isAssign && <input type="checkbox" value={e._id}  onChange={(e)=>selectModule(e,"checkbox")} checked={moduleSelectlist.includes(e._id)} />}{e.name}</span>
                                     </div>
                                 )
                         })}
