@@ -4,11 +4,19 @@ import '../styles/ControlBox.scss'
 import * as d3 from 'd3';
 import PropTypes from 'prop-types';
 import '../styles/TaskBox.scss';
+import CanvasAssign from '../containers/CanvasAssign';
+import CreateAssign from '../containers/CreateAssign';
 import ExecuteHome from '../../execute/containers/ExecuteHome';
 import {Dialog} from '@avo/designcomponents';
 import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
 import DesignHome from '../../design/containers/DesignHome';
 
+import TaskBox from './TaskBox';
+import { useHistory } from 'react-router-dom';
+import { assign } from 'nodemailer/lib/shared';
+import {SET_CT} from "../../plugin/state/action"
+import { style } from 'd3';
+// import { assign } from 'nodemailer/lib/shared';
 
 /*Component ControlBox
   use: returns node control options 
@@ -155,21 +163,29 @@ const ControlBox = (props) => {
         <>
         <Dialog
             hidden = {showScrape === false}
-            onDismiss = {()=>{setShowScrape(false)}}
-            title = 'Capture'
-            minWidth = '60rem'
-            confirmText = 'Save'>
-                <div style={{ height: '623px'}}><ScrapeScreen /></div>
+            onDismiss = {() => setShowScrape(false)}
+            
+            title={props.taskname + " : Capture Elements"} 
+            minWidth = '60rem' 
+            // onDecline={() => console.log(false)}
+            onConfirm = {() => { }} >
+                <div style={{ height: '120rem' }}><ScrapeScreen /></div>
             </Dialog>
             
             <Dialog
-             hidden = {ShowDesignTestSetup === false}
-             onDismiss = {() => {setShowDesignTestSetup(false)}}
-             title = 'Design Test Setup'
-             minWidth = '60rem'
-             confirmText = 'Save'
-             onConfirm = {() => { }} >
-                 <div style={{ height: '623px'}}><DesignHome /></div>
+            
+            hidden = {ShowDesignTestSetup === false}
+            onDismiss = {() => setShowDesignTestSetup(false)}
+          
+            title ={ props.taskname  +  " : Design Test Setup"}  
+            
+            
+           
+            minWidth = '60rem'
+            
+            // onDecline={() => console.log(false)}
+            onConfirm = {() => { }} >
+                <div style={{ height: '623px'}}><DesignHome /></div>
             </Dialog>
             
             <Dialog
