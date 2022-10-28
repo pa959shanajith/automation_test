@@ -540,8 +540,10 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
             }
             if (!isMultiMindmap && !('testscenarios' in data) || hasError){
                 setError("Incorrect JSON imported. Please check the contents!!");
+                setDisableSubmit(true) 
             }else if((!isMultiMindmap && data.testscenarios.length === 0) || hasNoScenarios){
                 setError("The file has no node structure to import, please check!!");
+                setDisableSubmit(true)
             }else{
                 var importProj = data[0].projectid
                 if(!importProj || !projList[importProj]){
@@ -549,23 +551,10 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
                     setBlockui({show:false})
                     return;
                 }
-                /* var res = await importMindmap(data)
-                // console.log("ImportMindmap Res: " + res)
-                if(res.error){setError(res.error);setBlockui({show:false});return;}
-                var req={
-                    tab:"tabCreate",
-                    projectid:data[0]?data[0].projectid:data.projectid,
-                    version:0,
-                    cycId: null,
-                    moduleid:Array.isArray(res._id)?res._id:res
-                }
-                res = await getModules(req)
-                // console.log("GetModules res: " + JSON. stringify(res))
-                if(res.error){setError(res.error);setBlockui({show:false});return;}
-                setFiledUpload(res) */
             } 
         }else{
             setError("File is not supported")
+            setDisableSubmit(true)
         }    
         setBlockui({show:false})
     }catch(err){
