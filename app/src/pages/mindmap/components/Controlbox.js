@@ -5,10 +5,6 @@ import * as d3 from 'd3';
 import {Provider, useSelector, useDispatch} from 'react-redux';
 import PropTypes from 'prop-types';
 import '../styles/TaskBox.scss';
-<<<<<<< HEAD
-=======
-
->>>>>>> 26765d8bf29b4b3e444032073f50439107c71079
 import CanvasAssign from '../containers/CanvasAssign';
 import CreateAssign from '../containers/CreateAssign';
 import ExecuteHome from '../../execute/containers/ExecuteHome';
