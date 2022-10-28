@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer } from '../../global';
-import { SearchBox , SearchDropdown, Toggle, TextField } from '@avo/designcomponents';
+import { SearchBox , SearchDropdown, Toggle } from '@avo/designcomponents';
 import { fetchConfigureList, deleteConfigureKey, execAutomation } from '../api';
 import { Dialog } from 'primereact/dialog';
-import { Button } from 'primereact/button'
+import { Button } from 'primereact/button';
+import { MultiSelect } from 'primereact/multiselect';
+// import { fetchProjects } from '../api';
+import * as pluginApi from "../../plugin/api";
 import {v4 as uuid} from 'uuid';
 
 import "../styles/DevOps.scss";
-import { TextFieldBase } from '@fluentui/react';
 
 
-const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading,setIntegrationConfig }) => {
+
+const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading, setIntegrationConfig }) => {
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
@@ -21,13 +24,25 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
     const [displayBasic2, setDisplayBasic2] = useState(false);
     const [position, setPosition] = useState('center');
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
+    const [projectdata, setProjectData] = useState('');
 
+
+    useEffect(()=>{
+                pluginApi.getProjectIDs()
+                .then(data => {
+                        setProjectData(data);
+                        console.log(data)           
+        })},[])
+        const projects = [
+            { name: projectdata},
+        ];
+        
     const dialogFuncMap = {
         'displayBasic': setDisplayBasic,
         'displayBasic1': setDisplayBasic1,
         'displayBasic2': setDisplayBasic2
     }
-
+    
     const onClick = (name, position) => {
         dialogFuncMap[`${name}`](true);
 
@@ -90,6 +105,10 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             }, 1500);
         }
     }
+
+    var myJsObj = {key:setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) => item.configurekey)[0]};
+    var str = JSON.stringify(myJsObj);
+
     const deleteDevOpsConfig = (key) => {
         setLoading('Please Wait...');
         setTimeout(async () => {
@@ -225,18 +244,22 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                         </label>
                     </span>
                 </div> */}
-                
-                {setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) => 
+                {/* <div>
+                {setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />)}
+                </div> */}
+                {/* <MultiSelect options={projects}  optionLabel="name" placeholder="Select a Project" /> */}
+                { 
+                setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) => 
                 <SearchDropdown
                     noItemsText={[ ]}
                     onChange={(selectedIce) => false}
                     options={[
                             {
-                            key: item.configurekey,
+                            key: 1,
                             text: item.project
                             },
                             {
-                            key: item.configurekey,
+                            key: 2,
                             text: item.project
                             }
                             
@@ -323,24 +346,26 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 <input type="radio" />&nbsp;&nbsp;
                 <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Agent / Avo Grid</label>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <input type="radio" />&nbsp;&nbsp;
+                <input type="radio" onSelect={()=>{}} />&nbsp;&nbsp;
                 <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Assure Client</label>
                 </Dialog>
                 <Dialog header="Schedule" visible={displayBasic1} style={{ width: '50vw' }}  onHide={() => onHide('displayBasic1')}></Dialog>
                 <Dialog header="Execute via CI/CD" visible={displayBasic} style={{ width: '50vw' }}  onHide={() => onHide('displayBasic')}>
-                <div>
-                        <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%'}}>DevOps Integration API url : </span>
-                        <span className="devOps_dropdown_label_input"><input type="text" value={url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
-                            <label>
-                                <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return apiKeyCopyToolTip }, 0]} />
-                                <div style={{fontSize:"24px"}}>
-                                    <i className="fa fa-files-o icon" style={{fontSize:"24px"}} data-for="copy" data-tip={apiKeyCopyToolTip} onClick={() => { copyKeyUrlFunc('api-url') }} ></i>
-                                </div>
-                            </label>
-                        </span>
-                    </div>
-
-                    <div>
+                <div style={{display: 'flex', marginBottom:'1rem'}}>
+                    <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%', marginTop: '1.5rem'}}>DevOps Integration API url : </span>
+                    <pre className='grid_download_dialog__content__code'>
+                        <code>
+                        {url}
+                        </code>
+                    </pre>
+                    <label>
+                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
+                            <div style={{fontSize:"24px"}}>
+                                <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyKeyUrlFunc('api-url') }} ></i>
+                            </div>
+                        </label>
+                </div>
+                    <div style={{display: 'flex', marginBottom:'1rem'}}>
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
                         <div className="devOps_dropdown_label_sync">
                             <label>Asynchronous </label>
@@ -348,27 +373,26 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                             <label>Synchronous </label>
                         </div>
                     </div>
-                    <div>
-                        <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>DevOps Request Body : </span>
-                        &nbsp;&nbsp;
-                        <span className="api-ut__inputLabel">
-                        <TextField value={setIntegrationConfig} width='84%' label="" standard={true} onChange={(event) => setIntegrationConfig({ name: event.target.value})} autoComplete="off" placeholder="Enter Configuration Name"
-                            // errorMessage={(integrationConfig.name === '' && error.name && error.name !== '') ?  error.name : null}
-                        />
-                        <label>
-                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return apiKeyCopyToolTip }, 0]} />
+                    <div style={{display: 'flex', marginBottom:'1rem'}}>
+                    <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '1.5rem'}}>DevOps Request Body : </span>
+                    <pre className='grid_download_dialog__content__code'>
+                        <code>
+                            {str}
+                        </code>
+                    </pre>
+                    <label>
+                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
                             <div style={{fontSize:"24px"}}>
-                                <i className="fa fa-files-o icon" style={{fontSize:"24px"}} data-for="copy" data-tip={apiKeyCopyToolTip} onClick={() => { copyKeyUrlFunc('devops-key') }} ></i>
+                                <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => {  copyKeyUrlFunc('devops-key') }} ></i>
                             </div>
                         </label>
-                        </span>
-                    </div>
+                </div>
                 </Dialog>
                 </ScrollBar>
                 
             </div>
         </> : <div className="no_config_img"> <img src="static/imgs/no-devops-config.svg" alt="Empty List Image"/> </div> }
     </>);
-}
 
+}
 export default DevOpsList;

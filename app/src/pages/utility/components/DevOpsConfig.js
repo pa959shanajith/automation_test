@@ -58,6 +58,7 @@ const DevOpsConfig = props => {
         ...props.currentIntegration,
         dataParameters: dataParametersCollection
     });
+
     const [icepoollist, setIcepoollist] = useState([
         { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
     ]);
@@ -128,11 +129,11 @@ const DevOpsConfig = props => {
                 console.error(reportResponse.error);
                 setMsg(MSG.REPORT.ERR_FETCH_PROJECT);
             }
+            
             else {
                 const [projList, newDict] = prepareOptionLists(reportResponse);
                 let newSelectValues = [...integrationConfig.selectValues];
                 newSelectValues[0].list = projList;
-
                 if(props.currentIntegration.name !== '') {
                     const projSetDetails = props.currentIntegration.executionRequest.batchInfo[0];
                     // proj
@@ -162,6 +163,7 @@ const DevOpsConfig = props => {
             props.setLoading(false);
         })()
     }, []);
+    
     useEffect(()=> {
         let isUpdated = false;
         Object.keys(integrationConfig).some(element => {
@@ -389,8 +391,8 @@ const DevOpsConfig = props => {
         </div>
         <div className="api-ut__btnGroup">
             <button style={{width: '15rem'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save configuration' : 'Update'}</button>
-            <button data-test="submit-button-test" onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : 'Back'}</button>
-            <div className="devOps_config_name" style={{marginRight:'35rem'}}>
+            <button data-test="submit-button-test" style={{width: '6rem'}} onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
+            <div className="devOps_config_name" style={{marginRight:'34rem'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Configuration Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
@@ -400,11 +402,14 @@ const DevOpsConfig = props => {
                 </span>
             </div>
         </div>
-        <div>
-        {
+        <div style={{display:'flex', marginBottom: '2rem' }}>
+        <input type='radio' value='e2eExecution' style={{width:'2rem', height: '2rem'}} onClick={selectedExecutionType}/>&nbsp;&nbsp;e2eExecution&nbsp;&nbsp;
+        <input type='radio' value='batchModules ' style={{width:'2rem', height: '2rem'}} onSelect={selectedExecutionType}/>&nbsp;&nbsp;batchModules&nbsp;&nbsp;
+        <input type='radio' value='normalExecution' style={{width:'2rem', height: '2rem'}} onSelect={selectedExecutionType}/>&nbsp;&nbsp;normalExecution
+        {/* {
             integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />
             
-        }
+        } */}
         </div>
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
@@ -450,14 +455,14 @@ const DevOpsConfig = props => {
                             width='54%'
                         />
                     </div>
-                    {/* <div>
+                    <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
                         <div className="devOps_dropdown_label_sync">
                             <label>Asynchronous </label>
                             <Toggle checked={integrationConfig.executionType == 'synchronous'} onChange={() => setIntegrationConfig({...integrationConfig, executionType: (integrationConfig.executionType === 'synchronous') ? 'asynchronous' : 'synchronous' })} label="" inlineLabel={true} />
                             <label>Synchronous </label>
                         </div>
-                    </div> */}
+                    </div>
                      <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Execution Mode : </label>
                         <div className="devOps_dropdown_label_sync">
