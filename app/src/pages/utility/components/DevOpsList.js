@@ -1,22 +1,154 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer } from '../../global';
-import { SearchBox , SearchDropdown} from '@avo/designcomponents';
+import { SearchBox , SearchDropdown, Toggle } from '@avo/designcomponents';
 import { fetchConfigureList, deleteConfigureKey, execAutomation } from '../api';
-// import 'primeicons/primeicons.css';
-// import 'primereact/resources/themes/lara-light-indigo/theme.css';
-// import 'primereact/resources/primereact.css';
-// import 'primeflex/primeflex.css';
-// import { MultiSelect } from 'primereact/multiselect'
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+import { MultiSelect } from 'primereact/multiselect';
+// import { fetchProjects } from '../api';
+import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
+import * as pluginApi from "../../plugin/api";
 import {v4 as uuid} from 'uuid';
-
+import ScheduleHome from '../../schedule/containers/ScheduleHome'
 import "../styles/DevOps.scss";
 
-const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading }) => {
+
+
+const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading, setIntegrationConfig }) => {
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
     const [filteredList, setFilteredList] = useState(configList);
+    const [displayBasic, setDisplayBasic] = useState(false);
+    const [displayBasic1, setDisplayBasic1] = useState(false);
+    const [displayBasic2, setDisplayBasic2] = useState(false);
+    const [position, setPosition] = useState('center');
+    const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
+    const [getProjectList,setProjectList]=useState([]);
+    const [getplugins_list,setplugins_list]=useState([]);
+    const [userDetailList,setUserDetailList]=useState([]);
+    // useEffect(()=>{
+    //             pluginApi.getProjectIDs()
+    //             .then(data => {
+    //                     setProjectData(data.projectName);
+    //                     console.log(data)           
+    //     })},[])
+    //     const projects = [
+    //         { name: projectdata},
+    //     ];
+    useEffect(()=>{
+        (async() => {
+            const UserList =  await pluginApi.getUserDetails("user");
+        if(UserList.error){
+            setMsg(MSG.CUSTOM("Error while fetching the user Details"));
+        }else{
+            setUserDetailList(UserList);
+        }
+
+        console.log("UserDetailsList");
+        console.log(UserList);
+            const ProjectList = await getDetails_ICE(["domaindetails"],["Banking"]);
+        if(ProjectList.error){
+            setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+        }else{
+            
+            const arraynew = ProjectList.projectIds.map((element, index) => {
+                return (
+                    {
+                        key: element,
+                        text: ProjectList.projectNames[index],
+                        disabled: true,
+                        title: 'License Not Supported'
+                    }
+                )
+            });
+            setProjectList(arraynew);
+        }
+       
+
+        console.log("domaindetails","Banking");
+        console.log(ProjectList);
+            var plugins = []; 
+        const plugins_list= await getAvailablePlugins();
+       
+        
+        if(plugins_list.error){
+            setMsg(MSG.CUSTOM("Error while fetching the app Details"));
+        }else{
+            console.log(plugins_list);
+           
+                    let txt = [];
+                     for (let x in plugins_list) {
+                        if(plugins_list[x] === true) {
+                            txt.push({
+                                key: x,
+                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                                title: x.charAt(0).toUpperCase()+x.slice(1),
+                                disabled: false
+                            })
+                        }
+                        else {
+                            txt.push({
+                                key: x,
+                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                                title: 'License Not Supported',
+                                disabled: true
+                            })
+                        }
+                       }
+                   
+            setplugins_list(txt);
+        }
+        
+        })()
+        
+    },[]);
+        
+    const dialogFuncMap = {
+        'displayBasic': setDisplayBasic,
+        'displayBasic1': setDisplayBasic1,
+        'displayBasic2': setDisplayBasic2
+    }
+    const [selectedItem, setSelectedItem] = useState({});
+
+    const onClick = (name, position) => {
+        dialogFuncMap[`${name}`](true);
+        if(name === 'displayBasic1'){
+            setSelectedItem(position);
+        }
+        if (position) {
+            setPosition(position);
+        }
+    }
+    const renderFooter = (name) => {
+        return (
+            <div>
+                <Button label="Execute" onClick={async () => onHide(name)} autoFocus />
+            </div>
+        );
+    }
+    const onHide = (name) => {
+        dialogFuncMap[`${name}`](false);
+    }
+
+    const copyKeyUrlFunc = (id) => {
+        const data = document.getElementById(id).value;
+        if (!data) {
+            setApiKeyCopyToolTip("Nothing to Copy!");
+            setTimeout(() => {
+                setApiKeyCopyToolTip("Click to Copy");
+            }, 1500);
+            return;
+        }
+        const x = document.getElementById(id);
+        x.select();
+        document.execCommand('copy');
+        setApiKeyCopyToolTip("Copied!");
+        setTimeout(() => {
+            setApiKeyCopyToolTip("Click to Copy");
+        }, 1500);
+    }
 
     const copyTokenFunc = () => {
         const data = url;
@@ -44,6 +176,10 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             }, 1500);
         }
     }
+
+    var myJsObj = {key:setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) => item.configurekey)[0]};
+    var str = JSON.stringify(myJsObj);
+
     const deleteDevOpsConfig = (key) => {
         setLoading('Please Wait...');
         setTimeout(async () => {
@@ -165,10 +301,10 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                     isHeadless: false
                 })} >New Configuration</button>
             { configList.length > 0 && <>
-                <div className='searchBoxInput'>
+                <div className='searchBoxInput' style={{marginLeft: '35rem'}}>
                     <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                 </div>
-                <div style={{marginLeft: '7rem'}}>
+                {/* <div style={{marginLeft: '7rem'}}>
                     <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>DevOps Integration API url : </span>
                     <span className="api-ut__inputLabel"><input type="text" value={url} data-test="req-body-test" className="req-body" autoComplete="off" id="api-url" name="request-body" style={{width:"25%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
                         <label>
@@ -178,40 +314,34 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                             </div>
                         </label>
                     </span>
-                </div>
-            </> }
-            {searchText.length == 0 && configList.length > 0 && configList.map((item, index) => 
+                </div> */}
+                {/* <div>
+                {setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />)}
+                </div> */}
+                {/* <MultiSelect options={projects}  optionLabel="name" placeholder="Select a Project" /> */}
+                {setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) =>
                 <SearchDropdown
                     noItemsText={[ ]}
                     onChange={(selectedIce) => false}
-                    options={[
-                            {
-                            key: item.configurekey,
-                            text: item.project
-                            },
-                            {
-                            key: item.configurekey,
-                            text: item.project
-                            }
-                            
-                        ]}
+                    options={getProjectList}
                     placeholder={item.project}
                     selectedKey={""}
                     width='15rem'
 
                     />)}
+            </> }
         </div>
         { configList.length > 0 ? <>
             { /* Table */ }
             <div className="d__table" style={{ flex: 0 }}>
                 <div className="d__table_header">
-                    <span className=" d__step_head tkn-table__sr_no tkn-table__head" >#</span>
+                    <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#</span>
                     <span className="d__obj_head tkn-table__name tkn-table__head" >Execution Name</span>
                     <span className="d__key_head tkn-table__key tkn-table__head" >Configuration Key</span>
                     {/* <span className="d__inp_head tkn-table__project tkn-table__head" >Project</span>
                     <span className="d__out_head tkn-table__project tkn-table__head" >Release</span> */}
-                    <span className="details_col d__det_head tkn-table__button" style={{marginRigrt: '126px'}}>Execution Action</span>
-                    <span className="d__out_head tkn-table__project tkn-table__head" >Action</span>
+                    <span className="details_col tkn-table__key d__det_head ">Execution Action</span>
+                    <span className="d__key_head tkn-table__key tkn-table__head" >Action</span>
                 </div>
             </div>
             <div id="activeUsersToken" className="wrap active-users-token" style={{paddingLeft: '0px', paddingRight: '0px' }}>
@@ -225,17 +355,24 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                 <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
                                 {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
-                                
-                                <td className="tkn-table__button">
-                                     <button style={{ marginRight: '4%' }} onClick={async ()=>{
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <td className="tkn-table__button" >
+                                    <button onClick={async () =>{onClick('displayBasic2');
                                          let temp = execAutomation(item.configurekey);
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                        }}>Execute Now</button>
-                                        <td className="tkn-table__button" > <button>   CI / CD   </button> </td>
-                                        <td className="tkn-table__button" > <button> Schedule  </button> </td>
-                                     <img style={{ marginRight: '10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
-                                     <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
-                                </td>
+                                         }}> Execute Now </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                     {/* <button onClick={async ()=>{
+                                         let temp = execAutomation(item.configurekey);
+                                         setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                                     }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
+                                     <button  onClick={() =>onClick('displayBasic')}> CI / CD </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                     <button  onClick={() =>onClick('displayBasic1')}>  Schedule </button>
+                                     
+                                    </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <td className="tkn-table__button" >
+                                        <img style={{marginRight: '3rem'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
+                                    </td>
                             </tr>)
                         }
                         {
@@ -245,26 +382,83 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                                 <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
                                 {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
-                                <td className="tkn-table__button" style={{marginLeft: '213px'}}>
-                                     <button style={{ marginRight: '10%' }} onClick={async ()=>{
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <td className="tkn-table__button" >
+                                <button onClick={async () =>{onClick('displayBasic2');
                                          let temp = execAutomation(item.configurekey);
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                     }}>Execute Now</button>
-                                     
-                                     <td className="tkn-table__button" > <button>   CI / CD   </button> </td>
-                                     <td className="tkn-table__button" > <button> Schedule  </button> </td>
-                                     <img style={{ marginRight: '19%', marginLeft:'10%' }} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;
-                                     <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
-                                      </td>
-                                
+                                         }}> Execute Now </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                     {/* <button onClick={async ()=>{
+                                         let temp = execAutomation(item.configurekey);
+                                         setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                                     }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
+                                     <button  onClick={() =>onClick('displayBasic')}> CI / CD </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                     <button  onClick={() =>onClick('displayBasic1', item)}>  Schedule </button>
+                                    </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <td className="tkn-table__button" >
+                                        <img style={{marginRight: '3rem'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
+                                    </td>
                             </tr>)
                         }
                     </tbody>
                 </table>
+                <Dialog header="Execute Now" visible={displayBasic2} style={{ width: '50vw' }}  footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
+                <input type="radio" />&nbsp;&nbsp;
+                <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Agent / Avo Grid</label>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="radio" onSelect={()=>{}} />&nbsp;&nbsp;
+                <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Assure Client</label>
+                </Dialog>
+
+                {/* Dialog for Schedule */}
+                <Dialog header="Schedule" visible={displayBasic1}   onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
+
+                {/* Dialog for CI /CD  */}
+
+                <Dialog header="Execute via CI/CD" visible={displayBasic} style={{ width: '50vw' }}  onHide={() => onHide('displayBasic')}>
+                <div style={{display: 'flex', marginBottom:'1rem'}}>
+                    <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%', marginTop: '1.5rem'}}>DevOps Integration API url : </span>
+                    <pre className='grid_download_dialog__content__code'>
+                        <code>
+                        {url}
+                        </code>
+                    </pre>
+                    <label>
+                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
+                            <div style={{fontSize:"24px"}}>
+                                <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyKeyUrlFunc('api-url') }} ></i>
+                            </div>
+                        </label>
+                </div>
+                    <div style={{display: 'flex', marginBottom:'1rem'}}>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
+                        <div className="devOps_dropdown_label_sync">
+                            <label>Asynchronous </label>
+                            <Toggle checked={setIntegrationConfig == 'synchronous'} onChange={() => setIntegrationConfig({ executionType: (setIntegrationConfig.executionType === 'synchronous') ? 'asynchronous' : 'synchronous' })} label="" inlineLabel={true} />
+                            <label>Synchronous </label>
+                        </div>
+                    </div>
+                    <div style={{display: 'flex', marginBottom:'1rem'}}>
+                    <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '1.5rem'}}>DevOps Request Body : </span>
+                    <pre className='grid_download_dialog__content__code'>
+                        <code>
+                            {str}
+                        </code>
+                    </pre>
+                    <label>
+                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
+                            <div style={{fontSize:"24px"}}>
+                                <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => {  copyKeyUrlFunc('devops-key') }} ></i>
+                            </div>
+                        </label>
+                </div>
+                </Dialog>
                 </ScrollBar>
+                
             </div>
         </> : <div className="no_config_img"> <img src="static/imgs/no-devops-config.svg" alt="Empty List Image"/> </div> }
     </>);
-}
 
+}
 export default DevOpsList;

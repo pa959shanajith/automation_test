@@ -266,7 +266,7 @@
 .devOps_pool_list {
     width: 45%;
     & > div {
-        margin: 1.4% 0;
+        margin: 4.4% 0;
         display: flex;
         align-items: center;
     }
@@ -362,5 +362,53 @@
     &>img {
         width: 1.2rem;
         margin-left: 1rem;
+    }
+}
+.grid_download_dialog{
+    display: flex;
+    &__hr {
+        margin: 0 0 1rem 0;
+    }
+    &__content {
+        &>p, &>h6 {
+            margin: 0;
+        }
+        &__selectedConfig {
+            border-radius: 0.35rem;
+            background: #613191;
+            color: #FFF;
+            padding: 3px;
+        }
+        &__br {
+            width: auto;
+            height: 0.75rem;
+        }
+        &__code {
+            padding: 1rem;
+            border-top: 20px solid #d3d3d3;
+            border-radius: 3px;
+            white-space: pre-wrap;
+            background-color: #B8D8FF;
+        }
+    }
+    &__prerequisite {
+        border: 2px solid #555;
+        border-radius: 1rem;
+        width: 25rem;
+        margin: 0 auto;
+        &__header {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 1rem 0 1rem;
+        }
+        &__body {
+            margin: 0 1rem;
+        }
+    }
+    &__seperator{
+        width: 0.05rem;
+        background-color: #323130;
+        height: auto;
+        margin: 0.1rem 0.5rem 0 0.5rem;
     }
 }

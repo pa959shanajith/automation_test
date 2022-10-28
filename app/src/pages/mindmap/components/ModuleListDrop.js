@@ -7,6 +7,8 @@ import * as d3 from 'd3';
 import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
 import {IconDropdown} from '@avo/designcomponents';
+import ImportMindmap from'../components/ImportMindmap.js';
+import CreateOptions from '../components/CreateOptions.js'; 
 
 
 // import CreateOptions from '../components/CreateOptions.js';
@@ -34,6 +36,20 @@ const ModuleListDrop = (props) =>{
     const SearchInp = useRef()
     const SearchMdInp = useRef()
     const [modE2Elist, setModE2EList] = useState(moduleList)
+    const [importPop,setImportPop] = useState(false)
+    const [blockui,setBlockui] = useState({show:false})
+    
+  
+
+    useEffect(()=> {
+        if(moduleList.length > 0) {
+            // const e = {
+            //     target: <span className='modNme' value={moduleList[0]._id} >{moduleList[0].name}</span>
+            // }
+            selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false); 
+        }
+        console.log(moduleList[0]);
+     },[])
     
     // useEffect(() => {
     //     (async () => {
@@ -56,23 +72,51 @@ const ModuleListDrop = (props) =>{
     //     })()
         
     // }, []);
+    // e = {
+        // target: {
+        //     value:,
+        //     type: ,name: 
+        // }
+    // }
 
-    const selectModule = (e) => {
-        var modID = e.target.getAttribute("value")
-        var type = e.target.getAttribute("type")
-        var name = e.target.getAttribute("name")
-        if(e.target.type=='checkbox'){
-            let selectedModList = [];
-            if(moduleSelectlist.length>0){
-                selectedModList=moduleSelectlist;                
-            }
-            if(e.target.checked){
-                if(selectedModList.indexOf(modID)==-1){
-                    selectedModList.push(modID);
-                }
-            }else{
-                selectedModList = selectedModList.filter(item => item !== modID)
-            }
+    // const selectModule = (e) => {
+    //     console.log('e.target');
+    //     console.log(e.target);
+    //     console.log(e.target.value);
+    //     console.log(e.target.type);
+    //     console.log(e.target.name);
+    //     console.log(e.target.checked);
+    //     var modID = e.target.getAttribute("value")
+    //     var type = e.target.getAttribute("type")
+    //     var name = e.target.getAttribute("name")
+    //     if(e.target.type=='checkbox'){
+    //         let selectedModList = [];
+    //         if(moduleSelectlist.length>0){
+    //             selectedModList=moduleSelectlist;                
+    //         }
+    //         if(e.target.checked){
+    //             if(selectedModList.indexOf(modID)==-1){
+    //                 selectedModList.push(modID);
+    //             }
+    //         }else{
+    //             selectedModList = selectedModList.filter(item => item !== modID)
+    //         }
+            const selectModule = (id,name,type,checked) => {
+                var modID = id
+                var type = name
+                var name = type
+                if(type=='checkbox'){
+                    let selectedModList = [];
+                    if(moduleSelectlist.length>0){
+                        selectedModList=moduleSelectlist;                
+                    }
+                    if(checked){
+                        if(selectedModList.indexOf(modID)==-1){
+                            selectedModList.push(modID);
+                        }
+                    }else{
+                        selectedModList = selectedModList.filter(item => item !== modID)
+                    }
             //loadModule(selectedModList);
            /*  var req={
                 tab:"tabCreate",
@@ -105,6 +149,7 @@ const ModuleListDrop = (props) =>{
         }
     }
     const selectModuleChkBox = (e) => {
+// console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",e)
 
     }
     const loadModule = async(modID) =>{
@@ -125,6 +170,7 @@ const ModuleListDrop = (props) =>{
         //     req.cycId = props.cycleRef.current?props.cycleRef.current.value: ""
         // }
         console.log('abc');
+        console.log('hello hanumant',actionTypes.SELECT_MODULE);
         var req={
             tab:"endToend",
             projectid:proj,
@@ -166,10 +212,12 @@ const ModuleListDrop = (props) =>{
     const setOptions1 = (data) =>{
         setOptions(data)
       }
+      const createType = {
+        'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))}
       
     return(
         <Fragment>
-            {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
+             {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
             {warning?<ModalContainer 
                 title='Confirmation'
                 close={()=>setWarning(false)}
@@ -177,115 +225,100 @@ const ModuleListDrop = (props) =>{
                 content={<Content/>} 
                 modalClass='modal-sm'
             />:null}
-            {/* focus for module list API */}
-            {<>
-                
-                <div data-test="moduleList" id='toolbar_module-list' className='toolbar__module-container'>
-                
-                <div className='module_title'><h6 ><b>Modules
-                </b></h6></div>
-                <div className= 'plusSymbol' >
-                <IconDropdown 
-                            items={[ 
-  {
-    key: 'csv',
-    text: 'Create New Module..',
-    
-    onClick: () => {CreateNew()
-    }
-  },
-  {
-    key: 'image',
-    text: 'Import Module..',
-    // iconProps: { iconName: 'image' }
-  }
-]}style={{width:'1.67rem',height:'1.67rem', marginLeft:'1rem',marginTop:'0.8rem', border: 'white'}}
-    placeholderIconName = 'plusIcon'
-                        />   
-                </div>
-                <span data-test="searchBox" className='searchBox' >
-                <input  placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
-                <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
-                    </span>
-                    
-                    <div style={{overflowY:'scroll',scrollBehavior: 'smooth', marginLeft:'0.5rem',marginTop:'-1.2rem',height:'55%'}} >
-                   
-                    {/* <button onClick={()=><CreateOptions setOptions/>}>create New</button>  */}
-                    {/* <CreateOptions setOptions={setOptions1}/> */}
-                        <div style={{height:'1.875rem'}} >
-                        {moduleList.map((e,i)=>{
-                            if(e.type==="basic")
-                            return(<div key={i} >
-                                    <div style={{}} data-test="modules" onClick={(e)=>selectModule(e)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")}  title={e.name} type={e.type}>                                    
-                                    <div  className='modClick' value={e._id} >{!isAssign && <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />}</div>
-                                        <img value={e._id} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
-                                        <span className='modNme' value={e._id} >{e.name}</span>
-                                    </div>
-                                    </div>
-                                    
-                                )
-                        })}
-                        {moduleList.map((e,i)=>{
-                            if(e.type==="basic")
-                            return(<div key={i} >
-                                    <div style={{}} data-test="modules" onClick={(e)=>selectModule(e)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")}  title={e.name} type={e.type}>                                    
-                                    <div  className='modClick' value={e._id} >{!isAssign && <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />}</div>
-                                        <img value={e._id} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
-                                        <span className='modNme' value={e._id} >{e.name}</span>
-                                    </div>
-                                    </div>
-                                    
-                                )
-                        })}
-                
-                    
-                      
-     
+            <div className='fullContainer pxBlack'>
+                <div className='leftContainer pxBlack'>
+                    <div className='modulesBox'>
+                        <div style={{ display:"flex", justifyContent:"space-between" }}>
+                            <h6  style={{ marginTop:'0.5rem'}}>
+                                <b>
+                                    Modules
+                                </b>
+                            </h6>
+
+                            <IconDropdown items={[ 
+                                {
+                                    key: 'csv',
+                                    text: 'Create New Module..',
+                                    onClick: () => {CreateNew()
+                                    }
+                                },
+                                {
+                                    key: 'image',
+                                    text: 'Import Module..',
+                                    onClick:()=>{setImportPop(true);}}
+                                ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'1rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
+                            />  
+                            {importPop?<ImportMindmap setBlockui={setBlockui} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
                         </div>
-                     
-                        
-                        
+                        <div className='searchBox pxBlack' style={{display:'flex'}}>
+                            <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}/>
+                            <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
+                        </div>
+                        <div className='moduleList'>
+                            {moduleList.map((e,i)=>{
+                                if(e.type==="basic")
+                                return(
+                                    <div key={i}>
+                                            <div data-test="modules" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?{backgroundColor:'#EFE6FF'}:{}} title={e.name} type={e.type}>                                    
+                                                <div className='modClick' value={e._id} >
+                                                    {!isAssign && <input type="checkbox" className="checkBox" value={e._id} onChange={(e)=>selectModuleChkBox(e.target.checked)}  />}
+                                                </div>
+                                                <img style={{width:'1.7rem',height:'1.7rem'}} value={e._id} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
+                                                <span className='modNme' value={e._id} >{e.name}</span>
+                                            </div>
+                                    </div>
+                                    )
+                            })}
+                        </div>
                     </div>
                     <div className='section-dividers'></div>
-                    <div><IconDropdown style={{width:'1.67rem',height:'1.67rem', marginLeft:'9.8rem',marginTop:'0.3rem', border: 'white'}}  onClick={()=>CreateNew} placeholderIconName = 'plusIcon'/> </div>     
-                    <div className='toolbar__ENE__module-container' >
-                    <h6 style={{ alignContent: 'center',width:'8rem', marginLeft:'.1rem',marginTop:'6.1rem',fontFamily: '$avoFont'}}><b>End To End Flows</b></h6>
-                    <span data-test="search" style={{width:'12rem',borderRadius: '0.9rem',marginTop:'0.05rem'}} className='ene_toolbar__header-searchbox'>
-                        <input data-test="searchInput" placeholder="Search Modules" ref={SearchMdInp} onChange={(e)=>searchModule_E2E(e.target.value)}></input>
-                        <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
-                    </span>
-               
-                    <div  style={{overflowY:'scroll',scrollBehavior: 'smooth', 
-                    display:'flex',flexDirection:'column', alignItems:'center',textAlign:'center', height:'5.2rem', marginLeft:'-0.87rem', }} scrollId='toolbar_module-list' trackColor={'transperent'} thumbColor={'grey'}>
-            {moduleList.map((e,i)=>{
-                if(e.type==="endtoend")
-                return(
-                    <div className= 'ene_toolbar__module-box_hover' style={{display:'flex', alignContent:'center',width: '11.25rem',
-    height:'1.7rem',alignItems: 'center',marginLeft:'1rem', marginTop:'-0.6rem' }} data-test="individualModules" name={e.name} type={e.type} onClick={(e)=>selectModule(e)} key={i} title={e.name}>
-    <input type="checkbox" value={e._id}  onChange={(e)=>selectModuleChkBox(e)}  />
-                        <img style={{display:'inlineBlock',height: '1.54rem',width: '1.54rem',cursor: 'pointer',marginLeft: '0.9rem'}} src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img>
-                        <span >{e.name}</span>
+                    <div className='endToEnd'>
+                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:'center', }}>
+                            <h6>
+                                <b>
+                                    End to End Flows
+                                </b>
+                            </h6>
+                            <IconDropdown items={[ 
+                                {
+                                    key: 'csv',
+                                    text: 'Create New Module..',
+                                    onClick: () => {CreateNew()
+                                    }
+                                },
+                                {
+                                    key: 'image',
+                                    text: 'Import Module..',
+                                }
+                                ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'1rem', border: 'white', marginTop:'-0.7rem'}} placeholderIconName = 'plusIcon'
+                            />  
+                        </div>
+                        <div className='searchBox pxBlack' style={{display:'flex'}}>
+                            <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}/>
+                            <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
+                        </div>
+                        <div className='endToEndMap'>
+                        {moduleList.map((e,i)=>{
+                            if(e.type==="endtoend")
+                            return(
+                                    <div key={i} style={{ display:'flex',  width:'20%', justifyContent:'space-between', padding:'0.25rem' }} data-test="individualModules" name={e.name} type={e.type} onClick={(e)=>selectModule(e)} title={e.name}>
+                                        <input type="checkbox" className="checkBox" value={e._id} onChange={(e)=>selectModuleChkBox(e)}  />
+                                        <img style={{height: '1.7rem',width:'1.7rem'}} src={(e.type==="endtoend")?"static/imgs/E2Eicon.png":"static/imgs/node-modules.png"} alt='module'></img>
+                                        <span className='modNme' >{e.name}</span>
+                                    </div>
+                            )
+                        })}
+                        </div>
                     </div>
-                )
-            })}      
-                    </div></div>
-                    </div>
-                    <div className='divider'></div>
-                    
-                    
-               
-                </>
-                
-            }
+                </div>
+            </div>
             <div data-test="dropDown" onClick={()=>{
-                {
                     dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})
-                }
                 }}>
                 
             </div>
         </Fragment>
-    )
+    );
 }
 
 //content for moduleclick warning popup

@@ -109,7 +109,7 @@ const CreateNew = ({importRedirect}) => {
                 
             </div>:null
         }
-        {/* <Sidebar/> */}
+        
         
         <ReferenceBar taskInfo={info} taskTop={true} collapsible={true} collapse={true}>
             <div className="ic_box" title="SwitchLayout" >

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // import {getUserDetails} from '../api';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Redirect } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
 import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, GenerateTaskList, Messages as MSG, setMsg } from '../../global';
 import FilterDialog from "./FilterDialog";
@@ -20,7 +20,9 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import ProjectNew from '../../admin/containers/ProjectAssign';
 import { DataTable } from 'primereact/datatable';
-
+// import { FontSizes } from '@fluentui/react';
+import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE} from '../api';
+import { text } from 'body-parser';
 
 // import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
@@ -57,16 +59,35 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [statechange,setStateChange] = useState(true);
     const [selectBox,setSelectBox] = useState([]);
     const [userDetailList,setUserDetailList]=useState([]);
-   
+    // const [getAvailablePlugins,setAvailablePlugins]=useState([]);
+    const [getProjectList,setProjectList]=useState([]);
+    const [getplugins_list,setplugins_list]=useState([]);
+    // const [selDomainOptions,setSelDomainOptions] = useState([])
+    // const [loading,setLoading] = useState(false)
    
     const [projectNames, setProjectNames] = useState(null);
+    const [projectId,setprojectId]=useState(null);
+
+    // const displayError = (error) =>{
+    //     setLoading(false)
+    //     setMsg(error)
+    // }
 
     let dataDict;
      
 
 
-    useEffect( async () => {
-        const UserList =  await pluginApi.getUserDetails("user");
+    // useEffect( async () => {
+        
+    // },[]);
+
+    // useEffect(async()=>{
+        
+    // },[]);
+
+    useEffect(()=>{
+        (async() => {
+            const UserList =  await pluginApi.getUserDetails("user");
         if(UserList.error){
             setMsg(MSG.CUSTOM("Error while fetching the user Details"));
         }else{
@@ -75,67 +96,150 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
         console.log("UserDetailsList");
         console.log(UserList);
+            const ProjectList = await getDetails_ICE(["domaindetails"],["Banking"]);
+        // ProjectList = {
+        //     "projectIds":["62e27e5887904e413dad10fe", "62e27e5887904e413dad10ff"],
+        //     "projectNames":["avangers", "avangers2"]
+        // }
+        if(ProjectList.error){
+            setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+        }else{
+            
+            const arraynew = ProjectList.projectIds.map((element, index) => {
+                return (
+                    {
+                        key: element,
+                        text: ProjectList.projectNames[index],
+                        disabled: true,
+                        title: 'License Not Supported'
+                    }
+                )
+            });
+            setProjectList(arraynew);
+            // key: "62e27e5887904e413dad10ff",
+            // text: "avangers2"
+        }
+        // [
+        //     {
+        //         key: "62e27e5887904e413dad10fe",
+        //         text: "avangers"
+        //     },
+        //     {
+        //     ]
+        // }
+
+        console.log("domaindetails","Banking");
+        console.log(ProjectList);
+            var plugins = []; 
+        const plugins_list= await getAvailablePlugins();
+       
+        
+        if(plugins_list.error){
+            setMsg(MSG.CUSTOM("Error while fetching the app Details"));
+        }else{
+            console.log(plugins_list);
+            // const arraynew1= {"desktop":true,"mainframe":false,"mobileapp":true,"mobileweb":true,"oebs":true,"sap":true,"system":false,"web":true,"webservice":true}
+            // let txt = [{key: "desktop",
+            //           text: "Desktop",
+            //           title: "Desktop",
+            //         disabled: false
+            //               }, 
+            //         {
+            //         key: "mainframe",
+            //         disabled: true,
+            //         title: 'License Not Supported',
+            //         text: "Mainframe"
+                    
+            //          },
+            //          {
+            //             key: "mobileapp",
+            //             disabled: true,
+            //             title: 'License Not Supported',
+            //             text: "mobileapp"
+                        
+            //          },
+            //          {
+            //             key: "mobileweb",
+            //             disabled: true,
+            //             title: 'License Not Supported',
+            //             text: "mobileweb"
+                        
+            //         },
+            //         {
+            //             key: "oebs",
+            //             disabled: true,
+            //             title: 'License Not Supported',
+            //             text: "oebs"
+                            
+            //         },
+            //         {
+            //             key: "sap",
+            //             disabled: true,
+            //             title: 'License Not Supported',
+            //             text: "sap"
+                        
+            //         },
+            //         {
+            //             key: "system",
+            //             disabled: true,
+                    //     title: 'License Not Supported',
+                    //     text: "system"
+                        
+                    // },
+                    // {
+                    //     key: "web",
+                    //     disabled: true,
+                    //     title: 'License Not Supported',
+                    //     text: "Mainframe"
+                        
+                    // },
+                    // {
+                    //     key: "webservice",
+                    //     disabled: true,
+                    //     title: 'License Not Supported',
+                    //     text: "webservice"
+                        
+                    // }];
+                    let txt = [];
+                     for (let x in plugins_list) {
+                        if(plugins_list[x] === true) {
+                            txt.push({
+                                key: x,
+                                //text: x[0].toUpperCase()+x.slice(1)
+                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                                title: x.charAt(0).toUpperCase()+x.slice(1),
+                                disabled: false
+                            })
+                        }
+                        else {
+                            txt.push({
+                                key: x,
+                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                                title: 'License Not Supported',
+                                disabled: true
+                            })
+                        }
+                       }
+                    //   setProjectList(arraynew1);
+                    // const arraynew2 = arraynew1.map((txt) => {
+                //       return (
+                //     {
+                //         key: txt,
+                //         text:txt
+                //     }
+                // )
+            // }
+            // ); 
+            setplugins_list(txt);
+        }
+        // console.log({"desktop":true, "mainframe": true, "mobileapp": true, "mobileweb": true, "oebs":true, "sap": true, "system":true,"web":true,"webservice":true});
+        // console.log(plugins_list);
+        })()
+        
     },[]);
+  
 
-    const moveItemsLeftgo = (to,from) =>{
-      setUnAssignedFlag(true);
-          
-          var selectId = document.getElementById("assignedProjectAP");
   
-          var newAllProj = [];
-          var newAssignProj = [];
-          for(var i=0;i<selectId.options.length;i++){
-              if(selectId.options[i].selected ===  true){
-                  newAllProj.push(JSON.parse(selectId.options[i].value));
-              }
-              else{
-                  newAssignProj.push(JSON.parse(selectId.options[i].value));
-              }
-          }
-          newAllProj = assignProj.allProjectAP.concat(newAllProj);
-          setAssignProj({allProjectAP:newAllProj,assignedProjectAP:newAssignProj});
-          selectId.selectedIndex = "-1";
-      };
-
-    const moveItemsRightgo = (from,to) =>{
-      setUnAssignedFlag(false);
-  
-          var selectId = document.getElementById("allProjectAP");
-          var newAllProj = [];
-          var newAssignProj = [];
-          for(var i=0;i<selectId.options.length;i++){
-              if(selectId.options[i].selected ===  true){
-                  newAssignProj.push(JSON.parse(selectId.options[i].value));
-              }
-              else{
-                  newAllProj.push(JSON.parse(selectId.options[i].value));
-              }
-          }
-          newAssignProj = assignProj.assignedProjectAP.concat(newAssignProj);
-          setAssignProj({allProjectAP:newAllProj,assignedProjectAP:newAssignProj});
-          selectId.selectedIndex = "-1";
-    };
-  
-    // const moveItemsLeftall =  ()=> {
-    //   setUnAssignedFlag(true);
-    //       for(var i=0; i<assignProj.assignedProjectAP.length; i++){
-    //           assignProj.allProjectAP.push(assignProj.assignedProjectAP[i]);
-    //       }
-    //       assignProj.assignedProjectAP=[];
-    //       setAssignProj(assignProj);
-    //       setStateChange(!statechange);
-    // };
-  
-    // const moveItemsRightall =() =>{
-  
-    //       setUnAssignedFlag(false);
-    //       for(var i=0; i<assignProj.allProjectAP.length; i++){
-    //           assignProj.assignedProjectAP.push(assignProj.allProjectAP[i]);
-    //       }
-    //       assignProj.allProjectAP=[];
-    //       setAssignProj(assignProj);
-    //       setStateChange(!statechange);
-    //   };
 
 
     useEffect(()=>{
@@ -361,7 +465,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             </div>
             <div>
             
-            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10"}} label="add project"  onClick={() => onClick('displayBasic')} />
+            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10", FontSize:"10px",marginLeft:"300px",marginTop:"10px"}} label="Add and Manage Project"  onClick={() => onClick('displayBasic')} />
             
             </div>
             <div>
@@ -370,11 +474,17 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
        
             <div className='button-design'>
-            <button className="reset-action__exit" style={{lineBreak:'50px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"50px",margin: "3px", }} onClick={(e) => { }}>Manage</button>
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { }}>Execute</button>
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { }}>Design</button>
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"1000px" ,margin: "3px"}} onClick={(e) => {
+                   window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+                   window.location.href = "/Execute";
+             }}>Execute</button>
+            
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"500px" ,margin: "3px"}} onClick={(e) => { 
+                window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+                window.location.href = "/mindmap";
+                }}>Design</button>
             </div>
        
             </div> 
@@ -385,36 +495,38 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 
     <Dialog header='Create Project'visible={displayBasic} style={{ width: '40vw' }}  onHide={() => onHide('displayBasic')}>
         <div>
-            <div className='dialog_textfield'>
-                <TextField 
+            <div className='dialog_dropDown'>
+                {/* {
+                    isCreate == true ? <TextField /> : <NormalDropDown /> 
+                } */}
+                <NormalDropDown
                     label=" Project Name"
+                    options={getProjectList}
+                    
+                        
                     placeholder="enter the project name"
                     standard
                     width="300px"
                     //   fontSize='40px'
                     //   marginLeft="200px"
                 />
+                
+                <Button  style={{ background: "transparent", color: "green", border: "none", padding:"0,0,0,10", FontSize:"-10px",marginRight:"300px",marginTop:"5px"}} label="create Project"  onClick={() => onClick('displayBasic')} />
+                
+                {/* <p onClick = {() => setisCreate(!isCreate)}>{
+                    isCreate == true ? 'Select Project' : '+ Create New'                     
+                }</p> */}
+
             </div>
             <div className='dialog_dropDown'>  
+                {/* {
+                    isCreate == false ? <TextField /> : <NormalDropDown /> 
+                } */}
                 <NormalDropDown  
                     label="App type"
-                    options={[
-                    {
-                        
-                        key: 'web',
-                        text: 'Web'
-                    },
-                    {
-                        key: 'Desktop',
-                        text: 'Desktop'
-                    },
-                    {
+                    options={getplugins_list}
+                    // disabled={true}
                     
-                    key: 'Mobile App',
-                    text: 'Mobile App'
-                    }
-                
-                    ]}
                     label1="Apptype"
                     options1={[selectedProject && allProjects[selectedProject] ?
                             {
@@ -425,6 +537,8 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                     ]}
                     placeholder="Select an apptype"
                     width="300px"
+                    top="200px"
+               
                     // disabled={!selectedProject}
                     // required
                     onChange={(e, item) => {
@@ -458,7 +572,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     </Dialog>
       
     </div>
-                {userRole !== "Test Manager" && 
+                {/* {userRole !== "Test Manager" && 
                     <div className="task-overflow" id="plugin__taskScroll">
                         <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                             <div data-test="task-content" className="task-content" id="plugin_page__list">
@@ -467,7 +581,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                         </ScrollBar>
                     
                     </div>
-                }
+                } */}
         </>
     );
 }
