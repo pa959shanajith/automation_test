@@ -1,6 +1,6 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
-import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, getProjectTypeMM} from '../api';
-import {ModalContainer, Messages as MSG,setMsg, VARIANT} from '../../global'
+import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap} from '../api';
+import {ModalContainer, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
@@ -8,18 +8,14 @@ import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
 
-
-
-
-
 const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport}) => {
     const [projList,setProjList] = useState({})
     const [error,setError] = useState('')
     const [submit,setSubmit] = useState(false)
     const [disableSubmit,setDisableSubmit] = useState(false)
     const [mindmapData,setMindmapData] = useState([])
-    const [duplicateModuleList,setDuplicateModuleList] = useState([])
-    
+    const [duplicateModuleList,setDuplicateModuleList] = useState([]);
+    const [duplicateFlag,setDuplicateFlag] = useState(false);
     
     useEffect(()=>{
         (async()=>{
@@ -34,13 +30,27 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
     },[]) 
     if(!Object.keys(projList).length >0) return null
     return(
+    <>
         <ModalContainer 
         modalClass = "modal-mmd"
         title='Import Modules'
         close={()=>setImportPop(false)}
-        footer={<Footer error={error} disableSubmit={disableSubmit} duplicateModuleList={duplicateModuleList} setSubmit={setSubmit}/>}
+        footer={<Footer error={error} disableSubmit={disableSubmit} duplicateModuleList={duplicateModuleList} setDuplicateFlag={setDuplicateFlag} setSubmit={setSubmit}/>}
         content={<Container submit={submit} setMindmapData={setMindmapData} setDuplicateModuleList={setDuplicateModuleList}mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}/>} 
       />
+      {duplicateFlag && 
+        <ModalContainer
+        modalClass='modal-md'
+        title={"Duplicate Modules Names"}
+        content={<ScrollBar thumbColor="#321e4f">
+                  <div style={{maxHeight:440, display:"flex", flexDirection:"column"}}>
+                    {Array.from(duplicateModuleList).map((module_name,idx)=> {return <li key={idx+module_name}>{module_name}</li>})} 
+                  </div>
+                </ScrollBar>}
+        close={()=>{setDuplicateFlag(false)}}
+        />
+        }
+    </>
     )
 }
 
@@ -324,23 +334,14 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     )
 }
 // Footer for sheet choose popup
-const Footer = ({error,setSubmit,disableSubmit,duplicateModuleList}) =>{
-    const [duplicateFlag,setDuplicateFlag] = useState(false);
+const Footer = ({error,setSubmit,disableSubmit,duplicateModuleList,setDuplicateFlag}) =>{
     return(
       <Fragment>
             <div className='mnode__buttons'>
                 <label className='err-message'>{error}
-                {error && duplicateModuleList?.size>0 && error.indexOf("duplicate")>-1 && <><br/><Link className="tcView" to="#" onClick={()=>setDuplicateFlag(true)}>View Duplicate Modules</Link></>
-                }</label>                
+                {error && duplicateModuleList?.size>0 && error.indexOf("duplicate")>-1 && <><br/><Link className="tcView" to="#" onClick={()=>setDuplicateFlag(true)}>View Duplicate Modules</Link></>}</label>                
                 <button disabled={disableSubmit} onClick={()=>setSubmit(true)}>Import</button>                
             </div>
-           {duplicateFlag &&  <ModalContainer
-                modalClass='modal-md'
-                title={"Duplicate Modules Names"}
-                content={Array.from(duplicateModuleList).join("\n")}
-                close={()=>setDuplicateFlag(false)}
-            />
-           }
       </Fragment>
     )
 }

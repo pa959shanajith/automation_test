@@ -1,4 +1,4 @@
-import React, { useState, useRef, Fragment } from 'react';
+import React, { useState, useRef, Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {getModules,getScreens} from '../api';
 import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit} from '../api';
@@ -34,6 +34,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
     const [modlist,setModList] = useState(moduleList)
     const [exportBox,setExportBox] = useState(false);
+    const [allModSelected, setAllModSelected] = useState(false);
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
         dispatch({type:actionTypes.SELECT_PROJECT,payload:proj})
@@ -127,6 +128,14 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         paste({...copyNodes})
     }
     var projectList = Object.entries(prjList)
+    useEffect(()=>{
+      if(selectedModulelist.length===moduleList.length && selectedModulelist.length>0){
+        setAllModSelected(true);
+      }
+      else{
+        setAllModSelected(false);
+      }
+    },[selectedModulelist])
     return(
         <Fragment>
             {exportBox?<ModalContainer
@@ -144,6 +153,15 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 <i className={"fa fa-crop fa-lg"+(selectBox?' active-map':'')} title="add a rectangle" onClick={clickSelectBox}></i>
                 <i className="fa fa-files-o fa-lg" title="copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
+                <input style={{marginLeft:"11%"}} name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
+                  if (!allModSelected) {
+                    dispatch({ type: actionTypes.SELECT_MODULELIST, payload: moduleList.map((modd) => modd._id) })
+                  } else {
+                    dispatch({ type: actionTypes.SELECT_MODULELIST, payload: [] })
+                  }
+                  setAllModSelected(!allModSelected)
+                }} ></input>
+                <label style={{margin:0, marginLeft:5}} for="selectall">Select All Modules</label>
             </span>
             <span data-test="searchBox" className='toolbar__header-searchbox'>
                 <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>

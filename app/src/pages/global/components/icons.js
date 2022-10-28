@@ -72,9 +72,19 @@ import { ReactComponent as BarChart } from '@avo/designcomponents/lib/assets/ico
 import { ReactComponent as PieChart } from '@avo/designcomponents/lib/assets/icons/pie-chart.svg';
 import { ReactComponent as DonutChart } from '@avo/designcomponents/lib/assets/icons/donut-chart.svg';
 import { ReactComponent as Input } from '@avo/designcomponents/lib/assets/icons/input.svg';
+import { ReactComponent as ChromeIcon } from "../../../assets/imgs/chrome_logo_new.svg";
+import { ReactComponent as EdgeIcon } from "../../../assets/imgs/edge_logo_new.svg";
+import { ReactComponent as WebIcon } from "../../../assets/imgs/web-icon.svg"
+import { ReactComponent as PinIcon } from "../../../assets/imgs/pin-icon.svg"
+import { ReactComponent as DeleteIcon } from "../../../assets/imgs/delete-icon.svg"
 
 registerIcons({
   icons: {
+    'pin-icon':<PinIcon/>,
+    'delete-icon':<DeleteIcon/>,
+    'web-icon':<WebIcon/>,
+    'chrome-icon':<ChromeIcon/>,
+    'edge-icon':<EdgeIcon/>,
     search: <Search />,
     bar: <BarChart />,
     pie: <PieChart />,
