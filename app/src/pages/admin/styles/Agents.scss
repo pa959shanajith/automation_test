@@ -9,7 +9,7 @@
 }
 .api-ut__btnGroup {
     width: 100%;
-    margin-bottom: 1%;
+    margin-bottom: 1.5%;
 
     &>button{
         position: relative;
@@ -259,7 +259,7 @@
     border: 2px solid #633693;
     border-radius: 0.625rem;
     width: 50%;
-    height: 60vh;
+    height: 50vh;
     &_filter {
         margin-bottom: 3%;
         display: flex;
@@ -273,7 +273,7 @@
 .devOps_pool_list {
     width: 45%;
     & > div {
-        margin: 5.4% 0;
+        margin: 4.4% 0;
         display: flex;
         align-items: center;
     }
@@ -353,13 +353,13 @@
     border-radius: 50%;
 }
 .select_project_img {
-    width: 80%;
+    width: 50%;
 }
 .react-checkbox-tree label {
     display: flex;
 }
 .no_config_img{
-    height: 78vh;
+    height: 28rem;
     display: flex;
     justify-content: flex-end;
     margin-right: 11%;

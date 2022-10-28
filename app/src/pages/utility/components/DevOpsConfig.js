@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown } from '../../global';
 import { fetchProjects, fetchAvoAgentAndAvoGridList, storeConfigureKey } from '../api';
 import { useSelector } from 'react-redux';
-import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
+import { SearchDropdown, TextField, Toggle, MultiSelectDropdown, SearchBox } from '@avo/designcomponents';
 
 
 // import classes from "../styles/DevOps.scss";
@@ -58,6 +58,7 @@ const DevOpsConfig = props => {
         ...props.currentIntegration,
         dataParameters: dataParametersCollection
     });
+
     const [icepoollist, setIcepoollist] = useState([
         { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
     ]);
@@ -128,11 +129,11 @@ const DevOpsConfig = props => {
                 console.error(reportResponse.error);
                 setMsg(MSG.REPORT.ERR_FETCH_PROJECT);
             }
+            
             else {
                 const [projList, newDict] = prepareOptionLists(reportResponse);
                 let newSelectValues = [...integrationConfig.selectValues];
                 newSelectValues[0].list = projList;
-
                 if(props.currentIntegration.name !== '') {
                     const projSetDetails = props.currentIntegration.executionRequest.batchInfo[0];
                     // proj
@@ -162,6 +163,7 @@ const DevOpsConfig = props => {
             props.setLoading(false);
         })()
     }, []);
+    
     useEffect(()=> {
         let isUpdated = false;
         Object.keys(integrationConfig).some(element => {
@@ -384,13 +386,13 @@ const DevOpsConfig = props => {
         :null}
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-                { props.currentIntegration.name === '' ? 'Create New' : 'Update'} Configuration
+                { props.currentIntegration.name === '' ? '' : 'Update'} Configuration set up
             </span>
         </div>
         <div className="api-ut__btnGroup">
-            <button data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
-            <button data-test="submit-button-test" onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : 'Back'}</button>
-            <div className="devOps_config_name">
+            <button style={{width: '15rem'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save configuration' : 'Update'}</button>
+            <button data-test="submit-button-test" style={{width: '6rem'}} onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
+            <div className="devOps_config_name" style={{marginRight:'34rem'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Configuration Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
@@ -400,10 +402,14 @@ const DevOpsConfig = props => {
                 </span>
             </div>
         </div>
-        <div>
-        {
+        <div style={{display:'flex', marginBottom: '2rem' }}>
+        <input type='radio' value='e2eExecution' style={{width:'2rem', height: '2rem'}} onClick={selectedExecutionType}/>&nbsp;&nbsp;e2eExecution&nbsp;&nbsp;
+        <input type='radio' value='batchModules ' style={{width:'2rem', height: '2rem'}} onSelect={selectedExecutionType}/>&nbsp;&nbsp;batchModules&nbsp;&nbsp;
+        <input type='radio' value='normalExecution' style={{width:'2rem', height: '2rem'}} onSelect={selectedExecutionType}/>&nbsp;&nbsp;normalExecution
+        {/* {
             integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />
-        }
+            
+        } */}
         </div>
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
@@ -411,7 +417,7 @@ const DevOpsConfig = props => {
                     <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} />
                 </div>
                 <div className="devOps_pool_list">
-                    <div style={{ marginTop: '0' }}>
+                    <div style={{ marginTop: '-22px' }}>
                         <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Agent / Avo Grid : </label>
                         <SearchDropdown
                             calloutMaxHeight="30vh"
@@ -457,7 +463,7 @@ const DevOpsConfig = props => {
                             <label>Synchronous </label>
                         </div>
                     </div>
-                    <div>
+                     <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Execution Mode : </label>
                         <div className="devOps_dropdown_label_sync">
                             <label>Non-Headless </label>
@@ -465,10 +471,14 @@ const DevOpsConfig = props => {
                             <label>Headless </label>
                         </div>
                     </div>
-                    <div className='devOps_seperation'>
-                    </div>
                     <div>
-                        <span className="devOps_dropdown_label devOps_dropdown_label_url">DevOps Integration API url : </span>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Accesibility Standard : </label>
+                        <SearchBox/>
+                    </div>
+                    {/* <div className='devOps_seperation'>
+                    </div> */}
+                    {/* <div>
+                        <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%'}}>DevOps Integration API url : </span>
                         <span className="devOps_dropdown_label_input"><input type="text" value={props.url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
                             <label>
                                 <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return apiKeyCopyToolTip }, 0]} />
@@ -477,8 +487,8 @@ const DevOpsConfig = props => {
                                 </div>
                             </label>
                         </span>
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                         <span className="devOps_dropdown_label devOps_dropdown_label_key">Configuration Key : </span>
                         <span className="devOps_dropdown_label_input"><input type="text" value={integrationConfig.key} id='devops-key' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='Configuration Key' />
                             <label>
@@ -488,7 +498,7 @@ const DevOpsConfig = props => {
                                 </div>
                             </label>
                         </span>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         }

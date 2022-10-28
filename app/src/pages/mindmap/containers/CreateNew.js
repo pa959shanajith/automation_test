@@ -14,7 +14,6 @@ import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
 
 
-
 /*Component CreateNew
   use: renders create New Mindmap page
 */
@@ -110,7 +109,7 @@ const CreateNew = ({importRedirect}) => {
                 
             </div>:null
         }
-        {/* <Sidebar/> */}
+        
         
         <ReferenceBar taskInfo={info} taskTop={true} collapsible={true} collapse={true}>
             <div className="ic_box" title="SwitchLayout" >

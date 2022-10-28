@@ -14,25 +14,25 @@
     margin-bottom: 15px;
     max-width: 80%;
 }
-#bluecolor{
-    color: blue;
-}
-a:hover{
-    text-decoration: none;
-}
-#bluecolor:hover{
-    list-style: none;
-    text-decoration:none ;
-   cursor: not-allowed;
-}
-#graycolor{
-    color:gray
-}
-#graycolor:hover{
-    list-style: none;
-    text-decoration:none ;
-   cursor: not-allowed;
-}
+// #bluecolor{
+//     color: blue;
+// }
+// a:hover{
+//     text-decoration: none;
+// }
+// #bluecolor:hover{
+//     list-style: none;
+//     text-decoration:none ;
+//    cursor: not-allowed;
+// }
+// #graycolor{
+//     color:gray
+// }
+// #graycolor:hover{
+//     list-style: none;
+//     text-decoration:none ;
+//    cursor: not-allowed;
+// }
 .ss__task_name{
     cursor: pointer;
     background-color: $primaryColorDarkest;
@@ -46,17 +46,10 @@ a:hover{
     border-radius: 5px;
     margin: 18px 15px 19px 24px;
 }
-
-
-
-.breadcrumb-item {
-    + .breadcrumb-item::before {
-      content: ">>" !important;
-      align-self: baseline;
-      color: #7d8daa;
-    }
-  }
-
-   
-
-
+// .breadcrumb-item {
+//     + .breadcrumb-item::before {
+//       content: ">>" !important;
+//       align-self: baseline;
+//       color: #7d8daa;
+//     }
+//   }
