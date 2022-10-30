@@ -1,4 +1,4 @@
-import React, { useState, Fragment} from 'react';
+import React, { useState, Fragment, useEffect} from 'react';
 import { useSelector, useDispatch} from 'react-redux';
 import {getModules}  from '../api'
 import {ScrollBar,ModalContainer,Messages as MSG, setMsg} from '../../global';
@@ -100,6 +100,11 @@ const ModuleListDrop = (props) =>{
         setLoading(false)
         setMsg(error)
     }
+
+    useEffect(()=>{
+      return ()=>{dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})}
+    },[])
+
     return(
         <Fragment>
             {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
@@ -127,7 +132,7 @@ const ModuleListDrop = (props) =>{
             }
             <div data-test="dropDown" className={'toolbar__module-footer'+ (moddrop?' z-up':'')} onClick={()=>{
                 if(!moddrop){
-                    dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})
+                    // dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})
                 }
                 setModdrop(!moddrop)}}>
                 <div><i className={(!moddrop)?"fa fa-caret-down":"fa fa-caret-up"} title="Drop down button"></i></div>
