@@ -539,7 +539,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                         <div className="OSselectionText">Please select Operating System for downloading Avo Assure Client</div>
                         <div className="choiceGroup">
                             {Object.keys(config).map((osPathname)=>{
-                                if (osPathname.includes("Windows")){
+                                if (osPathname.includes("Windows") || osPathname.includes("Linux")){
                                     return <></>;
                                 }
                                 let versionName = osPathname.split("_")[1]
