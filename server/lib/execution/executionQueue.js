@@ -589,6 +589,11 @@ module.exports.Execution_Queue = class Execution_Queue {
             'query': 'fetchExecutionData'
         }
         const executionData = await utils.fetchData(inputs, "devops/configurekey", fnName);
+
+        //Checking for "executiontype" in the request
+        if("executiontype" in req.body) {
+            executionData.executionData.executiontype == req.body.executiontype;
+        }
         const newExecutionListId = uuidV4()
         executionData['executionData']['executionListId'] = newExecutionListId;
         const gettingTestSuiteIds = await suitFunctions.ExecuteTestSuite_ICE({
