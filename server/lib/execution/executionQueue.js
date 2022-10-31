@@ -851,7 +851,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
 
         if(!checkInCache && 'reportData' in resultData && 'overallstatus' in resultData.reportData) {
-            console.log('yayyy');
             resultData.reportData.overallstatus.overallstatus = 'Terminated';
         }
         return await this.executionInvoker.setExecStatus(dataFromIce);
