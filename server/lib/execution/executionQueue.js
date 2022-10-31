@@ -786,7 +786,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     static setExecStatus = async (req, res) => {
 
         let dataFromIce = req.body,checkInCache = false;
-        let resultData = dataFromIce.exce_data;
+        let resultData = 'exce_data' in dataFromIce ? dataFromIce.exce_data : dataFromIce;
         let keyQueue = this.key_list[resultData.configkey];
         if (dataFromIce.status == 'finished')
         {
