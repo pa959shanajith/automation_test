@@ -589,6 +589,11 @@ module.exports.Execution_Queue = class Execution_Queue {
             'query': 'fetchExecutionData'
         }
         const executionData = await utils.fetchData(inputs, "devops/configurekey", fnName);
+
+        //Checking for "executiontype" in the request
+        if("executiontype" in req.body) {
+            executionData.executionData.executiontype == req.body.executiontype;
+        }
         const newExecutionListId = uuidV4()
         executionData['executionData']['executionListId'] = newExecutionListId;
         const gettingTestSuiteIds = await suitFunctions.ExecuteTestSuite_ICE({
@@ -781,7 +786,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     static setExecStatus = async (req, res) => {
 
         let dataFromIce = req.body,checkInCache = false;
-        let resultData = dataFromIce.exce_data;
+        let resultData = 'exce_data' in dataFromIce ? dataFromIce.exce_data : dataFromIce;
         let keyQueue = this.key_list[resultData.configkey];
         if (dataFromIce.status == 'finished')
         {
