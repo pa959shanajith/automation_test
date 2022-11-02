@@ -403,6 +403,8 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                         }
                     </tbody>
                 </table>
+
+                {/* Dialog for Execute Now */}
                 <Dialog header="Execute Now" visible={displayBasic2} style={{ width: '50vw' }}  footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
                 <input type="radio" />&nbsp;&nbsp;
                 <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Agent / Avo Grid</label>
@@ -410,9 +412,11 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 <input type="radio" onSelect={()=>{}} />&nbsp;&nbsp;
                 <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Assure Client</label>
                 </Dialog>
+                {/* Dialog for Execute Now */}
 
                 {/* Dialog for Schedule */}
-                <Dialog header="Schedule" visible={displayBasic1}   onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
+                <Dialog header="Schedule" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
+                {/* Dialog for Schedule */} 
 
                 {/* Dialog for CI /CD  */}
 
@@ -454,6 +458,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                         </label>
                 </div>
                 </Dialog>
+                {/* Dialog for CI /CD  */}
                 </ScrollBar>
                 
             </div>

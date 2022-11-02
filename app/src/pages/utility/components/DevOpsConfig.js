@@ -403,9 +403,9 @@ const DevOpsConfig = props => {
             </div>
         </div>
         <div style={{display:'flex', marginBottom: '2rem' }}>
-        <input type='radio' value='e2eExecution' style={{width:'2rem', height: '2rem'}} onClick={selectedExecutionType}/>&nbsp;&nbsp;e2eExecution&nbsp;&nbsp;
-        <input type='radio' value='batchModules ' style={{width:'2rem', height: '2rem'}} onSelect={selectedExecutionType}/>&nbsp;&nbsp;batchModules&nbsp;&nbsp;
-        <input type='radio' value='normalExecution' style={{width:'2rem', height: '2rem'}} onSelect={selectedExecutionType}/>&nbsp;&nbsp;normalExecution
+        <input type='radio' value='e2eExecution' style={{width:'2rem', height: '2rem'}} onClick={selectedExecutionType}/>&nbsp;&nbsp;E2EExecution&nbsp;&nbsp;
+        <input type='radio' value='batchModules ' style={{width:'2rem', height: '2rem'}} onSelect={selectedExecutionType}/>&nbsp;&nbsp;BatchModules&nbsp;&nbsp;
+        <input type='radio' value='normalExecution' style={{width:'2rem', height: '2rem'}} onSelect={selectedExecutionType}/>&nbsp;&nbsp;NormalExecution
         {/* {
             integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />
             
