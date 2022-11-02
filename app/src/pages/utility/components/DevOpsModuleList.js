@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../../global';
-import { CheckBox, SearchDropdown, Tab, NormalDropDown, Dialog, TextField } from '@avo/designcomponents';
+import { CheckBox, SearchDropdown, Tab, NormalDropDown, Dialog, TextField, SearchBox } from '@avo/designcomponents';
 import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
 
@@ -8,6 +8,13 @@ import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading }) => {
     const [moduleList, setModuleList] = useState([]);
+    const [searchText, setSearchText] = useState("");
+    const [filteredList, setFilteredList] = useState(moduleScenarioList);
+    const handleSearchChange = (value) => {
+        let filteredItems = moduleScenarioList.filter(item => (item.configurename.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.project.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.release.toLowerCase().indexOf(value.toLowerCase()) > -1));
+        setFilteredList(filteredItems);
+        setSearchText(value);
+    }
     const [filteredModuleList, setFilteredModuleList] = useState([]);
     const indeterminateStyle = {
         root: {
@@ -428,8 +435,10 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
             {
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
                     <div className='devOps_module_list_filter'>
-                        <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
-                        <SearchDropdown
+                        <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                        {/* <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} /> */}
+                        
+                        {/* <SearchDropdown
                             calloutMaxHeight="30vh"
                             noItemsText={'Loading...'}
                             onChange={handleExecutionTypeChange}
@@ -437,7 +446,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                             placeholder="Select Avo Agent or Avo Grid"
                             selectedKey={selectedExecutionType}
                             width='35%'
-                        />
+                        /> */}
                     </div>
                     <div id="moduleScenarioList" className="devOps_module_list_container">
                         <ScrollBar scrollId='moduleScenarioList' thumbColor="#929397" >

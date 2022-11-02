@@ -21,6 +21,7 @@ const DevOpsConfig = props => {
     const [configName, setConfigName] = useState("");
     const [dataDict, setDict] = useState({});
     const dataParametersCollection = [];
+    const [module, setModule] = useState("noemalExecution");
     const [error, setError] = useState({});
     if(props.currentIntegration && props.currentIntegration.executionRequest && props.currentIntegration.executionRequest.batchInfo){
         if(props.currentIntegration.selectedModuleType === 'normalExecution')
@@ -58,7 +59,7 @@ const DevOpsConfig = props => {
         ...props.currentIntegration,
         dataParameters: dataParametersCollection
     });
-
+    
     const [icepoollist, setIcepoollist] = useState([
         { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
     ]);
@@ -402,15 +403,13 @@ const DevOpsConfig = props => {
                 </span>
             </div>
         </div>
-        <div style={{display:'flex', marginBottom: '2rem' }}>
-        <input type='radio' value='e2eExecution' style={{width:'2rem', height: '2rem'}} onClick={selectedExecutionType}/>&nbsp;&nbsp;E2EExecution&nbsp;&nbsp;
-        <input type='radio' value='batchModules ' style={{width:'2rem', height: '2rem'}} onSelect={selectedExecutionType}/>&nbsp;&nbsp;BatchModules&nbsp;&nbsp;
-        <input type='radio' value='normalExecution' style={{width:'2rem', height: '2rem'}} onSelect={selectedExecutionType}/>&nbsp;&nbsp;NormalExecution
-        {/* {
-            integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />
-            
-        } */}
-        </div>
+            <div style={{display:'flex', marginBottom: '1rem' }} onSelect={() => props.currentIntegration.selectedModuleType}>
+                <input type='radio' id="E2E" value='e2eExecution' style={{width:'2rem', height: '2rem'}} selectedKey='e2eExecution'  checked={selectedExecutionType === 'e2eExecution'}/>&nbsp;<label for='E2E'>E2EExecution&nbsp;</label>
+                <input type='radio' id='Batch' value='batchExecution' style={{width:'2rem', height: '2rem'}} selectedKey='batchExecution' checked={selectedExecutionType === 'batchExecution'}/><label for='Batch'>&nbsp;BatchExecution&nbsp;</label>
+                <input type='radio' id='Normal' value='normalExecution' style={{width:'2rem', height: '2rem'}} selectedKey='normalExecution' checked={selectedExecutionType === 'normalExecution'}/><label for='Normal'>&nbsp;NormalExecution</label>
+            </div>
+        
+
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
                 <div className="devOps_module_list">
@@ -471,10 +470,10 @@ const DevOpsConfig = props => {
                             <label>Headless </label>
                         </div>
                     </div>
-                    <div>
-                        <label className="devOps_dropdown_label devOps_dropdown_label_browser">Accesibility Standard : </label>
-                        <SearchBox/>
-                    </div>
+                    {/* <div>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_sync">Accesibility Standard : </label>
+                        <SearchBox width='20rem'/>
+                    </div> */}
                     {/* <div className='devOps_seperation'>
                     </div> */}
                     {/* <div>
