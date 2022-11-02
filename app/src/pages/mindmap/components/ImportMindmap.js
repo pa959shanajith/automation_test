@@ -88,10 +88,17 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
         resetImportModule();
         setImportType(e.target.value)
     }
-    const resetImportModule = () => {
+    const resetImportModule = async() => {
+        var moduledata = await getModules({"tab":"tabCreate","projectid":projRef.current.value,"moduleid":null,"query":"modLength"})
+        if (moduledata.length>0){
+            setError('Please select a Project which has no Modules.')
+            setDisableSubmit(true);return
+
+        }
         setSheetList([])
         setFiledUpload(undefined)
         setError('')
+        setDisableSubmit(false)
         if(uploadFileRef.current)uploadFileRef.current.value = ''
     }
     const acceptType = {
