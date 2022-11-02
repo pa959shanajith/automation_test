@@ -155,7 +155,9 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading }) => {
         // document.body.appendChild(link);
         // link.click();
         // document.body.removeChild(link);
-        window.location.href = window.location.origin+"/downloadAgent";
+        // window.location.href = window.location.origin+"/downloadAgent";
+        window.location.href = "https://driver.avoautomation.com/driver/avoagent.exe";
+
 
         // const link = document.createElement('a');
         // const file = new Blob([window.location.origin.split("//")[1]], {type: 'text/plain'});
