@@ -168,7 +168,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const ScheduleTestSuite = async (schedulePoolDetails) => {
         setAllocateICE(false);
         setClearScheduleData(false);
-        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, current_task, appType, filter_data);
+        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, item.executionRequest.batchInfo[0].currentTask, appType, filter_data);
         if(!modul_Info){
             return
         }
@@ -324,6 +324,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     exeTypeLabel={"Select Schedule type"}
                     exeIceLabel={"Allocate ICE"}
                     scheSmartMode={smartMode}
+                    currentTask={item.executionRequest.batchInfo[0].currentTask}
                 />
             :null}
             { showIntegrationModal ? 
@@ -353,7 +354,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         <div id="s__btns">
                             <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}}  title="Add">Schedule</button>
                         </div>
-                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
+                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={item.executionRequest.batchInfo[0].currentTask} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
                     </div>
 
                 {/* //lower scheduled table Section */}
