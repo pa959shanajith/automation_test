@@ -132,7 +132,7 @@ const ModuleListDrop = (props) =>{
             displayError(MSG.MINDMAP.WARN_SELECT_COMPLETE_FLOW)
             return;
         }   */    
-            dispatch({type:actionTypes.SELECT_MODULELIST,payload:[...selectedModList]})
+            dispatch({type:actionTypes.SELECT_MODULELIST,payload:selectedModList})
             // d3.select('#pasteImg').classed('active-map',false)
             // d3.select('#copyImg').classed('active-map',false)
             // d3.selectAll('.ct-node').classed('node-selected',false)
@@ -215,11 +215,6 @@ const ModuleListDrop = (props) =>{
       const createType = {
         'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))}
       
-
-    useEffect(()=>{
-      return ()=>{dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})}
-    },[])
-
     return(
         <Fragment>
              {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
@@ -318,7 +313,7 @@ const ModuleListDrop = (props) =>{
                 </div>
             </div>
             <div data-test="dropDown" onClick={()=>{
-                    // dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})
+                    dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})
                 }}>
                 
             </div>

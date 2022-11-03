@@ -385,11 +385,6 @@ const LoginFields = (props) => {
 
     useEffect(()=>{
         setInitialFormPos(-20);
-        (async()=>{
-          const response = await fetch("/getLicenseInfo")
-          let { isTrialUser } = await response.json();
-          setIsTrialInstance(isTrialUser)
-        })();
         if(props.verifyPage){
             setOverlayText("Loading...");
             (async()=>{

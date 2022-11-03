@@ -346,29 +346,6 @@ export const importMindmap = async(data) => {
         return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }
 }
-export const getProjectTypeMM = async(data) => {
-    try{
-        const res = await axios(url+'/getProjectTypeMM', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: data,
-            credentials: 'include'
-        });
-        if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
-            return {error:MSG.GENERIC.INVALID_SESSION};
-        }
-        if(res.status===200 && res.data !== "fail"){            
-            return res.data;
-        }
-        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
-    }catch(err){
-        console.error(err)
-        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
-    }
-}
 /*Component gitToMindmap
   api return {"_id":"5f6d956afc748e91d0f8b74e"} on success
 */
@@ -650,31 +627,6 @@ export const getNotificationRules = async(data) => {
 export const deleteScenario = async(data) => {
     try{
         const res = await axios(url+'/deleteScenario', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: data,
-            credentials: 'include'
-        });
-        if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(history)
-            return {error:MSG.GENERIC.INVALID_SESSION};
-        }
-        
-        if(res.status===200 && res.data !== "fail"){            
-            return res.data;
-        }
-        console.error(res.data)
-        return {error:MSG.MINDMAP.ERR_DELETE_SCENARIO}
-    }catch(err){
-        console.error(err)
-        return {error:MSG.MINDMAP.ERR_DELETE_SCENARIO}
-    }
-}
-export const deleteScenarioETE = async(data) => {
-    try{
-        const res = await axios(url+'/deleteScenarioETE', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

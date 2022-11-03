@@ -3,15 +3,15 @@ import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../.
 import { CheckBox, SearchDropdown, Tab, NormalDropDown, Dialog, TextField, SearchBox } from '@avo/designcomponents';
 import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
-import 'react-checkbox-tree/lib/react-checkbox-tree.css';
-import CheckboxTree from 'react-checkbox-tree';
 
+import CheckboxTree from 'react-checkbox-tree';
+import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading }) => {
     const [moduleList, setModuleList] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [filteredList, setFilteredList] = useState(moduleScenarioList);
     const handleSearchChange = (value) => {
-        let filteredItems = moduleScenarioList.filter(item => (item.configurename.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.project.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.release.toLowerCase().indexOf(value.toLowerCase()) > -1));
+        let filteredItems = filteredModuleList.filter(item => (item.moduleState.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.filteredItems.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.release.toLowerCase().indexOf(value.toLowerCase()) > -1));
         setFilteredList(filteredItems);
         setSearchText(value);
     }
@@ -202,6 +202,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                 if(fetchedModuleList.error) {
                     setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
                 }else {
+                    // <Icon iconName='input' />
                     let filteredNodes = [];
                     if(selectedExecutionType === 'normalExecution') {
                         filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
@@ -233,7 +234,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                                 label: batch,
                             };
                             if(batchData[batch].length > 0) {
-                                filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+                                filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                                     let filterModule = {
                                         value: module.moduleid,
                                         label: module.name,
@@ -270,7 +271,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                             setIntegrationConfig({...integrationConfig, scenarioList: newScenarioList, dataParameters: newDataParams});
                         }
                     } else if(selectedExecutionType === 'e2eExecution') {
-                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
                                 label: module.name,
@@ -391,6 +392,11 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
     }
     return (
         <>
+         <div style={{display:'flex', position:'absolute',top:'31vh'}} > 
+                <input type='radio' id="E2E" value='e2eExecution'  onChange={() => handleExecutionTypeChange('e2eExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/>&nbsp;<label >E2E Execution&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type='radio' id='Batch' value='batchExecution' onChange={()=>handleExecutionTypeChange('batchExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><label >&nbsp;Batch Execution&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type='radio' id='Normal' value='normalExecution'  onChange={()=>handleExecutionTypeChange('normalExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><label >&nbsp;Normal Execution</label>
+            </div> 
             <Dialog
                 hidden = {modalContent === false}
                 onDismiss = {() => setModalContent(false)}
@@ -433,9 +439,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
             {
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
                     <div className='devOps_module_list_filter'>
+                        <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
                         <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
-                        {/* <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} /> */}
-                        
                         {/* <SearchDropdown
                             calloutMaxHeight="30vh"
                             noItemsText={'Loading...'}

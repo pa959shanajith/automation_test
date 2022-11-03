@@ -254,7 +254,8 @@
     border: 2px solid #633693;
     border-radius: 0.625rem;
     width: 50%;
-    height: 56vh;
+    height: 58vh;
+    margin-top: 6vh;
     &_filter {
         margin-bottom: 2%;
         display: flex;
@@ -263,12 +264,13 @@
     &_container {
         height: 47vh;
         max-height: 100%;
-        overflow-x: auto;
     }
 }
 .devOps_pool_list {
     width: 45%;
-    margin-top: 3rem;
+    margin-top: 19vh;
+    position: absolute;
+    left: 116vh;
     & > div {
         margin: 4.4% 0;
         display: flex;
@@ -350,42 +352,22 @@
 .select_project_img {
     width: 50%;
 }
-.react-checkbox-tree{
-    overflow-x: auto;
-    label {
-        display: flex;
-    }
+.react-checkbox-tree label {
+    display: flex;
 }
 .no_config_img{
-    height: 60vh;
+    height: 70vh;
     display: flex;
     justify-content: flex-end;
     margin-right: 11%;
     margin-top: -3%;
 }
-.devOps {
-    &_input_icon {
-        display: flex;
-        align-items: center;
-        &>img {
-            width: 1.2rem;
-            margin-left: 1rem;
-        }
-    }
-    &_terminate{
-        &_icon {
-            display: flex;
-            align-items: center;
-            &>img {
-                width: 1.2rem;
-                margin-left: 1rem;
-                cursor: pointer;
-            }
-        }
-        &_style {
-            display: flex;
-            align-items: center;
-        }
+.devOps_input_icon {
+    display: flex;
+    align-items: center;
+    &>img {
+        width: 1.2rem;
+        margin-left: 1rem;
     }
 }
 .grid_download_dialog{

@@ -3,7 +3,7 @@ import { ScrollBar, CalendarComp, TimeComp, RecurrenceComp} from '../../global'
 import {readTestSuite_ICE} from '../api';
 import "../styles/ScheduleSuitesTopSection.scss";
 
-const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, current_task, displayError, setLoading, scheduleTableData, setScheduleTableData, closePopups, setClosePopups, clearScheduleData}) => {
+const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, current_task, displayError, setLoading, scheduleTableData, setScheduleTableData, closePopups, setClosePopups, clearScheduleData, item}) => {
 
     const [closeCal, setCloseCal] = useState(false);
     
@@ -77,6 +77,20 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                     }
                 }
             }
+
+            // Change executestatus of scenarios which should not be scheduled according to devops config
+            for (var m = 0; m < keys.length; m++) {
+                tableData[m].scenarioids.map((scenarioid, index) => {
+                    tableData[m].executestatus[index] = 0;
+                    for (var k in item.executionRequest.batchInfo[0].suiteDetails) {
+                        if (scenarioid === item.executionRequest.batchInfo[0].suiteDetails[k].scenarioId) {
+                            tableData[m].executestatus[index] = 1;
+                            break;
+                        }
+                    }
+                });
+            }
+
             setModuleScheduledate(moduleScheduledateTime);
             setScheduleTableData(tableData);
             updateScenarioStatus(tableData);
