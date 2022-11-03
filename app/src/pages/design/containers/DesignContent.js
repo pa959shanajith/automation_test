@@ -60,7 +60,7 @@ const DesignContent = (props) => {
 
   const headerCheckRef = useRef();
 
-  const [debugButton,setDebugButton]=useState("");
+  const [debugButton,setDebugButton]=useState('');
 //   const [checkedTc, setCheckedTc] = useState({});
 //   const [dTcFlag, setDTcFlag] = useState(false);
 
@@ -1170,7 +1170,7 @@ const DesignContent = (props) => {
     
     if (props.appType !== "MobileWeb" && props.appType !== "Mainframe") browserType.push(selectedBrowserType);
     
-    // globalSelectedBrowserType = selectedBrowserType;
+    // globalSelectedBrowserType = selectedBrowserType;5
 
     if (props.dTcFlag) testcaseID = Object.values(props.checkedTc);
     else testcaseID.push(props.current_task.testCaseId);
@@ -1210,7 +1210,7 @@ const DesignContent = (props) => {
         });
 };
 
-
+console.log(debugButton);
   return (
     <>
       {showPopup && ConfirmPopup()}
@@ -1328,7 +1328,7 @@ const DesignContent = (props) => {
                       icon: 'internet',
                     },
 
-                    key: "ie",
+                    key: "3",
                     text: "Internet Explorer",
                   },
 
@@ -1336,8 +1336,7 @@ const DesignContent = (props) => {
                     data: {
                       icon: "chrome",
                     },
-
-                    key: "chrome",
+                    key: "1",
                     text: "Google Chrome",
                   },
                   {
@@ -1354,7 +1353,7 @@ const DesignContent = (props) => {
                       icon: "firefox",
                     },
 
-                    key: "mozilla",
+                    key: "2",
                     text: "Mozilla Firefox",
                   },
 
@@ -1363,7 +1362,7 @@ const DesignContent = (props) => {
                       icon: "edge",
                     },
 
-                    key: "edge",
+                    key: "7",
                     text: "Microsoft Edge",
                   },
                   {
@@ -1371,7 +1370,7 @@ const DesignContent = (props) => {
                       icon: "edge",
                     },
 
-                    key: "chromium",
+                    key: "8",
                     text: "Edge Chromium",
                   },
                 ]}
@@ -1381,7 +1380,7 @@ const DesignContent = (props) => {
             </div>
         
 
-           <Button label="Debug" className="p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
+           <Button label="Debug" className="p-button-warning" onClick={()=>debugTestCases(debugButton)}></Button>
               </div>
             
 

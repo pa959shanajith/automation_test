@@ -662,7 +662,7 @@ const ScrapeObjectList = () => {
                       icon: 'internet',
                     },
 
-                    key: "ie",
+                    key: "3",
                     text: "Internet Explorer",
                   },
 
@@ -670,8 +670,7 @@ const ScrapeObjectList = () => {
                     data: {
                       icon: "chrome",
                     },
-
-                    key: "chrome",
+                    key: "1",
                     text: "Google Chrome",
                   },
                   {
@@ -688,7 +687,7 @@ const ScrapeObjectList = () => {
                       icon: "firefox",
                     },
 
-                    key: "mozilla",
+                    key: "2",
                     text: "Mozilla Firefox",
                   },
 
@@ -697,7 +696,7 @@ const ScrapeObjectList = () => {
                       icon: "edge",
                     },
 
-                    key: "edge",
+                    key: "7",
                     text: "Microsoft Edge",
                   },
                   {
@@ -705,14 +704,15 @@ const ScrapeObjectList = () => {
                       icon: "edge",
                     },
 
-                    key: "chromium",
+                    key: "8",
                     text: "Edge Chromium",
                   },
                 ]}
                 placeholder="Select Browser"
-                width="188px"
-                
+                width="180px"
               />
+                
+              
             </div>
            
             <div key="append-edit" className={"ss__thumbnail"} >

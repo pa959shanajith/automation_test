@@ -240,7 +240,7 @@ const BottomContent = () => {
         hiddenInput.current.click();
     }
     
-    const lowerList = [
+    const lowerList =  [
         {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable:  compareFlag}, 
         {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
         {'title': 'Replace Object', 'img': 'static/imgs/ic-replaceobject.svg', 'action': ()=>setShowObjModal("replaceObjectSelBr"), 'show': appType === 'Web', 'disable': scrapeItemsLength <= 0 || ((scrapeItemsLength) === irisLen) || compareFlag },
