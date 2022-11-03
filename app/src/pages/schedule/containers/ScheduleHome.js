@@ -53,7 +53,7 @@ const ScheduleHome = ({item}) => {
                 <div className="s__mid_section">
                     <ActionBar 
                     // upperContent={<UpperContent key={666} appType={appType} isMac={isMac}browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />}  
-                    bottomContent={<BottomContent smartMode={smartMode} setSmartMode={setSmartMode} execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction} />}/> 
+                    bottomContent={<BottomContent smartMode={smartMode} setSmartMode={setSmartMode} execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType ? appType : item.executionRequest.batchInfo[0].appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction} />}/> 
                     <div className="s__content">
                         <ScheduleContent setExecEnv={setExecEnv} smartMode={smartMode} syncScenario={syncScenario} setSyncScenario={setSyncScenario} execEnv={execEnv} setBrowserTypeExe={setBrowserTypeExe} setExecAction={setExecAction} appType={appType} execAction={execAction} item={item} />
                     </div>
