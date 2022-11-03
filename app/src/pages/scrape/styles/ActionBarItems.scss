@@ -1,20 +1,19 @@
 @import "../../global/styles/ColorVariables.scss";
 
 .ss__thumbnail input[type='checkbox']{
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     outline: none;
-    margin: 4px 10px 2px 10px
 }
 
 .ss__thumbnail{
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 13% 22px 14% 2px;
-    font-size: 12px;
+    margin: 15% 23px 15% 7px;
+    font-size: 14px;
     font-family: Mulish;
-    font-weight: 400;
+    font-weight: 600;
 }
 
 .ss__thumbnail_title{
@@ -23,9 +22,8 @@
 
 .ss__scrapeOn{
     font-family: $avoPrimaryFont;
+    font-size: 18px;
     user-select: none;
-    font-size: 13.5px;
-    font-weight: 400;
 }
 
 

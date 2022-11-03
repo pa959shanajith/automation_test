@@ -9,7 +9,7 @@
 }
 .api-ut__btnGroup {
     width: 100%;
-    margin-bottom: 0.5%;
+    margin-bottom: 1.5%;
 
     &>button{
         position: relative;
@@ -411,10 +411,15 @@
 }
 .grid_download_dialog{
     display: flex;
+    &__disabled {
+        cursor: no-drop;
+    }
     &__hr {
         margin: 0 0 1rem 0;
     }
     &__content {
+        height: 58vh;
+        overflow-y: auto;
         &>p, &>h6 {
             margin: 0;
         }

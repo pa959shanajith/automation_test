@@ -168,7 +168,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const ScheduleTestSuite = async (schedulePoolDetails) => {
         setAllocateICE(false);
         setClearScheduleData(false);
-        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, current_task, appType, filter_data);
+        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, item.executionRequest.batchInfo[0].currentTask, appType, filter_data);
         if(!modul_Info){
             return
         }
@@ -324,6 +324,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     exeTypeLabel={"Select Schedule type"}
                     exeIceLabel={"Allocate ICE"}
                     scheSmartMode={smartMode}
+                    currentTask={item.executionRequest.batchInfo[0].currentTask}
                 />
             :null}
             { showIntegrationModal ? 
@@ -353,7 +354,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         <div id="s__btns">
                             <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}}  title="Add">Schedule</button>
                         </div>
-                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
+                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={item.executionRequest.batchInfo[0].currentTask} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
                     </div>
 
                 {/* //lower scheduled table Section */}
@@ -584,6 +585,7 @@ const checkSelectedModules = (scheduleTableData, displayError) => {
 } 
 
 const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate, displayError) => {
+    let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
     for(var i =0 ;i<eachData.length;i++){
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
@@ -596,6 +598,8 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 var dateValue = moduleScheduledate[eachData[i].testsuiteid]["date"];
                 var timeValue = moduleScheduledate[eachData[i].testsuiteid]["time"];
                 var recurringValue = moduleScheduledate[eachData[i].testsuiteid]["recurringValue"];
+                var recurringString = moduleScheduledate[eachData[i].testsuiteid]["recurringString"];
+                var recurringStringOnHover = moduleScheduledate[eachData[i].testsuiteid]["recurringStringOnHover"];
 
                 if (recurringValue === "") {
                     // Check if schedule recurring is not empty
@@ -622,8 +626,8 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 const sltime_2 = timeValue.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 const diff = (timestamp - new Date()) / 60000;
-                if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
-                    if (recurringValue != "One Time") {
+                if (diff < 5 && (recurringString === "One Time" || recurringString === "Every Day" || (recurringString === "Every Week" && (recurringStringOnHover.includes(days[new Date().getDay()]) || recurringStringOnHover === "Occurs every day")) || (recurringString === "Every Month" && (recurringValue.split(' ')[2] == new Date().getDate() || recurringStringOnHover.includes(days[new Date().getDay()]))))) { // Check if schedule time is not ahead of 5 minutes from current time
+                    if (recurringValue !== "One Time") {
                         moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
                     } else {
                         if (diff < 0) moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";

@@ -73,6 +73,9 @@ const CreateNew = ({importRedirect}) => {
         setLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
+    return ()=>{
+        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+    }
   },[])
 
   const displayError = (error) =>{

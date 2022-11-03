@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 // import {getUserDetails} from '../api';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Redirect } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
-import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, GenerateTaskList, Messages as MSG, setMsg } from '../../global';
+import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents,ValidationExpression, GenerateTaskList, Messages as MSG, setMsg,Messages ,VARIANT} from '../../global';
 import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as pluginApi from "../api";
@@ -20,12 +20,16 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import ProjectNew from '../../admin/containers/ProjectAssign';
 import { DataTable } from 'primereact/datatable';
+// import { FontSizes } from '@fluentui/react';
+// import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
+import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs, createProject_ICE} from '../api';
+import { text } from 'body-parser';
 
 
 // import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 
-const TaskSection = ({userInfo, userRole, dispatch}) =>{
+const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
     const history = useHistory();
     
@@ -57,16 +61,63 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     const [statechange,setStateChange] = useState(true);
     const [selectBox,setSelectBox] = useState([]);
     const [userDetailList,setUserDetailList]=useState([]);
-   
+    // const [getAvailablePlugins,setAvailablePlugins]=useState([]);
+    const [getProjectList,setProjectList]=useState([]);
+    const [getplugins_list,setplugins_list]=useState([]);
+    // const [selDomainOptions,setSelDomainOptions] = useState([])
+    // const [loading,setLoading] = useState(false)
    
     const [projectNames, setProjectNames] = useState(null);
+    const [projectId,setprojectId]=useState(null);
+    const [loading,setLoading] = useState(false)
+
+    const displayError = (error) =>{
+        setLoading(false)
+        setMsg(error)
+    }
+    
+    const checkCycle = (flag)=>{
+        for (var j = 0; j < props.releaseList.length; j++) {    
+			for (var i = 0; i < props.projectDetails.length; i++) {
+				if (props.releaseList[j] === props.projectDetails[i].name) {
+					if (props.projectDetails[i].cycles.length === 0) {
+                        displayError(Messages.ADMIN.WARN_ADD_CYCLE);
+                        return true;
+					}
+				}
+			}
+        };
+        return false;
+    }
+
+    const refreshDomainList = async () => {
+        let data = await getDomains_ICE() 
+        if(data.error){displayError(data.error);return;}
+        else if(data.length===0){
+            data=['Banking','Manufacturing','Finance'];
+        }
+        props.setSelDomainOptions(data);
+    }
+    // const displayError = (error) =>{
+    //     setLoading(false)
+    //     setMsg(error)
+    // }
 
     let dataDict;
      
 
 
-    useEffect( () => {
-        (async() => {const UserList =  await pluginApi.getUserDetails("user");
+    // useEffect( async () => {
+        
+    // },[]);
+
+    // useEffect(async()=>{
+        
+    // },[]);
+
+    useEffect(()=>{
+        (async() => {
+            const UserList =  await pluginApi.getUserDetails("user");
         if(UserList.error){
             setMsg(MSG.CUSTOM("Error while fetching the user Details"));
         }else{
@@ -74,68 +125,90 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
         }
 
         console.log("UserDetailsList");
-        console.log(UserList);})()
+        console.log(UserList);
+            const ProjectList = await getProjectIDs(["domaindetails"],["Banking"]);
+        // ProjectList = {
+        //     "projectIds":["62e27e5887904e413dad10fe", "62e27e5887904e413dad10ff"],
+        //     "projectNames":["avangers", "avangers2"]
+        // }
+        if(ProjectList.error){
+            setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+        }else{
+            
+            const arraynew = ProjectList.projectId.map((element, index) => {
+                return (
+                    {
+                        key: element,
+                        text: ProjectList.projectName[index],
+                        // disabled: true,
+                        // title: 'License Not Supported' 
+                    }
+                )
+            });
+            setProjectList(arraynew);
+            // key: "62e27e5887904e413dad10ff",
+            // text: "avangers2"
+        }
+        // [
+        //     {
+        //         key: "62e27e5887904e413dad10fe",
+        //         text: "avangers"
+        //     },
+        //     {
+        //     ]
+        // }
+
+        console.log("domaindetails","Banking");
+        console.log(ProjectList);
+            var plugins = []; 
+        const plugins_list= await getAvailablePlugins();
+       
+        
+        if(plugins_list.error){
+            setMsg(MSG.CUSTOM("Error while fetching the app Details"));
+        }else{
+            console.log(plugins_list);
+            
+                    let txt = [];
+                     for (let x in plugins_list) {
+                        if(plugins_list[x] === true) {
+                            txt.push({
+                                key: x,
+                                //text: x[0].toUpperCase()+x.slice(1)
+                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                                title: x.charAt(0).toUpperCase()+x.slice(1),
+                                disabled: false
+                            })
+                        }
+                        else {
+                            txt.push({
+                                key: x,
+                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                                title: 'License Not Supported',
+                                disabled: true
+                            })
+                        }
+                       }
+                    //   setProjectList(arraynew1);
+                    // const arraynew2 = arraynew1.map((txt) => {
+                //       return (
+                //     {
+                //         key: txt,
+                //         text:txt
+                //     }
+                // )
+            // }
+            // ); 
+            setplugins_list(txt);
+        }
+        // console.log({"desktop":true, "mainframe": true, "mobileapp": true, "mobileweb": true, "oebs":true, "sap": true, "system":true,"web":true,"webservice":true});
+        // console.log(plugins_list);
+        })()
+        
     },[]);
+  
 
-    const moveItemsLeftgo = (to,from) =>{
-      setUnAssignedFlag(true);
-          
-          var selectId = document.getElementById("assignedProjectAP");
   
-          var newAllProj = [];
-          var newAssignProj = [];
-          for(var i=0;i<selectId.options.length;i++){
-              if(selectId.options[i].selected ===  true){
-                  newAllProj.push(JSON.parse(selectId.options[i].value));
-              }
-              else{
-                  newAssignProj.push(JSON.parse(selectId.options[i].value));
-              }
-          }
-          newAllProj = assignProj.allProjectAP.concat(newAllProj);
-          setAssignProj({allProjectAP:newAllProj,assignedProjectAP:newAssignProj});
-          selectId.selectedIndex = "-1";
-      };
-
-    const moveItemsRightgo = (from,to) =>{
-      setUnAssignedFlag(false);
-  
-          var selectId = document.getElementById("allProjectAP");
-          var newAllProj = [];
-          var newAssignProj = [];
-          for(var i=0;i<selectId.options.length;i++){
-              if(selectId.options[i].selected ===  true){
-                  newAssignProj.push(JSON.parse(selectId.options[i].value));
-              }
-              else{
-                  newAllProj.push(JSON.parse(selectId.options[i].value));
-              }
-          }
-          newAssignProj = assignProj.assignedProjectAP.concat(newAssignProj);
-          setAssignProj({allProjectAP:newAllProj,assignedProjectAP:newAssignProj});
-          selectId.selectedIndex = "-1";
-    };
-  
-    // const moveItemsLeftall =  ()=> {
-    //   setUnAssignedFlag(true);
-    //       for(var i=0; i<assignProj.assignedProjectAP.length; i++){
-    //           assignProj.allProjectAP.push(assignProj.assignedProjectAP[i]);
-    //       }
-    //       assignProj.assignedProjectAP=[];
-    //       setAssignProj(assignProj);
-    //       setStateChange(!statechange);
-    // };
-  
-    // const moveItemsRightall =() =>{
-  
-    //       setUnAssignedFlag(false);
-    //       for(var i=0; i<assignProj.allProjectAP.length; i++){
-    //           assignProj.assignedProjectAP.push(assignProj.allProjectAP[i]);
-    //       }
-    //       assignProj.allProjectAP=[];
-    //       setAssignProj(assignProj);
-    //       setStateChange(!statechange);
-    //   };
 
 
     useEffect(()=>{
@@ -262,7 +335,9 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     };
 
     const searchTask = (activeTab, value) => {
-        let items = activeTab === "todo" ? todoItems : reviewItems;
+        let items = activeTab === "todo" ? todoItems : 
+        
+        reviewItems;
         let filteredItem = [];
 
         filteredItem = items.filter(item=>item.taskname.toLowerCase().indexOf(value.toLowerCase()) > -1);
@@ -345,7 +420,38 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     //     );
     // }
     
-    
+    const create_project = async()=>{
+        
+                        setLoading("Saving...");
+                        const createprojectObj = {};
+                        createprojectObj.domain = 'Banking';
+                        createprojectObj.projectName = props.projectName.trim();
+                        createprojectObj.appType = props.projectTypeSelected;
+                        createprojectObj.projectDetails = [
+                            {
+                              "name": "R1",
+                              "cycles": [
+                                {
+                                  "name": "C1"
+                                }
+                              ]
+                            }
+                          ];
+                        console.log(createprojectObj);
+                        console.log("Controller: " + createprojectObj);
+                        const createProjectRes = await createProject_ICE(createprojectObj)
+                        if(createProjectRes.error){displayError(createProjectRes.error);return;}
+                        else if (createProjectRes === 'success') {
+                            displayError(Messages.ADMIN.SUCC_PROJECT_CREATE);
+                            props.resetForm();
+                            props.setProjectDetails([]);
+                            refreshDomainList();
+                        } else {
+                            displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
+                            props.resetForm();
+                        }
+                        setLoading(false);
+                    }
     return (
         
         <>
@@ -361,7 +467,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             </div>
             <div>
             
-            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10"}} label="add project"  onClick={() => onClick('displayBasic')} />
+            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10", FontSize:"10px",marginLeft:"300px",marginTop:"10px"}} label="Add and Manage Project"  onClick={() => onClick('displayBasic')} />
             
             </div>
             <div>
@@ -370,11 +476,17 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
        
             <div className='button-design'>
-            <button className="reset-action__exit" style={{lineBreak:'50px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"50px",margin: "3px", }} onClick={(e) => { }}>Manage</button>
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { }}>Execute</button>
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"250px" ,margin: "3px"}} onClick={(e) => { }}>Design</button>
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "100px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"5000px" ,margin: "3px"}} onClick={(e) => {
+                   window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+                   window.location.href = "/execute";
+             }}>Execute</button>
+            
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "100px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"2500px" ,margin: "3px"}} onClick={(e) => { 
+                window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+                window.location.href = "/execute";
+                }}>Execute</button>
             </div>
        
             </div> 
@@ -383,38 +495,42 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
                 
                 
-    <Dialog header='Create Project'visible={displayBasic} style={{ width: '40vw' }}  onHide={() => onHide('displayBasic')}>
+    <Dialog header='Create Project'visible={displayBasic} style={{ width: '30vw' }}  onHide={() => onHide('displayBasic')}>
         <div>
-            <div className='dialog_textfield'>
-                <TextField 
+            <div className='dialog_dropDown'>
+                {/* {
+                    isCreate == true ? <TextField /> : <NormalDropDown /> 
+                } */}
+                <NormalDropDown
                     label=" Project Name"
+                    options={getProjectList}
+                    
+                        
                     placeholder="enter the project name"
                     standard
                     width="300px"
                     //   fontSize='40px'
                     //   marginLeft="200px"
                 />
+                {/* /create_project() */}
+                {/* <p><a href="#" onClick={()=>{}} target="_blank">Select Project</a></p> */}
+
+                {/* <a  style={{ background: "transparent", color: "green", border: "none", padding:"0,0,0,10", FontSize:"-10px",marginRight:"300px",marginTop:"5px"}} label="Select Project"  onClick={() => onClick('displayBasic')} a/> */}
+                
+                {/* <p onClick = {() => setisCreate(!isCreate)}>{
+                    isCreate == true ? 'Select Project' : '+ Create New'                     
+                }</p> */}
+
             </div>
             <div className='dialog_dropDown'>  
+                {/* {
+                    isCreate == false ? <TextField /> : <NormalDropDown /> 
+                } */}
                 <NormalDropDown  
                     label="App type"
-                    options={[
-                    {
-                        
-                        key: 'web',
-                        text: 'Web'
-                    },
-                    {
-                        key: 'Desktop',
-                        text: 'Desktop'
-                    },
-                    {
+                    options={getplugins_list}
+                    // disabled={true}
                     
-                    key: 'Mobile App',
-                    text: 'Mobile App'
-                    }
-                
-                    ]}
                     label1="Apptype"
                     options1={[selectedProject && allProjects[selectedProject] ?
                             {
@@ -425,6 +541,8 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                     ]}
                     placeholder="Select an apptype"
                     width="300px"
+                    top="200px"
+               
                     // disabled={!selectedProject}
                     // required
                     onChange={(e, item) => {
@@ -434,9 +552,9 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                 />
             </div>
             
-            <div className='labelStyle1'> <label>users</label></div>
+            <div className='labelStyle1'> <label><h5>users</h5></label></div>
         
-					<div className="wrap">
+					<div className="wrap" style={{height:'13rem'}}>
                             <div className='display_project_box'>
                                 {userDetailList.map((user, index) => (
                                         <div key={index} className='display_project_box_list'>
@@ -450,7 +568,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                     </div>
                     <div>
                         <div>
-                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} onClick={(e) => { }}>Create</button>
+                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} onClick={()=>{create_project()}}>Create</button>
                         </div>  
                     </div>
  
@@ -458,7 +576,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
     </Dialog>
       
     </div>
-                {userRole !== "Test Manager" && 
+                {/* {userRole !== "Test Manager" && 
                     <div className="task-overflow" id="plugin__taskScroll">
                         <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                             <div data-test="task-content" className="task-content" id="plugin_page__list">
@@ -467,7 +585,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
                         </ScrollBar>
                     
                     </div>
-                }
+                } */}
         </>
     );
 }
