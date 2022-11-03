@@ -65,8 +65,8 @@ const DevOpsConfig = props => {
     ]);
     const [browserlist, setBrowserlist] = useState([
         {
-            key: '0',
-            text: 'Internet Exploror'
+            key: '3',
+            text: 'Internet Explorer'
         },{
             key: '1',
             text: 'Google Chrome'
@@ -74,10 +74,10 @@ const DevOpsConfig = props => {
             key: '2',
             text: 'Mozilla Firefox'
         },{
-            key: '3',
+            key: '7',
             text: 'Microsoft Edge'
         },{
-            key: '4',
+            key: '8',
             text: 'Edge Chromium'
         }
     ]);

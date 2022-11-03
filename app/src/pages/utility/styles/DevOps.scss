@@ -263,6 +263,7 @@
     &_container {
         height: 47vh;
         max-height: 100%;
+        overflow-x: auto;
     }
 }
 .devOps_pool_list {
@@ -349,8 +350,11 @@
 .select_project_img {
     width: 50%;
 }
-.react-checkbox-tree label {
-    display: flex;
+.react-checkbox-tree{
+    overflow-x: auto;
+    label {
+        display: flex;
+    }
 }
 .no_config_img{
     height: 60vh;
@@ -359,12 +363,29 @@
     margin-right: 11%;
     margin-top: -3%;
 }
-.devOps_input_icon {
-    display: flex;
-    align-items: center;
-    &>img {
-        width: 1.2rem;
-        margin-left: 1rem;
+.devOps {
+    &_input_icon {
+        display: flex;
+        align-items: center;
+        &>img {
+            width: 1.2rem;
+            margin-left: 1rem;
+        }
+    }
+    &_terminate{
+        &_icon {
+            display: flex;
+            align-items: center;
+            &>img {
+                width: 1.2rem;
+                margin-left: 1rem;
+                cursor: pointer;
+            }
+        }
+        &_style {
+            display: flex;
+            align-items: center;
+        }
     }
 }
 .grid_download_dialog{

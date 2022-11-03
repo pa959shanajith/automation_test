@@ -967,4 +967,17 @@ exports.deleteScenario = async(req,res) => {
 		logger.error("Error occurred in mindmaps/deleteScenario:", exception);
 		return res.status('500').send("fail");
 	}
+}
+exports.deleteScenarioETE = async(req,res) => {
+	const fnName = "deleteScenarioETE"
+	logger.info("Inside UI service: " + fnName)
+	try{
+		const inputs = {};
+		console.log(req.body);		
+		const result = await utils.fetchData(req.body, "mindmap/deleteScenarioETE", fnName);
+		return res.status('200').send(result);
+	}catch (exception){
+		logger.error("Error occurred in mindmaps/deleteScenarioETE:", exception);
+		return res.status('500').send("fail");
+	}
 } 
