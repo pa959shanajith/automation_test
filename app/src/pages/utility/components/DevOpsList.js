@@ -319,7 +319,15 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 {setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />)}
                 </div> */}
                 {/* <MultiSelect options={projects}  optionLabel="name" placeholder="Select a Project" /> */}
-                {setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) =>
+                <SearchDropdown
+                    noItemsText={[ ]}
+                    onChange={(selectedIce) => false}
+                    options={getProjectList}
+                    placeholder={''}
+                    selectedKey={""}
+                    width='15rem'
+                    />
+                {/* {setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) =>
                 <SearchDropdown
                     noItemsText={[ ]}
                     onChange={(selectedIce) => false}
@@ -327,8 +335,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                     placeholder={item.project}
                     selectedKey={""}
                     width='15rem'
-
-                    />)}
+                    />)} */}
             </> }
         </div>
         { configList.length > 0 ? <>

@@ -478,7 +478,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"1000px" ,margin: "3px"}} onClick={(e) => {
                    window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-                   window.location.href = "/Execute";
+                   window.location.href = "/execute";
              }}>Execute</button>
             
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"500px" ,margin: "3px"}} onClick={(e) => { 
