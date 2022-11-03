@@ -96,8 +96,8 @@ const TaskBox = (props) => {
             bn: (nt) ? nt.batchname : '',
             at: (nt) ? nt.assignedto : '',
             rw: (nt && nt.reviewer != null) ? nt.reviewer : '',
-            sd: (nt) ? nt.startdate : `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`,
-            ed: (nt) ? nt.enddate : `${current.getDate()}/${(current.getMonth()+1)%12 + 2}/${current.getFullYear()}`,
+            sd: (nt) ? nt.startdate : `${current.getMonth()+1}/${current.getDate()}/${current.getFullYear()}`,
+            ed: (nt) ? nt.enddate : `${(current.getMonth()+1)%12 + 2}/${current.getDate()}/${current.getFullYear()}`,
             re: (nt && nt.release != null) ? nt.release : '',
             cy: (nt && nt.cycleid != null) ? nt.cycleid : '',
             ac: (nt) ? nt.accessibility_testing : 'Disable',
@@ -158,7 +158,7 @@ const TaskBox = (props) => {
                     setEndDate({show:false,value:tObj.ed})
                     return;
                 case 'pg':
-                    setPropagate({show:false,val:false})
+                    setPropagate({show:false,val:true})
                     return;
                 case 'cx':
                     if (dNodes[pi].parent) {
@@ -235,9 +235,9 @@ const TaskBox = (props) => {
                 addTask_11(pi, tObj, 0, cycleid, dNodes, nodeDisplay);
             }
             //Logic to add tasks for the scenario
-            if (dNodes[pi].children && propagate.val) dNodes[pi].children.forEach(function(tSc) {
+            if (dNodes[pi].children && propagate.val) dNodes[pi].children.forEach(function(tSc){
                 addTask_11(tSc.id, tObj, 1, cycleid, dNodes, nodeDisplay);
-                if (tSc.children != undefined) {
+                if (tSc.children != undefined){
                     tSc.children.forEach(function(scr) {
                         if (appType != "System" && appType != "Mainframe") addTask_11(scr.id, tObj, 2, cycleid, dNodes, nodeDisplay);
                         scr.children.forEach(function(tCa) {
@@ -294,8 +294,8 @@ const TaskBox = (props) => {
         <ClickAwayListener onClickAway={()=>{props.setTaskBox(false)}}>
             <div onClick={stopCal} id='ct-assignTable' className='task-box__container hide'>
                 <ul>
-                    {task.arr.length>0?
-                        <li>
+                    {((task.arr.length>0))?
+                        <li style={{ display: 'none' }}>
                             <label data-test="taskLabel">Task</label>
                             <select onClick={stopPropagate} data-test="taskSelect" onChange={changeTask}  disabled={assignbtn.reassign || task.disabled}  defaultValue={task.initVal} ref={taskRef}>
                                 {task.arr.map((e)=>
@@ -352,7 +352,7 @@ const TaskBox = (props) => {
                     {propagate.show?
                         <li>
                             <label data-test="propogateLabel">Propagate</label>
-                            <input data-test="propogateInput" onChange={()=>setPropagate({show:true,val:!propagate.val})} type='checkbox' checked></input>
+                            <input data-test="propogateInput" onChange={()=>setPropagate({show:true,val:!propagate.val})} type='checkbox'  ></input>
                         </li>
                     :null} 
                     {/* Hiding the Complexity component for every node type in mindmap */}
