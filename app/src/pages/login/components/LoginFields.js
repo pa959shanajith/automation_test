@@ -6,7 +6,6 @@ import { updatePassword } from "../../global/api";
 import errorImage from "../../../assets/imgs/error_exclamation.svg";
 import "../styles/LoginFields.scss";
 import { TextField } from "@avo/designcomponents";
-import ServiceBell from "@servicebell/widget";
 import {motion, AnimatePresence} from "framer-motion"
 
 /*
@@ -386,15 +385,6 @@ const LoginFields = (props) => {
 
     useEffect(()=>{
         setInitialFormPos(-20);
-        (async()=>{
-          const response = await fetch("/getLicenseInfo")
-          let { isTrialUser } = await response.json();
-          setIsTrialInstance(isTrialUser)
-          if(isTrialUser)
-          {
-            ServiceBell("init", "07e1c4e7d40744869cc8cca1ba485f2c");
-          }
-        })();
         if(props.verifyPage){
             setOverlayText("Loading...");
             (async()=>{
