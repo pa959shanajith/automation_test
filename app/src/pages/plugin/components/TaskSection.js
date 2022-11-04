@@ -22,7 +22,8 @@ import ProjectNew from '../../admin/containers/ProjectAssign';
 import { DataTable } from 'primereact/datatable';
 // import { FontSizes } from '@fluentui/react';
 // import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
-import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs, createProject_ICE} from '../api';
+import { getDetails_ICE ,getAvailablePlugins, getDomains_ICE, createProject_ICE} from '../../admin/api';
+import { getProjectIDs } from '../api';
 import { text } from 'body-parser';
 
 
@@ -218,7 +219,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             setOverlay("Loading Tasks..Please wait...");
             pluginApi.getProjectIDs()
             .then(data => {
-                console.log(data)
+                // console.log(data)
                 setProjectNames(data);
                 if(data === "Fail" || data === "Invalid Session") return RedirectPage(history);
                 else {
