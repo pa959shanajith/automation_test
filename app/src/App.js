@@ -35,6 +35,14 @@ const App = () => {
   const [blockui,setBlockui] = useState({show:false})
   useEffect(()=>{
     TabCheck(setBlockui);
+    (async()=>{
+          const response = await fetch("/getServiceBell")
+          let { enableServieBell } = await response.json();
+          if(enableServieBell)
+          {
+            ServiceBell("init", "07e1c4e7d40744869cc8cca1ba485f2c");
+          }
+        })();
   },[])
   return (
     <Provider store={store}>
