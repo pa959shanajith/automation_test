@@ -1315,7 +1315,7 @@ console.log(debugButton);
               <div style={{ marginLeft: '4px', marginBottom: '10px', marginRight:'3px',marginTop:'30px' }}>
               {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
               <NormalDropDown
-              style={{height:'25px',marginLeft:'2px', marginBottom: '50px', boxSizing:'40px', fontFamily:'LatoWeb' }}
+              style={{height:'22px',marginLeft:'2px', marginBottom: '47px', boxSizing:'40px', fontFamily:'LatoWeb' }}
               label="Select Browser"
                
 
@@ -1375,7 +1375,7 @@ console.log(debugButton);
                   },
                 ]}
                 placeholder="Select Browser"
-                width="220px"
+                width="190px"
               />
             </div>
         

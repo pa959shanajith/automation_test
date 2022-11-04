@@ -10,11 +10,14 @@ import RectangleBox from '../components/RectangleBox'
 import SaveMapButton from '../components/SaveMapButton'
 import ExportMapButton from '../components/ExportMapButton'
 import {Messages as MSG, ModalContainer, setMsg} from '../../global'
+import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
+import DesignHome from '../../design/containers/DesignHome';
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import * as actionTypes from '../state/action';
 import '../styles/MindmapCanvas.scss';
 import TaskBox from '../components/TaskBox';
+import {Dialog} from '@avo/designcomponents';
 
 import { deleteScenario} from '../api';
 
@@ -67,6 +70,9 @@ const CanvasNew = (props) => {
     const displayError = props.displayError
     const CanvasRef = useRef();
     readCtScale = () => ctScale
+
+    
+    
 
     useEffect(()=>{
         //useEffect to clear redux data selected module on unmount
@@ -446,9 +452,39 @@ const CanvasNew = (props) => {
     )
     return (
         <Fragment>
+            <Dialog
+            hidden = {props.showScrape === false}
+            isBlocking={true}
+            onDismiss = {() => {props.setShowScrape(false)}}
+            title={taskname + " : Capture Elements"} 
+            minWidth = '58rem' 
+            onDecline={() => console.log(false)}
+            onConfirm = {() => { }} 
+            >
+                <div style={{ height: '120rem' }}><ScrapeScreen /></div>
+            </Dialog>
+
+            <Dialog
+            hidden = {props.ShowDesignTestSetup === false}
+            isBlocking={true}
+            onDismiss = {() => {props.setShowDesignTestSetup(false)}}
+            title ={taskname  +  " : Design Test Setup"}  
+            minWidth = '58rem' 
+            onConfirm = {() => { }} >
+                <div style={{ height: '623px'}}><DesignHome /></div>
+            </Dialog>
+
+            
+
+            
+            
+
+            
+
             {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={"R1"} cycleid={"C1"} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
             {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
-            {(ctrlBox !== false)?<ControlBox setTaskBox={setTaskBox} nid={ctrlBox} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
+            {(ctrlBox !== false)?<ControlBox setShowScrape={props.setShowScrape} showScrape={props.showScrape} setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup}  setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
+            {/* {(ctrlBox !== false)?<ControlBox setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>

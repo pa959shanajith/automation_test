@@ -2,12 +2,12 @@
 .ss__btngroup{
     display: flex;
     max-width: 100%;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     margin-left: -8px;
     justify-content: space-between;
     font-family: $avoSecondaryFont;
     height:1px;
-    margin-top: -5px;
+    margin-top: 49px;
    
 }
 
@@ -25,7 +25,7 @@
 .ss__select-all{
     display: flex;
     align-items: center;
-    margin: 0;
+    margin: 14px -8px 14px -20px;
 }
     
 
@@ -35,17 +35,17 @@
 }
 
 .ss__select-all-lbl{
-    margin: 0 12px;
+    margin: -3px 17px -5px 0px;
     font-family: $avoFont;
     color: $darkGray;
-    font-size: 16px;
+    font-size: 13.5px;
 }
 
 .ss__taskBtn{
-    padding: 1px 13px;
+    padding: 2px 13px;
     margin-right: 2px;
-    height: 21px;
-    font-size: 13px;
+    height: 20px;
+    font-size: 12px;
     background-color: $primaryColor;
     &:disabled{
         background-color: $backgroundThree;
@@ -138,9 +138,12 @@
 }
 
 .p-button-warning {
-    width: 100px;
+    width: 85px;
     height: 30px;
     font-family: 'latoWeb';
+    margin: 52px 0px 57px 3px;
+    border-radius: 2px;
+    padding: 10px;
    
 
 }
@@ -149,3 +152,77 @@
     margin: 54px -19px 54px -18px;
 
 }
+.p-button-label {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.dialog_avo-dialog__title__1yow4 {
+    
+    font-size: 16px;
+    font-family: 'LatoWebLight';
+    display: inline-block;
+    background: #331d4c;
+    color: #ffffff;
+    margin: 4px 8px 28px 3px;
+    padding: 8px 8px 7px 6px;
+    border-radius: -5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: -49px;   
+}
+
+.scrollableContent-158{
+
+    overflow: hidden;
+}
+
+.label-199{
+
+    font-family: LatoWebLight !important;
+    padding: 5px 3px;
+    font-size: 14px;
+    margin: -2px;
+}
+
+.title-184{
+    font-size: 14px;
+    font-family: 'LatoWeb';
+}
+
+.title-216{
+    font-size: 15px;
+    font-family: 'LatoWeb';
+}
+
+.dropdownItem-224{
+    font-size: 15px;
+    font-family: 'LatoWeb';
+}
+
+.dropdownItemSelected-225{
+    font-size: 15px;
+    font-family: 'LatoWeb';
+
+}
+
+.dropdown-203{
+    font-size: 15px;
+    font-family: 'LatoWeb';
+}
+
+.label-201{
+    font-size: 13px;
+    font-family: 'LatoWeb';
+}
+
+.dropdownItem-210 .ms-Button-flexContainer {
+    width: 100%;
+    font-size: 15px;
+    font-family: 'LatoWebMedium';
+}
+.dropdownItemSelected-217:hover{
+    font-size: 15px;
+    font-family: 'LatoWebMedium'; 
+}
+
+

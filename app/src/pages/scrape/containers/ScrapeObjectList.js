@@ -642,7 +642,7 @@ const ScrapeObjectList = () => {
                 (disableAction || compareFlag ? " disable-thumbnail" : "")
               }
             ></div>
-            <div style={{  marginLeft: '30px',marginTop:'20px',  boxSizing:'40px'  }}>
+            <div style={{  marginLeft: '10px',marginTop:'23px',  boxSizing:'40px'  }}>
               {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
               <NormalDropDown 
               style={{height:'25px',marginLeft:'-3px', marginBottom: '50px', boxSizing:'40px', fontFamily:'LatoWeb' }}
@@ -709,7 +709,7 @@ const ScrapeObjectList = () => {
                   },
                 ]}
                 placeholder="Select Browser"
-                width="200px"
+                width="185px"
                 
               />
                 

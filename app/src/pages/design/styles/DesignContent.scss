@@ -39,7 +39,7 @@
 .d__btngroup{
     display: flex;
     max-width: 100%;
-    margin-bottom: 15px;
+    margin: -51px -17px -31px -29px;
     font-family: $avoSecondaryFont;
 }
 
@@ -79,7 +79,7 @@
     align-items: center;
     margin-left:-2px;
     flex-grow: 1;
-    font-size: 14px;
+    font-size: 13px;
 }
 .p-button-warning{
 
@@ -121,6 +121,7 @@
     display: flex;
     flex-direction: column;
     flex: 1 1 100%;
+    margin: -6px -21px 3px -21px;
 }
 
 .d__table_header{
@@ -177,7 +178,7 @@
 }
 
 .objname_col{
-    flex: 0 0 18%;
+    flex: 0 0 16%;
     width: 100%;
     height: 100%;
     padding: 0 5px;
@@ -194,7 +195,7 @@
 }
 
 .input_col, .output_col{
-    flex: 0 0 20%;
+    flex: 0 0 15%;
     display: flex;
     text-align: center;
     width: 100%;
@@ -259,14 +260,46 @@
   border-radius: 5px !important;
 }
 
-.dialog_avo-dialog__title__1yow4{
-    padding-bottom: 1.3125rem;
-}
+.dialog_avo-dialog__title__1yow4 {
+    
+        font-size: 16px;
+        font-family: 'LatoWebLight';
+        display: inline-block;
+        background: #331d4c;
+        color: #ffffff;
+        margin: 4px 8px 28px 3px;
+        padding: 8px 8px 7px 6px;
+        border-radius: -5px;
+        -moz-border-radius: 5px;
+        -webkit-border-radius: -49px;   
+    }
+
+
 
 
 .scrollableContent-158{
 
-    overflow: auto;
+    overflow: hidden;
+}
+
+.title-182{
+    font-size: 13px;
+}
+
+.p-button.p-button-warning{
+
+    height:25px;
+    width: 70px;
+}
+
+.dropdownItem-210 .ms-Button-flexContainer {
+    width: 100%;
+    font-size: 15px;
+    font-family: 'LatoWebMedium';
+}
+.dropdownItemSelected-217:hover{
+    font-size: 15px;
+    font-family: 'LatoWebMedium'; 
 }
 
 // .breadcrumb-item {
