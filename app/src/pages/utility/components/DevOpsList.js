@@ -81,37 +81,40 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
         }else {
             let nodesCollection = [];
             for (let item in queueList) {
-                let nodeItem = {
-                    value: item,
-                    label: item+'   :   '+queueList[item][0][0].configurename,
-                    showCheckbox: false
+                //To handle empty execution List id key
+                if(queueList && queueList[item] && queueList[item] && queueList[item][0] && queueList[item][0][0]){
+                    let nodeItem = {
+                        value: item,
+                        label: item+'   :   '+queueList[item][0][0].configurename,
+                        showCheckbox: false
+                    }
+                    let nodeItemChildren = [];
+                    let nodeItemChildrenIndex = 1;
+                    for (let executionNode of queueList[item]) {
+                        let executionItem = {
+                            value: item+nodeItemChildrenIndex,
+                            label: <div className="devOps_terminate_icon">Execution {nodeItemChildrenIndex}   <img src={"static/imgs/cicd_terminate.png"} title="Terminate Execution" alt="Terminate icon" onClick={async () => {
+                                    const deleteExecutionFromQueue = await deleteExecutionListId({configurekey: item, executionListId: executionNode[0].executionListId});
+                                    if(deleteExecutionFromQueue.status !== 'pass') {
+                                        setMsg(MSG.CUSTOM("Error While Removing Execution from Execution Queue",VARIANT.ERROR));
+                                    }else {
+                                        getCurrentQueueState();
+                                    }
+                                }}/></div>,
+                            showCheckbox: false,
+                            // className: 'devOps_terminate_style',
+                            children: executionNode.map((executionRequest) => ({
+                                label: 'Module : '+executionRequest.modulename+',   Status: '+executionRequest.status,
+                                value: executionRequest.executionListId+executionRequest.moduleid,
+                                showCheckbox: false
+                            }))
+                        };
+                        nodeItemChildrenIndex++;
+                        nodeItemChildren.push(executionItem);
+                    }
+                    nodeItem['children'] = nodeItemChildren;
+                    nodesCollection.push(nodeItem);
                 }
-                let nodeItemChildren = [];
-                let nodeItemChildrenIndex = 1;
-                for (let executionNode of queueList[item]) {
-                    let executionItem = {
-                        value: item+nodeItemChildrenIndex,
-                        label: <div className="devOps_terminate_icon">Execution {nodeItemChildrenIndex}   <img src={"static/imgs/cicd_terminate.png"} title="Terminate Execution" alt="Terminate icon" onClick={async () => {
-                                const deleteExecutionFromQueue = await deleteExecutionListId({configurekey: item, executionListId: executionNode[0].executionListId});
-                                if(deleteExecutionFromQueue.status !== 'pass') {
-                                    setMsg(MSG.CUSTOM("Error While Removing Execution from Execution Queue",VARIANT.ERROR));
-                                }else {
-                                    getCurrentQueueState();
-                                }
-                            }}/></div>,
-                        showCheckbox: false,
-                        // className: 'devOps_terminate_style',
-                        children: executionNode.map((executionRequest) => ({
-                            label: 'Module : '+executionRequest.modulename+',   Status: '+executionRequest.status,
-                            value: executionRequest.executionListId+executionRequest.moduleid,
-                            showCheckbox: false
-                        }))
-                    };
-                    nodeItemChildrenIndex++;
-                    nodeItemChildren.push(executionItem);
-                }
-                nodeItem['children'] = nodeItemChildren;
-                nodesCollection.push(nodeItem);
             }
             setExecutionQueue({
                 list: nodesCollection,
