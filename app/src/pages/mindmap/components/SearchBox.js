@@ -59,14 +59,14 @@ const SearchBox = (props) => {
     }
     return(
         <Rnd enableResizing={false} default={{x:10,y:10}} bounds="parent">
-            <div id="search-canvas-icon" data-test='SearchCanvas'>
+            {/* <div id="search-canvas-icon" data-test='SearchCanvas'>
                 <img data-test="searchIcon" alt="Search Icon" onClick={(e)=>{
                     if(drag){drag=false; return;}
                     setInp(!inp)}
                     } 
                 className="searchimg-canvas" src="static/imgs/ic-search-icon.png"/>
                 <input data-test="searchBox" type="text" onKeyPress={(e)=>{if(e.key==='Enter')onSearch(e)}} onChange={(e)=>onSearch(e)} className={"search-canvas"+(inp?" search-visible":"")+(err?" inputErrorBorderFull":"")} placeholder="Search Node.."/>
-            </div>
+            </div> */}
         </Rnd>
 
     )
