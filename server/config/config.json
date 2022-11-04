@@ -5,6 +5,7 @@
     "strictTaskWorkflow": false,
     "dateFormat": "YYYY-MM-DD",
     "benchmarkRuntimes": ["00:05","08:00","13:00","18:55"],
+    "enableServiceBell":false,
     "certificate": {
         "key": "./server/https/server.key",
         "cert": "./server/https/server.crt"
