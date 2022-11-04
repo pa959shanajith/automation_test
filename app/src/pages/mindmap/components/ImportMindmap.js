@@ -115,6 +115,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     useEffect(()=>{
         if(submit){
             setSubmit(false)
+            setDisableSubmit(true)
             setError('')
             var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
             if(err){
