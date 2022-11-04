@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import MindmapHome from './containers/MindmapHome';
-import { useSelector,useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { SetProgressBar, RedirectPage } from '../global';
-import ServiceBell from "@servicebell/widget";
 export var history
 
 /*Component Mindmap
@@ -11,10 +10,6 @@ export var history
 */
 
 const Mindmap = () => {
-  const userInfo = useSelector(state=>state.login.userinfo);
-    if(userInfo.isTrial){
-        ServiceBell("init", "07e1c4e7d40744869cc8cca1ba485f2c");
-    }
   history =  useHistory()
   const dispatch = useDispatch();
   useEffect(()=>{
