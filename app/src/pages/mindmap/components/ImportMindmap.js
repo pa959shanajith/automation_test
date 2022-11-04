@@ -67,6 +67,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     const [importType,setImportType] = useState(undefined)
     const [fileUpload,setFiledUpload] = useState(undefined)
     const [sheetList,setSheetList] = useState([])
+    const [uploadFileField,setUploadFileField] = useState(false)
     
     const upload = () => {
         let  project = "";
@@ -92,9 +93,12 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
         var moduledata = await getModules({"tab":"tabCreate","projectid":projRef.current.value,"moduleid":null,"query":"modLength"})
         if (moduledata.length>0){
             setError('Please select a Project which has no Modules.')
-            setDisableSubmit(true);return
+            setDisableSubmit(true)
+            setUploadFileField(false)
+            ;return
 
         }
+        setUploadFileField(true)
         setSheetList([])
         setFiledUpload(undefined)
         setError('')
@@ -256,10 +260,10 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                                 <input placeholder={'Ex: Projectname/Modulename'} ref={gitPathRef}/>
                             </div>
                         </Fragment>:
-                        <div>
+                        (<>{uploadFileField?<div>
                             <label>Upload File: </label>
-                            <input accept={acceptType[importType]} type='file' onChange={upload} ref={uploadFileRef}/>
-                            </div>
+                            <input accept={acceptType[importType]} disabled={!uploadFileField} type='file' onChange={upload} ref={uploadFileRef}/>
+                            </div>:null}</>)
                     }
                     
                 </Fragment>
@@ -538,28 +542,28 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
                 
             }
 
-            var isMultiMindmap = Array.isArray(data);
-            var hasError = false,hasNoScenarios= false;
-            if(isMultiMindmap){
-                hasError = data.find(element => !('testscenarios' in element))!=undefined;   
-                if(!hasError){
-                    hasNoScenarios = data.find(element => element.testscenarios.length === 0)!=undefined;
-                }             
-            }
-            if (!isMultiMindmap && !('testscenarios' in data) || hasError){
-                setError("Incorrect JSON imported. Please check the contents!!");
-                setDisableSubmit(true) 
-            }else if((!isMultiMindmap && data.testscenarios.length === 0) || hasNoScenarios){
-                setError("The file has no node structure to import, please check!!");
-                setDisableSubmit(true)
-            }else{
-                var importProj = data[0].projectid
-                if(!importProj || !projList[importProj]){
-                    setError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
-                    setBlockui({show:false})
-                    return;
-                }
-            } 
+            // var isMultiMindmap = Array.isArray(data);
+            // var hasError = false,hasNoScenarios= false;
+            // if(isMultiMindmap){
+            //     hasError = data.find(element => !('testscenarios' in element))!=undefined;   
+            //     if(!hasError){
+            //         hasNoScenarios = data.find(element => element.testscenarios.length === 0)!=undefined;
+            //     }             
+            // }
+            // if (!isMultiMindmap && !('testscenarios' in data) || hasError){
+            //     setError("Incorrect JSON imported. Please check the contents!!");
+            //     setDisableSubmit(true) 
+            // // }else if((!isMultiMindmap && data.testscenarios.length === 0) || hasNoScenarios){
+            // //     setError("The file has no node structure to import, please check!!");
+            // //     setDisableSubmit(true)
+            // }else{
+            //     var importProj = data[0].projectid
+            //     if(!importProj || !projList[importProj]){
+            //         setError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
+            //         setBlockui({show:false})
+            //         return;
+            //     }
+            // } 
         }else{
             setError("File is not supported")
             setDisableSubmit(true)
