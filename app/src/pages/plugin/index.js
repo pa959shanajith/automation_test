@@ -12,9 +12,9 @@ const Plugin = () => {
     const dispatch = useDispatch();
     
     useEffect(()=>{
-        if(window.localStorage['navigateScreen'] !== "plugin"){
-            RedirectPage(history, { reason: "screenMismatch" });
-        }
+        // if(window.localStorage['navigateScreen'] !== "plugin"){
+        //     RedirectPage(history, { reason: "screenMismatch" });
+        // }
         dispatch({type: actions.SET_CT, payload: {}});
         SetProgressBar("stop", dispatch);
         //eslint-disable-next-line
