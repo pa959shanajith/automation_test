@@ -606,3 +606,34 @@ export const fetchModuleListDevopsReport = async(props) => {
         return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }
 }
+
+
+
+/*Component  ExecuteContent
+  api returns  string - success/fail
+*/
+
+export const updateAccessibilitySelection = async(suiteInfo) => { 
+    try{
+        const res = await axios(url+'/updateAccessibilitySelection', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: suiteInfo,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.EXECUTE.ERR_SAVE_ACCESSIBILITY}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.EXECUTE.ERR_SAVE_ACCESSIBILITY}
+    }
+}

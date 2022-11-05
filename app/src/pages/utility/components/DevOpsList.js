@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
-import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer } from '../../global';
+import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer, ResetSession } from '../../global';
 import { SearchBox , SearchDropdown, Toggle } from '@avo/designcomponents';
-import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects } from '../api';
+import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects,updateAccessibilitySelection } from '../api';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
+import { useSelector, useDispatch } from 'react-redux';
+import { Dropdown } from 'primereact/dropdown';
 import { MultiSelect } from 'primereact/multiselect';
+import * as actionTypes from "../../plugin/state/action";
 // import { fetchProjects } from '../api';
 import { ExecuteTestSuite_ICE } from '../../execute/api';
 import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
 import * as pluginApi from "../../plugin/api";
 import {v4 as uuid} from 'uuid';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
-import ScheduleHome from '../../schedule/containers/ScheduleHome'
+import ScheduleHome from '../../schedule/containers/ScheduleHome';
+import { RadioButton } from 'primereact/radiobutton';
 import "../styles/DevOps.scss";
+
 
 
 
@@ -37,11 +42,13 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [showIntegrationModal,setShowIntegrationModal] = useState(false);
     const [modalDetails,setModalDetails] = useState({title:"",task:""});
     const [moduleInfo,setModuleInfo] = useState([]);
+    const [selectedProject, setSelectedProject] = useState(null);
+
     useEffect(()=>{
                 pluginApi.getProjectIDs()
                 .then(data => {
                         setProjectData(data);
-                        console.log(data.releases)           
+                        console.log(data.releases[0][0])           
         })},[])
 
     useEffect(()=>{
@@ -62,8 +69,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             const arraynew = ProjectList.projectIds.map((element, index) => {
                 return (
                     {
-                        key: element,
-                        text: ProjectList.projectNames[index],
+                        code: element,
+                        name: ProjectList.projectNames[index],
                         // disabled: true,
                         // title: 'License Not Supported'
                     }
@@ -110,91 +117,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         })()
         
     },[]);
-
-    const ExecuteTestSuite = async (executionData) => {
-       
-                 if(executionData === undefined) executionData = dataExecution;
-                 setAllocateICE(false);
-                // const modul_Info = parseLogicExecute(eachData, current_task, appType, projectdata, moduleInfo, accessibilityParameters, scenarioTaskType);
-                 //if(modul_Info === false) return;
-                 setLoading("Sending Execution Request");
-                //  executionData["source"]="task";
-                //  executionData["exectionMode"]=execAction;
-                //  executionData["executionEnv"]=execEnv;
-                //  executionData["browserType"]=browserTypeExe;
-                //  executionData["integration"]=integration;
-                //  executionData["batchInfo"]=modul_Info;
-                //  executionData["scenarioFlag"] = (current_task.scenarioFlag == 'True') ? true : false
-                //  ResetSession.start();
-                 try{
-                     setLoading(false);
-                     const data = await ExecuteTestSuite_ICE(executionData);
-                    // if (data.errorapi){displayError(data.errorapi);return;}
-                     if (data === "begin"){
-                         return false;
-                     }
-                    // ResetSession.end();
-                     if(data.status) {
-                         if(data.status === "fail") {
-                             setMsg(MSG.CUSTOM(data["error"],data.variant));
-                         } else {
-                             setMsg(MSG.CUSTOM(data["message"],data.variant));
-                         }
-                     }
-                    //  setBrowserTypeExe([]);
-                    //  setModuleInfo([]);
-                    //  setExecAction("serial");
-                    // setExecEnv("default");
-                    // setupdateAfterSave(!updateAfterSave);
-                    // setSyncScenario(false);
-                 }catch(error) {
-                    // setLoading(false);
-                    // ResetSession.end();
-                    // displayError(MSG.EXECUTE.ERR_EXECUTE)
-                    //  setBrowserTypeExe([]);
-                    //  setModuleInfo([]);
-                    //  setExecAction("serial");
-                    //  setExecEnv("default");
-                    // setupdateAfterSave(!updateAfterSave);
-                    // setSyncScenario(false);
-                 }
-             }
-        
-             const syncScenarioChange = (value) => {
-                 if (value === "1") {
-                     setShowIntegrationModal("ALM")
-         		}
-         		else if (value === "0") {
-                     setShowIntegrationModal("qTest")
-         		}
-                 else if (value === "2") {
-                     setShowIntegrationModal("Zephyr")
-         		}
-             }
-    
-    const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
-                 if(Array.isArray(executionData.targetUser)){
-         			for(let icename in executionData.targetUser){
-         				let ice_id = iceNameIdMap[executionData.targetUser[icename]];
-         				if(ice_id && ice_id.status){
-                             setDataExecution(executionData);
-         					setAllocateICE(false);
-                             setProceedExecution(true);
-                             return
-         				} 
-         			}
-         		}else{
-         			let ice_id = iceNameIdMap[executionData.targetUser];
-         			if(ice_id && ice_id.status){
-                         setDataExecution(executionData);
-         				setAllocateICE(false);
-                         setProceedExecution(true);
-                         return
-         			} 
-         		}
-                 ExecuteTestSuite(executionData);
-           }
-
         
     const dialogFuncMap = {
         'displayBasic': setDisplayBasic,
@@ -215,7 +137,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const renderFooter = (name) => {
         return (
             <div>
-                <Button label="Execute" onClick={async () => onHide(name)} autoFocus />
+                <Button label="Execute" title="Execute" onClick={async () => {
+                let temp = execAutomation(setCurrentIntegration && configList.map((item, index) => item.configurekey)[0]);
+                setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS))
+                  onHide(name)} } autoFocus />
             </div>
         );
     }
@@ -268,13 +193,31 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         }
     }
 
-    var myJsObj = {key:setCurrentIntegration && searchText.length == 0 && configList.length > 0 && configList.map((item, index) => item.configurekey)[0],
+    
+    document.addEventListener('input',(e)=>{
+
+        if(e.target.getAttribute('name')=="myRadios"){
+           }
+    })
+
+    document.addEventListener('label',(e)=>{
+
+        if(e.target.getAttribute('name')=="sync"){
+            console.log(e.target.value)
+           }
+    })
+    
+
+    var myJsObj = {key:setCurrentIntegration && configList.map((item, index) => item.configurekey)[0],
         'executionType' : 'asynchronous'}
     var str = JSON.stringify(myJsObj, null, 4);
     // const abc = {\n&nbps;&nbps;&nbps;&nbps;
     //     'key': str,
     //     \n&nbps;&nbps;&nbps;&nbps;'executionType' : 'asynchronous'
     //     \n}`;
+   
+    const categories = [{name: 'Avo Agent / Avo Grid', key: 'A'}, {name: 'Avo Assure Client', key: 'B'}];
+    const [selectedCategory, setSelectedCategory] = useState(categories[1]);
 
     const deleteDevOpsConfig = (key) => {
         setLoading('Please Wait...');
@@ -343,6 +286,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         });
         return;
     }
+
+
+
     const getScenarioList = (batchInfo, selectedModulesType) => {
         let scenarioList = [];
         for(let batch of batchInfo)
@@ -373,6 +319,17 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         })()
     }, []);
 
+    const onProjectChange = (e) => {
+        setSelectedProject(e.value);
+        let project = setCurrentIntegration && configList.map((item, index)=>item.project);
+        if(e.value === project){
+            return true;
+        }
+        if(e.value !== project){
+            return false;
+        }
+    }
+
     return (<>
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
@@ -397,7 +354,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     isHeadless: false
                 })} >New Configuration</button>
             { configList.length > 0 && <>
-                <div className='searchBoxInput' style={{marginLeft: '28rem'}}>
+                <div className='searchBoxInput'>
                     <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                 </div>
                 {/* <div style={{marginLeft: '7rem'}}>
@@ -415,29 +372,19 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             </> }
             
         </div>
-        <div style={{marginTop: '-4rem', display: 'flex', marginBottom: '1rem'}}>
-        <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '0.5rem', marginRight: '5px'}}>Project Name : </span>
+        <div style={{marginTop: '-9vh', display: 'flex', marginBottom: '2vh'}}>
+        <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '2vh', marginRight: '5px'}}>Project Name : </span>
         
+                    <Dropdown value={selectedProject} style={{width:'31vh', position: 'relative'}} options={getProjectList} onChange={onProjectChange} optionLabel="name"  placeholder="Select the Project"/>
                 {/* <SearchDropdown
                     noItemsText={[ ]}
-                    onChange={(selectedIce) => false}
+                    onChange={() =>{}}
                     options={getProjectList}
-                    placeholder={""}
+                    placeholder={setCurrentIntegration && configList.map((item, index) => item.project)}
                     selectedKey={""}
                     width='15rem'
 
-                    /> */}
-                
-                
-                <SearchDropdown
-                    noItemsText={[ ]}
-                    onChange={(selectedIce) => false}
-                    options={getProjectList}
-                    placeholder={""}
-                    selectedKey={""}
-                    width='15rem'
-
-                    />  
+                    />   */}
                     {/* <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '0.5rem', marginRight: '5px'}}>Project Name : </span> */}
                 </div>
         { configList.length > 0 ? <>
@@ -446,7 +393,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 <div className="d__table_header">
                     <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#</span>
                     <span className="details_col tkn-table__key d__det_head" >Execution Profile Name</span>
-                    <span className="details_col tkn-table__key d__det_head" >Configuration Key</span>
+                    {/* <span className="details_col tkn-table__key d__det_head" >Configuration Key</span> */}
                     {/* <span className="d__inp_head tkn-table__project tkn-table__head" >Project</span>
                     <span className="d__out_head tkn-table__project tkn-table__head" >Release</span> */}
                     <span className="details_col tkn-table__key d__det_head ">Execution Action</span>
@@ -459,46 +406,17 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <tbody>
                         {
                             searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
-                                <td className="tkn-table__sr_no"> {index+1} </td>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename}> <ReactTooltip id="name" effect="solid" backgroundColor="black" /><React.Fragment>{item.configurename}</React.Fragment> </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
+                            <td className="tkn-table__sr_no"> {index+1} </td>
+                                &nbsp;&nbsp;&nbsp;
+                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{width:'27vh', justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>&nbsp;&nbsp;&nbsp;&nbsp;
+                                {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
                                 {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <td className="tkn-table__button" >
-                                    <button onClick={async () =>{onClick('displayBasic2');
-                                         let temp = execAutomation(item.configurekey);
-                                         setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                         }}> Execute Now </button>&nbsp;&nbsp;&nbsp;
-                                     {/* <button onClick={async ()=>{
-                                         let temp = execAutomation(item.configurekey);
-                                         setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                     }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
-
-                                     
-                                     <button  onClick={() =>onClick('displayBasic1')}>  Schedule </button>&nbsp;&nbsp;&nbsp;
-                                     <button  onClick={() =>onClick('displayBasic')}> CI / CD </button>
-                                    </td>
-                                    <td className="tkn-table__button" >
-                                        <img style={{marginRight: '3rem'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
-                                        <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
-                                    </td>
-                            </tr>)
-                        }
-                        {
-                            searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
-                                <td className="tkn-table__sr_no"> {index+1} </td>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td>
-                                {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
-                                <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <td className="tkn-table__button" >
+                                &nbsp;
+                                <td className="tkn-table__button" style={{marginLeft: '46.5vh', width:'100vh'}} >
                                 <button onClick={async () =>{onClick('displayBasic2');
-                                         let temp = execAutomation(item.configurekey);
-                                         setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                                        //  let temp = execAutomation(item.configurekey);
+                                        //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                          }}> Execute Now </button>&nbsp;&nbsp;&nbsp;
                                      {/* <button onClick={async ()=>{
                                          let temp = execAutomation(item.configurekey);
@@ -507,9 +425,37 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      
                                      <button  onClick={() =>onClick('displayBasic1', item)}>  Schedule </button>&nbsp;&nbsp;&nbsp;
                                      <button  onClick={() =>onClick('displayBasic')}> CI / CD </button>
-                                    </td>
+                                    </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     <td className="tkn-table__button" >
-                                        <img style={{marginRight: '3rem'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
+                                        <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
+                                        <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
+                                    </td>
+                            </tr>)
+                        }
+                        {
+                            searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
+                                <td className="tkn-table__sr_no"> {index+1} </td>
+                                &nbsp;&nbsp;&nbsp;
+                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{width:'27vh', justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black"  />{item.configurename} </td>
+                                {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
+                                {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
+                                <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
+                                &nbsp;
+                                <td className="tkn-table__button" style={{marginLeft: '49.1vh', width:'100vh'}} >
+                                <button title="Execute" onClick={async () =>{onClick('displayBasic2');
+                                        //  let temp = execAutomation(item.configurekey);
+                                        //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                                         }}> Execute Now </button>&nbsp;&nbsp;&nbsp;
+                                     {/* <button onClick={async ()=>{
+                                         let temp = execAutomation(item.configurekey);
+                                         setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                                     }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
+                                     
+                                     <button  onClick={() =>onClick('displayBasic1', item)}>  Schedule </button>&nbsp;&nbsp;&nbsp;
+                                     <button  onClick={() =>onClick('displayBasic')}> CI / CD </button>
+                                    </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <td className="tkn-table__button" >
+                                        <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
                                     </td>
                             </tr>)
@@ -518,27 +464,39 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 </table>
 
                 {/* Dialog for Execute Now */}
-                <Dialog header="Execute Now" visible={displayBasic2} style={{ width: '50vw' }}  footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
-                <input type="radio" />&nbsp;&nbsp;
-                <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Agent / Avo Grid</label>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <input type="radio" onSelect={()=>{'#ice'}} />&nbsp;&nbsp;
-                <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Assure Client</label>
-                
+                <Dialog header="Execute Now" visible={displayBasic2} style={{ width: '40vw' }}  footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
+                    {/* <div style={{display: 'flex', justifyContent: 'space-around'}}>
+                    {
+                        categories.map((category) => {
+                            return (
+                                <div key={category.key} >
+                                    <RadioButton inputId={category.key} name="category" value={category} onChange={(e) => setSelectedCategory(e.value)}  checked={selectedCategory.key === category.key} />
+                                    <label htmlFor={category.key} style={{ marginBottom: '-0.5rem', marginLeft: '0.5rem'}}>{category.name}</label>
+                                </div>
+                            )
+                        })
+                    }
+                    </div> */}
+                    <input type="radio" name='myRadios' id='first'  onChange={() => {}}
+                     style={{width:'2.5vh', height: '2.5vh'}} checked/>&nbsp;&nbsp;
+                    <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Agent / Avo Grid</label>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input type="radio" name='myRadios' id='second' onChange={()=>{}} style={{width:'2.5vh', height: '2.5vh'}}/>&nbsp;&nbsp;
+                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Assure Client</label> 
+                    
+                </Dialog>
                 {allocateICE?
                 <AllocateICEPopup 
-                    //SubmitButton={ScheduleTestSuite} 
-                    // setAllocateICE={setAllocateICE} 
+                    // SubmitButton={CheckStatusAndExecute} 
+                    // setAllocateICE={setAllocateICE}
+                    modalButton={"Execute"} 
                     // allocateICE={allocateICE} 
-                    modalTitle={"Allocate ICE to Schedule"} 
-                    modalButton={"Schedule"}
-                    icePlaceholder={'Search ICE to allocate'}
-                    exeTypeLabel={"Select Schedule type"}
-                    exeIceLabel={"Allocate ICE"}
-                    //scheSmartMode={smartMode}
-                />
-                  :""}
-                </Dialog>
+                    modalTitle={"Select ICE to Execute"} 
+                    icePlaceholder={'Search ICE to execute'}
+                    exeTypeLabel={"Select Execution type"}
+                    exeIceLabel={"Execute on ICE"}
+                    ExeScreen={true}
+                />:null}
                 {/* Dialog for Execute Now */}
 
                 {/* Dialog for Schedule */}
@@ -548,43 +506,43 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 {/* Dialog for CI /CD  */}
 
                 <Dialog header="Execute via CI/CD" visible={displayBasic} style={{ width: '50vw' }}  onHide={() => onHide('displayBasic')}>
-                <div style={{display: 'flex', marginBottom:'1rem'}}>
-                    <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%', marginTop: '1.5rem'}}>DevOps Integration API url : </span>
-                    <pre className='grid_download_dialog__content__code' style={{ width: '23rem'}}>
-                        <code>
-                        {url}
-                        </code>
-                    </pre>
-                    <label>
-                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
-                            <div style={{fontSize:"24px"}}>
-                                <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyKeyUrlFunc('api-url') }} ></i>
-                            </div>
-                        </label>
-                </div>
-                    <div style={{display: 'flex', marginBottom:'1rem'}}>
-                        <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
-                        <div className="devOps_dropdown_label_sync">
-                            <label id='async'>Asynchronous </label>
-                            <Toggle id='synch'  dataoff='#async' dataOn='#sync' label="" />
-                            <label id='sync'>Synchronous </label>
-                        </div>
+                    <div style={{display: 'flex', marginBottom:'3vh'}}>
+                        <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%', marginTop: '1.5rem'}}>DevOps Integration API url : </span>
+                        <pre className='grid_download_dialog__content__code' style={{ width: '58vh'}}>
+                            <code>
+                            {url}
+                            </code>
+                        </pre>
+                        <label>
+                                <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
+                                <div style={{fontSize:"24px"}}>
+                                    <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '3.5vh'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyKeyUrlFunc('api-url') }} ></i>
+                                </div>
+                            </label>
                     </div>
-                    <div style={{display: 'flex', marginBottom:'1rem'}}>
-                    <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '1.5rem'}}>DevOps Request Body : </span>
-                    <pre className='grid_download_dialog__content__code' style={{ width: '23rem', marginLeft: '46px'}}>
-                        <code style={{fontSize: 'smaller'}}>
-                            {str}
-                            {/* {abc} */}
-                        </code>
-                    </pre>
-                    <label>
-                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
-                            <div style={{fontSize:"24px"}}>
-                                <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => {  copyKeyUrlFunc('devops-key') }} ></i>
+                        <div style={{display: 'flex', marginBottom:'3vh'}}>
+                            <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
+                            <div className="devOps_dropdown_label_sync">
+                                <label id='async' htmlFor='synch' value='asynchronous'>Asynchronous </label>
+                                <Toggle label="" inlineLabel={true} />
+                                <label id='sync' htmlFor='synch' value='synchronous'>Synchronous </label>
                             </div>
-                        </label>
-                </div>
+                        </div>
+                        <div style={{display: 'flex', marginBottom:'3vh'}}>
+                        <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '8.5vh'}}>DevOps Request Body : </span>
+                        <pre className='grid_download_dialog__content__code' style={{ width: '58vh', marginLeft: '46px'}}>
+                            <code style={{fontSize: 'smaller'}}>
+                                {str}
+                                {/* {abc} */}
+                            </code>
+                        </pre>
+                        <label>
+                                <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
+                                <div style={{fontSize:"24px",marginTop:'5vh'}}>
+                                    <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => {  copyKeyUrlFunc('devops-key') }} ></i>
+                                </div>
+                            </label>
+                    </div>
                 </Dialog>
                 {/* Dialog for CI /CD  */}
                 </ScrollBar>
