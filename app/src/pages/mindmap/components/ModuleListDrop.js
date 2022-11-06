@@ -19,6 +19,7 @@ import ImportMindmap from'../components/ImportMindmap.js';
 */
 // this code is used for drop down of modules...
 const ModuleListDrop = (props) =>{
+   console.log("modName",props.setModName)
     const dispatch = useDispatch()
     const moduleList = useSelector(state=>state.mindmap.moduleList)
     const proj = useSelector(state=>state.mindmap.selectedProj)
@@ -40,6 +41,7 @@ const ModuleListDrop = (props) =>{
     const filterSc = props.filterSc
     const [selectedSc,setSelctedSc] = useState([])
     const [isE2EOpen, setIsE2EOpen] = useState(false);
+    const [collapse, setCollapse] = useState(false);
     
   
 
@@ -56,6 +58,10 @@ const ModuleListDrop = (props) =>{
     }
     const CreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
+    }
+    const clickCreateNew = () =>{
+        dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
+        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:proj})
     }
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
@@ -76,6 +82,7 @@ const ModuleListDrop = (props) =>{
             modName:"",
             moduleid:modID
         }
+        
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
         dispatch({type:actionTypes.SELECT_MODULE,payload:res})
@@ -85,8 +92,19 @@ const ModuleListDrop = (props) =>{
                 var modID = id
                 var type = name
                 var name = type
-                 
-            
+                // below code about scenarios fetching
+                console.log("isE2EOpen",isE2EOpen)
+        if (isE2EOpen){
+            // if (type!=='endtoend')
+        setBlockui({content:'loading scenarios',show:true})
+        //loading screen
+        var res = await populateScenarios(modID)
+        if(res.error){displayError(res.error);return}
+        // props.setModName(name)
+        setScenarioList(res)
+        setInitScList(res)
+        setBlockui({show:false})
+        return;}
                 if(type=='checkbox'){
                     let selectedModList = [];
                     if(moduleSelectlist.length>0){
@@ -111,8 +129,9 @@ const ModuleListDrop = (props) =>{
             loadModule(modID)
             return;
         }else{
-            setWarning(modID)
+            setWarning({modID, type: name})
         }
+        
     }
     
     const selectModuleChkBox = (e) => {
@@ -122,41 +141,27 @@ const ModuleListDrop = (props) =>{
     }
     
     //E2E properties
-    const selectModules = async(e) => {
+    const selectModules= async(e) => {
         // setSelctedSc([])
         var modID = e.currentTarget.getAttribute("value")
         var type = e.currentTarget.getAttribute("type")
         var name = e.currentTarget.getAttribute("name")
-        // if(Object.keys(moduleSelect).length===0 && type!=='endtoend'){
-        //     displayError(MSG.MINDMAP.WARN_SELECT_E2E);
-        //     return;
-        // }
-        // if(type!=='endtoend'){
-        //     setBlockui({content:'loading scenarios',show:true})
-        //     //loading screen
-        //     var res = await populateScenarios(modID)
-        //     if(res.error){displayError(res.error);return}
-        //     props.setModName(name)
-        //     setScenarioList(res)
-        //     setInitScList(res)
-        //     setBlockui({show:false})
-        //     return;
-        // }
-        
-       
         if(Object.keys(moduleSelect).length===0){
             loadModuleE2E(modID)
             return;
         }else{
-            setWarning(modID)
+            setWarning({modID, type});
+            setWarning({
+                modID: modID,
+                type: type
+            })
             // loadModuleE2E(modID)
         }
-    }
-    
-    // const d = (isE2EOpen?'true':'false')
-     
+    }    
     const loadModuleE2E = async(modID) =>{
         setWarning(false)
+        console.log('setIsE2EOpen',isE2EOpen)
+        setIsE2EOpen(true)
         setBlockui({show:true,content:"Loading Module ..."})        
         if(moduleSelect._id === modID){
             dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
@@ -173,38 +178,6 @@ const ModuleListDrop = (props) =>{
         if(res.error){displayError(res.error);return}
         dispatch({type:actionTypes.SELECT_MODULE,payload:res})
         setBlockui({show:false})
-        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-        // setWarning(false)
-        // setLoading(true)
-        // var reqE2E={
-        //     tab:"tabCreate",
-        //     projectid:proj,
-        //     version:0,
-        //     cycId: null,
-        //     // modName:"",
-        //     moduleid:[modID]
-        // }
-        // if(isAssign){
-        //     req.tab = "tabAssign"
-        //     req.cycId = props.cycleRef.current?props.cycleRef.current.value: ""
-        // }
-        // console.log('abc');
-        // var req={
-        //     tab:"endToend",
-        //     projectid:proj,
-        //     version:0,
-        //     cycId: null,
-        //     modName:"",
-        //     moduleid:modID
-        // }
-        // var res = await getModules(req)
-        // if(res.error){displayError(res.error);return}
-        // if(isAssign && res.completeFlow === false){
-        //     displayError(MSG.MINDMAP.WARN_SELECT_COMPLETE_FLOW)
-        //     return;
-        // }
-        // dispatch({type:actionTypes.SELECT_MODULE,payload:res})
-        // setLoading(false)
     }
     
     // E2E search button
@@ -226,10 +199,10 @@ const ModuleListDrop = (props) =>{
     return(
         <Fragment>
              {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
-            {warning?<ModalContainer 
+            {warning.modID?<ModalContainer 
                 title='Confirmation'
                 close={()=>setWarning(false)}
-                footer={<Footer modID={warning} loadModule={loadModule} setWarning={setWarning} />}
+                footer={<Footer modID={warning.modID} loadModule={warning.type ==='endtoend' ? loadModuleE2E : loadModule} setWarning={setWarning} />}
                 content={<Content/>} 
                 modalClass='modal-sm'
             />:null}
@@ -293,7 +266,7 @@ const ModuleListDrop = (props) =>{
                                 {
                                     key: 'csv',
                                     text: 'Create New Module..',
-                                    onClick: () => {CreateNew()
+                                    onClick: () => {clickCreateNew()
                                     }
                                 },
                                 {
@@ -327,12 +300,15 @@ const ModuleListDrop = (props) =>{
                         <div key={i+'scenario'} onClick={(e)=>addScenario(e)} className={'dropdown_scenarios'+(selectedSc[e._id]?' selected':'')} title={e.name} value={e._id} >{e.name}</div>
                     )
                 })} */}
-                {/* {scenarioList.map((e,i)=>{ 
-                    console.log('scenario',scenarioList)
-                    return( 
-                        <div key={i+'scenario'}  title={e.name} value={e._id} >{e.name}</div>
+                
+              
+                {scenarioList.map((e,i)=>{ 
+                    console.log('scenario',e)
+                    return(
+                            <div key={i+'scenario'}  title={e.name} value={e._id} >{e.name}</div>
+                           
                     )
-                })} */}
+                })}
                             {/* {moduleList.map((e,i)=>{
                                 if(e.type==="basic")
                                 return(
