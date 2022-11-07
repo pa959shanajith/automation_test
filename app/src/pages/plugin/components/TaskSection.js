@@ -218,7 +218,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             setOverlay("Loading Tasks..Please wait...");
             pluginApi.getProjectIDs()
             .then(data => {
-                console.log(data)
+                // console.log(data)
                 setProjectNames(data);
                 if(data === "Fail" || data === "Invalid Session") return RedirectPage(history);
                 else {
