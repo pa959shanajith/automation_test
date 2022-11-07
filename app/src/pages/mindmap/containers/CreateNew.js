@@ -12,7 +12,7 @@ import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils'
 import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
-import CanvasEnE from './CanvasEnE';
+
 
 /*Component CreateNew
   use: renders create New Mindmap page
@@ -51,6 +51,7 @@ const CreateNew = ({importRedirect}) => {
         dispatch({type:actionTypes.UPDATE_PROJECTLIST,payload:data})
         if(!importRedirect){
             dispatch({type:actionTypes.SELECT_PROJECT,payload:selectProj?selectProj:res.projectId[0]}) 
+            console.log('hello');
             var req={
                 tab:"endToend",
                 projectid:selectProj?selectProj:res.projectId[0],
@@ -72,9 +73,6 @@ const CreateNew = ({importRedirect}) => {
         setLoading(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    return ()=>{
-        dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-    }
   },[])
 
   const displayError = (error) =>{
@@ -82,7 +80,6 @@ const CreateNew = ({importRedirect}) => {
     setLoading(false)
     setMsg(error)
   }
-//   console.log('this is mod select',moduleSelect)
   
   return (
     <Fragment>
@@ -95,6 +92,7 @@ const CreateNew = ({importRedirect}) => {
                     <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
                     
                 </div>
+                
                 <ModuleListDrop />
                 <div id='mp__canvas' className='mp__canvas'>
                 

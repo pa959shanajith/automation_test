@@ -354,6 +354,10 @@ if (cluster.isMaster) {
       return res.send({isTrialUser})
     })
 
+	app.get('/getServiceBell', (req,res) => {
+		const enableServiceBell = uiConfig.enableServiceBell;
+		return res.send({enableServiceBell})
+    })
 		//Route Directories
 		var mindmap = require('./server/controllers/mindmap');
 		var pdintegration = require('./server/controllers/pdintegration');

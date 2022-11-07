@@ -73,17 +73,16 @@
 .labelStyle1 {
     display:flex;
     flex-direction: column;
-    margin-bottom: -0.5rem;
+    margin-bottom: -0.3rem;
     padding:0rem 1rem;
     // font-weight: 300;
     line-height: 70%;
-    margin-top: 0.5rem;
-    font-size: 1.7rem;
-    font-weight: 800;
-    color: rgb(50, 49, 48);
+    margin-top: 0.7rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #323130;;
    font-family: Mulish;
     font-style: normal;
-    display: inline-block;
     
 }
 .display_project_box {
@@ -93,10 +92,8 @@
     line-height: 1.5rem;
     border: 2px solid var(--baseColorBorder);
     box-sizing: content-box;
-    width: 307px;
-    margin: 2px;
-    height: 10rem;
-    margin-top: -0.9rem;
+    width: 300px;
+    margin: 6px;
 }
 .display_project_box_list, input[type=checkbox]{
     box-sizing: border-box;
@@ -133,26 +130,21 @@
     font-family:  "LatoWeb" ;
     font-size: 20px;
     margin: 3px;
-    margin-top: -1rem;
+    margin-top: -50px;
     display: flex;
     flex-direction: row;
     border-bottom: 3px solid $borderFour;
     
    }
 .button-design{
-    margin-left: 4.5rem;
+    float: "left";
+    margin-left: 12.5rem;
     font-family:"LatoWeb";
     font-size: 18px;
     padding: 0rem 1rem 0rem 1rem;
     margin-bottom: 5px;
-    margin-top: -0.1rem;
-    width: 17rem;
-
-}
-.create_button{
-    font-size: medium;
-    font-family:"LatoWeb" ;
-    color: black;
+    margin-top: 0.1rem;
+    float: "bottom";
 }
 
 

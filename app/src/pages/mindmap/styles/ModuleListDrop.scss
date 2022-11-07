@@ -47,8 +47,8 @@
     height: 0.09rem;
     width: 85%;
     background-color: grey;
-    margin-top:0.67rem;
-    margin-left: 1rem;
+    margin-top:0.57rem;
+    margin-left: -0.55rem;
     z-index: 2;
 }
 // .divider{
@@ -227,25 +227,21 @@
     height: '80vh';
     display: flex;
     flex-direction: column;
-    border-right: 0.01rem solid black;
 }
 
 .fullContainer{
-    display: flex;
-    width: 28%;
+    width: 18%;
     height:94%;
     border-right: 0.01rem solid black;
 }
 
 .moduleList{
     height: 80%;
-    // padding: 0.25rem;
+    padding: 0.25rem;
     scroll-behavior: smooth;
     overflow-y: scroll;
     display: flex;
     flex-direction: column;
-    text-overflow: ellipsis;
-    width:105%;
 }
 
 .modulesBox{
@@ -267,24 +263,7 @@
     flex-direction: column;
     scroll-behavior: smooth;
     overflow-y: scroll;
-    width:105%;
-
 }
 .modNme{
     font-size: 0.75rem;
-}
-.scenarioList{
-    height: 80%;
-    padding: 0.25rem;
-    scroll-behavior: smooth;
-    overflow-y: scroll;
-//    margin-left: 18%;
-//    display: flex;
-   display: inline-block
-
-
-}
-.wholeVerticalBar{
-    display: inline-flexbox;
-
 }

@@ -69,13 +69,9 @@ const Header = ({show_WP_POPOVER=false, ...otherProps}) => {
     };
     
     const logout = event => {
-        let isTrial=userInfo.isTrial
         event.preventDefault();
         persistor.purge();
         RedirectPage(history, { reason: "logout" });
-        if(isTrial){
-            window.location.replace('https://avoautomation.ai/cloud-pricing/')
-        }
     };
 
   // getting OS version using userAgent
