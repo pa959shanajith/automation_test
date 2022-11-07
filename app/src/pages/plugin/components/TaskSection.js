@@ -470,31 +470,22 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
             </div>
             <div>
             <div className="task-nav-bar1">
-                {projectNames && projectNames.projectName.map((singleProj,idx)=>{
-                   
-return <>
-<div style={{display:'flex',justifyContent:'space-between'}}>
-<span className={"task-nav-item" + (activeTab==="todo" && "active-tab")} style={{display:"flex", flexDirection:"column"}}>
-            <span title={projectNames && singleProj}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
+            <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")}><ol><li>{projectNames && projectNames.projectName}</li></ol></span>
             {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
-<div className='button-design'>
+       
+            <div className='button-design'>
             
             
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"1000px" ,margin: "3px"}} onClick={(e) => {
                    window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-                   window.location.href = "/mindmap";
-             }}>Design</button>
+                   window.location.href = "/Execute";
+             }}>Execute</button>
             
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"500px" ,margin: "3px"}} onClick={(e) => { 
                 window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-                window.location.href = "/execute";
-                }}>Execute</button>
+                window.location.href = "/mindmap";
+                }}>Design</button>
             </div>
-            </div>
-            </>  
-                })}
-                   
-            
        
             </div> 
             </div>

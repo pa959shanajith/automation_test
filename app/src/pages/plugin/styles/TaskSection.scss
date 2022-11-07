@@ -132,14 +132,13 @@
     margin: 3px;
     margin-top: -50px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     border-bottom: 3px solid $borderFour;
-   
     
    }
 .button-design{
     float: "left";
-   
+    margin-left: 12.5rem;
     font-family:"LatoWeb";
     font-size: 18px;
     padding: 0rem 1rem 0rem 1rem;

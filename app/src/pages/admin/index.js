@@ -3,7 +3,7 @@ import AdminHome from './containers/AdminHome'
 import { useHistory } from 'react-router-dom';
 import TokenManagement from './containers/TokenMangement';
 import IceProvision from './containers/IceProvision'
-import GitConfig from './containers/GitConfig'
+import GitConfig from './containers/GitConfig';
 export var history
 
 /*Component App

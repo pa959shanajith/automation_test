@@ -496,6 +496,8 @@ class TestSuiteExecutor {
     };
     setExecStatus = async (dataFromIce) => {
         const fnName = "setExecStatus";
+        if('exec_req' in dataFromIce)
+            dataFromIce.exce_data = dataFromIce.exec_req;
         let execReq = dataFromIce.exce_data.execReq;
         let event = dataFromIce.exce_data.event;
         let status = dataFromIce.status,execType = 'ACTIVE';

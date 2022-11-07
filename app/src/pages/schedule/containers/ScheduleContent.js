@@ -34,9 +34,26 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [statusChange, setStatusChange] = useState("Select Status");
     const [clearScheduleData, setClearScheduleData] = useState(false);
     const [selectedItem, setSelectedItem] = useState({});
+    const [currentTask, setCurrentTask] = useState({})
 
     useEffect(()=>{
-        getScheduledDetails()
+        if (typeof current_task.testSuiteDetails === 'undefined') {
+            setCurrentTask({
+                testSuiteDetails: [{
+                    assignedTime: "",
+                    releaseid: item.executionRequest.batchInfo[0].releaseId,
+                    cycleid: item.executionRequest.batchInfo[0].cycleId,
+                    testsuiteid: item.executionRequest.batchInfo[0].testsuiteId,
+                    testsuitename: item.executionRequest.batchInfo[0].testsuiteName,
+                    projectidts: item.executionRequest.batchInfo[0].projectId,
+                    assignedTestScenarioIds: "",
+                    subTaskId: "",
+                    versionnumber: item.executionRequest.batchInfo[0].versionNumber,
+                }],
+                versionnumber: item.executionRequest.batchInfo[0].versionNumber,
+            });
+        }
+        getScheduledDetails();
     }, []);
 
     const getScheduledDetails = async () => {
@@ -168,7 +185,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const ScheduleTestSuite = async (schedulePoolDetails) => {
         setAllocateICE(false);
         setClearScheduleData(false);
-        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, current_task, appType, filter_data);
+        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, currentTask, item.executionRequest.batchInfo[0].appType, filter_data);
         if(!modul_Info){
             return
         }
@@ -324,6 +341,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     exeTypeLabel={"Select Schedule type"}
                     exeIceLabel={"Allocate ICE"}
                     scheSmartMode={smartMode}
+                    currentTask={currentTask}
                 />
             :null}
             { showIntegrationModal ? 
@@ -353,7 +371,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                         <div id="s__btns">
                             <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}}  title="Add">Schedule</button>
                         </div>
-                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={current_task} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
+                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={currentTask} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} item={item} />
                     </div>
 
                 {/* //lower scheduled table Section */}
