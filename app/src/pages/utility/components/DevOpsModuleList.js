@@ -11,7 +11,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
     const [searchText, setSearchText] = useState("");
     const [filteredList, setFilteredList] = useState(moduleScenarioList);
     const handleSearchChange = (value) => {
-        let filteredItems = moduleScenarioList.filter(item => (item.configurename.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.project.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.release.toLowerCase().indexOf(value.toLowerCase()) > -1));
+        let filteredItems = filteredModuleList.filter(item => (item.moduleState.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.filteredItems.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.release.toLowerCase().indexOf(value.toLowerCase()) > -1));
         setFilteredList(filteredItems);
         setSearchText(value);
     }
@@ -300,7 +300,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         })()
     },[integrationConfig.selectValues[2].selected]);
     const handleExecutionTypeChange = (selectedType) => {
-        const selectedKey = selectedType.key;
+        const selectedKey = selectedType;
         let filteredNodes = [];
         if(selectedKey === 'normalExecution') {
             filteredNodes = moduleScenarioList[selectedKey].map((module) => {
@@ -393,6 +393,11 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
     }
     return (
         <>
+         <div style={{display:'flex', position:'absolute',top:'31vh'}} > 
+                <input type='radio' id="E2E" value='e2eExecution'  onChange={() => handleExecutionTypeChange('e2eExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/>&nbsp;<label >E2E Execution&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type='radio' id='Batch' value='batchExecution' onChange={()=>handleExecutionTypeChange('batchExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><label >&nbsp;Batch Execution&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <input type='radio' id='Normal' value='normalExecution'  onChange={()=>handleExecutionTypeChange('normalExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><label >&nbsp;Normal Execution</label>
+            </div> 
             <Dialog
                 hidden = {modalContent === false}
                 onDismiss = {() => setModalContent(false)}
@@ -435,9 +440,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
             {
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
                     <div className='devOps_module_list_filter'>
+                        <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
                         <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
-                        {/* <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} /> */}
-                        
                         {/* <SearchDropdown
                             calloutMaxHeight="30vh"
                             noItemsText={'Loading...'}

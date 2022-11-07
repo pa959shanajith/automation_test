@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useHistory, Redirect } from 'react-router-dom';
 import {v4 as uuid} from 'uuid';
-import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents,ValidationExpression, GenerateTaskList, Messages as MSG, setMsg,Messages ,VARIANT} from '../../global';
+import { RedirectPage, ScrollBar, ScreenOverlay, TaskContents, GenerateTaskList, Messages as MSG, setMsg } from '../../global';
 import FilterDialog from "./FilterDialog";
 import * as actionTypes from '../state/action';
 import * as pluginApi from "../api";
@@ -21,15 +21,13 @@ import { Dialog } from 'primereact/dialog';
 import ProjectNew from '../../admin/containers/ProjectAssign';
 import { DataTable } from 'primereact/datatable';
 // import { FontSizes } from '@fluentui/react';
-// import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
-import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs, createProject_ICE} from '../api';
+import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE} from '../api';
 import { text } from 'body-parser';
-
 
 // import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 
-const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
+const TaskSection = ({userInfo, userRole, dispatch}) =>{
 
     const history = useHistory();
     
@@ -69,35 +67,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
    
     const [projectNames, setProjectNames] = useState(null);
     const [projectId,setprojectId]=useState(null);
-    const [loading,setLoading] = useState(false)
 
-    const displayError = (error) =>{
-        setLoading(false)
-        setMsg(error)
-    }
-    
-    const checkCycle = (flag)=>{
-        for (var j = 0; j < props.releaseList.length; j++) {    
-			for (var i = 0; i < props.projectDetails.length; i++) {
-				if (props.releaseList[j] === props.projectDetails[i].name) {
-					if (props.projectDetails[i].cycles.length === 0) {
-                        displayError(Messages.ADMIN.WARN_ADD_CYCLE);
-                        return true;
-					}
-				}
-			}
-        };
-        return false;
-    }
-
-    const refreshDomainList = async () => {
-        let data = await getDomains_ICE() 
-        if(data.error){displayError(data.error);return;}
-        else if(data.length===0){
-            data=['Banking','Manufacturing','Finance'];
-        }
-        props.setSelDomainOptions(data);
-    }
     // const displayError = (error) =>{
     //     setLoading(false)
     //     setMsg(error)
@@ -126,7 +96,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
         console.log("UserDetailsList");
         console.log(UserList);
-            const ProjectList = await getProjectIDs(["domaindetails"],["Banking"]);
+            const ProjectList = await getDetails_ICE(["domaindetails"],["Banking"]);
         // ProjectList = {
         //     "projectIds":["62e27e5887904e413dad10fe", "62e27e5887904e413dad10ff"],
         //     "projectNames":["avangers", "avangers2"]
@@ -135,13 +105,13 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             setMsg(MSG.CUSTOM("Error while fetching the project Details"));
         }else{
             
-            const arraynew = ProjectList.projectId.map((element, index) => {
+            const arraynew = ProjectList.projectIds.map((element, index) => {
                 return (
                     {
                         key: element,
-                        text: ProjectList.projectName[index],
-                        // disabled: true,
-                        // title: 'License Not Supported' 
+                        text: ProjectList.projectNames[index],
+                        disabled: true,
+                        title: 'License Not Supported'
                     }
                 )
             });
@@ -168,7 +138,68 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             setMsg(MSG.CUSTOM("Error while fetching the app Details"));
         }else{
             console.log(plugins_list);
-            
+            // const arraynew1= {"desktop":true,"mainframe":false,"mobileapp":true,"mobileweb":true,"oebs":true,"sap":true,"system":false,"web":true,"webservice":true}
+            // let txt = [{key: "desktop",
+            //           text: "Desktop",
+            //           title: "Desktop",
+            //         disabled: false
+            //               }, 
+            //         {
+            //         key: "mainframe",
+            //         disabled: true,
+            //         title: 'License Not Supported',
+            //         text: "Mainframe"
+                    
+            //          },
+            //          {
+            //             key: "mobileapp",
+            //             disabled: true,
+            //             title: 'License Not Supported',
+            //             text: "mobileapp"
+                        
+            //          },
+            //          {
+            //             key: "mobileweb",
+            //             disabled: true,
+            //             title: 'License Not Supported',
+            //             text: "mobileweb"
+                        
+            //         },
+            //         {
+            //             key: "oebs",
+            //             disabled: true,
+            //             title: 'License Not Supported',
+            //             text: "oebs"
+                            
+            //         },
+            //         {
+            //             key: "sap",
+            //             disabled: true,
+            //             title: 'License Not Supported',
+            //             text: "sap"
+                        
+            //         },
+            //         {
+            //             key: "system",
+            //             disabled: true,
+                    //     title: 'License Not Supported',
+                    //     text: "system"
+                        
+                    // },
+                    // {
+                    //     key: "web",
+                    //     disabled: true,
+                    //     title: 'License Not Supported',
+                    //     text: "Mainframe"
+                        
+                    // },
+                    // {
+                    //     key: "webservice",
+                    //     disabled: true,
+                    //     title: 'License Not Supported',
+                    //     text: "webservice"
+                        
+                    // }];
                     let txt = [];
                      for (let x in plugins_list) {
                         if(plugins_list[x] === true) {
@@ -335,9 +366,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     };
 
     const searchTask = (activeTab, value) => {
-        let items = activeTab === "todo" ? todoItems : 
-        
-        reviewItems;
+        let items = activeTab === "todo" ? todoItems : reviewItems;
         let filteredItem = [];
 
         filteredItem = items.filter(item=>item.taskname.toLowerCase().indexOf(value.toLowerCase()) > -1);
@@ -420,38 +449,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     //     );
     // }
     
-    const create_project = async()=>{
-        
-                        setLoading("Saving...");
-                        const createprojectObj = {};
-                        createprojectObj.domain = 'Banking';
-                        createprojectObj.projectName = props.projectName.trim();
-                        createprojectObj.appType = props.projectTypeSelected;
-                        createprojectObj.projectDetails = [
-                            {
-                              "name": "R1",
-                              "cycles": [
-                                {
-                                  "name": "C1"
-                                }
-                              ]
-                            }
-                          ];
-                        console.log(createprojectObj);
-                        console.log("Controller: " + createprojectObj);
-                        const createProjectRes = await createProject_ICE(createprojectObj)
-                        if(createProjectRes.error){displayError(createProjectRes.error);return;}
-                        else if (createProjectRes === 'success') {
-                            displayError(Messages.ADMIN.SUCC_PROJECT_CREATE);
-                            props.resetForm();
-                            props.setProjectDetails([]);
-                            refreshDomainList();
-                        } else {
-                            displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
-                            props.resetForm();
-                        }
-                        setLoading(false);
-                    }
+    
     return (
         
         <>
@@ -478,15 +476,15 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             <div className='button-design'>
             
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "100px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"5000px" ,margin: "3px"}} onClick={(e) => {
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"1000px" ,margin: "3px"}} onClick={(e) => {
                    window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-                   window.location.href = "/mindmap";
-             }}>Design</button>
+                   window.location.href = "/Execute";
+             }}>Execute</button>
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "100px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"2500px" ,margin: "3px"}} onClick={(e) => { 
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"500px" ,margin: "3px"}} onClick={(e) => { 
                 window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-                window.location.href = "/execute";
-                }}>Execute</button>
+                window.location.href = "/mindmap";
+                }}>Design</button>
             </div>
        
             </div> 
@@ -495,7 +493,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
                 
                 
-    <Dialog header='Create Project'visible={displayBasic} style={{ width: '30vw' }}  onHide={() => onHide('displayBasic')}>
+    <Dialog header='Create Project'visible={displayBasic} style={{ width: '40vw' }}  onHide={() => onHide('displayBasic')}>
         <div>
             <div className='dialog_dropDown'>
                 {/* {
@@ -512,10 +510,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                     //   fontSize='40px'
                     //   marginLeft="200px"
                 />
-                {/* /create_project() */}
-                {/* <p><a href="#" onClick={()=>{}} target="_blank">Select Project</a></p> */}
-
-                {/* <a  style={{ background: "transparent", color: "green", border: "none", padding:"0,0,0,10", FontSize:"-10px",marginRight:"300px",marginTop:"5px"}} label="Select Project"  onClick={() => onClick('displayBasic')} a/> */}
+                
+                <Button  style={{ background: "transparent", color: "green", border: "none", padding:"0,0,0,10", FontSize:"-10px",marginRight:"300px",marginTop:"5px"}} label="create Project"  onClick={() => onClick('displayBasic')} />
                 
                 {/* <p onClick = {() => setisCreate(!isCreate)}>{
                     isCreate == true ? 'Select Project' : '+ Create New'                     
@@ -552,9 +548,9 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                 />
             </div>
             
-            <div className='labelStyle1'> <label><h5>users</h5></label></div>
+            <div className='labelStyle1'> <label>users</label></div>
         
-					<div className="wrap" style={{height:'13rem'}}>
+					<div className="wrap">
                             <div className='display_project_box'>
                                 {userDetailList.map((user, index) => (
                                         <div key={index} className='display_project_box_list'>
@@ -568,7 +564,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                     </div>
                     <div>
                         <div>
-                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} onClick={()=>{create_project()}}>Create</button>
+                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} onClick={(e) => { }}>Create</button>
                         </div>  
                     </div>
  
