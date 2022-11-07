@@ -7,6 +7,7 @@ import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import Pagination from '../components/Pagination';
 import DevOpsList from '../../utility/components/DevOpsList';
+import { CheckBox } from '@avo/designcomponents';
 
 const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction,item}) => {
 
@@ -34,26 +35,9 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const [statusChange, setStatusChange] = useState("Select Status");
     const [clearScheduleData, setClearScheduleData] = useState(false);
     const [selectedItem, setSelectedItem] = useState({});
-    const [currentTask, setCurrentTask] = useState({})
 
     useEffect(()=>{
-        if (typeof current_task.testSuiteDetails === 'undefined') {
-            setCurrentTask({
-                testSuiteDetails: [{
-                    assignedTime: "",
-                    releaseid: item.executionRequest.batchInfo[0].releaseId,
-                    cycleid: item.executionRequest.batchInfo[0].cycleId,
-                    testsuiteid: item.executionRequest.batchInfo[0].testsuiteId,
-                    testsuitename: item.executionRequest.batchInfo[0].testsuiteName,
-                    projectidts: item.executionRequest.batchInfo[0].projectId,
-                    assignedTestScenarioIds: "",
-                    subTaskId: "",
-                    versionnumber: item.executionRequest.batchInfo[0].versionNumber,
-                }],
-                versionnumber: item.executionRequest.batchInfo[0].versionNumber,
-            });
-        }
-        getScheduledDetails();
+        getScheduledDetails()
     }, []);
 
     const getScheduledDetails = async () => {
@@ -185,7 +169,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
     const ScheduleTestSuite = async (schedulePoolDetails) => {
         setAllocateICE(false);
         setClearScheduleData(false);
-        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, currentTask, item.executionRequest.batchInfo[0].appType, filter_data);
+        const modul_Info = parseLogicExecute(schedulePoolDetails, moduleScheduledate, scheduleTableData, item.executionRequest.batchInfo[0].currentTask, appType, filter_data);
         if(!modul_Info){
             return
         }
@@ -341,7 +325,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     exeTypeLabel={"Select Schedule type"}
                     exeIceLabel={"Allocate ICE"}
                     scheSmartMode={smartMode}
-                    currentTask={currentTask}
+                    currentTask={item.executionRequest.batchInfo[0].currentTask}
                 />
             :null}
             { showIntegrationModal ? 
@@ -357,7 +341,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
             :null} 
             
             <div className="s__task_container">
-                <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
+                <div className="s__task_title"> <div className="s__task_name">{ item.executionRequest.configurename }-Schedule</div></div>
                     
                 </div>
                 <div id="pageContent">
@@ -369,14 +353,18 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                             <option value="2">Zephyr</option>
                         </select>
                         <div id="s__btns">
-                            <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}}  title="Add">Schedule</button>
+
+                            <button className="s__btn-md btnAddToSchedule only_schedule" onClick={()=>{ScheduleTestSuitePopup()}}  title="Add" >Schedule</button>
+
                         </div>
-                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={currentTask} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} item={item} />
+                        
+                        <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={item.executionRequest.batchInfo[0].currentTask} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
                     </div>
 
                 {/* //lower scheduled table Section */}
                 <div id="scheduleSuitesBottomSection">
                     <div id="page-taskName">
+                        <div>
                         <select value={statusChange} onChange={(event)=>{selectStatus(event.target.value); setStatusChange(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
                             <option disabled={true} value={"Select Status"}>Select Status</option>
                             <option value={"Completed"}>Completed</option>
@@ -390,26 +378,38 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                             <option value={"Skipped"}>Skipped</option>
                             <option value={"Show All"}>Show All</option>
                         </select>
-                        <div id="s__btns" onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
+                        {/* <div>
+                            <CheckBox name='Saucelabs'/>
+                        </div> */}
+                       
+                        </div>
+                        </div>
+
+                       
+                        
+                        
+                        <div id="s__btns">
+                            <button className={"s__btn-md btnAddToSchedule"+(showRecurringSchedules?" disabled":"")} onClick={() => {handleOnButtonClickScheduled();}} title="Scheduled Tasks">
+                                Scheduled Tasks
+                            </button>
+
+                        </div>
                         <div id="s__btns">
                             <button className={"s__btn-md btnAddToSchedule"+(showScheduledTasks?" disabled":"")} onClick={() => {handleOnButtonClickRecurring();}} title="Recurring Schedules">
                                 Recurring Schedules
                             </button>
                         </div>
-                        <div id="s__btns">
-                            <button className={"s__btn-md btnAddToSchedule"+(showRecurringSchedules?" disabled":"")} onClick={() => {handleOnButtonClickScheduled();}} title="Scheduled Tasks">
-                                Scheduled Tasks
-                            </button>
-                        </div>
-                    </div>
+                        <div id="s__btns" onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
+                        
+                    
 
                     <div className="scheduleDataTable">
 						<div className="scheduleDataHeader">
 							<span className="s__Table_date s__table_Textoverflow s__cursor s__Table_border" onClick={()=>{sortDateTime()}} title="Click to sort" ng-click="reverse=!reverse;predicate='scheduledatetime'">Date & Time</span>
 							<span className="s__Table_host s__table_Textoverflow s__Table_border" >Host</span>
-							<span className="s__Table_scenario s__table_Textoverflow s__Table_border" >Scenario Name</span>
+							{/* <span className="s__Table_scenario s__table_Textoverflow s__Table_border" >Scenario Name</span>
 							<span className="s__Table_suite s__table_Textoverflow s__Table_border" >Test Suite</span>
-							<span className="s__Table_appType s__table_Textoverflow s__Table_border" >App Type</span>
+							<span className="s__Table_appType s__table_Textoverflow s__Table_border" >App Type</span> */}
                             <span className="s__Table_scheduleType s__table_Textoverflow s__Table_border" >Schedule Type</span>
 							<span className="s__Table_status s__table_Textoverflow s__Table_border" >Status</span>
 						</div>
@@ -425,13 +425,13 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                             <div key={index} className="scheduleDataBodyRowChild">
                                                                 <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Job created on: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
                                                                 <div data-test = "schedule_data_target_user" className="s__Table_host" title={"Ice Pool: " +data.poolname}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
-                                                                <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
-                                                                <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
-                                                                <div data-test = "schedule_data_browser_type" className="s__Table_appType">
+                                                                {/* <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div> */}
+                                                                {/* <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div> */}
+                                                                {/* <div data-test = "schedule_data_browser_type" className="s__Table_appType">
                                                                     {data.browserlist.map((brow,index)=>(
                                                                         <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
                                                                     ))}
-                                                                </div>
+                                                                </div> */}
                                                                 <div data-test="schedule_data_schedule_type" className="s__Table_scheduleType" title={data.recurringstringonhover}>   
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>

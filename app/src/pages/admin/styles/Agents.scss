@@ -255,14 +255,13 @@
     height: 33px;
 }
 .devOps_module_list {
-    padding: 1%;
+    padding: 1.5%;
     border: 2px solid #633693;
     border-radius: 0.625rem;
     width: 50%;
-    height: 58vh;
-    margin-top: 6vh;
+    height: 50vh;
     &_filter {
-        margin-bottom: 2%;
+        margin-bottom: 3%;
         display: flex;
         justify-content: space-between;
     }
@@ -273,9 +272,6 @@
 }
 .devOps_pool_list {
     width: 45%;
-    margin-top: 19vh;
-    position: absolute;
-    left: 116vh;
     & > div {
         margin: 4.4% 0;
         display: flex;
@@ -323,13 +319,13 @@
         margin-right: 8%;
     }
     &_browser {
-        margin-right: 14%;
+        margin-right: 15%;
     }
     &_integration {
-        margin-right: 21%;
+        margin-right: 19%;
     }
     &_execution {
-        margin-right: 16.5%;
+        margin-right: 15.5%;
         margin-bottom: 8px;
     }
     &_url {

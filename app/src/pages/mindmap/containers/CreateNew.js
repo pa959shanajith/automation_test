@@ -97,8 +97,7 @@ const CreateNew = ({importRedirect}) => {
                 <div id='mp__canvas' className='mp__canvas'>
                 
                     {(Object.keys(moduleSelect).length>0)?
-                    <CanvasNew displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/> 
-                    // +<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
+                    <CanvasNew displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
                     :<Fragment>
                    
                         <ExportMapButton/>
@@ -106,18 +105,7 @@ const CreateNew = ({importRedirect}) => {
                         <Legends/>
                     </Fragment>}
                     
-                    
                 </div>
-                <div>
-                {/* {(Object.keys(moduleSelect).length>0)? */}
-                    {/* <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/> */}
-                    :<Fragment>
-                   
-                        {/* <ExportMapButton/>
-                        <SaveMapButton disabled={true}/>
-                        <Legends/> */}
-                    </Fragment>
-                    </div>
                 
             </div>:null
         }

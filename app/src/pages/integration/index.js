@@ -5,6 +5,9 @@ import { useHistory } from 'react-router-dom';
 import { SetProgressBar, RedirectPage } from '../global';
 export var history
 
+
+
+
 const Integration = ()=>{
     history =  useHistory()
     const dispatch = useDispatch();

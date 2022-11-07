@@ -11,7 +11,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
     const [searchText, setSearchText] = useState("");
     const [filteredList, setFilteredList] = useState(moduleScenarioList);
     const handleSearchChange = (value) => {
-        let filteredItems = filteredModuleList.filter(item => (item.moduleState.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.filteredItems.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.release.toLowerCase().indexOf(value.toLowerCase()) > -1));
+        let filteredItems = moduleScenarioList.filter(item => (item.configurename.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.project.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.release.toLowerCase().indexOf(value.toLowerCase()) > -1));
         setFilteredList(filteredItems);
         setSearchText(value);
     }
@@ -205,12 +205,12 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                     // <Icon iconName='input' />
                     let filteredNodes = [];
                     if(selectedExecutionType === 'normalExecution') {
-                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
                                 label: module.name,
                             };
-                            if(module.scenarios && module.scenarios.length > 0) {
+                            if(module.scenarios.length > 0) {
                                 const moduleChildren = module.scenarios.map((scenario) => {
                                     return ({
                                         value: scenario._id,
@@ -234,12 +234,12 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                                 label: batch,
                             };
                             if(batchData[batch].length > 0) {
-                                filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
+                                filterBatch['children'] = batchData[batch].map((module) => {
                                     let filterModule = {
                                         value: module.moduleid,
                                         label: module.name,
                                     };
-                                    if(module.scenarios && module.scenarios.length > 0) {
+                                    if(module.scenarios.length > 0) {
                                         const moduleChildren = module.scenarios.map((scenario, index) => {
                                             if(newScenarioList.includes(batch+module.moduleid+scenario._id)) {
                                                 flagCheckToUpdateNodeKey = true;
@@ -271,13 +271,14 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                             setIntegrationConfig({...integrationConfig, scenarioList: newScenarioList, dataParameters: newDataParams});
                         }
                     } else if(selectedExecutionType === 'e2eExecution') {
-                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
                                 label: module.name,
                             };
-                            if(module.scenarios && module.scenarios.length > 0) {
+                            if(module.scenarios.length > 0) {
                                 const moduleChildren = module.scenarios.map((scenario, index) => {
+                                    console.log('useeffect : '+module.batchname+module.moduleid+index+scenario._id);
                                     return ({
                                         value: module.batchname+module.moduleid+index+scenario._id,
                                         label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
@@ -299,7 +300,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         })()
     },[integrationConfig.selectValues[2].selected]);
     const handleExecutionTypeChange = (selectedType) => {
-        const selectedKey = selectedType;
+        const selectedKey = selectedType.key;
         let filteredNodes = [];
         if(selectedKey === 'normalExecution') {
             filteredNodes = moduleScenarioList[selectedKey].map((module) => {
@@ -307,8 +308,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                     value: module.moduleid,
                     label: module.name,
                 };
-                if(module.scenarios && module.scenarios.length > 0) {
-                    const moduleChildren = module.scenarios.filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((scenario) => {
+                if(module.scenarios.length > 0) {
+                    const moduleChildren = module.scenarios.map((scenario) => {
                         return ({
                             value: scenario._id,
                             label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
@@ -321,12 +322,12 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                 return filterModule;
             });
         } else if(selectedKey === 'e2eExecution') {
-            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+            filteredNodes = moduleScenarioList[selectedKey].map((module) => {
                 let filterModule = {
                     value: module.moduleid,
                     label: module.name,
                 };
-                if(module.scenarios && module.scenarios.length > 0) {
+                if(module.scenarios.length > 0) {
                     const moduleChildren = module.scenarios.map((scenario, index) => {
                         return ({
                             value: module.batchname+module.moduleid+index+scenario._id,
@@ -348,12 +349,12 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                     label: batch,
                 };
                 if(batchData[batch].length > 0) {
-                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 > 0 } ).map((module) => {
+                    filterBatch['children'] = batchData[batch].map((module) => {
                         let filterModule = {
                             value: module.moduleid,
                             label: module.name,
                         };
-                        if(module.scenarios && module.scenarios.length > 0) {
+                        if(module.scenarios.length > 0) {
                             const moduleChildren = module.scenarios.map((scenario, index) => {
                                 return ({
                                     value: batch+module.moduleid+index+scenario._id,
@@ -392,15 +393,10 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
     }
     return (
         <>
-         <div style={{display:'flex', position:'absolute',top:'31vh'}} > 
-                <input type='radio' id="E2E" value='e2eExecution'  onChange={() => handleExecutionTypeChange('e2eExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/>&nbsp;<label >E2E Execution&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <input type='radio' id='Batch' value='batchExecution' onChange={()=>handleExecutionTypeChange('batchExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><label >&nbsp;Batch Execution&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <input type='radio' id='Normal' value='normalExecution'  onChange={()=>handleExecutionTypeChange('normalExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><label >&nbsp;Normal Execution</label>
-            </div> 
             <Dialog
                 hidden = {modalContent === false}
                 onDismiss = {() => setModalContent(false)}
-                title = 'Execution Parameters'
+                title = 'Scenario Data Parametrization'
                 minWidth = '60rem'
                 confirmText = 'Save'
                 declineText = 'Cancel'
@@ -439,8 +435,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
             {
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>
                     <div className='devOps_module_list_filter'>
-                        <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} />
                         <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
+                        {/* <Tab options={options} selectedKey={selectedTab} onLinkClick={HandleTabChange} /> */}
+                        
                         {/* <SearchDropdown
                             calloutMaxHeight="30vh"
                             noItemsText={'Loading...'}
