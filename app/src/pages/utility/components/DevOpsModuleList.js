@@ -299,7 +299,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         })()
     },[integrationConfig.selectValues[2].selected]);
     const handleExecutionTypeChange = (selectedType) => {
-        const selectedKey = selectedType.key;
+        const selectedKey = selectedType;
         let filteredNodes = [];
         if(selectedKey === 'normalExecution') {
             filteredNodes = moduleScenarioList[selectedKey].map((module) => {
