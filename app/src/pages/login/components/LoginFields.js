@@ -385,11 +385,6 @@ const LoginFields = (props) => {
 
     useEffect(()=>{
         setInitialFormPos(-20);
-        (async()=>{
-          const response = await fetch("/getLicenseInfo")
-          let { isTrialUser } = await response.json();
-          setIsTrialInstance(isTrialUser)
-        })();
         if(props.verifyPage){
             setOverlayText("Loading...");
             (async()=>{
@@ -611,9 +606,9 @@ const LoginFields = (props) => {
               <div style={{marginBottom:"1rem"}}>
                 <TextField
                   iconName="user"
-                  label="Username"
+                  label="Username/Email"
                   onChange={handleUsername}
-                  placeholder="Username"
+                  placeholder="Username/Email"
                   value={username}
                   onFocus={()=>setFocus("username")}
                   width="400px"

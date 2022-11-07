@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import ExecuteHome from './containers/ExecuteHome'
 import { useHistory } from 'react-router-dom';
-import {RedirectPage} from '../global'
+import {RedirectPage} from '../global';
 export var history
 
 /*Component App
@@ -12,9 +12,9 @@ const Execute = () => {
   history = useHistory();
 
   useEffect(()=>{
-      // if(window.localStorage['navigateScreen'] !== "TestSuite"){
-      //     RedirectPage(history, { reason: "screenMismatch" });
-      // }
+      if(window.localStorage['navigateScreen'] !== "TestSuite"){
+          RedirectPage(history, { reason: "screenMismatch" });
+      }
   }, []);
   
   return (

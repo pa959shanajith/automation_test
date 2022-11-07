@@ -10,7 +10,6 @@ import "../styles/DevOps.scss";
 import DevOpsList from '../components/DevOpsList';
 import DevOpsConfig from '../components/DevOpsConfig';
 
-
 const DevOps = props => {
     const [showConfirmPop, setShowConfirmPop] = useState(false);
     const api = window.location.href.slice(0, -7)+'execAutomation';
