@@ -1,19 +1,171 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
-import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer } from '../../global';
-import { SearchBox, Dialog } from '@avo/designcomponents';
-import { fetchConfigureList, deleteConfigureKey, execAutomation, getQueueState, deleteExecutionListId } from '../api';
+import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer, ResetSession } from '../../global';
+import { SearchBox , SearchDropdown, Toggle } from '@avo/designcomponents';
+import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects, fetchAvoAgentAndAvoGridList, } from '../api';
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+import { useSelector, useDispatch } from 'react-redux';
+import { Dropdown } from 'primereact/dropdown';
+import { MultiSelect } from 'primereact/multiselect';
+import * as actionTypes from "../../plugin/state/action";
+// import { fetchProjects } from '../api';
+import { ExecuteTestSuite_ICE } from '../../execute/api';
+import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
+import * as pluginApi from "../../plugin/api";
 import {v4 as uuid} from 'uuid';
 import CheckboxTree from 'react-checkbox-tree';
 
 import "../styles/DevOps.scss";
+import { prepareOptionLists } from './DevOpsUtils';
 
-const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading }) => {
+
+
+const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading, setIntegrationConfig }) => {
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
     const [executionQueue, setExecutionQueue] = useState(false);
     const [filteredList, setFilteredList] = useState(configList);
+    const [displayBasic, setDisplayBasic] = useState(false);
+    const [displayBasic1, setDisplayBasic1] = useState(false);
+    const [displayBasic2, setDisplayBasic2] = useState(false);
+    const [position, setPosition] = useState('center');
+    const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
+    const [getProjectList,setProjectList]=useState([]);
+    const [getplugins_list,setplugins_list]=useState([]);
+    const [projectData, setProjectData] = useState([]);
+    const [allocateICE,setAllocateICE] = useState(false);
+    const [userDetailList,setUserDetailList]=useState([]);
+    const [proceedExecution, setProceedExecution] = useState(false);
+    const [dataExecution, setDataExecution] = useState({});
+    const [showIntegrationModal,setShowIntegrationModal] = useState(false);
+    const [modalDetails,setModalDetails] = useState({title:"",task:""});
+    const [moduleInfo,setModuleInfo] = useState([]);
+    const [dataDict, setDict] = useState({});
+    const [selectedProject, setSelectedProject] = useState(null);
+
+    useEffect(()=>{
+                pluginApi.getProjectIDs()
+                .then(data => {
+                        setProjectData(data);
+                        console.log(data.releases[0][0])           
+        })},[])
+  
+    useEffect(()=>{
+        (async() => {
+            const UserList =  await pluginApi.getUserDetails("user");
+        if(UserList.error){
+            setMsg(MSG.CUSTOM("Error while fetching the user Details"));
+        }else{
+            setUserDetailList(UserList);
+        }
+
+
+            const ProjectList = await getDetails_ICE(["domaindetails"],["Banking"]);
+        if(ProjectList.error){
+            setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+        }else{
+            
+            const arraynew = ProjectList.projectIds.map((element, index) => {
+                return (
+                    {
+                        code: element,
+                        name: ProjectList.projectNames[index],
+                        // disabled: true,
+                        // title: 'License Not Supported'
+                    }
+                )
+            });
+            setProjectList(arraynew);
+        }
+        
+
+        // console.log("domaindetails","Banking");
+        // console.log(ProjectList);
+            var plugins = []; 
+        const plugins_list= await getAvailablePlugins();
+       
+        
+        if(plugins_list.error){
+            setMsg(MSG.CUSTOM("Error while fetching the app Details"));
+        }else{
+            console.log(plugins_list);
+           
+                    let txt = [];
+                     for (let x in plugins_list) {
+                        if(plugins_list[x] === true) {
+                            txt.push({
+                                key: x,
+                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                                title: x.charAt(0).toUpperCase()+x.slice(1),
+                                disabled: false
+                            })
+                        }
+                        else {
+                            txt.push({
+                                key: x,
+                                text: x.charAt(0).toUpperCase()+x.slice(1),
+                                title: 'License Not Supported',
+                                
+                            })
+                        }
+                       }
+                   
+            setplugins_list(txt);
+        }
+        
+        })()
+        
+    },[]);
+        
+    const dialogFuncMap = {
+        'displayBasic': setDisplayBasic,
+        'displayBasic1': setDisplayBasic1,
+        'displayBasic2': setDisplayBasic2
+    }
+    const [selectedItem, setSelectedItem] = useState({});
+
+    const onClick = (name, position) => {
+        dialogFuncMap[`${name}`](true);
+        if(name === 'displayBasic1'){
+            setSelectedItem(position);
+        }
+        if (position) {
+            setPosition(position);
+        }
+    }
+    const renderFooter = (name) => {
+        return (
+            <div>
+                <Button label="Execute" title="Execute" onClick={async () => {
+                let temp = execAutomation(setCurrentIntegration && configList.map((item, index) => item.configurekey)[0]);
+                setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS))
+                  onHide(name)} } autoFocus />
+            </div>
+        );
+    }
+    const onHide = (name) => {
+        dialogFuncMap[`${name}`](false);
+    }
+
+    const copyKeyUrlFunc = (id) => {
+        const data = document.getElementById(id).value;
+        if (!data) {
+            setApiKeyCopyToolTip("Nothing to Copy!");
+            setTimeout(() => {
+                setApiKeyCopyToolTip("Click to Copy");
+            }, 1500);
+            return;
+        }
+        const x = document.getElementById(id);
+        x.select();
+        document.execCommand('copy');
+        setApiKeyCopyToolTip("Copied!");
+        setTimeout(() => {
+            setApiKeyCopyToolTip("Click to Copy");
+        }, 1500);
+    }
 
     const copyTokenFunc = () => {
         const data = url;
@@ -192,6 +344,9 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
             }, 500);
         })()
     }, []);
+ 
+    let projectid = getProjectList[0]
+    console.log(projectid)
 
     return (<>
         {
@@ -272,9 +427,28 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                             </div>
                         </label>
                     </span>
-                </div>
+                </div> 
+    
             </> }
+            
         </div>
+        
+                  <div style={{marginTop: '-9vh', display: 'flex', marginBottom: '2vh'}}>
+                 <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '2vh', marginRight: '5px'}}>Project Name : </span>
+        
+                    <Dropdown value={selectedProject} style={{width:'31vh', position: 'relative', border:'0.4vh solid #613191 '}} options={getProjectList} onChange={onProjectChange} optionLabel="name"  placeholder="Select the Project"/>
+                {/* <SearchDropdown
+                    noItemsText={[ ]}
+                    onChange={() =>{}}
+                    options={getProjectList}
+                    placeholder={setCurrentIntegration && configList.map((item, index) => item.project)}
+                    selectedKey={""}
+                    width='15rem'
+
+                    />   */}
+                    {/* <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '0.5rem', marginRight: '5px'}}>Project Name : </span> */}
+                </div>
+            
         { configList.length > 0 ? <>
             { /* Table */ }
             <div className="d__table" style={{ flex: 0 }}>
