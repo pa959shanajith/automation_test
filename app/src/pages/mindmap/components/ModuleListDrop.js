@@ -8,7 +8,7 @@ import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
 import {IconDropdown} from '@avo/designcomponents';
 import ImportMindmap from'../components/ImportMindmap.js';
-
+import CreateOptions from '../components/CreateOptions.js'; 
 
 
 // import CreateOptions from '../components/CreateOptions.js';
@@ -229,7 +229,6 @@ const ModuleListDrop = (props) =>{
                 content={<Content/>} 
                 modalClass='modal-sm'
             />:null}
-           
             <div className='fullContainer pxBlack'>
                 <div className='leftContainer pxBlack'>
                     <div className='modulesBox'>
@@ -315,7 +314,6 @@ const ModuleListDrop = (props) =>{
                         </div>
                     </div>
                 </div>
-                <div className='wholeVerticalBar'>
                 <div className='scenarioList'>
                     
                 {/* {scenarioList.map((e,i)=>{
@@ -347,7 +345,6 @@ const ModuleListDrop = (props) =>{
                                     )
                             })} */}
                         </div>
-            </div>
             </div>
             <div data-test="dropDown" onClick={()=>{
                     dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})
