@@ -22,7 +22,7 @@ import ProjectNew from '../../admin/containers/ProjectAssign';
 import { DataTable } from 'primereact/datatable';
 // import { FontSizes } from '@fluentui/react';
 // import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
-import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs} from '../api';
+import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs, createProject_ICE} from '../api';
 import { text } from 'body-parser';
 
 
@@ -61,7 +61,6 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [statechange,setStateChange] = useState(true);
     const [selectBox,setSelectBox] = useState([]);
     const [userDetailList,setUserDetailList]=useState([]);
-    const [createProjectCheck,setCreateProjectCheck]=useState(false);
     // const [getAvailablePlugins,setAvailablePlugins]=useState([]);
     const [getProjectList,setProjectList]=useState([]);
     const [getplugins_list,setplugins_list]=useState([]);
@@ -440,6 +439,17 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                           ];
                         console.log(createprojectObj);
                         console.log("Controller: " + createprojectObj);
+                        const createProjectRes = await createProject_ICE(createprojectObj)
+                        if(createProjectRes.error){displayError(createProjectRes.error);return;}
+                        else if (createProjectRes === 'success') {
+                            displayError(Messages.ADMIN.SUCC_PROJECT_CREATE);
+                            props.resetForm();
+                            props.setProjectDetails([]);
+                            refreshDomainList();
+                        } else {
+                            displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
+                            props.resetForm();
+                        }
                         setLoading(false);
                     }
     return (
@@ -457,7 +467,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             </div>
             <div>
             
-            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10", FontSize:"10px",marginLeft:"300px",marginTop:"10px", padding: '0'}} label="Add/Manage Project"  onClick={() => onClick('displayBasic')} />
+            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10", FontSize:"10px",marginLeft:"300px",marginTop:"10px"}} label="Add and Manage Project"  onClick={() => onClick('displayBasic')} />
             
             </div>
             <div>
@@ -470,8 +480,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "100px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"5000px" ,margin: "3px"}} onClick={(e) => {
                    window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-                   window.location.href = "/mindmap";
-             }}>Design</button>
+                   window.location.href = "/execute";
+             }}>Execute</button>
             
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "100px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"2500px" ,margin: "3px"}} onClick={(e) => { 
                 window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
@@ -485,27 +495,25 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
                 
                 
-    <Dialog header={!createProjectCheck ? 'Select Project' : 'Create Project'} visible={displayBasic} style={{ width: '30vw' }}  onHide={() => onHide('displayBasic')}>
+    <Dialog header='Create Project'visible={displayBasic} style={{ width: '30vw' }}  onHide={() => onHide('displayBasic')}>
         <div>
             <div className='dialog_dropDown'>
                 {/* {
                     isCreate == true ? <TextField /> : <NormalDropDown /> 
                 } */}
-                {
-                    createProjectCheck ? <TextField label='Enter Project Name'  width='19rem' placeholder='Enter Project Name' /> : <NormalDropDown
-                        label="Select Project Name"
-                        options={getProjectList}
+                <NormalDropDown
+                    label=" Project Name"
+                    options={getProjectList}
+                    
                         
-                            
-                        placeholder="Select Project"
-                        standard
-                        width="300px"
-                        //   fontSize='40px'
-                        //   marginLeft="200px"
-                    />
-                }
+                    placeholder="enter the project name"
+                    standard
+                    width="300px"
+                    //   fontSize='40px'
+                    //   marginLeft="200px"
+                />
                 {/* /create_project() */}
-                <p><a style={{ color: 'green' }} onClick={()=>{setCreateProjectCheck(!createProjectCheck)}} target="_blank">{createProjectCheck ? 'Select Project' : 'Create New Project'}</a></p>
+                {/* <p><a href="#" onClick={()=>{}} target="_blank">Select Project</a></p> */}
 
                 {/* <a  style={{ background: "transparent", color: "green", border: "none", padding:"0,0,0,10", FontSize:"-10px",marginRight:"300px",marginTop:"5px"}} label="Select Project"  onClick={() => onClick('displayBasic')} a/> */}
                 
@@ -518,32 +526,30 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                 {/* {
                     isCreate == false ? <TextField /> : <NormalDropDown /> 
                 } */}
-                {
-                    createProjectCheck ? <NormalDropDown  
-                        label="Select App type"
-                        options={getplugins_list}
-                        // disabled={true}
-                        
-                        label1="Apptype"
-                        options1={[selectedProject && allProjects[selectedProject] ?
-                                {
-                                    key: allProjects[selectedProject].apptype,
-                                    text: allProjects[selectedProject].apptypeName
-                                }
-                            : {}
-                        ]}
-                        placeholder="Select Apptype"
-                        width="300px"
-                        top="200px"
-                
-                        // disabled={!selectedProject}
-                        // required
-                        onChange={(e, item) => {
-                        setAppType(item.text)
-                        }}
-                
-                    /> : <TextField label='Selected App Type' value='Web' width='19rem' />
-                }
+                <NormalDropDown  
+                    label="App type"
+                    options={getplugins_list}
+                    // disabled={true}
+                    
+                    label1="Apptype"
+                    options1={[selectedProject && allProjects[selectedProject] ?
+                            {
+                                key: allProjects[selectedProject].apptype,
+                                text: allProjects[selectedProject].apptypeName
+                            }
+                        : {}
+                    ]}
+                    placeholder="Select an apptype"
+                    width="300px"
+                    top="200px"
+               
+                    // disabled={!selectedProject}
+                    // required
+                    onChange={(e, item) => {
+                    setAppType(item.text)
+                    }}
+              
+                />
             </div>
             
             <div className='labelStyle1'> <label><h5>users</h5></label></div>
@@ -562,7 +568,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                     </div>
                     <div>
                         <div>
-                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} onClick={()=>{create_project()}}>{createProjectCheck ? 'Create' : 'Modify'}</button>
+                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} onClick={()=>{create_project()}}>Create</button>
                         </div>  
                     </div>
  

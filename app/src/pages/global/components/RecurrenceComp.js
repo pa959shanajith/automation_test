@@ -299,16 +299,10 @@ const RecurrenceComp = (props) => {
     };
 
     const handleFSTFLChange = (event) => {
-        setRecurringValue("");
-        setRecurringStringOnHover("");
-        setMonthlyRecurrenceMonthValue_1("");
         setMonthlyRecurrenceFSTFLValue(event.target.value);
     };
 
     const handleWeekInputChange = (event) => {
-        setRecurringValue("");
-        setRecurringStringOnHover("");
-        setMonthlyRecurrenceMonthValue_1("");
         setMonthlyRecurrenceWeekValue(event.target.value);
     };
 

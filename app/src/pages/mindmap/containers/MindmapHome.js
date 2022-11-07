@@ -1,16 +1,13 @@
-import React, { useState, Fragment, useEffect } from 'react';
+import React, { useState, Fragment } from 'react';
 import { Header, FooterTwo as Footer,ActionBar,ReferenceBar, setMsg, ScreenOverlay} from '../../global'
 import CreateOptions from '../components/CreateOptions.js'; 
 import CreateNew from './CreateNew.js';
 import CreateEnE from './CreateEnE.js'
 import CreateAssign from './CreateAssign.js';
 import ImportMindmap from'../components/ImportMindmap.js';
-import {exportMindmap, getProjectList, getModules} from '../api';
+import {exportMindmap} from '../api';
 import '../styles/MindmapHome.scss';
 import {Messages as MSG} from '../../global';
-import {parseProjList} from './MindmapUtils';
-import {useDispatch, useSelector} from 'react-redux';
-
 
 /*Component MindmapHome
   use: renders mindmap plugins landing page 
@@ -21,7 +18,6 @@ const MindmapHome = () => {
   const [options,setOptions] = useState(undefined)
   const [importPop,setImportPop] = useState(false)
   const [blockui,setBlockui] = useState({show:false})
-  const selectProj = useSelector(state=>state.mindmap.selectedProj)
   // const selectedModule = useSelector(state=>state.mindmap.selectedModule)
   // const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
   // const selectedProj = useSelector(state=>state.mindmap.selectedProj)
@@ -41,24 +37,6 @@ const MindmapHome = () => {
     setBlockui({show:false})
     setMsg(error)
   }
-  useEffect(() => {
-    (async () => {
-      const res = await getProjectList()
-      if(res.error){return;}
-      const data = parseProjList(res)
-      var req={
-        tab:"endToend",
-        projectid:selectProj?selectProj:res.projectId[0],
-        version:0,
-        cycId: null,
-        modName:"",
-        moduleid:null
-      }
-      // var moduledata = await getModules({"tab":"tabCreate","projectid":selectProj?selectProj:res.projectId[0],"moduleid":null})
-      var moduledata = await getModules(req);
-      if(moduledata.length > 0) setOptions1('newmindmap');
-    })()
-  },[]);
  
 
 //data-selected="true"
@@ -102,7 +80,7 @@ const MindmapHome = () => {
         <ActionBar collapsible={true} collapse={options}>
           <div className="mp__ic_box">
             <div className="ic_box" title="Create">
-              <img onClick={()=>setOptions(undefined)} alt='Create Mindmap' className={"thumb__ic"+(options!=='assignmap' && options!=='importmodules'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
+              <img onClick={()=>setOptions(undefined)} alt='Create Mindmap' className={"thumb__ic"+(options==='createmindmap'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
                 <span className="rb_box_title">Create</span>
             </div>
             <div className="ic_box" title="Assign">

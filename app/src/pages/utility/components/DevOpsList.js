@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer } from '../../global';
 import { SearchBox , SearchDropdown, Toggle } from '@avo/designcomponents';
-import { fetchConfigureList, deleteConfigureKey, execAutomation, getQueueState, deleteExecutionListId } from '../api';
+import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects } from '../api';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { MultiSelect } from 'primereact/multiselect';
@@ -12,8 +12,7 @@ import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
 import * as pluginApi from "../../plugin/api";
 import {v4 as uuid} from 'uuid';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
-import ScheduleHome from '../../schedule/containers/ScheduleHome';
-import CheckboxTree from 'react-checkbox-tree';
+import ScheduleHome from '../../schedule/containers/ScheduleHome'
 import "../styles/DevOps.scss";
 
 
@@ -22,7 +21,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
-    const [executionQueue, setExecutionQueue] = useState(false);
     const [filteredList, setFilteredList] = useState(configList);
     const [displayBasic, setDisplayBasic] = useState(false);
     const [displayBasic1, setDisplayBasic1] = useState(false);
@@ -305,58 +303,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         }, 500);
         setShowConfirmPop(false);
     }
-    const [confirmExecuteNow, setConfirmExecuteNow] = useState(false);
-    const getCurrentQueueState = async () => {
-        setLoading('Please Wait...');
-        const queueList = await getQueueState();
-        if(queueList.error) {
-            if(queueList.error.CONTENT) {
-                setMsg(MSG.CUSTOM(queueList.error.CONTENT,VARIANT.ERROR));
-            } else {
-                setMsg(MSG.CUSTOM("Error While Fetching Execution Queue List",VARIANT.ERROR));
-            }
-        }else {
-            let nodesCollection = [];
-            for (let item in queueList) {
-                let nodeItem = {
-                    value: item,
-                    label: item+'   :   '+queueList[item][0][0].configurename,
-                    showCheckbox: false
-                }
-                let nodeItemChildren = [];
-                let nodeItemChildrenIndex = 1;
-                for (let executionNode of queueList[item]) {
-                    let executionItem = {
-                        value: item+nodeItemChildrenIndex,
-                        label: <div className="devOps_terminate_icon">Execution {nodeItemChildrenIndex}   <img src={"static/imgs/cicd_terminate.png"} title="Terminate Execution" alt="Terminate icon" onClick={async () => {
-                                const deleteExecutionFromQueue = await deleteExecutionListId({configurekey: item, executionListId: executionNode[0].executionListId});
-                                if(deleteExecutionFromQueue.status !== 'pass') {
-                                    setMsg(MSG.CUSTOM("Error While Removing Execution from Execution Queue",VARIANT.ERROR));
-                                }else {
-                                    getCurrentQueueState();
-                                }
-                            }}/></div>,
-                        showCheckbox: false,
-                        // className: 'devOps_terminate_style',
-                        children: executionNode.map((executionRequest) => ({
-                            label: 'Module : '+executionRequest.modulename+',   Status: '+executionRequest.status,
-                            value: executionRequest.executionListId+executionRequest.moduleid,
-                            showCheckbox: false
-                        }))
-                    };
-                    nodeItemChildrenIndex++;
-                    nodeItemChildren.push(executionItem);
-                }
-                nodeItem['children'] = nodeItemChildren;
-                nodesCollection.push(nodeItem);
-            }
-            setExecutionQueue({
-                list: nodesCollection,
-                expanded: []
-            });
-        }
-        setLoading(false);
-    }
     const onClickDeleteDevOpsConfig = (name, key) => {
         setShowConfirmPop({'title': 'Delete DevOps Configuration', 'content': <p>Are you sure, you want to delete <b>{name}</b> Configuration?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
     }
@@ -428,45 +374,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     }, []);
 
     return (<>
-        {
-            executionQueue && 
-            <Dialog
-                hidden = {executionQueue === false}
-                onDismiss = {() => setExecutionQueue(false)}
-                title = 'Manage Execution Queue'
-                minWidth = '60rem' >
-                    {
-                        (executionQueue.list.length > 0 ) ? <CheckboxTree
-                            showNodeIcon={false} className='devOps_checkbox_tree' nodes={executionQueue.list} expanded={executionQueue.expanded} onExpand={(expanded) => setExecutionQueue({...executionQueue, expanded: expanded}) } /> : 
-                            <p>You have nothing pending to execute. Try to Execute any Configure Key and come here. </p>
-                    }
-            </Dialog>
-        }
-        {
-            confirmExecuteNow && <Dialog
-                hidden = {confirmExecuteNow === false}
-                onDismiss = {() => setConfirmExecuteNow(false)}
-                title = 'Confirm Execute Now'
-                minWidth = '60rem'
-                confirmText = 'Confirm'
-                declineText = 'Cancel'
-                onDecline={() => setConfirmExecuteNow(false)}
-                onConfirm = {async () => {
-                    const temp = await execAutomation(confirmExecuteNow.configurekey);
-                    if(temp.status !== "pass") {
-                        if(temp.error && temp.error.CONTENT) {
-                            setMsg(MSG.CUSTOM(temp.error.CONTENT,VARIANT.ERROR));
-                        } else {
-                            setMsg(MSG.CUSTOM("Error While Adding Configuration to the Queue",VARIANT.ERROR));
-                        }
-                    }else {
-                        setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                    }
-                    setConfirmExecuteNow(false);
-                }} >
-                    Are you sure you want to execute <b>{confirmExecuteNow.configname}</b> now?
-            </Dialog>
-        }
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
                 Execution Profile
@@ -494,10 +401,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                 </div>
                 {/* <div style={{marginLeft: '7rem'}}>
-                <div className="api-ut__btnGroup">
-                    <button onClick={() => getCurrentQueueState() }>Manage Execution Queue</button>
-                </div>
-                <div>
                     <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>DevOps Integration API url : </span>
                     <span className="api-ut__inputLabel"><input type="text" value={url} data-test="req-body-test" className="req-body" autoComplete="off" id="api-url" name="request-body" style={{width:"25%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
                         <label>
