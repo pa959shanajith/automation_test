@@ -16,7 +16,7 @@ const UpperContent = props => {
 
     const dispatch = useDispatch();
     const disableAction = useSelector(state => state.scrape.disableAction);
-    
+    const disableAppend = useSelector(state => state.scrape.disableAppend);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const { appType, subTaskId } = useSelector(state => state.plugin.CT);
     const [isMac, setIsMac] = useState(false);
@@ -30,14 +30,14 @@ const UpperContent = props => {
     }, [appType, saved, subTaskId]);
 
 
-    // const WebList = [
-        // { 'title': "Internet Explorer", 'img': "static/imgs/internet_explorer_logo_new.svg", action: () => startScrape('ie'), 'disable': disableAction || compareFlag },
-    //     { 'title': "Google Chrome", 'img': "static/imgs/chrome_logo_new.svg", action: () => startScrape('chrome'), 'disable': disableAction || compareFlag },
-    //     { 'title': "Safari", 'img': "static/imgs/safari_logo_new.svg", action: () => startScrape('safari'), 'disable': disableAction || compareFlag },
-    //     { 'title': "Mozilla Firefox", 'img': "static/imgs/firefox_logo_new.svg", action: () => startScrape('mozilla'), 'disable': disableAction || compareFlag },
-    //     { 'title': "Microsoft Edge", 'img': "static/imgs/edge_logo_new.svg", action: () => startScrape('edge'), 'disable': disableAction || compareFlag },
-    //     { 'title': "Edge Chromium", 'img': "static/imgs/edge_logo_new.svg", action: () => startScrape('chromium'), 'disable': disableAction || compareFlag }
-    // ]
+    const WebList = [
+        { 'title': "Internet Explorer", 'img': "static/imgs/internet_explorer_logo_new.svg", action: () => startScrape('ie'), 'disable': disableAction || compareFlag },
+        { 'title': "Google Chrome", 'img': "static/imgs/chrome_logo_new.svg", action: () => startScrape('chrome'), 'disable': disableAction || compareFlag },
+        { 'title': "Safari", 'img': "static/imgs/safari_logo_new.svg", action: () => startScrape('safari'), 'disable': disableAction || compareFlag },
+        { 'title': "Mozilla Firefox", 'img': "static/imgs/firefox_logo_new.svg", action: () => startScrape('mozilla'), 'disable': disableAction || compareFlag },
+        { 'title': "Microsoft Edge", 'img': "static/imgs/edge_logo_new.svg", action: () => startScrape('edge'), 'disable': disableAction || compareFlag },
+        { 'title': "Edge Chromium", 'img': "static/imgs/edge_logo_new.svg", action: () => startScrape('chromium'), 'disable': disableAction || compareFlag }
+    ]
 
     const oebsList = [{ 'title': "OEBS Apps", 'img': 'static/imgs/ic-desktop.png', action: ()=> setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction }]
 
@@ -62,17 +62,17 @@ const UpperContent = props => {
     }
 
     let renderComp = [
-        <div data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Insprint Automation</div>,
-        // (appType!=="Webservice" && <Thumbnail data-test="pdfUtility" key="pdf-icon-scrape" tooltip= "Launch PDF utility" title="PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
-    //     // <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
-    //     //     <input data-test="appendInput" id="enable_append" type="checkbox" title="Enable Append" onChange={onAppend} checked={appendCheck} />
-    //     //     <span data-test="append" className="ss__thumbnail_title" title="Enable Append">{appType==="Webservice" ? "Edit" : "Append"}</span>
-    //     // </div>
+        <div data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Scrape On</div>,
+        (appType!=="Webservice" && <Thumbnail data-test="pdfUtility" key="pdf-icon-scrape" tooltip= "Launch PDF utility" title="PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
+        <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
+            <input data-test="appendInput" id="enable_append" type="checkbox" title="Enable Append" onChange={onAppend} checked={appendCheck} />
+            <span data-test="append" className="ss__thumbnail_title" title="Enable Append">{appType==="Webservice" ? "Edit" : "Append"}</span>
+        </div>
     ];
 
     switch (appType) {
-        // case "Web": renderComp.splice(1, 0, <Fragment key="scrape-upper-section"> {WebList.map((icon, i) => icon.title !== "Safari" || isMac ? <Thumbnail key={i} title={icon.title} tooltip={"Launch "+icon.title} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable} /> : null)}</Fragment>);
-        //     break;
+        case "Web": renderComp.splice(1, 0, <Fragment key="scrape-upper-section"> {WebList.map((icon, i) => icon.title !== "Safari" || isMac ? <Thumbnail key={i} title={icon.title} tooltip={"Launch "+icon.title} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable} /> : null)}</Fragment>);
+            break;
         case "OEBS": renderComp.splice(1, 0, <Fragment key="scrape-upper-section">{oebsList.map((icon, i) => <Thumbnail key={i} title={icon.title} img={icon.img} tooltip={icon.title} action={icon.action} disable={icon.disable} />)}</Fragment>);
             break;
         case "Desktop": renderComp.splice(1, 0, <Fragment key="scrape-upper-section">{desktopList.map((icon, i) => <Thumbnail key={i} title={icon.title} tooltip={icon.title} img={icon.img} action={icon.action} disable={icon.disable} />)}</Fragment>);
