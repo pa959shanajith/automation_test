@@ -475,7 +475,7 @@ const TaskSection = ({userInfo, userRole, dispatch}) =>{
 return <>
 <div style={{display:'flex',justifyContent:'space-between'}}>
 <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")} style={{display:"flex", flexDirection:"column"}}>
-            <span title={projectNames && singleProj}> {projectNames && `${idx+1}:${singleProj}`}</span></span>
+            <span title={projectNames && singleProj}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
             {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
 <div className='button-design'>
             
