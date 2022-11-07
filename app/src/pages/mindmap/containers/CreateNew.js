@@ -29,7 +29,8 @@ const CreateNew = ({importRedirect}) => {
   const selectProj = useSelector(state=>state.mindmap.selectedProj)
   const prjList = useSelector(state=>state.mindmap.projectList)
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
-  
+  const [showScrape, setShowScrape] = useState(false)
+  const[ShowDesignTestSetup, setShowDesignTestSetup]=useState(false)
 
 
   useEffect(()=>{
@@ -83,6 +84,16 @@ const CreateNew = ({importRedirect}) => {
   
   return (
     <Fragment>
+        {/* {showScrape?<Dialog
+            // hidden = {showScrape === false}
+            onDismiss = {() => {setShowScrape(false)}}
+            
+            title={props.taskname + " : Capture Elements"} 
+            minWidth = '60rem' 
+            // onDecline={() => console.log(false)}
+            onConfirm = {() => { }} >
+                <div style={{ height: '120rem' }}><ScrapeScreen /></div>
+            </Dialog>:null} */}
         {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
         {(delSnrWarnPop)? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} displayError={displayError}/>:null}
         {(!loading)?
@@ -97,8 +108,7 @@ const CreateNew = ({importRedirect}) => {
                 <div id='mp__canvas' className='mp__canvas'>
                 
                     {(Object.keys(moduleSelect).length>0)?
-                    <CanvasNew displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/> 
-                    // +<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
+                    <CanvasNew showScrape={showScrape} setShowScrape={setShowScrape} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
                     :<Fragment>
                    
                         <ExportMapButton/>

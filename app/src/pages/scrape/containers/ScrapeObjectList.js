@@ -10,6 +10,9 @@ import * as scrapeApi from '../api';
 import "../styles/ScrapeObjectList.scss";
 import ScreenWrapper from './ScreenWrapper';
 import SubmitTask from '../components/SubmitTask';
+import { NormalDropDown } from "@avo/designcomponents";
+
+import { Button } from "primereact/button";
 
 const ScrapeObjectList = () => {
     const dispatch = useDispatch();
@@ -27,7 +30,8 @@ const ScrapeObjectList = () => {
     const [modified, setModified] = useState({});
     const [editableObj, setEditableObj] = useState({});
     const [dnd, setDnd] = useState(false);
-    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, setOrderList } = useContext(ScrapeContext);
+    const[captureButton, setCaptureButton]=useState("");
+    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, setOrderList, startScrape, } = useContext(ScrapeContext);
 
     useEffect(()=> {
         // setActiveEye(null);
@@ -41,6 +45,42 @@ const ScrapeObjectList = () => {
         setDnd(false);
         //eslint-disable-next-line
     }, [current_task])
+    
+  const disableAction = useSelector((state) => state.scrape.disableAction);
+  const compareFlag = useSelector((state) => state.scrape.compareFlag);
+
+  const [appendCheck, setAppendCheck] = useState(false);
+  const [isMac, setIsMac] = useState(false);
+  const disableAppend = useSelector((state) => state.scrape.disableAppend);
+  const { appType, subTaskId } = useSelector((state) => state.plugin.CT);
+  console.log(disableAppend, compareFlag);
+
+  useEffect(() => {
+    setIsMac(navigator.appVersion.toLowerCase().indexOf("mac") !== -1);
+    if (saved.flag || disableAction) setAppendCheck(false);
+    //eslint-disable-next-line
+  }, [appType, saved, subTaskId]);
+  const onAppend = (event) => {
+    dispatch({
+      type: actionTypes.SET_DISABLEACTION,
+      payload: !event.target.checked,
+    });
+    if (event.target.checked) {
+      setAppendCheck(true);
+      if (appType === "Webservice") setSaved({ flag: false });
+    } else setAppendCheck(false);
+  };
+  
+
+  // let renderComp = [
+  //     <div data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Capture</div>,
+  // ];
+  // switch (appType) {
+  //     case "Web": renderComp.splice(1, 0, <Fragment key="scrape-upper-section"> {WebList.map((icon, i) => icon.title !== "Safari" || isMac ? <Thumbnail key={i} title={icon.title} tooltip={"Launch "+icon.title} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable} /> : null)}</Fragment>);
+  //         break;
+  // };
+  // return renderComp;
+
 
     useEffect(()=>{
         let disable = {};
@@ -413,8 +453,120 @@ const ScrapeObjectList = () => {
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
                         { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>}
-                    </div>
+                          {/* dropdown button --divya*/}
 
+                    <div 
+                      data-test="scrapeOnHeading"
+                      key="scrapeOn"
+                      className={
+                        "ss__scrapeOn" +
+                        (disableAction || compareFlag ? " disable-thumbnail" : "")
+                      }
+                    ></div>
+                    <div style={{  marginLeft: '10px',marginTop:'23px',  boxSizing:'40px'  }}>
+                      {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
+                      <NormalDropDown 
+                      style={{height:'25px',marginLeft:'-3px', marginBottom: '50px', boxSizing:'40px', fontFamily:'LatoWeb' }}
+                        label="Select Browser"
+                        className={
+                          "ss__scrapeOn" +
+                          (disableAction || compareFlag ? " disable-thumbnail" : "")
+                        }
+                        onChange={(e,item)=>{setCaptureButton(item.key)}}
+                        // onChange={(e, item) => {
+                        //  ;
+                        // }}
+                        
+                        options={[
+                          {
+                            data: {
+                              icon: 'internet',
+                            },
+
+                            key: "3",
+                            text: "Internet Explorer",
+                          },
+
+                          {
+                            data: {
+                              icon: "chrome",
+                            },
+                            key: "1",
+                            text: "Google Chrome",
+                          },
+                          {
+                            data: {
+                              icon: "safari",
+                            },
+
+                            key: "safari",
+                            text: "Safari",
+                          },
+
+                          {
+                            data: {
+                              icon: "firefox",
+                            },
+
+                            key: "2",
+                            text: "Mozilla Firefox",
+                          },
+
+                          {
+                            data: {
+                              icon: "edge",
+                            },
+
+                            key: "7",
+                            text: "Microsoft Edge",
+                          },
+                          {
+                            data: {
+                              icon: "edge",
+                            },
+
+                            key: "8",
+                            text: "Edge Chromium",
+                          },
+                        ]}
+                        placeholder="Select Browser"
+                        width="185px"
+                        
+                      />
+                        
+                      
+                    </div>
+                  
+                    <div key="append-edit" className={"ss__thumbnail"} >
+                      <input
+                        data-test="appendInput"
+                        id="enable_append"
+                        type="checkbox"
+                        title="Enable Append"
+                        onChange={(e) => {
+                          onAppend(e);
+                        }}
+                        checked={appendCheck}
+                      />
+                      <span
+                        data-test="append"
+                        className="ss__thumbnail_title"
+                        title="Enable Append"
+                      >
+                        {appType === "Webservice" ? "Edit" : "Add Elements"}
+                      </span>
+                    </div>
+                  
+
+                    <Button label="Capture" className="p-button-warning" onClick={()=>{startScrape(captureButton)}} style={{marginLeft:'-18px'}} />
+
+
+
+
+
+                    </div>
+                    
+                    
                     <SubmitTask />
 
                 </div>
