@@ -10,6 +10,7 @@ import ExecuteHome from '../../execute/containers/ExecuteHome';
 import {Dialog} from '@avo/designcomponents';
 import ScrapeScreen from '../../scrape/containers/ScrapeScreen';
 import DesignHome from '../../design/containers/DesignHome';
+import "../../global/styles/ColorVariables.scss";
 
 import TaskBox from './TaskBox';
 import { useHistory } from 'react-router-dom';
@@ -56,69 +57,69 @@ const ControlBox = (props) => {
                 c.select('p.' + faRef.plus).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.plus1).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
-                c.select('p.' + faRef.edit).html('Edit End to End Module');
+                c.select('p.' + faRef.edit).html('Edit End to End Module').style('font-family','LatoWeb');;
                 c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
             }else{
                 c.select('p.' + faRef.plus).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.plus1).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !0);
                 c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-                c.select('p.' + faRef.delete).html('Delete Scenario');
+                c.select('p.' + faRef.delete).html('Delete Scenario').style('font-family','LatoWeb');;
             }
         }else if (t === 'modules') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus).html('Add Scenario');
+            c.select('p.' + faRef.plus).html('Add Scenario').style('font-family','LatoWeb');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus1 ).html('Add Scenarios');
-            c.select('p.' + faRef.edit ).html('Rename');
+            c.select('p.' + faRef.plus1 ).html('Add Scenarios').style('font-family','LatoWeb');
+            c.select('p.' + faRef.edit ).html('Rename').style('font-family','LatoWeb');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
             c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.assign).html('Assign');
+            c.select('p.' + faRef.assign).html('Assign').style('font-family','LatoWeb');
             c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.execute).html('Execute');
+            c.select('p.' + faRef.execute).html('Execute').style('font-family','LatoWeb');
             c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
 
         } else if (t === 'scenarios') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus ).html('Add Screen');
+            c.select('p.' + faRef.plus ).html('Add Screen').style('font-family','LatoWeb');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus1).html('Add Screens');
-            c.select('p.' + faRef.edit ).html('Rename');
+            c.select('p.' + faRef.plus1).html('Add Screens').style('font-family','LatoWeb');
+            c.select('p.' + faRef.edit ).html('Rename').style('font-family','LatoWeb');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.delete).html('Delete ');
+            c.select('p.' + faRef.delete).html('Delete ').style('font-family','LatoWeb');
             c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.record).html('Record');
+            c.select('p.' + faRef.record).html('Record').style('font-family','LatoWeb');
             c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.assign).html('Assign');
+            c.select('p.' + faRef.assign).html('Assign').style('font-family','LatoWeb');
             c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.execute).html('Execute');
+            c.select('p.' + faRef.execute).html('Execute').style('font-family','LatoWeb');
         } else if (t === 'screens') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus).html('Add Testcase');
+            c.select('p.' + faRef.plus).html('Add Testcase').style('font-family','LatoWeb');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus1).html('Add Testcases');
-            c.select('p.' + faRef.edit ).html('Rename');
+            c.select('p.' + faRef.plus1).html('Add Testcases').style('font-family','LatoWeb');
+            c.select('p.' + faRef.edit ).html('Rename').style('font-family','LatoWeb');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.delete).html('Delete ');
+            c.select('p.' + faRef.delete).html('Delete ').style('font-family','LatoWeb');
             c.select('p.' + faRef.captureelements).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.captureelements).html('Capture Elements');
+            c.select('p.' + faRef.captureelements).html('Capture Elements').style('font-family','LatoWeb');
             c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.assign).html('Assign');
+            c.select('p.' + faRef.assign).html('Assign').style('font-family','LatoWeb');
             c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.execute).html('Execute');
+            c.select('p.' + faRef.execute).html('Execute').style('font-family','LatoWeb');
         } else if (t === 'testcases') {
             c.select('p.' + faRef.plus ).classed('ct-ctrl-inactive', !0);
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !0);
             c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.edit ).html('Rename');
+            c.select('p.' + faRef.edit ).html('Rename').style('font-family','LatoWeb');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.delete ).html('Delete');
+            c.select('p.' + faRef.delete ).html('Delete').style('font-family','LatoWeb');
             c.select('p.' + faRef.designtestsetup).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.designtestsetup).html('Design Test Setup');
+            c.select('p.' + faRef.designtestsetup).html('Design Test Setup').style('font-family','LatoWeb');
             c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.assign).html('Assign');
+            c.select('p.' + faRef.assign).html('Assign').style('font-family','LatoWeb');
             c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.execute).html('Execute');
+            c.select('p.' + faRef.execute).html('Execute').style('font-family','LatoWeb');
         }
         d3.select('#ct-ctrlBox').classed('show-box', !0);
         p.classed('node-highlight',!0)
@@ -200,14 +201,15 @@ const ControlBox = (props) => {
            
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
             {t ==='modules'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
-                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
+                <p data-test="add" className="ct-ctrl fa fa-plus " value={props.nid} onClick={addNode}> </p>
                 <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
                 <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={editNode}></p>
                 <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode}></p>
                 <p data-test="assign"  className="ct-ctrl fa fa-light fa-user " style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59" , marginBottom: 8,paddingBottom: '20%'}} onClick={Assign} ><>  Assign </></p>
                 <p data-test="execute"  className="ct-ctrl fa fa-play" onClick={() => execute()}> Execute </p>
-            </div>   :     
-            t ==='scenarios'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
+            </div>   :  "" }  </ClickAwayListener>
+            <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
+           { t ==='scenarios'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
                 <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
                 <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
                 <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode}></p>
@@ -215,8 +217,9 @@ const ControlBox = (props) => {
                 <p data-test="record"  className="ct-ctrl fa fa-dot-circle-o " style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}}  > <> Record_AvoGenius </></p >
                 <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign}><>  Assign </></p>
                 <p data-test="execute"  className="ct-ctrl fa fa-play" onClick={() => execute()}> Execute </p>
-            </div> :
-            t ==='screens'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
+            </div> :""}</ClickAwayListener>
+            <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
+            {t ==='screens'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
                <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"onClick={editNode}></p>
@@ -224,8 +227,9 @@ const ControlBox = (props) => {
                <p data-test="captureelements"  className="ct-ctrl fa fa-crop "  onClick={() => CaptureElement()}><> Capture Elements  </></p>
                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign}><>  Assign </></p>
                <p data-test="execute"  className="ct-ctrl fa fa-play"  onClick={() => execute()}> Execute </p>
-            </div>   :
-            t ==='testcases'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
+            </div>   :""}</ClickAwayListener>
+            <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
+           {t ==='testcases'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
                <p data-test="add" className="ct-ctrl fa fa-plus ct-ctrl-inactive" value={props.nid} onClick={addNode}> </p>
                <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o ct-ctrl-inactive" value={props.nid} onClick={addMultipleNode}></p>
                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" onClick={editNode}></p>
@@ -233,8 +237,7 @@ const ControlBox = (props) => {
                <p data-test="designtestsetup"  className="ct-ctrl fa fa-list-alt" onClick={()=> DesignTest()} > <> Design Test Setup </></p>
                <p data-test="assign"  className="ct-ctrl fa fa-light fa-user" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign}><>  Assign </></p>
                <p data-test="execute"  className="ct-ctrl fa fa-play" onClick={() => execute()} > Execute </p>
-            </div> : ""
-}
+            </div> : ""}
         </ClickAwayListener> 
         </>
     )
