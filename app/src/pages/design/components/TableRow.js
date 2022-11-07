@@ -23,6 +23,7 @@ import "../styles/TableRow.scss";
 */
 
 const TableRow = (props) => {
+
     const rowRef = useRef(null);
     const [checked, setChecked] = useState(false);
     const [objName, setObjName] = useState(null);
@@ -32,7 +33,6 @@ const TableRow = (props) => {
     const [output, setOutput] = useState('');
     const [inputPlaceholder, setInputPlaceholder] = useState('');
     const [outputPlaceholder, setOutputPlaceholder] = useState('');
-    const [tooltip, setTooltip] = useState(null);
     const [keywordList, setKeywordList] = useState(null);
     const [focused, setFocused] = useState(false);
     const [commented, setCommented] = useState(false);
@@ -48,14 +48,12 @@ const TableRow = (props) => {
     useEffect(()=>{
         if (!focused){
             setObjName(props.testCase.custname);
-            const caseData = props.getKeywords(props.testCase.custname);
-            setObjType(caseData.obType);
+            setObjType(null);
             setKeyword(props.testCase.keywordVal);
             setInput(props.testCase.inputVal[0]);
             setOutput(props.testCase.outputVal);
             setInputPlaceholder(null);
             setOutputPlaceholder(null);
-            setTooltip(props.testCase.tooltip);
             setKeywordList(null);
             setTcAppType(props.testCase.appType);
             // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -154,7 +152,6 @@ const TableRow = (props) => {
         setObjType(caseData.obType);
         setOutputPlaceholder(placeholders.outputval);
         setInputPlaceholder(placeholders.inputval);
-        setTooltip(placeholders.tooltip?placeholders.tooltip:null);
         setObjName(event.target.value)
         setKeyword(caseData.keywords[0]);
         setTcAppType(caseData.appType);
@@ -167,7 +164,6 @@ const TableRow = (props) => {
         setOutput("");
         setOutputPlaceholder(placeholders.outputval);
         setInputPlaceholder(placeholders.inputval);
-        setTooltip(placeholders.tooltip?placeholders.tooltip:null);
         setKeyword(event.target.value);
     };
 
@@ -203,13 +199,11 @@ const TableRow = (props) => {
                 </span>
                 <span className="keyword_col" >
                     { focused ? 
-                    <>
-                        <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} disabled={disableStep}>
-                            { objName === "OBJECT_DELETED" && <option>{keyword}</option> }
-                            { keywordList && keywordList.map((keyword, i) => <option key={i} value={keyword} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""}>{keyword}</option>) }
-                        </select>
-                    </> :
-                    <div className="d__row_text" title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""}>{keyword}</div>}
+                    <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={keyword} disabled={disableStep}>
+                        { objName === "OBJECT_DELETED" && <option>{keyword}</option> }
+                        { keywordList && keywordList.map((keyword, i) => <option key={i} value={keyword}>{keyword}</option>) }
+                    </select> :
+                    <div className="d__row_text" title={keyword} >{keyword}</div> }
                 </span>
                 <span className="input_col" >
                     { focused ? ['getBody', 'setHeader', 'setWholeBody', 'setHeaderTemplate'].includes(keyword) ? 

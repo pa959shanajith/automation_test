@@ -133,20 +133,21 @@
     font-family:  "LatoWeb" ;
     font-size: 20px;
     margin: 3px;
-    margin-top: -1rem;
+    margin-top: -50px;
     display: flex;
     flex-direction: row;
     border-bottom: 3px solid $borderFour;
     
    }
 .button-design{
-    margin-left: 4.5rem;
+    float: "left";
+    margin-left: 10.5rem;
     font-family:"LatoWeb";
     font-size: 18px;
     padding: 0rem 1rem 0rem 1rem;
     margin-bottom: 5px;
     margin-top: -0.1rem;
-    width: 17rem;
+    float: "bottom";
 
 }
 .create_button{

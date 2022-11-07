@@ -411,15 +411,10 @@
 }
 .grid_download_dialog{
     display: flex;
-    &__disabled {
-        cursor: no-drop;
-    }
     &__hr {
         margin: 0 0 1rem 0;
     }
     &__content {
-        height: 58vh;
-        overflow-y: auto;
         &>p, &>h6 {
             margin: 0;
         }

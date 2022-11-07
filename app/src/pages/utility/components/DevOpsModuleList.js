@@ -3,9 +3,9 @@ import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../.
 import { CheckBox, SearchDropdown, Tab, NormalDropDown, Dialog, TextField, SearchBox } from '@avo/designcomponents';
 import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
-import 'react-checkbox-tree/lib/react-checkbox-tree.css';
-import CheckboxTree from 'react-checkbox-tree';
 
+import CheckboxTree from 'react-checkbox-tree';
+import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading }) => {
     const [moduleList, setModuleList] = useState([]);
     const [searchText, setSearchText] = useState("");
@@ -202,14 +202,15 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                 if(fetchedModuleList.error) {
                     setMsg(MSG.CUSTOM("Error While Fetching Module List",VARIANT.ERROR));
                 }else {
+                    // <Icon iconName='input' />
                     let filteredNodes = [];
                     if(selectedExecutionType === 'normalExecution') {
-                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
                                 label: module.name,
                             };
-                            if(module.scenarios && module.scenarios.length > 0) {
+                            if(module.scenarios.length > 0) {
                                 const moduleChildren = module.scenarios.map((scenario) => {
                                     return ({
                                         value: scenario._id,
@@ -233,12 +234,12 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                                 label: batch,
                             };
                             if(batchData[batch].length > 0) {
-                                filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+                                filterBatch['children'] = batchData[batch].map((module) => {
                                     let filterModule = {
                                         value: module.moduleid,
                                         label: module.name,
                                     };
-                                    if(module.scenarios && module.scenarios.length > 0) {
+                                    if(module.scenarios.length > 0) {
                                         const moduleChildren = module.scenarios.map((scenario, index) => {
                                             if(newScenarioList.includes(batch+module.moduleid+scenario._id)) {
                                                 flagCheckToUpdateNodeKey = true;
@@ -270,13 +271,14 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                             setIntegrationConfig({...integrationConfig, scenarioList: newScenarioList, dataParameters: newDataParams});
                         }
                     } else if(selectedExecutionType === 'e2eExecution') {
-                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
                                 label: module.name,
                             };
-                            if(module.scenarios && module.scenarios.length > 0) {
+                            if(module.scenarios.length > 0) {
                                 const moduleChildren = module.scenarios.map((scenario, index) => {
+                                    console.log('useeffect : '+module.batchname+module.moduleid+index+scenario._id);
                                     return ({
                                         value: module.batchname+module.moduleid+index+scenario._id,
                                         label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
@@ -306,8 +308,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                     value: module.moduleid,
                     label: module.name,
                 };
-                if(module.scenarios && module.scenarios.length > 0) {
-                    const moduleChildren = module.scenarios.filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((scenario) => {
+                if(module.scenarios.length > 0) {
+                    const moduleChildren = module.scenarios.map((scenario) => {
                         return ({
                             value: scenario._id,
                             label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
@@ -320,12 +322,12 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                 return filterModule;
             });
         } else if(selectedKey === 'e2eExecution') {
-            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+            filteredNodes = moduleScenarioList[selectedKey].map((module) => {
                 let filterModule = {
                     value: module.moduleid,
                     label: module.name,
                 };
-                if(module.scenarios && module.scenarios.length > 0) {
+                if(module.scenarios.length > 0) {
                     const moduleChildren = module.scenarios.map((scenario, index) => {
                         return ({
                             value: module.batchname+module.moduleid+index+scenario._id,
@@ -347,12 +349,12 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                     label: batch,
                 };
                 if(batchData[batch].length > 0) {
-                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 > 0 } ).map((module) => {
+                    filterBatch['children'] = batchData[batch].map((module) => {
                         let filterModule = {
                             value: module.moduleid,
                             label: module.name,
                         };
-                        if(module.scenarios && module.scenarios.length > 0) {
+                        if(module.scenarios.length > 0) {
                             const moduleChildren = module.scenarios.map((scenario, index) => {
                                 return ({
                                     value: batch+module.moduleid+index+scenario._id,
@@ -394,7 +396,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
             <Dialog
                 hidden = {modalContent === false}
                 onDismiss = {() => setModalContent(false)}
-                title = 'Execution Parameters'
+                title = 'Scenario Data Parametrization'
                 minWidth = '60rem'
                 confirmText = 'Save'
                 declineText = 'Cancel'

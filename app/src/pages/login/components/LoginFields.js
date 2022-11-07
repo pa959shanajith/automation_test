@@ -611,9 +611,9 @@ const LoginFields = (props) => {
               <div style={{marginBottom:"1rem"}}>
                 <TextField
                   iconName="user"
-                  label="Username/Email"
+                  label="Username"
                   onChange={handleUsername}
-                  placeholder="Username/Email"
+                  placeholder="Username"
                   value={username}
                   onFocus={()=>setFocus("username")}
                   width="400px"
