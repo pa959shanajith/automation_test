@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer, ResetSession } from '../../global';
 import { SearchBox , SearchDropdown, Toggle } from '@avo/designcomponents';
-import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects,updateAccessibilitySelection } from '../api';
+import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects, fetchAvoAgentAndAvoGridList, } from '../api';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { useSelector, useDispatch } from 'react-redux';
@@ -18,7 +18,7 @@ import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import ScheduleHome from '../../schedule/containers/ScheduleHome';
 import { RadioButton } from 'primereact/radiobutton';
 import "../styles/DevOps.scss";
-
+import { prepareOptionLists } from './DevOpsUtils';
 
 
 
@@ -42,6 +42,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [showIntegrationModal,setShowIntegrationModal] = useState(false);
     const [modalDetails,setModalDetails] = useState({title:"",task:""});
     const [moduleInfo,setModuleInfo] = useState([]);
+    const [dataDict, setDict] = useState({});
     const [selectedProject, setSelectedProject] = useState(null);
 
     useEffect(()=>{
@@ -50,7 +51,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         setProjectData(data);
                         console.log(data.releases[0][0])           
         })},[])
-
+  
     useEffect(()=>{
         (async() => {
             const UserList =  await pluginApi.getUserDetails("user");
@@ -78,7 +79,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             });
             setProjectList(arraynew);
         }
-       
+        
 
         // console.log("domaindetails","Banking");
         // console.log(ProjectList);
@@ -318,6 +319,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             }, 500);
         })()
     }, []);
+ 
+    let projectid = getProjectList[0]
+    console.log(projectid)
 
     const onProjectChange = (e) => {
         setSelectedProject(e.value);
@@ -341,7 +345,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     name: '',
                     key: uuid(),
                     selectValues: [
-                        { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '62e2559414c6a4687ec7c2b5', width: '30%', disabled: false, selectedName: '' },
+                        { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: {}, width: '30%', disabled: false, selectedName: '' },
                         { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: 'R1', width: '25%', disabled: false, selectedName: '' },
                         { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '62e2559414c6a4687ec7c2b4', width: '25%', disabled: false, selectedName: '' },
                     ],
@@ -375,7 +379,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         <div style={{marginTop: '-9vh', display: 'flex', marginBottom: '2vh'}}>
         <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '2vh', marginRight: '5px'}}>Project Name : </span>
         
-                    <Dropdown value={selectedProject} style={{width:'31vh', position: 'relative'}} options={getProjectList} onChange={onProjectChange} optionLabel="name"  placeholder="Select the Project"/>
+                    <Dropdown value={selectedProject} style={{width:'31vh', position: 'relative', border:'0.4vh solid #613191 '}} options={getProjectList} onChange={onProjectChange} optionLabel="name"  placeholder="Select the Project"/>
                 {/* <SearchDropdown
                     noItemsText={[ ]}
                     onChange={() =>{}}
