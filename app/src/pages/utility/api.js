@@ -485,7 +485,7 @@ export const getAgentTask = async(props) => {
     }
 }
 
-export const fetchConfigureList = async() => {
+export const fetchConfigureList = async(props) => {
     try{
         const res = await axios(url+'/getConfigureList', {
             method: 'POST',
@@ -493,7 +493,8 @@ export const fetchConfigureList = async() => {
                 'Content-type': 'application/json',
             },
             data: {
-                action: "configurelist"
+                action: "configurelist",
+                projectid: props.projectid
             }
         });
         if(res.status === 401){
@@ -606,3 +607,47 @@ export const fetchModuleListDevopsReport = async(props) => {
         return {error:MSG.UTILITY.ERR_FETCH_DATATABLES}
     }
 }
+export const getQueueState = async(data) => {
+    try{
+        const res = await axios(url+'/getQueueState', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }else if(res.status===200 && res.data === "fail"){            
+            return {error : MSG.GLOBAL.ERR_SOMETHING_WRONG};
+        }
+        else if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.GLOBAL.ERR_SOMETHING_WRONG}
+    }catch(err){
+        return {error:MSG.GLOBAL.ERR_SOMETHING_WRONG}
+    }
+}
+
+export const deleteExecutionListId = async(props) => {
+    try{
+        const res = await axios(url+'/deleteExecutionListId', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data:props
+        });
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }else if(res.status===200 && res.data === "fail"){            
+            return {error : MSG.GLOBAL.ERR_SOMETHING_WRONG};
+        }
+        else if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.GLOBAL.ERR_SOMETHING_WRONG}
+    }catch(err){
+        return {error:MSG.GLOBAL.ERR_SOMETHING_WRONG}
+    }
+}
+
