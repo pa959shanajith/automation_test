@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
-import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer, ResetSession} from '../../global';
+import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer, ResetSession } from '../../global';
 import { SearchBox , SearchDropdown, Toggle } from '@avo/designcomponents';
-import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects, fetchAvoAgentAndAvoGridList,getQueueState, deleteExecutionListId  } from '../api';
+import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects,updateAccessibilitySelection } from '../api';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { useSelector, useDispatch } from 'react-redux';
@@ -14,11 +14,11 @@ import { ExecuteTestSuite_ICE } from '../../execute/api';
 import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
 import * as pluginApi from "../../plugin/api";
 import {v4 as uuid} from 'uuid';
-import CheckboxTree from 'react-checkbox-tree';
+import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import ScheduleHome from '../../schedule/containers/ScheduleHome';
-import AllocateICEPopup from '../../global/components/AllocateICEPopup';
+import { RadioButton } from 'primereact/radiobutton';
 import "../styles/DevOps.scss";
-import { prepareOptionLists } from './DevOpsUtils';
+
 
 
 
@@ -26,7 +26,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
-    const [executionQueue, setExecutionQueue] = useState(false);
     const [filteredList, setFilteredList] = useState(configList);
     const [displayBasic, setDisplayBasic] = useState(false);
     const [displayBasic1, setDisplayBasic1] = useState(false);
@@ -43,7 +42,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [showIntegrationModal,setShowIntegrationModal] = useState(false);
     const [modalDetails,setModalDetails] = useState({title:"",task:""});
     const [moduleInfo,setModuleInfo] = useState([]);
-    const [dataDict, setDict] = useState({});
     const [selectedProject, setSelectedProject] = useState(null);
 
     useEffect(()=>{
@@ -52,7 +50,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         setProjectData(data);
                         console.log(data.releases[0][0])           
         })},[])
-  
+
     useEffect(()=>{
         (async() => {
             const UserList =  await pluginApi.getUserDetails("user");
@@ -80,7 +78,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             });
             setProjectList(arraynew);
         }
-        
+       
 
         // console.log("domaindetails","Banking");
         // console.log(ProjectList);
@@ -136,24 +134,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setPosition(position);
         }
     }
-
-        var myJsObj = {key:setCurrentIntegration && configList.map((item, index) => item.configurekey)[0],
-                'executionType' : 'asynchronous'}
-            var str = JSON.stringify(myJsObj, null, 4);
-            // const abc = {\n&nbps;&nbps;&nbps;&nbps;
-            //     'key': str,
-            //     \n&nbps;&nbps;&nbps;&nbps;'executionType' : 'asynchronous'
-            //     \n}`;
-           
-        const categories = [{name: 'Avo Agent / Avo Grid', key: 'A'}, {name: 'Avo Assure Client', key: 'B'}];
-        const [selectedCategory, setSelectedCategory] = useState(categories[1]);
-
-        document.addEventListener('input',(e)=>{
-            
-                    if(e.target.getAttribute('name')=="myRadios"){
-                       }
-                })
-            
     const renderFooter = (name) => {
         return (
             <div>
@@ -166,9 +146,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     }
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
-    }
-    const onProjectChange = (e) => {
-        setSelectedProject(e.value);
     }
 
     const copyKeyUrlFunc = (id) => {
@@ -215,6 +192,33 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             }, 1500);
         }
     }
+
+    
+    document.addEventListener('input',(e)=>{
+
+        if(e.target.getAttribute('name')=="myRadios"){
+           }
+    })
+
+    document.addEventListener('label',(e)=>{
+
+        if(e.target.getAttribute('name')=="sync"){
+            console.log(e.target.value)
+           }
+    })
+    
+
+    var myJsObj = {key:setCurrentIntegration && configList.map((item, index) => item.configurekey)[0],
+        'executionType' : 'asynchronous'}
+    var str = JSON.stringify(myJsObj, null, 4);
+    // const abc = {\n&nbps;&nbps;&nbps;&nbps;
+    //     'key': str,
+    //     \n&nbps;&nbps;&nbps;&nbps;'executionType' : 'asynchronous'
+    //     \n}`;
+   
+    const categories = [{name: 'Avo Agent / Avo Grid', key: 'A'}, {name: 'Avo Assure Client', key: 'B'}];
+    const [selectedCategory, setSelectedCategory] = useState(categories[1]);
+
     const deleteDevOpsConfig = (key) => {
         setLoading('Please Wait...');
         setTimeout(async () => {
@@ -242,61 +246,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         }, 500);
         setShowConfirmPop(false);
     }
-    const [confirmExecuteNow, setConfirmExecuteNow] = useState(false);
-    const getCurrentQueueState = async () => {
-        setLoading('Please Wait...');
-        const queueList = await getQueueState();
-        if(queueList.error) {
-            if(queueList.error.CONTENT) {
-                setMsg(MSG.CUSTOM(queueList.error.CONTENT,VARIANT.ERROR));
-            } else {
-                setMsg(MSG.CUSTOM("Error While Fetching Execution Queue List",VARIANT.ERROR));
-            }
-        }else {
-            let nodesCollection = [];
-            for (let item in queueList) {
-                //To handle empty execution List id key
-                if(queueList && queueList[item] && queueList[item] && queueList[item][0] && queueList[item][0][0]){
-                    let nodeItem = {
-                        value: item,
-                        label: item+'   :   '+queueList[item][0][0].configurename,
-                        showCheckbox: false
-                    }
-                    let nodeItemChildren = [];
-                    let nodeItemChildrenIndex = 1;
-                    for (let executionNode of queueList[item]) {
-                        let executionItem = {
-                            value: item+nodeItemChildrenIndex,
-                            label: <div className="devOps_terminate_icon">Execution {nodeItemChildrenIndex}   <img src={"static/imgs/cicd_terminate.png"} title="Terminate Execution" alt="Terminate icon" onClick={async () => {
-                                    const deleteExecutionFromQueue = await deleteExecutionListId({configurekey: item, executionListId: executionNode[0].executionListId});
-                                    if(deleteExecutionFromQueue.status !== 'pass') {
-                                        setMsg(MSG.CUSTOM("Error While Removing Execution from Execution Queue",VARIANT.ERROR));
-                                    }else {
-                                        getCurrentQueueState();
-                                    }
-                                }}/></div>,
-                            showCheckbox: false,
-                            // className: 'devOps_terminate_style',
-                            children: executionNode.map((executionRequest) => ({
-                                label: 'Module : '+executionRequest.modulename+',   Status: '+executionRequest.status,
-                                value: executionRequest.executionListId+executionRequest.moduleid,
-                                showCheckbox: false
-                            }))
-                        };
-                        nodeItemChildrenIndex++;
-                        nodeItemChildren.push(executionItem);
-                    }
-                    nodeItem['children'] = nodeItemChildren;
-                    nodesCollection.push(nodeItem);
-                }
-            }
-            setExecutionQueue({
-                list: nodesCollection,
-                expanded: []
-            });
-        }
-        setLoading(false);
-    }
     const onClickDeleteDevOpsConfig = (name, key) => {
         setShowConfirmPop({'title': 'Delete DevOps Configuration', 'content': <p>Are you sure, you want to delete <b>{name}</b> Configuration?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
     }
@@ -323,8 +272,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             key: item.configurekey,
             selectValues: [
                 { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '30%', disabled: false, selectedName: '' },
-                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
-                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
+                { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
+                { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: false, selectedName: '' },
             ],
             scenarioList: getScenarioList(item.executionRequest.batchInfo, item.executionRequest.selectedModuleType),
             selectedModuleType: item.executionRequest.selectedModuleType,
@@ -337,6 +286,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         });
         return;
     }
+
+
+
     const getScenarioList = (batchInfo, selectedModulesType) => {
         let scenarioList = [];
         for(let batch of batchInfo)
@@ -366,24 +318,32 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             }, 500);
         })()
     }, []);
- 
-    let projectid = getProjectList[0]
-    console.log(projectid)
+
+    const onProjectChange = (e) => {
+        setSelectedProject(e.value);
+        let project = setCurrentIntegration && configList.map((item, index)=>item.project);
+        if(e.value === project){
+            return true;
+        }
+        if(e.value !== project){
+            return false;
+        }
+    }
 
     return (<>
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-            Execution Profile
+                Execution Profile
             </span>
         </div>
         <div className="api-ut__btnGroup">
-            <button data-test="submit-button-test" style={{width: '44vh'}} onClick={() => setCurrentIntegration({
+            <button data-test="submit-button-test" onClick={() => setCurrentIntegration({
                     name: '',
                     key: uuid(),
                     selectValues: [
-                        { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '30%', disabled: false, selectedName: '' },
-                        { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
-                        { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
+                        { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '62e2559414c6a4687ec7c2b5', width: '30%', disabled: false, selectedName: '' },
+                        { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: 'R1', width: '25%', disabled: false, selectedName: '' },
+                        { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '62e2559414c6a4687ec7c2b4', width: '25%', disabled: false, selectedName: '' },
                     ],
                     scenarioList: [],
                     avoAgentGrid: 'cicdanyagentcanbeselected',
@@ -397,18 +357,25 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 <div className='searchBoxInput'>
                     <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                 </div>
-                <div className="api-ut__btnGroup">
-                    {/* <button onClick={() => getCurrentQueueState() }>Manage Execution Queue</button> */}
-                </div>
+                {/* <div style={{marginLeft: '7rem'}}>
+                    <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>DevOps Integration API url : </span>
+                    <span className="api-ut__inputLabel"><input type="text" value={url} data-test="req-body-test" className="req-body" autoComplete="off" id="api-url" name="request-body" style={{width:"25%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
+                        <label>
+                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
+                            <div style={{fontSize:"24px"}}>
+                                <i className="fa fa-files-o icon" style={{fontSize:"24px"}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyTokenFunc() }} ></i>
+                            </div>
+                        </label>
+                    </span>
+                </div> */}
     
             </> }
             
         </div>
+        <div style={{marginTop: '-9vh', display: 'flex', marginBottom: '2vh'}}>
+        <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '2vh', marginRight: '5px'}}>Project Name : </span>
         
-                  <div style={{marginTop: '-9vh', display: 'flex', marginBottom: '2vh'}}>
-                 <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '2vh', marginRight: '5px'}}>Project Name : </span>
-        
-                    <Dropdown value={selectedProject} style={{width:'31vh', position: 'relative', border:'0.4vh solid #613191 '}} options={getProjectList} onChange={onProjectChange} optionLabel="name"  placeholder="Select the Project"/>
+                    <Dropdown value={selectedProject} style={{width:'31vh', position: 'relative'}} options={getProjectList} onChange={onProjectChange} optionLabel="name"  placeholder="Select the Project"/>
                 {/* <SearchDropdown
                     noItemsText={[ ]}
                     onChange={() =>{}}
@@ -420,12 +387,11 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     />   */}
                     {/* <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '0.5rem', marginRight: '5px'}}>Project Name : </span> */}
                 </div>
-            
         { configList.length > 0 ? <>
             { /* Table */ }
             <div className="d__table" style={{ flex: 0 }}>
                 <div className="d__table_header">
-                <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#</span>
+                    <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#</span>
                     <span className="details_col tkn-table__key d__det_head" >Execution Profile Name</span>
                     {/* <span className="details_col tkn-table__key d__det_head" >Configuration Key</span> */}
                     {/* <span className="d__inp_head tkn-table__project tkn-table__head" >Project</span>
@@ -434,12 +400,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <span className="d__out_head tkn-table__project tkn-table__head" >Action</span>
                 </div>
             </div>
-            <div id="activeUsersToken" className="wrap active-users-token">
-                <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
+            <div id="activeUsersToken" className="wrap active-users-token" style={{paddingLeft: '0px', paddingRight: '0px' }}>
+                <ScrollBar  scrollId='activeUsersToken' thumbColor="#929397" >
                 <table className = "table table-hover sessionTable" id="configList">
                     <tbody>
-                    {
-                             searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
+                        {
+                            searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                             <td className="tkn-table__sr_no"> {index+1} </td>
                                 &nbsp;&nbsp;&nbsp;
                                 <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{width:'27vh', justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -448,7 +414,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
                                 &nbsp;
                                 <td className="tkn-table__button" style={{marginLeft: '46.5vh', width:'100vh'}} >
-                                <button onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
+                                <button onClick={async () =>{onClick('displayBasic2');
+                                        //  let temp = execAutomation(item.configurekey);
                                         //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                          }}> Execute Now </button>&nbsp;&nbsp;&nbsp;
                                      {/* <button onClick={async ()=>{
@@ -463,11 +430,11 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                         <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
                                     </td>
-                             </tr>)
-                         }
+                            </tr>)
+                        }
                         {
-                             searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
-                                 <td className="tkn-table__sr_no"> {index+1} </td>
+                            searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
+                                <td className="tkn-table__sr_no"> {index+1} </td>
                                 &nbsp;&nbsp;&nbsp;
                                 <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{width:'27vh', justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black"  />{item.configurename} </td>
                                 {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
@@ -475,9 +442,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
                                 &nbsp;
                                 <td className="tkn-table__button" style={{marginLeft: '49.1vh', width:'100vh'}} >
-                                <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
-                                       //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                        }}> Execute Now </button>&nbsp;&nbsp;&nbsp;
+                                <button title="Execute" onClick={async () =>{onClick('displayBasic2');
+                                        //  let temp = execAutomation(item.configurekey);
+                                        //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
+                                         }}> Execute Now </button>&nbsp;&nbsp;&nbsp;
                                      {/* <button onClick={async ()=>{
                                          let temp = execAutomation(item.configurekey);
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
@@ -489,13 +457,13 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     <td className="tkn-table__button" >
                                         <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
-                                   </td>
-                             </tr>)
-                         }
+                                    </td>
+                            </tr>)
+                        }
                     </tbody>
                 </table>
-                
-               {/* Dialog for Execute Now */}
+
+                {/* Dialog for Execute Now */}
                 <Dialog header="Execute Now" visible={displayBasic2} style={{ width: '40vw' }}  footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
                     {/* <div style={{display: 'flex', justifyContent: 'space-around'}}>
                     {
@@ -578,9 +546,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 </Dialog>
                 {/* Dialog for CI /CD  */}
                 </ScrollBar>
+                
             </div>
         </> : <div className="no_config_img"> <img src="static/imgs/no-devops-config.svg" alt="Empty List Image"/> </div> }
     </>);
-}
 
+}
 export default DevOpsList;

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route ,Switch} from "react-router-dom";
 import {v4 as uuid} from 'uuid';
 import {Provider, useSelector, useDispatch} from 'react-redux';
-import ServiceBell from "@servicebell/widget";
 import {store} from './reducer';
 import {ProgressBar, ErrorPage, PopupMsg, VARIANT} from './pages/global'
 import { SWITCHED } from './pages/global/state/action';
@@ -36,11 +35,6 @@ const App = () => {
   const [blockui,setBlockui] = useState({show:false})
   useEffect(()=>{
     TabCheck(setBlockui);
-    (async()=>{
-      const response = await fetch("/getServiceBell")
-      let { enableServiceBell } = await response.json();
-      if(enableServiceBell) ServiceBell("init", "07e1c4e7d40744869cc8cca1ba485f2c");
-    })();
   },[])
   return (
     <Provider store={store}>
