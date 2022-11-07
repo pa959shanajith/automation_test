@@ -10,6 +10,9 @@ import * as scrapeApi from '../api';
 import "../styles/ScrapeObjectList.scss";
 import ScreenWrapper from './ScreenWrapper';
 import SubmitTask from '../components/SubmitTask';
+import { NormalDropDown } from "@avo/designcomponents";
+
+import { Button } from "primereact/button";
 
 const ScrapeObjectList = () => {
     const dispatch = useDispatch();
@@ -27,7 +30,8 @@ const ScrapeObjectList = () => {
     const [modified, setModified] = useState({});
     const [editableObj, setEditableObj] = useState({});
     const [dnd, setDnd] = useState(false);
-    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, setOrderList } = useContext(ScrapeContext);
+    const[captureButton, setCaptureButton]=useState("");
+    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, setOrderList, startScrape, } = useContext(ScrapeContext);
 
     useEffect(()=> {
         // setActiveEye(null);
@@ -449,9 +453,7 @@ const ScrapeObjectList = () => {
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
                         { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>}
-                    </div>
-                    
-                    {/* dropdown button --divya*/}
+                          {/* dropdown button --divya*/}
 
                     <div 
                       data-test="scrapeOnHeading"
@@ -557,6 +559,14 @@ const ScrapeObjectList = () => {
                   
 
                     <Button label="Capture" className="p-button-warning" onClick={()=>{startScrape(captureButton)}} style={{marginLeft:'-18px'}} />
+
+
+
+
+
+                    </div>
+                    
+                    
                     <SubmitTask />
 
                 </div>

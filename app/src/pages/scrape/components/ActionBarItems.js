@@ -62,12 +62,12 @@ const UpperContent = props => {
     }
 
     let renderComp = [
-        <div data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Scrape On</div>,
-        (appType!=="Webservice" && <Thumbnail data-test="pdfUtility" key="pdf-icon-scrape" tooltip= "Launch PDF utility" title="PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
-        <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
-            <input data-test="appendInput" id="enable_append" type="checkbox" title="Enable Append" onChange={onAppend} checked={appendCheck} />
-            <span data-test="append" className="ss__thumbnail_title" title="Enable Append">{appType==="Webservice" ? "Edit" : "Append"}</span>
-        </div>
+        <div data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Insprint Automation</div>,
+        // (appType!=="Webservice" && <Thumbnail data-test="pdfUtility" key="pdf-icon-scrape" tooltip= "Launch PDF utility" title="PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
+        // <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
+        //     <input data-test="appendInput" id="enable_append" type="checkbox" title="Enable Append" onChange={onAppend} checked={appendCheck} />
+        //     <span data-test="append" className="ss__thumbnail_title" title="Enable Append">{appType==="Webservice" ? "Edit" : "Append"}</span>
+        // </div>
     ];
 
     switch (appType) {

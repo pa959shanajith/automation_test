@@ -3,19 +3,35 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ReactSortable } from 'react-sortablejs';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScreenOverlay, RedirectPage, ScrollBar, ModalContainer, VARIANT, Messages as MSG, setMsg, SelectRecipients } from '../../global'
-import { getObjNameList, getKeywordList } from '../components/UtilFunctions';
-import TableRow from '../components/TableRow';
-import DetailsDialog from '../components/DetailsDialog';
-import RemarkDialog from '../components/RemarkDialog';
-import PasteStepDialog from '../components/PasteStepDialog';
-import SelectMultipleDialog from '../components/SelectMultipleDialog';
-import * as DesignApi from "../api";
-import { reviewTask } from '../../global/api';
+
 import {getUserDetails,getNotificationGroups} from '../../admin/api';
 import * as pluginActions from "../../plugin/state/action";
 import * as designActions from '../state/action';
 import "../styles/DesignContent.scss";
+import {
+    ScreenOverlay,
+    RedirectPage,
+    ScrollBar,
+    ModalContainer,
+    VARIANT,
+    Messages as MSG,
+    setMsg,
+    SelectRecipients,
+  } from "../../global";
+  import { getObjNameList, getKeywordList } from "../components/UtilFunctions";
+import TableRow from "../components/TableRow";
+import DetailsDialog from "../components/DetailsDialog";
+import RemarkDialog from "../components/RemarkDialog";
+import PasteStepDialog from "../components/PasteStepDialog";
+import SelectMultipleDialog from "../components/SelectMultipleDialog";
+import * as DesignApi from "../api";
+import { reviewTask } from "../../global/api";
+import { NormalDropDown } from "@avo/designcomponents";
+import {ResetSession } from '../../global';
+import * as DesignActions from '../state/action';
+import { Button } from "primereact/button";
+
+
 
 /*
     Container: DesignContent
@@ -35,6 +51,7 @@ const DesignContent = props => {
     const copiedContent = useSelector(state=>state.design.copiedTestCases);
     const modified = useSelector(state=>state.design.modified);
     const saveEnable = useSelector(state=>state.design.saveEnable);
+    const mainTestCases = useSelector(state=>state.design.testCases);
 
     const headerCheckRef = useRef();
 
@@ -255,9 +272,7 @@ const DesignContent = props => {
         });
     };
     
-    if (props.appType !== "MobileWeb" && props.appType !== "Mainframe") browserType.push(selectedBrowserType);
-    
-    // globalSelectedBrowserType = selectedBrowserType;5
+
     const saveTestCases = (e, confirmed) => {
         if (userInfo.role !== "Viewer") {
             if (reusedTC && !confirmed) {
@@ -824,6 +839,55 @@ const DesignContent = props => {
 
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
 
+    //Debug function
+
+    const debugTestCases = selectedBrowserType => {
+        let testcaseID = [];
+        let browserType = [];
+        
+        if (props.appType !== "MobileWeb" && props.appType !== "Mainframe") browserType.push(selectedBrowserType);
+        
+        // globalSelectedBrowserType = selectedBrowserType;5
+    
+        if (props.dTcFlag) testcaseID = Object.values(props.checkedTc);
+        else testcaseID.push(props.current_task.testCaseId);
+        setOverlay('Debug in Progress. Please Wait...');
+        ResetSession.start();
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
+            .then(data => {
+                setOverlay("");
+                ResetSession.end();
+                if (data === "Invalid Session") return RedirectPage(history);
+                else if (data === "unavailableLocalServer")  setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER)
+                else if (data === "success") setMsg(MSG.DESIGN.SUCC_DEBUG)
+                else if (data === "fail") setMsg(MSG.DESIGN.ERR_DEBUG)
+                else if (data === "Terminate") setMsg(MSG.DESIGN.WARN_DEBUG_TERMINATE)
+                else if (data === "browserUnavailable") setMsg(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER)
+                else if (data === "scheduleModeOn") setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE)
+                else if (data === "ExecutionOnlyAllowed") setMsg(MSG.GENERIC.WARN_EXECUTION_ONLY)
+                else if (data.status === "success"){
+                    let rows={}
+                    mainTestCases.forEach((testCase, index) => {
+                        if(index+1 in data){
+                            rows[testCase.custname]=data[index+1].xpath;
+                        }
+                    });
+                    dispatch({type: DesignActions.SET_MODIFIED, payload: rows});
+                    dispatch({type: DesignActions.SET_SAVEENABLE, payload: !saveEnable})
+                    setMsg(MSG.DESIGN.SUCC_DEBUG);
+                } else {
+                    console.log(data);
+                }										
+            })
+            .catch(error => {
+                setOverlay("");
+                ResetSession.end();
+                setMsg(MSG.DESIGN.ERR_DEBUG);
+                console.error("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
+            });
+    };
+    
+
     return (
         <>
         { showPopup && ConfirmPopup()}
@@ -836,9 +900,9 @@ const DesignContent = props => {
         <div className="d__content">
             <div className="d__content_wrap">
             { /* Task Name */ }
-            <div className="d__task_title">
+            {/* <div className="d__task_title">
                 <div className="d__task_name" data-test="d__taskName">{props.current_task.taskName}</div>
-            </div>
+            </div> */}
 
             { /* Button Group */ }
             <div className="d__btngroup">
@@ -853,10 +917,10 @@ const DesignContent = props => {
                 <div className="d__taskBtns">
                     <button className="d__taskBtn d__btn" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} disabled={!changed}>Save</button>
                     <button className="d__taskBtn d__btn" data-test="d__deleteBtn" title="Delete Test Step" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
-                    <div style={{ marginLeft: '4px', marginBottom: '10px', marginRight:'3px',marginTop:'30px' }}>
+                    <div style={{ marginLeft: '-1px', marginBottom: '1px', marginRight:'-5px',marginTop:'37px' }}>
                         {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                         <NormalDropDown
-                        style={{height:'22px',marginLeft:'2px', marginBottom: '47px', boxSizing:'40px', fontFamily:'LatoWeb' }}
+                        style={{height:'22px',marginLeft:'-1px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb' }}
                         label="Select Browser"
                         
 
@@ -918,8 +982,11 @@ const DesignContent = props => {
                             placeholder="Select Browser"
                             width="190px"
                         />
+                        <div>
                         <Button label="Debug" className="p-button-warning" onClick={()=>debugTestCases(debugButton)}></Button>
                         </div>
+                        </div>
+
                 </div>
 
                 <div className="d__submit" data-test="d__actionBtn">
