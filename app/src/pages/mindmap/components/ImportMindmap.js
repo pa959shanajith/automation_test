@@ -1,6 +1,6 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
 import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap} from '../api';
-import {ModalContainer, Messages as MSG,setMsg, VARIANT} from '../../global'
+import {ModalContainer, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
@@ -8,18 +8,14 @@ import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
 
-
-
-
-
 const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport}) => {
     const [projList,setProjList] = useState({})
     const [error,setError] = useState('')
     const [submit,setSubmit] = useState(false)
     const [disableSubmit,setDisableSubmit] = useState(false)
     const [mindmapData,setMindmapData] = useState([])
-    const [duplicateModuleList,setDuplicateModuleList] = useState([])
-    
+    const [duplicateModuleList,setDuplicateModuleList] = useState([]);
+    const [duplicateFlag,setDuplicateFlag] = useState(false);
     
     useEffect(()=>{
         (async()=>{
@@ -29,17 +25,32 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
             var data = parseProjList(res)
             setProjList(data)
             setBlockui({show:false})
+            setDuplicateModuleList([])
         })()
     },[]) 
     if(!Object.keys(projList).length >0) return null
     return(
+    <>
         <ModalContainer 
         modalClass = "modal-mmd"
         title='Import Modules'
         close={()=>setImportPop(false)}
-        footer={<Footer error={error} disableSubmit={disableSubmit} duplicateModuleList={duplicateModuleList} setSubmit={setSubmit}/>}
+        footer={<Footer error={error} disableSubmit={disableSubmit} duplicateModuleList={duplicateModuleList} setDuplicateFlag={setDuplicateFlag} setSubmit={setSubmit}/>}
         content={<Container submit={submit} setMindmapData={setMindmapData} setDuplicateModuleList={setDuplicateModuleList}mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}/>} 
       />
+      {duplicateFlag && 
+        <ModalContainer
+        modalClass='modal-md'
+        title={"Duplicate Modules Names"}
+        content={<ScrollBar thumbColor="#321e4f">
+                  <div style={{maxHeight:440, display:"flex", flexDirection:"column"}}>
+                    {Array.from(duplicateModuleList).map((module_name,idx)=> {return <li key={idx+module_name}>{module_name}</li>})} 
+                  </div>
+                </ScrollBar>}
+        close={()=>{setDuplicateFlag(false)}}
+        />
+        }
+    </>
     )
 }
 
@@ -70,16 +81,24 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     }
         setError('')
         setFiledUpload(undefined)
+        setDuplicateModuleList([])
         uploadFile({setBlockui,setMindmapData,setDuplicateModuleList,projList,uploadFileRef,setSheetList,setError,setDisableSubmit,setFiledUpload, selectedProject:project})
     }
     const changeImportType = (e) => {
         resetImportModule();
         setImportType(e.target.value)
     }
-    const resetImportModule = () => {
+    const resetImportModule = async() => {
+        var moduledata = await getModules({"tab":"tabCreate","projectid":projRef.current.value,"moduleid":null,"query":"modLength"})
+        if (moduledata.length>0){
+            setError('Please select a Project which has no Modules.')
+            setDisableSubmit(true);return
+
+        }
         setSheetList([])
         setFiledUpload(undefined)
         setError('')
+        setDisableSubmit(false)
         if(uploadFileRef.current)uploadFileRef.current.value = ''
     }
     const acceptType = {
@@ -322,23 +341,14 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     )
 }
 // Footer for sheet choose popup
-const Footer = ({error,setSubmit,disableSubmit,duplicateModuleList}) =>{
-    const [duplicateFlag,setDuplicateFlag] = useState(false);
+const Footer = ({error,setSubmit,disableSubmit,duplicateModuleList,setDuplicateFlag}) =>{
     return(
       <Fragment>
             <div className='mnode__buttons'>
                 <label className='err-message'>{error}
-                {error && duplicateModuleList?.size>0 && <><br/><Link className="tcView" to="#" onClick={()=>setDuplicateFlag(true)}>View Duplicate Modules</Link></>
-                }</label>                
+                {error && duplicateModuleList?.size>0 && error.indexOf("duplicate")>-1 && <><br/><Link className="tcView" to="#" onClick={()=>setDuplicateFlag(true)}>View Duplicate Modules</Link></>}</label>                
                 <button disabled={disableSubmit} onClick={()=>setSubmit(true)}>Import</button>                
             </div>
-           {duplicateFlag &&  <ModalContainer
-                modalClass='modal-md'
-                title={"Duplicate Modules Names"}
-                content={Array.from(duplicateModuleList).join("\n")}
-                close={()=>setDuplicateFlag(false)}
-            />
-           }
       </Fragment>
     )
 }
@@ -463,9 +473,8 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
         }else if(extension === 'json' || extension === 'mm'){
             var projFlag = false
             var duplicateData = JSON.parse(result);
-            let selectedAppType = projList[selectedProject].apptypeName;
-            let importedProjId = duplicateData[0].projectid.$oid;
-            let importedAppType = projList[importedProjId].apptypeName;
+            let selectedAppType = projList[selectedProject].apptypeName;  
+            var importedAppType=duplicateData[0].apptype;
             if(selectedAppType!==importedAppType){
                 setError("Selected project is of different App Type");
                 setDisableSubmit(true)
@@ -513,7 +522,7 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
                 setMsg(MSG.MINDMAP.ERR_IMPORT_DATA)
             }
             else if(duplicatelength > 0) {
-                setError((duplicatelength)+" modules are dupliacte. Only"+ (uniqlength)+" will be imported");
+                setError((duplicatelength)+" modules are duplicate. Only"+ (uniqlength)+" will be imported");
                 
             }
             
@@ -539,8 +548,10 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
             }
             if (!isMultiMindmap && !('testscenarios' in data) || hasError){
                 setError("Incorrect JSON imported. Please check the contents!!");
+                setDisableSubmit(true) 
             }else if((!isMultiMindmap && data.testscenarios.length === 0) || hasNoScenarios){
                 setError("The file has no node structure to import, please check!!");
+                setDisableSubmit(true)
             }else{
                 var importProj = data[0].projectid
                 if(!importProj || !projList[importProj]){
@@ -548,23 +559,10 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
                     setBlockui({show:false})
                     return;
                 }
-                /* var res = await importMindmap(data)
-                // console.log("ImportMindmap Res: " + res)
-                if(res.error){setError(res.error);setBlockui({show:false});return;}
-                var req={
-                    tab:"tabCreate",
-                    projectid:data[0]?data[0].projectid:data.projectid,
-                    version:0,
-                    cycId: null,
-                    moduleid:Array.isArray(res._id)?res._id:res
-                }
-                res = await getModules(req)
-                // console.log("GetModules res: " + JSON. stringify(res))
-                if(res.error){setError(res.error);setBlockui({show:false});return;}
-                setFiledUpload(res) */
             } 
         }else{
             setError("File is not supported")
+            setDisableSubmit(true)
         }    
         setBlockui({show:false})
     }catch(err){

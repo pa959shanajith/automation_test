@@ -413,7 +413,6 @@ export const storeConfigureKey = async(props) => {
 }
 export const execAutomation = async(props) => {
     try{
-        console.log(props)
         const res = await axios(url+'/execAutomation', {
             method: 'POST',
             headers: {
@@ -485,7 +484,7 @@ export const getAgentTask = async(props) => {
     }
 }
 
-export const fetchConfigureList = async(props) => {
+export const fetchConfigureList = async() => {
     try{
         const res = await axios(url+'/getConfigureList', {
             method: 'POST',
@@ -493,8 +492,7 @@ export const fetchConfigureList = async(props) => {
                 'Content-type': 'application/json',
             },
             data: {
-                action: "configurelist",
-                projectid: props.projectid
+                action: "configurelist"
             }
         });
         if(res.status === 401){
@@ -630,24 +628,23 @@ export const getQueueState = async(data) => {
 
 export const deleteExecutionListId = async(props) => {
     try{
-        const res = await axios(url+'/deleteExecutionListId', {
+            const res = await axios(url+'/deleteExecutionListId', {
             method: 'POST',
             headers: {
-                'Content-type': 'application/json',
+                'Content-Type': 'application/json'
             },
-            data:props
+            data: props,
+            credentials: 'include'
         });
-        if(res.status===200 && res.data !== "fail"){            
+        if(res.status===200 && res.data !== "fail"){
             return res.data;
-        }else if(res.status===200 && res.data === "fail"){            
-            return {error : MSG.GLOBAL.ERR_SOMETHING_WRONG};
-        }
-        else if(res.status === 401 || res.data === "Invalid Session"){
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
-        return {error:MSG.GLOBAL.ERR_SOMETHING_WRONG}
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }catch(err){
-        return {error:MSG.GLOBAL.ERR_SOMETHING_WRONG}
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }
-

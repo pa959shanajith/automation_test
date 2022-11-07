@@ -4,10 +4,11 @@ import { useDispatch } from 'react-redux';
 import {useHistory} from 'react-router-dom';
 import * as actions from './state/action';
 import { SetProgressBar, RedirectPage } from '../global';
+import ServiceBell from "@servicebell/widget";
 export var history
 
 const Plugin = () => {
-
+    ServiceBell("init", "07e1c4e7d40744869cc8cca1ba485f2c");
     const history = useHistory();
     const dispatch = useDispatch();
     

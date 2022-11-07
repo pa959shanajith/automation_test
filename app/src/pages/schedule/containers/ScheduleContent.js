@@ -7,7 +7,6 @@ import ScheduleSuitesTopSection from '../components/ScheduleSuitesTopSection';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup'
 import Pagination from '../components/Pagination';
 import DevOpsList from '../../utility/components/DevOpsList';
-import { CheckBox } from '@avo/designcomponents';
 
 const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrowserTypeExe,setExecAction,appType,browserTypeExe,execAction,item}) => {
 
@@ -341,7 +340,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
             :null} 
             
             <div className="s__task_container">
-                <div className="s__task_title"> <div className="s__task_name">{ item.executionRequest.configurename }-Schedule</div></div>
+                <div className="s__task_title"> <div className="s__task_name">Schedule</div></div>
                     
                 </div>
                 <div id="pageContent">
@@ -353,18 +352,14 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                             <option value="2">Zephyr</option>
                         </select>
                         <div id="s__btns">
-
-                            <button className="s__btn-md btnAddToSchedule only_schedule" onClick={()=>{ScheduleTestSuitePopup()}}  title="Add" >Schedule</button>
-
+                            <button className="s__btn-md btnAddToSchedule" onClick={()=>{ScheduleTestSuitePopup()}}  title="Add">Schedule</button>
                         </div>
-                        
                         <ScheduleSuitesTopSection closePopups={closePopups} setClosePopups={setClosePopups} setLoading={setLoading} displayError={displayError} moduleScheduledate={moduleScheduledate} setModuleScheduledate={setModuleScheduledate} current_task={item.executionRequest.batchInfo[0].currentTask} filter_data={filter_data} scheduleTableData={scheduleTableData}  setScheduleTableData={setScheduleTableData} clearScheduleData={clearScheduleData} />
                     </div>
 
                 {/* //lower scheduled table Section */}
                 <div id="scheduleSuitesBottomSection">
                     <div id="page-taskName">
-                        <div>
                         <select value={statusChange} onChange={(event)=>{selectStatus(event.target.value); setStatusChange(event.target.value)}} id="scheduledSuitesFilterData" className="form-control-schedule">
                             <option disabled={true} value={"Select Status"}>Select Status</option>
                             <option value={"Completed"}>Completed</option>
@@ -378,38 +373,26 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                             <option value={"Skipped"}>Skipped</option>
                             <option value={"Show All"}>Show All</option>
                         </select>
-                        {/* <div>
-                            <CheckBox name='Saucelabs'/>
-                        </div> */}
-                       
-                        </div>
-                        </div>
-
-                       
-                        
-                        
-                        <div id="s__btns">
-                            <button className={"s__btn-md btnAddToSchedule"+(showRecurringSchedules?" disabled":"")} onClick={() => {handleOnButtonClickScheduled();}} title="Scheduled Tasks">
-                                Scheduled Tasks
-                            </button>
-
-                        </div>
+                        <div id="s__btns" onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
                         <div id="s__btns">
                             <button className={"s__btn-md btnAddToSchedule"+(showScheduledTasks?" disabled":"")} onClick={() => {handleOnButtonClickRecurring();}} title="Recurring Schedules">
                                 Recurring Schedules
                             </button>
                         </div>
-                        <div id="s__btns" onClick={()=>{getScheduledDetails()}} className="fa fa-refresh s__refresh" title="Refresh Scheduled Data" ></div>
-                        
-                    
+                        <div id="s__btns">
+                            <button className={"s__btn-md btnAddToSchedule"+(showRecurringSchedules?" disabled":"")} onClick={() => {handleOnButtonClickScheduled();}} title="Scheduled Tasks">
+                                Scheduled Tasks
+                            </button>
+                        </div>
+                    </div>
 
                     <div className="scheduleDataTable">
 						<div className="scheduleDataHeader">
 							<span className="s__Table_date s__table_Textoverflow s__cursor s__Table_border" onClick={()=>{sortDateTime()}} title="Click to sort" ng-click="reverse=!reverse;predicate='scheduledatetime'">Date & Time</span>
 							<span className="s__Table_host s__table_Textoverflow s__Table_border" >Host</span>
-							{/* <span className="s__Table_scenario s__table_Textoverflow s__Table_border" >Scenario Name</span>
+							<span className="s__Table_scenario s__table_Textoverflow s__Table_border" >Scenario Name</span>
 							<span className="s__Table_suite s__table_Textoverflow s__Table_border" >Test Suite</span>
-							<span className="s__Table_appType s__table_Textoverflow s__Table_border" >App Type</span> */}
+							<span className="s__Table_appType s__table_Textoverflow s__Table_border" >App Type</span>
                             <span className="s__Table_scheduleType s__table_Textoverflow s__Table_border" >Schedule Type</span>
 							<span className="s__Table_status s__table_Textoverflow s__Table_border" >Status</span>
 						</div>
@@ -425,13 +408,13 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                             <div key={index} className="scheduleDataBodyRowChild">
                                                                 <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Job created on: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
                                                                 <div data-test = "schedule_data_target_user" className="s__Table_host" title={"Ice Pool: " +data.poolname}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
-                                                                {/* <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div> */}
-                                                                {/* <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div> */}
-                                                                {/* <div data-test = "schedule_data_browser_type" className="s__Table_appType">
+                                                                <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
+                                                                <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
+                                                                <div data-test = "schedule_data_browser_type" className="s__Table_appType">
                                                                     {data.browserlist.map((brow,index)=>(
                                                                         <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
                                                                     ))}
-                                                                </div> */}
+                                                                </div>
                                                                 <div data-test="schedule_data_schedule_type" className="s__Table_scheduleType" title={data.recurringstringonhover}>   
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>
@@ -602,6 +585,7 @@ const checkSelectedModules = (scheduleTableData, displayError) => {
 } 
 
 const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate, displayError) => {
+    let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
     for(var i =0 ;i<eachData.length;i++){
         for(var j =0 ; j<eachData[i].executestatus.length; j++){
             if(eachData[i].executestatus[j]===1){
@@ -614,6 +598,8 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 var dateValue = moduleScheduledate[eachData[i].testsuiteid]["date"];
                 var timeValue = moduleScheduledate[eachData[i].testsuiteid]["time"];
                 var recurringValue = moduleScheduledate[eachData[i].testsuiteid]["recurringValue"];
+                var recurringString = moduleScheduledate[eachData[i].testsuiteid]["recurringString"];
+                var recurringStringOnHover = moduleScheduledate[eachData[i].testsuiteid]["recurringStringOnHover"];
 
                 if (recurringValue === "") {
                     // Check if schedule recurring is not empty
@@ -640,8 +626,8 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 const sltime_2 = timeValue.split(":");
                 const timestamp = new Date(sldate_2[2], (sldate_2[1] - 1), sldate_2[0], sltime_2[0], sltime_2[1]);
                 const diff = (timestamp - new Date()) / 60000;
-                if (diff < 5) {  // Check if schedule time is not ahead of 5 minutes from current time
-                    if (recurringValue != "One Time") {
+                if (diff < 5 && (recurringString === "One Time" || recurringString === "Every Day" || (recurringString === "Every Week" && (recurringStringOnHover.includes(days[new Date().getDay()]) || recurringStringOnHover === "Occurs every day")) || (recurringString === "Every Month" && (recurringValue.split(' ')[2] == new Date().getDate() || recurringStringOnHover.includes(days[new Date().getDay()]))))) { // Check if schedule time is not ahead of 5 minutes from current time
+                    if (recurringValue !== "One Time") {
                         moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker s__err-Border";
                     } else {
                         if (diff < 0) moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-datePicker s__err-Border";

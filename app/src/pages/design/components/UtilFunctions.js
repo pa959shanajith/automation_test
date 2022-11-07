@@ -12,8 +12,8 @@ export const getObjNameList = (appType, data) => {
                             break;
         case "OEBS":        obnames = ["@Generic", "@Excel", "@Oebs", "@Custom", "@Word"];
                             break;
-        case "MobileApp":   if (navigator.appVersion.indexOf("Mac") === -1) obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action","@Excel","@Word"];
-                            else if (navigator.appVersion.indexOf("Mac") !== -1) obnames = ["@Generic", "@Mobile", "@CustomiOS","@Excel","@Word"];
+        case "MobileApp":   if (navigator.userAgent.toLowerCase().indexOf("mac") === -1) obnames = ["@Generic", "@Mobile", "@Android_Custom", "@Action","@Excel","@Word"];
+                            else if (navigator.userAgent.toLowerCase().indexOf("mac") !== -1) obnames = ["@Generic", "@Mobile", "@CustomiOS","@Excel","@Word"];
                             break;
         case "MobileWeb":   obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action","@Excel","@Word","@Custom"];
                             break;

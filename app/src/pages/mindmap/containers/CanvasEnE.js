@@ -7,9 +7,11 @@ import ControlBox from '../components/Controlbox'
 import InputBox from '../components/InputBox' 
 import SaveMapButton from '../components/SaveMapButton'
 import { useDispatch, useSelector} from 'react-redux';
+import {Messages as MSG, ModalContainer, setMsg} from '../../global';
 import {generateTree,toggleNode,moveNodeEnd,moveNodeBegin,createNode,createNewMap,deleteNode} from './MindmapUtils'
 import * as actionTypes from '../state/action';
 import '../styles/CanvasEnE.scss'
+import { deleteScenarioETE } from '../api';
 
 const types = {
     'modules': 112,
@@ -45,6 +47,7 @@ const CanvasEnE =(props)=>{
     const [createnew,setCreateNew] = useState(false)
     const scenarioList = useSelector(state=>state.mindmap.scenarioList)
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
+    const displayError = props.displayError
     readCtScale = () => ctScale
 
     const clickDeleteNode=(id)=>{
@@ -57,6 +60,31 @@ const CanvasEnE =(props)=>{
             setdNodes(res.dNodes)
         }
     }
+    useEffect(()=>{
+        if(deletedNodes && deletedNodes.length>0){
+            var scenarioIds=[]
+            var parentIds=[]
+            for(let i = 0 ;i<deletedNodes.length; i++){
+                if(deletedNodes[i].length>1){
+                    if(deletedNodes[i][1]=="scenarios"){
+                        scenarioIds.push(deletedNodes[i][0]);
+                        parentIds.push(deletedNodes[i][2]);                    
+                    }
+                }
+                
+            } 
+            (async()=>{
+                setBlockui({show:true,content:'Loading ...'})
+                var res = await deleteScenarioETE({scenarioIds:scenarioIds,parentIds:parentIds})
+                if(res.error){displayError(res.error);return;}                 
+                dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[]})
+                setBlockui({show:false})
+                setMsg(MSG.MINDMAP.SUCC_REMOVED_SCENARIO)                
+                setCreateNew('autosave')                            
+            })()
+        }
+    },[deletedNodes]
+    )
     useEffect(()=>{
         //useEffect to clear redux data selected module on unmount
         return ()=>{
@@ -104,7 +132,13 @@ const CanvasEnE =(props)=>{
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.module,props.reload,props.verticalLayout]);
     useEffect(()=>{
-        if(createnew !== false){
+        if(createnew === 'save'){
+            setCreateNew(false)
+        }
+        if(createnew === 'autosave'){
+            setCreateNew(false)
+        }
+        else if(createnew !== false){
             var p = d3.select('#node_'+createnew);
             setCreateNew(false)
             setInpBox(p)
@@ -173,7 +207,7 @@ const CanvasEnE =(props)=>{
             <Legends isEnE={true}/>
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(ctrlBox !== false)?<ControlBox isEnE={true} nid={ctrlBox}  clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            <SaveMapButton isEnE={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>
+            <SaveMapButton createnew={createnew} isEnE={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>

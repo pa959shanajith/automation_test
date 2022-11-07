@@ -150,8 +150,7 @@ exports.getConfigureList = async (req, res) => {
 	try {
 		// const reqData = req.session.userid;
 		const input = {
-			userid: req.session.userid,
-			projectid: req.body.projectid
+			userid: req.session.userid
 		}
 		const list = await utils.fetchData(input, "devops/getConfigureList", "getConfigureList");
 		res.send(list);
