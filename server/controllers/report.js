@@ -694,3 +694,71 @@ exports.saveAccessibilityReports = async function (reports){
 		logger.error(e.message);
 	}
 }
+
+//GET REPORTS FOR DEVOPS EXECUTION
+exports.getDevopsReport_API = async (req) => {
+    const fnName = "getDevopsReport_API";
+    var statusCode = '500';
+    logger.info("Inside UI service: " + fnName);
+    try {
+        const execData = req.body.execution_data || {};
+		var executionId = execData.executionId || "";
+		var scenarioIds = execData.scenarioIds;
+		var finalReport = [];
+		var tempModDict = {};
+		// const userInfo = await tokenAuth.tokenValidation(headerUserInfo);
+		const execResponse = {};
+        // execResponse.tokenValidation = 'passed';
+
+        const inputs = { executionId, scenarioIds, 'query': 'devopsReport' };
+        const data = await utils.fetchData(inputs, "reports/getReport_API", fnName, true);
+        let reportResult = data[0];
+        let reportStatus = data[2];
+        if (reportResult == "fail") {
+            return 'fail';
+        }
+        if (reportResult.errMsg != ""){
+            statusCode = "400"
+            execResponse.error_message=reportResult.errMsg;
+        } 
+        // finalReport.push(execResponse);
+        for(let i=0; i<reportResult.rows.length; ++i) {
+            const reportInfo = reportResult.rows[i];
+            const report = prepareReportData(reportInfo).report;
+            report.overallstatus.reportId = reportInfo.reportid;
+            delete report.overallstatus.scenarioName;
+            delete report.overallstatus.executionId;
+            delete report.overallstatus.moduleName;
+            delete report.rows
+            // const suburl = req.req.originalUrl.endsWith('/')? req.req.originalUrl.slice(0,-1):req.req.originalUrl;
+            // const downloadUri = req.req.protocol + '://' + (req.req.headers["origin"] || req.req.hostname) + suburl.split('/').slice(0,-1).join('/') + '/viewReport/' + reportInfo.reportid;
+            const scenarioReport = {
+                scenarioId: reportInfo.testscenarioid,
+                scenarioName: reportInfo.testscenarioname,
+                // pdf: downloadUri + '.pdf',
+                // view: downloadUri + '.html',
+                Report: report
+            };
+            const moduleId = reportInfo.moduleid;
+            if (tempModDict[moduleId]) {
+                tempModDict[moduleId].Scenarios.push(scenarioReport);
+            } else {
+                tempModDict[moduleId] = {
+                    moduleId: moduleId,
+                    moduleName: reportInfo.testsuitename,
+                    Scenarios: [scenarioReport]
+                };
+            }
+        }
+        for (let modid in tempModDict) {
+            finalReport.push(tempModDict[modid]);
+        } 
+        logger.info("Sending reports in the service %s", fnName);
+        if (statusCode != "400") statusCode = '200';
+        delete execResponse.error_message;
+        return finalReport;
+    } catch (exception) {
+        logger.error("Exception in the service %s - Error: %s", fnName, exception);
+        return 'fail'
+    }
+};

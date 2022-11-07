@@ -20,7 +20,7 @@ const AssignListBox = (props) => {
                     <img className="load" style={{position: "relative", left: "10px", bottom: "4px"}} src={"static/imgs/loader.gif"} alt="Loading..."/>
                     :null}
                     {/* <!--Labels--> */}
-                    <div className="seprator">
+                    <div className="seprator" style={{marginBottom:"0px"}}>
                         <select multiple id="allProjectAP" className="ng-pristine ng-untouched ng-valid">
                             {assignProj.allProjectAP.map((prj) => ( 
                                 <option  value={JSON.stringify(prj)} >{prj.projectname} </option>

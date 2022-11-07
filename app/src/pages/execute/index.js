@@ -12,9 +12,9 @@ const Execute = () => {
   history = useHistory();
 
   useEffect(()=>{
-      // if(window.localStorage['navigateScreen'] !== "TestSuite"){
-      //     RedirectPage(history, { reason: "screenMismatch" });
-      // }
+      if(window.localStorage['navigateScreen'] !== "TestSuite"){
+          RedirectPage(history, { reason: "screenMismatch" });
+      }
   }, []);
   
   return (

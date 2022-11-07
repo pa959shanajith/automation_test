@@ -485,8 +485,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "100px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'Right',marginRight:"2500px" ,margin: "3px"}} onClick={(e) => { 
                 window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-                window.location.href = "/execute";
-                }}>Execute</button>
+                window.location.href = "/mindmap";
+                }}>Design</button>
             </div>
        
             </div> 
