@@ -56,6 +56,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     const [importType,setImportType] = useState(undefined)
     const [fileUpload,setFiledUpload] = useState(undefined)
     const [sheetList,setSheetList] = useState([])
+    const [uploadFileField,setUploadFileField] = useState(false)
     
     const upload = () => {
         let  project = "";
@@ -76,7 +77,16 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
         resetImportModule();
         setImportType(e.target.value)
     }
-    const resetImportModule = () => {
+    const resetImportModule = async() => {
+        var moduledata = await getModules({"tab":"tabCreate","projectid":projRef.current.value,"moduleid":null,"query":"modLength"})
+        if (moduledata.length>0){
+            setError('Please select a Project which has no Modules.')
+            setDisableSubmit(true)
+            setUploadFileField(false)
+            ;return
+
+        }
+        setUploadFileField(true)
         setSheetList([])
         setFiledUpload(undefined)
         setError('')
@@ -92,6 +102,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     useEffect(()=>{
         if(submit){
             setSubmit(false)
+            setDisableSubmit(true)
             setError('')
             var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
             if(err){
@@ -237,10 +248,10 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                                 <input placeholder={'Ex: Projectname/Modulename'} ref={gitPathRef}/>
                             </div>
                         </Fragment>:
-                        <div>
+                        (<>{uploadFileField?<div>
                             <label>Upload File: </label>
-                            <input accept={acceptType[importType]} type='file' onChange={upload} ref={uploadFileRef}/>
-                            </div>
+                            <input accept={acceptType[importType]} disabled={!uploadFileField} type='file' onChange={upload} ref={uploadFileRef}/>
+                            </div>:null}</>)
                     }
                     
                 </Fragment>
@@ -529,40 +540,28 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
                 
             }
 
-            var isMultiMindmap = Array.isArray(data);
-            var hasError = false,hasNoScenarios= false;
-            if(isMultiMindmap){
-                hasError = data.find(element => !('testscenarios' in element))!=undefined;   
-                if(!hasError){
-                    hasNoScenarios = data.find(element => element.testscenarios.length === 0)!=undefined;
-                }             
-            }
-            if (!isMultiMindmap && !('testscenarios' in data) || hasError){
-                setError("Incorrect JSON imported. Please check the contents!!");
-            }else if((!isMultiMindmap && data.testscenarios.length === 0) || hasNoScenarios){
-                setError("The file has no node structure to import, please check!!");
-            }else{
-                var importProj = data[0].projectid
-                if(!importProj || !projList[importProj]){
-                    setError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
-                    setBlockui({show:false})
-                    return;
-                }
-                /* var res = await importMindmap(data)
-                // console.log("ImportMindmap Res: " + res)
-                if(res.error){setError(res.error);setBlockui({show:false});return;}
-                var req={
-                    tab:"tabCreate",
-                    projectid:data[0]?data[0].projectid:data.projectid,
-                    version:0,
-                    cycId: null,
-                    moduleid:Array.isArray(res._id)?res._id:res
-                }
-                res = await getModules(req)
-                // console.log("GetModules res: " + JSON. stringify(res))
-                if(res.error){setError(res.error);setBlockui({show:false});return;}
-                setFiledUpload(res) */
-            } 
+            // var isMultiMindmap = Array.isArray(data);
+            // var hasError = false,hasNoScenarios= false;
+            // if(isMultiMindmap){
+            //     hasError = data.find(element => !('testscenarios' in element))!=undefined;   
+            //     if(!hasError){
+            //         hasNoScenarios = data.find(element => element.testscenarios.length === 0)!=undefined;
+            //     }             
+            // }
+            // if (!isMultiMindmap && !('testscenarios' in data) || hasError){
+            //     setError("Incorrect JSON imported. Please check the contents!!");
+            //     setDisableSubmit(true) 
+            // // }else if((!isMultiMindmap && data.testscenarios.length === 0) || hasNoScenarios){
+            // //     setError("The file has no node structure to import, please check!!");
+            // //     setDisableSubmit(true)
+            // }else{
+            //     var importProj = data[0].projectid
+            //     if(!importProj || !projList[importProj]){
+            //         setError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
+            //         setBlockui({show:false})
+            //         return;
+            //     }
+            // } 
         }else{
             setError("File is not supported")
         }    
