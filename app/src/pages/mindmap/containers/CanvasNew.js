@@ -435,7 +435,7 @@ const CanvasNew = (props) => {
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
-            <SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>
+            {props.GeniusDialog ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>}
             <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>

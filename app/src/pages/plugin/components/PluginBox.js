@@ -43,7 +43,7 @@ const PluginBox = ({pluginName, pluginTitle}) => {
 			setRedirectTo(`/${pluginName}`) 
 		}
 		//All the plugins that require direct Redirect
-		else if(['mindmap','utility'].includes(pluginName)){
+		else if(['mindmap','utility','genius'].includes(pluginName)){
 			setRedirectTo(`/${pluginName}`) 
 		}
 		else {

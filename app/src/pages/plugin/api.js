@@ -78,3 +78,24 @@ export const getMappedDiscoverUser = async(data) => {
         return {error:MSG.PLUGIN.ERR_FETCHING_DISCOVER_USER}
     }
 }
+
+export const getGeniusData = async(data) => {
+  try{
+      const res = await axios(url+'/getGeniusData', {
+          method: 'POST',
+          credentials: 'include',
+          data
+      });
+      if(res.status===200 && res.data !== "fail"){            
+          return res.data;
+      }else if(res.status===200 && res.data === "fail"){            
+          return {error : MSG.PLUGIN.ERR_UNMAPPED_DISCOVER_USER};
+      }
+      else if(res.status === 401 || res.data === "Invalid Session"){
+          return {error:MSG.GENERIC.INVALID_SESSION};
+      }
+      return {error:MSG.PLUGIN.ERR_FETCHING_DISCOVER_USER}
+  }catch(err){
+      return {error:MSG.PLUGIN.ERR_FETCHING_DISCOVER_USER}
+  }
+}
