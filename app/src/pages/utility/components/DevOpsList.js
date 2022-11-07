@@ -34,8 +34,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [position, setPosition] = useState('center');
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
     const [getProjectList,setProjectList]=useState([]);
+    const [projectId, setPojectId] = useState('')
     const [getplugins_list,setplugins_list]=useState([]);
     const [projectData, setProjectData] = useState([]);
+    const [projectData1, setProjectData1] = useState([]);
     const [allocateICE,setAllocateICE] = useState(false);
     const [userDetailList,setUserDetailList]=useState([]);
     const [proceedExecution, setProceedExecution] = useState(false);
@@ -44,15 +46,21 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [modalDetails,setModalDetails] = useState({title:"",task:""});
     const [moduleInfo,setModuleInfo] = useState([]);
     const [dataDict, setDict] = useState({});
-    const [selectedProject, setSelectedProject] = useState(null);
+    const [selectedProject, setSelectedProject] = useState('');
+    const [selectedCycle, setSelectedCycle] = useState('');
+    const [cyclesList, setCyclesList] = useState('');
+    
 
     useEffect(()=>{
                 pluginApi.getProjectIDs()
                 .then(data => {
-                        setProjectData(data);
-                        console.log(data.releases[0][0])           
+                        setProjectData1(data.releases[0][0].name);
+                        setProjectData(data.releases[0][0].cycles[0]._id)
+                        console.log(data.releases[0][0].name)   
+                        console.log(data.releases[0][0].cycles[0]._id)     
+
         })},[])
-  
+
     useEffect(()=>{
         (async() => {
             const UserList =  await pluginApi.getUserDetails("user");
@@ -69,16 +77,26 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         }else{
             
             const arraynew = ProjectList.projectIds.map((element, index) => {
+                let tempcycleList = [];
+                for(let cycles in ProjectList.cycles) {
+                    tempcycleList.push(ProjectList.cycles[cycles][2]);
+                }
+                setCyclesList(tempcycleList);
                 return (
                     {
-                        code: element,
-                        name: ProjectList.projectNames[index],
+                        // code: element,
+                        // name: ProjectList.projectNames[index],
+                        key: element,
+                        text: ProjectList.projectNames[index],
+                        title: ProjectList.projectNames[index]
                         // disabled: true,
                         // title: 'License Not Supported'
                     }
                 )
             });
             setProjectList(arraynew);
+            setSelectedProject(arraynew[0].key);
+            setSelectedCycle(arraynew[0].key);
         }
         
 
@@ -167,8 +185,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
     }
-    const onProjectChange = (e) => {
-        setSelectedProject(e.value);
+    const onProjectChange = (option) => {
+        setSelectedProject(option.key);
+        // projectData(getProjectList.filter((config) => config.key === option.key)[0].data.cycle);
+        
     }
 
     const copyKeyUrlFunc = (id) => {
@@ -367,8 +387,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         })()
     }, []);
  
-    let projectid = getProjectList[0]
-    console.log(projectid)
+    // let projectid = getProjectList[0].code
+    // console.log(projectid)let projectid = getProjectList[0].code
+    // console.log(projectid)
 
     return (<>
         <div className="page-taskName" >
@@ -381,9 +402,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     name: '',
                     key: uuid(),
                     selectValues: [
-                        { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: '', width: '30%', disabled: false, selectedName: '' },
-                        { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
-                        { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
+                        { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: selectedProject, width: '30%', disabled: false, selectedName: '' },
+                        { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: projectData1, width: '25%', disabled: true, selectedName: '' },
+                        { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: (getProjectList.findIndex((project) => project.key === selectedProject) > -1) ? (cyclesList[getProjectList.findIndex((project) => project.key === selectedProject)]) : '', width: '25%', disabled: true, selectedName: '' },
                     ],
                     scenarioList: [],
                     avoAgentGrid: 'cicdanyagentcanbeselected',
@@ -408,16 +429,16 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                   <div style={{marginTop: '-9vh', display: 'flex', marginBottom: '2vh'}}>
                  <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '2vh', marginRight: '5px'}}>Project Name : </span>
         
-                    <Dropdown value={selectedProject} style={{width:'31vh', position: 'relative', border:'0.4vh solid #613191 '}} options={getProjectList} onChange={onProjectChange} optionLabel="name"  placeholder="Select the Project"/>
-                {/* <SearchDropdown
+                    {/* <Dropdown value={selectedProject} style={{width:'31vh', position: 'relative', border:'0.4vh solid #613191 '}} options={getProjectList} onChange={onProjectChange} optionLabel="name"  placeholder="Select the Project"/> */}
+                <SearchDropdown
                     noItemsText={[ ]}
-                    onChange={() =>{}}
+                    onChange={onProjectChange}
                     options={getProjectList}
-                    placeholder={setCurrentIntegration && configList.map((item, index) => item.project)}
-                    selectedKey={""}
+                    // placeholder={setCurrentIntegration && configList.map((item, index) => item.project)}
+                    selectedKey={selectedProject}
                     width='15rem'
 
-                    />   */}
+                    />  
                     {/* <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '0.5rem', marginRight: '5px'}}>Project Name : </span> */}
                 </div>
             
