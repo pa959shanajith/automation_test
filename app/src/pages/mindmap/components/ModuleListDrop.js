@@ -171,16 +171,12 @@ const ModuleListDrop = (props) =>{
             return;
         }else{
             setWarning({modID, type});
-            setWarning({
-                modID: modID,
-                type: type
-            })
+            
             // loadModuleE2E(modID)
         }
     }    
     const loadModuleE2E = async(modID) =>{
         setWarning(false)
-        console.log('setIsE2EOpen',isE2EOpen)
         setIsE2EOpen(true)
         setBlockui({show:true,content:"Loading Module ..."})        
         if(moduleSelect._id === modID){
@@ -301,9 +297,8 @@ const ModuleListDrop = (props) =>{
                         {moduleList.map((e,i)=>{
                             if(e.type==="endtoend")
                             return(
-                                    <div key={i} style={{ display:'flex',  width:'20%', justifyContent:'space-between', padding:'0.25rem' }} data-test="individualModules" name={e.name} type={e.type} onClick={(e)=>setSelectedModuleList(e)} title={e.name}>
-                                        <input type="checkbox" className="checkBox" value={e._id} onChange={(e)=>selectModuleChkBox(e)}  />
-                                        <img style={{height: '1.7rem',width:'1.7rem'}} src={(e.type==="endtoend")?"static/imgs/E2Eicon.png":"static/imgs/node-modules.png"} alt='module'></img>
+                                    <div key={i} style={{ display:'flex',  width:'20%', justifyContent:'space-between', padding:'0.25rem', marginLeft:'1.62rem' }} data-test="individualModules" name={e.name} value={e._id} type={e.type} onClick={(e)=>selectModules(e)} title={e.name}>
+                                        <img style={{height: '1.7rem',width:'1.7rem'}} src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img>
                                         <span className='modNme' >{e.name}</span>
                                     </div>
                             )
