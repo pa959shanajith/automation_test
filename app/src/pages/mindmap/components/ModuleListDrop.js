@@ -1,6 +1,6 @@
 import React, { useState, Fragment, useRef, useEffect } from 'react';
 import { useSelector, useDispatch} from 'react-redux';
-import {getModules}  from '../api'
+import {getModules, populateScenarios}  from '../api'
 import {ScrollBar,ModalContainer,Messages as MSG, setMsg} from '../../global';
 import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
@@ -301,7 +301,7 @@ const ModuleListDrop = (props) =>{
                         {moduleList.map((e,i)=>{
                             if(e.type==="endtoend")
                             return(
-                                    <div key={i} style={{ display:'flex',  width:'20%', justifyContent:'space-between', padding:'0.25rem' }} data-test="individualModules" name={e.name} type={e.type} onClick={(e)=>selectModule(e)} title={e.name}>
+                                    <div key={i} style={{ display:'flex',  width:'20%', justifyContent:'space-between', padding:'0.25rem' }} data-test="individualModules" name={e.name} type={e.type} onClick={(e)=>setSelectedModuleList(e)} title={e.name}>
                                         <input type="checkbox" className="checkBox" value={e._id} onChange={(e)=>selectModuleChkBox(e)}  />
                                         <img style={{height: '1.7rem',width:'1.7rem'}} src={(e.type==="endtoend")?"static/imgs/E2Eicon.png":"static/imgs/node-modules.png"} alt='module'></img>
                                         <span className='modNme' >{e.name}</span>
