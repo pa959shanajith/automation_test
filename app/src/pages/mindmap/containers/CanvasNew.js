@@ -305,7 +305,7 @@ const CanvasNew = (props) => {
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
-            <NavButton setCtScale={setCtScale} zoom={zoom}/>
+            {/* <NavButton setCtScale={setCtScale} zoom={zoom}/> */}
             <Legends/>
             <SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>
             <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>
