@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown } from '../../global';
 import { fetchProjects, fetchAvoAgentAndAvoGridList, storeConfigureKey } from '../api';
 import { useSelector } from 'react-redux';
-import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
+import { SearchDropdown, TextField, Toggle, MultiSelectDropdown, SearchBox } from '@avo/designcomponents';
 
 
 // import classes from "../styles/DevOps.scss";
@@ -21,6 +21,7 @@ const DevOpsConfig = props => {
     const [configName, setConfigName] = useState("");
     const [dataDict, setDict] = useState({});
     const dataParametersCollection = [];
+    const [module, setModule] = useState("noemalExecution");
     const [error, setError] = useState({});
     if(props.currentIntegration && props.currentIntegration.executionRequest && props.currentIntegration.executionRequest.batchInfo){
         if(props.currentIntegration.selectedModuleType === 'normalExecution')
@@ -58,13 +59,14 @@ const DevOpsConfig = props => {
         ...props.currentIntegration,
         dataParameters: dataParametersCollection
     });
+    
     const [icepoollist, setIcepoollist] = useState([
         { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
     ]);
     const [browserlist, setBrowserlist] = useState([
         {
-            key: '3',
-            text: 'Internet Explorer'
+            key: '0',
+            text: 'Internet Exploror'
         },{
             key: '1',
             text: 'Google Chrome'
@@ -72,10 +74,10 @@ const DevOpsConfig = props => {
             key: '2',
             text: 'Mozilla Firefox'
         },{
-            key: '7',
+            key: '3',
             text: 'Microsoft Edge'
         },{
-            key: '8',
+            key: '4',
             text: 'Edge Chromium'
         }
     ]);
@@ -128,11 +130,11 @@ const DevOpsConfig = props => {
                 console.error(reportResponse.error);
                 setMsg(MSG.REPORT.ERR_FETCH_PROJECT);
             }
+            
             else {
                 const [projList, newDict] = prepareOptionLists(reportResponse);
                 let newSelectValues = [...integrationConfig.selectValues];
                 newSelectValues[0].list = projList;
-
                 if(props.currentIntegration.name !== '') {
                     const projSetDetails = props.currentIntegration.executionRequest.batchInfo[0];
                     // proj
@@ -162,6 +164,7 @@ const DevOpsConfig = props => {
             props.setLoading(false);
         })()
     }, []);
+    
     useEffect(()=> {
         let isUpdated = false;
         Object.keys(integrationConfig).some(element => {
@@ -268,7 +271,21 @@ const DevOpsConfig = props => {
                             scenarioName: scenario.name,
                             scenarioId: scenario._id,
                             accessibilityParameters: []
-                        }))
+                        })),
+                        currentTask: {
+                            testSuiteDetails: [{
+                                assignedTime: "",
+                                releaseid: integrationConfig.selectValues[1].selected,
+                                cycleid: integrationConfig.selectValues[2].selected,
+                                testsuiteid: module.moduleid,
+                                testsuitename: module.name,
+                                projectidts: integrationConfig.selectValues[0].selected,
+                                assignedTestScenarioIds: "",
+                                subTaskId: "",
+                                versionnumber: 0
+                            }],
+                            versionnumber: 0,
+                        }
                     });
                 });
         else if(selectedExecutionType === 'e2eExecution')
@@ -384,13 +401,13 @@ const DevOpsConfig = props => {
         :null}
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-                { props.currentIntegration.name === '' ? '' : 'Update'} Execution Configuration
+                { props.currentIntegration.name === '' ? '' : 'Update'} Configuration set up
             </span>
         </div>
         <div className="api-ut__btnGroup">
-        <button style={{width: '30vh'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save configuration' : 'Update'}</button>
-            <button data-test="submit-button-test" style={{width: '15vh'}} onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
-            <div className="devOps_config_name" style={{marginRight:'92vh',position:'absolute',right: '49vh'}}>
+            <button style={{width: '15rem'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save configuration' : 'Update'}</button>
+            <button data-test="submit-button-test" style={{width: '6rem'}} onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
+            <div className="devOps_config_name" style={{marginRight:'34rem'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Configuration Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
@@ -400,11 +417,13 @@ const DevOpsConfig = props => {
                 </span>
             </div>
         </div>
-        {/* <div>
-        {
-            integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />
-        }
-        </div> */}
+            <div style={{display:'flex', marginBottom: '1rem' }} onSelect={() => props.currentIntegration.selectedModuleType}>
+                <input type='radio' id="E2E" value='e2eExecution' style={{width:'2rem', height: '2rem'}} selectedKey='e2eExecution'  checked={selectedExecutionType === 'e2eExecution'}/>&nbsp;<label for='E2E'>E2EExecution&nbsp;</label>
+                <input type='radio' id='Batch' value='batchExecution' style={{width:'2rem', height: '2rem'}} selectedKey='batchExecution' checked={selectedExecutionType === 'batchExecution'}/><label for='Batch'>&nbsp;BatchExecution&nbsp;</label>
+                <input type='radio' id='Normal' value='normalExecution' style={{width:'2rem', height: '2rem'}} selectedKey='normalExecution' checked={selectedExecutionType === 'normalExecution'}/><label for='Normal'>&nbsp;NormalExecution</label>
+            </div>
+        
+
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
                 <div className="devOps_module_list">
@@ -457,7 +476,7 @@ const DevOpsConfig = props => {
                             <label>Synchronous </label>
                         </div>
                     </div> */}
-                    <div>
+                     <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution_mode">Execution Mode : </label>
                         <div className="devOps_dropdown_label_sync">
                             <label>Non-Headless </label>
@@ -465,10 +484,14 @@ const DevOpsConfig = props => {
                             <label>Headless </label>
                         </div>
                     </div>
-                    <div className='devOps_seperation'>
-                    </div>
                     {/* <div>
-                        <span className="devOps_dropdown_label devOps_dropdown_label_url">DevOps Integration API url : </span>
+                        <label className="devOps_dropdown_label devOps_dropdown_label_sync">Accesibility Standard : </label>
+                        <SearchBox width='20rem'/>
+                    </div> */}
+                    {/* <div className='devOps_seperation'>
+                    </div> */}
+                    {/* <div>
+                        <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%'}}>DevOps Integration API url : </span>
                         <span className="devOps_dropdown_label_input"><input type="text" value={props.url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />
                             <label>
                                 <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return apiKeyCopyToolTip }, 0]} />

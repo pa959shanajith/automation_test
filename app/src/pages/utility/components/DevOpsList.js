@@ -98,7 +98,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setSelectedProject(arraynew[0].key);
             setSelectedCycle(arraynew[0].key);
         }
-        
+       
 
         // console.log("domaindetails","Banking");
         // console.log(ProjectList);
@@ -394,7 +394,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     return (<>
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-            Execution Profile
+                Execution Profile
             </span>
         </div>
         <div className="api-ut__btnGroup">
@@ -420,7 +420,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 </div>
                 <div className="api-ut__btnGroup">
                     {/* <button onClick={() => getCurrentQueueState() }>Manage Execution Queue</button> */}
-                </div>
+                            </div>
     
             </> }
             
@@ -446,7 +446,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             { /* Table */ }
             <div className="d__table" style={{ flex: 0 }}>
                 <div className="d__table_header">
-                <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#</span>
+                    <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#</span>
                     <span className="details_col tkn-table__key d__det_head" >Execution Profile Name</span>
                     {/* <span className="details_col tkn-table__key d__det_head" >Configuration Key</span> */}
                     {/* <span className="d__inp_head tkn-table__project tkn-table__head" >Project</span>
@@ -459,9 +459,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
                 <table className = "table table-hover sessionTable" id="configList">
                     <tbody>
-                    {
-                             searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
-                            <td className="tkn-table__sr_no"> {index+1} </td>
+                        {
+                            searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
+                                <td className="tkn-table__sr_no"> {index+1} </td>
                                 &nbsp;&nbsp;&nbsp;
                                 <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{width:'27vh', justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>&nbsp;&nbsp;&nbsp;&nbsp;
                                 {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
@@ -484,11 +484,11 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                         <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
                                     </td>
-                             </tr>)
-                         }
+                            </tr>)
+                        }
                         {
-                             searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
-                                 <td className="tkn-table__sr_no"> {index+1} </td>
+                            searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
+                                <td className="tkn-table__sr_no"> {index+1} </td>
                                 &nbsp;&nbsp;&nbsp;
                                 <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{width:'27vh', justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black"  />{item.configurename} </td>
                                 {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
@@ -498,7 +498,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <td className="tkn-table__button" style={{marginLeft: '49.1vh', width:'100vh'}} >
                                 <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                        //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                        }}> Execute Now </button>&nbsp;&nbsp;&nbsp;
+                                         }}> Execute Now </button>&nbsp;&nbsp;&nbsp;
                                      {/* <button onClick={async ()=>{
                                          let temp = execAutomation(item.configurekey);
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
@@ -510,13 +510,13 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                     <td className="tkn-table__button" >
                                         <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
-                                   </td>
-                             </tr>)
-                         }
+                                    </td>
+                            </tr>)
+                        }
                     </tbody>
                 </table>
-                
-               {/* Dialog for Execute Now */}
+
+                {/* Dialog for Execute Now */}
                 <Dialog header="Execute Now" visible={displayBasic2} style={{ width: '40vw' }}  footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
                     {/* <div style={{display: 'flex', justifyContent: 'space-around'}}>
                     {
@@ -536,12 +536,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="radio" name='myRadios' id='second' onChange={()=>{}} style={{width:'2.5vh', height: '2.5vh'}}/>&nbsp;&nbsp;
                     <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Assure Client</label> 
-                    
+                
                 </Dialog>
                 {allocateICE?
                 <AllocateICEPopup 
                     // SubmitButton={CheckStatusAndExecute} 
-                    // setAllocateICE={setAllocateICE}
+                    // setAllocateICE={setAllocateICE} 
                     modalButton={"Execute"} 
                     // allocateICE={allocateICE} 
                     modalTitle={"Select ICE to Execute"} 
@@ -560,42 +560,42 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
 
                 <Dialog header="Execute via CI/CD" visible={displayBasic} style={{ width: '50vw' }}  onHide={() => onHide('displayBasic')}>
                     <div style={{display: 'flex', marginBottom:'3vh'}}>
-                        <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%', marginTop: '1.5rem'}}>DevOps Integration API url : </span>
+                    <span className="devOps_dropdown_label devOps_dropdown_label_url" style={{marginRight: '1%', marginTop: '1.5rem'}}>DevOps Integration API url : </span>
                         <pre className='grid_download_dialog__content__code' style={{ width: '58vh'}}>
-                            <code>
-                            {url}
-                            </code>
-                        </pre>
-                        <label>
-                                <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
-                                <div style={{fontSize:"24px"}}>
+                        <code>
+                        {url}
+                        </code>
+                    </pre>
+                    <label>
+                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
+                            <div style={{fontSize:"24px"}}>
                                     <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '3.5vh'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyKeyUrlFunc('api-url') }} ></i>
-                                </div>
-                            </label>
-                    </div>
+                            </div>
+                        </label>
+                </div>
                         <div style={{display: 'flex', marginBottom:'3vh'}}>
-                            <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
-                            <div className="devOps_dropdown_label_sync">
+                        <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
+                        <div className="devOps_dropdown_label_sync">
                                 <label id='async' htmlFor='synch' value='asynchronous'>Asynchronous </label>
                                 <Toggle label="" inlineLabel={true} />
                                 <label id='sync' htmlFor='synch' value='synchronous'>Synchronous </label>
-                            </div>
                         </div>
+                    </div>
                         <div style={{display: 'flex', marginBottom:'3vh'}}>
                         <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '8.5vh'}}>DevOps Request Body : </span>
                         <pre className='grid_download_dialog__content__code' style={{ width: '58vh', marginLeft: '46px'}}>
-                            <code style={{fontSize: 'smaller'}}>
-                                {str}
-                                {/* {abc} */}
-                            </code>
-                        </pre>
-                        <label>
-                                <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
+                        <code style={{fontSize: 'smaller'}}>
+                            {str}
+                            {/* {abc} */}
+                        </code>
+                    </pre>
+                    <label>
+                            <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
                                 <div style={{fontSize:"24px",marginTop:'5vh'}}>
-                                    <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => {  copyKeyUrlFunc('devops-key') }} ></i>
-                                </div>
-                            </label>
-                    </div>
+                                <i className="fa fa-files-o icon" style={{fontSize:"24px", marginTop: '1.5rem'}} data-for="copy" data-tip={copyToolTip} onClick={() => {  copyKeyUrlFunc('devops-key') }} ></i>
+                            </div>
+                        </label>
+                </div>
                 </Dialog>
                 {/* Dialog for CI /CD  */}
                 </ScrollBar>

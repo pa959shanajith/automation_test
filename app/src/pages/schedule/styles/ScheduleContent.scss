@@ -46,9 +46,9 @@
 .btnAddToSchedule,
 .btnAddToSchedule:active:focus,
 .btnAddToSchedule:focus {
-    padding: 2px 30px !important;
-    margin-right:10px;
-    float: right!important;
+    // padding: 2px 30px !important;
+    // margin-right:-14px;
+    // float: right!important;
 }
 .s__task_title{
     margin-bottom: 10px;
@@ -98,7 +98,7 @@
     margin-left: -20px;
     padding: 20px;
     // height: 57%;
-    height: 50%;
+    height: 70%;
 }
 .form-control-schedule{
     display: block;
@@ -118,6 +118,10 @@
     -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
+.ab_btn{
+    float: left;
+}
+
 #scheduledSuitesFilterData{
     margin-bottom: 0;
     border: 1px solid $borderGray !important;
@@ -234,8 +238,16 @@
     margin-right: 5px;
 }
 #s__btns{
-	float:right;
-	margin-bottom: 15px;
+	float:left;
+	margin: -40px 10px 32px 10px;
+    
+}
+
+.only_schedule{
+    position: absolute;
+    top: 78vh;
+    right: 35px;
+    margin: -30px
 }
 .s__Table_date-time{
     cursor: default;

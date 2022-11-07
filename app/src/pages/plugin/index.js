@@ -20,8 +20,11 @@ const Plugin = () => {
         //eslint-disable-next-line
     }, []);
 
+   
+
     return (
-        <>
+        <>  
+            
             <PluginHome />
         </>
     );

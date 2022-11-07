@@ -510,20 +510,20 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
     var t = s.attr('data-nodetype');
     if (t === 'modules' || t === 'endtoend') return;
     var p = dNodes[sid].parent;
-    // if(dNodes[sid]['taskexists']!=null && dNodes[sid]['taskexists'].status !== 'complete'){
-    //     setMsg(MSG.MINDMAP.WARN_TASK_ASSIGNED)
-    //     return; 
-    // }
-    // var taskCheck=checkparenttask(dNodes[sid],false);
-    // if(taskCheck){
-    //     setMsg(MSG.MINDMAP.WARN_PARENT_TASK_ASSIGNED)
-    //     return;
-    // }
-    // taskCheck=checkchildrentask(dNodes[sid],false);
-    // if(taskCheck){
-    //     setMsg(MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED)
-    //     return;
-    // }
+    if(dNodes[sid]['taskexists']!=null && dNodes[sid]['taskexists'].status !== 'complete'){
+        setMsg(MSG.MINDMAP.WARN_TASK_ASSIGNED)
+        return; 
+    }
+    var taskCheck=checkparenttask(dNodes[sid],false);
+    if(taskCheck){
+        setMsg(MSG.MINDMAP.WARN_PARENT_TASK_ASSIGNED)
+        return;
+    }
+    taskCheck=checkchildrentask(dNodes[sid],false);
+    if(taskCheck){
+        setMsg(MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED)
+        return;
+    }
     recurseDelChild(dNodes[sid],linkDisplay, nodeDisplay,dNodes,dLinks,undefined,deletedNodes);
     for (var j = dLinks.length - 1; j >= 0; j--) {
         if (dLinks[j].target.id === sid){
