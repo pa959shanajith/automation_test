@@ -269,7 +269,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     <div key={title+idx} className="d-p-card__item">
                       <div className="d-p-card__I-title">{type!=="OR" ? idx+1+". " : ""} {item.title}</div>
                       {/* <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${item.imageName}.svg)`}}></div> */}
-                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.svg`} className="d-p-card__image"/></div>
+                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.svg`} className="d-p-card__image" onClick={()=>enlargeImage(item.imageName)}/></div>
                     </div>
                     {idx !== items.length-1 ? <div key={title+idx+"sep"} className="d-p-card__separator">{type==="OR"?"OR  ": <div className="d-p-card__div__image" style={{backgroundImage:`url(static/imgs/WW_r_arrow.svg)`}}></div>}</div>:null}
                   </>))}
