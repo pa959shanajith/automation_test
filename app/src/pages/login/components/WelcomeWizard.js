@@ -13,22 +13,6 @@ import { useHistory } from 'react-router-dom';
 import { manageUserDetails } from '../../admin/api';
 import { IconButton } from "@avo/designcomponents"
 
-const DPCard = ({title, items, type}) => {
-    return (<div className="d-p-card">
-                <div className="d-p-card__title">{title}</div>
-                <div className="d-p-card__itemsContainer">
-                  {items.map((item,idx)=> (<>
-                    <div key={title+idx} className="d-p-card__item">
-                      <div className="d-p-card__I-title">{type!=="OR" ? idx+1+". " : ""} {item.title}</div>
-                      {/* <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${item.imageName}.svg)`}}></div> */}
-                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.svg`} className="d-p-card__image"/></div>
-                    </div>
-                    {idx !== items.length-1 ? <div key={title+idx+"sep"} className="d-p-card__separator">{type==="OR"?"OR  ": <div className="d-p-card__div__image" style={{backgroundImage:`url(static/imgs/WW_r_arrow.svg)`}}></div>}</div>:null}
-                  </>))}
-                </div>
-            </div>)
-}
-
 
 const WelcomeWizard = ({showWizard, setPopover}) => {
   const [percentComplete,setPercentComplete] = useState(0);
@@ -50,6 +34,10 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const TnCInnerRef = useRef(undefined);
   const history = useHistory();
   const dispatch = useDispatch();
+   const enlargeImage = (imageName) => {
+    setShowImage(imageName)
+       
+  };
 
   // getting the browser name using userAgent
   const userAgent = window.navigator.userAgent.toLowerCase();
@@ -258,6 +246,36 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   // //     // }
   // //   }
   // }
+
+  const GetImageModal = ({imageName}) =>{ 
+    document.getElementsByClassName("form-container")[0].style.visibility="hidden";
+    document.getElementsByClassName("stepper")[0].style.visibility="hidden";
+    return (
+        <div>
+            <img src={`static/imgs/${imageName}.svg`} className="enlargeImage"/>
+            <img src={`static/imgs/close-btn.svg`} className="close-btn" onClick={()=>
+                {setShowImage("");
+                document.getElementsByClassName("form-container")[0].style.visibility="visible";
+                document.getElementsByClassName("stepper")[0].style.visibility="visible";}} />
+        </div>
+    )
+}
+
+  const DPCard = ({title, items, type}) => {
+    return (<div className="d-p-card">
+                <div className="d-p-card__title">{title}</div>
+                <div className="d-p-card__itemsContainer">
+                  {items.map((item,idx)=> (<>
+                    <div key={title+idx} className="d-p-card__item">
+                      <div className="d-p-card__I-title">{type!=="OR" ? idx+1+". " : ""} {item.title}</div>
+                      {/* <div className="d-p-card__image" style={{backgroundImage:`url(static/imgs/${item.imageName}.svg)`}}></div> */}
+                      <div style={{display:"flex", height:"inherit"}}><img src={`static/imgs/${item.imageName}.svg`} className="d-p-card__image"/></div>
+                    </div>
+                    {idx !== items.length-1 ? <div key={title+idx+"sep"} className="d-p-card__separator">{type==="OR"?"OR  ": <div className="d-p-card__div__image" style={{backgroundImage:`url(static/imgs/WW_r_arrow.svg)`}}></div>}</div>:null}
+                  </>))}
+                </div>
+            </div>)
+}
 
   const getTermsAndConditions = () => {
       return (
@@ -589,6 +607,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   return (
       <div className={"WW_container "+(activeStep>3?AnimationClassNames.fadeOut500:AnimationClassNames.fadeIn100)}>
         <div className="form">
+        {showImage !== "" && <GetImageModal imageName = {showImage} /> } 
         <div className="progressbar">
              <Stepper
                 steps={[
