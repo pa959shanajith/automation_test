@@ -16,7 +16,7 @@ import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import * as actionTypes from '../state/action';
 import '../styles/MindmapCanvas.scss';
-import TaskBox from '../components/TaskBox';
+// import TaskBox from '../components/TaskBox';
 import {Dialog} from '@avo/designcomponents';
 
 
@@ -57,7 +57,7 @@ const CanvasNew = (props) => {
     const [dLinks,setdLinks] = useState([])
     const [createnew,setCreateNew] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(false);
-    const [taskbox,setTaskBox] = useState(false);
+    // const [taskbox,setTaskBox] = useState(false);
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
@@ -255,17 +255,17 @@ const CanvasNew = (props) => {
         }
     }
 
-    const clickUnassign = (res) =>{
-        setNodes(res.nodeDisplay)
-        dispatch({type:actionTypes.UPDATE_UNASSIGNTASK,payload:res.unassignTask})
-        setTaskBox(false)
-    }
+    // const clickUnassign = (res) =>{
+    //     setNodes(res.nodeDisplay)
+    //     dispatch({type:actionTypes.UPDATE_UNASSIGNTASK,payload:res.unassignTask})
+    //     setTaskBox(false)
+    // }
 
-    const clickAddTask = (res) =>{
-        setNodes(res.nodeDisplay)
-        setdNodes(res.dNodes)
-        setTaskBox(false)
-    }
+    // const clickAddTask = (res) =>{
+    //     setNodes(res.nodeDisplay)
+    //     setdNodes(res.dNodes)
+    //     setTaskBox(false)
+    // }
 
     return (
         <Fragment>
@@ -298,14 +298,14 @@ const CanvasNew = (props) => {
 
             
 
-            {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={"R1"} cycleid={"C1"} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null}
+            {/* {taskbox?<TaskBox clickUnassign={clickUnassign} nodeDisplay={{...nodes}} releaseid={"R1"} cycleid={"C1"} ctScale={ctScale} nid={taskbox} dNodes={[...dNodes]} setTaskBox={setTaskBox} clickAddTask={clickAddTask} displayError={displayError}/>:null} */}
             {(selectBox)?<RectangleBox ctScale={ctScale} dNodes={[...dNodes]} dLinks={[...dLinks]}/>:null}
-            {(ctrlBox !== false)?<ControlBox setShowScrape={props.setShowScrape} showScrape={props.showScrape} setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup}  setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
+            {(ctrlBox !== false)?<ControlBox setShowScrape={props.setShowScrape} showScrape={props.showScrape} setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
             {/* {(ctrlBox !== false)?<ControlBox setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
-            {/* <NavButton setCtScale={setCtScale} zoom={zoom}/> */}
+            <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
             <SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>
             <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>

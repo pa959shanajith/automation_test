@@ -159,38 +159,42 @@ const ModuleListDrop = (props) =>{
 // console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",e)
 
     }
-    // const loadModule = async(modID) =>{
-    //     dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
-    //     setModdrop(false)
-    //     setWarning(false)
-    //     setLoading(true)
-    //     // var req={
-    //     //     tab:"tabCreate",
-    //     //     projectid:proj,
-    //     //     version:0,
-    //     //     cycId: null,
-    //     //     // modName:"",
-    //     //     moduleid:[modID]
-    //     // }
-    //     // if(isAssign){
-    //     //     req.tab = "tabAssign"
-    //     //     req.cycId = props.cycleRef.current?props.cycleRef.current.value: ""
-    //     // }
-    //     console.log('abc');
-    //     console.log('hello hanumant',actionTypes.SELECT_MODULE);
-    //     var req={
-    //         tab:"endToend",
-    //         projectid:proj,
-    //         version:0,
-    //         cycId: null,
-    //         modName:"",
-    //         moduleid:modID
-    //     }
-    //     var res = await getModules(req)
-    //     if(res.error){displayError(res.error);return}
-    //     dispatch({type:actionTypes.SELECT_MODULE,payload:res})
-    //     setBlockui({show:false})
-    // }
+    
+    //E2E properties
+    const selectModules= async(e) => {
+        // setSelctedSc([])
+        var modID = e.currentTarget.getAttribute("value")
+        var type = e.currentTarget.getAttribute("type")
+        var name = e.currentTarget.getAttribute("name")
+        if(Object.keys(moduleSelect).length===0){
+            loadModuleE2E(modID)
+            return;
+        }else{
+            setWarning({modID, type});
+            
+            // loadModuleE2E(modID)
+        }
+    }    
+    const loadModuleE2E = async(modID) =>{
+        setWarning(false)
+        setIsE2EOpen(true)
+        setBlockui({show:true,content:"Loading Module ..."})        
+        if(moduleSelect._id === modID){
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+        }
+        var req={
+            tab:"endToend",
+            projectid:proj,
+            version:0,
+            cycId: null,
+            modName:"",
+            moduleid:modID
+        }
+        var res = await getModules(req)
+        if(res.error){displayError(res.error);return}
+        dispatch({type:actionTypes.SELECT_MODULE,payload:res})
+        setBlockui({show:false})
+    }
     // E2E search button
     const searchModule_E2E = (val) =>{
         var initmodule = modE2Elist
@@ -286,16 +290,15 @@ const ModuleListDrop = (props) =>{
                             />  
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
-                            <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}/>
+                            <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule_E2E(e.target.value)}/>
                             <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
                         </div>
                         <div className='endToEndMap'>
                         {moduleList.map((e,i)=>{
                             if(e.type==="endtoend")
                             return(
-                                    <div key={i} style={{ display:'flex',  width:'20%', justifyContent:'space-between', padding:'0.25rem' }} data-test="individualModules" name={e.name} type={e.type} onClick={(e)=>selectModule(e)} title={e.name}>
-                                        <input type="checkbox" className="checkBox" value={e._id} onChange={(e)=>selectModuleChkBox(e)}  />
-                                        <img style={{height: '1.7rem',width:'1.7rem'}} src={(e.type==="endtoend")?"static/imgs/E2Eicon.png":"static/imgs/node-modules.png"} alt='module'></img>
+                                    <div key={i} style={{ display:'flex',  width:'20%', justifyContent:'space-between', padding:'0.25rem', marginLeft:'1.62rem' }} data-test="individualModules" name={e.name} value={e._id} type={e.type} onClick={(e)=>selectModules(e)} title={e.name}>
+                                        <img style={{height: '1.7rem',width:'1.7rem'}} src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img>
                                         <span className='modNme' >{e.name}</span>
                                     </div>
                             )

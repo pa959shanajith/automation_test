@@ -398,17 +398,17 @@ const DevOpsConfig = props => {
         :null}
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-                { props.currentIntegration.name === '' ? '' : 'Update'} Configuration set up
+                { props.currentIntegration.name === '' ? 'Create' : 'Update'} Execution Profile
             </span>
         </div>
         <div className="api-ut__btnGroup">
         <button style={{width: '30vh'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save configuration' : 'Update'}</button>
             <button data-test="submit-button-test" style={{width: '15vh'}} onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
             <div className="devOps_config_name" style={{marginRight:'92vh',position:'absolute',right: '49vh'}}>
-                <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Configuration Name : </span>
+                <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
-                    <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Configuration Name"
+                    <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Profile Name"
                         errorMessage={(integrationConfig.name === '' && error.name && error.name !== '') ?  error.name : null}
                     />
                 </span>
@@ -479,8 +479,8 @@ const DevOpsConfig = props => {
                             <label>Headless </label>
                         </div>
                     </div>
-                    <div className='devOps_seperation'>
-                    </div>
+                    {/* <div className='devOps_seperation'>
+                    </div> */}
                     {/* <div>
                         <span className="devOps_dropdown_label devOps_dropdown_label_url">DevOps Integration API url : </span>
                         <span className="devOps_dropdown_label_input"><input type="text" value={props.url} id='api-url' className="req-body" autoComplete="off" style={{width:"84%"}} placeholder='https: &lt;&lt;Avo Assure&gt;&gt;/execAutomation' />

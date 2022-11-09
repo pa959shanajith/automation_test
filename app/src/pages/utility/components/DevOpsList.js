@@ -97,6 +97,24 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setProjectList(arraynew);
             setSelectedProject(arraynew[0].key);
             setSelectedCycle(arraynew[0].key);
+
+
+            // console.log(selectedProject);
+            if(arraynew.length > 0) {
+                const configurationList = await fetchConfigureList({
+                    'projectid': arraynew[0].key
+                });
+                if(configurationList.error) {
+                    if(configurationList.error.CONTENT) {
+                        setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
+                    } else {
+                        setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
+                    }
+                }else {
+                    setConfigList(configurationList);
+                }
+            }
+            setLoading(false);
         }
         
 
@@ -137,7 +155,28 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         })()
         
     },[]);
-        
+    useEffect(() => {
+        (() => {
+            setLoading('Please Wait...');
+            setTimeout(async () => {
+            // console.log(selectedProject);
+            //     const configurationList = await fetchConfigureList({
+            //         'projectid': selectedProject
+            //     });
+            //     if(configurationList.error) {
+            //         if(configurationList.error.CONTENT) {
+            //             setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
+            //         } else {
+            //             setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
+            //         }
+            //     }else {
+            //         setConfigList(configurationList);
+            //     }
+            //     setLoading(false);
+            }, 500);
+        })()
+    }, []);
+    
     const dialogFuncMap = {
         'displayBasic': setDisplayBasic,
         'displayBasic1': setDisplayBasic1,
@@ -185,8 +224,22 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const onHide = (name) => {
         dialogFuncMap[`${name}`](false);
     }
-    const onProjectChange = (option) => {
+    const onProjectChange = async (option) => {
+        setLoading('Please Wait...');
         setSelectedProject(option.key);
+        const configurationList = await fetchConfigureList({
+            'projectid': option.key
+        });
+        if(configurationList.error) {
+            if(configurationList.error.CONTENT) {
+                setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
+            } else {
+                setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
+            }
+        }else {
+            setConfigList(configurationList);
+        }
+        setLoading(false);
         // projectData(getProjectList.filter((config) => config.key === option.key)[0].data.cycle);
         
     }
@@ -246,7 +299,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     setMsg(MSG.CUSTOM("Error While Deleting DevOps Configuration",VARIANT.ERROR));
                 }
             }else {
-                const configurationList = await fetchConfigureList();
+                console.log('selectedProject');
+                const configurationList = await fetchConfigureList({
+                    'projectid': selectedProject
+                });
                 if(configurationList.error) {
                     if(configurationList.error.CONTENT) {
                         setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
@@ -368,24 +424,27 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             }
         return scenarioList;
     }
-    useEffect(() => {
-        (() => {
-            setLoading('Please Wait...');
-            setTimeout(async () => {
-                const configurationList = await fetchConfigureList();
-                if(configurationList.error) {
-                    if(configurationList.error.CONTENT) {
-                        setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
-                    } else {
-                        setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
-                    }
-                }else {
-                    setConfigList(configurationList);
-                }
-                setLoading(false);
-            }, 500);
-        })()
-    }, []);
+    // useEffect(() => {
+    //     (() => {
+    //         setLoading('Please Wait...');
+    //         setTimeout(async () => {
+    //         console.log(selectedProject);
+    //             const configurationList = await fetchConfigureList({
+    //                 'projectid': selectedProject
+    //             });
+    //             if(configurationList.error) {
+    //                 if(configurationList.error.CONTENT) {
+    //                     setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
+    //                 } else {
+    //                     setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
+    //                 }
+    //             }else {
+    //                 setConfigList(configurationList);
+    //             }
+    //             setLoading(false);
+    //         }, 500);
+    //     })()
+    // }, []);
  
     // let projectid = getProjectList[0].code
     // console.log(projectid)let projectid = getProjectList[0].code
@@ -413,7 +472,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     integration: '',
                     executionType: 'asynchronous',
                     isHeadless: false
-                })} >New Configuration</button>
+                })} >New Profile</button>
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>
                     <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
@@ -427,7 +486,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         </div>
         
                   <div style={{marginTop: '-9vh', display: 'flex', marginBottom: '2vh'}}>
-                 <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '2vh', marginRight: '5px'}}>Project Name : </span>
+                 <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '1vh', marginRight: '5px'}}>Project Name : </span>
         
                     {/* <Dropdown value={selectedProject} style={{width:'31vh', position: 'relative', border:'0.4vh solid #613191 '}} options={getProjectList} onChange={onProjectChange} optionLabel="name"  placeholder="Select the Project"/> */}
                 <SearchDropdown
@@ -444,7 +503,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             
         { configList.length > 0 ? <>
             { /* Table */ }
-            <div className="d__table" style={{ flex: 0 }}>
+            <div className="d__table" style={{flex: '0 1 0%', width: '207vh',marginLeft: '-0.6vh' }}>
                 <div className="d__table_header">
                 <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#</span>
                     <span className="details_col tkn-table__key d__det_head" >Execution Profile Name</span>
@@ -455,7 +514,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <span className="d__out_head tkn-table__project tkn-table__head" >Action</span>
                 </div>
             </div>
-            <div id="activeUsersToken" className="wrap active-users-token">
+            <div id="activeUsersToken" className="wrap active-users-token" style={{marginLeft: '-1.5vh',width: '101%'}}>
                 <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
                 <table className = "table table-hover sessionTable" id="configList">
                     <tbody>

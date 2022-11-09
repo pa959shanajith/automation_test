@@ -28,18 +28,20 @@ const ExportMapButton = ({setBlockui,displayError,isAssign,releaseRef,cycleRef})
         setExportBox(true)
     }
     const clickExport = () => {
-        if(!selectedModule._id || selectedModulelist.length==0)return;
+        // if(!selectedModule._id || selectedModulelist.length==0)return;
         var err = validate([fnameRef,ftypeRef,gitconfigRef,gitBranchRef,gitVerRef])
         if(err)return
+        let selectedModuleVar = selectedModulelist.length>0?selectedModulelist:selectedModule;
         setExportBox(false)
         setBlockui({show:true,content:'Exporting Mindmap ...'})
         var ftype = ftypeRef.current.value
         if(ftype === 'json') {
-            toJSON(selectedModulelist.length>0?selectedModulelist:selectedModule,fnameRef.current.value,displayError,setBlockui);
+            toJSON(selectedModuleVar,fnameRef.current.value,displayError,setBlockui);
         }
-        if(ftype === 'excel') toExcel(selectedProj,selectedModule,fnameRef.current.value,displayError,setBlockui);
-        if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
-        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule});
+        
+        if(ftype === 'excel') toExcel(selectedProj,selectedModulelist.length>0?selectedModulelist[0]:selectedModule,fnameRef.current.value,displayError,setBlockui);
+        // if(ftype === 'custom') toCustom(selectedProj,selectedModuleVar,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
+        if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelist.length>0?selectedModulelist[0]:selectedModule});
     }
     return(
         <Fragment>
@@ -49,12 +51,12 @@ const ExportMapButton = ({setBlockui,displayError,isAssign,releaseRef,cycleRef})
             footer={<Footer clickExport={clickExport}/>}
             content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={selectedModule.name} isAssign={isAssign}/>} 
             />:null}
-            {/* <svg data-test="exportButton" className={"ct-exportBtn"+(selectedModule._id || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={openExport}>
+            <svg data-test="exportButton" className={"ct-exportBtn"+(selectedModule._id || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox(true)}>
                 <g id="ct-exportAction" className="ct-actionButton">
                     <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                     <text x="16" y="18">Export</text>
                 </g>
-            </svg> */}
+            </svg>
         </Fragment>
     )
 }
@@ -129,11 +131,11 @@ const Footer = ({clickExport}) => <div><button onClick={clickExport}>Export</but
     Purpose : Exporting Module in json file
     param :
 */
-const toExcel = async(projId,modId,fname,displayError,setBlockui) => {
+const toExcel = async(projId,module,fname,displayError,setBlockui) => {
     try{
         var data = {
             "projectid":projId,
-            "moduleid":modId._id
+            "moduleid":module
         }
         var result = await exportToExcel(data)
         if(result.error){displayError(result.error);return;}
@@ -163,7 +165,7 @@ const toJSON = async(module,fname,displayError,setBlockui) => {
     try{
         var result =  await exportMindmap(Array.isArray(module)?module:module._id)
         if(result.error){displayError(result.error);return;}
-        jsonDownload(fname+'.mm', JSON.stringify(result[0]));
+        jsonDownload(fname+'.mm', JSON.stringify(result));
         setBlockui({show:false,content:''})
         setMsg(MSG.MINDMAP.SUCC_DATA_EXPORTED)
     }catch(err){
@@ -188,7 +190,7 @@ const toGit = async ({projectList,displayError,setBlockui,gitconfigRef,gitVerRef
         gitVersion: gitVerRef.current.value,
 		gitFolderPath:gitpath,
 		gitBranch: gitBranchRef.current.value,
-		mindmapId: selectedModule._id
+		mindmapId: selectedModule
     })
     if(res.error){displayError(res.error);return;}
     setBlockui({show:false})
@@ -257,7 +259,7 @@ Purpose : download json file
 */
 
 function jsonDownload(filename, responseData) {
-    var blob = new Blob([responseData], { type: 'text/json' });
+    var blob = new Blob([responseData], { type: 'text/json' });    
     var e = document.createEvent('MouseEvents');
     var a = document.createElement('a');
     a.download = filename;

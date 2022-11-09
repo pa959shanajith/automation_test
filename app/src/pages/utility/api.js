@@ -485,7 +485,8 @@ export const getAgentTask = async(props) => {
     }
 }
 
-export const fetchConfigureList = async() => {
+export const fetchConfigureList = async(props) => {
+    console.log(props);
     try{
         const res = await axios(url+'/getConfigureList', {
             method: 'POST',
@@ -493,7 +494,8 @@ export const fetchConfigureList = async() => {
                 'Content-type': 'application/json',
             },
             data: {
-                action: "configurelist"
+                action: "configurelist",
+                'projectid': props.projectid
             }
         });
         if(res.status === 401){

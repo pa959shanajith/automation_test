@@ -989,24 +989,7 @@ const DesignContent = props => {
 
                 </div>
 
-                <div className="d__submit" data-test="d__actionBtn">
-                    { isUnderReview && 
-                        <>
-                        <button className="d__reassignBtn d__btn" title="Reassign Task" onClick={()=>onAction("reassign")}>
-                            Reassign
-                        </button>
-                        <button className="d__approveBtn d__btn" title="Approve Task" onClick={()=>onAction("approve")}>
-                            Approve
-                        </button>
-                        </>
-                    }
-                    { !hideSubmit && !isUnderReview &&
-                        <button className="d__submitBtn d__btn" title="Submit Task" onClick={()=>onAction("submit")}>
-                            Submit
-                        </button>
-                    }
-                </div>
-
+               
             </div>
             </div>
 
@@ -1048,7 +1031,30 @@ const DesignContent = props => {
                 </div>
                 </div>}
                 </div>
-            </div>
+          
+          
+            <div className="d__submit" data-test="d__actionBtn">
+                    { isUnderReview && 
+                        <>
+                        <button className="d__reassignBtn d__btn" title="Reassign Task" onClick={()=>onAction("reassign")}>
+                            Reassign
+                        </button>
+                        <button className="d__approveBtn d__btn" title="Approve Task" onClick={()=>onAction("approve")}>
+                            Approve
+                        </button>
+                        </>
+                    }
+                    { !hideSubmit && !isUnderReview &&
+                        <button className="d__submitBtn d__btn" title="Submit Task" onClick={()=>onAction("submit")}>
+                            Submit
+                        </button>
+                    }
+                </div>
+                
+
+                </div>
+
+
         </div>
         </>
     );

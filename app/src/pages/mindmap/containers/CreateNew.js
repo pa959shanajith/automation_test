@@ -12,7 +12,7 @@ import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils'
 import {ScreenOverlay, setMsg, ReferenceBar} from '../../global';
 import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
-
+// import CanvasEnE from './CanvasEnE';
 
 /*Component CreateNew
   use: renders create New Mindmap page
@@ -109,6 +109,7 @@ const CreateNew = ({importRedirect}) => {
                 
                     {(Object.keys(moduleSelect).length>0)?
                     <CanvasNew showScrape={showScrape} setShowScrape={setShowScrape} ShowDesignTestSetup={ShowDesignTestSetup} setShowDesignTestSetup={setShowDesignTestSetup} displayError={displayError} setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop}/>
+                    // +<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
                     :<Fragment>
                    
                         <ExportMapButton/>
@@ -118,6 +119,16 @@ const CreateNew = ({importRedirect}) => {
                     
                     
                 </div>
+                <div>
+                {/* {(Object.keys(moduleSelect).length>0)?
+                    {/* <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/> */}
+                    :<Fragment>
+                   
+                        {/* <ExportMapButton/>
+                        <SaveMapButton disabled={true}/>
+                        <Legends/> */}
+                    </Fragment>
+                    </div>
                 
             </div>:null
         }
