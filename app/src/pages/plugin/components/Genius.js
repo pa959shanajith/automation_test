@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { NormalDropDown, TextField, Card, IconButton } from '@avo/designcomponents';
 import { Icon } from "@fluentui/react/lib/Icon";
 import { Header, FooterOne, RedirectPage } from '../../global';
@@ -27,9 +27,12 @@ const Genius = () => {
   const [navURL, setNavURL] = useState("")
   const [selectedBrowser, setSelectedBrowser] = useState(null);
   const [blockui, setBlockui] = useState({ show: false })
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false);
   const [flag, setFlag] = useState(false);
   const moduleSelect = useSelector(state => state.mindmap.selectedModule);
+  const userInfo = useSelector(state => state.login.userinfo);
+  const savedRef = useRef(false);
+  const finalDataRef = useRef([])
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -45,8 +48,69 @@ const Genius = () => {
       loadModule(selectedModule.key, selectedProject.key);
       return
     }
+    else if (data === "startDebugging") {
+      if (savedRef.current) {
+        const firstStep = {
+          "stepNo": 1,
+          "custname": "@Browser",
+          "keywordVal": "openBrowser",
+          "objectName": "",
+          "inputVal": [
+            ""
+          ],
+          "outputVal": "",
+          "appType": "Web",
+          "remarks": "",
+          "addDetails": "",
+          "cord": "",
+          "url": ""
+        };
+        try {
+
+          let index = 2;
+          const res = await DesignApi.debugTestCase_ICE(["1"], [firstStep, ...finalDataRef.current.data.screens.reduce((acc, curr) => {
+            let dataObjectsArr = curr.data_objects;
+            let dataObjectsObj = {}
+            dataObjectsArr.forEach((d_obj) => {
+              if (d_obj.tempOrderId)
+                dataObjectsObj[d_obj.tempOrderId] = d_obj
+            })
+            let testcasesArr = curr.testcases.map((tc, idx) => {
+              tc["stepNo"] = index++;
+              tc['objectName'] = ""; tc['url'] = ""; tc['addTestCaseDetailsInfo'] = ""; tc['addTestCaseDetails'] = '';
+              if ('addDetails' in tc) {
+                tc['addTestCaseDetailsInfo'] = tc['addDetails']
+                delete tc['addDetails']
+              }
+              if (tc['custname'] === "@Custom") {
+                tc['objectName'] = "@Custom";
+                return tc;
+              }
+              if ('custname' in tc && "tempOrderId" in tc) {
+                if (tc["tempOrderId"] in dataObjectsObj) {
+                  tc['objectName'] = dataObjectsObj[tc["tempOrderId"]]["tag"] === "browser_navigate" ? "" : dataObjectsObj[tc["tempOrderId"]]['xpath']
+                  tc['url'] = 'url' in dataObjectsObj[tc["tempOrderId"]] ? dataObjectsObj[tc["tempOrderId"]]['url'] ? dataObjectsObj[tc["tempOrderId"]]['url'] : "" : "";
+                  tc['cord'] = 'cord' in dataObjectsObj[tc["tempOrderId"]] ? dataObjectsObj[tc["tempOrderId"]]['cord'] ? dataObjectsObj[tc["tempOrderId"]]['cord'] : "" : ""
+                }
+              }
+              return tc;
+            })
+
+            return acc.concat(...testcasesArr)
+          }, [])], userInfo, appType, true)
+        } catch (err) {
+          console.log(err)
+        }
+        return
+      }
+      else {
+        return
+      }
+    }
     try {
       const res = await PluginApi.getGeniusData(data);
+      savedRef.current = true;
+      finalDataRef.current = data;
       if (port) port.postMessage({
         "saved": true
       });
@@ -141,6 +205,7 @@ const Genius = () => {
         try {
           port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassue" });
           ResetSession.start();
+          setLoading("Genius Started...");
           sendMessageToPort({
             "open": true,
             "project": selectedProject,
@@ -155,6 +220,7 @@ const Genius = () => {
           port.onDisconnect.addListener(() => {
             port = undefined;
             ResetSession.end();
+            setLoading(false);
           })
           port.onMessage.addListener(backgroundListener);
         }
@@ -162,8 +228,10 @@ const Genius = () => {
           ResetSession.end();
           if (idx < 3)
             createPort(keywordData, idx++);
-          else
+          else {
             port = undefined;
+            setLoading(false);
+          }
           console.log(err);
         }
       } else {
@@ -182,6 +250,7 @@ const Genius = () => {
 
     }
     else {
+      setLoading(false);
       console.log("Extension not present");
     }
   }
@@ -189,6 +258,7 @@ const Genius = () => {
   return (
     <div className="plugin-bg-container">
       <Header />
+      {loading ? <ScreenOverlay content={loading} /> : null}
       {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 ? <GeniusMindmap displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={hideMindmap} /> : null}
       <div className='plugin-elements'>
         <h3 style={{ margin: "1rem 0 1rem 1rem" }}>Welcome To Avo Genius</h3>
@@ -410,7 +480,7 @@ const Genius = () => {
                     //       }
                     //     });
                     // })
-                    .catch((err) => { console.log("error") })
+                    .catch((err) => { console.log("error"); setLoading(false); })
                 }
                 }>
                 Next
