@@ -55,9 +55,14 @@ const CanvasNew = (props) => {
     const [nodes,setNodes] = useState({})
     const [dNodes,setdNodes] = useState([])
     const [dLinks,setdLinks] = useState([])
+    const [delReuseNodes,setDelReuseNodes] = useState([])
     const [createnew,setCreateNew] = useState(false)
-    const [verticalLayout,setVerticalLayout] = useState(false);
-    // const [taskbox,setTaskBox] = useState(false);
+    const [reuseDelConfirm,setReuseDelConfirm] = useState(false)
+    const [selectedDelNode,setSelectedDelNode] = useState()
+    const [DelConfirm,setDelConfirm] = useState(false)
+    const [reuseDelContent,setReuseDelContent] = useState()
+    const[endToEndDelConfirm,setEndToEndDelConfirm]=useState(false)
+    const [verticalLayout,setVerticalLayout] = useState(false)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
@@ -400,6 +405,11 @@ const CanvasNew = (props) => {
             temp={...temp,...res.temp}
         }
     }
+    const DelReuseMsgContainer = ({message}) => (
+        <p style={{color:'red'}}>
+            {message}
+        </p>
+    )
 
     // const clickUnassign = (res) =>{
     //     setNodes(res.nodeDisplay)
