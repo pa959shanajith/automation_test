@@ -49,6 +49,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [selectedProject, setSelectedProject] = useState('');
     const [selectedCycle, setSelectedCycle] = useState('');
     const [cyclesList, setCyclesList] = useState('');
+    const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
     
 
     useEffect(()=>{
@@ -195,7 +196,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     }
 
         var myJsObj = {key:setCurrentIntegration && configList.map((item, index) => item.configurekey)[0],
-                'executionType' : 'asynchronous'}
+                'executionType' : executionTypeInRequest}
             var str = JSON.stringify(myJsObj, null, 4);
             // const abc = {\n&nbps;&nbps;&nbps;&nbps;
             //     'key': str,
@@ -636,7 +637,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         <label className="devOps_dropdown_label devOps_dropdown_label_execution">Execution Type : </label>
                         <div className="devOps_dropdown_label_sync">
                                 <label id='async' htmlFor='synch' value='asynchronous'>Asynchronous </label>
-                                <Toggle label="" inlineLabel={true} />
+                                <Toggle label="" inlineLabel={true} onChange = {() => executionTypeInRequest == 'asynchronous' ? setExecutionTypeInRequest('synchronous') : setExecutionTypeInRequest('asynchronous')}/>
                                 <label id='sync' htmlFor='synch' value='synchronous'>Synchronous </label>
                         </div>
                     </div>
