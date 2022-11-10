@@ -504,15 +504,15 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             
         { configList.length > 0 ? <>
             { /* Table */ }
-            <div className="d__table" style={{flex: '0 1 0%', width: '207vh',marginLeft: '-0.6vh' }}>
+            <div className="d__table" style={{flex: '0 1 0%', paddingLeft:'2vh', paddingRight:'2vh'}}>
                 <div className="d__table_header">
                 <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#</span>
-                    <span className="details_col tkn-table__key d__det_head" >Execution Profile Name</span>
+                    <span className="d__inp_head tkn-table__key tkn-table__head" >Execution Profile Name</span>
                     {/* <span className="details_col tkn-table__key d__det_head" >Configuration Key</span> */}
                     {/* <span className="d__inp_head tkn-table__project tkn-table__head" >Project</span>
                     <span className="d__out_head tkn-table__project tkn-table__head" >Release</span> */}
                     <span className="details_col tkn-table__key d__det_head ">Execution Action</span>
-                    <span className="d__out_head tkn-table__project tkn-table__head" >Action</span>
+                    <span className=" details_col tkn-table__key d__det_head" >Action</span>
                 </div>
             </div>
             <div id="activeUsersToken" className="wrap active-users-token" style={{marginLeft: '-1.5vh',width: '101%'}}>
@@ -522,13 +522,13 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         {
                             searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
-                                &nbsp;&nbsp;&nbsp;
-                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{width:'27vh', justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>&nbsp;&nbsp;&nbsp;&nbsp;
+                                
+                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>&nbsp;&nbsp;&nbsp;&nbsp;
                                 {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
                                 {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
-                                &nbsp;
-                                <td className="tkn-table__button" style={{marginLeft: '46.5vh', width:'100vh'}} >
+                                
+                                <td className="tkn-table__button" >
                                 <button onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                         //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                          }}> Execute Now </button>&nbsp;&nbsp;&nbsp;
@@ -539,7 +539,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      
                                      <button  onClick={() =>onClick('displayBasic1', item)}>  Schedule </button>&nbsp;&nbsp;&nbsp;
                                      <button  onClick={() =>onClick('displayBasic')}> CI / CD </button>
-                                    </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    </td>
                                     <td className="tkn-table__button" >
                                         <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
@@ -548,14 +548,13 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                          }
                         {
                              searchText.length == 0 && configList.length > 0 && configList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
-                                 <td className="tkn-table__sr_no"> {index+1} </td>
-                                &nbsp;&nbsp;&nbsp;
-                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{width:'27vh', justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black"  />{item.configurename} </td>
+                                <td className="tkn-table__sr_no"> {index+1} </td>
+                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black"  />{item.configurename} </td>
                                 {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
                                 {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
-                                &nbsp;
-                                <td className="tkn-table__button" style={{marginLeft: '49.1vh', width:'100vh'}} >
+                            
+                                <td className="tkn-table__button" >
                                 <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                        //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                          }}> Execute Now </button>&nbsp;&nbsp;&nbsp;
@@ -566,7 +565,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                      
                                      <button  onClick={() =>onClick('displayBasic1', item)}>  Schedule </button>&nbsp;&nbsp;&nbsp;
                                      <button  onClick={() =>onClick('displayBasic')}> CI / CD </button>
-                                    </td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    </td>
                                     <td className="tkn-table__button" >
                                         <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
                                         <img onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
