@@ -379,6 +379,20 @@ const CanvasNew = (props) => {
             processDeleteNode(delReuseNodes[i]);
         }
     }
+    const deleteNodeHere=()=>{
+        clickDeleteNodeHere(selectedDelNode)
+    }
+    const clickDeleteNodeHere=(id)=>{
+        var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes})
+        if(res){
+            // dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
+            setReuseDelConfirm(false)
+            setNodes(res.nodeDisplay)
+            setLinks(res.linkDisplay)
+            setdLinks(res.dLinks)
+            setdNodes(res.dNodes)
+        }
+    }
     const processDeleteNode = (sel_node) => {        
         var res = deleteNode(sel_node?sel_node:selectedDelNode,[...dNodes],[...dLinks],{...links},{...nodes})
         if(res){
@@ -466,10 +480,11 @@ const CanvasNew = (props) => {
                 close={()=>setReuseDelConfirm(false)}
                 footer={
                     <>
-                        <button onClick={()=>{reusedDelConfirm()}}>Yes</button>
-                        <button onClick={()=>setReuseDelConfirm(false)}>No</button>        
+                        <button onClick={()=>{reusedDelConfirm()}}>Delete everywhere</button>
+                        <button onClick={()=>{deleteNodeHere()}}>Delete current</button>
+                        <button onClick={()=>setReuseDelConfirm(false)}>Cancel</button>        
                     </>}
-                modalClass='modal-sm'
+                modalClass='modal-md'
             />:null}
             {DelConfirm?<ModalContainer 
                 title='Confirmation'
