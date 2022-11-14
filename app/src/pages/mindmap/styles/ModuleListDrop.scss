@@ -222,18 +222,18 @@
     background-color: $whiteColor;
     // padding: 0.625rem 1.25rem;
     z-index:2;
-    position: relative;
-    // width: 100%;
-    // height: '80vh';
+    position: relative;         
     display: flex;
     flex-direction: column;
     height: 100%;
+    width:100%;
 }
 
 .fullContainer{
-    width: 18%;
+    width: 19%;
     height:94%;
     border-right: 0.01rem solid black;
+    display: flex;
 }
 
 .moduleList{
@@ -243,6 +243,8 @@
     overflow-y: scroll;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    padding-right: 2.4rem;
 }
 
 .modulesBox{
@@ -293,4 +295,72 @@
 }
 .modNme{
     font-size: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.modNmeE2E{
+    font-size: 0.75rem;
+
+}
+.scenarioList{
+    height: 80%;
+    // padding: 0.25rem;
+    scroll-behavior: smooth;
+    overflow-y:auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 9rem;
+    scroll-behavior: smooth;
+    // padding-top: 2rem;
+    margin-top: 3rem;
+
+}
+.scenarioListBox{
+    border-right: 1px solid black;
+    // width: 10%;
+    // padding-left: 10rem;
+    align-content: center;
+    z-index: 2;
+    background-color: #F5F5F5;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 55%;
+    border-bottom:1px solid black; 
+    transition-duration: 0.4s;
+    opacity:0.5;
+    
+}
+.wholeContainer{
+    // border: 1px solid black;
+    display: flex;
+//   flex-wrap: nowrap;
+    height: 100%;
+}
+.collapseButton{
+    transform: rotate(180deg);
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: $primaryText;
+    width: 15px;
+    height: 20px;
+    // top: 50%;
+    // right: 0;
+    z-index: 1;
+    cursor: pointer;
+    // margin-right: 1rem;
+}
+.collapseButton hover{
+    border: 1px solid black;
+}
+.scenarios{
+    width:6rem;
+    height: 1.5rem;
+    padding: 0.25rem;
+    font-weight: bold;
+    
+    
+   
 }

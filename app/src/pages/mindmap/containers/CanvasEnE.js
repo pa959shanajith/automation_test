@@ -173,7 +173,7 @@ const CanvasEnE =(props)=>{
             <Legends isEnE={true}/>
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(ctrlBox !== false)?<ControlBox isEnE={true} nid={ctrlBox}  clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null}
-            <SaveMapButton isEnE={true} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>
+            <SaveMapButton isEnE={true} verticalLayout={setVerticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui}/>
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
