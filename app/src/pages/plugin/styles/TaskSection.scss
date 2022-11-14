@@ -60,7 +60,18 @@
     flex-direction: column;
     padding:0rem 1rem;
     margin-bottom: 0.7rem;
+    font-family: LatoWeb;
+    font-size: 16px;
 
+}
+
+.Radiobutton_des{
+    display: flex;
+    flex-direction: row;
+    color: black;
+    font-family:LatoWeb ;
+    font-size: 16px;
+    margin-left: 2px;
 }
 .filter-on{
     background-color: $primaryColorLightest;
@@ -73,17 +84,18 @@
 .labelStyle1 {
     display:flex;
     flex-direction: column;
-    margin-bottom: -0.5rem;
+    margin-bottom: -0.8rem;
     padding:0rem 1rem;
     // font-weight: 300;
     line-height: 70%;
     margin-top: 0.5rem;
-    font-size: 1.7rem;
+    font-size: 1.2rem;
     font-weight: 800;
-    color: rgb(50, 49, 48);
-   font-family: Mulish;
+    color:  #323130;
+   font-family: LatoWeb;
     font-style: normal;
     display: inline-block;
+    line-height: 0.2;
     
 }
 .display_project_box {
@@ -94,7 +106,7 @@
     border: 2px solid var(--baseColorBorder);
     box-sizing: content-box;
     width: 307px;
-    margin: 2px;
+    margin: 10px;
     height: 10rem;
     margin-top: -0.9rem;
 }
@@ -133,17 +145,17 @@
     font-family:  "LatoWeb" ;
     font-size: 20px;
     margin: 3px;
-    margin-top: -50px;
-    border-bottom: 3px solid $borderFour;
+    margin-top: -30px;
+    // border-bottom: 3px solid $borderFour;
     
    }
 .button-design{
     float: "left";
     margin-left: 1rem;
     font-family:"LatoWeb";
-    font-size: 18px;
-    padding: 0rem 1rem 0rem 1rem;
-    margin-bottom: 5px;
+    font-size: 16px;
+    padding: 0rem -9rem 0rem 1rem;
+    // margin-bottom: 5px;
     margin-top: -0.1rem;
     float: "bottom";
 
