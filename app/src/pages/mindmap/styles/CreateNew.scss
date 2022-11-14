@@ -7,6 +7,22 @@
     border: 1px solid transparent;
     width: 100%;
 }
+.note{
+    display: flex;
+    // position:fixed;
+    // top:6691px;
+    // right: 1341px;
+    position: sticky;
+    // width: 27px;
+    // height: 14px;
+    left:-1046px;
+    // top: 20px;
+    line-height: 14.4px;
+    font-size: 12px;
+    font-weight: 400;
+    font-family: 'LatoWeb';
+    margin: -534px 0px 421px 282px;
+}
 .mp__canvas_container{
     position: relative;
     margin: 2px;

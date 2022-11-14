@@ -105,6 +105,9 @@ const CreateNew = ({importRedirect}) => {
                 </div>
                 
                 <ModuleListDrop />
+                <div className='note'>
+                <p><b>Note </b>- Read the Mindmap from left to right</p>
+                </div>
                 <div id='mp__canvas' className='mp__canvas'>
                 
                     {(Object.keys(moduleSelect).length>0)?
