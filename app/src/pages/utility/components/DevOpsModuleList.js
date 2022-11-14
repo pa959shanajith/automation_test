@@ -226,7 +226,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                                 label: batch,
                             };
                             if(batchData[batch].length > 0) {
-                                filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+                                filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                                     let filterModule = {
                                         value: module.moduleid,
                                         label: module.name,
@@ -263,7 +263,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                             setIntegrationConfig({...integrationConfig, scenarioList: newScenarioList, dataParameters: newDataParams});
                         }
                     } else if(selectedExecutionType === 'e2eExecution') {
-                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+                        filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
                                 label: module.name,
@@ -300,7 +300,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                     label: module.name,
                 };
                 if(module.scenarios && module.scenarios.length > 0) {
-                    const moduleChildren = module.scenarios.filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((scenario) => {
+                    const moduleChildren = module.scenarios.filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((scenario) => {
                         return ({
                             value: scenario._id,
                             label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
@@ -313,7 +313,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                 return filterModule;
             });
         } else if(selectedKey === 'e2eExecution') {
-            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                 let filterModule = {
                     value: module.moduleid,
                     label: module.name,
@@ -340,7 +340,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                     label: batch,
                 };
                 if(batchData[batch].length > 0) {
-                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                         let filterModule = {
                             value: module.moduleid,
                             label: module.name,
