@@ -340,7 +340,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
                     label: batch,
                 };
                 if(batchData[batch].length > 0) {
-                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 > 0 } ).map((module) => {
+                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
                         let filterModule = {
                             value: module.moduleid,
                             label: module.name,
