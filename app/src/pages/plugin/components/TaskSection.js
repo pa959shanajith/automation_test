@@ -504,7 +504,7 @@ return <>
 <div className='button-design'>
             
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1000px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
                    window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
                    window.location.href = "/mindmap";
              }}>Design</button>
@@ -540,14 +540,14 @@ return <>
             
           <label style={{ marginRight: '2rem' }} >
             
-            <RadioButton
+            <RadioButton style={{marginRight:'0.3rem',fontSize:'16px',fontFamily:'LatoWeb'}}
              label="Create"
              value={createProj}
              onChange={handleCreateChange}/>
              Create Project
           </label>
-          <label>
-             <RadioButton 
+          <label >
+             <RadioButton style={{marginRight:'0.3rem',fontSize:'16px',fontFamily:'LatoWeb'}}
               label="Modify"
              value={ModifyProj}
              onChange={handleModifyChange} />
@@ -577,6 +577,7 @@ return <>
                         placeholder="Select Project"
                         standard
                         width="300px"
+                        fontSize='16px'
                         
                         //   fontSize='40px'
                         //   marginLeft="200px"
