@@ -199,11 +199,13 @@ const TableRow = (props) => {
                 </span>
                 <span className="keyword_col" >
                     { focused ? 
-                    <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={keyword} disabled={disableStep}>
-                        { objName === "OBJECT_DELETED" && <option>{keyword}</option> }
-                        { keywordList && keywordList.map((keyword, i) => <option key={i} value={keyword}>{keyword}</option>) }
-                    </select> :
-                    <div className="d__row_text" title={keyword} >{keyword}</div> }
+                    <>
+                        <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} disabled={disableStep}>
+                            { objName === "OBJECT_DELETED" && <option>{keyword}</option> }
+                            { keywordList && keywordList.map((keyword, i) => <option key={i} value={keyword} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""}>{keyword}</option>) }
+                        </select>
+                    </> :
+                    <div className="d__row_text" title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""}>{keyword}</div>}
                 </span>
                 <span className="input_col" >
                     { focused ? ['getBody', 'setHeader', 'setWholeBody', 'setHeaderTemplate'].includes(keyword) ? 

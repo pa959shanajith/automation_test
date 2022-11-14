@@ -12,7 +12,7 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
     const [projList,setProjList] = useState({})
     const [error,setError] = useState('')
     const [submit,setSubmit] = useState(false)
-    const [disableSubmit,setDisableSubmit] = useState(false)
+    const [disableSubmit,setDisableSubmit] = useState(true)
     const [mindmapData,setMindmapData] = useState([])
     const [duplicateModuleList,setDuplicateModuleList] = useState([]);
     const [duplicateFlag,setDuplicateFlag] = useState(false);
@@ -82,28 +82,35 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
     }
         setError('')
         setFiledUpload(undefined)
+        setDisableSubmit(false)
         setDuplicateModuleList([])
         uploadFile({setBlockui,setMindmapData,setDuplicateModuleList,projList,uploadFileRef,setSheetList,setError,setDisableSubmit,setFiledUpload, selectedProject:project})
     }
     const changeImportType = (e) => {
-        resetImportModule();
-        setImportType(e.target.value)
+        // projRef.current.value = ""
+        if(projRef.current)projRef.current.value = ''
+        if(uploadFileRef.current)uploadFileRef.current.value = ''
+        setImportType(e.target.value)        
+        setFiledUpload(undefined)
+        setDisableSubmit(true)
+        setError('')
+        if(e.target.value==="json"){ setUploadFileField(false); resetImportModule();}
     }
     const resetImportModule = async() => {
-        var moduledata = await getModules({"tab":"tabCreate","projectid":projRef.current.value,"moduleid":null,"query":"modLength"})
-        if (moduledata.length>0){
-            setError('Please select a Project which has no Modules.')
-            setDisableSubmit(true)
-            setUploadFileField(false)
-            ;return
-
+      if(uploadFileRef.current)uploadFileRef.current.value = ''
+        if(projRef.current.value) {
+            var moduledata = await getModules({"tab":"tabCreate","projectid":projRef.current.value,"moduleid":null,"query":"modLength"})
+            if (moduledata.length>0){
+                setError('Please select a Project which has no Modules.')                
+                setUploadFileField(false)
+                setFiledUpload(undefined)
+                return
+            }
         }
-        setUploadFileField(true)
+        if(projRef.current.value) setUploadFileField(true)
         setSheetList([])
         setFiledUpload(undefined)
-        setError('')
-        setDisableSubmit(false)
-        if(uploadFileRef.current)uploadFileRef.current.value = ''
+        setError('')        
     }
     const acceptType = {
         pd:".pd",
@@ -116,6 +123,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
         if(submit){
             setSubmit(false)
             setDisableSubmit(true)
+            setImportPop(false)
             setError('')
             var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
             if(err){
@@ -261,9 +269,9 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                                 <input placeholder={'Ex: Projectname/Modulename'} ref={gitPathRef}/>
                             </div>
                         </Fragment>:
-                        (<>{uploadFileField?<div>
+                        (<>{uploadFileField || (["excel","sel"].includes(importType))?<div>
                             <label>Upload File: </label>
-                            <input accept={acceptType[importType]} disabled={!uploadFileField} type='file' onChange={upload} ref={uploadFileRef}/>
+                            <input accept={acceptType[importType]} disabled={!uploadFileField && importType==="json"} type='file' onChange={upload} ref={uploadFileRef}/>
                             </div>:null}</>)
                     }
                     

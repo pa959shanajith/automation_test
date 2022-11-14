@@ -920,8 +920,8 @@ const DesignContent = props => {
                     <div style={{ marginLeft: '-1px', marginBottom: '1px', marginRight:'-5px',marginTop:'37px' }}>
                         {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                         <NormalDropDown
-                        style={{height:'22px',marginLeft:'-1px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb' }}
-                        label="Select Browser"
+                        style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '19px' }}
+                        
                         
 
                             onChange={(e,item)=>{setDebugButton(item.key)}}
@@ -1002,7 +1002,7 @@ const DesignContent = props => {
                     <span className="keyword_col d__key_head" >Keyword</span>
                     <span className="input_col d__inp_head" >Input</span>
                     <span className="output_col d__out_head" >Output</span>
-                    <span className="remark_col d__rem_head" >Remarks</span>
+                    {/* <span className="remark_col d__rem_head" >Remarks</span> */}
                     <span className="details_col d__det_head" >Details</span>
                 </div>
                 <div style={{height: "100%"}}>
