@@ -91,7 +91,7 @@ const UpperContent = props => {
     return renderComp;
 }
 
-const BottomContent = () => {
+const BottomContent = (props) => {
 
     const hiddenInput = useRef();
     const { appType, screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
@@ -239,10 +239,10 @@ const BottomContent = () => {
     const importTestCase = () => {
         hiddenInput.current.click();
     }
-    
+    console.log('appType', props.appType);
     const lowerList =  [
-        {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable:  compareFlag}, 
-        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
+        {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': props.appType === 'Web' || props.appType === "MobileWeb", disable:  compareFlag}, 
+        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': props.appType === 'Web' || props.appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
         {'title': 'Replace Object', 'img': 'static/imgs/ic-replaceobject.svg', 'action': ()=>setShowObjModal("replaceObjectSelBr"), 'show': appType === 'Web', 'disable': scrapeItemsLength <= 0 || ((scrapeItemsLength) === irisLen) || compareFlag },
         {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag || unsavedObjPresent || !saved.flag },
         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},

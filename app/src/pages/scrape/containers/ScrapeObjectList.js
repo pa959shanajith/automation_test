@@ -14,7 +14,7 @@ import { NormalDropDown } from "@avo/designcomponents";
 
 import { Button } from "primereact/button";
 
-const ScrapeObjectList = () => {
+const ScrapeObjectList = (props) => {
     const dispatch = useDispatch();
     const current_task = useSelector(state=>state.plugin.CT);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
@@ -454,7 +454,7 @@ const ScrapeObjectList = () => {
                         </button>
                         { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>} */}
                           {/* dropdown button --divya*/}
-
+                    
                     <div 
                       data-test="scrapeOnHeading"
                       key="scrapeOn"
@@ -466,7 +466,7 @@ const ScrapeObjectList = () => {
                     <div style={{  marginLeft: '10px',marginTop:'23px',  boxSizing:'40px'  }}>
                       {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                       <NormalDropDown 
-                      style={{height:'25px',marginLeft:'-3px', marginBottom: '21px', boxSizing:'40px', fontFamily:'LatoWeb' }}
+                      style={{height:'25px',marginLeft:'30px', marginBottom: '21px', boxSizing:'40px', fontFamily:'LatoWeb' , width:'200px'}}
                         
                         className={
                           "ss__scrapeOn" +
@@ -558,13 +558,13 @@ const ScrapeObjectList = () => {
                     </div>
                   
 
-                    <Button label="Capture" className="p-button-warning" onClick={()=>{startScrape(captureButton)}} style={{marginLeft:'-18px'}} />
+                    <Button label="Capture" className="p-button-warning" onClick={()=>{startScrape(captureButton)}} style={{ marginLeft: '26px', marginBottom: '42px'}} />
 
 
 
 
 
-                    </div>
+</div>
                     
                     
                     {/* <SubmitTask /> */}
