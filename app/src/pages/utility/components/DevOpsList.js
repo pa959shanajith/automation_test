@@ -202,8 +202,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             //     \n&nbps;&nbps;&nbps;&nbps;'executionType' : 'asynchronous'
             //     \n}`;
            
-        const categories = [{name: 'Avo Agent / Avo Grid', key: 'A'}, {name: 'Avo Assure Client', key: 'B'}];
-        const [selectedCategory, setSelectedCategory] = useState(categories[1]);
+        const categories = [{name: 'Avo Assure Client', key: 'A'}, {name: 'Avo Agent / Avo Grid', key: 'B'}];
+        const [selectedCategory, setSelectedCategory] = useState(categories[0]);
 
         document.addEventListener('input',(e)=>{
             
@@ -472,7 +472,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     integration: '',
                     executionType: 'asynchronous',
                     isHeadless: false
-                })} >New Profile</button>
+                })} >Add Profile</button>
             { configList.length > 0 && <>
                 <div className='searchBoxInput'>
                     <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
@@ -590,11 +590,11 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     }
                     </div> */}
                     <input type="radio" name='myRadios' id='first'  onChange={() => {}}
-                     style={{width:'2.5vh', height: '2.5vh'}} checked/>&nbsp;&nbsp;
-                    <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Agent / Avo Grid</label>
+                     style={{width:'2.5vh', height: '2.5vh'}} />&nbsp;&nbsp;
+                    <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Assure Client</label>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="radio" name='myRadios' id='second' onChange={()=>{}} style={{width:'2.5vh', height: '2.5vh'}}/>&nbsp;&nbsp;
-                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Assure Client</label> 
+                    <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Agent / Avo Grid</label> 
                 
                 </Dialog>
                 {allocateICE?

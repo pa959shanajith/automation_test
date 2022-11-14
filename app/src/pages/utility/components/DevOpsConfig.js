@@ -402,7 +402,7 @@ const DevOpsConfig = props => {
             </span>
         </div>
         <div className="api-ut__btnGroup">
-        <button style={{width: '30vh'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save configuration' : 'Update'}</button>
+        <button style={{width: '15vh'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
             <button data-test="submit-button-test" style={{width: '15vh'}} onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
             <div className="devOps_config_name" style={{marginRight:'92vh',position:'absolute',right: '49vh'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
