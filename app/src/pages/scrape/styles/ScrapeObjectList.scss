@@ -42,23 +42,51 @@
 }
 
 .ss__taskBtn{
-    padding: 2px 13px;
-    margin-right: 2px;
-    height: 20px;
-    font-size: 12px;
-    background-color: $primaryColor;
-    &:disabled{
-        background-color: $backgroundThree;
-        cursor: not-allowed;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 5px;
+    cursor: pointer;
+    touch-action: manipulation;
+    &:disabled {
+      cursor: not-allowed;
+
+      &:active {
+        background-color: #0003 !important;
+        border-radius: 5px;
+      }
+
+
     }
 }
 
-.ss__btn{
-    border: none;
-    outline: none;
-    color: $whiteColor;
-    border-radius: 20px;
-}
+
+
+
+
+
+
+
+
+//     padding: 7px 8px;
+//     font-size: 14px;
+//     margin: 1px 2px;
+//     vertical-align: middle;
+//     cursor: pointer;
+//     touch-action: manipulation;
+//     &:disabled{
+//         // background-color: $backgroundThree;
+//         // cursor: not-allowed;
+//     }
+// }
+
+// .ss__btn{
+//     border: none;
+//     outline: none;
+//     color: $whiteColor;
+//     border-radius: 20px;
+// }
 
 .ss__search-btn{
     outline: none;
@@ -68,6 +96,8 @@
     border: 1px solid $primaryColor;
     border-radius: 5px;
     height: 24px;
+    width: 35px;
+    margin: -42px 14px 12px -26px;
 }
 
 .ss__search-icon{
@@ -83,6 +113,8 @@
     height: 24px;
     font-family: $avoFont ;
     font-size: 13px;
+    margin: -37px 13px 13px 14px;
+   
     &:focus{
       outline: none;  
     }
@@ -157,24 +189,13 @@
     font-size: 13px;
 }
 
-.dialog_avo-dialog__title__1yow4 {
-    
-    font-size: 16px;
-    font-family: 'LatoWebLight';
-    display: inline-block;
-    background: #331d4c;
-    color: #ffffff;
-    margin: 4px 8px 28px 3px;
-    padding: 8px 8px 7px 6px;
-    border-radius: -5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: -49px;   
-}
 
 .scrollableContent-158{
 
     overflow: hidden;
 }
+
+
 
 .label-199{
 
