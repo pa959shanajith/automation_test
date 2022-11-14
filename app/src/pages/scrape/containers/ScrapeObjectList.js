@@ -445,14 +445,14 @@ const ScrapeObjectList = () => {
                                 Select all
                             </span>
                         </label>
-                        <button data-test="save" className="ss__taskBtn ss__btn" title="Save Objects" disabled={disableBtns.save} onClick={onSave}>Save</button>
-                        <button data-test="delete"className="ss__taskBtn ss__btn" title="Delete Objects" disabled={disableBtns.delete} onClick={onDelete}>Delete</button>
-                        <button data-test="edit"className="ss__taskBtn ss__btn" title="Edit Objects" disabled={disableBtns.edit} onClick={onEdit}>Edit</button>
-                        <button data-test="dnd"className="ss__taskBtn ss__btn" title="Rearrange" disabled={disableBtns.dnd} onClick={(e)=>onRearrange(e, dnd)}>{dnd?"Stop":"Rearrange"}</button>
-                        <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
+                        <button data-test="save" className="ss__taskBtn ss__btn" title="Save Objects" disabled={disableBtns.save} onClick={onSave}><img src="static/imgs/save_ic.png" style={{height:"30px",width:"30px"}}/>  </button>
+                        <button data-test="delete"className="ss__taskBtn ss__btn" title="Delete Objects" disabled={disableBtns.delete} onClick={onDelete}><img src="static/imgs/delete_ic.png" style={{height:"30px",width:"30px"}}  /></button>
+                        <button  data-test="edit"  className="ss__taskBtn ss__btn" title="Edit Objects" disabled={disableBtns.edit} onClick={onEdit}>  <img src={"static/imgs/ic-jq-editstep.png"}/></button>
+                        <button data-test="dnd"className="ss__taskBtn ss__btn" title="Rearrange" disabled={disableBtns.dnd} onClick={(e)=>onRearrange(e, dnd)}> <img src= {'static/imgs/ic-jq-dragstep.png'}/>  </button>
+                        {/* <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
-                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>}
+                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>} */}
                           {/* dropdown button --divya*/}
 
                     <div 
@@ -466,8 +466,8 @@ const ScrapeObjectList = () => {
                     <div style={{  marginLeft: '10px',marginTop:'23px',  boxSizing:'40px'  }}>
                       {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                       <NormalDropDown 
-                      style={{height:'25px',marginLeft:'-3px', marginBottom: '50px', boxSizing:'40px', fontFamily:'LatoWeb' }}
-                        label="Select Browser"
+                      style={{height:'25px',marginLeft:'-3px', marginBottom: '21px', boxSizing:'40px', fontFamily:'LatoWeb' }}
+                        
                         className={
                           "ss__scrapeOn" +
                           (disableAction || compareFlag ? " disable-thumbnail" : "")
@@ -478,61 +478,61 @@ const ScrapeObjectList = () => {
                         // }}
                         
                         options={[
-                          {
-                            data: {
-                              icon: 'internet',
+                            {
+                              data: {
+                                icon: 'internet',
+                              },
+  
+                              key: "ie",
+                              text: "Internet Explorer",
                             },
-
-                            key: "3",
-                            text: "Internet Explorer",
-                          },
-
-                          {
-                            data: {
-                              icon: "chrome",
+  
+                            {
+                              data: {
+                                icon: "chrome",
+                              },
+                              key: "chrome",
+                              text: "Google Chrome",
                             },
-                            key: "1",
-                            text: "Google Chrome",
-                          },
-                          {
-                            data: {
-                              icon: "safari",
+                            {
+                              data: {
+                                icon: "safari",
+                              },
+  
+                              key: "safari",
+                              text: "Safari",
                             },
-
-                            key: "safari",
-                            text: "Safari",
-                          },
-
-                          {
-                            data: {
-                              icon: "firefox",
+  
+                            {
+                              data: {
+                                icon: "firefox",
+                              },
+  
+                              key: "mozilla",
+                              text: "Mozilla Firefox",
                             },
-
-                            key: "2",
-                            text: "Mozilla Firefox",
-                          },
-
-                          {
-                            data: {
-                              icon: "edge",
+  
+                            {
+                              data: {
+                                icon: "edge",
+                              },
+  
+                              key: "edge",
+                              text: "Microsoft Edge",
                             },
-
-                            key: "7",
-                            text: "Microsoft Edge",
-                          },
-                          {
-                            data: {
-                              icon: "edge",
+                            {
+                              data: {
+                                icon: "edge",
+                              },
+  
+                              key: "chromium",
+                              text: "Edge Chromium",
                             },
-
-                            key: "8",
-                            text: "Edge Chromium",
-                          },
-                        ]}
-                        placeholder="Select Browser"
-                        width="185px"
-                        
-                      />
+                          ]}
+                          placeholder="Select Browser"
+                          width="185px"
+                          
+                        />
                         
                       
                     </div>
@@ -542,7 +542,7 @@ const ScrapeObjectList = () => {
                         data-test="appendInput"
                         id="enable_append"
                         type="checkbox"
-                        title="Enable Append"
+                        title="Enable Add"
                         onChange={(e) => {
                           onAppend(e);
                         }}
@@ -567,12 +567,26 @@ const ScrapeObjectList = () => {
                     </div>
                     
                     
-                    <SubmitTask />
+                    {/* <SubmitTask /> */}
 
                 </div>
             }
+
+           
+
+           
             scrapeObjectList={
                 <div className="scraped_obj_list">
+
+
+                       <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
+                            <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
+                        </button>
+                        { showSearch && <input data-test="searchbox" className="ss__search_field" value={searchVal} onChange={onSearch}/>}
+
+
+                    
+
                 <div className="sc__ab">
                     <div className="sc__min">
                     <div className="sc__con" id="scrapeObjCon">
@@ -591,8 +605,10 @@ const ScrapeObjectList = () => {
                     </div>
                 </div>
                 </div>
+            
             }
         />
+            
     );
 }
 

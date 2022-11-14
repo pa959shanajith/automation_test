@@ -255,7 +255,6 @@
     border-radius: 0.625rem;
     width: 50%;
     height: 58vh;
-    margin-top: 5vh;
     &_filter {
         margin-bottom: 2%;
         display: flex;
@@ -289,7 +288,7 @@
 }
 .action_icons{
     cursor: pointer;
-    width: 8%;
+    width: fit-content;
 }
 .checkbox{
     width: 5%;

@@ -427,6 +427,7 @@ const CanvasNew = (props) => {
         <Fragment>
             <Dialog
             hidden = {props.showScrape === false}
+            
             isBlocking={true}
             onDismiss = {() => {props.setShowScrape(false)}}
             title={taskname + " : Capture Elements"} 
@@ -434,7 +435,7 @@ const CanvasNew = (props) => {
             onDecline={() => console.log(false)}
             onConfirm = {() => { }} 
             >
-                <div style={{ height: '120rem' }}><ScrapeScreen /></div>
+                <div style={{ height: '120rem', overFlow:" hidden" }}><ScrapeScreen /></div>
             </Dialog>
 
             <Dialog

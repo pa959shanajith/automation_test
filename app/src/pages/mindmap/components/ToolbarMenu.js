@@ -146,8 +146,8 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
             </select>
             <span data-test="headerMenu" className='toolbar__header-menus'>
-                <i className={"fa fa-crop fa-lg"+(selectBox?' active-map':'')} title="add a rectangle" onClick={clickSelectBox}></i>
-                <i className="fa fa-files-o fa-lg" title="copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
+                <i className={"fa fa-crop fa-lg"+(selectBox?' active-map':'')} title="Select" onClick={clickSelectBox}></i>
+                <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                 <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
             </span>
             {/* <span data-test="searchBox" className='toolbar__header-searchbox'>

@@ -58,6 +58,94 @@ const DevOpsConfig = props => {
         ...props.currentIntegration,
         dataParameters: dataParametersCollection
     });
+    const [moduleState, setModuleState] = useState({
+        checked: props.currentIntegration.scenarioList,
+        expanded: []
+    });
+    const [moduleList, setModuleList] = useState([]);
+    const [filteredModuleList, setFilteredModuleList] = useState([]);
+    const handleExecutionTypeChange = (selectedType) => {
+        // handleExecutionTypeChange{selectedType}
+        const selectedKey = selectedType;
+        let filteredNodes = [];
+        if(selectedKey === 'normalExecution') {
+            filteredNodes = moduleScenarioList[selectedKey].map((module) => {
+                let filterModule = {
+                    value: module.moduleid,
+                    label: module.name,
+                };
+                if(module.scenarios && module.scenarios.length > 0) {
+                    const moduleChildren = module.scenarios.filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((scenario) => {
+                        return ({
+                            value: scenario._id,
+                            label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                event.preventDefault();}}/></div>
+                                // onDataParamsIconClick(scenario._id, scenario.name)}}
+                        })
+                    });
+                    filterModule['children'] = moduleChildren;
+                }
+                return filterModule;
+            });
+        } else if(selectedKey === 'e2eExecution') {
+            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
+                let filterModule = {
+                    value: module.moduleid,
+                    label: module.name,
+                };
+                if(module.scenarios && module.scenarios.length > 0) {
+                    const moduleChildren = module.scenarios.map((scenario, index) => {
+                        return ({
+                            value: module.batchname+module.moduleid+index+scenario._id,
+                            label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                event.preventDefault();}}/></div>
+                                
+                               // onDataParamsIconClick(module.batchname+module.moduleid+index+scenario._id, scenario.name)
+                        })
+                    });
+                    filterModule['children'] = moduleChildren;
+                }
+                return filterModule;
+            });
+        }
+        else if(selectedKey === 'batchExecution') {
+            const batchData = moduleScenarioList['batchExecution'];
+            filteredNodes = Object.keys(batchData).map((batch) => {
+                let filterBatch = {
+                    value: batch,
+                    label: batch,
+                };
+                if(batchData[batch].length > 0) {
+                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 > 0 } ).map((module) => {
+                        let filterModule = {
+                            value: module.moduleid,
+                            label: module.name,
+                        };
+                        if(module.scenarios && module.scenarios.length > 0) {
+                            const moduleChildren = module.scenarios.map((scenario, index) => {
+                                return ({
+                                    value: batch+module.moduleid+index+scenario._id,
+                                    label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                        event.preventDefault();
+                                     }}/></div>
+                                        //onDataParamsIconClick(batch+module.moduleid+index+scenario._id, scenario.name)
+                                })
+                            });
+                            filterModule['children'] = moduleChildren;
+                        }
+                        return filterModule;
+                    });
+                }
+                return filterBatch;
+            });
+        }
+        setSelectedExecutionType(selectedKey);
+        setModuleList(filteredNodes);
+        setFilteredModuleList(filteredNodes);
+        setModuleState({expanded: [], checked: []});
+        setIntegrationConfig({ ...props.currentIntegration, scenarioList: [], dataParameters: [] });
+    }
+
     const [icepoollist, setIcepoollist] = useState([
         { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
     ]);
@@ -404,7 +492,7 @@ const DevOpsConfig = props => {
         <div className="api-ut__btnGroup">
         <button style={{width: '30vh'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save configuration' : 'Update'}</button>
             <button data-test="submit-button-test" style={{width: '15vh'}} onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
-            <div className="devOps_config_name" style={{marginRight:'92vh',position:'absolute',right: '49vh'}}>
+            <div className="devOps_config_name" style={{marginRight:'92vh'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
@@ -414,6 +502,11 @@ const DevOpsConfig = props => {
                 </span>
             </div>
         </div>
+        <div style={{display:'flex'}} > 
+                            <input type='radio' id="E2E" value='e2eExecution'  onChange={() => handleExecutionTypeChange('e2eExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/>&nbsp;<label >E2E Execution&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type='radio' id='Batch' value='batchExecution' onChange={()=>handleExecutionTypeChange('batchExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><label >&nbsp;Batch Execution&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type='radio' id='Normal' value='normalExecution'  onChange={()=>handleExecutionTypeChange('normalExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><label >&nbsp;Normal Execution</label>
+                        </div>
         {/* <div>
         {
             integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />
@@ -422,7 +515,7 @@ const DevOpsConfig = props => {
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
                 <div className="devOps_module_list">
-                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} />
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} />
                 </div>
                 <div className="devOps_pool_list">
                     <div style={{ marginTop: '-22px' }}>
