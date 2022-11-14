@@ -8,7 +8,8 @@ import * as actionTypes from '../state/action';
 import '../styles/ModuleListDrop.scss'
 import {IconDropdown} from '@avo/designcomponents';
 import ImportMindmap from'../components/ImportMindmap.js';
-import CreateOptions from '../components/CreateOptions.js'; 
+import { style } from 'd3';
+
 
 
 // import CreateOptions from '../components/CreateOptions.js';
@@ -55,7 +56,6 @@ const ModuleListDrop = (props) =>{
             // }
             selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false); 
         }
-        console.log(moduleList[0]);
      },[])
     
     const displayError = (error) =>{
@@ -66,8 +66,13 @@ const ModuleListDrop = (props) =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
     }
     const clickCreateNew = () =>{
+        // const CreateNew = () =>{
+            // dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
+        // }
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
-        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:proj})
+        console.log('isE2ECreate: true');
+        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
+        console.log('isE2ECreate: true end');
     }
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
@@ -99,9 +104,7 @@ const ModuleListDrop = (props) =>{
                 var type = name
                 var name = type
                 // below code about scenarios fetching
-                console.log("isE2EOpen",isE2EOpen)
         if (isE2EOpen){
-            // if (type!=='endtoend')
         setBlockui({content:'loading scenarios',show:true})
         //loading screen
         var res = await populateScenarios(modID)
@@ -159,6 +162,7 @@ const ModuleListDrop = (props) =>{
 // console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",e)
 
     }
+    const collapsed =()=> setCollapse(!collapse)
     
     //E2E properties
     const selectModules= async(e) => {
@@ -178,6 +182,7 @@ const ModuleListDrop = (props) =>{
     const loadModuleE2E = async(modID) =>{
         setWarning(false)
         setIsE2EOpen(true)
+        setCollapse(true)
         setBlockui({show:true,content:"Loading Module ..."})        
         if(moduleSelect._id === modID){
             dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
@@ -208,8 +213,9 @@ const ModuleListDrop = (props) =>{
     const setOptions1 = (data) =>{
         setOptions(data)
       }
-      const createType = {
-        'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))}
+    const createType = {
+        'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))
+    }
       
     return(
         <Fragment>
@@ -221,6 +227,7 @@ const ModuleListDrop = (props) =>{
                 content={<Content/>} 
                 modalClass='modal-sm'
             />:null}
+            <div className='wholeContainer'>
             <div className='fullContainer pxBlack'>
                 <div className='leftContainer pxBlack'>
                     <div className='modulesBox'>
@@ -234,13 +241,13 @@ const ModuleListDrop = (props) =>{
                             <IconDropdown items={[ 
                                 {
                                     key: 'csv',
-                                    text: 'Create New Module..',
+                                    text: 'Create New Module',
                                     onClick: () => {CreateNew()
                                     }
                                 },
                                 {
                                     key: 'image',
-                                    text: 'Import Module..',
+                                    text: 'Import Module',
                                     onClick:()=>{setImportPop(true);}}
                                 ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'1rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
                             />  
@@ -278,14 +285,14 @@ const ModuleListDrop = (props) =>{
                             <IconDropdown items={[ 
                                 {
                                     key: 'csv',
-                                    text: 'Create New Module..',
+                                    text: 'Create New Module',
                                     onClick: () => {clickCreateNew()
                                     }
                                 },
-                                {
-                                    key: 'image',
-                                    text: 'Import Module..',
-                                }
+                                // {
+                                //     key: 'image',
+                                //     text: 'Import Module..',
+                                // }
                                 ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'1rem', border: 'white', marginTop:'-0.7rem'}} placeholderIconName = 'plusIcon'
                             />  
                         </div>
@@ -297,15 +304,18 @@ const ModuleListDrop = (props) =>{
                         {moduleList.map((e,i)=>{
                             if(e.type==="endtoend")
                             return(
-                                    <div key={i} style={{ display:'flex',  width:'20%', justifyContent:'space-between', padding:'0.25rem', marginLeft:'1.62rem' }} data-test="individualModules" name={e.name} value={e._id} type={e.type} onClick={(e)=>selectModules(e)} title={e.name}>
+                                    <div key={i} style={{ display:'flex',  width:'20%', justifyContent:'space-between', padding:'0.25rem', marginLeft:'1.62rem' }} data-test="individualModules" name={e.name} value={e._id} type={e.type} onClick={(e)=>selectModules(e)} title={e.name} >
                                         <img style={{height: '1.7rem',width:'1.7rem'}} src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img>
-                                        <span className='modNme' >{e.name}</span>
+                                        <span className='modNmeE2E' >{e.name}</span>
                                     </div>
                             )
                         })}
                         </div>
                     </div>
                 </div>
+                </div>
+                <div className='scenarioListBox' style={{width:collapse? "12%":"0%"}}>
+                    
                 <div className='scenarioList'>
                     
                 {/* {scenarioList.map((e,i)=>{
@@ -316,28 +326,19 @@ const ModuleListDrop = (props) =>{
                 
               
                 {scenarioList.map((e,i)=>{ 
-                    console.log('scenario',e)
-                    return(
-                            <div key={i+'scenario'}  title={e.name} value={e._id} >{e.name}</div>
+                    return(<div className='scenarios'>
+                        <div key={i+'scenario'} style={{backgroundColor:'#EFE6FF',height:'1.2rem',justifyContent:'center',textAlign:'center',fontSize:'0.75rem',borderRadius:'0.36rem', cursor:'pointer',}}  title={e.name} value={e._id} ><b>{e.name}</b></div>
+                            </div>
+                            
                            
                     )
                 })}
-                            {/* {moduleList.map((e,i)=>{
-                                if(e.type==="basic")
-                                return(
-                                    <div key={i}>
-                                            <div data-test="modules" onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id)?" selected":"")} style={moduleSelect._id===e._id?{backgroundColor:'#EFE6FF'}:{}} title={e.name} type={e.type}>                                    
-                                                <div className='modClick' value={e._id} >
-                                                    {!isAssign && <input type="checkbox" className="checkBox" value={e._id} onChange={(e)=>selectModuleChkBox(e)}  />}
-                                                </div>
-                                                <img style={{width:'1.7rem',height:'1.7rem'}} value={e._id} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
-                                                <span className='modNme' value={e._id} >{e.name}</span>
-                                            </div>
-                                    </div>
-                                    )
-                            })} */}
                         </div>
-            </div>
+                        <div ><img   className='collapseButton' style={{cursor:!isE2EOpen? 'no-drop':'pointer',transform:isE2EOpen&&collapse? 'rotate(0deg)':'rotate(180deg)',  }} onClick={isE2EOpen? collapsed : 'null'} src='static/imgs/collapseButton.png'  /> </div>
+                        {/*  <button >..</button> */}
+                        </div>
+                        </div>
+            
             <div data-test="dropDown" onClick={()=>{
                     dispatch({type:actionTypes.SELECT_MODULELIST,payload:[]})
                 }}>
