@@ -27,7 +27,7 @@ import { style } from 'd3';
 const ControlBox = (props) => {
     // const [showScrape, setShowScrape] = useState(false);
     // const [ShowDesignTestSetup,setShowDesignTestSetup] = useState(false);
-    const [showExecute,setShowExecute] = useState(false);
+    // const [showExecute,setShowExecute] = useState(false);
     // const [showAssign,setShowAssign] = useState(false);
     var faRef = {
         "plus": "fa-plus",
@@ -35,7 +35,7 @@ const ControlBox = (props) => {
         "edit": "fa-pencil-square-o",
         "delete": "fa-trash-o",
         "assign":"fa-user-o",
-        "execute":"fa-play",
+        // "execute":"fa-play",
         // "record":"fa-dot-circle-o",
         "captureelements":"fa-camera-retro",
         "designtestsetup":"fa-list-alt",
@@ -74,8 +74,8 @@ const ControlBox = (props) => {
             // c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
             // c.select('p.' + faRef.assign).html('Assign').style('font-family', 'LatoWeb');
             // c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.execute).html('Debug').style('font-family', 'LatoWeb');
-            c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
+            // c.select('p.' + faRef.execute).html('Debug').style('font-family', 'LatoWeb');
+            // c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
 
         } else if (t === 'scenarios') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
@@ -89,13 +89,13 @@ const ControlBox = (props) => {
             // // c.select('p.' + faRef.record).html('Record');
             // c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
             // c.select('p.' + faRef.assign).html('Assign').style('font-family', 'LatoWeb');
-            c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.execute).html('Debug').style('font-family', 'LatoWeb');
+            // c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
+            // c.select('p.' + faRef.execute).html('Debug').style('font-family', 'LatoWeb');
         } else if (t === 'screens') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.plus).html('Add Testcase').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus1).html('Add Testcases').style('font-family', 'LatoWeb', 'font-size','12px');
+            c.select('p.' + faRef.plus1).html('Add Testcases').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.edit ).html('Rename').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.delete).html('Delete ').style('font-family', 'LatoWeb');
@@ -103,8 +103,8 @@ const ControlBox = (props) => {
             c.select('p.' + faRef.captureelements).html('Capture Elements').style('font-family','LatoWeb');
             // c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
             // c.select('p.' + faRef.assign).html('Assign').style('font-family','LatoWeb');
-            c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.execute).html('Debug').style('font-family', 'LatoWeb');
+            // c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
+            // c.select('p.' + faRef.execute).html('Debug').style('font-family', 'LatoWeb');
         } else if (t === 'testcases') {
             c.select('p.' + faRef.plus ).classed('ct-ctrl-inactive', !0);
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !0);
@@ -116,8 +116,8 @@ const ControlBox = (props) => {
             c.select('p.' + faRef.designtestsetup).html('Design Test Setup').style('font-family','LatoWeb');
             // c.select('p.' + faRef.assign).classed('ct-ctrl-inactive', !1);
             // c.select('p.' + faRef.assign).html('Assign').style('font-family','LatoWeb');
-            c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.execute).html('Debug').style('font-family', 'LatoWeb');
+            // c.select('p.' + faRef.execute).classed('ct-ctrl-inactive', !1);
+            // c.select('p.' + faRef.execute).html('Debug').style('font-family', 'LatoWeb');
         }
         d3.select('#ct-ctrlBox').classed('show-box', !0);
         p.classed('node-highlight',!0)
@@ -169,7 +169,7 @@ const ControlBox = (props) => {
                 <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" onClick={editNode}></p>
                 <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode}></p>
                 {/* <p data-test="assign"  className="ct-ctrl fa fa-user-o" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} style={{width: "-webkit-fill-available",height: 24, marginBottom: 1,paddingBottom: '20%'}} onClick={Assign} ><>  Assign </></p> */}
-                <p data-test="debug"  className="ct-ctrl fa fa-play" onClick={() => {}}> Debug </p>   
+                {/* <p data-test="debug"  className="ct-ctrl fa fa-play" onClick={() => {}}> Debug </p>    */}
             </div>   : ""} </ClickAwayListener>   
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}> 
             {t ==='scenarios'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
@@ -179,7 +179,7 @@ const ControlBox = (props) => {
                 <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive"  onClick={deleteNode}></p>
                 {/* <p data-test="record"  className="ct-ctrl fa fa-dot-circle-o " style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}}  > <> Record_AvoGenius </></p > */}
                 {/* <p data-test="assign"  className="ct-ctrl fa fa-user-o" style={{width: "-webkit-fill-available",height: 24, marginBottom: 1,paddingBottom: '20%'}} onClick={Assign}><>  Assign </></p> */}
-                <p data-test="debug"  className="ct-ctrl fa fa-play" onClick={() => {}}> Debug </p>
+                {/* <p data-test="debug"  className="ct-ctrl fa fa-play" onClick={() => {}}> Debug </p> */}
             </div> : ""} </ClickAwayListener>
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>     
             {t ==='screens'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
@@ -199,7 +199,7 @@ const ControlBox = (props) => {
                <p data-test="delete"  className="ct-ctrl fa fa-trash-o" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderBottom: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={deleteNode}></p>
                <p data-test="designtestsetup"  className="ct-ctrl fa fa-list-alt" onClick={() => props.setShowDesignTestSetup(true)}> <> Design Test Setup </></p>
                {/* <p data-test="assign"  className="ct-ctrl fa fa-user-o" style={{ width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom: 6,paddingBottom: '6%'}} onClick={Assign}><>  Assign </></p> */}
-               <p data-test="debug"  className="ct-ctrl fa fa-play" onClick={() => {}} > Debug</p>
+               {/* <p data-test="debug"  className="ct-ctrl fa fa-play" onClick={() => {}} > Debug</p> */}
             </div> : ""
             }
             </ClickAwayListener> 

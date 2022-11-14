@@ -55,9 +55,14 @@ const CanvasNew = (props) => {
     const [nodes,setNodes] = useState({})
     const [dNodes,setdNodes] = useState([])
     const [dLinks,setdLinks] = useState([])
+    const [delReuseNodes,setDelReuseNodes] = useState([])
     const [createnew,setCreateNew] = useState(false)
-    const [verticalLayout,setVerticalLayout] = useState(false);
-    // const [taskbox,setTaskBox] = useState(false);
+    const [reuseDelConfirm,setReuseDelConfirm] = useState(false)
+    const [selectedDelNode,setSelectedDelNode] = useState()
+    const [DelConfirm,setDelConfirm] = useState(false)
+    const [reuseDelContent,setReuseDelContent] = useState()
+    const[endToEndDelConfirm,setEndToEndDelConfirm]=useState(false)
+    const [verticalLayout,setVerticalLayout] = useState(false)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
@@ -216,7 +221,153 @@ const CanvasNew = (props) => {
         count= {...count,...res.count}
     }
     const clickDeleteNode=(id)=>{
+        var sid = parseFloat(id.split('node_')[1]);
+        var reu=[...dNodes][sid]['reuse'];
+        var type =[...dNodes][sid]['type'];
+        if (type=='scenarios'){
+            if (reu){
+                if([...dNodes][sid]['children']){
+                    for ( let i=0; i< [...dNodes][sid]['children'].length;i++) {
+                        if ([...dNodes][sid]['children'][i]["reuse"]){
+                            reusedNode(dNodes,sid,type);
+                            setReuseDelContent(<div>Selected Test Scenario has <b>re used Screens and Test cases</b> and is used in <b>End To End flow</b>, By deleting this will impact other Test Scenarios.<br/><br/> Are you sure you want to Delete permenantly?" </div>)
+                            setSelectedDelNode(id);
+                            setReuseDelConfirm(true);
+                            return;
+                        }
+                        else {
+                            continue;
+                        }
+                }}
+                setReuseDelContent("Selected Test Scenario is used in End To End flow.\n \n Are you sure you want to delete it permenantly?")
+                setSelectedDelNode(id);
+                setEndToEndDelConfirm(true)
+                return;
+            }
+            else if([...dNodes][sid]['children']){
+                for ( let i=0; i< [...dNodes][sid]['children'].length;i++) {
+                    if ([...dNodes][sid]['children'][i]["reuse"]){
+                        reusedNode(dNodes,sid,type);
+                        setReuseDelContent("Selected Test Scenario has re used Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?" )
+                        setSelectedDelNode(id);
+                        setReuseDelConfirm(true);
+                        return;
+                    }
+                    else {
+                        continue;
+                    }
+            }} 
+            setSelectedDelNode(id);
+            setDelConfirm(true);
+            return;
+        }        
+        else if (type=='screens'){
+                if (reu){
+                    reusedNode(dNodes,sid,type);
+                    setReuseDelContent("Selected Screen is re used. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?");
+                    setSelectedDelNode(id);
+                    setReuseDelConfirm(true);
+                    return;
+                }
+                else{
+                    setSelectedDelNode(id);
+                    setDelConfirm(true);
+                    return;
+                }
+
+            
+        }
+        else if (type=='testcases'){
+            if (reu){
+                reusedNode(dNodes,sid,type);
+                setSelectedDelNode(id);
+                setReuseDelContent("Selected Test case is re used. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?");
+                setReuseDelConfirm(true);
+                return;
+            }
+            else{
+                setSelectedDelNode(id);
+                setDelConfirm(true);
+                return;
+            }
+        }
+        // setReuseList(reusedNames)
+        processDeleteNode(id)        
+    }
+    const reusedNode = (nodes,sid,type) => {
+        let reusedNodes = [];
+        let reusedScreens = [];
+        const selectedNodeChildIds=[];
+        const selectedNodeId = nodes[sid]['_id'];
+        if(nodes[sid]['children']){
+            for ( let i=0; i< nodes[sid]['children'].length;i++) {
+                let selectedNodeChildId= nodes[sid]['children'][i]['_id'];
+                selectedNodeChildIds.push(nodes[sid]['children'][i]['_id'])
+        }}
+        nodes.forEach((node) =>{
+            if(node['type']=='scenarios' && type=='scenarios'){ 
+                if(node['_id'] == selectedNodeId){
+                    reusedNodes.push(node.id);
+                    
+                }else{
+                    if(node?.children && node?.children.length>0){
+                        for(let i = 0 ;i<node?.children?.length; i++){
+                            let tempId=node?.children[i]['_id']
+                            if(selectedNodeChildIds.includes(tempId)){
+                                reusedNodes.push(node?.children[i].id); }}}
+                }                                            
+            }
+            if(node['type']=='screens' && type=='screens'){
+                if(node['_id'] == selectedNodeId){
+                    reusedNodes.push(node.id);
+                }else{
+                    if(node?.children && node?.children.length>0){
+                        for(let i = 0 ;i<node?.children?.length; i++){
+                            if(node?.children[i]['_id'] == selectedNodeId){
+                                reusedNodes.push(node?.children[i].id);
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            if(node['type']=='testcases'  && type=='testcases'){
+                if(node['_id'] == selectedNodeId){
+                    reusedNodes.push(node.id);
+                }
+            }
+            
+        });
+        let nodesReused=[]
+        reusedNodes.sort()
+        reusedNodes.reverse()
+        for(let i = 0 ;i<reusedNodes.length; i++){
+            nodesReused.push('node_'+reusedNodes[i])
+        }
+        setDelReuseNodes(nodesReused);
+    }
+    const reusedDelConfirm = () => {
+        //processDeleteNode();
+        for(let i = 0 ;i<delReuseNodes.length; i++){
+            processDeleteNode(delReuseNodes[i]);
+        }
+    }
+    const deleteNodeHere=()=>{
+        clickDeleteNodeHere(selectedDelNode)
+    }
+    const clickDeleteNodeHere=(id)=>{
         var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes})
+        if(res){
+            // dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
+            setReuseDelConfirm(false)
+            setNodes(res.nodeDisplay)
+            setLinks(res.linkDisplay)
+            setdLinks(res.dLinks)
+            setdNodes(res.dNodes)
+        }
+    }
+    const processDeleteNode = (sel_node) => {        
+        var res = deleteNode(sel_node?sel_node:selectedDelNode,[...dNodes],[...dLinks],{...links},{...nodes})
         if(res){
             dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
             setNodes(res.nodeDisplay)
@@ -254,6 +405,11 @@ const CanvasNew = (props) => {
             temp={...temp,...res.temp}
         }
     }
+    const DelReuseMsgContainer = ({message}) => (
+        <p style={{color:'red'}}>
+            {message}
+        </p>
+    )
 
     // const clickUnassign = (res) =>{
     //     setNodes(res.nodeDisplay)
@@ -271,6 +427,7 @@ const CanvasNew = (props) => {
         <Fragment>
             <Dialog
             hidden = {props.showScrape === false}
+            
             isBlocking={true}
             onDismiss = {() => {props.setShowScrape(false)}}
             title={taskname + " : Capture Elements"} 
@@ -278,7 +435,7 @@ const CanvasNew = (props) => {
             onDecline={() => console.log(false)}
             onConfirm = {() => { }} 
             >
-                <div style={{ height: '120rem' }}><ScrapeScreen /></div>
+                <div style={{ height: '120rem', overFlow:" hidden" }}><ScrapeScreen /></div>
             </Dialog>
 
             <Dialog
@@ -332,6 +489,40 @@ const CanvasNew = (props) => {
                     </g>)}
                 </g>
             </svg>
+            {reuseDelConfirm?<ModalContainer 
+                title='Confirmation'
+                content= {<DelReuseMsgContainer message={reuseDelContent}/>}
+                close={()=>setReuseDelConfirm(false)}
+                footer={
+                    <>
+                        <button onClick={()=>{reusedDelConfirm()}}>Delete everywhere</button>
+                        <button onClick={()=>{deleteNodeHere()}}>Delete current</button>
+                        <button onClick={()=>setReuseDelConfirm(false)}>Cancel</button>        
+                    </>}
+                modalClass='modal-md'
+            />:null}
+            {DelConfirm?<ModalContainer 
+                title='Confirmation'
+                content={"Are you sure, you want to Delete it permenantly?"}         
+                close={()=>setDelConfirm(false)}
+                footer={
+                    <>
+                        <button onClick={()=>{processDeleteNode()}}>Yes</button>
+                        <button onClick={()=>setDelConfirm(false)}>No</button>        
+                    </>}
+                modalClass='modal-sm'
+            />:null}
+            {endToEndDelConfirm?<ModalContainer 
+                title='Confirmation'
+                content={<DelReuseMsgContainer message={reuseDelContent}/>}                         
+                close={()=>setEndToEndDelConfirm(false)}
+                footer={
+                    <>
+                        <button onClick={()=>{processDeleteNode()}}>Yes</button>
+                        <button onClick={()=>setEndToEndDelConfirm(false)}>No</button>        
+                    </>}
+                modalClass='modal-sm'
+            />:null}
         </Fragment>
     );
 }

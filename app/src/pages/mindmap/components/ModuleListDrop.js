@@ -229,13 +229,12 @@ const ModuleListDrop = (props) =>{
             />:null}
             <div className='wholeContainer'>
             <div className='fullContainer pxBlack'>
-                <div className='leftContainer pxBlack'>
-                    <div className='modulesBox'>
+                <div className='leftContainer pxBlack' style={{ display:"flex"}}>
+                    <div className='modulesBox' >
                         <div style={{ display:"flex", justifyContent:"space-between" }}>
-                            <h6  style={{ marginTop:'0.5rem'}}>
-                                <b>
+                        <img src="static/imgs/node-modules.png" alt="modules" style={{display:"flex",position:'',width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}}/>
+                            <h6 id='moduleStyle' style={{ marginTop:'0.5rem'}}>
                                     Modules
-                                </b>
                             </h6>
 
                             <IconDropdown items={[ 
@@ -266,7 +265,7 @@ const ModuleListDrop = (props) =>{
                                                 <div className='modClick' value={e._id} >
                                                     {!isAssign && <input type="checkbox" className="checkBox" value={e._id} onChange={(e)=>selectModuleChkBox(e.target.checked)}  />}
                                                 </div>
-                                                <img style={{width:'1.7rem',height:'1.7rem'}} value={e._id} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img>
+                                                {/* <img style={{width:'1.7rem',height:'1.7rem'}} value={e._id} src={'static/imgs/'+(e.type==="endtoend"?"node-endtoend.png":"node-modules.png")} alt='module'></img> */}
                                                 <span className='modNme' value={e._id} >{e.name}</span>
                                             </div>
                                     </div>
@@ -277,10 +276,9 @@ const ModuleListDrop = (props) =>{
                     <div className='section-dividers'></div>
                     <div className='endToEnd'>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:'center', }}>
-                            <h6>
-                                <b>
+                        <img src="static/imgs/E2Eicon.png" alt="modules" style={{display:"flex",width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}}/>
+                            <h6 id='Endto' style={{margin: '5px -82px 3px -17px'}}>
                                     End to End Flows
-                                </b>
                             </h6>
                             <IconDropdown items={[ 
                                 {
@@ -305,7 +303,7 @@ const ModuleListDrop = (props) =>{
                             if(e.type==="endtoend")
                             return(
                                     <div key={i} style={{ display:'flex',  width:'20%', justifyContent:'space-between', padding:'0.25rem', marginLeft:'1.62rem' }} data-test="individualModules" name={e.name} value={e._id} type={e.type} onClick={(e)=>selectModules(e)} title={e.name} >
-                                        <img style={{height: '1.7rem',width:'1.7rem'}} src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img>
+                                        {/* <img style={{height: '1.7rem',width:'1.7rem'}} src={(e.type==="endtoend")?"static/imgs/node-endtoend.png":"static/imgs/node-modules.png"} alt='module'></img> */}
                                         <span className='modNmeE2E' >{e.name}</span>
                                     </div>
                             )

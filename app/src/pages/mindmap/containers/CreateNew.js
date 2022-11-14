@@ -111,6 +111,9 @@ const CreateNew = ({importRedirect}) => {
                 </div>
                 
                 <ModuleListDrop />
+                <div className='note'>
+                <p><b>Note </b>- Read the Mindmap from left to right</p>
+                </div>
                 <div id='mp__canvas' className='mp__canvas'>
                 {/* //isCreateE2E = true/false -- new hook */}
                      {!isCreateE2E ? ((Object.keys(moduleSelect).length>0)?

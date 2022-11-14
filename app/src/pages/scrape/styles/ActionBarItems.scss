@@ -1,16 +1,16 @@
 @import "../../global/styles/ColorVariables.scss";
 
 .ss__thumbnail input[type='checkbox']{
-    width: 18px;
-    height: 18px;
+    width: 15px;
+    height: 16px;
     outline: none;
 }
 
 .ss__thumbnail{
     display: flex;
-    flex-direction: column;
+    
     align-items: center;
-    margin: 13% 23px 15% 0px;
+    margin: 15% 27px 14% 33px;
     font-size: 12.6px;
     font-family: Mulish;
     font-weight: 600;
