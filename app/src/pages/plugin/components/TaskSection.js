@@ -24,6 +24,9 @@ import { DataTable } from 'primereact/datatable';
 // import { getNames_ICE, , updateProject_ICE, exportProject} from '../../admin/api';
 import { getDetails_ICE ,getAvailablePlugins,getDomains_ICE,getProjectIDs} from '../api';
 import { text } from 'body-parser';
+import { RadioButton } from 'primereact/radiobutton'
+// import useOnClickOutside from './UseOnClickOutside'
+// import * as actionTypes from '../state/action';
 
 
 // import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -71,6 +74,23 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [projectId,setprojectId]=useState(null);
     const [loading,setLoading] = useState(false)
     const [createProjectCheck,setCreateProjectCheck]=useState(false);
+
+    const [createProj, setCreateProj] = React.useState(true);
+    const [ModifyProj, setModifyProj] = React.useState(true);
+
+    // const userConf = useSelector(state=>state.admin.userConf)
+    // const node = useRef();
+
+    // useOnClickOutside(node, () => props.setShowDropdownEdit(!props.showDropdownEdit));
+
+    const handleCreateChange = () => {
+        setCreateProjectCheck(true)
+      };
+
+      const handleModifyChange = () => {
+        setCreateProjectCheck(false)
+      };
+    
 
     const displayError = (error) =>{
         setLoading(false)
@@ -453,6 +473,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                         // }
                         setLoading(false);
                     }
+    
     return (
         
         <>
@@ -464,11 +485,11 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                 <span data-test="my-task" className="my-task"> Projects </span>
                 { showSearch && <input data-test="search-input" className="task-search-bar " autoFocus onChange={onSearchHandler} value={searchValue} />}
                 <span data-test="search-icon" className={"task-ic-container"+(showSearch?" plugin__showSearch":"")} onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
-                <span data-test="filter-icon" className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span>
+                {/* <span data-test="filter-icon" className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span> */}
             </div>
             <div>
             
-            <Button  style={{ background: "transparent", color: "#5F338F", border: "none", padding:"0,0,0,10", FontSize:"10px",marginLeft:"300px",marginTop:"10px"}} label="Add and Manage Project"  onClick={() => onClick('displayBasic')} />
+            <Button  style={{ background: "transparent", color: "#643693", border: "none", padding:" 8px 16px", FontSize:"16px",marginLeft:"380px",marginTop:"10px",fontFamily:"LatoWeb",fontStyle:"normal",lineHeight:"16px"}} label="Manage Project(s)"  onClick={() => onClick('displayBasic')} />
             
             </div>
             <div>
@@ -476,19 +497,19 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                 {projectNames && projectNames.projectName.map((singleProj,idx)=>{
                    
 return <>
-<div key={idx} style={{display:'flex',justifyContent:'space-between'}}>
+<div key={idx} style={{display:'flex',justifyContent:'space-between',borderBottomStyle:'ridge'}}>
 <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")} style={{display:"flex", flexDirection:"column"}}>
-            <span title={projectNames && singleProj}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
+            <span title={projectNames && singleProj} style={{marginTop: '1.5vh'}}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
             {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
 <div className='button-design'>
             
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"1000px" ,margin: "3px"}} onClick={(e) => {
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
                    window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
                    window.location.href = "/mindmap";
              }}>Design</button>
             
-            <button className="reset-action__exit" style={{lineBreak:'00px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"0rem 1rem 0rem 1rem",background: "white",float:'left',marginLeft:"500px" ,margin: "3px"}} onClick={(e) => { 
+            <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"500px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => { 
                 window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
                 window.location.href = "/execute";
                 }}>Execute</button>
@@ -505,14 +526,50 @@ return <>
             {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
                 
                 
-                <Dialog header={!createProjectCheck ? 'Select Project' : 'Create Project'} visible={displayBasic} style={{ width: '30vw' }}  onHide={() => onHide('displayBasic')}>
+                <Dialog header={!createProjectCheck ? 'Manage Project(s)' : 'Create Project'} visible={displayBasic} style={{ width: '30vw',fontFamily:'LatoWeb',fontSize:'16px' }}  onHide={() => onHide('displayBasic')}>
+                    
+{/* <div className="container"> */}
+  {/* <div className="column"> */}
+    {/* <div className="col-sm-12"> */}
+        <div>
+
+      <form>
+        <div className='Radiobutton_des'>
+        
+        <div className="radio"  >
+            
+          <label style={{ marginRight: '2rem' }} >
+            
+            <RadioButton style={{marginRight:'0.3rem',fontSize:'16px',fontFamily:'LatoWeb'}}
+             label="Create"
+             value={createProj}
+             onChange={handleCreateChange}/>
+             Create Project
+          </label>
+          <label >
+             <RadioButton style={{marginRight:'0.3rem',fontSize:'16px',fontFamily:'LatoWeb'}}
+              label="Modify"
+             value={ModifyProj}
+             onChange={handleModifyChange} />
+             Modify Project
+            </label>
+        </div>
+       </div>
+        
+        
+      </form>
+      </div>
+
+    {/* </div> */}
+  {/* </div> */}
+{/* </div> */}
         <div>
             <div className='dialog_dropDown'>
                 {/* {
                     isCreate == true ? <TextField /> : <NormalDropDown /> 
                 } */}
                 {
-                    createProjectCheck ? <TextField label='Enter Project Name'  width='19rem' placeholder='Enter Project Name' /> : <NormalDropDown
+                    createProjectCheck ? <TextField label='Enter Project Name'  width='19rem' placeholder='Enter Project Name' fontStyle='LatoWeb' FontSize='16px' /> : <NormalDropDown
                         label="Select Project Name"
                         options={getProjectList}
                         
@@ -520,12 +577,14 @@ return <>
                         placeholder="Select Project"
                         standard
                         width="300px"
+                        fontSize='16px'
+                        
                         //   fontSize='40px'
                         //   marginLeft="200px"
                     />
                 }
                 {/* /create_project() */}
-                <p><a style={{ color: 'green' }} onClick={()=>{setCreateProjectCheck(!createProjectCheck)}} target="_blank">{createProjectCheck ? 'Select Project' : 'Create New Project'}</a></p>
+                {/* <p><a style={{ color: 'green' }} onClick={()=>{setCreateProjectCheck(!createProjectCheck)}} target="_blank">{createProjectCheck ? 'Select Project' : 'Create New Project'}</a></p> */}
 
                 {/* <a  style={{ background: "transparent", color: "green", border: "none", padding:"0,0,0,10", FontSize:"-10px",marginRight:"300px",marginTop:"5px"}} label="Select Project"  onClick={() => onClick('displayBasic')} a/> */}
                 
@@ -554,7 +613,9 @@ return <>
                         ]}
                         placeholder="Select Apptype"
                         width="300px"
-                        top="200px"
+                        top="300px"
+                        
+                        
                 
                         // disabled={!selectedProject}
                         // required
@@ -566,14 +627,30 @@ return <>
                 }
             </div>
             
-            <div className='labelStyle1'> <label><h5>Users</h5></label></div>
+            <div className='labelStyle1'> <label>Users</label></div>
         
 					<div className="wrap" style={{height:'12rem'}}>
                             <div className='display_project_box' style={{ overflow: 'auto' }}>
+                            {/* <div className='userForm-edit adminControl-edit'>
+                    <button title={userConf.fType} className="userTypeBtn_conv-edit " style={{margin:"4px 0",right:"0",cursor:"default"}}>{userConf.fType}</button>
+                    <input data-test="userListInputEdit" list="allUsersListauto" className=" btn-users edit-user-dropdown-edit" onClick = {()=>{props.click();props.setShowDropdownEdit(!props.showDropdownEdit);props.setAllUserFilList(userConf.allUsersList);}} type="text"  id="userIdName"  onChange={(event)=>{dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:event.target.value});props.searchFunctionUser(event.target.value);}} value={userConf.allUserFilter}  placeholder="Search User.." autoComplete="none"/>
+                    {(props.showDropdownEdit && userConf.allUsersList!==[])?
+                        <div ref={node} className=" dropdown-menu-edit dropdown-menu-users-edit create-user__dropdown c__usersList" role="menu" style={{}}>
+                            <ScrollBar scrollId='allUsersListauto' thumbColor="#929397" >
+                            {props.allUserFilList.map((uid,index) => (  
+                                <option key={index} role="presentation" onClick = {()=>{props.setShowDropdownEdit(!props.showDropdownEdit);dispatch({type:actionTypes.UPDATE_USERIDNAME,payload:uid[1]+';'+uid[0]});dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:uid[0]});props.getUserData({user_idName:uid[1]+';'+uid[0]});}} value={uid[1] +";"+uid[0]} className="user-select__option"> {uid[0]}</option> 
+                            ))}
+                            </ScrollBar>
+                        </div>
+                        :null
+                    }
+                </div> */}
                                 {userDetailList.map((user, index) => (
                                         <div key={index} className='display_project_box_list'>
+                                            
                                             <input type='checkbox' value={JSON.stringify(user[0])}></input>
                                             <span >{user[0]}</span>
+                                            
                                             {/* <option key={user[0]} value={JSON.stringify(user)} >{user[0]} </option> */}
                                         </div> 
                                          
