@@ -239,7 +239,11 @@ const DevOpsConfig = props => {
             return;
         }
         if(integrationConfig.browsers.length < 1) {
-            setMsg(MSG.CUSTOM("Please Select atlease one Browser",VARIANT.ERROR));
+            setMsg(MSG.CUSTOM("Please Select atleast one Browser",VARIANT.ERROR));
+            return;
+        }
+        if(props.currentIntegration.selectValues[2].selected === '') {
+            setMsg(MSG.CUSTOM("Please Select Project/Release/Cycle",VARIANT.ERROR));
             return;
         }
         let batchInfo = [];
@@ -328,7 +332,10 @@ const DevOpsConfig = props => {
                         })).filter((scenario, index) => integrationConfig.scenarioList.includes(module.batchname+module.moduleid+index+scenario.scenarioId))
                     });
                 }));
-
+        if(batchInfo.length < 1) {
+            setMsg(MSG.CUSTOM("Please Select atleast one Scenario",VARIANT.ERROR));
+            return;
+        }
         props.setLoading('Please Wait...');
         const storeConfig = await storeConfigureKey({
             type: "",
@@ -402,13 +409,13 @@ const DevOpsConfig = props => {
         </div>
         <div>
         {
-            integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />
+            integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} isEditing={props.currentIntegration.name !== ''} />
         }
         </div>
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
                 <div className="devOps_module_list">
-                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} />
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} isEditing={props.currentIntegration.name !== ''} />
                 </div>
                 <div className="devOps_pool_list">
                     <div style={{ marginTop: '0' }}>
