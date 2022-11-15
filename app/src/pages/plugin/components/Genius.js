@@ -48,6 +48,9 @@ const Genius = () => {
       loadModule(selectedModule.key, selectedProject.key);
       return
     }
+    if (data === "disconnect") {
+      setLoading(false);
+    }
     else if (data === "startDebugging") {
       if (savedRef.current) {
         const firstStep = {
@@ -139,6 +142,23 @@ const Genius = () => {
     dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
   }
 
+  const reconnectEx = () => {
+    // port.onMessage.removeListener(backgroundListener); 
+    port = undefined; connect()
+  }
+  useEffect(() => {
+    if (port) {
+      port.onMessage.addListener(backgroundListener);
+      port.onDisconnect.addListener(reconnectEx)
+    }
+    return () => {
+      if (port) {
+        port.onMessage.removeListener(backgroundListener);
+        port.onDisconnect.removeListener(reconnectEx)
+      }
+    }
+  }, [selectedProject, selectedModule, selectedScenario, allProjects, projModules, modScenarios, appType, navURL, selectedBrowser, blockui, loading, flag, moduleSelect, userInfo])
+
   useEffect(() => {
     (async () => {
       if (selectedProject && selectedProject.key) {
@@ -182,6 +202,7 @@ const Genius = () => {
     //     });
     // }, 2000);
 
+    connect();
     (async () => {
       setBlockui({ show: true, content: 'Loading...' })
       var res = await getProjectList();
@@ -199,11 +220,30 @@ const Genius = () => {
   const sendMessageToPort = (msg) => {
     if (port) port.postMessage(msg);
   }
-  const createPort = (keywordData, idx = 0) => {
+
+  function connect() {
     if (window.chrome.runtime) {
       if (!port) {
         try {
-          port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassue" });
+          // setLoading("Genius Started...");
+          port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassure" });
+          port.onDisconnect.addListener(reconnectEx);
+          port.onMessage.addListener(backgroundListener);
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+    else {
+      setLoading(false);
+      console.log("Extension not present");
+    }
+  }
+  const createPort = (keywordData, idx = 0) => {
+    if (window.chrome.runtime) {
+      if (port) {
+        try {
+          // port = window.chrome.runtime.connect(editorExtensionId, { "name": "avoassue" });
           ResetSession.start();
           setLoading("Genius Started...");
           sendMessageToPort({
@@ -217,35 +257,35 @@ const Genius = () => {
             "keywordData": keywordData,
             "appType": appType
           });
-          port.onDisconnect.addListener(() => {
-            port = undefined;
-            ResetSession.end();
-            setLoading(false);
-          })
-          port.onMessage.addListener(backgroundListener);
+          // port.onDisconnect.addListener(() => {
+          //   port = undefined;
+          //   ResetSession.end();
+          //   setLoading(false);
+          // })
+          // port.onMessage.addListener(backgroundListener);
         }
         catch (err) {
-          ResetSession.end();
-          if (idx < 3)
-            createPort(keywordData, idx++);
-          else {
-            port = undefined;
-            setLoading(false);
-          }
-          console.log(err);
+          // ResetSession.end();
+          // if (idx < 3)
+          //   createPort(keywordData, idx++);
+          // else {
+          //   port = undefined;
+          //   setLoading(false);
+          // }
+          // console.log(err);
         }
       } else {
-        sendMessageToPort({
-          "open": true,
-          "project": selectedProject,
-          "module": selectedModule,
-          "scenario": selectedScenario,
-          "navurl": navURL,
-          "browser": selectedBrowser,
-          "siteURL": window.location.origin,
-          "keywordData": keywordData,
-          "appType": appType
-        });
+        // sendMessageToPort({
+        //   "open": true,
+        //   "project": selectedProject,
+        //   "module": selectedModule,
+        //   "scenario": selectedScenario,
+        //   "navurl": navURL,
+        //   "browser": selectedBrowser,
+        //   "siteURL": window.location.origin,
+        //   "keywordData": keywordData,
+        //   "appType": appType
+        // });
       }
 
     }
@@ -393,22 +433,14 @@ const Genius = () => {
             <NormalDropDown
               label="Select Browser"
               id="icon-normal-dropdown"
-              options={[
-                {
+              options={
+                [{
                   data: {
                     icon: "chrome-icon"
                   },
                   key: 'chrome',
                   text: 'Google Chrome'
-                },
-                // {
-                //   data: {
-                //     icon: "edge-icon"
-                //   },
-                //   key: 'edge',
-                //   text: 'Edge'
-                // },
-              ]}
+                }]}
               onChange={(e, item) => {
                 setSelectedBrowser(item.key)
               }}
