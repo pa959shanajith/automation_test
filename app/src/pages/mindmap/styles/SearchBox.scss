@@ -1,18 +1,30 @@
 @import "../../global/styles/ColorVariables.scss";
 #search-canvas-icon {
+    // width: 14rem;
+    // height: 22px;
+    // left: 933px;
+    // top: 27px;
+    // position: relative;
+    // display: flex;
+    // font-weight: 300;
+    // font-size: 14px;
+    // -webkit-touch-callout:none;
+    // -webkit-user-select:none;
+    // -moz-user-select:none;
+    // -ms-user-select:none;
+    // user-select:none!important;
+    // z-index: 1;
     width: 14rem;
     height: 22px;
-    left: 1074px;
+    left: 929px;
     top: 27px;
-    position: fixed;
+    position: absolute;
     display: flex;
     font-weight: 300;
     font-size: 14px;
-    -webkit-touch-callout:none;
-    -webkit-user-select:none;
-    -moz-user-select:none;
-    -ms-user-select:none;
-    user-select:none!important;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none!important;
     z-index: 1;
 }
 .searchimg-canvas {

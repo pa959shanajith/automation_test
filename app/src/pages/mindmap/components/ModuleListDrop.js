@@ -248,7 +248,7 @@ const ModuleListDrop = (props) =>{
                                     key: 'image',
                                     text: 'Import Module',
                                     onClick:()=>{setImportPop(true);}}
-                                ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'1rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
+                                ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.2rem'}} placeholderIconName = 'plusIcon'
                             />  
                             {importPop?<ImportMindmap setBlockui={setBlockui} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
                         </div>
@@ -291,7 +291,7 @@ const ModuleListDrop = (props) =>{
                                 //     key: 'image',
                                 //     text: 'Import Module..',
                                 // }
-                                ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'1rem', border: 'white', marginTop:'-0.7rem'}} placeholderIconName = 'plusIcon'
+                                ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.3rem'}} placeholderIconName = 'plusIcon'
                             />  
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
