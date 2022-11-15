@@ -8,20 +8,18 @@
     width: 100%;
 }
 .note{
-    display: flex;
-    // position:fixed;
-    // top:6691px;
-    // right: 1341px;
-    position: sticky;
-    // width: 27px;
-    // height: 14px;
-    left:-1046px;
-    // top: 20px;
+    
     line-height: 14.4px;
     font-size: 12px;
     font-weight: 400;
     font-family: 'LatoWeb';
-    margin: -534px 0px 421px 282px;
+    width: 275px;
+    height: 22px;
+    left: 1084px;
+    top: 103px;
+    position: absolute;
+    display: flex;
+    z-index: 1;
 }
 .mp__canvas_container{
     position: relative;

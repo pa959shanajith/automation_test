@@ -269,7 +269,7 @@ const ModuleListDrop = (props) =>{
                     <div className='section-dividers'></div>
                     <div className='endToEnd'>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:'center', }}>
-                        <img src="static/imgs/E2Eicon.png" alt="modules" style={{display:"flex",width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}}/>
+                        <img src="static/imgs/node-endtoend.png" alt="modules" style={{display:"flex",width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}}/>
                             <h6 id='Endto' style={{margin: '5px -82px 3px -17px'}}>
                                     End to End Flows
                             </h6>
