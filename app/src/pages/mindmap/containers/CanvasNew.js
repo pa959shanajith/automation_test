@@ -62,7 +62,7 @@ const CanvasNew = (props) => {
     const [DelConfirm,setDelConfirm] = useState(false)
     const [reuseDelContent,setReuseDelContent] = useState()
     const[endToEndDelConfirm,setEndToEndDelConfirm]=useState(false)
-    const [verticalLayout,setVerticalLayout] = useState(false)
+    const [verticalLayout,setVerticalLayout] = useState(true)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
