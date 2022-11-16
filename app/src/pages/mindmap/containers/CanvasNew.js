@@ -14,7 +14,7 @@ import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import * as actionTypes from '../state/action';
 import '../styles/MindmapCanvas.scss';
-import { deleteScenario,fetchScenario} from '../api';
+import { deleteScenario} from '../api';
 
 /*Component Canvas
   use: return mindmap on a canvas
