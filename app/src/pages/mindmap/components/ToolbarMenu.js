@@ -52,9 +52,9 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:moduledata})
         
         if(screendata)dispatch({type:actionTypes.UPDATE_SCREENDATA,payload:screendata})
-        if(SearchInp){
-            SearchInp.current.value = ""
-        }
+        // if(SearchInp){
+        //     SearchInp.current.value = ""
+        // }
         
         setBlockui({show:false})
         
