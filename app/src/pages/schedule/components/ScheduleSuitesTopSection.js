@@ -12,7 +12,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
         let readTestSuite = current_task.testSuiteDetails;
             if(typeof readTestSuite === "string") readTestSuite = JSON.parse(current_task.testSuiteDetails);
             for (var rti = 0; rti < readTestSuite.length; rti++) {
-                readTestSuite[rti].versionnumber = parseFloat(current_task.versionnumber);
+                readTestSuite[rti].versionnumber = current_task.versionnumber ? parseFloat(current_task.versionnumber) : parseFloat(readTestSuite[rti].versionnumber);
             }
             readTestSuiteFunct(readTestSuite);
         }
@@ -82,10 +82,12 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
             for (var m = 0; m < keys.length; m++) {
                 tableData[m].scenarioids.map((scenarioid, index) => {
                     tableData[m].executestatus[index] = 0;
-                    for (var k in item.executionRequest.batchInfo[0].suiteDetails) {
-                        if (scenarioid === item.executionRequest.batchInfo[0].suiteDetails[k].scenarioId) {
-                            tableData[m].executestatus[index] = 1;
-                            break;
+                    if (m < item.executionRequest.batchInfo.length) {
+                        for (var k in item.executionRequest.batchInfo[m].suiteDetails) {
+                            if (scenarioid === item.executionRequest.batchInfo[m].suiteDetails[k].scenarioId) {
+                                tableData[m].executestatus[index] = 1;
+                                break;
+                            }
                         }
                     }
                 });
@@ -249,6 +251,13 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
         else if (date_time === "recurringStringOnHover") {	
             moduleScheduledateTime[testsuiteid]["recurringStringOnHover"] =	value;	
         }
+
+        // update same schedule time to every module
+        Object.entries(moduleScheduledateTime).forEach(([key, value]) => {
+            if (key !== testsuiteid) {
+                moduleScheduledateTime[key] = moduleScheduledateTime[testsuiteid];
+            }
+        });
         setModuleScheduledate(moduleScheduledateTime);
     }
 
@@ -259,7 +268,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                 <div className="s__min">
                     <div className="s__con" id="schSuiteTable">
                         {/* <ScrollBar scrollId="schSuiteTable" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" onScrollY={()=>setCloseCal(true)}> */}
-                        {scheduleTableData.map((rowData,i)=>(
+                        {scheduleTableData.length > 0 && [scheduleTableData[0]].map((rowData,i)=>(
                             <div key={i} className="batchSuite">
                                 <div className="scheduleSuite" id={`ss-id${i}`} >
                                     {/* <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" /> */}

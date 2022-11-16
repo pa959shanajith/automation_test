@@ -361,7 +361,7 @@ exports.testSuitesScheduler_ICE = async (req, res) => {
 /** This service fetches all the schedule jobs */
 exports.getScheduledDetails_ICE = async (req, res) => {
 	logger.info("Inside UI service getScheduledDetails_ICE");
-	const inputs = { "query": "getallscheduledata" };
+	const inputs = { "query": "getallscheduledata", "configKey": req.body.configKey, "configName": req.body.configName };
 	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
 	return res.send(result);
 }
@@ -414,5 +414,17 @@ exports.getQueueState = async(req,res) => {
 
 exports.deleteExecutionListId = async(req,res) => {
 	let result = await queue.Execution_Queue.deleteExecutionListId(req, res);
+	return res.send(result);
+}
+
+// TODO:
+exports.getScheduledDetailsOnDate_ICE = async (req, res) => {
+	logger.info("Inside UI service getScheduledDetailsOnDate_ICE");
+	let scheduledDate = req.body.scheduledDate;
+	let dateValue = scheduledDate.split(' ')[0]
+	let timeValue = scheduledDate.split(' ')[1]
+	let timestamp = + new Date(parseInt(dateValue.split('-')[0]), parseInt(dateValue.split('-')[1])-1, parseInt(dateValue.split('-')[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+	const inputs = { "query": "getallscheduledataondate", "scheduledDate": timestamp, "configKey": req.body.configKey, "configName": req.body.configName };
+	const result = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", "getScheduledDetails_ICE");
 	return res.send(result);
 }

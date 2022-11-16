@@ -516,7 +516,7 @@ const RecurrenceComp = (props) => {
                         </div>
                     </div>
                 )}
-                <img className={"timepickerIconToken" + (disabled ? " disabled" : "")} src={"static/imgs/ic-timepicker.png"} alt="timepicker" onClick={openRecurrenceScreen} />
+                <img className={"timepickerIconToken" + (disabled ? " disabled" : "")} src={"static/imgs/ic-recurring.png"} alt="recurring" onClick={openRecurrenceScreen} />
             </div>
         </ClickAwayListener>
     );
