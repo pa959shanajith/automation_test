@@ -141,6 +141,9 @@ const CanvasNew = (props) => {
                 tree = dNodes[0]
             }
             //load mindmap from data
+            // if(!(tree && tree.createnew && tree.createnew === true)) {
+            //     tree = generateTree(tree,types,{...count},props.verticalLayout)
+            // }
             tree = generateTree(tree,types,{...count},props.verticalLayout)
             count= {...count,...tree.count}
         }
