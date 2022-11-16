@@ -10,7 +10,7 @@
 .api-ut__btnGroup {
     width: 100%;
     margin-bottom: 1.5%;
-
+    height: 6vh;
     &>button{
         position: relative;
         float: right;
@@ -206,7 +206,7 @@
     white-space: nowrap;
 }
 .tkn-table__head {
-    text-align: center !important;
+    text-align: end !important;
 }
 .tkn-table__sr_no{
     flex: 0 0 5% !important;
@@ -272,11 +272,12 @@
 }
 .devOps_pool_list {
     width: 45%;
-    margin-top: 22vh;
+    margin-top: 3vh;
     & > div {
         margin: 1.4% 0;
         display: flex;
         align-items: center;
+        margin-bottom: 7vh;
     }
 }
 .devOps__scenario_list {
@@ -317,13 +318,13 @@
     font-weight: 700;
     margin-bottom: 0;
     &_ice {
-        margin-right: 8%;
+        margin-right: 9%;
     }
     &_browser {
         margin-right: 15%;
     }
     &_integration {
-        margin-right: 19%;
+        margin-right: 21%;
     }
     &_execution {
         margin-right: 15.5%;
@@ -344,7 +345,7 @@
         justify-content: space-between;
     }
     &_execution_mode {
-        margin-right: 14.5%;
+        margin-right: 15.5%;
     }
 }
 .devOps_seperation {

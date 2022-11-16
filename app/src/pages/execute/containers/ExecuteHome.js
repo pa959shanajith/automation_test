@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 // import { useSelector } from 'react-redux';
 // import { UpperContent, BottomContent } from "../components/ActionBarItems";
 import { Header, FooterTwo as Footer, ActionBar, ReferenceBar } from '../../global';
+import DevOps from '../../utility/containers/DevOps';
 import "../styles/ExecuteHome.scss";
 import ExecuteContent from './ExecuteContent';
 
@@ -69,7 +70,7 @@ const ExecuteHome = () => {
         <div className="e__body">
             <Header />
                 <div className="e__mid_section">
-                    <ExecuteContent />
+                    <DevOps/>
                     {/* <ActionBar 
                         upperContent={<UpperContent appType={appType} isMac={isMac} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} />}
                         bottomContent={<BottomContent execEnv={execEnv} updateExecEnv={updateExecEnv} appType={appType} execAction={execAction} browserTypeExe={browserTypeExe} UpdateBrowserTypeExe={UpdateBrowserTypeExe} updateExecAction={updateExecAction}/>}/> 
