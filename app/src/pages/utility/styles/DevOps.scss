@@ -200,8 +200,8 @@
     margin-right: 3rem;
     white-space: nowrap;
 }
-.tkn-table__head {
-    text-align: center !important;
+.tkn-table__head1 {
+    text-align: left !important;
 }
 .tkn-table__sr_no{
     flex: 0 0 5% !important;
@@ -267,11 +267,12 @@
 }
 .devOps_pool_list {
     width: 45%;
-    margin-top: 22vh;
+    margin-top: 3vh;
     & > div {
         margin: 4.4% 0;
         display: flex;
         align-items: center;
+        margin-bottom: 7vh;
     }
 }
 .devOps__scenario_list {
@@ -289,6 +290,7 @@
 .action_icons{
     cursor: pointer;
     width: fit-content;
+    height: 3.5vh;
 }
 .checkbox{
     width: 5%;
@@ -310,7 +312,7 @@
     font-weight: 700;
     margin-bottom: 0;
     &_ice {
-        margin-right: 8%;
+        margin-right: 9%;
     }
     &_browser {
         margin-right: 14%;
@@ -337,7 +339,7 @@
         justify-content: space-between;
     }
     &_execution_mode {
-        margin-right: 14.5%;
+        margin-right: 15.5%;
     }
 }
 .devOps_seperation {

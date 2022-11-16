@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../../global';
 import { CheckBox, SearchDropdown, Tab, NormalDropDown, Dialog, TextField, SearchBox } from '@avo/designcomponents';
 import { fetchModules } from '../api';
@@ -6,7 +7,8 @@ import { Icon } from '@fluentui/react';
 
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
-const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading }) => {
+import ExecuteContent from '../../execute/containers/ExecuteContent';
+const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist }) => {
     const [moduleList, setModuleList] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [filteredList, setFilteredList] = useState(moduleScenarioList);
@@ -208,7 +210,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                         filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
-                                label: module.name,
+                                label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                    event.preventDefault();
+                                    onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                             };
                             if(module.scenarios && module.scenarios.length > 0) {
                                 const moduleChildren = module.scenarios.map((scenario) => {
@@ -237,7 +241,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                                     let filterModule = {
                                         value: module.moduleid,
-                                        label: module.name,
+                                        label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                            event.preventDefault();
+                                            onDataParamsIconClick1(batch+module.moduleid+module.moduleid, module.name)}}/></div>
                                     };
                                     if(module.scenarios && module.scenarios.length > 0) {
                                         const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -274,7 +280,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                         filteredNodes = fetchedModuleList[selectedExecutionType].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
                             let filterModule = {
                                 value: module.moduleid,
-                                label: module.name,
+                                label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                    event.preventDefault();
+                                    onDataParamsIconClick1(module.batchname+module.moduleid+module.moduleid, module.name)}}/></div>
                             };
                             if(module.scenarios && module.scenarios.length > 0) {
                                 const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -299,7 +307,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
         })()
     },[integrationConfig.selectValues[2].selected]);
 
-    const [modalContent, setModalContent] = useState(false);
+
     const onDataParamsIconClick = (scenarioId, name) => {
         if(integrationConfig.dataParameters.some((data) => data.scenarioId === scenarioId)) {
             let paramIndex = integrationConfig.dataParameters.findIndex((data) => data.scenarioId === scenarioId);
@@ -313,20 +321,21 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
             })
         }
     }
+    
     return (
         <>
 
             <Dialog
                 hidden = {modalContent === false}
                 onDismiss = {() => setModalContent(false)}
-                title = 'Execution Parameters'
+                title = 'Scenario Data Parametrization'
                 minWidth = '60rem'
                 confirmText = 'Save'
                 declineText = 'Cancel'
                 onDecline={() => setModalContent(false)}
                 onConfirm = {() => {
                     let updatedParamCollection = integrationConfig.dataParameters;
-                    let paramIndex = updatedParamCollection.findIndex((data) => data.scenarioId === modalContent.scenarioId);
+                    let paramIndex = updatedParamCollection.findIndex((data) => data.ModuleId === modalContent.ModuleId);
                     if(paramIndex > -1){
                         updatedParamCollection[paramIndex] = modalContent;
                         setIntegrationConfig({ ...integrationConfig, dataParameters: updatedParamCollection });
@@ -339,9 +348,10 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 }} >
                     <div style={{ display: 'flex', flexDirection: 'column'}}>
                         <div style={{display: 'flex', alignItems: 'baseline'}}>
-                            <h4 style={{marginRight: '1rem'}} >Scenario Name : </h4><h5>{modalContent.name}</h5>
+                            <h4 style={{marginRight: '1rem'}} >Module Name : </h4><h5>{modalContent.name}</h5>
                         </div>
-                        <div style={{display: 'flex'}}>
+                        <ExecuteContent integrationConfig={integrationConfig} />
+                        {/* <div style={{display: 'flex'}}>
                             <div style={{ marginRight: '2rem' }}>
                                 <TextField value = {modalContent.dataparam} onChange={(ev, newValue) => {
                                     if (newValue === '') setModalContent({...modalContent, dataparam: ''});
@@ -352,8 +362,9 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                             { key: 0, text: 'False'},
                             { key: 1, text: 'True' }
                             ]} label='Condition' onChange={(ev, option) =>setModalContent({...modalContent, condition: option.key })} />
-                        </div>
+                        </div> */}
                     </div>
+                    
             </Dialog>
             {
                 (integrationConfig.selectValues && integrationConfig.selectValues.length> 0 && integrationConfig.selectValues[2].selected === '') ? <img src='static/imgs/select-project.png' className="select_project_img" /> : <>

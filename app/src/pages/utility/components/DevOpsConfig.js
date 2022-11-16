@@ -72,7 +72,9 @@ const DevOpsConfig = props => {
             filteredNodes = moduleScenarioList[selectedKey].map((module) => {
                 let filterModule = {
                     value: module.moduleid,
-                    label: module.name,
+                    label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                        event.preventDefault();
+                        onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                 };
                 if(module.scenarios && module.scenarios.length > 0) {
                     const moduleChildren = module.scenarios.filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((scenario) => {
@@ -91,7 +93,9 @@ const DevOpsConfig = props => {
             filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((module) => {
                 let filterModule = {
                     value: module.moduleid,
-                    label: module.name,
+                    label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                        event.preventDefault();
+                        onDataParamsIconClick1(module.batchname+module.moduleid+module.moduleid, module.name)}}/></div>
                 };
                 if(module.scenarios && module.scenarios.length > 0) {
                     const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -119,7 +123,9 @@ const DevOpsConfig = props => {
                     filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length) > 0 > 0 } ).map((module) => {
                         let filterModule = {
                             value: module.moduleid,
-                            label: module.name,
+                            label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                event.preventDefault();
+                                onDataParamsIconClick1(batch+module.moduleid+module.moduleid, module.name)}}/></div>
                         };
                         if(module.scenarios && module.scenarios.length > 0) {
                             const moduleChildren = module.scenarios.map((scenario, index) => {
@@ -128,7 +134,7 @@ const DevOpsConfig = props => {
                                     label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                                         event.preventDefault();
                                      }}/></div>
-                                        //onDataParamsIconClick(batch+module.moduleid+index+scenario._id, scenario.name)
+                                        // onDataParamsIconClick(batch+module.moduleid+index+scenario._id, scenario.name)
                                 })
                             });
                             filterModule['children'] = moduleChildren;
@@ -145,7 +151,20 @@ const DevOpsConfig = props => {
         setModuleState({expanded: [], checked: []});
         setIntegrationConfig({ ...props.currentIntegration, scenarioList: [], dataParameters: [] });
     }
-
+    const [modalContent, setModalContent] = useState(false);
+    const onDataParamsIconClick1 = (ModuleId, name) => {
+        if(integrationConfig.dataParameters.some((data) => data.Id === ModuleId)) {
+            let paramIndex = integrationConfig.dataParameters.findIndex((data) => data.ModuleId === ModuleId);
+            setModalContent(integrationConfig.dataParameters[paramIndex]);
+        } else {
+            setModalContent({
+                moduleId: ModuleId,
+                name: name,
+                dataparam: '',
+                condition: 0
+            })
+        }
+    }
     const [icepoollist, setIcepoollist] = useState([
         { key: 'cicdanyagentcanbeselected', text: 'Any Agent' },
     ]);
@@ -492,7 +511,17 @@ const DevOpsConfig = props => {
         <div className="api-ut__btnGroup">
         <button style={{width: '15vh'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
             <button data-test="submit-button-test" style={{width: '15vh'}} onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
-            <div className="devOps_config_name" style={{marginRight:'92vh'}}>
+            {/* <div className="devOps_config_name" style={{marginRight:'101vh'}}>
+                <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
+                &nbsp;&nbsp;
+                <span className="api-ut__inputLabel">
+                    <TextField value={integrationConfig.name} width='150%' label="" standard={true} onChange={(event) => setIntegrationConfig({...integrationConfig, name: event.target.value})} autoComplete="off" placeholder="Enter Profile Name"
+                        errorMessage={(integrationConfig.name === '' && error.name && error.name !== '') ?  error.name : null}
+                    />
+                </span>
+            </div> */}
+        </div>
+         <div className="devOps_config_name" style={{position: 'absolute',top: '19.5vh'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
@@ -501,11 +530,10 @@ const DevOpsConfig = props => {
                     />
                 </span>
             </div>
-        </div>
         <div style={{display:'flex'}} > 
-                            <input type='radio' id="E2E" value='e2eExecution'  onChange={() => handleExecutionTypeChange('e2eExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/>&nbsp;<label >E2E Execution&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <input type='radio' id='Batch' value='batchExecution' onChange={()=>handleExecutionTypeChange('batchExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><label >&nbsp;Batch Execution&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            <input type='radio' id='Normal' value='normalExecution'  onChange={()=>handleExecutionTypeChange('normalExecution')} style={{width:'3vh', height: '3vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><label >&nbsp;Normal Execution</label>
+                            <input type='radio' id="E2E" value='e2eExecution'  onChange={() => handleExecutionTypeChange('e2eExecution')} style={{width:'2vh', height: '3.5vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'e2eExecution'}/>&nbsp;<label >E2E Execution&nbsp;&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type='radio' id='Batch' value='batchExecution' onChange={()=>handleExecutionTypeChange('batchExecution')} style={{width:'2vh', height: '3.5vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'batchExecution'}/><label >&nbsp;Batch Execution&nbsp;&nbsp;&nbsp;</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type='radio' id='Normal' value='normalExecution'  onChange={()=>handleExecutionTypeChange('normalExecution')} style={{width:'2vh', height: '3.5vh'}} selectedKey={selectedExecutionType} checked={selectedExecutionType === 'normalExecution'}/><label >&nbsp;Normal Execution</label>
                         </div>
         {/* <div>
         {
@@ -515,10 +543,10 @@ const DevOpsConfig = props => {
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
                 <div className="devOps_module_list">
-                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} />
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} />
                 </div>
                 <div className="devOps_pool_list">
-                    <div style={{ marginTop: '-22px' }}>
+                    <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_ice">Avo Agent / Avo Grid : </label>
                         <SearchDropdown
                             calloutMaxHeight="30vh"
