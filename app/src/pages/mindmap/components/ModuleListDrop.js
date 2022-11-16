@@ -62,17 +62,17 @@ const ModuleListDrop = (props) =>{
         setLoading(false)
         setMsg(error)
     }
+    const collapsed =()=> setCollapse(!collapse)
     const CreateNew = () =>{
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
+        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
+
     }
     const clickCreateNew = () =>{
-        // const CreateNew = () =>{
-            // dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
-        // }
         dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
-        console.log('isE2ECreate: true');
         dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
-        console.log('isE2ECreate: true end');
+        setIsE2EOpen(isE2EOpen)
+
     }
     const searchModule = (val) =>{
         var filter = modlist.filter((e)=>(e.type === 'basic' && (e.name.toUpperCase().indexOf(val.toUpperCase())!==-1) || e.type === 'endtoend'))
@@ -162,7 +162,7 @@ const ModuleListDrop = (props) =>{
 // console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",e)
 
     }
-    const collapsed =()=> setCollapse(!collapse)
+    
     
     //E2E properties
     const selectModules= async(e) => {
@@ -276,15 +276,16 @@ const ModuleListDrop = (props) =>{
                     <div className='section-dividers'></div>
                     <div className='endToEnd'>
                         <div style={{ display:"flex", justifyContent:"space-between", alignItems:'center', }}>
-                        <img src="static/imgs/node-endtoend.png" alt="modules" style={{display:"flex",width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}}/>
-                            <h6 id='Endto' style={{margin: '5px -82px 3px -17px'}}>
+                        <img src="static/imgs/E2Eicon.png" alt="modules" style={{display:"flex",width:'1.7rem',height:'1.7rem',margin: '5px -82px 3px -17px'}}/>
+                            <h6 id='Endto' style={{margin: '5px -50px 3px -17px'}}>
                                     End to End Flows
                             </h6>
                             <IconDropdown items={[ 
                                 {
                                     key: 'csv',
                                     text: 'Create New Module',
-                                    onClick: () => {clickCreateNew()
+                                    onClick: () => {clickCreateNew();
+                                        collapsed();
                                     }
                                 },
                                 // {
@@ -316,6 +317,7 @@ const ModuleListDrop = (props) =>{
                     
                 <div className='scenarioList'>
                     
+                    
                 {/* {scenarioList.map((e,i)=>{
                     return(
                         <div key={i+'scenario'} onClick={(e)=>addScenario(e)} className={'dropdown_scenarios'+(selectedSc[e._id]?' selected':'')} title={e.name} value={e._id} >{e.name}</div>
@@ -324,7 +326,13 @@ const ModuleListDrop = (props) =>{
                 
               
                 {scenarioList.map((e,i)=>{ 
-                    return(<div className='scenarios'>
+                    if(!isE2EOpen){
+                        return <h2>hello</h2>
+                    }
+                    
+                    return(
+                    <div className='scenarios'>
+                        <div key={i+'scenario'} style={{backgroundColor:'#EFE6FF',height:'1.2rem',justifyContent:'center',textAlign:'center',fontSize:'0.75rem',borderRadius:'0.36rem', cursor:'pointer',}}  title={e.name} value={e._id} ><b>{e.name}</b></div>
                         <div key={i+'scenario'} style={{backgroundColor:'#EFE6FF',height:'1.2rem',justifyContent:'center',textAlign:'center',fontSize:'0.75rem',borderRadius:'0.36rem', cursor:'pointer',}}  title={e.name} value={e._id} ><b>{e.name}</b></div>
                             </div>
                             
@@ -332,7 +340,7 @@ const ModuleListDrop = (props) =>{
                     )
                 })}
                         </div>
-                        <div ><img   className='collapseButton' style={{cursor:!isE2EOpen? 'no-drop':'pointer',transform:isE2EOpen&&collapse? 'rotate(0deg)':'rotate(180deg)',  }} onClick={isE2EOpen? collapsed : 'null'} src='static/imgs/collapseButton.png'  /> </div>
+                        <div ><img   className='collapseButton' style={{cursor:!isE2EOpen? 'no-drop':'pointer',transform:isE2EOpen&&collapse? 'rotate(0deg)':'rotate(180deg)',   }} onClick={isE2EOpen? collapsed : 'null'} src='static/imgs/collapseButton.png'  /> </div>
                         {/*  <button >..</button> */}
                         </div>
                         </div>

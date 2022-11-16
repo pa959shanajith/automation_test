@@ -41,7 +41,7 @@ const CanvasEnE =(props)=>{
     const [dLinks,setdLinks] = useState([])
     const [sections,setSection] =  useState({})
     const [ctScale,setCtScale] = useState({})
-    const [verticalLayout,setVerticalLayout] = useState(false)
+    const [verticalLayout,setVerticalLayout] = useState(true)
     const [createnew,setCreateNew] = useState(false)
     const scenarioList = useSelector(state=>state.mindmap.scenarioList)
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)

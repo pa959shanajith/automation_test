@@ -31,8 +31,8 @@ const CreateNew = ({importRedirect}) => {
   const initEnEProj = useSelector(state=>state.mindmap.initEnEProj)
   const [delSnrWarnPop,setDelSnrWarnPop] = useState(false)
   const [showScrape, setShowScrape] = useState(false)
-//   const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj)
-  const [isCreateE2E, setIsCreateE2E] = useState(true)
+  const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
+//   const [isCreateE2E, setIsCreateE2E] = useState(true)
   const[ShowDesignTestSetup, setShowDesignTestSetup]=useState(false)
 
 
@@ -48,7 +48,7 @@ const CreateNew = ({importRedirect}) => {
   },[selectProj,prjList])
   useEffect(() => {
       console.log(initEnEProj);
-    setIsCreateE2E(initEnEProj);
+    setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
   },[initEnEProj]);
   useEffect(()=>{
     (async()=>{
@@ -111,9 +111,6 @@ const CreateNew = ({importRedirect}) => {
                 </div>
                 
                 <ModuleListDrop />
-                <div className='note'>
-                <p><b>Note </b>- Read the Mindmap from left to right</p>
-                </div>
                 <div id='mp__canvas' className='mp__canvas'>
                 {/* //isCreateE2E = true/false -- new hook */}
                      {!isCreateE2E ? ((Object.keys(moduleSelect).length>0)?
@@ -124,7 +121,12 @@ const CreateNew = ({importRedirect}) => {
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
                         <Legends/>
-                    </Fragment>) : null}
+                    </Fragment>) : (Object.keys(moduleSelect).length>0)?
+                <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
+                :<Fragment>
+                    <SaveMapButton disabled={true}/>
+                    <Legends isEnE={true}/>
+                </Fragment>}
                     {console.log('initEnEProj', initEnEProj)}
                     {console.log('isCreateE2E', isCreateE2E)}
                     {/* {isCreateE2E ? ( (Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
@@ -132,13 +134,14 @@ const CreateNew = ({importRedirect}) => {
                     <SaveMapButton disabled={true}/>
                     <Legends isEnE={true}/>
                 </Fragment>) : null}  */}
-                {console.log('initEnEProj', initEnEProj)}
-                {console.log('isCreateE2E', isCreateE2E)}
-                {(Object.keys(moduleSelect).length>0)?<CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
+                {/* {console.log('initEnEProj', initEnEProj)}
+                {console.log('isCreateE2E', isCreateE2E)} */}
+                {/* {(Object.keys(moduleSelect).length>0)?
+                <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout}/>
                 :<Fragment>
                     <SaveMapButton disabled={true}/>
                     <Legends isEnE={true}/>
-                </Fragment>}
+                </Fragment>} */}
                     
                     
                 </div>
