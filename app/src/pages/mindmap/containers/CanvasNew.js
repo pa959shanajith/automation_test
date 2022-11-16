@@ -256,7 +256,7 @@ const CanvasNew = (props) => {
                 if([...dNodes][sid]['children']){
                     for ( let i=0; i< [...dNodes][sid]['children'].length;i++) {
                         if ([...dNodes][sid]['children'][i]["reuse"]){
-                            // reusedNode(dNodes,sid,type);
+                            reusedNode(dNodes,sid,type);
                             setReuseDelContent(<div>Selected Test Scenario has <b>re used Screens and Test cases</b> and is used in <b>End To End flow</b>, By deleting this will impact other Test Scenarios.<br/><br/> Are you sure you want to Delete permenantly?" </div>)
                             setSelectedDelNode(id);
                             setReuseDelConfirm(true);
@@ -274,7 +274,7 @@ const CanvasNew = (props) => {
             else if([...dNodes][sid]['children']){
                 for ( let i=0; i< [...dNodes][sid]['children'].length;i++) {
                     if ([...dNodes][sid]['children'][i]["reuse"]){
-                        // reusedNode(dNodes,sid,type);
+                        reusedNode(dNodes,sid,type);
                         setReuseDelContent("Selected Test Scenario has re used Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?" )
                         setSelectedDelNode(id);
                         setReuseDelConfirm(true);
@@ -290,7 +290,7 @@ const CanvasNew = (props) => {
         }        
         else if (type=='screens'){
                 if (reu){
-                    // reusedNode(dNodes,sid,type);
+                    reusedNode(dNodes,sid,type);
                     setReuseDelContent("Selected Screen is re used. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?");
                     setSelectedDelNode(id);
                     setReuseDelConfirm(true);
@@ -306,7 +306,7 @@ const CanvasNew = (props) => {
         }
         else if (type=='testcases'){
             if (reu){
-                // reusedNode(dNodes,sid,type);
+                reusedNode(dNodes,sid,type);
                 setSelectedDelNode(id);
                 setReuseDelContent("Selected Test case is re used. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?");
                 setReuseDelConfirm(true);
@@ -375,9 +375,9 @@ const CanvasNew = (props) => {
     }
     const reusedDelConfirm = () => {
         //processDeleteNode();
-        // for(let i = 0 ;i<delReuseNodes.length; i++){
-            processDeleteNode(selectedDelNode);
-        // }
+        for(let i = 0 ;i<delReuseNodes.length; i++){
+            processDeleteNode(delReuseNodes[i]);
+        }
     }
     const deleteNodeHere=()=>{
         clickDeleteNodeHere(selectedDelNode)
