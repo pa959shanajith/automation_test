@@ -7,7 +7,7 @@ import { Icon } from '@fluentui/react';
 
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
-import ExecuteContent from '../../execute/containers/ExecuteContent';
+// import ExecuteContent from '../../execute/containers/ExecuteContent';
 const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist }) => {
     const [moduleList, setModuleList] = useState([]);
     const [searchText, setSearchText] = useState("");
@@ -350,8 +350,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                         <div style={{display: 'flex', alignItems: 'baseline'}}>
                             <h4 style={{marginRight: '1rem'}} >Module Name : </h4><h5>{modalContent.name}</h5>
                         </div>
-                        <ExecuteContent integrationConfig={integrationConfig} />
-                        {/* <div style={{display: 'flex'}}>
+                        {/* <ExecuteContent integrationConfig={integrationConfig} /> */}
+                        <div style={{display: 'flex'}}>
                             <div style={{ marginRight: '2rem' }}>
                                 <TextField value = {modalContent.dataparam} onChange={(ev, newValue) => {
                                     if (newValue === '') setModalContent({...modalContent, dataparam: ''});
@@ -362,7 +362,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                             { key: 0, text: 'False'},
                             { key: 1, text: 'True' }
                             ]} label='Condition' onChange={(ev, option) =>setModalContent({...modalContent, condition: option.key })} />
-                        </div> */}
+                        </div>
                     </div>
                     
             </Dialog>

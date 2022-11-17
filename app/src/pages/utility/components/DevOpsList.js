@@ -47,7 +47,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [moduleInfo,setModuleInfo] = useState([]);
     const [dataDict, setDict] = useState({});
     const [selectedProject, setSelectedProject] = useState('');
-    const [selectedCycle, setSelectedCycle] = useState('');
+    const [selectedCycle, setSelectedCycle] = useState(0);
     const [cyclesList, setCyclesList] = useState('');
     const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
     const[currentKey,setCurrentKey]=useState('')
@@ -57,13 +57,11 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     useEffect(()=>{
         pluginApi.getProjectIDs()
         .then(data => {
-                setProjectData1(data.releases[0][0].name);
-                setProjectData(data.releases[0][0].cycles[0]._id)
-                console.log(data.releases[0][0].name)   
-                console.log(data.releases[0][0].cycles[0]._id)
+                setProjectData1(data.releases[selectedCycle][0].name);
+                setProjectData(data.releases[selectedCycle][0].cycles[0]._id)
                 projectIdTypesDicts[data.projectId[0]] === "Web" ? setShowCICD(true) : setShowCICD(false)
 
-    })},[])
+    })},[selectedCycle])
   
     useEffect(()=>{
         (async() => {
@@ -87,7 +85,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         // name: ProjectList.projectNames[index],
                         key: element,
                         text: ProjectList.projectNames[index],
-                        title: ProjectList.projectNames[index]
+                        title: ProjectList.projectNames[index],
+                        index: index
                         // disabled: true,
                         // title: 'License Not Supported'
                     }
@@ -95,7 +94,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             });
             setProjectList(arraynew);
             setSelectedProject(arraynew[0].key);
-            setSelectedCycle(arraynew[0].key);
+
 
 
             // console.log(selectedProject);
@@ -226,6 +225,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const onProjectChange = async (option) => {
         setLoading('Please Wait...');
         setSelectedProject(option.key);
+        setSelectedCycle(option.index)
         projectIdTypesDicts[option.key] === "Web" ? setShowCICD(true) : setShowCICD(false)
         const configurationList = await fetchConfigureList({
             'projectid': option.key
@@ -597,7 +597,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                      style={{width:'2.5vh', height: '2.5vh'}} />&nbsp;&nbsp;
                     <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Assure Client</label>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <input type="radio" name='myRadios' id='second' onChange={()=>{}} style={{width:'2.5vh', height: '2.5vh'}}/>&nbsp;&nbsp;
+                    <input type="radio" name='myRadios' id='second' onChange={()=>{}} style={{width:'2.5vh', height: '2.5vh'}} checked/>&nbsp;&nbsp;
                     <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Agent / Avo Grid</label> 
                 
                 </Dialog>
