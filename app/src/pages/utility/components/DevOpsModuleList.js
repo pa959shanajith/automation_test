@@ -328,7 +328,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
             <Dialog
                 hidden = {modalContent === false}
                 onDismiss = {() => setModalContent(false)}
-                title = 'Scenario Data Parametrization'
+                title = 'Execution Parameters'
                 minWidth = '60rem'
                 confirmText = 'Save'
                 declineText = 'Cancel'
