@@ -110,7 +110,9 @@ exports.prepareSchedulingRequest = async (session, body) => {
             "recurringStringOnHover": recurringStringOnHoverValue,
             "time": timeValue,
             "parentId": parentId,
-            "startDate": startDate.toString()
+            "startDate": startDate.toString(),
+            "configureKey": multiExecutionData.configureKey,
+            "configureName": multiExecutionData.configureName
         };
         for (let i = 0; i < batchIdx.length; i++) {
             let suite = batchInfo[batchIdx[i]];
@@ -504,8 +506,8 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         type: multiExecutionData.type,
         targetaddress: targetUser,
         scenarioFlag: multiExecutionData.scenarioFlag,
-        scenarios: [multiExecutionData.batchInfo[0].suiteDetails],
-        testsuiteIds: [multiExecutionData.batchInfo[0].testsuiteId],
+        scenarios: multiExecutionData.batchInfo.map((item, index) => {return item.suiteDetails}),
+        testsuiteIds: multiExecutionData.batchInfo.map((item, index) => {return item.testsuiteId}),
         query: "insertscheduledata",
         scheduledby: invokinguser,
         poolid: poolid,
@@ -515,7 +517,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         recurringStringOnHover:	multiExecutionData.batchInfo[0].recurringStringOnHover,
         time: timeSelected,
         parentId: 0,
-        startDate: createdDate.toString()
+        startDate: createdDate.toString(),
+        configureKey: multiExecutionData.configureKey,
+        configureName: multiExecutionData.configureName
     };
 
     const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
@@ -531,8 +535,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 let timeValueString = "at " + timeValue.toString();
                 let timeStamp = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                body.executionData.batchInfo[0].parentId = scheduleId;
+                // body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                // body.executionData.batchInfo[0].parentId = scheduleId;
+                body.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
                 let result1 = exports.prepareSchedulingRequest(session, body);
                 schedFlag = result1;
 
@@ -546,8 +551,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     let timeValue = multiExecutionData.executionData.batchInfo[0].time;
                     let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                    multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                    // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    // multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                    multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
                     let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                     schedFlag = result1;
                     done();
@@ -568,8 +574,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 let timeValue = multiExecutionData['batchInfo'][0]['time'];
                 let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                body.executionData.batchInfo[0].parentId = scheduleId;
+                // body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                // body.executionData.batchInfo[0].parentId = scheduleId;
+                body.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
                 let result1 = exports.prepareSchedulingRequest(session, body);
                 schedFlag = result1;
 
@@ -583,8 +590,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     let timeValue = multiExecutionData.executionData.batchInfo[0].time;
                     let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                    multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                    // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    // multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                    multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
                     let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                     schedFlag = result1;
                     done();
@@ -605,8 +613,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
             let timeValue = multiExecutionData['batchInfo'][0]['time'];
             let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-            body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-            body.executionData.batchInfo[0].parentId = scheduleId;
+            // body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+            // body.executionData.batchInfo[0].parentId = scheduleId;
+            body.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
             let result1 = exports.prepareSchedulingRequest(session, body);
             schedFlag = result1;
 
@@ -620,8 +629,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 let timeValue = multiExecutionData.executionData.batchInfo[0].time;
                 let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                // multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
                 let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                 schedFlag = result1;
                 done();
@@ -662,8 +672,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 let timeValue = multiExecutionData['batchInfo'][0]['time'];
                 let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                body.executionData.batchInfo[0].parentId = scheduleId;
+                // body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                // body.executionData.batchInfo[0].parentId = scheduleId;
+                body.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
                 let result1 = exports.prepareSchedulingRequest(session, body);
                 schedFlag = result1;
 
@@ -701,8 +712,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                         let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
                         let timeValue = multiExecutionData.executionData.batchInfo[0].time;
                         let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                        multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                        multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                        // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                        // multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                        multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
                         let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                         schedFlag = result1;
                     }
@@ -728,8 +740,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 let timeValue = multiExecutionData['batchInfo'][0]['time'];
                 let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                body.executionData.batchInfo[0].parentId = scheduleId;
+                // body.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                // body.executionData.batchInfo[0].parentId = scheduleId;
+                body.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
                 let result1 = exports.prepareSchedulingRequest(session, body);
                 schedFlag = result1;
 
@@ -751,8 +764,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                         let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
                         let timeValue = multiExecutionData.executionData.batchInfo[0].time;
                         let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                        multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                        multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                        // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                        // multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                        multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
                         let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                         schedFlag = result1;
                     }
@@ -854,8 +868,9 @@ exports.reScheduleRecurringTestsuite = async () => {
                         let timeValue = multiExecutionData.executionData.batchInfo[0].time;
                         let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                        multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                        multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                        // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                        // multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                        multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = schd._id});
                         let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                         schedFlag = result1;
                         done();
@@ -884,8 +899,9 @@ exports.reScheduleRecurringTestsuite = async () => {
                         let timeValue = multiExecutionData.executionData.batchInfo[0].time;
                         let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                        multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                        multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                        // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                        // multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                        multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = schd._id});
                         let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                         schedFlag = result1;
                         done();
@@ -912,8 +928,9 @@ exports.reScheduleRecurringTestsuite = async () => {
                     let timeValue = multiExecutionData.executionData.batchInfo[0].time;
                     let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                    multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                    // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    // multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                    multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = schd._id});
                     let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                     schedFlag = result1;
                     done();
@@ -998,8 +1015,9 @@ exports.reScheduleRecurringTestsuite = async () => {
                             let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
                             let timeValue = multiExecutionData.executionData.batchInfo[0].time;
                             let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                            multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                            multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                            // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            // multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                            multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = schd._id});
                             let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                             schedFlag = result1;
                         }
@@ -1033,8 +1051,9 @@ exports.reScheduleRecurringTestsuite = async () => {
                             let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
                             let timeValue = multiExecutionData.executionData.batchInfo[0].time;
                             let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                            multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                            multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                            // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            // multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                            multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = schd._id});
                             let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                             schedFlag = result1;
                         }

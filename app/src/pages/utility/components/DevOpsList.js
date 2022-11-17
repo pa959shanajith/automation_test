@@ -22,7 +22,7 @@ import { prepareOptionLists } from './DevOpsUtils';
 
 
 
-const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading, setIntegrationConfig }) => {
+const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading, setIntegrationConfig, projectIdTypesDicts }) => {
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
@@ -51,18 +51,19 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [cyclesList, setCyclesList] = useState('');
     const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
     const[currentKey,setCurrentKey]=useState('')
-    
+    const [showCICD, setShowCICD] = useState(false);
+
 
     useEffect(()=>{
-                pluginApi.getProjectIDs()
-                .then(data => {
-                    console.log(data)
-                        setProjectData1(data.releases[0][0].name);
-                        setProjectData(data.releases[0][0].cycles[0]._id)
-                        console.log(data.releases[1][0].name)   
-                        console.log(data.releases[1][0].cycles[0]._id)     
+        pluginApi.getProjectIDs()
+        .then(data => {
+                setProjectData1(data.releases[0][0].name);
+                setProjectData(data.releases[0][0].cycles[0]._id)
+                console.log(data.releases[0][0].name)   
+                console.log(data.releases[0][0].cycles[0]._id)
+                projectIdTypesDicts[data.projectId[0]] === "Web" ? setShowCICD(true) : setShowCICD(false)
 
-        })},[])
+    })},[])
   
     useEffect(()=>{
         (async() => {
@@ -80,7 +81,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         }else{
             
             const arraynew = ProjectList.projectIds.map((element, index) => {
-            
                 return (
                     {
                         // code: element,
@@ -94,8 +94,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 )
             });
             setProjectList(arraynew);
-            let cycles = arraynew.map((item, index)=>item.key)
-            console.log(cycles)
             setSelectedProject(arraynew[0].key);
             setSelectedCycle(arraynew[0].key);
 
@@ -197,7 +195,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
 
         var myJsObj = {key: currentKey,
                 'executionType' : executionTypeInRequest}
-        var str = JSON.stringify(myJsObj, null, 4);
+            var str = JSON.stringify(myJsObj, null, 4);
             // const abc = {\n&nbps;&nbps;&nbps;&nbps;
             //     'key': str,
             //     \n&nbps;&nbps;&nbps;&nbps;'executionType' : 'asynchronous'
@@ -228,6 +226,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const onProjectChange = async (option) => {
         setLoading('Please Wait...');
         setSelectedProject(option.key);
+        projectIdTypesDicts[option.key] === "Web" ? setShowCICD(true) : setShowCICD(false)
         const configurationList = await fetchConfigureList({
             'projectid': option.key
         });
@@ -479,8 +478,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <SearchBox placeholder='Enter Text to Search' width='20rem' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                 </div>
                 <div className="api-ut__btnGroup">
-                    <button onClick={() => getCurrentQueueState() }>Manage Execution Queue</button>
-                            </div>
+                    { showCICD ? <button onClick={() => getCurrentQueueState() }>Manage Execution Queue</button> : null }
+                </div>
     
             </> }
             
@@ -532,18 +531,18 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <img onClick={() =>{onClick('displayBasic2');setCurrentKey(item.configurekey)}} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                         //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                         }}> Execute </button>&nbsp;&nbsp;&nbsp; */}
+                                         }}> Execute Now </button>&nbsp;&nbsp;&nbsp; */}
                                      {/* <button onClick={async ()=>{
                                          let temp = execAutomation(item.configurekey);
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
-                                     <img onClick={() =>{onClick('displayBasic1')}} src="static/imgs/Schedule.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
-                                     {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
-                                     <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon"/>
-                                     {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
+                                     <img onClick={() =>{onClick('displayBasic1', item)}} src="static/imgs/Schedule.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
+                                     {/* <button  onClick={() =>onClick('displayBasic1', item)}>  Schedule </button>&nbsp;&nbsp;&nbsp; */}
+                                     { showCICD ? <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon"/> : null }
+                                     {/* { showCICD ? <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> : null } */}
                                     </td>
                                     <td className="tkn-table__button" >
-                                        <img style={{marginRight: '8vh',height: '3vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
+                                        <img style={{marginRight: '8vh', height: '3vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
                                         <img style={{height: '3vh'}} onClick={() => onClickDeleteDevOpsConfig(item.configurename, item.configurekey)} src="static/imgs/DeleteIcon.svg" className="action_icons" alt="Delete Icon"/>
                                     </td>
                              </tr>)
@@ -560,15 +559,16 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <img onClick={() =>{onClick('displayBasic2');setCurrentKey(item.configurekey)}} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                        //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                                         }}> Execute </button>&nbsp;&nbsp;&nbsp; */}
+                                         }}> Execute Now </button>&nbsp;&nbsp;&nbsp; */}
                                      {/* <button onClick={async ()=>{
                                          let temp = execAutomation(item.configurekey);
                                          setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                      }}>Execute Now</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
-                                     <img onClick={() =>{onClick('displayBasic1')}} src="static/imgs/Schedule.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
-                                     {/* <button  onClick={() =>onClick('displayBasic1', item)}>Schedule</button>&nbsp;&nbsp;&nbsp; */}
-                                     <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon"/>
-                                     {/* <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> */}
+                                     
+                                     <img onClick={() =>{onClick('displayBasic1', item)}} src="static/imgs/Schedule.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
+                                     {/* <button  onClick={() =>onClick('displayBasic1', item)}>  Schedule </button>&nbsp;&nbsp;&nbsp; */}
+                                     { showCICD ? <img onClick={() =>{onClick('displayBasic');setCurrentKey(item.configurekey)}} src="static/imgs/CICD.png" className="action_icons" alt="Edit Icon"/> : null }
+                                     {/* { showCICD ? <button  onClick={() =>onClick('displayBasic')}> CI / CD </button> : null } */}
                                     </td>
                                     <td className="tkn-table__button" >
                                         <img style={{marginRight: '8vh'}} onClick={() => handleEdit(item)} src="static/imgs/EditIcon.svg" className="action_icons" alt="Edit Icon"/> 
