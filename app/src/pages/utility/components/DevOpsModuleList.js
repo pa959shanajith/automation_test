@@ -179,15 +179,15 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
 
         //clicked on scenario
         if(targetnode.isLeaf){
-            if(notexe[targetnode.parent.value] == undefined) {
-                notexe[targetnode.parent.value] = []
+            if(notexe.current[targetnode.parent.value] == undefined) {
+                notexe.current[targetnode.parent.value] = []
             }
             if(targetnode.checked)
-                notexe[targetnode.parent.value].push(targetnode.index)
+                notexe.current[targetnode.parent.value].push(targetnode.index)
             else{
-                const index = notexe[targetnode.parent.value].indexOf(targetnode.index);
+                const index = notexe.current[targetnode.parent.value].indexOf(targetnode.index);
                 if (index > -1) { 
-                    notexe[targetnode.parent.value].splice(index, 1);
+                    notexe.current[targetnode.parent.value].splice(index, 1);
                 }
             }
         }
@@ -195,36 +195,27 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
             //condition for clicking on batch
             if(targetnode.value === targetnode.label) {
                 for(let module of targetnode.children) {
-                    notexe[module.value] = []
+                    notexe.current[module.value] = []
                     for(let i = 0;i<module.children.length;i++){
-                        notexe[module.value].push(i);
+                        notexe.current[module.value].push(i);
                     }
                 }
             }
             else{
-                notexe[targetnode.value] = []
+                notexe.current[targetnode.value] = []
                 for(let i = 0;i<targetnode.children.length;i++){
-                    notexe[targetnode.value].push(i);
+                    notexe.current[targetnode.value].push(i);
                 }
             }
         }
 
         if(selectedTab === 'all') {
-            // let scenarioLength = notexe.current[targetnode.value].length;
-            // for(let i = 0;i<scenarioLength;i++) {
-            //     notexe.current[targetnode.value][i] = 1;
-            // }
-            // if(targetnode.children == undefined) {
-            //     notexe.current[targetnode.parent.value][targetnode.index] = 1;
-            // }
             setIntegrationConfig({ ...integrationConfig, scenarioList: checked, notexe });
         }
         else if(selectedTab === 'selected') {
-            // notexe.current[targetnode.parent.value][targetnode.index] = 1;
             setIntegrationConfig({ ...integrationConfig, scenarioList: checked, notexe });
         }
         else if(selectedTab === 'unselected') {
-            // notexe.current[targetnode.parent.value][targetnode.index] = 0;
             setIntegrationConfig({ ...integrationConfig, scenarioList: [...integrationConfig.scenarioList, ...checked], notexe });
             setModuleState({...moduleState, checked: [...integrationConfig.scenarioList, ...checked]});
             return;
