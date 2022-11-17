@@ -354,6 +354,7 @@ const DevOpsConfig = props => {
             avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'a_') ? [integrationConfig.avoAgentGrid.slice(2)] : [],
             integration: integration,
             batchInfo: batchInfo,
+            donotexe: integrationConfig.notexe,
             scenarioFlag: false
         });
         if(storeConfig !== 'success') {
