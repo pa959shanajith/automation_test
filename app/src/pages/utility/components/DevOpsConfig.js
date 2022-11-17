@@ -22,6 +22,11 @@ const DevOpsConfig = props => {
     const [dataDict, setDict] = useState({});
     const dataParametersCollection = [];
     const [error, setError] = useState({});
+    const [showSelectBrowser, setShowSelectBrowser] = useState(false);
+
+    useEffect(() => {
+        props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web" ? setShowSelectBrowser(true) : setShowSelectBrowser(false)
+    }, [])
     if(props.currentIntegration && props.currentIntegration.executionRequest && props.currentIntegration.executionRequest.batchInfo){
         if(props.currentIntegration.selectedModuleType === 'normalExecution')
             for (let info of props.currentIntegration.executionRequest.batchInfo) {
@@ -558,7 +563,7 @@ const DevOpsConfig = props => {
                             width='54%'
                         />
                     </div>
-                    <div>
+                    { showSelectBrowser && <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_browser">Select Browsers : </label>
                         <MultiSelectDropdown
                             hideSelectAll
@@ -570,7 +575,7 @@ const DevOpsConfig = props => {
                             selectedKeys={integrationConfig.browsers}
                             width='54%'
                             />
-                    </div>
+                    </div> }
                     <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_integration">Integration : </label>
                         <SearchDropdown

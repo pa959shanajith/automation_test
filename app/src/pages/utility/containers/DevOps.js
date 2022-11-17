@@ -63,7 +63,7 @@ const DevOps = props => {
     return (<>
         { showConfirmPop && <ConfirmPopup /> }
         {loading?<ScreenOverlay content={loading}/>:null}
-        {currentIntegration ? <DevOpsConfig url={api} setCurrentIntegration={setCurrentIntegration} currentIntegration={currentIntegration} showMessageBar={showMessageBar} setLoading={setLoading} /> : <DevOpsList url={api} setShowConfirmPop={setShowConfirmPop} setCurrentIntegration={setCurrentIntegration} showMessageBar={showMessageBar} setLoading={setLoading} projectIdTypesDicts={projectIdTypesDicts} /> }
+        {currentIntegration ? <DevOpsConfig url={api} setCurrentIntegration={setCurrentIntegration} currentIntegration={currentIntegration} showMessageBar={showMessageBar} setLoading={setLoading} projectIdTypesDicts={projectIdTypesDicts} /> : <DevOpsList url={api} setShowConfirmPop={setShowConfirmPop} setCurrentIntegration={setCurrentIntegration} showMessageBar={showMessageBar} setLoading={setLoading} projectIdTypesDicts={projectIdTypesDicts} /> }
 {/*         
         <div className={classes["api-ut_contents"]}>
         <div className={classes["api-ut__ab"]}>
