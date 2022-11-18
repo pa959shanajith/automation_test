@@ -31,7 +31,7 @@ const ScrapeObjectList = (props) => {
     const [editableObj, setEditableObj] = useState({});
     const [dnd, setDnd] = useState(false);
     const[captureButton, setCaptureButton]=useState("");
-    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, setOrderList, startScrape, } = useContext(ScrapeContext);
+    const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, setOrderList, startScrape, setShowAppPop} = useContext(ScrapeContext);
 
     useEffect(()=> {
         // setActiveEye(null);
@@ -463,7 +463,7 @@ const ScrapeObjectList = (props) => {
                         (disableAction || compareFlag ? " disable-thumbnail" : "")
                       }
                     ></div>
-                    <div style={{  marginLeft: '10px',marginTop:'23px',  boxSizing:'40px'  }}>
+                    { props.appType === "Web" ? <div style={{  marginLeft: '10px',marginTop:'23px',  boxSizing:'40px'  }}>
                       {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                       <NormalDropDown 
                       style={{height:'25px',marginLeft:'30px', marginBottom: '21px', boxSizing:'40px', fontFamily:'LatoWeb' , width:'200px'}}
@@ -529,13 +529,29 @@ const ScrapeObjectList = (props) => {
                               text: "Edge Chromium",
                             },
                           ]}
-                          placeholder="Select Browser"
-                          width="185px"
-                          
-                        />
+                        placeholder="Select Browser"
+                        width="185px"
+                        
+                      />
                         
                       
-                    </div>
+                    </div> :
+                    props.appType==="Desktop" ? 
+                    <div className={'desktop_btn'+(disableAction || compareFlag ? " disable-thumbnail" : "")}>
+                        <p onClick={() => {setShowAppPop({'appType': 'Desktop', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Desktop Apps</span></p>
+                    </div>: 
+                    props.appType==="OEBS"? <div className='desktop_btn'>
+                    <p onClick={() => {setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Oebs Apps</span></p>
+                    </div>:
+                    props.appType==="SAP"?<div className='desktop_btn'>
+                    <p onClick={() => {setShowAppPop({'appType': 'SAP', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
+                    </div>:
+                    props.appType==="MobileApp"?<div >
+                    <p className='mobileApp_btn'  onClick={() => {setShowAppPop({'appType': 'MobileApp', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img style={{height:'25px', width:'20px'}} src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
+                    </div>:
+                    props.appType==="MobileWeb"?<div className='mobileApp_btn'>
+                    <p onClick={() => {setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}}src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>MobileWeb Apps</span></p>
+                    </div>:""}
                   
                     <div key="append-edit" className={"ss__thumbnail"} >
                       <input
@@ -558,7 +574,7 @@ const ScrapeObjectList = (props) => {
                     </div>
                   
 
-                    <Button label="Capture" className="p-button-warning" onClick={()=>{startScrape(captureButton)}} style={{ marginLeft: '26px', marginBottom: '42px'}} />
+                    <Button label="Capture" className="p-button-warning" onClick={()=>{startScrape(captureButton)}} style={{ marginLeft: '26px', marginBottom: '50px'}} />
 
 
 
