@@ -29,3 +29,125 @@ exports.updateAccessibilitySelection = async function(req, res){
 		return res.send("fail");
 	}
 }
+exports.userCreateProject_ICE = async (req, res) =>{
+    const fnName = "userCreateProject_ICE";
+    logger.info("Inside UI service: userCreateProject_ICE ");
+
+    var status = "fail";
+    const regEx= /[~*+=?^%<>()|\\|\/]/;
+    const createProjectObj=req.body;
+		if (regEx.test(createProjectObj.projectName)) {
+			logger.error("Error occurred in admin/"+fnName+": Special characters found in project name");
+			return res.send("invalid_name_spl");
+		}
+		for(let rel of createProjectObj.releases) {
+			if (regEx.test(rel.name)) {
+				logger.error("Error occurred in admin/"+fnName+": Special characters found in release name");
+				return res.send("invalid_name_spl");
+			} else {
+				for (let cyc of rel.cycles) {
+					if(regEx.test(cyc.name)) {
+						logger.error("Error occurred in admin/"+fnName+": Special characters found in cycle name");
+						return res.send("invalid_name_spl");
+					}
+				}
+			}
+		}
+        const userid = req.session.userid;
+		const roleId = req.session.activeRoleId;
+        createProjectObj.assignedUsers[userid] = true;
+		const inputs = {
+			name: createProjectObj.projectName,
+			domain: createProjectObj.domain,
+			type: createProjectObj.appType,
+			releases: createProjectObj.releases,
+            assignedUsers:createProjectObj.assignedUsers,
+			createdby: userid,
+			createdbyrole: roleId,
+			modifiedby: userid,
+			modifiedbyrole: roleId
+		};
+
+    try {
+
+        var result = await utils.fetchData(inputs,"/plugins/userCreateProject_ICE",fnName);
+
+        if(result != 'fail') status = "success";
+
+        return res.send(status);
+
+       
+
+    } catch(exception) {
+
+        logger.error("Error occurred in creating project :", exception);
+
+        return res.send("fail");
+
+    }
+
+};
+exports.userUpdateProject_ICE = async (req, res) =>{
+    const fnName = "userUpdateProject_ICE"
+    logger.info("Inside UI service: updateProject_ICE ");
+    const createProjectObj=req.body;
+    var status = "fail";
+    const userid = req.session.userid;
+    const roleId = req.session.activeRoleId;
+    const inputs = {
+        project_id: createProjectObj.project_id,
+        domain: createProjectObj.domain,
+        type: createProjectObj.appType,
+        releases: createProjectObj.releases,
+        assignedUsers:createProjectObj.assignedUsers,
+        createdby: userid,
+        createdbyrole: roleId,
+        modifiedby: userid,
+        modifiedbyrole: roleId
+    };
+
+    try {
+
+        var result = await utils.fetchData(inputs,"/plugins/userUpdateProject_ICE", fnName);
+
+        if(result != 'fail') status = "success";
+
+        return res.send(status);
+
+       
+
+    } catch(exception) {
+
+        logger.error("Error occurred in updating project :", exception);
+
+        return res.send("fail");
+
+    }
+
+};
+
+ 
+
+exports.getUsers_ICE = async (req, res) =>{
+    const fnName = "getUsers_ICE"
+    logger.info("Inside UI service: getUsers_ICE ");
+
+    var status = "fail";
+
+    try {
+
+        var result = await utils.fetchData({"project_id":req.body.project_id},"/plugins/getUsers_ICE",fnName);
+
+        if(result != 'fail') status = "success";
+
+        return res.send(result);
+
+    } catch(exception) {
+
+        logger.error("Error occurred in getting users list:", exception);
+
+        return res.send("fail");
+
+    }
+
+};

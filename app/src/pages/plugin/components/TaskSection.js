@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useRef} from 'react';
 // import {getUserDetails} from '../api';
 import { useSelector } from 'react-redux';
 import { useHistory, Redirect } from 'react-router-dom';
@@ -27,6 +27,7 @@ import { text } from 'body-parser';
 import { RadioButton } from 'primereact/radiobutton'
 // import useOnClickOutside from './UseOnClickOutside'
 // import * as actionTypes from '../state/action';
+// import {userCreateProject_ICE} from '../api';
 
 
 // import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -57,7 +58,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [selectedTab, setSelectedTab] = useState('windows');
     const [selectedProject, setSelectedProject] = useState(null);
     const [appType, setAppType] = useState(null);
-    const [allProjects, setAllProjects] = useState({});
+    const [projectsDetails, setProjectsDetails] = useState({});
     const [projModules, setProjModules] = useState([]);
     const [assignProj,setAssignProj] = useState({allProjectAP:[],assignedProjectAP:[]});
     const [unAssignedFlag,setUnAssignedFlag] = useState(false);
@@ -67,16 +68,22 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     // const [getAvailablePlugins,setAvailablePlugins]=useState([]);
     const [getProjectList,setProjectList]=useState([]);
     const [getplugins_list,setplugins_list]=useState([]);
+    const [projectName, setProjectName] = useState("");
     // const [selDomainOptions,setSelDomainOptions] = useState([])
     // const [loading,setLoading] = useState(false)
    
     const [projectNames, setProjectNames] = useState(null);
     const [projectId,setprojectId]=useState(null);
     const [loading,setLoading] = useState(false)
-    const [createProjectCheck,setCreateProjectCheck]=useState(false);
+    const [createProjectCheck,setCreateProjectCheck]=useState(true);
+    const [isCreate, setisCreate]=useState(false);
 
     const [createProj, setCreateProj] = React.useState(true);
     const [ModifyProj, setModifyProj] = React.useState(true);
+    const [createprojectObj,setcreateprojectObj]=useState([]);
+    const [assignedUsers, setAssignedUsers] = useState({});   
+    const [unassignedUsers, setUnassignedUsers] = useState([]);
+    const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
 
     // const userConf = useSelector(state=>state.admin.userConf)
     // const node = useRef();
@@ -88,7 +95,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
       };
 
       const handleModifyChange = () => {
-        setCreateProjectCheck(false)
+        setCreateProjectCheck(false);
+        setAssignedUsers({});
       };
     
 
@@ -136,18 +144,26 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         
     // },[]);
 
+    // useEffect(()=>{
+    //     (async () => {
+    //         const res= await pluginApi.userCreateProject_ICE();
+    //     })()
+    // },[])
+
     useEffect(()=>{
         (async() => {
-            const UserList =  await pluginApi.getUserDetails("user");
-        if(UserList.error){
+            let userListFromApi =  await pluginApi.getUserDetails("user");
+        if(userListFromApi.error){
             setMsg(MSG.CUSTOM("Error while fetching the user Details"));
         }else{
-            setUserDetailList(UserList);
+            setUserDetailList(userListFromApi);
+            
         }
 
         console.log("UserDetailsList");
-        console.log(UserList);
+        console.log(userListFromApi);
             const ProjectList = await getProjectIDs(["domaindetails"],["Banking"]);
+            setProjectsDetails(ProjectList)
         // ProjectList = {
         //     "projectIds":["62e27e5887904e413dad10fe", "62e27e5887904e413dad10ff"],
         //     "projectNames":["avangers", "avangers2"]
@@ -226,7 +242,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         // console.log(plugins_list);
         })()
         
-    },[]);
+    },[])
   
 
   
@@ -301,6 +317,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         }
     }, [userInfo, userRole]);
 
+     
     const resetStates = () => {
         setShowSearch(false);
         setActiveTab("todo");
@@ -489,7 +506,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             </div>
             <div>
             
-            <Button  style={{ background: "transparent", color: "#643693", border: "none", padding:" 8px 16px", FontSize:"16px",marginLeft:"380px",marginTop:"10px",fontFamily:"LatoWeb",fontStyle:"normal",lineHeight:"16px"}} label="Manage Project(s)"  onClick={() => onClick('displayBasic')} />
+            <Button  style={{ background: "transparent", color: "#643693", border: "none", padding:" 8px 16px", FontSize:"16px",marginLeft:"380px",marginTop:"10px",fontFamily:"LatoWeb",fontStyle:"normal",lineHeight:"16px"}} label="Manage Project(s)"  onClick={() =>{setUnassignedUsers([]);setProjectAssignedUsers([]);setAssignedUsers({});setProjectName("");setAppType(null);setSelectedProject(null); setCreateProjectCheck(true); setAssignedUsers({}); onClick('displayBasic')}} />
             
             </div>
             <div>
@@ -499,7 +516,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 return <>
 <div key={idx} style={{display:'flex',justifyContent:'space-between',borderBottomStyle:'ridge'}}>
 <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")} style={{display:"flex", flexDirection:"column"}}>
-            <span title={projectNames && singleProj} style={{marginTop: '1.5vh'}}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
+            <span title={projectNames && singleProj} style={{marginTop: '1vh',marginBottom:'1vh'}}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
             {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
 <div className='button-design'>
             
@@ -534,16 +551,35 @@ return <>
         <div>
 
       <form>
-        <div className='Radiobutton_des'>
+
+      <div className="ss__radioContainer">
+
+        <label>
+
+            <input type="radio" checked={createProjectCheck === true} value="create" onChange={ handleCreateChange } />
+
+            <span>Create Project</span>
+
+        </label>
+        <label>
+
+        <input type="radio" checked={createProjectCheck === false} value="modify" onChange={ handleModifyChange } />
+
+        <span>Modify Project</span>
+
+        </label>
+        </div>
+        {/* <div className='Radiobutton_des'>
         
         <div className="radio"  >
             
           <label style={{ marginRight: '2rem' }} >
             
-            <RadioButton style={{marginRight:'0.3rem',fontSize:'16px',fontFamily:'LatoWeb'}}
+            <RadioButton style={{marginRight:'0.3rem',fontSize:'16px',fontFamily:'LatoWeb' }}
              label="Create"
              value={createProj}
-             onChange={handleCreateChange}/>
+             onChange={handleCreateChange}
+             />
              Create Project
           </label>
           <label >
@@ -551,10 +587,11 @@ return <>
               label="Modify"
              value={ModifyProj}
              onChange={handleModifyChange} />
+ 
              Modify Project
             </label>
-        </div>
-       </div>
+        </div> */}
+       {/* </div> */}
         
         
       </form>
@@ -569,11 +606,21 @@ return <>
                     isCreate == true ? <TextField /> : <NormalDropDown /> 
                 } */}
                 {
-                    createProjectCheck ? <TextField label='Enter Project Name'  width='19rem' placeholder='Enter Project Name' fontStyle='LatoWeb' FontSize='16px' /> : <NormalDropDown
+                    createProjectCheck ? <TextField label='Enter Project Name'  width='300px' placeholder='Enter Project Name' fontStyle='LatoWeb'  onChange={(e)=>{setProjectName(e.target.value)}} FontSize='16px'  /> : 
+                    <NormalDropDown
                         label="Select Project Name"
                         options={getProjectList}
-                        
-                            
+                        onChange={async(e,item) =>{
+                            setSelectedProject(item.key)
+                            const users_obj = await pluginApi.getUsers_ICE(item.key);
+                            debugger
+                            // const assigned = {};
+                            // users_obj["assignedUsers"].forEach((user_obj)=> {assigned[user_obj._id]=true})
+                            // setAssignedUsers(assigned);
+                            setUnassignedUsers(users_obj["unassignedUsers"]);
+                            setProjectAssignedUsers(users_obj["assignedUsers"]);
+                        }}
+                        selectedKey={selectedProject}    
                         placeholder="Select Project"
                         standard
                         width="300px"
@@ -603,14 +650,14 @@ return <>
                         options={getplugins_list}
                         // disabled={true}
                         
-                        label1="Apptype"
-                        options1={[selectedProject && allProjects[selectedProject] ?
-                                {
-                                    key: allProjects[selectedProject].apptype,
-                                    text: allProjects[selectedProject].apptypeName
-                                }
-                            : {}
-                        ]}
+                        // label1="Apptype"
+                        // options1={[selectedProject && allProjects[selectedProject] ?
+                        //         {
+                        //             key: allProjects[selectedProject].apptype,
+                        //             text: allProjects[selectedProject].apptypeName
+                        //         }
+                        //     : {}
+                        // ]}
                         placeholder="Select Apptype"
                         width="300px"
                         top="300px"
@@ -620,10 +667,10 @@ return <>
                         // disabled={!selectedProject}
                         // required
                         onChange={(e, item) => {
-                        setAppType(item.text)
+                        setAppType(item)
                         }}
                 
-                    /> : <TextField label='Selected App Type' value='Web' width='19rem' />
+                    /> : <TextField label='Selected App Type' disabled value={selectedProject ?projectsDetails["appTypeName"][projectsDetails["projectId"].indexOf(selectedProject)]:""} width='19rem' />
                 }
             </div>
             
@@ -645,21 +692,117 @@ return <>
                         :null
                     }
                 </div> */}
-                                {userDetailList.map((user, index) => (
-                                        <div key={index} className='display_project_box_list'>
-                                            
-                                            <input type='checkbox' value={JSON.stringify(user[0])}></input>
-                                            <span >{user[0]}</span>
-                                            
-                                            {/* <option key={user[0]} value={JSON.stringify(user)} >{user[0]} </option> */}
+                <div >
+                {createProjectCheck && userDetailList.map((user, index) => (
+                                        <div key={index} className='display_project_box_list' style={{}} >                                           
+                                            <input type='checkbox' disabled={userInfo.user_id === user[1] } defaultChecked={userInfo.user_id === user[1]} value={user[0]} onChange={(e)=>{
+                                                if(e.target.checked) {setAssignedUsers({...assignedUsers, [user[1]]:true}) }
+                                                else{
+                                                    setAssignedUsers((prevState)=>{
+                                                        delete prevState[user[1]]
+                                                        return prevState;
+                                                    }) 
+                                                }}} />
+
+                                            <span >{user[0]} </span>
                                         </div> 
-                                         
-                                ) )}
+                                        // </ScrollBar>
+                    ) )}
+                                {!createProjectCheck && selectedProject && projectAssignedUsers.length>0 && projectAssignedUsers.map((user_obj,index)=>{
+                                    return (
+                                        <div key={index} className='display_project_box_list' style={{}} >                                           
+                                        <input type='checkbox' disabled={userInfo.user_id === user_obj["_id"] } defaultChecked={true} value={user_obj["name"]} onChange={(e)=>{
+                                            if(e.target.checked) {
+                                                setAssignedUsers((prevState)=>{
+                                                    delete prevState[user_obj["_id"]];
+                                                    return prevState;
+                                                }) 
+                                            }
+                                            else{
+                                                setAssignedUsers((prevState)=>{
+                                                    prevState[user_obj["_id"]] = false;
+                                                    return prevState;
+                                                }) 
+                                            }}} />
+
+                                        <span >{user_obj["name"]} </span>
+                                    </div> 
+                                    )
+                                })}
+                                <hr></hr>
+                                {!createProjectCheck && selectedProject && unassignedUsers.length>0 && unassignedUsers.map((user_obj,index)=>{
+                                    return (
+                                        <div key={index} className='display_project_box_list' style={{}} >                                           
+                                        <input type='checkbox' disabled={userInfo.user_id === user_obj["_id"] } defaultChecked={false} value={user_obj["name"]} onChange={(e)=>{
+                                            if(e.target.checked) {setAssignedUsers({...assignedUsers, [user_obj["_id"]]:true}) }
+                                            else{
+                                                setAssignedUsers((prevState)=>{
+                                                    delete prevState[user_obj["_id"]] 
+                                                    return prevState;
+                                                }) 
+                                            }}} />
+
+                                        <span >{user_obj["name"]} </span>
+                                    </div> 
+                                    )
+                                })}
+                                  </div>
                             </div>
                     </div>
                     <div>
                         <div>
-                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px" }} onClick={()=>{}}>{createProjectCheck ? 'Create' : 'Modify'}</button>
+                            <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px",marginTop:'-0.9rem' }} 
+                            onClick={async()=>{
+                                debugger;
+                               if(createProjectCheck){
+                                    try{
+                                        const config = {
+                                            projectName,
+                                            domain: "banking",
+                                            appType:appType? appType.text:undefined,
+                                            releases: [{"name":"R1","cycles":[{"name":"C1"}]}],
+                                            assignedUsers
+                                        }
+                                        const res= await pluginApi.userCreateProject_ICE(config)
+                                        setMsg(MSG.CUSTOM("Project Created Successfully","success"));
+                                        onHide('displayBasic');
+                                        try{
+                                            const ProjectList = await getProjectIDs();
+                                            setProjectNames(ProjectList);
+                                        }catch(err) {
+                                            console.log(err)
+                                        }
+                                    }
+                                    catch(err){
+                                        setMsg(MSG.CUSTOM("Failed to create Project","error"));
+                                        console.log(err);
+                                    }
+                                }
+                                else {
+                                    try{
+                                        const config = {
+                                           "project_id": selectedProject,
+                                            domain: "banking",
+                                            appType:appType? appType.text:undefined,
+                                            releases: [{"name":"R1","cycles":[{"name":"C1"}]}],
+                                            assignedUsers
+                                        }
+                                        const res= await pluginApi.userUpdateProject_ICE(config)
+                                        setMsg(MSG.CUSTOM("Project Modified Successfully","success"));
+                                        onHide('displayBasic');
+                                        try{
+                                            const ProjectList = await getProjectIDs();
+                                            setProjectNames(ProjectList);
+                                        }catch(err) {
+                                            console.log(err)
+                                        }
+                                    }
+                                    catch(err){
+                                        setMsg(MSG.CUSTOM("Failed to create Project","error"));
+                                        console.log(err);
+                                    }
+                                }
+                            }}>{createProjectCheck ? 'Create' : 'Modify'}</button>
                         </div>  
                     </div>
  

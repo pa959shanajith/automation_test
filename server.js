@@ -506,6 +506,9 @@ if (cluster.isMaster) {
 		app.post('/connectJira_ICE', auth.protect, report.connectJira_ICE);
 		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		//Plugin Routes
+		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
+        app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);
+        app.post('/getUsers_ICE', auth.protect, plugin.getUsers_ICE)
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', auth.protect, taskbuilder.getTaskJson_mindmaps);
 		app.post('/updateTaskstatus_mindmaps', auth.protect, taskbuilder.updateTaskstatus_mindmaps);
