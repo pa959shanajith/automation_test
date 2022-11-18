@@ -158,6 +158,148 @@ export const getTaskJson_mindmaps = obj => {
     });
 }
 
+export const userCreateProject_ICE = (details) => {
+
+    return new Promise((resolve, reject)=> {
+
+        axios(url+"/userCreateProject_ICE", {
+
+            method: 'POST',
+
+            headers : {
+
+                'Content-type' : 'application/json'
+
+            },
+
+            data : {'action': 'createProject_ICE', 'allflag': true, ...details},
+
+            credentials : 'include',
+
+        })
+
+        .then(res=>{
+
+            if (res.status === 200){
+
+                resolve(res.data);
+
+            }
+
+            else{
+
+                reject(res.status)
+
+            }
+
+        })
+
+        .catch(err => {
+
+            reject(err);
+
+        })
+
+    })
+
+}
+
+ 
+
+export const userUpdateProject_ICE = (data) => {
+
+    return new Promise((resolve, reject)=> {
+
+        axios(url+"/userUpdateProject_ICE", {
+
+            method: 'POST',
+
+            headers : {
+
+                'Content-type' : 'application/json'
+
+            },
+
+            data : {'action': 'userUpdateProject_ICE', 'allflag': true, ...data},
+
+            credentials : 'include',
+
+        })
+
+        .then(res=>{
+
+            if (res.status === 200){
+
+                resolve(res.data);
+
+            }
+
+            else{
+
+                reject(res.status)
+
+            }
+
+        })
+
+        .catch(err => {
+
+            reject(err);
+
+        })
+
+    })
+
+}
+
+ 
+
+export const getUsers_ICE = (project_id) => {
+
+    return new Promise((resolve, reject)=> {
+
+        axios(url+"/getUsers_ICE", {
+
+            method: 'POST',
+
+            headers : {
+
+                'Content-type' : 'application/json'
+
+            },
+
+            data : {'action': 'getUsers_ICE', 'allflag': true,project_id},
+
+            credentials : 'include',
+
+        })
+
+        .then(res=>{
+
+            if (res.status === 200){
+
+                resolve(res.data);
+
+            }
+
+            else{
+
+                reject(res.status)
+
+            }
+
+        })
+
+        .catch(err => {
+
+            reject(err);
+
+        })
+
+    })
+
+}
+
 
 export const getMappedDiscoverUser = async(data) => {
     try{
