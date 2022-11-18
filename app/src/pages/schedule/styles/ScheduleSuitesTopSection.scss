@@ -20,7 +20,7 @@
     // margin-left: -411px;
     display: flex;
     flex-direction: row-reverse;
-    justify-content: start;
+    justify-content: flex-start;
 }
 .scheduleSuite .ipContainer{
 	float: right;
@@ -42,8 +42,9 @@
     font-family: $avoFont;
 }
 .scheduleSuite .timePicContainer{
-    position: relative; display: inline-block;
-    float: right;
+    position: relative; 
+    display: inline-block;
+    // float: right;
     margin-right: 10px;
     font-size: 14px;
     font-family: $avoFont;
