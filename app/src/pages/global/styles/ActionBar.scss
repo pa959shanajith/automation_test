@@ -16,7 +16,9 @@
   }
 
   .ab__upper_contents {
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid grey;
+    padding-bottom: 38px;
+    
   }
 
   .action__contents {
@@ -102,9 +104,10 @@
 
 .ab__bottom_contents{
     font-size: 16px;
+    margin: 7px 31px 7px 10px;
     .thumbnail__title{
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 500;
         font-family: Mulish;
     }
     .thumbnail{

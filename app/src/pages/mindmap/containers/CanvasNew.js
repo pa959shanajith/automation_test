@@ -18,6 +18,7 @@ import * as actionTypes from '../state/action';
 import '../styles/MindmapCanvas.scss';
 // import TaskBox from '../components/TaskBox';
 import {Dialog} from '@avo/designcomponents';
+import * as pluginApi from '../../plugin/api';
 
 
 /*Component Canvas
@@ -63,6 +64,8 @@ const CanvasNew = (props) => {
     const [reuseDelContent,setReuseDelContent] = useState()
     const[endToEndDelConfirm,setEndToEndDelConfirm]=useState(false)
     const [verticalLayout,setVerticalLayout] = useState(true)
+    const [appType, setAppType] = useState("");
+    const proj = useSelector(state=>state.mindmap.selectedProj)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
@@ -74,10 +77,18 @@ const CanvasNew = (props) => {
 
     useEffect(()=>{
         //useEffect to clear redux data selected module on unmount
+        pluginApi.getProjectIDs()
+            .then(data => {
+                debugger
+                let projectIndex = data.projectId.findIndex((project_id)=> project_id===proj)
+                setAppType(data.appTypeName[projectIndex])
+            }).catch(error=>{
+                console.log(error)
+            })
         return ()=>{
             // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         }
-    },[dispatch])
+    },[])
     useEffect(() => {
         var tree;
         count = {
@@ -438,7 +449,7 @@ const CanvasNew = (props) => {
             onDecline={() => console.log(false)}
             onConfirm = {() => { }} 
             >
-                <div style={{ height: '120rem', overFlow:" hidden" }}><ScrapeScreen /></div>
+                <div style={{ height: '120rem', overFlow:" hidden" }}><ScrapeScreen appType={appType} /></div>
             </Dialog>
 
             <Dialog
@@ -448,7 +459,7 @@ const CanvasNew = (props) => {
             title ={taskname  +  " : Design Test Setup"}  
             minWidth = '58rem' 
             onConfirm = {() => { }} >
-                <div style={{ height: '623px'}}><DesignHome /></div>
+                <div style={{ height: '623px'}}><DesignHome appType={appType} /></div>
             </Dialog>
 
             

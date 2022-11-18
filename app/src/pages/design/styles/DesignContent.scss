@@ -77,13 +77,13 @@
 .d__taskBtns{
     display: flex;
     align-items: center;
-    margin-left:-2px;
+    margin-left:6px;
     flex-grow: 1;
     font-size: 13px;
 }
 .p-button-warning{
 
-    margin: 48px 7px 53px 196px;
+    margin: 50px 47px 51px 19px;
 }
 
 .d__taskBtn{
@@ -95,8 +95,15 @@
         cursor: not-allowed;
     }
 }
-
-
+.debug_button{
+    margin-left: 15px;
+    position: sticky;
+    /* top: 47px; */
+    margin-top: 10px;
+}
+// .d__content_wrap{
+//     display: flex;
+// }
 
 
 // .d__submitBtn{
@@ -290,7 +297,9 @@
 .p-button.p-button-warning{
 
     height:25px;
-    width: 70px;
+    width: 80px;
+    // top: 23px;
+    // left: 71px;
 }
 
 .dropdownItem-210 .ms-Button-flexContainer {
@@ -301,6 +310,29 @@
 .dropdownItemSelected-217:hover{
     font-size: 15px;
     font-family: 'LatoWebMedium'; 
+}
+
+.mobileAppDesign_btn {
+    margin-Left: 2px;
+    margin-Bottom: -16px;
+    font-family: "LatoWeb";
+    padding-left: 16px;
+    background: white;
+    border: none;
+    color: black;
+    margin-right: -92px;
+}
+.desktopAppDesign_btn {
+    margin-Left: -3px;
+    margin-Bottom: 2px;
+    width: 200px;
+    font-family: "LatoWeb";
+    padding-left: 14px;
+    background: white;
+    border: none;
+    color: black;
+    margin-right: -128px;
+    height: 22px;
 }
 
 // .breadcrumb-item {

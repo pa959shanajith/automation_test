@@ -13,7 +13,7 @@ import "../styles/DesignHome.scss";
     Props: None
 */
 
-const DesignHome = () => {
+const DesignHome = (props) => {
     
     const current_task = useSelector(state=>state.plugin.CT)
     const filter_data = useSelector(state=>state.plugin.FD)
@@ -111,6 +111,7 @@ const DesignHome = () => {
                                 setMirror={setMirror}
                                 setShowConfirmPop={setShowConfirmPop}
                                 setDisableActionBar={setDisableActionBar}
+                                appType = {props.appType}
                                 />
                 
                 {/* <ReferenceContent data-test="d__refBar" mirror={mirror}/> */}

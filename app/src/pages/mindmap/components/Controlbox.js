@@ -157,6 +157,7 @@ const ControlBox = (props) => {
     //     props.setTaskBox(props.nid);
     //     props.setCtrlBox(false);
     // };
+    
 
     return(
         <>
@@ -186,8 +187,8 @@ const ControlBox = (props) => {
                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
                <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" onClick={editNode}></p>
-               <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" style={{ width: "-webkit-fill-available",height: 24,lineHeight: 1.5, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom:-4,paddingBottom: '18%'}} onClick={deleteNode}></p>
-               <p data-test="captureelements"  className="ct-ctrl fa fa-camera-retro" onClick={() =>props.setShowScrape(true)}  style={{textAlign: 'center'}}><> Capture Element </></p>
+               <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode}></p>
+               <p data-test="captureelements"  className="ct-ctrl fa fa-camera-retro" onClick={() =>props.setShowScrape(true)}  style={{ width: "-webkit-fill-available",height: 24,lineHeight: 1.5, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom:-4,paddingBottom: '18%'}}><> Capture Element </></p>
                {/* <p data-test="assign"  className="ct-ctrl fa fa-user-o" style={{width: "-webkit-fill-available",height: 24, marginLeft: 0, marginRight: 0, borderTop: "2px solid #5B5A59", marginBottom: 8,paddingBottom: '20%'}} onClick={Assign}><>  Assign </></p> */}
                {/* <p data-test="debug"  className="ct-ctrl fa fa-play"  onClick={() => {}}> Debug </p> */}
             </div>   : ""}</ClickAwayListener>
