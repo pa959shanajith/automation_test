@@ -10,7 +10,10 @@ import index from 'uuid-random';
 const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, isEditing }) => {
     const [moduleList, setModuleList] = useState([]);
     const [filteredModuleList, setFilteredModuleList] = useState([]);
-    const notexe = useRef({});
+    const notexe = useRef(
+        integrationConfig.executionRequest != undefined ? integrationConfig.executionRequest.donotexe.current : {}
+        );
+
     const indeterminateStyle = {
         root: {
             '&[class ~= is-enabled]': {
@@ -330,6 +333,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         })()
     },[integrationConfig.selectValues[2].selected]);
     const handleExecutionTypeChange = (selectedType) => {
+        notexe['current'] = {}
         const selectedKey = selectedType.key;
         let filteredNodes = [];
         if(selectedKey === 'normalExecution') {

@@ -152,7 +152,7 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
                 { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
                 { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: '', width: '25%', disabled: true, selectedName: '' },
             ],
-            scenarioList: getScenarioList(item.executionRequest.batchInfo, item.executionRequest.selectedModuleType),
+            scenarioList: getScenarioList(item.executionRequest.batchInfo, item.executionRequest.selectedModuleType,item.executionRequest.donotexe),
             selectedModuleType: item.executionRequest.selectedModuleType,
             avoAgentGrid: 'cicdanyagentcanbeselected',
             browsers: item.executionRequest.browserType,
@@ -163,14 +163,15 @@ const DevOpsList = ({ setShowConfirmPop, setCurrentIntegration, url, showMessage
         });
         return;
     }
-    const getScenarioList = (batchInfo, selectedModulesType) => {
+    const getScenarioList = (batchInfo, selectedModulesType,donotexe) => {
         let scenarioList = [];
+        let counter = 0;
         for(let batch of batchInfo)
             for(let suiteIndex=0; suiteIndex<batch.suiteDetails.length; suiteIndex++) {
                 if(selectedModulesType === 'normalExecution') scenarioList.push(batch.suiteDetails[suiteIndex].scenarioId)
-                else if(selectedModulesType === 'batchExecution') scenarioList.push(batch.batchname+batch.testsuiteId+suiteIndex+batch.suiteDetails[suiteIndex].scenarioId)
+                else if(selectedModulesType === 'batchExecution') scenarioList.push(batch.batchname+batch.testsuiteId+donotexe['current'][batch.testsuiteId][suiteIndex]+batch.suiteDetails[suiteIndex].scenarioId)
                 else {
-                    scenarioList.push(batch.batchname+batch.testsuiteId+suiteIndex+batch.suiteDetails[suiteIndex].scenarioId)}
+                    scenarioList.push(batch.batchname+batch.testsuiteId+donotexe['current'][batch.testsuiteId][suiteIndex]+batch.suiteDetails[suiteIndex].scenarioId)}
             }
         return scenarioList;
     }
