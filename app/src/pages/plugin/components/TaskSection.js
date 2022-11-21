@@ -84,6 +84,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [assignedUsers, setAssignedUsers] = useState({});   
     const [unassignedUsers, setUnassignedUsers] = useState([]);
     const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
+    const [redirectTo, setRedirectTo] = useState("");
 
     // const userConf = useSelector(state=>state.admin.userConf)
     // const node = useRef();
@@ -514,6 +515,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                 {projectNames && projectNames.projectName.map((singleProj,idx)=>{
                    
 return <>
+			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
+
 <div key={idx} style={{display:'flex',justifyContent:'space-between',borderBottomStyle:'ridge'}}>
 <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")} style={{display:"flex", flexDirection:"column"}}>
             <span title={projectNames && singleProj} style={{marginTop: '1vh',marginBottom:'1vh'}}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
@@ -522,13 +525,13 @@ return <>
             
             
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
-                   window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-                   window.location.href = "/mindmap";
+                window.localStorage['navigateScreen'] = "mindmap";
+                setRedirectTo(`/mindmap`);
              }}>Design</button>
             
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"500px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => { 
-                window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
-                window.location.href = "/execute";
+                window.localStorage['navigateScreen'] = "TestSuite";
+                setRedirectTo(`/execute`);
                 }}>Execute</button>
             </div>
             </div>

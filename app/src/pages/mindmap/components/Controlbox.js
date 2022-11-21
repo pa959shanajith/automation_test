@@ -13,9 +13,7 @@ import DesignHome from '../../design/containers/DesignHome';
 
 import TaskBox from './TaskBox';
 import { useHistory } from 'react-router-dom';
-import { assign } from 'nodemailer/lib/shared';
 import {SET_CT} from "../../plugin/state/action"
-import { style } from 'd3';
 // import { assign } from 'nodemailer/lib/shared';
 
 /*Component ControlBox
