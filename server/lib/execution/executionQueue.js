@@ -664,7 +664,7 @@ module.exports.Execution_Queue = class Execution_Queue {
             'maxicecount': "1",
             'key': "",
             'executionListId': '',
-            'screenshotpath': screenshotpath.screenShotPath.default
+            'screenshotpath': screenshotpath.screenShotPath
         };
 
         try {
