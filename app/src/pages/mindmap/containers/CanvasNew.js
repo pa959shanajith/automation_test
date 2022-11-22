@@ -450,7 +450,7 @@ const CanvasNew = (props) => {
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
             <SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>
-            <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>
+            {/* <ExportMapButton setBlockui={setBlockui} displayError={displayError}/> */}
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>
                 {Object.entries(links).map((link)=>{
