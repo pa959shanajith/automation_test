@@ -34,6 +34,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const TnCInnerRef = useRef(undefined);
   const history = useHistory();
   const dispatch = useDispatch();
+  const [showImage , setShowImage] = useState("")
    const enlargeImage = (imageName) => {
     setShowImage(imageName)
        

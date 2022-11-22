@@ -5,7 +5,6 @@ import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 import CheckboxTree from 'react-checkbox-tree';
-import index from 'uuid-random';
 
 const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, isEditing }) => {
     const [moduleList, setModuleList] = useState([]);
