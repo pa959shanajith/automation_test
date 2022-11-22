@@ -57,6 +57,7 @@ const ModuleListDrop = (props) =>{
             // }
             selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false); 
         }
+        setWarning(false);
      },[])
     
     const displayError = (error) =>{

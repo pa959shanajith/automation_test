@@ -55,13 +55,13 @@ exports.userCreateProject_ICE = async (req, res) =>{
 		}
         const userid = req.session.userid;
 		const roleId = req.session.activeRoleId;
-        createProjectObj.assignedUsers[userid] = true;
+    createProjectObj.assignedUsers[userid] = true;
 		const inputs = {
 			name: createProjectObj.projectName,
 			domain: createProjectObj.domain,
 			type: createProjectObj.appType,
 			releases: createProjectObj.releases,
-            assignedUsers:createProjectObj.assignedUsers,
+      assignedUsers:createProjectObj.assignedUsers,
 			createdby: userid,
 			createdbyrole: roleId,
 			modifiedby: userid,

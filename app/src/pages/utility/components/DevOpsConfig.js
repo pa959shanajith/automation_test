@@ -350,7 +350,7 @@ const DevOpsConfig = props => {
             });
             return;
         }
-        if(integrationConfig.browsers.length < 1) {
+        if(integrationConfig.browsers.length < 1 && props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web") {
             setMsg(MSG.CUSTOM("Please Select atleast one Browser",VARIANT.ERROR));
             return;
         }
@@ -371,7 +371,7 @@ const DevOpsConfig = props => {
                         testsuiteId: module.moduleid,
                         batchname: "",
                         versionNumber: 0,
-                        appType: "Web",
+                        appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
                         projectName: integrationConfig.selectValues[0].selectedName,
                         projectId: integrationConfig.selectValues[0].selected,
@@ -413,7 +413,7 @@ const DevOpsConfig = props => {
                         testsuiteId: module.moduleid,
                         batchname: "",
                         versionNumber: 0,
-                        appType: "Web",
+                        appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
                         projectName: integrationConfig.selectValues[0].selectedName,
                         projectId: integrationConfig.selectValues[0].selected,
@@ -442,7 +442,7 @@ const DevOpsConfig = props => {
                         testsuiteId: module.moduleid,
                         batchname: module.batchname,
                         versionNumber: 0,
-                        appType: "Web",
+                        appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
                         projectName: integrationConfig.selectValues[0].selectedName,
                         projectId: integrationConfig.selectValues[0].selected,
