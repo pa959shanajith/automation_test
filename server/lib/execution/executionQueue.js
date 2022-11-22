@@ -13,7 +13,8 @@ const { timestamp } = require('winston/lib/winston/common');
 const { info } = require('winston');
 const { update } = require('../../notifications');
 const suitFunctions = require('../../controllers/suite');
-const reportFunctions = require('../../controllers/report')
+const reportFunctions = require('../../controllers/report');
+const screenshotpath = require('../../config/config');
 module.exports.Execution_Queue = class Execution_Queue {
     /*
         this.queue_list: main execution queue, it stores all the queue's corresponding to pools
@@ -662,7 +663,8 @@ module.exports.Execution_Queue = class Execution_Queue {
             'tasktype': "EXECUTE",
             'maxicecount': "1",
             'key': "",
-            'executionListId': ''
+            'executionListId': '',
+            'screenshotpath': screenshotpath.screenShotPath
         };
 
         try {
