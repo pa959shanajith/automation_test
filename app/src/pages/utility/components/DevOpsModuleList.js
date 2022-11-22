@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../../global';
 import { CheckBox, SearchDropdown, Tab, NormalDropDown, Dialog, TextField } from '@avo/designcomponents';
 import { fetchModules } from '../api';
 import { Icon } from '@fluentui/react';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 import CheckboxTree from 'react-checkbox-tree';
+import index from 'uuid-random';
 
 const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, isEditing }) => {
     const [moduleList, setModuleList] = useState([]);
     const [filteredModuleList, setFilteredModuleList] = useState([]);
+    const notexe = useRef(
+        integrationConfig.executionRequest != undefined ? integrationConfig.executionRequest.donotexe.current : {}
+        );
+
     const indeterminateStyle = {
         root: {
             '&[class ~= is-enabled]': {
@@ -173,11 +178,48 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         }
         setSelectedTab(key);
     }
-    const HandleTreeChange = (checked) => {
-        if(selectedTab === 'all') setIntegrationConfig({ ...integrationConfig, scenarioList: checked });
-        else if(selectedTab === 'selected') setIntegrationConfig({ ...integrationConfig, scenarioList: checked });
+    const HandleTreeChange = (checked,targetnode) => {
+
+        //clicked on scenario
+        if(targetnode.isLeaf){
+            if(notexe.current[targetnode.parent.value] == undefined) {
+                notexe.current[targetnode.parent.value] = []
+            }
+            if(targetnode.checked)
+                notexe.current[targetnode.parent.value].push(targetnode.index)
+            else{
+                const index = notexe.current[targetnode.parent.value].indexOf(targetnode.index);
+                if (index > -1) { 
+                    notexe.current[targetnode.parent.value].splice(index, 1);
+                }
+            }
+        }
+        else {
+            //condition for clicking on batch
+            if(targetnode.value === targetnode.label) {
+                for(let module of targetnode.children) {
+                    notexe.current[module.value] = []
+                    for(let i = 0;i<module.children.length;i++){
+                        notexe.current[module.value].push(i);
+                    }
+                }
+            }
+            else{
+                notexe.current[targetnode.value] = []
+                for(let i = 0;i<targetnode.children.length;i++){
+                    notexe.current[targetnode.value].push(i);
+                }
+            }
+        }
+
+        if(selectedTab === 'all') {
+            setIntegrationConfig({ ...integrationConfig, scenarioList: checked, notexe });
+        }
+        else if(selectedTab === 'selected') {
+            setIntegrationConfig({ ...integrationConfig, scenarioList: checked, notexe });
+        }
         else if(selectedTab === 'unselected') {
-            setIntegrationConfig({ ...integrationConfig, scenarioList: [...integrationConfig.scenarioList, ...checked] });
+            setIntegrationConfig({ ...integrationConfig, scenarioList: [...integrationConfig.scenarioList, ...checked], notexe });
             setModuleState({...moduleState, checked: [...integrationConfig.scenarioList, ...checked]});
             return;
         }
@@ -291,6 +333,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig, moduleScena
         })()
     },[integrationConfig.selectValues[2].selected]);
     const handleExecutionTypeChange = (selectedType) => {
+        notexe['current'] = {}
         const selectedKey = selectedType.key;
         let filteredNodes = [];
         if(selectedKey === 'normalExecution') {
