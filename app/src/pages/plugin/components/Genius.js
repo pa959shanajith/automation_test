@@ -201,7 +201,7 @@ const Genius = () => {
     //       }
     //     });
     // }, 2000);
-
+    dispatch({ type: mindmapActionTypes.SELECT_MODULE, payload: {} })
     connect();
     (async () => {
       setBlockui({ show: true, content: 'Loading...' })
