@@ -51,6 +51,7 @@ const ScrapeObjectList = (props) => {
 
   const [appendCheck, setAppendCheck] = useState(false);
   const [isMac, setIsMac] = useState(false);
+  const [disable, setDisable] = useState(false);
   const disableAppend = useSelector((state) => state.scrape.disableAppend);
   const { appType, subTaskId } = useSelector((state) => state.plugin.CT);
   console.log(disableAppend, compareFlag);
@@ -275,6 +276,7 @@ const ScrapeObjectList = (props) => {
     }
 
     const onSave = (e, confirmed) => {
+       
         let continueSave = true;
         
         if (mainScrapedData.reuse && !confirmed) {
@@ -307,7 +309,7 @@ const ScrapeObjectList = (props) => {
                     if (scrapeItem.xpath === "" || scrapeItem.xpath === undefined) continue;
                     let xpath = scrapeItem.xpath;
     
-                    if (current_task.appType === 'MobileWeb') xpath = xpath.split(";")[2];
+                    if (props.appType === 'MobileWeb') xpath = xpath.split(";")[2];
     
                     if (uniqueXPaths.includes(xpath)) {
                         dXpath = true;
@@ -382,7 +384,7 @@ const ScrapeObjectList = (props) => {
             'deletedObj': deleted,
             'modifiedObj': modifiedObjects,
             'addedObj': {...added, view: views},
-            'screenId': current_task.screenId,
+            'screenId': props.fetchingDetails["_id"],
             'userId': user_id,
             'roleId': role,
             'param': 'saveScrapeData',
@@ -445,10 +447,10 @@ const ScrapeObjectList = (props) => {
                                 Select all
                             </span>
                         </label>
-                        <button data-test="save" className="ss__taskBtn ss__btn" title="Save Objects" disabled={disableBtns.save} onClick={onSave}><img src="static/imgs/save_ic.png" style={{height:"30px",width:"30px"}}/>  </button>
-                        <button data-test="delete"className="ss__taskBtn ss__btn" title="Delete Objects" disabled={disableBtns.delete} onClick={onDelete}><img src="static/imgs/delete_ic.png" style={{height:"30px",width:"30px"}}  /></button>
-                        <button  data-test="edit"  className="ss__taskBtn ss__btn" title="Edit Objects" disabled={disableBtns.edit} onClick={onEdit}>  <img src={"static/imgs/ic-jq-editstep.png"}/></button>
-                        <button data-test="dnd"className="ss__taskBtn ss__btn" title="Rearrange" disabled={disableBtns.dnd} onClick={(e)=>onRearrange(e, dnd)}> <img src= {'static/imgs/ic-jq-dragstep.png'}/>  </button>
+                        <button data-test="save" className="ss__taskBtn ss__btn" title="Save Objects"  onClick={onSave}><img src="static/imgs/save_ic.png" style={{height:"30px",width:"30px"}}/>  </button>
+                        <button data-test="delete"className="ss__taskBtn ss__btn" title="Delete Objects"  onClick={onDelete}><img src="static/imgs/delete_ic.png" style={{height:"30px",width:"30px"}}  /></button>
+                        <button  data-test="edit"  className="ss__taskBtn ss__btn" title="Edit Objects"  onClick={onEdit}>  <img src={"static/imgs/ic-jq-editstep.png"}/></button>
+                        <button data-test="dnd"className="ss__taskBtn ss__btn" title="Rearrange"  onClick={(e)=>onRearrange(e, dnd)}> <img src= {'static/imgs/ic-jq-dragstep.png'}/>  </button>
                         {/* <button data-test="search"className="ss__search-btn" onClick={toggleSearch}>
                             <img className="ss__search-icon" alt="search-ic" src="static/imgs/ic-search-icon.png"/>
                         </button>
@@ -466,6 +468,7 @@ const ScrapeObjectList = (props) => {
                     { props.appType === "Web" ? <div style={{  marginLeft: '10px',marginTop:'23px',  boxSizing:'40px'  }}>
                       {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                       <NormalDropDown 
+
                       style={{height:'25px',marginLeft:'30px', marginBottom: '21px', boxSizing:'40px', fontFamily:'LatoWeb' , width:'200px'}}
                         
                         className={
@@ -473,6 +476,7 @@ const ScrapeObjectList = (props) => {
                           (disableAction || compareFlag ? " disable-thumbnail" : "")
                         }
                         onChange={(e,item)=>{setCaptureButton(item.key)}}
+                        defaultSelectedKey='chrome'
                         // onChange={(e, item) => {
                         //  ;
                         // }}
@@ -530,7 +534,7 @@ const ScrapeObjectList = (props) => {
                             },
                           ]}
                         placeholder="Select Browser"
-                        width="185px"
+                        width="200px"
                         
                       />
                         
@@ -553,15 +557,13 @@ const ScrapeObjectList = (props) => {
                     <p onClick={() => {setShowAppPop({'appType': 'MobileWeb', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)})}}><img  style={{height:'25px', width:'20px'}}src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>MobileWeb Apps</span></p>
                     </div>:""}
                   
-                    <div key="append-edit" className={"ss__thumbnail"} >
+                    <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")} >
                       <input
                         data-test="appendInput"
                         id="enable_append"
                         type="checkbox"
                         title="Enable Add"
-                        onChange={(e) => {
-                          onAppend(e);
-                        }}
+                        onChange={onAppend}
                         checked={appendCheck}
                       />
                       <span
@@ -569,12 +571,12 @@ const ScrapeObjectList = (props) => {
                         className="ss__thumbnail_title"
                         title="Enable Append"
                       >
-                        {appType === "Webservice" ? "Edit" : "Add Elements"}
+                        {appType === "Webservice" ? "Edit" : "Append"}
                       </span>
                     </div>
                   
 
-                    <Button label="Capture" className="p-button-warning" onClick={()=>{startScrape(captureButton)}} style={{ marginLeft: '26px', marginBottom: '50px'}} />
+                    <Button label="Capture" /**disabled={captureButton===""} */  className={"p-button-warning"  } onClick={()=>{startScrape(captureButton)}} style={{ marginLeft: '26px', marginBottom: '50px', background:'#643693'}} />
 
 
 

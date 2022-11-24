@@ -48,6 +48,7 @@ const CanvasNew = (props) => {
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
     const [sections,setSection] =  useState({})
     const [ctrlBox,setCtrlBox] = useState(false);
+    const [fetchingDetails, setFetchingDestails]= useState(null);
     const [taskname, setTaskName] = useState("") 
     const [inpBox,setInpBox] = useState(false);
     const [multipleNode,setMultipleNode] = useState(false)
@@ -79,7 +80,6 @@ const CanvasNew = (props) => {
         //useEffect to clear redux data selected module on unmount
         pluginApi.getProjectIDs()
             .then(data => {
-                debugger
                 let projectIndex = data.projectId.findIndex((project_id)=> project_id===proj)
                 setAppType(data.appTypeName[projectIndex])
             }).catch(error=>{
@@ -182,6 +182,7 @@ const CanvasNew = (props) => {
        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[createnew])
     const nodeClick=(e)=>{
+        setFetchingDestails(dNodes[e.target.parentElement.id.split("_")[1]])
         e.stopPropagation()
         if(d3.select('#pasteImg').classed('active-map')){
             var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},verticalLayout)
@@ -389,6 +390,7 @@ const CanvasNew = (props) => {
             setLinks(res.linkDisplay)
             setdLinks(res.dLinks)
             setdNodes(res.dNodes)
+            
         }
         setDelConfirm(false);
     }
@@ -451,7 +453,7 @@ const CanvasNew = (props) => {
             onDecline={() => console.log(false)}
             onConfirm = {() => { }} 
             >
-                <div style={{ height: '120rem', overFlow:" hidden" }}><ScrapeScreen appType={appType} /></div>
+                <div style={{ height: '120rem', overFlow:" hidden" }}> <ScrapeScreen fetchingDetails={fetchingDetails} appType={appType} /></div>
             </Dialog>
 
             <Dialog
