@@ -460,7 +460,7 @@ const CanvasNew = (props) => {
             hidden = {props.ShowDesignTestSetup === false}
             isBlocking={true}
             onDismiss = {() => {props.setShowDesignTestSetup(false)}}
-            title ={taskname  +  " : Design Test Setup"}  
+            title ={taskname  +  " : Design Test Steps"}  
             minWidth = '58rem' 
             onConfirm = {() => { }} >
                 <div style={{ height: '623px'}}><DesignHome appType={appType} /></div>
