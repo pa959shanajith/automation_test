@@ -358,6 +358,11 @@ if (cluster.isMaster) {
 		const enableServiceBell = uiConfig.enableServiceBell;
 		return res.send({enableServiceBell})
     })
+
+	app.get('/getServiceBellSecretKey', (req,res) => {
+		const SERVICEBELL_IDENTITY_SECRET_KEY = uiConfig.SERVICEBELL_IDENTITY_SECRET_KEY;
+		return res.send({SERVICEBELL_IDENTITY_SECRET_KEY})
+    })
 		//Route Directories
 		var mindmap = require('./server/controllers/mindmap');
 		var pdintegration = require('./server/controllers/pdintegration');
