@@ -65,13 +65,16 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         zephyr: {url:"",username:"",password:""}
     });
     const [appType, setAppType] = useState('');
+    const [projectName, setProjectName] = useState('');
+    const [cycleName, setCycleName] = useState('');
 
 
     useEffect(()=>{
         pluginApi.getProjectIDs()
         .then(data => {
                 setProjectData1(data.releases[selectedCycle][0].name);
-                setProjectData(data.releases[selectedCycle][0].cycles[0]._id)
+                setProjectData(data.releases[selectedCycle][0].cycles[0]._id);
+                setCycleName(data.releases[selectedCycle][0].cycles[0].name);
                 projectIdTypesDicts[data.projectId[selectedCycle]] === "Web" ? setShowCICD(true) : setShowCICD(false)
 
     })},[selectedCycle])
@@ -107,6 +110,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             });
             setProjectList(arraynew);
             setSelectedProject(arraynew[0].key);
+            setProjectName(arraynew[0].text);
 
 
 
@@ -238,7 +242,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const onProjectChange = async (option) => {
         setLoading('Please Wait...');
         setSelectedProject(option.key);
-        setSelectedCycle(option.index)
+        setSelectedCycle(option.index);
+        setProjectName(option.text);
         projectIdTypesDicts[option.key] === "Web" ? setShowCICD(true) : setShowCICD(false)
         const configurationList = await fetchConfigureList({
             'projectid': option.key
@@ -587,9 +592,9 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     name: '',
                     key: uuid(),
                     selectValues: [
-                        { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: selectedProject, width: '30%', disabled: false, selectedName: '' },
+                        { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: selectedProject, width: '30%', disabled: false, selectedName: projectName },
                         { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: projectData1, width: '25%', disabled: true, selectedName: '' },
-                        { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: projectData, width: '25%', disabled: true, selectedName: '' },
+                        { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: projectData, width: '25%', disabled: true, selectedName: cycleName },
                     ],
                     scenarioList: [],
                     avoAgentGrid: 'cicdanyagentcanbeselected',
@@ -669,7 +674,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                             projectidts: element.projectId,
                                             assignedTestScenarioIds: "",
                                             subTaskId: "",
-                                            versionnumber: element.versionNumber
+                                            versionnumber: element.versionNumber,
+                                            domainName: element.domainName,
+                                            projectName: element.projectName,
+                                            cycleName: element.cycleName
                                         });                                   
                                     });
                                     setCurrentTask({
@@ -866,11 +874,11 @@ const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleI
         suiteInfo.batchname = eachData[i].batchname;
         suiteInfo.versionNumber = testsuiteDetails.versionnumber;
         suiteInfo.appType = appType;
-        suiteInfo.domainName = projectdata.project[projectid].domain;
-        suiteInfo.projectName = projectdata.projectDict[projectid];
+        suiteInfo.domainName = (projectid in projectdata.project) ? projectdata.project[projectid].domain : testsuiteDetails.domainName;
+        suiteInfo.projectName = (projectid in projectdata.projectDict) ? projectdata.projectDict[projectid] : testsuiteDetails.projectName;
         suiteInfo.projectId = projectid;
         suiteInfo.releaseId = relid;
-        suiteInfo.cycleName = projectdata.cycleDict[cycid];
+        suiteInfo.cycleName = (cycid in projectdata.cycleDict) ? projectdata.cycleDict[cycid] : testsuiteDetails.cycleName;
         suiteInfo.cycleId = cycid;
         suiteInfo.suiteDetails = selectedRowData;
         if(selectedRowData.length !== 0) moduleInfo.push(suiteInfo);

@@ -53,7 +53,10 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                     projectidts: element.projectId,
                     assignedTestScenarioIds: "",
                     subTaskId: "",
-                    versionnumber: element.versionNumber
+                    versionnumber: element.versionNumber,
+                    domainName: element.domainName,
+                    projectName: element.projectName,
+                    cycleName: element.cycleName
                 });                                   
             });
             setCurrentTask({
@@ -502,7 +505,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                             <div id="scheduledDataBody" className="scheduledDataBody">
                                                 <ScrollBar scrollId="scheduledDataBody" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                     <div className='scheduleDataBodyRow'>
-                                                        {pageOfItems.map((data,index)=>( (data.status == "recurring" || data.status == "cancelled" || data.status == "Failed") && data.recurringpattern != "One Time" &&
+                                                        {pageOfItems.map((data,index)=>( (data.status == "recurring" || data.status == "cancelled" || data.status == "Failed" || data.status == "Completed") && data.recurringpattern != "One Time" &&
                                                             <div key={index} className="scheduleDataBodyRowChild">
                                                                 <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Job created on: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
                                                                 <div data-test = "schedule_data_target_user" className="s__Table_host" title={"Ice Pool: " +data.poolname}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div>
@@ -555,6 +558,7 @@ const updateDateTimeValues = (scheduleTableData, setModuleScheduledate) => {
                 time:"",
                 recurringValue: "",
                 recurringString: "",
+                endAfter: "",
                 inputPropstime: {readOnly:"readonly" ,
                     disabled : true,
                     className:"fc-timePicker",
@@ -571,6 +575,11 @@ const updateDateTimeValues = (scheduleTableData, setModuleScheduledate) => {
                     readOnly: "readonly",
                     className: "fc-timePicker textbox-container",
                 },
+                inputPropsEndDate: {readOnly:"readonly" ,
+                disabled : true,
+                className:"fc-timePicker textbox-container",
+                placeholder: "Select End After"
+            }
             };
         }
     })
@@ -655,10 +664,12 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsdate"]["className"]="fc-timePicker";
                 moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"]="fc-timePicker";
                 moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsrecurring"]["className"] = "fc-timePicker textbox-container";
+                moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsEndDate"]["className"]="fc-timePicker textbox-container";
 
                 var dateValue = moduleScheduledate[eachData[i].testsuiteid]["date"];
                 var timeValue = moduleScheduledate[eachData[i].testsuiteid]["time"];
                 var recurringValue = moduleScheduledate[eachData[i].testsuiteid]["recurringValue"];
+                var endAfterValue = moduleScheduledate[eachData[i].testsuiteid]["endAfter"];
 
                 if (recurringValue === "") {
                     // Check if schedule recurring is not empty
@@ -672,6 +683,10 @@ const checkDateTimeValues = (eachData, moduleScheduledate, setModuleScheduledate
                 }
                 else if (recurringValue != "" && timeValue === "") {
                     moduleScheduledateTime[eachData[i].testsuiteid]["inputPropstime"]["className"] = "fc-datePicker s__err-Border";
+                    doNotSchedule = true;
+                }
+                else if (recurringValue != "" && recurringValue !== "One Time" && timeValue != "" && endAfterValue === "") {
+                    moduleScheduledateTime[eachData[i].testsuiteid]["inputPropsEndDate"]["className"] = "fc-datePicker textbox-container s__err-Border";
                     doNotSchedule = true;
                 }
                 setModuleScheduledate(moduleScheduledateTime);
@@ -729,11 +744,11 @@ const parseLogicExecute = (schedulePoolDetails, moduleScheduledate, eachData, cu
         suiteInfo.versionNumber = testsuiteDetails.versionnumber;
         suiteInfo.appType = appType;
         suiteInfo.batchname = eachData[i].batchname;
-        suiteInfo.domainName = projectdata.project[projectid].domain;
-        suiteInfo.projectName = projectdata.projectDict[projectid];
+        suiteInfo.domainName = (projectid in projectdata.project) ? projectdata.project[projectid].domain : testsuiteDetails.domainName;
+        suiteInfo.projectName = (projectid in projectdata.projectDict) ? projectdata.projectDict[projectid] : testsuiteDetails.projectName;
         suiteInfo.projectId = projectid;
         suiteInfo.releaseId = relid;
-        suiteInfo.cycleName = projectdata.cycleDict[cycid];
+        suiteInfo.cycleName = (cycid in projectdata.cycleDict) ? projectdata.cycleDict[cycid] : testsuiteDetails.cycleName;
         suiteInfo.cycleId = cycid;
         suiteInfo.suiteDetails = selectedRowData;
         suiteInfo.poolid = schedulePoolDetails.poolid;
@@ -757,6 +772,7 @@ const parseLogicExecute = (schedulePoolDetails, moduleScheduledate, eachData, cu
                 suiteInfo.recurringValue = moduleScheduledate[eachData[i].testsuiteid]["recurringValue"];
                 suiteInfo.recurringString = moduleScheduledate[eachData[i].testsuiteid]["recurringString"];
                 suiteInfo.recurringStringOnHover = moduleScheduledate[eachData[i].testsuiteid][	"recurringStringOnHover"];
+                suiteInfo.endAfter = moduleScheduledate[eachData[i].testsuiteid]["endAfter"];
             } 
         }
         if(selectedRowData.length !== 0) moduleInfo.push(suiteInfo);
