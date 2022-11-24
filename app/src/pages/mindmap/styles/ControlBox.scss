@@ -4,7 +4,7 @@
     display: flex;
     position: absolute;
     height: fit-content;
-    width: 175px;
+    width: 225px;
     z-index: 10;
     background-color: #323130;
     -webkit-border-radius: 5px;
@@ -15,9 +15,7 @@
 }
 .ct-ctrl  {
     color: $whiteColor;
-    // margin: 0 72px 0 0;
-    margin : -33px -1px 9px 0px;
-    // margin : -12px 9px 7px -1px;
+    margin : -33px 28px 9px 0px;
     cursor : pointer;
     font-family: 'LatoWeb';
 }
@@ -25,9 +23,6 @@
     display: block;
     color:  #5B5A59;
 }
-// .fa{
-//     font-family: 'LatoWeb';
-// }
 .ct-ctrl  .ct-tooltiptext {
     position: absolute;
     display: none;
@@ -35,26 +30,19 @@
     text-align: center;
     white-space: nowrap;
     font-size: 11px;
-    // font-family: 'LatoWeb';
     top: 25px;
     left: 27%;
-    // background: $backgroundOne;
     color: $black;
 }
 .ct-ctrl-inactive {
-    // color: rgba(255,255,255,0.4);
     cursor: not-allowed;
     display: none;
     visibility: hidden;
     height: 0;
     width: 0;
-    // max-height: 0;
     overflow:0;
     opacity: 0;
 }
-
-
- 
 .ct-ctrl-inactive:hover .ct-tooltiptext {
     display: none;
 }
@@ -62,12 +50,10 @@
     display: none!important;
 }
 #ct-ctrlBox.end-to-end{
-    // width: 103px;
-    // height: 114px;
     display: flex;
     position: absolute;
     height: fit-content;
-    width: 170px;
+    width: 180px;
     z-index: 10;
     background-color: #323130;
     -webkit-border-radius: 5px;
@@ -81,7 +67,6 @@
 {
     color: $whisper;
     margin: 10px;
-    // background-color: $primaryColorDarkest ;
     padding: 3px ;
     border: 1px  ;
     line-height: 1.5;
@@ -90,8 +75,6 @@
 .fa-hand-peace-o:before
 {
     color: $whisper;
-    // padding: 1px 20px 0px 11px;
-    // background-color: $primaryColorDarkest ;
     margin: 10px;
     padding: 3px ;
     border: 1px ;
@@ -101,8 +84,6 @@
 .fa-pencil-square-o:before 
 {
     color: $whisper;
-    // padding: 5px 49px 4px 18px;
-    // background-color: $primaryColorDarkest ;
     padding: 3px ;
     margin: 10px;
     border: 1px ;
@@ -112,8 +93,6 @@
 .fa-trash-o:before
 {
     color: $whisper;
-    // padding: 5px 49px 4px 18px;
-    // background-color: $primaryColorDarkest ;
     padding: 4px ;
     margin: 10px;
     border: 1px ;
@@ -123,40 +102,24 @@
 .fa-user-o:before 
 {
     color: $whisper;
-    // padding: 5px 49px 4px 18px;
-    // background-color: $primaryColorDarkest ;
     padding: 3px 5px ;
     margin: 8px;
     border: 1px ; 
     line-height: 1.5;
-    font:normal normal normal 14px/1 fontAwesome
+    font:normal normal normal 14px/1 fontAwesome;
 }
-// .fa-crop-simple:before
-// {
-//     color: $whisper;
-//     content: "\f565";
-//     // padding: 5px 49px 4px 18px;
-//     background-color: $primaryColorDarkest ;
-//     padding: 3px 5px ;
-//     margin: 8px;
-//     border: 1px ; 
-// }
 .fa-play:before 
 {
     color: $whisper;
-    // padding: 5px 49px 4px 18px;
-    // background-color: $primaryColorDarkest ;
     padding: 3px 5px ;
     margin: 8px;
     border: 1px ; 
     line-height: 1.5;
-    font:normal normal normal 14px/1 fontAwesome
+    font:normal normal normal 14px/1 fontAwesome;
 }
 .fa-dot-circle-o:before
 {
     color: $whisper;
-    // padding: 5px 49px 4px 18px;
-    // background-color: $primaryColorDarkest ;
     padding: 3px 5px ;
     margin: 8px;
     border: 1px ; 
@@ -167,8 +130,6 @@
 .fa-camera-retro:before
 {
     color: $whisper;
-    // padding: 5px 49px 4px 18px;
-    // background-color: $primaryColorDarkest ;
     padding: 3px 5px ;
     margin: 8px;
     border: 1px ;
@@ -178,24 +139,19 @@
 .fa-list-alt:before
 {
     color: $whisper;
-    // padding: 5px 49px 4px 18px;
-    // background-color: $primaryColorDarkest ;
     padding: 3px;
     margin: 9px;
     border: 1px ; 
     line-height: 1.5;
     font:normal normal normal 14px/1 fontAwesome;
 }
-// .Ca{
-//      font-family: 'LatoWeb';
-    
-// }
-// .faRef.plus{
-//     font-family: 'LatoWebBlack';
-//     font-style: normal;
-//     font-weight: normal;
-//     text-rendering: optimizeLegibility;
-// }
-// .text{
-//     font: normal normal normal 14px/1 Latoweb;
-// }
+#AlignmentBottom{
+    width: -webkit-fill-available;
+    height: 0px;
+    margin-left:0;
+    margin-right: 0;
+    border-bottom: 2px solid #5B5A59;
+    margin-bottom: 9px;
+    padding-bottom: 12%;
+    line-height: 1px;
+}
