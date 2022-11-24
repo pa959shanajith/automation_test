@@ -46,9 +46,9 @@ const CanvasNew = (props) => {
     const copyNodes = useSelector(state=>state.mindmap.copyNodes)
     const selectBox = useSelector(state=>state.mindmap.selectBoxState)
     const deletedNodes = useSelector(state=>state.mindmap.deletedNodes)
-    const [sections,setSection] =  useState({})
+    const [sections,setSection] =  useState({});
+    const [fetchingDetails,setFetchingDetails] = useState(null); // this can be used for fetching testcase/screen/scenario/module details
     const [ctrlBox,setCtrlBox] = useState(false);
-    const [fetchingDetails, setFetchingDestails]= useState(null);
     const [taskname, setTaskName] = useState("") 
     const [inpBox,setInpBox] = useState(false);
     const [multipleNode,setMultipleNode] = useState(false)
@@ -182,7 +182,7 @@ const CanvasNew = (props) => {
        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[createnew])
     const nodeClick=(e)=>{
-        setFetchingDestails(dNodes[e.target.parentElement.id.split("_")[1]])
+        setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
         e.stopPropagation()
         if(d3.select('#pasteImg').classed('active-map')){
             var res = pasteNode(e.target.parentElement.id,{...copyNodes},{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},verticalLayout)
@@ -453,7 +453,7 @@ const CanvasNew = (props) => {
             onDecline={() => console.log(false)}
             onConfirm = {() => { }} 
             >
-                <div style={{ height: '120rem', overFlow:" hidden" }}> <ScrapeScreen fetchingDetails={fetchingDetails} appType={appType} /></div>
+                <div style={{ height: '120rem', overFlow:" hidden" }}><ScrapeScreen fetchingDetails = {fetchingDetails} appType={appType} /></div>
             </Dialog>
 
             <Dialog
@@ -463,7 +463,7 @@ const CanvasNew = (props) => {
             title ={taskname  +  " : Design Test Steps"}  
             minWidth = '58rem' 
             onConfirm = {() => { }} >
-                <div style={{ height: '623px'}}><DesignHome appType={appType} /></div>
+                <div style={{ height: '623px'}}><DesignHome fetchingDetails={fetchingDetails} appType={appType}  /></div>
             </Dialog>
 
             

@@ -26,7 +26,8 @@ import "../styles/ActionBarItems.scss"
         disable -> flag to check if action bar is required to disable
 */
 
-const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, setShowDlg, dTcFlag, checkedTc, showDlg}) => {
+const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, setShowDlg, dTcFlag, checkedTc, showDlg, fetchingDetails}) => {
+
 
     const userInfo = useSelector(state=>state.login.userinfo);
     const current_task = useSelector(state=>state.plugin.CT);
@@ -103,7 +104,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
         else testcaseID.push(current_task.testCaseId);
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
-        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, appType)
+        DesignApi.debugTestCase_ICE(browserType, fetchingDetails['_id'], userInfo, appType)
             .then(data => {
                 setOverlay("");
                 ResetSession.end();
@@ -164,7 +165,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
     return renderComp;
 };
 
-const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay}) => {
+const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay, fetchingDetails, appType}) => {
 
     const current_task = useSelector(state=>state.plugin.CT);
     const userInfo = useSelector(state=>state.login.userinfo);
@@ -172,11 +173,13 @@ const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay}) =
     const hiddenInput = useRef(null);
 
     const exportTestCase =  () => {
-		let testCaseId = current_task.testCaseId;
-		let testCaseName = current_task.testCaseName;
-        let versionnumber = current_task.versionnumber;
+        console.log("this is export test cases");
+		let testCaseId = fetchingDetails['_id'];
+		let testCaseName = fetchingDetails['name'];
+        // let versionnumber = fetchingDetails.versionnumber;
+        // console.log("versionNumber.........",versionnumber);
         
-		DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber)
+		DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, 0)
 		.then(response => {
 				if (response === "Invalid Session") return RedirectPage(history);
                 
@@ -207,10 +210,10 @@ const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay}) =
     }
     
     const onInputChange = (event) => {
-        let testCaseId = current_task.testCaseId;
-		let testCaseName = current_task.testCaseName;
-        let versionnumber = current_task.versionnumber;
-        let appType = current_task.appType;
+        let testCaseId = fetchingDetails['_id'];
+		let testCaseName = fetchingDetails['name'];
+        // let versionnumber = fetchingDetails.versionnumber;
+        // let appType = appType;
 		let import_status = true;
         let flag = false;
 
@@ -234,7 +237,7 @@ const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay}) =
                         ) 
                             throw MSG.DESIGN.ERR_NO_MATCH_APPTYPE
                     }
-                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, versionnumber, import_status)
+                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, 0, import_status)
                         .then(data => {
                             setOverlay("");
                             if (data === "Invalid Session") RedirectPage(history);
@@ -259,15 +262,17 @@ const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay}) =
 
     const importTestCase = (overWrite) => {
         
-        let testCaseId = current_task.testCaseId;
-		let testCaseName = current_task.testCaseName;
-        let versionnumber = current_task.versionnumber;
+        let testCaseId = fetchingDetails['_id'];
+		let testCaseName = fetchingDetails['name'];
+        // let versionnumber = fetchingDetails.versionnumber;
         if(overWrite) setShowConfirmPop(false);
+
+        // console.log(versionnumber);
         
-        DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber)
+        DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName , 0 )
 		.then(response => {
 				if (response === "Invalid Session") RedirectPage(history);
-                if (response.testcase.length === 0 || overWrite) {
+                if (response.testcase && response.testcase.length === 0 || overWrite) {
                     hiddenInput.current.click();
                     // document.getElementById("importTestCaseField").click();
                 }
