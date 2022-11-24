@@ -154,7 +154,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                 <input placeholder="Search Modules" ref={SearchInp} onChange={(e)=>searchModule(e.target.value)}></input>
                 <img src={"static/imgs/ic-search-icon.png"} alt={'search'}/>
             </span> */}
-            <button data-test="exportModules" disabled ={selectedModulelist.length==0} className='btn' title="Export Modules" onClick={()=>setExportBox(true)}>Export Modules</button>
+            {/* <button data-test="exportModules" disabled ={selectedModulelist.length==0} className='btn' title="Export Modules" onClick={()=>setExportBox(true)}>Export Modules</button> */}
             {/* <button data-test="createNew" className='btn' title="Create New Mindmap" onClick={()=>CreateNew()}>Create New</button> */}
         </div>
         
