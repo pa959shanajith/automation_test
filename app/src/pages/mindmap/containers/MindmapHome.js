@@ -2,8 +2,8 @@ import React, { useState, Fragment, useEffect } from 'react';
 import { Header, FooterTwo as Footer,ActionBar,ReferenceBar, setMsg, ScreenOverlay} from '../../global'
 import CreateOptions from '../components/CreateOptions.js'; 
 import CreateNew from './CreateNew.js';
-import CreateEnE from './CreateEnE.js'
-import CreateAssign from './CreateAssign.js';
+// import CreateEnE from './CreateEnE.js'
+// import CreateAssign from './CreateAssign.js';
 import ImportMindmap from'../components/ImportMindmap.js';
 import {exportMindmap, getProjectList, getModules} from '../api';
 import '../styles/MindmapHome.scss';
@@ -28,8 +28,8 @@ const MindmapHome = () => {
   const createType = {
     'newmindmap': React.memo(() => (<CreateNew/>)),
     //'importmindmap': React.memo(() => (<CreateNew importRedirect={true}/>)),
-    'enemindmap': React.memo(() => (<CreateEnE/>)),
-    'assignmap': React.memo(() => (<CreateAssign/>)),
+    // 'enemindmap': React.memo(() => (<CreateEnE/>)),
+    // 'assignmap': React.memo(() => (<CreateAssign/>)),
     'importmodules':React.memo(() => (<CreateNew importRedirect={true}/>))
  
     
@@ -62,7 +62,7 @@ const MindmapHome = () => {
  
 
 //data-selected="true"
-  var Component = (!options)? null : createType[options];
+  var Component = createType["newmindmap"];
   return (
     <div className='mp__container'>
       <Header/> 
@@ -99,7 +99,7 @@ const MindmapHome = () => {
 
       </div> */}
       <div className='mp__body'>
-        <ActionBar collapsible={true} collapse={options}>
+        <ActionBar collapsible={false} collapse={"newmindmap"}>
           <div className="mp__ic_box">
             <div className="ic_box" title="Create">
               <img onClick={()=>setOptions(undefined)} alt='Create Mindmap' className={"thumb__ic"+(options!=='assignmap' && options!=='importmodules'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
@@ -119,18 +119,18 @@ const MindmapHome = () => {
             </div> */}
           </div> 
       </ActionBar>
-        {(!options)?
+        {/* {(!options)?
         <Fragment>
           <div className='mp__middle_container'>
             <CreateOptions setOptions={setOptions1}/>
           </div>
           <ReferenceBar taskTop={true} collapsible={true} hideInfo={true}/>
-        </Fragment>:
+        </Fragment>: */}
         <Fragment>
           {importPop?<ImportMindmap setBlockui={setBlockui} setOptions={setOptions} displayError={displayError} setImportPop={setImportPop} isMultiImport={true} />:null}
           <Component/>
         </Fragment>        
-        }
+        {/* } */}
       </div>
       <div className='mp__footer'><Footer/></div>
     </div>

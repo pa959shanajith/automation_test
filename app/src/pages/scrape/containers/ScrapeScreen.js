@@ -24,7 +24,7 @@ import * as scrapeApi from '../api';
 import * as actionTypes from '../state/action';
 import '../styles/ScrapeScreen.scss';
 
-const ScrapeScreen = ()=>{
+const ScrapeScreen = (props)=>{
     const dispatch = useDispatch();
     const history = useHistory();
     const current_task = useSelector(state=>state.plugin.CT);
@@ -402,10 +402,10 @@ const ScrapeScreen = ()=>{
             
             <div data-test="ssMidSection" className="ss__mid_section">
                 <ScrapeContext.Provider value={{ startScrape, setScrapedURL, scrapedURL, isUnderReview, fetchScrapeData, setShowObjModal, saved, setShowAppPop, setSaved, newScrapedData, setNewScrapedData, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, hideSubmit, setOverlay, setShowPop, updateScrapeItems, orderList, setOrderList }}>
-                    <ActionBarItems />
+                <ActionBarItems appType={props.appType} />
                     { current_task.appType === "Webservice" 
                         ? <WebserviceScrape /> 
-                        : compareFlag ? <CompareObjectList /> : <ScrapeObjectList />}
+                        : compareFlag ? <CompareObjectList /> : <ScrapeObjectList appType={props.appType} />}
                     {/* <RefBarItems mirror={mirror}/> */}
                 </ScrapeContext.Provider>
             </div>

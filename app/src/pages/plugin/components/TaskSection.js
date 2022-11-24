@@ -84,6 +84,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [assignedUsers, setAssignedUsers] = useState({});
     const [unassignedUsers, setUnassignedUsers] = useState([]);
     const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
+    const [redirectTo, setRedirectTo] = useState("");
 
     // const userConf = useSelector(state=>state.admin.userConf)
     // const node = useRef();
@@ -507,13 +508,15 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
                 <div>
 
             <Button  style={{ background: "transparent", color: "#643693", border: "none", padding:" 8px 16px", FontSize:"16px",marginLeft:"380px",marginTop:"10px",fontFamily:"LatoWeb",fontStyle:"normal",lineHeight:"16px"}} label="Manage Project(s)"  onClick={() =>{setUnassignedUsers([]);setProjectAssignedUsers([]);setAssignedUsers({});setProjectName("");setAppType(null);setSelectedProject(null); setCreateProjectCheck(true); setAssignedUsers({}); onClick('displayBasic')}} />
+            
+            </div>
+            <div>
+            <div className="task-nav-bar1">
+                {projectNames && projectNames.projectName.map((singleProj,idx)=>{
+                   
+return <>
+			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
 
-                </div>
-                <div>
-                    <div className="task-nav-bar1">
-                        {projectNames && (searchValue ? searchItems : projectNames.projectName).map((singleProj, idx)  => {
-
-                            return <>
 <div key={idx} style={{display:'flex',justifyContent:'space-between',borderBottomStyle:'ridge'}}>
 <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")} style={{display:"flex", flexDirection:"column"}}>
             <span title={projectNames && singleProj} style={{marginTop: '1vh',marginBottom:'1vh'}}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>

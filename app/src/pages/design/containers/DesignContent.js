@@ -917,10 +917,11 @@ const DesignContent = props => {
                 <div className="d__taskBtns">
                     <button className="d__taskBtn d__btn" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} disabled={!changed}>Save</button>
                     <button className="d__taskBtn d__btn" data-test="d__deleteBtn" title="Delete Test Step" onClick={deleteTestcase} disabled={!stepSelect.check.length}>Delete</button>
-                    <div style={{ marginLeft: '-1px', marginBottom: '1px', marginRight:'-5px',marginTop:'37px' }}>
+                    {props.appType==="Web"?<div style={{ marginLeft: '-1px', marginBottom: '1px', marginRight:'-5px',marginTop:'-29px' }}>
+                   
                         {/* <span style={{float:'left' ,fontFamily:'LatoWeb', marginRight:'7px'}}>Select Browser</span> */}
                         <NormalDropDown
-                        style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '19px' }}
+                        style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '5px' }}
                         
                         
 
@@ -982,15 +983,34 @@ const DesignContent = props => {
                             placeholder="Select Browser"
                             width="190px"
                         />
-                        <div>
-                        <Button label="Debug" className="p-button-warning" onClick={()=>debugTestCases(debugButton)}></Button>
                         </div>
-                        </div>
+                        :
+                        props.appType==="OEBS" ? 
+                        <div className='desktopAppDesign_btn'>
+                            <p onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>OEBS Apps</span></p>
+                        </div>: 
+                        props.appType==="Desktop"? <div className='desktopAppDesign_btn'>
+                        <p  onClick={()=>debugTestCases('1')} ><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Destop Apps</span></p>
+                        </div>:
+                        props.appType==="SAP"?<div className='desktopAppDesign_btn'>
+                        <p  onClick={()=>debugTestCases('1')} ><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span>SAP Apps</p>
+                        </div>:
+                        props.appType==="MobileApp"?<div className='mobileAppDesign_btn'>
+                        <p  onClick={()=>debugTestCases('1')} ><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
+                        </div>:
+                        props.appType==="MobileWeb"?<div className='mobileAppDesign_btn'>
+                        <p onClick={()=>debugTestCases()}><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></p>
+                        </div>:""}
 
                 </div>
+                       
+                <div className="debug_button">
+                            <Button label="Debug" className="p-button-warning" onClick={()=>debugTestCases(debugButton)}></Button>
 
-               
+                        </div>
             </div>
+           
+
             </div>
 
             { /* Table */ }

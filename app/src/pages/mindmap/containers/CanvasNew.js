@@ -18,6 +18,7 @@ import * as actionTypes from '../state/action';
 import '../styles/MindmapCanvas.scss';
 // import TaskBox from '../components/TaskBox';
 import {Dialog} from '@avo/designcomponents';
+import * as pluginApi from '../../plugin/api';
 
 
 /*Component Canvas
@@ -63,6 +64,8 @@ const CanvasNew = (props) => {
     const [reuseDelContent,setReuseDelContent] = useState()
     const[endToEndDelConfirm,setEndToEndDelConfirm]=useState(false)
     const [verticalLayout,setVerticalLayout] = useState(true)
+    const [appType, setAppType] = useState("");
+    const proj = useSelector(state=>state.mindmap.selectedProj)
     const setBlockui=props.setBlockui
     const setDelSnrWarnPop = props.setDelSnrWarnPop
     const displayError = props.displayError
@@ -74,10 +77,18 @@ const CanvasNew = (props) => {
 
     useEffect(()=>{
         //useEffect to clear redux data selected module on unmount
+        pluginApi.getProjectIDs()
+            .then(data => {
+                debugger
+                let projectIndex = data.projectId.findIndex((project_id)=> project_id===proj)
+                setAppType(data.appTypeName[projectIndex])
+            }).catch(error=>{
+                console.log(error)
+            })
         return ()=>{
             // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         }
-    },[dispatch])
+    },[])
     useEffect(() => {
         var tree;
         count = {
@@ -368,6 +379,7 @@ const CanvasNew = (props) => {
             setdLinks(res.dLinks)
             setdNodes(res.dNodes)
         }
+        
     }
     const processDeleteNode = (sel_node) => {        
         var res = deleteNode(sel_node?sel_node:selectedDelNode,[...dNodes],[...dLinks],{...links},{...nodes})
@@ -378,6 +390,7 @@ const CanvasNew = (props) => {
             setdLinks(res.dLinks)
             setdNodes(res.dNodes)
         }
+        setDelConfirm(false);
     }
     const clickCollpase=(e)=>{
         var id = e.target.parentElement.id;
@@ -438,17 +451,17 @@ const CanvasNew = (props) => {
             onDecline={() => console.log(false)}
             onConfirm = {() => { }} 
             >
-                <div style={{ height: '120rem', overFlow:" hidden" }}><ScrapeScreen /></div>
+                <div style={{ height: '120rem', overFlow:" hidden" }}><ScrapeScreen appType={appType} /></div>
             </Dialog>
 
             <Dialog
             hidden = {props.ShowDesignTestSetup === false}
             isBlocking={true}
             onDismiss = {() => {props.setShowDesignTestSetup(false)}}
-            title ={taskname  +  " : Design Test Setup"}  
+            title ={taskname  +  " : Design Test Steps"}  
             minWidth = '58rem' 
             onConfirm = {() => { }} >
-                <div style={{ height: '623px'}}><DesignHome /></div>
+                <div style={{ height: '623px'}}><DesignHome appType={appType} /></div>
             </Dialog>
 
             
@@ -467,7 +480,7 @@ const CanvasNew = (props) => {
             <SearchBox setCtScale={setCtScale} zoom={zoom}/>
             <NavButton setCtScale={setCtScale} zoom={zoom}/>
             <Legends/>
-            <SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>
+            {props.GeniusDialog ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop}/>}
             <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
                 <g className='ct-container'>

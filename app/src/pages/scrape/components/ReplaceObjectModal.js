@@ -59,7 +59,7 @@ const RenderGroupItem = (props) =>{
                                         {/** If we want to retain the selected mappings after saving also */}
                                         {/* defaultValue={(COKMap[oldObj.objId] && COKMap[oldObj.objId]["keywordMap"][k_word])? COKMap[oldObj.objId]["keywordMap"][k_word]: ""}  */}
 
-                                        <select className="r-group__select" defaultValue={""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}>
+                                        <select className="r-group__select" defaultValue={newkeywords.includes(k_word)?k_word:""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}>
                                             <option key={"notSelected"} value={""} title={"Select keyword"} disabled>{"Select keyword"}</option>
                                             { newkeywords && newkeywords.map((keyword, i) => <option key={keyword+i} title={keyword} value={keyword}>{keyword.slice(0,30) + (keyword.length>30?"...":"")}</option>) }
                                         </select>

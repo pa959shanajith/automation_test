@@ -126,7 +126,7 @@ export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userI
   api returns String (Invalid Session/unavailableLocalServer/success/fail/Terminate/browserUnavailable/scheduleModeOn/ExecutionOnlyAllowed)
                 or {status:"", "":xpath}
 */ 
-export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType) => {
+export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType, geniusExecution=false) => {
     return new Promise((resolve, reject)=>{
         axios(url+"/debugTestCase_ICE", {
             method: 'POST',
@@ -138,7 +138,8 @@ export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType) =>
                 userInfo: userInfo,
                 browsertypes: browserType,
                 testcaseids: testcaseID,
-                apptype: appType
+                apptype: appType,
+                geniusExecution
             },
             credentials : 'include',
         })

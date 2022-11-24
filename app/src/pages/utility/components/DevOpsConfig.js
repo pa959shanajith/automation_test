@@ -350,10 +350,14 @@ const DevOpsConfig = props => {
             });
             return;
         }
-        if(integrationConfig.browsers.length < 1) {
-            setMsg(MSG.CUSTOM("Please Select atlease one Browser",VARIANT.ERROR));
+        if(integrationConfig.browsers.length < 1 && props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web") {
+            setMsg(MSG.CUSTOM("Please Select atleast one Browser",VARIANT.ERROR));
             return;
         }
+        if(props.currentIntegration.selectValues[2].selected === '') {
+            setMsg(MSG.CUSTOM("Please Select Project/Release/Cycle",VARIANT.ERROR));
+            return;
+        }    
         let batchInfo = [];
         if(selectedExecutionType === 'normalExecution')
             batchInfo = moduleScenarioList[selectedExecutionType].filter((module) => {
@@ -367,7 +371,7 @@ const DevOpsConfig = props => {
                         testsuiteId: module.moduleid,
                         batchname: "",
                         versionNumber: 0,
-                        appType: "Web",
+                        appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
                         projectName: integrationConfig.selectValues[0].selectedName,
                         projectId: integrationConfig.selectValues[0].selected,
@@ -409,7 +413,7 @@ const DevOpsConfig = props => {
                         testsuiteId: module.moduleid,
                         batchname: "",
                         versionNumber: 0,
-                        appType: "Web",
+                        appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
                         projectName: integrationConfig.selectValues[0].selectedName,
                         projectId: integrationConfig.selectValues[0].selected,
@@ -438,7 +442,7 @@ const DevOpsConfig = props => {
                         testsuiteId: module.moduleid,
                         batchname: module.batchname,
                         versionNumber: 0,
-                        appType: "Web",
+                        appType: props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected],
                         domainName: "Banking",
                         projectName: integrationConfig.selectValues[0].selectedName,
                         projectId: integrationConfig.selectValues[0].selected,
@@ -454,7 +458,10 @@ const DevOpsConfig = props => {
                         })).filter((scenario, index) => integrationConfig.scenarioList.includes(module.batchname+module.moduleid+index+scenario.scenarioId))
                     });
                 }));
-
+        if(batchInfo.length < 1) {
+            setMsg(MSG.CUSTOM("Please Select atleast one Scenario",VARIANT.ERROR));
+            return;
+        }
         props.setLoading('Please Wait...');
         const storeConfig = await storeConfigureKey({
             type: "",
@@ -510,11 +517,11 @@ const DevOpsConfig = props => {
         :null}
         <div className="page-taskName" >
             <span data-test="page-title-test" className="taskname">
-                { props.currentIntegration.name === '' ? 'Create' : 'Update'} Execution Profile
+                { props.currentIntegration.name === '' ? 'Create' : 'Update'} Execution Profile: {props.currentIntegration.selectValues[0].selectedName}
             </span>
         </div>
         <div className="api-ut__btnGroup">
-        <button style={{width: '15vh'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save' : 'Update'}</button>
+        <button style={{width: '30vh'}} data-test="submit-button-test" onClick={() => handleConfigSave()} >{props.currentIntegration.name == '' ? 'Save Configuration' : 'Update'}</button>
             <button data-test="submit-button-test" style={{width: '15vh'}} onClick={() => props.setCurrentIntegration(false)} >{dataUpdated ? 'Cancel' : '  Back'}</button>
             {/* <div className="devOps_config_name" style={{marginRight:'101vh'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
@@ -542,7 +549,7 @@ const DevOpsConfig = props => {
                         </div>
         {/* <div>
         {
-            integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} />
+            integrationConfig.selectValues && integrationConfig.selectValues.length > 0  && <ReleaseCycleSelection selectValues={integrationConfig.selectValues} handleSelect={handleNewSelect} isEditing={props.currentIntegration.name !== ''} />
         }
         </div> */}
         {

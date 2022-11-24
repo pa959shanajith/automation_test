@@ -16,8 +16,9 @@
     padding-bottom: 22px;
     display: flex;
     align-items:center;
-    margin:-72px -135px -13px 2px;
+    margin:-72px -135px -13px -23px;
     height:8px;
+    padding-left: 36px;
 }
    
 
@@ -39,6 +40,42 @@
     font-family: $avoFont;
     color: $darkGray;
     font-size: 13.5px;
+}
+
+.mobileApp_btn{
+    margin-Left:14px;
+    margin-Bottom: 4px;
+    width:200px;
+    font-family: $avoFont;
+    padding-left: 59px;
+    background: white;
+    border: none;
+    color: black;
+    margin-right: -75px;  
+}
+
+.desktop_btn{
+    margin-Left:-6px;
+    margin-Bottom: 0px;
+    width:200px;
+    font-family: $avoFont;
+    padding-left: 57px;
+    background: white;
+    border: none;
+    color: black;
+    margin-right: -55px;
+    height: 27px;  
+}
+
+
+.ss__thumbnail{
+    display: flex;
+    
+    align-items: center;
+    margin: 15% 27px 14% -2px;
+    font-size: 12.6px;
+    font-family: Mulish;
+    font-weight: 600;
 }
 
 .ss__taskBtn{

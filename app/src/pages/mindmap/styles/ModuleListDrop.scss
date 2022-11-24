@@ -95,9 +95,9 @@
 // .modClick{
 //     margin-left: 1rem;
 // }
-// .toolbar__module-box:hover{
-//     background-color: #f7f7f7;
-// }
+.toolbar__module-box:hover{
+    background-color: #f7f7f7;
+}
 // .selected{
 //     background: $whisper;
 // }
@@ -143,9 +143,9 @@
 //     left: 2.03125rem;
 //     top: -0.1875rem;
 // }
-// .toolbar__module-warning-footer .btn-yes{
-//     margin-right: 0.9375rem;
-// }
+.toolbar__module-warning-footer .btn-yes{
+    margin-right: 0.9375rem;
+}
 // .module_title{
 //     margin-left:0rem;
 //     // background-color : #f7f7f7;
@@ -293,6 +293,24 @@
     scroll-behavior: smooth;
     overflow-y: scroll;
 }
+.endToEndModules{
+    display:flex;
+    // width:20%;
+     justify-content:space-between;
+     padding:0.25rem;
+     margin-left:.3rem;
+     width: 9.6rem;
+    height:1.75rem ;
+    -webkit-border-radius: 0.625rem;
+    -moz-border-radius: 0.625rem;
+    border-radius: 0.625rem;
+    cursor: pointer;
+    text-align: center;
+
+}
+.endToEndModules :hover{
+    background-color: #f7f7f7;
+}
 .modNme{
     font-size: 0.75rem;
     overflow: hidden;
@@ -300,6 +318,7 @@
 }
 .modNmeE2E{
     font-size: 0.75rem;
+    margin-left: 1.5rem;
 
 }
 .scenarioList{
