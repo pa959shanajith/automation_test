@@ -46,6 +46,7 @@ const RenderGroupItem = (props) =>{
                 </div>
                 <div style={{display: expanded?"flex":"none",width:"100%",flex:1,flexDirection:"column"}}>
                     {keywords.map(((k_word,idx)=>{
+                        const similarTagNames = (tagListToReplace.includes(oldObj.tag)?oldObj.tag:"element")===(tagListToReplace.includes(newObj.tag)?newObj.tag:"element")
                         return (
                             <div key={idx} className="r-group__item">
                                 <div className='r-group__spacer'></div>
@@ -59,7 +60,7 @@ const RenderGroupItem = (props) =>{
                                         {/** If we want to retain the selected mappings after saving also */}
                                         {/* defaultValue={(COKMap[oldObj.objId] && COKMap[oldObj.objId]["keywordMap"][k_word])? COKMap[oldObj.objId]["keywordMap"][k_word]: ""}  */}
 
-                                        <select className="r-group__select" defaultValue={newkeywords.includes(k_word)?k_word:""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}>
+                                        <select className="r-group__select" defaultValue={ similarTagNames && newkeywords.includes(k_word)?k_word:""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}>
                                             <option key={"notSelected"} value={""} title={"Select keyword"} disabled>{"Select keyword"}</option>
                                             { newkeywords && newkeywords.map((keyword, i) => <option key={keyword+i} title={keyword} value={keyword}>{keyword.slice(0,30) + (keyword.length>30?"...":"")}</option>) }
                                         </select>
@@ -137,7 +138,7 @@ const ReplaceObjectModal = props => {
     useEffect(()=>{
         if(Object.keys(replace).length>0){
           Object.keys(replace).forEach((val_id,idx)=>{
-            if(replace[val_id]&& replace[val_id][0].tag===(tagListToReplace.includes(replace[val_id][1].tag)?replace[val_id][1].tag:"element")){
+            if(replace[val_id] && (tagListToReplace.includes(replace[val_id][0].tag)?replace[val_id][0].tag:"element")===(tagListToReplace.includes(replace[val_id][1].tag)?replace[val_id][1].tag:"element")){
               let keywords = CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords:[]
               keywords.forEach((keyword,idx1)=>{
                 if (!CrossObjKeywordMap[replace[val_id][0].objId]){
