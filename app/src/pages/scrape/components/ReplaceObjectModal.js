@@ -59,7 +59,7 @@ const RenderGroupItem = (props) =>{
                                         {/** If we want to retain the selected mappings after saving also */}
                                         {/* defaultValue={(COKMap[oldObj.objId] && COKMap[oldObj.objId]["keywordMap"][k_word])? COKMap[oldObj.objId]["keywordMap"][k_word]: ""}  */}
 
-                                        <select className="r-group__select" defaultValue={""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}>
+                                        <select className="r-group__select" defaultValue={newkeywords.includes(k_word)?k_word:""} onFocus={(e)=>{e.target.value?e.target.classList.remove("r-group__selectError"):e.target.classList.add("r-group__selectError")}} onChange={(e)=>{handleSelectChange(e,k_word)}}>
                                             <option key={"notSelected"} value={""} title={"Select keyword"} disabled>{"Select keyword"}</option>
                                             { newkeywords && newkeywords.map((keyword, i) => <option key={keyword+i} title={keyword} value={keyword}>{keyword.slice(0,30) + (keyword.length>30?"...":"")}</option>) }
                                         </select>
@@ -128,11 +128,34 @@ const ReplaceObjectModal = props => {
     }, [])
 
     useEffect(()=>{
-        updateScrollBar();
-        if(activeTab==="keywordsReplacement" && !document.querySelector(".r-group__container")){
-            _handleModalClose()
-        }
+      updateScrollBar();
+      if(activeTab==="keywordsReplacement" && !document.querySelector(".r-group__container")){
+          _handleModalClose()
+      }
     },[replace])
+    
+    useEffect(()=>{
+        if(Object.keys(replace).length>0){
+          Object.keys(replace).forEach((val_id,idx)=>{
+            if(replace[val_id]&& replace[val_id][0].tag===(tagListToReplace.includes(replace[val_id][1].tag)?replace[val_id][1].tag:"element")){
+              let keywords = CORData[replace[val_id][0].objId] ? CORData[replace[val_id][0].objId].keywords:[]
+              keywords.forEach((keyword,idx1)=>{
+                if (!CrossObjKeywordMap[replace[val_id][0].objId]){
+                  CrossObjKeywordMap[replace[val_id][0].objId] = {
+                    "keywordMap":{
+                      [keyword]:keyword
+                    }
+                  }
+                }
+                else{
+                  CrossObjKeywordMap[replace[val_id][0].objId]["keywordMap"][keyword] = keyword;
+                }
+                setCrossObjKeywordMap(CrossObjKeywordMap);
+              })
+            } 
+          })
+        }
+    },[CORData])
 
     const onDragStart = (event, data) => event.dataTransfer.setData("object", JSON.stringify(data))
 
@@ -217,11 +240,15 @@ const ReplaceObjectModal = props => {
                                 setMsg(MSG.SCRAPE.SUCC_OBJ_TESTCASES_REPLACED)
                                 if(!objectsReplaced)
                                     setObjectsReplaced(true)
-                                /** uncomment the line below when retaining the selected mappings, for deleting only saved object */
-                                // delete CrossObjKeywordMap[oldObjId]
+                                /** comment the line below when retaining the selected mappings, for deleting only saved object */
+                                setCrossObjKeywordMap((prevData) => {
+                                  const newData = {...prevData}
+                                  delete newData[oldObjId]
+                                  return newData;
+                                })
 
-                                /** comment the line below when retaining the selected mappings, currently deleting all mappings after saving */
-                                setCrossObjKeywordMap({})
+                                /** uncomment the line below when retaining the selected mappings, currently deleting all mappings after saving */
+                                // setCrossObjKeywordMap({})
                             }
                             else {
                                 setMsg(MSG.SCRAPE.ERR_REPLACE_OBJECT_FAILED)
