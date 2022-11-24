@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
   use: renders ExportMapButton and popups for selection on click 
 */
 
-const ExportMapButton = ({setBlockui,displayError,isAssign,releaseRef,cycleRef}) => {
+const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycleRef}) => {
     const fnameRef = useRef()
     const ftypeRef = useRef()
     const gitconfigRef = useRef()
@@ -40,7 +40,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign,releaseRef,cycleRef})
         }
         
         if(ftype === 'excel') toExcel(selectedProj,selectedModulelist.length>0?selectedModulelist[0]:selectedModule,fnameRef.current.value,displayError,setBlockui);
-        // if(ftype === 'custom') toCustom(selectedProj,selectedModuleVar,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
+        if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
         if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelist.length>0?selectedModulelist[0]:selectedModule});
     }
     return(
@@ -49,9 +49,9 @@ const ExportMapButton = ({setBlockui,displayError,isAssign,releaseRef,cycleRef})
             title='Export MindMap'
             close={()=>setExportBox(false)}
             footer={<Footer clickExport={clickExport}/>}
-            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={selectedModule.name} isAssign={isAssign}/>} 
+            content={<Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={selectedModule.name} isAssign={isAssign}/>} 
             />:null}
-            <svg data-test="exportButton" className={"ct-exportBtn"+(selectedModule._id || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox(true)}>
+            <svg data-test="exportButton" className={"ct-exportBtn"+(selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox(true)}>
                 <g id="ct-exportAction" className="ct-actionButton">
                     <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px"></rect>
                     <text x="16" y="18">Export</text>
@@ -75,7 +75,7 @@ const validate = (arr) =>{
     return err
 }
 
-const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef}) =>{
+const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,selectedModulelist,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef}) =>{
     const [expType,setExpType] = useState(undefined)
     const changeExport = (e) => {
         setExpType(e.target.value)
@@ -86,11 +86,11 @@ const Container = ({fnameRef,isEndtoEnd,ftypeRef,modName,isAssign,gitconfigRef,g
                 <label>Export As: </label>
                 <select defaultValue={'def-option'} ref={ftypeRef} onChange={changeExport}>
                     <option value={'def-option'} disabled>Select Export Format</option>
-                    {isAssign && <option value={'custom'}>Custom (.json)</option>}
+                    {isAssign && <option value={'custom'}disabled={selectedModulelist.length>1}>Custom (.json)</option>}
                     {!isEndtoEnd &&
                     <>
-                    <option value={'excel'}>Excel Workbook (.xlx,.xlsx)</option>
-                    <option value={'git'}>Git (.mm)</option>
+                    <option value={'excel'}disabled={selectedModulelist.length>1}>Excel Workbook (.xlx,.xlsx)</option>
+                    <option value={'git'}disabled={selectedModulelist.length>1}>Git (.mm)</option>
                     <option value={'json'}>MindMap (.mm)</option>
                     </>}
                 </select>
@@ -212,9 +212,9 @@ const toCustom = async (selectedProj,selectedModule,projectList,releaseRef,cycle
         moduleData.domainName = projectList[selectedProj].domains;
         moduleData.projectName = projectList[selectedProj].name;
         moduleData.projectId = projectList[selectedProj].id;
-        moduleData.releaseId = releaseRef.current.selectedOptions[0].innerText;
-        moduleData.cycleName = cycleRef.current.selectedOptions[0].innerText;
-        moduleData.cycleId = cycleRef.current.value;
+        moduleData.releaseId = projectList[selectedProj].releases[0].name;
+        moduleData.cycleName = projectList[selectedProj].releases[0].cycles[0].name;
+        moduleData.cycleId = projectList[selectedProj].releases[0].cycles[0]._id;
         const reqObject = [{
             "releaseid": moduleData.releaseId,
             "cycleid": moduleData.cycleId,

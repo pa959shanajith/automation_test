@@ -99,7 +99,7 @@ const MindmapHome = () => {
 
       </div> */}
       <div className='mp__body'>
-        <ActionBar collapsible={true} collapse={"newmindmap"}>
+        <ActionBar collapsible={false} collapse={"newmindmap"}>
           <div className="mp__ic_box">
             <div className="ic_box" title="Create">
               <img onClick={()=>setOptions(undefined)} alt='Create Mindmap' className={"thumb__ic"+(options!=='assignmap' && options!=='importmodules'? " selected_rb_thumb":"")} src="static/imgs/create.png"/>
