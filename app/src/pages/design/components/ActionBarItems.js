@@ -173,11 +173,9 @@ const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay, fe
     const hiddenInput = useRef(null);
 
     const exportTestCase =  () => {
-        console.log("this is export test cases");
 		let testCaseId = fetchingDetails['_id'];
 		let testCaseName = fetchingDetails['name'];
         // let versionnumber = fetchingDetails.versionnumber;
-        // console.log("versionNumber.........",versionnumber);
         
 		DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, 0)
 		.then(response => {
@@ -267,7 +265,6 @@ const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay, fe
         // let versionnumber = fetchingDetails.versionnumber;
         if(overWrite) setShowConfirmPop(false);
 
-        // console.log(versionnumber);
         
         DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName , 0 )
 		.then(response => {
