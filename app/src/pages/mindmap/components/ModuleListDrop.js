@@ -12,15 +12,6 @@ import { style } from 'd3';
 
 
 
-// import CreateOptions from '../components/CreateOptions.js';
-// import ImportMindmap from './ImportMindmap'
-// import MindmapHome from '../containers/MindmapHome'
-/*Component ModuleListDrop
-  use: renders 
-  props: 
-    setoptions from mindmapHome.js 
-*/
-// this code is used for drop down of modules...
 const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
     const moduleList = useSelector(state=>state.mindmap.moduleList)
@@ -50,9 +41,7 @@ const ModuleListDrop = (props) =>{
 
     useEffect(()=> {
         if(moduleList.length > 0) {
-            // const e = {
-            //     target: <span className='modNme' value={moduleList[0]._id} >{moduleList[0].name}</span>
-            // }
+            
             selectModule(moduleList[0]._id, moduleList[0].name, moduleList[0].type, false); 
         }
         setWarning(false)
@@ -79,7 +68,6 @@ const ModuleListDrop = (props) =>{
         dispatch({type:actionTypes.UPDATE_MODULELIST,payload:filter})
     }
      const loadModule = async(modID) =>{
-        // setModdrop(false)
         setWarning(false)
         setBlockui({show:true,content:"Loading Module ..."})        
         if(moduleSelect._id === modID){
@@ -100,8 +88,6 @@ const ModuleListDrop = (props) =>{
         setBlockui({show:false})
     }
     const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');
-    // normal module selection
-    //hoisting in javascript
             const selectModule = async (id,name,type,checked) => {
                 var modID = id
                 var type = name
@@ -118,40 +104,6 @@ const ModuleListDrop = (props) =>{
                         setInitScList(res)
                         setBlockui({show:false})
                         return;}
-        //         if(type=='checkbox'){
-        //             setWarning(false)
-        //             let selectedModList = [];
-        //             if(moduleSelectlist.length>0){
-        //                 selectedModList=moduleSelectlist;                
-        //             }
-        //             if(checked){
-        //                 if(selectedModList.indexOf(modID)==-1){
-        //                     selectedModList.push(modID);
-        //                 }
-        //             }else{
-        //                 selectedModList = selectedModList.filter(item => item !== modID)
-        //             }
-        //     //loadModule(selectedModList);
-        //    /*  var req={
-        //         tab:"tabCreate",
-        //         projectid:proj,
-        //         version:0,
-        //         cycId: null,
-        //         // modName:"",
-        //         moduleid:selectedModList
-        //     }     
-        //     var res = await getModules(req)
-        // if(res.error){displayError(res.error);return}
-        // if(isAssign && res.completeFlow === false){
-        //     displayError(MSG.MINDMAP.WARN_SELECT_COMPLETE_FLOW)
-        //     return;
-        // }   */    
-        //     dispatch({type:actionTypes.SELECT_MODULELIST,payload:selectedModList})
-        //     // d3.select('#pasteImg').classed('active-map',false)
-        //     // d3.select('#copyImg').classed('active-map',false)
-        //     // d3.selectAll('.ct-node').classed('node-selected',false)
-        //     return;
-        // }
         d3.select('#pasteImg').classed('active-map',false)
         d3.select('#copyImg').classed('active-map',false)
         d3.selectAll('.ct-node').classed('node-selected',false)
@@ -163,15 +115,10 @@ const ModuleListDrop = (props) =>{
         }
         
     }
-//     const selectModuleChkBox = (e) => {
-// // console.log("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",e)
-
-//     }
     
     
     //E2E properties
     const selectModules= async(e) => {
-        // setSelctedSc([])
         var modID = e.currentTarget.getAttribute("value")
         var type = e.currentTarget.getAttribute("type")
         var name = e.currentTarget.getAttribute("name")
@@ -181,7 +128,6 @@ const ModuleListDrop = (props) =>{
         }else{
             setWarning({modID, type});
             
-            // loadModuleE2E(modID)
         }
     }    
     const loadModuleE2E = async(modID) =>{
@@ -325,10 +271,6 @@ const ModuleListDrop = (props) =>{
                                         setIsE2EOpen(true);
                                     }
                                 },
-                                // {
-                                //     key: 'image',
-                                //     text: 'Import Module..',
-                                // }
                                 ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.3rem'}} placeholderIconName = 'plusIcon'
                             />  
                         </div>
@@ -362,7 +304,9 @@ const ModuleListDrop = (props) =>{
                                     
                                     return (
                                         <div className='scenarios'>
-                                            <div key={i + 'scenario'} onClick={(e) => addScenario(e)} className={'dropdown_scenarios' + (selectedSc[e._id] ? ' selected' : '')} title={e.name} value={e._id} >{e.name}</div>
+                                            <div key={i + 'scenario'} onClick={(e) => addScenario(e)} className={'dropdown_scenarios' + (selectedSc[e._id] ? ' selected' : '')} title={e.name} value={e._id} >
+                                                <span style={{textOverflow:"ellipsis"}}>
+                                                {e.name}</span></div>
                                         </div>
                                     )
                                 })}
