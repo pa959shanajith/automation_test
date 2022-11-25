@@ -10,7 +10,7 @@ import * as pluginApi from "../api";
 import "../styles/TaskSection.scss";
 // import '../styles/ProjectAssign.scss';
 import PropTypes from 'prop-types';
-import { NormalDropDown, TextField} from '@avo/designcomponents';
+import { NormalDropDown, SearchBox, TextField } from '@avo/designcomponents';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
@@ -36,7 +36,7 @@ import { RadioButton } from 'primereact/radiobutton'
 const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
     const history = useHistory();
-    
+
 
     const taskJson = useSelector(state=>state.plugin.tasksJson);
     const [showSearch, setShowSearch] = useState(false);
@@ -70,8 +70,8 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [getplugins_list,setplugins_list]=useState([]);
     const [projectName, setProjectName] = useState("");
     // const [selDomainOptions,setSelDomainOptions] = useState([])
-    // const [loading,setLoading] = useState(false)
-   
+    const [searchUsers, setSearchUsers] = useState("")
+
     const [projectNames, setProjectNames] = useState(null);
     const [projectId,setprojectId]=useState(null);
     const [loading,setLoading] = useState(false)
@@ -81,7 +81,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     const [createProj, setCreateProj] = React.useState(true);
     const [ModifyProj, setModifyProj] = React.useState(true);
     const [createprojectObj,setcreateprojectObj]=useState([]);
-    const [assignedUsers, setAssignedUsers] = useState({});   
+    const [assignedUsers, setAssignedUsers] = useState({});
     const [unassignedUsers, setUnassignedUsers] = useState([]);
     const [projectAssignedUsers, setProjectAssignedUsers] = useState([]);
     const [redirectTo, setRedirectTo] = useState("");
@@ -93,35 +93,35 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
 
     const handleCreateChange = () => {
         setCreateProjectCheck(true)
-      };
+    };
 
-      const handleModifyChange = () => {
+    const handleModifyChange = () => {
         setCreateProjectCheck(false);
         setAssignedUsers({});
-      };
-    
+    };
+
 
     const displayError = (error) =>{
         setLoading(false)
         setMsg(error)
     }
-    
+
     const checkCycle = (flag)=>{
-        for (var j = 0; j < props.releaseList.length; j++) {    
-			for (var i = 0; i < props.projectDetails.length; i++) {
-				if (props.releaseList[j] === props.projectDetails[i].name) {
-					if (props.projectDetails[i].cycles.length === 0) {
+        for (var j = 0; j < props.releaseList.length; j++) {
+            for (var i = 0; i < props.projectDetails.length; i++) {
+                if (props.releaseList[j] === props.projectDetails[i].name) {
+                    if (props.projectDetails[i].cycles.length === 0) {
                         displayError(Messages.ADMIN.WARN_ADD_CYCLE);
                         return true;
-					}
-				}
-			}
+                    }
+                }
+            }
         };
         return false;
     }
 
     const refreshDomainList = async () => {
-        let data = await getDomains_ICE() 
+        let data = await getDomains_ICE()
         if(data.error){displayError(data.error);return;}
         else if(data.length===0){
             data=['Banking','Manufacturing','Finance'];
@@ -134,15 +134,15 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     // }
 
     let dataDict;
-     
+
 
 
     // useEffect( async () => {
-        
+
     // },[]);
 
     // useEffect(async()=>{
-        
+
     // },[]);
 
     // useEffect(()=>{
@@ -155,170 +155,170 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
         (async() => {
             let userListFromApi =  await pluginApi.getUserDetails("user");
         if(userListFromApi.error){
-            setMsg(MSG.CUSTOM("Error while fetching the user Details"));
+                setMsg(MSG.CUSTOM("Error while fetching the user Details"));
         }else{
-            setUserDetailList(userListFromApi);
-            
-        }
+                setUserDetailList(userListFromApi);
 
-        console.log("UserDetailsList");
-        console.log(userListFromApi);
+            }
+
+            console.log("UserDetailsList");
+            console.log(userListFromApi);
             const ProjectList = await getProjectIDs(["domaindetails"],["Banking"]);
             setProjectsDetails(ProjectList)
-        // ProjectList = {
-        //     "projectIds":["62e27e5887904e413dad10fe", "62e27e5887904e413dad10ff"],
-        //     "projectNames":["avangers", "avangers2"]
-        // }
+            // ProjectList = {
+            //     "projectIds":["62e27e5887904e413dad10fe", "62e27e5887904e413dad10ff"],
+            //     "projectNames":["avangers", "avangers2"]
+            // }
         if(ProjectList.error){
-            setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+                setMsg(MSG.CUSTOM("Error while fetching the project Details"));
         }else{
-            
-            const arraynew = ProjectList.projectId.map((element, index) => {
-                return (
-                    {
-                        key: element,
-                        text: ProjectList.projectName[index],
-                        // disabled: true,
-                        // title: 'License Not Supported' 
-                    }
-                )
-            });
-            setProjectList(arraynew);
-            // key: "62e27e5887904e413dad10ff",
-            // text: "avangers2"
-        }
-        // [
-        //     {
-        //         key: "62e27e5887904e413dad10fe",
-        //         text: "avangers"
-        //     },
-        //     {
-        //     ]
-        // }
+
+                const arraynew = ProjectList.projectId.map((element, index) => {
+                    return (
+                        {
+                            key: element,
+                            text: ProjectList.projectName[index],
+                            // disabled: true,
+                            // title: 'License Not Supported' 
+                        }
+                    )
+                });
+                setProjectList(arraynew);
+                // key: "62e27e5887904e413dad10ff",
+                // text: "avangers2"
+            }
+            // [
+            //     {
+            //         key: "62e27e5887904e413dad10fe",
+            //         text: "avangers"
+            //     },
+            //     {
+            //     ]
+            // }
 
         console.log("domaindetails","Banking");
-        console.log(ProjectList);
-            var plugins = []; 
+            console.log(ProjectList);
+            var plugins = [];
         const plugins_list= await getAvailablePlugins();
-       
-        
+
+
         if(plugins_list.error){
-            setMsg(MSG.CUSTOM("Error while fetching the app Details"));
+                setMsg(MSG.CUSTOM("Error while fetching the app Details"));
         }else{
-            console.log(plugins_list);
-            
-                    let txt = [];
-                     for (let x in plugins_list) {
+                console.log(plugins_list);
+
+                let txt = [];
+                for (let x in plugins_list) {
                         if(plugins_list[x] === true) {
-                            txt.push({
-                                key: x,
-                                //text: x[0].toUpperCase()+x.slice(1)
+                        txt.push({
+                            key: x,
+                            //text: x[0].toUpperCase()+x.slice(1)
                                 text: x.charAt(0).toUpperCase()+x.slice(1),
                                 title: x.charAt(0).toUpperCase()+x.slice(1),
-                                disabled: false
-                            })
-                        }
-                        else {
-                            txt.push({
-                                key: x,
+                            disabled: false
+                        })
+                    }
+                    else {
+                        txt.push({
+                            key: x,
                                 text: x.charAt(0).toUpperCase()+x.slice(1),
-                                title: 'License Not Supported',
-                                disabled: true
-                            })
-                        }
-                       }
-                    //   setProjectList(arraynew1);
-                    // const arraynew2 = arraynew1.map((txt) => {
+                            title: 'License Not Supported',
+                            disabled: true
+                        })
+                    }
+                }
+                //   setProjectList(arraynew1);
+                // const arraynew2 = arraynew1.map((txt) => {
                 //       return (
                 //     {
                 //         key: txt,
                 //         text:txt
                 //     }
                 // )
-            // }
-            // ); 
-            setplugins_list(txt);
-        }
-        // console.log({"desktop":true, "mainframe": true, "mobileapp": true, "mobileweb": true, "oebs":true, "sap": true, "system":true,"web":true,"webservice":true});
-        // console.log(plugins_list);
+                // }
+                // ); 
+                setplugins_list(txt);
+            }
+            // console.log({"desktop":true, "mainframe": true, "mobileapp": true, "mobileweb": true, "oebs":true, "sap": true, "system":true,"web":true,"webservice":true});
+            // console.log(plugins_list);
         })()
-        
-    },[])
-  
 
-  
+    },[])
+
+
+
 
 
     useEffect(()=>{
         if(Object.keys(userInfo).length!==0 && userRole!=="Admin") {
             resetStates();
-            
+
             setOverlay("Loading Tasks..Please wait...");
             pluginApi.getProjectIDs()
-            .then(data => {
-                console.log(data)
-                setProjectNames(data);
+                .then(data => {
+                    console.log(data)
+                    setProjectNames(data);
                 if(data === "Fail" || data === "Invalid Session") return RedirectPage(history);
-                else {
-                    pluginApi.getTaskJson_mindmaps(data)
-                    .then(tasksJson => {
-                        //eslint-disable-next-line
-                        dataDict = dataDictState;
+                    else {
+                        pluginApi.getTaskJson_mindmaps(data)
+                            .then(tasksJson => {
+                                //eslint-disable-next-line
+                                dataDict = dataDictState;
 
                         if(tasksJson === "Fail" || tasksJson === "Invalid Session") return RedirectPage(history);
-                        else {                            
+                                else {
                             for (let i=0 ; i < tasksJson.length ; i++){
-                                tasksJson[i].uid = uuid();
+                                        tasksJson[i].uid = uuid();
                                 fillFilterValues(tasksJson[i],0);
-                            }
+                                    }
 
-                            let { dataObjList, reviewList, todoList } = GenerateTaskList(tasksJson, "pluginList");
+                                    let { dataObjList, reviewList, todoList } = GenerateTaskList(tasksJson, "pluginList");
 
-                            // setTaskJson(tasksJson);
+                                    // setTaskJson(tasksJson);
                             dispatch({type: actionTypes.SET_TASKSJSON, payload: tasksJson});
-                            setReviewItems(reviewList);
-                            setTodoItems(todoList);
-                            setDataObj(dataObjList);
-                            setOverlay("");
-                        }
+                                    setReviewItems(reviewList);
+                                    setTodoItems(todoList);
+                                    setDataObj(dataObjList);
+                                    setOverlay("");
+                                }
 
                         for (const projectID in dataDict.project){
-                          let dataIdx = data.projectId.indexOf(projectID);
-                          
-                          dataDict.project[projectID].domain = data.domains[dataIdx];
-                          dataDict.project[projectID].appType = { [data.appTypeName[dataIdx]]: data.appType[dataIdx] }
-                          dataDict.projectDict[projectID] = data.projectName[dataIdx];
-                          
-                          //eslint-disable-next-line
-                          for (const releaseID in dataDict.project[projectID].release){
-                            //eslint-disable-next-line
-                            dataDict.project[projectID].release[releaseID].forEach(cycleID=> {
-                                //eslint-disable-next-line
-                                dataDict.cycleDict[cycleID] = data.cycles[cycleID][2];
-                            })
-                          }
-                        } 
+                                    let dataIdx = data.projectId.indexOf(projectID);
 
-                        setDataDictState(dataDict);
+                                    dataDict.project[projectID].domain = data.domains[dataIdx];
+                                    dataDict.project[projectID].appType = { [data.appTypeName[dataIdx]]: data.appType[dataIdx] }
+                                    dataDict.projectDict[projectID] = data.projectName[dataIdx];
+
+                                    //eslint-disable-next-line
+                          for (const releaseID in dataDict.project[projectID].release){
+                                        //eslint-disable-next-line
+                            dataDict.project[projectID].release[releaseID].forEach(cycleID=> {
+                                            //eslint-disable-next-line
+                                            dataDict.cycleDict[cycleID] = data.cycles[cycleID][2];
+                                        })
+                                    }
+                                }
+
+                                setDataDictState(dataDict);
                         dispatch({type: actionTypes.SET_FD, payload: dataDict})
-                        console.log(data)
-                    })
-                    .catch(error => {
-                        setOverlay("");
-                        setMsg(MSG.PLUGIN.ERR_LOAD_TASK);
-                        console.error("Error::::", error);
-                    });
-                }
-            })
-            .catch(error => {
-                setOverlay("");
-                setMsg(MSG.PLUGIN.ERR_LOAD_TASK);
-                console.error("Error::::", error);
-            });
+                                console.log(data)
+                            })
+                            .catch(error => {
+                                setOverlay("");
+                                setMsg(MSG.PLUGIN.ERR_LOAD_TASK);
+                                console.error("Error::::", error);
+                            });
+                    }
+                })
+                .catch(error => {
+                    setOverlay("");
+                    setMsg(MSG.PLUGIN.ERR_LOAD_TASK);
+                    console.error("Error::::", error);
+                });
         }
     }, [userInfo, userRole]);
 
-     
+
     const resetStates = () => {
         setShowSearch(false);
         setActiveTab("todo");
@@ -334,7 +334,7 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     }
 
     const filterTasks = (filterData) => {
-	
+
         setShowFltrDlg(false);
 
         let review_items = [];
@@ -344,53 +344,53 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
             let taskname = taskJson[i].taskDetails[0].taskName;
             let tasktype = taskJson[i].taskDetails[0].taskType;
             let status = taskJson[i].taskDetails[0].status;
-            
+
             let dataobj = dataObj[i];
             if(passFilterTest(taskJson[i],0, filterData)){
                 if (status === 'underReview') review_items.push({'panel_idx': i, 'testSuiteDetails': taskJson[i].testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
                 else todo_items.push({'panel_idx': i, 'testSuiteDetails': taskJson[i].testSuiteDetails, 'dataobj': dataobj, 'taskname': taskname, 'tasktype': tasktype})
-            }				
+            }
         }
-        
-        setReviewItems(review_items);
+
+        // setReviewItems(review_items);
         setTodoItems(todo_items);
 
         if(filterData['prjval']==='Select Project' && filterData['relval']==='Select Release' && filterData['cycval']==='Select Cycle' && !(Object.values(filterData['tasktype']).includes(true) || Object.values(filterData['apptype']).includes(true))) 
             setFiltered(false);
-		    else setFiltered(true);
+        else setFiltered(true);
 
-        let items = activeTab === "todo" ? todo_items : review_items;
+        let items = activeTab === "todo" ? projectNames : null;
         let filteredItem = [];
-        filteredItem = items.filter(item=>item.taskname.toLowerCase().indexOf(searchValue.toLowerCase()) > -1);
+        filteredItem = items.filter(item => item.projectNames.toLowerCase().indexOf(searchValue.toLowerCase()) > -1);
 
         setSearchItems(filteredItem);
         setFilterData(filterData);
-	};
+    };
 
 
     const onSearchHandler = event => {
-        searchTask(activeTab, event.target.value)
+        searchProjects(event.target.value)
         setSearchValue(event.target.value);
     };
 
-    const searchTask = (activeTab, value) => {
-        let items = activeTab === "todo" ? todoItems : 
-        
-        reviewItems;
-        let filteredItem = [];
+    const searchProjects = (value) => {
+        // let items = activeTab === "todo" ? todoItems : 
 
-        filteredItem = items.filter(item=>item.taskname.toLowerCase().indexOf(value.toLowerCase()) > -1);
+        // reviewItems;
+        let filteredItems = [];
 
-        setSearchItems(filteredItem);
+        filteredItems = projectNames.projectName.filter(projectName => projectName.toLowerCase().indexOf(value.toLowerCase()) > -1);
+
+        setSearchItems(filteredItems);
     }
 
 
     const fillFilterValues = (obj, tidx) => {
         if (!dataDict.project[obj.projectId]) dataDict.project[obj.projectId] = {'release': {}}
-        
+
         if (!dataDict.project[obj.projectId].release[obj.taskDetails[tidx].releaseid])
             dataDict['project'][obj.projectId].release[obj.taskDetails[tidx].releaseid] = [];
-        
+
         if (!dataDict.project[obj.projectId].release[obj.taskDetails[tidx].releaseid].includes(obj.taskDetails[tidx].cycleid))
             dataDict.project[obj.projectId].release[obj.taskDetails[tidx].releaseid].push(obj.taskDetails[tidx].cycleid)
 
@@ -399,26 +399,26 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     }
 
     const passFilterTest = (node, tidx, filterData) => {
-      var pflag = false, rflag = false, cflag = false, aflag = false, tflag = false;
+        var pflag = false, rflag = false, cflag = false, aflag = false, tflag = false;
       if(filterData['prjval']==='Select Project' || filterData['prjval']===node.testSuiteDetails[tidx].projectidts) pflag = true;
       if(filterData['relval']==='Select Release' || filterData['relval']===node.taskDetails[tidx].releaseid) rflag = true;
       if(filterData['cycval']==='Select Cycle' || filterData['cycval']===node.taskDetails[tidx].cycleid) cflag = true;
       if(Object.keys(filterData['tasktype']).map(function(itm) { return filterData['tasktype'][itm]; }).indexOf(true) === -1 || filterData.tasktype[node.taskDetails[tidx].taskType]) tflag = true;
       if(Object.keys(filterData['apptype']).map(function(itm) { return filterData['apptype'][itm]; }).indexOf(true) === -1 || filterData.apptype[node.appType]) aflag = true;		
-      
+
       if(pflag && rflag && cflag && aflag && tflag) return true;
-      else return false;
-	}
-    
-    const onSelectTodo = event =>{
-        setActiveTab("todo");
-        if (showSearch) searchTask("todo", searchValue);
+        else return false;
     }
 
-    const onSelectReview = event => {
-        setActiveTab("review");
-        if (showSearch) searchTask("review", searchValue);
-    }
+    // const onSelectTodo = event =>{
+    //     setActiveTab("todo");
+    //     if (showSearch) searchTask("todo", searchValue);
+    // }
+
+    // const onSelectReview = event => {
+    //     setActiveTab("review");
+    //     if (showSearch) searchTask("review", searchValue);
+    // }
 
     const hideSearchBar = event => {
         setSearchValue("");
@@ -458,55 +458,55 @@ const TaskSection = ({userInfo, userRole, dispatch,props}) =>{
     //         </div>
     //     );
     // }
-    
+
     const create_project = async()=>{
-        
-                        setLoading("Saving...");
-                        const createprojectObj = {};
-                        createprojectObj.domain = 'Banking';
-                        createprojectObj.projectName = props.projectName.trim();
-                        createprojectObj.appType = props.projectTypeSelected;
-                        createprojectObj.projectDetails = [
-                            {
-                              "name": "R1",
-                              "cycles": [
-                                {
-                                  "name": "C1"
-                                }
-                              ]
-                            }
-                          ];
-                        console.log(createprojectObj);
-                        console.log("Controller: " + createprojectObj);
-                        // const createProjectRes = await createProject_ICE(createprojectObj)
-                        // if(createProjectRes.error){displayError(createProjectRes.error);return;}
-                        // else if (createProjectRes === 'success') {
-                        //     displayError(Messages.ADMIN.SUCC_PROJECT_CREATE);
-                        //     props.resetForm();
-                        //     props.setProjectDetails([]);
-                        //     refreshDomainList();
-                        // } else {
-                        //     displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
-                        //     props.resetForm();
-                        // }
-                        setLoading(false);
+
+        setLoading("Saving...");
+        const createprojectObj = {};
+        createprojectObj.domain = 'Banking';
+        createprojectObj.projectName = props.projectName.trim();
+        createprojectObj.appType = props.projectTypeSelected;
+        createprojectObj.projectDetails = [
+            {
+                "name": "R1",
+                "cycles": [
+                    {
+                        "name": "C1"
                     }
-    
+                ]
+            }
+        ];
+        console.log(createprojectObj);
+        console.log("Controller: " + createprojectObj);
+        // const createProjectRes = await createProject_ICE(createprojectObj)
+        // if(createProjectRes.error){displayError(createProjectRes.error);return;}
+        // else if (createProjectRes === 'success') {
+        //     displayError(Messages.ADMIN.SUCC_PROJECT_CREATE);
+        //     props.resetForm();
+        //     props.setProjectDetails([]);
+        //     refreshDomainList();
+        // } else {
+        //     displayError(Messages.ADMIN.ERR_CREATE_PROJECT);
+        //     props.resetForm();
+        // }
+        setLoading(false);
+    }
+
     return (
-        
+
         <>
-       
+
         {overlay && <ScreenOverlay data-test="screenoverlay-component" content={overlay}/>}
         { showFltrDlg && <FilterDialog data-test="filterdialog-component" setShow={setShowFltrDlg} dataDict={dataDictState} filterData={filterData} filterTasks={filterTasks} /> }
     <div  data-test="task-section" className="task-section">
-            <div data-test="task-header" className="task-header">
-                <span data-test="my-task" className="my-task"> Projects </span>
+                <div data-test="task-header" className="task-header">
+                    <span data-test="my-task" className="my-task"> Projects </span>
                 { showSearch && <input data-test="search-input" className="task-search-bar " autoFocus onChange={onSearchHandler} value={searchValue} />}
                 <span data-test="search-icon" className={"task-ic-container"+(showSearch?" plugin__showSearch":"")} onClick={hideSearchBar}><img className="search-ic" alt="search-ic" src="static/imgs/ic-search-icon.png"/></span>
-                {/* <span data-test="filter-icon" className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span> */}
-            </div>
-            <div>
-            
+                    {/* <span data-test="filter-icon" className={"task-ic-container " + (filtered && "filter-on") } onClick={()=>setShowFltrDlg(true)}><img className="filter-ic" alt="filter-ic" src="static/imgs/ic-filter-task.png"/></span> */}
+                </div>
+                <div>
+
             <Button  style={{ background: "transparent", color: "#643693", border: "none", padding:" 8px 16px", FontSize:"16px",marginLeft:"380px",marginTop:"10px",fontFamily:"LatoWeb",fontStyle:"normal",lineHeight:"16px"}} label="Manage Project(s)"  onClick={() =>{setUnassignedUsers([]);setProjectAssignedUsers([]);setAssignedUsers({});setProjectName("");setAppType(null);setSelectedProject(null); setCreateProjectCheck(true); setAssignedUsers({}); onClick('displayBasic')}} />
             
             </div>
@@ -520,59 +520,59 @@ return <>
 <div key={idx} style={{display:'flex',justifyContent:'space-between',borderBottomStyle:'ridge'}}>
 <span className={"task-nav-item" + (activeTab==="todo" && "active-tab")} style={{display:"flex", flexDirection:"column"}}>
             <span title={projectNames && singleProj} style={{marginTop: '1vh',marginBottom:'1vh'}}> {projectNames && `${idx+1}. ${singleProj}`}</span></span>
-            {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
-<div className='button-design'>
-            
-            
+                                    {/* <h4 className={"task-num" + (props.disableTask ? " disable-task" : "")}>{props.counter}</h4> */}
+                                    <div className='button-design'>
+
+
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"1200px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => {
-                window.localStorage['navigateScreen'] = "mindmap";
-                setRedirectTo(`/mindmap`);
-             }}>Design</button>
-            
+                                            window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+                                            window.location.href = "/mindmap";
+                                        }}>Design</button>
+
             <button className="reset-action__exit" style={{lineBreak:'00px', border: "1px solid #643693", color: "#643693", borderRadius: "24px",  padding:"0rem 1rem 0rem 1rem",background: " #FFFFFF",float:'left',marginLeft:"500px" ,margin: "9px",fontFamily:"LatoWeb",FontSize:"14px"}} onClick={(e) => { 
-                window.localStorage['navigateScreen'] = "TestSuite";
-                setRedirectTo(`/execute`);
-                }}>Execute</button>
-            </div>
-            </div>
-            </>  
-                })}
-                   
-            
-       
-            </div> 
-            </div>
-            {/* <div>
+                                            window.localStorage['Reduxbackup'] = window.localStorage['persist:login'];
+                                            window.location.href = "/execute";
+                                        }}>Execute</button>
+                                    </div>
+                                </div>
+                            </>
+                        })}
+
+
+
+                    </div>
+                </div>
+                {/* <div>
             {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={('displayBasic') => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
-                
-                
+
+
                 <Dialog header={!createProjectCheck ? 'Manage Project(s)' : 'Create Project'} visible={displayBasic} style={{ width: '30vw',fontFamily:'LatoWeb',fontSize:'16px' }}  onHide={() => onHide('displayBasic')}>
-                    
-{/* <div className="container"> */}
-  {/* <div className="column"> */}
-    {/* <div className="col-sm-12"> */}
-        <div>
 
-      <form>
+                    {/* <div className="container"> */}
+                    {/* <div className="column"> */}
+                    {/* <div className="col-sm-12"> */}
+                    <div>
 
-      <div className="ss__radioContainer">
+                        <form>
 
-        <label>
+                            <div className="ss__radioContainer">
 
-            <input type="radio" checked={createProjectCheck === true} value="create" onChange={ handleCreateChange } />
+                                <label>
 
-            <span>Create Project</span>
+                                    <input type="radio" checked={createProjectCheck === true} value="create" onChange={handleCreateChange} />
 
-        </label>
-        <label>
+                                    <span>Create Project</span>
 
-        <input type="radio" checked={createProjectCheck === false} value="modify" onChange={ handleModifyChange } />
+                                </label>
+                                <label>
 
-        <span>Modify Project</span>
+                                    <input type="radio" checked={createProjectCheck === false} value="modify" onChange={handleModifyChange} />
 
-        </label>
-        </div>
-        {/* <div className='Radiobutton_des'>
+                                    <span>Modify Project</span>
+
+                                </label>
+                            </div>
+                            {/* <div className='Radiobutton_des'>
         
         <div className="radio"  >
             
@@ -594,94 +594,94 @@ return <>
              Modify Project
             </label>
         </div> */}
-       {/* </div> */}
-        
-        
-      </form>
-      </div>
+                            {/* </div> */}
 
-    {/* </div> */}
-  {/* </div> */}
-{/* </div> */}
-        <div>
-            <div className='dialog_dropDown'>
-                {/* {
+
+                        </form>
+                    </div>
+
+                    {/* </div> */}
+                    {/* </div> */}
+                    {/* </div> */}
+                    <div>
+                        <div className='dialog_dropDown'>
+                            {/* {
                     isCreate == true ? <TextField /> : <NormalDropDown /> 
                 } */}
-                {
+                            {
                     createProjectCheck ? <TextField label='Enter Project Name'  width='300px' placeholder='Enter Project Name' fontStyle='LatoWeb'  onChange={(e)=>{setProjectName(e.target.value)}} FontSize='16px'  /> : 
-                    <NormalDropDown
-                        label="Select Project Name"
-                        options={getProjectList}
+                                    <NormalDropDown
+                                        label="Select Project Name"
+                                        options={getProjectList}
                         onChange={async(e,item) =>{
-                            setSelectedProject(item.key)
-                            const users_obj = await pluginApi.getUsers_ICE(item.key);
-                            debugger
-                            // const assigned = {};
-                            // users_obj["assignedUsers"].forEach((user_obj)=> {assigned[user_obj._id]=true})
-                            // setAssignedUsers(assigned);
-                            setUnassignedUsers(users_obj["unassignedUsers"]);
-                            setProjectAssignedUsers(users_obj["assignedUsers"]);
-                        }}
-                        selectedKey={selectedProject}    
-                        placeholder="Select Project"
-                        standard
-                        width="300px"
-                        fontSize='16px'
-                        
-                        //   fontSize='40px'
-                        //   marginLeft="200px"
-                    />
-                }
-                {/* /create_project() */}
-                {/* <p><a style={{ color: 'green' }} onClick={()=>{setCreateProjectCheck(!createProjectCheck)}} target="_blank">{createProjectCheck ? 'Select Project' : 'Create New Project'}</a></p> */}
+                                            setSelectedProject(item.key)
+                                            const users_obj = await pluginApi.getUsers_ICE(item.key);
+                                            debugger
+                                            // const assigned = {};
+                                            // users_obj["assignedUsers"].forEach((user_obj)=> {assigned[user_obj._id]=true})
+                                            // setAssignedUsers(assigned);
+                                            setUnassignedUsers(users_obj["unassignedUsers"]);
+                                            setProjectAssignedUsers(users_obj["assignedUsers"]);
+                                        }}
+                                        selectedKey={selectedProject}
+                                        placeholder="Select Project"
+                                        standard
+                                        width="300px"
+                                        fontSize='16px'
 
-                {/* <a  style={{ background: "transparent", color: "green", border: "none", padding:"0,0,0,10", FontSize:"-10px",marginRight:"300px",marginTop:"5px"}} label="Select Project"  onClick={() => onClick('displayBasic')} a/> */}
-                
-                {/* <p onClick = {() => setisCreate(!isCreate)}>{
+                                    //   fontSize='40px'
+                                    //   marginLeft="200px"
+                                    />
+                            }
+                            {/* /create_project() */}
+                            {/* <p><a style={{ color: 'green' }} onClick={()=>{setCreateProjectCheck(!createProjectCheck)}} target="_blank">{createProjectCheck ? 'Select Project' : 'Create New Project'}</a></p> */}
+
+                            {/* <a  style={{ background: "transparent", color: "green", border: "none", padding:"0,0,0,10", FontSize:"-10px",marginRight:"300px",marginTop:"5px"}} label="Select Project"  onClick={() => onClick('displayBasic')} a/> */}
+
+                            {/* <p onClick = {() => setisCreate(!isCreate)}>{
                     isCreate == true ? 'Select Project' : '+ Create New'                     
                 }</p> */}
 
-            </div>
-            <div className='dialog_dropDown'>  
-                {/* {
+                        </div>
+                        <div className='dialog_dropDown'>
+                            {/* {
                     isCreate == false ? <TextField /> : <NormalDropDown /> 
                 } */}
-                {
-                    createProjectCheck ? <NormalDropDown  
-                        label="Select App type"
-                        options={getplugins_list}
-                        // disabled={true}
-                        
-                        // label1="Apptype"
-                        // options1={[selectedProject && allProjects[selectedProject] ?
-                        //         {
-                        //             key: allProjects[selectedProject].apptype,
-                        //             text: allProjects[selectedProject].apptypeName
-                        //         }
-                        //     : {}
-                        // ]}
-                        placeholder="Select Apptype"
-                        width="300px"
-                        top="300px"
-                        
-                        
-                
-                        // disabled={!selectedProject}
-                        // required
-                        onChange={(e, item) => {
-                        setAppType(item)
-                        }}
-                
+                            {
+                                createProjectCheck ? <NormalDropDown
+                                    label="Select App Type"
+                                    options={getplugins_list}
+                                    // disabled={true}
+
+                                    // label1="Apptype"
+                                    // options1={[selectedProject && allProjects[selectedProject] ?
+                                    //         {
+                                    //             key: allProjects[selectedProject].apptype,
+                                    //             text: allProjects[selectedProject].apptypeName
+                                    //         }
+                                    //     : {}
+                                    // ]}
+                                    placeholder="Select AppType"
+                                    width="300px"
+                                    top="300px"
+
+
+
+                                    // disabled={!selectedProject}
+                                    // required
+                                    onChange={(e, item) => {
+                                        setAppType(item)
+                                    }}
+
                     /> : <TextField label='Selected App Type' disabled value={selectedProject ?projectsDetails["appTypeName"][projectsDetails["projectId"].indexOf(selectedProject)]:""} width='19rem' />
-                }
-            </div>
-            
-            <div className='labelStyle1'> <label>Users</label></div>
-        
+                            }
+                        </div>
+
+                        <div className='labelStyle1'> <label>Users</label></div>
+
 					<div className="wrap" style={{height:'12rem'}}>
                             <div className='display_project_box' style={{ overflow: 'auto' }}>
-                            {/* <div className='userForm-edit adminControl-edit'>
+                                {/* <div className='userForm-edit adminControl-edit'>
                     <button title={userConf.fType} className="userTypeBtn_conv-edit " style={{margin:"4px 0",right:"0",cursor:"default"}}>{userConf.fType}</button>
                     <input data-test="userListInputEdit" list="allUsersListauto" className=" btn-users edit-user-dropdown-edit" onClick = {()=>{props.click();props.setShowDropdownEdit(!props.showDropdownEdit);props.setAllUserFilList(userConf.allUsersList);}} type="text"  id="userIdName"  onChange={(event)=>{dispatch({type:actionTypes.UPDATE_ALL_USER_FILTER,payload:event.target.value});props.searchFunctionUser(event.target.value);}} value={userConf.allUserFilter}  placeholder="Search User.." autoComplete="none"/>
                     {(props.showDropdownEdit && userConf.allUsersList!==[])?
@@ -694,126 +694,149 @@ return <>
                         </div>
                         :null
                     }
-                </div> */}
-                <div >
-                {createProjectCheck && userDetailList.map((user, index) => (
-                                        <div key={index} className='display_project_box_list' style={{}} >                                           
-                                            <input type='checkbox' disabled={userInfo.user_id === user[1] } defaultChecked={userInfo.user_id === user[1]} value={user[0]} onChange={(e)=>{
-                                                if(e.target.checked) {setAssignedUsers({...assignedUsers, [user[1]]:true}) }
-                                                else{
-                                                    setAssignedUsers((prevState)=>{
+                </div> */}      
+                <div style={{display:'flex', width:"100%", marginTop:"10px"}}>
+                     <SearchBox
+                        placeholder="Enter Username"
+                        width="20rem"
+                        value={searchUsers}
+                        onClear={() => {setSearchUsers("")}}
+                        onChange={(e)=>{
+                            setSearchUsers(e.target.value)
+                        }}
+                    />
+                </div>
+                                <div >
+                                    {createProjectCheck && userDetailList.map((user, index) => {
+                                        return user[0].includes(searchUsers)? <div key={index} className='display_project_box_list' style={{}} >
+                                            <input type='checkbox' disabled={userInfo.user_id === user[1]} defaultChecked={userInfo.user_id === user[1]}  value={user[0]} onChange={(e) => {
+                                                if (e.target.checked) { setAssignedUsers({ ...assignedUsers, [user[1]]: true }) }
+                                                else {
+                                                    setAssignedUsers((prevState) => {
                                                         delete prevState[user[1]]
                                                         return prevState;
-                                                    }) 
-                                                }}} />
+                                                    })
+                                                }
+                                            }} />
 
                                             <span >{user[0]} </span>
-                                        </div> 
+                                        </div>:null
                                         // </ScrollBar>
-                    ) )}
-                                {!createProjectCheck && selectedProject && projectAssignedUsers.length>0 && projectAssignedUsers.map((user_obj,index)=>{
-                                    return (
-                                        <div key={index} className='display_project_box_list' style={{}} >                                           
-                                        <input type='checkbox' disabled={userInfo.user_id === user_obj["_id"] } defaultChecked={true} value={user_obj["name"]} onChange={(e)=>{
-                                            if(e.target.checked) {
-                                                setAssignedUsers((prevState)=>{
-                                                    delete prevState[user_obj["_id"]];
-                                                    return prevState;
-                                                }) 
-                                            }
+                                    })}
+                                    {!createProjectCheck && selectedProject && projectAssignedUsers.length > 0 && projectAssignedUsers.map((user_obj, index) => {
+                                        return user_obj["name"].includes(searchUsers)?(
+                                            <div key={index} className='display_project_box_list' style={{}} >
+                                                <input type='checkbox' defaultChecked={true} value={user_obj["name"]} onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setAssignedUsers((prevState) => {
+                                                            delete prevState[user_obj["_id"]];
+                                                            return prevState;
+                                                        })
+                                                    }
                                             else{
                                                 setAssignedUsers((prevState)=>{
-                                                    prevState[user_obj["_id"]] = false;
-                                                    return prevState;
-                                                }) 
-                                            }}} />
+                                                            prevState[user_obj["_id"]] = false;
+                                                            return prevState;
+                                                        })
+                                                    }
+                                                }} />
 
-                                        <span >{user_obj["name"]} </span>
-                                    </div> 
-                                    )
-                                })}
-                                <hr></hr>
-                                {!createProjectCheck && selectedProject && unassignedUsers.length>0 && unassignedUsers.map((user_obj,index)=>{
-                                    return (
-                                        <div key={index} className='display_project_box_list' style={{}} >                                           
+                                                <span >{user_obj["name"]} </span>
+                                            </div>
+                                        ):null
+                                    })}
+                                    {createProjectCheck?null:<hr></hr>}
+                                    {!createProjectCheck && selectedProject && unassignedUsers.length > 0 && unassignedUsers.map((user_obj, index) => {
+                                        return user_obj["name"].includes(searchUsers)? (
+                                            <div key={index} className='display_project_box_list' style={{}} >
                                         <input type='checkbox' disabled={userInfo.user_id === user_obj["_id"] } defaultChecked={false} value={user_obj["name"]} onChange={(e)=>{
                                             if(e.target.checked) {setAssignedUsers({...assignedUsers, [user_obj["_id"]]:true}) }
                                             else{
                                                 setAssignedUsers((prevState)=>{
-                                                    delete prevState[user_obj["_id"]] 
-                                                    return prevState;
-                                                }) 
-                                            }}} />
+                                                            delete prevState[user_obj["_id"]]
+                                                            return prevState;
+                                                        })
+                                                    }
+                                                }} />
 
-                                        <span >{user_obj["name"]} </span>
-                                    </div> 
-                                    )
-                                })}
-                                  </div>
+                                                <span >{user_obj["name"]} </span>
+                                            </div>
+                                        ):null
+                                    })}
+                                </div>
                             </div>
-                    </div>
-                    <div>
+                        </div>
                         <div>
+                            <div>
                             <button className="reset-action__exit" style={{lineBreak:'10px', border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px",  padding:"8px 25px",background: "white",float:'right',marginLeft:"5px",marginTop:'-0.9rem' }} 
                             onClick={async()=>{
                                 debugger;
                                if(createProjectCheck){
                                     try{
-                                        const config = {
-                                            projectName,
-                                            domain: "banking",
-                                            appType:appType? appType.text:undefined,
-                                            releases: [{"name":"R1","cycles":[{"name":"C1"}]}],
-                                            assignedUsers
-                                        }
-                                        const res= await pluginApi.userCreateProject_ICE(config)
-                                        setMsg(MSG.CUSTOM("Project Created Successfully","success"));
-                                        onHide('displayBasic');
-                                        try{
-                                            const ProjectList = await getProjectIDs();
-                                            setProjectNames(ProjectList);
+                                                const config = {
+                                                    "projectName":projectName.trim(),
+                                                    domain: "banking",
+                                                    appType: appType ? appType.text : undefined,
+                                                    releases: [{ "name": "R1", "cycles": [{ "name": "C1" }] }],
+                                                    assignedUsers
+                                                }
+                                                let proceed = false
+                                                if (projectNames.projectName.length > 0) {
+                                                    for ( let i = 0; i < projectNames.projectName.length; i++) {
+                                                        if (projectName.trim() === projectNames.projectName[i]) {
+                                                            displayError(Messages.ADMIN.WARN_PROJECT_EXIST);
+                                                            return;
+                                                        } else proceed = true;
+                                                    }
+                                                } 
+                                                const res = await pluginApi.userCreateProject_ICE(config)
+                                                setMsg(MSG.CUSTOM("Project Created Successfully", "success"));
+                                                // onHide('displayBasic');
+                                                try {
+                                                    const ProjectList = await getProjectIDs();
+                                                    setProjectNames(ProjectList);
                                         }catch(err) {
-                                            console.log(err)
-                                        }
-                                    }
+                                                    console.log(err)
+                                                }
+                                            }
                                     catch(err){
                                         setMsg(MSG.CUSTOM("Failed to create Project","error"));
-                                        console.log(err);
-                                    }
-                                }
-                                else {
+                                                console.log(err);
+                                            }
+                                        }
+                                        else {
                                     try{
-                                        const config = {
-                                           "project_id": selectedProject,
-                                            domain: "banking",
+                                                const config = {
+                                                    "project_id": selectedProject,
+                                                    domain: "banking",
                                             appType:appType? appType.text:undefined,
                                             releases: [{"name":"R1","cycles":[{"name":"C1"}]}],
-                                            assignedUsers
-                                        }
+                                                    assignedUsers
+                                                }
                                         const res= await pluginApi.userUpdateProject_ICE(config)
                                         setMsg(MSG.CUSTOM("Project Modified Successfully","success"));
-                                        onHide('displayBasic');
+                                                onHide('displayBasic');
                                         try{
-                                            const ProjectList = await getProjectIDs();
-                                            setProjectNames(ProjectList);
+                                                    const ProjectList = await getProjectIDs();
+                                                    setProjectNames(ProjectList);
                                         }catch(err) {
-                                            console.log(err)
-                                        }
-                                    }
+                                                    console.log(err)
+                                                }
+                                            }
                                     catch(err){
                                         setMsg(MSG.CUSTOM("Failed to create Project","error"));
-                                        console.log(err);
-                                    }
-                                }
-                            }}>{createProjectCheck ? 'Create' : 'Modify'}</button>
-                        </div>  
+                                                console.log(err);
+                                            }
+                                        }                                   
+                                    }}>{createProjectCheck ? 'Create' : 'Modify'}</button>
+                            </div>
+                        </div>
+
                     </div>
- 
-        </div>
-    </Dialog>
-      
-    </div>
-                {/* {userRole !== "Test Manager" && 
+                </Dialog>
+
+            </div>
+            {/* {userRole !== "Test Manager" && 
                     <div className="task-overflow" id="plugin__taskScroll">
                         <ScrollBar data-test="scrollbar-component" scrollId="plugin__taskScroll" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                             <div data-test="task-content" className="task-content" id="plugin_page__list">
