@@ -88,6 +88,7 @@ const ModuleListDrop = (props) =>{
         setBlockui({show:false})
     }
     const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');
+    // normal module selection
             const selectModule = async (id,name,type,checked) => {
                 var modID = id
                 var type = name
@@ -104,6 +105,9 @@ const ModuleListDrop = (props) =>{
                         setInitScList(res)
                         setBlockui({show:false})
                         return;}
+        d3.selectAll('.ct-node').classed('node-selected',false)
+        //     return;
+        // }
         d3.select('#pasteImg').classed('active-map',false)
         d3.select('#copyImg').classed('active-map',false)
         d3.selectAll('.ct-node').classed('node-selected',false)
@@ -116,9 +120,9 @@ const ModuleListDrop = (props) =>{
         
     }
     
-    
     //E2E properties
     const selectModules= async(e) => {
+        // setSelctedSc([])
         var modID = e.currentTarget.getAttribute("value")
         var type = e.currentTarget.getAttribute("type")
         var name = e.currentTarget.getAttribute("name")
@@ -271,7 +275,8 @@ const ModuleListDrop = (props) =>{
                                         setIsE2EOpen(true);
                                     }
                                 },
-                                ]} style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.3rem'}} placeholderIconName = 'plusIcon'
+                                ]}
+                                 style={{width:'1.67rem',height:'1.67rem', marginLeft:'15rem', border: 'white', marginTop:'0.3rem'}} placeholderIconName = 'plusIcon'
                             />  
                         </div>
                         <div className='searchBox pxBlack' style={{display:'flex'}}>
