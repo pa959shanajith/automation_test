@@ -173,6 +173,7 @@
     right: 0;
     display: flex;
     flex-direction: column;
+    overflow: auto;
 }
 .sc__min{
     min-height: 0;

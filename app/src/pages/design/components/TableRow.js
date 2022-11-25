@@ -218,7 +218,7 @@ const TableRow = (props) => {
                     <div className="d__row_text" title={output}>{output}</div> }
                 </span>
             </div>
-            <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span>
+            {/* <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span> */}
             <span className={"details_col"+(disableStep? " d__disabled_step":"")} onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-details-" + ( TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail ) ? "active.png" : "inactive.png" : "inactive.png")} alt="details"  onClick={()=>{props.showDetailDialog(props.idx); setFocused(false)}} /></span>
         </div>
         </>

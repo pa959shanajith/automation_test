@@ -28,6 +28,7 @@ const DesignHome = (props) => {
     const [showDpndntTcDlg, setShowDpndntTcDlg] = useState(false);
     const [dTcFlag, setDTcFlag] = useState(false);
     const [checkedTc, setCheckedTc] = useState({});
+    const [Collapsed, setCollapsed] = useState(false);
     
     useEffect(()=>{
         setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
@@ -35,6 +36,8 @@ const DesignHome = (props) => {
         setImported(false);
     }, [current_task, filter_data]);
 
+    const closeBar =()=> setCollapsed(!Collapsed);
+    
     const ConfirmPopup = () => (
         <ModalContainer 
             title={showConfirmPop.title}
@@ -82,6 +85,8 @@ const DesignHome = (props) => {
                                     isMac={isMac}
                                     disable={disableActionBar} 
                                     setOverlay={setOverlay}
+                                    appType = {props.appType}
+                                    fetchingDetails={props.fetchingDetails}
                                 />
                             } 
                             bottomContent={
@@ -90,6 +95,8 @@ const DesignHome = (props) => {
                                     setImported={setImported} 
                                     setOverlay={setOverlay}
                                     setShowConfirmPop={setShowConfirmPop}
+                                    appType = {props.appType}
+                                    fetchingDetails={props.fetchingDetails}
                                 />
                             }
                 />
@@ -112,9 +119,15 @@ const DesignHome = (props) => {
                                 setShowConfirmPop={setShowConfirmPop}
                                 setDisableActionBar={setDisableActionBar}
                                 appType = {props.appType}
+                                fetchingDetails={props.fetchingDetails}
+                                
                                 />
-                
-                {/* <ReferenceContent data-test="d__refBar" mirror={mirror}/> */}
+                {/* <div style={{ display: 'flex',alignItems:'center', }}>
+                    <div >
+                <img style={{ height: '1.1rem' }} onClick={closeBar} src={'static/imgs/collapseButton.png'}/></div>
+                {<div style={{width:Collapsed? '5rem':'0rem'}}>
+                    <ReferenceContent data-test="d__refBar" mirror={mirror} appType={props.appType}/> </div>
+                }</div> */}
                 
             </div>
             {/* <div data-test="d__footer" className='d__footer'><Footer/></div> */}
