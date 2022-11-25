@@ -743,14 +743,14 @@ const DesignContent = props => {
         headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
     }
 
-    const onAction = operation => {
-        switch(operation){
-            case "submit": setShow({'title':'Submit Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
-            case "reassign": setShow({'title':'Reassign Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
-            case "approve": setShow({'title':'Approve Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
-            default: break;
-        }                       
-    }
+    // const onAction = operation => {
+    //     switch(operation){
+    //         case "submit": setShow({'title':'Submit Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+    //         case "reassign": setShow({'title':'Reassign Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+    //         case "approve": setShow({'title':'Approve Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+    //         default: break;
+    //     }                       
+    // }
 
     const onCheckAll = (event) => {
         let checkList = [...stepSelect.check]
@@ -802,16 +802,16 @@ const DesignContent = props => {
                 </div>
             </div>}
             close={()=>{setShow(false);resetData();}}
-            footer={
-                <>
-                <button onClick={()=>{submitTask(showPopup.content)}}>
-                    {showPopup.continueText ? showPopup.continueText : "Yes"}
-                </button>
-                <button onClick={()=>{setShow(false);resetData()}}>
-                    {showPopup.rejectText ? showPopup.rejectText : "No"}
-                </button>
-                </>
-            }
+            // footer={
+            //     <>
+            //     <button onClick={()=>{submitTask(showPopup.content)}}>
+            //         {showPopup.continueText ? showPopup.continueText : "Yes"}
+            //     </button>
+            //     <button onClick={()=>{setShow(false);resetData()}}>
+            //         {showPopup.rejectText ? showPopup.rejectText : "No"}
+            //     </button>
+            //     </>
+            // }
         /> 
     )
 
@@ -1053,7 +1053,7 @@ const DesignContent = props => {
                 </div>
           
           
-            <div className="d__submit" data-test="d__actionBtn">
+            {/* <div className="d__submit" data-test="d__actionBtn">
                     { isUnderReview && 
                         <>
                         <button className="d__reassignBtn d__btn" title="Reassign Task" onClick={()=>onAction("reassign")}>
@@ -1069,7 +1069,7 @@ const DesignContent = props => {
                             Submit
                         </button>
                     }
-                </div>
+                </div> */}
                 
 
                 </div>
