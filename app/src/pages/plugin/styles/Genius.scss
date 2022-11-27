@@ -44,11 +44,14 @@
   position: relative;
   color: #5F338F;
   flex: 1;
+
   &[data-value=filled] {
     color: white !important;
+
     &::after {
       background: #5F338F !important;
     }
+
     &::before {
       background: #5F338F !important;
     }
@@ -56,11 +59,13 @@
 
   &[data-value=disabled] {
     color: #A19F9D !important;
+
     &::after {
       border-left: 2px solid #D9D9D9 !important;
       border-right: 2px solid #D9D9D9 !important;
       border-bottom: 2px solid #D9D9D9 !important;
     }
+
     &::before {
       border-left: 2px solid #D9D9D9 !important;
       border-right: 2px solid #D9D9D9 !important;
@@ -115,4 +120,42 @@
   margin: 1rem 1px 1rem 1.5rem;
   display: flex;
   width: calc(100% - 3rem)
+}
+
+#projectCreateBox {
+  display: block;
+  padding: 0rem 1rem 0rem 1rem;
+  line-height: 1.5rem;
+  border: 2px solid var(--baseColorBorder);
+  border-radius: 5px;
+  box-sizing: border-box;
+  width: 300px;
+  height: 10rem;
+}
+
+.dialog {
+  &__child {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  &__footer__action {
+    border: 2px solid #5F338F;
+    color: #5F338F;
+    border-radius: 10px;
+    padding: 8px 25px;
+    background: white;
+  }
+}
+
+.create__button {
+  &[data-attribute=disabled]{
+    cursor: default !important;
+    pointer-events: none !important;
+    color: #999 !important;
+  }
+}
+
+.ms-SearchBox-iconContainer {
+  width: unset !important;
 }
