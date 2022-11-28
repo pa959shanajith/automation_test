@@ -27,7 +27,7 @@ const SaveMapButton = (props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj,moduledata,verticalLayout)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNodes,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop)
     }
     return(
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -40,7 +40,7 @@ const SaveMapButton = (props) => {
 }
 
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout)=>{
+const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop)=>{
     var tab = "tabCreate"
     var selectedProject;
     var error = !1
@@ -144,8 +144,13 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
             sendNotify: {} //{Execute Batch: "priyanka.r", Execute Scenario: "priyanka.r"}
         }
     }
-    var modId = await saveMindmap(data)
-    if(modId.error){displayError(modId.error);return}
+    var result = await saveMindmap(data)
+    if(result.error){displayError(result.error);return}
+    var modId
+    if(result.scenarioInfo)
+        modId=result.currentmoduleid
+    else
+        modId = result
     var moduleselected = await getModules({modName:null,cycId:cycId?cycId:null,"tab":tab,"projectid":projId,"moduleid":modId})
     if(moduleselected.error){displayError(moduleselected.error);return}
     var screendata = await getScreens(projId)
@@ -154,6 +159,10 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNodes,unassignTask,
     dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})
     setBlockui({show:false});
     setMsg(MSG.CUSTOM(isAssign?MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,VARIANT.SUCCESS))
+    if(result.scenarioInfo){
+        dispatch({type:actionTypes.DELETE_SCENARIO,payload:result.scenarioInfo})
+        setDelSnrWarnPop(true);
+    }
     return;
 }
 

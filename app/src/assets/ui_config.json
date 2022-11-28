@@ -1,0 +1,60 @@
+{
+  "pluginData":{
+    "integration":{
+      "tooltip":{
+        "generic":"Connect Avo Assure to other test management systems, ALM and DevOps Tools"
+      },
+      "availableForTrial":false
+    },
+    "utility":{
+      "tooltip":{
+        "generic":"Setup data encryption, imbedded data tables, and more for use during test design"
+      },
+      "availableForTrial":false
+    },
+    "mindmap":{
+      "tooltip":{
+        "generic":"Visually design and assign test flow scenarios"
+      },
+      "availableForTrial":true
+    },
+    "reports":{
+      "tooltip":{
+        "generic":"View, analyze and export executed tests"
+      },
+      "availableForTrial":true
+    },
+    "dashboard":{
+      "tooltip":{
+        "generic":"Create, view, manage your own test automation dashboard"
+      },
+      "availableForTrial":false
+    },
+    "seleniumtoavo":{
+      "tooltip":{
+        "generic":"This is selenium to avo"
+      }
+    },
+    "neurongraphs":{
+      "tooltip":{
+        "generic":"This is neurongraphs"
+      }
+    },
+    "performancetesting":{
+      "tooltip":{
+        "generic":"This is performancetesting"
+      }
+    },
+    "avodiscover":{
+      "tooltip":{
+        "generic":"This is avodiscover"
+      }
+    },
+    "itdm":{
+      "tooltip":{
+        "generic":"Test Data Management tool to create synthetic data"
+      },
+      "availableForTrial":false
+    }
+  }
+}

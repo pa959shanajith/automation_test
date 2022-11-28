@@ -25,7 +25,7 @@ process.env.nulluser = "5fc137cc72142998e29b5e63";
 process.env.nullpool = "5fc13ea772142998e29b5e64";
 var logger = require('./logger');
 var nginxEnabled = process.env.NGINX_ON.toLowerCase().trim() == "true";
-
+let isTrialUser = false;
 if (cluster.isMaster) {
 	cluster.fork();
 	cluster.on('disconnect', function(worker) {
@@ -273,6 +273,10 @@ if (cluster.isMaster) {
 			sessionCheck(req, res, roles);
 		});
 
+		app.get(/^\/(verify|reset|expiry)$/, async (req, res, next) => {
+			return res.sendFile("index.html", { root: __dirname + "/public/" });
+		});
+
 		function sessionCheck(req, res, roles) {
 			logger.info("Inside sessioncheck for URL : %s", req.url);
 			var sess = req.session;
@@ -299,16 +303,30 @@ if (cluster.isMaster) {
 			let clientVer = String(req.query.ver);
 			let iceFile = uiConfig.avoClientConfig[clientVer];
 			if (req.query.file == "getICE") {
-				return res.download(path.resolve(iceFile),"AvoAssureClient."+iceFile.split(".").pop())
+				return res.download(path.resolve(iceFile),"AvoAssureClient"+(req.query.fileName?(req.query.fileName):"")+"."+iceFile.split(".").pop())
 			} else {
 				let status = "na";
 				try {
-					await fs.promises.access(path.resolve(iceFile));
-					status = "available";
-				} catch (error) {}
+					let stats = await fs.promises.stat(path.resolve(iceFile))
+					// await fs.promises.access(path.resolve(iceFile));
+					if(stats.isFile()){
+						status = "available";
+					}else {
+						console.error("Error Occurred in fetching Avo Client")
+					}
+				} catch (error) {
+					console.error("Catch: Error Occurred in fetching Avo Client")
+				}
 				return res.send({status});
 			}
 		});
+
+    app.get('/downloadURL', (req, res) => {
+      var text = String(req.query.link)
+      res.attachment('avoURL.txt');
+      res.type('txt');
+      res.send(text);
+    })
 
 		app.get('/getClientConfig', (req,res) => {
 			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks})
@@ -325,6 +343,10 @@ if (cluster.isMaster) {
 				console.error("external plugin doesn't exist");
 			}
 		});
+
+    app.get('/getLicenseInfo', (req,res) => {
+      return res.send({isTrialUser})
+    })
 
 		//Route Directories
 		var mindmap = require('./server/controllers/mindmap');
@@ -363,12 +385,15 @@ if (cluster.isMaster) {
 		app.post('/pdProcess', auth.protect, pdintegration.pdProcess);	// process discovery service
 		app.post('/exportToGit', auth.protect, mindmap.exportToGit);
 		app.post('/importGitMindmap', auth.protect, mindmap.importGitMindmap);
+		app.post('/deleteScenario', auth.protect, mindmap.deleteScenario);
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
 		app.post('/forgotPasswordEmail', authlib.forgotPasswordEmail);
 		app.post('/unlockAccountEmail', authlib.unlockAccountEmail);
 		app.post('/unlock', authlib.unlock);
+		app.post('/verifyUser',authlib.verifyUser);
+    app.post('/checkForgotExpiry',authlib.checkForgotExpiry);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);
@@ -565,12 +590,13 @@ if (cluster.isMaster) {
 		try {
 			var apireq = apiclient.post(epurl + "server", function(data, response) {
 				try {
-					if (response.statusCode != 200 || !data || data.toString() != "pass") {
+					if (response.statusCode != 200 || !data || data.toString() === "fail") {
 						httpsServer.close();
 						logger.error("Please run the Service API and Restart the Server");
 					} else {
+            isTrialUser = JSON.parse(data.toString()).isTrial
 						scheduler.reScheduleTestsuite();
-						// scheduler.reScheduleRecurringTestsuite();
+						scheduler.reScheduleRecurringTestsuite();
 						console.info("Avo Assure Server Ready...\n");
 					}
 				} catch (exception) {

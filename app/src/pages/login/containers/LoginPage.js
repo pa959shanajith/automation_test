@@ -21,7 +21,7 @@ const LoginPage = () => {
 
     return (
         <StaticElements>
-             <LoginFields SetProgressBar={SetProgressBar}/>
+             <LoginFields SetProgressBar={SetProgressBar} verifyPage={window.location.pathname==="/verify"?true:false} resetPassword={window.location.pathname==="/reset"?true:false}/>
         </StaticElements>
     );
 }

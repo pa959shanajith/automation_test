@@ -217,6 +217,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     response['status'] = "pass";
                 } else if (targetICE && targetICE != EMPTYUSER) {
                     //the target ice is neither part of a pool nor is connected to server, queuing not possible
+                    scheduler.updateScheduleStatus(batchExecutionData.scheduleId,'Missed');
                     response['status'] = "pass";
                     response['variant'] = "error";
                     response["message"] = targetICE + " not connected to server and not part of any pool, connect ICE to server or add ICE to a pool to proceed."

@@ -3,6 +3,8 @@ import { Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types';
 import { getMappedDiscoverUser } from '../api';
 import { setMsg } from '../../global' ;
+import { useSelector } from "react-redux";
+import uiConfig from "../../../assets/ui_config.json";
 
 const displayError = (error) =>{
 	setMsg(error)
@@ -17,8 +19,14 @@ const openDiscover = async() =>{
 const PluginBox = ({pluginName, pluginTitle}) => {
 
 	const [redirectTo, setRedirectTo] = useState("");
+  const userInfo = useSelector(state=>state.login.userinfo);
+  const pluginData = uiConfig.pluginData;
+  const disabled = userInfo.isTrial && !pluginData[pluginName.split(' ').join('').toLowerCase()]["availableForTrial"]
 
 	const pluginRedirect = async() => {
+    if (disabled) {
+      return
+    }
 		pluginName = pluginName.split(' ').join('').toLowerCase();
 		window.localStorage['navigateScreen'] = pluginName;
 		if(['dashboard', 'neurongraphs', 'seleniumtoavo', "reports"].includes(pluginName)){
@@ -49,10 +57,13 @@ const PluginBox = ({pluginName, pluginTitle}) => {
     return (
 		<>
 			{ redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
-            <div data-test="plugin-blocks" className="plugin-block" title={pluginTitle} onClick={pluginRedirect}>
-                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}.svg`} />
+            <div data-test="plugin-blocks" className={"plugin-block " +(disabled?"disabled-plugin":"")} title={pluginData[pluginName.split(' ').join('').toLowerCase()]["tooltip"]["generic"]} onClick={pluginRedirect}>
+                <img data-test="plugin-image" className="plugin-ic" alt="plugin-ic" src={`static/imgs/${pluginName.split(' ').join('')}${disabled?"_disabled":""}.svg`} />
                 <span data-test="plugin-name" className="plugin-text">{pluginTitle}</span>
-        	</div>
+                {disabled?
+                  <div className='disabled-info'><i class="fa fa-lock fa-fw" style={{color:"#ffcc62",paddingLeft:1,fontSize:9, marginRight:4}} aria-hidden="true"></i>Premium</div>
+                :null}
+        	  </div>
 		</>
     );
 }

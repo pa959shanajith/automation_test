@@ -1,18 +1,24 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
 import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap , pdProcess, importGitMindmap} from '../api';
-import {ModalContainer, Messages as MSG } from '../../global'
+import {ModalContainer, Messages as MSG,setMsg} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch } from 'react-redux';
 import * as actionTypes from '../state/action';
 import PropTypes from 'prop-types';
-import '../styles/ImportMindmap.scss'
+import '../styles/ImportMindmap.scss';
 
 
+// const [selectedProject , setSelectedProject]= useState("Select Project");
+// const button1=document.querySelectorAll('button');
 
-const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions}) => {
+const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport}) => {
     const [projList,setProjList] = useState({})
     const [error,setError] = useState('')
     const [submit,setSubmit] = useState(false)
+    const [disableSubmit,setDisableSubmit] = useState(false)
+    const [mindmapData,setMindmapData] = useState([])
+    // const [istrue,setistrue] = useState(false)
+    
     useEffect(()=>{
         (async()=>{
             setBlockui({show:true,content:'Loading ...'})
@@ -27,15 +33,15 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions}) => {
     return(
         <ModalContainer 
         modalClass = 'modal-md'
-        title='Import Mindmap'
+        title='Import Modules'
         close={()=>setImportPop(false)}
-        footer={<Footer error={error} setSubmit={setSubmit}/>}
-        content={<Container submit={submit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} displayError={displayError}/>} 
+        footer={<Footer error={error} disableSubmit={disableSubmit} setSubmit={setSubmit}/>}
+        content={<Container submit={submit} setMindmapData={setMindmapData} mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}/>} 
       />
     )
 }
 
-const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,setOptions,setImportPop}) => {
+const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,setDisableSubmit,setError,setSubmit,submit,setOptions,setImportPop,isMultiImport}) => {
     const dispatch = useDispatch()
     const ftypeRef = useRef()
     const uploadFileRef = useRef()
@@ -48,10 +54,16 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
     const [importType,setImportType] = useState(undefined)
     const [fileUpload,setFiledUpload] = useState(undefined)
     const [sheetList,setSheetList] = useState([])
+    
     const upload = () => {
+        const project = projRef.current.value;
+        if(project=='def-val'){
+            displayError("Please select project");return;
+        }
         setError('')
         setFiledUpload(undefined)
-        uploadFile({setBlockui,projList,uploadFileRef,setSheetList,setError,setFiledUpload})
+        // console.log("project: " + project)
+        uploadFile({setBlockui,setMindmapData,projList,uploadFileRef,setSheetList,setError,setDisableSubmit,setFiledUpload, selectedProject:project})
     }
     const changeImportType = (e) => {
         setSheetList([])
@@ -107,25 +119,46 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                         projectid:data.projectid,
                         version:0,
                         cycId: null,
-                        moduleid:res._id
+                        moduleid:Array.isArray(res._id)?res._id:[res._id]
                     }
                     var res = await getModules(req)
                     if(res.error){displayError(res.error);return;}
                     importData = res
                     setBlockui({show:false})
                 }
-                loadImportData({
-                    importType,
-                    importData, 
-                    importProj:projRef.current ? projRef.current.value: undefined,
-                    sheet:sheetRef.current? sheetRef.current.value: undefined,
-                    dispatch:dispatch,
-                    displayError:displayError,
-                    setBlockui:setBlockui,
-                    setOptions:setOptions,
-                    setImportPop:setImportPop,
-                    changeImportType:changeImportType
-                })
+                // console.log("ProjectId " + projRef.current.value)
+                if(isMultiImport){
+                    var res = await importMindmap(mindmapData)
+                
+                if(res.error){setError(res.error);setBlockui({show:false});return;}
+                var req={
+                    tab:"tabCreate",
+                    projectid:mindmapData[0]?mindmapData[0].projectid:mindmapData.projectid,
+                    version:0,
+                    cycId: null,
+                    moduleid:Array.isArray(res._id)?res._id:res
+                }
+                res = await getModules(req)
+                // console.log("GetModules res: " + JSON. stringify(res))
+                if(res.error){setError(res.error);setBlockui({show:false});return;}
+                setFiledUpload(res)
+                setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
+                setImportPop(false);
+                }else{
+                    loadImportData({
+                        importType,
+                        importData, 
+                        importProj:projRef.current ? projRef.current.value: undefined,
+                        sheet:sheetRef.current? sheetRef.current.value: undefined,
+                        dispatch:dispatch,
+                        displayError:displayError,
+                        setBlockui:setBlockui,
+                        setOptions:setOptions,
+                        setImportPop:setImportPop,
+                        changeImportType:changeImportType
+                    })
+
+                } 
             })()
         }
     },[submit])
@@ -142,6 +175,81 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
 					<option value={'sel'}>Selenium To Avo (.sel)</option>
                 </select>
             </div>
+            {isMultiImport && 
+                <Fragment>
+                    {(importType==='json')?
+                        <div>
+                            <label>
+                            Project:   
+                            </label>
+                            <select className='imp-inp' disabled={false} ref={projRef}>
+                            <option value={'def-val'}>Select Project</option>
+                                {(()=>{
+                                    return Object.entries(projList).map((e)=>{
+                                            return <option value={e[1].id} key={e[0]}>{e[1].name}</option>
+                                    })
+                                })()       
+                                }
+                                {/* <option value={fileUpload.projectID} >{projList[fileUpload.projectID].name}</option> */}
+                            </select>
+                        </div>
+                    :null}
+                    {(importType==='pd')?
+                        <div>
+                            <label>Project: </label>
+                            <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
+                                <option value={'def-val'} disabled>Select Project</option>
+                                {(()=>{
+                                    var appType = getApptypePD(fileUpload)
+                                    return Object.entries(projList).map((e)=>{
+                                        //if(appType === e[1].apptypeName.toLowerCase()){
+                                            return <option value={e[1].id} key={e[0]}>{e[1].name}</option>
+                                        //}
+                                    })
+                                })()       
+                                }
+                            </select>
+                        </div>:null
+                    }
+                    {(importType==='sel')?
+                        <div>
+                            <label>Project: </label>
+                            <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
+                                <option value={'def-val'} disabled>Select Project</option>
+                                {(()=>{
+                                    var appType = 'web';
+                                    return Object.entries(projList).map((e)=>{
+                                        if(appType === e[1].apptypeName.toLowerCase()){
+                                            return <option value={e[1].id} key={e[0]}>{e[1].name}</option>
+                                        }
+                                    })
+                                })()       
+                                }
+                            </select>
+                        </div>:null
+                    }
+                    {(importType==='excel')?
+                        <Fragment>
+                            <div>
+                                <label>Project: </label>
+                                <select className='imp-inp' defaultValue={'def-val'} ref={projRef}>
+                                    <option value={'def-val'} disabled>Select Project</option>
+                                    {Object.entries(projList).map((e,i)=>
+                                    <option value={e[1].id} key={i}>{e[1].name}</option>
+                                )}
+                                </select>
+                            </div>
+                            <div>
+                                <label>Select Sheet: </label>
+                                <select defaultValue={"def-val"} ref={sheetRef}>
+                                    <option value="def-val" disabled>Please Select Sheet</option>
+                                    {sheetList.map((e,i)=><option value={e} key={i}>{e}</option>)}
+                                </select>
+                            </div>
+                        </Fragment>
+                :null}
+            </Fragment>
+            }
             {importType &&
                 <Fragment>
                     {(importType==='git')?
@@ -179,13 +287,20 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                     }
                 </Fragment>
             }
-            {fileUpload &&
+            {fileUpload && !isMultiImport &&
                 <Fragment>
                     {(importType==='json')?
                     <div>
                         <label>Project: </label>
-                        <select className='imp-inp' disabled={true} defaultValue={fileUpload.projectID} ref={projRef}>
-                            <option value={fileUpload.projectID} disabled>{projList[fileUpload.projectID].name}</option>
+                        <select className='imp-inp' disabled={false} ref={projRef}>
+                        <option value={'def-val'}>Select Project</option>
+                            {(()=>{
+                                return Object.entries(projList).map((e)=>{
+                                        return <option value={e[1].id} key={e[0]}>{e[1].name}</option>
+                                })
+                            })()       
+                            }
+                            {/* <option value={fileUpload.projectID} >{projList[fileUpload.projectID].name}</option> */}
                         </select>
                     </div>
                     :null}
@@ -197,9 +312,9 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
                             {(()=>{
                                 var appType = getApptypePD(fileUpload)
                                 return Object.entries(projList).map((e)=>{
-                                    if(appType === e[1].apptypeName.toLowerCase()){
+                                    //if(appType === e[1].apptypeName.toLowerCase()){
                                         return <option value={e[1].id} key={e[0]}>{e[1].name}</option>
-                                    }
+                                    //}
                                 })
                             })()       
                             }
@@ -249,12 +364,14 @@ const Container = ({projList,setBlockui,displayError,setError,setSubmit,submit,s
     )
 }
 // Footer for sheet choose popup
-const Footer = ({error,setSubmit}) =>{
+const Footer = ({error,setSubmit,disableSubmit}) =>{
+    console.log("disableSubmit"+disableSubmit)
     return(
       <Fragment>
             <div className='mnode__buttons'>
                 <label className='err-message'>{error}</label>
-                <button onClick={()=>setSubmit(true)}>Import</button>
+                <button disabled={disableSubmit} onClick={()=>setSubmit(true)}>Import</button>
+                
             </div>
       </Fragment>
     )
@@ -284,6 +401,7 @@ const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitV
 
 const loadImportData = async({importData,sheet,importType,importProj,dispatch,displayError,setBlockui,setImportPop,setOptions,changeImportType}) =>{
     var mindmapData = importData
+    // console.log("ImportProj: " + importProj)
     setBlockui({content:'Importing ...',show:true})
     if(importType === 'excel'){
         let validateNode = true;
@@ -323,10 +441,13 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
     })
     setImportPop(false)
     setOptions('importmindmap')
+   
 }
 
-const uploadFile = async({uploadFileRef,setSheetList,setError,setFiledUpload,projList,setData,fileImport,setBlockui}) =>{
+const uploadFile = async({uploadFileRef,setMindmapData,setSheetList,setDisableSubmit,setistrue,setError,setFiledUpload,projList,setData,fileImport,setBlockui,selectedProject}) =>{
     var file = uploadFileRef.current.files[0]
+    
+    // console.log('Selected Project: ' + selectedProject)
     if(!file)return;
     var extension = file.name.substr(file.name.lastIndexOf('.')+1)
     setBlockui({content:'Uploading ...',show:true})
@@ -371,31 +492,82 @@ const uploadFile = async({uploadFileRef,setSheetList,setError,setFiledUpload,pro
                 setError("File is empty")
             }
         }else if(extension === 'json' || extension === 'mm'){
-            var data = JSON.parse(result);
-            if (!('testscenarios' in data)){
+            var existingModulesInSelectedProject = await getModules({"tab":"tabCreate","projectid":selectedProject,"moduleid":null})
+            var uniqueModuleNames = new Set();
+            existingModulesInSelectedProject.map((m) => {
+                uniqueModuleNames.add(m.name)
+            })
+            console.log('existingModulesInSelectedProject: ', JSON.stringify(existingModulesInSelectedProject))
+            console.log('uniqueModuleNames: ', JSON.stringify(uniqueModuleNames))
+
+            var duplicateData = JSON.parse(result);
+            console.log('duplicateData',duplicateData);
+            var data = duplicateData.filter((d)=>!uniqueModuleNames.has(d.name))
+                                    .map((d)=>{
+                                        // Override projectId with the selected projectId
+                                        d.projectid = selectedProject;
+                                        uniqueModuleNames.add(d.name);
+                                        return d;
+                                    })
+                               
+            console.log('data',data);
+            var totallength=duplicateData.length;
+            var uniqlength=data.length;
+            
+            if(uniqlength > 0) {
+                setError((uniqlength)+"/"+(totallength) + " unique modules found. Unique will be imported");
+                
+           } 
+            else    if(uniqlength == 0) {
+                setError((uniqlength)+"/"+(totallength) + " unique modules found to import");
+                setBlockui({show:false});
+                setMsg(MSG.MINDMAP.ERR_IMPORT_DATA)
+                
+            }
+            if( !data  || data.length == 0){
+                setDisableSubmit(true)
+                return;
+            }
+            else {
+                setDisableSubmit(false)
+                setMindmapData(data)
+                
+            }
+
+             var isMultiMindmap = Array.isArray(data);
+            var hasError = false,hasNoScenarios= false;
+            if(isMultiMindmap){
+                hasError = data.find(element => !('testscenarios' in element))!=undefined;   
+                if(!hasError){
+                    hasNoScenarios = data.find(element => element.testscenarios.length === 0)!=undefined;
+                }             
+            }
+            if (!isMultiMindmap && !('testscenarios' in data) || hasError){
                 setError("Incorrect JSON imported. Please check the contents!!");
-            }else if(data.testscenarios.length === 0){
+            }else if((!isMultiMindmap && data.testscenarios.length === 0) || hasNoScenarios){
                 setError("The file has no node structure to import, please check!!");
             }else{
-                var importProj = data.projectid
+                var importProj = data[0].projectid
                 if(!importProj || !projList[importProj]){
                     setError(MSG.MINDMAP.WARN_PROJECT_ASSIGN_USER)
                     setBlockui({show:false})
                     return;
                 }
-                var res = await importMindmap(data)
+                /* var res = await importMindmap(data)
+                // console.log("ImportMindmap Res: " + res)
                 if(res.error){setError(res.error);setBlockui({show:false});return;}
                 var req={
                     tab:"tabCreate",
-                    projectid:data.projectid,
+                    projectid:data[0]?data[0].projectid:data.projectid,
                     version:0,
                     cycId: null,
-                    moduleid:res._id
+                    moduleid:Array.isArray(res._id)?res._id:res
                 }
                 res = await getModules(req)
+                // console.log("GetModules res: " + JSON. stringify(res))
                 if(res.error){setError(res.error);setBlockui({show:false});return;}
-                setFiledUpload(res)
-            }
+                setFiledUpload(res) */
+            } 
         }else{
             setError("File is not supported")
         }    

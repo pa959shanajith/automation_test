@@ -24,19 +24,19 @@ const UpperContent = props => {
     const { setShowAppPop, saved, startScrape, setSaved } = useContext(ScrapeContext);
 
     useEffect(() => {
-        setIsMac(navigator.appVersion.indexOf("Mac") !== -1);
+        setIsMac(navigator.appVersion.toLowerCase().indexOf("mac") !== -1);
         if (saved.flag || disableAction) setAppendCheck(false);
         //eslint-disable-next-line
     }, [appType, saved, subTaskId]);
 
 
     const WebList = [
-        { 'title': "Internet Explorer", 'img': "static/imgs/ic-ie.png", action: () => startScrape('ie'), 'disable': disableAction || compareFlag },
-        { 'title': "Google Chrome", 'img': "static/imgs/ic-chrome.png", action: () => startScrape('chrome'), 'disable': disableAction || compareFlag },
+        { 'title': "Internet Explorer", 'img': "static/imgs/internet_explorer_logo_new.svg", action: () => startScrape('ie'), 'disable': disableAction || compareFlag },
+        { 'title': "Google Chrome", 'img': "static/imgs/chrome_logo_new.svg", action: () => startScrape('chrome'), 'disable': disableAction || compareFlag },
         { 'title': "Safari", 'img': "static/imgs/ic-safari.png", action: () => startScrape('safari'), 'disable': disableAction || compareFlag },
-        { 'title': "Mozilla Firefox", 'img': "static/imgs/ic-mozilla.png", action: () => startScrape('mozilla'), 'disable': disableAction || compareFlag },
-        { 'title': "Microsoft Edge", 'svg': "static/imgs/ic-edge.svg", action: () => startScrape('edge'), 'disable': disableAction || compareFlag },
-        { 'title': "Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg", action: () => startScrape('chromium'), 'disable': disableAction || compareFlag }
+        { 'title': "Mozilla Firefox", 'img': "static/imgs/firefox_logo_new.svg", action: () => startScrape('mozilla'), 'disable': disableAction || compareFlag },
+        { 'title': "Microsoft Edge", 'svg': "static/imgs/edge_logo_new.svg", action: () => startScrape('edge'), 'disable': disableAction || compareFlag },
+        { 'title': "Edge Chromium", 'svg': "static/imgs/edge_logo_new.svg", action: () => startScrape('chromium'), 'disable': disableAction || compareFlag }
     ]
 
     const oebsList = [{ 'title': "OEBS Apps", 'img': 'static/imgs/ic-desktop.png', action: ()=> setShowAppPop({'appType': 'OEBS', 'startScrape': (scrapeObjects)=>startScrape(scrapeObjects)}), 'disable': disableAction }]

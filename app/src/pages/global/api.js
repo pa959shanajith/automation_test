@@ -79,14 +79,14 @@ export const updateTaskStatus = obj => {
 /*Component ChangePassword
   api returns "Invalid Session"/"success"/"same"/"incorrect"/"fail"
 */
-export const resetPassword = (newpassword, currpassword) => {
+export const resetPassword = (newpassword, currpassword=null, userData=null) => {
     return new Promise((resolve, reject) => {
         axios(url+"/resetPassword", {
             method: "POST",
             headers: {
                 "Content-type": "application/json"
             },
-            data: {'newpassword': newpassword, 'currpassword': currpassword},
+            data: {'newpassword': newpassword, currpassword, userData},
             credentials : 'include'
         })
         .then(res => {
@@ -106,14 +106,14 @@ export const resetPassword = (newpassword, currpassword) => {
 /*Component ChangePassword
   api returns "Invalid Session"/"success"/"same"/"incorrect"/"fail"
 */
-export const updatePassword = (newpassword, userObj) => {
+export const updatePassword = (newpassword, user_id) => {
     return new Promise((resolve, reject) => {
         axios(url+"/updatePassword", {
             method: "POST",
             headers: {
                 "Content-type": "application/json"
             },
-            data: {'newpassword': newpassword, userObj},
+            data: {'newpassword': newpassword, user_id},
             credentials : 'include'
         })
         .then(res => {

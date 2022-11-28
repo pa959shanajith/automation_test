@@ -167,6 +167,19 @@ exports.manageUserDetails = async (req, res) => {
 		}
 		const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (result == "fail" || result == "forbidden") res.status(500).send("fail");
+		else if (action==="create"){
+			if(result["userData"]){
+				res.send(result["status"]);			
+				let uData = result["userData"];
+				try{
+					notifications.notify("verifyUser", {field: "verifyUser", user: uData});
+				}catch(error) {
+					logger.error("Error occurred in admin/"+fnName,error);
+				}
+			}else{
+				res.send(result)
+			}
+		}
 		else res.send(result);
 	} catch (exception) {
 		logger.error("Error occurred in admin/"+fnName, exception);

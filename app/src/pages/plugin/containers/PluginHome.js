@@ -17,6 +17,7 @@ const PluginHome = () => {
 
     const [name, setName] = useState("Demo User");
     const [showTCPopup,setShowTCPopup] = useState(false);
+    const [show_WP_POPOVER, setPopover] = useState(false);
 
     useEffect(()=>{
         if (Object.keys(userInfo).length!==0){
@@ -34,8 +35,8 @@ const PluginHome = () => {
     return(
         <div className="plugin-bg-container">
             <img className="plugin-bg-img" alt="bg-img" src="static/imgs/light-bg.png"/>
-            {showTCPopup && (userInfo.welcomeStepNo!==undefined) ?<WelcomeWizard showWizard={setShowTCPopup}/>:null}
-            <Header />
+            {showTCPopup && (userInfo.welcomeStepNo!==undefined)?<WelcomeWizard showWizard={setShowTCPopup} setPopover={setPopover}/>:null}
+            <Header show_WP_POPOVER={show_WP_POPOVER} setPopover={setPopover}/>
             <div className="plugin-elements" id="plugin__mainScreen">
                 <ScrollBar scrollId="plugin__mainScreen" thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)" verticalbarWidth='8px'>
                 <div className="greeting-text">

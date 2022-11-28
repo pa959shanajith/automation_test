@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import ThumbnailSchedule from './ThumbnailSchedule';
 import { ModalContainer} from '../../global';
+import {CheckBox} from "@avo/designcomponents";
 import "../styles/ActionBarItems.scss"
 
 // todo: after pull add bottomcontent two icons smart scheduling 
@@ -78,34 +79,45 @@ const BottomContent = ({appType, updateExecAction, execAction, updateExecEnv, ex
             :null}
             {appType === "Web"?
                 <>
-                    <div className="s__parallel_icon" title="Parallel Execution" onClick={()=>{updateExecAction()}}>
-                        <img className={"s__parallel_icon__img"+ (execAction==="parallel" ? " s__selectedBrowser" : "" )}   src='static/imgs/ic-parallel.png' alt="Parallel Execution"/>
+                    <div className={"s__parallel_icon" + (execAction==="parallel" ? " s__selectedBrowser" : "" )} title="Parallel Execution" onClick={()=>{updateExecAction()}}>
+                        {execAction==="parallel" ?<div id="browser-checkbox"><CheckBox label="" checked={true} onChange={() => {}} variant="circle"/></div>:null}
+                        <img className={"s__parallel_icon__img"} src='static/imgs/ic-parallel.png' alt="Parallel Execution"/>
                         <span className="s__thumbnail__title">Parallel Execution</span>
                     </div>
-                    <div className="s__parallel_icon" title="SauceLabs Execution" onClick={()=>{updateExecEnv()}}>
-                        <img className={"s__parallel_icon__img"+ (execEnv!=="default" ? " s__selectedBrowser" : "" )}   src='static/imgs/saucelabs.png' alt="SauceLabs Execution"/>
+                    <div className={"s__parallel_icon" + (execEnv!=="default" ? " s__selectedBrowser" : "" )} title="SauceLabs Execution" onClick={()=>{updateExecEnv()}}>
+                        {execEnv!=="default" ?<div id="browser-checkbox"><CheckBox label="" checked={true} onChange={() => {}} variant="circle"/></div>:null}
+                        <img className={"s__parallel_icon__img"} src='static/imgs/saucelabs.png' alt="SauceLabs Execution"/>
                         <span className="s__thumbnail__title">SauceLabs Execution</span>
                     </div>
-                    <div className="s__parallel_icon" title="Module Smart Scheduling" onClick={()=>{updateSmartMode("smartModule")}}>
-                        <img className={"s__parallel_icon__img"+ (smartMode==="smartModule" ? " s__selectedBrowser" : "" )}   src='static/imgs/ic-module-smart.png' alt="Module Smart Scheduling"/>
+                    <div className={"s__parallel_icon" + (smartMode==="smartModule" ? " s__selectedBrowser" : "" )} title="Module Smart Scheduling" onClick={()=>{updateSmartMode("smartModule")}}>
+                        {smartMode==="smartModule" ?<div id="browser-checkbox"><CheckBox label="" checked={true} onChange={() => {}} variant="circle"/></div>:null}
+                        <img className={"s__parallel_icon__img"} src='static/imgs/ic-module-smart.png' alt="Module Smart Scheduling"/>
                         <span className="s__thumbnail__title">Module Smart Scheduling</span>
                     </div>
-                    <div className="s__parallel_icon" title="Scenario Smart Scheduling" onClick={()=>{updateSmartMode("smartScenario")}}>
-                        <img className={"s__parallel_icon__img"+ (smartMode==="smartScenario" ? " s__selectedBrowser" : "" )}   src='static/imgs/ic-scenario-smart.png' alt="Scenario Smart Scheduling"/>
+                    <div className={"s__parallel_icon" + (smartMode==="smartScenario" ? " s__selectedBrowser" : "" )} title="Scenario Smart Scheduling" onClick={()=>{updateSmartMode("smartScenario")}}>
+                        {smartMode==="smartScenario" ?<div id="browser-checkbox"><CheckBox label="" checked={true} onChange={() => {}} variant="circle"/></div>:null}
+                        <img className={"s__parallel_icon__img"} src='static/imgs/ic-scenario-smart.png' alt="Scenario Smart Scheduling"/>
                         <span className="s__thumbnail__title">Scenario Smart Scheduling</span>
                     </div>
                 </>
             :null}
+            {appType === "MobileWeb" && 
+                <div className={"s__parallel_icon"  + (execEnv!=="default" ? " s__selectedBrowser" : "" )} title="SauceLabs Execution" onClick={()=>{updateExecEnv()}}>
+                    {execEnv!=="default" ?<div id="browser-checkbox"><CheckBox label="" checked={true} onChange={() => {}} variant="circle"/></div>:null}
+                    <img className={"s__parallel_icon__img"}   src='static/imgs/saucelabs.png' alt="SauceLabs Execution"/>
+                    <span className="s__thumbnail__title">SauceLabs Execution</span>
+                </div>
+            }
         </>
     );
 };
 
 const WebList = [
-    {'title': "Internet Explorer", 'tooltip':"Schedule on IE", 'img': "static/imgs/ic-ie.png",'id':"3"}, 
-    {'title': "Google Chrome", 'tooltip':"Schedule on Chrome", 'img': "static/imgs/ic-chrome.png",'id':"1"},
-    {'title': "Mozilla Firefox", 'tooltip':"Schedule on Firefox", 'img': "static/imgs/ic-mozilla.png",'id':"2"},
-    {'title': "Microsoft Edge", 'tooltip':"Schedule on Microsoft Edge", 'svg': "static/imgs/ic-edge.svg",'id':"7"},
-    {'title': "Edge Chromium", 'tooltip':"Schedule on Edge Chromium", 'svg': "static/imgs/ic-edge-chromium.svg",'id':"8"}
+    {'title': "Internet Explorer", 'tooltip':"Schedule on IE", 'img': "static/imgs/internet_explorer_logo_new.svg",'id':"3"}, 
+    {'title': "Google Chrome", 'tooltip':"Schedule on Chrome", 'img': "static/imgs/chrome_logo_new.svg",'id':"1"},
+    {'title': "Mozilla Firefox", 'tooltip':"Schedule on Firefox", 'img': "static/imgs/firefox_logo_new.svg",'id':"2"},
+    {'title': "Microsoft Edge", 'tooltip':"Schedule on Microsoft Edge", 'svg': "static/imgs/edge_logo_new.svg",'id':"7"},
+    {'title': "Edge Chromium", 'tooltip':"Schedule on Edge Chromium", 'svg': "static/imgs/edge_logo_new.svg",'id':"8"}
     ]
 
 const oebsList = [{'title': "OEBS Apps" , 'img': 'static/imgs/ic-desktop.png','id':"1"}]
