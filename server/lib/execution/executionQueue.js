@@ -676,8 +676,9 @@ module.exports.Execution_Queue = class Execution_Queue {
                 "icecount": 1,
                 createdon: new Date().toLocaleString(),
                 status: "inactive",
-                recentCall: new Date().toLocaleString()
-            }   
+                recentCall: new Date().toLocaleString(),
+                currentIceCount: 'currentIceCount' in req.body ? req.body.currentIceCount : 0
+            }
             const agentStatus = await utils.fetchData(agentDetails, "devops/agentDetails", fnName);
 
             if(agentStatus['status'] != 'inactive') {
