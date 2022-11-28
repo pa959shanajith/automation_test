@@ -676,8 +676,9 @@ module.exports.Execution_Queue = class Execution_Queue {
                 "icecount": 1,
                 createdon: new Date().toLocaleString(),
                 status: "inactive",
-                recentCall: new Date().toLocaleString()
-            }   
+                recentCall: new Date().toLocaleString(),
+                currentIceCount: 'currentIceCount' in req.body ? req.body.currentIceCount : 0
+            }
             const agentStatus = await utils.fetchData(agentDetails, "devops/agentDetails", fnName);
 
             if(agentStatus['status'] != 'inactive') {
@@ -723,6 +724,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         response['error'] = "None";
         try {
             const configKey = req.body.configkey;
+            const agentName = 'agentName' in req.body ? req.body.agentName : '';
             const executionListId = req.body.executionListId;
             if(configKey in this.key_list) {
 
@@ -737,7 +739,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                             moduleIndex++;
                             if(testSuites['status'] == 'QUEUED') {
                                 this.key_list[configKey][listIndex][moduleIndex]['status'] = 'IN_PROGRESS'
-                                executionData = await utils.fetchData({'key':configKey,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}, "devops/getExecScenario", fnName);
+                                executionData = await utils.fetchData({'key':configKey,'agentName':agentName,'testSuiteId':testSuites.moduleid,'executionListId':testSuites['executionListId']}, "devops/getExecScenario", fnName);
                                 const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
                                     'body': executionData[0],
                                     'session':executionData[0].session,
@@ -787,75 +789,82 @@ module.exports.Execution_Queue = class Execution_Queue {
     // };
     static setExecStatus = async (req, res) => {
 
-        let dataFromIce = req.body,checkInCache = false;
-        let resultData = 'exce_data' in dataFromIce ? dataFromIce.exce_data : dataFromIce;
-        let keyQueue = this.key_list[resultData.configkey];
-        if (dataFromIce.status == 'finished')
-        {
-            //Changing the status to completed in the cache.
-            let updatedKeyQueue = [];
-            let listIndex = -1,statusCount = 0;
-            for(let executionList of keyQueue) {
-                listIndex++;
-                
-                if(executionList[0]['executionListId'] == resultData.executionListId)
-                {
-                    checkInCache = true;
-                    let moduleIndex = -1;
-                    for (let testSuite of executionList){
-                        moduleIndex++;
-                        if(testSuite.moduleid == resultData.testsuiteId){
-                            this.key_list[resultData.configkey][listIndex][moduleIndex]['status'] = 'COMPLETED';
-                            
-                            //Adding details for synchronous report
-                            if(resultData.execReq.executiontype != 'asynchronous') {
-                                if(!(resultData['executionListId'] in this.synchronous_execution_report))
-                                    this.synchronous_execution_report[[resultData['executionListId']]] = [];
+        try {
+            let dataFromIce = req.body,checkInCache = false;
+            let resultData = 'exce_data' in dataFromIce ? dataFromIce.exce_data : dataFromIce;
+            let keyQueue = this.key_list[resultData.configkey];
+            if (dataFromIce.status == 'finished')
+            {
+                //Changing the status to completed in the cache.
+                let updatedKeyQueue = [];
+                let listIndex = -1,statusCount = 0;
+                for(let executionList of keyQueue) {
+                    listIndex++;
+                    
+                    if(executionList[0]['executionListId'] == resultData.executionListId)
+                    {
+                        checkInCache = true;
+                        let moduleIndex = -1;
+                        for (let testSuite of executionList){
+                            moduleIndex++;
+                            if(testSuite.moduleid == resultData.testsuiteId){
+                                this.key_list[resultData.configkey][listIndex][moduleIndex]['status'] = 'COMPLETED';
+                                
+                                //Adding details for synchronous report
+                                if(resultData.execReq.executiontype != 'asynchronous') {
+                                    if(!(resultData['executionListId'] in this.synchronous_execution_report))
+                                        this.synchronous_execution_report[[resultData['executionListId']]] = [];
 
-                                this.synchronous_execution_report[resultData['executionListId']].push({
-                                    "execution_data": {
-                                        "executionId": resultData.executionId,
-                                        "scenarioIds": resultData.execReq.suitedetails[0].scenarioIds
-                                    }
-                                })
-                                await cache.set("synchronous_report", this.synchronous_execution_report);
-                                let synchronous_report = await cache.get('synchronous_report');
-                                console.log(synchronous_report);
+                                    this.synchronous_execution_report[resultData['executionListId']].push({
+                                        "execution_data": {
+                                            "executionId": resultData.executionId,
+                                            "scenarioIds": resultData.execReq.suitedetails[0].scenarioIds
+                                        }
+                                    })
+                                    await cache.set("synchronous_report", this.synchronous_execution_report);
+                                    let synchronous_report = await cache.get('synchronous_report');
+                                    console.log(synchronous_report);
+                                }
+                                await cache.set("execution_list", this.key_list);
                             }
-                            await cache.set("execution_list", this.key_list);
+                            statusCount+=(testSuite.status == 'COMPLETED');
+                            if(statusCount == executionList.length) {
+                                statusCount = -1;
+                            }
                         }
-                        statusCount+=(testSuite.status == 'COMPLETED');
-                        if(statusCount == executionList.length) {
-                            statusCount = -1;
-                        }
+                    } else {
+                        updatedKeyQueue.push(executionList);
                     }
-                } else {
-                    updatedKeyQueue.push(executionList);
+                }
+                //To delete the execution from the cache
+                if(statusCount == -1){
+                    this.key_list[resultData.configkey] = updatedKeyQueue
+                    await cache.set("execution_list", this.key_list);
+                }
+
+                //User Manually deleted from cache
+                if(!checkInCache) {
+                    dataFromIce.executionStatus = false;
                 }
             }
-            //To delete the execution from the cache
-            if(statusCount == -1){
-                this.key_list[resultData.configkey] = updatedKeyQueue
-                await cache.set("execution_list", this.key_list);
+            //To check whether executionListId present in cache data.
+            for(let execution of keyQueue) {
+                if(execution[0].executionListId == resultData.executionListId) {
+                    // newConfigureKeyExecution.push(execution);
+                    checkInCache = true
+                }
             }
 
-            //User Manually deleted from cache
-            if(!checkInCache) {
-                dataFromIce.executionStatus = false;
+            if(!checkInCache && 'reportData' in resultData && 'overallstatus' in resultData.reportData) {
+                resultData.reportData.overallstatus.overallstatus = 'Terminated';
             }
-        }
-        //To check whether executionListId present in cache data.
-        for(let execution of keyQueue) {
-            if(execution[0].executionListId == resultData.executionListId) {
-                // newConfigureKeyExecution.push(execution);
-                checkInCache = true
-            }
-        }
+            return await this.executionInvoker.setExecStatus(dataFromIce);
 
-        if(!checkInCache && 'reportData' in resultData && 'overallstatus' in resultData.reportData) {
-            resultData.reportData.overallstatus.overallstatus = 'Terminated';
+        } catch (error) {
+            console.info(error);
+            logger.error("Error in setExecStatus. Error: %s", error);
+            return 'fail';
         }
-        return await this.executionInvoker.setExecStatus(dataFromIce);
 
     }
 
