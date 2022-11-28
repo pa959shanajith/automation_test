@@ -1,5 +1,4 @@
-trigger:
-  - master
+trigger: none
 
 variables:
 - name: PLATFORM
@@ -81,12 +80,17 @@ stages:
       
     - script: |
         cd $(Build.SourcesDirectory)/Webapp
+        
+        set tagno=%Version_tagno%
+        set buildno=%Version_buildno%
+
         cd app
         call npm install
 
         call npm run-script build
 
         cd..
+        call npm install
         del .gitignore package-lock.json README.md
         call rimraf app
         rmdir /S /Q .vscode
@@ -153,6 +157,7 @@ stages:
             call npm run-script build
 
             cd ..
+            call npm install
             del .gitignore package-lock.json README.md
             call rimraf dashboard-app mongo-postgresql-streamer
             git config user.name "%BUILD_USER_NAME%"

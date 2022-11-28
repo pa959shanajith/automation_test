@@ -35,6 +35,9 @@
 	font-family: $avoSecondaryFont !important;
     outline: 0 !important;
 }
+.disabled {
+    opacity: 0.7;
+}
 .s__btn-md-cust{
     margin-bottom: 25px !important;
 }
@@ -124,7 +127,7 @@
     height: 30px;
     font-size: 14px;
     font-family: $avoFont;
-    margin-left: 15px;
+    // margin-left: 15px;
     outline: 0;
 }
 #scheduledSuitesFilterData:focus{
@@ -154,7 +157,7 @@
     justify-content: space-between;
 }
 .s__Table_date{
-    width: 18%;
+    width: 16%;
     cursor: pointer;
 }
 .s__Table_host{
@@ -167,10 +170,13 @@
     width: 20%;
 }
 .s__Table_appType{
-    width: 10%; 
+    width: 14%;
+}
+.s__Table_scheduleType{
+    width: 14%; 
 }
 .s__Table_status{
-    width: 14%
+    width: 12%
 }
 .s__Table_border{
     border-right: 1px solid $whiteColor

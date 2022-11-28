@@ -82,7 +82,7 @@ const TimeComp = (props) => {
                 timeFormat="HH:mm" 
                 onOpen={onOpen}
             />
-            <img onClick={onOpen} className="timepickerIconToken" src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
+            <img onClick={onOpen} className={"timepickerIconToken"+(disabled?" disabled":"")} src={"static/imgs/ic-timepicker.png"} alt="timepicker" />
         </ClickAwayListener>
     )
 }

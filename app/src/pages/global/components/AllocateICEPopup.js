@@ -21,7 +21,8 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
     const [availableICE,setAvailableICE] = useState([])
     const [chooseICEPoolOptions,setChooseICEPoolOptions] = useState([])
     const [selectedPool,setSelectedPool] = useState("")
-    const [iceNameIdMap,setIceNameIdMap] = useState({})
+    const [iceNameIdMap,setIceNameIdMap] = useState({});
+    const [poolType,setPoolType] = useState("unallocated");
 
     useEffect(()=>{
         fetchData();
@@ -66,22 +67,24 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
 			return {color,status}
 		}
 		if(unallocated){
-            if(arr===undefined) iceStatusdata = iceStatus;
+      setPoolType("unallocated")
+      if(arr===undefined) iceStatusdata = iceStatus;
 			arr = Object.entries(iceStatusdata.unallocatedICE)
 			arr.forEach((e)=>{
-				var res = statusUpdate(e[1])
-				e[1].color = res.color;
-				e[1].statusCode = res.status;
-				ice.push(e[1])
+        var res = statusUpdate(e[1])
+        e[1].color = res.color;
+        e[1].statusCode = res.status;
+        ice.push(e[1])
 			})
 		}else{
-            var iceNameIdMapData = {...iceNameIdMap};
+      setPoolType("allocated")
+      var iceNameIdMapData = {...iceNameIdMap};
 			arr.forEach((e)=>{
 				if(e[1].ice_list){
 					Object.entries(e[1].ice_list).forEach((k)=>{
 						if(k[0] in iceStatusValue){
-                            var res = statusUpdate(iceStatusValue[k[0]])
-                            iceNameIdMapData[k[1].icename] = {}
+              var res = statusUpdate(iceStatusValue[k[0]])
+              iceNameIdMapData[k[1].icename] = {}
 							iceNameIdMapData[k[1].icename].id = k[0];
 							iceNameIdMapData[k[1].icename].status = iceStatusValue[k[0]].status;
 							k[1].color = res.color;
@@ -90,8 +93,8 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
 						}
 					})
 				}
-            })
-            setIceNameIdMap(iceNameIdMapData);
+      })
+      setIceNameIdMap(iceNameIdMapData);
 		}
 		ice.sort((a,b) => a.icename.localeCompare(b.icename))
         setAvailableICE(ice);
@@ -127,7 +130,7 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
                         title={modalTitle} 
                         footer={submitModalButton(setInputErrorBorder, iceNameIdMap, SubmitButton, selectedPool, smartMode, selectedICE, modalButton,scheSmartMode,ExeScreen)} 
                         close={()=>{setAllocateICE(false)}}
-                        content={MiddleContent(inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeIceLabel, icePlaceholder, chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode,selectedICE, setSelectedICE, ExeScreen, scheSmartMode)}
+                        content={MiddleContent(inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeIceLabel, icePlaceholder, chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode,selectedICE, setSelectedICE, ExeScreen, scheSmartMode, poolType)}
                         // modalClass=" modal-md"
                     />
                 </div>
@@ -137,7 +140,7 @@ const AllocateICEPopup = ( {exeTypeLabel, ExeScreen, scheSmartMode, exeIceLabel,
     );
 } 
 
-const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode, selectedICE, setSelectedICE, ExeScreen, scheSmartMode) => {
+const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeIceLabel, icePlaceholder,chooseICEPoolOptions, onChangeChooseICEPool, availableICE, smartMode, setSmartMode, selectedICE, setSelectedICE, ExeScreen, scheSmartMode, poolType) => {
 
     const setSelectedICEState = (value) => {
         if(value==='normal' ) setSelectedICE("");
@@ -172,7 +175,7 @@ const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeI
             <div className='adminControl-ice popup-content'>
 				<div>
 					<span className="leftControl" title="Token Name">{exeIceLabel}</span>
-                    <DropDownList ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={icePlaceholder} data={availableICE} smartMode={(ExeScreen===true?smartMode:scheSmartMode)} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
+                    <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={icePlaceholder} data={availableICE} smartMode={(ExeScreen===true?smartMode:scheSmartMode)} selectedICE={selectedICE} setSelectedICE={setSelectedICE} />
 				</div>
 			</div>
 
@@ -207,7 +210,7 @@ const submitModalButton = (setInputErrorBorder, iceNameIdMap, SubmitButton,  sel
     const executionData = {};
     executionData.type = (ExeScreen===true?((smartMode==="normal")?"":smartMode):scheSmartMode)
     executionData.poolid =  selectedPool
-    if((ExeScreen===true?smartMode:scheSmartMode) !== "normal") executionData.targetUser = Object.keys(selectedICE);
+    if((ExeScreen===true?smartMode:scheSmartMode) !== "normal") executionData.targetUser = Object.keys(selectedICE).filter((icename)=>selectedICE[icename]);
     else executionData.targetUser = selectedICE
 
     const buttonAction = () => {
