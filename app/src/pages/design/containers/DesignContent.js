@@ -898,8 +898,8 @@ const DesignContent = props => {
                                     updateChecklist={updateChecklist} setStepSelect={setStepSelect}
                                     setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
                                     rowChange={rowChange}
-                                                        />)
-                                } 
+                                />)
+                                }
                             </ReactSortable>
                             </ClickAwayListener>
                             </ScrollBar>

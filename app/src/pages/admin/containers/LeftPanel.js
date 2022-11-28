@@ -51,6 +51,8 @@ const LeftPanel = (props) => {
 						<span><span className={'fa fa-envelope'+ ((props.middleScreen==="emailConfigTab") ? " selected-icon" : "")}  ></span></span>Email Server Configuration</i></li>
 					<li><i id='emailGroupTab' title="Manage Email Groups" onClick={()=>{props.setMiddleScreen("emailGroupTab");resetScreen("emailGroupTab")}} className="selectBrowser" >
 						<span><span className={'fa fa-bell'+ ((props.middleScreen==="emailGroupTab") ? " selected-icon" : "")}  ></span></span>Email Groups</i></li>
+					<li><i id='agents' title="Manage Agents" onClick={()=>{props.setMiddleScreen("agents");resetScreen("agents")}} className="selectBrowser" >
+						<span><span className={'fa fa-android'+ ((props.middleScreen==="agents") ? " selected-icon" : "")}  ></span></span>Manage Agents</i></li>
 					<li><i id='sessionTab' title="Session Management" onClick={()=>{props.setMiddleScreen("sessionTab");resetScreen("sessionTab");}} className="selectBrowser" >
 						<span><span className={'fa fa-users'+ ((props.middleScreen==="sessionTab") ? " selected-icon" : "")} ></span></span>Session Management</i></li>
 					<li className='left-top-section__preferencesTab'><i id='Preferences' title="Preferences" onClick={()=>{props.setMiddleScreen("Preferences");resetScreen("Preferences")}} className="selectBrowser" >

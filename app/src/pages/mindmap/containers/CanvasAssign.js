@@ -12,6 +12,7 @@ import {generateTree,toggleNode,moveNodeEnd,moveNodeBegin} from './MindmapUtils'
 import * as actionTypes from '../state/action';
 import '../styles/CanvasAssign.scss'
 
+
 const types = {
     'modules': 112,
     'scenarios': 237,

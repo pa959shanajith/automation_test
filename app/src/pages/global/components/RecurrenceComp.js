@@ -20,6 +20,8 @@ const RecurrenceComp = (props) => {
     const [monthlyRecurrenceMonthInputDisable_1, setMonthlyRecurrenceMonthInputDisable_1] = useState(true);
     const [isClicked, setIsClicked] = useState(false);
 
+    const regEx = new RegExp('^[1-9][0-9]*$');
+
     const weekDays = [{ name: "Sunday" }, { name: "Monday" }, { name: "Tuesday" }, { name: "Wednesday" }, { name: "Thursday" }, { name: "Friday" }, { name: "Saturday" }, { name: "All" }];
 
     const [weeklyRecurrenceWeek, setWeeklyRecurrenceWeek] = useState(
@@ -108,7 +110,7 @@ const RecurrenceComp = (props) => {
     const handleInputChange = (event) => {
         setDailyRecurrenceValue(event.target.value);
 
-        if (isNaN(event.target.value) || event.target.value.includes(".")) {
+        if (regEx.test(event.target.value) === false) {
             displayError("Invalid input, Please enter a number");
             return;
         }
@@ -224,7 +226,7 @@ const RecurrenceComp = (props) => {
         setMonthlyRecurrenceDayValue(event.target.value);
         setMonthlyRecurrenceMonthInputDisable(false);
 
-        if (isNaN(event.target.value) || event.target.value.includes(".")) {
+        if (regEx.test(event.target.value) === false) {
             displayError("Invalid input, Please enter a number");
             setMonthlyRecurrenceMonthValue("");
             setMonthlyRecurrenceMonthInputDisable(true);
@@ -250,7 +252,7 @@ const RecurrenceComp = (props) => {
     const handleMonthInputChange = (event) => {
         setMonthlyRecurrenceMonthValue(event.target.value);
 
-        if (isNaN(event.target.value) || event.target.value.includes(".")) {
+        if (regEx.test(event.target.value) === false) {
             displayError("Invalid input, Please enter a number");
             return;
         }
@@ -307,7 +309,7 @@ const RecurrenceComp = (props) => {
     const handleMonthInputChange_1 = (event) => {
         setMonthlyRecurrenceMonthValue_1(event.target.value);
 
-        if (isNaN(event.target.value) || event.target.value.includes(".")) {
+        if (regEx.test(event.target.value) === false) {
             displayError("Invalid input, Please enter a number");
             return;
         }

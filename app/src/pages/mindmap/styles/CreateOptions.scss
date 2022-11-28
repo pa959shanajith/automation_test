@@ -9,13 +9,13 @@
     -webkit-transform: translateX(-50%) translateY(-50%);
     -ms-transform: translateX(-45%) translateY(-45%);
     background-color: $borderThree;
-    min-width: 496px;
-    min-height: 200px;
+    min-width: 100px;
+    min-height: 50px;
     max-height: 275px;
     max-width: 774px;
-    width: 40%;
-    height: 28%;
-    border-radius: 16px;
+    width: 30%;
+    height: 25%;
+    border-radius: 10px;
 }
 .mindmap__option-container > div {
     display: block;

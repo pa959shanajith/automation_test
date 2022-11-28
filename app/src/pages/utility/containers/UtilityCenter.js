@@ -4,6 +4,7 @@ import Pairwise from '../components/Optimization.js'
 import ExecutionMetrics from '../components/ExecutionMetrics.js';
 import DataTable from '../components/DataTable';
 import ApiUtils from './ApiUtils';
+import DevOps from './DevOps';
 import {setMsg ,ScreenOverlay} from '../../global';
 import '../styles/UtilityCenter.scss'
 import {Encrypt_ICE } from '../api';
@@ -169,7 +170,12 @@ const UtilityCenter=(props)=>{
                         setBlockui={setBlockui} 
                         setScreenType={props.setScreenType}
                     /> }
-
+            { props.screenType === "devOps"
+                && <DevOps 
+                        currScreen={props.screenType}
+                        setBlockui={setBlockui} 
+                        setScreenType={props.setScreenType}
+                    /> }
             {props.screenType === "api-utils"
                     && <ApiUtils
                         setBlockui={setBlockui}

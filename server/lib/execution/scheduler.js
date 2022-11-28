@@ -268,7 +268,7 @@ exports.reScheduleTestsuite = async () => {
                     "scheduleid": schd._id	
                 };	
                 const result1 = await utils.fetchData(inputs1, "suite/ScheduleTestSuite_ICE", fnName);	
-                if (result1 == "fail") {	
+                if (result1 == "fail" || result1.length === 0) {	
                     await this.updateScheduleStatus(schd._id, "Failed");	
                     continue;	
                 }	
@@ -808,7 +808,7 @@ exports.reScheduleRecurringTestsuite = async () => {
                 "scheduleid": schd._id
             };
             const result1 = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
-            if (result1 == "fail") {
+            if (result1 == "fail" || result1.length === 0) {
                 await this.updateScheduleStatus(schd._id, "Failed");
                 continue;
             }

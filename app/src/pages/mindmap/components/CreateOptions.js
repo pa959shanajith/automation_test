@@ -15,7 +15,7 @@ const CreateOptions = (props) => {
   const options = [
     {ico : "ic-create-newMindmap.png",label:'Create New',comp:'newmindmap'},
     {ico : "ic-endtoendFlow.png",label:'End to End Flow',comp:'enemindmap'},
-    {ico :"ic-importfromexcel-mindmap.png",label:'Import Mindmap',comp:'importmindmap'}
+    // {ico :"ic-importfromexcel-mindmap.png",label:'Import Mindmap',comp:'importmindmap'}
   ]
   const displayError = (error) =>{
     setBlockui({show:false})

@@ -65,6 +65,14 @@
         left: 0;
     }
 
+    &[data-type=empty] {
+      border: none !important;
+      color: #5f338f !important;
+      background-color: transparent !important;
+      left: 0;
+      box-shadow: unset !important;
+  }
+
     &:disabled {
       border: 2px solid #ccc !important;
       color: #000 !important;
@@ -80,8 +88,6 @@
 
 .static-button {
   position: static !important;
-  margin-bottom: 0.6rem;
-  margin-top: 0.6rem;
 }
 
 .step2{
@@ -112,14 +118,16 @@
 }
 
 .type2-button{
-    width: 16rem;
-    height: 3.4rem;
+    width: auto;
+    min-width: 250px;
+    height: auto;
     background: #5f338f;
     border-radius: 1.2rem;
     color: #fff;
     border: none;
     font-family: 'Mulish';
-    font-size: 1.3rem;
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
 }
 
 .welcomeToAssure {
@@ -299,7 +307,7 @@
     box-sizing: border-box;
     border-radius: 5px;
     height: 3rem;
-    width: 10rem;
+    width: auto;
     font-family: 'Mulish';
     font-style: normal;
     font-weight: 400;
@@ -308,6 +316,7 @@
     color: #323130;
     margin-left: 0.5rem;
     margin-right: 0.5rem;
+    padding: 1px 1rem;
 
     &:hover {
         border-color: #5f338f !important;
@@ -360,10 +369,9 @@
     display: flex;
     justify-content:center;
     font-size: 5rem;
-    margin-bottom: 4rem;
+    margin-bottom: 2rem;
     @media screen and (max-height:1000px) {
         font-size: 3rem;
-        margin-bottom: 2rem;
     }
 }
 
@@ -371,6 +379,7 @@
     display: flex;
     flex-direction: column;
     max-width: 90%;
+    min-height: 100px;
     align-items: center;
     flex: 1;
     justify-content: center;
@@ -391,16 +400,23 @@
     }
 }
 
+.specifications {
+  width: 90%;
+  height: auto;
+  margin-bottom: 2rem;
+}
+
 .installation-instructions-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     max-height: 100%;
+    height: 70%;
     width: 100%;
     font-family: Mulish;
     margin: 0;
-    flex: 3;
+    flex: 2;
 
     .circle {
       height: 1rem;
@@ -417,46 +433,81 @@
     .d-p-card-container {
         display: flex;
         width: 100%;
-        gap: 20px;
+        // gap: 20px;
         justify-content: space-between;
         align-items: center;
         height: 100%;
 
         .d-p-card {
-            height: 90%;
-            max-width: 50%;
-            min-width: 170px;
+            height: 100%;
+            max-width: 100%;
+            padding: 0 1rem;
             display: flex;
-            max-height: 270px;
             flex: 1;
-            flex-direction: row;
-            border: 1px solid #E1DFDD;
+            flex-direction: column;
             border-radius: 8px;
             align-items: center;
             background: #FFFFFF;
-            box-shadow: 0px 1px 9px 0px rgba(0,0,0,0.5);
-            -webkit-box-shadow: 0px 1px 9px 0px rgba(0,0,0,0.5);
-            -moz-box-shadow: 0px 1px 9px 0px rgba(0,0,0,0.5);
+            
+            .d-p-card__itemsContainer {
+              display: flex;
+              flex-direction: row;
+              flex: 3;
+              width: 100%;
+              align-items: center;
+              gap: 10px;
+              height: min-content;;
+            }
 
-            .d-p-card__right {
+            .d-p-card__item {
                 display: flex;
                 flex-direction: column;
-                border-radius: 8px 8px 0px 0px;
-                gap: 8px;
-                flex: 3;
+                flex: 1;
                 font-family: Mulish;
-                height: 100%;
-                margin-left: 5px;
-                justify-content: center;
+                height: 80%;
+                justify-content: flex-start;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .d-p-card__div__image {
+              width: 100%;
+              height: 100%;
+              background-position: center;
+              background-size: contain;
+              background-repeat: no-repeat;
+            }
+
+            .d-p-card__image {
+              height: min-content;
+              max-height: 100%;
+              width: 100%;
+            }
+
+            .d-p-card__separator {
+              display: flex;
+              height: 100%;
+              align-items: center;
+              justify-content: center;
+              width: 3rem;
             }
 
             .d-p-card__title {
-                text-transform: uppercase;
-                font-size: 0.75rem;
+                // text-transform: uppercase;
+                font-size: 1.2rem;
+                font-weight: 400;
+                display: flex;
+                flex:1;
+                min-height: 40px;
+                align-items: center;
             }
 
             .d-p-card__subtitle {
                 font-size: 0.9rem;
+            }
+
+            .d-p-card__I-title {
+              font-size: 0.9rem;
             }
 
             .d-p-card__content {

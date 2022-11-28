@@ -17,6 +17,7 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
             var result = "fail";
             logger.error("Error in executeTestSuite. Error: %s", ex)
         }
+        if(batchExecutionData['configurekey']) return result;
         let reportResult = {};
         batchExecutionData.batchInfo[0]["testsuitename"] = batchExecutionData.batchInfo[0]["testsuiteName"];
 
@@ -211,5 +212,23 @@ module.exports.ExecutionInvoker = class ExecutionInvoker {
         }));
         try { return await promiseData; }
         catch (e) { logger.error(e); }
+    }
+
+    setExecStatus = async function (dataFromIce) {
+        try {
+            var result = await executor.setExecStatus(dataFromIce);
+        } catch (ex) {
+            var result = "fail";
+            logger.error("Error in setExecStatus. Error: %s", ex)
+        }
+        // if(batchExecutionData['configurekey']) return 'pass'
+        // let reportResult = {};
+        // batchExecutionData.batchInfo[0]["testsuitename"] = batchExecutionData.batchInfo[0]["testsuiteName"];
+
+        // reportResult["testSuiteIds"] = batchExecutionData.batchInfo;
+        // reportResult["status"] = result;
+        // let username = userInfo.username;
+        // this.setNotifications(username, reportResult);
+        return result;
     }
 }

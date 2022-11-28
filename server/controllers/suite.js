@@ -7,6 +7,7 @@ var queue = require('../lib/execution/executionQueue')
 var cache = require('../lib/cache').getClient(2);
 if (process.env.REPORT_SIZE_LIMIT) require('follow-redirects').maxBodyLength = parseInt(process.env.REPORT_SIZE_LIMIT) * 1024 * 1024;
 const constants = require('../lib/execution/executionConstants');
+const { default: async } = require('async');
 /** This service reads the testsuite and scenario information for the testsuites */
 exports.readTestSuite_ICE = async (req, res) => {
 	const fnName = "readTestSuite_ICE";
@@ -61,6 +62,7 @@ exports.readTestSuite_ICE = async (req, res) => {
 		};
 		responsedata = schedulingDetails
 	}
+	if(req.body.key) return responsedata;
 	res.send(responsedata);
 };
 
@@ -171,6 +173,36 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	const fnName = "ExecuteTestSuite_ICE"
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	const batchExecutionData = req.body.executionData;
+	if(batchExecutionData['configurekey'] && req.query == 'fetchingTestSuiteIds') {
+		let index = -1;
+		for (let testSuiteData of batchExecutionData.batchInfo){
+			index++;
+			const body = {
+				'key': batchExecutionData['configurekey'],
+				'fromFlag': 'execution',
+				'param': 'readTestSuite_ICE',
+				'readTestSuite': [{
+						'assignedTestScenarioIds': "",
+						'assignedTime': "",
+						'cycleid': testSuiteData['cycleId'],
+						'projectidts':testSuiteData['projectId'],
+						'releaseid': testSuiteData['releaseId'],
+						'subTaskId': "",
+						'testsuiteid': testSuiteData['testsuiteId'],
+						'testsuitename':testSuiteData['testsuiteName'],
+						'versionnumber': testSuiteData['versionnumber'],
+					}]
+			}
+			const session = req.session;
+			const response = await this.readTestSuite_ICE({body,session});
+			const mindmapid = batchExecutionData['batchInfo'][index]['testsuiteId'];
+			batchExecutionData['batchInfo'][index]['testsuiteId'] = response[mindmapid].testsuiteid;
+		}
+		return {
+			'executionData': batchExecutionData,
+            'session':req.session,
+		};
+	}
 	var targetUser = batchExecutionData.targetUser;
 	const type = batchExecutionData.type;
 	const poolid = batchExecutionData.poolid;
@@ -215,6 +247,10 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 		if (Array.isArray(targetUser)) targetUser = "";
 		var makeReq = await makeRequestAndAddToQueue(batchExecutionData,targetUser,userInfo,poolid);
 		Object.assign(result,makeReq);
+	}
+	if(batchExecutionData['configurekey']) {
+		
+		return makeReq;
 	}
 	return res.send(result);
 };
@@ -352,3 +388,21 @@ exports.testSuitesSchedulerRecurring_ICE = async (req, res) => {
 		return res.status('500').send(result);
 	}
 };
+exports.execAutomation = async(req,res) => {
+	let result = await queue.Execution_Queue.execAutomation(req, res);
+	return res.send(result);
+}
+
+exports.getAgentTask = async(req,res) => {
+	let result = await queue.Execution_Queue.getAgentTask(req, res);
+	return res.send(result);
+}
+
+exports.getExecScenario = async(req,res) => {
+	let result = await queue.Execution_Queue.getExecScenario(req, res);
+	return res.send(result);
+}
+exports.setExecStatus = async(req,res) => {
+	let result = await queue.Execution_Queue.setExecStatus(req, res);
+	return res.send(result);
+}

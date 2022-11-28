@@ -1,0 +1,364 @@
+.api-ut__btnGroup {
+    width: 100%;
+    margin-bottom: 1%;
+
+    &>button{
+        position: relative;
+        float: right;
+        padding: 2px 25px;
+        margin-right: 7px;
+        height: 2.5rem;
+        font-size: 17px;
+        font-family: "LatoWebLight";
+        background-color: #633693;
+        border: none;
+        outline: none;
+        color: #fff;
+        border-radius: 20px;
+        &:disabled{
+            background-color: #997cb8;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.api-ut__mandate{
+    color: red;
+    font-weight: 400;
+}
+
+.api-ut__inputError {
+    border: 2px solid #d33c3c !important;
+}
+
+.api-ut_contents{
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    margin-left: 5px;
+    height: 100%;
+}
+
+.api-ut__ab{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+}
+.api-ut__min{
+    min-height: 0;
+}
+.api-ut__con{
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    height: 100%;
+}
+
+.api-ut__inputGroup{
+    display: grid;
+    grid-template-columns: 23% 77%;
+    row-gap: 20px;
+    width: 83%;
+    padding: 20px;
+    font-size: 14px;
+    font-family: "LatoWeb";
+
+    .api-ut__inputLabel{
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    .api-ut__input{
+        height: 27px;
+        padding: 6px 12px;
+        line-height: 1.42857143;
+        color: #555;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    }
+    .api-ut__req{
+        width: 100%;
+    }
+    .api-ut__tip{
+        float: right;
+    }
+    .action-api-ut{
+        width:auto;
+        margin-right:10px;
+    }
+    .req-body {
+        width:100%;
+        margin-top: 5px;
+        height: 80px;
+        resize: none;
+        font-size: 14px;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        div{
+            font-size: 22px !important;
+        }
+        .icon{
+            font-size: 22px !important;
+        }
+    }
+}
+.api-ut__select{
+    height: 25px;
+    width:100%;
+    margin-top: 3px;
+    line-height: 2;
+    border: 1px solid #ccc;
+    -webkit-text-stroke: thin;
+    font-size: 14px;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    outline: none;
+    border-radius: 4px;
+    line-height: 2;
+}
+
+.api-ut__outputGroup{
+    display: grid;
+    grid-template-columns: 23% 77%;
+    row-gap: 24px;
+    width: 85%;
+    padding: 20px;
+    font-size: 14px;
+    font-family: "LatoWeb";
+
+    .api-ut__inputLabel{
+        display: flex;
+        align-items: center;
+        font-weight: 700;
+    }
+
+    
+    .api-ut__req{
+        width: 100%;
+    }
+    .req-body {
+        width:100%;
+        margin-top: 5px;
+        height: 100px !important;
+        resize: none;
+        font-size: 14px;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    }
+}
+.api-ut__select{
+    height: 25px;
+    width:100%;
+    margin-top: 3px;
+    line-height: 2;
+    border: 1px solid #ccc;
+    -webkit-text-stroke: thin;
+    font-size: 14px;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    outline: none;
+    border-radius: 4px;
+    line-height: 2;
+}
+.icon{
+    font-size: 22px;
+    padding: 5px;
+    width: auto;
+    display: block;
+  
+}
+.tkn-table__row{
+    display: flex;
+}
+.tkn-table__row:nth-child(odd){
+    background-color: #e8e6fe;
+}
+.tkn-table__name{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 0 14%;
+    white-space: nowrap;
+}
+.tkn-table__head {
+    text-align: center !important;
+}
+.tkn-table__sr_no{
+    flex: 0 0 5% !important;
+    text-align: end;
+    margin-right: 0.5px;
+}
+.tkn-table__key{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    justify-content: center;
+    flex: 0 0 23%;
+}
+.tkn-table__icon {
+    width: 4%;
+}
+.tkn-table__project{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 0 15%;
+    white-space: nowrap;
+}
+.tkn-table__button{
+    width: 40%;
+    display: flex;
+    justify-content: center;
+    button {
+        visibility: visible;
+    }
+}
+.btn-list-tkn-mgmt{
+    margin-left:-21%;
+}
+.tkn_table_key_value {
+    width: 91%;
+    vertical-align: -webkit-baseline-middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.searchIcon {
+    border: 2px solid #633693;
+    margin-right: 11px;
+}
+.searchIcon__input {
+    background: #633693;
+    height: 33px;
+}
+.devOps_module_list {
+    padding: 1.5%;
+    border: 2px solid #633693;
+    border-radius: 0.625rem;
+    width: 50%;
+    height: 60vh;
+    &_filter {
+        margin-bottom: 3%;
+        display: flex;
+        justify-content: space-between;
+    }
+    &_container {
+        height: 47vh;
+        max-height: 100%;
+    }
+}
+.devOps_pool_list {
+    width: 45%;
+    & > div {
+        margin: 5.4% 0;
+        display: flex;
+        align-items: center;
+    }
+}
+.devOps__scenario_list {
+    padding-left: 2%;
+}
+.active-users-token {
+    max-height: 70vh;
+    height: 100% !important;
+}
+.searchBoxInput {
+    position: relative;
+    float: right;
+    margin-right: 1%;
+}
+.action_icons{
+    cursor: pointer;
+    width: 5%;
+}
+.checkbox{
+    width: 5%;
+    height: 5%;
+}
+.rct-checkbox * {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+}
+.ms-Checkbox-checkmark {
+    width: 80% !important;
+    margin: 0 10% !important;
+}
+.devOps_config_name {
+    display: flex;
+    align-items: center;
+}
+.devOps_dropdown_label {
+    font-weight: 700;
+    margin-bottom: 0;
+    &_ice {
+        margin-right: 8%;
+    }
+    &_browser {
+        margin-right: 13.5%;
+    }
+    &_integration {
+        margin-right: 18.5%;
+    }
+    &_execution {
+        margin-right: 15.5%;
+        margin-bottom: 8px;
+    }
+    &_url {
+        margin-right: 2%;
+    }
+    &_key {
+        margin-right: 11%;
+    }
+    &_input {
+        width: 63%;
+    }
+    &_sync {
+        display: flex;
+        width: 37%;
+        justify-content: space-between;
+    }
+    &_execution_mode {
+        margin-right: 14.5%;
+    }
+}
+.devOps_seperation {
+    height: 0.5%;
+    width: 86%;
+    background-color: #633693;
+    border-radius: 50%;
+}
+.select_project_img {
+    width: 80%;
+}
+.react-checkbox-tree label {
+    display: flex;
+}
+.no_config_img{
+    height: 60vh;
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 11%;
+    margin-top: -3%;
+}
+.devOps_input_icon {
+    display: flex;
+    align-items: center;
+    &>img {
+        width: 1.2rem;
+        margin-left: 1rem;
+    }
+}

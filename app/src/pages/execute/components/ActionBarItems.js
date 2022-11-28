@@ -9,7 +9,7 @@ const UpperContent = ({appType, isMac, UpdateBrowserTypeExe, browserTypeExe}) =>
 
     if (appType === "Web") {renderComp.splice(1, 0, <Fragment key={2}>
                                 {WebList.map((icon, i) => <ThumbnailExecute key={i} title={icon.title} tooltip={icon.tooltip} img={icon.img} svg={icon.svg} id={icon.id} UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe} />)}
-                                { isMac && <ThumbnailExecute title="Safari" tooltip={"Execute on Safari"} img="static/imgs/ic-safari.png"  id="6" UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe} />}</Fragment>)}
+                                { isMac && <ThumbnailExecute title="Safari" tooltip={"Execute on Safari"} img="static/imgs/safari_logo_new.svg"  id="6" UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe} />}</Fragment>)}
     else if (appType === "OEBS") renderComp.splice(1, 0, <Fragment key={2}>{oebsList.map((icon, i) => <ThumbnailExecute key={i} title={icon.title} tooltip={"Execute on "+icon.title} img={icon.img} id={icon.id} UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe} />)}</Fragment>)
     else if (appType === "Desktop") renderComp.splice(1, 0, <Fragment key={2}>{desktopList.map((icon, i) => <ThumbnailExecute key={i} title={icon.title} tooltip={"Execute on "+icon.title} img={icon.img} id={icon.id} UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe} />)}</Fragment>)
     else if (appType === "System") renderComp.splice(1, 0, <Fragment key={2}>{systemList.map((icon, i) => <ThumbnailExecute key={i} title={icon.title} tooltip={"Execute on "+icon.title} img={icon.img} id={icon.id} UpdateBrowserTypeExe={UpdateBrowserTypeExe} browserTypeExe={browserTypeExe}/>)}</Fragment>)
@@ -64,8 +64,8 @@ const WebList = [
     {'title': "Internet Explorer", 'tooltip':"Execute on IE", 'img': "static/imgs/internet_explorer_logo_new.svg",'id':"3"}, 
     {'title': "Google Chrome", 'tooltip':"Execute on Chrome", 'img': "static/imgs/chrome_logo_new.svg",'id':"1"},
     {'title': "Mozilla Firefox", 'tooltip':"Execute on Mozilla Firefox", 'img': "static/imgs/firefox_logo_new.svg",'id':"2"},
-    {'title': "Microsoft Edge", 'tooltip':"Execute on Microsoft Edge", 'svg': "static/imgs/edge_logo_new.svg",'id':"7"},
-    {'title': "Edge Chromium", 'tooltip':"Execute on Edge Chromium", 'svg': "static/imgs/edge_logo_new.svg",'id':"8"}
+    {'title': "Microsoft Edge", 'tooltip':"Execute on Microsoft Edge", 'img': "static/imgs/edge_logo_new.svg",'id':"7"},
+    {'title': "Edge Chromium", 'tooltip':"Execute on Edge Chromium", 'img': "static/imgs/edge_logo_new.svg",'id':"8"}
     ]
 
 const oebsList = [{'title': "OEBS Apps" , 'img': 'static/imgs/ic-desktop.png','id':"1"}]

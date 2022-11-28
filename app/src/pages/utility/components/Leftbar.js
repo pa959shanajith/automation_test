@@ -12,10 +12,6 @@ const Leftbar=(props)=>{
                     <img className="util__execution_ic" src='static/imgs/ic-encryption-utility.png' alt="EncryptIcon" id={(focus==="encryption")? "selected":null}/>
                     <div>Encryption</div>
                 </span>
-                {/* <span onClick={()=>{props.setScreenType("optimization");  setFocus("optimization") ; props.setPairwiseClicked(false)}}>
-                    <img src='static/imgs/ic-optimization.png' alt="optimizationIcon" id={(focus==="optimization")? "selected":null}/>
-                    <div>Optimization</div>
-                </span> */}
                 <span onClick={()=>{props.setScreenType("execution");  setFocus("execution"); }} title="Execution Metrics">
                     <div className="fa fa-database fa-2x util__execution_ic" id={(focus==="execution")? "selected":""}/>
                     <div>Execution Metrics</div>
@@ -23,6 +19,10 @@ const Leftbar=(props)=>{
                 <span onClick={()=>{props.setScreenType("datatable-Create");  setFocus("datatable"); }} title="Data Table">
                     <div className="fa fa-table fa-2x util__execution_ic" id={(focus==="datatable")? "selected":""}/>
                     <div>Data Table</div>
+                </span>
+                <span onClick={()=>{props.setScreenType("devOps");  setFocus("devOps"); }} title="DevOps">
+                    <img className="util__execution_ic util__devOps" src='static/imgs/devOps.svg' alt="devOps Icon" id={(focus==="devOps")? "selected":""}/>
+                    <div>DevOps</div>
                 </span>
                 <span onClick={()=>{props.setScreenType("api-utils");  setFocus("api-utils"); }} title="Request Body Generator">
                     <img className="util__execution_ic" src={"static/imgs/RequestBodyGenerator.svg"} id={(focus==="api-utils")? "selected":""}/>
