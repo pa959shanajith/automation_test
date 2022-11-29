@@ -71,7 +71,7 @@ const ControlBox = (props) => {
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.delete).html('Delete ').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.record).html('AvoGenius(SmartRecord)').style('font-family', 'LatoWeb');
+            c.select('p.' + faRef.record).html('AvoGenius (Smart Recorder)').style('font-family', 'LatoWeb');
         } else if (t === 'screens') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.plus).html('Add Testcase').style('font-family', 'LatoWeb');
@@ -91,6 +91,7 @@ const ControlBox = (props) => {
             c.select('p.' + faRef.designteststeps).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.designteststeps).html('Design Test Steps').style('font-family','LatoWeb');
         }
+        d3.select('#ct-ctrlBox').classed('show-box', !0);
         p.classed('node-highlight',!0);
         let body_bounds = document.querySelector(".mp__body").getBoundingClientRect();
         let ct_bounds = d3.select('#ct-ctrlBox').node()?.getBoundingClientRect();
@@ -99,7 +100,6 @@ const ControlBox = (props) => {
             d3.select('#ct-ctrlBox').style("top","unset")
             d3.select('#ct-ctrlBox').style('bottom', 0 + 'px').style('left', l[0] + 'px');
         }
-        d3.select('#ct-ctrlBox').classed('show-box', !0);
         return ()=>{
             p.classed('node-highlight',false)
         }

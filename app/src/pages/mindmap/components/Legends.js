@@ -30,7 +30,7 @@ const Legends = ({isEnE}) => {
                     </g>
                     <g data-test="testcases">
                         <circle className="ct-testcases" cx="255" cy="0" r="10"></circle>
-                        <text className="ct-nodeLabel" x="270" y="3">TestStep</text>
+                        <text className="ct-nodeLabel" x="270" y="3">Testcase</text>
                     </g>
                 </Fragment>
                 :null}
