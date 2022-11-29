@@ -55,6 +55,12 @@
         "generic":"Test Data Management tool to create synthetic data"
       },
       "availableForTrial":false
+    },
+    "genius":{
+      "tooltip":{
+        "generic":"Avo Genus"
+      },
+      "availableForTrial":true
     }
   }
 }

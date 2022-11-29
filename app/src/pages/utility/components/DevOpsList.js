@@ -12,6 +12,7 @@ import * as actionTypes from "../../plugin/state/action";
 // import { fetchProjects } from '../api';
 import { ExecuteTestSuite_ICE } from '../../execute/api';
 import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
+import {readTestSuite_ICE} from '../../schedule/api';
 import * as pluginApi from "../../plugin/api";
 import {v4 as uuid} from 'uuid';
 import CheckboxTree from 'react-checkbox-tree';
@@ -55,16 +56,30 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const[currentKey,setCurrentKey]=useState('');
     const [projectName, setProjectName] = useState('');
     const [currentName, setCurrentName] = useState('');
+  
+    const [showCICD, setShowCICD] = useState(false);
+    const [currentTask, setCurrentTask] = useState({});
+    const [eachData, setEachData] = useState([]);
+    const filter_data = useSelector(state=>state.plugin.FD);
+    const [browserTypeExe,setBrowserTypeExe] = useState([]); // Contains selected browser id for execution
+	const [execAction,setExecAction] = useState("serial"); 
+	const [execEnv,setExecEnv] = useState("default");
+    const [integration,setIntegration] = useState({
+        alm: {url:"",username:"",password:""}, 
+        qtest: {url:"",username:"",password:"",qteststeps:""}, 
+        zephyr: {url:"",username:"",password:""}
+    });
+    const [appType, setAppType] = useState('');
+    const [cycleName, setCycleName] = useState('');
+
 
     useEffect(()=>{
-                pluginApi.getProjectIDs()
-                .then(data => {
-                    // console.log(data.releases[0][0].name)
-                    // console.log(selectedCycle)
-                        setProjectData1(data.releases[selectedCycle][0].name);
-                        setProjectData(data.releases[selectedCycle][0].cycles[0]._id)
-                        // console.log(data.releases[1][0].name)   
-                        // console.log(data.releases[1][0].cycles[0]._id)     
+        pluginApi.getProjectIDs()
+        .then(data => {
+                setProjectData1(data.releases[selectedCycle][0].name);
+                setProjectData(data.releases[selectedCycle][0].cycles[0]._id);
+                setCycleName(data.releases[selectedCycle][0].cycles[0].name);
+                projectIdTypesDicts[data.projectId[selectedCycle]] === "Web" ? setShowCICD(true) : setShowCICD(false)
 
         })},[selectedCycle])
   
@@ -193,7 +208,8 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setLoading('Please Wait...');
         setSelectedProject(option.key);
         setSelectedCycle(option.index);
-        setProjectName(option.text)
+        setProjectName(option.text);
+        projectIdTypesDicts[option.key] === "Web" ? setShowCICD(true) : setShowCICD(false)
         const configurationList = await fetchConfigureList({
             'projectid': option.key
         });
@@ -476,6 +492,119 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     // console.log(projectid)let projectid = getProjectList[0].code
     // console.log(projectid)
 
+    const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
+        if(Array.isArray(executionData.targetUser)){
+			for(let icename in executionData.targetUser){
+				let ice_id = iceNameIdMap[executionData.targetUser[icename]];
+				if(ice_id && ice_id.status){
+                    setDataExecution(executionData);
+					setAllocateICE(false);
+                    setProceedExecution(true);
+                    return
+				} 
+			}
+		}else{
+			let ice_id = iceNameIdMap[executionData.targetUser];
+			if(ice_id && ice_id.status){
+                setDataExecution(executionData);
+				setAllocateICE(false);
+                setProceedExecution(true);
+                return
+			} 
+		}
+        ExecuteTestSuite(executionData);
+    }
+
+    const ExecuteTestSuite = async (executionData) => {
+       
+        if(executionData === undefined) executionData = dataExecution;
+        setAllocateICE(false);
+        const modul_Info = parseLogicExecute(eachData, currentTask, appType, filter_data, moduleInfo, '', '');
+        if(modul_Info === false) return;
+        setLoading("Sending Execution Request");
+        executionData["source"]="task";
+        executionData["exectionMode"]=execAction;
+        executionData["executionEnv"]=execEnv;
+        executionData["browserType"]=browserTypeExe;
+        executionData["integration"]=integration;
+        executionData["batchInfo"]=modul_Info;
+        executionData["scenarioFlag"] = (currentTask.scenarioFlag == 'True') ? true : false
+        ResetSession.start();
+        try{
+            setLoading(false);
+            const data = await ExecuteTestSuite_ICE(executionData);
+            if (data.errorapi){displayError(data.errorapi);return;}
+            if (data === "begin"){
+                return false;
+            }
+            ResetSession.end();
+            if(data.status) {
+                if(data.status === "fail") {
+                    setMsg(MSG.CUSTOM(data["error"],data.variant));
+                } else {
+                    setMsg(MSG.CUSTOM(data["message"],data.variant));
+                }
+            }
+            setBrowserTypeExe([]);
+            setModuleInfo([]);
+            setExecAction("serial");
+            setExecEnv("default");
+        }catch(error) {
+            setLoading(false);
+            ResetSession.end();
+            displayError(MSG.EXECUTE.ERR_EXECUTE)
+            setBrowserTypeExe([]);
+            setModuleInfo([]);
+            setExecAction("serial");
+            setExecEnv("default");
+        }
+    }
+
+    const displayError = (error) =>{
+        setLoading(false)
+        setMsg(error)
+    }
+
+    const readTestSuiteFunct = async (readTestSuite, item) => {
+        setLoading("Loading in Progress. Please Wait");
+        const result = await readTestSuite_ICE(readTestSuite, "execute");
+        if(result.error){displayError(result.error);return;}
+        else if (result.testSuiteDetails) {
+            var data = result.testSuiteDetails;
+            var keys = Object.keys(data);
+            var tableData = [];
+            keys.map(itm => tableData.push({...data[itm]}));
+
+            //CR 2287 - If a scenario is opened and then navigated to it's scheduling then by default that particular scenario must be selected and rest of the scenarios from the module must be unselected.
+            // if (current_task.scenarioFlag === 'True') {
+            //     for (var m = 0; m < keys.length; m++) {
+            //         for (var k = 0; k < tableData[m].scenarioids.length; k++) {
+            //             if (tableData[m].scenarioids[k] === current_task.assignedTestScenarioIds || tableData[m].scenarioids[k] === current_task.assignedTestScenarioIds[0]) {
+            //                 tableData[m].executestatus[k] = 1;
+            //             } else tableData[m].executestatus[k] = 0;
+            //         }
+            //     }
+            // }
+
+            // Change executestatus of scenarios which should not be scheduled according to devops config
+            for (var m = 0; m < keys.length; m++) {
+                tableData[m].scenarioids.map((scenarioid, index) => {
+                    tableData[m].executestatus[index] = 0;
+                    if (m < item.executionRequest.batchInfo.length) {
+                        for (var k in item.executionRequest.batchInfo[m].suiteDetails) {
+                            if (scenarioid === item.executionRequest.batchInfo[m].suiteDetails[k].scenarioId) {
+                                tableData[m].executestatus[index] = 1;
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+            setEachData(tableData);
+        }
+        setLoading(false);
+    }
+
     return (<>
      {
             executionQueue &&
@@ -499,7 +628,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     selectValues: [
                         { type: 'proj', label: 'Select Project', emptyText: 'No Projects Found', list: [], selected: selectedProject, width: '30%', disabled: false, selectedName: projectName },
                         { type: 'rel', label: 'Select Release', emptyText: 'No Release Found', list: [], selected: projectData1, width: '25%', disabled: true, selectedName: '' },
-                        { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: projectData, width: '25%', disabled: true, selectedName: '' },
+                        { type: 'cyc', label: 'Select Cycle', emptyText: 'No Cycles Found', list: [], selected: projectData, width: '25%', disabled: true, selectedName: cycleName },
                     ],
                     scenarioList: [],
                     avoAgentGrid: 'cicdanyagentcanbeselected',
@@ -564,7 +693,33 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
                                 
                                 <td className="tkn-table__button" >
-                                <img onClick={() =>{onClick('displayBasic2');setCurrentKey(item.configurekey);setCurrentName(item.configurename)}} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
+                                <img onClick={() =>{
+                                    onClick('displayBasic2');
+                                    setCurrentKey(item.configurekey);
+                                    setAppType(item.executionRequest.batchInfo[0].appType);
+                                    setBrowserTypeExe(item.executionRequest.browserType);
+                                    setCurrentName(item.configurename)
+                                    let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
+                                        return ({
+                                            assignedTime: "",
+                                            releaseid: element.releaseId,
+                                            cycleid: element.cycleId,
+                                            testsuiteid: element.testsuiteId,
+                                            testsuitename: element.testsuiteName,
+                                            projectidts: element.projectId,
+                                            assignedTestScenarioIds: "",
+                                            subTaskId: "",
+                                            versionnumber: element.versionNumber,
+                                            domainName: element.domainName,
+                                            projectName: element.projectName,
+                                            cycleName: element.cycleName
+                                        });                                   
+                                    });
+                                    setCurrentTask({
+                                        testSuiteDetails: testSuiteDetails
+                                    });
+                                    readTestSuiteFunct(testSuiteDetails, item);
+                                    }} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                         //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                          }}> Execute </button>&nbsp;&nbsp;&nbsp; */}
@@ -592,7 +747,30 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
                             
                                 <td className="tkn-table__button" >
-                                <img onClick={() =>{onClick('displayBasic2');setCurrentKey(item.configurekey);setCurrentName(item.configurename)}} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
+                                <img onClick={() =>{
+                                    onClick('displayBasic2');
+                                    setCurrentKey(item.configurekey);
+                                    setAppType(item.executionRequest.batchInfo[0].appType);
+                                    setBrowserTypeExe(item.executionRequest.browserType);
+                                    setCurrentName(item.configurename)
+                                    let testSuiteDetails = item.executionRequest.batchInfo.map((element) => {
+                                        return ({
+                                            assignedTime: "",
+                                            releaseid: element.releaseId,
+                                            cycleid: element.cycleId,
+                                            testsuiteid: element.testsuiteId,
+                                            testsuitename: element.testsuiteName,
+                                            projectidts: element.projectId,
+                                            assignedTestScenarioIds: "",
+                                            subTaskId: "",
+                                            versionnumber: element.versionNumber
+                                        });                                   
+                                    });
+                                    setCurrentTask({
+                                        testSuiteDetails: testSuiteDetails
+                                    });
+                                    readTestSuiteFunct(testSuiteDetails, item);
+                                    }} src="static/imgs/Execute.png" className="action_icons" alt="Edit Icon"/>&nbsp;&nbsp;&nbsp;
                                 {/* <button title="Execute" onClick={async () =>{onClick('displayBasic2');                                        //  let temp = execAutomation(item.configurekey);
                                        //  setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
                                          }}> Execute </button>&nbsp;&nbsp;&nbsp; */}
@@ -628,7 +806,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         })
                     }
                     </div> */}
-                    <input type="radio" name='myRadios' id='first'  onChange={() => {}}
+                    <input type="radio" name='myRadios' id='first'  onChange={() => {setAllocateICE(true); setDisplayBasic2(false);}}
                      style={{width:'2.5vh', height: '2.5vh'}} />&nbsp;&nbsp;
                     <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Assure Client</label>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -636,19 +814,21 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <label htmlFor='second' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}} >Avo Agent / Avo Grid</label> 
                 
                 </Dialog>
+                {/* Dialog for Execute Now */}
+
                 {allocateICE?
                 <AllocateICEPopup 
-                    // SubmitButton={CheckStatusAndExecute} 
-                    // setAllocateICE={setAllocateICE} 
+                    SubmitButton={CheckStatusAndExecute} 
+                    setAllocateICE={setAllocateICE} 
                     modalButton={"Execute"} 
-                    // allocateICE={allocateICE} 
+                    allocateICE={allocateICE} 
                     modalTitle={"Select ICE to Execute"} 
                     icePlaceholder={'Search ICE to execute'}
                     exeTypeLabel={"Select Execution type"}
                     exeIceLabel={"Execute on ICE"}
                     ExeScreen={true}
+                    currentTask={currentTask}
                 />:null}
-                {/* Dialog for Execute Now */}
 
                 {/* Dialog for Schedule */}
                 <Dialog header="Schedule" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
@@ -700,6 +880,45 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             </div>
         </> : <div className="no_config_img"> <img src="static/imgs/no-devops-config.png" alt="Empty List Image" label='No Execution Profile Found' style={{ width: 'auto',height: '60vh',marginRight: '37vh'}}/><h6 style={{position: 'relative',top: '63vh',right: '70vh'}}>No Execution Profile Found<h4 style={ { position: 'absolute', left: '3.5vh', width:'33vh'}}><b>Create Now</b></h4></h6> </div> }
     </>);
+}
+
+const parseLogicExecute = (eachData, current_task, appType, projectdata, moduleInfo,accessibilityParameters, scenarioTaskType) => {
+    for(var i =0 ;i<eachData.length;i++){
+        var testsuiteDetails = current_task.testSuiteDetails[i];
+        var suiteInfo = {};
+        var selectedRowData = [];
+        var relid = testsuiteDetails.releaseid;
+        var cycid = testsuiteDetails.cycleid;
+        var projectid = testsuiteDetails.projectidts;
+        
+        for(var j =0 ; j<eachData[i].executestatus.length; j++){
+            if(eachData[i].executestatus[j]===1){
+                selectedRowData.push({
+                    condition: eachData[i].condition[j],
+                    dataparam: [eachData[i].dataparam[j].trim()],
+                    scenarioName: eachData[i].scenarionames[j],
+                    scenarioId: eachData[i].scenarioids[j],
+                    scenariodescription: undefined,
+                    accessibilityParameters: accessibilityParameters
+                });
+            }
+        }
+        suiteInfo.scenarioTaskType = scenarioTaskType;
+        suiteInfo.testsuiteName = eachData[i].testsuitename;
+        suiteInfo.testsuiteId = eachData[i].testsuiteid;
+        suiteInfo.batchname = eachData[i].batchname;
+        suiteInfo.versionNumber = testsuiteDetails.versionnumber;
+        suiteInfo.appType = appType;
+        suiteInfo.domainName = (projectid in projectdata.project) ? projectdata.project[projectid].domain : testsuiteDetails.domainName;
+        suiteInfo.projectName = (projectid in projectdata.projectDict) ? projectdata.projectDict[projectid] : testsuiteDetails.projectName;
+        suiteInfo.projectId = projectid;
+        suiteInfo.releaseId = relid;
+        suiteInfo.cycleName = (cycid in projectdata.cycleDict) ? projectdata.cycleDict[cycid] : testsuiteDetails.cycleName;
+        suiteInfo.cycleId = cycid;
+        suiteInfo.suiteDetails = selectedRowData;
+        if(selectedRowData.length !== 0) moduleInfo.push(suiteInfo);
+    }
+    return moduleInfo;
 }
 
 export default DevOpsList;

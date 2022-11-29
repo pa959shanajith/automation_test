@@ -17,6 +17,7 @@ import Design from './pages/design';
 import Utility from './pages/utility';
 import Integration from './pages/integration';
 import Settings from './pages/settings';
+import Genius from "./pages/plugin/components/Genius";
 import {ScreenOverlay,ErrorBoundary} from './pages/global';
 import './pages/global/components/icons.js';
 import SocketFactory from './SocketFactory';
@@ -24,6 +25,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-datetime/css/react-datetime.css';
 import '@avo/designcomponents/lib/assets/styles/avoassure.scss';
+import 'primeicons/primeicons.css';
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primereact/resources/primereact.css';
+import 'primeflex/primeflex.css';
 
 const { REACT_APP_DEV } = process.env
 /*Component App
@@ -81,6 +86,7 @@ const RouteApp = () => {
       <Route path ="/execute" component={Execute}/>
       <Route path ="/scheduling" component={Schedule}/>
       <Route path ='/settings' component={Settings}/>
+      <Route path ='/genius' component={Genius}/>
       <Route component={ErrorPage} />
     </Switch>
   </Router>

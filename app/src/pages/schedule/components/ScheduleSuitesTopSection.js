@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollBar, CalendarComp, TimeComp, RecurrenceComp} from '../../global'
+import { ScrollBar, CalendarComp, TimeComp, RecurrenceComp, EndDateComp} from '../../global'
 import {readTestSuite_ICE} from '../api';
 import "../styles/ScheduleSuitesTopSection.scss";
 
@@ -42,7 +42,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
             tableData.map((rowData)=>{
                 if(moduleScheduledateTime[rowData.testsuiteid] === undefined) {
                     moduleScheduledateTime[rowData.testsuiteid] = {
-                        date:"",time:"",recurringValue: "",recurringString: "",recurringStringOnHover: "",
+                        date:"",time:"",recurringValue: "",recurringString: "",recurringStringOnHover: "",endAfter: "",
                         inputPropstime: {readOnly:"readonly" ,
                             disabled : true,
                             className:"fc-timePicker",
@@ -63,6 +63,12 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                           className: "fc-timePicker textbox-container",
                           title: "Select Frequency",
                       },
+                        inputPropsEndDate: {readOnly:"readonly" ,
+                            disabled : true,
+                            className:"fc-timePicker textbox-container",
+                            placeholder: "Select End After",
+                            title: "Select End After"
+                        }
                     };
                 }
             })
@@ -160,7 +166,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
     const updateDateTime = (date_time, value , testsuiteid) => {
         let moduleScheduledateTime = {...moduleScheduledate}
         if(moduleScheduledateTime[testsuiteid] === undefined) {
-            moduleScheduledateTime[testsuiteid] = {date:"",time:"",recurringValue: "", recurringString: "", recurringStringOnHover: ""};
+            moduleScheduledateTime[testsuiteid] = {date:"",time:"",recurringValue: "", recurringString: "", recurringStringOnHover: "", endAfter: ""};
         }
         if(date_time==="date"){
             moduleScheduledateTime[testsuiteid]["date"] = value;
@@ -223,6 +229,9 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                     moduleScheduledateTime[testsuiteid]["inputPropstime"][
                         "disabled"
                     ] = false;
+                    moduleScheduledateTime[testsuiteid]["inputPropsEndDate"][
+                        "disabled"
+                    ] = false;
                 }
                 else {
                     moduleScheduledateTime[testsuiteid]["date"] = "";
@@ -231,6 +240,9 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                         "disabled"
                     ] = true;
                     moduleScheduledateTime[testsuiteid]["inputPropstime"][
+                        "disabled"
+                    ] = true;
+                    moduleScheduledateTime[testsuiteid]["inputPropsEndDate"][
                         "disabled"
                     ] = true;
                 }
@@ -251,6 +263,10 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
         else if (date_time === "recurringStringOnHover") {	
             moduleScheduledateTime[testsuiteid]["recurringStringOnHover"] =	value;	
         }
+        else if (date_time === "endAfter") {	
+            moduleScheduledateTime[testsuiteid]["endAfter"] = value;	
+        }
+
 
         // update same schedule time to every module
         Object.entries(moduleScheduledateTime).forEach(([key, value]) => {
@@ -274,6 +290,7 @@ const ScheduleSuitesTopSection = ({setModuleScheduledate, moduleScheduledate, cu
                                     {/* <input type="checkbox" onChange={(event)=>{changeSelectALL(i,"selectScheduleSuite_"+i)}} id={"selectScheduleSuite_"+i} className="selectScheduleSuite" /> */}
                                     {/* <span className="scheduleSuiteName" data-testsuiteid= {rowData.testsuiteid}>{rowData.testsuitename}</span> */}
                                     <TimeComp idx={i} closeCal={closeCal} setCloseCal={setCloseCal} screen="scheduleSuiteTop" time={moduleScheduledate[rowData.testsuiteid]["time"]} setTime={(val)=>{updateDateTime("time",val,rowData.testsuiteid)}} inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropstime"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropstime"].disabled} classTimer="schedule_timer"/>
+                                    <EndDateComp placeholder={moduleScheduledate[rowData.testsuiteid]["inputPropsEndDate"].placeholder} classname={moduleScheduledate[rowData.testsuiteid]["inputPropsEndDate"].className} readonly={moduleScheduledate[rowData.testsuiteid]["inputPropsEndDate"].readOnly } title={moduleScheduledate[rowData.testsuiteid]["inputPropsEndDate"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropsEndDate"].disabled } endAfterValue={moduleScheduledate[rowData.testsuiteid]["endAfter"]} setEndAfterValue={(val) => {updateDateTime("endAfter", val, rowData.testsuiteid)}}  classTimer="schedule_timer" />
                                     <CalendarComp idx={i} closeCal={closeCal} setCloseCal={setCloseCal} screen="scheduleSuiteTop" inputProps={moduleScheduledate[rowData.testsuiteid]["inputPropsdate"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropsdate"].disabled} date={moduleScheduledate[rowData.testsuiteid]["date"]} setDate={(val)=>{updateDateTime("date",val,rowData.testsuiteid)}} classCalender="schedule_calender"/>
                                     <RecurrenceComp closeCal={closeCal} setCloseCal={setCloseCal} placeholder={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].placeholder} classname={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].className} readonly={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].readOnly } title={moduleScheduledate[rowData.testsuiteid]["recurringStringOnHover"]} disabled={moduleScheduledate[rowData.testsuiteid]["inputPropsrecurring"].disabled } recur={moduleScheduledate[rowData.testsuiteid]["recurringString"]} setRecurringString={(val) => {updateDateTime("recurringString", val, rowData.testsuiteid)}} setRecurringStringOnHover={(val) => {updateDateTime("recurringStringOnHover", val, rowData.testsuiteid)}} setRecurringValue={(val) => {updateDateTime("recurringValue", val, rowData.testsuiteid)}} clearScheduleData={clearScheduleData} classTimer="schedule_timer" />
                                 </div>

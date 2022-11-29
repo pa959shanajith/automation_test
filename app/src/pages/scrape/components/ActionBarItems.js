@@ -21,7 +21,31 @@ const UpperContent = props => {
     const { appType, subTaskId } = useSelector(state => state.plugin.CT);
     const [isMac, setIsMac] = useState(false);
     const [appendCheck, setAppendCheck] = useState(false);
-    const { setShowAppPop, saved, startScrape, setSaved } = useContext(ScrapeContext);
+    const [scrapeItemsLength, setScrapeLen] = useState(0);
+    const { setShowAppPop, saved, startScrape, setSaved,setShowObjModal,scrapeItems } = useContext(ScrapeContext);
+    const [customLen, setCustomLen] = useState(0);
+    const [irisLen, setIrisLen] = useState(false);
+    const [unsavedObjPresent, setUnsavedObjPresent] = useState(0);
+   
+    
+
+
+    useEffect(()=>{
+        let customs = 0;
+        let savedObjects = 0;
+        let unsavedObjects = 0;
+        let irisObjects = 0;
+        for (let scrapeItem of scrapeItems){
+            if( scrapeItem.xpath && scrapeItem.xpath.split(";")[0]==="iris" ) irisObjects++;
+            if ( scrapeItem.objId && scrapeItem.isCustom) customs++;
+            if (scrapeItem.objId) savedObjects++;
+            else unsavedObjects++;
+        }
+        setScrapeLen(savedObjects);
+        setUnsavedObjPresent(unsavedObjects);
+        setCustomLen(customs);
+        setIrisLen(irisObjects);
+    }, [scrapeItems])
 
     useEffect(() => {
         setIsMac(navigator.appVersion.toLowerCase().indexOf("mac") !== -1);
@@ -62,13 +86,24 @@ const UpperContent = props => {
     }
 
     let renderComp = [
-        <div data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Insprint Automation</div>,
+        // ...[{'title': 'Create Object','id':'addObjDesign', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag}].map((icon,i)=> <Thumbnail data-test="bottomContent" key={i} title={icon.title} tooltip={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>),
+        (props.appType === 'Web' || props.appType === "MobileWeb")? <div id='Insprint' data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Insprint Automation</div>:<></>,
+        ...[{'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': props.appType === 'Web' || props.appType === "MobileWeb", disable:  compareFlag},
+         {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': props.appType === 'Web' || props.appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag}].map((icon,i)=>
+        icon.show && <Thumbnail data-test="bottomContent" key={i} title={icon.title} tooltip={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>),
+        (props.appType === 'Web' || props.appType === "MobileWeb")?<div id='UpgradeAn' data-test="scrapeOnHeading" key="scrapeOn" className={'ss__scrapeOn' + (disableAction || compareFlag ? " disable-thumbnail" : "")}>Upgrade Analyzer</div>:<></>,
+        ...[{'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': props.appType === 'Web' || props.appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag || unsavedObjPresent || !saved.flag },
+        {'title': 'Replace Object', 'img': 'static/imgs/ic-replaceobject.png', 'action': ()=>setShowObjModal("replaceObjectSelBr"), 'show': props.appType === 'Web', 'disable': scrapeItemsLength <= 0 || ((scrapeItemsLength) === irisLen) || compareFlag }].map((icon,i)=>
+        icon.show && <Thumbnail data-test="bottomContent" key={i} title={icon.title} tooltip={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>),
         // (appType!=="Webservice" && <Thumbnail data-test="pdfUtility" key="pdf-icon-scrape" tooltip= "Launch PDF utility" title="PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
+        
+    ];
+        //  (appType!=="Webservice" && <Thumbnail data-test="pdfUtility" key="pdf-icon-scrape" tooltip= "Launch PDF utility" title="PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />),
         // <div key="append-edit" className={"ss__thumbnail" + (disableAppend || compareFlag ? " disable-thumbnail" : "")}>
         //     <input data-test="appendInput" id="enable_append" type="checkbox" title="Enable Append" onChange={onAppend} checked={appendCheck} />
         //     <span data-test="append" className="ss__thumbnail_title" title="Enable Append">{appType==="Webservice" ? "Edit" : "Append"}</span>
         // </div>
-    ];
+    
 
     switch (appType) {
         case "Web": renderComp.splice(1, 0, <Fragment key="scrape-upper-section"> {WebList.map((icon, i) => icon.title !== "Safari" || isMac ? <Thumbnail key={i} title={icon.title} tooltip={"Launch "+icon.title} img={icon.img} svg={icon.svg} action={icon.action} disable={icon.disable} /> : null)}</Fragment>);
@@ -94,12 +129,15 @@ const UpperContent = props => {
 const BottomContent = (props) => {
 
     const hiddenInput = useRef();
-    const { appType, screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
+    let appType = props.appType;
+    let fetchingDetails = props.fetchingDetails;
+    
+    const { screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
     const disableAction = useSelector(state => state.scrape.disableAction);
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
 
-    const { setShowObjModal, scrapeItems, fetchScrapeData, setOverlay, saved } = useContext(ScrapeContext);
+    const { setShowObjModal, scrapeItems, fetchScrapeData, setOverlay, saved, startScrape } = useContext(ScrapeContext);
     const [customLen, setCustomLen] = useState(0);
     const [scrapeItemsLength, setScrapeLen] = useState(0);
     const [unsavedObjPresent, setUnsavedObjPresent] = useState(0);
@@ -124,8 +162,10 @@ const BottomContent = (props) => {
         setIrisLen(irisObjects);
     }, [scrapeItems])
 
+    
+
     const exportScrapeObjects = () => {
-		scrapeApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
+        scrapeApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails["_id"], props.fetchingDetails.projectID, "")
         .then(data => {
             if (data === "Invalid Session") return RedirectPage(history);
             let temp = {}
@@ -134,16 +174,16 @@ const BottomContent = (props) => {
 
             if (typeof data === 'object' && data.view.length > 0) { 
                 hasData = true;
-                if (appType === "Webservice"){
+                if (props.appType === "Webservice"){
                     let {view, reuse, ...info } = data; 
                     temp['scrapeinfo'] = info;
                     temp['reuse'] = reuse;
                     temp['view'] = view;
                 } else temp = data;
 
-                temp['appType'] = appType;
-                temp['screenId'] = screenId;
-                temp['versionnumber'] = versionnumber;
+                temp['appType'] = props.appType;
+                temp['screenId'] = props.fetchingDetails["_id"];
+                temp['versionnumber'] = 0;
                 responseData = JSON.stringify(temp, undefined, 2);
             }
 
@@ -190,8 +230,8 @@ const BottomContent = (props) => {
                         if ('body' in resultString) {
                             let { reuse, appType, screenId, view, versionnumber, ...scrapeinfo } = resultString; 
                             objList['reuse'] = reuse;
-                            objList['appType'] = appType;
-                            objList['screenId'] = screenId;
+                            objList['appType'] = props.appType;
+                            objList['screenId'] =  props.fetchingDetails["_id"];
                             objList['view'] = view;
                             objList['scrapeinfo'] = scrapeinfo;
                         }
@@ -199,12 +239,12 @@ const BottomContent = (props) => {
 
                         let arg = {
                             projectId: projectId,
-                            screenId: screenId,
-                            screenName: screenName,
+                            screenId:  props.fetchingDetails["_id"],
+                            screenName:props.fetchingDetails["parent"]["name"] ,
                             userId: user_id,
                             roleId: role,
                             param: "importScrapeData",
-                            appType: appType,
+                            appType:props.appType,
                             objList: objList
                         };
                         scrapeApi.updateScreen_ICE(arg)
@@ -239,22 +279,23 @@ const BottomContent = (props) => {
     const importTestCase = () => {
         hiddenInput.current.click();
     }
-    console.log('appType', props.appType);
+    
     const lowerList =  [
-        {'title': 'Add Object', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': props.appType === 'Web' || props.appType === "MobileWeb", disable:  compareFlag}, 
-        {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': props.appType === 'Web' || props.appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
-        {'title': 'Replace Object', 'img': 'static/imgs/ic-replaceobject.svg', 'action': ()=>setShowObjModal("replaceObjectSelBr"), 'show': appType === 'Web', 'disable': scrapeItemsLength <= 0 || ((scrapeItemsLength) === irisLen) || compareFlag },
-        {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag || unsavedObjPresent || !saved.flag },
-        {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},
-        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: (appType!=="Web"), disable: compareFlag && appType!=="Webservice"},
-        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>setShowObjModal("importObject"), show: (appType==="Web"), disable: compareFlag && appType==="Web"},
+        // {'title': 'Add Object','id':'addObjDesign', 'img': 'static/imgs/ic-addobject.png', 'action': ()=>setShowObjModal("addObject"), 'show': props.appType === 'Web' || props.appType === "MobileWeb", disable:  compareFlag}, 
+        // {'title': 'Map Object', 'img': 'static/imgs/ic-mapobject.png', 'action': ()=>setShowObjModal("mapObject"), 'show': props.appType === 'Web' || props.appType === "MobileWeb", 'disable': customLen <= 0 || scrapeItemsLength-customLen <= 0 || compareFlag},
+        // {'title': 'Compare Object', 'img': 'static/imgs/ic-compareobject.png', 'action': ()=>setShowObjModal("compareObject"), 'show': appType === 'Web' || appType === "MobileWeb", 'disable': scrapeItemsLength-customLen <= 0 || !disableAction || compareFlag || unsavedObjPresent || !saved.flag },
+        // {'title': 'Replace Object', 'img': 'static/imgs/ic-replaceobject.svg', 'action': ()=>setShowObjModal("replaceObjectSelBr"), 'show': appType === 'Web', 'disable': scrapeItemsLength <= 0 || ((scrapeItemsLength) === irisLen) || compareFlag },
+         {'title': 'Create Object', 'img': 'static/imgs/ic-jq-editstep.png', 'action': ()=>setShowObjModal("createObject"), 'show': appType === 'Web' || appType === "MobileWeb", disable: compareFlag},
         {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportScrapeObjects(), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType!=="Webservice", show: (appType!=="Web")},
-        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>setShowObjModal("exportObject"), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType==="Web", show: (appType==="Web")}
+        {'title': 'Export Screen', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>setShowObjModal("exportObject"), 'disable': ((customLen <= 0 && scrapeItemsLength-customLen <= 0) || compareFlag) && appType==="Web", show: (appType==="Web")},
+        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase(), show: (props.appType!=="Web"), disable: compareFlag && props.appType!=="Webservice"},
+        {'title': 'Import Screen', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>setShowObjModal("importObject"), show: (props.appType==="Web"), disable: compareFlag && props.appType==="Web"},        
     ]
 
     return (
         <>
             {lowerList.map((icon, i) => icon.show && <Thumbnail data-test="bottomContent" key={i} title={icon.title} tooltip={icon.title} img={icon.img} action={icon.action} disable={icon.disable}/>)}
+            {/* {(appType!=="Webservice" && <Thumbnail data-test="pdfUtility" key="pdf-icon-scrape" tooltip= "Launch PDF utility" title="PDF utility" img="static/imgs/ic-pdf_scrape.png" action={() => startScrape("pdf")} disable={disableAction} />)} */}
             <input ref={hiddenInput} data-test="fileInput" id="importScreenField" type="file" style={{display: "none"}} onChange={onInputChange} accept=".json"/>
         </>
     );
@@ -262,11 +303,11 @@ const BottomContent = (props) => {
 
 
 const ActionBarItems = props => {
-    const { appType } = useSelector(state=>state.plugin.CT);
+    // const { appType } = useSelector(state=>state.plugin.CT);
     return (
         <ActionBar
-            upperContent={ appType === "Mainframe" ? null : <UpperContent />}
-            bottomContent={ appType === "Mainframe" ? null : <BottomContent />}
+            upperContent={ props.appType === "Mainframe" ? null : <UpperContent appType={props.appType} />}
+            bottomContent={ props.appType === "Mainframe" ? null : <BottomContent appType={props.appType} />}
         />
     )
 }

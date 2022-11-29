@@ -206,6 +206,7 @@ if (cluster.isMaster) {
 
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
+    var plugin = require('./server/controllers/plugin');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -218,6 +219,7 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
+		app.post('/getGeniusData',plugin.getGeniusData);
 		app.use(csrf({
 			cookie: true
 		}));
@@ -265,7 +267,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|plugin|seleniumtoavo|settings)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|plugin|seleniumtoavo|settings|genius)$/, function(req, res) {
 			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -365,7 +367,6 @@ if (cluster.isMaster) {
 		var admin = require('./server/controllers/admin');
 		var design = require('./server/controllers/design');
 		var designscreen = require('./server/controllers/designscreen');
-		var plugin = require('./server/controllers/plugin');
 		var utility = require('./server/controllers/utility');
 		var qc = require('./server/controllers/qualityCenter');
 		var qtest = require('./server/controllers/qtest');
@@ -506,6 +507,9 @@ if (cluster.isMaster) {
 		app.post('/connectJira_ICE', auth.protect, report.connectJira_ICE);
 		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		//Plugin Routes
+		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
+        app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);
+        app.post('/getUsers_ICE', auth.protect, plugin.getUsers_ICE)
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);
 		app.post('/getTaskJson_mindmaps', auth.protect, taskbuilder.getTaskJson_mindmaps);
 		app.post('/updateTaskstatus_mindmaps', auth.protect, taskbuilder.updateTaskstatus_mindmaps);
