@@ -173,6 +173,7 @@
     right: 0;
     display: flex;
     flex-direction: column;
+    overflow: auto;
 }
 .sc__min{
     min-height: 0;
@@ -187,6 +188,9 @@
 .scrape_object_container{
     flex: 1 1;
     overflow: auto;
+    height: 385px;
+    margin: 10px 10px 8px 13px;
+
 }
 
 .ss__dup_scroll{
@@ -212,10 +216,16 @@
     font-family: 'latoWeb';
     margin: 52px 0px 57px 3px;
     border-radius: 2px;
+   
     padding: 10px;
+     
    
 
 }
+.p-button-warning .p-button {
+    border: 1px solid #643693;
+}
+
 
 .p-button{
     margin: 54px -19px 54px -18px;

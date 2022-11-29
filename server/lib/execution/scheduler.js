@@ -25,6 +25,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
     let recurringStringOnHoverValue = body.executionData.batchInfo[0].recurringStringOnHover;
     let timeValue = body.executionData.batchInfo[0].time;
     let parentId = body.executionData.batchInfo[0].parentId ? body.executionData.batchInfo[0].parentId : 0;
+    let endAfter = body.executionData.batchInfo[0].endAfter ? body.executionData.batchInfo[0].endAfter : 0;
     let startDate = (recurringStringOnHoverValue === "One Time") ? (+ new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), new Date(new Date().getHours()), new Date(new Date().getMinutes()))).toString() : (body.executionData.batchInfo[0].startDate ? body.executionData.batchInfo[0].startDate : body.executionData.batchInfo[0].timestamp)
     if (!poolid || poolid === "") poolid = constants.EMPTYPOOL
     var invokinguser = {
@@ -112,7 +113,8 @@ exports.prepareSchedulingRequest = async (session, body) => {
             "parentId": parentId,
             "startDate": startDate.toString(),
             "configureKey": multiExecutionData.configureKey,
-            "configureName": multiExecutionData.configureName
+            "configureName": multiExecutionData.configureName,
+            "endAfter": endAfter
         };
         for (let i = 0; i < batchIdx.length; i++) {
             let suite = batchInfo[batchIdx[i]];
@@ -438,6 +440,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
     body.executionData.batchInfo[0].startDate = createdDate;
     let recurringString = multiExecutionData['batchInfo'][0]['recurringString'];
     let recurringStringOnHover = multiExecutionData.batchInfo[0].recurringStringOnHover;
+    let endAfter = multiExecutionData.batchInfo[0].endAfter;
 
     if (recurringString == "Every Day") {
         if (!recurringPattern.includes("1-5") && recurringStringOnHover != "Occurs every day") {
@@ -519,7 +522,8 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         parentId: 0,
         startDate: createdDate.toString(),
         configureKey: multiExecutionData.configureKey,
-        configureName: multiExecutionData.configureName
+        configureName: multiExecutionData.configureName,
+        endAfter: endAfter
     };
 
     const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
@@ -553,10 +557,28 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
 
                     // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
                     // multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
-                    multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
-                    let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
-                    schedFlag = result1;
-                    done();
+                    if (timeStamp.valueOf() <= job.attrs.endDate.valueOf()) {
+                        multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
+                        let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
+                        schedFlag = result1;
+                        done();
+                    }
+                    else {
+                        // TODO: logic to cancel the agend job and status update
+
+                        // cancel the job
+                        const inputs2 = {
+                            "query": "cancelagendajobs",
+                            "scheduleid": job.attrs.name
+                        };
+                        const jobCancelled = await utils.fetchData(inputs2, "suite/ScheduleTestSuite_ICE", fnName);
+                        if (jobCancelled == "fail") {
+                            await this.updateScheduleStatus(scheduleId, "Failed");
+                        }
+                        else {
+                            await this.updateScheduleStatus(scheduleId, "Completed");
+                        }
+                    }
                 });
 
                 // triggerring the agenda job with repeatEvery option(recurring jobs).
@@ -564,7 +586,10 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     const dailyJob = agenda.create(scheduleId, { scheduleData: body.executionData });
                     await agenda.start();
                     let startDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate() - nextRun), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                    await dailyJob.schedule(startDate).repeatEvery(nextRunString, { skipImmediate: true }).save();
+                    let endDate = new Date(startDate)
+                    endDate.setDate(endDate.getDate() + nextRun);
+                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    await dailyJob.schedule(startDate).repeatEvery(nextRunString, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
             else {
@@ -582,19 +607,37 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
 
                 // definations of the job.
                 agenda.define(scheduleId, async (job, done) => {
-                    let multiExecutionData = {};
-                    let data = job.attrs.data.scheduleData;
-                    multiExecutionData.executionData = data;
-                    let dateString = job.attrs.nextRunAt.toString().split(' ');
-                    let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
-                    let timeValue = multiExecutionData.executionData.batchInfo[0].time;
-                    let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                    if (job.attrs.nextRunAt !== null) {
+                        let multiExecutionData = {};
+                        let data = job.attrs.data.scheduleData;
+                        multiExecutionData.executionData = data;
+                        let dateString = job.attrs.nextRunAt.toString().split(' ');
+                        let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                        let timeValue = multiExecutionData.executionData.batchInfo[0].time;
+                        let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                    // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    // multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
-                    multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
-                    let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
-                    schedFlag = result1;
+                        // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                        // multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                        multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
+                        let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
+                        schedFlag = result1;
+                    }
+                    else if (job.attrs.nextRunAt === null) {
+                        // TODO: logic to cancel the agend job and status update
+
+                        // cancel the job
+                        const inputs2 = {
+                            "query": "cancelagendajobs",
+                            "scheduleid": job.attrs.name
+                        };
+                        const jobCancelled = await utils.fetchData(inputs2, "suite/ScheduleTestSuite_ICE", fnName);
+                        if (jobCancelled == "fail") {
+                            await this.updateScheduleStatus(scheduleId, "Failed");
+                        }
+                        else {
+                            await this.updateScheduleStatus(scheduleId, "Completed");
+                        }
+                    }
                     done();
                 });
 
@@ -602,7 +645,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 (async function () {
                     const dailyJob = agenda.create(scheduleId, { scheduleData: body.executionData });
                     await agenda.start();
-                    await dailyJob.repeatEvery(recurringPattern, { skipImmediate: true }).save();
+                    let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    await dailyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
         }
@@ -621,19 +666,37 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
 
             // definations of the job.
             agenda.define(scheduleId, async (job, done) => {
-                let multiExecutionData = {};
-                let data = job.attrs.data.scheduleData;
-                multiExecutionData.executionData = data;
-                let dateString = job.attrs.nextRunAt.toString().split(' ');
-                let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
-                let timeValue = multiExecutionData.executionData.batchInfo[0].time;
-                let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                if (job.attrs.nextRunAt !== null) {
+                    let multiExecutionData = {};
+                    let data = job.attrs.data.scheduleData;
+                    multiExecutionData.executionData = data;
+                    let dateString = job.attrs.nextRunAt.toString().split(' ');
+                    let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                    let timeValue = multiExecutionData.executionData.batchInfo[0].time;
+                    let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
 
-                // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                // multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
-                multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
-                let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
-                schedFlag = result1;
+                    // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                    // multiExecutionData.executionData.batchInfo[0].parentId = scheduleId;
+                    multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = scheduleId});
+                    let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
+                    schedFlag = result1;
+                }
+                else if (job.attrs.nextRunAt === null) {
+                    // TODO: logic to cancel the agend job and status update
+
+                    // cancel the job
+                    const inputs2 = {
+                        "query": "cancelagendajobs",
+                        "scheduleid": job.attrs.name
+                    };
+                    const jobCancelled = await utils.fetchData(inputs2, "suite/ScheduleTestSuite_ICE", fnName);
+                    if (jobCancelled == "fail") {
+                        await this.updateScheduleStatus(scheduleId, "Failed");
+                    }
+                    else {
+                        await this.updateScheduleStatus(scheduleId, "Completed");
+                    }
+                }
                 done();
             });
 
@@ -641,7 +704,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
             (async function () {
                 const weeklyJob = agenda.create(scheduleId, { scheduleData: body.executionData });
                 await agenda.start();
-                await weeklyJob.repeatEvery(recurringPattern, { skipImmediate: true }).save();
+                let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                await weeklyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
             })();
         }
         else if (recurringString == "Every Month") {
@@ -682,7 +747,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 agenda.define(scheduleId, async (job, done) => {
                     let recurringPattern = job.attrs.data.scheduleData.batchInfo[0].recurringValue;
                     let nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
-                    if (job.attrs.data.runCount % nextRun == 0) {
+                    if (job.attrs.data.runCount % nextRun == 0 && job.attrs.nextRunAt !== null) {
                         let multiExecutionData = {};
                         let data = job.attrs.data.scheduleData;
                         multiExecutionData.executionData = data;
@@ -719,6 +784,22 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                         schedFlag = result1;
                     }
                     job.attrs.data.runCount = job.attrs.data.runCount + 1;
+                    if (job.attrs.nextRunAt === null) {
+                        // TODO: logic to cancel the agend job and status update
+
+                        // cancel the job
+                        const inputs2 = {
+                            "query": "cancelagendajobs",
+                            "scheduleid": job.attrs.name
+                        };
+                        const jobCancelled = await utils.fetchData(inputs2, "suite/ScheduleTestSuite_ICE", fnName);
+                        if (jobCancelled == "fail") {
+                            await this.updateScheduleStatus(scheduleId, "Failed");
+                        }
+                        else {
+                            await this.updateScheduleStatus(scheduleId, "Completed");
+                        }
+                    }
                     done();
                 });
 
@@ -726,7 +807,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 (async function () {
                     const monthlyJob = agenda.create(scheduleId, { scheduleData: body.executionData, runCount: 0 });
                     await agenda.start();
-                    await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true }).save();
+                    let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
             else {
@@ -750,7 +833,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 agenda.define(scheduleId, async (job, done) => {
                     let recurringPattern = job.attrs.data.scheduleData.batchInfo[0].recurringValue;
                     let nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
-                    if (job.attrs.data.runCount % nextRun == 0) {
+                    if (job.attrs.data.runCount % nextRun == 0 && job.attrs.nextRunAt !== null) {
                         let multiExecutionData = {};
                         let data = job.attrs.data.scheduleData;
                         multiExecutionData.executionData = data;
@@ -771,6 +854,22 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                         schedFlag = result1;
                     }
                     job.attrs.data.runCount = job.attrs.data.runCount + 1;
+                    if (job.attrs.nextRunAt === null) {
+                        // TODO: logic to cancel the agend job and status update
+
+                        // cancel the job
+                        const inputs2 = {
+                            "query": "cancelagendajobs",
+                            "scheduleid": job.attrs.name
+                        };
+                        const jobCancelled = await utils.fetchData(inputs2, "suite/ScheduleTestSuite_ICE", fnName);
+                        if (jobCancelled == "fail") {
+                            await this.updateScheduleStatus(scheduleId, "Failed");
+                        }
+                        else {
+                            await this.updateScheduleStatus(scheduleId, "Completed");
+                        }
+                    }
                     done();
                 });
 
@@ -778,7 +877,9 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 (async function () {
                     const monthlyJob = agenda.create(scheduleId, { scheduleData: body.executionData, runCount: 0 });
                     await agenda.start();
-                    await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true }).save();
+                    let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
         }
@@ -870,9 +971,27 @@ exports.reScheduleRecurringTestsuite = async () => {
 
                         // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
                         // multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
-                        multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = schd._id});
-                        let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
-                        schedFlag = result1;
+                        if (timeStamp.valueOf() <= job.attrs.endDate.valueOf()) {
+                            multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = schd._id});
+                            let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
+                            schedFlag = result1;
+                        }
+                        else {
+                            // TODO: logic to cancel the agend job and status update
+    
+                            // cancel the job
+                            const inputs2 = {
+                                "query": "cancelagendajobs",
+                                "scheduleid": job.attrs.name
+                            };
+                            const jobCancelled = await utils.fetchData(inputs2, "suite/ScheduleTestSuite_ICE", fnName);
+                            if (jobCancelled == "fail") {
+                                await this.updateScheduleStatus(schd._id, "Failed");
+                            }
+                            else {
+                                await this.updateScheduleStatus(schd._id, "Completed");
+                            }
+                        }
                         done();
                     });
 
@@ -883,7 +1002,10 @@ exports.reScheduleRecurringTestsuite = async () => {
                         startDate = startDate.toString().split(" ");
                         let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(startDate[1]) / 3;
                         startDate = new Date(parseInt(startDate[3]), parseInt(month), parseInt(startDate[2]) - nextRun, parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                        await dailyJob.schedule(startDate).repeatEvery(nextRunString, { skipImmediate: true }).save();
+                        let endDate = new Date(startDate)
+                        endDate.setDate(endDate.getDate() + nextRun);
+                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        await dailyJob.schedule(startDate).repeatEvery(nextRunString, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }
                 else {
@@ -891,6 +1013,57 @@ exports.reScheduleRecurringTestsuite = async () => {
 
                     // definations of the job.
                     agenda.define(schd._id, async (job, done) => {
+                        if (job.attrs.nextRunAt !== null) {
+                            let multiExecutionData = {};
+                            let data = job.attrs.data.scheduleData;
+                            multiExecutionData.executionData = data;
+                            let dateString = job.attrs.nextRunAt.toString().split(' ');
+                            let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
+                            let timeValue = multiExecutionData.executionData.batchInfo[0].time;
+                            let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+
+                            // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
+                            // multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
+                            multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = schd._id});
+                            let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
+                            schedFlag = result1;
+                        }
+                        else if (job.attrs.nextRunAt === null) {
+                            // TODO: logic to cancel the agend job and status update
+    
+                            // cancel the job
+                            const inputs2 = {
+                                "query": "cancelagendajobs",
+                                "scheduleid": job.attrs.name
+                            };
+                            const jobCancelled = await utils.fetchData(inputs2, "suite/ScheduleTestSuite_ICE", fnName);
+                            if (jobCancelled == "fail") {
+                                await this.updateScheduleStatus(schd._id, "Failed");
+                            }
+                            else {
+                                await this.updateScheduleStatus(schd._id, "Completed");
+                            }
+                        }
+                        done();
+                    });
+
+                    // triggerring the agenda job with repeatEvery option(recurring jobs).
+                    (async function () {
+                        const dailyJob = agenda.create(schd._id, { scheduleData: multiBatchExecutionData.executionData });
+                        await agenda.start();
+                        let timeValue = schd.time;
+                        let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        await dailyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
+                    })();
+                }
+            }
+            else if (schd.scheduletype == "Every Week") {
+                let recurringPattern = schd.recurringpattern;
+
+                // definations of the job.
+                agenda.define(schd._id, async (job, done) => {
+                    if (job.attrs.nextRunAt !== null) {
                         let multiExecutionData = {};
                         let data = job.attrs.data.scheduleData;
                         multiExecutionData.executionData = data;
@@ -904,35 +1077,23 @@ exports.reScheduleRecurringTestsuite = async () => {
                         multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = schd._id});
                         let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
                         schedFlag = result1;
-                        done();
-                    });
-
-                    // triggerring the agenda job with repeatEvery option(recurring jobs).
-                    (async function () {
-                        const dailyJob = agenda.create(schd._id, { scheduleData: multiBatchExecutionData.executionData });
-                        await agenda.start();
-                        await dailyJob.repeatEvery(recurringPattern, { skipImmediate: true }).save();
-                    })();
-                }
-            }
-            else if (schd.scheduletype == "Every Week") {
-                let recurringPattern = schd.recurringpattern;
-
-                // definations of the job.
-                agenda.define(schd._id, async (job, done) => {
-                    let multiExecutionData = {};
-                    let data = job.attrs.data.scheduleData;
-                    multiExecutionData.executionData = data;
-                    let dateString = job.attrs.nextRunAt.toString().split(' ');
-                    let month = "JanFebMarAprMayJunJulAugSepOctNovDec".indexOf(dateString[1]) / 3;
-                    let timeValue = multiExecutionData.executionData.batchInfo[0].time;
-                    let timeStamp = new Date(parseInt(dateString[3]), parseInt(month), parseInt(dateString[2]), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-
-                    // multiExecutionData.executionData.batchInfo[0].timestamp = timeStamp.valueOf();
-                    // multiExecutionData.executionData.batchInfo[0].parentId = schd._id;
-                    multiExecutionData.executionData.batchInfo.map((item)=> {item.timestamp = timeStamp.valueOf(); item.parentId = schd._id});
-                    let result1 = exports.prepareSchedulingRequest(session, multiExecutionData);
-                    schedFlag = result1;
+                    }
+                    else if (job.attrs.nextRunAt === null) {
+                        // TODO: logic to cancel the agend job and status update
+    
+                        // cancel the job
+                        const inputs2 = {
+                            "query": "cancelagendajobs",
+                            "scheduleid": job.attrs.name
+                        };
+                        const jobCancelled = await utils.fetchData(inputs2, "suite/ScheduleTestSuite_ICE", fnName);
+                        if (jobCancelled == "fail") {
+                            await this.updateScheduleStatus(schd._id, "Failed");
+                        }
+                        else {
+                            await this.updateScheduleStatus(schd._id, "Completed");
+                        }
+                    }
                     done();
                 });
 
@@ -940,7 +1101,10 @@ exports.reScheduleRecurringTestsuite = async () => {
                 (async function () {
                     const weeklyJob = agenda.create(schd._id, { scheduleData: multiBatchExecutionData.executionData });
                     await agenda.start();
-                    await weeklyJob.repeatEvery(recurringPattern, { skipImmediate: true }).save();
+                    let timeValue = schd.time;
+                    let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                    endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                    await weeklyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
             else if (schd.scheduletype == "Every Month") {
@@ -985,7 +1149,7 @@ exports.reScheduleRecurringTestsuite = async () => {
                     agenda.define(schd._id, async (job, done) => {
                         let recurringPattern = job.attrs.data.scheduleData.batchInfo[0].recurringValue;
                         let nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
-                        if (job.attrs.data.runCount % nextRun == 0) {
+                        if (job.attrs.data.runCount % nextRun == 0 && job.attrs.nextRunAt !== null) {
                             let multiExecutionData = {};
                             let data = job.attrs.data.scheduleData;
                             multiExecutionData.executionData = data;
@@ -1022,6 +1186,22 @@ exports.reScheduleRecurringTestsuite = async () => {
                             schedFlag = result1;
                         }
                         job.attrs.data.runCount = job.attrs.data.runCount + 1;
+                        if (job.attrs.nextRunAt === null) {
+                            // TODO: logic to cancel the agend job and status update
+    
+                            // cancel the job
+                            const inputs2 = {
+                                "query": "cancelagendajobs",
+                                "scheduleid": job.attrs.name
+                            };
+                            const jobCancelled = await utils.fetchData(inputs2, "suite/ScheduleTestSuite_ICE", fnName);
+                            if (jobCancelled == "fail") {
+                                await this.updateScheduleStatus(schd._id, "Failed");
+                            }
+                            else {
+                                await this.updateScheduleStatus(schd._id, "Completed");
+                            }
+                        }
                         done();
                     });
 
@@ -1029,7 +1209,10 @@ exports.reScheduleRecurringTestsuite = async () => {
                     (async function () {
                         const monthlyJob = agenda.create(schd._id, { scheduleData: multiBatchExecutionData.executionData, runCount: runCount });
                         await agenda.start();
-                        await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true }).save();
+                        let timeValue = schd.time;
+                        let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }
                 else {
@@ -1037,7 +1220,7 @@ exports.reScheduleRecurringTestsuite = async () => {
                     agenda.define(schd._id, async (job, done) => {
                         let recurringPattern = job.attrs.data.scheduleData.batchInfo[0].recurringValue;
                         let nextRun = parseInt(recurringPattern.split("/")[1].split(" ")[0]);
-                        if (job.attrs.data.runCount % nextRun == 0) {
+                        if (job.attrs.data.runCount % nextRun == 0 && job.attrs.nextRunAt !== null) {
                             let multiExecutionData = {};
                             let data = job.attrs.data.scheduleData;
                             multiExecutionData.executionData = data;
@@ -1058,6 +1241,22 @@ exports.reScheduleRecurringTestsuite = async () => {
                             schedFlag = result1;
                         }
                         job.attrs.data.runCount = job.attrs.data.runCount + 1;
+                        if (job.attrs.nextRunAt === null) {
+                            // TODO: logic to cancel the agend job and status update
+    
+                            // cancel the job
+                            const inputs2 = {
+                                "query": "cancelagendajobs",
+                                "scheduleid": job.attrs.name
+                            };
+                            const jobCancelled = await utils.fetchData(inputs2, "suite/ScheduleTestSuite_ICE", fnName);
+                            if (jobCancelled == "fail") {
+                                await this.updateScheduleStatus(schd._id, "Failed");
+                            }
+                            else {
+                                await this.updateScheduleStatus(schd._id, "Completed");
+                            }
+                        }
                         done();
                     });
 
@@ -1065,7 +1264,10 @@ exports.reScheduleRecurringTestsuite = async () => {
                     (async function () {
                         const monthlyJob = agenda.create(schd._id, { scheduleData: multiBatchExecutionData.executionData, runCount: runCount });
                         await agenda.start();
-                        await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true }).save();
+                        let timeValue = schd.time;
+                        let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
+                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }
             }

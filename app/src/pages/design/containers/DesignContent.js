@@ -148,7 +148,8 @@ const DesignContent = props => {
     }, [props.imported]);
 
     useEffect(()=>{
-        if (Object.keys(userInfo).length && Object.keys(props.current_task).length) {
+        if (Object.keys(userInfo).length){
+        //  && Object.keys(props.current_task).length) {
             fetchTestCases()
             .then(data=>{
                 data !== "success" &&
@@ -168,12 +169,12 @@ const DesignContent = props => {
 
     const fetchTestCases = () => {
 		return new Promise((resolve, reject)=>{
-            let { testCaseName, versionnumber, screenName, screenId, projectId, testCaseId, appType } = props.current_task;
+            // let { testCaseName, versionnumber, screenName, screenId, projectId, testCaseId, appType } = props.current_task;
             let deleteObjectFlag = false;
             
             setOverlay("Loading...");
             
-            DesignApi.readTestCase_ICE(userInfo, testCaseId, testCaseName, versionnumber, screenName)
+            DesignApi.readTestCase_ICE(userInfo, props.fetchingDetails["_id"], props.fetchingDetails["name"], 0 /** versionNumber */, props.fetchingDetails["parent"]["name"])
             .then(data => {
                 if (data === "Invalid Session") return RedirectPage(history);
                 
@@ -192,14 +193,14 @@ const DesignContent = props => {
                 setHideSubmit(data.testcase.length === 0);
                 setReusedTC(data.reuse);
 
-                DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
+                DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails.parent['_id'], props.fetchingDetails.projectId, props.fetchingDetails.testCaseId)
                     .then(scriptData => {
                         if (scriptData === "Invalid Session") return RedirectPage(history);
 
                         setTestScriptData(scriptData.view);
                         props.setMirror(scriptData.mirror);
                         
-                        DesignApi.getKeywordDetails_ICE(appType)
+                        DesignApi.getKeywordDetails_ICE(props.appType)
                             .then(keywordData => {
                                 if (keywordData === "Invalid Session") return RedirectPage(history);
                                 
@@ -217,7 +218,7 @@ const DesignContent = props => {
                                             delete testcase[i];
                                             testcase = testcase.filter(n => n !== null);
                                         } else {
-                                            if (appType === "Webservice") {
+                                            if (props.appType === "Webservice") {
                                                 if (testcase[i].keywordVal === "setHeader" || testcase[i].keywordVal === "setHeaderTemplate") {
                                                     testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
                                                 }
@@ -233,7 +234,7 @@ const DesignContent = props => {
                                 setDraggable(false);
                                 setTestCaseData(testcaseArray);
                                 setPastedTC([]);
-                                setObjNameList(getObjNameList(props.current_task.appType, scriptData.view));
+                                setObjNameList(getObjNameList(props.appType, scriptData.view));
                                 let msg = deleteObjectFlag ? "deleteObjs" : "success"
                                 resolve(msg);
                             })
@@ -279,8 +280,13 @@ const DesignContent = props => {
                 props.setShowConfirmPop({'title': 'Save Testcase', 'content': 'Testcase has been reused. Are you sure you want to save?', 'onClick': ()=>{props.setShowConfirmPop(false);saveTestCases(null, true)}});
                 return;
             }
+             let screenId = props.fetchingDetails['parent']['_id'];
+             let testCaseId = props.fetchingDetails['_id'];
+             let testCaseName = props.fetchingDetails.testCaseName;
+             let versionnumber = 0;
 
-            let { screenId, testCaseId, testCaseName, versionnumber } = props.current_task;
+
+            // let { screenId, testCaseId, testCaseName, versionnumber } = props.current_task;
             let import_status = false;
 
             if (String(screenId) !== "undefined" && String(testCaseId) !== "undefined") {
@@ -320,16 +326,16 @@ const DesignContent = props => {
                 }
 
                 if (!errorFlag) {
-                    DesignApi.updateTestCase_ICE(testCaseId, testCaseName, testCases, userInfo, versionnumber, import_status, pastedTC)
+                    DesignApi.updateTestCase_ICE(props.fetchingDetails['_id'], props.fetchingDetails['name'], testCases, userInfo, 0 /**versionnumber*/, import_status, pastedTC)
                     .then(data => {
                         if (data === "Invalid Session") return RedirectPage(history);
                         if (data === "success") {
                             
-                            if(props.current_task.appType.toLowerCase()==="web" && Object.keys(modified).length !== 0){
+                            if(props.appType.toLowerCase()==="web" && Object.keys(modified).length !== 0){
                                 let scrape_data = {};
-                                let { appType, projectId, testCaseId, versionnumber } = props.current_task;
+                                // let { appType, projectId, testCaseId, versionnumber } = props.current_task;
                                 
-                                DesignApi.getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
+                                DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails['parent']['_id'], props.fetchingDetails.projectId, props.fetchingDetails['_id'])
                                 .then(res => {
                                     scrape_data=res;
                                     let modifiedObjects = [];
@@ -344,7 +350,7 @@ const DesignContent = props => {
                                         'deletedObj': [],
                                         'modifiedObj': modifiedObjects,
                                         'addedObj': {...scrape_data, view: []},
-                                        'testCaseId': testCaseId,
+                                        'testCaseId': props.fetchingDetails.testCaseId,
                                         'userId': userInfo.user_id,
                                         'roleId': userInfo.role,
                                         'versionnumber': versionnumber,
@@ -597,7 +603,7 @@ const DesignContent = props => {
             }
             
             if (!copyErrorFlag) {
-                copyContent = {'appType': props.current_task.appType, 'testCaseId': props.current_task.testCaseId, 'testCases': copyTestCases};
+                copyContent = {'appType': props.appType, 'testCaseId': props.fetchingDetails['_id'], 'testCases': copyTestCases};
                 dispatch({type: designActions.SET_COPYTESTCASES, payload: copyContent});
                 setEdit(false);
             }
@@ -615,7 +621,7 @@ const DesignContent = props => {
             return;
         }
 
-        if (copiedContent.testCaseId !== props.current_task.testCaseId) {
+        if (copiedContent.testCaseId !== props.fetchingDetails['_id']) {
             let appTypeFlag = false;
             for (let testCase of copiedContent.testCases){
                 if (["Web", "Desktop", "Mainframe", "OEBS", "MobileApp", "MobileWeb", "MobileApp", "SAP"].includes(testCase.appType)) {
@@ -623,7 +629,7 @@ const DesignContent = props => {
                     break;
                 }
             }
-            if (copiedContent.appType !== props.current_task.appType && appTypeFlag) {
+            if (copiedContent.appType !== props.appType && appTypeFlag) {
                 setMsg(MSG.DESIGN.WARN_DIFF_PROJTYPE);
             }
             else{
@@ -743,14 +749,14 @@ const DesignContent = props => {
         headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
     }
 
-    const onAction = operation => {
-        switch(operation){
-            case "submit": setShow({'title':'Submit Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
-            case "reassign": setShow({'title':'Reassign Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
-            case "approve": setShow({'title':'Approve Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
-            default: break;
-        }                       
-    }
+    // const onAction = operation => {
+    //     switch(operation){
+    //         case "submit": setShow({'title':'Submit Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+    //         case "reassign": setShow({'title':'Reassign Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+    //         case "approve": setShow({'title':'Approve Task', 'content': operation, 'onClick': ()=>submitTask(operation)}); break;
+    //         default: break;
+    //     }                       
+    // }
 
     const onCheckAll = (event) => {
         let checkList = [...stepSelect.check]
@@ -802,16 +808,16 @@ const DesignContent = props => {
                 </div>
             </div>}
             close={()=>{setShow(false);resetData();}}
-            footer={
-                <>
-                <button onClick={()=>{submitTask(showPopup.content)}}>
-                    {showPopup.continueText ? showPopup.continueText : "Yes"}
-                </button>
-                <button onClick={()=>{setShow(false);resetData()}}>
-                    {showPopup.rejectText ? showPopup.rejectText : "No"}
-                </button>
-                </>
-            }
+            // footer={
+            //     <>
+            //     <button onClick={()=>{submitTask(showPopup.content)}}>
+            //         {showPopup.continueText ? showPopup.continueText : "Yes"}
+            //     </button>
+            //     <button onClick={()=>{setShow(false);resetData()}}>
+            //         {showPopup.rejectText ? showPopup.rejectText : "No"}
+            //     </button>
+            //     </>
+            // }
         /> 
     )
 
@@ -835,7 +841,7 @@ const DesignContent = props => {
         }
     }
 
-    const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.current_task.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
+    const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.current_task, testScriptData]);
 
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
 
@@ -850,10 +856,10 @@ const DesignContent = props => {
         // globalSelectedBrowserType = selectedBrowserType;5
     
         if (props.dTcFlag) testcaseID = Object.values(props.checkedTc);
-        else testcaseID.push(props.current_task.testCaseId);
+        else testcaseID.push(props.fetchingDetails['_id']);
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
-        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
+        DesignApi.debugTestCase_ICE(browserType, [props.fetchingDetails['_id']], userInfo, props.appType)
             .then(data => {
                 setOverlay("");
                 ResetSession.end();
@@ -923,9 +929,10 @@ const DesignContent = props => {
                         <NormalDropDown
                         style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '5px' }}
                         
-                        
+                        defaultSelectedKey='1'
 
-                            onChange={(e,item)=>{setDebugButton(item.key)}}
+                            onChange={(e,item)=>{
+                                setDebugButton(item.key)}}
                             
                             
                             options={[
@@ -993,19 +1000,27 @@ const DesignContent = props => {
                         <p  onClick={()=>debugTestCases('1')} ><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>Destop Apps</span></p>
                         </div>:
                         props.appType==="SAP"?<div className='desktopAppDesign_btn'>
-                        <p  onClick={()=>debugTestCases('1')} ><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span>SAP Apps</p>
+                        <p  onClick={()=>debugTestCases('1')}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>SAP Apps</span></p>
                         </div>:
                         props.appType==="MobileApp"?<div className='mobileAppDesign_btn'>
                         <p  onClick={()=>debugTestCases('1')} ><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile App</span></p>
                         </div>:
                         props.appType==="MobileWeb"?<div className='mobileAppDesign_btn'>
                         <p onClick={()=>debugTestCases()}><img src="static/imgs/ic-mobility.png"/><span style={{paddingLeft:'7px'}}>Mobile Web</span></p>
+                        </div>:
+                        props.appType==="System"? <div className='desktopAppDesign_btn'>
+                        <p onClick={()=>debugTestCases('1')}><img  style={{height:'25px', width:'25px'}} src="static/imgs/ic-desktop.png"/><span style={{paddingLeft:'7px'}}>System App</span></p>
+                        </div>:
+                        props.appType==="Mainframe"?<div className='mainframeDesign_btn'>
+                            <p onClick={()=>debugTestCases()}><img style={{height:'25px', width:'25px'}} src="static/imgs/ic-mainframe-o.png"/><span style={{paddingLeft:'7px'}}>Maniframe</span></p>
                         </div>:""}
 
                 </div>
                        
                 <div className="debug_button">
-                            <Button label="Debug" className="p-button-warning" onClick={()=>debugTestCases(debugButton)}></Button>
+                            <Button label="Debug" /**disabled={debugButton===""} */ className="p-button-warning" onClick={()=>{
+                                debugTestCases(debugButton)
+                                }}></Button>
 
                         </div>
             </div>
@@ -1025,8 +1040,8 @@ const DesignContent = props => {
                     {/* <span className="remark_col d__rem_head" >Remarks</span> */}
                     <span className="details_col d__det_head" >Details</span>
                 </div>
-                <div style={{height: "100%"}}>
-                {testCaseData.length>0 && <div className="d__table_contents" >
+                <div style={{height: '495px' }}>
+                {testCaseData.length>0 && <div className="d__table_contents"  >
                 <div className="ab">
                     <div className="min">
                         <div className="con" id="d__tcListId">
@@ -1053,7 +1068,7 @@ const DesignContent = props => {
                 </div>
           
           
-            <div className="d__submit" data-test="d__actionBtn">
+            {/* <div className="d__submit" data-test="d__actionBtn">
                     { isUnderReview && 
                         <>
                         <button className="d__reassignBtn d__btn" title="Reassign Task" onClick={()=>onAction("reassign")}>
@@ -1064,18 +1079,18 @@ const DesignContent = props => {
                         </button>
                         </>
                     }
-                    { !hideSubmit && !isUnderReview &&
-                        <button className="d__submitBtn d__btn" title="Submit Task" onClick={()=>onAction("submit")}>
-                            Submit
-                        </button>
-                    }
+                    {/* { !hideSubmit && !isUnderReview &&
+                        // <button className="d__submitBtn d__btn" title="Submit Task" onClick={()=>onAction("submit")}>
+                        //     Submit
+                        // </button>
+                    } */}
                 </div>
                 
 
                 </div>
 
 
-        </div>
+        
         </>
     );
 

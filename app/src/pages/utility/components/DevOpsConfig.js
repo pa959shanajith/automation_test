@@ -384,21 +384,7 @@ const DevOpsConfig = props => {
                             scenarioName: scenario.name,
                             scenarioId: scenario._id,
                             accessibilityParameters: []
-                        })),
-                        currentTask: {
-                            testSuiteDetails: [{
-                                assignedTime: "",
-                                releaseid: integrationConfig.selectValues[1].selected,
-                                cycleid: integrationConfig.selectValues[2].selected,
-                                testsuiteid: module.moduleid,
-                                testsuitename: module.name,
-                                projectidts: integrationConfig.selectValues[0].selected,
-                                assignedTestScenarioIds: "",
-                                subTaskId: "",
-                                versionnumber: 0
-                            }],
-                            versionnumber: 0,
-                        }
+                        }))
                     });
                 });
         else if(selectedExecutionType === 'e2eExecution')

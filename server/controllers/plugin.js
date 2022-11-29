@@ -53,7 +53,7 @@ exports.userCreateProject_ICE = async (req, res) =>{
 				}
 			}
 		}
-        const userid = req.session.userid;
+    const userid = req.session.userid;
 		const roleId = req.session.activeRoleId;
     createProjectObj.assignedUsers[userid] = true;
 		const inputs = {

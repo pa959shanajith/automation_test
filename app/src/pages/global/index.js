@@ -26,7 +26,8 @@ import {Messages, VARIANT} from './components/Messages';
 import SelectRecipients from './components/SelectRecipients'
 import { AnimateDiv, AnimatePageWrapper } from "./components/AnimatePage";
 import RecurrenceComp from "./components/RecurrenceComp";
-import WelcomePopover from "./components/WelcomePopover"
+import WelcomePopover from "./components/WelcomePopover";
+import EndDateComp from "./components/EndDateComp";
 
 
 export { Header, 
@@ -62,5 +63,6 @@ export { Header,
         AnimateDiv,
         AnimatePageWrapper,
         RecurrenceComp,
-        WelcomePopover
+        WelcomePopover,
+        EndDateComp
     };

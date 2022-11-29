@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { NormalDropDown, TextField, Card, IconButton } from '@avo/designcomponents';
+import { NormalDropDown, TextField, Card, IconButton, SearchBox } from '@avo/designcomponents';
 import { Icon } from "@fluentui/react/lib/Icon";
 import { Header, FooterOne, RedirectPage } from '../../global';
 import "../styles/Genius.scss";
-import { getProjectList, getModules, getScreens } from '../../mindmap/api';
-import { ScreenOverlay, setMsg, ReferenceBar, ResetSession } from '../../global';
+import { getProjectList, getModules, getScreens, saveMindmap } from '../../mindmap/api';
+import { ScreenOverlay, setMsg, ReferenceBar, ResetSession, Messages as MSG } from '../../global';
+import { Dialog } from 'primereact/dialog';
 import { parseProjList } from '../../mindmap/containers/MindmapUtils';
 import { useHistory } from 'react-router-dom';
 import * as DesignApi from "../../design/api";
@@ -23,12 +24,23 @@ const Genius = () => {
   const [allProjects, setAllProjects] = useState({})
   const [projModules, setProjModules] = useState([])
   const [modScenarios, setModScenarios] = useState([])
-  const [appType, setAppType] = useState(null)
+  const [appType, setAppType] = useState(null);
+  const [appTypeDialog, setAppTypeDialog] = useState(null)
   const [navURL, setNavURL] = useState("")
   const [selectedBrowser, setSelectedBrowser] = useState(null);
   const [blockui, setBlockui] = useState({ show: false })
   const [loading, setLoading] = useState(false);
   const [flag, setFlag] = useState(false);
+  const [displayCreateProject, setDisplayCreateProject] = useState(false);
+  const [displayCreateModule, setDisplayCreateModule] = useState(false);
+  const [displayCreateScenario, setDisplayCreateScenario] = useState(false);
+  const [projectName, setProjectName] = useState("");
+  const [moduleName, setModuleName] = useState("");
+  const [scenarioName, setScenarioName] = useState("");
+  const [searchUsers, setSearchUsers] = useState("");
+  const [assignedUsers, setAssignedUsers] = useState({});
+  const [userDetailList, setUserDetailList] = useState([]);
+  const [plugins_list, setplugins_list] = useState([]);
   const moduleSelect = useSelector(state => state.mindmap.selectedModule);
   const userInfo = useSelector(state => state.login.userinfo);
   const savedRef = useRef(false);
@@ -37,9 +49,10 @@ const Genius = () => {
   const history = useHistory();
 
   const displayError = (error) => {
+    console.log(error)
     setBlockui({ show: false })
     setLoading(false)
-    setMsg(error)
+    setMsg(typeof error === "object" ? error : MSG.CUSTOM(error, "error"))
   }
 
   const backgroundListener = async (data) => {
@@ -48,7 +61,7 @@ const Genius = () => {
       loadModule(selectedModule.key, selectedProject.key);
       return
     }
-    if (data === "disconnect") {
+    else if (data === "disconnect") {
       setLoading(false);
     }
     else if (data === "startDebugging") {
@@ -100,7 +113,7 @@ const Genius = () => {
             })
 
             return acc.concat(...testcasesArr)
-          }, [])], userInfo, appType, true)
+          }, [])], userInfo, appType && appType.key ? appType.text : "", true)
         } catch (err) {
           console.log(err)
         }
@@ -110,16 +123,24 @@ const Genius = () => {
         return
       }
     }
-    try {
-      const res = await PluginApi.getGeniusData(data);
-      savedRef.current = true;
-      finalDataRef.current = data;
-      if (port) port.postMessage({
-        "saved": true
-      });
+    else if (typeof data === "object") {
+      try {
+        const res = await PluginApi.getGeniusData(data);
+        savedRef.current = true;
+        finalDataRef.current = data;
+        if (port) port.postMessage({
+          "saved": true
+        });
+      }
+      catch (err) {
+        console.log(err)
+      }
     }
-    catch (err) {
-      console.log(err)
+    else if (data === "pleaseBeConnected") {
+      console.log("got the message for being connected")
+    }
+    else {
+      console.log(data);
     }
   }
 
@@ -157,7 +178,7 @@ const Genius = () => {
         port.onDisconnect.removeListener(reconnectEx)
       }
     }
-  }, [selectedProject, selectedModule, selectedScenario, allProjects, projModules, modScenarios, appType, navURL, selectedBrowser, blockui, loading, flag, moduleSelect, userInfo])
+  }, [selectedProject, selectedModule, selectedScenario, allProjects, projModules, modScenarios, appType && appType.key ? appType.text : "", navURL, selectedBrowser, blockui, loading, flag, moduleSelect, userInfo])
 
   useEffect(() => {
     (async () => {
@@ -177,9 +198,7 @@ const Genius = () => {
     (async () => {
       if (selectedModule && selectedModule.key) {
         setSelectedScenario(null);
-        var moduledata = await getModules({
-          "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null
-        })
+        var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
         if (moduledata === "Invalid Session") return RedirectPage(history);
         if (moduledata.error) { displayError(moduledata.error); return; }
         setModScenarios(moduledata.children);
@@ -205,11 +224,46 @@ const Genius = () => {
     connect();
     (async () => {
       setBlockui({ show: true, content: 'Loading...' })
-      var res = await getProjectList();
+      let res = await getProjectList();
       if (res === "Invalid Session") return RedirectPage(history);
       if (res.error) { displayError(res.error); return; }
       var data = parseProjList(res)
       setAllProjects(data)
+      res = await PluginApi.getUserDetails("user");
+      if (res === "Invalid Session") return RedirectPage(history);
+      if (res.error) {
+        setMsg(MSG.CUSTOM("Error while fetching the user Details"));
+      } else {
+        let users = res.filter((user_arr) => !["5db0022cf87fdec084ae49a9", "5f0ee20fba8ae8b8a603b5b6"].includes(user_arr[2]))
+        setUserDetailList(users);
+      }
+      res = await PluginApi.getAvailablePlugins();
+      if (res === "Invalid Session") return RedirectPage(history);
+      if (res.error) {
+        setMsg(MSG.CUSTOM("Error while fetching the app Details"));
+        return;
+      } else {
+        let txt = [];
+        for (let x in res) {
+          if (res[x] === true) {
+            txt.push({
+              key: x,
+              text: x.charAt(0).toUpperCase() + x.slice(1),
+              title: x.charAt(0).toUpperCase() + x.slice(1),
+              disabled: false
+            })
+          }
+          else {
+            txt.push({
+              key: x,
+              text: x.charAt(0).toUpperCase() + x.slice(1),
+              title: 'License Not Supported',
+              disabled: true
+            })
+          }
+        }
+        setplugins_list(txt);
+      }
     })()
 
     return () => {
@@ -255,7 +309,7 @@ const Genius = () => {
             "browser": selectedBrowser,
             "siteURL": window.location.origin,
             "keywordData": keywordData,
-            "appType": appType
+            "appType": appType ? appType.text : ""
           });
           // port.onDisconnect.addListener(() => {
           //   port = undefined;
@@ -295,11 +349,328 @@ const Genius = () => {
     }
   }
 
+  const handleProjectCreate = async () => {
+    try {
+      if (!(appTypeDialog && appTypeDialog.key && projectName)) {
+        setMsg(MSG.CUSTOM("Please fill the mandatory fields", "error"));
+        return;
+      }
+      const config = {
+        "projectName": projectName,
+        domain: "banking",
+        appType: appTypeDialog ? appTypeDialog.text : undefined,
+        releases: [{ "name": "R1", "cycles": [{ "name": "C1" }] }],
+        assignedUsers
+      }
+      let proceed = false
+      if (Object.keys(allProjects).length > 0) {
+        for (let i of Object.values(allProjects)) {
+          if (projectName.trim() === i.name) {
+            displayError(MSG.ADMIN.WARN_PROJECT_EXIST);
+            return;
+          } else proceed = true;
+        }
+      }
+      const res = await PluginApi.userCreateProject_ICE(config)
+      if (res === "Invalid Session") return RedirectPage(history);
+      if (res.error) { displayError(res.error); return; }
+      if (res === "invalid_name_spl") {
+        setMsg(MSG.CUSTOM("Project contains special characters", "error"));
+        return;
+      }
+      setMsg(MSG.CUSTOM("Project Created Successfully", "success"));
+      try {
+        let response = await getProjectList();
+        if (response === "Invalid Session") return RedirectPage(history);
+        if (response.error) { displayError(response.error); return; }
+        var data = parseProjList(response)
+        setAllProjects(data);
+        setDisplayCreateProject(false);
+      } catch (err) {
+        console.log(err)
+      }
+    }
+    catch (err) {
+      setMsg(MSG.CUSTOM("Failed to create Project", "error"));
+      console.log(err);
+    }
+  }
+
+
+  const handleModuleCreate = async (e) => {
+    if (!(moduleName)) {
+      setMsg(MSG.CUSTOM("Please fill the mandatory fields", "error"));
+      return;
+    }
+    const regEx = /[~*+=?^%<>()|\\|\/]/;
+    if (!(selectedProject && selectedProject.key)) {
+      setMsg(MSG.CUSTOM("Please select a project", "error"))
+      return;
+    }
+    else if (regEx.test(moduleName)) {
+      setMsg(MSG.CUSTOM("Module name cannot contain special characters", "error"))
+      return;
+    }
+    else if (projModules.filter((mod) => mod.name === moduleName).length > 0) {
+      setMsg(MSG.CUSTOM("Module already exists", "error"));
+      return;
+    }
+    const module_data = {
+      "action": "/saveData",
+      "write": 10,
+      "map": [
+        {
+          "id": 0,
+          "childIndex": 0,
+          "_id": null,
+          "oid": null,
+          "name": moduleName,
+          "type": "modules",
+          "pid": null,
+          "pid_c": null,
+          "task": null,
+          "renamed": false,
+          "orig_name": null,
+          "taskexists": null,
+          "state": "created",
+          "cidxch": null
+        }
+      ],
+      "deletednode": [],
+      "unassignTask": [],
+      "prjId": selectedProject ? selectedProject.key : null,
+      "createdthrough": "Web",
+      "relId": null
+    }
+    try {
+      const response = await saveMindmap(module_data);
+      if (response === "Invalid Session") return RedirectPage(history);
+      if (response.error) { displayError(response.error); return }
+      setMsg(MSG.CUSTOM("Module Created Successfully", "success"));
+      let modulesdata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": null });
+      if (modulesdata === "Invalid Session") return RedirectPage(history);
+      if (modulesdata.error) { displayError(modulesdata.error); return; }
+      setProjModules(modulesdata);
+      setDisplayCreateModule(false);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const validateNames = (value, type) => {
+    if (value.length === 0) return (
+      <>
+        <Icon iconName="warning" styles={{ root: { display: "flex", height: 12, marginRight: 5 } }} />
+        <div>Please enter {type} name</div>
+      </>
+    )
+  }
+
+  const handleScenarioCreate = async () => {
+    if (!(scenarioName)) {
+      setMsg(MSG.CUSTOM("Please fill the mandatory fields", "error"));
+      return;
+    }
+    const regEx = /[~*+=?^%<>()|\\|\/]/;
+    if (!(selectedModule && selectedModule.key)) {
+      setMsg(MSG.CUSTOM("Please select a module", "error"))
+      return;
+    }
+    else if (regEx.test(scenarioName)) {
+      setMsg(MSG.CUSTOM("Scenario name cannot contain special characters", "error"))
+      return;
+    }
+    else if (modScenarios.filter((scenario) => scenario.name === scenarioName).length > 0) {
+      setMsg(MSG.CUSTOM("Scenario already exists", "error"));
+      return;
+    }
+
+    const templateObjectFunc = (prj_id, id, childIndex, _id, name, type, pid) => {
+      return {
+        "projectID": prj_id,
+        "id": id,
+        "childIndex": childIndex,
+        "_id": _id,
+        "oid": null,
+        "name": name,
+        "type": type,
+        "pid": pid,
+        "task": null,
+        "renamed": false,
+        "orig_name": null,
+        "taskexists": null,
+        "state": "saved",
+        "cidxch": null
+      }
+    }
+
+    let indexCounter = 1;
+
+    const getMindmapInternals = () => {
+      let tempArr = [];
+      let scenarioPID = indexCounter;
+      let screenPID = indexCounter;
+      modScenarios.forEach((scenario, idx) => {
+        tempArr.push(templateObjectFunc(scenario.projectID, indexCounter++, scenario.childIndex, scenario._id, scenario.name, "scenarios", 0));
+        if (scenario.children && scenario.children.length > 0) {
+          scenario.children.forEach((screen, idx_scr) => {
+            tempArr.push(templateObjectFunc(screen.projectID, indexCounter++, screen.childIndex, screen._id, screen.name, "screens", scenarioPID))
+            screenPID = indexCounter;
+            if (screen.children && screen.children.length > 0) {
+              screen.children.forEach((tc, idx_tc) => {
+                tempArr.push(templateObjectFunc(tc.projectID, indexCounter++, tc.childIndex, tc._id, tc.name, "testcases", screenPID))
+              })
+            }
+          })
+        }
+      })
+      return tempArr;
+    }
+
+    const scenario_data = {
+      "write": 10,
+      "map": [
+        {
+          "projectID": selectedProject ? selectedProject.key : null,
+          "id": 0,
+          "childIndex": 0,
+          "_id": selectedModule ? selectedModule.key : null,
+          "oid": null,
+          "name": selectedModule ? selectedModule.text : null,
+          "type": "modules",
+          "pid": null,
+          "pid_c": null,
+          "task": null,
+          "renamed": false,
+          "orig_name": null,
+          "taskexists": null,
+          "state": "saved",
+          "cidxch": null
+        },
+        ...getMindmapInternals(),
+        {
+          "id": indexCounter,
+          "childIndex": modScenarios.length + 1,
+          "_id": null,
+          "oid": null,
+          "name": scenarioName,
+          "type": "scenarios",
+          "pid": 0,
+          "task": null,
+          "renamed": false,
+          "orig_name": null,
+          "taskexists": null,
+          "state": "created",
+          "cidxch": "true"
+        }
+      ],
+      "deletednode": [],
+      "unassignTask": [],
+      "prjId": selectedProject ? selectedProject.key : null,
+      "createdthrough": "Web"
+    }
+    try {
+      const response = await saveMindmap(scenario_data);
+      if (response === "Invalid Session") return RedirectPage(history);
+      if (response.error) { displayError(response.error); return }
+      setMsg(MSG.CUSTOM("Scenario Created Successfully", "success"));
+      var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
+      if (moduledata === "Invalid Session") return RedirectPage(history);
+      if (moduledata.error) { displayError(moduledata.error); return; }
+      setModScenarios(moduledata.children);
+      setDisplayCreateScenario(false);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const resetGeniusFields = () => {
+    setSelectedProject(null);
+    setSelectedModule(null);
+    setSelectedScenario(null);
+    setAppType(null);
+    setNavURL("");
+    setSelectedBrowser(null);
+  }
+
   return (
     <div className="plugin-bg-container">
       <Header />
       {loading ? <ScreenOverlay content={loading} /> : null}
       {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 ? <GeniusMindmap displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={hideMindmap} /> : null}
+      <Dialog header={'Create Project'} visible={displayCreateProject} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setSearchUsers(""); setProjectName(""); setAppTypeDialog(null); setAssignedUsers({}); setDisplayCreateProject(false) }}>
+        <div>
+          <div className='dialog__child'>
+            <TextField required label='Enter Project Name' onGetErrorMessage={(value) => { return validateNames(value, "project") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' placeholder='Enter Project Name' value={projectName} standard={true} onChange={(e) => { setProjectName(e.target.value.trim()) }} />
+          </div>
+          <div className='dialog__child'>
+            <NormalDropDown
+              label="Select App Type"
+              options={plugins_list}
+              placeholder="Select AppType"
+              width="300px"
+              required
+              selectedKey={appTypeDialog ? appTypeDialog.key : null}
+              onChange={(e, item) => {
+                setAppTypeDialog(item)
+              }}
+            />
+          </div>
+          <div className='dialog__child' style={{ padding: "5px 0px", fontSize: "18px", fontFamily: "Mulish", fontWeight: 600, marginBottom: 0 }}> Users </div>
+          <div className="dialog__child" id="projectCreateBox" style={{ height: '12rem', overflowY: "auto" }}>
+            <div style={{ display: 'flex', width: "100%", marginTop: "10px" }}>
+              <SearchBox
+                placeholder="Enter Username"
+                width="20rem"
+                value={searchUsers}
+                onClear={() => { setSearchUsers("") }}
+                onChange={(e) => {
+                  setSearchUsers(e.target.value.trim())
+                }}
+              />
+            </div>
+            <div>
+              {userDetailList.map((user, index) => {
+                return user[0].includes(searchUsers) ? <div key={index} className='display_project_box_list' style={{}} >
+                  <input type='checkbox' disabled={userInfo.user_id === user[1]} defaultChecked={userInfo.user_id === user[1]} value={user[0]} onChange={(e) => {
+                    if (e.target.checked) { setAssignedUsers({ ...assignedUsers, [user[1]]: true }) }
+                    else {
+                      setAssignedUsers((prevState) => {
+                        delete prevState[user[1]]
+                        return prevState;
+                      })
+                    }
+                  }} />
+                  <span >{user[0]} </span>
+                </div> : null
+              })}
+            </div>
+          </div>
+          <div className='dialog__child' style={{ justifyContent: "flex-end", marginBottom: 0 }}>
+            <button className="dialog__footer__action" onClick={handleProjectCreate}>{'Create'}</button>
+          </div>
+        </div>
+      </Dialog>
+      <Dialog header={'Create Module'} visible={displayCreateModule} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setModuleName(""); setDisplayCreateModule(false); }}>
+        <div>
+          <div className='dialog__child'>
+            <TextField required label='Enter Module Name' onGetErrorMessage={(value) => { return validateNames(value, "module") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder='Enter Module Name' value={moduleName} onChange={(e) => { setModuleName(e.target.value.trim()) }} />
+          </div>
+          <div className='dialog__child' style={{ justifyContent: "flex-end", marginBottom: 0 }}>
+            <button className="dialog__footer__action" onClick={handleModuleCreate}>{'Create'}</button>
+          </div>
+        </div>
+      </Dialog>
+      <Dialog header={'Create Scenario'} visible={displayCreateScenario} style={{ fontFamily: 'LatoWeb', fontSize: '16px' }} onHide={() => { setScenarioName(""); setDisplayCreateScenario(false); }}>
+        <div>
+          <div className='dialog__child'>
+            <TextField required label='Enter Scenario Name' onGetErrorMessage={(value) => { return validateNames(value, "scenario") }} validateOnFocusOut={true} validateOnLoad={false} width='300px' standard={true} placeholder='Enter Scenario Name' value={scenarioName} onChange={(e) => { setScenarioName(e.target.value.trim()) }} />
+          </div>
+          <div className='dialog__child' style={{ justifyContent: "flex-end", marginBottom: 0 }}>
+            <button className="dialog__footer__action" onClick={handleScenarioCreate}>{'Create'}</button>
+          </div>
+        </div>
+      </Dialog>
       <div className='plugin-elements'>
         <h3 style={{ margin: "1rem 0 1rem 1rem" }}>Welcome To Avo Genius</h3>
         <div className="breadcrumbs__container">
@@ -324,9 +695,12 @@ const Genius = () => {
           flexDirection: 'row',
           margin: 10,
           marginLeft: "1.5rem",
-          gap: 30
+          gap: 50
         }}>
-          <div>
+          <div style={{ position: "relative" }}>
+            <div style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={async () => {
+              setDisplayCreateProject(true)
+            }}>+ New Project</div>
             <NormalDropDown
               label="Select Project"
               options={
@@ -343,10 +717,12 @@ const Genius = () => {
               placeholder="Select a project"
               width="300px"
               required
+              selectedKey={selectedProject ? selectedProject.key : null}
             />
           </div>
 
-          <div>
+          <div style={{ position: "relative" }}>
+            <div className="create__button" style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>+ New Module</div>
             <NormalDropDown
               label="Select Module"
               options={projModules.map((mod) => {
@@ -366,7 +742,8 @@ const Genius = () => {
             />
           </div>
 
-          <div>
+          <div style={{ position: "relative" }}>
+            <div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{ position: "absolute", top: 7, right: 0, color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>+ New Scenario</div>
             <NormalDropDown
               label="Select Scenario"
               options={modScenarios.map((scenario) => {
@@ -393,7 +770,7 @@ const Genius = () => {
           flexDirection: 'row',
           margin: "0 10px 1rem 10px",
           marginLeft: "1.5rem",
-          gap: 30
+          gap: 50
         }}>
           <div>
             <NormalDropDown
@@ -410,11 +787,12 @@ const Genius = () => {
               width="300px"
               disabled={!(selectedProject && selectedProject.key)}
               required
+              selectedKey={appType ? appType.key : null}
               onChange={(e, item) => {
-                setAppType(item.text)
+                setAppType(item)
               }}
             />
-            <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={() => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button>
+            {/* <button style={{ background: "transparent", color: "#5F338F", border: "none" }} onClick={() => { }}><span style={{ fontSize: "1.2rem" }}>+</span> Create New Project Details</button> */}
 
           </div>
           <div>
@@ -426,7 +804,7 @@ const Genius = () => {
               value={navURL}
               width="300px"
               required
-              disabled={(appType ? !appType.toLowerCase().includes("web") : true)}
+              disabled={(appType && appType.key ? !appType.text.toLowerCase().includes("web") : true)}
             />
           </div>
           <div id="icon-dropdown-container">
@@ -445,9 +823,10 @@ const Genius = () => {
                 setSelectedBrowser(item.key)
               }}
               placeholder="Select a browser"
+              selectedKey={selectedBrowser ? selectedBrowser.key : null}
               width="300px"
               required
-              disabled={(appType ? !appType.toLowerCase().includes("web") : true)}
+              disabled={(appType && appType.key ? !appType.text.toLowerCase().includes("web") : true)}
             />
           </div>
         </div>
@@ -482,13 +861,13 @@ const Genius = () => {
           <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
             <a href="/plugin" className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem" }}>EXIT</a>
             <div className="actionButton__inner" style={{ display: "flex", gap: 10 }}>
-              <button className="reset-action__exit" style={{ border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px", padding: "8px 25px", background: "white" }} onClick={(e) => { }}>Reset</button>
+              <button className="reset-action__exit" style={{ border: "2px solid #5F338F", color: "#5F338F", borderRadius: "10px", padding: "8px 25px", background: "white" }} onClick={resetGeniusFields}>Reset</button>
               <button className="reset-action__next"
-                disabled={!(selectedBrowser && selectedProject && selectedModule && selectedScenario && navURL && appType)}
+                disabled={!(selectedBrowser && selectedProject && selectedModule && selectedScenario && navURL && (appType ? appType.text : ""))}
                 style={{ border: "2px solid #5F338F", color: "white", borderRadius: "10px", padding: "8px 25px", background: "#5F338F" }} onClick={(e) => {
                   // let eURL = `electron-fiddle://project=${JSON.stringify(selectedProject)}&module=${JSON.stringify(selectedModule)}&scenario=${JSON.stringify(selectedScenario)}&navurl=${navURL}&browser=${selectedBrowser}`
                   // window.location.href = eURL;
-                  DesignApi.getKeywordDetails_ICE(appType)
+                  DesignApi.getKeywordDetails_ICE(appType.text)
                     .then(keywordData => {
                       if (keywordData === "Invalid Session") return RedirectPage(history);
                       createPort(keywordData);
