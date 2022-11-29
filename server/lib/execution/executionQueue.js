@@ -677,7 +677,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                 createdon: new Date().toLocaleString(),
                 status: "inactive",
                 recentCall: new Date().toLocaleString(),
-                currentIceCount: 'currentIceCount' in req.body ? req.body.currentIceCount : 0
+                //updated to use icecount value from agent
+                currentIceCount: 'icecount' in req.body ? req.body.icecount : 0
             }
             const agentStatus = await utils.fetchData(agentDetails, "devops/agentDetails", fnName);
 
