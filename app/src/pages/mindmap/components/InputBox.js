@@ -22,14 +22,14 @@ const InputBox = (props) => {
 
     useEffect(()=>{
         document.addEventListener("keydown", (e)=>{if(e.keyCode === 27)props.setInpBox(false)}, false);
-        if (dNodes[pi].taskexists) {
-            var msg = 'Unassign the task to rename';
-            if (t === 'screens') {
-                msg = 'Unassign the task And the corresponding testcases tasks to rename';
-            }
-            setMsg(MSG.CUSTOM(msg,t === 'screens'?VARIANT.WARNING:VARIANT.ERROR))
-            props.setInpBox(false)
-        }
+        // if (dNodes[pi].taskexists) {
+        //     var msg = 'Unassign the task to rename';
+        //     if (t === 'screens') {
+        //         msg = 'Unassign the task And the corresponding testcases tasks to rename';
+        //     }
+        //     setMsg(MSG.CUSTOM(msg,t === 'screens'?VARIANT.WARNING:VARIANT.ERROR))
+        //     props.setInpBox(false)
+        // }
         return () => {
             document.removeEventListener("keydown", (e)=>{if(e.keyCode === 27)props.setInpBox(false)} , false);
           };
