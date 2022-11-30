@@ -796,7 +796,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 />:null}
 
                 {/* Dialog for Schedule */}
-                <Dialog header="Schedule" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
+                <Dialog className='schedule__dialog' header="" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
                 {/* Dialog for Schedule */} 
 
                 {/* Dialog for CI /CD  */}
