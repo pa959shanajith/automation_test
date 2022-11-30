@@ -520,7 +520,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                                                                     { data.scheduletype ? data.scheduletype : "One Time"}
                                                                 </div>
                                                                 <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
-                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}}>{data.status}</span>
+                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}} onClick={() => { setShowModuleInfo(true); setScheduledDate(formatDate(data.scheduledatetime)) }}>{data.status}</span>
                                                                     {(data.status === 'scheduled' || data.status === "recurring")?
                                                                         <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError,item.configurekey,item.configurename)}} title='Cancel Job'/>
                                                                     :null}
@@ -541,7 +541,7 @@ const ScheduleContent = ({smartMode, execEnv, setExecEnv, syncScenario, setBrows
                 </div>
             
                 {/* Dialog for Schedule module wise info */}
-                <Dialog header={ item.executionRequest.configurename + " - Status" } visible={showModuleInfo} style={{ width: '60vw',height:'80rem' }} onHide={() => setShowModuleInfo(false)}><ScheduleContentModuleWise scheduledDate={scheduledDate} configKey={item.configurekey} configName={item.configurename} /></Dialog>
+                <Dialog header={ item.executionRequest.configurename + " - Status" } visible={showModuleInfo} style={{ width: '60vw',height:'80rem' }} onHide={() => setShowModuleInfo(false)}><ScheduleContentModuleWise scheduledDate={scheduledDate} configKey={item.configurekey} configName={item.configurename} showScheduledTasks={showScheduledTasks} showRecurringSchedules={showRecurringSchedules} /></Dialog>
                 {/* Dialog for Schedule module wise info */}
             </div>
         </>

@@ -72,11 +72,16 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     useEffect(()=>{
         pluginApi.getProjectIDs()
         .then(data => {
+                projectIdTypesDicts[data.projectId[selectedCycle]] === "Web" ? setShowCICD(true) : setShowCICD(false)
+    })},[])
+
+
+    useEffect(()=>{
+        pluginApi.getProjectIDs()
+        .then(data => {
                 setProjectData1(data.releases[selectedCycle][0].name);
                 setProjectData(data.releases[selectedCycle][0].cycles[0]._id);
                 setCycleName(data.releases[selectedCycle][0].cycles[0].name);
-                projectIdTypesDicts[data.projectId[selectedCycle]] === "Web" ? setShowCICD(true) : setShowCICD(false)
-
     })},[selectedCycle])
   
     useEffect(()=>{
