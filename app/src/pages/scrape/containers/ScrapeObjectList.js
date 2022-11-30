@@ -30,7 +30,7 @@ const ScrapeObjectList = (props) => {
     const [modified, setModified] = useState({});
     const [editableObj, setEditableObj] = useState({});
     const [dnd, setDnd] = useState(false);
-    const[captureButton, setCaptureButton]=useState("chrome");
+    const[captureButton, setCaptureButton]=useState("");
     const { setShowObjModal, fetchScrapeData, saved, setSaved, newScrapedData, setNewScrapedData, setShowPop, setShowConfirmPop, mainScrapedData, scrapeItems, setScrapeItems, setOrderList, startScrape, setShowAppPop} = useContext(ScrapeContext);
 
     useEffect(()=> {
@@ -476,7 +476,7 @@ const ScrapeObjectList = (props) => {
                           (disableAction || compareFlag ? " disable-thumbnail" : "")
                         }
                         onChange={(e,item)=>{setCaptureButton(item.key)}}
-                        // defaultSelectedKey='chrome'
+                        defaultSelectedKey='chrome'
                         // onChange={(e, item) => {
                         //  ;
                         // }}
@@ -501,12 +501,10 @@ const ScrapeObjectList = (props) => {
                             {
                               data: {
                                 icon: "safari",
-                                
                               },
   
                               key: "safari",
                               text: "Safari",
-                              disabled:true,
                             },
   
                             {
@@ -578,8 +576,7 @@ const ScrapeObjectList = (props) => {
                     </div>
                   
 
-                    {props.appType === 'Web' ?
-                    <Button label="Capture" /**disabled={captureButton===""} */  className={"p-button-warning"  } onClick={()=>{startScrape(captureButton)}} style={{ marginLeft: '26px', marginBottom: '50px', background:'#643693', border:"none",borderRadius:"17px", fontFamily:"LatoWeb"}} />:""}
+                    <Button label="Capture" /**disabled={captureButton===""} */  className={"p-button-warning"  } onClick={()=>{startScrape(captureButton)}} style={{ marginLeft: '26px', marginBottom: '50px', background:'#643693'}} />
 
 
 

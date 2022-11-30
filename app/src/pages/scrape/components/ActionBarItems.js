@@ -130,16 +130,10 @@ const BottomContent = (props) => {
 
     const hiddenInput = useRef();
     let appType = props.appType;
-   // let fetchingDetails = props.fetchingDetails;
+    let fetchingDetails = props.fetchingDetails;
     
-   // const { screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
+    const { screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
     const disableAction = useSelector(state => state.scrape.disableAction);
-    // const {screenId, screenName, versionnumber, projectId, testCaseId }=props.fetchingDetails
-    const screenId = props.fetchingDetails["_id"]
-    const projectId = props.fetchingDetails.projectID
-    const screenName = props.fetchingDetails["name"]
-    const versionnumber = 0
-
     const compareFlag = useSelector(state=>state.scrape.compareFlag);
     const { user_id, role } = useSelector(state=>state.login.userinfo);
 
@@ -171,7 +165,7 @@ const BottomContent = (props) => {
     
 
     const exportScrapeObjects = () => {
-        scrapeApi.getScrapeDataScreenLevel_ICE(props.appType, screenId, projectId, "")
+        scrapeApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails["_id"], props.fetchingDetails.projectID, "")
         .then(data => {
             if (data === "Invalid Session") return RedirectPage(history);
             let temp = {}
@@ -188,8 +182,8 @@ const BottomContent = (props) => {
                 } else temp = data;
 
                 temp['appType'] = props.appType;
-                temp['screenId'] = screenId;
-                temp['versionnumber'] = versionnumber;
+                temp['screenId'] = props.fetchingDetails["_id"];
+                temp['versionnumber'] = 0;
                 responseData = JSON.stringify(temp, undefined, 2);
             }
 
@@ -236,8 +230,8 @@ const BottomContent = (props) => {
                         if ('body' in resultString) {
                             let { reuse, appType, screenId, view, versionnumber, ...scrapeinfo } = resultString; 
                             objList['reuse'] = reuse;
-                            objList['appType'] = appType;
-                            objList['screenId'] =  screenId;
+                            objList['appType'] = props.appType;
+                            objList['screenId'] =  props.fetchingDetails["_id"];
                             objList['view'] = view;
                             objList['scrapeinfo'] = scrapeinfo;
                         }
@@ -245,12 +239,12 @@ const BottomContent = (props) => {
 
                         let arg = {
                             projectId: projectId,
-                            screenId:  screenId,
-                            screenName:screenName ,
+                            screenId:  props.fetchingDetails["_id"],
+                            screenName:props.fetchingDetails["parent"]["name"] ,
                             userId: user_id,
                             roleId: role,
                             param: "importScrapeData",
-                            appType:appType,
+                            appType:props.appType,
                             objList: objList
                         };
                         scrapeApi.updateScreen_ICE(arg)
@@ -312,8 +306,8 @@ const ActionBarItems = props => {
     // const { appType } = useSelector(state=>state.plugin.CT);
     return (
         <ActionBar
-            upperContent={ props.appType === "Mainframe" ? null : <UpperContent fetchingDetails={props.fetchingDetails} appType={props.appType} />}
-            bottomContent={ props.appType === "Mainframe" ? null : <BottomContent  fetchingDetails={props.fetchingDetails} appType={props.appType} />}
+            upperContent={ props.appType === "Mainframe" ? null : <UpperContent appType={props.appType} />}
+            bottomContent={ props.appType === "Mainframe" ? null : <BottomContent appType={props.appType} />}
         />
     )
 }

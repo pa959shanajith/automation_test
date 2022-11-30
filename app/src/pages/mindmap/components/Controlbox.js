@@ -15,13 +15,14 @@ import { Redirect } from 'react-router-dom'
 const ControlBox = (props) => {
     const [redirectTo, setRedirectTo] = useState("");
     var faRef = {
-        "plus": "add_icon",
-        "plus1": "addmultiple_icon",
-        "edit": "edit_icon",
-        "delete": "delete_icon",
-        "record":"record_icon",
-        "captureelements":"capture_icon",
-        "designteststeps":"design_icon",
+        "plus": "fa-plus",
+        "plus1": "fa-hand-peace-o",
+        "edit": "fa-pencil-square-o",
+        "delete": "fa-trash-o",
+        "assign":"fa-user-o",
+        "record":"fa-dot-circle-o",
+        "captureelements":"fa-camera-retro",
+        "designteststeps":"fa-list-alt",
     };
     var ctScale = props.ctScale;
     var isEnE = props.isEnE;
@@ -45,13 +46,10 @@ const ControlBox = (props) => {
             }else{
                 c.select('p.' + faRef.plus).classed('ct-ctrl-hide', !0);
                 c.select('p.' + faRef.plus1).classed('ct-ctrl-hide', !0);
-                c.select('p.' + faRef.edit).classed('ct-ctrl-hide', !0);
-                // c.select('p.' + faRef.edit).html('Rename').style('font-family','LatoWeb');
-                c.select('p.' + faRef.record).classed('ct-ctrl-hide', !0);
-                // c.select('p.' + faRef.record).html('AvoGenius(SmartRecord)').style('font-family', 'LatoWeb');
+                c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !0);
+                c.select('p.' + faRef.edit).html('Rename').style('font-family','LatoWeb');
                 c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
                 c.select('p.' + faRef.delete).html('Delete').style('font-family', 'LatoWeb');
-                c.selectAll('hr').classed('ct-ctrl-hide', !0);
             }
         }else if (t === 'modules') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
@@ -71,7 +69,7 @@ const ControlBox = (props) => {
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.delete).html('Delete ').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.record).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.record).html('AvoGenius (Smart Recorder)').style('font-family', 'LatoWeb');
+            c.select('p.' + faRef.record).html('AvoGenius(SmartRecord)').style('font-family', 'LatoWeb');
         } else if (t === 'screens') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.plus).html('Add Testcase').style('font-family', 'LatoWeb');
@@ -127,44 +125,38 @@ const ControlBox = (props) => {
         { redirectTo && <Redirect data-test="redirectTo" to={redirectTo} />}
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
             {t==="modules"? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
-                <p data-test="add" className="ct-ctrl add_icon onhover" value={props.nid} onClick={addNode}></p>
-                <p data-test="addMultiple" className="ct-ctrl addmultiple_icon onhover" value={props.nid} onClick={addMultipleNode}></p>
-                <hr className='separator'/>
-                <p data-test="edit" className="ct-ctrl  edit_icon onhover" onClick={editNode}></p>
-                {/* <p data-test="delete"  className="ct-ctrl  delete_icon ct-ctrl-inactive onhover" onClick={deleteNode}></p> */}
-            </div>  : ""} </ClickAwayListener>
+                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}></p>
+                <p data-test="addMultiple" id="AlignmentBottom"  className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
+                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" onClick={editNode}></p>
+                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode}></p>
+            </div>   : ""} </ClickAwayListener>
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>
             {t==='endtoend'?
             <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
-                <p data-test="edit" className="ct-ctrl onhover edit_icon" onClick={editNode}></p> 
+                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" onClick={editNode}></p> 
             </div>  : ""}
         </ClickAwayListener>  
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}> 
             {t ==='scenarios'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
-                <p data-test="add" className="ct-ctrl add_icon onhover" value={props.nid} onClick={addNode}> </p>
-                <p data-test="addMultiple" className="ct-ctrl addmultiple_icon onhover" value={props.nid} onClick={addMultipleNode}></p>
-                <hr className='separator'/>
-                <p data-test="record"  className="ct-ctrl record_icon onhover" onClick={()=>{window.localStorage['navigateScreen'] = "genius";setRedirectTo(`/genius`)}} ></p >
-                <hr className='separator'/>
-                <p data-test="edit" className="ct-ctrl edit_icon onhover" onClick={editNode}></p>
-                <p data-test="delete"  className="ct-ctrl delete_icon ct-ctrl-inactive onhover"  onClick={deleteNode}></p>
+                <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
+                <p data-test="addMultiple" id="AlignmentBottom" className="ct-ctrl fa fa-hand-peace-o" value={props.nid} onClick={addMultipleNode}></p>
+                <p data-test="record" id="AlignmentBottom"  className="ct-ctrl fa fa-dot-circle-o " onClick={()=>{window.localStorage['navigateScreen'] = "genius";setRedirectTo(`/genius`)}} > <> Record(AvoGenius) </></p >
+                <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" onClick={editNode}></p>
+                <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive"  onClick={deleteNode}></p>
             </div> : ""} </ClickAwayListener>
         <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}>     
             {t ==='screens'? <div id="ct-ctrlBox" className={(isEnE ?'end-to-end':'')}>
-               <p data-test="add" className="ct-ctrl add_icon onhover" value={props.nid} onClick={addNode}> </p>
-               <p data-test="addMultiple" className="ct-ctrl addmultiple_icon onhover" value={props.nid} onClick={addMultipleNode}></p>
-               <hr className='separator'/>
-               <p data-test="captureelements" className="ct-ctrl capture_icon onhover" onClick={() =>props.setShowScrape(true)}  ><> Capture Element </></p>
-               <hr className='separator'/>
-               <p data-test="edit" className="ct-ctrl edit_icon onhover" onClick={editNode}></p>
-               <p data-test="delete"  className="ct-ctrl delete_icon ct-ctrl-inactive onhover" onClick={deleteNode}></p>
+               <p data-test="add" className="ct-ctrl fa fa-plus" value={props.nid} onClick={addNode}> </p>
+               <p data-test="addMultiple" className="ct-ctrl fa fa-hand-peace-o" id="AlignmentBottom" value={props.nid} onClick={addMultipleNode}></p>
+               <p data-test="captureelements" id="AlignmentBottom"  className="ct-ctrl fa fa-camera-retro" onClick={() =>props.setShowScrape(true)}  ><> Capture Element </></p>
+               <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o" onClick={editNode}></p>
+               <p data-test="delete"  className="ct-ctrl fa fa-trash-o ct-ctrl-inactive" onClick={deleteNode}></p>
             </div>   : ""}</ClickAwayListener>
             <ClickAwayListener onClickAway={(e)=>{if(e.target.className.baseVal !== "ct-nodeIcon")props.setCtrlBox(false)}}> 
             {t ==='testcases'? <div id="ct-ctrlBox"  className={(isEnE ?'end-to-end':'')}>
-               <p data-test="designteststeps" className="ct-ctrl design_icon onhover"  onClick={() => props.setShowDesignTestSetup(true)}> <> Design Test Steps </></p>
-               <hr className='separator'/>
-               <p data-test="edit" className="ct-ctrl edit_icon onhover"  onClick={editNode}></p>
-               <p data-test="delete"  className="ct-ctrl delete_icon onhover"  onClick={deleteNode}></p>
+               <p data-test="designteststeps" id="AlignmentBottom" className="ct-ctrl fa fa-list-alt"  onClick={() => props.setShowDesignTestSetup(true)}> <> Design Test Steps </></p>
+               <p data-test="edit" className="ct-ctrl fa fa-pencil-square-o"  onClick={editNode}></p>
+               <p data-test="delete"  className="ct-ctrl fa fa-trash-o"  onClick={deleteNode}></p>
             </div> : ""
             }
             </ClickAwayListener> 

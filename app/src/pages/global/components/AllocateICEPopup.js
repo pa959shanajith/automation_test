@@ -149,7 +149,7 @@ const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeI
 
     return(
         <div >
-            {/* {ExeScreen!==undefined && ExeScreen===true ?
+            {ExeScreen!==undefined && ExeScreen===true ?
                 <div className='adminControl-ice popup-content'>
                     <div>
                         <span className="leftControl" title="Execution type">{exeTypeLabel}</span>
@@ -171,7 +171,7 @@ const MiddleContent = (inputErrorBorder, setInputErrorBorder, exeTypeLabel, exeI
                         ))}
                     </select>
                 </div>
-            </div> */}
+            </div>
             <div className='adminControl-ice popup-content'>
 				<div>
 					<span className="leftControl" title="Token Name">{exeIceLabel}</span>

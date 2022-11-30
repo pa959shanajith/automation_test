@@ -60,13 +60,13 @@ const DesignHome = (props) => {
         { overlay && <ScreenOverlay content={overlay} />}
         { showConfirmPop && <ConfirmPopup /> }
         { showDpndntTcDlg && <DependentTestCaseDialog 
-                                scenarioId = {props.fetchingDetails.parent.parent["_id"]}
+                                scenarioId = {current_task.scenarioId}
                                 setShowDlg={setShowDpndntTcDlg} 
                                 checkedTc={checkedTc}
                                 setCheckedTc={setCheckedTc} 
                                 setDTcFlag={setDTcFlag}
-                                taskName={props.fetchingDetails.name}
-                                taskId={props.fetchingDetails["_id"]}
+                                taskName={current_task.testCaseName}
+                                taskId={current_task.testCaseId}
                                 />
         }
         <div className="d__body">
