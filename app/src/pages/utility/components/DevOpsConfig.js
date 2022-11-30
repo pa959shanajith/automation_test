@@ -1,20 +1,32 @@
 import React, { useEffect, useState } from 'react';
+import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown } from '../../global';
 import { fetchProjects, fetchAvoAgentAndAvoGridList, storeConfigureKey } from '../api';
+import { useSelector } from 'react-redux';
 import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
 
 
 // import classes from "../styles/DevOps.scss";
 import "../styles/DevOps.scss";
-// import ReleaseCycleSelection from './ReleaseCycleSelection';
+import ReleaseCycleSelection from './ReleaseCycleSelection';
 import { prepareOptionLists } from './DevOpsUtils';
 import DevOpsModuleList from './DevOpsModuleList';
 
 const DevOpsConfig = props => {
+    const reportData = {hasData: false};
+    const [api, setApi] = useState("Execution");
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
+    const [request, setRequest] = useState({});
+    const [requestText, setRequestText] = useState("");
+    const [configName, setConfigName] = useState("");
     const [dataDict, setDict] = useState({});
     const dataParametersCollection = [];
     const [error, setError] = useState({});
+    const [showSelectBrowser, setShowSelectBrowser] = useState(false);
+
+    useEffect(() => {
+        props.projectIdTypesDicts[props.currentIntegration.selectValues[0].selected] === "Web" ? setShowSelectBrowser(true) : setShowSelectBrowser(false)
+    }, [])
     if(props.currentIntegration && props.currentIntegration.executionRequest && props.currentIntegration.executionRequest.batchInfo){
         if(props.currentIntegration.selectedModuleType === 'normalExecution')
             for (let info of props.currentIntegration.executionRequest.batchInfo) {
@@ -58,6 +70,7 @@ const DevOpsConfig = props => {
     const [moduleList, setModuleList] = useState([]);
     const [filteredModuleList, setFilteredModuleList] = useState([]);
     const handleExecutionTypeChange = (selectedType) => {
+        // handleExecutionTypeChange{selectedType}
         const selectedKey = selectedType;
         let filteredNodes = [];
         if(selectedKey === 'normalExecution') {
@@ -66,16 +79,15 @@ const DevOpsConfig = props => {
                     value: module.moduleid,
                     label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                         event.preventDefault();
-                        onClick('displayMaximizable');
                         onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
                 };
                 if(module.scenarios && module.scenarios.length > 0) {
                     const moduleChildren = module.scenarios.filter((module) => { return (module.scenarios && module.scenarios.length) > 0 } ).map((scenario) => {
                         return ({
                             value: scenario._id,
-                            // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                            //     event.preventDefault();
-                            //     onDataParamsIconClick1(scenario._id, scenario.name)}}/></div>
+                            label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                event.preventDefault();}}/></div>
+                                // onDataParamsIconClick(scenario._id, scenario.name)}}
                         })
                     });
                     filterModule['children'] = moduleChildren;
@@ -88,17 +100,16 @@ const DevOpsConfig = props => {
                     value: module.moduleid,
                     label:<div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                         event.preventDefault();
-                        onClick('displayMaximizable');
-                        onDataParamsIconClick1(module.batchname+module.moduleid, module.name)}}/></div>
+                        onDataParamsIconClick1(module.batchname+module.moduleid+module.moduleid, module.name)}}/></div>
                 };
                 if(module.scenarios && module.scenarios.length > 0) {
                     const moduleChildren = module.scenarios.map((scenario, index) => {
                         return ({
                             value: module.batchname+module.moduleid+index+scenario._id,
-                            // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                            //     event.preventDefault();
+                            label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                event.preventDefault();}}/></div>
                                 
-                            //    onDataParamsIconClick1(module.batchname+module.moduleid+index+scenario._id, scenario.name)}}/></div>
+                               // onDataParamsIconClick(module.batchname+module.moduleid+index+scenario._id, scenario.name)
                         })
                     });
                     filterModule['children'] = moduleChildren;
@@ -119,17 +130,16 @@ const DevOpsConfig = props => {
                             value: module.moduleid,
                             label: <div className="devOps_input_icon">{module.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
                                 event.preventDefault();
-                                onClick('displayMaximizable');
-                                onDataParamsIconClick1(batch+module.moduleid, module.name)}}/></div>
+                                onDataParamsIconClick1(batch+module.moduleid+module.moduleid, module.name)}}/></div>
                         };
                         if(module.scenarios && module.scenarios.length > 0) {
                             const moduleChildren = module.scenarios.map((scenario, index) => {
                                 return ({
                                     value: batch+module.moduleid+index+scenario._id,
-                                    // label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                    //     event.preventDefault();
-                                    
-                                    //     onDataParamsIconClick1(batch+module.moduleid+index+scenario._id, scenario.name) }}/></div>
+                                    label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                        event.preventDefault();
+                                     }}/></div>
+                                        // onDataParamsIconClick(batch+module.moduleid+index+scenario._id, scenario.name)
                                 })
                             });
                             filterModule['children'] = moduleChildren;
@@ -465,7 +475,7 @@ const DevOpsConfig = props => {
                 setMsg(MSG.CUSTOM("Something Went Wrong",VARIANT.ERROR));
             }
         }else {
-            props.showMessageBar( `Configuration ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d Successfully` , 'SUCCESS');
+            props.showMessageBar( `Execution profile ${(props.currentIntegration.name == '') ? 'Create' : 'Update'}d Successfully` , 'SUCCESS');
             props.setCurrentIntegration(false);
         }
         props.setLoading(false);
@@ -478,27 +488,6 @@ const DevOpsConfig = props => {
         setShowIntegrationModal(status);
     }
 
- const [displayMaximizable, setDisplayMaximizable] = useState(false);
- const [position, setPosition] = useState('center');
-    
-        const dialogFuncMap = {
-        
-            'displayMaximizable': setDisplayMaximizable,
-           
-        }
-    
-        const onClick = (name, position) => {
-            dialogFuncMap[`${name}`](true);
-    
-            if (position) {
-                setPosition(position);
-            }
-        }
-    
-        const onHide = (name) => {
-            dialogFuncMap[`${name}`](false);
-        }
-    
     return (<>
         { showIntegrationModal ? 
             <IntegrationDropDown
@@ -530,7 +519,7 @@ const DevOpsConfig = props => {
                 </span>
             </div> */}
         </div>
-         <div className="devOps_config_name" style={{position: 'absolute',top: '18vh'}}>
+         <div className="devOps_config_name" style={{position: 'absolute',top: '19.5vh'}}>
                 <span className="api-ut__inputLabel" style={{fontWeight: '700'}}>Profile Name : </span>
                 &nbsp;&nbsp;
                 <span className="api-ut__inputLabel">
@@ -552,7 +541,7 @@ const DevOpsConfig = props => {
         {
             <div style={{ display: 'flex', justifyContent:'space-between' }}>
                 <div className="devOps_module_list">
-                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} onClick={onClick} onHide={onHide} displayMaximizable={displayMaximizable}/>
+                    <DevOpsModuleList setLoading={props.setLoading} integrationConfig={integrationConfig} setIntegrationConfig={setIntegrationConfig} moduleScenarioList={moduleScenarioList} setModuleScenarioList={setModuleScenarioList} selectedExecutionType={selectedExecutionType} setSelectedExecutionType={setSelectedExecutionType} handleExecutionTypeChange={handleExecutionTypeChange} filteredModuleList={filteredModuleList} setFilteredModuleList={setFilteredModuleList} onDataParamsIconClick1={onDataParamsIconClick1} setModalContent ={setModalContent} modalContent={modalContent} setBrowserlist={setBrowserlist} />
                 </div>
                 <div className="devOps_pool_list">
                     <div>
@@ -567,7 +556,7 @@ const DevOpsConfig = props => {
                             width='54%'
                         />
                     </div>
-                    <div>
+                    { showSelectBrowser && <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_browser">Select Browsers : </label>
                         <MultiSelectDropdown
                             hideSelectAll
@@ -579,7 +568,7 @@ const DevOpsConfig = props => {
                             selectedKeys={integrationConfig.browsers}
                             width='54%'
                             />
-                    </div>
+                    </div> }
                     <div>
                         <label className="devOps_dropdown_label devOps_dropdown_label_integration">Integration : </label>
                         <SearchDropdown

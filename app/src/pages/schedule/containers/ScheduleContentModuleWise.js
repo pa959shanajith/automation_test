@@ -5,7 +5,7 @@ import {getScheduledDetailsOnDate_ICE, cancelScheduledJob_ICE} from '../api';
 import "../styles/ScheduleContentModuleWise.scss";
 import Pagination from '../components/Pagination';
 
-const ScheduleContentModuleWise = ({scheduledDate, configKey, configName}) => {
+const ScheduleContentModuleWise = ({scheduledDate, configKey, configName, showScheduledTasks, showRecurringSchedules}) => {
 
     const nulluser = "5fc137cc72142998e29b5e63";
     const dateFormat = useSelector(state=>state.login.dateformat);
@@ -13,6 +13,8 @@ const ScheduleContentModuleWise = ({scheduledDate, configKey, configName}) => {
     const [scheduledData,setScheduledData] = useState([]);
     const [scheduledDataOriginal,setScheduledDataOriginal] = useState([]);
     const [pageOfItems,setPageOfItems] = useState([]);
+    const [scheduledRecurringData, setScheduledRecurringData] = useState([]);	
+    const [scheduledRecurringDataOriginal, setScheduledRecurringDataOriginal] =	useState([]);
 
     useEffect(()=>{
         getScheduledDetails(scheduledDate, configKey, configName);
@@ -36,6 +38,7 @@ const ScheduleContentModuleWise = ({scheduledDate, configKey, configName}) => {
                             + ("0" + sdt.getDate()).slice(-2) + " " + ("0" + sdt.getHours()).slice(-2) + ":" + ("0" + sdt.getMinutes()).slice(-2);
                 }
                 var scheduledDataParsed = [];
+                var scheduledRecurringDataParsed = [];
                 var eachScenarioDetails;
                 for(var i =result.length-1 ; i>=0  ; i-- ) {
                     eachScenarioDetails = result[i].scenariodetails[0].length>1 ? result[i].scenariodetails[0] : result[i].scenariodetails;
@@ -65,6 +68,16 @@ const ScheduleContentModuleWise = ({scheduledDate, configKey, configName}) => {
                 } 
                 setScheduledData(scheduledDataParsed);
                 setScheduledDataOriginal(scheduledDataParsed);
+
+                for (var i = 0; i < scheduledDataParsed.length; i++) {	
+                    if (scheduledDataParsed[i].recurringpattern != "One Time") {	
+                        scheduledRecurringDataParsed.push(	
+                            scheduledDataParsed[i]	
+                        );	
+                    }	
+                }
+                setScheduledRecurringData(scheduledRecurringDataParsed);	
+                setScheduledRecurringDataOriginal(scheduledRecurringDataParsed);
             }
             setLoading(false);
             document.getElementById("scheduledSuitesFilterData").selectedIndex = "0"; 
@@ -130,7 +143,7 @@ const ScheduleContentModuleWise = ({scheduledDate, configKey, configName}) => {
 							<span className="s__Table_status s__table_Textoverflow s__Table_border" >Status</span>
 						</div>
 
-                        <div className="s__table_container" >
+                        { showScheduledTasks && <div className="s__table_container" >
                             <div className="s__table_contents" >
                                 <div className="s__ab">
                                     <div className="s__min">
@@ -168,7 +181,47 @@ const ScheduleContentModuleWise = ({scheduledDate, configKey, configName}) => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> }
+
+                        { showRecurringSchedules && <div className="s__table_container" >
+                            <div className="s__table_contents" >
+                                <div className="s__ab">
+                                    <div className="s__min">
+                                        <div className="s__con">
+                                            <div id="scheduledDataBody" className="scheduledDataBody">
+                                                <ScrollBar scrollId="scheduledDataBody" thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
+                                                    <div className='scheduleDataBodyRow'>
+                                                        {pageOfItems.map((data,index)=>( (data.status == "recurring" || data.status == "cancelled" || data.status == "Failed" || data.status == "Completed") && data.recurringpattern != "One Time" &&
+                                                            <div key={index} className="scheduleDataBodyRowChild">
+                                                                {/* <div data-test = "schedule_data_date" className="s__Table_date s__Table_date-time " title={"Job created on: " +formatDate(data.startdatetime).toString()}>{formatDate(data.scheduledatetime)}</div>
+                                                                <div data-test = "schedule_data_target_user" className="s__Table_host" title={"Ice Pool: " +data.poolname}>{data.target === nulluser?'Pool: '+ (data.poolname?data.poolname:'Unallocated ICE'):data.target}</div> */}
+                                                                <div data-test = "schedule_data_date_suite_name" className="s__Table_suite" title={data.testsuitenames[0]} >{data.testsuitenames[0]}</div>
+                                                                <div data-test = "schedule_data_scenario_name" className="s__Table_scenario" title={data.scenarioname}>{data.scenarioname}</div>
+                                                                {/* <div data-test = "schedule_data_browser_type" className="s__Table_appType">
+                                                                    {data.browserlist.map((brow,index)=>(
+                                                                        <img key={index} src={"static/"+browImg(brow,data.appType)} alt="apptype" className="s__Table_apptypy_img "/>
+                                                                    ))}
+                                                                </div>
+                                                                <div data-test="schedule_data_schedule_type" className="s__Table_scheduleType" title={data.recurringstringonhover}>   
+                                                                    { data.scheduletype ? data.scheduletype : "One Time"}
+                                                                </div> */}
+                                                                <div data-test = "schedule_data_status" className="s__Table_status"  data-scheduledatetime={data.scheduledatetime.valueOf().toString()}>
+                                                                    <span style={{color: `rgb(100, 54, 147)`, cursor: 'pointer', fontWeight: 'bold'}}>{data.status === "Terminate" ? "Terminated" : data.status}</span>
+                                                                    {/* {(data.status === 'scheduled' || data.status === "recurring")?
+                                                                        <span className="fa fa-close s__cancel" onClick={()=>{cancelThisJob(data.cycleid,data.scheduledatetime,data._id,data.target,data.scheduledby,"cancelled",getScheduledDetails,displayError)}} title='Cancel Job'/>
+                                                                    :null} */}
+                                                                </div> 
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </ScrollBar>
+                                            </div>
+                                        </div>
+                                        <Pagination items={scheduledRecurringData} onChangePage={onChangePage} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div> }
                     </div>
             </div>
         </>

@@ -14,8 +14,13 @@ const ExportObjectModal = props => {
         {value: "excel", name: "Excel"}
     ]
     const [objects, setObjects] = useState([ {objType: "", tempId: tempIdCounter } ]);
-    const { appType, screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
+    // const { appType, screenId, screenName, versionnumber, projectId, testCaseId } = useSelector(state => state.plugin.CT);
     const setOverlay = props.setOverlay
+    let appType = props.appType;
+    const screenId = props.fetchingDetails["_id"]
+    const projectId = props.fetchingDetails.projectID
+    const screenName = props.fetchingDetails["name"]
+    let versionnumber = 0
     const Content = () =>{
         return (
             <div className='mp__import-popup'>
@@ -42,6 +47,8 @@ const ExportObjectModal = props => {
     
     const onExport = () => {
         let objectsBlob;
+        
+    let versionnumber = 0
         let filename;
         let hasData = false;
         let responseData;
@@ -50,7 +57,7 @@ const ExportObjectModal = props => {
         if(err)return
         setOverlay('Exporting ...')
         if (objects[0].objType === "json"){
-            getScrapeDataScreenLevel_ICE(appType, screenId, projectId, testCaseId)
+            getScrapeDataScreenLevel_ICE(appType, screenId, projectId,"")
             .then(data => {
             {
                     if (data === "Invalid Session") return RedirectPage(history);
@@ -66,7 +73,7 @@ const ExportObjectModal = props => {
     
                         temp['appType'] = appType;
                         temp['screenId'] = screenId;
-                        temp['versionnumber'] = versionnumber;
+                        temp['versionnumber'] = 0;
                         responseData = JSON.stringify(temp, undefined, 2);
                     }
                     if (hasData){
@@ -81,9 +88,10 @@ const ExportObjectModal = props => {
                             let a = window.document.createElement('a');
                             a.href = window.URL.createObjectURL(objectsBlob);
                             a.download = filename;
-                            document.body.appendChild(a);
+                            a.className = "exportScreen"
                             a.click();
-                            document.body.removeChild(a);
+                            // document.body.appendChild(a);
+                            // document.body.removeChild(a);
                             props.setMsg(MSG.SCRAPE.SUCC_DATA_EXPORTED);
                         } 
                     } else props.setMsg(MSG.SCRAPE.ERR_EXPORT_DATA);
@@ -92,7 +100,7 @@ const ExportObjectModal = props => {
             .catch(error => console.error(error));
         }
         else if(objects[0].objType === "excel"){
-		exportScreenToExcel(appType, screenId, projectId, testCaseId)
+		exportScreenToExcel(appType, screenId, projectId,"")
         .then(data => {
             if(data instanceof ArrayBuffer){
                     filename = "Screen_" + screenName + ".xlsx";
@@ -107,9 +115,10 @@ const ExportObjectModal = props => {
                     let a = window.document.createElement('a');
                     a.href = window.URL.createObjectURL(objectsBlob);
                     a.download = filename;
-                    document.body.appendChild(a);
+                    a.className = "exportScreen"
+                    // document.body.appendChild(a);
+                    // document.body.removeChild(a);
                     a.click();
-                    document.body.removeChild(a);
                     props.setMsg(MSG.SCRAPE.SUCC_DATA_EXPORTED);
                   } 
             } else props.setMsg(MSG.SCRAPE.ERR_EXPORT);

@@ -69,7 +69,10 @@ const ModuleListDrop = (props) =>{
     }
      const loadModule = async(modID) =>{
         setWarning(false)
-        setBlockui({show:true,content:"Loading Module ..."})        
+        setBlockui({show:true,content:"Loading Module ..."}) 
+        // dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
+        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:undefined})
+       
         if(moduleSelect._id === modID){
             dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         }
@@ -88,12 +91,14 @@ const ModuleListDrop = (props) =>{
         setBlockui({show:false})
     }
     const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');
+
     // normal module selection
             const selectModule = async (id,name,type,checked) => {
                 var modID = id
                 var type = name
                 var name = type
                 // below code about scenarios fetching
+                setSelctedSc([])
                     if (isE2EOpen){
                         setBlockui({content:'loading scenarios',show:true})
                         //loading screen
@@ -105,6 +110,12 @@ const ModuleListDrop = (props) =>{
                         setInitScList(res)
                         setBlockui({show:false})
                         return;}
+                        if(Object.keys(moduleSelect).length===0){
+                            loadModule(modID)
+                            return;
+                        }else{
+                            setWarning(modID)
+                        }
         d3.selectAll('.ct-node').classed('node-selected',false)
         //     return;
         // }
@@ -131,16 +142,17 @@ const ModuleListDrop = (props) =>{
             return;
         }else{
             setWarning({modID, type});
-            
         }
     }    
     const loadModuleE2E = async(modID) =>{
         setWarning(false)
         setIsE2EOpen(true)
         setCollapse(true)
-        setBlockui({show:true,content:"Loading Module ..."})        
+        setBlockui({show:true,content:"Loading Module ..."})   
+        dispatch({type:actionTypes.INIT_ENEPROJECT,payload:{proj, isE2ECreate: true}});
+        // dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
         if(moduleSelect._id === modID){
-            dispatch({type:actionTypes.SELECT_MODULE,payload:{}})
+            dispatch({type:actionTypes.SELECT_MODULE,payload:{createnew:true}})
         }
         var req={
             tab:"endToend",
@@ -248,7 +260,7 @@ const ModuleListDrop = (props) =>{
                                 if(e.type==="basic")
                                 return(
                                     <div key={i}>
-                                            <div data-test="modules" value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id || e._id===isModuleSelectedForE2E)?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E)?   {backgroundColor:'#EFE6FF'}:{}  }  title={e.name} type={e.type}>                                    
+                                            <div data-test="modules" value={e._id}  className={'toolbar__module-box'+((moduleSelect._id===e._id  )?" selected":"")} style={(moduleSelect._id===e._id || e._id===isModuleSelectedForE2E)?   {backgroundColor:'#EFE6FF'}:{}  }  title={e.name} type={e.type}>                                    
                                                 <div className='modClick' value={e._id} style={{display:'flex',flexDirection:'row'}} >
                                                 {<input type="checkbox" className="checkBox" value={e._id} onChange={(e)=>selectedCheckbox(e,"checkbox") } checked={moduleSelectlist.includes(e._id)}  />}  
                                                 <span  onClick={(e)=>selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} className='modNme' value={e._id} style={{textOverflow:'ellipsis',textAlign:'left',width:'7rem'}}>{e.name}</span>

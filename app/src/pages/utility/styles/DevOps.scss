@@ -254,7 +254,7 @@
     border: 2px solid #633693;
     border-radius: 0.625rem;
     width: 50%;
-    height: 59.5vh;
+    height: 58vh;
     &_filter {
         margin-bottom: 2%;
         display: flex;
@@ -279,7 +279,7 @@
     padding-left: 2%;
 }
 .active-users-token {
-    max-height: 61vh;
+    max-height: 70vh;
     height: 100% !important;
 }
 .searchBoxInput {
@@ -416,4 +416,12 @@
         height: auto;
         margin: 0.1rem 0.5rem 0 0.5rem;
     }
+}
+
+.schedule__dialog .p-dialog-header {
+    position: absolute;
+    padding: 1rem !important;
+    width: 100%;
+    background: transparent !important;
+    z-index: 10;
 }
