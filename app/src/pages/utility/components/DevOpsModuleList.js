@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect, useRef } from 'react';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ScreenOverlay } from '../../global';
 import { CheckBox, SearchDropdown, Tab, NormalDropDown, TextField, SearchBox } from '@avo/designcomponents';
 import { fetchModules } from '../api';
@@ -30,6 +29,10 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     const [testSuiteName, setTestSuiteName] = useState();
     const [appTypes, setAppTypes] = useState([]);
     const[initialFilteredModuleList,setinitialFilteredModuleList]=useState(null);
+    const [filteredModuleList, setFilteredModuleList] = useState([]);
+    const notexe = useRef(
+        integrationConfig.executionRequest != undefined ? integrationConfig.executionRequest.donotexe.current : {}
+        );
 
     const indeterminateStyle = {
         root: {
@@ -195,11 +198,48 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
         }
         setSelectedTab(key);
     }
-    const HandleTreeChange = (checked) => {
-        if(selectedTab === 'all') setIntegrationConfig({ ...integrationConfig, scenarioList: checked });
-        else if(selectedTab === 'selected') setIntegrationConfig({ ...integrationConfig, scenarioList: checked });
+    const HandleTreeChange = (checked,targetnode) => {
+
+        //clicked on scenario
+        if(targetnode.isLeaf){
+            if(notexe.current[targetnode.parent.value] == undefined) {
+                notexe.current[targetnode.parent.value] = []
+            }
+            if(targetnode.checked)
+                notexe.current[targetnode.parent.value].push(targetnode.index)
+            else{
+                const index = notexe.current[targetnode.parent.value].indexOf(targetnode.index);
+                if (index > -1) { 
+                    notexe.current[targetnode.parent.value].splice(index, 1);
+                }
+            }
+        }
+        else {
+            //condition for clicking on batch
+            if(targetnode.value === targetnode.label) {
+                for(let module of targetnode.children) {
+                    notexe.current[module.value] = []
+                    for(let i = 0;i<module.children.length;i++){
+                        notexe.current[module.value].push(i);
+                    }
+                }
+            }
+            else{
+                notexe.current[targetnode.value] = []
+                for(let i = 0;i<targetnode.children.length;i++){
+                    notexe.current[targetnode.value].push(i);
+                }
+            }
+        }
+
+        if(selectedTab === 'all') {
+            setIntegrationConfig({ ...integrationConfig, scenarioList: checked, notexe });
+        }
+        else if(selectedTab === 'selected') {
+            setIntegrationConfig({ ...integrationConfig, scenarioList: checked, notexe });
+        }
         else if(selectedTab === 'unselected') {
-            setIntegrationConfig({ ...integrationConfig, scenarioList: [...integrationConfig.scenarioList, ...checked] });
+            setIntegrationConfig({ ...integrationConfig, scenarioList: [...integrationConfig.scenarioList, ...checked], notexe });
             setModuleState({...moduleState, checked: [...integrationConfig.scenarioList, ...checked]});
             return;
         }
@@ -362,6 +402,86 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
 
    }
     const [scenario, setScenario] = useState(false);
+    const handleExecutionTypeChange = (selectedType) => {
+        notexe['current'] = {}
+        const selectedKey = selectedType.key;
+        let filteredNodes = [];
+        if(selectedKey === 'normalExecution') {
+            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
+                let filterModule = {
+                    value: module.moduleid,
+                    label: module.name,
+                };
+                if(module.scenarios && module.scenarios.length > 0) {
+                    const moduleChildren = module.scenarios.map((scenario) => {
+                        return ({
+                            value: scenario._id,
+                            label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                event.preventDefault();
+                                onDataParamsIconClick(scenario._id, scenario.name)}}/></div>
+                        })
+                    });
+                    filterModule['children'] = moduleChildren;
+                }
+                return filterModule;
+            });
+        } else if(selectedKey === 'e2eExecution') {
+            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
+                let filterModule = {
+                    value: module.moduleid,
+                    label: module.name,
+                };
+                if(module.scenarios && module.scenarios.length > 0) {
+                    const moduleChildren = module.scenarios.map((scenario, index) => {
+                        return ({
+                            value: module.batchname+module.moduleid+index+scenario._id,
+                            label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                event.preventDefault();
+                                onDataParamsIconClick(module.batchname+module.moduleid+index+scenario._id, scenario.name)}}/></div>
+                        })
+                    });
+                    filterModule['children'] = moduleChildren;
+                }
+                return filterModule;
+            });
+        }
+        else if(selectedKey === 'batchExecution') {
+            const batchData = moduleScenarioList['batchExecution'];
+            filteredNodes = Object.keys(batchData).map((batch) => {
+                let filterBatch = {
+                    value: batch,
+                    label: batch,
+                };
+                if(batchData[batch].length > 0) {
+                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
+                        let filterModule = {
+                            value: module.moduleid,
+                            label: module.name,
+                        };
+                        if(module.scenarios && module.scenarios.length > 0) {
+                            const moduleChildren = module.scenarios.map((scenario, index) => {
+                                return ({
+                                    value: batch+module.moduleid+index+scenario._id,
+                                    label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
+                                        event.preventDefault();
+                                        onDataParamsIconClick(batch+module.moduleid+index+scenario._id, scenario.name)}}/></div>
+                                })
+                            });
+                            filterModule['children'] = moduleChildren;
+                        }
+                        return filterModule;
+                    });
+                }
+                return filterBatch;
+            });
+        }
+        setSelectedExecutionType(selectedKey);
+        setModuleList(filteredNodes);
+        setFilteredModuleList(filteredNodes);
+        setModuleState({expanded: [], checked: []});
+        setIntegrationConfig({ ...integrationConfig, scenarioList: [], dataParameters: [] });
+    }
+    const [modalContent, setModalContent] = useState(false);
     const onDataParamsIconClick = (scenarioId, name) => {
         if(integrationConfig.dataParameters.some((data) => data.scenarioId === scenarioId)) {
             let paramIndex = integrationConfig.dataParameters.findIndex((data) => data.scenarioId === scenarioId);

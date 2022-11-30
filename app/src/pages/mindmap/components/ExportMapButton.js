@@ -16,30 +16,28 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const gitBranchRef =  useRef()
     const gitVerRef =  useRef()
     const gitPathRef =  useRef()
-    const [exportBox,setExportBox] = useState(false)    
+    const [exportBox,setExportBox] = useState(false)
     const selectedModule = useSelector(state=>state.mindmap.selectedModule)
-    const selectedModulelist = useSelector(state=>state.mindmap.selectedModulelist)
     const selectedProj = useSelector(state=>state.mindmap.selectedProj)
     const projectList = useSelector(state=>state.mindmap.projectList)
     const openExport = ()=>{
-        if(!selectedProj || !selectedModule || !selectedModule._id || selectedModulelist.length==0){
+        if(!selectedProj || !selectedModule || !selectedModule._id){
             return;
         }
         setExportBox(true)
     }
     const clickExport = () => {
-        // if(!selectedModule._id || selectedModulelist.length==0)return;
+        if(!selectedModule._id)return;
         var err = validate([fnameRef,ftypeRef,gitconfigRef,gitBranchRef,gitVerRef])
         if(err)return
         let selectedModuleVar = selectedModulelist.length>0?selectedModulelist:selectedModule;
         setExportBox(false)
         setBlockui({show:true,content:'Exporting Mindmap ...'})
         var ftype = ftypeRef.current.value
-        if(ftype === 'json') {
-            toJSON(selectedModuleVar,fnameRef.current.value,displayError,setBlockui);
-        }
+
         
         if(ftype === 'excel') toExcel(selectedProj,selectedModulelist.length>0?selectedModulelist[0]:selectedModule,fnameRef.current.value,displayError,setBlockui);
+        if(ftype === 'json') toJSON(selectedModule,fnameRef.current.value,displayError,setBlockui);
         if(ftype === 'custom') toCustom(selectedProj,selectedModule,projectList,releaseRef,cycleRef,fnameRef.current.value,displayError,setBlockui);
         if(ftype === 'git') toGit({selectedProj,projectList,displayError,setBlockui,gitconfigRef,gitVerRef,gitPathRef,gitBranchRef,selectedModule:selectedModulelist.length>0?selectedModulelist[0]:selectedModule});
     }
@@ -161,9 +159,9 @@ const toExcel = async(projId,module,fname,displayError,setBlockui) => {
     Purpose : Exporting Module in json file
     param :
 */
-const toJSON = async(module,fname,displayError,setBlockui) => {
+const toJSON = async(modId,fname,displayError,setBlockui) => {
     try{
-        var result =  await exportMindmap(Array.isArray(module)?module:module._id)
+        var result =  await exportMindmap(modId._id)
         if(result.error){displayError(result.error);return;}
         jsonDownload(fname+'.mm', JSON.stringify(result));
         setBlockui({show:false,content:''})

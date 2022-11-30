@@ -338,7 +338,7 @@ const DevOpsConfig = props => {
         }
         return data;
     }
-    const handleConfigSave = async () => {
+    const handleConfigSave = async (checkForButton) => {
         if(integrationConfig.name === ''){
             setError({
                 ...error,
@@ -440,6 +440,7 @@ const DevOpsConfig = props => {
                         })).filter((scenario, index) => integrationConfig.scenarioList.includes(module.batchname+module.moduleid+index+scenario.scenarioId))
                     });
                 }));
+        
         if(batchInfo.length < 1) {
             setMsg(MSG.CUSTOM("Please Select atleast one Scenario",VARIANT.ERROR));
             return;
@@ -462,6 +463,7 @@ const DevOpsConfig = props => {
             avoagents: (integrationConfig.avoAgentGrid && integrationConfig.avoAgentGrid !== '' && integrationConfig.avoAgentGrid !== "cicdanyagentcanbeselected" && integrationConfig.avoAgentGrid.slice(0,2) === 'a_') ? [integrationConfig.avoAgentGrid.slice(2)] : [],
             integration: integration,
             batchInfo: batchInfo,
+            donotexe: checkForButton == '' ? integrationConfig.notexe : integrationConfig.executionRequest.donotexe,
             scenarioFlag: false
         });
         if(storeConfig !== 'success') {
