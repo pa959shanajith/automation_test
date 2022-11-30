@@ -27,13 +27,22 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     const [dataParameter, setDataParameter] = useState([]);
     const [condition, setCondition] = useState([]);
     const [testSuiteIds, setTestSuiteId] = useState([]);
-    // const [filteredList, setFilteredList] = useState(filteredModuleList);
+    const [scenarioTaskType,setScenarioTaskType] = useState(integrationConfig.scenarioTaskType);
     const [doNotExecute, setDoNotExecuteArr] = useState([]);
     const [scenarioIds, setScenarioIds] = useState([]);
     const [testSuiteName, setTestSuiteName] = useState();
+    const [appTypes, setAppTypes] = useState([]);
     const[initialFilteredModuleList,setinitialFilteredModuleList]=useState(null);
    
     // const [filteredModuleList, setFilteredModuleList] = useState([]);
+
+    // useEffect(()=>{
+    //     if (Object.keys().length!==0){
+    //         setAccessibilityParameters(accessibilityParameters);
+    //         setScenarioTaskType(scenarioTaskType);
+    //     }
+    // }, []);
+
     const indeterminateStyle = {
         root: {
             '&[class ~= is-enabled]': {
@@ -230,8 +239,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                     event.preventDefault();
                                     onClick('displayMaximizable');
                                     onDataParamsIconClick1(module.moduleid, module.name)}}/></div>
-                            };
-                            // console.log(module)
+                            }
                             if(module.scenarios && module.scenarios.length > 0) {
                                 const moduleChildren = module.scenarios.map((scenario) => {
                                     return ({
@@ -333,14 +341,11 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 "testsuitename": modalContent.name,
                 "projectidts": integrationConfig.selectValues[0].selected
                 }]
-                // console.log(modalContent.moduleId)
-                // setModuleIds(modalContent.moduleId)
                 const testSuiteData1 = await readTestSuite_ICE(payload)
-                // console.log(Object.values(testSuiteData1)[0])
                 const testSuiteData = Object.values(testSuiteData1)[0];
                 setModuleIds(testSuiteData.testsuiteid)
                 setTestSuiteName(testSuiteData.testsuitename)
-                let scenarioNameArr = [], dataParameterArr = [], conditionArr = [], testSuiteIdArr = [], doNotExecuteArr = [], scenarioIdArr = []
+                let scenarioNameArr = [], dataParameterArr = [], conditionArr = [], testSuiteIdArr = [], doNotExecuteArr = [], scenarioIdArr = [], appTypeArr = []
                 for (let i=0;i<testSuiteData.scenarioids.length;i++)
                 {
                     scenarioNameArr.push(testSuiteData.scenarionames[i])
@@ -348,6 +353,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                     conditionArr.push(testSuiteData.condition[i])
                     doNotExecuteArr.push(testSuiteData.executestatus[i])
                     scenarioIdArr.push(testSuiteData.scenarioids[i])
+                    appTypeArr.push(testSuiteData.apptypes[i])
                 }
                 setScenarioName(scenarioNameArr)
                 setDataParameter(dataParameterArr)
@@ -355,100 +361,19 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                 setTestSuiteId(testSuiteIdArr)
                 setDoNotExecuteArr(doNotExecuteArr)
                 setScenarioIds(scenarioIdArr)
+                setAppTypes(appTypeArr)
             } 
         })()
     },[integrationConfig.selectValues[2].selected, modalContent]);
-   
+
 
    const handleSearchChange = (value) => {
        let filteredItems = filteredModuleList.filter(element=>element.label.props.children[0].includes(value))
-    //    console.log(filteredItems)
-       // setFilteredList(filteredItems);
        setFilteredModuleList(filteredItems)
        setSearchText(value);
 
    }
-    // const [scenario, setScenario] = useState(false);
-    // },[integrationConfig.selectValues[2].selected]);
-    const handleExecutionTypeChange = (selectedType) => {
-        const selectedKey = selectedType.key;
-        let filteredNodes = [];
-        if(selectedKey === 'normalExecution') {
-            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
-                let filterModule = {
-                    value: module.moduleid,
-                    label: module.name,
-                };
-                if(module.scenarios && module.scenarios.length > 0) {
-                    const moduleChildren = module.scenarios.map((scenario) => {
-                        return ({
-                            value: scenario._id,
-                            label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                event.preventDefault();
-                                onDataParamsIconClick(scenario._id, scenario.name)}}/></div>
-                        })
-                    });
-                    filterModule['children'] = moduleChildren;
-                }
-                return filterModule;
-            });
-        } else if(selectedKey === 'e2eExecution') {
-            filteredNodes = moduleScenarioList[selectedKey].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
-                let filterModule = {
-                    value: module.moduleid,
-                    label: module.name,
-                };
-                if(module.scenarios && module.scenarios.length > 0) {
-                    const moduleChildren = module.scenarios.map((scenario, index) => {
-                        return ({
-                            value: module.batchname+module.moduleid+index+scenario._id,
-                            label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                event.preventDefault();
-                                onDataParamsIconClick(module.batchname+module.moduleid+index+scenario._id, scenario.name)}}/></div>
-                        })
-                    });
-                    filterModule['children'] = moduleChildren;
-                }
-                return filterModule;
-            });
-        }
-        else if(selectedKey === 'batchExecution') {
-            const batchData = moduleScenarioList['batchExecution'];
-            filteredNodes = Object.keys(batchData).map((batch) => {
-                let filterBatch = {
-                    value: batch,
-                    label: batch,
-                };
-                if(batchData[batch].length > 0) {
-                    filterBatch['children'] = batchData[batch].filter((module) => { return (module.scenarios && module.scenarios.length > 0) } ).map((module) => {
-                        let filterModule = {
-                            value: module.moduleid,
-                            label: module.name,
-                        };
-                        if(module.scenarios && module.scenarios.length > 0) {
-                            const moduleChildren = module.scenarios.map((scenario, index) => {
-                                return ({
-                                    value: batch+module.moduleid+index+scenario._id,
-                                    label: <div className="devOps_input_icon">{scenario.name}<img src={"static/imgs/input.png"} alt="input icon" onClick={(event) => {
-                                        event.preventDefault();
-                                        onDataParamsIconClick(batch+module.moduleid+index+scenario._id, scenario.name)}}/></div>
-                                })
-                            });
-                            filterModule['children'] = moduleChildren;
-                        }
-                        return filterModule;
-                    });
-                }
-                return filterBatch;
-            });
-        }
-        setSelectedExecutionType(selectedKey);
-        setModuleList(filteredNodes);
-        setFilteredModuleList(filteredNodes);
-        setModuleState({expanded: [], checked: []});
-        setIntegrationConfig({ ...integrationConfig, scenarioList: [], dataParameters: [] });
-    }
-    // const [modalContent, setModalContent] = useState(false);
+    const [scenario, setScenario] = useState(false);
     const onDataParamsIconClick = (scenarioId, name) => {
         if(integrationConfig.dataParameters.some((data) => data.scenarioId === scenarioId)) {
             let paramIndex = integrationConfig.dataParameters.findIndex((data) => data.scenarioId === scenarioId);
@@ -477,18 +402,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                 "conditioncheck": condition,
                                 "donotexecute": doNotExecute
                             }]
-                            // console.log(payload)
                         await updateTestSuite_ICE(payload);
-                        // let updatedParamCollection = integrationConfig.dataParameters;
-                        // let paramIndex = updatedParamCollection.findIndex((data) => data.scenarioId === scenario.scenarioId);
-                        //     if(paramIndex > -1){
-                        //         updatedParamCollection[paramIndex] = scenario;
-                        //         setIntegrationConfig({ ...integrationConfig, dataParameters: updatedParamCollection });
-                        //     } else {
-                        //             let newDataParameterArray = updatedParamCollection;
-                        //             newDataParameterArray.push(scenario);
-                        //         setIntegrationConfig({ ...integrationConfig, dataParameters: newDataParameterArray });
-                        //     }
+            
                         integrationConfig.dataParameters = dataParameter;
                         integrationConfig.condition = condition;
                         integrationConfig.scenarioList = scenarioIds;
@@ -501,59 +416,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     return (
         <>
 
-            {/* <Dialog
-                hidden = {modalContent === false}
-                onDismiss = {() => setModalContent(false)}
-                title = {modalContent.name + ` : Execution Parameters`}
-                minWidth = '60rem'
-                confirmText = 'Save'
-                declineText = 'Cancel'
-                onDecline={() => setModalContent(false)}
-                onConfirm = {async () => {
-                    let updatedParamCollection = integrationConfig.dataParameters;
-                    // const batchInfo = {"assignedTestScenarioIds": "",
-                    //                     "assignedTime": "",
-                    //                     "cycleid": "61fb99f03dca644ddfec183f",
-                    //                     "projectidts": "61fb99f03dca644ddfec1840",
-                    //                     "releaseid": "R3",
-                    //                     "subTaskId": "620e10524edee7bbbba18297",
-                    //                     "testsuiteid": "620e0ff14edee7bbbba1828d",
-                    //                     "testsuitename": "Module_webTest",
-                    //                     "versionnumber": 0
-                    //                  }
-                    // const data = await updateTestSuite_ICE(batchInfo);
-                    let paramIndex = updatedParamCollection.findIndex((data) => data.scenarioId === modalContent.scenarioId);
-                    if(paramIndex > -1){
-                        updatedParamCollection[paramIndex] = modalContent;
-                        setIntegrationConfig({ ...integrationConfig, dataParameters: updatedParamCollection });
-                    } else {
-                        let newDataParameterArray = updatedParamCollection;
-                        newDataParameterArray.push(modalContent);
-                        setIntegrationConfig({ ...integrationConfig, dataParameters: newDataParameterArray });
-                    }
-                    setModalContent(false);
-                }} >
-                    <div style={{ display: 'flex', flexDirection: 'column', height:'auto'}}>
-                        {/* <div style={{display: 'flex', alignItems: 'baseline'}}>
-                            <h4 style={{marginRight: '1rem'}} >Module Name : </h4><h5>{modalContent.name}</h5>
-                        </div> */}
-                        {/* <ExecuteContent integrationConfig={integrationConfig} /> */}
-                        {/* <div style={{display: 'flex'}}>
-                            <div style={{ marginRight: '2rem' }}>
-                                <TextField value = {modalContent.dataparam} onChange={(ev, newValue) => {
-                                    if (newValue === '') setModalContent({...modalContent, dataparam: ''});
-                                    if (newValue) setModalContent({...modalContent, dataparam: newValue.toString()});
-                                }} label='Data Parameterization' width='30rem' standard={true} placeholder='Enter Data Paramterization' />
-                            </div>
-                            <NormalDropDown selectedKey={modalContent.condition} width='8rem' options={[
-                            { key: 0, text: 'False'},
-                            { key: 1, text: 'True' }
-                            ]} label='Condition' onChange={(ev, option) =>setModalContent({...modalContent, condition: option.key })} />
-                        </div> */}
-                    
-            {/* </Dialog> */} 
-            {/* <Button label="Show" icon="pi pi-external-link" onClick={() => onClick('displayMaximizable')} /> */}
-                <Dialog header={modalContent.name + ` : Execution Parameters`} visible={displayMaximizable} maximizable modal style={{ width: '70vw', height:'30vw' }} footer={renderFooter('displayMaximizable')} onHide={() => onHide('displayMaximizable')}>
+            <Dialog header={modalContent.name + ` : Execution Parameters`} visible={displayMaximizable} maximizable modal style={{ width: '70vw', height:'30vw' }} footer={renderFooter('displayMaximizable')} onHide={() => onHide('displayMaximizable')}>
                         <div className="e__batchSuites e__batchSuites_Max">
                                 {/* <ScrollBar  thumbColor="rgb(51,51,51)" trackColor="rgb(211, 211, 211)" > */}
                                             {/* <div className='suiteNameTxt' ><span  className='taskname'> </span></div> */}
@@ -562,12 +425,13 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                     <div className="e__table-head">
                                                         <div className="e__table-head-row">
                                                             <div className='e__contextmenu' id='contextmenu'></div>
-                                                            <div className='e__selectAll' ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
+                                                            <div className='e__selectAll' style={{marginRight:'2vh'}} ><i title='Do Not Execute' aria-hidden='true' className='e__selectAll-exe'></i>
                                                             <input className='e-execute' type='checkbox' checked /></div>	
                                                             <div className='e__scenario'>Scenario Name</div>
                                                             <div className='e__param'>Data Parameterization</div>
                                                             <div className='e__condition'>Condition</div>
-                                                            <div className='e__projectName' style={{width:'30vh'}}>Accesibility Standard</div>
+                                                            <div className='e__apptype' >App Type</div>
+                                                           <div className='e__accessibilityTesting' style={{width:'30vh'}}>Accesibility Standard</div>
                                                         </div>
                                                     </div>
                                                     <div className={'e__testScenarioScroll e__table-bodyContainer e__table-bodyContainer'}>
@@ -575,7 +439,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                         {scenarioName.map((e,i)=>
                                                             <div key={e.name} className={"e__table_row_status e__table_row  e__table_row"} style={{marginLeft:'-1vh'}}>   
                                                             <div className='e__table-col tabeleCellPadding e__contextmenu' style={{marginRight:'1vh'}} >{i+1}</div>
-                                                            <div className='e__table-col tabeleCellPadding exe-ExecuteStatus'>
+                                                            <div className='e__table-col tabeleCellPadding exe-ExecuteStatus' style={{marginRight:'3vh'}}>
                                                             <input type='checkbox' onChange={e=>{e.target.checked ? doNotExecute[i]=0:doNotExecute[i]=1; setDoNotExecuteArr([...doNotExecute])}} title='Select to execute this scenario' className='doNotExecuteScenario e-execute' checked={!doNotExecute[i]}/>
                                                             </div>
                                                             <div className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" >{scenarioName[i]}</div>
@@ -583,6 +447,10 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                                 {   dataParameter[i] = e.target.value;
                                                                     setDataParameter([...dataParameter])}} type="text" value = {dataParameter[i]}/></div>
                                                             <div className="e__table-col tabeleCellPadding exe-conditionCheck"><select onChange={(e)=>{condition[i]=e.target.value; setCondition([...condition])}} value={condition[i]} className={"conditionCheck form-control "+((condition[i]=== 0 || condition[i] === '0')?"alertRed":"alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </div>
+                                                            <div title={details[appTypes[i]]}  className='e__table-col tabeleCellPadding exe-apptype'>
+                                                                    <img src={"static/imgs/"+appTypes[i]+".png"} alt="apptype" className="e__table_webImg"/>
+                                                                </div>
+                                                                
                                                             <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} /></div>
                                                         </div>)
                                                         }
@@ -618,5 +486,18 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
             }    
         </>
     );
+    
+};
+
+const details = {
+    "web":{"data":"Web","title":"Web","img":"web"},
+    "webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
+    "desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
+    "oebs":{"data":"OEBS","title":"Oracle Apps","img":"oracleApps"},
+    "mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
+    "mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
+    "sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
+    "system":{"data":"System","title":"System Apps","img":"desktop"},
+    "mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"}
 };
 export default DevOpsModuleList;

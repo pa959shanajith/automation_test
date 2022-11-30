@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-// import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, IntegrationDropDown } from '../../global';
 import { fetchProjects, fetchAvoAgentAndAvoGridList, storeConfigureKey } from '../api';
-// import { useSelector } from 'react-redux';
 import { SearchDropdown, TextField, Toggle, MultiSelectDropdown } from '@avo/designcomponents';
 
 
@@ -13,12 +11,7 @@ import { prepareOptionLists } from './DevOpsUtils';
 import DevOpsModuleList from './DevOpsModuleList';
 
 const DevOpsConfig = props => {
-    // const reportData = {hasData: false};
-    // const [api, setApi] = useState("Execution");
     const [apiKeyCopyToolTip, setApiKeyCopyToolTip] = useState("Click To Copy");
-    // const [request, setRequest] = useState({});
-    // const [requestText, setRequestText] = useState("");
-    // const [configName, setConfigName] = useState("");
     const [dataDict, setDict] = useState({});
     const dataParametersCollection = [];
     const [error, setError] = useState({});
@@ -65,7 +58,6 @@ const DevOpsConfig = props => {
     const [moduleList, setModuleList] = useState([]);
     const [filteredModuleList, setFilteredModuleList] = useState([]);
     const handleExecutionTypeChange = (selectedType) => {
-        // handleExecutionTypeChange{selectedType}
         const selectedKey = selectedType;
         let filteredNodes = [];
         if(selectedKey === 'normalExecution') {

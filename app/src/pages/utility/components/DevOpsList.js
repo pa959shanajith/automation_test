@@ -6,10 +6,7 @@ import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects, 
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { useSelector, useDispatch } from 'react-redux';
-import { Dropdown } from 'primereact/dropdown';
-import { MultiSelect } from 'primereact/multiselect';
-import * as actionTypes from "../../plugin/state/action";
-// import { fetchProjects } from '../api';
+
 import { ExecuteTestSuite_ICE } from '../../execute/api';
 import {getDetails_ICE ,getAvailablePlugins} from "../../plugin/api";
 import {readTestSuite_ICE} from '../../schedule/api';
@@ -19,8 +16,6 @@ import CheckboxTree from 'react-checkbox-tree';
 import ScheduleHome from '../../schedule/containers/ScheduleHome';
 import AllocateICEPopup from '../../global/components/AllocateICEPopup';
 import "../styles/DevOps.scss";
-import { prepareOptionLists } from './DevOpsUtils';
-import { index } from 'd3';
 
 
 
@@ -53,7 +48,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [selectedCycle, setSelectedCycle] = useState(0);
     const [cyclesList, setCyclesList] = useState('');
     const [executionTypeInRequest,setExecutionTypeInRequest] = useState('asynchronous');
-    const[currentKey,setCurrentKey]=useState('');
+    const [currentKey,setCurrentKey] = useState('');
     const [projectName, setProjectName] = useState('');
     const [currentName, setCurrentName] = useState('');
   
@@ -102,14 +97,11 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             
                 return (
                     {
-                        // code: element,
-                        // name: ProjectList.projectNames[index],
+
                         key: element,
                         text: ProjectList.projectNames[index],
                         title: ProjectList.projectNames[index],
                         index:index
-                        // disabled: true,
-                        // title: 'License Not Supported'
                     }
                 )
             });
@@ -118,7 +110,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setProjectName(arraynew[selectedCycle].text);
 
 
-            // console.log(selectedProject);
+
             if(arraynew.length > selectedCycle) {
                 const configurationList = await fetchConfigureList({
                     'projectid': arraynew[selectedCycle].key
@@ -135,10 +127,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             }
             setLoading(false);
         }
-        
-
-        // console.log("domaindetails","Banking");
-        // console.log(ProjectList);
             var plugins = []; 
         const plugins_list= await getAvailablePlugins();
        
@@ -146,7 +134,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         if(plugins_list.error){
             setMsg(MSG.CUSTOM("Error while fetching the app Details"));
         }else{
-            // console.log(plugins_list);
            
                     let txt = [];
                      for (let x in plugins_list) {
@@ -223,13 +210,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             setConfigList(configurationList);
         }
         setLoading(false);
-        // projectData(getProjectList.filter((config) => config.key === option.key)[0].data.cycle);
+        
         
     }
 
     const copyKeyUrlFunc = (id) => {
         const data = document.getElementById(id).title;
-        // console.log(data)
         if (!data) {
             setApiKeyCopyToolTip("Nothing to Copy!");
             setTimeout(() => {
@@ -283,7 +269,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     setMsg(MSG.CUSTOM("Error While Deleting DevOps Configuration",VARIANT.ERROR));
                 }
             }else {
-                // console.log('selectedProject');
                 const configurationList = await fetchConfigureList({
                     'projectid': selectedProject
                 });
@@ -350,7 +335,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     nodesCollection.push(nodeItem);
                 }
             }
-            console.log(nodesCollection)
             setExecutionQueue({
                 list: nodesCollection,
                 expanded: []
@@ -362,7 +346,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         setShowConfirmPop({'title': 'Delete DevOps Configuration', 'content': <p>Are you sure, you want to delete <b>{name}</b> Configuration?</p>, 'onClick': ()=>{ deleteDevOpsConfig(key) }});
     }
     const handleSearchChange = (value) => {
-        let filteredItems = configList.filter(item => (item.configurename.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.project.toLowerCase().indexOf(value.toLowerCase()) > -1) || (item.release.toLowerCase().indexOf(value.toLowerCase()) > -1));
+        let filteredItems = configList.filter(item => (item.configurename.toLowerCase().indexOf(value.toLowerCase()) > -1));
         setFilteredList(filteredItems);
         setSearchText(value);
     }
@@ -424,10 +408,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         var myJsObj = {key: currentKey,
                 'executionType' : executionTypeInRequest}
         var str = JSON.stringify(myJsObj, null, 4);
-            // const abc = {\n&nbps;&nbps;&nbps;&nbps;
-            //     'key': str,
-            //     \n&nbps;&nbps;&nbps;&nbps;'executionType' : 'asynchronous'
-            //     \n}`;
            
         const categories = [{name: 'Avo Assure Client', key: 'A'}, {name: 'Avo Agent / Avo Grid', key: 'B'}];
         const [selectedCategory, setSelectedCategory] = useState(categories[0]);
@@ -442,7 +422,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         return (
             <div>
                 <Button label="Execute" title="Execute" onClick={async () => {
-                    console.log(currentKey)
                     const temp = await execAutomation(currentKey);
                     if(temp.status !== "pass") {
                         if(temp.error && temp.error.CONTENT) {
@@ -455,10 +434,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     }
                     onHide(name);
                 }} autoFocus />
-                    {/* // setConfirmExecuteNow({ configurekey: currentKey, configname: currentName});
-                    // let temp = execAutomation(confirmExecuteNow.currentKey);
-                    // setMsg(MSG.CUSTOM("Execution Added to the Queue",VARIANT.SUCCESS));
-                      */}
             </div>
         );
     }
@@ -466,31 +441,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         dialogFuncMap[`${name}`](false);
     }
 
-    // useEffect(() => {
-    //     (() => {
-    //         setLoading('Please Wait...');
-    //         setTimeout(async () => {
-    //         console.log(selectedProject);
-    //             const configurationList = await fetchConfigureList({
-    //                 'projectid': selectedProject
-    //             });
-    //             if(configurationList.error) {
-    //                 if(configurationList.error.CONTENT) {
-    //                     setMsg(MSG.CUSTOM(configurationList.error.CONTENT,VARIANT.ERROR));
-    //                 } else {
-    //                     setMsg(MSG.CUSTOM("Error While Fetching DevOps Configuration List",VARIANT.ERROR));
-    //                 }
-    //             }else {
-    //                 setConfigList(configurationList);
-    //             }
-    //             setLoading(false);
-    //         }, 500);
-    //     })()
-    // }, []);
- 
-    // let projectid = getProjectList[0].code
-    // console.log(projectid)let projectid = getProjectList[0].code
-    // console.log(projectid)
+
 
     const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
         if(Array.isArray(executionData.targetUser)){
@@ -653,17 +604,16 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                   <div style={{marginTop: '6vh',position: 'absolute', display: 'flex'}}>
                  <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '1vh', marginRight: '5px'}}>Project Name : </span>
         
-                    {/* <Dropdown value={selectedProject} style={{width:'31vh', position: 'relative', border:'0.4vh solid #613191 '}} options={getProjectList} onChange={onProjectChange} optionLabel="name"  placeholder="Select the Project"/> */}
+                    
                 <SearchDropdown
                     noItemsText={[ ]}
                     onChange={onProjectChange}
                     options={getProjectList}
-                    // placeholder={setCurrentIntegration && configList.map((item, index) => item.project)}
                     selectedKey={selectedProject}
                     width='15rem'
 
                     />  
-                    {/* <span className="api-ut__inputLabel" style={{fontWeight: '700', marginTop: '0.5rem', marginRight: '5px'}}>Project Name : </span> */}
+                    
                 </div>
             
         { configList.length > 0 ? <>
@@ -687,7 +637,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                             searchText.length > 0 && filteredList.length > 0 && filteredList.map((item, index) => <tr key={item.configurekey} className='tkn-table__row'>
                                 <td className="tkn-table__sr_no"> {index+1} </td>
                                 
-                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <td className="tkn-table__key" data-for="name" data-tip={item.configurename} style={{justifyContent: 'flex-start'}}> <ReactTooltip id="name" effect="solid" backgroundColor="black" />{item.configurename} </td>
                                 {/* <td className="tkn-table__key"> <span className="tkn_table_key_value tkn_table_key_value">{ item.configurekey }</span> <ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} /> <i className="fa fa-files-o icon" style={{fontSize:"16px", float: 'right'}} data-for="copy" data-tip={copyToolTip} onClick={() => { copyConfigKey(item.configurekey) }} ></i></td> */}
                                 {/* <td className="tkn-table__project" data-for="project" data-tip={item.project}> <ReactTooltip id="project" effect="solid" backgroundColor="black" /> {item.project} </td>
                                 <td className="tkn-table__project" data-for="release" data-tip={item.release}> <ReactTooltip id="release" effect="solid" backgroundColor="black" /> {item.release} </td> */}
@@ -794,18 +744,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 
                {/* Dialog for Execute Now */}
                 <Dialog header="Execute Now" visible={displayBasic2} style={{ width: '40vw' }}  footer={renderFooter('displayBasic2')} onHide={() => onHide('displayBasic2')}>
-                    {/* <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                    {
-                        categories.map((category) => {
-                            return (
-                                <div key={category.key} >
-                                    <RadioButton inputId={category.key} name="category" value={category} onChange={(e) => setSelectedCategory(e.value)}  checked={selectedCategory.key === category.key} />
-                                    <label htmlFor={category.key} style={{ marginBottom: '-0.5rem', marginLeft: '0.5rem'}}>{category.name}</label>
-                                </div>
-                            )
-                        })
-                    }
-                    </div> */}
+    
                     <input type="radio" name='myRadios' id='first'  onChange={() => {setAllocateICE(true); setDisplayBasic2(false);}}
                      style={{width:'2.5vh', height: '2.5vh'}} />&nbsp;&nbsp;
                     <label htmlFor='first' className="devOps_dropdown_label devOps_dropdown_label_ice" style={{width:'25vh', height: '4vh'}}>Avo Assure Client</label>
