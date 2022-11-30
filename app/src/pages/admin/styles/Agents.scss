@@ -2,7 +2,7 @@
     padding: 2%;
 }
 .page-taskName {
-    margin-top: 1%;
+    margin-top: 0%;
 }
 .agent-icons {
     width: fit-content;
@@ -259,9 +259,9 @@
     border: 2px solid #633693;
     border-radius: 0.625rem;
     width: 50%;
-    height: 58vh;
+    height: 59.5vh;
     &_filter {
-        margin-bottom: 3%;
+        margin-bottom: 2%;
         display: flex;
         justify-content: space-between;
     }
@@ -284,7 +284,7 @@
     padding-left: 2%;
 }
 .active-users-token {
-    max-height: 70vh;
+    max-height: 61vh;
     height: 100% !important;
 }
 .searchBoxInput {
