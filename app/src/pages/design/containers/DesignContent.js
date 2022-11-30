@@ -1018,9 +1018,7 @@ const DesignContent = props => {
                 </div>
                        
                 <div className="debug_button">
-                            <Button label="Debug" /**disabled={debugButton===""} */ className="p-button-warning" onClick={()=>{
-                                debugTestCases(debugButton)
-                                }}></Button>
+                            <Button label="Debug" className="p-button-warning" onClick={()=>debugTestCases(debugButton)}  style={{ background:'#643693', border:"none",borderRadius:"17px", fontFamily:"LatoWeb"}} ></Button>
 
                         </div>
             </div>
