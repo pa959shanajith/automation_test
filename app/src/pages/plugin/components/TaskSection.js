@@ -679,7 +679,7 @@ return <>
 
                         <div className='labelStyle1'> <label>Users</label></div>
 
-					<div className="wrap" style={{height:'12rem'}}>
+					<div className="wrap" style={{height:'12rem'}} >
                             <div className='display_project_box' style={{ overflow: 'auto' }}>
                                 {/* <div className='userForm-edit adminControl-edit'>
                     <button title={userConf.fType} className="userTypeBtn_conv-edit " style={{margin:"4px 0",right:"0",cursor:"default"}}>{userConf.fType}</button>
@@ -699,10 +699,10 @@ return <>
                      <SearchBox
                         placeholder="Enter Username"
                         width="20rem"
-                        value={searchUsers}
                         onClear={() => {setSearchUsers("")}}
-                        onChange={(e)=>{
-                            setSearchUsers(e.target.value)
+                        onChange={(e,value)=>{
+                            debugger;
+                            setSearchUsers(value)
                         }}
                     />
                 </div>
@@ -773,6 +773,10 @@ return <>
                                 debugger;
                                if(createProjectCheck){
                                     try{
+                                                if (!(appType && appType.key && projectName)) {
+                                                    setMsg(MSG.CUSTOM("Please fill the mandatory fields", "error"));
+                                                    return;
+                                                }
                                                 const config = {
                                                     "projectName":projectName.trim(),
                                                     domain: "banking",
@@ -805,17 +809,21 @@ return <>
                                             }
                                         }
                                         else {
-                                    try{
+                                            try{
+                                                if (!(selectedProject)) {
+                                                    setMsg(MSG.CUSTOM("Please fill the mandatory fields", "error"));
+                                                    return;
+                                                }
                                                 const config = {
                                                     "project_id": selectedProject,
                                                     domain: "banking",
-                                            appType:appType? appType.text:undefined,
+                                            appType:selectedProject ?projectsDetails["appTypeName"][projectsDetails["projectId"].indexOf(selectedProject)]:"",
                                             releases: [{"name":"R1","cycles":[{"name":"C1"}]}],
                                                     assignedUsers
                                                 }
                                         const res= await pluginApi.userUpdateProject_ICE(config)
                                         setMsg(MSG.CUSTOM("Project Modified Successfully","success"));
-                                                onHide('displayBasic');
+                                                // onHide('displayBasic');
                                         try{
                                                     const ProjectList = await getProjectIDs();
                                                     setProjectNames(ProjectList);
