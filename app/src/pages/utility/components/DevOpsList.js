@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { ScrollBar, Messages as MSG, setMsg, VARIANT, ModalContainer, ResetSession} from '../../global';
-import { SearchBox , SearchDropdown, Toggle,  } from '@avo/designcomponents';
+import { SearchBox , SearchDropdown, Toggle  } from '@avo/designcomponents';
 import { fetchConfigureList, deleteConfigureKey, execAutomation, fetchProjects, fetchAvoAgentAndAvoGridList,getQueueState, deleteExecutionListId  } from '../api';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
@@ -67,6 +67,12 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const [appType, setAppType] = useState('');
     const [cycleName, setCycleName] = useState('');
 
+    useEffect(()=>{
+        pluginApi.getProjectIDs()
+        .then(data => {
+                projectIdTypesDicts[data.projectId[selectedCycle]] === "Web" ? setShowCICD(true) : setShowCICD(false)
+    })},[])
+    
 
     useEffect(()=>{
         pluginApi.getProjectIDs()
@@ -74,7 +80,6 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 setProjectData1(data.releases[selectedCycle][0].name);
                 setProjectData(data.releases[selectedCycle][0].cycles[0]._id);
                 setCycleName(data.releases[selectedCycle][0].cycles[0].name);
-                projectIdTypesDicts[data.projectId[selectedCycle]] === "Web" ? setShowCICD(true) : setShowCICD(false)
 
         })},[selectedCycle])
   
@@ -101,7 +106,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                         key: element,
                         text: ProjectList.projectNames[index],
                         title: ProjectList.projectNames[index],
-                        index:index
+                        index: index
                     }
                 )
             });
