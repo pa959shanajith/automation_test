@@ -72,7 +72,14 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         .then(data => {
                 projectIdTypesDicts[data.projectId[selectedCycle]] === "Web" ? setShowCICD(true) : setShowCICD(false)
     })},[])
-    
+
+
+    useEffect(()=>{
+        pluginApi.getProjectIDs()
+        .then(data => {
+                projectIdTypesDicts[data.projectId[selectedCycle]] === "Web" ? setShowCICD(true) : setShowCICD(false)
+    })},[])
+
 
     useEffect(()=>{
         pluginApi.getProjectIDs()
@@ -80,8 +87,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 setProjectData1(data.releases[selectedCycle][0].name);
                 setProjectData(data.releases[selectedCycle][0].cycles[0]._id);
                 setCycleName(data.releases[selectedCycle][0].cycles[0].name);
-
-        })},[selectedCycle])
+    })},[selectedCycle])
   
     useEffect(()=>{
         (async() => {
@@ -775,7 +781,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                 />:null}
 
                 {/* Dialog for Schedule */}
-                <Dialog header="Schedule" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
+                <Dialog className='schedule__dialog' header="" visible={displayBasic1}  onDismiss = {() => {displayBasic1(false)}} style={{ width: '80vw',height:'110rem' }}  onHide={() => onHide('displayBasic1')}><ScheduleHome item={selectedItem} /></Dialog>
                 {/* Dialog for Schedule */} 
 
                 {/* Dialog for CI /CD  */}
