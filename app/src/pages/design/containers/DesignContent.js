@@ -55,7 +55,7 @@ const DesignContent = props => {
 
     const headerCheckRef = useRef();
 
-  const [debugButton,setDebugButton]=useState('');
+  const [debugButton,setDebugButton]=useState('1');
 //   const [checkedTc, setCheckedTc] = useState({});
 //   const [dTcFlag, setDTcFlag] = useState(false);
     const history = useHistory();
@@ -929,7 +929,6 @@ const DesignContent = props => {
                         <NormalDropDown
                         style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '5px' }}
                         
-                        defaultSelectedKey='1'
 
                             onChange={(e,item)=>{
                                 setDebugButton(item.key)}}
@@ -959,6 +958,7 @@ const DesignContent = props => {
 
                                 key: "safari",
                                 text: "Safari",
+                                disabled:true,
                             },
 
                             {
@@ -987,6 +987,7 @@ const DesignContent = props => {
                                 text: "Edge Chromium",
                             },
                             ]}
+                            selectedKey={debugButton}
                             placeholder="Select Browser"
                             width="190px"
                         />
@@ -1017,12 +1018,11 @@ const DesignContent = props => {
 
                 </div>
                        
-                <div className="debug_button">
-                            <Button label="Debug" /**disabled={debugButton===""} */ className="p-button-warning" onClick={()=>{
-                                debugTestCases(debugButton)
-                                }}></Button>
-
-                        </div>
+               {props.appType==="Web"?
+               (<div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
+                    <Button label="Debug" /**disabled={debugButton===""} */ className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
+                </div>)
+                :""} 
             </div>
            
 
@@ -1040,7 +1040,7 @@ const DesignContent = props => {
                     {/* <span className="remark_col d__rem_head" >Remarks</span> */}
                     <span className="details_col d__det_head" >Details</span>
                 </div>
-                <div style={{height: '495px' }}>
+                <div style={{height: '66vh' }}>
                 {testCaseData.length>0 && <div className="d__table_contents"  >
                 <div className="ab">
                     <div className="min">

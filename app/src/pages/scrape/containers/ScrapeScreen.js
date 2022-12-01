@@ -390,7 +390,7 @@ const ScrapeScreen = (props)=>{
         { showPop && <PopupDialog />}
         { showConfirmPop && <ConfirmPopup /> }
         { showObjModal === "exportObject" && <ExportObjectModal  appType={props.appType}  fetchingDetails={props.fetchingDetails} setMsg={setMsg} setOverlay={setOverlay} setShow={setShowObjModal} />}
-        { showObjModal === "importObject" && <ImportObjectModal fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType={props.appType}  fetchingDetails={props.fetchingDetails} />}
+        { showObjModal === "importObject" && <ImportObjectModal  fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} setShow={setShowObjModal} appType={props.appType}  fetchingDetails={props.fetchingDetails} />}
         { showObjModal === "mapObject" && <MapObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} current_task={current_task} fetchScrapeData={fetchScrapeData} history={history} /> }
         { showObjModal === "addObject" && <AddObjectModal setShow={setShowObjModal} setShowPop={setShowPop} scrapeItems={scrapeItems} setScrapeItems={setScrapeItems} setSaved={setSaved} setOrderList={setOrderList} /> }
         { showObjModal === "compareObject" && <CompareObjectModal setShow={setShowObjModal} startScrape={startScrape} /> }

@@ -39,7 +39,10 @@
 .d__btngroup{
     display: flex;
     max-width: 100%;
-    margin: -51px -17px -31px -29px;
+    // margin: -51px -17px -31px -29px;
+    padding: 10px 0;
+    width: 100%;
+    margin-left: -15px;
     font-family: $avoSecondaryFont;
 }
 
@@ -95,7 +98,14 @@
         cursor: not-allowed;
     }
 }
-.debug_button{
+// .debug_button{
+//     margin-left: 15px;
+//     position: sticky;
+//     /* top: 47px; */
+//     margin-top: 10px;
+// }
+
+#debug_buttonWeb{
     margin-left: 15px;
     position: sticky;
     /* top: 47px; */
@@ -130,7 +140,7 @@
     flex-direction: column;
     flex: 1 1 100%;
     margin: -6px -21px 3px -21px;
-    overflow: auto;
+    // overflow: auto;
     height: 385px;
 }
 
@@ -424,3 +434,14 @@
 //         padding: 0 0.647vh;
 //     }
 // }
+
+.d__debugButton .p-button-warning{
+    margin: 0;
+}
+
+.debug_button{
+    background: #643693 !important;
+    border: none !important;
+    border-radius:17px;
+    font-family:"LatoWeb";
+}
