@@ -35,11 +35,26 @@
 
 #Insprint{
     border-bottom: 1px solid grey;
+    font-family: $avoPrimaryFont;
+    font-size: 15px;
+    user-select: none;
 }
 #UpgradeAn{
     border-bottom: 1px solid grey;
+    font-family: $avoPrimaryFont;
+    font-size: 15px;
+    user-select: none;
     margin-top: 23px;
     margin-left: -16px;
+}
+#Otherapp{
+    border-bottom: 1px solid grey;
+    font-family: $avoPrimaryFont;
+    font-size: 15px;
+    user-select: none;
+    margin-top: 23px;
+    margin-left: 5px;
+
 }
 
 
