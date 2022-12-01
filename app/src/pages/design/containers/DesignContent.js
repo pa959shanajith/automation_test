@@ -1020,7 +1020,7 @@ const DesignContent = props => {
                        
                {props.appType==="Web"?
                (<div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
-                    <Button label="Debug" /**disabled={debugButton===""} */ className="p-button-warning" onClick={()=>{debugTestCases(debugButton)}} style={{ background:'#643693', border:"none",borderRadius:"17px", fontFamily:"LatoWeb"}}></Button>
+                    <Button label="Debug" /**disabled={debugButton===""} */ className="debug_button p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
                 </div>)
                 :""} 
             </div>
