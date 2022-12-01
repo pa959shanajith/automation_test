@@ -55,7 +55,7 @@ const DesignContent = props => {
 
     const headerCheckRef = useRef();
 
-  const [debugButton,setDebugButton]=useState('');
+  const [debugButton,setDebugButton]=useState('1');
 //   const [checkedTc, setCheckedTc] = useState({});
 //   const [dTcFlag, setDTcFlag] = useState(false);
     const history = useHistory();
@@ -929,7 +929,6 @@ const DesignContent = props => {
                         <NormalDropDown
                         style={{height:'22px',marginLeft:'2px', marginBottom: '-71px', boxSizing:'40px', fontFamily:'LatoWeb', marginTop: '5px' }}
                         
-                        defaultSelectedKey='1'
 
                             onChange={(e,item)=>{
                                 setDebugButton(item.key)}}
@@ -959,6 +958,7 @@ const DesignContent = props => {
 
                                 key: "safari",
                                 text: "Safari",
+                                disabled:true,
                             },
 
                             {
@@ -987,6 +987,7 @@ const DesignContent = props => {
                                 text: "Edge Chromium",
                             },
                             ]}
+                            selectedKey={debugButton}
                             placeholder="Select Browser"
                             width="190px"
                         />
@@ -1017,10 +1018,11 @@ const DesignContent = props => {
 
                 </div>
                        
-                <div className="debug_button">
-                            <Button label="Debug" className="p-button-warning" onClick={()=>debugTestCases(debugButton)}  style={{ background:'#643693', border:"none",borderRadius:"17px", fontFamily:"LatoWeb"}} ></Button>
-
-                        </div>
+               {props.appType==="Web"?
+               (<div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
+                    <Button label="Debug" /**disabled={debugButton===""} */ className="p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
+                </div>)
+                :""} 
             </div>
            
 

@@ -199,9 +199,9 @@ const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay, fe
                     a.download = filename;
                     a.href = window.URL.createObjectURL(testCaseBlob);
                     a.target = '_blank';
-                    document.body.appendChild(a);
+                    // document.body.appendChild(a);
                     a.click();
-                    document.body.removeChild(a);
+                    // document.body.removeChild(a);
                   } 
             })
             .catch(error => console.error("ERROR::::", error));
