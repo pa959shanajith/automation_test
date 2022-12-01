@@ -1020,7 +1020,7 @@ const DesignContent = props => {
                        
                {props.appType==="Web"?
                (<div className={"d__debugButton"} style={{marginLeft: '15px', position: 'sticky', marginTop: '10px'}}>
-                    <Button label="Debug" /**disabled={debugButton===""} */ className="p-button-warning" onClick={()=>{debugTestCases(debugButton)}}></Button>
+                    <Button label="Debug" /**disabled={debugButton===""} */ className="p-button-warning" onClick={()=>{debugTestCases(debugButton)}} style={{ background:'#643693', border:"none",borderRadius:"17px", fontFamily:"LatoWeb"}}></Button>
                 </div>)
                 :""} 
             </div>
@@ -1040,7 +1040,7 @@ const DesignContent = props => {
                     {/* <span className="remark_col d__rem_head" >Remarks</span> */}
                     <span className="details_col d__det_head" >Details</span>
                 </div>
-                <div style={{height: '495px' }}>
+                <div style={{height: '66vh' }}>
                 {testCaseData.length>0 && <div className="d__table_contents"  >
                 <div className="ab">
                     <div className="min">

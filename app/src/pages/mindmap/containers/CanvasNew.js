@@ -453,7 +453,7 @@ const CanvasNew = (props) => {
             onDecline={() => console.log(false)}
             onConfirm = {() => { }} 
             >
-                <div style={{ height: '120rem', overFlow:" hidden" }}><ScrapeScreen fetchingDetails = {fetchingDetails} appType={appType} /></div>
+                <div style={{ height: '74vh', overFlow:" hidden" }}><ScrapeScreen fetchingDetails = {fetchingDetails} appType={appType} /></div>
             </Dialog>
 
             <Dialog
@@ -463,7 +463,7 @@ const CanvasNew = (props) => {
             title ={taskname  +  " : Design Test Steps"}  
             minWidth = '58rem' 
             onConfirm = {() => { }} >
-                <div style={{ height: '623px'}}><DesignHome fetchingDetails={fetchingDetails} appType={appType}  /></div>
+                <div style={{ height: '74vh'}}><DesignHome fetchingDetails={fetchingDetails} appType={appType}  /></div>
             </Dialog>
 
             
