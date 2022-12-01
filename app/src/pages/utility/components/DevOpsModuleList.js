@@ -14,7 +14,7 @@ import { updateTestSuite_ICE } from '../../execute/api';
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css';
 
-const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist,onClick, onHide,displayMaximizable }) => {
+const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModuleList,setFilteredModuleList, moduleScenarioList, setModuleScenarioList, selectedExecutionType, setSelectedExecutionType, setLoading, onDataParamsIconClick1, setModalContent, modalContent, setBrowserlist,onClick, onHide,displayMaximizable, showSelectBrowser }) => {
     const [moduleList, setModuleList] = useState([]);
     const [searchText, setSearchText] = useState("");
     const [moduleIds, setModuleIds] = useState();
@@ -29,7 +29,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     const [testSuiteName, setTestSuiteName] = useState();
     const [appTypes, setAppTypes] = useState([]);
     const[initialFilteredModuleList,setinitialFilteredModuleList]=useState(null);
-    const [filteredModuleList, setFilteredModuleList] = useState([]);
+    // const [filteredModuleList, setFilteredModuleList] = useState([]);
     const notexe = useRef(
         integrationConfig.executionRequest != undefined ? integrationConfig.executionRequest.donotexe.current : {}
         );
@@ -481,7 +481,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
         setModuleState({expanded: [], checked: []});
         setIntegrationConfig({ ...integrationConfig, scenarioList: [], dataParameters: [] });
     }
-    const [modalContent, setModalContent] = useState(false);
+    // const [modalContent, setModalContent] = useState(false);
     const onDataParamsIconClick = (scenarioId, name) => {
         if(integrationConfig.dataParameters.some((data) => data.scenarioId === scenarioId)) {
             let paramIndex = integrationConfig.dataParameters.findIndex((data) => data.scenarioId === scenarioId);
@@ -539,7 +539,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                             <div className='e__param'>Data Parameterization</div>
                                                             <div className='e__condition'>Condition</div>
                                                             <div className='e__apptype' >App Type</div>
-                                                           <div className='e__accessibilityTesting' style={{width:'30vh'}}>Accesibility Standard</div>
+                                                            { showSelectBrowser && <div className='e__accessibilityTesting' style={{width:'30vh'}}>Accesibility Standard</div> }
                                                         </div>
                                                     </div>
                                                     <div className={'e__testScenarioScroll e__table-bodyContainer e__table-bodyContainer'}>
@@ -558,8 +558,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                             <div title={details[appTypes[i]]}  className='e__table-col tabeleCellPadding exe-apptype'>
                                                                     <img src={"static/imgs/"+appTypes[i]+".png"} alt="apptype" className="e__table_webImg"/>
                                                                 </div>
-                                                                
-                                                            <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} /></div>
+                                                            { showSelectBrowser &&   
+                                                            <div className="exe__table-multiDropDown"><MultiSelectDropDown accessibilityParameters={accessibilityParameters} setAccessibilityParameters={setAccessibilityParameters} /></div> }
                                                         </div>)
                                                         }
                             

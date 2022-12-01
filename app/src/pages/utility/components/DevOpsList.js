@@ -19,7 +19,7 @@ import "../styles/DevOps.scss";
 
 
 
-const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading, setIntegrationConfig }) => {
+const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration, url, showMessageBar, setLoading, setIntegrationConfig, projectIdTypesDicts }) => {
     const [copyToolTip, setCopyToolTip] = useState("Click To Copy");
     const [searchText, setSearchText] = useState("");
     const [configList, setConfigList] = useState([]);
@@ -624,7 +624,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
             
         { configList.length > 0 ? <>
             { /* Table */ }
-            <div className="d__table" style={{flex: '0 1 0%', paddingLeft:'2vh', paddingRight:'2vh'}}>
+            <div className="d__table" style={{flex: '1 1 7%', paddingLeft:'2vh', paddingRight:'2vh'}}>
                 <div className="d__table_header">
                 <span className=" d__obj_head tkn-table__sr_no tkn-table__head" >#&nbsp;</span>
                     <span className="d__out_head tkn-table__key tkn-table__head1" >&nbsp;&nbsp;Execution Profile Name</span>
