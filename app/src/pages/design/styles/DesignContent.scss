@@ -39,7 +39,10 @@
 .d__btngroup{
     display: flex;
     max-width: 100%;
-    margin: -51px -17px -31px -29px;
+    // margin: -51px -17px -31px -29px;
+    padding: 10px 0;
+    width: 100%;
+    margin-left: -15px;
     font-family: $avoSecondaryFont;
 }
 
@@ -96,6 +99,13 @@
     }
 }
 .debug_button{
+    margin-left: 15px;
+    position: sticky;
+    /* top: 47px; */
+    margin-top: 10px;
+}
+
+#debug_buttonWeb{
     margin-left: 15px;
     position: sticky;
     /* top: 47px; */
@@ -424,3 +434,7 @@
 //         padding: 0 0.647vh;
 //     }
 // }
+
+.d__debugButton .p-button-warning{
+    margin: 0;
+}
