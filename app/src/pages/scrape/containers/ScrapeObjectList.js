@@ -476,7 +476,7 @@ const ScrapeObjectList = (props) => {
                           (disableAction || compareFlag ? " disable-thumbnail" : "")
                         }
                         onChange={(e,item)=>{setCaptureButton(item.key)}}
-                        // defaultSelectedKey='chrome'
+                        defaultSelectedKey={captureButton}
                         // onChange={(e, item) => {
                         //  ;
                         // }}
@@ -489,6 +489,7 @@ const ScrapeObjectList = (props) => {
   
                               key: "ie",
                               text: "Internet Explorer",
+                              
                             },
   
                             {
