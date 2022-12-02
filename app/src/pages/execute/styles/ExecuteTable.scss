@@ -215,10 +215,13 @@ input[type="checkbox"] {
     width: 27%
 }
 .exe__table-multiDropDown{
-    width: 21%;
+    width: 20%;
 }
-.exe__table-multiDropDown-pad{
+.exe__table-multiDropDown-pad:nth-child(even){
     padding-left: 8%;
+    background: #ffffff !important;
+    margin-left: 1.5rem;
+    width: 10rem;
 }
 .exe-conditionCheck{
     width: 18%
