@@ -9,6 +9,7 @@ import ClickAwayListener from 'react-click-away-listener';
 import { persistor } from '../../../reducer';
 import NotifyDropDown from './NotifyDropDown';
 import { RedirectPage, ModalContainer, ScreenOverlay, WelcomePopover, Messages as MSG, setMsg } from '../../global';
+import ServiceBell from "@servicebell/widget";
 import "../styles/Header.scss";
 
 /*
