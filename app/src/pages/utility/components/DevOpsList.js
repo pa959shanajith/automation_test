@@ -93,19 +93,19 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
         }
 
 
-            const ProjectList = await getDetails_ICE(["domaindetails"],["Banking"]);
+            const ProjectList = await pluginApi.getProjectIDs();
         if(ProjectList.error){
             setMsg(MSG.CUSTOM("Error while fetching the project Details"));
         }else{
             
-            const arraynew = ProjectList.projectIds.map((element, index) => {
+            const arraynew = ProjectList.projectId.map((element, index) => {
             
                 return (
                     {
 
                         key: element,
-                        text: ProjectList.projectNames[index],
-                        title: ProjectList.projectNames[index],
+                        text: ProjectList.projectName[index],
+                        title: ProjectList.projectName[index],
                         index: index
                     }
                 )
@@ -427,7 +427,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
     const renderFooter = (name) => {
         return (
             <div>
-                <Button label="Execute" title="Execute" onClick={async () => {
+                <Button label="Execute" title="Execute" className="p-button-rounded" onClick={async () => {
                     const temp = await execAutomation(currentKey);
                     if(temp.status !== "pass") {
                         if(temp.error && temp.error.CONTENT) {
@@ -635,7 +635,7 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                     <span className=" details_col tkn-table__key d__det_head" >Action</span>
                 </div>
             </div>
-            <div id="activeUsersToken" className="wrap active-users-token" style={{marginLeft: '-1.5vh',width: '101%'}}>
+            <div id="activeUsersToken" className="wrap active-users-token" style={{marginLeft: '-1.5vh',width: '101.5%', paddingBottom:'0%'}}>
                 <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
                 <table className = "table table-hover sessionTable" id="configList">
                     <tbody>

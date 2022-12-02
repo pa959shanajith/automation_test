@@ -298,6 +298,7 @@ input[type="checkbox"] {
     border-left: 4px solid transparent;
     display: flex;
     justify-content: space-between;
+    // margin-right: 2px;
 }
 .e__table-head-row div{
     font-weight: normal !important;
@@ -342,8 +343,26 @@ input[type="checkbox"] {
     border-top: 0 none;
     background: #ffffff;
     color: #495057;
-    padding: 0px 1rem 1rem 1rem;
+    padding: 5px 1rem 1rem 1rem;
     text-align: right;
     border-bottom-right-radius: 6px;
     border-bottom-left-radius: 6px;
+}
+.p-dialog .p-dialog-footer button{
+    height: 2.5rem;
+    background-color: #633693;
+}
+.p-button-label .p-c {
+    font-weight: 600;
+    font-size: 17px;
+    font-family: "LatoWebLight";
+}
+.p-button:enabled:hover, .p-button:not(button):not(a):not(.p-disabled):hover {
+    background: #633693;
+    color: #ffffff;
+    border-color: #633693;
+}
+
+.ps{
+    overflow: none !important;
 }

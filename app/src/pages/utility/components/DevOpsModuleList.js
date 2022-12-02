@@ -501,8 +501,8 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
     const renderFooter = (name) => {
             return (
                 <div>
-                    <Button label="Cancel"  onClick={() => onHide(name)} className="p-button-text" />
-                    <Button label="Save"  onClick={async () => {const payload =  [{
+                    <Button label="Cancel"  onClick={() => onHide(name)} className="p-button-rounded" />
+                    <Button label="Save"  className='p-button-rounded' onClick={async () => {const payload =  [{
                                 "testsuiteid": moduleIds,
                                 "testsuitename": testSuiteName,
                                 "testscenarioids": scenarioIds,
@@ -547,7 +547,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                         {scenarioName.map((e,i)=>
                                                             <div key={e.name} className={"e__table_row  e__table_row"} style={{marginLeft:'-1vh'}}>   
                                                             <div className='e__table-col tabeleCellPadding e__contextmenu' style={{marginRight:'1vh'}} >{i+1}</div>
-                                                            <div className='e__table-col tabeleCellPadding exe-ExecuteStatus' style={{marginRight:'3vh'}}>
+                                                            <div className='e__table-col tabeleCellPadding exe-ExecuteStatus' style={{marginRight:'2vh'}}>
                                                             <input type='checkbox' onChange={e=>{e.target.checked ? doNotExecute[i]=0:doNotExecute[i]=1; setDoNotExecuteArr([...doNotExecute])}} title='Select to execute this scenario' className='doNotExecuteScenario e-execute' checked={!doNotExecute[i]}/>
                                                             </div>
                                                             <div className="tabeleCellPadding exe-scenarioIds e__table_scenaio-name" >{scenarioName[i]}</div>
@@ -555,7 +555,7 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                                 {   dataParameter[i] = e.target.value;
                                                                     setDataParameter([...dataParameter])}} type="text" value = {dataParameter[i]}/></div>
                                                             <div className="e__table-col tabeleCellPadding exe-conditionCheck"><select onChange={(e)=>{condition[i]=e.target.value; setCondition([...condition])}} value={condition[i]} className={"conditionCheck form-control "+((condition[i]=== 0 || condition[i] === '0')?"alertRed":"alertGreen")}><option value={1}>True</option><option value={0}>False</option></select> </div>
-                                                            <div title={details[appTypes[i]]}  className='e__table-col tabeleCellPadding exe-apptype'>
+                                                            <div title={details[appTypes[i]]}  className='e__table-col tabeleCellPadding exe-apptype'  style={{ marginRight: '1rem'}}>
                                                                     <img src={"static/imgs/"+appTypes[i]+".png"} alt="apptype" className="e__table_webImg"/>
                                                                 </div>
                                                             { showSelectBrowser &&   
