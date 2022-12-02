@@ -1,6 +1,6 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
 import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap} from '../api';
-import {ModalContainer, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
+import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
@@ -172,10 +172,10 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                 
                 if(isMultiImport && importType === 'json'){
                     setBlockui({content:'Importing ...',show:true})
-                    
+                    ResetSession.start()          
                     var res = await importMindmap(mindmapData)
                 
-                    if(res.error){setError(res.error);setBlockui({show:false});return;}
+                    if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end(); return;}
                     var req={
                         tab:"tabCreate",
                         projectid:mindmapData[0]?mindmapData[mindmapData.length -1]["projectid"]:mindmapData.projectid,
@@ -185,11 +185,12 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                     }
                     res = await getModules(req)
                 
-                    if(res.error){setError(res.error);setBlockui({show:false});return;}
+                    if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end();return;}
                     setFiledUpload(res)
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
                     setImportPop(false);
                     setBlockui({show:false})
+                    ResetSession.end();
                 }else{
                         loadImportData({
                             importType,
