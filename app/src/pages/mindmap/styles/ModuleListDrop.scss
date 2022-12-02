@@ -9,10 +9,10 @@
 
 .section-dividers{
     flex-shrink: 0;
-    height: 0.09rem;
+    height: 0.07rem;
     width: 85%;
     background-color: grey;
-    margin-top:0.57rem;
+    margin-top:0.85rem;
     margin-left: 0.72rem;
     z-index: 2;
 }
@@ -21,7 +21,7 @@
     display: flex;
     text-overflow: ellipsis;
     padding: 0rem;
-    margin: 0rem 0rem 0.625rem;
+    margin: 0rem 0rem 0.2rem;
     text-align: center;
     -webkit-border-radius: 0.625rem;
     -moz-border-radius: 0.625rem;
@@ -29,8 +29,8 @@
     cursor: pointer;
     text-align: center;
     background-color: $whiteColor;
-    width: 9.6825rem;
-    height:1.75rem ;
+    width: 10.6825rem;
+    height:1.4rem ;
     align-items: center;
 }
 .toolbar__module-box:hover{
@@ -90,11 +90,12 @@
     height: 80%;
     padding: 0.25rem;
     scroll-behavior: smooth;
-    overflow-y: scroll;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     width: 100%;
     padding-right: 2.4rem;
+    overflow-x: hidden;
 }
 
 .modulesBox{
@@ -130,7 +131,7 @@
 }
 
 .endToEnd{
-    margin-top: 5%;
+    margin-top: 0%;
     height: 23vh;
     padding: 0 8%;
     text-overflow: ellipsis;
@@ -178,8 +179,10 @@
     font-size: 0.75rem;
     text-overflow:ellipsis ;
     width: 7rem;
-    text-align: left;
-    padding-left: 25px;
+    // text-align: left;
+    padding-left: 0px;
+    margin-left: -4px;
+    margin-top: 4px;
 }
 .scenarioList{
     height: 80%;
@@ -198,15 +201,14 @@
 
 
 .scenarioListBox{
-    border-right: 1px solid black;
+    // border-right: 1px solid black;
     align-content: center;
     z-index: 2;
-    background-color: transparent;
+    background-color: #F8F8F8;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    height: 59%;
-    border-bottom:1px solid black;
+    height: 94%;
     overflow: hidden; 
     transition-duration: 0.4s;
     // opacity:0.5;
@@ -215,7 +217,7 @@
 .dropdown_scenarios{
     // background-color:#EFE6FF;
     height:1.2rem;
-    justify-content:center;
+    // justify-content:center;
     text-align:center;
     font-size:0.75rem;
     border-radius:0.36rem;
@@ -228,11 +230,13 @@
     background: $iceColor;
     color: inherit;
     border-radius: 0.5rem;
+    width: 7rem;
 }
 .dropdown_scenarios.selected{
     background-color: $summerSky;
     color: $whiteColor;
-    border-radius: 0.5rem;}
+    border-radius: 0.5rem;
+    width: 9rem;}
 .wholeContainer{
     // border: 1px solid black;
     display: flex;
@@ -263,7 +267,8 @@
     font-weight: bold;
     justify-content: center;
     text-align: center;
-    overflow: hidden;}
+    overflow: hidden;
+display: flex;}
 
     .AddBut{
         // padding: 0.5rem;
@@ -278,11 +283,14 @@
     }
 
 .collapseButtonDiv {
+    position: relative;
     display: flex;
-    align-items: flex-end;
-    height: 28%;
+    align-items: center;
+    height: 99%;
     padding-left: 2px;
     padding-bottom: 2px;
+    margin-top: 0rem;
+    
 }
 .collapseButtonDiv :hover{
     background: $iceColor;
