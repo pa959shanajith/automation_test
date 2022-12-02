@@ -719,7 +719,10 @@ const DevOpsList = ({ integrationConfig,setShowConfirmPop, setCurrentIntegration
                                             projectidts: element.projectId,
                                             assignedTestScenarioIds: "",
                                             subTaskId: "",
-                                            versionnumber: element.versionNumber
+                                            versionnumber: element.versionNumber,
+                                            domainName: element.domainName,
+                                            projectName: element.projectName,
+                                            cycleName: element.cycleName
                                         });                                   
                                     });
                                     setCurrentTask({
