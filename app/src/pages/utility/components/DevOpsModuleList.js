@@ -539,13 +539,13 @@ const DevOpsModuleList = ({ integrationConfig, setIntegrationConfig,filteredModu
                                                             <div className='e__param'>Data Parameterization</div>
                                                             <div className='e__condition'>Condition</div>
                                                             <div className='e__apptype' >App Type</div>
-                                                            { showSelectBrowser && <div className='e__accessibilityTesting' style={{width:'30vh'}}>Accesibility Standard</div> }
+                                                            { showSelectBrowser && <div className='e__accessibilityTesting' style={{width:'30vh'}}>Accessibility Standard</div> }
                                                         </div>
                                                     </div>
-                                                    <div className={'e__testScenarioScroll e__table-bodyContainer e__table-bodyContainer'}>
+                                                    <div className={'e__table-bodyContainer'}>
                                                         <ScrollBar thumbColor="#321e4f" trackColor="rgb(211, 211, 211)" >
                                                         {scenarioName.map((e,i)=>
-                                                            <div key={e.name} className={"e__table_row_status e__table_row  e__table_row"} style={{marginLeft:'-1vh'}}>   
+                                                            <div key={e.name} className={"e__table_row  e__table_row"} style={{marginLeft:'-1vh'}}>   
                                                             <div className='e__table-col tabeleCellPadding e__contextmenu' style={{marginRight:'1vh'}} >{i+1}</div>
                                                             <div className='e__table-col tabeleCellPadding exe-ExecuteStatus' style={{marginRight:'3vh'}}>
                                                             <input type='checkbox' onChange={e=>{e.target.checked ? doNotExecute[i]=0:doNotExecute[i]=1; setDoNotExecuteArr([...doNotExecute])}} title='Select to execute this scenario' className='doNotExecuteScenario e-execute' checked={!doNotExecute[i]}/>

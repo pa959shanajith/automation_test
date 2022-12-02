@@ -16,7 +16,7 @@
     position: relative !important;
     top: 3px;
     display: block;
-    height: 56vh;
+    // height: 56vh;
     width: 100%;
 }
 [id^=page-taskName] {
@@ -263,7 +263,7 @@ input[type="checkbox"] {
     padding-bottom: 5px !important;
 }
 .e__table-bodyContainer{
-    overflow: auto;
+    // overflow: auto;
     margin-top: 0px !important;
     position: absolute;
     width: 100%;
