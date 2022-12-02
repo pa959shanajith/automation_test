@@ -1,6 +1,6 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
 import {excelToMindmap, getProjectList, getModules, getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap} from '../api';
-import {ModalContainer, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
+import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actionTypes from '../state/action';
@@ -124,15 +124,16 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
             setSubmit(false)
             setDisableSubmit(true)
             setImportPop(false)
-            setError('')
+            setError('')           
             var err = validate({importType,ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,sheetRef})
             if(err){
+                setBlockui({show:false})
                 return;
             }
             var importData = fileUpload;
             (async()=>{
                 if(importType === 'git'){
-                    setBlockui({content:'Importing ...',show:true})
+                    // setBlockui({content:'Importing ...',show:true})
                     var data = await importGitMindmap ({
                         projectid : projRef.current.value,
                         gitname : gitconfigRef.current.value,
@@ -170,22 +171,26 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                 }
                 
                 if(isMultiImport && importType === 'json'){
+                    setBlockui({content:'Importing ...',show:true})
+                    ResetSession.start()          
                     var res = await importMindmap(mindmapData)
                 
-                    if(res.error){setError(res.error);setBlockui({show:false});return;}
+                    if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end(); return;}
                     var req={
                         tab:"tabCreate",
-                        projectid:mindmapData[0]?mindmapData[0].projectid:mindmapData.projectid,
+                        projectid:mindmapData[0]?mindmapData[mindmapData.length -1]["projectid"]:mindmapData.projectid,
                         version:0,
                         cycId: null,
-                        moduleid:Array.isArray(res._id)?res._id:res
+                        moduleid:Array.isArray(res)?res:res
                     }
                     res = await getModules(req)
                 
-                    if(res.error){setError(res.error);setBlockui({show:false});return;}
+                    if(res.error){setError(res.error);setBlockui({show:false});ResetSession.end();return;}
                     setFiledUpload(res)
                     setMsg(MSG.MINDMAP.SUCC_DATA_IMPORTED)
                     setImportPop(false);
+                    setBlockui({show:false})
+                    ResetSession.end();
                 }else{
                         loadImportData({
                             importType,
@@ -198,6 +203,7 @@ const Container = ({projList,setBlockui,setMindmapData,setDuplicateModuleList,di
                             setOptions:setOptions,
                             setImportPop:setImportPop,
                         changeImportType:changeImportType
+                        
                         })
 
                 } 
@@ -391,7 +397,7 @@ const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitBranchRef,gitV
 const loadImportData = async({importData,sheet,importType,importProj,dispatch,displayError,setBlockui,setImportPop,setOptions,changeImportType}) =>{
     var mindmapData = importData
     // console.log("ImportProj: " + importProj)
-    setBlockui({content:'Importing ...',show:true})
+    // setBlockui({content:'Importing ...',show:true})
     if(importType === 'excel'){
         let validateNode = true;
         var res = await excelToMindmap({'content':importData,'flag':'data',sheetname: sheet})
@@ -404,6 +410,7 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
             displayError(MSG.MINDMAP.ERR_INVALID_MODULE_NAME);return;
         }
         mindmapData = {createnew:true,importData:{createdby:'excel',data:res}} 
+        
     }
     if(importType === 'pd'){
         var res =  await pdProcess({'projectid':importProj,'file':importData})
@@ -431,6 +438,7 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
         })
         setImportPop(false)
         setOptions('importmodules')
+        // setBlockui({show:false})
         }, 200);
     // }
    
@@ -487,69 +495,70 @@ const uploadFile = async({uploadFileRef,setMindmapData,setDuplicateModuleList,se
             var projFlag = false
             var duplicateData = JSON.parse(result);
             let selectedAppType = projList[selectedProject].apptypeName;  
-            var importedAppType=duplicateData[0].apptype;
+            var importedAppType=duplicateData[duplicateData.length -2]["apptype"];
             if(selectedAppType!==importedAppType){
                 setError("Selected project is of different App Type");
                 setDisableSubmit(true)
                 return false
             }
-            var existingModulesInSelectedProject = await getModules({"tab":"tabCreate","projectid":selectedProject,"moduleid":null})
-            var uniqueModuleNames = new Set();
-            existingModulesInSelectedProject.map((m) => {
-                uniqueModuleNames.add(m.name)
-            })
-            console.log('existingModulesInSelectedProject: ', JSON.stringify(existingModulesInSelectedProject))
-            console.log('uniqueModuleNames: ', JSON.stringify(uniqueModuleNames))
+            // var existingModulesInSelectedProject = await getModules({"tab":"tabCreate","projectid":selectedProject,"moduleid":null})
+            // var uniqueModuleNames = new Set();
+            // existingModulesInSelectedProject.map((m) => {
+            //     uniqueModuleNames.add(m.name)
+            // })
+            // console.log('existingModulesInSelectedProject: ', JSON.stringify(existingModulesInSelectedProject))
+            // console.log('uniqueModuleNames: ', JSON.stringify(uniqueModuleNames))
 
             
-            var duplicateModuleNames = new Set();
-            console.log('duplicateData',duplicateData);
-            var data = duplicateData.filter((d)=>{
-                if(uniqueModuleNames.has(d.name)){
-                    duplicateModuleNames.add(d.name);
-                    return false;
-                }else{
-                    return true;
-                }
-            })
-            .map((d)=>{
-                // Override projectId with the selected projectId
-                d.projectid = selectedProject;
-                uniqueModuleNames.add(d.name);
-                return d;
-            })
+            // var duplicateModuleNames = new Set();
+            // console.log('duplicateData',duplicateData);
+            duplicateData[duplicateData.length -1]["projectid"]=selectedProject
+            // var data = duplicateData[2]
+            //     // if(uniqueModuleNames.has(d.name)){
+            //     //     duplicateModuleNames.add(d.name);
+            //     //     return false;
+            //     // }else{
+            //     //     return true;
+            //     // }
+            // // })
+            // .map((d)=>{
+            //     // Override projectId with the selected projectId
+            //     d.projectid = selectedProject;
+            //     // uniqueModuleNames.add(d.name);
+            //     return d;
+            // })
             
-            setDuplicateModuleList(duplicateModuleNames)
-            console.log('data',data);
-            var totallength=duplicateData.length;
-            var uniqlength=data.length;
-            var duplicatelength=totallength-uniqlength
+            // setDuplicateModuleList(duplicateModuleNames)
+            // console.log('data',data);
+            // var totallength=duplicateData.length;
+            // var uniqlength=data.length;
+            // var duplicatelength=totallength-uniqlength
             
             
-            if(duplicatelength ==0){
-                setError("All "+(uniqlength)+" modules are unique and will be imported");
-            }
-            else    if(duplicatelength == totallength) {
-                setError("All "+(duplicatelength)+" modules are duplicate and none will be imported");
-                setBlockui({show:false});
-                setMsg(MSG.MINDMAP.ERR_IMPORT_DATA)
-            }
-            else if(duplicatelength > 0) {
-                setError((duplicatelength)+" modules are duplicate. Only"+ (uniqlength)+" will be imported");
+            // if(duplicatelength ==0){
+            //     setError("All "+(uniqlength)+" modules are unique and will be imported");
+            // }
+            // else    if(duplicatelength == totallength) {
+            //     setError("All "+(duplicatelength)+" modules are duplicate and none will be imported");
+            //     setBlockui({show:false});
+            //     setMsg(MSG.MINDMAP.ERR_IMPORT_DATA)
+            // }
+            // else if(duplicatelength > 0) {
+            //     setError((duplicatelength)+" modules are duplicate. Only"+ (uniqlength)+" will be imported");
                 
-            }
+            // }
             
                
             
-            if( !data  || data.length == 0){
-                setDisableSubmit(true)
-                return;
-            }
-            else {
-                setDisableSubmit(false)
-                setMindmapData(data)
+            // if( !data  || data.length == 0){
+            //     setDisableSubmit(true)
+            //     return;
+            // }
+            // else {
+            //     setDisableSubmit(false)
+            setMindmapData(duplicateData)
                 
-            }
+            // }
 
             // var isMultiMindmap = Array.isArray(data);
             // var hasError = false,hasNoScenarios= false;
